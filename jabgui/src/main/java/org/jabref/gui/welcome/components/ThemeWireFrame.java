@@ -3,7 +3,7 @@ package org.jabref.gui.welcome.components;
 import javafx.fxml.FXML;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.theme.ThemeTypes;
+import org.jabref.gui.theme.ThemeColorScheme;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.jspecify.annotations.NonNull;
@@ -19,18 +19,18 @@ public class ThemeWireFrame extends VBox {
     private void initialize() {
     }
 
-    public void setThemeType(@NonNull ThemeTypes themeType) {
+    public void setThemeColorScheme(@NonNull ThemeColorScheme themeColorScheme) {
         getStyleClass().removeIf(styleClass ->
                 styleClass.startsWith("wireframe-light") ||
                         styleClass.startsWith("wireframe-dark") ||
                         styleClass.startsWith("wireframe-custom"));
 
-        String themeClassName = switch (themeType) {
+        String themeClassName = switch (themeColorScheme) {
             case LIGHT ->
                     "wireframe-light";
             case DARK ->
                     "wireframe-dark";
-            case CUSTOM ->
+            case FOLLOW_SYSTEM ->
                     "wireframe-custom";
         };
         getStyleClass().add(themeClassName);

@@ -2,6 +2,7 @@ package org.jabref.gui;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -12,15 +13,20 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.gui.theme.Theme;
+import org.jabref.gui.theme.StyleSheet;
+import org.jabref.gui.theme.ThemeColorScheme;
+import org.jabref.gui.theme.ThemePreset;
 import org.jabref.logic.l10n.Language;
+import org.jabref.logic.util.OptionalObjectProperty;
 
 public class WorkspacePreferences {
     private final ObjectProperty<Language> language;
     private final BooleanProperty shouldOverrideDefaultFontSize;
     private final IntegerProperty mainFontSize;
-    private final ObjectProperty<Theme> theme;
-    private final BooleanProperty themeSyncOs;
+    private final ObjectProperty<ThemePreset> theme;
+    private final ObjectProperty<ThemeColorScheme> colorScheme;
+    private final OptionalObjectProperty<StyleSheet> customTheme;
+
     private final BooleanProperty shouldOpenLastEdited;
     private final BooleanProperty showAdvancedHints;
     private final BooleanProperty confirmDelete;
@@ -30,8 +36,9 @@ public class WorkspacePreferences {
     public WorkspacePreferences(Language language,
                                 boolean shouldOverrideDefaultFontSize,
                                 int mainFontSize,
-                                Theme theme,
-                                boolean themeSyncOs,
+                                ThemePreset theme,
+                                ThemeColorScheme colorScheme,
+                                StyleSheet customTheme,
                                 boolean shouldOpenLastEdited,
                                 boolean showAdvancedHints,
                                 boolean confirmDelete,
@@ -41,7 +48,9 @@ public class WorkspacePreferences {
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
         this.theme = new SimpleObjectProperty<>(theme);
-        this.themeSyncOs = new SimpleBooleanProperty(themeSyncOs);
+        this.colorScheme = new SimpleObjectProperty<>(colorScheme);
+        this.customTheme = OptionalObjectProperty.empty();
+        this.customTheme.set(Optional.ofNullable(customTheme));
         this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
@@ -55,8 +64,9 @@ public class WorkspacePreferences {
                 Language.getLanguageFor(Locale.getDefault().getLanguage()), // Default language
                 false,                                                      // Default font size override
                 9,                                                          // Default font size
-                Theme.system(),                                             // Default theme
-                true,                                                       // Default theme sync with OS
+                ThemePreset.JABREF,                                         // Default theme
+                ThemeColorScheme.FOLLOW_SYSTEM,                             // Default color scheme is follow system
+                null,                                                       // Custom theme
                 true,                                                       // Default open last edited
                 true,                                                       // Default show advanced hints
                 true,                                                       // Default confirm delete
@@ -74,12 +84,16 @@ public class WorkspacePreferences {
         this.shouldOverrideDefaultFontSize.set(preferences.shouldOverrideDefaultFontSize());
         this.mainFontSize.set(preferences.getMainFontSize());
         this.theme.set(preferences.getTheme());
-        this.themeSyncOs.set(preferences.shouldThemeSyncOs());
+        this.colorScheme.set(preferences.getColorScheme());
         this.shouldOpenLastEdited.set(preferences.shouldOpenLastEdited());
         this.showAdvancedHints.set(preferences.shouldShowAdvancedHints());
         this.confirmDelete.set(preferences.shouldConfirmDelete());
         this.confirmHideTabBar.set(preferences.shouldHideTabBar());
         this.selectedSlrCatalogs.setAll(preferences.getSelectedSlrCatalogs());
+    }
+
+    public ThemeColorScheme getColorScheme() {
+        return colorScheme.get();
     }
 
     public Language getLanguage() {
@@ -118,28 +132,28 @@ public class WorkspacePreferences {
         return mainFontSize;
     }
 
-    public Theme getTheme() {
+    public ThemePreset getTheme() {
         return theme.get();
     }
 
-    public void setTheme(Theme theme) {
+    public void setTheme(ThemePreset theme) {
         this.theme.set(theme);
     }
 
-    public ObjectProperty<Theme> themeProperty() {
+    public ObjectProperty<ThemePreset> themeProperty() {
         return theme;
     }
 
-    public boolean shouldThemeSyncOs() {
-        return themeSyncOs.get();
+    public ThemeColorScheme shouldThemeSyncOs() {
+        return colorScheme.get();
     }
 
-    public BooleanProperty themeSyncOsProperty() {
-        return themeSyncOs;
+    public ObjectProperty<ThemeColorScheme> colorSchemeProperty() {
+        return colorScheme;
     }
 
-    public void setThemeSyncOs(boolean themeSyncOs) {
-        this.themeSyncOs.set(themeSyncOs);
+    public void setColorScheme(ThemeColorScheme colorScheme) {
+        this.colorScheme.set(colorScheme);
     }
 
     public boolean shouldOpenLastEdited() {
@@ -196,5 +210,17 @@ public class WorkspacePreferences {
 
     public void setSelectedSlrCatalogs(List<String> catalogs) {
         selectedSlrCatalogs.setAll(catalogs);
+    }
+
+    public Optional<StyleSheet> getCustomTheme() {
+        return customTheme.get();
+    }
+
+    public OptionalObjectProperty<StyleSheet> customThemeProperty() {
+        return customTheme;
+    }
+
+    public void setCustomTheme(Optional<StyleSheet> customTheme) {
+        this.customTheme.set(customTheme);
     }
 }

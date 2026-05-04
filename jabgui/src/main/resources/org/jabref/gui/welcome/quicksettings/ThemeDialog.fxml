@@ -4,66 +4,56 @@
 <?import javafx.scene.control.ButtonType?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <?import org.jabref.gui.util.component.HelpButton?>
-<?import org.jabref.gui.welcome.components.ThemeWireFrame?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
 <DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.jabref.gui.welcome.quicksettings.ThemeDialog">
     <content>
         <VBox styleClass="quick-settings-dialog-container">
-            <HBox alignment="CENTER_LEFT" spacing="4">
-                <Label text="%Choose between light, dark, or custom themes to personalize your JabRef experience."
-                       wrapText="true" HBox.hgrow="ALWAYS"/>
-                <HelpButton fx:id="helpButton"/>
-            </HBox>
+            <Label text="%Choose between different Themes, the Color Scheme or even add a custom theme on top."
+                   wrapText="true" HBox.hgrow="ALWAYS"/>
+            <GridPane hgap="10.0" vgap="4.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" percentWidth="30.0"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+                <children>
+                    <Label text="%Theme"
+                           GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="theme" prefWidth="200.0"
+                              GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-            <CheckBox fx:id="themeSyncOs" text="%Use System Preference"/>
-
-            <HBox>
-                <VBox styleClass="theme-option" onMouseClicked="#selectLight">
-                    <RadioButton fx:id="lightRadio" text="%Light Theme" disable="${themeSyncOs.selected}">
-                        <toggleGroup>
-                            <ToggleGroup fx:id="themeGroup"/>
-                        </toggleGroup>
-                    </RadioButton>
-                    <ThemeWireFrame fx:id="lightWireframe"/>
-                </VBox>
-
-                <VBox styleClass="theme-option" onMouseClicked="#selectDark">
-                    <RadioButton fx:id="darkRadio" text="%Dark Theme" disable="${themeSyncOs.selected}"
-                                 toggleGroup="$themeGroup"/>
-                    <ThemeWireFrame fx:id="darkWireframe"/>
-                </VBox>
-
-                <VBox styleClass="theme-option" onMouseClicked="#selectCustom">
-                    <RadioButton fx:id="customRadio" text="%Custom Theme" disable="${themeSyncOs.selected}"
-                                 toggleGroup="$themeGroup"/>
-                    <ThemeWireFrame fx:id="customWireframe"/>
-                </VBox>
-            </HBox>
-
-            <VBox fx:id="customThemeContainer" spacing="4.0">
-                <HBox spacing="4.0">
-                    <TextField fx:id="customPathField"
-                               promptText="%Custom theme file path"
-                               HBox.hgrow="ALWAYS" disable="${themeSyncOs.selected}"/>
-                    <Button styleClass="icon-button" onAction="#browseThemeFile" disable="${themeSyncOs.selected}">
-                        <graphic>
-                            <JabRefIconView glyph="OPEN"/>
-                        </graphic>
-                        <tooltip>
-                            <Tooltip text="%Browse"/>
-                        </tooltip>
-                    </Button>
-                </HBox>
-            </VBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0" GridPane.rowIndex="3" GridPane.columnIndex="0">
+                        <CheckBox fx:id="customTheme" text="%Custom Theme" />
+                        <HelpButton fx:id="helpButton"/>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="4.0"
+                          GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.columnSpan="2"
+                          disable="${!customTheme.selected}">
+                        <TextField fx:id="customThemePath" HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="customThemeBrowse" onAction="#importTheme" styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0">
+                            <graphic>
+                                <JabRefIconView glyph="OPEN"/>
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%Browse"/>
+                            </tooltip>
+                        </Button>
+                    </HBox>
+                    <Label text="%Color Scheme"
+                           GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="themeColorScheme" prefWidth="200.0"
+                              GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                </children>
+            </GridPane>
         </VBox>
     </content>
 

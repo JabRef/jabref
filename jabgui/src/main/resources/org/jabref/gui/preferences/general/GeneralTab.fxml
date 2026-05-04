@@ -15,33 +15,36 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <?import org.controlsfx.control.SearchableComboBox?>
+<?import org.jabref.gui.util.component.HelpButton?>
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.preferences.general.GeneralTab">
     <Label styleClass="titleHeader" text="%General"/>
     <GridPane hgap="10.0" vgap="4.0">
         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" percentWidth="30.0"/>
-            <ColumnConstraints hgrow="NEVER"/>
-            <ColumnConstraints hgrow="SOMETIMES"/>
+            <ColumnConstraints hgrow="ALWAYS" percentWidth="30.0"/>
+            <ColumnConstraints hgrow="ALWAYS"/>
         </columnConstraints>
         <Label styleClass="sectionHeader" text="%Appearance"
-               GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="3"/>
+               GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
         <Label text="%Language"
                GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-        <SearchableComboBox fx:id="language" prefWidth="200.0" editable="false"
-                  GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        <SearchableComboBox fx:id="language" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-        <Label text="%Visual theme"
+        <Label text="%Theme"
                GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="theme" prefWidth="200.0" disable="${themeSyncOs.selected}"
+        <ComboBox fx:id="theme" prefWidth="200.0"
                   GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-        <CheckBox fx:id="themeSyncOs" text="%Use System Preference"
-                  GridPane.rowIndex="2" GridPane.columnIndex="2"/>
-        <HBox alignment="CENTER_LEFT" spacing="4.0" disable="${themeSyncOs.selected}"
-              GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="3">
+
+        <HBox alignment="CENTER_LEFT" spacing="4.0" GridPane.rowIndex="3" GridPane.columnIndex="0">
+            <CheckBox fx:id="customTheme" text="%Custom Theme" />
+            <HelpButton fx:id="helpButton"/>
+        </HBox>
+        <HBox alignment="CENTER_LEFT" spacing="4.0"
+              GridPane.rowIndex="3" GridPane.columnIndex="1"
+              disable="${!customTheme.selected}">
             <TextField fx:id="customThemePath" HBox.hgrow="ALWAYS"/>
-            <Button fx:id="customThemeBrowse" onAction="#importTheme" styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0">
+            <Button fx:id="customThemeBrowse" onAction="#importTheme" styleClass="icon-button,narrow">
                 <graphic>
                     <JabRefIconView glyph="OPEN"/>
                 </graphic>
@@ -49,17 +52,18 @@
                     <Tooltip text="%Browse"/>
                 </tooltip>
             </Button>
-            <padding>
-                <Insets left="20.0"/>
-            </padding>
         </HBox>
+        <Label text="%Color Scheme"
+               GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="themeColorScheme"
+                  GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
         <CheckBox fx:id="fontOverride" text="%Override default font settings"
-                  GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                  GridPane.rowIndex="5" GridPane.columnIndex="0"/>
         <HBox alignment="CENTER_LEFT" spacing="4.0" disable="${!fontOverride.selected}"
-              GridPane.rowIndex="4" GridPane.columnIndex="1">
+              GridPane.rowIndex="5" GridPane.columnIndex="1">
             <Label text="%Size"/>
-            <Spinner fx:id="fontSize" styleClass="fontsizeSpinner" editable="true"/>
+            <Spinner fx:id="fontSize" editable="true"/>
         </HBox>
     </GridPane>
 

@@ -1,7 +1,6 @@
 package org.jabref.gui.theme;
 
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,52 +52,41 @@ public class ThemeManager {
     );
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
-
     private final WorkspacePreferences workspacePreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private final StyleSheet jabRefTheme;
-    private Theme theme;
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
+    private ThemePreset theme;
+    private ThemeColorScheme colorScheme = ThemeColorScheme.FOLLOW_SYSTEM;
+    private final FileUpdateListener cssLiveUpdate = this::cssLiveUpdate;
+    private StyleSheet customTheme;
+    private final FileUpdateListener customCssLiveUpdate = this::customCssLiveUpdate;
 
     public ThemeManager(@NonNull WorkspacePreferences workspacePreferences,
                         @NonNull FileUpdateMonitor fileUpdateMonitor) {
         this.workspacePreferences = workspacePreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
 
-        this.jabRefTheme = Theme.getJabRefTheme();
-        this.theme = workspacePreferences.getTheme();
-
         initializeWindowThemeUpdater();
 
-        // Watching base CSS only works in development and test scenarios, where the build system exposes the CSS as a
-        // file (e.g. for Gradle run task it will be in build/resources/main/org/jabref/gui/jabref-theme.css)
-        addStylesheetToWatchlist(this.jabRefTheme, this::cssLiveUpdate);
-
-        // Normally ThemeManager is only instantiated by JabGui and therefore already on the FX Thread,
-        // but when it's called from a test (e.g. ThemeManagerTest) then it's not on the fx thread
-        UiTaskExecutor.runNowOrInJavaFXThread(() -> {
-            BindingsHelper.subscribeFuture(workspacePreferences.themeProperty(), _ -> updateThemeSettings());
-            BindingsHelper.subscribeFuture(workspacePreferences.themeSyncOsProperty(), _ -> updateThemeSettings());
-            BindingsHelper.subscribeFuture(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), _ -> updateFontSettings());
-            BindingsHelper.subscribeFuture(workspacePreferences.mainFontSizeProperty(), _ -> updateFontSettings());
-            BindingsHelper.subscribeFuture(Platform.getPreferences().colorSchemeProperty(), _ -> updateThemeSettings());
-            updateThemeSettings();
-            applyFontToAllWindows();
-        });
+        BindingsHelper.subscribeFuture(workspacePreferences.themeProperty(), _ -> updateThemeSettings());
+        BindingsHelper.subscribeFuture(workspacePreferences.colorSchemeProperty(), _ -> updateThemeSettings());
+        BindingsHelper.subscribeFuture(workspacePreferences.customThemeProperty(), _ -> updateThemeSettings());
+        BindingsHelper.subscribeFuture(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), _ -> updateFontSettings());
+        BindingsHelper.subscribeFuture(workspacePreferences.mainFontSizeProperty(), _ -> updateFontSettings());
+        BindingsHelper.subscribeFuture(Platform.getPreferences().colorSchemeProperty(), _ -> updateThemeSettings());
+        updateThemeSettings();
+        updateFontSettings();
     }
 
-    /// Installs the base and additional CSS files as stylesheets in the given scene.
-    ///
-    /// This method is primarily intended to be called by `JabRefGUI` during startup.
-    /// Using `installCss` directly would cause a delay in theme application, resulting
-    /// in a brief flash of the default JavaFX theme (Modena CSS) before the intended theme appears.
-    public void installCssOnScene(Scene scene) {
-        List<String> toAdd = new ArrayList<>(2);
-        toAdd.add(jabRefTheme.getSceneStylesheet().toExternalForm());
-        theme.getAdditionalStylesheet()
-             .map(StyleSheet::getSceneStylesheet)
-             .map(URL::toExternalForm)
-             .ifPresent(toAdd::add);
+    /// Installs the CSS on the given scene
+    /// We always add our jabref theme so that our variables are known.
+    public void updateCssOnScene(Scene scene) {
+        List<String> toAdd = new ArrayList<>(1);
+
+        toAdd.add(theme.getStyleSheet().getSceneStylesheet().toExternalForm());
+        if (customTheme != null) {
+            toAdd.add(customTheme.getSceneStylesheet().toExternalForm());
+        }
 
         scene.getStylesheets().setAll(toAdd);
     }
@@ -109,8 +97,7 @@ public class ThemeManager {
     /// @param webEngine the web engine to install the css into
     public void installCssOnWebEngine(WebEngine webEngine) {
         if (this.webEngines.add(webEngine)) {
-            webEngine.setUserStyleSheetLocation(this.theme.getAdditionalStylesheet().isPresent() ?
-                                                this.theme.getAdditionalStylesheet().get().getWebEngineStylesheet() : "");
+            webEngine.setUserStyleSheetLocation(customTheme != null ? customTheme.getWebEngineStylesheet() : "");
         }
     }
 
@@ -119,7 +106,7 @@ public class ThemeManager {
     /// automatically when the scene is created.
     ///
     /// @param scene is the scene, the font size should be applied to
-    private void updateFontStyle(@NonNull Scene scene) {
+    private void updateFontOnScene(@NonNull Scene scene) {
         UiTaskExecutor.runNowOrInJavaFXThread(() -> updateFontStyleForScene(scene));
     }
 
@@ -143,14 +130,14 @@ public class ThemeManager {
                 for (Window window : change.getAddedSubList()) {
                     window.sceneProperty().addListener((_, _, newScene) -> {
                         if (newScene != null) {
-                            applyModeToWindow(newScene);
-                            updateFontStyle(newScene);
+                            updateColorSchemeOnScene(newScene);
+                            updateFontOnScene(newScene);
                         }
                     });
                     Scene scene = window.getScene();
                     if (scene != null) {
-                        applyModeToWindow(scene);
-                        updateFontStyle(scene);
+                        updateColorSchemeOnScene(scene);
+                        updateFontOnScene(scene);
                     }
                 }
             }
@@ -160,103 +147,103 @@ public class ThemeManager {
         LOGGER.debug("Window theme monitoring initialized");
     }
 
-    private void applyModeToWindow(Scene scene) {
-        Theme.Type type = theme.getType();
-        if (type == Theme.Type.CUSTOM) {
-            return;
-        }
+    private void updateColorSchemeOnScene(Scene scene) {
+        ColorScheme javafxColorScheme = switch (colorScheme) {
+            case FOLLOW_SYSTEM ->
+                    null;
+            case LIGHT ->
+                    ColorScheme.LIGHT;
+            case DARK ->
+                    ColorScheme.DARK;
+        };
 
-        if (Objects.equals(type, Theme.Type.LIGHT)) {
-            scene.getPreferences().setColorScheme(ColorScheme.LIGHT);
-        } else if (Objects.equals(type, Theme.Type.DARK)) {
-            scene.getPreferences().setColorScheme(ColorScheme.DARK);
-        } else {
-            scene.getPreferences().setColorScheme(null);
-        }
+        scene.getPreferences().setColorScheme(javafxColorScheme);
     }
 
     private void updateThemeSettings() {
-        Theme newTheme = workspacePreferences.getTheme();
+        ThemePreset newTheme = workspacePreferences.getTheme();
 
-        // In this case we let JavaFX decide and don't do any changes.
-        if (workspacePreferences.shouldThemeSyncOs()) {
-            newTheme = Theme.system();
+        boolean cssChanged = false;
+        if (theme != newTheme) {
+            if (theme != null) {
+                removeStylesheetFromWatchList(theme.getStyleSheet(), cssLiveUpdate);
+            }
+            addStylesheetToWatchlist(newTheme.getStyleSheet(), cssLiveUpdate);
+
+            cssChanged = true;
+            theme = newTheme;
+
+            LOGGER.debug("Theme set to {}", newTheme);
         }
 
-        if (newTheme.equals(this.theme)) {
-            LOGGER.debug("Not updating newTheme because it hasn't changed");
-        } else {
-            newTheme.getAdditionalStylesheet().ifPresent(this::removeStylesheetFromWatchList);
+        ThemeColorScheme newColorScheme = workspacePreferences.getColorScheme();
+        if (colorScheme != newColorScheme) {
+            colorScheme = newColorScheme;
+
+            updateModeToAllScenes();
+
+            LOGGER.debug("Color Scheme set to {}", newColorScheme);
         }
 
-        boolean customCssChanged = false;
-        if (theme.getType() == Theme.Type.CUSTOM || newTheme.getType() == Theme.Type.CUSTOM) {
-            customCssChanged = true;
+        StyleSheet newCustomTheme = workspacePreferences.getCustomTheme().orElse(null);
+        if (!Objects.equals(customTheme, newCustomTheme)) {
+            if (customTheme != null) {
+                removeStylesheetFromWatchList(customTheme, customCssLiveUpdate);
+            }
+            if (newCustomTheme != null) {
+                addStylesheetToWatchlist(newCustomTheme, customCssLiveUpdate);
+            }
+
+            customTheme = newCustomTheme;
+
+            cssChanged = true;
+
+            LOGGER.debug("Custom Theme set to {}", newCustomTheme);
         }
 
-        this.theme = newTheme;
-        LOGGER.debug("Theme set to {} with base css {}", newTheme, jabRefTheme);
-
-        this.theme.getAdditionalStylesheet().ifPresent(
-                styleSheet -> addStylesheetToWatchlist(styleSheet, this::additionalCssLiveUpdate));
-
-        if (customCssChanged) {
-            reinstallCssToAllWindows();
+        if (cssChanged) {
+            updateCssToAllScenes();
         }
-        applyModeToAllWindows();
-    }
-
-    private void reinstallCssToAllWindows() {
-        Window.getWindows().stream()
-              .map(Window::getScene)
-              .filter(Objects::nonNull)
-              .forEach(this::installCssOnScene);
     }
 
     private void updateFontSettings() {
-        UiTaskExecutor.runNowOrInJavaFXThread(this::applyFontToAllWindows);
+        updateFontToAllScenes();
     }
 
-    private void removeStylesheetFromWatchList(StyleSheet styleSheet) {
+    private void removeStylesheetFromWatchList(StyleSheet styleSheet, FileUpdateListener updateMethod) {
         Path oldPath = styleSheet.getWatchPath();
         if (oldPath != null) {
-            fileUpdateMonitor.removeListener(oldPath, this::additionalCssLiveUpdate);
+            fileUpdateMonitor.removeListener(oldPath, updateMethod);
             LOGGER.info("No longer watch css {} for live updates", oldPath);
         }
     }
 
     private void addStylesheetToWatchlist(StyleSheet styleSheet, FileUpdateListener updateMethod) {
         Path watchPath = styleSheet.getWatchPath();
-        if (watchPath != null) {
-            try {
-                fileUpdateMonitor.addListenerForFile(watchPath, updateMethod);
-                LOGGER.info("Watching css {} for live updates", watchPath);
-            } catch (IOException e) {
-                LOGGER.warn("Cannot watch css path {} for live updates", watchPath, e);
-            }
+        if (watchPath == null) {
+            return;
+        }
+
+        try {
+            fileUpdateMonitor.addListenerForFile(watchPath, updateMethod);
+            LOGGER.info("Watching css {} for live updates", watchPath);
+        } catch (IOException e) {
+            LOGGER.warn("Cannot watch css path {} for live updates", watchPath, e);
         }
     }
 
     private void cssLiveUpdate() {
-        jabRefTheme.reload();
-        if (jabRefTheme.getSceneStylesheet() == null) {
-            LOGGER.error("Base stylesheet does not exist.");
-        } else {
-            LOGGER.debug("Updating base CSS for all scenes");
-        }
-        UiTaskExecutor.runInJavaFXThread(this::applyModeToAllWindows);
+        UiTaskExecutor.runInJavaFXThread(this::updateModeToAllScenes);
     }
 
-    private void additionalCssLiveUpdate() {
-        final String newStyleSheetLocation = this.theme.getAdditionalStylesheet().map(styleSheet -> {
-            styleSheet.reload();
-            return styleSheet.getWebEngineStylesheet();
-        }).orElse("");
+    private void customCssLiveUpdate() {
+        customTheme.reload();
 
         LOGGER.debug("Updating additional CSS for all scenes and {} web engines", webEngines.size());
 
         UiTaskExecutor.runInJavaFXThread(() -> {
             webEngines.forEach(webEngine -> {
+                String newStyleSheetLocation = customTheme.getWebEngineStylesheet();
                 // force refresh by unloading style sheet, if the location hasn't changed
                 if (newStyleSheetLocation.equals(webEngine.getUserStyleSheetLocation())) {
                     webEngine.setUserStyleSheetLocation(null);
@@ -266,23 +253,36 @@ public class ThemeManager {
         });
     }
 
-    private void applyModeToAllWindows() {
+    private void updateCssToAllScenes() {
         Window.getWindows().stream()
               .map(Window::getScene)
               .filter(Objects::nonNull)
-              .forEach(this::applyModeToWindow);
+              .forEach(this::updateCssOnScene);
     }
 
-    private void applyFontToAllWindows() {
+    private void updateModeToAllScenes() {
         Window.getWindows().stream()
               .map(Window::getScene)
               .filter(Objects::nonNull)
-              .forEach(this::updateFontStyle);
+              .forEach(this::updateColorSchemeOnScene);
+    }
+
+    private void updateFontToAllScenes() {
+        Window.getWindows().stream()
+              .map(Window::getScene)
+              .filter(Objects::nonNull)
+              .forEach(this::updateFontOnScene);
     }
 
     /// @return the currently active theme
     @VisibleForTesting
-    Theme getActiveTheme() {
+    ThemePreset getTheme() {
         return this.theme;
+    }
+
+    /// @return the currently active custom theme
+    @VisibleForTesting
+    StyleSheet getCustomTheme() {
+        return this.customTheme;
     }
 }

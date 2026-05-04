@@ -76,7 +76,7 @@ public class QuickSettings extends VBox {
                 this::showMainFileDirectoryDialog);
 
         Button themeButton = createButton(
-                Localization.lang("Change visual theme"),
+                Localization.lang("Change visual appearance"),
                 IconTheme.JabRefIcons.PREFERENCES,
                 this::showThemeDialog);
 

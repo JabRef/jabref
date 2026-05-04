@@ -19,9 +19,12 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.theme.ThemeTypes;
+import org.jabref.gui.theme.ThemeColorScheme;
+import org.jabref.gui.theme.ThemePreset;
 import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.util.component.HelpButton;
 import org.jabref.http.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiMessageHandler;
@@ -32,7 +35,6 @@ import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.model.database.BibDatabaseMode;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 import org.controlsfx.control.SearchableComboBox;
@@ -46,10 +48,11 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @Inject private StateManager stateManager;
 
     @FXML private SearchableComboBox<Language> language;
-    @FXML private ComboBox<ThemeTypes> theme;
-    @FXML private CheckBox themeSyncOs;
+    @FXML private ComboBox<ThemePreset> theme;
+    @FXML private ComboBox<ThemeColorScheme> themeColorScheme;
+    @FXML private CheckBox customTheme;
+    @FXML private HelpButton helpButton;
     @FXML private TextField customThemePath;
-    @FXML private Button customThemeBrowse;
     @FXML private CheckBox fontOverride;
     @FXML private Spinner<Integer> fontSize;
     @FXML private CheckBox openLastStartup;
@@ -123,18 +126,20 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         fontSize.getEditor().textProperty().bindBidirectional(viewModel.fontSizeProperty());
         fontSize.getEditor().setTextFormatter(fontSizeFormatter);
 
-        new ViewModelListCellFactory<ThemeTypes>()
-                .withText(ThemeTypes::getDisplayName)
+        new ViewModelListCellFactory<ThemePreset>()
+                .withText(ThemePreset::getLocalizedName)
                 .install(theme);
         theme.itemsProperty().bind(viewModel.themesListProperty());
         theme.valueProperty().bindBidirectional(viewModel.selectedThemeProperty());
-        themeSyncOs.selectedProperty().bindBidirectional(viewModel.themeSyncOsProperty());
+
+        new ViewModelListCellFactory<ThemeColorScheme>()
+                .withText(ThemeColorScheme::getLocalizedName)
+                .install(themeColorScheme);
+        themeColorScheme.itemsProperty().bind(viewModel.colorSchemeListProperty());
+        themeColorScheme.valueProperty().bindBidirectional(viewModel.selectedThemeColorSchemeProperty());
+
         customThemePath.textProperty().bindBidirectional(viewModel.customPathToThemeProperty());
-        EasyBind.subscribe(viewModel.selectedThemeProperty(), theme -> {
-            boolean isCustomTheme = theme == ThemeTypes.CUSTOM;
-            customThemePath.disableProperty().set(!isCustomTheme);
-            customThemeBrowse.disableProperty().set(!isCustomTheme);
-        });
+        customTheme.selectedProperty().bindBidirectional(viewModel.customThemeEnabledProperty());
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
 
@@ -163,15 +168,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
         usePostgresSearch.selectedProperty().bindBidirectional(viewModel.usePostgresSearchProperty());
 
-        Platform.runLater(() -> {
-            validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);
-            validationVisualizer.initVisualization(viewModel.httpPortValidationStatus(), httpServerPort);
-            validationVisualizer.initVisualization(viewModel.languageServerPortValidationStatus(), languageServerPort);
-            validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);
-            validationVisualizer.initVisualization(viewModel.customPathToThemeValidationStatus(), customThemePath);
-            validationVisualizer.initVisualization(viewModel.themeValidationStatus(), theme);
-        });
-
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
         remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
         remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
@@ -185,6 +181,17 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         enableLanguageServer.selectedProperty().bindBidirectional(viewModel.enableLanguageServerProperty());
         languageServerPort.textProperty().bindBidirectional(viewModel.languageServerPortProperty());
         languageServerPort.disableProperty().bind(enableLanguageServer.selectedProperty().not());
+
+        helpButton.setHelpUrl(URLs.CUSTOM_THEME_DOC);
+
+        Platform.runLater(() -> {
+            validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);
+            validationVisualizer.initVisualization(viewModel.httpPortValidationStatus(), httpServerPort);
+            validationVisualizer.initVisualization(viewModel.languageServerPortValidationStatus(), languageServerPort);
+            validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);
+            validationVisualizer.initVisualization(viewModel.themeValidationStatus(), theme);
+            validationVisualizer.initVisualization(viewModel.themeColorSchemeValidationStatus(), themeColorScheme);
+        });
     }
 
     @FXML

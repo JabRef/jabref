@@ -1,23 +1,95 @@
 /*
-* Contains styles for different style classes and non JavaFX components.
-*
-* Imports the JabRef colors and styles, which also includes a full customization of all JavaFX components.
+* Base JabRef styling for specific UIs and style classes.
+* =====
+* For the Future:
+* All '-jr-xxx' variables should be carefully reconsidered to decouple themes from it.
+* Instead, the '-fx-xxx' variables should be used so that all JavaFX styles play nice with it.
+* This make it much easier to plugin in any other CSS.
 */
 
-@import "jabref-javafx.css";
+@media (prefers-color-scheme: light) {
+    * {
+        -jr-theme: #50618F;
+        -jr-selected: #A3B7E6;
+        -jr-hover: #0002;
+
+        -jr-icon-background-active: #0001;
+        -jr-icon-background-armed: #0002;
+
+        -jr-row-odd-background: derive(#EBEBEB, 90%);
+        -jr-row-even-background: derive(#EBEBEB, 95%);
+
+        -jr-sidepane-background: #DDDDDD;
+        -jr-sidepane-header-background: #D5D5D5;
+        -jr-background-alt: derive(#EBEBEB, 25%);
+        -jr-search-background: derive(#EBEBEB, 80%);
+
+        -jr-group-hits-bg: derive(#DDDDDD, -50%);
+        -jr-group-hits-fg: #FFFFFF;
+
+        -jr-drag-target: #A3B7E6;
+        -jr-drag-target-hover: derive(#A3B7E6, 80%);
+
+        -jr-menu-background: derive(#EBEBEB, 45%);
+        -jr-menu-forground-active: #000;
+
+        -jr-toolbar: derive(#EBEBEB, 45%);
+        -jr-separator: derive(#EBEBEB, -5%);
+        -jr-text-foreground: #000;
+
+        -jr-purple: #7559C2;
+        -jr-green: #10ac84;
+        -jr-light-green: #1dd1a1;
+        -jr-red: #ee5253;
+        -jr-light-red: #ff6b6b;
+        -jr-orange: #ff9f43;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    * {
+        -jr-theme: #2C9490;
+        -jr-selected: #255652;
+        -jr-hover: #FFF1;
+
+        -jr-icon-background-active: #FFF1;
+        -jr-icon-background-armed: #FFF2;
+
+        -jr-row-odd-background: #272b38;
+        -jr-row-even-background: #212330;
+
+        -jr-sidepane-background: #212330;
+        -jr-sidepane-header-background: #151924;
+        -jr-background-alt: #151924;
+        -jr-search-background: #2C2E3B;
+
+        -jr-group-hits-bg: #151924;
+        -jr-group-hits-fg: #E5E7EA;
+
+        -jr-drag-target: #255652;
+        -jr-drag-target-hover: derive(#255652, 80%);
+
+        -jr-menu-background: #141824;
+        -jr-menu-forground-active: derive(#E5E7EA, 50%);
+
+        -jr-separator: #333744;
+        -jr-toolbar: #141824;
+        -jr-text-foreground: #E5E7EA;
+
+        -jr-purple: #b72486;
+        -jr-green: #1cb631;
+        -jr-light-green: #28d93c;
+        -jr-red: #b71c1f;
+        -jr-light-red: #db1d2b;
+        -jr-orange: #b77620;
+    }
+}
 
 /* JabRef variables and colors */
 * {
-    /* Consistent size for headers of tab-pane and side-panels*/
-    -jr-header-height: 3em;
-
-    /* Colors for messages and errors */
-    -jr-info: -jr-light-green;
-    -jr-warn: -jr-orange;
-    -jr-error: -jr-light-red;
-    -jr-success: -jr-green;
-
     /* Generic colors */
+    -jr-icon-background: transparent;
+
     -jr-white: #ffffff;
     -jr-gray-1: #dddddd;
     -jr-gray-2: #808080;
@@ -42,13 +114,104 @@
     -jr-match-4-text-color: derive(-jr-text-foreground, -60%);
 
     /* Used only in Code inside setStyle(..) */
-    -jr-ai-message-user: derive(-jr-accent, 50%);
+    -jr-ai-message-user: derive(-fx-accent, 50%);
     -jr-ai-message-user-border: -jr-theme;
-    -jr-ai-message-ai: derive(-jr-accent, 80%);
+    -jr-ai-message-ai: derive(-fx-accent, 80%);
     -jr-ai-message-ai-border: -jr-theme;
-    -jr-ai-message-error: -jr-error;
-    -jr-ai-message-error-border: derive(-jr-error, -40%);
+    -jr-ai-message-error: -jr-light-red;
+    -jr-ai-message-error-border: derive(-jr-light-red, -40%);
 }
+
+/* JavaFX with custom components */
+.tab-pane > .tab-header-area > .headers-region > .tab .glyph-icon,
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
+    -glyph-size: 0.812em;
+    -fx-fill: -fx-mid-text-color;
+    -fx-text-fill: -fx-mid-text-color;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab.drop {
+    -fx-border-color: -jr-drag-target;
+    -fx-background-color: -jr-drag-target-hover;
+    -fx-border-width: 3 1 1 1;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab.drop .tab-label {
+    -fx-fill: -jr-drag-target;
+    -fx-text-fill: -jr-drag-target;
+}
+
+.tab-pane.hide-tab-bar > .tab-header-area {
+    -fx-min-height: 0;
+    -fx-max-height: 0;
+    -fx-pref-height: 0;
+    -fx-padding: 0;
+}
+
+.tree-table-row-cell:selected > .tree-table-cell > .glyph-icon {
+    -fx-fill: white;
+    -fx-text-fill: white;
+}
+
+.table-view .groupColumnBackground {
+    -fx-stroke: -jr-gray-3;
+}
+
+.TextFlow > .embeddedHyperlink {
+    -fx-padding: 0.166667em 0.25em 0.166667em 0.25em;
+}
+
+.table-cell:invalid,
+.list-cell:invalid {
+    -fx-background-color: -jr-orange;
+}
+
+.text-field:invalid {
+    -fx-background-color: rgba(240, 128, 128, 0.5);
+}
+
+.menu-item .glyph-icon {
+    -fx-fill: -jr-text-foreground;
+    -fx-text-fill: -jr-text-foreground;
+}
+
+.menu-item:focused .glyph-icon {
+    -fx-fill: -jr-menu-forground-active;
+    -fx-text-fill: -jr-menu-forground-active;
+}
+
+.column-header .glyph-icon {
+    -fx-alignment: baseline-center;
+    -fx-text-fill: -fx-text-inner-color;
+    -fx-fill: -fx-text-inner-color;
+}
+
+.table-cell .glyph-icon,
+.tree-table-cell .glyph-icon {
+    -fx-cell-size: 4.0em;
+    -fx-padding: 0.5em 1em 0.5em 1em;
+    -fx-fill: -fx-text-background-color;
+    -fx-text-fill: -fx-text-background-color;
+}
+
+.table-row-cell:dragOver-bottom {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 0 0 -2 0;
+}
+
+.table-row-cell:dragOver-center,
+.table-row-cell:dragOver-center > .table-cell {
+    -fx-background-color: -jr-drag-target-hover;
+}
+
+.table-row-cell:dragOver-top {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 2 0 0 0;
+    -fx-padding: -2 0 0 0;
+}
+
+/* Custom styles */
 
 .unchanged,
 .text-unchanged {
@@ -56,11 +219,11 @@
 }
 
 .addition {
-    -rtfx-background-color: -jr-success;
+    -rtfx-background-color: -jr-green;
 }
 
 .deletion {
-    -rtfx-background-color: -jr-error;
+    -rtfx-background-color: -jr-light-red;
 }
 
 .bold {
@@ -74,10 +237,6 @@
 
 .merge-header {
     -fx-background-color: -jr-row-odd-background;
-}
-
-.table-view .groupColumnBackground {
-    -fx-stroke: -jr-gray-3;
 }
 
 #groupTree .numberColumn > .hits:any-selected {
@@ -128,10 +287,6 @@
     -fx-background-color: -jr-background-alt;
 }
 
-.TextFlow > .embeddedHyperlink {
-    -fx-padding: 0.166667em 0.25em 0.166667em 0.25em;
-}
-
 .glyph-icon {
     /* This adjusts text alignment within the bounds of text nodes so that
        the text is always vertically centered within the bounds. Based on
@@ -151,8 +306,8 @@
 }
 
 .contained-button {
-    -fx-background-color: -jr-accent;
-    -fx-border-color: -jr-accent;
+    -fx-background-color: -fx-accent;
+    -fx-border-color: -fx-accent;
 }
 
 .icon-buttonNoSpaceBottom,
@@ -225,11 +380,6 @@
     -fx-padding: 4 0 0 5;
 }
 
-.table-cell:invalid,
-.list-cell:invalid {
-    -fx-background-color: -jr-warn;
-}
-
 .duplicate-entry {
     -fx-background-color: -jr-light-green;
 }
@@ -241,7 +391,7 @@
 .sidePaneComponentHeader {
     -fx-background-color: -jr-sidepane-header-background;
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
-    -fx-pref-height: -jr-header-height;
+    -fx-pref-height: 3em;
 }
 
 .sidePaneComponentHeader > .label {
@@ -273,16 +423,6 @@
 
 .mainMenu > .container > .menu-button > .label {
     -fx-text-fill: -jr-text-foreground;
-}
-
-.menu-item .glyph-icon {
-    -fx-fill: -jr-text-foreground;
-    -fx-text-fill: -jr-text-foreground;
-}
-
-.menu-item:focused .glyph-icon {
-    -fx-fill: -jr-menu-forground-active;
-    -fx-text-fill: -jr-menu-forground-active;
 }
 
 .mainToolbar {
@@ -374,39 +514,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -fx-mark-highlight-color, derive(-jr-theme, -30%);
 }
 
-.column-header .glyph-icon {
-    -fx-alignment: baseline-center;
-    -fx-text-fill: -fx-text-inner-color;
-    -fx-fill: -fx-text-inner-color;
-}
-
-.table-cell .glyph-icon,
-.tree-table-cell .glyph-icon {
-    -fx-cell-size: 4.0em;
-    -fx-padding: 0.5em 1em 0.5em 1em;
-    -fx-fill: -fx-text-background-color;
-    -fx-text-fill: -fx-text-background-color;
-}
-
-/* Drag and drop colored indicator */
-
-.table-row-cell:dragOver-bottom {
-    -fx-border-color: -jr-drag-target;
-    -fx-border-width: 0 0 2 0;
-    -fx-padding: 0 0 -2 0;
-}
-
-.table-row-cell:dragOver-center,
-.table-row-cell:dragOver-center > .table-cell {
-    -fx-background-color: -jr-drag-target-hover;
-}
-
-.table-row-cell:dragOver-top {
-    -fx-border-color: -jr-drag-target;
-    -fx-border-width: 2 0 0 0;
-    -fx-padding: -2 0 0 0;
-}
-
 /* Improve the context menu of the main toolbar, when icons don't fit and you have to press the little arrow to see them */
 .mainToolbar .context-menu .glyph-icon {
     -fx-fill: -jr-theme;
@@ -415,20 +522,7 @@ We want to have a look that matches our icons in the tool-bar */
 .mainToolbar .context-menu .glyph-icon:hover {
     -fx-fill: -jr-menu-forground-active;
     -fx-text-fill: -jr-menu-forground-active;
-    -fx-background-color: -jr-icon-background-active; /* TODO: This has no effect */
-}
-
-/* This is awful, but I don't know a better way*/
-.mainToolbar .context-menu * {
-    -fx-background-color: -fx-control-inner-background;
-}
-
-#sidePane {
-    -fx-background-color: -jr-sidepane-background;
-}
-
-.sidePaneComponent {
-    -fx-background-color: -jr-sidepane-background;
+    -fx-background-color: -jr-icon-background-active;
 }
 
 .bibEntry .type {
@@ -458,30 +552,30 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .warning-icon {
-    -fx-fill: -jr-warn;
+    -fx-fill: -jr-orange;
 }
 
 .warning-message {
-    -fx-fill: -jr-warn;
-    -fx-text-fill: -jr-warn;
+    -fx-fill: -jr-orange;
+    -fx-text-fill: -jr-orange;
 }
 
 .error-message {
-    -fx-fill: -jr-error;
-    -fx-text-fill: -jr-error;
+    -fx-fill: -jr-light-red;
+    -fx-text-fill: -jr-light-red;
 }
 
 .error-icon {
-    -fx-text-fill: -jr-error;
-    -fx-fill: -jr-error;
+    -fx-text-fill: -jr-light-red;
+    -fx-fill: -jr-light-red;
 }
 
 .tooltip-warning {
-    -fx-background-color: -jr-warn;
+    -fx-background-color: -jr-orange;
 }
 
 .tooltip-error {
-    -fx-background-color: -jr-error;
+    -fx-background-color: -jr-light-red;
 }
 
 .titleHeader {
@@ -517,7 +611,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .code-area .selection {
-    -fx-fill: -jr-accent;
+    -fx-fill: -fx-accent;
 }
 
 .code-area .caret {
@@ -558,7 +652,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .tags-field:focused {
-    -fx-border-color: -jr-accent;
+    -fx-border-color: -fx-accent;
 }
 
 .tags-field > .flow-pane > .tag-view {
@@ -579,7 +673,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-width: 0;
     -fx-text-fill: -fx-focused-text-base-color;
     -fx-highlight-text-fill: -fx-text-inner-color;
-    -fx-highlight-fill: derive(-jr-accent, 20%);
+    -fx-highlight-fill: derive(-fx-accent, 20%);
 }
 
 .searchBar:invalid {
@@ -588,19 +682,10 @@ We want to have a look that matches our icons in the tool-bar */
 
 .searchBar:unsupported {
     -fx-background-color: rgba(255, 159, 67, 0.5);
-
 }
 
 .mainTable-header {
     -fx-fill: -fx-mid-text-color;
-}
-
-.fontsizeSpinner {
-    -fx-pref-width: 5em;
-}
-
-.text-field:invalid {
-    -fx-background-color: rgba(240, 128, 128, 0.5);
 }
 
 .rating {
@@ -710,7 +795,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 .main-table .table-row-cell:matching-search-and-groups:selected:hover,
 .main-table .table-row-cell:matching-search-and-groups:hover {
-    -fx-background-color: -jr-hover
+    -fx-background-color: -jr-hover;
 }
 
 .main-table .table-row-cell:matching-search-and-groups > .table-cell,
@@ -979,7 +1064,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0.8333em 1em;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.075), 20, 0.25, 0, 6);
     -fx-alignment: center-left;
-    -fx-border-color: derive(-jr-base, -10%);
+    -fx-border-color: derive(-fx-base, -10%);
     -fx-border-radius: 0.8333333333em;
     -fx-max-height: 4em;
     -fx-spacing: 1.16667em;
@@ -1093,14 +1178,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-insets: 0;
 }
 
-/* EntryEditor */
-#entryEditor .editorPane {
-    -fx-hgap: 10;
-    -fx-vgap: 6;
-    -fx-background-color: -fx-control-inner-background;
-    -fx-padding: 5 5 5 15;
-}
-
 #entryEditor Text {
     -fx-text-fill: -fx-text-base-color;
     -fx-fill: -fx-text-base-color;
@@ -1167,20 +1244,20 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #entryEditor .warning-icon {
-    -fx-fill: -jr-warn;
+    -fx-fill: -jr-orange;
 }
 
 #entryEditor .error-icon {
-    -fx-text-fill: -jr-error;
-    -fx-fill: -jr-error;
+    -fx-text-fill: -jr-light-red;
+    -fx-fill: -jr-light-red;
 }
 
 #entryEditor .tooltip-warning {
-    -fx-background-color: -jr-warn;
+    -fx-background-color: -jr-orange;
 }
 
 #entryEditor .tooltip-error {
-    -fx-background-color: -jr-error;
+    -fx-background-color: -jr-light-red;
 }
 
 #entryEditor .code-area .context-menu {
@@ -1198,7 +1275,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #entryEditor .gdpr-notice {
-    -fx-border-color: -jr-warn;
+    -fx-border-color: -jr-orange;
     -fx-border-insets: 5;
     -fx-border-style: dashed;
     -fx-border-width: 2;
@@ -1258,7 +1335,7 @@ We want to have a look that matches our icons in the tool-bar */
 #entryEditor #scite-error-label {
     -fx-font-size: 1.5em;
     -fx-font-weight: bold;
-    -fx-text-fill: -jr-error;
+    -fx-text-fill: -jr-light-red;
 }
 
 #entryEditor .latex-citations-directory-path {
@@ -1313,28 +1390,28 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #errorConsole .exception .glyph-icon {
-    -fx-icon-color: -jr-error;
+    -fx-icon-color: -jr-light-red;
 }
 
 #errorConsole .output .glyph-icon {
-    -fx-icon-color: -jr-warn;
+    -fx-icon-color: -jr-orange;
 }
 
 #errorConsole .log .glyph-icon {
-    -fx-icon-color: -jr-info;
+    -fx-icon-color: -jr-light-green;
 }
 
-/* Poor readability on -jr-accent. See: https://webaim.org/resources/contrastchecker/?fcolor=9E4C00&bcolor=A3B7E6 */
+/* Poor readability on -fx-accent. See: https://webaim.org/resources/contrastchecker/?fcolor=9E4C00&bcolor=A3B7E6 */
 #errorConsole .error-console-cell:selected .exception .glyph-icon {
-    -fx-icon-color: derive(-jr-error, -50%);
+    -fx-icon-color: derive(-jr-light-red, -50%);
 }
 
 #errorConsole .error-console-cell:selected .output .glyph-icon {
-    -fx-icon-color: derive(-jr-warn, -50%);
+    -fx-icon-color: derive(-jr-orange, -50%);
 }
 
 #errorConsole .error-console-cell:selected .log .glyph-icon {
-    -fx-icon-color: derive(-jr-info, -50%);
+    -fx-icon-color: derive(-jr-light-green, -50%);
 }
 
 #errorConsole .exception,
@@ -1366,6 +1443,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 #groupTree .numberColumn > .hits {
     -fx-font-size: 0.75em;
+    -fx-background: -jr-group-hits-bg;
     -fx-background-color: -jr-group-hits-bg;
     -fx-padding: 0.4em 0.4em 0.4em 0.4em;
     -fx-background-insets: 0;
@@ -1535,16 +1613,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -jr-sidepane-background;
 }
 
-#referenceListView > .virtual-flow > .clipped-container > .sheet > .list-cell {
-    -fx-padding: 4 4 4 4;
-    -fx-background: transparent;
-    -fx-text-fill: -fx-text-base-color;
-}
-
-#referenceListView > .virtual-flow > .clipped-container > .sheet > .list-cell * {
-    -fx-text-fill: -fx-text-base-color;
-}
-
 #parseLatexResultDialog > .split-pane > .split-pane-divider {
     -fx-padding: 0 4 0 4;
     -fx-background-color: transparent;
@@ -1559,28 +1627,9 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -fx-accent;
 }
 
-/* PreferenceDialog */
-#preferencesDialog #sidepane {
-    -fx-background-color: -jr-sidepane-background;
-}
-
-#preferencesDialog #preferenceTabList {
-    -fx-background-color: transparent;
-}
-
-#preferencesDialog #preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell {
-    -fx-padding: 8 8 8 8;
-    -fx-background: transparent;
-    -fx-text-fill: -fx-text-base-color;
-}
-
 #preferencesDialog .button-bar > .container {
     -fx-border-width: 1 0 0 0;
     -fx-border-color: -jr-sidepane-background;
-}
-
-#preferencesDialog #preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected {
-    -fx-background: -fx-control-inner-background;
 }
 
 #preferencesDialog > .split-pane > .split-pane-divider {
@@ -1669,19 +1718,19 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #testButton.success {
-    -fx-text-fill: -jr-success;
+    -fx-text-fill: -jr-green;
 }
 
 #testButton.success .glyph-icon {
-    -fx-icon-color: -jr-success;
+    -fx-icon-color: -jr-green;
 }
 
 #testButton.error {
-    -fx-text-fill: -jr-error;
+    -fx-text-fill: -jr-light-red;
 }
 
 #testButton.error .glyph-icon {
-    -fx-icon-color: -jr-error;
+    -fx-icon-color: -jr-light-red;
 }
 
 .api-key-dialog-content {
@@ -1775,15 +1824,15 @@ journalInfo .grid-cell-b {
 }
 
 .three-way-merge .merged-field .styled-text-area:focused {
-    -fx-highlight-fill: derive(-jr-accent, 20%);
-    -fx-background-color: -jr-accent, -fx-control-inner-background;
+    -fx-highlight-fill: derive(-fx-accent, 20%);
+    -fx-background-color: -fx-accent, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
     -fx-highlight-text-fill: -fx-text-inner-color;
 }
 
 .three-way-merge .merge-field-value:selected .selection-box {
-    -fx-background-color: -jr-accent-alt;
-    -fx-border-color: -jr-accent;
+    -fx-background-color: -fx-accent-alt;
+    -fx-border-color: -fx-accent;
 }
 
 .three-way-merge .merge-field-value .selection-box {
@@ -1881,7 +1930,7 @@ journalInfo .grid-cell-b {
 }
 
 .quick-settings-button {
-    -fx-background-color: derive(-jr-base, 10%);
+    -fx-background-color: derive(-fx-base, 10%);
     -fx-border-color: -jr-gray-1;
     -fx-border-width: 0.08333em;
     -fx-border-radius: 0.333em;
@@ -1896,7 +1945,7 @@ journalInfo .grid-cell-b {
 
 .quick-settings-button:hover {
     -fx-background-color: -jr-hover;
-    -fx-border-color: -jr-accent;
+    -fx-border-color: -fx-accent;
 }
 
 .quick-settings-button .glyph-icon,
@@ -2067,12 +2116,12 @@ journalInfo .grid-cell-b {
 }
 
 .detected-application {
-    -fx-background-color: derive(-jr-accent, 80%);
+    -fx-background-color: derive(-fx-accent, 80%);
     -fx-font-weight: bold;
 }
 
 .application-item:filled:selected {
-    -fx-background-color: -jr-accent;
+    -fx-background-color: -fx-accent;
     -fx-text-fill: white;
 }
 
@@ -2212,7 +2261,7 @@ journalInfo .grid-cell-b {
 }
 
 .walkthrough-quit-button {
-    -fx-background-color: -jr-base;
+    -fx-background-color: -fx-base;
     -fx-border-color: transparent;
     /* For easy clipping */
     -fx-padding: 0.5em;
@@ -2225,11 +2274,11 @@ journalInfo .grid-cell-b {
 }
 
 .walkthrough-quit-button:hover {
-    -fx-background-color: derive(-jr-base, -20%);
+    -fx-background-color: derive(-fx-base, -20%);
 }
 
 .walkthrough-quit-button:pressed {
-    -fx-background-color: derive(-jr-base, 30%);
+    -fx-background-color: derive(-fx-base, 30%);
 }
 
 .walkthrough-quit-button .glyph-icon,
@@ -2348,7 +2397,7 @@ journalInfo .grid-cell-b {
 
 .invalid-path {
     -fx-background-color: rgba(238, 82, 83, 0.2);
-    -fx-border-color: -jr-error;
+    -fx-border-color: -jr-light-red;
     -fx-border-width: 1px;
 }
 
@@ -2383,49 +2432,4 @@ journalInfo .grid-cell-b {
 
 .automatic-field-editor .button-bar .button:default {
     -fx-min-width: 12em;
-}
-
-/* GemsFX Notifications */
-
-.info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .group-name-label {
-    -fx-text-fill: -fx-mid-text-color;
-}
-
-.info-center-view .notification-view > .content > .text-container > .title-time-box > .title-label {
-    -fx-text-fill: -fx-dark-text-color;
-}
-
-.info-center-view .notification-view > .content > .close-icon-wrapper > .ikonli-font-icon {
-    -fx-icon-color: -fx-dark-text-color;
-}
-
-.info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .time-label {
-    -fx-text-fill: -fx-dark-text-color;
-}
-
-.info-center-view .notification-view > .content > .text-container > .description-label {
-    -fx-text-fill: -fx-dark-text-color;
-}
-
-.info-center-view .notification-view .default-icon {
-    -fx-icon-color: -fx-dark-text-color;
-}
-
-.info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane .ikonli-font-icon {
-    -fx-icon-color: -fx-dark-text-color;
-}
-
-.info-center-view .notification-view:expanded > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane .ikonli-font-icon {
-    -fx-icon-color: -fx-dark-text-color;
-}
-
-.info-center-view .notification-view > .content > .text-container > .actions-box .button {
-    -fx-background-color: -fx-default-button;
-}
-
-/* Note: stack-pane comes from GemsFX */
-.stack-pane {
-    -fx-background-color: transparent;
-    -fx-background-insets: 0, 0;
-    -fx-padding: 0;
 }

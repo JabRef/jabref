@@ -6,7 +6,7 @@ import java.util.prefs.Preferences;
 
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
-import org.jabref.gui.theme.Theme;
+import org.jabref.gui.theme.ThemeColorScheme;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 
@@ -278,7 +278,7 @@ class GuiPreferencesMigrationsTest {
 
         PreferencesMigrations.upgradeTheme(preferences);
 
-        verify(workspacePreferences).setTheme(Theme.dark());
+        verify(workspacePreferences).setColorScheme(ThemeColorScheme.DARK);
     }
 
     @Test
@@ -290,6 +290,6 @@ class GuiPreferencesMigrationsTest {
 
         PreferencesMigrations.upgradeTheme(preferences);
 
-        verify(workspacePreferences).setTheme(Theme.light());
+        verify(workspacePreferences).setColorScheme(ThemeColorScheme.LIGHT);
     }
 }
