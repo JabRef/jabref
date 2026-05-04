@@ -20,7 +20,7 @@ class ConnectorAuthenticationTaskTest {
 
     @BeforeEach
     void setUp() {
-        remotePreferences = new RemotePreferences(6050, true, 23119, false, false, 2087, List.of(), "", false, false);
+        remotePreferences = new RemotePreferences(true, 6050, false, 23119, false, 2087, List.of(), "", false, false);
         authenticationTask = new ConnectorAuthenticationTask(remotePreferences);
     }
 
