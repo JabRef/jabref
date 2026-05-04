@@ -762,8 +762,7 @@ public class BibtexParser implements Parser {
                     // TODO: multiple keywords fields should be combined to one
                     entry.addKeyword(content, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                 }
-            } else // If a BibDesk File Field is encountered
-            if (field.getName().length() > 10 && field.getName().startsWith("bdsk-file-")) {
+            } else if (field.getName().length() > 10 && field.getName().startsWith("bdsk-file-")) { // If a BibDesk File Field is encountered
                 try {
                     byte[] decodedBytes = Base64.getDecoder().decode(content);
 
