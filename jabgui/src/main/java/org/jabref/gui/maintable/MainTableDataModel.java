@@ -274,6 +274,7 @@ public class MainTableDataModel {
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
             // When entries are removed, we need to refresh the search matches
             // to ensure the filtered list is properly updated and doesn't show stale entries
+            ObservableList<GroupTreeNode> selectedGroups = selectedGroupsProperty.get();
             BackgroundTask.wrap(() -> {
                 // Re-run the current search to update the filtered results
                 if (searchQueryProperty.get().isPresent()) {
@@ -281,7 +282,7 @@ public class MainTableDataModel {
                 } else {
                     clearSearchMatches();
                 }
-                updateGroupMatches(selectedGroupsProperty.get());
+                updateGroupMatches(selectedGroups);
             }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
         }
     }
