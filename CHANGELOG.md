@@ -104,6 +104,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where a warning was printed when the column name was empty. [#15571](https://github.com/JabRef/jabref/issues/15571)
 - We fixed the Hayagriva YAML exporter producing a multi-document YAML file, which broke Typst compilation. [#15617](https://github.com/JabRef/jabref/issues/15617)
 - We fixed security issues where it was possible to execute arbitary commands on the user's machine when the CAYW feature was used in combination with TexShop or Sublime Text [#15628](https://github.com/JabRef/jabref/pull/15628)
+- Fixed issue where MonthChecker allowed partial matches for month values. [#15577](https://github.com/JabRef/jabref/pull/15675)
 
 ### Removed
 
