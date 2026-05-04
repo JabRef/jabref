@@ -333,7 +333,7 @@ public class PdfContentImporter extends PdfImporter {
         // we start at the current line
         curString = lines[lineIndex];
         // i might get incremented later and curString modified, too
-        lineIndex = lineIndex + 1;
+        lineIndex++;
 
         String author;
         String editor = null;
@@ -613,7 +613,7 @@ public class PdfContentImporter extends PdfImporter {
     /// (besides at strange PDFs). These strange PDFs are handled here:
     /// proceed to next non-empty line
     private void proceedToNextNonEmptyLine() {
-        while ((lineIndex < lines.length) && lines[lineIndex].trim().isEmpty()) {
+        while ((lineIndex < lines.length) && lines[lineIndex].isBlank()) {
             lineIndex++;
         }
     }
@@ -650,7 +650,7 @@ public class PdfContentImporter extends PdfImporter {
     ///
     /// invariant before/after: i points to line before the last handled block
     private void readLastBlock() {
-        while ((lineIndex >= 0) && lines[lineIndex].trim().isEmpty()) {
+        while ((lineIndex >= 0) && lines[lineIndex].isBlank()) {
             lineIndex--;
         }
         // i is now at the end of a block
