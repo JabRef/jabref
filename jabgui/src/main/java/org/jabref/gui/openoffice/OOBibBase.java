@@ -105,7 +105,7 @@ public class OOBibBase {
         } catch (WrappedTargetException
                  | IndexOutOfBoundsException
                  | NoSuchElementException ex) {
-            LOGGER.warn("Problem connecting", ex);
+            LOGGER.warn(errorTitle, ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         }
 
@@ -148,10 +148,6 @@ public class OOBibBase {
         err.showErrorDialog(dialogService);
     }
 
-    void showDialog(String errorTitle, OOError err) {
-        err.setTitle(errorTitle).showErrorDialog(dialogService);
-    }
-
     OOVoidResult<OOError> collectResults(String errorTitle, List<OOVoidResult<OOError>> results) {
         String msg = results.stream()
                             .filter(OOVoidResult::isError)
@@ -170,10 +166,6 @@ public class OOBibBase {
 
     boolean testDialog(String errorTitle, OOVoidResult<OOError> res) {
         return res.ifError(e -> showDialog(e.setTitle(errorTitle))).isError();
-    }
-
-    boolean testDialog(String errorTitle, List<OOVoidResult<OOError>> results) {
-        return testDialog(errorTitle, collectResults(errorTitle, results));
     }
 
     @SafeVarargs
@@ -481,7 +473,6 @@ public class OOBibBase {
     /// -  Missing pageInfo means no action.
     /// -  Missing CitationEntry means no action (no attempt to remove
     /// citation from the text).
-    ///
     public void guiActionApplyCitationEntries(List<CitationEntry> citationEntries) {
         final String errorTitle = Localization.lang("Problem modifying citation");
 
@@ -568,58 +559,38 @@ public class OOBibBase {
         OOResult<FunctionalTextViewCursor, OOError> fcursor = null;
         if (syncOptions.isPresent()) {
             fcursor = getFunctionalTextViewCursor(doc, errorTitle);
+            syncOptions.map(e -> e.setAlwaysAddCitedOnPages(openOfficePreferences.getAlwaysAddCitedOnPages()));
             if (testDialog(errorTitle, fcursor.asVoidResult()) || testDialog(databaseIsRequired(syncOptions.get().databases,
                     OOError::noDataBaseIsOpenForSyncingAfterCitation))) {
                 return;
             }
         }
 
-        syncOptions.map(e -> e.setAlwaysAddCitedOnPages(openOfficePreferences.getAlwaysAddCitedOnPages()));
-
         try {
 
             UnoUndo.enterUndoContext(doc, "Insert citation");
             if (style instanceof CitationStyle citationStyle) {
                 // Handle insertion of CSL Style citations
-                try {
-                    // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
-                    // MUST always be paired with an unlockControllers() call
-                    doc.lockControllers();
-
-                    if (citationType == CitationType.AUTHORYEAR_PAR) {
-                        // "Cite" button
-                        cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
-                    } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
-                        // "Cite in-text" button
-                        cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
-                    } else if (citationType == CitationType.INVISIBLE_CIT) {
-                        // "Insert empty citation"
-                        cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries);
-                    }
-
-                    // If "Automatically sync bibliography when inserting citations" is enabled
-                    if (citationStyle.hasBibliography()) {
-                        syncOptions.ifPresent(options -> guiActionUpdateDocument(options.databases, citationStyle));
-                    }
-                } finally {
-                    // Release controller lock
-                    doc.unlockControllers();
-                }
+                insertCSLCitation(entries,
+                        doc,
+                        citationType,
+                        citationStyle,
+                        bibDatabaseContext,
+                        bibEntryTypesManager,
+                        cursor,
+                        syncOptions);
             } else if (style instanceof JStyle jStyle) {
                 // Handle insertion of JStyle citations
-
-                EditInsert.insertCitationGroup(doc,
-                        frontend.get(),
-                        cursor.get(),
-                        entries,
-                        bibDatabaseContext.getDatabase(),
-                        jStyle,
+                insertJStyleCitation(entries,
+                        doc,
                         citationType,
-                        pageInfo);
-
-                if (syncOptions.isPresent()) {
-                    Update.resyncDocument(doc, jStyle, fcursor.get(), syncOptions.get());
-                }
+                        jStyle,
+                        frontend,
+                        cursor,
+                        bibDatabaseContext,
+                        syncOptions,
+                        pageInfo,
+                        fcursor);
             }
         } catch (NoDocumentException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
@@ -637,6 +608,94 @@ public class OOBibBase {
             OOError.fromMisc(e).setTitle(errorTitle).showErrorDialog(dialogService);
         } finally {
             UnoUndo.leaveUndoContext(doc);
+        }
+    }
+
+    /// Helper method for guiActionInsertEntry. Handles CSL citation insertion
+    /// Throws CreationException, com.sun.star.uno.Exception
+    /// Caught by guiActionInsertEntry
+    ///
+    /// @param entries            The entries to cite.
+    /// @param bibDatabaseContext The database the entries belong to (all of them). Used when creating the citation mark.
+    /// @param citationType       Indicates whether it is an in-text citation, a citation in parenthesis or an invisible citation.
+    /// @param citationStyle      Indicates style, name and path of citation
+    /// @param syncOptions        Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise, provides options for refreshing the reference list.
+    public void insertCSLCitation(List<BibEntry> entries,
+                                  XTextDocument doc,
+                                  CitationType citationType,
+                                  CitationStyle citationStyle,
+                                  BibDatabaseContext bibDatabaseContext,
+                                  BibEntryTypesManager bibEntryTypesManager,
+                                  OOResult<XTextCursor,
+                                          OOError> cursor,
+                                  Optional<Update.SyncOptions> syncOptions)
+            throws CreationException, com.sun.star.uno.Exception {
+        try {
+            // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
+            // MUST always be paired with an unlockControllers() call
+            doc.lockControllers();
+
+            if (citationType == CitationType.AUTHORYEAR_PAR) {
+                // "Cite" button
+                cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+            } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
+                // "Cite in-text" button
+                cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+            } else if (citationType == CitationType.INVISIBLE_CIT) {
+                // "Insert empty citation"
+                cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries);
+            }
+
+            // If "Automatically sync bibliography when inserting citations" is enabled
+            if (citationStyle.hasBibliography()) {
+                syncOptions.ifPresent(options -> guiActionUpdateDocument(options.databases, citationStyle));
+            }
+        } finally {
+            // Release controller lock
+            doc.unlockControllers();
+        }
+    }
+
+    /// Helper method for guiActionInsertEntry
+    /// Throws PropertyVetoException, WrappedTargetException, IllegalTypeException, NotRemoveableException, CreationException, NoDocumentException
+    /// Exceptions caught by guiActionInsertEntry
+    ///
+    /// @param entries            The entries to cite.
+    /// @param citationType       Indicates whether it is an in-text citation, a citation in parentheses or an invisible citation.
+    /// @param jStyle             Indicates citation formating in JStyle
+    /// @param bibDatabaseContext The database the entries belong to (all of them). Used when creating the citation mark.
+    /// @param syncOptions        Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise, provides options for refreshing the reference list.
+    /// @param pageInfo           A single page-info for these entries. Attributed to the last entry.
+    public void insertJStyleCitation(List<BibEntry> entries,
+                                     XTextDocument doc,
+                                     CitationType citationType,
+                                     JStyle jStyle,
+                                     OOResult<OOFrontend,
+                                             OOError> frontend,
+                                     OOResult<XTextCursor,
+                                             OOError> cursor,
+                                     BibDatabaseContext bibDatabaseContext,
+                                     Optional<Update.SyncOptions> syncOptions,
+                                     String pageInfo,
+                                     OOResult<FunctionalTextViewCursor,
+                                             OOError> fcursor)
+            throws PropertyVetoException,
+            WrappedTargetException,
+            IllegalTypeException,
+            NotRemoveableException,
+            CreationException,
+            NoDocumentException {
+        EditInsert.insertCitationGroup(doc,
+                frontend.get(),
+                cursor.get(),
+                entries,
+                bibDatabaseContext.getDatabase(),
+                jStyle,
+                citationType,
+                pageInfo);
+
+        if (syncOptions.isPresent()) {
+            Update.resyncDocument(doc, jStyle, fcursor.get(), syncOptions.get());
         }
     }
 
@@ -683,7 +742,7 @@ public class OOBibBase {
                      | PropertyVetoException
                      | WrappedTargetException
                      | com.sun.star.lang.IllegalArgumentException ex) {
-                LOGGER.warn("Problem combining cite markers", ex);
+                LOGGER.warn(errorTitle, ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             } finally {
                 UnoUndo.leaveUndoContext(doc);
@@ -708,6 +767,7 @@ public class OOBibBase {
             }
 
             XTextDocument doc = odoc.get();
+
             OOResult<FunctionalTextViewCursor, OOError> fcursor = getFunctionalTextViewCursor(doc, errorTitle);
 
             if (testDialog(errorTitle,
@@ -737,7 +797,7 @@ public class OOBibBase {
                      | PropertyVetoException
                      | WrappedTargetException
                      | com.sun.star.lang.IllegalArgumentException ex) {
-                LOGGER.warn("Problem during separating cite markers", ex);
+                LOGGER.warn(errorTitle, ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             } finally {
                 UnoUndo.leaveUndoContext(doc);
@@ -777,7 +837,7 @@ public class OOBibBase {
 
             if (!result.newDatabase.hasEntries()) {
                 dialogService.showErrorDialogAndWait(
-                        Localization.lang("Unable to generate new library"),
+                        Localization.lang(errorTitle),
                         Localization.lang("Your OpenOffice/LibreOffice document references"
                                 + " no citation keys"
                                 + " which could also be found in your current library."));
@@ -787,7 +847,7 @@ public class OOBibBase {
             List<String> unresolvedKeys = result.unresolvedKeys;
             if (!unresolvedKeys.isEmpty()) {
                 dialogService.showErrorDialogAndWait(
-                        Localization.lang("Unable to generate new library"),
+                        Localization.lang(errorTitle),
                         Localization.lang("Your OpenOffice/LibreOffice document references"
                                         + " at least %0 citation keys"
                                         + " which could not be found in your current library."
@@ -819,20 +879,20 @@ public class OOBibBase {
     /// @param style     Style.
     public void guiActionUpdateDocument(List<BibDatabase> databases, OOStyle style) {
         final String errorTitle = Localization.lang("Unable to synchronize bibliography");
+
+        OOResult<XTextDocument, OOError> odoc = getXTextDocument();
+        if (testDialog(errorTitle,
+                odoc.asVoidResult(),
+                styleIsRequired(style))) {
+            return;
+        }
+
+        XTextDocument doc = odoc.get();
+
+        OOResult<FunctionalTextViewCursor, OOError> fcursor = getFunctionalTextViewCursor(doc, errorTitle);
+
         if (style instanceof JStyle jStyle) {
             try {
-
-                OOResult<XTextDocument, OOError> odoc = getXTextDocument();
-                if (testDialog(errorTitle,
-                        odoc.asVoidResult(),
-                        styleIsRequired(jStyle))) {
-                    return;
-                }
-
-                XTextDocument doc = odoc.get();
-
-                OOResult<FunctionalTextViewCursor, OOError> fcursor = getFunctionalTextViewCursor(doc, errorTitle);
-
                 if (testDialog(errorTitle,
                         fcursor.asVoidResult(),
                         checkStylesExistInTheDocument(jStyle, doc),
@@ -845,28 +905,7 @@ public class OOBibBase {
                     return;
                 }
 
-                List<String> unresolvedKeys;
-                try {
-                    UnoUndo.enterUndoContext(doc, "Refresh bibliography");
-
-                    Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
-                    syncOptions
-                            .setUpdateBibliography(true)
-                            .setAlwaysAddCitedOnPages(openOfficePreferences.getAlwaysAddCitedOnPages());
-
-                    unresolvedKeys = Update.synchronizeDocument(doc, frontend, jStyle, fcursor.get(), syncOptions);
-                } finally {
-                    UnoUndo.leaveUndoContext(doc);
-                    fcursor.get().restore(doc);
-                }
-
-                if (!unresolvedKeys.isEmpty()) {
-                    String msg = Localization.lang(
-                            "Your OpenOffice/LibreOffice document references the citation key '%0',"
-                                    + " which could not be found in your current library.",
-                            unresolvedKeys.getFirst());
-                    dialogService.showErrorDialogAndWait(errorTitle, msg);
-                }
+                updateJStyleBibliography(databases, jStyle, doc, frontend, fcursor, errorTitle);
             } catch (NoDocumentException ex) {
                 OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             } catch (DisposedException ex) {
@@ -882,64 +921,97 @@ public class OOBibBase {
                 return;
             }
             try {
-                OOResult<XTextDocument, OOError> odoc = getXTextDocument();
-                if (testDialog(errorTitle, odoc.asVoidResult())) {
-                    return;
-                }
-
-                XTextDocument doc = odoc.get();
-
-                OOResult<FunctionalTextViewCursor, OOError> fcursor = getFunctionalTextViewCursor(doc, errorTitle);
-
                 if (testDialog(errorTitle,
                         fcursor.asVoidResult(),
                         checkIfOpenOfficeIsRecordingChanges(doc))) {
                     return;
                 }
 
-                try {
-                    UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
-
-                    // Collect only cited entries from all databases
-                    List<BibEntry> citedEntries = new ArrayList<>();
-                    for (BibDatabase database : databases) {
-                        for (BibEntry entry : database.getEntries()) {
-                            if (cslCitationOOAdapter.isCitedEntry(entry)) {
-                                citedEntries.add(entry);
-                            }
-                        }
-                    }
-
-                    // If no entries are cited, show a message and return
-                    if (citedEntries.isEmpty()) {
-                        dialogService.showInformationDialogAndWait(
-                                Localization.lang("Bibliography"),
-                                Localization.lang("No cited entries found in the document.")
-                        );
-                        return;
-                    }
-
-                    // A separate database and database context
-                    BibDatabase bibDatabase = new BibDatabase(citedEntries);
-                    BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
-
-                    // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
-                    // MUST always be paired with an unlockControllers() call
-                    doc.lockControllers();
-
-                    cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
-                } catch (NoDocumentException | com.sun.star.uno.Exception e) {
-                    dialogService.notify(Localization.lang("No document found or LibreOffice insertion failure"));
-                    LOGGER.error("Could not update CSL bibliography", e);
-                } finally {
-                    doc.unlockControllers();
-                    UnoUndo.leaveUndoContext(doc);
-                    fcursor.get().restore(doc);
-                }
+                updateCSLBibliography(databases, citationStyle, doc, fcursor);
             } catch (CreationException | com.sun.star.lang.IllegalArgumentException ex) {
                 LOGGER.error("Could not update CSL bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
+        }
+    }
+
+    /// Helper method for guiActionUpdateDocument, refreshes a JStyle bibliography.
+    ///
+    /// @param databases        Must have at least one.
+    /// @param jStyle           Indicates citation formating in JStyle.
+    /// @param doc              Text document.
+    /// @param frontend,fcursor Used to synchronize document.
+    /// @param errorTitle       Error message for user.
+    private void updateJStyleBibliography(List<BibDatabase> databases, JStyle jStyle, XTextDocument doc, OOFrontend frontend,
+                                          OOResult<FunctionalTextViewCursor, OOError> fcursor, String errorTitle)
+            throws CreationException, NoDocumentException, WrappedTargetException {
+        List<String> unresolvedKeys;
+        try {
+            UnoUndo.enterUndoContext(doc, "Refresh bibliography");
+
+            Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
+            syncOptions
+                    .setUpdateBibliography(true)
+                    .setAlwaysAddCitedOnPages(openOfficePreferences.getAlwaysAddCitedOnPages());
+
+            unresolvedKeys = Update.synchronizeDocument(doc, frontend, jStyle, fcursor.get(), syncOptions);
+        } finally {
+            UnoUndo.leaveUndoContext(doc);
+            fcursor.get().restore(doc);
+        }
+
+        if (!unresolvedKeys.isEmpty()) {
+            String msg = Localization.lang(
+                    "Your OpenOffice/LibreOffice document references the citation key '%0',"
+                            + " which could not be found in your current library.",
+                    unresolvedKeys.getFirst());
+            dialogService.showErrorDialogAndWait(errorTitle, msg);
+        }
+    }
+
+    /// Helper method for guiActionUpdateDocument, refreshes a CSL bibliography.
+    ///
+    /// @param databases     Must have at least one.
+    /// @param citationStyle Citation style to update bibliography with.
+    /// @param doc           Text document.
+    /// @param fcursor       Used to synchronize document.
+    private void updateCSLBibliography(List<BibDatabase> databases, CitationStyle citationStyle, XTextDocument doc,
+                                       OOResult<FunctionalTextViewCursor, OOError> fcursor)
+            throws CreationException {
+        try {
+            UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
+
+            // Collect only cited entries from all databases
+            List<BibEntry> citedEntries = databases.stream()
+                                                   .flatMap(database -> database.getEntries().stream())
+                                                   .filter(cslCitationOOAdapter::isCitedEntry)
+                                                   .collect(Collectors.toCollection(ArrayList::new));
+
+            // If no entries are cited, show a message and return
+            if (citedEntries.isEmpty()) {
+                dialogService.showInformationDialogAndWait(
+                        Localization.lang("Bibliography"),
+                        Localization.lang("No cited entries found in the document.")
+                );
+                return;
+            }
+
+            // A separate database and database context
+            BibDatabase bibDatabase = new BibDatabase(citedEntries);
+            BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
+
+            // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
+            // MUST always be paired with an unlockControllers() call
+            doc.lockControllers();
+
+            cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+        } catch (NoDocumentException | com.sun.star.uno.Exception e) {
+            dialogService.notify(Localization.lang("No document found or LibreOffice insertion failure"));
+            LOGGER.error("Could not update CSL bibliography", e);
+        } finally {
+            doc.unlockControllers();
+            UnoUndo.leaveUndoContext(doc);
+            fcursor.get().restore(doc);
         }
     }
 }
