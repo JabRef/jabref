@@ -45,7 +45,7 @@ dependencies.constraints {
     api("com.fasterxml:aalto-xml:1.3.4")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j:1.0.0")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta:1.0.0")
-    api("com.github.ben-manes.caffeine:caffeine:3.2.3")
+    api("com.github.ben-manes.caffeine:caffeine:3.2.4")
     api("com.github.javakeyring:java-keyring:1.0.4")
     api("com.github.javaparser:javaparser-core:3.28.1")
     api("com.github.javaparser:javaparser-symbol-solver-core:3.28.1")
