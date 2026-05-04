@@ -35,7 +35,7 @@ public class ConnectorAuthenticationTask {
     /// Generates a new 6-digit PIN valid for 5 minutes. Invalidates any previous PIN.
     public String generatePin() {
         int pinValue = secureRandom.nextInt(1_000_000);
-        activePin = String.format("%06d", pinValue);
+        activePin = "%06d".formatted(pinValue);
         pinExpiration = Instant.now().plusSeconds(PIN_TTL_SECONDS);
         return activePin;
     }
