@@ -49,7 +49,7 @@ public class SearchRxivExporter {
     }
 
     /// Builds a JSON string following the search-query format.
-    /// Format spec: <a href="https://github.com/CoLRev-Environment/search-query">search-query</a>
+    /// Format spec: [search-query](https://github.com/CoLRev-Environment/search-query)
     private String buildJson(Study study, String query, String platform) throws IOException {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("search_string", query);
