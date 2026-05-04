@@ -31,6 +31,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.query.GroupNameFilterVisitor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -40,7 +41,6 @@ import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
-import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
@@ -109,7 +109,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
         EasyBind.subscribe(selectedGroups, this::onSelectedGroupChanged);
 
         // Set-up bindings
-        filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));
+        filterPredicate.bind(EasyBind.map(filterText, text ->
+                group -> GroupNameFilterVisitor.matches(group.getDisplayName(), text)
+        ));
     }
 
     private void refresh() {
@@ -161,50 +163,26 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// Gets invoked if the user changes the active database.
     /// We need to get the new group tree and update the view
     private void onActiveDatabaseChanged(Optional<BibDatabaseContext> newDatabase) {
-        if (newDatabase.isPresent()) {
-            GroupNodeViewModel newRoot = newDatabase
-                    .map(BibDatabaseContext::getMetaData)
-                    .flatMap(MetaData::getGroups)
-                    .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, root, localDragboard, preferences))
-                    .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor, localDragboard, preferences));
-
-            rootGroup.setValue(newRoot);
-            if (stateManager.getSelectedGroups(newDatabase.get()).isEmpty()) {
-                stateManager.setSelectedGroups(newDatabase.get(), List.of(newRoot.getGroupNode()));
-            }
-            selectedGroups.setAll(
-                    stateManager.getSelectedGroups(newDatabase.get()).stream()
-                                .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences))
-                                .collect(Collectors.toList()));
-        } else {
-            rootGroup.setValue(null);
-        }
         currentDatabase = newDatabase;
-        newDatabase.ifPresent(_ -> addGroupImportEntries(rootGroup.get()));
-    }
-
-    /// Creates the "Imported entries" group if enabled and missing.
-    /// Selection is disabled to prevent focus theft when switching tabs.
-    private void addGroupImportEntries(GroupNodeViewModel parent) {
-        if (!preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
+        if (newDatabase.isEmpty()) {
+            rootGroup.setValue(null);
             return;
         }
 
-        String groupName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
-        boolean groupExists = parent.getGroupNode()
-                                    .getChildren()
-                                    .stream()
-                                    .map(GroupTreeNode::getGroup)
-                                    .anyMatch(grp -> grp instanceof ExplicitGroup && grp.getName().equalsIgnoreCase(groupName));
-        if (!groupExists) {
-            currentDatabase.ifPresent(db -> {
-                char keywordSeparator = preferences.getBibEntryPreferences().getKeywordSeparator();
-                AbstractGroup importEntriesGroup = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, keywordSeparator);
-                GroupTreeNode newSubgroup = parent.addSubgroup(importEntriesGroup);
-                newSubgroup.moveTo(parent.getGroupNode(), 0);
-                writeGroupChangesToMetaData();
-            });
+        GroupNodeViewModel newRoot = newDatabase
+                .map(BibDatabaseContext::getMetaData)
+                .flatMap(MetaData::getGroups)
+                .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, root, localDragboard, preferences))
+                .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor, localDragboard, preferences));
+
+        rootGroup.setValue(newRoot);
+        if (stateManager.getSelectedGroups(newDatabase.get()).isEmpty()) {
+            stateManager.setSelectedGroups(newDatabase.get(), List.of(newRoot.getGroupNode()));
         }
+        selectedGroups.setAll(
+                stateManager.getSelectedGroups(newDatabase.get()).stream()
+                            .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences))
+                            .toList());
     }
 
     /// Opens "New Group Dialog" and adds the resulting group as subgroup to the specified group
@@ -383,7 +361,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
 
                 if (newGroup.get().getClass() == WordKeywordGroup.class) {
-                    content = content + "\n\n" +
+                    content += "\n\n" +
                             Localization.lang("(Note: If original entries lack keywords to qualify for the new group configuration, confirming here will add them)");
                 }
                 Optional<ButtonType> previousAssignments = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.WARNING,

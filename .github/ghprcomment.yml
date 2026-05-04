@@ -76,7 +76,7 @@
 
 
     The issues found can be **automatically fixed**.
-    Please execute the gradle task *`rewriteRun`* from the [`rewrite` group of the Gradle Tool window](https://devdocs.jabref.org/code-howtos/faq.html#failing-openrewrite-tests) in IntelliJ, then check the results, commit, and push.
+    Please execute the gradle task *`rewriteRun`* from the [`rewrite` group of the Gradle Tool window](https://devdocs.jabref.org/code-howtos/faq.html#failing-openrewrite-tests) in IntelliJ, then check the results, reformat the code, commit, and push.
 - jobName: Modernizer
   workflowName: 'Source Code Tests'
   message: >

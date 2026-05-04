@@ -167,18 +167,13 @@ public class BibEntryWriter {
         Optional<String> value = entry.getField(field);
         // only write field if it is not empty
         // field.ifPresent does not work as an IOException may be thrown
-        if (value.isPresent() && !value.get().trim().isEmpty()) {
+        if (value.isPresent() && !value.get().isBlank()) {
             out.write("  ");
             out.write(getFormattedFieldName(field, indent));
-            try {
-                int start = out.getCurrentPosition();
-                out.write(fieldWriter.write(field, value.get()));
-                int end = out.getCurrentPosition();
-                fieldPositions.put(field, new Range(start, end));
-            } catch (InvalidFieldValueException ex) {
-                LOGGER.warn("Invalid field value {} of field {} of entry {}", value.get(), field, entry.getCitationKey().orElse(""), ex);
-                throw new IOException("Error in field '" + field + " of entry " + entry.getCitationKey().orElse("") + "': " + ex.getMessage(), ex);
-            }
+            int start = out.getCurrentPosition();
+            out.write(fieldWriter.write(field, value.get()));
+            int end = out.getCurrentPosition();
+            fieldPositions.put(field, new Range(start, end));
             out.writeLine(",");
         }
     }
@@ -200,7 +195,7 @@ public class BibEntryWriter {
     @ADR(49)
     static String getFormattedFieldName(Field field, int indent) {
         String fieldName = field.getName();
-        return fieldName + StringUtil.repeatSpaces(indent - fieldName.length()) + " = ";
+        return fieldName + " ".repeat(Math.max(0, indent - fieldName.length())) + " = ";
     }
 
     public Map<Field, Range> getFieldPositions() {

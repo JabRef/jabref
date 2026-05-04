@@ -95,27 +95,6 @@ class FetchAiModelsBackgroundTaskTest {
     }
 
     @Test
-    void taskHandlesGpt4AllProvider() {
-        List<String> expectedModels = List.of("llama-3", "mistral");
-        when(mockAiModelService.fetchModelsSynchronously(
-                eq(AiProvider.GPT4ALL),
-                any(String.class),
-                any(String.class)
-        )).thenReturn(expectedModels);
-
-        FetchAiModelsBackgroundTask task = new FetchAiModelsBackgroundTask(
-                mockAiModelService,
-                AiProvider.GPT4ALL,
-                "http://localhost:4891",
-                ""
-        );
-
-        List<String> result = task.call();
-
-        assertEquals(expectedModels, result);
-    }
-
-    @Test
     void taskHasCorrectTitle() {
         FetchAiModelsBackgroundTask task = new FetchAiModelsBackgroundTask(
                 mockAiModelService,

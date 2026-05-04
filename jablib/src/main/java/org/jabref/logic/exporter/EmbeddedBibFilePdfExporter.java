@@ -152,7 +152,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
     private String getBibString(List<BibEntry> entries) throws IOException {
         StringWriter stringWriter = new StringWriter();
         BibWriter bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
-        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
+        FieldWriter fieldWriter = new FieldWriter(fieldPreferences);
         BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, bibEntryTypesManager);
         for (BibEntry entry : entries) {
             bibEntryWriter.write(entry, bibWriter, bibDatabaseMode);

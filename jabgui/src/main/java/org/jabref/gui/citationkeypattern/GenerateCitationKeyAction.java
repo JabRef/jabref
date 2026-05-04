@@ -1,6 +1,7 @@
 package org.jabref.gui.citationkeypattern;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -19,6 +20,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 
 public class GenerateCitationKeyAction extends SimpleCommand {
@@ -123,8 +125,12 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                             new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
                     int entriesDone = 0;
                     for (BibEntry entry : entries) {
-                        keyGenerator.generateAndSetKey(entry)
-                                    .ifPresent(fieldChange -> compound.addEdit(new UndoableKeyChange(fieldChange)));
+                        String newKey = keyGenerator.generateKey(entry);
+                        // Set the key on the FX thread, since BibEntry uses ObservableMap which fires FX listeners
+                        Optional<FieldChange> fieldChange = UiTaskExecutor.runInJavaFXThread(() -> entry.setCitationKey(newKey));
+                        if (fieldChange != null) {
+                            fieldChange.ifPresent(change -> compound.addEdit(new UndoableKeyChange(change)));
+                        }
                         entriesDone++;
                         int finalEntriesDone = entriesDone;
                         UiTaskExecutor.runInJavaFXThread(() -> {

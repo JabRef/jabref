@@ -6,6 +6,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class OwnerPreferences {
+    private static final String DEFAULT_OWNER = System.getProperty("user.name");
+
     private final BooleanProperty useOwner;
     private final StringProperty defaultOwner;
     private final BooleanProperty overwriteOwner;
@@ -18,7 +20,26 @@ public class OwnerPreferences {
         this.overwriteOwner = new SimpleBooleanProperty(overwriteOwner);
     }
 
-    public boolean isUseOwner() {
+    private OwnerPreferences() {
+        this(
+                false,         // useOwner
+                DEFAULT_OWNER, // defaultOwner
+                false          // overwriteOwner
+        );
+    }
+
+    public static OwnerPreferences getDefault() {
+        return new OwnerPreferences();
+    }
+
+    public OwnerPreferences setAll(OwnerPreferences preferences) {
+        setUseOwner(preferences.shouldUseOwner());
+        setDefaultOwner(preferences.getDefaultOwner());
+        setOverwriteOwner(preferences.shouldOverwriteOwner());
+        return this;
+    }
+
+    public boolean shouldUseOwner() {
         return useOwner.getValue();
     }
 
@@ -42,7 +63,7 @@ public class OwnerPreferences {
         this.defaultOwner.set(defaultOwner);
     }
 
-    public boolean isOverwriteOwner() {
+    public boolean shouldOverwriteOwner() {
         return overwriteOwner.getValue();
     }
 
