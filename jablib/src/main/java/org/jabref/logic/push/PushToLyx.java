@@ -10,6 +10,7 @@ import java.util.List;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.NotificationService;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
@@ -48,10 +49,9 @@ public class PushToLyx extends AbstractPushToApplication {
         couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
+        commandPath = preferences.getCommandPaths().getOrDefault(this.getDisplayName(), "");
 
-        commandPath = preferences.getCommandPaths().get(this.getDisplayName());
-
-        if ((commandPath == null) || commandPath.trim().isEmpty()) {
+        if (StringUtil.isBlank(commandPath)) {
             notDefined = true;
             return;
         }
