@@ -170,7 +170,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
         BstParser.IdListOptContext entryStrings = ctx.idListOpt(2);
         for (BstParser.IdentifierContext identifierContext : entryStrings.identifier()) {
             for (BstEntry entry : bstVMContext.entries()) {
-                entry.localStrings.put(identifierContext.getText(), null);
+                entry.localStrings.put(identifierContext.getText(), "");
             }
         }
 

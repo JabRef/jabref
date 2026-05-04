@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BstVMVisitorTest {
@@ -27,11 +26,11 @@ class BstVMVisitorTest {
 
         Map<String, String> strList = vm.getContext().strings();
         assertTrue(strList.containsKey("test.string1"));
-        assertNull(strList.get("test.string1"));
+        assertEquals("", strList.get("test.string1"));
         assertTrue(strList.containsKey("test.string2"));
-        assertNull(strList.get("test.string2"));
+        assertEquals("", strList.get("test.string2"));
         assertTrue(strList.containsKey("test.string3"));
-        assertNull(strList.get("test.string3"));
+        assertEquals("", strList.get("test.string3"));
     }
 
     @Test

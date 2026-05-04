@@ -55,7 +55,7 @@ public class BstFunctions {
         this.strings = bstVMContext.strings();
         this.integers = bstVMContext.integers();
         this.functions = bstVMContext.functions();
-        this.preamble = Optional.ofNullable(bstVMContext.bibDatabase()).flatMap(BibDatabase::getPreamble).orElse("");
+        this.preamble = Optional.of(bstVMContext.bibDatabase()).flatMap(BibDatabase::getPreamble).orElse("");
         this.stack = bstVMContext.stack();
 
         this.bbl = bbl;
@@ -148,16 +148,6 @@ public class BstFunctions {
         Object o1 = stack.pop();
         Object o2 = stack.pop();
 
-        if ((o1 == null) ^ (o2 == null)) {
-            stack.push(BstVM.FALSE);
-            return;
-        }
-
-        if ((o1 == null) && (o2 == null)) {
-            stack.push(BstVM.TRUE);
-            return;
-        }
-
         stack.push(o1.equals(o2) ? BstVM.TRUE : BstVM.FALSE);
     }
 
@@ -201,13 +191,6 @@ public class BstFunctions {
         }
         Object o2 = stack.pop();
         Object o1 = stack.pop();
-
-        if (o1 == null) {
-            o1 = "";
-        }
-        if (o2 == null) {
-            o2 = "";
-        }
 
         if (!((o1 instanceof String) && (o2 instanceof String))) {
             LOGGER.error("o1: {} ({})", o1, o1.getClass());
@@ -414,17 +397,11 @@ public class BstFunctions {
         }
         Object o1 = stack.pop();
 
-        if (o1 == null) {
-            LOGGER.trace("null is empty");
-            stack.push(BstVM.TRUE);
-            return;
-        }
-
         if (!(o1 instanceof String s)) {
             throw new BstVMException("Operand does not match function empty$ (line %d)".formatted(ctx.start.getLine()));
         }
 
-        boolean result = s.trim().isEmpty();
+        boolean result = StringUtil.isBlank(s);
         LOGGER.trace("empty$({}) result: {}", s, result);
         stack.push(result ? BstVM.TRUE : BstVM.FALSE);
     }
@@ -550,11 +527,6 @@ public class BstFunctions {
             throw new BstVMException("Not enough operands on stack for operation missing$ (line %d)".formatted(ctx.start.getLine()));
         }
         Object o1 = stack.pop();
-
-        if (o1 == null) {
-            stack.push(BstVM.TRUE);
-            return;
-        }
 
         if (!(o1 instanceof String)) {
             LOGGER.warn("Not a string or missing field in operation missing$ (line {})", ctx.start.getLine());
