@@ -83,6 +83,10 @@ jobs:
       - name: Run OpenRewrite
         run: |
           gradle --no-configuration-cache :rewriteRun
+
+      # Reformat code (because OpenRewrite does different indents)
+      - uses: ./.github/actions/format-java
+
       - name: Fail if working directory is unclean
         run: git diff --exit-code
 
@@ -91,12 +95,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: leventeBajczi/intellij-idea-format@master
-        with:
-          file-mask: "*.java"
-          settings-file: ".idea/codeStyles/Project.xml"
-      - name: Undo JBang changes # IntelliJ issue: https://youtrack.jetbrains.com/issue/IDEA-https://youtrack.jetbrains.com/issue/IDEA-384956/Skip-formatting-of-shebang-headers/Skip-formatting-of-shebang-headers
-        run: git checkout HEAD -- jablib-examples/jbang/*.java
+      - uses: ./.github/actions/format-java
       # job should fail in case there are changes
       - name: Check if any files changed
         run: git diff --exit-code
