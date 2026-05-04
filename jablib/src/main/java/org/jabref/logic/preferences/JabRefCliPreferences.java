@@ -379,8 +379,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String ALLOWED_ORIGINS = "allowedOrigins";
     private static final String API_TOKEN = "apiToken";
     private static final String HTTP_SERVER_ALLOW_UNAUTHENTICATED_WITHOUT_ORIGIN = "httpServerAllowUnauthenticatedAccessWithoutOrigin";
-
-
     // endregion
 
     // region AiPreferences
