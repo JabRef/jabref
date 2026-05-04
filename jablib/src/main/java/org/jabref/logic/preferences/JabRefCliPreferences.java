@@ -1481,9 +1481,8 @@ public class JabRefCliPreferences implements CliPreferences {
             return CitationKeyPatternPreferences.KeySuffix.ALWAYS;
         } else if (!alwaysAddLetter && firstLetterA) {
             return CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
-        } else {
-            return CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
         }
+        return CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
     }
 
     private @NonNull GlobalCitationKeyPatterns getGlobalCitationKeyPattern(CitationKeyPatternPreferences defaults) {

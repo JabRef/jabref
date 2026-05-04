@@ -282,15 +282,13 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 horizontalDividerSubscription.unsubscribe();
             }
             horizontalSplit.getItems().remove(sidePane);
-        } else {
-            if (!horizontalSplit.getItems().contains(sidePane)) {
-                horizontalSplit.setVisible(false);
-                horizontalSplit.getItems().addFirst(sidePane);
-                Platform.runLater(() -> {
-                    updateHorizontalDividerPosition();
-                    horizontalSplit.setVisible(true);
-                });
-            }
+        } else if (!horizontalSplit.getItems().contains(sidePane)) {
+            horizontalSplit.setVisible(false);
+            horizontalSplit.getItems().addFirst(sidePane);
+            Platform.runLater(() -> {
+                updateHorizontalDividerPosition();
+                horizontalSplit.setVisible(true);
+            });
         }
     }
 
@@ -300,11 +298,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 verticalDividerSubscription.unsubscribe();
             }
             verticalSplit.getItems().remove(entryEditor);
-        } else {
-            if (!verticalSplit.getItems().contains(entryEditor)) {
-                verticalSplit.getItems().addLast(entryEditor);
-                updateVerticalDividerPosition();
-            }
+        } else if (!verticalSplit.getItems().contains(entryEditor)) {
+            verticalSplit.getItems().addLast(entryEditor);
+            updateVerticalDividerPosition();
         }
     }
 

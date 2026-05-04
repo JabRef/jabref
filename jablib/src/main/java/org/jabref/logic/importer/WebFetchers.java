@@ -132,9 +132,8 @@ public class WebFetchers {
     public static <T extends Identifier> IdFetcher<T> getIdFetcherForIdentifier(Class<T> clazz) {
         if (clazz == DOI.class) {
             return (IdFetcher<T>) new CrossRef();
-        } else {
-            throw new IllegalArgumentException("No fetcher found for identifier" + clazz.getCanonicalName());
         }
+        throw new IllegalArgumentException("No fetcher found for identifier" + clazz.getCanonicalName());
     }
 
     public static Optional<IdFetcher<? extends Identifier>> getIdFetcherForField(Field field) {
@@ -313,8 +312,7 @@ class CompositeSearchFirstComparator implements Comparator<SearchBasedFetcher> {
     public int compare(SearchBasedFetcher s1, SearchBasedFetcher s2) {
         if (Objects.equals(s1.getName(), CompositeSearchBasedFetcher.FETCHER_NAME)) {
             return -1;
-        } else {
-            return String.CASE_INSENSITIVE_ORDER.compare(s1.getName(), s2.getName());
         }
+        return String.CASE_INSENSITIVE_ORDER.compare(s1.getName(), s2.getName());
     }
 }

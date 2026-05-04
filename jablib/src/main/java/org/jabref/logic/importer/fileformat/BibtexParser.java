@@ -486,9 +486,8 @@ public class BibtexParser implements Parser {
             return purge(result, BibDatabaseWriter.DATABASE_ID_PREFIX);
         } else if (result.contains(SaveConfiguration.ENCODING_PREFIX)) {
             return purge(result, SaveConfiguration.ENCODING_PREFIX);
-        } else {
-            return result;
         }
+        return result;
     }
 
     /// Purges the given stringToPurge (if it exists) from the given context
@@ -763,38 +762,36 @@ public class BibtexParser implements Parser {
                     // TODO: multiple keywords fields should be combined to one
                     entry.addKeyword(content, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                 }
-            } else {
-                // If a BibDesk File Field is encountered
-                if (field.getName().length() > 10 && field.getName().startsWith("bdsk-file-")) {
-                    try {
-                        byte[] decodedBytes = Base64.getDecoder().decode(content);
+            } else // If a BibDesk File Field is encountered
+            if (field.getName().length() > 10 && field.getName().startsWith("bdsk-file-")) {
+                try {
+                    byte[] decodedBytes = Base64.getDecoder().decode(content);
 
-                        // Parse the base64 encoded binary plist to get the relative (to the .bib file) path
-                        NSDictionary plist = (NSDictionary) BinaryPropertyListParser.parse(decodedBytes);
+                    // Parse the base64 encoded binary plist to get the relative (to the .bib file) path
+                    NSDictionary plist = (NSDictionary) BinaryPropertyListParser.parse(decodedBytes);
 
-                        if (plist.containsKey("relativePath")) {
-                            NSString relativePath = (NSString) plist.objectForKey("relativePath");
+                    if (plist.containsKey("relativePath")) {
+                        NSString relativePath = (NSString) plist.objectForKey("relativePath");
+                        Path path = Path.of(relativePath.getContent());
+
+                        LinkedFile file = new LinkedFile("", path, "");
+                        entry.addFile(file);
+                    } else if (plist.containsKey("$objects") && plist.objectForKey("$objects") instanceof NSArray nsArray) {
+                        if (nsArray.getArray().length > INDEX_RELATIVE_PATH_IN_PLIST) {
+                            NSString relativePath = (NSString) nsArray.objectAtIndex(INDEX_RELATIVE_PATH_IN_PLIST);
                             Path path = Path.of(relativePath.getContent());
 
                             LinkedFile file = new LinkedFile("", path, "");
                             entry.addFile(file);
-                        } else if (plist.containsKey("$objects") && plist.objectForKey("$objects") instanceof NSArray nsArray) {
-                            if (nsArray.getArray().length > INDEX_RELATIVE_PATH_IN_PLIST) {
-                                NSString relativePath = (NSString) nsArray.objectAtIndex(INDEX_RELATIVE_PATH_IN_PLIST);
-                                Path path = Path.of(relativePath.getContent());
-
-                                LinkedFile file = new LinkedFile("", path, "");
-                                entry.addFile(file);
-                            }
-                        } else {
-                            LOGGER.error("Could not find attribute 'relativePath' for entry {} in decoded BibDesk field bdsk-file...) ", entry);
                         }
-                    } catch (Exception e) {
-                        LOGGER.error("Could not parse BibDesk files content (field: bdsk-file...) for entry {}", entry, e);
+                    } else {
+                        LOGGER.error("Could not find attribute 'relativePath' for entry {} in decoded BibDesk field bdsk-file...) ", entry);
                     }
-                } else {
-                    entry.setField(field, content);
+                } catch (Exception e) {
+                    LOGGER.error("Could not parse BibDesk files content (field: bdsk-file...) for entry {}", entry, e);
                 }
+            } else {
+                entry.setField(field, content);
             }
         }
         ParserResult.Range keyRange = new ParserResult.Range(startLine, startColumn, line, column);
@@ -980,25 +977,23 @@ public class BibtexParser implements Parser {
             if (!Character.isWhitespace((char) character) && (Character.isLetterOrDigit((char) character)
                     || (character == ':') || ("#{}~,=\uFFFD".indexOf(character) == -1))) {
                 token.append((char) character);
+            } else if (Character.isWhitespace((char) character)) {
+                // We have encountered white space instead of the comma at
+                // the end of
+                // the key. Possibly the comma is missing, so we try to
+                // return what we
+                // have found, as the key and try to restore the rest in fixKey().
+                return token + fixKey();
+            } else if ((character == ',') || (character == '}')) {
+                unread(character);
+                return token.toString();
+            } else if (character == '=') {
+                // If we find a '=' sign, it is either an error, or
+                // the entry lacked a comma signifying the end of the key.
+                return token.toString();
             } else {
-                if (Character.isWhitespace((char) character)) {
-                    // We have encountered white space instead of the comma at
-                    // the end of
-                    // the key. Possibly the comma is missing, so we try to
-                    // return what we
-                    // have found, as the key and try to restore the rest in fixKey().
-                    return token + fixKey();
-                } else if ((character == ',') || (character == '}')) {
-                    unread(character);
-                    return token.toString();
-                } else if (character == '=') {
-                    // If we find a '=' sign, it is either an error, or
-                    // the entry lacked a comma signifying the end of the key.
-                    return token.toString();
-                } else {
-                    throw new IOException("Error in line " + line + ":" + "Character '" + (char) character + "' is not "
-                            + "allowed in citation keys.");
-                }
+                throw new IOException("Error in line " + line + ":" + "Character '" + (char) character + "' is not "
+                        + "allowed in citation keys.");
             }
         }
     }

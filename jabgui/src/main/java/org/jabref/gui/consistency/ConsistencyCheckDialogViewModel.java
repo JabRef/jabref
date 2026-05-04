@@ -144,9 +144,8 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
                         return ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
                     } else if (optionalFields.contains(field)) {
                         return ConsistencySymbol.OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
-                    } else {
-                        return ConsistencySymbol.UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
                     }
+                    return ConsistencySymbol.UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
                 }).orElse(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText()))
         );
         return result;

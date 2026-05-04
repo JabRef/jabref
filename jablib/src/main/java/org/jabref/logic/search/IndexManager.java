@@ -187,9 +187,8 @@ public class IndexManager {
             pendingFileValuesByEntry.compute(entry, (_, existing) -> {
                 if (existing == null) {
                     return new FileDelta(event.getOldValue(), event.getNewValue());
-                } else {
-                    return new FileDelta(existing.oldValue(), event.getNewValue());
                 }
+                return new FileDelta(existing.oldValue(), event.getNewValue());
             });
         }
 

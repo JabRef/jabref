@@ -237,15 +237,14 @@ public class GroupDialogViewModel {
                 input -> {
                     if (StringUtil.isBlank(input)) {
                         return false;
-                    } else {
-                        Path inputPath = getAbsoluteTexGroupPath(input);
-                        if (!inputPath.isAbsolute() || !Files.isRegularFile(inputPath)) {
-                            return false;
-                        }
-                        return FileUtil.getFileExtension(input)
-                                       .map("aux"::equalsIgnoreCase)
-                                       .orElse(false);
                     }
+                    Path inputPath = getAbsoluteTexGroupPath(input);
+                    if (!inputPath.isAbsolute() || !Files.isRegularFile(inputPath)) {
+                        return false;
+                    }
+                    return FileUtil.getFileExtension(input)
+                            .map("aux"::equalsIgnoreCase)
+                            .orElse(false);
                 },
                 ValidationMessage.error(Localization.lang("Please provide a valid aux file.")));
 
