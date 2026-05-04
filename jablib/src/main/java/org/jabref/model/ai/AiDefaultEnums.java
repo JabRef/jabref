@@ -19,4 +19,3 @@ public final class AiDefaultEnums {
         throw new UnsupportedOperationException("cannot instantiate a utility class");
     }
 }
-

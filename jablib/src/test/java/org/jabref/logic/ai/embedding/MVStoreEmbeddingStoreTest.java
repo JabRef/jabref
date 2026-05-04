@@ -147,4 +147,3 @@ class MVStoreEmbeddingStoreTest {
         assertEquals("remove", matches.getFirst().embedded().text());
     }
 }
-

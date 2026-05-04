@@ -81,4 +81,3 @@ public class UniversalStatusPaneViewModel extends AbstractViewModel {
         return button2Action;
     }
 }
-

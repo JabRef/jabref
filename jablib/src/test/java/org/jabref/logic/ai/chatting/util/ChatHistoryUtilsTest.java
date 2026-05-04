@@ -149,4 +149,3 @@ class ChatHistoryUtilsTest {
         assertTrue(last.isEmpty());
     }
 }
-

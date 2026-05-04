@@ -53,5 +53,3 @@ class EmbeddingModelCacheTest {
         assertSame(afterClose, secondAfterClose);
     }
 }
-
-

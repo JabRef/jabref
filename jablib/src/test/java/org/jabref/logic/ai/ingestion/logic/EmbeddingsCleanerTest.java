@@ -115,5 +115,3 @@ class EmbeddingsCleanerTest {
         assertTrue(ingestedDocumentsRepository.isDocumentIngested("hash-xyz"));
     }
 }
-
-

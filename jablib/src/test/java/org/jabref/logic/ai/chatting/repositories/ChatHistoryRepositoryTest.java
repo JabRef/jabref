@@ -140,4 +140,3 @@ class ChatHistoryRepositoryTest {
         assertEquals("beta message", repo.getAllMessages(id2).getFirst().content());
     }
 }
-

@@ -73,7 +73,3 @@ class AiSummaryExporterTest {
         assertTrue(result.contains("significant") && result.contains("improvement"));
     }
 }
-
-
-
-

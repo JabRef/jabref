@@ -233,4 +233,3 @@ public class UniversalStatusPaneView extends BorderPane {
         viewModel.button2ActionProperty().set(onButton2Click);
     }
 }
-

@@ -122,4 +122,3 @@ public final class ObservablesHelper {
         return createClosableObjectBinding(func, dependencies.toArray(Observable[]::new));
     }
 }
-

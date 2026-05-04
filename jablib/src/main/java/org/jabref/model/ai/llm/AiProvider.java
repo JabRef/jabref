@@ -50,4 +50,3 @@ public enum AiProvider implements Serializable {
         }
     }
 }
-

@@ -52,4 +52,3 @@ public class EmbeddingModelCache implements AutoCloseable {
         cache.clear();
     }
 }
-

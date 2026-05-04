@@ -64,5 +64,3 @@ public enum PredefinedChatModel {
         return aiProvider.toString() + " " + name;
     }
 }
-
-

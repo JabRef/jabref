@@ -58,4 +58,3 @@ class FileHasherTest {
         assertTrue(hash.get().matches("[0-9a-f]+"), "Hash should contain only hexadecimal characters");
     }
 }
-
