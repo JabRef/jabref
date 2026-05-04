@@ -203,7 +203,7 @@ public class PicaXmlParser implements Parser {
                 String kor = getSubfield("b", datafield);
 
                 if (kor != null) {
-                    series = series + " / " + kor;
+                    series += " / " + kor;
                 }
             }
 
