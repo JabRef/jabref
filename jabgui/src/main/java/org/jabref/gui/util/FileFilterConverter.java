@@ -96,15 +96,15 @@ public class FileFilterConverter {
 
     public static Filter<Path> toDirFilter(List<String> extensions) {
         List<String> extensionsCleaned = extensions.stream()
-                .map(extension -> extension.replace(".", "").replace("*", ""))
-                .filter(StringUtil::isNotBlank)
-                .toList();
+                                                   .map(extension -> extension.replace(".", "").replace("*", ""))
+                                                   .filter(StringUtil::isNotBlank)
+                                                   .toList();
         if (extensionsCleaned.isEmpty()) {
             // Except every file
             return _ -> true;
         }
         return path -> FileUtil.getFileExtension(path)
-                .map(extensionsCleaned::contains)
-                .orElse(false);
+                               .map(extensionsCleaned::contains)
+                               .orElse(false);
     }
 }

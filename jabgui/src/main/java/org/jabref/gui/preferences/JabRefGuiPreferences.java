@@ -875,11 +875,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private List<String> previewLayoutsToStrings(List<PreviewLayout> previewCycle) {
         return previewCycle.stream()
                            .map(layout -> {
-            if (layout instanceof CitationStylePreviewLayout citationStyleLayout) {
-                return citationStyleLayout.getFilePath();
-            }
-            return layout.getName();
-        }).toList();
+                               if (layout instanceof CitationStylePreviewLayout citationStyleLayout) {
+                                   return citationStyleLayout.getFilePath();
+                               }
+                               return layout.getName();
+                           }).toList();
     }
 
     private int getPreviewCyclePosition(List<PreviewLayout> layouts, int defaultPosition) {

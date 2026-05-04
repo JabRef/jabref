@@ -446,9 +446,9 @@ public class GroupNodeViewModel {
             return true;
         } else if (group instanceof LastNameGroup || group instanceof RegexKeywordGroup) {
             return groupNode.getParent()
-                    .map(GroupTreeNode::getGroup)
-                    .map(groupParent -> groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup)
-                    .orElse(false);
+                            .map(GroupTreeNode::getGroup)
+                            .map(groupParent -> groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup)
+                            .orElse(false);
         } else if (group instanceof KeywordGroup) {
             // also covers WordKeywordGroup
             return true;

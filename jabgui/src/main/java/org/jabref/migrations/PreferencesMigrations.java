@@ -453,11 +453,11 @@ public class PreferencesMigrations {
         List<String> fieldColumnNames = oldColumnNames.stream()
                                                       .filter(columnName -> columnName.startsWith("field:") || columnName.startsWith("special:"))
                                                       .map(columnName -> {
-            if (columnName.startsWith("field:")) {
-                return columnName.substring(6);
-            } // special
-            return columnName.substring(8);
-        }).collect(Collectors.toList());
+                                                          if (columnName.startsWith("field:")) {
+                                                              return columnName.substring(6);
+                                                          } // special
+                                                          return columnName.substring(8);
+                                                      }).collect(Collectors.toList());
 
         if (!fieldColumnNames.isEmpty()) {
             preferences.putStringList(V5_0_COLUMN_NAMES, fieldColumnNames);

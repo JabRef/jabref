@@ -179,9 +179,9 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
             return IconTheme.JabRefIcons.FILE_MULTIPLE.getGraphicNode();
         } else if (linkedFiles.size() == 1) {
             return ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFiles.getFirst(), true, preferences.getExternalApplicationsPreferences())
-                    .map(ExternalFileType::getIcon)
-                    .orElse(IconTheme.JabRefIcons.FILE)
-                    .getGraphicNode();
+                                    .map(ExternalFileType::getIcon)
+                                    .orElse(IconTheme.JabRefIcons.FILE)
+                                    .getGraphicNode();
         }
         return null;
     }

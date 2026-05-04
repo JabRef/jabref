@@ -243,8 +243,8 @@ public class GroupDialogViewModel {
                         return false;
                     }
                     return FileUtil.getFileExtension(input)
-                            .map("aux"::equalsIgnoreCase)
-                            .orElse(false);
+                                   .map("aux"::equalsIgnoreCase)
+                                   .orElse(false);
                 },
                 ValidationMessage.error(Localization.lang("Please provide a valid aux file.")));
 
