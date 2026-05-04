@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
@@ -63,14 +64,7 @@ public class SearchRxivExporter {
     }
 
     private String buildFileName(String query, String databaseName, int index) {
-        String cleanDb = databaseName.replaceAll("[^A-Za-z0-9]", "_");
-        String cleanQuery = query.replaceAll("[^A-Za-z0-9]", "_");
-        if (cleanQuery.isEmpty()) {
-            cleanQuery = "query";
-        }
-        if (cleanQuery.length() > 20) {
-            cleanQuery = cleanQuery.substring(0, 20);
-        }
-        return cleanDb + "-" + cleanQuery + "-" + index + ".json";
+        String queryPart = query.isBlank() ? "query" : query;
+        return FileUtil.getValidFileName(databaseName + "-" + queryPart + "-" + index + ".json");
     }
 }
