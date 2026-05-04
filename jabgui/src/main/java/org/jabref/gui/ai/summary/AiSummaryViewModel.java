@@ -34,7 +34,7 @@ import org.jabref.model.ai.summarization.AiSummary;
 import org.jabref.model.entry.BibEntry;
 
 import com.tobiasdiez.easybind.EasyBind;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class AiSummaryViewModel extends AbstractViewModel {
     public enum State {

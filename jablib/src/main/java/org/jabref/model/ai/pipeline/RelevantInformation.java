@@ -1,6 +1,6 @@
 package org.jabref.model.ai.pipeline;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public record RelevantInformation(@Nullable String source, String text) {
 }

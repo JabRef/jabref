@@ -3,7 +3,7 @@ package org.jabref.gui.util;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public final class ExceptionsUtil {
     private ExceptionsUtil() {
