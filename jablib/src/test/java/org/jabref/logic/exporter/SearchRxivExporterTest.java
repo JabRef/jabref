@@ -3,7 +3,6 @@ package org.jabref.logic.exporter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
@@ -12,8 +11,7 @@ import org.jabref.model.study.StudyQuery;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.CsvSource;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
@@ -81,15 +79,12 @@ class SearchRxivExporterTest {
         }
     }
 
-    static Stream<Arguments> exportProducesExpectedFileName() {
-        return Stream.of(
-                Arguments.of("a/b:c*d", "IEEE", "IEEE-a_b_c_d-0.json"),
-                Arguments.of("   ", "IEEE", "IEEE-query-0.json"),
-                Arguments.of("machine learning", "IEEE", "IEEE-machine learning-0.json"));
-    }
-
     @ParameterizedTest
-    @MethodSource
+    @CsvSource(textBlock = """
+            'a/b:c*d'         , IEEE, IEEE-a_b_c_d-0.json
+            '   '             , IEEE, IEEE-query-0.json
+            'machine learning', IEEE, 'IEEE-machine learning-0.json'
+            """)
     void exportProducesExpectedFileName(String query, String database, String expectedFileName, @TempDir Path tempDir) throws Exception {
         Study study = new Study(
                 List.of("John Doe"),
