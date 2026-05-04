@@ -95,7 +95,6 @@ public class BstVM {
         } else {
             throw new BstVMException("BstVM must have rendered at least once to provide the latest context");
         }
-        throw new BstVMException("BstVM must have rendered at least once to provide the latest stack");
     }
 
     private static class ThrowingErrorListener extends BaseErrorListener {
