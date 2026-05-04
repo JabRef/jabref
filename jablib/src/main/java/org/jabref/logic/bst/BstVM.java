@@ -2,7 +2,6 @@ package org.jabref.logic.bst;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,7 +65,7 @@ public class BstVM {
     /// @param bibEntries  list of entries to convert
     /// @param bibDatabase (may be null) the bibDatabase used for resolving strings / crossref
     /// @return list of references in plain text form
-    public String render(Collection<BibEntry> bibEntries, @Nullable BibDatabase bibDatabase) {
+    public String render(List<BibEntry> bibEntries, BibDatabase bibDatabase) {
         // needs to be modifiable due to sort operations later
         List<BstEntry> entries = bibEntries.stream().map(BstEntry::new).collect(Collectors.toList());
 
@@ -85,8 +84,8 @@ public class BstVM {
         return resultBuffer.toString();
     }
 
-    public String render(Collection<BibEntry> bibEntries) {
-        return render(bibEntries, null);
+    public String render(List<BibEntry> bibEntries) {
+        return render(bibEntries, new BibDatabase(bibEntries));
     }
 
     @VisibleForTesting

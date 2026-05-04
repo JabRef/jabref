@@ -216,7 +216,7 @@ class BstFunctionsTest {
         bstVMContext.stack().push(start);
         bstVMContext.stack().push(length);
         bstFunctions.bstSubstring(
-                new BstVMVisitor(new BstVMContext(List.of(), null, null), new StringBuilder(0)),
+                new BstVMVisitor(new BstVMContext(List.of(), new BibDatabase(), null), new StringBuilder(0)),
                 ParserRuleContext.EMPTY);
         assertEquals(expected, bstVMContext.stack().pop());
     }
