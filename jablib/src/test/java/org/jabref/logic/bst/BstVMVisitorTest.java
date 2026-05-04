@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BstVMVisitorTest {
@@ -25,13 +24,13 @@ class BstVMVisitorTest {
 
         vm.render(List.of());
 
-        Map<String, String> strList = vm.latestContext.strings();
+        Map<String, String> strList = vm.getContext().strings();
         assertTrue(strList.containsKey("test.string1"));
-        assertNull(strList.get("test.string1"));
+        assertEquals("", strList.get("test.string1"));
         assertTrue(strList.containsKey("test.string2"));
-        assertNull(strList.get("test.string2"));
+        assertEquals("", strList.get("test.string2"));
         assertTrue(strList.containsKey("test.string3"));
-        assertNull(strList.get("test.string3"));
+        assertEquals("", strList.get("test.string3"));
     }
 
     @Test
@@ -40,7 +39,7 @@ class BstVMVisitorTest {
 
         vm.render(List.of());
 
-        Map<String, Integer> integersList = vm.latestContext.integers();
+        Map<String, Integer> integersList = vm.getContext().integers();
         assertTrue(integersList.containsKey("variable.a"));
         assertEquals(0, integersList.get("variable.a"));
         assertTrue(integersList.containsKey("variable.b"));
@@ -58,7 +57,7 @@ class BstVMVisitorTest {
 
         vm.render(List.of());
 
-        Map<String, BstFunctions.BstFunction> functions = vm.latestContext.functions();
+        Map<String, BstFunctions.BstFunction> functions = vm.getContext().functions();
         assertTrue(functions.containsKey("test.func"));
         assertNotNull(functions.get("test.func"));
     }
@@ -72,11 +71,11 @@ class BstVMVisitorTest {
 
         vm.render(List.of());
 
-        Map<String, BstFunctions.BstFunction> functions = vm.latestContext.functions();
+        Map<String, BstFunctions.BstFunction> functions = vm.getContext().functions();
         assertTrue(functions.containsKey("jan"));
         assertNotNull(functions.get("jan"));
-        assertEquals("January", vm.latestContext.stack().pop());
-        assertTrue(vm.latestContext.stack().isEmpty());
+        assertEquals("January", vm.getContext().stack().pop());
+        assertTrue(vm.getContext().stack().isEmpty());
     }
 
     @Test
@@ -86,7 +85,7 @@ class BstVMVisitorTest {
 
         vm.render(testEntries);
 
-        BstEntry bstEntry = vm.latestContext.entries().getFirst();
+        BstEntry bstEntry = vm.getContext().entries().getFirst();
         assertTrue(bstEntry.fields.containsKey("address"));
         assertTrue(bstEntry.fields.containsKey("author"));
         assertTrue(bstEntry.fields.containsKey("title"));
@@ -106,7 +105,7 @@ class BstVMVisitorTest {
 
         vm.render(testEntries);
 
-        Map<String, String> fields = vm.latestContext.entries().getFirst().fields;
+        Map<String, String> fields = vm.getContext().entries().getFirst().fields;
         assertEquals("Crowston, K. and Annabi, H. and Howison, J. and Masango, C.", fields.get("author"));
         assertEquals("Effective work practices for floss development: A model and propositions", fields.get("title"));
         assertEquals("Hawaii International Conference On System Sciences (HICSS)", fields.get("booktitle"));
@@ -126,7 +125,7 @@ class BstVMVisitorTest {
 
         vm.render(List.of());
 
-        assertEquals(5, vm.latestContext.integers().get("variable.a"));
+        assertEquals(5, vm.getContext().integers().get("variable.a"));
     }
 
     @Test
@@ -144,9 +143,9 @@ class BstVMVisitorTest {
 
         vm.render(testEntries);
 
-        assertEquals(2, vm.getStack().size());
-        assertEquals("test", vm.getStack().pop());
-        assertEquals("canh05", vm.getStack().pop());
+        assertEquals(2, vm.getContext().stack().size());
+        assertEquals("test", vm.getContext().stack().pop());
+        assertEquals("canh05", vm.getContext().stack().pop());
     }
 
     @Test
@@ -164,9 +163,9 @@ class BstVMVisitorTest {
 
         vm.render(testEntries);
 
-        assertEquals(2, vm.getStack().size());
-        assertEquals("canh05", vm.getStack().pop());
-        assertEquals("test", vm.getStack().pop());
+        assertEquals(2, vm.getContext().stack().size());
+        assertEquals("canh05", vm.getContext().stack().pop());
+        assertEquals("test", vm.getContext().stack().pop());
     }
 
     @Test
@@ -185,7 +184,7 @@ class BstVMVisitorTest {
 
         vm.render(testEntries);
 
-        List<BstEntry> sortedEntries = vm.latestContext.entries();
+        List<BstEntry> sortedEntries = vm.getContext().entries();
         assertEquals(Optional.of("a"), sortedEntries.getFirst().entry.getCitationKey());
         assertEquals(Optional.of("b"), sortedEntries.get(1).entry.getCitationKey());
         assertEquals(Optional.of("c"), sortedEntries.get(2).entry.getCitationKey());
@@ -213,11 +212,11 @@ class BstVMVisitorTest {
 
         vm.render(testEntries);
 
-        assertEquals(2, vm.getStack().pop());
-        assertEquals("TEST-GLOBAL", vm.getStack().pop());
-        assertEquals(1, vm.getStack().pop());
-        assertEquals("TEST", vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals(2, vm.getContext().stack().pop());
+        assertEquals("TEST-GLOBAL", vm.getContext().stack().pop());
+        assertEquals(1, vm.getContext().stack().pop());
+        assertEquals("TEST", vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     @Test
@@ -237,12 +236,12 @@ class BstVMVisitorTest {
 
         vm.render(List.of());
 
-        assertEquals(3, vm.getStack().pop());
-        assertInstanceOf(ParseTree.class, vm.getStack().pop());
-        assertEquals(new BstVMVisitor.Identifier("t"), vm.getStack().pop());
-        assertEquals(1, vm.getStack().pop());
-        assertEquals("HELLO", vm.getStack().pop());
-        assertEquals(0, vm.getStack().size());
+        assertEquals(3, vm.getContext().stack().pop());
+        assertInstanceOf(ParseTree.class, vm.getContext().stack().pop());
+        assertEquals(new BstVMVisitor.Identifier("t"), vm.getContext().stack().pop());
+        assertEquals(1, vm.getContext().stack().pop());
+        assertEquals("HELLO", vm.getContext().stack().pop());
+        assertEquals(0, vm.getContext().stack().size());
     }
 
     // stackitem
