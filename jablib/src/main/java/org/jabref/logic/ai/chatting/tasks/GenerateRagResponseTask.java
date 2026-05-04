@@ -96,7 +96,3 @@ public class GenerateRagResponseTask extends BackgroundTask<ChatMessage> {
         );
     }
 }
-
-
-
-
