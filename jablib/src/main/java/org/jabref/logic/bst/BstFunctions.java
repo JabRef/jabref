@@ -390,7 +390,7 @@ public class BstFunctions {
                 return;
             }
 
-            bstEntry.entry.getCitationKey().ifPresent(stack::push);
+            stack.push(bstEntry.entry.getCitationKey().orElse(""));
         }
     }
 
