@@ -11,13 +11,13 @@ import org.jabref.model.ai.summarization.AiSummary;
 import org.jabref.model.entry.BibEntry;
 
 /// Session-scoped RAM cache for AI summaries.
-/// 
+///
 /// Keyed by {@link BibEntry} *reference identity* (using {@link IdentityHashMap}), so it
 /// works even for entries that have no citation key or a non-unique one.
-/// 
+///
 /// On {@link #close()}, entries whose {@link BibEntry} has a *present and unique*
 /// citation key and a valid AI library ID are flushed to the persistent {@link SummariesRepository}.
-/// 
+///
 /// Thread-safe: all map operations are protected by a synchronized wrapper.
 public class InMemorySummaryCache {
 
@@ -54,7 +54,7 @@ public class InMemorySummaryCache {
     /// Writes all cached summaries to the persistent repository for entries whose citation key is
     /// *present and unique* and whose database has a valid AI library ID.
     /// Entries that do not satisfy both conditions are silently skipped.
-    /// 
+    ///
     /// Call this when the library or application is closing so that valid summaries survive
     /// the next restart.
     public void close() {

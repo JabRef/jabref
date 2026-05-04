@@ -32,7 +32,7 @@ class AiModelServiceTest {
     void setUp() {
         aiModelService = new AiModelService();
     }
-    
+
     @Test
     void fetchModelsSynchronouslyReturnsEmptyListForInvalidApiKey() {
         List<String> models = aiModelService.fetchModelsSynchronously(

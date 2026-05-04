@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class InMemoryChatHistoryCacheTest {
-    
+
     private static final String LIBRARY_ID = "test-lib-id";
 
     private FakeChatHistoryRepository fakeRepository;

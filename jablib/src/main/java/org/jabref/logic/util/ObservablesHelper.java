@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Utility methods for working with JavaFX {@link Observable} objects in non-GUI logic code.
-/// 
+///
 /// GUI code should use `BindingsHelper` from `jabgui` instead.
 public final class ObservablesHelper {
     private final static Logger LOGGER = LoggerFactory.getLogger(ObservablesHelper.class);
@@ -36,26 +36,25 @@ public final class ObservablesHelper {
     }
 
     /// Creates an {@link ObjectBinding} that safely manages the lifecycle of {@link AutoCloseable} resources.
-    /// 
+    ///
     /// Standard JavaFX bindings are lazy and stateless, which can lead to resource leaks when
     /// binding to heavy or stateful objects (like file streams, external processes, or specialized
     /// internal components). This utility creates a binding that retains a reference to its
     /// previously calculated value and guarantees that {@link AutoCloseable#close()} is invoked
     /// on the old value immediately before a new value is computed.
-    /// 
-    /// 
+    ///
+    ///
     /// **Lifecycle & Memory Management:**
-    /// 
+    ///
     /// - **Lazy Evaluation:** Old resources are closed *only* when a new value is explicitly requested via `.get()` after invalidation.
     /// - **Disposal:** The active resource is automatically closed when {@link ObjectBinding#dispose()} is called.
-    /// 
-    /// 
-    /// 
+    ///
+    ///
+    ///
     /// *Note:* Exceptions thrown during the closing of old resources or the computation of
     /// new ones are caught and logged to prevent crashing the JavaFX application thread.
     /// If computation fails, the binding will evaluate to `null`.
-    /// 
-    /// 
+    ///
     /// @param <T>          The type of the closable resource, which must implement {@link AutoCloseable}.
     /// @param func         The factory {@link Callable} used to compute the new resource.
     /// This executes lazily when the binding's value is requested.

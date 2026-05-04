@@ -34,18 +34,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Migrates chat history from the old v1 MVStore file to the new v2 repository.
-/// 
+///
 /// Old format (v1): Stored in "chat-history.mv" file.
 /// Map keys like "bibDatabasePath-entry-citationKey" or "bibDatabasePath-group-groupName"
 /// containing Map&lt;Integer, ChatHistoryRecord&gt; where ChatHistoryRecord was a private inner
 /// class of MVStoreChatHistoryStorage (full name:
 /// org.jabref.logic.ai.chatting.chathistory.storages.MVStoreChatHistoryStorage$ChatHistoryRecord).
-/// 
+///
 /// New format (v2): Stored via repository using ChatIdentifier(libraryId, chatType, chatName).
-/// 
+///
 /// **Problem:** The old inner class no longer exists, so MVStore's ObjectDataType fails with
 /// ClassNotFoundException before our code can intercept.
-/// 
+///
 /// **Solution:** Open the map with a custom {@link RawBytesDataType} that returns the raw
 /// Java-serialized bytes for each value without invoking standard Java deserialization.
 /// Then a {@link ClassRemappingObjectInputStream} deserializes those bytes while remapping
@@ -67,7 +67,7 @@ public final class ChatHistoryMigrationV1 {
     }
 
     /// Migrates old chat history data from v1 file to v2 repository.
-    /// 
+    ///
     /// @param bibDatabaseContext  The database context containing the AI library ID
     /// @param repository          The new v2 chat history repository to migrate to
     /// @param notificationService Service for notifying user of errors
@@ -90,7 +90,7 @@ public final class ChatHistoryMigrationV1 {
 
         migrate(oldFilePath, libraryId, bibDatabaseContext, repository, notificationService);
     }
-    
+
     public static void migrate(
             Path oldFilePath,
             String libraryId,
@@ -269,7 +269,7 @@ public final class ChatHistoryMigrationV1 {
 
     /// Custom ObjectInputStream that remaps the deleted old inner class name
     /// to the current {@link ChatHistoryRecord} class.
-    /// 
+    ///
     /// The old and new records have identical components (className: String, content: String),
     /// so Java record deserialization will call the canonical constructor successfully.
     private static class ClassRemappingObjectInputStream extends ObjectInputStream {

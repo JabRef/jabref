@@ -12,7 +12,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 /// Exports an AI summary to Markdown format.
-/// 
+///
 /// Internally constructs a single-message dummy chat containing the summary content
 /// and delegates to {@link AiChatMarkdownExporter}.
 public class AiSummaryMarkdownExporter implements AiSummaryExporter {

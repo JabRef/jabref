@@ -26,7 +26,7 @@ public class AiSummaryView extends StackPane {
     @FXML private UniversalStatusPaneView processingPane;
     @FXML private UniversalStatusPaneView errorPane;
     @FXML private UniversalStatusPaneView cancelledPane;
-    
+
     @FXML private UniversalStatusPaneView noFilesPane;
     @FXML private UniversalStatusPaneView noSupportedFileTypesPane;
 

@@ -1,10 +1,10 @@
 package org.jabref.logic.ai.util;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /// Cleans raw LLM response strings by extracting content from the last
 /// fenced code block (``` ... ```) if present, or simply trimming whitespace.
-/// 
+///
 /// Rules:
 /// <ol>
 /// - If the response contains no ``` fences → return the string stripped of
@@ -23,7 +23,7 @@ public final class LlmResponseCleaner {
     }
 
     /// Cleans the given LLM response string according to the rules above.
-    /// 
+    ///
     /// @param response the raw LLM response; may be `null`
     /// @return the cleaned string, never `null`
     public static String clean(@Nullable String response) {
@@ -75,7 +75,7 @@ public final class LlmResponseCleaner {
     }
 
     /// Returns the start index of the last "opening" ``` in the string.
-    /// 
+    ///
     /// We treat every ``` as a potential opener/closer pair. Walking through the
     /// string we toggle a flag: the first ``` opens a block, the next closes it, etc.
     /// We remember the start index of each opener and return the last one seen.

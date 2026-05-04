@@ -22,13 +22,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// An {@link EmbeddingModel} that downloads/loads its underlying model asynchronously via a background task.
-/// 
+///
 /// The constructor immediately schedules an {@link UpdateEmbeddingModelTask}. Call
 /// {@link #embedAll(List)} only once the model is ready (check {@link #isPresent()}).
-/// 
+///
 /// Does not listen to any preferences; the owner is responsible for reacting to preference
 /// changes and creating a new instance if needed.
-/// 
+///
 /// Implements {@link AutoCloseable}; close it to release the loaded model.
 public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncEmbeddingModel.class);

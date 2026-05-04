@@ -8,7 +8,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.NotificationService;
 
 /// This class is responsible for recording the information about which documents (or documents) have been fully ingested.
-/// 
+///
 /// The class tracks files by their SHA-256 hash.
 public class MVStoreIngestedDocumentsRepository extends MVStoreBase implements IngestedDocumentsRepository {
     private static final String INGESTED_MAP_NAME = "ingested";
