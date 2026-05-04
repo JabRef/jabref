@@ -140,7 +140,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator, keystoreValidator);
 
         EasyBind.subscribe(useSSL, selected -> {
-            // Force the keystoreValidator to re-evaluate by "touching" the text property
             String current = keystore.getValue();
             keystore.setValue(null);
             keystore.setValue(current);
