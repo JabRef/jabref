@@ -2,17 +2,15 @@ package org.jabref.logic.auxparser;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.AfterEach;
@@ -39,13 +37,11 @@ class AuxParserTest {
     }
 
     @Test
-    void normal() throws URISyntaxException, IOException {
-        InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
-        Path auxFile = Path.of(AuxParserTest.class.getResource("paper.aux").toURI());
-        try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
-
-            AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
+    void normal() throws URISyntaxException, IOException, JabRefException {
+        try (InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib")) {
+            Path auxFile = Path.of(AuxParserTest.class.getResource("paper.aux").toURI());
+            final BibDatabaseContext bibDatabaseContext = BibDatabaseContext.of(originalStream, importFormatPreferences);
+            AuxParser auxParser = new DefaultAuxParser(bibDatabaseContext.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);
 
             assertTrue(auxResult.getGeneratedBibDatabase().hasEntries());
@@ -64,15 +60,12 @@ class AuxParserTest {
     }
 
     @Test
-    void twoArgMacro() throws URISyntaxException, IOException {
+    void twoArgMacro() throws URISyntaxException, IOException, JabRefException {
         // Result should be identical to that of testNormal
-
-        InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
-        Path auxFile = Path.of(AuxParserTest.class.getResource("papertwoargmacro.aux").toURI());
-        try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
-
-            AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
+        try (InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib")) {
+            Path auxFile = Path.of(AuxParserTest.class.getResource("papertwoargmacro.aux").toURI());
+            final BibDatabaseContext bibDatabaseContext = BibDatabaseContext.of(originalStream, importFormatPreferences);
+            AuxParser auxParser = new DefaultAuxParser(bibDatabaseContext.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);
 
             assertTrue(auxResult.getGeneratedBibDatabase().hasEntries());
@@ -91,13 +84,11 @@ class AuxParserTest {
     }
 
     @Test
-    void notAllFound() throws URISyntaxException, IOException {
-        InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
-        Path auxFile = Path.of(AuxParserTest.class.getResource("badpaper.aux").toURI());
-        try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
-
-            AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
+    void notAllFound() throws URISyntaxException, IOException, JabRefException {
+        try (InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib")) {
+            Path auxFile = Path.of(AuxParserTest.class.getResource("badpaper.aux").toURI());
+            final BibDatabaseContext bibDatabaseContext = BibDatabaseContext.of(originalStream, importFormatPreferences);
+            AuxParser auxParser = new DefaultAuxParser(bibDatabaseContext.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);
 
             assertTrue(auxResult.getGeneratedBibDatabase().hasEntries());
@@ -113,13 +104,11 @@ class AuxParserTest {
     }
 
     @Test
-    void duplicateBibDatabaseConfiguration() throws URISyntaxException, IOException {
-        InputStream originalStream = AuxParserTest.class.getResourceAsStream("config.bib");
-        Path auxFile = Path.of(AuxParserTest.class.getResource("paper.aux").toURI());
-        try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
-
-            AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
+    void duplicateBibDatabaseConfiguration() throws URISyntaxException, IOException, JabRefException {
+        try (InputStream originalStream = AuxParserTest.class.getResourceAsStream("config.bib")) {
+            Path auxFile = Path.of(AuxParserTest.class.getResource("paper.aux").toURI());
+            final BibDatabaseContext bibDatabaseContext = BibDatabaseContext.of(originalStream, importFormatPreferences);
+            AuxParser auxParser = new DefaultAuxParser(bibDatabaseContext.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);
             BibDatabase db = auxResult.getGeneratedBibDatabase();
 
@@ -129,13 +118,11 @@ class AuxParserTest {
     }
 
     @Test
-    void nestedAux() throws URISyntaxException, IOException {
-        InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
-        Path auxFile = Path.of(AuxParserTest.class.getResource("nested.aux").toURI());
-        try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
-
-            AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
+    void nestedAux() throws URISyntaxException, IOException, JabRefException {
+        try (InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib")) {
+            Path auxFile = Path.of(AuxParserTest.class.getResource("nested.aux").toURI());
+            final BibDatabaseContext bibDatabaseContext = BibDatabaseContext.of(originalStream, importFormatPreferences);
+            AuxParser auxParser = new DefaultAuxParser(bibDatabaseContext.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);
 
             assertTrue(auxResult.getGeneratedBibDatabase().hasEntries());
@@ -151,13 +138,11 @@ class AuxParserTest {
     }
 
     @Test
-    void crossRef() throws URISyntaxException, IOException {
-        InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
-        Path auxFile = Path.of(AuxParserTest.class.getResource("crossref.aux").toURI());
-        try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
-
-            AuxParser auxParser = new DefaultAuxParser(result.getDatabase());
+    void crossRef() throws URISyntaxException, IOException, JabRefException {
+        try (InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib")) {
+            Path auxFile = Path.of(AuxParserTest.class.getResource("crossref.aux").toURI());
+            final BibDatabaseContext bibDatabaseContext = BibDatabaseContext.of(originalStream, importFormatPreferences);
+            AuxParser auxParser = new DefaultAuxParser(bibDatabaseContext.getDatabase());
             AuxParserResult auxResult = auxParser.parse(auxFile);
 
             assertTrue(auxResult.getGeneratedBibDatabase().hasEntries());

@@ -117,22 +117,22 @@ class ACMPortalParserTest {
     void parseBibEntryWithFamilyAuthorOnly() {
         String json = "{\"id\":\"10.1145/3011077.3011113\",\"type\":\"PAPER_CONFERENCE\",\"author\":[{\"family\":\"Ngo-Thi-Thu-Trang\"},{\"family\":\"Bui\",\"given\":\"Hieu T.\"},{\"family\":\"Nguyen\",\"given\":\"Nhan D.\"}],\"accessed\":{\"date-parts\":[[2023,8,4]]},\"issued\":{\"date-parts\":[[2016,12,8]]},\"original-date\":{\"date-parts\":[[2016,12,8]]},\"abstract\":\"\",\"call-number\":\"10.1145/3011077.3011113\",\"collection-title\":\"SoICT '16\",\"container-title\":\"Proceedings of the 7th Symposium on Information and Communication Technology\",\"DOI\":\"10.1145/3011077.3011113\",\"event-place\":\"Ho Chi Minh City, Vietnam\",\"ISBN\":\"9781450348157\",\"keyword\":\"orthogonal frequency division multiplexing (OFDM), long-range passive optical network (LR PON), four-wave mixing (FWM), wavelength division multiplexing (WDM)\",\"number-of-pages\":\"6\",\"page\":\"216–221\",\"publisher\":\"Association for Computing Machinery\",\"publisher-place\":\"New York, NY, USA\",\"title\":\"A simple performance analysis of IM-DD OFDM WDM systems in long range PON application\",\"URL\":\"https://doi.org/10.1145/3011077.3011113\"}";
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Conference)
-            .withField(StandardField.AUTHOR, "Ngo-Thi-Thu-Trang and Bui, Hieu T. and Nguyen, Nhan D.")
-            .withField(StandardField.TITLE, "A simple performance analysis of IM-DD OFDM WDM systems in long range PON application")
-            .withField(StandardField.BOOKTITLE, "Proceedings of the 7th Symposium on Information and Communication Technology")
-            .withField(StandardField.YEAR, "2016")
-            .withField(StandardField.SERIES, "SoICT '16")
-            .withField(StandardField.PAGES, "216–221")
-            .withField(StandardField.ADDRESS, "New York, NY, USA")
-            .withField(StandardField.MONTH, "12")
-            .withField(StandardField.PUBLISHER, "Association for Computing Machinery")
-            .withField(StandardField.LOCATION, "Ho Chi Minh City, Vietnam")
-            .withField(StandardField.ISBN, "9781450348157")
-            .withField(StandardField.DAY, "8")
-            .withField(StandardField.PAGETOTAL, "6")
-            .withField(StandardField.DOI, "10.1145/3011077.3011113")
-            .withField(StandardField.KEYWORDS, "four-wave mixing (FWM), long-range passive optical network (LR PON), orthogonal frequency division multiplexing (OFDM), wavelength division multiplexing (WDM)")
-            .withField(StandardField.URL, "https://doi.org/10.1145/3011077.3011113");
+                .withField(StandardField.AUTHOR, "Ngo-Thi-Thu-Trang and Bui, Hieu T. and Nguyen, Nhan D.")
+                .withField(StandardField.TITLE, "A simple performance analysis of IM-DD OFDM WDM systems in long range PON application")
+                .withField(StandardField.BOOKTITLE, "Proceedings of the 7th Symposium on Information and Communication Technology")
+                .withField(StandardField.YEAR, "2016")
+                .withField(StandardField.SERIES, "SoICT '16")
+                .withField(StandardField.PAGES, "216–221")
+                .withField(StandardField.ADDRESS, "New York, NY, USA")
+                .withField(StandardField.MONTH, "12")
+                .withField(StandardField.PUBLISHER, "Association for Computing Machinery")
+                .withField(StandardField.LOCATION, "Ho Chi Minh City, Vietnam")
+                .withField(StandardField.ISBN, "9781450348157")
+                .withField(StandardField.DAY, "8")
+                .withField(StandardField.PAGETOTAL, "6")
+                .withField(StandardField.DOI, "10.1145/3011077.3011113")
+                .withField(StandardField.KEYWORDS, "four-wave mixing (FWM), long-range passive optical network (LR PON), orthogonal frequency division multiplexing (OFDM), wavelength division multiplexing (WDM)")
+                .withField(StandardField.URL, "https://doi.org/10.1145/3011077.3011113");
 
         BibEntry parsedEntry = parser.parseBibEntry(json);
         assertEquals(expectedEntry, parsedEntry);

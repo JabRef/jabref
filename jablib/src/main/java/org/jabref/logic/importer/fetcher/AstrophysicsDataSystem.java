@@ -6,7 +6,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -17,7 +16,6 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
@@ -29,21 +27,20 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.paging.Page;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.model.search.query.BaseQueryNode;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.jspecify.annotations.NonNull;
 
-/**
- * Fetches data from the SAO/NASA Astrophysics Data System (<a href="https://ui.adsabs.harvard.edu/">https://ui.adsabs.harvard.edu/</a>)
- */
+/// Fetches data from the SAO/NASA Astrophysics Data System (<a href="https://ui.adsabs.harvard.edu/">https://ui.adsabs.harvard.edu/</a>)
 public class AstrophysicsDataSystem
         implements IdBasedParserFetcher, PagedSearchBasedParserFetcher, EntryBasedParserFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "SAO/NASA ADS";
@@ -51,27 +48,23 @@ public class AstrophysicsDataSystem
     private static final String API_SEARCH_URL = "https://api.adsabs.harvard.edu/v1/search/query";
     private static final String API_EXPORT_URL = "https://api.adsabs.harvard.edu/v1/export/bibtexabs";
 
-    private final ImportFormatPreferences preferences;
+    private final ImportFormatPreferences importFormatPreferences;
     private final ImporterPreferences importerPreferences;
 
-    public AstrophysicsDataSystem(ImportFormatPreferences preferences, ImporterPreferences importerPreferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public AstrophysicsDataSystem(@NonNull ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
         this.importerPreferences = importerPreferences;
     }
 
-    /**
-     * @param bibcodes collection of bibcodes for which a JSON object should be created
-     */
+    /// @param bibcodes collection of bibcodes for which a JSON object should be created
     private static String buildPostData(Collection<String> bibcodes) {
         JSONObject obj = new JSONObject();
         obj.put("bibcode", bibcodes);
         return obj.toString();
     }
 
-    /**
-     * @return export URL endpoint
-     */
-    private static URL getURLforExport() throws URISyntaxException, MalformedURLException {
+    /// @return export URL endpoint
+    private static URL getUrlForExport() throws URISyntaxException, MalformedURLException {
         return new URIBuilder(API_EXPORT_URL).build().toURL();
     }
 
@@ -80,24 +73,21 @@ public class AstrophysicsDataSystem
         return FETCHER_NAME;
     }
 
-    /**
-     * @param luceneQuery query string, matching the apache solr format
-     * @return URL which points to a search request for given query
-     */
+    /// @param queryList the list that contains the parsed nodes
+    /// @return URL which points to a search request for given query
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(BaseQueryNode queryList, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
-        builder.addParameter("q", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
+        builder.addParameter("q", new DefaultQueryTransformer().transformSearchQuery(queryList).orElse(""));
+        builder.addParameter("q", "");
         builder.addParameter("fl", "bibcode");
         builder.addParameter("rows", String.valueOf(getPageSize()));
         builder.addParameter("start", String.valueOf(getPageSize() * pageNumber));
         return builder.build().toURL();
     }
 
-    /**
-     * @param entry BibEntry for which a search URL is created
-     * @return URL which points to a search request for given entry
-     */
+    /// @param entry BibEntry for which a search URL is created
+    /// @return URL which points to a search request for given entry
     @Override
     public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException {
         StringBuilder stringBuilder = new StringBuilder();
@@ -121,10 +111,8 @@ public class AstrophysicsDataSystem
         return builder.build().toURL();
     }
 
-    /**
-     * @param identifier bibcode or doi for which a search URL is created
-     * @return URL which points to a search URL for given identifier
-     */
+    /// @param identifier bibcode or doi for which a search URL is created
+    /// @return URL which points to a search URL for given identifier
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
         String query = "doi:\"" + identifier + "\" OR " + "bibcode:\"" + identifier + "\"";
@@ -135,13 +123,8 @@ public class AstrophysicsDataSystem
     }
 
     @Override
-    public Optional<HelpFile> getHelpPage() {
-        return Optional.of(HelpFile.FETCHER_ADS);
-    }
-
-    @Override
     public Parser getParser() {
-        return new BibtexParser(preferences);
+        return new BibtexParser(importFormatPreferences);
     }
 
     @Override
@@ -170,7 +153,7 @@ public class AstrophysicsDataSystem
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+    public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
         if (entry.getFieldOrAlias(StandardField.TITLE).isEmpty() && entry.getFieldOrAlias(StandardField.AUTHOR).isEmpty()) {
             return List.of();
         }
@@ -186,10 +169,8 @@ public class AstrophysicsDataSystem
         return performSearchByIds(bibcodes);
     }
 
-    /**
-     * @param url search ul for which bibcode will be returned
-     * @return list of bibcodes matching the search request. May be empty
-     */
+    /// @param url search ul for which bibcode will be returned
+    /// @return list of bibcodes matching the search request. May be empty
     private List<String> fetchBibcodes(URL url) throws FetcherException {
         try {
             URLDownload download = getUrlDownload(url);
@@ -233,10 +214,8 @@ public class AstrophysicsDataSystem
         return Optional.of(entry);
     }
 
-    /**
-     * @param identifiers bibcodes for which bibentries ahould be fetched
-     * @return list of bibentries matching the bibcodes. Can be empty and differ in size to the size of requested bibcodes
-     */
+    /// @param identifiers bibcodes for which bibentries should be fetched
+    /// @return list of bibentries matching the bibcodes. Can be empty and differ in size to the size of requested bibcodes
     private List<BibEntry> performSearchByIds(Collection<String> identifiers) throws FetcherException {
         List<String> ids = identifiers.stream().filter(identifier -> !StringUtil.isBlank(identifier)).collect(Collectors.toList());
         if (ids.isEmpty()) {
@@ -245,7 +224,7 @@ public class AstrophysicsDataSystem
 
         URL urLforExport;
         try {
-            urLforExport = getURLforExport();
+            urLforExport = getUrlForExport();
         } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URI is malformed", e);
         }
@@ -278,10 +257,10 @@ public class AstrophysicsDataSystem
     }
 
     @Override
-    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
+    public List<BibEntry> performSearch(BaseQueryNode queryList) throws FetcherException {
         URL urlForQuery;
         try {
-            urlForQuery = getURLForQuery(luceneQuery);
+            urlForQuery = getURLForQuery(queryList);
         } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URI is malformed", e);
         }
@@ -290,17 +269,17 @@ public class AstrophysicsDataSystem
     }
 
     @Override
-    public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
+    public Page<BibEntry> performSearchPaged(BaseQueryNode queryList, int pageNumber) throws FetcherException {
         URL urlForQuery;
         try {
-            urlForQuery = getURLForQuery(luceneQuery, pageNumber);
+            urlForQuery = getURLForQuery(queryList, pageNumber);
         } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URI is malformed", e);
         }
         // This is currently just interpreting the complex query as a default string query
         List<String> bibCodes = fetchBibcodes(urlForQuery);
         Collection<BibEntry> results = performSearchByIds(bibCodes);
-        return new Page<>(luceneQuery.toString(), pageNumber, results);
+        return new Page<>(queryList.toString(), pageNumber, results);
     }
 
     @Override

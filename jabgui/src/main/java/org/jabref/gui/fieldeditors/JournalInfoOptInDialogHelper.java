@@ -6,9 +6,7 @@ import org.jabref.logic.l10n.Localization;
 
 public class JournalInfoOptInDialogHelper {
 
-    /**
-     * Using the journal information data fetcher service needs to be opt-in for GDPR compliance.
-     */
+    /// Using the journal information data fetcher service needs to be opt-in for GDPR compliance.
     public static boolean isJournalInfoEnabled(DialogService dialogService, EntryEditorPreferences preferences) {
         if (preferences.shouldEnableJournalPopup() == EntryEditorPreferences.JournalPopupEnabled.ENABLED) {
             return true;
@@ -23,8 +21,8 @@ public class JournalInfoOptInDialogHelper {
             );
 
             preferences.setEnableJournalPopup(enableJournalPopup
-                    ? EntryEditorPreferences.JournalPopupEnabled.ENABLED
-                    : EntryEditorPreferences.JournalPopupEnabled.DISABLED);
+                                              ? EntryEditorPreferences.JournalPopupEnabled.ENABLED
+                                              : EntryEditorPreferences.JournalPopupEnabled.DISABLED);
 
             return enableJournalPopup;
         }
@@ -34,8 +32,8 @@ public class JournalInfoOptInDialogHelper {
                 Localization.lang("Allow sending ISSN to a JabRef online service (SCimago) for fetching journal information"));
 
         preferences.setEnableJournalPopup(journalInfoEnabled
-                ? EntryEditorPreferences.JournalPopupEnabled.ENABLED
-                : EntryEditorPreferences.JournalPopupEnabled.DISABLED);
+                                          ? EntryEditorPreferences.JournalPopupEnabled.ENABLED
+                                          : EntryEditorPreferences.JournalPopupEnabled.DISABLED);
         return journalInfoEnabled;
     }
 }

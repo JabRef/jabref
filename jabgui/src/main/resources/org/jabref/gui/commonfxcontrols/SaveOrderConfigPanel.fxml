@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root prefWidth="650.0" spacing="10.0" type="VBox"
@@ -23,25 +24,26 @@
     <RadioButton fx:id="exportInSpecifiedOrder"
                  text="%Use specified order" toggleGroup="$saveOrderToggleGroup"/>
 
-    <GridPane fx:id="sortCriterionList" hgap="10.0" vgap="4.0" maxWidth="450.0"
+    <GridPane fx:id="sortCriterionList" hgap="10.0" vgap="4.0"
               disable="${!exportInSpecifiedOrder.selected}">
         <columnConstraints>
             <ColumnConstraints hgrow="NEVER" minWidth="40.0" maxWidth="40.0"/>
             <ColumnConstraints hgrow="SOMETIMES"/>
             <ColumnConstraints hgrow="SOMETIMES" halignment="LEFT"/>
-            <ColumnConstraints hgrow="NEVER" minWidth="30.0" maxWidth="30.0"/>
+            <ColumnConstraints hgrow="NEVER"/>
         </columnConstraints>
         <padding>
-            <Insets left="30.0"/>
+            <Insets left="30.0" right="10.0"/>
         </padding>
     </GridPane>
-    <Button fx:id="addButton" onAction="#addCriterion" styleClass="icon-button" disable="${!exportInSpecifiedOrder.selected}"
-            maxWidth="450.0" prefWidth="450.0">
-        <graphic>
-            <JabRefIconView glyph="ADD_NOBOX"/>
-        </graphic>
-        <tooltip>
-            <Tooltip text="Add"/>
-        </tooltip>
-    </Button>
+    <HBox alignment="BASELINE_RIGHT" disable="${!exportInSpecifiedOrder.selected}">
+        <Button fx:id="addButton" onAction="#addCriterion" text="%Add">
+            <graphic>
+                <JabRefIconView glyph="ADD_NOBOX"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="Add"/>
+            </tooltip>
+        </Button>
+    </HBox>
 </fx:root>

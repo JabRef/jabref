@@ -2,7 +2,7 @@ package org.jabref.gui.collab.metedatachange;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.bibtex.comparator.MetaDataDiff;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -17,7 +17,7 @@ public final class MetadataChange extends DatabaseChange {
     }
 
     @Override
-    public void applyChange(NamedCompound undoEdit) {
+    public void applyChange(NamedCompoundEdit undoEdit) {
         // TODO: Metadata edit should be undoable
         databaseContext.setMetaData(metaDataDiff.getNewMetaData());
         // group change is handled by GroupChange, so we set the groups root to the original value

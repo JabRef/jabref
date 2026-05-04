@@ -1,6 +1,8 @@
 package org.jabref.http.server;
 
 import org.jabref.http.JabrefMediaType;
+import org.jabref.http.server.resources.LibrariesResource;
+import org.jabref.http.server.resources.LibraryResource;
 
 import jakarta.ws.rs.core.Application;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -14,6 +16,7 @@ class LibraryResourceTest extends ServerTest {
     protected Application configure() {
         ResourceConfig resourceConfig = new ResourceConfig(LibraryResource.class, LibrariesResource.class);
         addFilesToServeToResourceConfig(resourceConfig);
+        addGuiBridgeToResourceConfig(resourceConfig);
         addPreferencesToResourceConfig(resourceConfig);
         addGsonToResourceConfig(resourceConfig);
         return resourceConfig.getApplication();

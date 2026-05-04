@@ -13,19 +13,18 @@ import java.util.regex.Pattern;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Represents the Application Version with the major and minor number, the full Version String and if it's a developer version
- */
+/// Represents the Application Version with the major and minor number, the full Version String and if it's a developer version
 public class Version {
 
     public static final String JABREF_DOWNLOAD_URL = "https://downloads.jabref.org";
 
     private static final Version UNKNOWN_VERSION = new Version();
 
-    private final static Pattern VERSION_PATTERN = Pattern.compile("(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?(?<stage>-alpha|-beta)?(?<num>\\d+)?(?<dev>-?dev)?.*");
+    private final static Pattern VERSION_PATTERN = Pattern.compile("(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?(?<stage>-alpha|-beta)?(?:[._]?(?<num>\\d+))?(?<dev>-?dev)?.*");
     private final static Pattern CI_SUFFIX_PATTERN = Pattern.compile("-ci\\.\\d+");
 
     private static final String JABREF_GITHUB_RELEASES = "https://api.github.com/repos/JabRef/JabRef/releases";
@@ -38,24 +37,18 @@ public class Version {
     private int developmentNum = -1;
     private boolean isDevelopmentVersion;
 
-    /**
-     * Dummy constructor to create a local object (and  {@link Version#UNKNOWN_VERSION})
-     */
+    /// Dummy constructor to create a local object (and  {@link Version#UNKNOWN_VERSION})
     private Version() {
     }
 
-    /**
-     * Tinylog does not allow for altering existing loging configuraitons after the logger was initialized .
-     * Lazy initialization to enable tinylog writing to a file (and also still enabling loggin in this class)
-     */
+    /// Tinylog does not allow for altering existing loging configuraitons after the logger was initialized .
+    /// Lazy initialization to enable tinylog writing to a file (and also still enabling loggin in this class)
     private static Logger getLogger() {
         return LoggerFactory.getLogger(Version.class);
     }
 
-    /**
-     * @param version must be in form of following pattern: {@code (\d+)(\.(\d+))?(\.(\d+))?(-alpha|-beta)?(-?dev)?} (e.g., 3.3; 3.4-dev)
-     * @return the parsed version or {@link Version#UNKNOWN_VERSION} if an error occurred
-     */
+    /// @param version must be in form of following pattern: `(\d+)(\.(\d+))?(\.(\d+))?(-alpha|-beta)?(-?dev)?` (e.g., 3.3; 3.4-dev)
+    /// @return the parsed version or {@link Version#UNKNOWN_VERSION} if an error occurred
     public static Version parse(String version) {
         if ((version == null) || version.isEmpty() || BuildInfo.UNKNOWN_VERSION.equals(version)
                 || "${version}".equals(version)) {
@@ -101,9 +94,7 @@ public class Version {
         return parsedVersion;
     }
 
-    /**
-     * Grabs all the available releases from the GitHub repository
-     */
+    /// Grabs all the available releases from the GitHub repository
     public static List<Version> getAllAvailableVersions() throws IOException {
         HttpURLConnection connection = (HttpURLConnection) URLUtil.create(JABREF_GITHUB_RELEASES).openConnection();
         connection.setRequestProperty("Accept-Charset", "UTF-8");
@@ -120,11 +111,8 @@ public class Version {
         }
     }
 
-    /**
-     * @return true if this version is newer than the passed one
-     */
-    public boolean isNewerThan(Version otherVersion) {
-        Objects.requireNonNull(otherVersion);
+    /// @return true if this version is newer than the passed one
+    public boolean isNewerThan(@NonNull Version otherVersion) {
         if (Objects.equals(this, otherVersion)) {
             return false;
         } else if (BuildInfo.UNKNOWN_VERSION.equals(this.getFullVersion())) {
@@ -163,11 +151,9 @@ public class Version {
         return false;
     }
 
-    /**
-     * Checks if this version should be updated to one of the given ones. Ignoring the other Version if this one is Stable and the other one is not.
-     *
-     * @return The version this one should be updated to, or an empty Optional
-     */
+    /// Checks if this version should be updated to one of the given ones. Ignoring the other Version if this one is Stable and the other one is not.
+    ///
+    /// @return The version this one should be updated to, or an empty Optional
     public Optional<Version> shouldBeUpdatedTo(List<Version> availableVersions) {
         Optional<Version> newerVersion = Optional.empty();
         for (Version version : availableVersions) {
@@ -179,11 +165,9 @@ public class Version {
         return newerVersion;
     }
 
-    /**
-     * Checks if this version should be updated to the given one. Ignoring the other Version if this one is Stable and the other one is not.
-     *
-     * @return True if this version should be updated to the given one
-     */
+    /// Checks if this version should be updated to the given one. Ignoring the other Version if this one is Stable and the other one is not.
+    ///
+    /// @return True if this version should be updated to the given one
     public boolean shouldBeUpdatedTo(Version otherVersion) {
         // ignoring the other version if it is not stable, except if this version itself is not stable
         if (developmentStage == Version.DevelopmentStage.STABLE
@@ -219,9 +203,7 @@ public class Version {
         return isDevelopmentVersion;
     }
 
-    /**
-     * @return The link to the changelog on GitHub to this specific version (https://github.com/JabRef/jabref/blob/vX.X/CHANGELOG.md)
-     */
+    /// @return The link to the changelog on GitHub to this specific version (https://github.com/JabRef/jabref/blob/vX.X/CHANGELOG.md)
     public String getChangelogUrl() {
         if (isDevelopmentVersion) {
             return "https://github.com/JabRef/jabref/blob/main/CHANGELOG.md#unreleased";
@@ -281,9 +263,7 @@ public class Version {
         BETA("-beta", 2),
         STABLE("", 3);
 
-        /**
-         * describes how stable this stage is, the higher the better
-         */
+        /// describes how stable this stage is, the higher the better
         private final int stability;
         private final String stage;
 
@@ -307,9 +287,7 @@ public class Version {
             return UNKNOWN;
         }
 
-        /**
-         * @return true if this stage is more stable than the {@code otherStage}
-         */
+        /// @return true if this stage is more stable than the `otherStage`
         public boolean isMoreStableThan(DevelopmentStage otherStage) {
             return this.stability > otherStage.stability;
         }

@@ -30,9 +30,7 @@ public class TexBibEntriesResolver {
         this.fileMonitor = fileMonitor;
     }
 
-    /**
-     * Resolve all BibTeX entries and check if they are in the given database.
-     */
+    /// Resolve all BibTeX entries and check if they are in the given database.
     public LatexBibEntriesResolverResult resolve(LatexParserResults latexParserResults) {
         LatexBibEntriesResolverResult resolverResult = new LatexBibEntriesResolverResult(latexParserResults);
 

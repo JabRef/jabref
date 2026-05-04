@@ -15,16 +15,12 @@ public class OptionalUtil {
         return left.map(t -> right.filter(u -> equality.test(t, u)).isPresent()).orElseGet(right::isEmpty);
     }
 
-    /**
-     * @return An immutable list containing the value - if no value: empty immutable list
-     */
+    /// @return An immutable list containing the value - if no value: empty immutable list
     public static <T> List<T> toList(Optional<T> value) {
         return value.map(List::of).orElseGet(List::of);
     }
 
-    /**
-     * @return An immutable list containing the values - if no values present: empty immutable list
-     */
+    /// @return An immutable list containing the values - if no values present: empty immutable list
     @SafeVarargs
     public static <T> List<T> toList(Optional<T>... values) {
         return Stream.of(values).flatMap(Optional::stream).toList();

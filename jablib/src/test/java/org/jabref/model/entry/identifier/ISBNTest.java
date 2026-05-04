@@ -1,16 +1,23 @@
 package org.jabref.model.entry.identifier;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ISBNTest {
 
-    @Test
-    void isValidFormat10Correct() {
-        assertTrue(new ISBN("0-123456-47-9").isValidFormat());
-        assertTrue(new ISBN("0-9752298-0-X").isValidFormat());
+    @ParameterizedTest
+    @CsvSource(
+            textBlock = """
+                    0-123456-47-9
+                    0-9752298-0-X
+                    """
+    )
+    void isValidFormat10Correct(String isbn) {
+        assertTrue(new ISBN(isbn).isValidFormat());
     }
 
     @Test
@@ -18,11 +25,16 @@ class ISBNTest {
         assertFalse(new ISBN("0-12B456-47-9").isValidFormat());
     }
 
-    @Test
-    void isValidChecksum10Correct() {
-        assertTrue(new ISBN("0-123456-47-9").isValidChecksum());
-        assertTrue(new ISBN("0-9752298-0-X").isValidChecksum());
-        assertTrue(new ISBN("0-9752298-0-x").isValidChecksum());
+    @ParameterizedTest
+    @CsvSource(
+            textBlock = """
+                    0-123456-47-9
+                    0-9752298-0-X
+                    0-9752298-0-x
+                    """
+    )
+    void isValidChecksum10Correct(String isbn) {
+        assertTrue(new ISBN(isbn).isValidChecksum());
     }
 
     @Test
@@ -50,10 +62,15 @@ class ISBNTest {
         assertFalse(new ISBN("978-1-56619-909-5").isValidChecksum());
     }
 
-    @Test
-    void isIsbn10Correct() {
-        assertTrue(new ISBN("0-123456-47-9").isIsbn10());
-        assertTrue(new ISBN("0-9752298-0-X").isIsbn10());
+    @ParameterizedTest
+    @CsvSource(
+            textBlock = """
+                    0-123456-47-9
+                    0-9752298-0-X
+                    """
+    )
+    void isIsbn10Correct(String isbn) {
+        assertTrue(new ISBN(isbn).isIsbn10());
     }
 
     @Test

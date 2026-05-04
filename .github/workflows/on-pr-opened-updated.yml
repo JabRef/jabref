@@ -5,151 +5,99 @@ on:
   pull_request_target:
   # default: opened, synchronize, reopened
 
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number'
+        required: true
+
 jobs:
-  determine_issue_number:
-    name: Determine issue number
-    runs-on: ubuntu-latest
-    if: >
-      !(
-        (github.actor == 'dependabot[bot]') ||
-        (
-          startsWith(github.event.pull_request.title, '[Bot] ') ||
-          startsWith(github.event.pull_request.title, 'Bump ') ||
-          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
-          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
-        )
-      )
-    permissions:
-      contents: read
-    outputs:
-      issue_number: ${{ steps.get_issue_number.outputs.ticketNumber }}
-    steps:
-      - name: echo PR data
-        run: |
-          echo "PR Number: ${{ github.event.pull_request.number }}"
-          echo "PR URL: ${{ github.event.pull_request.html_url }}"
-          cat <<EOF
-          PR Body:
-          ${{ github.event.pull_request.body }}
-          EOF
-      - name: Determine issue number
-        id: get_issue_number
-        uses: koppor/ticket-check-action@add-output
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ticketLink: 'https://github.com/JabRef/jabref/issues/%ticketNumber%'
-          ticketPrefix: '#'
-          titleRegex: '^#(?<ticketNumber>\d+)'
-          branchRegex: '^(?<ticketNumber>\d+)'
-          # Matches GitHub's closes/fixes/resolves #{number}, but does not match our example `Closes #12345` in PULL_REQUEST_TEMPLATE
-          # Also matches URLs that are wrapped in `<>`.
-          bodyRegex: '(?<action>fixes|closes|resolves|refs)\s+<?(?:https?:\/\/github\.com\/JabRef\/jabref\/issues\/)?#?(?<ticketNumber>(?!12345\b)\d+)>?'
-          bodyRegexFlags: 'i'
-          outputOnly: true
-      - run: echo "${{ steps.get_issue_number.outputs.ticketNumber }}"
-      - name: Issue number present
-        if: steps.get_issue_number.outputs.ticketNumber == '-1'
-        run: |
-          echo "No valid ticket number found!"
-          exit 1
-  move_issue:
-    if: github.repository_owner == 'JabRef'
-    name: Mark issue as in progress
-    # after determine_issue_number to ensure that there is only one failure because of no ticket number
-    needs: determine_issue_number
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-    steps:
-      - name: Move issue to "In Progress" in "Good First Issues"
-        uses: m7kvqbe1/github-action-move-issues/@main
-        with:
-          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
-          project-url: "https://github.com/orgs/JabRef/projects/5"
-          target-labels: "📍 Assigned"
-          target-column: "In Progress"
-          ignored-columns: ""
-          default-column: "In Progress"
-          issue-number: ${{ needs.determine_issue_number.outputs.issue_number }}
-          skip-if-not-in-project: true
-      - name: Move issue to "In Progress" in "Candidates for University Projects"
-        uses: m7kvqbe1/github-action-move-issues/@main
-        with:
-          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
-          project-url: "https://github.com/orgs/JabRef/projects/3"
-          target-labels: "📍 Assigned"
-          target-column: "In Progress"
-          ignored-columns: ""
-          default-column: "In Progress"
-          issue-number: ${{ needs.determine_issue_number.outputs.issue_number }}
-          skip-if-not-in-project: true
-  ensure_assignment:
-    if: github.repository_owner == 'JabRef'
-    name: Ensure that contributor is assigned (fails if not commented on issue)
-    # after determine_issue_number to ensure that there is only one failure because of no ticket number
-    needs: determine_issue_number
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          show-progress: 'false'
-      - name: Assign PR creator to issue
-        run: |
-          set -e
-
-          echo "Updating issue '${{ needs.determine_issue_number.outputs.issue_number }}'"
-
-          # "gh issue edit" cannot be used - workaround found at https://github.com/cli/cli/issues/9620#issuecomment-2703135049
-
-          ASSIGNEES=$(gh api /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --jq '[.assignees[].login]')
-
-          # Check if the user is already assigned
-          if echo "$ASSIGNEES" | jq -e '. | index("${{ github.event.pull_request.user.login }}")' >/dev/null; then
-            echo "User '${{ github.event.pull_request.user.login }}' is already an assignee. No update needed."
-            echo "Debug: $ASSIGNEES"
-            exit 0
-          fi
-
-          # Append the new assignee
-          UPDATED_ASSIGNEES=$(echo "$ASSIGNEES" | jq --arg new "${{ github.event.pull_request.user.login }}" '. + [$new]')
-
-          # Update issue with the new assignee list
-          echo "Updating issue #${{ needs.determine_issue_number.outputs.issue_number }} updated with assignees: $UPDATED_ASSIGNEES..."
-          gh api -X PATCH /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}")
-
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Add label "📌 Pinned"
-        run: gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --add-label "📌 Pinned"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   conflicts_with_target:
+    if: github.repository == 'JabRef/jabref'
     name: Conflicts with target branch
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
+    permissions:
+      actions: write
+      contents: read
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           show-progress: 'false'
       - name: Check PR mergeability
         id: check_mergeable
         run: |
-          MERGEABLE=$(gh pr view --json mergeable ${{ github.event.number }} --template '{{.mergeable}}')
+          set -ex
+
+          echo "Checking PR [#$PR_NUMBER](https://github.com/JabRef/jabref/pull/$PR_NUMBER)" >> $GITHUB_STEP_SUMMARY
+
+          # Retry a few times until mergeable != UNKNOWN
+          # See https://github.com/cli/cli/discussions/8020#discussioncomment-7057040 for details
+          for i in 1 2 3 4 5; do
+            MERGEABLE=$(gh pr view "$PR_NUMBER" --json mergeable --template '{{.mergeable}}')
+            echo "Attempt $i: $MERGEABLE"
+            if [ "$MERGEABLE" != "UNKNOWN" ]; then
+              break
+            fi
+            sleep 5
+          done
+          echo "Result: $MERGEABLE" >> $GITHUB_STEP_SUMMARY
+
           if [ "$MERGEABLE" == "CONFLICTING" ]; then
             echo "❌ Merge conflicts"
+            echo "❌ Merge conflicts" >> $GITHUB_STEP_SUMMARY
+            gh issue edit $PR_NUMBER --remove-label "status: ready-for-review,status: no-bot-comments" --add-label "status: changes-required"
+
+            # "workflow dispatch" does not trigger subsequent "on completion" runs.
+            # Therefore, we emulate ghprcomment here
+            if [ "$EVENT" = "workflow_dispatch" ]; then
+              HAS_CONFLICT_COMMENT=$(
+                gh api graphql -f query="
+                  query {
+                    repository(owner: \"JabRef\", name: \"JabRef\") {
+                      pullRequest(number: $PR_NUMBER) {
+                        comments(last: 20) {
+                          nodes { body }
+                        }
+                      }
+                    }
+                  }
+                " \
+                | jq -r '.data.repository.pullRequest.comments.nodes[].body' \
+                | grep -q "Conflicts with target branch" \
+                  && echo "true" \
+                  || echo "false"
+              )
+
+              if [ "$HAS_CONFLICT_COMMENT" = "true" ]; then
+                echo "Already commented about conflicts."
+                # When triggered by another workflow, success is also if there is a merge conflict
+                exit 0;
+              fi
+
+              echo "Commenting on PR..."
+              cat > body.txt <<EOF
+          Your pull request conflicts with the target branch.
+
+          Please [merge `upstream/main`](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-command-line) with your code. For a step-by-step guide to resolve merge conflicts, see <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line>.
+
+          <!-- ghprcomment
+          On PR opened/updated (check)
+          Conflicts with target branch
+          -->
+          EOF
+              gh issue comment "$PR_NUMBER" --body-file body.txt
+              echo "Commented on PR" >> $GITHUB_STEP_SUMMARY
+
+              # When triggered by another workflow, success is also if there is a merge conflict
+              exit 0;
+            fi;
+
             exit 1
           fi
           echo "✅ No merge conflicts"
+          echo "✅ No merge conflicts" >> $GITHUB_STEP_SUMMARY
         env:
+          EVENT: ${{ github.event_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  upload-pr-number:
-    if: ${{ github.repository == 'JabRef/jabref' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create pr_number.txt
-        run: echo "${{ github.event.number }}" > pr_number.txt
-      - uses: actions/upload-artifact@v4
-        with:
-          name: pr_number
-          path: pr_number.txt
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}

@@ -1,6 +1,5 @@
 package org.jabref.gui.externalfiles;
 
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,6 +14,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.importer.FetcherResult;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -24,9 +24,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Try to download fulltext PDF for selected entry(s) by following URL or DOI link.
- */
+/// Try to download fulltext PDF for selected entry(s) by following URL or DOI link.
 public class DownloadFullTextAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadFullTextAction.class);
@@ -80,10 +78,10 @@ public class DownloadFullTextAction extends SimpleCommand {
             }
         }
 
-        Task<Map<BibEntry, Optional<URL>>> findFullTextsTask = new Task<>() {
+        Task<Map<BibEntry, Optional<FetcherResult>>> findFullTextsTask = new Task<>() {
             @Override
-            protected Map<BibEntry, Optional<URL>> call() {
-                Map<BibEntry, Optional<URL>> downloads = new ConcurrentHashMap<>();
+            protected Map<BibEntry, Optional<FetcherResult>> call() {
+                Map<BibEntry, Optional<FetcherResult>> downloads = new ConcurrentHashMap<>();
                 int count = 0;
                 for (BibEntry entry : entries) {
                     FulltextFetchers fetchers = new FulltextFetchers(
@@ -107,10 +105,10 @@ public class DownloadFullTextAction extends SimpleCommand {
         taskExecutor.execute(findFullTextsTask);
     }
 
-    private void downloadFullTexts(Map<BibEntry, Optional<URL>> downloads, BibDatabaseContext databaseContext) {
-        for (Map.Entry<BibEntry, Optional<URL>> download : downloads.entrySet()) {
+    private void downloadFullTexts(Map<BibEntry, Optional<FetcherResult>> downloads, BibDatabaseContext databaseContext) {
+        for (Map.Entry<BibEntry, Optional<FetcherResult>> download : downloads.entrySet()) {
             BibEntry entry = download.getKey();
-            Optional<URL> result = download.getValue();
+            Optional<FetcherResult> result = download.getValue();
             if (result.isPresent()) {
                 addLinkedFileFromURL(databaseContext, result.get(), entry);
             } else {
@@ -120,16 +118,14 @@ public class DownloadFullTextAction extends SimpleCommand {
         }
     }
 
-    /**
-     * This method attaches a linked file from a URL (if not already linked) to an entry using the key and value pair
-     * from the findFullTexts map and then downloads the file into the given targetDirectory
-     *
-     * @param databaseContext the active database
-     * @param url             the url "key"
-     * @param entry           the entry "value"
-     */
-    private void addLinkedFileFromURL(BibDatabaseContext databaseContext, URL url, BibEntry entry) {
-        LinkedFile newLinkedFile = new LinkedFile(url, "");
+    /// This method attaches a linked file from a URL (if not already linked) to an entry using the key and value pair
+    /// from the findFullTexts map and then downloads the file into the given targetDirectory
+    ///
+    /// @param databaseContext the active database
+    /// @param result          the fetcher result containing the URL and any required download headers
+    /// @param entry           the entry "value"
+    private void addLinkedFileFromURL(BibDatabaseContext databaseContext, FetcherResult result, BibEntry entry) {
+        LinkedFile newLinkedFile = new LinkedFile(result.source(), "");
 
         if (!entry.getFiles().contains(newLinkedFile)) {
             LinkedFileViewModel onlineFile = new LinkedFileViewModel(
@@ -139,7 +135,7 @@ public class DownloadFullTextAction extends SimpleCommand {
                     taskExecutor,
                     dialogService,
                     preferences);
-            onlineFile.download(true);
+            onlineFile.download(true, result.headers());
         } else {
             dialogService.notify(Localization.lang("Full text document for entry %0 already linked.",
                     entry.getCitationKey().orElse(Localization.lang("undefined"))));

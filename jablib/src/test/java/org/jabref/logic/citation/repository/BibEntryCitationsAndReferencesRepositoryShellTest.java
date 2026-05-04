@@ -10,28 +10,34 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@Execution(ExecutionMode.SAME_THREAD)
 class BibEntryCitationsAndReferencesRepositoryShellTest {
 
     private static BibEntry createBibEntry() {
         int i = RandomGenerator.getDefault().nextInt();
         return new BibEntry()
-            .withCitationKey(String.valueOf(i))
-            .withField(StandardField.DOI, "10.1234/5678" + i);
+                .withCitationKey(String.valueOf(i))
+                .withField(StandardField.DOI, "10.1234/5678" + i);
     }
 
     private static List<BibEntry> createRelations(BibEntry entry) {
         return entry
-            .getCitationKey()
-            .map(key -> RandomGenerator
-                .StreamableGenerator.of("L128X256MixRandom").ints(150)
-                .mapToObj(i -> new BibEntry()
-                    .withCitationKey("%s relation %s".formatted(key, i))
-                    .withField(StandardField.DOI, "10.2345/6789" + i)
+                .getCitationKey()
+                .map(key -> RandomGenerator
+                        .StreamableGenerator.of("L128X256MixRandom").ints(150)
+                                            .mapToObj(i -> new BibEntry()
+                                                    .withCitationKey("%s relation %s".formatted(key, i))
+                                                    .withField(StandardField.DOI, "10.2345/6789" + i)
+                                            )
                 )
-            )
-            .orElseThrow()
-            .toList();
+                .orElseThrow()
+                .toList();
     }
 
     private static class BibEntryRelationRepositoryMock implements BibEntryRelationRepository {
@@ -52,36 +58,31 @@ class BibEntryCitationsAndReferencesRepositoryShellTest {
         public boolean containsKey(BibEntry entry) {
             return this.relations.containsKey(entry);
         }
-
-        @Override
-        public void close() {
-            // do nothing
-        }
     }
 
     @Test
-    void repositoryShouldWriteAndReadCitationsToAndFromExpectedDAO() {
+    void repositoryShouldWriteAndGetCitationsToAndFromExpectedDAO() {
         // GIVEN
         BibEntry bibEntry = createBibEntry();
         List<BibEntry> citations = createRelations(bibEntry);
         BibEntryRelationRepositoryMock citationsDAO = new BibEntryRelationRepositoryMock();
         BibEntryCitationsAndReferencesRepositoryShell bibEntryRelationsRepository = new BibEntryCitationsAndReferencesRepositoryShell(
-            citationsDAO,
-            new BibEntryRelationRepositoryMock()
+                citationsDAO,
+                new BibEntryRelationRepositoryMock()
         );
         Assertions.assertFalse(bibEntryRelationsRepository.containsCitations(bibEntry));
         Assertions.assertFalse(citations.isEmpty());
 
         // WHEN
-        bibEntryRelationsRepository.insertCitations(bibEntry, citations);
+        bibEntryRelationsRepository.addCitations(bibEntry, citations);
 
         // THEN
-        Assertions.assertTrue(bibEntryRelationsRepository.containsCitations(bibEntry));
-        Assertions.assertEquals(citations, bibEntryRelationsRepository.readCitations(bibEntry));
+        assertTrue(bibEntryRelationsRepository.containsCitations(bibEntry));
+        assertEquals(citations, bibEntryRelationsRepository.getCitations(bibEntry));
     }
 
     @Test
-    void repositoryShouldWriteAndReadReferencesToAndFromExpectedDAO() {
+    void repositoryShouldWriteAndGetReferencesToAndFromExpectedDAO() {
         // GIVEN
         BibEntry bibEntry = createBibEntry();
         List<BibEntry> references = createRelations(bibEntry);
@@ -94,10 +95,10 @@ class BibEntryCitationsAndReferencesRepositoryShellTest {
         Assertions.assertFalse(references.isEmpty());
 
         // WHEN
-        bibEntryRelationsRepository.insertCitations(bibEntry, references);
+        bibEntryRelationsRepository.addCitations(bibEntry, references);
 
         // THEN
-        Assertions.assertTrue(bibEntryRelationsRepository.containsCitations(bibEntry));
-        Assertions.assertEquals(references, bibEntryRelationsRepository.readCitations(bibEntry));
+        assertTrue(bibEntryRelationsRepository.containsCitations(bibEntry));
+        assertEquals(references, bibEntryRelationsRepository.getCitations(bibEntry));
     }
 }

@@ -1,14 +1,13 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 
-/**
- * Removes all line breaks in the string.
- */
+import org.jspecify.annotations.NonNull;
+
+/// Removes all line breaks in the string.
 public class RemoveNewlinesFormatter extends Formatter {
     private static final Pattern LINEBREAKS = Pattern.compile("\\R");
 
@@ -23,9 +22,7 @@ public class RemoveNewlinesFormatter extends Formatter {
     }
 
     @Override
-    public String format(String value) {
-        Objects.requireNonNull(value);
-
+    public String format(@NonNull String value) {
         value = LINEBREAKS.matcher(value).replaceAll(" ");
         return value.trim();
     }

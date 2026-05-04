@@ -1,6 +1,7 @@
 package org.jabref.gui.citationkeypattern;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -11,7 +12,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -19,6 +20,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 
 public class GenerateCitationKeyAction extends SimpleCommand {
@@ -105,36 +107,40 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
     private BackgroundTask<Void> generateKeysInBackground() {
         return new BackgroundTask<>() {
-            private NamedCompound compound;
+            private NamedCompoundEdit compound;
 
             @Override
             public Void call() {
-                    if (isCanceled) {
-                        return null;
-                    }
-                UiTaskExecutor.runInJavaFXThread(() -> {
-                        updateProgress(0, entries.size());
-                        messageProperty().set(Localization.lang("%0/%1 entries", 0, entries.size()));
-                    });
-                    stateManager.getActiveDatabase().ifPresent(databaseContext -> {
-                        // generate the new citation keys for each entry
-                        compound = new NamedCompound(Localization.lang("Autogenerate citation keys"));
-                        CitationKeyGenerator keyGenerator =
-                                new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
-                        int entriesDone = 0;
-                        for (BibEntry entry : entries) {
-                            keyGenerator.generateAndSetKey(entry)
-                                        .ifPresent(fieldChange -> compound.addEdit(new UndoableKeyChange(fieldChange)));
-                            entriesDone++;
-                            int finalEntriesDone = entriesDone;
-                            UiTaskExecutor.runInJavaFXThread(() -> {
-                                updateProgress(finalEntriesDone, entries.size());
-                                messageProperty().set(Localization.lang("%0/%1 entries", finalEntriesDone, entries.size()));
-                            });
-                        }
-                        compound.end();
-                    });
+                if (isCanceled) {
                     return null;
+                }
+                UiTaskExecutor.runInJavaFXThread(() -> {
+                    updateProgress(0, entries.size());
+                    messageProperty().set(Localization.lang("%0/%1 entries", 0, entries.size()));
+                });
+                stateManager.getActiveDatabase().ifPresent(databaseContext -> {
+                    // generate the new citation keys for each entry
+                    compound = new NamedCompoundEdit(Localization.lang("Autogenerate citation keys"));
+                    CitationKeyGenerator keyGenerator =
+                            new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
+                    int entriesDone = 0;
+                    for (BibEntry entry : entries) {
+                        String newKey = keyGenerator.generateKey(entry);
+                        // Set the key on the FX thread, since BibEntry uses ObservableMap which fires FX listeners
+                        Optional<FieldChange> fieldChange = UiTaskExecutor.runInJavaFXThread(() -> entry.setCitationKey(newKey));
+                        if (fieldChange != null) {
+                            fieldChange.ifPresent(change -> compound.addEdit(new UndoableKeyChange(change)));
+                        }
+                        entriesDone++;
+                        int finalEntriesDone = entriesDone;
+                        UiTaskExecutor.runInJavaFXThread(() -> {
+                            updateProgress(finalEntriesDone, entries.size());
+                            messageProperty().set(Localization.lang("%0/%1 entries", finalEntriesDone, entries.size()));
+                        });
+                    }
+                    compound.end();
+                });
+                return null;
             }
 
             @Override

@@ -8,14 +8,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FulltextFetcher;
-import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ImporterPreferences;
-import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.util.URLUtil;
@@ -29,15 +24,14 @@ import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * FulltextFetcher implementation that follows the DOI resolution redirects and scans for a full-text PDF URL.
- *
- * Note that we also have custom fetchers in place.
- * See {@link WebFetchers#getFullTextFetchers(ImportFormatPreferences, ImporterPreferences)}.
- */
+/// FulltextFetcher implementation that follows the DOI resolution redirects and scans for a full-text PDF URL.
+///
+/// Note that we also have custom fetchers in place.
+/// See {@link org.jabref.logic.importer.WebFetchers#getFullTextFetchers(org.jabref.logic.importer.ImportFormatPreferences, org.jabref.logic.importer.ImporterPreferences)}.
 public class DoiResolution implements FulltextFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiResolution.class);
@@ -49,9 +43,7 @@ public class DoiResolution implements FulltextFetcher {
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException {
-        Objects.requireNonNull(entry);
-
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException {
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
         if (doi.isEmpty()) {
@@ -61,7 +53,7 @@ public class DoiResolution implements FulltextFetcher {
         URL base;
 
         String doiLink;
-        if (doiPreferences.isUseCustom()) {
+        if (doiPreferences.shouldUseCustom()) {
             base = URLUtil.create(doiPreferences.getDefaultBaseURI());
             doiLink = doi.get()
                          .getExternalURIWithCustomBase(base.toString())
@@ -139,10 +131,8 @@ public class DoiResolution implements FulltextFetcher {
         return Optional.empty();
     }
 
-    /**
-     * Scan for {@code <meta name="citation_pdf_url">}.
-     * See https://scholar.google.com/intl/de/scholar/inclusion.html#indexing
-     */
+    /// Scan for `<meta name="citation_pdf_url">`.
+    /// See https://scholar.google.com/intl/de/scholar/inclusion.html#indexing
     private Optional<URL> citationMetaTag(Document html) {
         Elements citationPdfUrlElement = html.head().select("meta[name='citation_pdf_url']");
         Optional<String> citationPdfUrl = citationPdfUrlElement.stream().map(e -> e.attr("content")).findFirst();
@@ -150,7 +140,7 @@ public class DoiResolution implements FulltextFetcher {
         if (citationPdfUrl.isPresent()) {
             try {
                 return Optional.of(URLUtil.create(citationPdfUrl.get()));
-            } catch (MalformedURLException e) {
+            } catch (MalformedURLException _) {
                 return Optional.empty();
             }
         }
@@ -167,7 +157,7 @@ public class DoiResolution implements FulltextFetcher {
             try {
                 URL url = base.toURI().resolve(pdfUrl.get()).toURL();
                 return Optional.of(url);
-            } catch (MalformedURLException | URISyntaxException e) {
+            } catch (MalformedURLException | URISyntaxException _) {
                 return Optional.empty();
             }
         }
@@ -175,7 +165,7 @@ public class DoiResolution implements FulltextFetcher {
     }
 
     private Optional<URL> findDistinctLinks(List<URL> urls) {
-        List<URL> distinctLinks = urls.stream().distinct().collect(Collectors.toList());
+        List<URL> distinctLinks = urls.stream().distinct().toList();
 
         if (distinctLinks.isEmpty()) {
             return Optional.empty();

@@ -18,11 +18,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class FileFilterConverter {
 
-    public static FileChooser.ExtensionFilter ANY_FILE = new FileChooser.ExtensionFilter(Localization.lang("Any file"), "*.*");
+    public static FileChooser.ExtensionFilter ANY_FILE = new FileChooser.ExtensionFilter(Localization.lang("Any file"), "*");
 
     private FileFilterConverter() {
     }
@@ -37,14 +37,12 @@ public class FileFilterConverter {
         return new FileChooser.ExtensionFilter(description, fileType.getExtensionsWithAsteriskAndDot());
     }
 
-    /**
-     * Determines the appropriate file extension filter based on the given file.
-     * If the file is recognized as a BibTeX file, it returns a BibTeX-specific extension filter.
-     * Otherwise, it returns a generic filter.
-     *
-     * @param file The file to check.
-     * @return The corresponding Extension Filter for the file type.
-     */
+    /// Determines the appropriate file extension filter based on the given file.
+    /// If the file is recognized as a BibTeX file, it returns a BibTeX-specific extension filter.
+    /// Otherwise, it returns a generic filter.
+    ///
+    /// @param file The file to check.
+    /// @return The corresponding Extension Filter for the file type.
     public static FileChooser.ExtensionFilter determineExtensionFilter(Path file) {
         if (FileUtil.isBibFile(file)) {
             return toExtensionFilter("BibTeX", StandardFileType.BIBTEX_DB);
@@ -106,8 +104,8 @@ public class FileFilterConverter {
             return _ -> true;
         } else {
             return path -> FileUtil.getFileExtension(path)
-                                       .map(extensionsCleaned::contains)
-                                       .orElse(false);
+                                   .map(extensionsCleaned::contains)
+                                   .orElse(false);
         }
     }
 }

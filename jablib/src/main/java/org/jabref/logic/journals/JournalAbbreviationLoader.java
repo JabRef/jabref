@@ -14,15 +14,13 @@ import org.jabref.logic.journals.ltwa.LtwaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * <p>
- * This class loads abbreviations from a CSV file and stores them into a MV file ({@link #readAbbreviationsFromCsvFile(Path)}
- * It can also create an {@link JournalAbbreviationRepository} based on an MV file ({@link #loadRepository(JournalAbbreviationPreferences)}.
- * </p>
- * <p>
- * Abbreviations are available at <a href="https://github.com/JabRef/abbrv.jabref.org/">https://github.com/JabRef/abbrv.jabref.org/</a>.
- * </p>
- */
+///
+/// This class loads abbreviations from a CSV file and stores them into a MV file ({@link #readAbbreviationsFromCsvFile(Path)}
+/// It can also create an {@link JournalAbbreviationRepository} based on an MV file ({@link #loadRepository(JournalAbbreviationPreferences)}.
+///
+///
+/// Abbreviations are available at <a href="https://github.com/JabRef/abbrv.jabref.org/">https://github.com/JabRef/abbrv.jabref.org/</a>.
+///
 public class JournalAbbreviationLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);
@@ -40,7 +38,7 @@ public class JournalAbbreviationLoader {
         // Initialize with built-in list
         try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/journal-list.mv")) {
             if (resourceAsStream == null) {
-                LOGGER.warn("There is no journal-list.mv. We use a default journal list");
+                LOGGER.warn("There is no journal-list.mv. We use a default journal list.");
                 repository = new JournalAbbreviationRepository();
             } else {
                 Path tempDir = Files.createTempDirectory("jabref-journal");
@@ -49,6 +47,7 @@ public class JournalAbbreviationLoader {
                 repository = new JournalAbbreviationRepository(tempJournalList, loadLtwaRepository());
                 tempDir.toFile().deleteOnExit();
                 tempJournalList.toFile().deleteOnExit();
+                LOGGER.debug("Loaded journal abbreviations from {}", tempJournalList.toAbsolutePath());
             }
         } catch (IOException e) {
             LOGGER.error("Error while loading journal abbreviation repository", e);

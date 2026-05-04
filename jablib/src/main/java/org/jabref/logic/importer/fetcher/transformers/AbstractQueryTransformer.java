@@ -4,21 +4,17 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.search.query.BaseQueryNode;
+import org.jabref.model.search.query.NotNode;
+import org.jabref.model.search.query.OperatorNode;
+import org.jabref.model.search.query.SearchQueryNode;
 
-import org.apache.lucene.queryparser.flexible.core.nodes.BooleanQueryNode;
-import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
-import org.apache.lucene.queryparser.flexible.core.nodes.GroupQueryNode;
-import org.apache.lucene.queryparser.flexible.core.nodes.ModifierQueryNode;
-import org.apache.lucene.queryparser.flexible.core.nodes.OrQueryNode;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * In case the transformer contains state for a query transformation (such as the {@link IEEEQueryTransformer}), it has to be noted at the JavaDoc.
- * Otherwise, a single instance QueryTransformer can be used.
- */
+/// In case the transformer contains state for a query transformation (such as the {@link IEEEQueryTransformer}), it has to be noted at the JavaDoc.
+/// Otherwise, a single instance QueryTransformer can be used.
 public abstract class AbstractQueryTransformer {
     public static final String NO_EXPLICIT_FIELD = "default";
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractQueryTransformer.class);
@@ -27,20 +23,18 @@ public abstract class AbstractQueryTransformer {
     protected int startYear = Integer.MAX_VALUE;
     protected int endYear = Integer.MIN_VALUE;
 
-    /**
-     * Transforms a and b and c to (a AND b AND c), where
-     * a, b, and c can be complex expressions.
-     */
-    protected Optional<String> transform(BooleanQueryNode query) {
+    /// Transforms a and b and c to (a AND b AND c), where
+    /// a, b, and c can be complex expressions.
+    protected Optional<String> transform(OperatorNode query) {
         String delimiter;
-        if (query instanceof OrQueryNode) {
+        if (query.op() == OperatorNode.Operator.OR) {
             delimiter = getLogicalOrOperator();
         } else {
             // We define the logical AND operator as the default implementation
             delimiter = getLogicalAndOperator();
         }
 
-        String result = query.getChildren().stream()
+        String result = query.children().stream()
                              .map(this::transform)
                              .flatMap(Optional::stream)
                              .collect(Collectors.joining(delimiter, "(", ")"));
@@ -50,32 +44,30 @@ public abstract class AbstractQueryTransformer {
         return Optional.of(result);
     }
 
-    /**
-     * Returns the logical AND operator used by the library
-     * Note: whitespaces have to be included around the operator
-     *
-     * Example: <code>" AND "</code>
-     */
+    /// Returns the logical AND operator used by the library
+    /// Note: whitespaces have to be included around the operator
+    ///
+    /// Example: `" AND "`
     protected abstract String getLogicalAndOperator();
 
-    /**
-     * Returns the logical OR operator used by the library
-     * Note: whitespaces have to be included around the operator
-     *
-     * Example: <code>" OR "</code>
-     */
+    /// Returns the logical OR operator used by the library
+    /// Note: whitespaces have to be included around the operator
+    ///
+    /// Example: `" OR "`
     protected abstract String getLogicalOrOperator();
 
-    /**
-     * Returns the logical NOT operator used by the library
-     *
-     * Example: <code>"!"</code>
-     */
+    /// Returns the logical NOT operator used by the library
+    ///
+    /// Example: `"!"`
     protected abstract String getLogicalNotOperator();
 
-    private Optional<String> transform(FieldQueryNode query) {
-        String term = query.getTextAsString();
-        switch (query.getFieldAsString()) {
+    private Optional<String> transform(SearchQueryNode query) {
+        String term = query.term();
+        String field = NO_EXPLICIT_FIELD;
+        if (query.field().isPresent()) {
+            field = String.valueOf(query.field().get().getName()).toLowerCase();
+        }
+        switch (field) {
             case "author" -> {
                 return Optional.of(handleAuthor(term));
             }
@@ -102,7 +94,7 @@ public abstract class AbstractQueryTransformer {
             }
             default -> {
                 // Just add unknown fields as default
-                return handleOtherField(query.getFieldAsString(), term);
+                return handleOtherField(field, term);
             }
         }
     }
@@ -111,36 +103,21 @@ public abstract class AbstractQueryTransformer {
         return "doi:" + term;
     }
 
-    /**
-     * Handles the not modifier, all other cases are silently ignored
-     */
-    private Optional<String> transform(ModifierQueryNode query) {
-        ModifierQueryNode.Modifier modifier = query.getModifier();
-        if (modifier == ModifierQueryNode.Modifier.MOD_NOT) {
-            return transform(query.getChild()).map(s -> getLogicalNotOperator() + s);
-        } else {
-            return transform(query.getChild());
-        }
+    /// Handles the not modifier, all other cases are silently ignored
+    private Optional<String> transform(NotNode query) {
+        return transform(query.negatedNode()).map(s -> getLogicalNotOperator() + s);
     }
 
-    /**
-     * Return a string representation of the author fielded term
-     */
+    /// Return a string representation of the author fielded term
     protected abstract String handleAuthor(String author);
 
-    /**
-     * Return a string representation of the title fielded term
-     */
+    /// Return a string representation of the title fielded term
     protected abstract String handleTitle(String title);
 
-    /**
-     * Return a string representation of the journal fielded term
-     */
+    /// Return a string representation of the journal fielded term
     protected abstract String handleJournal(String journalTitle);
 
-    /**
-     * Return a string representation of the year fielded term
-     */
+    /// Return a string representation of the year fielded term
     protected abstract String handleYear(String year);
 
     /// Parses the year range and fills startYear and endYear.
@@ -158,12 +135,10 @@ public abstract class AbstractQueryTransformer {
         }
     }
 
-    /**
-     * Return a string representation of the year-range fielded term
-     * Should follow the structure yyyy-yyyy
-     *
-     * Example: <code>2015-2021</code>
-     */
+    /// Return a string representation of the year-range fielded term
+    /// Should follow the structure yyyy-yyyy
+    ///
+    /// Example: `2015-2021`
     protected String handleYearRange(String yearRange) {
         parseYearRange(yearRange);
         if (endYear == Integer.MAX_VALUE) {
@@ -177,11 +152,9 @@ public abstract class AbstractQueryTransformer {
         return resultBuilder.toString();
     }
 
-    /**
-     * Return a string representation of the un-fielded (default fielded) term
-     * <p>
-     * Default implementation: just return the term (in quotes if a space is contained)
-     */
+    /// Return a string representation of the un-fielded (default fielded) term
+    ///
+    /// Default implementation: just return the term (in quotes if a space is contained)
     protected Optional<String> handleUnFieldedTerm(String term) {
         return Optional.of(StringUtil.quoteStringIfSpaceIsContained(term));
     }
@@ -194,53 +167,45 @@ public abstract class AbstractQueryTransformer {
         return "%s%s%s".formatted(fieldAsString, separator, StringUtil.quoteStringIfSpaceIsContained(term));
     }
 
-    /**
-     * Return a string representation of the provided field
-     * If it is not supported return an empty optional.
-     */
+    /// Return a string representation of the provided field
+    /// If it is not supported return an empty optional.
     protected Optional<String> handleOtherField(String fieldAsString, String term) {
         return Optional.of(createKeyValuePair(fieldAsString, term));
     }
 
-    protected Optional<String> transform(QueryNode query) {
+    protected Optional<String> transform(BaseQueryNode query) {
         switch (query) {
-            case BooleanQueryNode booleanQueryNode -> {
-                return transform(booleanQueryNode);
+            case OperatorNode operatorQueryNode -> {
+                return transform(operatorQueryNode);
             }
-            case FieldQueryNode fieldQueryNode -> {
-                return transform(fieldQueryNode);
+            case SearchQueryNode searchQueryNode -> {
+                return transform(searchQueryNode);
             }
-            case GroupQueryNode groupQueryNode -> {
-                return transform(groupQueryNode.getChild());
+            case NotNode notQueryNode -> {
+                return transform(notQueryNode);
             }
-            case ModifierQueryNode modifierQueryNode -> {
-                return transform(modifierQueryNode);
-            }
-            case null, default -> {
+            case null,
+                 default -> {
                 LOGGER.error("Unsupported case when transforming the query:\n {}", query);
                 return Optional.empty();
             }
         }
     }
 
-    /**
-     * Parses the given query string into a complex query using lucene.
-     * Note: For unique fields, the alphabetically and numerically first instance in the query string is used in the complex query.
-     *
-     * @param luceneQuery The lucene query tp transform
-     * @return A query string containing all fields that are contained in the original lucene query and
-     * that are expressible in the library specific query language, other information either is discarded or
-     * stored as part of the state of the transformer if it can be used e.g. as a URL parameter for the query.
-     */
-    public Optional<String> transformLuceneQuery(QueryNode luceneQuery) {
-        Optional<String> transformedQuery = transform(luceneQuery);
+    /// Parses the given query string into a complex query using lucene.
+    /// Note: For unique fields, the alphabetically and numerically first instance in the query string is used in the complex query.
+    ///
+    /// @param queryNode The first search node
+    /// @return A query string containing all fields that are contained in the original lucene query and
+    /// that are expressible in the library specific query language, other information either is discarded or
+    /// stored as part of the state of the transformer if it can be used e.g. as a URL parameter for the query.
+    public Optional<String> transformSearchQuery(BaseQueryNode queryNode) {
+        Optional<String> transformedQuery = transform(queryNode);
         transformedQuery = transformedQuery.map(this::removeOuterBraces);
         return transformedQuery;
     }
 
-    /**
-     * Removes the outer braces as they are unnecessary
-     */
+    /// Removes the outer braces as they are unnecessary
     private String removeOuterBraces(String query) {
         if (query.startsWith("(") && query.endsWith(")")) {
             return query.substring(1, query.length() - 1);

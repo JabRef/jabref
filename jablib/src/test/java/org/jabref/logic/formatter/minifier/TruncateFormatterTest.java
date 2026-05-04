@@ -5,9 +5,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/**
- * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
- */
+/// Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
 class TruncateFormatterTest {
     private final String TITLE = "A Title";
 

@@ -12,11 +12,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
-/**
- * Tools for automatically detecting OpenOffice or LibreOffice installations.
- */
+/// Tools for automatically detecting OpenOffice or LibreOffice installations.
 public class DetectOpenOfficeInstallation {
 
     private final OpenOfficePreferences openOfficePreferences;
@@ -40,9 +38,7 @@ public class DetectOpenOfficeInstallation {
         return dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
     }
 
-    /**
-     * Checks whether the executablePath exists
-     */
+    /// Checks whether the executablePath exists
     private boolean checkAutoDetectedPaths(OpenOfficePreferences openOfficePreferences) {
         String executablePath = openOfficePreferences.getExecutablePath();
 

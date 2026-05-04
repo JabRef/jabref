@@ -33,11 +33,15 @@ public class TextInputKeyBindings {
                         focusedTextField.nextWord();
                         event.consume();
                     }
-                    case EDITOR_BEGINNING, EDITOR_UP, EDITOR_BEGINNING_DOC -> {
+                    case EDITOR_BEGINNING,
+                         EDITOR_UP,
+                         EDITOR_BEGINNING_DOC -> {
                         focusedTextField.home();
                         event.consume();
                     }
-                    case EDITOR_END, EDITOR_DOWN, EDITOR_END_DOC -> {
+                    case EDITOR_END,
+                         EDITOR_DOWN,
+                         EDITOR_END_DOC -> {
                         focusedTextField.end();
                         event.consume();
                     }

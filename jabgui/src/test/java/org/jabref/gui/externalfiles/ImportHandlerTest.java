@@ -39,7 +39,6 @@ import static org.mockito.Mockito.when;
 
 class ImportHandlerTest {
 
-
     private ImportHandler importHandler;
     private BibDatabaseContext bibDatabaseContext;
     private BibEntry testEntry;
@@ -113,14 +112,14 @@ class ImportHandlerTest {
     @Test
     void cleanUpEntryTest() {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Clear Author");
-        BibEntry cleanedEntry = importHandler.cleanUpEntry(bibDatabaseContext, entry);
+        BibEntry cleanedEntry = importHandler.cleanUpEntry(entry);
         assertEquals(new BibEntry().withField(StandardField.AUTHOR, "Clear Author"), cleanedEntry);
     }
 
     @Test
     void findDuplicateTest() {
         // Assume there is no duplicate initially
-        assertTrue(importHandler.findDuplicate(bibDatabaseContext, testEntry).isEmpty());
+        assertTrue(importHandler.findDuplicate(testEntry).isEmpty());
     }
 
     @Test
@@ -146,7 +145,7 @@ class ImportHandlerTest {
         Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
         // Act
-        BibEntry result = importHandler.handleDuplicates(bibDatabaseContext, testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK).get();
+        BibEntry result = importHandler.handleDuplicates(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK).get();
 
         // Assert that the duplicate entry was removed from the database
         assertFalse(bibDatabase.getEntries().contains(duplicateEntry));
@@ -177,7 +176,7 @@ class ImportHandlerTest {
         Mockito.doReturn(decisionResult).when(importHandler).getDuplicateDecision(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
         // Act
-        BibEntry result = importHandler.handleDuplicates(bibDatabaseContext, testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK).get();
+        BibEntry result = importHandler.handleDuplicates(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK).get();
 
         // Assert
         assertTrue(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry is still in the database
@@ -212,7 +211,7 @@ class ImportHandlerTest {
 
         // Act
         // create and return a default BibEntry or do other computations
-        BibEntry result = importHandler.handleDuplicates(bibDatabaseContext, testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK)
+        BibEntry result = importHandler.handleDuplicates(testEntry, duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult.BREAK)
                                        .orElseGet(BibEntry::new);
 
         // Assert

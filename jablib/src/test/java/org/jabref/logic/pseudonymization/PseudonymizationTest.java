@@ -12,7 +12,6 @@ import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -38,7 +37,7 @@ class PseudonymizationTest {
 
     private BibtexImporter importer;
 
-    private BibtexDatabaseWriter databaseWriter;
+    private BibDatabaseWriter databaseWriter;
     private StringWriter stringWriter;
     private BibWriter bibWriter;
     private SelfContainedSaveConfiguration saveConfiguration;
@@ -57,7 +56,7 @@ class PseudonymizationTest {
         citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS);
         entryTypesManager = new BibEntryTypesManager();
 
-        databaseWriter = new BibtexDatabaseWriter(
+        databaseWriter = new BibDatabaseWriter(
                 bibWriter,
                 saveConfiguration,
                 fieldPreferences,
@@ -101,15 +100,13 @@ class PseudonymizationTest {
 
         Pseudonymization pseudonymization = new Pseudonymization();
         Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
-        databaseWriter.saveDatabase(result.bibDatabaseContext());
+        databaseWriter.writeDatabase(result.bibDatabaseContext());
 
         Path expectedPath = Path.of(PseudonymizationTest.class.getResource("Chocolate-pseudnomyized.bib").toURI());
         assertEquals(Files.readString(expectedPath), stringWriter.toString());
     }
 
-    /**
-     * This test can be used to anonymize a library.
-     */
+    /// This test can be used to anonymize a library.
     @Test
     void pseudonymizeLibraryFile(@TempDir Path tempDir) throws URISyntaxException, IOException {
         // modify path to the file to be anonymized
@@ -122,7 +119,7 @@ class PseudonymizationTest {
 
         Pseudonymization pseudonymization = new Pseudonymization();
         Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
-        databaseWriter.saveDatabase(result.bibDatabaseContext());
+        databaseWriter.writeDatabase(result.bibDatabaseContext());
 
         Files.writeString(target, stringWriter.toString());
 

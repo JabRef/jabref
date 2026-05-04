@@ -300,9 +300,9 @@ class DOITest {
 
     @Test
     void emptyOrUndescoreOnlyReturnsEmpty() {
-       assertEquals(Optional.empty(), DOI.parse("_"));
-       assertEquals(Optional.empty(), DOI.parse("\t_"));
-       assertEquals(Optional.empty(), DOI.parse("___"));
+        assertEquals(Optional.empty(), DOI.parse("_"));
+        assertEquals(Optional.empty(), DOI.parse("\t_"));
+        assertEquals(Optional.empty(), DOI.parse("___"));
     }
 
     @Test

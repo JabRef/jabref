@@ -14,6 +14,9 @@ import org.jabref.support.DisabledOnCIServer;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,6 +27,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @DisabledOnCIServer("Tests fails sporadically on CI server")
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("remote")
 class RemoteSetupTest {
 
     private RemoteMessageHandler messageHandler;
@@ -36,7 +41,7 @@ class RemoteSetupTest {
     @Test
     void goodCase() {
         final int port = 34567;
-        final String[] message = new String[]{"MYMESSAGE"};
+        final String[] message = new String[] {"MYMESSAGE"};
 
         try (RemoteListenerServerManager server = new RemoteListenerServerManager()) {
             assertFalse(server.isOpen());
@@ -52,7 +57,7 @@ class RemoteSetupTest {
     @Test
     void goodCaseWithAllLifecycleMethods() {
         final int port = 34567;
-        final String[] message = new String[]{"MYMESSAGE"};
+        final String[] message = new String[] {"MYMESSAGE"};
 
         try (RemoteListenerServerManager server = new RemoteListenerServerManager()) {
             assertFalse(server.isOpen());
@@ -98,7 +103,7 @@ class RemoteSetupTest {
         final int port = 34567;
         final String message = "MYMESSAGE";
 
-        assertFalse(new RemoteClient(port).sendCommandLineArguments(new String[]{message}));
+        assertFalse(new RemoteClient(port).sendCommandLineArguments(new String[] {message}));
     }
 
     @Test

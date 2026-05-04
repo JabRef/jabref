@@ -65,6 +65,7 @@
     <CheckBox fx:id="fulltextIndex" text="%Automatically index all linked files for fulltext search"/>
 
     <Label styleClass="sectionHeader" text="%Linked file name conventions"/>
+    <CheckBox fx:id="autoRenameFilesOnChange" text="%Auto rename files if entry changes"/>
     <GridPane hgap="4.0" vgap="4.0">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" percentWidth="30.0"/>
@@ -86,4 +87,7 @@
     <Label styleClass="sectionHeader" text="%Attached files"/>
     <CheckBox fx:id="confirmLinkedFileDelete" text="%Show confirmation dialog when deleting attached files"/>
     <CheckBox fx:id="moveToTrash" text="%Move deleted files to trash (instead of deleting them)"/>
+    <CheckBox fx:id="adjustLinkedFilesOnTransfer" text="%Update linked file paths during entry transfer if the files are accessible"/>
+    <CheckBox fx:id="copyLinkedFilesOnTransfer" text="%Copy linked files on entry transfer when they would otherwise be inaccessible"/>
+    <CheckBox fx:id="moveLinkedFilesOnTransfer" text="%Move linked files on entry transfer when they would otherwise be inaccessible"/>
 </fx:root>

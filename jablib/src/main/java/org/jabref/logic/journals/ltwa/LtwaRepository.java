@@ -20,10 +20,8 @@ import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A repository for LTWA (List of Title Word Abbreviations) entries.
- * Provides methods for retrieving and applying abbreviations based on LTWA rules.
- */
+/// A repository for LTWA (List of Title Word Abbreviations) entries.
+/// Provides methods for retrieving and applying abbreviations based on LTWA rules.
 public class LtwaRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(LtwaRepository.class);
     private static final Pattern INFLECTION = Pattern.compile("[ieasn'’]{1,3}");
@@ -34,19 +32,15 @@ public class LtwaRepository {
     private final PrefixTree<LtwaEntry> prefix;
     private final PrefixTree<LtwaEntry> suffix;
 
-    /**
-     * Creates an empty LtwaRepository.
-     */
+    /// Creates an empty LtwaRepository.
     public LtwaRepository() {
         this.prefix = new PrefixTree<>();
         this.suffix = new PrefixTree<>();
     }
 
-    /**
-     * Creates a new LtwaRepository from an MV store file.
-     *
-     * @param ltwaListFile Path to the LTWA MVStore file
-     */
+    /// Creates a new LtwaRepository from an MV store file.
+    ///
+    /// @param ltwaListFile Path to the LTWA MVStore file
     public LtwaRepository(Path ltwaListFile) {
         this();
 
@@ -72,12 +66,10 @@ public class LtwaRepository {
         }
     }
 
-    /**
-     * Abbreviates a given title using the ISO4 rules.
-     *
-     * @param title The title to be abbreviated
-     * @return The abbreviated title
-     */
+    /// Abbreviates a given title using the ISO4 rules.
+    ///
+    /// @param title The title to be abbreviated
+    /// @return The abbreviated title
     public Optional<String> abbreviate(String title) {
         if (title == null || title.isEmpty()) {
             return Optional.empty();
@@ -98,9 +90,7 @@ public class LtwaRepository {
                        });
     }
 
-    /**
-     * Listener to apply abbreviation rules to the parsed title
-     */
+    /// Listener to apply abbreviation rules to the parsed title
     private static class AbbreviationListener extends LtwaBaseListener {
         private final StringBuilder result = new StringBuilder();
         private final String originalTitle;
@@ -211,9 +201,7 @@ public class LtwaRepository {
             }
         }
 
-        /**
-         * Find matching entries from prefix and suffix trees
-         */
+        /// Find matching entries from prefix and suffix trees
         private List<LtwaEntry> findMatchingEntries(String normalizedText) {
             return Stream.concat(
                                  prefix.search(normalizedText).stream(),
@@ -222,9 +210,7 @@ public class LtwaRepository {
                          .toList();
         }
 
-        /**
-         * Find the best entry based on prioritization criteria
-         */
+        /// Find the best entry based on prioritization criteria
         private Optional<LtwaEntry> findBestEntry(List<LtwaEntry> entries) {
             return entries.stream()
                           .max(Comparator
@@ -280,9 +266,7 @@ public class LtwaRepository {
         }
     }
 
-    /**
-     * Restore capitalization and diacritics from the original text to the abbreviation
-     */
+    /// Restore capitalization and diacritics from the original text to the abbreviation
     private static Optional<String> restoreCapitalizationAndDiacritics(String abbreviation, String original) {
         if (abbreviation == null || original == null) {
             return Optional.empty();
@@ -312,9 +296,7 @@ public class LtwaRepository {
                              });
     }
 
-    /**
-     * Helper method to preserve original character properties (case, diacritics)
-     */
+    /// Helper method to preserve original character properties (case, diacritics)
     private static void preserveOriginalCharacterProperties(
             int normalizedChar, int originalChar, int[] resultCodePoints, int index) {
 
@@ -327,9 +309,7 @@ public class LtwaRepository {
                       .ifPresent(_ -> resultCodePoints[index] = originalChar);
     }
 
-    /**
-     * Determines if a title matches an LTWA entry
-     */
+    /// Determines if a title matches an LTWA entry
     private static boolean matches(String title, LtwaEntry entry) {
         String word = entry.word();
         int margin = (word.startsWith("-") ? 1 : 0) + (word.endsWith("-") ? 1 : 0);
@@ -345,9 +325,7 @@ public class LtwaRepository {
         return matchesInternal(title, word);
     }
 
-    /**
-     * Internal matching logic after handling special cases
-     */
+    /// Internal matching logic after handling special cases
     private static boolean matchesInternal(String title, String word) {
         int wordPosition = 0;
         int titlePosition = 0;
@@ -386,9 +364,7 @@ public class LtwaRepository {
         return handleRemainingText(title, titlePosition);
     }
 
-    /**
-     * Handle remaining text after initial match
-     */
+    /// Handle remaining text after initial match
     private static boolean handleRemainingText(String title, int titlePosition) {
         Matcher match = INFLECTION.matcher(title.substring(titlePosition));
         if (match.lookingAt()) {

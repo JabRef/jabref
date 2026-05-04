@@ -1,10 +1,7 @@
 package org.jabref.gui.collab;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-
-import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -15,44 +12,34 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.NonNull;
 
 public class ExternalChangesResolverViewModel extends AbstractViewModel {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ExternalChangesResolverViewModel.class);
-
     private final ObservableList<DatabaseChange> visibleChanges = FXCollections.observableArrayList();
 
-    /**
-     * Because visible changes list will be bound to the UI, certain changes can be removed. This list is used to keep
-     * track of changes even when they're removed from the UI.
-     */
+    /// Because visible changes list will be bound to the UI, certain changes can be removed. This list is used to keep
+    /// track of changes even when they're removed from the UI.
     private final ObservableList<DatabaseChange> changes = FXCollections.observableArrayList();
-
     private final ObjectProperty<DatabaseChange> selectedChange = new SimpleObjectProperty<>();
-
     private final BooleanBinding areAllChangesResolved;
-
-    private BooleanBinding areAllChangesAccepted;
-
-    private BooleanBinding areAllChangesDenied;
-
+    private final BooleanBinding areAllChangesAccepted;
+    private final BooleanBinding areAllChangesDenied;
     private final BooleanBinding canAskUserToResolveChange;
 
-    private final UndoManager undoManager;
-
-    public ExternalChangesResolverViewModel(List<DatabaseChange> externalChanges, UndoManager undoManager) {
-        Objects.requireNonNull(externalChanges);
-        assert !externalChanges.isEmpty();
-
+    public ExternalChangesResolverViewModel(@NonNull List<DatabaseChange> externalChanges) {
         this.visibleChanges.addAll(externalChanges);
         this.changes.addAll(externalChanges);
-        this.undoManager = undoManager;
 
-        areAllChangesResolved = Bindings.createBooleanBinding(visibleChanges::isEmpty, visibleChanges);
-        areAllChangesAccepted = Bindings.createBooleanBinding(() -> changes.stream().allMatch(DatabaseChange::isAccepted));
-        areAllChangesDenied = Bindings.createBooleanBinding(() -> changes.stream().noneMatch(DatabaseChange::isAccepted));
+        if (externalChanges.isEmpty()) {
+            areAllChangesResolved = Bindings.createBooleanBinding(() -> false);
+            areAllChangesAccepted = Bindings.createBooleanBinding(() -> false);
+            areAllChangesDenied = Bindings.createBooleanBinding(() -> false);
+        } else {
+            areAllChangesResolved = Bindings.createBooleanBinding(visibleChanges::isEmpty, visibleChanges);
+            areAllChangesAccepted = Bindings.createBooleanBinding(() -> changes.stream().allMatch(DatabaseChange::isAccepted));
+            areAllChangesDenied = Bindings.createBooleanBinding(() -> changes.stream().noneMatch(DatabaseChange::isAccepted));
+        }
         canAskUserToResolveChange = Bindings.createBooleanBinding(() -> selectedChange.isNotNull().get() && selectedChange.get().getExternalChangeResolver().isPresent(), selectedChange);
     }
 
@@ -107,9 +94,7 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
         getSelectedChange().ifPresent(getVisibleChanges()::remove);
     }
 
-    public void acceptMergedChange(DatabaseChange databaseChange) {
-        Objects.requireNonNull(databaseChange);
-
+    public void acceptMergedChange(@NonNull DatabaseChange databaseChange) {
         getSelectedChange().ifPresent(oldChange -> {
             changes.remove(oldChange);
             changes.add(databaseChange);

@@ -5,22 +5,19 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.SequencedSet;
-import java.util.StringJoiner;
 
-/**
- * Represents a choice between two (or more) fields or any combination of them.
- * <p>
- * The idea of OrFields originates from BibLaTeX, where the manual lists following
- * <br>
- * Required fields: author, title, journaltitle, year/date
- * <br>
- * The class OrFields is used to model "year/date" in this case.
- * <p>
- * Example is that a BibEntry requires either an author or an editor, but both can be present.
- */
+/// Represents a choice between two (or more) fields or any combination of them.
+///
+/// The idea of OrFields originates from BibLaTeX, where the manual lists following
+/// <br>
+/// Required fields: author, title, journaltitle, year/date
+/// <br>
+/// The class OrFields is used to model "year/date" in this case.
+///
+/// Example is that a BibEntry requires either an author or an editor, but both can be present.
 public class OrFields implements Comparable<OrFields> {
 
-    private SequencedSet<Field> fields = new LinkedHashSet<>();
+    private final SequencedSet<Field> fields = new LinkedHashSet<>();
 
     public OrFields(Field field) {
         fields.add(field);
@@ -32,14 +29,6 @@ public class OrFields implements Comparable<OrFields> {
 
     public OrFields(Collection<Field> fieldsToAdd) {
         fields.addAll(fieldsToAdd);
-    }
-
-    public String getDisplayName() {
-        StringJoiner joiner = new StringJoiner("/");
-        for (Field field : fields) {
-            joiner.add(field.getDisplayName());
-        }
-        return joiner.toString();
     }
 
     public Field getPrimary() {

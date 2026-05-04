@@ -14,11 +14,11 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.FileType;
 
-/**
- * Object with data for a custom importer.
- *
- * <p>Is also responsible for instantiating the class loader.</p>
- */
+import org.jspecify.annotations.NonNull;
+
+/// Object with data for a custom importer.
+///
+/// Is also responsible for instantiating the class loader.
 public class CustomImporter extends Importer {
 
     private final String className;
@@ -38,7 +38,7 @@ public class CustomImporter extends Importer {
 
     private static Importer load(URL basePathURL, String className)
             throws IOException, ReflectiveOperationException {
-        try (URLClassLoader cl = new URLClassLoader(new URL[]{basePathURL})) {
+        try (URLClassLoader cl = new URLClassLoader(new URL[] {basePathURL})) {
             Class<?> clazz = Class.forName(className, true, cl);
             return (Importer) clazz.getDeclaredConstructor().newInstance();
         }
@@ -70,12 +70,12 @@ public class CustomImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException {
         return importer.isRecognizedFormat(input);
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader input) throws IOException {
+    public ParserResult importDatabase(@NonNull BufferedReader input) throws IOException {
         return importer.importDatabase(input);
     }
 

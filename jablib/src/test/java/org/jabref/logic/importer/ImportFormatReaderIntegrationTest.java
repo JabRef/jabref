@@ -39,37 +39,37 @@ class ImportFormatReaderIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("importFormats")
-    void importUnknownFormat(String resource, String format, int count) throws ImportException, URISyntaxException {
+    void importFromFileWithAutoDetection(String resource, String format, int count) throws ImportException, URISyntaxException {
         Path file = Path.of(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
-        ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(file, new DummyFileUpdateMonitor());
-        assertEquals(count, unknownFormat.parserResult().getDatabase().getEntryCount());
+        ImportFormatReader.ImportResult importResult = reader.importWithAutoDetection(file);
+        assertEquals(count, importResult.parserResult().getDatabase().getEntryCount());
     }
 
     @ParameterizedTest
     @MethodSource("importFormats")
-    void importFormatFromFile(String resource, String format, int count) throws ImportException, URISyntaxException {
+    void importFromFileWithGivenFormat(String resource, String format, int count) throws ImportException, URISyntaxException {
         Path file = Path.of(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
         assertEquals(count, reader.importFromFile(format, file).getDatabase().getEntries().size());
     }
 
     @ParameterizedTest
     @MethodSource("importFormats")
-    void importUnknownFormatFromString(String resource, String format, int count) throws URISyntaxException, IOException, ImportException {
+    void importFromStringWithAutoDetection(String resource, String format, int count) throws URISyntaxException, IOException, ImportException {
         Path file = Path.of(ImportFormatReaderIntegrationTest.class.getResource(resource).toURI());
         String data = Files.readString(file);
-        assertEquals(count, reader.importUnknownFormat(data).parserResult().getDatabase().getEntries().size());
+        assertEquals(count, reader.importWithAutoDetection(data).parserResult().getDatabase().getEntries().size());
     }
 
     private static Stream<Object[]> importFormats() {
         Collection<Object[]> result = new ArrayList<>();
-        result.add(new Object[]{"fileformat/RisImporterTest1.ris", "ris", 1});
-        result.add(new Object[]{"fileformat/IsiImporterTest1.isi", "isi", 1});
-        result.add(new Object[]{"fileformat/RepecNepImporterTest2.txt", "repecnep", 1});
-        result.add(new Object[]{"fileformat/OvidImporterTest3.txt", "ovid", 1});
-        result.add(new Object[]{"fileformat/Endnote.entries.enw", "refer", 5});
-        result.add(new Object[]{"fileformat/MsBibImporterTest4.xml", "msbib", 1});
-        result.add(new Object[]{"fileformat/MsBibImporterTest4.bib", "bibtex", 1});
-        result.add(new Object[]{"fileformat/refer.bibIX.ref", "refer-bibIX", 4});
+        result.add(new Object[] {"fileformat/RisImporterTest1.ris", "ris", 1});
+        result.add(new Object[] {"fileformat/IsiImporterTest1.isi", "isi", 1});
+        result.add(new Object[] {"fileformat/RepecNepImporterTest2.txt", "repecnep", 1});
+        result.add(new Object[] {"fileformat/OvidImporterTest3.txt", "ovid", 1});
+        result.add(new Object[] {"fileformat/Endnote.entries.enw", "refer", 5});
+        result.add(new Object[] {"fileformat/MsBibImporterTest4.xml", "msbib", 1});
+        result.add(new Object[] {"fileformat/MsBibImporterTest4.bib", "bibtex", 1});
+        result.add(new Object[] {"fileformat/refer.bibIX.ref", "refer-bibIX", 4});
         return result.stream();
     }
 }

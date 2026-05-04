@@ -2,14 +2,14 @@ name: On issue unlabeled
 
 on:
   issues:
-     types:
-       - unlabeled
+    types:
+      - unlabeled
 
 jobs:
   handle_Assigned_and_FirstTimeCodeContribution:
     name: "📍 Assigned or FirstTimeCodeContribution"
     if: ${{ (github.event.label.name == '📍 Assigned' || github.event.label.name == 'FirstTimeCodeContribution') && github.repository_owner == 'JabRef' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       issues: write
     steps:
@@ -33,12 +33,17 @@ jobs:
           ignored-columns: ""
           default-column: "Free to take"
           skip-if-not-in-project: true
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Remove all assignees
         run: |
           ASSIGNEES=$(gh issue view ${{ github.event.issue.number }} --json assignees --template '{{range .assignees}}{{.login}} {{end}}')
           for user in $ASSIGNEES; do
             gh issue edit ${{ github.event.issue.number }} --remove-assignee "$user"
           done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Remove labels assigned, reminder-sent, pinned, and "FirstTimeCodeContribution"
+        run: |
+          gh issue edit ${{ github.event.issue.number }} --remove-label "📍 Assigned,🔔 reminder-sent,📌 Pinned,FirstTimeCodeContribution"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

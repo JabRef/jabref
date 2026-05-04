@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.util.List;
+import java.util.Locale;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -18,12 +19,10 @@ public class WorkspacePreferences {
     private final ObjectProperty<Language> language;
     private final BooleanProperty shouldOverrideDefaultFontSize;
     private final IntegerProperty mainFontSize;
-    private final IntegerProperty defaultFontSize;
     private final ObjectProperty<Theme> theme;
     private final BooleanProperty themeSyncOs;
     private final BooleanProperty shouldOpenLastEdited;
     private final BooleanProperty showAdvancedHints;
-    private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
     private final BooleanProperty confirmHideTabBar;
     private final ObservableList<String> selectedSlrCatalogs;
@@ -31,27 +30,56 @@ public class WorkspacePreferences {
     public WorkspacePreferences(Language language,
                                 boolean shouldOverrideDefaultFontSize,
                                 int mainFontSize,
-                                int defaultFontSize,
                                 Theme theme,
                                 boolean themeSyncOs,
                                 boolean shouldOpenLastEdited,
                                 boolean showAdvancedHints,
-                                boolean warnAboutDuplicatesInInspection,
                                 boolean confirmDelete,
                                 boolean confirmHideTabBar,
                                 List<String> selectedSlrCatalogs) {
         this.language = new SimpleObjectProperty<>(language);
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
-        this.defaultFontSize = new SimpleIntegerProperty(defaultFontSize);
         this.theme = new SimpleObjectProperty<>(theme);
         this.themeSyncOs = new SimpleBooleanProperty(themeSyncOs);
         this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
-        this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
         this.confirmHideTabBar = new SimpleBooleanProperty(confirmHideTabBar);
         this.selectedSlrCatalogs = FXCollections.observableArrayList(selectedSlrCatalogs);
+    }
+
+    /// Creates Object with default values
+    private WorkspacePreferences() {
+        this(
+                Language.getLanguageFor(Locale.getDefault().getLanguage()), // Default language
+                false,                                                      // Default font size override
+                9,                                                          // Default font size
+                Theme.system(),                                             // Default theme
+                true,                                                       // Default theme sync with OS
+                true,                                                       // Default open last edited
+                true,                                                       // Default show advanced hints
+                true,                                                       // Default confirm delete
+                true,                                                       // Default confirm hide tab bar
+                List.of()                                                   // Default selected SLR catalogs
+        );
+    }
+
+    public static WorkspacePreferences getDefault() {
+        return new WorkspacePreferences();
+    }
+
+    public void setAll(WorkspacePreferences preferences) {
+        this.language.set(preferences.getLanguage());
+        this.shouldOverrideDefaultFontSize.set(preferences.shouldOverrideDefaultFontSize());
+        this.mainFontSize.set(preferences.getMainFontSize());
+        this.theme.set(preferences.getTheme());
+        this.themeSyncOs.set(preferences.shouldThemeSyncOs());
+        this.shouldOpenLastEdited.set(preferences.shouldOpenLastEdited());
+        this.showAdvancedHints.set(preferences.shouldShowAdvancedHints());
+        this.confirmDelete.set(preferences.shouldConfirmDelete());
+        this.confirmHideTabBar.set(preferences.shouldHideTabBar());
+        this.selectedSlrCatalogs.setAll(preferences.getSelectedSlrCatalogs());
     }
 
     public Language getLanguage() {
@@ -80,10 +108,6 @@ public class WorkspacePreferences {
 
     public int getMainFontSize() {
         return mainFontSize.get();
-    }
-
-    public int getDefaultFontSize() {
-        return defaultFontSize.get();
     }
 
     public void setMainFontSize(int mainFontSize) {
@@ -140,18 +164,6 @@ public class WorkspacePreferences {
 
     public void setShowAdvancedHints(boolean showAdvancedHints) {
         this.showAdvancedHints.set(showAdvancedHints);
-    }
-
-    public boolean shouldWarnAboutDuplicatesInInspection() {
-        return warnAboutDuplicatesInInspection.get();
-    }
-
-    public BooleanProperty warnAboutDuplicatesInInspectionProperty() {
-        return warnAboutDuplicatesInInspection;
-    }
-
-    public void setWarnAboutDuplicatesInInspection(boolean warnAboutDuplicatesInInspection) {
-        this.warnAboutDuplicatesInInspection.set(warnAboutDuplicatesInInspection);
     }
 
     public boolean shouldConfirmDelete() {

@@ -3,13 +3,15 @@ package org.jabref.logic.integrity;
 import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Date;
-import org.jabref.model.strings.StringUtil;
+
+import org.jspecify.annotations.Nullable;
 
 public class DateChecker implements ValueChecker {
 
     @Override
-    public Optional<String> checkValue(String value) {
+    public Optional<String> checkValue(@Nullable String value) {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();
         }

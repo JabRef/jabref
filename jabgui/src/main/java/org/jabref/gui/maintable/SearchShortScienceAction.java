@@ -15,18 +15,25 @@ import org.jabref.logic.util.ExternalLinkCreator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.jabref.gui.actions.ActionHelper.isFieldSetForSelectedEntry;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
 public class SearchShortScienceAction extends SimpleCommand {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchShortScienceAction.class);
+
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
+    private final ExternalLinkCreator externalLinkCreator;
 
     public SearchShortScienceAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
+        this.externalLinkCreator = new ExternalLinkCreator(preferences.getImporterPreferences());
 
         BooleanExpression fieldIsSet = isFieldSetForSelectedEntry(StandardField.TITLE, stateManager);
         this.executable.bind(needsEntriesSelected(1, stateManager).and(fieldIsSet));
@@ -41,11 +48,12 @@ public class SearchShortScienceAction extends SimpleCommand {
                 dialogService.notify(Localization.lang("This operation requires exactly one item to be selected."));
                 return;
             }
-            ExternalLinkCreator.getShortScienceSearchURL(bibEntries.getFirst()).ifPresent(url -> {
+            externalLinkCreator.getShortScienceSearchURL(bibEntries.getFirst()).ifPresent(url -> {
                 try {
                     NativeDesktop.openExternalViewer(databaseContext, preferences, url, StandardField.URL, dialogService, bibEntries.getFirst());
                 } catch (IOException ex) {
-                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open ShortScience."), ex);
+                    LOGGER.warn("Could not open ShortScience", ex);
+                    dialogService.notify(Localization.lang("Unable to open ShortScience.") + " " + ex.getMessage());
                 }
             });
         });

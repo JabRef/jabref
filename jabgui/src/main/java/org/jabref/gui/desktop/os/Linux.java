@@ -17,20 +17,18 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
-import org.jabref.gui.util.StreamGobbler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.StreamGobbler;
 
 import org.slf4j.LoggerFactory;
 
-/**
- * This class contains Linux specific implementations for file directories and file/application open handling methods.
- * <p>
- * We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link JabKit#initLogging}.
- * The configuration of tinylog will become immutable as soon as the first log entry is issued.
- * https://tinylog.org/v2/configuration
- */
+/// This class contains Linux specific implementations for file directories and file/application open handling methods.
+///
+/// We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link JabKit#initLogging}.
+/// The configuration of tinylog will become immutable as soon as the first log entry is issued.
+/// https://tinylog.org/v2/configuration
 @AllowedToUseAwt("Requires AWT to open a file with the native method")
 public class Linux extends NativeDesktop {
 

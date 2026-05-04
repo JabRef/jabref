@@ -4,35 +4,24 @@ import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Objects;
 
-import org.jabref.model.strings.StringUtil;
-
+/// This class models a field that is not natively known to JabRef.
+/// It might be a custom field added by the user.
+/// It also might originate from an importer if the source "field" cannot be mapped to one of the existing fields by its name and/or properties.
+/// It is not called "CustomField", because there was the idea that StandardFields could be customized.
+///
+/// This can be instantiated with [org.jabref.model.entry.field.FieldFactory#parseField(java.lang.String)]
 public class UnknownField implements Field {
     private String name;
     private final EnumSet<FieldProperty> properties;
-    private final String displayName;
 
     public UnknownField(String name) {
-        this(name, StringUtil.capitalizeFirst(name));
-    }
-
-    public UnknownField(String name, String displayName) {
         this.name = name;
-        this.displayName = displayName;
         this.properties = EnumSet.noneOf(FieldProperty.class);
     }
 
     public UnknownField(String name, FieldProperty first, FieldProperty... rest) {
-        this(name, StringUtil.capitalizeFirst(name), first, rest);
-    }
-
-    public UnknownField(String name, String displayName, FieldProperty first, FieldProperty... rest) {
         this.name = name;
-        this.displayName = displayName;
         this.properties = EnumSet.of(first, rest);
-    }
-
-    public static UnknownField fromDisplayName(String displayName) {
-        return new UnknownField(displayName.toLowerCase(Locale.ROOT), displayName);
     }
 
     @Override
@@ -47,11 +36,6 @@ public class UnknownField implements Field {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Override
-    public String getDisplayName() {
-        return displayName;
     }
 
     @Override
@@ -78,7 +62,7 @@ public class UnknownField implements Field {
     @Override
     public String toString() {
         return "UnknownField{" +
-               "name='" + name + '\'' +
-               '}';
+                "name='" + name + '\'' +
+                '}';
     }
 }

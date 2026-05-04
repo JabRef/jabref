@@ -22,9 +22,9 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.push.PushToApplication;
-import org.jabref.gui.push.PushToApplications;
-import org.jabref.gui.push.PushToTeXstudio;
+import org.jabref.gui.push.GuiPushToApplication;
+import org.jabref.gui.push.GuiPushToApplications;
+import org.jabref.gui.push.GuiPushToTeXstudio;
 import org.jabref.gui.texparser.CitationsDisplay;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.DirectoryMonitor;
@@ -98,11 +98,11 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2 && selectedItem != null) {
             String applicationName = preferences.getPushToApplicationPreferences()
                                                 .getActiveApplicationName();
-            PushToApplication application = PushToApplications.getApplicationByName(
-                                                                      applicationName,
-                                                                      dialogService,
-                                                                      preferences)
-                                                              .orElse(new PushToTeXstudio(dialogService, preferences));
+            GuiPushToApplication application = GuiPushToApplications.getGUIApplicationByName(
+                                                                            applicationName,
+                                                                            dialogService,
+                                                                            preferences.getPushToApplicationPreferences())
+                                                                    .orElseGet(() -> new GuiPushToTeXstudio(dialogService, preferences.getPushToApplicationPreferences()));
             preferences.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());
             application.jumpToLine(selectedItem.path(), selectedItem.line(), selectedItem.colStart());
         }
@@ -132,7 +132,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                 .withInitialDirectory(directory.get()).build();
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory ->
-                currentDatabaseContext.getMetaData().setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), selectedDirectory.toAbsolutePath()));
+                currentDatabaseContext.getMetaData().setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), selectedDirectory.toAbsolutePath().toString()));
 
         checkAndUpdateDirectory();
     }

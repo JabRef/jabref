@@ -9,10 +9,10 @@ import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.strings.StringUtil;
 
 public class MonthEditorViewModel extends OptionEditorViewModel<Month> {
     private final BibDatabaseMode databaseMode;

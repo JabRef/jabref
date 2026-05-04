@@ -30,6 +30,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.protectedterms;
     exports org.jabref.logic.remote;
     exports org.jabref.logic.remote.client;
+    exports org.jabref.logic.remote.server;
     exports org.jabref.logic.net.ssl;
     exports org.jabref.logic.citationstyle;
     exports org.jabref.architecture;
@@ -39,6 +40,7 @@ open module org.jabref.jablib {
     exports org.jabref.model.groups.event;
     exports org.jabref.logic.preview;
     exports org.jabref.logic.ai;
+    exports org.jabref.logic.ai.models;
     exports org.jabref.logic.pdf;
     exports org.jabref.model.database.event;
     exports org.jabref.model.entry.event;
@@ -67,7 +69,9 @@ open module org.jabref.jablib {
     exports org.jabref.logic.layout.format;
     exports org.jabref.logic.auxparser;
     exports org.jabref.logic.cleanup;
+    exports org.jabref.logic.relatedwork;
     exports org.jabref.logic.formatter;
+    exports org.jabref.logic.importer.fetcher.citation.crossref;
     exports org.jabref.logic.importer.fetcher.citation.semanticscholar;
     exports org.jabref.logic.formatter.bibtexfields;
     exports org.jabref.model.pdf;
@@ -84,7 +88,6 @@ open module org.jabref.jablib {
     exports org.jabref.logic.biblog;
     exports org.jabref.model.biblog;
     exports org.jabref.model.http;
-    exports org.jabref.logic.remote.server;
     exports org.jabref.logic.util.strings;
     exports org.jabref.model.openoffice;
     exports org.jabref.logic.openoffice;
@@ -103,16 +106,29 @@ open module org.jabref.jablib {
     exports org.jabref.logic.shared.event;
     exports org.jabref.logic.citation;
     exports org.jabref.logic.crawler;
-    exports org.jabref.logic.git;
     exports org.jabref.logic.pseudonymization;
     exports org.jabref.logic.citation.repository;
+    exports org.jabref.model.paging;
+    exports org.jabref.logic.git;
+    exports org.jabref.logic.git.conflicts;
+    exports org.jabref.logic.git.io;
+    exports org.jabref.logic.git.model;
+    exports org.jabref.logic.git.status;
+    exports org.jabref.logic.command;
+    exports org.jabref.logic.git.util;
+    exports org.jabref.logic.git.preferences;
+    exports org.jabref.logic.icore;
+    exports org.jabref.model.icore;
+    exports org.jabref.logic.git.merge.planning;
+    exports org.jabref.logic.git.merge.execution;
+    exports org.jabref.model.sciteTallies;
+    exports org.jabref.logic.bibtex.comparator.plausibility;
 
     requires java.base;
 
-    requires javafx.base;
-    requires javafx.graphics; // because of javafx.scene.paint.Color
+    requires transitive javafx.base;
     requires afterburner.fx;
-    requires com.tobiasdiez.easybind;
+    requires transitive com.tobiasdiez.easybind;
 
     // for java.awt.geom.Rectangle2D required by org.jabref.logic.pdf.TextExtractor
     requires java.desktop;
@@ -122,99 +138,98 @@ open module org.jabref.jablib {
     requires java.sql.rowset;
 
     // region: Logging
-    requires org.slf4j;
-    requires jul.to.slf4j;
-    requires org.apache.logging.log4j.to.slf4j;
+    requires transitive org.slf4j;
+    // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog in the CLI and GUI)
+    requires /*runtime*/ jul.to.slf4j;
+    // route all requests to log4j to SLF4J
+    requires /*runtime*/ org.apache.logging.log4j.to.slf4j;
+    // required by org.jabref.generators (only)
+    requires /*runtime*/ org.tinylog.api.slf4j;
+    requires /*runtime*/ org.tinylog.impl;
     // endregion
 
     // Preferences and XML
     requires java.prefs;
-    requires com.fasterxml.aalto;
+    requires /*runtime*/ com.fasterxml.aalto;
 
     // YAML
     requires org.yaml.snakeyaml;
 
     // region: Annotations (@PostConstruct)
-    requires jakarta.annotation;
-    requires jakarta.inject;
+    requires static jakarta.annotation;
+    requires transitive jakarta.inject;
     // endregion
 
     // region: data mapping
-    requires jakarta.xml.bind;
     requires jdk.xml.dom;
     requires com.google.gson;
-    requires com.fasterxml.jackson.databind;
-    requires com.fasterxml.jackson.dataformat.yaml;
-    requires com.fasterxml.jackson.datatype.jsr310;
-    // needs to be loaded here as it's otherwise not found at runtime, related to XJC
-    requires org.glassfish.jaxb.runtime;
+    requires tools.jackson.databind;
+    requires tools.jackson.dataformat.yaml;
+    requires tools.jackson.core;
+    requires transitive com.fasterxml.jackson.annotation;
     // endregion
 
     // region HTTP clients
     requires java.net.http;
     requires jakarta.ws.rs;
-    requires org.apache.httpcomponents.core5.httpcore5;
-    requires org.jsoup;
-    requires unirest.java.core;
-    requires unirest.modules.gson;
+    requires transitive org.apache.httpcomponents.core5.httpcore5;
+    requires transitive org.jsoup;
+    requires transitive unirest.java.core;
+    requires /*runtime*/ unirest.modules.gson;
     // endregion
 
     // region: SQL databases
     requires embedded.postgres;
-    requires org.tukaani.xz;
+    // For arm, we explicitly need to add these as well
+    requires /*runtime*/ embedded.postgres.binaries.darwin.arm64v8;
+    requires /*runtime*/ embedded.postgres.binaries.linux.arm64v8;
+
+    requires /*runtime*/ org.tukaani.xz;
     requires org.postgresql.jdbc;
     // endregion
 
     // region: Apache Commons and other (similar) helper libraries
-    requires com.google.common;
-    requires io.github.javadiffutils;
+    requires transitive com.google.common;
     requires java.string.similarity;
-    requires org.apache.commons.compress;
-    requires org.apache.commons.csv;
+    requires transitive org.apache.commons.csv;
     requires org.apache.commons.io;
     requires org.apache.commons.lang3;
     requires org.apache.commons.text;
-    requires org.apache.commons.logging;
+    // endregion
+
+    // region: caching
+    requires com.github.benmanes.caffeine;
     // endregion
 
     // region: latex2unicode
     requires com.github.tomtung.latex2unicode;
     requires fastparse;
-    requires scala.library;
     // endregion
 
     requires jbibtex;
-    requires citeproc.java;
+    requires transitive citeproc.java;
 
-    requires snuggletex.core;
+    requires transitive snuggletex.core;
 
-    requires org.apache.pdfbox;
-    requires org.apache.xmpbox;
+    requires transitive org.apache.pdfbox;
+    requires transitive org.apache.xmpbox;
     requires com.ibm.icu;
 
     requires flexmark;
-    requires flexmark.html2md.converter;
     requires flexmark.util.ast;
     requires flexmark.util.data;
 
-    requires com.h2database.mvstore;
+    requires transitive com.h2database.mvstore;
 
     requires java.keyring;
-    requires org.freedesktop.dbus;
-
-    requires org.jooq.jool;
 
     // region AI
-    requires ai.djl.api;
-    requires ai.djl.pytorch_model_zoo;
+    requires transitive ai.djl.api;
+    requires /*runtime*/ ai.djl.pytorch_model_zoo;
     requires ai.djl.tokenizers;
     requires jvm.openai;
     requires langchain4j;
-    requires langchain4j.core;
-    requires langchain4j.google.ai.gemini;
-    requires langchain4j.hugging.face;
-    requires langchain4j.mistral.ai;
-    requires langchain4j.open.ai;
+    requires transitive langchain4j.core;
     uses ai.djl.engine.EngineProvider;
     uses ai.djl.repository.RepositoryFactory;
     uses ai.djl.repository.zoo.ZooProvider;
@@ -226,31 +241,32 @@ open module org.jabref.jablib {
     /*
      * In case the version is updated, please also increment {@link org.jabref.model.search.LinkedFilesConstants.VERSION} to trigger reindexing.
      */
-    uses org.apache.lucene.codecs.lucene101.Lucene101Codec;
+    uses org.apache.lucene.codecs.lucene104.Lucene104Codec;
     requires org.apache.lucene.analysis.common;
-    requires org.apache.lucene.core;
-    requires org.apache.lucene.highlighter;
+    requires transitive org.apache.lucene.core;
+    requires transitive org.apache.lucene.highlighter;
     requires org.apache.lucene.queryparser;
     // endregion
 
+    // region: appdirs
     requires net.harawata.appdirs;
-    requires com.sun.jna;
-    requires com.sun.jna.platform;
+    // endregion
 
-    requires org.eclipse.jgit;
+    // region: jgit
+    requires transitive org.eclipse.jgit;
     uses org.eclipse.jgit.transport.SshSessionFactory;
     uses org.eclipse.jgit.lib.Signer;
-
-    requires transitive org.jspecify;
+    // endregion
 
     // region: other libraries (alphabetically)
     requires cuid;
-    requires dd.plist;
-    requires io.github.adr;
-    // required by okhttp and some AI library
-    requires kotlin.stdlib;
+    requires com.dd.plist;
+    requires io.github.darvil.terminal.textformatter;
+    requires static io.github.eadr;
     requires mslinks;
-    requires org.antlr.antlr4.runtime;
-    requires org.libreoffice.uno;
+    requires transitive org.antlr.antlr4.runtime;
+    requires org.jooq.jool;
+    requires transitive org.libreoffice.uno;
+    requires transitive org.jspecify;
     // endregion
 }

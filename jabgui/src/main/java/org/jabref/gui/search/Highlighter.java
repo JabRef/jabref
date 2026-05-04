@@ -13,13 +13,11 @@ import java.util.Optional;
 import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.search.query.SearchQueryConversion;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.search.PostgreConstants;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchQueryNode;
 import org.jabref.model.util.Range;
 
 import com.airhacks.afterburner.injection.Injector;
-import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -31,12 +29,14 @@ import org.slf4j.LoggerFactory;
 public class Highlighter {
     private static final Logger LOGGER = LoggerFactory.getLogger(Highlighter.class);
 
-    /**
-     * Functions defined in {@link PostgreConstants#POSTGRES_FUNCTIONS}
-     */
+    /// Functions defined in {@link org.jabref.model.search.PostgreConstants#POSTGRES_FUNCTIONS}
     private static final String REGEXP_MARK = "SELECT regexp_mark(?, ?)";
     private static final String REGEXP_POSITIONS = "SELECT * FROM regexp_positions(?, ?)";
     private static Connection connection;
+
+    private Highlighter() {
+        // prevent instantiation
+    }
 
     public static String highlightHtml(String htmlText, SearchQuery searchQuery) {
         Optional<String> searchTermsPattern = buildSearchPattern(searchQuery);
@@ -45,16 +45,11 @@ public class Highlighter {
         }
 
         Document document = Jsoup.parse(htmlText);
-        try {
-            highlightTextNodes(document.body(), searchTermsPattern.get());
-            return document.outerHtml();
-        } catch (InvalidTokenOffsetsException e) {
-            LOGGER.debug("Error highlighting search terms in HTML", e);
-            return htmlText;
-        }
+        highlightTextNodes(document.body(), searchTermsPattern.get());
+        return document.outerHtml();
     }
 
-    private static void highlightTextNodes(Element element, String searchPattern) throws InvalidTokenOffsetsException {
+    private static void highlightTextNodes(Element element, String searchPattern) {
         for (Node node : element.childNodes()) {
             if (node instanceof TextNode textNode) {
                 String highlightedText = highlightNode(textNode.text(), searchPattern);

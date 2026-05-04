@@ -12,7 +12,7 @@ public enum DateRange {
     private final String dateRange;
 
     DateRange(String dateRange) {
-       this.dateRange = dateRange;
+        this.dateRange = dateRange;
     }
 
     public static DateRange parse(String name) {

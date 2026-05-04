@@ -3,7 +3,7 @@ package org.jabref.logic.importer.fetcher.transformers;
 import java.util.Calendar;
 import java.util.Optional;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
@@ -12,9 +12,7 @@ public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
 
     private JSONObject payload = new JSONObject();
 
-    /**
-     * Default values for necessary parameters set in constructor
-     */
+    /// Default values for necessary parameters set in constructor
     public CiteSeerQueryTransformer() {
         handlePage("1");
         handlePageSize("20");
@@ -67,29 +65,32 @@ public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleYearRange(String yearRange) {
-         parseYearRange(yearRange);
-         if (endYear == Integer.MAX_VALUE) { // invalid year range
-             Calendar calendar = Calendar.getInstance();
-             this.getJSONPayload().put("yearEnd", calendar.get(Calendar.YEAR));
-             return "";
-         }
-         this.getJSONPayload().put("yearStart", startYear);
-         this.getJSONPayload().put("yearEnd", endYear);
-         return yearRange;
+        parseYearRange(yearRange);
+        if (endYear == Integer.MAX_VALUE) { // invalid year range
+            Calendar calendar = Calendar.getInstance();
+            this.getJSONPayload().put("yearEnd", calendar.get(Calendar.YEAR));
+            return "";
+        }
+        this.getJSONPayload().put("yearStart", startYear);
+        this.getJSONPayload().put("yearEnd", endYear);
+        return yearRange;
     }
 
-    /**
-     * covers the five fields that are required to make a POST request
-     * except "must_have_pdf" as FullTextFetcher is not yet implemented for CiteSeer
-     */
+    /// covers the five fields that are required to make a POST request
+    /// except "must_have_pdf" as FullTextFetcher is not yet implemented for CiteSeer
     @Override
     protected Optional<String> handleOtherField(String fieldAsString, String term) {
         return switch (fieldAsString) {
-            case "page" -> handlePage(term);
-            case "pageSize" -> handlePageSize(term);
-            case "must_have_pdf" -> handleMustHavePdf(term);
-            case "sortBy" -> handleSortBy(term);
-            default -> super.handleOtherField(fieldAsString, term);
+            case "page" ->
+                    handlePage(term);
+            case "pageSize" ->
+                    handlePageSize(term);
+            case "must_have_pdf" ->
+                    handleMustHavePdf(term);
+            case "sortBy" ->
+                    handleSortBy(term);
+            default ->
+                    super.handleOtherField(fieldAsString, term);
         };
     }
 

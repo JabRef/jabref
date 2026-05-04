@@ -86,7 +86,7 @@ class MathSciNetTest {
     @Test
     @DisabledOnCIServer("CI server has no subscription to MathSciNet and thus gets 401 response. One single call goes through, but subsequent calls fail.")
     void searchByQueryFindsEntry() throws FetcherException {
-        List<BibEntry> fetchedEntries = fetcher.performSearch("Existence and uniqueness theorems Two-Dimensional Ericksen Leslie System");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("\"Existence and uniqueness theorems Two-Dimensional Ericksen Leslie System\"");
         assertFalse(fetchedEntries.isEmpty());
         BibEntry secondEntry = fetchedEntries.get(1);
         normalizeWhitespacesCleanup.cleanup(secondEntry);

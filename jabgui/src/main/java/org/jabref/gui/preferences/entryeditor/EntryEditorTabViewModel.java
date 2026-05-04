@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -15,6 +17,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
+import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -28,6 +31,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableAiChatTabProperty = new SimpleBooleanProperty();
     private final BooleanProperty acceptRecommendationsProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableLatexCitationsTabProperty = new SimpleBooleanProperty();
+    private final BooleanProperty smartFileAnnotationsTabProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableValidationProperty = new SimpleBooleanProperty();
     private final BooleanProperty allowIntegerEditionProperty = new SimpleBooleanProperty();
     private final BooleanProperty journalPopupProperty = new SimpleBooleanProperty();
@@ -35,6 +39,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableSciteTabProperty = new SimpleBooleanProperty();
 
     private final BooleanProperty showUserCommentsProperty = new SimpleBooleanProperty();
+    private final ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty = new SimpleObjectProperty<>();
 
     private final StringProperty fieldsProperty = new SimpleStringProperty();
 
@@ -62,12 +67,14 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         enableAiChatTabProperty.setValue(entryEditorPreferences.shouldShowAiChatTab());
         acceptRecommendationsProperty.setValue(mrDlibPreferences.shouldAcceptRecommendations());
         enableLatexCitationsTabProperty.setValue(entryEditorPreferences.shouldShowLatexCitationsTab());
+        smartFileAnnotationsTabProperty.setValue(entryEditorPreferences.shouldShowFileAnnotationsTab());
         enableValidationProperty.setValue(entryEditorPreferences.shouldEnableValidation());
         allowIntegerEditionProperty.setValue(entryEditorPreferences.shouldAllowIntegerEditionBibtex());
         journalPopupProperty.setValue(entryEditorPreferences.shouldEnableJournalPopup() == EntryEditorPreferences.JournalPopupEnabled.ENABLED);
         autoLinkEnabledProperty.setValue(entryEditorPreferences.autoLinkFilesEnabled());
         enableSciteTabProperty.setValue(entryEditorPreferences.shouldShowSciteTab());
         showUserCommentsProperty.setValue(entryEditorPreferences.shouldShowUserCommentsFields());
+        citationCountFetcherTypeProperty.setValue(entryEditorPreferences.getCitationCountFetcherType());
 
         setFields(entryEditorPreferences.getEntryEditorTabs());
     }
@@ -98,16 +105,18 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         entryEditorPreferences.setShouldShowAiChatTab(enableAiChatTabProperty.getValue());
         mrDlibPreferences.setAcceptRecommendations(acceptRecommendationsProperty.getValue());
         entryEditorPreferences.setShouldShowLatexCitationsTab(enableLatexCitationsTabProperty.getValue());
+        entryEditorPreferences.setShouldShowFileAnnotationsTab(smartFileAnnotationsTabProperty.getValue());
         entryEditorPreferences.setShowSourceTabByDefault(defaultSourceProperty.getValue());
         entryEditorPreferences.setEnableValidation(enableValidationProperty.getValue());
         entryEditorPreferences.setAllowIntegerEditionBibtex(allowIntegerEditionProperty.getValue());
         entryEditorPreferences.setEnableJournalPopup(journalPopupProperty.getValue()
-                ? EntryEditorPreferences.JournalPopupEnabled.ENABLED
-                : EntryEditorPreferences.JournalPopupEnabled.DISABLED);
+                                                     ? EntryEditorPreferences.JournalPopupEnabled.ENABLED
+                                                     : EntryEditorPreferences.JournalPopupEnabled.DISABLED);
         // entryEditorPreferences.setDividerPosition();
         entryEditorPreferences.setAutoLinkFilesEnabled(autoLinkEnabledProperty.getValue());
         entryEditorPreferences.setShouldShowSciteTab(enableSciteTabProperty.getValue());
         entryEditorPreferences.setShowUserCommentsFields(showUserCommentsProperty.getValue());
+        entryEditorPreferences.setCitationCountFetcherType(citationCountFetcherTypeProperty.getValue());
 
         Map<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
         String[] lines = fieldsProperty.get().split("\n");
@@ -168,6 +177,10 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         return enableLatexCitationsTabProperty;
     }
 
+    public BooleanProperty smartFileAnnotationsTabProperty() {
+        return smartFileAnnotationsTabProperty;
+    }
+
     public BooleanProperty enableValidationProperty() {
         return enableValidationProperty;
     }
@@ -194,5 +207,9 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty showUserCommentsProperty() {
         return this.showUserCommentsProperty;
+    }
+
+    public ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty() {
+        return citationCountFetcherTypeProperty;
     }
 }

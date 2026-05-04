@@ -25,6 +25,8 @@ import org.jabref.model.entry.field.Field;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
+// TODO: Document why this is not an IdentifierEditor like ISBN and EPrint
+//       If there is no reason, then integrate it in IdentifierEditor
 public class ISSNEditor extends HBox implements FieldEditorFX {
     @FXML private ISSNEditorViewModel viewModel;
     @FXML private EditorTextField textField;

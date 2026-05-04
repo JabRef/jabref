@@ -1,5 +1,7 @@
 package org.jabref.model.entry;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,7 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
@@ -27,10 +28,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.FileFieldWriter;
+import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.util.FileFieldParser;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
@@ -44,16 +51,18 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.MultiKeyMap;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.function.Predicate.not;
 
 /// Represents a Bib(La)TeX entry, which can be BibTeX or BibLaTeX.
 ///
@@ -85,25 +94,19 @@ import org.slf4j.LoggerFactory;
 /// In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods [#withCitationKey(String)] and [#withField(Field,String)]. All these methods set [#hasChanged()] to <code>false</code>. In case <code>changed</code>, use [#withChanged(boolean)].
 ///
 @AllowedToUseLogic("because it needs access to parser and writers")
-public class BibEntry implements Cloneable {
+public class BibEntry {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
     private final SharedBibEntryData sharedBibEntryData;
 
-    /**
-     * Map to store the words in every field
-     */
+    /// Map to store the words in every field
     private final Map<Field, Set<String>> fieldsAsWords = new HashMap<>();
 
-    /**
-     * Cache that stores latex free versions of fields.
-     */
+    /// Cache that stores latex free versions of fields.
     private final Map<Field, String> latexFreeFields = new ConcurrentHashMap<>();
 
-    /**
-     * Cache that stores the field as keyword lists (format &lt;Field, Separator, Keyword list>)
-     */
+    /// Cache that stores the field as keyword lists (format &lt;Field, Separator, Keyword list>)
     private final MultiKeyMap<StandardField, Character, KeywordList> fieldsAsKeywords = new MultiKeyMap<>(StandardField.class);
 
     private final EventBus eventBus = new EventBus();
@@ -114,26 +117,18 @@ public class BibEntry implements Cloneable {
 
     private ObservableMap<Field, String> fields = FXCollections.observableMap(new ConcurrentHashMap<>());
 
-    /**
-     * The part before the start of the entry
-     */
+    /// The part before the start of the entry
     private String commentsBeforeEntry = "";
 
-    /**
-     * Stores the text "rendering" of the entry as read by the BibTeX reader. Includes comments.
-     */
+    /// Stores the text "rendering" of the entry as read by the BibTeX reader. Includes comments.
     private String parsedSerialization = "";
 
-    /**
-     * Marks whether the complete serialization, which was read from file, should be used.
-     * <p>
-     * Is set to <code>true</code>, if parts of the entry changed. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
-     */
+    /// Marks whether the complete serialization, which was read from file, should be used.
+    ///
+    /// Is set to `true`, if parts of the entry changed. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
     private boolean changed;
 
-    /**
-     * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
-     */
+    /// Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
     public BibEntry() {
         this(DEFAULT_TYPE);
     }
@@ -143,9 +138,7 @@ public class BibEntry implements Cloneable {
         this.setCitationKey(citationKey);
     }
 
-    /**
-     * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
-     */
+    /// Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
     public BibEntry(EntryType type) {
         this.id = IdGenerator.next();
         setType(type);
@@ -155,6 +148,17 @@ public class BibEntry implements Cloneable {
     public BibEntry(EntryType type, String citationKey) {
         this(type);
         this.setCitationKey(citationKey);
+    }
+
+    /// Returns a copy of this entry.
+    /// This will set a new ID for the copied entry to be able to distinguish both copies.
+    /// Does *not* port the listeners.
+    public BibEntry(BibEntry other) {
+        this(other.type.getValue());
+        this.fields = FXCollections.observableMap(new ConcurrentHashMap<>(other.fields));
+        this.commentsBeforeEntry = other.commentsBeforeEntry;
+        this.parsedSerialization = other.parsedSerialization;
+        this.changed = other.changed;
     }
 
     public Optional<FieldChange> setMonth(Month parsedMonth) {
@@ -175,14 +179,12 @@ public class BibEntry implements Cloneable {
         return Optional.empty();
     }
 
-    /**
-     * Map an (empty) field of a BibEntry to a field of a cross-referenced entry.
-     *
-     * @param targetField field name of the BibEntry
-     * @param targetEntry type of the BibEntry
-     * @param sourceEntry type of the cross-referenced BibEntry
-     * @return the mapped field or null if there is no valid mapping available
-     */
+    /// Map an (empty) field of a BibEntry to a field of a cross-referenced entry.
+    ///
+    /// @param targetField field name of the BibEntry
+    /// @param targetEntry type of the BibEntry
+    /// @param sourceEntry type of the cross-referenced BibEntry
+    /// @return the mapped field or null if there is no valid mapping available
     private Optional<Field> getSourceField(Field targetField, EntryType targetEntry, EntryType sourceEntry) {
         // 1. Sort out forbidden fields
         if ((targetField == StandardField.IDS) ||
@@ -298,19 +300,17 @@ public class BibEntry implements Cloneable {
         return Optional.ofNullable(targetField);
     }
 
-    /**
-     * Returns the text stored in the given field of the given bibtex entry
-     * which belongs to the given database.
-     * <p>
-     * If a database is given, this function will try to resolve any string
-     * references in the field-value.
-     * Also, if a database is given, this function will try to find values for
-     * unset fields in the entry linked by the "crossref" ({@link StandardField#CROSSREF} field, if any.
-     *
-     * @param field    The field to return the value of.
-     * @param database The database of the bibtex entry.
-     * @return The resolved field value or null if not found.
-     */
+    /// Returns the text stored in the given field of the given bibtex entry
+    /// which belongs to the given database.
+    ///
+    /// If a database is given, this function will try to resolve any string
+    /// references in the field-value.
+    /// Also, if a database is given, this function will try to find values for
+    /// unset fields in the entry linked by the "crossref" ({@link StandardField#CROSSREF} field, if any.
+    ///
+    /// @param field    The field to return the value of.
+    /// @param database The database of the bibtex entry.
+    /// @return The resolved field value or null if not found.
     public Optional<String> getResolvedFieldOrAlias(Field field, @Nullable BibDatabase database) {
         return genericGetResolvedFieldOrAlias(field, database, BibEntry::getFieldOrAlias);
     }
@@ -345,30 +345,28 @@ public class BibEntry implements Cloneable {
         }
 
         return (database == null) || result.isEmpty() ?
-                result :
-                Optional.of(database.resolveForStrings(result.get()));
+               result :
+               Optional.of(database.resolveForStrings(result.get()));
     }
 
-    /**
-     * Returns this entry's ID. It is used internally to distinguish different BibTeX entries.
-     * <p>
-     * It is <em>not</em> the citation key (which is stored in the {@link InternalField#KEY_FIELD} and also known as BibTeX key).
-     */
+    /// Returns this entry's ID. It is used internally to distinguish different BibTeX entries.
+    //  It is **not** the citation key (which is stored in the {@link InternalField#KEY_FIELD} and also known as BibTeX key).
+
+    ///
+    /// This id changes on each run of JabRef (because it is currently generated as increasing number).
+    ///
+    /// For more stable ids, check {@link org.jabref.model.entry.SharedBibEntryData#getSharedID}
     public String getId() {
         return id;
     }
 
-    /**
-     * Sets this entry's identifier (ID).
-     * <p>
-     * The entry is also updated in the shared database - provided the database containing it doesn't veto the change.
-     *
-     * @param id The ID to be used
-     */
+    /// Sets this entry's identifier (ID).
+    ///
+    /// The entry is also updated in the shared database - provided the database containing it doesn't veto the change.
+    ///
+    /// @param id The ID to be used
     @VisibleForTesting
-    public void setId(String id) {
-        Objects.requireNonNull(id, "Every BibEntry must have an ID");
-
+    public void setId(@NonNull String id) {
         String oldId = this.id;
 
         eventBus.post(new FieldChangedEvent(this, InternalField.INTERNAL_ID_FIELD, id, oldId));
@@ -376,12 +374,10 @@ public class BibEntry implements Cloneable {
         changed = true;
     }
 
-    /**
-     * Sets the citation key. Note: This is <em>not</em> the internal Id of this entry.
-     * The internal Id is always present, whereas the citation key might not be present.
-     *
-     * @param newKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
-     */
+    /// Sets the citation key. Note: This is *not* the internal Id of this entry.
+    /// The internal Id is always present, whereas the citation key might not be present.
+    ///
+    /// @param newKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
     public Optional<FieldChange> setCitationKey(String newKey) {
         return setField(InternalField.KEY_FIELD, newKey);
     }
@@ -392,25 +388,18 @@ public class BibEntry implements Cloneable {
         return this;
     }
 
-    /**
-     * If not present, {@link BibEntry#getAuthorTitleYear(int)} can be used
-     */
+    /// If not present, [BibEntry#getAuthorTitleYear(int)] can be used
+    @NonNull
     public Optional<String> getCitationKey() {
-        String key = fields.get(InternalField.KEY_FIELD);
-        if (StringUtil.isBlank(key)) {
-            return Optional.empty();
-        } else {
-            return Optional.of(key);
-        }
+        return Optional.ofNullable(fields.get(InternalField.KEY_FIELD))
+                       .filter(StringUtil::isNotBlank);
     }
 
     public boolean hasCitationKey() {
         return getCitationKey().isPresent();
     }
 
-    /**
-     * Returns this entry's type.
-     */
+    /// Returns this entry's type.
     public EntryType getType() {
         return type.getValue();
     }
@@ -419,20 +408,14 @@ public class BibEntry implements Cloneable {
         return type;
     }
 
-    /**
-     * Sets this entry's type.
-     */
+    /// Sets this entry's type.
     public Optional<FieldChange> setType(EntryType type) {
         return setType(type, EntriesEventSource.LOCAL);
     }
 
-    /**
-     * Sets this entry's type and sets the changed flag to true <br>
-     * If the new entry type equals the old entry type no changed flag is set.
-     */
-    public Optional<FieldChange> setType(EntryType newType, EntriesEventSource eventSource) {
-        Objects.requireNonNull(newType);
-
+    /// Sets this entry's type and sets the changed flag to true <br>
+    /// If the new entry type equals the old entry type no changed flag is set.
+    public Optional<FieldChange> setType(@NonNull EntryType newType, EntriesEventSource eventSource) {
         EntryType oldType = type.get();
         if (newType.equals(oldType)) {
             return Optional.empty();
@@ -446,23 +429,17 @@ public class BibEntry implements Cloneable {
         return Optional.of(change);
     }
 
-    /**
-     * Returns an unmodifiable sequence containing the names of all fields that are set for this particular entry.
-     */
+    /// Returns an unmodifiable sequence containing the names of all fields that are set for this particular entry.
     public SequencedSet<Field> getFields() {
         return new LinkedHashSet<>(fields.keySet());
     }
 
-    /**
-     * Returns an unmodifiable sequence containing the names of all fields that are a) set for this particular entry and b) matching the given predicate
-     */
+    /// Returns an unmodifiable sequence containing the names of all fields that are a) set for this particular entry and b) matching the given predicate
     public SequencedSet<Field> getFields(Predicate<Field> selector) {
         return getFields().stream().filter(selector).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    /**
-     * Returns the contents of the given field as an Optional.
-     */
+    /// Returns the contents of the given field as an Optional.
     public Optional<String> getField(Field field) {
         return Optional.ofNullable(fields.get(field));
     }
@@ -488,22 +465,18 @@ public class BibEntry implements Cloneable {
         }
     }
 
-    /**
-     * Returns true if the entry has the given field, or false if it is not set.
-     */
+    /// Returns true if the entry has the given field, or false if it is not set.
     public boolean hasField(Field field) {
         return fields.containsKey(field);
     }
 
-    /**
-     * Internal method used to get the content of a field (or its alias)
-     *
-     * Used by {@link #getFieldOrAlias(Field)} and {@link #getFieldOrAliasLatexFree(Field)}
-     *
-     * @param field         the field
-     * @param getFieldValue the method to get the value of a given field in a given entry
-     * @return determined field value
-     */
+    /// Internal method used to get the content of a field (or its alias)
+    ///
+    /// Used by {@link #getFieldOrAlias(Field)} and {@link #getFieldOrAliasLatexFree(Field)}
+    ///
+    /// @param field         the field
+    /// @param getFieldValue the method to get the value of a given field in a given entry
+    /// @return determined field value
     private Optional<String> genericGetFieldOrAlias(Field field, BiFunction<BibEntry, Field, Optional<String>> getFieldValue) {
         Optional<String> fieldValue = getFieldValue.apply(this, field);
 
@@ -537,10 +510,14 @@ public class BibEntry implements Cloneable {
             Optional<Date> parsedDate = Date.parse(date.get());
             if (parsedDate.isPresent()) {
                 return switch (field) {
-                    case StandardField.YEAR -> parsedDate.get().getYear().map(Object::toString);
-                    case StandardField.MONTH -> parsedDate.get().getMonth().map(Month::getJabRefFormat);
-                    case StandardField.DAY -> parsedDate.get().getDay().map(Object::toString);
-                    default -> throw new IllegalStateException("Unexpected value");
+                    case StandardField.YEAR ->
+                            parsedDate.get().getYear().map(Object::toString);
+                    case StandardField.MONTH ->
+                            parsedDate.get().getMonth().map(Month::getJabRefFormat);
+                    case StandardField.DAY ->
+                            parsedDate.get().getDay().map(Object::toString);
+                    default ->
+                            throw new IllegalStateException("Unexpected value");
                 };
             } else {
                 // Date field not in valid format
@@ -577,41 +554,31 @@ public class BibEntry implements Cloneable {
         return genericGetFieldOrAlias(field, BibEntry::getField);
     }
 
-    /**
-     * Return the LaTeX-free contents of the given field or its alias an Optional
-     * <p>
-     * For details see also {@link #getFieldOrAlias(Field)}
-     *
-     * @param name the name of the field
-     * @return the stored latex-free content of the field (or its alias)
-     */
+    /// Return the LaTeX-free contents of the given field or its alias an Optional
+    ///
+    /// For details see also {@link #getFieldOrAlias(Field)}
+    ///
+    /// @param name the name of the field
+    /// @return the stored latex-free content of the field (or its alias)
     public Optional<String> getFieldOrAliasLatexFree(Field name) {
         return genericGetFieldOrAlias(name, BibEntry::getFieldLatexFree);
     }
 
-    /**
-     * Sets a number of fields simultaneously. The given HashMap contains field
-     * names as keys, each mapped to the value to set.
-     */
-    public void setField(Map<Field, String> fields) {
-        Objects.requireNonNull(fields, "fields must not be null");
-
+    /// Sets a number of fields simultaneously. The given HashMap contains field
+    /// names as keys, each mapped to the value to set.
+    public void setField(@NonNull Map<Field, String> fields) {
         fields.forEach(this::setField);
     }
 
-    /**
-     * Set a field, and notify listeners about the change.
-     *
-     * @param field       The field to set
-     * @param value       The value to set
-     * @param eventSource Source the event is sent from
-     */
-    public Optional<FieldChange> setField(Field field, String value, EntriesEventSource eventSource) {
-        Objects.requireNonNull(field, "field name must not be null");
-        Objects.requireNonNull(value, "field value for field " + field.getName() + " must not be null");
-        Objects.requireNonNull(eventSource, "field eventSource must not be null");
-
-        if (value.isEmpty()) {
+    /// Set a field, and notify listeners about the change.
+    ///
+    /// @param field       The field to set
+    /// @param value       The value to set - "null" for clear. Useful for cleaner code at fetchers.
+    /// @param eventSource Source the event is sent from
+    public Optional<FieldChange> setField(@NonNull Field field,
+                                          @Nullable String value,
+                                          @NonNull EntriesEventSource eventSource) {
+        if (StringUtil.isNullOrEmpty(value)) {
             return clearField(field);
         }
 
@@ -635,32 +602,26 @@ public class BibEntry implements Cloneable {
         return Optional.of(change);
     }
 
-    /**
-     * Set a field, and notify listeners about the change.
-     *
-     * @param field The field to set.
-     * @param value The value to set.
-     */
-    public Optional<FieldChange> setField(Field field, String value) {
+    /// Set a field, and notify listeners about the change.
+    ///
+    /// @param field The field to set.
+    /// @param value The value to set - "null" for clear. Useful for cleaner code at fetchers.
+    public Optional<FieldChange> setField(Field field, @Nullable String value) {
         return setField(field, value, EntriesEventSource.LOCAL);
     }
 
-    /**
-     * Remove the mapping for the field name, and notify listeners about the change.
-     *
-     * @param field The field to clear.
-     */
+    /// Remove the mapping for the field name, and notify listeners about the change.
+    ///
+    /// @param field The field to clear.
     public Optional<FieldChange> clearField(Field field) {
         return clearField(field, EntriesEventSource.LOCAL);
     }
 
-    /**
-     * Remove the mapping for the field name, and notify listeners about
-     * the change including the {@link EntriesEventSource}.
-     *
-     * @param field       the field to clear.
-     * @param eventSource the source a new {@link FieldChangedEvent} should be posten from.
-     */
+    /// Remove the mapping for the field name, and notify listeners about
+    /// the change including the {@link EntriesEventSource}.
+    ///
+    /// @param field       the field to clear.
+    /// @param eventSource the source a new {@link FieldChangedEvent} should be posten from.
     public Optional<FieldChange> clearField(Field field, EntriesEventSource eventSource) {
         Optional<String> oldValue = getField(field);
         if (oldValue.isEmpty()) {
@@ -677,34 +638,18 @@ public class BibEntry implements Cloneable {
         return Optional.of(change);
     }
 
-    /**
-     * Determines whether this entry has all the given fields present. If a non-null
-     * database argument is given, this method will try to look up missing fields in
-     * entries linked by the "crossref" field, if any.
-     *
-     * @param fields   An array of field names to be checked.
-     * @param database The database in which to look up crossref'd entries, if any. This argument can be null, meaning
-     *                 that no attempt will be made to follow crossrefs.
-     * @return true if all fields are set or could be resolved, false otherwise.
-     */
+    /// Determines whether this entry has all the given fields present. If a non-null
+    /// database argument is given, this method will try to look up missing fields in
+    /// entries linked by the "crossref" field, if any.
+    ///
+    /// @param fields   An array of field names to be checked.
+    /// @param database The database in which to look up crossref'd entries, if any. This argument can be null, meaning that no attempt will be made to follow crossrefs.
+    /// @return true if all fields are set or could be resolved, false otherwise.
     public boolean allFieldsPresent(Collection<OrFields> fields, BibDatabase database) {
         return fields.stream().allMatch(field -> this.getResolvedFieldOrAlias(field, database).isPresent());
     }
 
-    /**
-     * Returns a clone of this entry. Useful for copying.
-     * This will set a new ID for the cloned entry to be able to distinguish both copies.
-     * Does <em>not</em> port the listeners.
-     */
-    @Override
-    public Object clone() {
-        BibEntry clone = new BibEntry(type.getValue());
-        clone.fields = FXCollections.observableMap(new ConcurrentHashMap<>(fields));
-        clone.commentsBeforeEntry = commentsBeforeEntry;
-        clone.parsedSerialization = parsedSerialization;
-        clone.changed = changed;
-        return clone;
-    }
+    // region String representations
 
     /// Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key.
     ///
@@ -717,7 +662,7 @@ public class BibEntry implements Cloneable {
     /// as is. In case the JabRef "hack" for distinguishing "field = value" and "field = {value}" (in .bib files) is
     /// used, it is output as "field = {#value#}", which may cause headaches in debugging.
     ///
-    /// Alternative for some more readable output: [#getAuthorTitleYear(int)]
+    /// Alternative for some more readable output: [#getAuthorTitleYear(int)] or [#getKeyAuthorTitleYear(int)].
     ///
     /// @return A user-readable string NOT A VALID BibTeX string
     @Override
@@ -725,36 +670,81 @@ public class BibEntry implements Cloneable {
         return CanonicalBibEntry.getCanonicalRepresentation(this);
     }
 
+    /// Uses `\n` as newline separator
+    ///
+    /// Method similar to [org.jabref.gui.entryeditor.SourceTab#getSourceString(BibEntry, BibDatabaseMode, FieldPreferences)]
+    ///
+    /// @return String representation - empty string in case of an error (to ease calling)
+    public @NonNull String getStringRepresentation(
+            BibEntry entry,
+            BibDatabaseMode type,
+            BibEntryTypesManager entryTypesManager,
+            FieldPreferences fieldPreferences) {
+        try (StringWriter writer = new StringWriter()) {
+            BibWriter bibWriter = new BibWriter(writer, "\n");
+            FieldWriter fieldWriter = new FieldWriter(fieldPreferences);
+            BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, entryTypesManager);
+            bibEntryWriter.write(entry, bibWriter, type, true);
+            return writer.toString();
+        } catch (IOException e) {
+            LOGGER.error("Could not write entry", e);
+            return "";
+        }
+    }
+
+    public String getParsedSerialization() {
+        return parsedSerialization;
+    }
+
+    public void setParsedSerialization(String parsedSerialization) {
+        changed = false;
+        this.parsedSerialization = parsedSerialization;
+    }
+    // endregion
+
     public String getAuthorTitleYear() {
         return getAuthorTitleYear(0);
     }
 
-    /**
-     * Creates a short textual description of the entry in the format: <code>Author1, Author2: Title (Year)</code>
-     *
-     * If <code>0</code> is passed as <code>maxCharacters</code>, the description is not truncated.
-     *
-     * @param maxCharacters The maximum number of characters (additional
-     *                      characters are replaced with "..."). Set to 0 to disable truncation.
-     * @return A short textual description of the entry in the format:
-     * Author1, Author2: Title (Year)
-     */
-    public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[]{getField(StandardField.AUTHOR).orElse("N/A"), getField(StandardField.TITLE).orElse("N/A"),
-                getField(StandardField.YEAR).orElse("N/A")};
-
-        String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
-        if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
-            return text;
-        }
-        return text.substring(0, maxCharacters + 1) + "...";
+    public String getKeyAuthorTitleYear() {
+        return getKeyAuthorTitleYear(0);
     }
 
-    /**
-     * Returns the title of the given BibTeX entry as an Optional.
-     *
-     * @return an Optional containing the title of a BibTeX entry in case it exists, otherwise return an empty Optional.
-     */
+    /// Creates a short textual description of the entry in the format: `Author1, Author2: Title (Year)`
+    ///
+    /// If `0` is passed as `maxCharacters`, the description is not truncated.
+    ///
+    /// @param maxCharacters The maximum number of characters (additional characters are replaced by "..."). Set to 0 to disable truncation.
+    /// @return A short textual description of the entry in the format:
+    /// Author1, Author2: Title (Year)
+    public String getAuthorTitleYear(int maxCharacters) {
+        String authorField = getField(StandardField.AUTHOR).orElse("N/A");
+        String titleField = getField(StandardField.TITLE).orElse("N/A");
+        String yearField = getField(StandardField.YEAR).orElse("N/A");
+
+        String formattedAuthors = AuthorList.fixAuthorLastNameOnlyCommas(authorField, false);
+        String formattedTitle = LatexToUnicodeAdapter.format(titleField);
+
+        StringBuilder textBuilder = new StringBuilder();
+        textBuilder.append(formattedAuthors)
+                   .append(": \"")
+                   .append(formattedTitle)
+                   .append("\" (")
+                   .append(yearField)
+                   .append(')');
+
+        return StringUtil.limitStringLength(textBuilder.toString(), maxCharacters);
+    }
+
+    public String getKeyAuthorTitleYear(int maxCharacters) {
+        String citationKey = getCitationKey().orElse("N/A");
+        String result = citationKey + " - " + getAuthorTitleYear(0);
+        return StringUtil.limitStringLength(result, maxCharacters);
+    }
+
+    /// Returns the title of the given BibTeX entry as an Optional.
+    ///
+    /// @return an Optional containing the title of a BibTeX entry in case it exists, otherwise return an empty Optional.
     public Optional<String> getTitle() {
         return getField(StandardField.TITLE);
     }
@@ -767,22 +757,11 @@ public class BibEntry implements Cloneable {
         return getField(StandardField.ISBN).flatMap(ISBN::parse);
     }
 
-    /**
-     * Will return the publication date of the given bibtex entry conforming to ISO 8601, i.e. either YYYY or YYYY-MM.
-     *
-     * @return will return the publication date of the entry or null if no year was found.
-     */
+    /// Will return the publication date of the given bibtex entry conforming to ISO 8601, i.e. either YYYY or YYYY-MM.
+    ///
+    /// @return will return the publication date of the entry or null if no year was found.
     public Optional<Date> getPublicationDate() {
         return getFieldOrAlias(StandardField.DATE).flatMap(Date::parse);
-    }
-
-    public String getParsedSerialization() {
-        return parsedSerialization;
-    }
-
-    public void setParsedSerialization(String parsedSerialization) {
-        changed = false;
-        this.parsedSerialization = parsedSerialization;
     }
 
     public void setCommentsBeforeEntry(String parsedComments) {
@@ -797,23 +776,19 @@ public class BibEntry implements Cloneable {
         this.changed = changed;
     }
 
-    /**
-     * Required to trigger new serialization of the entry.
-     * Reason: We don't have a <code>build()</code> command, we don't want to create a new serialization at each call,
-     * we need to construct a BibEntry with <code>changed=false</code> (which is the default) and thus we need a workaround.
-     */
+    /// Required to trigger new serialization of the entry.
+    /// Reason: We don't have a `build()` command, we don't want to create a new serialization at each call,
+    /// we need to construct a BibEntry with `changed=false` (which is the default) and thus we need a workaround.
     public BibEntry withChanged(boolean changed) {
         this.changed = changed;
         return this;
     }
 
-    public Optional<FieldChange> putKeywords(List<String> keywords, Character delimiter) {
-        Objects.requireNonNull(delimiter);
+    public Optional<FieldChange> putKeywords(List<String> keywords, @NonNull Character delimiter) {
         return putKeywords(new KeywordList(keywords), delimiter);
     }
 
-    public Optional<FieldChange> putKeywords(KeywordList keywords, Character delimiter) {
-        Objects.requireNonNull(keywords);
+    public Optional<FieldChange> putKeywords(@NonNull KeywordList keywords, Character delimiter) {
         Optional<String> oldValue = this.getField(StandardField.KEYWORDS);
 
         if (keywords.isEmpty()) {
@@ -830,14 +805,10 @@ public class BibEntry implements Cloneable {
         return this.setField(StandardField.KEYWORDS, newValue);
     }
 
-    /**
-     * Check if a keyword already exists (case insensitive), if not: add it
-     *
-     * @param keyword Keyword to add
-     */
-    public void addKeyword(String keyword, Character delimiter) {
-        Objects.requireNonNull(keyword, "keyword must not be null");
-
+    /// Check if a keyword already exists (case insensitive), if not: add it
+    ///
+    /// @param keyword Keyword to add
+    public void addKeyword(@NonNull String keyword, Character delimiter) {
         if (keyword.isEmpty()) {
             return;
         }
@@ -851,13 +822,10 @@ public class BibEntry implements Cloneable {
         this.putKeywords(keywords, delimiter);
     }
 
-    /**
-     * Add multiple keywords to entry
-     *
-     * @param keywords Keywords to add
-     */
-    public void addKeywords(Collection<String> keywords, Character delimiter) {
-        Objects.requireNonNull(keywords);
+    /// Add multiple keywords to entry
+    ///
+    /// @param keywords Keywords to add
+    public void addKeywords(@NonNull Collection<String> keywords, Character delimiter) {
         keywords.forEach(keyword -> addKeyword(keyword, delimiter));
     }
 
@@ -909,17 +877,6 @@ public class BibEntry implements Cloneable {
         return sharedBibEntryData;
     }
 
-    public BibEntry withSharedBibEntryData(int sharedId, int version) {
-        sharedBibEntryData.setSharedID(sharedId);
-        sharedBibEntryData.setVersion(version);
-        return this;
-    }
-
-    public BibEntry withSharedBibEntryData(SharedBibEntryData sharedBibEntryData) {
-        sharedBibEntryData = sharedBibEntryData;
-        return this;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -934,17 +891,15 @@ public class BibEntry implements Cloneable {
                 && Objects.equals(commentsBeforeEntry, entry.commentsBeforeEntry);
     }
 
-    /**
-     * On purpose, this hashes the "content" of the BibEntry, not the {@link #sharedBibEntryData}.
-     *
-     * The content is
-     *
-     * <ul>
-     *     <li>comments before entry</li>
-     *     <li>entry type</li>
-     *     <li>fields (including the citation key {@link InternalField#KEY_FIELD}</li>
-     * </ul>
-     */
+    /// On purpose, this hashes the "content" of the BibEntry, not the {@link #sharedBibEntryData}.
+    ///
+    /// The content is
+    ///
+    ///
+    /// - comments before entry
+    /// - entry type
+    /// - fields (including the citation key {@link InternalField#KEY_FIELD}
+    ///
     @Override
     public int hashCode() {
         return Objects.hash(type.getValue(), fields, commentsBeforeEntry);
@@ -969,9 +924,7 @@ public class BibEntry implements Cloneable {
         return this;
     }
 
-    /**
-     * A copy is made of the parameter
-     */
+    /// A copy is made of the parameter
     public BibEntry withFields(Map<Field, String> content) {
         this.fields = FXCollections.observableMap(new HashMap<>(content));
         this.setChanged(false);
@@ -1077,12 +1030,10 @@ public class BibEntry implements Cloneable {
         return this;
     }
 
-    /**
-     * Gets a list of linked files.
-     *
-     * @return the list of linked files, is never null but can be empty.
-     * Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}.
-     */
+    /// Gets a list of linked files.
+    ///
+    /// @return the list of linked files, is never null but can be empty.
+    /// Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}.
     public List<LinkedFile> getFiles() {
         Optional<String> oldValue = getField(StandardField.FILE);
         if (oldValue.isEmpty()) {
@@ -1118,24 +1069,22 @@ public class BibEntry implements Cloneable {
     }
     // endregion
 
-    /**
-     * Checks {@link StandardField#CITES} for a list of citation keys and returns them.
-     * <p>
-     * Empty citation keys are not returned. There is no consistency check made.
-     *
-     * @return List of citation keys; empty list if field is empty or not available.
-     */
+    /// Checks {@link StandardField#CITES} for a list of citation keys and returns them.
+    ///
+    /// Empty citation keys are not returned. There is no consistency check made.
+    ///
+    /// @return List of citation keys; empty list if field is empty or not available.
     public SequencedSet<String> getCites() {
         return this.getField(StandardField.CITES)
-                   .map(content -> Arrays.stream(content.split(",")))
-                   .orElseGet(Stream::empty)
+                   .stream()
+                   .flatMap(content -> Arrays.stream(content.split(",")))
                    .map(String::trim)
-                   .filter(key -> !key.isEmpty())
+                   .filter(not(String::isEmpty))
                    .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public Optional<FieldChange> setCites(SequencedSet<String> keys) {
-        return this.setField(StandardField.CITES, keys.stream().collect(Collectors.joining(",")));
+        return this.setField(StandardField.CITES, String.join(",", keys));
     }
 
     public void setDate(Date date) {
@@ -1167,22 +1116,18 @@ public class BibEntry implements Cloneable {
         return fields;
     }
 
-    /**
-     * Returns a list of observables that represent the data of the entry.
-     */
+    /// Returns a list of observables that represent the data of the entry.
     public Observable[] getObservables() {
         return new Observable[] {fields, type};
     }
 
-    /**
-     * Helper method to add a downloaded file to the entry.
-     * <p>
-     * Use-case: URL is contained in the file, the file is downloaded and should then replace the url.
-     * This method. adds the given path (as file) to the entry and removes the url.
-     *
-     * @param linkToDownloadedFile the link to the file, which was downloaded
-     * @param downloadedFile the path to be added to the entry
-     */
+    /// Helper method to add a downloaded file to the entry.
+    ///
+    /// Use-case: URL is contained in the file, the file is downloaded and should then replace the url.
+    /// This method. adds the given path (as file) to the entry and removes the url.
+    ///
+    /// @param linkToDownloadedFile the link to the file, which was downloaded
+    /// @param downloadedFile       the path to be added to the entry
     public void replaceDownloadedFile(String linkToDownloadedFile, LinkedFile downloadedFile) {
         List<LinkedFile> linkedFiles = this.getFiles();
 
@@ -1205,23 +1150,19 @@ public class BibEntry implements Cloneable {
         this.setFiles(linkedFiles);
     }
 
-    /**
-     * Merge this entry's fields with another BibEntry. Non-intersecting fields will be automatically merged. In cases of
-     * intersection, priority is given to THIS entry's field value.
-     *
-     * @param other another BibEntry from which fields are sourced from
-     */
+    /// Merge this entry's fields with another BibEntry. Non-intersecting fields will be automatically merged. In cases of
+    /// intersection, priority is given to THIS entry's field value.
+    ///
+    /// @param other another BibEntry from which fields are sourced from
     public void mergeWith(BibEntry other) {
         mergeWith(other, Set.of());
     }
 
-    /**
-     * Merge this entry's fields with another BibEntry. Non-intersecting fields will be automatically merged. In cases of
-     * intersection, priority is given to THIS entry's field value, UNLESS specified otherwise in the arguments.
-     *
-     * @param other another BibEntry from which fields are sourced from
-     * @param otherPrioritizedFields collection of Fields in which 'other' has a priority into final result
-     */
+    /// Merge this entry's fields with another BibEntry. Non-intersecting fields will be automatically merged. In cases of
+    /// intersection, priority is given to THIS entry's field value, UNLESS specified otherwise in the arguments.
+    ///
+    /// @param other                  another BibEntry from which fields are sourced from
+    /// @param otherPrioritizedFields collection of Fields in which 'other' has a priority into final result
     public void mergeWith(BibEntry other, Set<Field> otherPrioritizedFields) {
         Set<Field> thisFields = new TreeSet<>(Comparator.comparing(Field::getName));
         Set<Field> otherFields = new TreeSet<>(Comparator.comparing(Field::getName));
@@ -1269,5 +1210,11 @@ public class BibEntry implements Cloneable {
             return true;
         }
         return StandardField.AUTOMATIC_FIELDS.containsAll(this.getFields());
+    }
+
+    /// Trims whitespaces at the beginning of the BibEntry
+    public void trimLeft() {
+        this.parsedSerialization = parsedSerialization.trim(); // we should do "trimLeft", but currently, it is OK as is.
+        this.commentsBeforeEntry = commentsBeforeEntry.trim(); // we should do "trimLeft", but currently, it is OK as is.
     }
 }

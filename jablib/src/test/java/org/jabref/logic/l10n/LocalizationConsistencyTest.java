@@ -24,6 +24,7 @@ import org.jabref.support.DisabledOnCIServerWindows;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.testfx.framework.junit5.ApplicationExtension;
@@ -35,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 // Need to run on JavaFX thread since we are parsing FXML files
 @ExtendWith(ApplicationExtension.class)
 @DisabledOnCIServerWindows("Needs DISPLAY variable to be set")
+@ResourceLock("Localization.lang")
 class LocalizationConsistencyTest {
 
     @Test
@@ -215,9 +217,7 @@ class LocalizationConsistencyTest {
             super();
         }
 
-        /**
-         * Overriding the HashTable put() so we can check for duplicates
-         */
+        /// Overriding the HashTable put() so we can check for duplicates
         @Override
         public synchronized Object put(Object key, Object value) {
             // Have we seen this key before?

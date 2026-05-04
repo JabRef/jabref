@@ -23,11 +23,9 @@ import javafx.scene.transform.Rotate;
 
 import static javafx.css.StyleConverter.getEnumConverter;
 
-/**
- *
- * CustomTitledPaneSkin with option to move arrow to the right
- * https://stackoverflow.com/a/55085777/3450689s
- */
+///
+/// CustomTitledPaneSkin with option to move arrow to the right
+/// https://stackoverflow.com/a/55085777/3450689s
 public class CustomTitledPaneSkin extends TitledPaneSkin {
 
     public enum ArrowSide {
@@ -123,8 +121,13 @@ public class CustomTitledPaneSkin extends TitledPaneSkin {
 
         textGraphicTranslateBinding = Bindings.createDoubleBinding(
                 () -> switch (getSkinnable().getAlignment()) {
-                    case TOP_CENTER, CENTER, BOTTOM_CENTER, BASELINE_CENTER -> 0.0;
-                    default -> -arrowButton.getWidth();
+                    case TOP_CENTER,
+                         CENTER,
+                         BOTTOM_CENTER,
+                         BASELINE_CENTER ->
+                            0.0;
+                    default ->
+                            -arrowButton.getWidth();
                 }, getSkinnable().alignmentProperty(), arrowButton.widthProperty());
         text.translateXProperty().bind(textGraphicTranslateBinding);
 
@@ -194,7 +197,6 @@ public class CustomTitledPaneSkin extends TitledPaneSkin {
                 }
                 return null;
             }
-
         };
 
         private static final List<CssMetaData<?, ?>> CSS_META_DATA;
@@ -205,6 +207,5 @@ public class CustomTitledPaneSkin extends TitledPaneSkin {
             list.add(ARROW_SIDE);
             CSS_META_DATA = Collections.unmodifiableList(list);
         }
-
     }
 }

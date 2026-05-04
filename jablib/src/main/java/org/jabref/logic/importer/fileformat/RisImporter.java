@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -29,6 +30,8 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.jspecify.annotations.NonNull;
+
 public class RisImporter extends Importer {
 
     private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY {2}- .*");
@@ -55,13 +58,14 @@ public class RisImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(reader);
         // Our strategy is to look for the "TY  - *" line.
-        return reader.lines().anyMatch(line -> RECOGNIZED_FORMAT_PATTERN.matcher(line).find());
+        return bufferedReader.lines().anyMatch(line -> RECOGNIZED_FORMAT_PATTERN.matcher(line).find());
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         List<BibEntry> bibEntries = new ArrayList<>();
 
         // use optional here, so that no exception will be thrown if the file is empty
@@ -115,15 +119,25 @@ public class RisImporter extends Importer {
                     String value = entry.substring(6).trim();
                     if ("TY".equals(tag)) {
                         type = switch (value) {
-                            case "BOOK" -> StandardEntryType.Book;
-                            case "JOUR", "MGZN" -> StandardEntryType.Article;
-                            case "THES" -> StandardEntryType.PhdThesis;
-                            case "UNPB" -> StandardEntryType.Unpublished;
-                            case "RPRT" -> StandardEntryType.TechReport;
-                            case "CONF" -> StandardEntryType.InProceedings;
-                            case "CHAP" -> StandardEntryType.InCollection;
-                            case "PAT" -> IEEETranEntryType.Patent;
-                            default -> StandardEntryType.Misc;
+                            case "BOOK" ->
+                                    StandardEntryType.Book;
+                            case "JOUR",
+                                 "MGZN" ->
+                                    StandardEntryType.Article;
+                            case "THES" ->
+                                    StandardEntryType.PhdThesis;
+                            case "UNPB" ->
+                                    StandardEntryType.Unpublished;
+                            case "RPRT" ->
+                                    StandardEntryType.TechReport;
+                            case "CONF" ->
+                                    StandardEntryType.InProceedings;
+                            case "CHAP" ->
+                                    StandardEntryType.InCollection;
+                            case "PAT" ->
+                                    IEEETranEntryType.Patent;
+                            default ->
+                                    StandardEntryType.Misc;
                         };
                     } else if ("T1".equals(tag) || "TI".equals(tag)) {
                         String oldVal = fields.get(StandardField.TITLE);
@@ -292,7 +306,7 @@ public class RisImporter extends Importer {
             }
 
             // Remove empty fields
-            fields.entrySet().removeIf(key -> (key.getValue() == null) || key.getValue().trim().isEmpty());
+            fields.entrySet().removeIf(key -> (key.getValue() == null) || key.getValue().isBlank());
 
             // Create final entry
             BibEntry entry = new BibEntry(type);
@@ -304,8 +318,8 @@ public class RisImporter extends Importer {
         return new ParserResult(bibEntries);
     }
 
-  private void addDoi(Map<Field, String> hm, String val) {
-      Optional<DOI> parsedDoi = DOI.parse(val);
-      parsedDoi.ifPresent(doi -> hm.put(StandardField.DOI, doi.asString()));
-  }
+    private void addDoi(Map<Field, String> hm, String val) {
+        Optional<DOI> parsedDoi = DOI.parse(val);
+        parsedDoi.ifPresent(doi -> hm.put(StandardField.DOI, doi.asString()));
+    }
 }

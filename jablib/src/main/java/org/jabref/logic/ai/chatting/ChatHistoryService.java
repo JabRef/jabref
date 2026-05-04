@@ -53,7 +53,8 @@ public class ChatHistoryService implements AutoCloseable {
     // Note about `Optional<BibDatabaseContext>`: it was necessary in previous version, but currently we never save an `Optional.empty()`.
     // However, we decided to left it here: to reduce migrations and to make possible to chat with a {@link BibEntry} without {@link BibDatabaseContext}
     // ({@link BibDatabaseContext} is required only for load/store of the chat).
-    private record ChatHistoryManagementRecord(Optional<BibDatabaseContext> bibDatabaseContext, ObservableList<ChatMessage> chatHistory) { }
+    private record ChatHistoryManagementRecord(Optional<BibDatabaseContext> bibDatabaseContext, ObservableList<ChatMessage> chatHistory) {
+    }
 
     // We use a {@link TreeMap} here to store {@link BibEntry} chat histories by their id.
     // When you compare {@link BibEntry} instances, they are compared by value, not by reference.
@@ -71,19 +72,19 @@ public class ChatHistoryService implements AutoCloseable {
 
     public void setupDatabase(BibDatabaseContext bibDatabaseContext) {
         bibDatabaseContext.getMetaData().getGroups().ifPresent(rootGroupTreeNode ->
-            rootGroupTreeNode.iterateOverTree().forEach(groupNode -> {
-            groupNode.getGroup().nameProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue != null && oldValue != null) {
-                    transferGroupHistory(bibDatabaseContext, groupNode, oldValue, newValue);
-                }
-            });
+                rootGroupTreeNode.iterateOverTree().forEach(groupNode -> {
+                    groupNode.getGroup().nameProperty().addListener((observable, oldValue, newValue) -> {
+                        if (newValue != null && oldValue != null) {
+                            transferGroupHistory(bibDatabaseContext, groupNode, oldValue, newValue);
+                        }
+                    });
 
-            groupNode.getGroupProperty().addListener((obs, oldValue, newValue) -> {
-                if (oldValue != null && newValue != null) {
-                    transferGroupHistory(bibDatabaseContext, groupNode, oldValue.getName(), newValue.getName());
-                }
-            });
-        }));
+                    groupNode.getGroupProperty().addListener((obs, oldValue, newValue) -> {
+                        if (oldValue != null && newValue != null) {
+                            transferGroupHistory(bibDatabaseContext, groupNode, oldValue.getName(), newValue.getName());
+                        }
+                    });
+                }));
 
         bibDatabaseContext.getDatabase().getEntries().forEach(entry -> entry.registerListener(new CitationKeyChangeListener(bibDatabaseContext)));
     }
@@ -103,15 +104,13 @@ public class ChatHistoryService implements AutoCloseable {
         }).chatHistory;
     }
 
-    /**
-     * Removes the chat history for the given {@link BibEntry} from the internal RAM map.
-     * If the {@link BibEntry} satisfies requirements for serialization and deserialization of chat history (see
-     * the docstring for the {@link ChatHistoryService}), then the chat history will be stored via the
-     * {@link ChatHistoryStorage}.
-     * <p>
-     * It is not necessary to call this method (everything will be stored in {@link ChatHistoryService#close()},
-     * but it's best to call it when the chat history {@link BibEntry} is no longer needed.
-     */
+    /// Removes the chat history for the given {@link BibEntry} from the internal RAM map.
+    /// If the {@link BibEntry} satisfies requirements for serialization and deserialization of chat history (see
+    /// the docstring for the {@link ChatHistoryService}), then the chat history will be stored via the
+    /// {@link ChatHistoryStorage}.
+    ///
+    /// It is not necessary to call this method (everything will be stored in {@link ChatHistoryService#close()},
+    /// but it's best to call it when the chat history {@link BibEntry} is no longer needed.
     public void closeChatHistoryForEntry(BibEntry entry) {
         ChatHistoryManagementRecord chatHistoryManagementRecord = bibEntriesChatHistory.get(entry);
         if (chatHistoryManagementRecord == null) {
@@ -153,15 +152,13 @@ public class ChatHistoryService implements AutoCloseable {
         }).chatHistory;
     }
 
-    /**
-     * Removes the chat history for the given {@link GroupTreeNode} from the internal RAM map.
-     * If the {@link GroupTreeNode} satisfies requirements for serialization and deserialization of chat history (see
-     * the docstring for the {@link ChatHistoryService}), then the chat history will be stored via the
-     * {@link ChatHistoryStorage}.
-     * <p>
-     * It is not necessary to call this method (everything will be stored in {@link ChatHistoryService#close()},
-     * but it's best to call it when the chat history {@link GroupTreeNode} is no longer needed.
-     */
+    /// Removes the chat history for the given {@link GroupTreeNode} from the internal RAM map.
+    /// If the {@link GroupTreeNode} satisfies requirements for serialization and deserialization of chat history (see
+    /// the docstring for the {@link ChatHistoryService}), then the chat history will be stored via the
+    /// {@link ChatHistoryStorage}.
+    ///
+    /// It is not necessary to call this method (everything will be stored in {@link ChatHistoryService#close()},
+    /// but it's best to call it when the chat history {@link GroupTreeNode} is no longer needed.
     public void closeChatHistoryForGroup(GroupTreeNode group) {
         ChatHistoryManagementRecord chatHistoryManagementRecord = groupsChatHistory.get(group);
         if (chatHistoryManagementRecord == null) {

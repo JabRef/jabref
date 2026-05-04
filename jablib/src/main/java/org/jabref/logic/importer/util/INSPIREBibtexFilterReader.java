@@ -6,13 +6,11 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.regex.Pattern;
 
-/**
- * Warning -- it is not a generic filter, only read is implemented!
- * <p>
- * Note: this is just a quick port of the original SPIRESBibtexFilterReader.
- * <p>
- * TODO: Fix grammar in bibtex entries -- it may return invalid bibkeys (with space)
- */
+/// Warning -- it is not a generic filter, only read is implemented!
+///
+/// Note: this is just a quick port of the original SPIRESBibtexFilterReader.
+///
+/// TODO: Fix grammar in bibtex entries -- it may return invalid bibkeys (with space)
 public class INSPIREBibtexFilterReader extends FilterReader {
 
     private static final Pattern PATTERN = Pattern.compile("@Article\\{.*,");
@@ -32,7 +30,9 @@ public class INSPIREBibtexFilterReader extends FilterReader {
 
     private String readpreLine() throws IOException {
         String l;
+        // @formatter:off
         do {
+            // @formatter:on
             l = inReader.readLine();
             if (l == null) {
                 return null;

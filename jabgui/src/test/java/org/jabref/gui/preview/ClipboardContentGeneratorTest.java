@@ -19,16 +19,14 @@ class ClipboardContentGeneratorTest {
                 "Smith, B.; Jones, B. &amp; Williams, J." + OS.NEWLINE +
                 "Taylor, P. (Ed.)" + OS.NEWLINE +
                 "Title of the test entry " + OS.NEWLINE +
-                "BibTeX Journal, JabRef Publishing, 2016, 34, 45-67 " + OS.NEWLINE +
-                "" + OS.NEWLINE +
+                "BibTeX Journal, JabRef Publishing, 2016, 34, 45-67 " + OS.NEWLINE + OS.NEWLINE +
                 "Abstract:  This entry describes a test scenario which may be useful in JabRef. By providing a test entry it is possible to see how certain things will look in this graphical BIB-file mananger. " + OS.NEWLINE +
                 "<br>" + OS.NEWLINE +
                 "Article (Smith2016)" + OS.NEWLINE +
                 "Smith, B.; Jones, B. &amp; Williams, J." + OS.NEWLINE +
                 "Taylor, P. (Ed.)" + OS.NEWLINE +
                 "Title of the test entry " + OS.NEWLINE +
-                "BibTeX Journal, JabRef Publishing, 2016, 34, 45-67 " + OS.NEWLINE +
-                "" + OS.NEWLINE +
+                "BibTeX Journal, JabRef Publishing, 2016, 34, 45-67 " + OS.NEWLINE + OS.NEWLINE +
                 "Abstract:  This entry describes a test scenario which may be useful in JabRef. By providing a test entry it is possible to see how certain things will look in this graphical BIB-file mananger. ";
 
         String citation = "Article (Smith2016)" + OS.NEWLINE +
@@ -138,4 +136,18 @@ class ClipboardContentGeneratorTest {
         Object actual = htmlTransferable.getHtml();
         assertEquals(expected, actual);
     }
+
+    @Test
+    void processCslMarkdownAsMarkdown() {
+        String citationMd = "[1]  " + OS.NEWLINE +
+                "B. Smith, B. Jones, and J. Williams, \"Title of the test entry,\" *BibTeX Journal*, vol. 34, no. 3, pp. 45--67, Jul. 2016.";
+
+        String expected = citationMd + OS.NEWLINE + citationMd + OS.NEWLINE;
+
+        ClipboardContent markdown = ClipboardContentGenerator.processMarkdown(List.of(citationMd, citationMd));
+        String actual = markdown.getString();
+
+        assertEquals(expected, actual);
+    }
 }
+

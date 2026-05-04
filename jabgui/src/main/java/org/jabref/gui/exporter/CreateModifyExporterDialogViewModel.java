@@ -16,12 +16,10 @@ import org.jabref.logic.util.StandardFileType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This view model can be used both for "add exporter" and "modify exporter" functionalities.
- * It takes an optional exporter which is empty for "add exporter," and takes the selected exporter
- * for "modify exporter."  It returns an optional exporter which empty if an invalid or no exporter is
- * created, and otherwise contains the exporter to be added or that is modified.
- */
+/// This view model can be used both for "add exporter" and "modify exporter" functionalities.
+/// It takes an optional exporter which is empty for "add exporter," and takes the selected exporter
+/// for "modify exporter."  It returns an optional exporter which empty if an invalid or no exporter is
+/// created, and otherwise contains the exporter to be added or that is modified.
 
 public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
 
@@ -74,8 +72,8 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
 
     public void browse() {
         String fileDir = layoutFile.getValue().isEmpty()
-                ? preferences.getExportPreferences().getExportWorkingDirectory().toString()
-                : layoutFile.getValue();
+                         ? preferences.getExportPreferences().getExportWorkingDirectory().toString()
+                         : layoutFile.getValue();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("Custom layout file"), StandardFileType.LAYOUT)

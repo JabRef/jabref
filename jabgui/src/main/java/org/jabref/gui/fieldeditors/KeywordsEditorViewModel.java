@@ -18,9 +18,13 @@ import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
 
-import org.tinylog.Logger;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class KeywordsEditorViewModel extends AbstractEditorViewModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeywordsEditorViewModel.class);
 
     private final ListProperty<Keyword> keywordListProperty;
     private final Character keywordSeparator;
@@ -57,20 +61,20 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
         return keywordListProperty;
     }
 
-    public StringConverter<Keyword> getStringConverter() {
+    static StringConverter<Keyword> getStringConverter() {
         return new StringConverter<>() {
             @Override
             public String toString(Keyword keyword) {
                 if (keyword == null) {
-                    Logger.debug("Keyword is null");
+                    LOGGER.debug("Keyword is null");
                     return "";
                 }
-                return keyword.get();
+                return keyword.toString();
             }
 
             @Override
             public Keyword fromString(String keywordString) {
-                return new Keyword(keywordString);
+                return Keyword.ofHierarchical(keywordString);
             }
         };
     }
@@ -83,12 +87,17 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
                                                       .distinct()
                                                       .collect(Collectors.toList());
 
-        Keyword requestedKeyword = new Keyword(request);
+        Keyword requestedKeyword = parseKeyword(request);
         if (!suggestions.contains(requestedKeyword)) {
             suggestions.addFirst(requestedKeyword);
         }
 
         return suggestions;
+    }
+
+    @Nullable
+    public Keyword parseKeyword(String keyword) {
+        return KeywordList.parse(keyword, keywordSeparator).stream().findFirst().orElse(null);
     }
 
     public Character getKeywordSeparator() {

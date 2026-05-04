@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.SequencedMap;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -34,15 +33,11 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.jspecify.annotations.NonNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class EndnoteXmlExporter extends Exporter {
-
-    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
-
-    private record EndNoteType(String name, Integer number) {
-    }
 
     private static final Map<EntryType, EndNoteType> ENTRY_TYPE_MAPPING = new HashMap<>();
 
@@ -64,8 +59,8 @@ public class EndnoteXmlExporter extends Exporter {
         ENTRY_TYPE_MAPPING.put(StandardEntryType.Misc, new EndNoteType("Generic", 15));
     }
 
-    // Contains the mapping of all fields not explicitly handled by mapX methods
-    // We need a fixed order here, so we use a SequencedMap
+    /// Contains the mapping of all fields not explicitly handled by mapX methods.
+    /// We need a fixed order here, so we use a SequencedMap
     private static final SequencedMap<Field, String> STANDARD_FIELD_MAPPING = new LinkedHashMap<>();
 
     static {
@@ -95,24 +90,28 @@ public class EndnoteXmlExporter extends Exporter {
 
     private static final EndNoteType DEFAULT_TYPE = new EndNoteType("Generic", 15);
 
+    private final DocumentBuilderFactory documentBuilderFactory;
+
+    private record EndNoteType(String name, int number) {
+    }
+
     private final BibEntryPreferences bibEntryPreferences;
 
     public EndnoteXmlExporter(BibEntryPreferences bibEntryPreferences) {
         super("endnote", "EndNote XML", StandardFileType.XML);
         this.bibEntryPreferences = bibEntryPreferences;
+        this.documentBuilderFactory = DocumentBuilderFactory.newInstance();
     }
 
     @Override
-    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws ParserConfigurationException, TransformerException {
-        Objects.requireNonNull(databaseContext);
-        Objects.requireNonNull(file);
-        Objects.requireNonNull(entries);
-
+    public void export(@NonNull BibDatabaseContext databaseContext,
+                       @NonNull Path file,
+                       @NonNull List<BibEntry> entries) throws ParserConfigurationException, TransformerException {
         if (entries.isEmpty()) {
             return;
         }
 
-        DocumentBuilder dBuilder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
+        DocumentBuilder dBuilder = documentBuilderFactory.newDocumentBuilder();
         Document document = dBuilder.newDocument();
 
         Element rootElement = document.createElement("xml");
@@ -187,7 +186,7 @@ public class EndnoteXmlExporter extends Exporter {
     }
 
     private void mapKeywords(BibDatabase bibDatabase, BibEntry entry, Document document, Element recordElement) {
-        entry.getFieldOrAlias(StandardField.KEYWORDS).ifPresent(keywords -> {
+        entry.getFieldOrAlias(StandardField.KEYWORDS).ifPresent(_ -> {
             Element keywordsElement = document.createElement("keywords");
             entry.getResolvedKeywords(bibEntryPreferences.getKeywordSeparator(), bibDatabase).forEach(keyword -> {
                 Element keywordElement = document.createElement("keyword");
@@ -258,7 +257,7 @@ public class EndnoteXmlExporter extends Exporter {
         EndNoteType endNoteType = ENTRY_TYPE_MAPPING.getOrDefault(entryType, DEFAULT_TYPE);
         Element refTypeElement = document.createElement("ref-type");
         refTypeElement.setAttribute("name", endNoteType.name());
-        refTypeElement.setTextContent(endNoteType.number().toString());
+        refTypeElement.setTextContent(String.valueOf(endNoteType.number()));
         recordElement.appendChild(refTypeElement);
     }
 

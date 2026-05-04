@@ -25,6 +25,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
@@ -118,7 +119,7 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
     private void addFieldIfUnique(Field fieldToAdd) {
         boolean exists = fieldKeywordsMap.containsKey(fieldToAdd);
         if (exists) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Field name \"%0\" already exists", fieldToAdd.getDisplayName()));
+            dialogService.showErrorDialogAndWait(Localization.lang("Field name \"%0\" already exists", FieldTextMapper.getDisplayName(fieldToAdd)));
             return;
         }
 
@@ -134,7 +135,7 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
 
         boolean deleteConfirmed = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Remove field name"),
-                Localization.lang("Are you sure you want to remove field name: \"%0\"?", fieldToRemove.getDisplayName())
+                Localization.lang("Are you sure you want to remove field name: \"%0\"?", FieldTextMapper.getDisplayName(fieldToRemove))
         );
 
         if (deleteConfirmed) {
@@ -185,21 +186,19 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
         keywords.remove(keywordToRemove);
     }
 
-    /**
-     * Determines the list of fields to remove in case a non-default map:
-     *
-     * <ul>
-     *     <li>Fields that are not in the new list of fields and</li>
-     *     <li>>all default fields that have no associated keywords</li>
-     * </ul>
-     */
+    /// Determines the list of fields to remove in case a non-default map:
+    ///
+    ///
+    /// - Fields that are not in the new list of fields and
+    /// - >all default fields that have no associated keywords
+    ///
     private List<Field> determineFieldsToRemove() {
         Set<Field> newlyAddedKeywords = fieldKeywordsMap.keySet();
 
         // Remove all content selectors that are not in the new list
         List<Field> result = new ArrayList<>(metaData.getContentSelectors().getFieldsWithSelectors().stream()
-                                                   .filter(field -> !newlyAddedKeywords.contains(field))
-                                                   .toList());
+                                                     .filter(field -> !newlyAddedKeywords.contains(field))
+                                                     .toList());
         // Remove all unset default fields
         result.addAll(fieldKeywordsMap.entrySet()
                                       .stream()

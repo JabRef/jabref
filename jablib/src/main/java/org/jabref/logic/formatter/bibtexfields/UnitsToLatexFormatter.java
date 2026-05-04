@@ -3,11 +3,12 @@ package org.jabref.logic.formatter.bibtexfields;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringLengthComparator;
+
+import org.jspecify.annotations.NonNull;
 
 public class UnitsToLatexFormatter extends Formatter {
 
@@ -92,8 +93,7 @@ public class UnitsToLatexFormatter extends Formatter {
     }
 
     @Override
-    public String format(String text) {
-        Objects.requireNonNull(text);
+    public String format(@NonNull String text) {
         if (text.isEmpty()) {
             return text;
         }

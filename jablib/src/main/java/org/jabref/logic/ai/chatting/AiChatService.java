@@ -22,10 +22,10 @@ public class AiChatService {
     private final AiTemplatesService aiTemplatesService;
 
     public AiChatService(AiPreferences aiPreferences,
-                       ChatModel chatLanguageModel,
-                       EmbeddingModel embeddingModel,
-                       EmbeddingStore<TextSegment> embeddingStore,
-                       AiTemplatesService aiTemplatesService
+                         ChatModel chatLanguageModel,
+                         EmbeddingModel embeddingModel,
+                         EmbeddingStore<TextSegment> embeddingStore,
+                         AiTemplatesService aiTemplatesService
     ) {
         this.aiPreferences = aiPreferences;
         this.chatLanguageModel = chatLanguageModel;
@@ -40,12 +40,17 @@ public class AiChatService {
             ObservableList<BibEntry> entries,
             BibDatabaseContext bibDatabaseContext
     ) {
+        FollowUpQuestionGenerator followUpQuestionGenerator = new FollowUpQuestionGenerator(
+                chatLanguageModel,
+                aiTemplatesService,
+                aiPreferences);
         return new AiChatLogic(
                 aiPreferences,
                 chatLanguageModel,
                 embeddingModel,
                 embeddingStore,
                 aiTemplatesService,
+                followUpQuestionGenerator,
                 name,
                 chatHistory,
                 entries,

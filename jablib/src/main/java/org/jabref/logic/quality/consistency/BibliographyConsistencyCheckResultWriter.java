@@ -19,26 +19,25 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.types.EntryType;
 
 import org.jooq.lambda.Unchecked;
 
-/**
- * Outputs the findings as CSV.
- * <p>
- * Following symbols are used (as default):
- *
- * <ul>
- *     <li><code>x</code> - required field is present</li>
- *     <li><code>o</code> - optional field is present</li>
- *     <li><code>?</code> - unknown field is present</li>
- *     <li><code>-</code> - field is absent</li>
- * </ul>
- * <p>
- * Note that this classification is based on JabRef's definition and might not match the publisher's definition.
- *
- * @implNote We could have implemented a <code>PaperConsistencyCheckResultFormatter</code>, but that would have been too much effort.
- */
+/// Outputs the findings as CSV.
+///
+/// Following symbols are used (as default):
+///
+///
+/// - `x` - required field is present
+/// - `o` - optional field is present
+/// - `?` - unknown field is present
+/// - `-` - field is absent
+///
+///
+/// Note that this classification is based on JabRef's definition and might not match the publisher's definition.
+///
+/// @implNote We could have implemented a `PaperConsistencyCheckResultFormatter`, but that would have been too much effort.
 public abstract class BibliographyConsistencyCheckResultWriter implements Closeable {
 
     protected static final String REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY = "x";
@@ -85,7 +84,7 @@ public abstract class BibliographyConsistencyCheckResultWriter implements Closea
         List<String> results = new ArrayList<>(columnCount + 2);
         results.add("entry type");
         results.add("citation key");
-        allReportedFields.forEach(field -> results.add(field.getDisplayName()));
+        allReportedFields.forEach(field -> results.add(FieldTextMapper.getDisplayName(field)));
         return results;
     }
 
@@ -94,15 +93,15 @@ public abstract class BibliographyConsistencyCheckResultWriter implements Closea
         results.add(entryType);
         results.add(bibEntry.getCitationKey().orElse(""));
         allReportedFields.forEach(field -> results.add(
-            bibEntry.getField(field).map(value -> {
-            if (requiredFields.contains(field)) {
-                return REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
-            } else if (optionalFields.contains(field)) {
-                return OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
-            } else {
-                return UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
-            }
-        }).orElse(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY)));
+                bibEntry.getField(field).map(value -> {
+                    if (requiredFields.contains(field)) {
+                        return REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+                    } else if (optionalFields.contains(field)) {
+                        return OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+                    } else {
+                        return UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+                    }
+                }).orElse(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY)));
         return results;
     }
 

@@ -20,7 +20,7 @@ public class BibDatabaseDiff {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseDiff.class);
 
-    private static final double MATCH_THRESHOLD = 0.4;
+    private static final double MATCH_THRESHOLD = 0.8;
     private final Optional<MetaDataDiff> metaDataDiff;
     private final Optional<PreambleDiff> preambleDiff;
     private final List<BibStringDiff> bibStringDiffs;
@@ -98,7 +98,8 @@ public class BibDatabaseDiff {
             notMatched.add(originalEntry);
         }
 
-        // Now we've found all exact matches, look through the remaining entries, looking for close matches.
+        // We've found all exact matches - and stored the non-matched entries in the notMatched set.
+        // Look through the remaining entries, looking for close matches.
         DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         for (BibEntry originalEntry : notMatched) {
             // These two variables will keep track of which entry most closely matches the one we're looking at.
@@ -113,10 +114,15 @@ public class BibDatabaseDiff {
                     }
                 }
             }
+
             BibEntry bestEntry = newEntries.get(bestMatchIndex);
-            if (bestMatch > MATCH_THRESHOLD
-                    || hasEqualCitationKey(originalEntry, bestEntry)
-                    || duplicateCheck.isDuplicate(originalEntry, bestEntry, mode)) {
+
+            boolean isDuplicate = duplicateCheck.isDuplicate(originalEntry, bestEntry, mode);
+            boolean hasEqualCitationKey = hasEqualCitationKey(originalEntry, bestEntry);
+            // For a diff, it could be nice to have a pair of entries being similar, but not being a duplicate or having the same citation key.
+            boolean ratioOfEqualFieldsAboveThreshold = bestMatch > MATCH_THRESHOLD;
+
+            if (isDuplicate || hasEqualCitationKey || ratioOfEqualFieldsAboveThreshold) {
                 matchedEntries.add(bestMatchIndex);
                 differences.add(new BibEntryDiff(originalEntry, newEntries.get(bestMatchIndex)));
             } else {

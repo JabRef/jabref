@@ -9,11 +9,9 @@ import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
-/**
- * This class can be used to wrap an @see ObservableList inside it. When wrapped, any Listener listening for updates to the wrapped ObservableList (for example because of a binding to it) is ensured to be notified on the JavaFX Application Thread. It should be used to implement bindings where updates come in from a background thread but should be reflected in the UI where it is necessary that changes to the UI are performed on the JavaFX Application thread.
- *
- * @param <E> the type of the elements of the wrapped ObservableList.
- */
+/// This class can be used to wrap an @see ObservableList inside it. When wrapped, any Listener listening for updates to the wrapped ObservableList (for example because of a binding to it) is ensured to be notified on the JavaFX Application Thread. It should be used to implement bindings where updates come in from a background thread but should be reflected in the UI where it is necessary that changes to the UI are performed on the JavaFX Application thread.
+///
+/// @param <E> the type of the elements of the wrapped ObservableList.
 public class UiThreadObservableList<E> implements ObservableList<E> {
 
     private final ObservableList<E> delegate;
@@ -32,13 +30,15 @@ public class UiThreadObservableList<E> implements ObservableList<E> {
         delegate.removeListener(listener);
     }
 
+    @SafeVarargs
     @Override
-    public boolean addAll(E... elements) {
+    public final boolean addAll(E... elements) {
         return delegate.addAll(elements);
     }
 
+    @SafeVarargs
     @Override
-    public boolean setAll(E... elements) {
+    public final boolean setAll(E... elements) {
         return delegate.setAll(elements);
     }
 
@@ -47,13 +47,15 @@ public class UiThreadObservableList<E> implements ObservableList<E> {
         return delegate.setAll(col);
     }
 
+    @SafeVarargs
     @Override
-    public boolean removeAll(E... elements) {
+    public final boolean removeAll(E... elements) {
         return delegate.removeAll(elements);
     }
 
+    @SafeVarargs
     @Override
-    public boolean retainAll(E... elements) {
+    public final boolean retainAll(E... elements) {
         return delegate.retainAll(elements);
     }
 

@@ -3,7 +3,7 @@ package org.jabref.gui.autocompleter;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import com.google.common.base.Equivalence;
 import org.controlsfx.control.textfield.AutoCompletionBinding;

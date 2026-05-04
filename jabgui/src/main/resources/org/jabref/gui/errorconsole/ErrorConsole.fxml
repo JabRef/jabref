@@ -15,7 +15,7 @@
     </content>
     <header>
         <Label fx:id="descriptionLabel" styleClass="info-section"
-               text="%We now give you insight into the inner workings of JabRef's internals. This information might be helpful to diagnose the root cause of a problem. Please feel free to inform the developers about an issue."
+               text="%The event log displays information regarding JabRef's internal processes. This data can be useful for debugging. If you encounter a problem, please consider reporting it to the development team."
                wrapText="true"/>
     </header>
     <buttonTypes>

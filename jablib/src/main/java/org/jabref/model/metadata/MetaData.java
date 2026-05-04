@@ -18,7 +18,7 @@ import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.ChangePropagation;
@@ -32,8 +32,7 @@ import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
 import com.tobiasdiez.easybind.optional.OptionalWrapper;
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.Nullable;
 
 @AllowedToUseLogic("because it needs access to citation pattern and cleanups")
 public class MetaData {
@@ -59,33 +58,34 @@ public class MetaData {
     public static final char SEPARATOR_CHARACTER = ';';
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHARACTER);
     public static final String BLG_FILE_PATH = "blgFilePath";
-    private static final Logger LOGGER = LoggerFactory.getLogger(MetaData.class);
+
     private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
-    private final Map<String, Path> laTexFileDirectory = new HashMap<>(); // <User, FilePath>
+    private final Map<String, String> latexFileDirectory = new HashMap<>(); // <User-Host, FilePath>
 
     private final ObjectProperty<GroupTreeNode> groupsRoot = new SimpleObjectProperty<>(null);
     private final OptionalBinding<GroupTreeNode> groupsRootBinding = new OptionalWrapper<>(groupsRoot);
     private final Map<String, Path> blgFilePathMap = new HashMap<>();
     private Optional<Version> groupSearchSyntaxVersion = Optional.empty();
 
-    private Charset encoding;
-    private SaveOrder saveOrder;
-    private String defaultCiteKeyPattern;
-    private FieldFormatterCleanups saveActions;
-    private BibDatabaseMode mode;
+    @Nullable private Charset encoding;
+    @Nullable private SaveOrder saveOrder;
+    @Nullable private String defaultCiteKeyPattern;
+    @Nullable private FieldFormatterCleanupActions saveActions;
+    @Nullable private BibDatabaseMode mode;
     private boolean isProtected;
-    private String librarySpecificFileDirectory;
+    @Nullable private String librarySpecificFileDirectory;
+
+    @NonNull
     private final ContentSelectors contentSelectors = new ContentSelectors();
+
     private final Map<String, List<String>> unknownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
-    private String versionDBStructure;
+    @Nullable private String versionDBStructure;
 
-    /**
-     * Constructs an empty metadata.
-     */
+    /// Constructs an empty metadata.
     public MetaData() {
         // Do nothing
     }
@@ -107,11 +107,8 @@ public class MetaData {
         return groupsRootBinding;
     }
 
-    /**
-     * Sets a new group root node. <b>WARNING </b>: This invalidates everything returned by getGroups() so far!!!
-     */
-    public void setGroups(GroupTreeNode root) {
-        Objects.requireNonNull(root);
+    /// Sets a new group root node. **WARNING **: This invalidates everything returned by getGroups() so far!!!
+    public void setGroups(@NonNull GroupTreeNode root) {
         groupsRoot.setValue(root);
         root.subscribeToDescendantChanged(groupTreeNode -> groupsRootBinding.invalidate());
         root.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
@@ -128,11 +125,8 @@ public class MetaData {
         return this.groupSearchSyntaxVersion;
     }
 
-    /**
-     * @return the stored label patterns
-     */
-    public AbstractCitationKeyPatterns getCiteKeyPatterns(GlobalCitationKeyPatterns globalPatterns) {
-        Objects.requireNonNull(globalPatterns);
+    /// @return the stored label patterns
+    public AbstractCitationKeyPatterns getCiteKeyPatterns(@NonNull GlobalCitationKeyPatterns globalPatterns) {
         AbstractCitationKeyPatterns bibtexKeyPatterns = new DatabaseCitationKeyPatterns(globalPatterns);
 
         // Add stored key patterns
@@ -142,14 +136,10 @@ public class MetaData {
         return bibtexKeyPatterns;
     }
 
-    /**
-     * Updates the stored key patterns to the given key patterns.
-     *
-     * @param bibtexKeyPatterns the key patterns to update to. <br /> A reference to this object is stored internally and is returned at getCiteKeyPattern();
-     */
-    public void setCiteKeyPattern(AbstractCitationKeyPatterns bibtexKeyPatterns) {
-        Objects.requireNonNull(bibtexKeyPatterns);
-
+    /// Updates the stored key patterns to the given key patterns.
+    ///
+    /// @param bibtexKeyPatterns the key patterns to update to. <br /> A reference to this object is stored internally and is returned at getCiteKeyPattern();
+    public void setCiteKeyPattern(@NonNull AbstractCitationKeyPatterns bibtexKeyPatterns) {
         CitationKeyPattern defaultValue = bibtexKeyPatterns.getDefaultValue();
         Map<EntryType, CitationKeyPattern> nonDefaultPatterns = bibtexKeyPatterns.getPatterns();
         setCiteKeyPattern(defaultValue, nonDefaultPatterns);
@@ -174,12 +164,12 @@ public class MetaData {
         postChange();
     }
 
-    public Optional<FieldFormatterCleanups> getSaveActions() {
+    public Optional<FieldFormatterCleanupActions> getSaveActions() {
         return Optional.ofNullable(saveActions);
     }
 
-    public void setSaveActions(FieldFormatterCleanups saveActions) {
-        this.saveActions = Objects.requireNonNull(saveActions);
+    public void setSaveActions(@NonNull FieldFormatterCleanupActions saveActions) {
+        this.saveActions = saveActions;
         postChange();
     }
 
@@ -187,12 +177,12 @@ public class MetaData {
         return Optional.ofNullable(mode);
     }
 
-    public void setMode(BibDatabaseMode mode) {
+    public void setMode(@NonNull BibDatabaseMode mode) {
         if (mode == this.mode) {
             return;
         }
 
-        this.mode = Objects.requireNonNull(mode);
+        this.mode = mode;
         postChange();
     }
 
@@ -200,25 +190,25 @@ public class MetaData {
         return isProtected;
     }
 
-    public ContentSelectors getContentSelectors() {
+    public @NonNull ContentSelectors getContentSelectors() {
         return contentSelectors;
     }
 
-    public SortedSet<ContentSelector> getContentSelectorsSorted() {
+    public @NonNull SortedSet<@NonNull ContentSelector> getContentSelectorsSorted() {
         return contentSelectors.getContentSelectors();
     }
 
-    public void addContentSelector(ContentSelector contentSelector) {
+    public void addContentSelector(@NonNull ContentSelector contentSelector) {
         this.contentSelectors.addContentSelector(contentSelector);
         postChange();
     }
 
-    public void clearContentSelectors(Field field) {
+    public void clearContentSelectors(@NonNull Field field) {
         contentSelectors.removeSelector(field);
         postChange();
     }
 
-    public List<String> getContentSelectorValuesForField(Field field) {
+    public @NonNull List<@NonNull String> getContentSelectorValuesForField(Field field) {
         return contentSelectors.getSelectorValuesForField(field);
     }
 
@@ -226,8 +216,8 @@ public class MetaData {
         return Optional.ofNullable(librarySpecificFileDirectory);
     }
 
-    public void setLibrarySpecificFileDirectory(String path) {
-        librarySpecificFileDirectory = Objects.requireNonNull(path).trim();
+    public void setLibrarySpecificFileDirectory(@NonNull String path) {
+        librarySpecificFileDirectory = path.trim();
         postChange();
     }
 
@@ -235,8 +225,8 @@ public class MetaData {
         return Optional.ofNullable(versionDBStructure);
     }
 
-    public void setVersionDBStructure(String version) {
-        versionDBStructure = Objects.requireNonNull(version).trim();
+    public void setVersionDBStructure(@NonNull String version) {
+        versionDBStructure = version.trim();
         postChange();
     }
 
@@ -254,8 +244,8 @@ public class MetaData {
         postChange();
     }
 
-    public void setUserFileDirectory(String user, String path) {
-        userFileDirectory.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
+    public void setUserFileDirectory(@NonNull String user, @NonNull String path) {
+        userFileDirectory.put(user, path);
         postChange();
     }
 
@@ -264,17 +254,17 @@ public class MetaData {
         postChange();
     }
 
-    public Optional<Path> getLatexFileDirectory(String user) {
-        return Optional.ofNullable(laTexFileDirectory.get(user));
+    public Optional<Path> getLatexFileDirectory(String userHostString) {
+        return Optional.ofNullable(latexFileDirectory.get(userHostString)).map(Path::of);
     }
 
-    public void setLatexFileDirectory(String user, Path path) {
-        laTexFileDirectory.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
+    public void setLatexFileDirectory(@NonNull String userHostString, @NonNull String path) {
+        latexFileDirectory.put(userHostString, path);
         postChange();
     }
 
-    public void clearLatexFileDirectory(String user) {
-        laTexFileDirectory.remove(user);
+    public void clearLatexFileDirectory(String userHostString) {
+        latexFileDirectory.remove(userHostString);
         postChange();
     }
 
@@ -293,18 +283,14 @@ public class MetaData {
         postChange();
     }
 
-    /**
-     * Posts a new {@link MetaDataChangedEvent} on the {@link EventBus}.
-     */
+    /// Posts a new {@link MetaDataChangedEvent} on the {@link EventBus}.
     private void postChange() {
         if (isEventPropagationEnabled) {
             eventBus.post(new MetaDataChangedEvent(this));
         }
     }
 
-    /**
-     * Returns the encoding used during parsing.
-     */
+    /// Returns the encoding used during parsing.
     public Optional<Charset> getEncoding() {
         return Optional.ofNullable(encoding);
     }
@@ -313,11 +299,9 @@ public class MetaData {
         setEncoding(encoding, ChangePropagation.POST_EVENT);
     }
 
-    /**
-     * This method (with additional parameter) has been introduced to avoid event loops while saving a database.
-     */
-    public void setEncoding(Charset encoding, ChangePropagation postChanges) {
-        this.encoding = Objects.requireNonNull(encoding);
+    /// This method (with additional parameter) has been introduced to avoid event loops while saving a database.
+    public void setEncoding(@NonNull Charset encoding, ChangePropagation postChanges) {
+        this.encoding = encoding;
         if (postChanges == ChangePropagation.POST_EVENT) {
             postChange();
         }
@@ -327,16 +311,12 @@ public class MetaData {
         return encodingExplicitlySupplied;
     }
 
-    /**
-     * Sets the indication whether the encoding was set using "% Encoding: ..." or whether it was detected "magically"
-     */
+    /// Sets the indication whether the encoding was set using "% Encoding: ..." or whether it was detected "magically"
     public void setEncodingExplicitlySupplied(boolean encodingExplicitlySupplied) {
         this.encodingExplicitlySupplied = encodingExplicitlySupplied;
     }
 
-    /**
-     * If disabled {@link MetaDataChangedEvent} will not be posted.
-     */
+    /// If disabled {@link MetaDataChangedEvent} will not be posted.
     public void setEventPropagation(boolean enabled) {
         this.isEventPropagationEnabled = enabled;
     }
@@ -365,18 +345,15 @@ public class MetaData {
         return Collections.unmodifiableMap(userFileDirectory);
     }
 
-    public Map<String, Path> getLatexFileDirectories() {
-        return Collections.unmodifiableMap(laTexFileDirectory);
+    public Map<String, String> getLatexFileDirectories() {
+        return Collections.unmodifiableMap(latexFileDirectory);
     }
 
     public Map<String, List<String>> getUnknownMetaData() {
         return Collections.unmodifiableMap(unknownMetaData);
     }
 
-    public void putUnknownMetaDataItem(String key, List<String> value) {
-        Objects.requireNonNull(key);
-        Objects.requireNonNull(value);
-
+    public void putUnknownMetaDataItem(@NonNull String key, @NonNull List<String> value) {
         unknownMetaData.put(key, value);
     }
 
@@ -395,7 +372,7 @@ public class MetaData {
                 && Objects.equals(saveOrder, that.saveOrder)
                 && Objects.equals(citeKeyPatterns, that.citeKeyPatterns)
                 && Objects.equals(userFileDirectory, that.userFileDirectory)
-                && Objects.equals(laTexFileDirectory, that.laTexFileDirectory)
+                && Objects.equals(latexFileDirectory, that.latexFileDirectory)
                 && Objects.equals(defaultCiteKeyPattern, that.defaultCiteKeyPattern)
                 && Objects.equals(saveActions, that.saveActions)
                 && (mode == that.mode)
@@ -407,12 +384,12 @@ public class MetaData {
     @Override
     public int hashCode() {
         return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrder, citeKeyPatterns, userFileDirectory,
-                laTexFileDirectory, defaultCiteKeyPattern, saveActions, mode, librarySpecificFileDirectory, contentSelectors, versionDBStructure);
+                latexFileDirectory, defaultCiteKeyPattern, saveActions, mode, librarySpecificFileDirectory, contentSelectors, versionDBStructure);
     }
 
     @Override
     public String toString() {
-        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + laTexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + "]";
+        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + "]";
     }
 
     public Optional<Path> getBlgFilePath(String user) {

@@ -33,13 +33,11 @@ public class SearchQueryConversion {
         return new SearchQueryExtractorVisitor(searchQuery.getSearchFlags()).visit(searchQuery.getContext());
     }
 
-    /**
-     * Unescapes search value based on the Search grammar rules.
-     * <p>
-     * - STRING_LITERAL: Removes enclosing quotes and unescapes {@code \"}
-     * <p>
-     * - TERM: Unescapes {@code \=, \!, \~, \(, \)}
-     */
+    /// Unescapes search value based on the Search grammar rules.
+    ///
+    /// - STRING_LITERAL: Removes enclosing quotes and unescapes `\"`
+    ///
+    /// - TERM: Unescapes `\=, \!, \~, \(, \)`
     public static String unescapeSearchValue(SearchParser.SearchValueContext ctx) {
         if (ctx == null) {
             return "";

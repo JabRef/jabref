@@ -6,21 +6,26 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.http.SimpleHttpResponse;
-import org.jabref.model.strings.StringUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FetcherException extends JabRefException {
     private static final Logger LOGGER = LoggerFactory.getLogger(FetcherException.class);
-    private static final Pattern API_KEY_PATTERN = Pattern.compile("(?i)(api|key|api[-_]?key)=[^&]*");
-    private static String REDACTED_STRING = "[REDACTED]";
+    private static final String API_KEY_PARAM_NAME = "apiKeyParamName";
+    private static final Pattern API_KEY_PATTERN = Pattern.compile("(?i)(?<" + API_KEY_PARAM_NAME + ">api|key|api[-_]?key)=[^&]*");
+    private static final String REDACTED_STRING = "[REDACTED]";
 
+    @Nullable
     private final String url;
+
+    @Nullable
     private final SimpleHttpResponse httpResponse;
 
-    public FetcherException(String url, SimpleHttpResponse httpResponse) {
+    public FetcherException(@Nullable String url, @Nullable SimpleHttpResponse httpResponse) {
         // Empty string handled at org.jabref.logic.importer.FetcherException.getPrefix.
         super("");
         this.url = url;
@@ -85,12 +90,12 @@ public class FetcherException extends JabRefException {
         }
     }
 
-    private String getRedactedUrl() {
-        return API_KEY_PATTERN.matcher(url).replaceAll(REDACTED_STRING);
+    String getRedactedUrl() {
+        return getRedactedUrl(url == null ? "" : url);
     }
 
-    public static Object getRedactedUrl(URL source) {
-        return API_KEY_PATTERN.matcher(source.toString()).replaceAll(REDACTED_STRING);
+    public static String getRedactedUrl(String source) {
+        return API_KEY_PATTERN.matcher(source).replaceAll("${" + API_KEY_PARAM_NAME + "}=" + REDACTED_STRING);
     }
 
     private String getPrefix() {

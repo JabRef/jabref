@@ -3,10 +3,16 @@ package org.jabref.gui.externalfiles;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
+
 import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefGuiStateManager;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,10 +34,15 @@ class FindUnlinkedFilesActionTest {
     private StateManager stateManager;
     private FindUnlinkedFilesAction action;
 
+    @Mock private GuiPreferences preferences;
+    @Mock private TaskExecutor taskExecutor;
+    @Mock private UndoManager undoManager;
+    @Mock private FileUpdateMonitor fileUpdateMonitor;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        stateManager = new StateManager();
+        stateManager = new JabRefGuiStateManager();
         action = new FindUnlinkedFilesAction(dialogService, stateManager);
     }
 

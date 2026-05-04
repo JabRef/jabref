@@ -17,9 +17,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.logic.ai.templates.AiTemplate;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
-import org.jabref.model.strings.StringUtil;
 
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
@@ -35,6 +35,8 @@ public class AiPreferences {
     private final BooleanProperty enableAi;
     private final BooleanProperty autoGenerateEmbeddings;
     private final BooleanProperty autoGenerateSummaries;
+    private final BooleanProperty generateFollowUpQuestions;
+    private final IntegerProperty followUpQuestionsCount;
 
     private final ObjectProperty<AiProvider> aiProvider;
 
@@ -42,7 +44,6 @@ public class AiPreferences {
     private final StringProperty mistralAiChatModel;
     private final StringProperty geminiChatModel;
     private final StringProperty huggingFaceChatModel;
-    private final StringProperty gpt4AllChatModel;
 
     private final BooleanProperty customizeExpertSettings;
 
@@ -50,7 +51,6 @@ public class AiPreferences {
     private final StringProperty mistralAiApiBaseUrl;
     private final StringProperty geminiApiBaseUrl;
     private final StringProperty huggingFaceApiBaseUrl;
-    private final StringProperty gpt4AllApiBaseUrl;
 
     private final ObjectProperty<EmbeddingModel> embeddingModel;
     private final DoubleProperty temperature;
@@ -67,18 +67,18 @@ public class AiPreferences {
     public AiPreferences(boolean enableAi,
                          boolean autoGenerateEmbeddings,
                          boolean autoGenerateSummaries,
+                         boolean generateFollowUpQuestions,
+                         int followUpQuestionsCount,
                          AiProvider aiProvider,
                          String openAiChatModel,
                          String mistralAiChatModel,
                          String geminiChatModel,
                          String huggingFaceChatModel,
-                         String gpt4AllModel,
                          boolean customizeExpertSettings,
                          String openAiApiBaseUrl,
                          String mistralAiApiBaseUrl,
                          String geminiApiBaseUrl,
                          String huggingFaceApiBaseUrl,
-                         String gpt4AllApiBaseUrl,
                          EmbeddingModel embeddingModel,
                          double temperature,
                          int contextWindowSize,
@@ -91,6 +91,8 @@ public class AiPreferences {
         this.enableAi = new SimpleBooleanProperty(enableAi);
         this.autoGenerateEmbeddings = new SimpleBooleanProperty(autoGenerateEmbeddings);
         this.autoGenerateSummaries = new SimpleBooleanProperty(autoGenerateSummaries);
+        this.generateFollowUpQuestions = new SimpleBooleanProperty(generateFollowUpQuestions);
+        this.followUpQuestionsCount = new SimpleIntegerProperty(followUpQuestionsCount);
 
         this.aiProvider = new SimpleObjectProperty<>(aiProvider);
 
@@ -98,7 +100,6 @@ public class AiPreferences {
         this.mistralAiChatModel = new SimpleStringProperty(mistralAiChatModel);
         this.geminiChatModel = new SimpleStringProperty(geminiChatModel);
         this.huggingFaceChatModel = new SimpleStringProperty(huggingFaceChatModel);
-        this.gpt4AllChatModel = new SimpleStringProperty(gpt4AllModel);
 
         this.customizeExpertSettings = new SimpleBooleanProperty(customizeExpertSettings);
 
@@ -106,7 +107,6 @@ public class AiPreferences {
         this.mistralAiApiBaseUrl = new SimpleStringProperty(mistralAiApiBaseUrl);
         this.geminiApiBaseUrl = new SimpleStringProperty(geminiApiBaseUrl);
         this.huggingFaceApiBaseUrl = new SimpleStringProperty(huggingFaceApiBaseUrl);
-        this.gpt4AllApiBaseUrl = new SimpleStringProperty(gpt4AllApiBaseUrl);
 
         this.embeddingModel = new SimpleObjectProperty<>(embeddingModel);
         this.temperature = new SimpleDoubleProperty(temperature);
@@ -116,6 +116,9 @@ public class AiPreferences {
         this.ragMaxResultsCount = new SimpleIntegerProperty(ragMaxResultsCount);
         this.ragMinScore = new SimpleDoubleProperty(ragMinScore);
 
+        this.apiKeyChangeListener = () -> {
+        };
+
         this.templates = Map.of(
                 AiTemplate.CHATTING_SYSTEM_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CHATTING_SYSTEM_MESSAGE)),
                 AiTemplate.CHATTING_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CHATTING_USER_MESSAGE)),
@@ -124,7 +127,8 @@ public class AiPreferences {
                 AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE)),
                 AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE)),
                 AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE)),
-                AiTemplate.CITATION_PARSING_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CITATION_PARSING_USER_MESSAGE))
+                AiTemplate.CITATION_PARSING_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CITATION_PARSING_USER_MESSAGE)),
+                AiTemplate.FOLLOW_UP_QUESTIONS, new SimpleStringProperty(templates.get(AiTemplate.FOLLOW_UP_QUESTIONS))
         );
     }
 
@@ -192,6 +196,30 @@ public class AiPreferences {
         this.autoGenerateSummaries.set(autoGenerateSummaries);
     }
 
+    public BooleanProperty generateFollowUpQuestionsProperty() {
+        return generateFollowUpQuestions;
+    }
+
+    public IntegerProperty followUpQuestionsCountProperty() {
+        return followUpQuestionsCount;
+    }
+
+    public int getFollowUpQuestionsCount() {
+        return followUpQuestionsCount.get();
+    }
+
+    public void setFollowUpQuestionsCount(int followUpQuestionsCount) {
+        this.followUpQuestionsCount.set(followUpQuestionsCount);
+    }
+
+    public boolean getGenerateFollowUpQuestions() {
+        return generateFollowUpQuestions.get();
+    }
+
+    public void setGenerateFollowUpQuestions(boolean generateFollowUpQuestions) {
+        this.generateFollowUpQuestions.set(generateFollowUpQuestions);
+    }
+
     public ObjectProperty<AiProvider> aiProviderProperty() {
         return aiProvider;
     }
@@ -250,18 +278,6 @@ public class AiPreferences {
 
     public void setHuggingFaceChatModel(String huggingFaceChatModel) {
         this.huggingFaceChatModel.set(huggingFaceChatModel);
-    }
-
-    public StringProperty gpt4AllChatModelProperty() {
-        return gpt4AllChatModel;
-    }
-
-    public String getGpt4AllChatModel() {
-        return gpt4AllChatModel.get();
-    }
-
-    public void setGpt4AllChatModel(String gpt4AllChatModel) {
-        this.gpt4AllChatModel.set(gpt4AllChatModel);
     }
 
     public BooleanProperty customizeExpertSettingsProperty() {
@@ -340,18 +356,6 @@ public class AiPreferences {
         this.huggingFaceApiBaseUrl.set(huggingFaceApiBaseUrl);
     }
 
-    public StringProperty gpt4AllApiBaseUrlProperty() {
-        return gpt4AllApiBaseUrl;
-    }
-
-    public String getGpt4AllApiBaseUrl() {
-        return gpt4AllApiBaseUrl.get();
-    }
-
-    public void setGpt4AllApiBaseUrl(String gpt4AllApiBaseUrl) {
-        this.gpt4AllApiBaseUrl.set(gpt4AllApiBaseUrl);
-    }
-
     public DoubleProperty temperatureProperty() {
         return temperature;
     }
@@ -377,11 +381,14 @@ public class AiPreferences {
             return contextWindowSize.get();
         } else {
             return switch (aiProvider.get()) {
-                case OPEN_AI -> AiDefaultPreferences.getContextWindowSize(AiProvider.OPEN_AI, openAiChatModel.get());
-                case MISTRAL_AI -> AiDefaultPreferences.getContextWindowSize(AiProvider.MISTRAL_AI, mistralAiChatModel.get());
-                case HUGGING_FACE -> AiDefaultPreferences.getContextWindowSize(AiProvider.HUGGING_FACE, huggingFaceChatModel.get());
-                case GEMINI -> AiDefaultPreferences.getContextWindowSize(AiProvider.GEMINI, geminiChatModel.get());
-                case GPT4ALL -> AiDefaultPreferences.getContextWindowSize(AiProvider.GPT4ALL, gpt4AllChatModel.get());
+                case OPEN_AI ->
+                        AiDefaultPreferences.getContextWindowSize(AiProvider.OPEN_AI, openAiChatModel.get());
+                case MISTRAL_AI ->
+                        AiDefaultPreferences.getContextWindowSize(AiProvider.MISTRAL_AI, mistralAiChatModel.get());
+                case HUGGING_FACE ->
+                        AiDefaultPreferences.getContextWindowSize(AiProvider.HUGGING_FACE, huggingFaceChatModel.get());
+                case GEMINI ->
+                        AiDefaultPreferences.getContextWindowSize(AiProvider.GEMINI, geminiChatModel.get());
             };
         }
     }
@@ -454,11 +461,9 @@ public class AiPreferences {
         this.ragMinScore.set(ragMinScore);
     }
 
-    /**
-     * Listen to changes of preferences that are related to embeddings generation.
-     *
-     * @param runnable The runnable that should be executed when the preferences change.
-     */
+    /// Listen to changes of preferences that are related to embeddings generation.
+    ///
+    /// @param runnable The runnable that should be executed when the preferences change.
     public void addListenerToEmbeddingsParametersChange(Runnable runnable) {
         embeddingModel.addListener((observableValue, oldValue, newValue) -> {
             if (newValue != oldValue) {
@@ -509,8 +514,6 @@ public class AiPreferences {
                     huggingFaceChatModel.get();
             case GEMINI ->
                     geminiChatModel.get();
-            case GPT4ALL ->
-                    gpt4AllChatModel.get();
         };
     }
 
@@ -525,8 +528,6 @@ public class AiPreferences {
                         huggingFaceApiBaseUrl.get();
                 case GEMINI ->
                         geminiApiBaseUrl.get();
-                case GPT4ALL ->
-                        gpt4AllApiBaseUrl.get();
             };
         } else {
             return aiProvider.get().getApiUrl();
@@ -537,22 +538,20 @@ public class AiPreferences {
         this.apiKeyChangeListener = apiKeyChangeListener;
     }
 
-    /**
-     * Notify that the API key has been updated.
-     */
+    /// Notify that the API key has been updated.
     public void apiKeyUpdated() {
         apiKeyChangeListener.run();
     }
 
     public void setTemplate(AiTemplate aiTemplate, String template) {
-        templates.get(aiTemplate).set(template);
+        templateProperty(aiTemplate).set(template);
     }
 
     public String getTemplate(AiTemplate aiTemplate) {
-        return templates.get(aiTemplate).get();
+        return templateProperty(aiTemplate).get();
     }
 
     public StringProperty templateProperty(AiTemplate aiTemplate) {
-        return templates.get(aiTemplate);
+        return templates.getOrDefault(aiTemplate, new SimpleStringProperty(""));
     }
 }

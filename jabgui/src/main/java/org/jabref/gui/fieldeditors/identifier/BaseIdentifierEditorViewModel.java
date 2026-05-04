@@ -11,9 +11,11 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.AbstractEditorViewModel;
+import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -24,6 +26,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.identifier.Identifier;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -33,14 +36,16 @@ import org.slf4j.LoggerFactory;
 public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extends AbstractEditorViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseIdentifierEditorViewModel.class);
     protected BooleanProperty isInvalidIdentifier = new SimpleBooleanProperty();
+    protected final BooleanProperty canShortenIdentifier = new SimpleBooleanProperty(false);
     protected final BooleanProperty identifierLookupInProgress = new SimpleBooleanProperty(false);
     protected final BooleanProperty canLookupIdentifier = new SimpleBooleanProperty(true);
-    protected final BooleanProperty canFetchBibliographyInformationById = new SimpleBooleanProperty();
+    protected final BooleanProperty canFetchBibliographyInformationById = new SimpleBooleanProperty(false);
     protected IdentifierParser identifierParser;
     protected final ObjectProperty<Optional<T>> identifier = new SimpleObjectProperty<>(Optional.empty());
     protected DialogService dialogService;
     protected TaskExecutor taskExecutor;
     protected GuiPreferences preferences;
+    protected final StateManager stateManager;
 
     public BaseIdentifierEditorViewModel(Field field,
                                          SuggestionProvider<?> suggestionProvider,
@@ -48,23 +53,24 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
                                          DialogService dialogService,
                                          TaskExecutor taskExecutor,
                                          GuiPreferences preferences,
-                                         UndoManager undoManager) {
+                                         UndoManager undoManager,
+                                         StateManager stateManager) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
+        this.stateManager = stateManager;
     }
 
-    /**
-     * Since it's not possible to perform the same actions on all identifiers, specific implementations can call the {@code configure}
-     * method to tell the actions they can perform and the actions they can't. Based on this configuration, the view will enable/disable or
-     * show/hide certain UI elements for certain identifier editors.
-     * <p>
-     * <b>NOTE: This method MUST be called by all the implementation view models in their principal constructor</b>
-     * */
-    protected final void configure(boolean canFetchBibliographyInformationById, boolean canLookupIdentifier) {
-        this.canLookupIdentifier.set(canLookupIdentifier);
+    /// Since it's not possible to perform the same actions on all identifiers, specific implementations can call the `configure`
+    /// method to tell the actions they can perform and the actions they can't. Based on this configuration, the view will enable/disable or
+    /// show/hide certain UI elements for certain identifier editors.
+    ///
+    /// **NOTE: This method MUST be called by all the implementation view models in their principal constructor**
+    protected final void configure(boolean canFetchBibliographyInformationById, boolean canLookupIdentifier, boolean canShortenIdentifier) {
         this.canFetchBibliographyInformationById.set(canFetchBibliographyInformationById);
+        this.canLookupIdentifier.set(canLookupIdentifier);
+        this.canShortenIdentifier.set(canShortenIdentifier);
     }
 
     protected Optional<T> updateIdentifier() {
@@ -87,6 +93,14 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
         } else {
             dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", fetcher.getName()), Localization.lang("Error occurred %0", exception.getCause().getMessage()));
         }
+    }
+
+    public BooleanProperty canShortenIdentifierProperty() {
+        return canShortenIdentifier;
+    }
+
+    public boolean getCanShortenIdentifier() {
+        return canShortenIdentifierProperty().get();
     }
 
     public BooleanProperty canFetchBibliographyInformationByIdProperty() {
@@ -121,12 +135,20 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
         return identifierLookupInProgress;
     }
 
+    public boolean getIdentifierLookupNotInProgress() {
+        return identifierLookupInProgress.not().get();
+    }
+
     public void fetchBibliographyInformation(BibEntry bibEntry) {
-        LOGGER.warn("Unable to fetch bibliography information using the '{}' identifier", field.getDisplayName());
+        stateManager.getActiveDatabase().ifPresentOrElse(
+                databaseContext -> new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, undoManager, stateManager)
+                        .fetchAndMerge(entry, field),
+                () -> dialogService.notify(Localization.lang("No library selected"))
+        );
     }
 
     public void lookupIdentifier(BibEntry bibEntry) {
-        LOGGER.warn("Unable to lookup identifier for '{}'", field.getDisplayName());
+        LOGGER.warn("Lookup not implemented yet for identifier '{}'", FieldTextMapper.getDisplayName(field));
     }
 
     public void openExternalLink() {
@@ -138,6 +160,10 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
                     }
                 }
         );
+    }
+
+    public void shortenID() throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Shortening of identifiers is not supported by this identifier editor.");
     }
 
     @Override

@@ -8,12 +8,14 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <?import org.controlsfx.control.textfield.CustomPasswordField?>
+<?import com.dlsc.gemsfx.EnhancedPasswordField?>
 <fx:root spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.preferences.network.NetworkTab">
     <Label styleClass="titleHeader" text="%Network" />
     <CheckBox fx:id="versionCheck" text="%Check for updates on startup"/>
@@ -32,8 +34,8 @@
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-         <RowConstraints />
-         <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
         </rowConstraints>
         <CheckBox fx:id="proxyUse" text="%Use custom proxy configuration" GridPane.columnSpan="3" GridPane.rowIndex="0" />
         <Label fx:id="proxyHostnameLabel" text="%Hostname" GridPane.rowIndex="1" />
@@ -44,13 +46,38 @@
         <Label fx:id="proxyUsernameLabel" text="%Username" GridPane.rowIndex="4" />
         <TextField fx:id="proxyUsername" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
         <Label fx:id="proxyPasswordLabel" text="%Password" GridPane.rowIndex="5" />
-        <CustomPasswordField fx:id="proxyPassword" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+        <EnhancedPasswordField fx:id="proxyPassword" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
         <SplitPane fx:id="persistentTooltipWrapper" GridPane.columnIndex="2" GridPane.rowIndex="5">
             <CheckBox fx:id="proxyPersistPassword" text="%Persist password between sessions"/>
         </SplitPane>
         <Button fx:id="checkConnectionButton" onAction="#checkConnection" prefWidth="200.0" text="%Check connection" GridPane.columnIndex="1" GridPane.rowIndex="6" />
     </GridPane>
-   <Label styleClass="sectionHeader" text="%SSL Configuration" />
+
+    <Label styleClass="sectionHeader" text="%Git configuration" />
+    <GridPane hgap="10.0" vgap="10.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" />
+            <ColumnConstraints hgrow="SOMETIMES" />
+            <ColumnConstraints hgrow="SOMETIMES" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+
+        <Label fx:id="gitUsernameLabel" text="%Username" GridPane.rowIndex="0" />
+        <TextField fx:id="gitUsername" prefWidth="200.0" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+        <Label fx:id="gitPatLabel" text="%PAT" GridPane.rowIndex="1">
+            <tooltip><Tooltip text="%Personal Access Token"/></tooltip>
+        </Label>
+        <EnhancedPasswordField fx:id="gitPat" prefWidth="200.0" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+        <SplitPane fx:id="persistGitPatTooltipWrapper" GridPane.rowIndex="1" GridPane.columnIndex="2">
+            <CheckBox fx:id="gitPersistPat" text="%Persist PAT between sessions"/>
+        </SplitPane>
+    </GridPane>
+
+    <Label styleClass="sectionHeader" text="%SSL configuration" />
     <GridPane
             hgap="10.0"
             vgap="10.0">
@@ -129,24 +156,25 @@
                         editable="false" resizable="false" reorderable="false"
                 />
             </columns>
-           <columnResizePolicy>
-               <TableView
-                       fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-           </columnResizePolicy>
+            <columnResizePolicy>
+                <TableView
+                        fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
         </TableView>
         <Button fx:id="addCertificate"
                 mnemonicParsing="false"
                 onAction="#addCertificateFile"
-                text="%Add certificate"
+                styleClass="add-certificate"
+                text="%Browse for certificate..."
                 GridPane.columnIndex="2"
                 GridPane.halignment="RIGHT"
                 GridPane.rowIndex="1"
                 GridPane.valignment="TOP">
-           <GridPane.margin>
-               <Insets right="16.0"/>
-           </GridPane.margin>
+            <GridPane.margin>
+                <Insets right="16.0"/>
+            </GridPane.margin>
             <graphic>
-                <JabRefIconView glyph="OPEN_LIST"/>
+                <JabRefIconView glyph="ADD_NOBOX"/>
             </graphic>
         </Button>
     </GridPane>

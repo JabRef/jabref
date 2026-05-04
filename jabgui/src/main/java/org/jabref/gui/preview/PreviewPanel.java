@@ -17,8 +17,10 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.icon.IconTheme;
@@ -121,21 +123,21 @@ public class PreviewPanel extends VBox implements PreviewControls {
     private ContextMenu createPopupMenu() {
         MenuItem copyCitationHtml = new MenuItem(Localization.lang("Copy citation (html)"), IconTheme.JabRefIcons.COPY.getGraphicNode());
         keyBindingRepository.getKeyCombination(KeyBinding.COPY_PREVIEW).ifPresent(copyCitationHtml::setAccelerator);
-        copyCitationHtml.setOnAction(event -> previewView.copyPreviewHtmlToClipBoard());
+        copyCitationHtml.setOnAction(_ -> previewView.copyPreviewHtmlToClipBoard());
         MenuItem copyCitationText = new MenuItem(Localization.lang("Copy citation (text)"));
-        copyCitationText.setOnAction(event -> previewView.copyPreviewTextToClipBoard());
+        copyCitationText.setOnAction(_ -> previewView.copyPreviewPlainTextToClipBoard());
         MenuItem exportToClipboard = new MenuItem(Localization.lang("Export to clipboard"));
-        exportToClipboard.setOnAction(event -> previewView.exportToClipBoard(stateManager));
+        exportToClipboard.setOnAction(_ -> previewView.exportToClipBoard(stateManager));
         MenuItem copySelection = new MenuItem(Localization.lang("Copy selection"));
-        copySelection.setOnAction(event -> previewView.copySelectionToClipBoard());
+        copySelection.setOnAction(_ -> previewView.copySelectionToClipBoard());
         MenuItem printEntryPreview = new MenuItem(Localization.lang("Print entry preview"), IconTheme.JabRefIcons.PRINTED.getGraphicNode());
-        printEntryPreview.setOnAction(event -> previewView.print());
+        printEntryPreview.setOnAction(_ -> previewView.print());
         MenuItem previousPreviewLayout = new MenuItem(Localization.lang("Previous preview layout"));
         keyBindingRepository.getKeyCombination(KeyBinding.PREVIOUS_PREVIEW_LAYOUT).ifPresent(previousPreviewLayout::setAccelerator);
-        previousPreviewLayout.setOnAction(event -> this.previousPreviewStyle());
+        previousPreviewLayout.setOnAction(_ -> this.previousPreviewStyle());
         MenuItem nextPreviewLayout = new MenuItem(Localization.lang("Next preview layout"));
         keyBindingRepository.getKeyCombination(KeyBinding.NEXT_PREVIEW_LAYOUT).ifPresent(nextPreviewLayout::setAccelerator);
-        nextPreviewLayout.setOnAction(event -> this.nextPreviewStyle());
+        nextPreviewLayout.setOnAction(_ -> this.nextPreviewStyle());
 
         ContextMenu menu = new ContextMenu();
         menu.getItems().add(copyCitationHtml);
@@ -179,6 +181,8 @@ public class PreviewPanel extends VBox implements PreviewControls {
 
         PreviewLayout layout = previewPreferences.getSelectedPreviewLayout();
         previewView.setLayout(layout);
-        dialogService.notify(Localization.lang("Preview style changed to: %0", layout.getDisplayName()));
+        dialogService.notify(
+                new Notifications.UiNotification(Localization.lang("Preview style changed"), layout.getDisplayName())
+                        .withAutoClose(Duration.seconds(5)));
     }
 }

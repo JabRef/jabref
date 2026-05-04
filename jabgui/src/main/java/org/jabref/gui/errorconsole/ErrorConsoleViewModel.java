@@ -3,17 +3,18 @@ package org.jabref.gui.errorconsole;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.ObservableList;
+import javafx.scene.input.KeyCombination;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.logging.LogMessages;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
@@ -23,6 +24,7 @@ import org.jabref.logic.util.BuildInfo;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,12 +38,17 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
     private final BuildInfo buildInfo;
     private final ListProperty<LogEventViewModel> allMessagesData;
 
-    public ErrorConsoleViewModel(DialogService dialogService, GuiPreferences preferences, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
-        this.dialogService = Objects.requireNonNull(dialogService);
-        this.preferences = Objects.requireNonNull(preferences);
-        this.clipBoardManager = Objects.requireNonNull(clipBoardManager);
-        this.buildInfo = Objects.requireNonNull(buildInfo);
-        ObservableList<LogEventViewModel> eventViewModels = EasyBind.map(BindingsHelper.forUI(LogMessages.getInstance().getMessages()), LogEventViewModel::new);
+    public ErrorConsoleViewModel(@NonNull DialogService dialogService,
+                                 @NonNull GuiPreferences preferences,
+                                 @NonNull ClipBoardManager clipBoardManager,
+                                 @NonNull BuildInfo buildInfo) {
+        this.dialogService = dialogService;
+        this.preferences = preferences;
+        this.clipBoardManager = clipBoardManager;
+        this.buildInfo = buildInfo;
+        ObservableList<LogEventViewModel> eventViewModels = EasyBind.map(
+                BindingsHelper.forUI(LogMessages.getInstance().getMessages()),
+                LogEventViewModel::new);
         allMessagesData = new ReadOnlyListWrapper<>(eventViewModels);
     }
 
@@ -49,27 +56,21 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
         return this.allMessagesData;
     }
 
-    /**
-     * Concatenates the formatted message of the given {@link LogEventViewModel}s by using a new line separator.
-     *
-     * @return all messages as String
-     */
+    /// Concatenates the formatted message of the given {@link LogEventViewModel}s by using a new line separator.
+    ///
+    /// @return all messages as String
     private String getLogMessagesAsString(List<LogEventViewModel> messages) {
         return messages.stream()
                        .map(LogEventViewModel::getDetailedText)
                        .collect(Collectors.joining(OS.NEWLINE));
     }
 
-    /**
-     * Copies the whole log to the clipboard
-     */
+    /// Copies the whole log to the clipboard
     public void copyLog() {
         copyLog(allMessagesData);
     }
 
-    /**
-     * Copies the given list of {@link LogEventViewModel}s to the clipboard.
-     */
+    /// Copies the given list of {@link LogEventViewModel}s to the clipboard.
     public void copyLog(List<LogEventViewModel> messages) {
         if (messages.isEmpty()) {
             return;
@@ -78,23 +79,17 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
         dialogService.notify(Localization.lang("Log copied to clipboard."));
     }
 
-    /**
-     * Copies the detailed text of the given {@link LogEventViewModel} to the clipboard.
-     */
+    /// Copies the detailed text of the given {@link LogEventViewModel} to the clipboard.
     public void copyLogEntry(LogEventViewModel logEvent) {
         clipBoardManager.setContent(logEvent.getDetailedText());
     }
 
-    /**
-     * Clears the current log
-     */
+    /// Clears the current log
     public void clearLog() {
         LogMessages.getInstance().clear();
     }
 
-    /**
-     * Opens a new issue on GitHub and copies log to clipboard.
-     */
+    /// Opens a new issue on GitHub and copies log to clipboard.
     public void reportIssue() {
         try {
             // System info
@@ -113,7 +108,8 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
             dialogService.showInformationDialogAndWait(Localization.lang("Issue report successful"),
                     Localization.lang("Your issue was reported in your browser.") + "\n" +
                             Localization.lang("The log and exception information was copied to your clipboard.") + " " +
-                            Localization.lang("Please paste this information (with Ctrl+V) in the issue description.") + "\n" +
+                            Localization.lang("Please paste this information (with %0) in the issue description.",
+                                    preferences.getKeyBindingRepository().getKeyCombination(KeyBinding.PASTE).map(KeyCombination::getDisplayText).orElse("")) + "\n" +
                             Localization.lang("Please also add all steps to reproduce this issue, if possible."));
 
             URIBuilder uriBuilder = new URIBuilder()

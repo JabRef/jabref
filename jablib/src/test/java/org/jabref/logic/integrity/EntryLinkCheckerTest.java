@@ -8,11 +8,12 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ResourceLock("Localization.lang")
 class EntryLinkCheckerTest {
 
     private BibDatabase database;
@@ -25,11 +26,6 @@ class EntryLinkCheckerTest {
         checker = new EntryLinkChecker(database);
         entry = new BibEntry();
         database.insertEntry(entry);
-    }
-
-    @Test
-    void entryLinkChecker() {
-        assertThrows(NullPointerException.class, () -> new EntryLinkChecker(null));
     }
 
     @Test

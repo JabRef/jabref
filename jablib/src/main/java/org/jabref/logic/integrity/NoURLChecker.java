@@ -4,10 +4,11 @@ import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.URLUtil;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class NoURLChecker implements ValueChecker {
 
+    @Override
     public Optional<String> checkValue(String value) {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();

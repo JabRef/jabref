@@ -3,26 +3,24 @@ package org.jabref.logic.layout.format;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.StringInt;
 import org.jabref.logic.util.strings.RtfCharMap;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Transform a LaTeX-String to RTF.
- *
- * This method will:
- *
- *   1.) Remove LaTeX-Command sequences.
- *
- *   2.) Replace LaTeX-Special chars with RTF equivalents.
- *
- *   3.) Replace emph and textit and textbf with their RTF replacements.
- *
- *   4.) Take special care to save all unicode characters correctly.
- *
- *   5.) Replace --- by \emdash and -- by \endash.
- */
+/// Transform a LaTeX-String to RTF.
+///
+/// This method will:
+///
+/// 1.) Remove LaTeX-Command sequences.
+///
+/// 2.) Replace LaTeX-Special chars with RTF equivalents.
+///
+/// 3.) Replace emph and textit and textbf with their RTF replacements.
+///
+/// 4.) Take special care to save all unicode characters correctly.
+///
+/// 5.) Replace --- by \emdash and -- by \endash.
 public class RTFChars implements LayoutFormatter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RTFChars.class);
@@ -94,11 +92,11 @@ public class RTFChars implements LayoutFormatter {
                     assert incommand;
 
                     // First test for braces that may be part of a LaTeX command:
-                    if ((c == '{') && (currentCommand.length() == 0)) {
+                    if ((c == '{') && (currentCommand.isEmpty())) {
                         // We have seen something like \{, which is probably the start
                         // of a command like \{aa}. Swallow the brace.
                         continue;
-                    } else if ((c == '}') && (currentCommand.length() > 0)) {
+                    } else if ((c == '}') && (!currentCommand.isEmpty())) {
                         // Seems to be the end of a command like \{aa}. Look it up:
                         String command = currentCommand.toString();
                         String result = RTF_CHARS.get(command);
@@ -116,7 +114,7 @@ public class RTFChars implements LayoutFormatter {
                         break testContent;
                     }
 
-                    if (((c == '{') || (c == ' ')) && (currentCommand.length() > 0)) {
+                    if (((c == '{') || (c == ' ')) && (!currentCommand.isEmpty())) {
                         String command = currentCommand.toString();
                         // Then test if we are dealing with a italics or bold
                         // command. If so, handle.
@@ -160,12 +158,10 @@ public class RTFChars implements LayoutFormatter {
                  .replace("''", "{\\rdblquote}");
     }
 
-    /**
-     * @param text                  the text to extract the part from
-     * @param i                     the position to start
-     * @param commandNestedInBraces true if the command is nested in braces (\emph{xy}), false if spaces are sued (\emph xy)
-     * @return a tuple of number of added characters and the extracted part
-     */
+    /// @param text                  the text to extract the part from
+    /// @param i                     the position to start
+    /// @param commandNestedInBraces true if the command is nested in braces (\emph{xy}), false if spaces are sued (\emph xy)
+    /// @return a tuple of number of added characters and the extracted part
     private StringInt getPart(String text, int i, boolean commandNestedInBraces) {
         char c;
         int count = 0;
@@ -198,12 +194,10 @@ public class RTFChars implements LayoutFormatter {
         return new StringInt(format(res), part.length());
     }
 
-    /**
-     * This method transforms the unicode of a special character into its base character: 233 (é) - > e
-     *
-     * @param c long
-     * @return returns the basic character of the given unicode
-     */
+    /// This method transforms the unicode of a special character into its base character: 233 (é) - > e
+    ///
+    /// @param c long
+    /// @return returns the basic character of the given unicode
     private String transformSpecialCharacter(long c) {
         if (((192 <= c) && (c <= 197)) || (c == 256) || (c == 258) || (c == 260)) {
             return "A";

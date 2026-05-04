@@ -21,12 +21,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class is responsible for getting the recommendations from Mr. DLib
- */
+/// This class is responsible for getting the recommendations from Mr. DLib
 public class MrDLibFetcher implements EntryBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MrDLibFetcher.class);
     private static final String NAME = "MDL_FETCHER";
@@ -52,7 +51,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+    public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
         Optional<String> title = entry.getFieldLatexFree(StandardField.TITLE);
         if (title.isEmpty()) {
             // without a title there is no reason to ask MrDLib
@@ -96,11 +95,9 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         return description;
     }
 
-    /**
-     * Contact the server with the title of the selected item
-     *
-     * @return Returns the server response. This is an XML document as a String.
-     */
+    /// Contact the server with the title of the selected item
+    ///
+    /// @return Returns the server response. This is an XML document as a String.
     private String makeServerRequest(URL url) throws FetcherException {
         URLDownload urlDownload = new URLDownload(url);
         String response = urlDownload.asString();
@@ -111,12 +108,10 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         return response;
     }
 
-    /**
-     * Constructs the query based on title of the BibEntry. Adds statistical stuff to the url.
-     *
-     * @param queryWithTitle the query holds the title of the selected entry. Used to make a query to the MDL Server
-     * @return the string used to make the query at mdl server
-     */
+    /// Constructs the query based on title of the BibEntry. Adds statistical stuff to the url.
+    ///
+    /// @param queryWithTitle the query holds the title of the selected entry. Used to make a query to the MDL Server
+    /// @return the string used to make the query at mdl server
     private URL constructQuery(String queryWithTitle) throws URISyntaxException, MalformedURLException {
         // The encoding does not work for / so we convert them by our own
         queryWithTitle = queryWithTitle.replace("/", " ");

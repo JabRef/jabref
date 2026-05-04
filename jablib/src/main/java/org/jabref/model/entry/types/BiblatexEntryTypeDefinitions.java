@@ -8,12 +8,10 @@ import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 
-/**
- * This class defines entry types for biblatex support.
- * It is based on the <a href="https://texdoc.org/serve/biblatex.pdf/0">biblatex documentation</a>
- * <p>
- * The definitions for BibTeX are done at {@link BibtexEntryTypeDefinitions}
- */
+/// This class defines entry types for biblatex support.
+/// It is based on the <a href="https://texdoc.org/serve/biblatex.pdf/0">biblatex documentation</a>
+///
+/// The definitions for BibTeX are done at {@link BibtexEntryTypeDefinitions}
 public class BiblatexEntryTypeDefinitions {
 
     private static final BibEntryType ARTICLE = new BibEntryTypeBuilder()
@@ -178,11 +176,11 @@ public class BiblatexEntryTypeDefinitions {
             .withType(StandardEntryType.Misc)
             .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE)
             .withImportantFields(
-                    StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED, StandardField.LOCATION, StandardField.DOI,
-                    StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
-            .withDetailFields(StandardField.LANGUAGE,
-                    StandardField.TYPE, StandardField.VERSION, StandardField.NOTE, StandardField.ORGANIZATION,
-                    StandardField.ADDENDUM, StandardField.PUBSTATE)
+                    StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.HOWPUBLISHED,
+                    StandardField.LOCATION, StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.URL, StandardField.URLDATE)
+            .withDetailFields(StandardField.ADDENDUM,
+                    StandardField.LANGUAGE, StandardField.NOTE, StandardField.ORGANIZATION, StandardField.PAGETOTAL,
+                    StandardField.PUBSTATE, StandardField.TYPE, StandardField.VERSION)
             .build();
 
     private static final BibEntryType ONLINE = new BibEntryTypeBuilder()
@@ -413,4 +411,10 @@ public class BiblatexEntryTypeDefinitions {
             THESIS, UNPUBLISHED, CONFERENCE, ELECTRONIC, MASTERSTHESIS, PHDTHESIS, TECHREPORT, WWW, SOFTWARE, DATASET);
 
     public static final List<BibEntryType> RECOMMENDED = Arrays.asList(ARTICLE, BOOK, INPROCEEDINGS, REPORT, MISC);
+
+    /// Returns the MISC entry type for use by other classes in the same package.
+    /// This getter is provided to maintain package-private access while satisfying Checkstyle's DeclarationOrder rule.
+    static BibEntryType getMisc() {
+        return MISC;
+    }
 }

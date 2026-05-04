@@ -17,17 +17,13 @@ import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationMessage;
 import org.controlsfx.validation.decoration.GraphicValidationDecoration;
 
-/**
- * This class is similar to {@link GraphicValidationDecoration} but with a different style and font-based icon.
- */
+/// This class is similar to {@link GraphicValidationDecoration} but with a different style and font-based icon.
 public class IconValidationDecorator extends GraphicValidationDecoration {
 
     private final Pos position;
 
-    /**
-     * Creates a new IconValidationDecorator with default position CENTER_LEFT.
-     * This position is chosen to better align with text content regardless of case.
-     */
+    /// Creates a new IconValidationDecorator with default position CENTER_LEFT.
+    /// This position is chosen to better align with text content regardless of case.
     public IconValidationDecorator() {
         this(Pos.CENTER_LEFT);
     }
@@ -39,8 +35,8 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
     @Override
     public Node createDecorationNode(ValidationMessage message) {
         Node graphic = Severity.ERROR == message.getSeverity()
-                ? IconTheme.JabRefIcons.ERROR.getGraphicNode()
-                : IconTheme.JabRefIcons.WARNING.getGraphicNode();
+                       ? IconTheme.JabRefIcons.ERROR.getGraphicNode()
+                       : IconTheme.JabRefIcons.WARNING.getGraphicNode();
         graphic.getStyleClass().add(Severity.ERROR == message.getSeverity() ? "error-icon" : "warning-icon");
         Label label = new Label();
         label.setGraphic(graphic);

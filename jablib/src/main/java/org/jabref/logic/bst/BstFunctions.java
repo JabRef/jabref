@@ -12,6 +12,7 @@ import org.jabref.logic.bst.util.BstNameFormatter;
 import org.jabref.logic.bst.util.BstPurifier;
 import org.jabref.logic.bst.util.BstTextPrefixer;
 import org.jabref.logic.bst.util.BstWidthCalculator;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -19,9 +20,12 @@ import org.jabref.model.entry.AuthorList;
 import com.google.common.annotations.VisibleForTesting;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class BstFunctions {
     private static final Logger LOGGER = LoggerFactory.getLogger(BstFunctions.class);
     private static final Pattern ADD_PERIOD_PATTERN = Pattern.compile("([^.?!}\\s])(}|\\s)*$");
@@ -37,11 +41,11 @@ public class BstFunctions {
     private int bstWarning = 0;
 
     @FunctionalInterface
-    public interface BstFunction {
+    interface BstFunction {
 
         void execute(BstVMVisitor visitor, ParserRuleContext ctx);
 
-        default void execute(BstVMVisitor visitor, ParserRuleContext ctx, BstEntry bstEntryContext) {
+        default void execute(BstVMVisitor visitor, ParserRuleContext ctx, @Nullable BstEntry bstEntryContext) {
             this.execute(visitor, ctx);
         }
     }
@@ -51,13 +55,13 @@ public class BstFunctions {
         this.strings = bstVMContext.strings();
         this.integers = bstVMContext.integers();
         this.functions = bstVMContext.functions();
-        this.preamble = Optional.ofNullable(bstVMContext.bibDatabase()).flatMap(BibDatabase::getPreamble).orElse("");
+        this.preamble = Optional.of(bstVMContext.bibDatabase()).flatMap(BibDatabase::getPreamble).orElse("");
         this.stack = bstVMContext.stack();
 
         this.bbl = bbl;
     }
 
-    protected Map<String, BstFunction> getBuiltInFunctions() {
+    Map<String, BstFunction> getBuiltInFunctions() {
         Map<String, BstFunction> builtInFunctions = new HashMap<>();
 
         builtInFunctions.put(">", this::bstIsGreaterThan);
@@ -101,11 +105,9 @@ public class BstFunctions {
         return builtInFunctions;
     }
 
-    /**
-     * Pops the top two (integer) literals, compares them, and pushes
-     * the integer 1 if the second is greater than the first, 0
-     * otherwise.
-     */
+    /// Pops the top two (integer) literals, compares them, and pushes
+    /// the integer 1 if the second is greater than the first, 0
+    /// otherwise.
     private void bstIsGreaterThan(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 2) {
             throw new BstVMException("Not enough operands on stack for operation > (line %d)".formatted(ctx.start.getLine()));
@@ -120,11 +122,9 @@ public class BstFunctions {
         stack.push(((Integer) o1).compareTo((Integer) o2) > 0 ? BstVM.TRUE : BstVM.FALSE);
     }
 
-    /**
-     * Pops the top two (integer) literals, compares them, and pushes
-     * the integer 1 if the second is lower than the first, 0
-     * otherwise.
-     */
+    /// Pops the top two (integer) literals, compares them, and pushes
+    /// the integer 1 if the second is lower than the first, 0
+    /// otherwise.
     private void bstIsLowerThan(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 2) {
             throw new BstVMException("Not enough operands on stack for operation <");
@@ -139,10 +139,8 @@ public class BstFunctions {
         stack.push(((Integer) o1).compareTo((Integer) o2) < 0 ? BstVM.TRUE : BstVM.FALSE);
     }
 
-    /**
-     * Pops the top two (both integer or both string) literals, compares
-     * them, and pushes the integer 1 if they're equal, 0 otherwise.
-     */
+    /// Pops the top two (both integer or both string) literals, compares
+    /// them, and pushes the integer 1 if they're equal, 0 otherwise.
     private void bstEquals(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 2) {
             throw new BstVMException("Not enough operands on stack for operation = (line %d)".formatted(ctx.start.getLine()));
@@ -163,9 +161,7 @@ public class BstFunctions {
         stack.push(o1.equals(o2) ? BstVM.TRUE : BstVM.FALSE);
     }
 
-    /**
-     * Pops the top two (integer) literals and pushes their sum.
-     */
+    /// Pops the top two (integer) literals and pushes their sum.
     private void bstAdd(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 2) {
             throw new BstVMException("Not enough operands on stack for operation + (line %d)".formatted(ctx.start.getLine()));
@@ -180,10 +176,8 @@ public class BstFunctions {
         stack.push((Integer) o1 + (Integer) o2);
     }
 
-    /**
-     * Pops the top two (integer) literals and pushes their difference
-     * (the first subtracted from the second).
-     */
+    /// Pops the top two (integer) literals and pushes their difference
+    /// (the first subtracted from the second).
     private void bstSubtract(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 2) {
             throw new BstVMException("Not enough operands on stack for operation - (line %d)".formatted(ctx.start.getLine()));
@@ -198,11 +192,9 @@ public class BstFunctions {
         stack.push((Integer) o1 - (Integer) o2);
     }
 
-    /**
-     * Pops the top two (string) literals, concatenates them (in reverse
-     * order, that is, the order in which pushed), and pushes the
-     * resulting string.
-     */
+    /// Pops the top two (string) literals, concatenates them (in reverse
+    /// order, that is, the order in which pushed), and pushes the
+    /// resulting string.
     private void bstConcat(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 2) {
             throw new BstVMException("Not enough operands on stack for operation * (line %d)".formatted(ctx.start.getLine()));
@@ -226,11 +218,9 @@ public class BstFunctions {
         stack.push(o1.toString() + o2);
     }
 
-    /**
-     * Pops the top two literals and assigns to the first (which must be
-     * a global or entry variable) the value of the second.
-     */
-    public class BstAssignFunction implements BstFunction {
+    /// Pops the top two literals and assigns to the first (which must be
+    /// a global or entry variable) the value of the second.
+    class BstAssignFunction implements BstFunction {
 
         @Override
         public void execute(BstVMVisitor visitor, ParserRuleContext ctx) {
@@ -238,14 +228,16 @@ public class BstFunctions {
         }
 
         @Override
-        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, BstEntry bstEntry) {
+        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, @Nullable BstEntry bstEntry) {
             if (stack.size() < 2) {
                 throw new BstVMException("Not enough operands on stack for operation := (line %d)".formatted(ctx.start.getLine()));
             }
             Object o1 = stack.pop();
             Object o2 = stack.pop();
 
-            if (!(o1 instanceof BstVMVisitor.Identifier(String name))) {
+            if (!(o1 instanceof BstVMVisitor.Identifier(
+                    String name
+            ))) {
                 throw new BstVMException("Invalid parameters (line %d)".formatted(ctx.start.getLine()));
             }
 
@@ -273,11 +265,9 @@ public class BstFunctions {
         }
     }
 
-    /**
-     * Pops the top (string) literal, adds a `.' to it if the last non
-     * '}' character isn't a `.', `?', or `!', and pushes this resulting
-     * string.
-     */
+    /// Pops the top (string) literal, adds a `.' to it if the last non
+    /// '}' character isn't a `.', `?', or `!', and pushes this resulting
+    /// string.
     private void bstAddPeriod(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.isEmpty()) {
             throw new BstVMException("Not enough operands on stack for operation add.period$ (line %d)".formatted(ctx.start.getLine()));
@@ -304,24 +294,22 @@ public class BstFunctions {
         }
     }
 
-    /**
-     * Executes the function whose name is the entry type of entry.
-     * For example if an entry is of type book, this function executes
-     * the book function. When given as an argument to the ITERATE
-     * command, call.type$ actually produces the output for the entries.
-     * For an entry with an unknown type, it executes the function
-     * default.type. Thus, you should define (before the READ command)
-     * one function for each standard entry type as well as a
-     * <code>default.type</code> function.
-     */
-    public class BstCallTypeFunction implements BstFunction {
+    /// Executes the function whose name is the entry type of entry.
+    /// For example if an entry is of type book, this function executes
+    /// the book function. When given as an argument to the ITERATE
+    /// command, call.type$ actually produces the output for the entries.
+    /// For an entry with an unknown type, it executes the function
+    /// default.type. Thus, you should define (before the READ command)
+    /// one function for each standard entry type as well as a
+    /// `default.type` function.
+    class BstCallTypeFunction implements BstFunction {
         @Override
         public void execute(BstVMVisitor visitor, ParserRuleContext ctx) {
             throw new BstVMException("Call.type$ can only be called from within a context (ITERATE or REVERSE). (line %d)".formatted(ctx.start.getLine()));
         }
 
         @Override
-        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, BstEntry bstEntry) {
+        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, @Nullable BstEntry bstEntry) {
             if (bstEntry == null) {
                 this.execute(visitor, ctx); // Throw error
             } else {
@@ -336,25 +324,23 @@ public class BstFunctions {
         }
     }
 
-    /**
-     * Pops the top two (string) literals; it changes the case of the second
-     * according to the specifications of the first, as follows. (Note: The word
-     * `letters' in the next sentence refers only to those at brace-level 0, the
-     * top-most brace level; no other characters are changed, except perhaps for
-     * \special characters", described in Section 4.) If the first literal is the
-     * string `t', it converts to lower case all letters except the very first
-     * character in the string, which it leaves alone, and except the first
-     * character following any colon and then nonnull white space, which it also
-     * leaves alone; if it's the string `l', it converts all letters to lower case;
-     * and if it's the string `u', it converts all letters to upper case. It then
-     * pushes this resulting string. If either type is incorrect, it complains and
-     * pushes the null string; however, if both types are correct but the
-     * specification string (i.e., the first string) isn't one of the legal ones, it
-     * merely pushes the second back onto the stack, after complaining. (Another
-     * note: It ignores case differences in the specification string; for example,
-     * the strings t and T are equivalent for the purposes of this built-in
-     * function.)
-     */
+    /// Pops the top two (string) literals; it changes the case of the second
+    /// according to the specifications of the first, as follows. (Note: The word
+    /// `letters' in the next sentence refers only to those at brace-level 0, the
+    /// top-most brace level; no other characters are changed, except perhaps for
+    /// \special characters", described in Section 4.) If the first literal is the
+    /// string `t', it converts to lower case all letters except the very first
+    /// character in the string, which it leaves alone, and except the first
+    /// character following any colon and then nonnull white space, which it also
+    /// leaves alone; if it's the string `l', it converts all letters to lower case;
+    /// and if it's the string `u', it converts all letters to upper case. It then
+    /// pushes this resulting string. If either type is incorrect, it complains and
+    /// pushes the null string; however, if both types are correct but the
+    /// specification string (i.e., the first string) isn't one of the legal ones, it
+    /// merely pushes the second back onto the stack, after complaining. (Another
+    /// note: It ignores case differences in the specification string; for example,
+    /// the strings t and T are equivalent for the purposes of this built-in
+    /// function.)
     private void bstChangeCase(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 2) {
             throw new BstVMException("Not enough operands on stack for operation change.case$ (line %d)".formatted(ctx.start.getLine()));
@@ -373,11 +359,9 @@ public class BstFunctions {
         stack.push(BstCaseChanger.changeCase(toChange, BstCaseChanger.FormatMode.of(format)));
     }
 
-    /**
-     * Pops the top (string) literal, makes sure it's a single
-     * character, converts it to the corresponding ASCII integer, and
-     * pushes this integer.
-     */
+    /// Pops the top (string) literal, makes sure it's a single
+    /// character, converts it to the corresponding ASCII integer, and
+    /// pushes this integer.
     private void bstChrToInt(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.isEmpty()) {
             throw new BstVMException("Not enough operands on stack for operation chr.to.int$ (line %d)".formatted(ctx.start.getLine()));
@@ -391,30 +375,26 @@ public class BstFunctions {
         stack.push((int) s.charAt(0));
     }
 
-    /**
-     * Pushes the string that was the \cite-command argument for this
-     * entry.
-     */
-    public class BstCiteFunction implements BstFunction {
+    /// Pushes the string that was the \cite-command argument for this
+    /// entry.
+    class BstCiteFunction implements BstFunction {
         @Override
         public void execute(BstVMVisitor visitor, ParserRuleContext ctx) {
             throw new BstVMException("Must have an entry to cite$ (line %d)".formatted(ctx.start.getLine()));
         }
 
         @Override
-        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, BstEntry bstEntryContext) {
-            if (bstEntryContext == null) {
+        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, @Nullable BstEntry bstEntry) {
+            if (bstEntry == null) {
                 execute(visitor, ctx);
                 return;
             }
 
-            stack.push(bstEntryContext.entry.getCitationKey().orElse(null));
+            stack.push(bstEntry.entry.getCitationKey().orElse(""));
         }
     }
 
-    /**
-     * Pops the top literal from the stack and pushes two copies of it.
-     */
+    /// Pops the top literal from the stack and pushes two copies of it.
     private void bstDuplicate(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.isEmpty()) {
             throw new BstVMException("Not enough operands on stack for operation duplicate$ (line %d)".formatted(ctx.start.getLine()));
@@ -425,11 +405,9 @@ public class BstFunctions {
         stack.push(o1);
     }
 
-    /**
-     * Pops the top literal and pushes the integer 1 if it's a missing
-     * field or a string having no non-white-space characters, 0
-     * otherwise.
-     */
+    /// Pops the top literal and pushes the integer 1 if it's a missing
+    /// field or a string having no non-white-space characters, 0
+    /// otherwise.
     private void bstEmpty(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.isEmpty()) {
             throw new BstVMException("Not enough operands on stack for operation empty$ (line %d)".formatted(ctx.start.getLine()));
@@ -446,22 +424,20 @@ public class BstFunctions {
             throw new BstVMException("Operand does not match function empty$ (line %d)".formatted(ctx.start.getLine()));
         }
 
-        boolean result = s.trim().isEmpty();
+        boolean result = StringUtil.isBlank(s);
         LOGGER.trace("empty$({}) result: {}", s, result);
         stack.push(result ? BstVM.TRUE : BstVM.FALSE);
     }
 
-    /**
-     * The |built_in| function {\.{format.name\$}} pops the
-     * top three literals (they are a string, an integer, and a string
-     * literal, in that order). The last string literal represents a
-     * name list (each name corresponding to a person), the integer
-     * literal specifies which name to pick from this list, and the
-     * first string literal specifies how to format this name, as
-     * described in the \BibTeX\ documentation. Finally, this function
-     * pushes the formatted name. If any of the types is incorrect, it
-     * complains and pushes the null string.
-     */
+    /// The _|built_in|_ function {\.{format.name\$}} pops the
+    /// top three literals (ordered):
+    ///
+    ///  - String: format string, as described in the \BibTeX\ documentation.
+    ///  - Integer: number of the name to format, starting with 1
+    ///  - String: name list (each name corresponding to a person).
+    ///
+    /// Finally, this function pushes the formatted name. If any of the types is
+    /// incorrect, it complains and pushes an empty string.
     private void bstFormatName(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 3) {
             throw new BstVMException("Not enough operands on stack for operation format.name$ (line %d)".formatted(ctx.start.getLine()));
@@ -470,35 +446,38 @@ public class BstFunctions {
         Object o2 = stack.pop();
         Object o3 = stack.pop();
 
-        if (!(o1 instanceof String) && !(o2 instanceof Integer) && !(o3 instanceof String)) {
-            // warning("A string is needed for change.case$");
+        if (!(o1 instanceof String format)
+                || !(o2 instanceof Integer name)
+                || !(o3 instanceof String authors)) {
             stack.push("");
             return;
         }
 
-        String format = (String) o1;
-        Integer name = (Integer) o2;
-        String names = (String) o3;
-
-        if (names == null) {
+        if (StringUtil.isBlank(format)) {
+            LOGGER.warn("Format string is empty");
             stack.push("");
-        } else {
-            AuthorList a = AuthorList.parse(names);
-            if (name > a.getNumberOfAuthors()) {
-                throw new BstVMException("Author Out of Bounds. Number %d invalid for %s (line %d)".formatted(name, names, ctx.start.getLine()));
-            }
-            Author author = a.getAuthor(name - 1);
-
-            stack.push(BstNameFormatter.formatName(author, format));
+            return;
         }
+
+        if (StringUtil.isBlank(authors)) {
+            LOGGER.warn("Author list is empty");
+            stack.push("");
+            return;
+        }
+
+        AuthorList parsedAuthors = AuthorList.parse(authors);
+        if (name < 1 || name > parsedAuthors.getNumberOfAuthors()) {
+            throw new BstVMException("Author out of bounds. Number %d invalid for %s (line %d)".formatted(name, authors, ctx.start.getLine()));
+        }
+        Author author = parsedAuthors.getAuthor(name - 1);
+
+        stack.push(BstNameFormatter.formatName(author, format));
     }
 
-    /**
-     * Pops the top three literals (they are two function literals and
-     * an integer literal, in that order); if the integer is greater
-     * than 0, it executes the second literal, else it executes the
-     * first.
-     */
+    /// Pops the top three literals (they are two function literals and
+    /// an integer literal, in that order); if the integer is greater
+    /// than 0, it executes the second literal, else it executes the
+    /// first.
     private void bstIf(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 3) {
             throw new BstVMException("Not enough operands on stack for if$ (line %d)".formatted(ctx.start.getLine()));
@@ -524,18 +503,18 @@ public class BstFunctions {
     private void callIdentifierOrTree(Object f, BstVMVisitor visitor, ParserRuleContext ctx) {
         if (f instanceof ParseTree tree) {
             visitor.visit(tree);
-        } else if (f instanceof BstVMVisitor.Identifier(String name)) {
+        } else if (f instanceof BstVMVisitor.Identifier(
+                String name
+        )) {
             visitor.resolveIdentifier(name, ctx);
         } else {
             stack.push(f);
         }
     }
 
-    /**
-     * Pops the top (integer) literal, interpreted as the ASCII integer
-     * value of a single character, converts it to the corresponding
-     * single-character string, and pushes this string.
-     */
+    /// Pops the top (integer) literal, interpreted as the ASCII integer
+    /// value of a single character, converts it to the corresponding
+    /// single-character string, and pushes this string.
     private void bstIntToChr(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.isEmpty()) {
             throw new BstVMException("Not enough operands on stack for operation int.to.chr$ (line %d)".formatted(ctx.start.getLine()));
@@ -549,10 +528,8 @@ public class BstFunctions {
         stack.push(String.valueOf((char) i.intValue()));
     }
 
-    /**
-     * Pops the top (integer) literal, converts it to its (unique)
-     * string equivalent, and pushes this string.
-     */
+    /// Pops the top (integer) literal, converts it to its (unique)
+    /// string equivalent, and pushes this string.
     private void bstIntToStr(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.isEmpty()) {
             throw new BstVMException("Not enough operands on stack for operation int.to.str$ (line %d)".formatted(ctx.start.getLine()));
@@ -566,23 +543,16 @@ public class BstFunctions {
         stack.push(o1.toString());
     }
 
-    /**
-     * Pops the top literal and pushes the integer 1 if it's a missing
-     * field, 0 otherwise.
-     */
+    /// Pops the top literal and pushes the integer 1 if it's a missing
+    /// field, 0 otherwise.
     private void bstMissing(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.isEmpty()) {
             throw new BstVMException("Not enough operands on stack for operation missing$ (line %d)".formatted(ctx.start.getLine()));
         }
         Object o1 = stack.pop();
 
-        if (o1 == null) {
-            stack.push(BstVM.TRUE);
-            return;
-        }
-
         if (!(o1 instanceof String)) {
-            LOGGER.warn("Not a string or missing field in operation missing$ (line %d)".formatted(ctx.start.getLine()));
+            LOGGER.warn("Not a string or missing field in operation missing$ (line {})", ctx.start.getLine());
             stack.push(BstVM.TRUE);
             return;
         }
@@ -590,23 +560,19 @@ public class BstFunctions {
         stack.push(BstVM.FALSE);
     }
 
-    /**
-     * Writes onto the bbl file what is accumulated in the output buffer.
-     * It writes a blank line if and only if the output buffer is empty.
-     * Since write$ does reasonable line breaking, you should use this
-     * function only when you want a blank line or an explicit line
-     * break.
-     */
+    /// Writes onto the bbl file what is accumulated in the output buffer.
+    /// It writes a blank line if and only if the output buffer is empty.
+    /// Since write$ does reasonable line breaking, you should use this
+    /// function only when you want a blank line or an explicit line
+    /// break.
     private void bstNewLine(BstVMVisitor visitor, ParserRuleContext ctx) {
         this.bbl.append('\n');
     }
 
-    /**
-     * Pops the top (string) literal and pushes the number of names the
-     * string represents one plus the number of occurrences of the
-     * substring "and" (ignoring case differences) surrounded by
-     * non-null white-space at the top brace level.
-     */
+    /// Pops the top (string) literal and pushes the number of names the
+    /// string represents one plus the number of occurrences of the
+    /// substring "and" (ignoring case differences) surrounded by
+    /// non-null white-space at the top brace level.
     private void bstNumNames(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.isEmpty()) {
             throw new BstVMException("Not enough operands on stack for operation num.names$ (line %d)".formatted(ctx.start.getLine()));
@@ -620,31 +586,25 @@ public class BstFunctions {
         stack.push(AuthorList.parse(s).getNumberOfAuthors());
     }
 
-    /**
-     * Pops the top of the stack but doesn't print it; this gets rid of
-     * an unwanted stack literal.
-     */
+    /// Pops the top of the stack but doesn't print it; this gets rid of
+    /// an unwanted stack literal.
     private void bstPop(BstVMVisitor visitor, ParserRuleContext ctx) {
         stack.pop();
     }
 
-    /**
-     * The |built_in| function {\.{preamble\$}} pushes onto the stack
-     * the concatenation of all the \.{preamble} strings read from the
-     * database files. (or the empty string if there were none)
-     * '@PREAMBLE' strings are read from the database files.
-     */
+    /// The |built_in| function {\.{preamble\$}} pushes onto the stack
+    /// the concatenation of all the \.{preamble} strings read from the
+    /// database files. (or the empty string if there were none)
+    /// '@PREAMBLE' strings are read from the database files.
     private void bstPreamble(BstVMVisitor visitor, ParserRuleContext ctx) {
         stack.push(preamble);
     }
 
-    /**
-     * Pops the top (string) literal, removes nonalphanumeric characters
-     * except for white-space characters and hyphens and ties (these all get
-     * converted to a space), removes certain alphabetic characters
-     * contained in the control sequences associated with a \special
-     * character", and pushes the resulting string.
-     */
+    /// Pops the top (string) literal, removes nonalphanumeric characters
+    /// except for white-space characters and hyphens and ties (these all get
+    /// converted to a space), removes certain alphabetic characters
+    /// contained in the control sequences associated with a \special
+    /// character", and pushes the resulting string.
     private void bstPurify(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.isEmpty()) {
             throw new BstVMException("Not enough operands on stack for operation purify$ (line %d)".formatted(ctx.start.getLine()));
@@ -660,39 +620,31 @@ public class BstFunctions {
         stack.push(BstPurifier.purify((String) o1));
     }
 
-    /**
-     * Pushes the string consisting of the double-quote character.
-     */
+    /// Pushes the string consisting of the double-quote character.
     private void bstQuote(BstVMVisitor visitor, ParserRuleContext ctx) {
         stack.push("\"");
     }
 
-    /**
-     * Does nothing.
-     */
+    /// Does nothing.
     private void bstSkip(BstVMVisitor visitor, ParserRuleContext ctx) {
         // no-op
     }
 
-    /**
-     * Pops and prints the whole stack; it's meant to be used for style
-     * designers while debugging.
-     */
+    /// Pops and prints the whole stack; it's meant to be used for style
+    /// designers while debugging.
     private void bstStack(BstVMVisitor visitor, ParserRuleContext ctx) {
         while (!stack.isEmpty()) {
             LOGGER.debug("Stack entry {}", stack.pop());
         }
     }
 
-    /**
-     * Pops the top three literals (they are the two integers literals
-     * len and start, and a string literal, in that order). It pushes
-     * the substring of the (at most) len consecutive characters
-     * starting at the start-th character (assuming 1-based indexing) if
-     * start is positive, and ending at the start-th character
-     * (including) from the end if start is negative (where the first
-     * character from the end is the last character).
-     */
+    /// Pops the top three literals (they are the two integers literals
+    /// len and start, and a string literal, in that order). It pushes
+    /// the substring of the (at most) len consecutive characters
+    /// starting at the start-th character (assuming 1-based indexing) if
+    /// start is positive, and ending at the start-th character
+    /// (including) from the end if start is negative (where the first
+    /// character from the end is the last character).
     @VisibleForTesting
     void bstSubstring(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 3) {
@@ -733,14 +685,12 @@ public class BstFunctions {
         stack.push(result);
     }
 
-    /**
-     * Swaps the top two literals on the stack. text.length$ Pops the
-     * top (string) literal, and pushes the number of text characters
-     * it contains, where an accented character (more precisely, a
-     * \special character", defined in Section 4) counts as a single
-     * text character, even if it's missing its matching right brace,
-     * and where braces don't count as text characters.
-     */
+    /// Swaps the top two literals on the stack. text.length$ Pops the
+    /// top (string) literal, and pushes the number of text characters
+    /// it contains, where an accented character (more precisely, a
+    /// \special character", defined in Section 4) counts as a single
+    /// text character, even if it's missing its matching right brace,
+    /// and where braces don't count as text characters.
     private void bstSwap(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 2) {
             throw new BstVMException("Not enough operands on stack for operation swap$ (line %d)".formatted(ctx.start.getLine()));
@@ -752,17 +702,15 @@ public class BstFunctions {
         stack.push(f2);
     }
 
-    /**
-     * text.length$ Pops the top (string) literal, and pushes the number
-     * of text characters it contains, where an accented character (more
-     * precisely, a "special character", defined in Section 4) counts as
-     * a single text character, even if it's missing its matching right
-     * brace, and where braces don't count as text characters.
-     * <p>
-     * From BibTeXing: For the purposes of counting letters in labels,
-     * BibTEX considers everything contained inside the braces as a
-     * single letter.
-     */
+    /// text.length$ Pops the top (string) literal, and pushes the number
+    /// of text characters it contains, where an accented character (more
+    /// precisely, a "special character", defined in Section 4) counts as
+    /// a single text character, even if it's missing its matching right
+    /// brace, and where braces don't count as text characters.
+    ///
+    /// From BibTeXing: For the purposes of counting letters in labels,
+    /// BibTEX considers everything contained inside the braces as a
+    /// single letter.
     private void bstTextLength(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.isEmpty()) {
             throw new BstVMException("Not enough operands on stack for operation text.length$ (line %d)".formatted(ctx.start.getLine()));
@@ -808,17 +756,15 @@ public class BstFunctions {
         stack.push(result);
     }
 
-    /**
-     * Pops the top two literals (the integer literal len and a string
-     * literal, in that order). It pushes the substring of the (at most) len
-     * consecutive text characters starting from the beginning of the
-     * string. This function is similar to substring$, but this one
-     * considers a \special character", even if it's missing its matching
-     * right brace, to be a single text character (rather than however many
-     * ASCII characters it actually comprises), and this function doesn't
-     * consider braces to be text characters; furthermore, this function
-     * appends any needed matching right braces.
-     */
+    /// Pops the top two literals (the integer literal len and a string
+    /// literal, in that order). It pushes the substring of the (at most) len
+    /// consecutive text characters starting from the beginning of the
+    /// string. This function is similar to substring$, but this one
+    /// considers a \special character", even if it's missing its matching
+    /// right brace, to be a single text character (rather than however many
+    /// ASCII characters it actually comprises), and this function doesn't
+    /// consider braces to be text characters; furthermore, this function
+    /// appends any needed matching right braces.
     private void bstTextPrefix(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 2) {
             throw new BstVMException("Not enough operands on stack for operation text.prefix$ (line %d)".formatted(ctx.start.getLine()));
@@ -841,25 +787,21 @@ public class BstFunctions {
         stack.push(BstTextPrefixer.textPrefix((Integer) o1, (String) o2));
     }
 
-    /**
-     * Pops and prints the top of the stack to the log file. It's useful for debugging.
-     */
+    /// Pops and prints the top of the stack to the log file. It's useful for debugging.
     private void bstTop(BstVMVisitor visitor, ParserRuleContext ctx) {
         LOGGER.debug("Stack entry {} (line {})", stack.pop(), ctx.start.getLine());
     }
 
-    /**
-     * Pushes the current entry's type (book, article, etc.), but pushes
-     * the null string if the type is either unknown or undefined.
-     */
-    public class BstTypeFunction implements BstFunction {
+    /// Pushes the current entry's type (book, article, etc.), but pushes
+    /// the null string if the type is either unknown or undefined.
+    class BstTypeFunction implements BstFunction {
         @Override
         public void execute(BstVMVisitor visitor, ParserRuleContext ctx) {
             throw new BstVMException("type$ need a context (line %d)".formatted(ctx.start.getLine()));
         }
 
         @Override
-        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, BstEntry bstEntryContext) {
+        public void execute(BstVMVisitor visitor, ParserRuleContext ctx, @Nullable BstEntry bstEntryContext) {
             if (bstEntryContext == null) {
                 this.execute(visitor, ctx);
                 return;
@@ -869,20 +811,16 @@ public class BstFunctions {
         }
     }
 
-    /**
-     * Pops the top (string) literal and prints it following a warning
-     * message. This also increments a count of the number of warning
-     * messages issued.
-     */
+    /// Pops the top (string) literal and prints it following a warning
+    /// message. This also increments a count of the number of warning
+    /// messages issued.
     private void bstWarning(BstVMVisitor visitor, ParserRuleContext ctx) {
         LOGGER.warn("Warning (#{}): {}", bstWarning++, stack.pop());
     }
 
-    /**
-     * Pops the top two (function) literals, and keeps executing the
-     * second as long as the (integer) literal left on the stack by
-     * executing the first is greater than 0.
-     */
+    /// Pops the top two (function) literals, and keeps executing the
+    /// second as long as the (integer) literal left on the stack by
+    /// executing the first is greater than 0.
     private void bstWhile(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 2) {
             throw new BstVMException("Not enough operands on stack for operation while$ (line %d)".formatted(ctx.start.getLine()));
@@ -895,7 +833,9 @@ public class BstFunctions {
             throw new BstVMException("Expecting two functions for while$ (line %d)".formatted(ctx.start.getLine()));
         }
 
+        // @formatter:off
         do {
+            // @formatter:on
             visitor.visit((ParseTree) f1);
 
             Object i = stack.pop();
@@ -910,15 +850,13 @@ public class BstFunctions {
         } while (true);
     }
 
-    /**
-     * The |built_in| function {\.{width\$}} pops the top (string) literal and
-     * pushes the integer that represents its width in units specified by the
-     * |char_width| array. This function takes the literal literally; that is, it
-     * assumes each character in the string is to be printed as is, regardless of
-     * whether the character has a special meaning to \TeX, except that special
-     * characters (even without their |right_brace|s) are handled specially. If the
-     * literal isn't a string, it complains and pushes~0.
-     */
+    /// The |built_in| function {\.{width\$}} pops the top (string) literal and
+    /// pushes the integer that represents its width in units specified by the
+    /// |char_width| array. This function takes the literal literally; that is, it
+    /// assumes each character in the string is to be printed as is, regardless of
+    /// whether the character has a special meaning to \TeX, except that special
+    /// characters (even without their |right_brace|s) are handled specially. If the
+    /// literal isn't a string, it complains and pushes~0.
     private void bstWidth(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.isEmpty()) {
             throw new BstVMException("Not enough operands on stack for operation width$ (line %d)".formatted(ctx.start.getLine()));
@@ -934,11 +872,9 @@ public class BstFunctions {
         stack.push(BstWidthCalculator.width((String) o1));
     }
 
-    /**
-     * Pops the top (string) literal and writes it on the output buffer
-     * (which will result in stuff being written onto the bbl file when
-     * the buffer fills up).
-     */
+    /// Pops the top (string) literal and writes it on the output buffer
+    /// (which will result in stuff being written onto the bbl file when
+    /// the buffer fills up).
     private void bstWrite(BstVMVisitor visitor, ParserRuleContext ctx) {
         String s = (String) stack.pop();
         bbl.append(s);

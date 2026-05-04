@@ -23,7 +23,7 @@ public class SearchPreferences {
     private final DoubleProperty searchWindowHeight;
     private final DoubleProperty searchWindowWidth;
     private final DoubleProperty searchWindowDividerPosition;
-    private final BooleanProperty keepSearchSting;
+    private final BooleanProperty keepSearchString;
     private final ObjectProperty<SearchDisplayMode> searchDisplayMode;
 
     public SearchPreferences(SearchDisplayMode searchDisplayMode,
@@ -56,7 +56,7 @@ public class SearchPreferences {
         this.searchWindowHeight = new SimpleDoubleProperty(searchWindowHeight);
         this.searchWindowWidth = new SimpleDoubleProperty(searchWindowWidth);
         this.searchWindowDividerPosition = new SimpleDoubleProperty(searchWindowDividerPosition);
-        this.keepSearchSting = new SimpleBooleanProperty(keepSearchString);
+        this.keepSearchString = new SimpleBooleanProperty(keepSearchString);
     }
 
     public EnumSet<SearchFlags> getSearchFlags() {
@@ -92,7 +92,7 @@ public class SearchPreferences {
     }
 
     public boolean shouldKeepSearchString() {
-        return keepSearchSting.get();
+        return keepSearchString.get();
     }
 
     public boolean shouldKeepWindowOnTop() {
@@ -139,8 +139,8 @@ public class SearchPreferences {
         return this.searchDisplayMode;
     }
 
-    public BooleanProperty keepSearchStingProperty() {
-        return keepSearchSting;
+    public BooleanProperty keepSearchStringProperty() {
+        return keepSearchString;
     }
 
     public void setSearchWindowHeight(double height) {
@@ -160,6 +160,6 @@ public class SearchPreferences {
     }
 
     public void setKeepSearchString(boolean keepSearchString) {
-        this.keepSearchSting.set(keepSearchString);
+        this.keepSearchString.set(keepSearchString);
     }
 }

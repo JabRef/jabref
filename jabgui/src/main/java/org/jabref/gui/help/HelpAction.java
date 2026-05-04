@@ -6,10 +6,8 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.help.HelpFile;
 
-/**
- * This Action keeps a reference to a URL. When activated, it shows the help
- * Dialog unless it is already visible, and shows the URL in it.
- */
+/// This Action keeps a reference to a URL. When activated, it shows the help
+/// Dialog unless it is already visible, and shows the URL in it.
 public class HelpAction extends SimpleCommand {
 
     private final HelpFile helpPage;

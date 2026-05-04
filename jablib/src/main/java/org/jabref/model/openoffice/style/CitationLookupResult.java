@@ -5,27 +5,25 @@ import java.util.Objects;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
+import org.jspecify.annotations.NonNull;
+
 public class CitationLookupResult {
 
     public final BibEntry entry;
     public final BibDatabase database;
 
-    public CitationLookupResult(BibEntry entry, BibDatabase database) {
-        Objects.requireNonNull(entry);
-        Objects.requireNonNull(database);
+    public CitationLookupResult(@NonNull BibEntry entry, @NonNull BibDatabase database) {
         this.entry = entry;
         this.database = database;
     }
 
-    /**
-     * Note: BibEntry overrides Object.equals, but BibDatabase does not.
-     * <p>
-     * Consequently, {@code this.database.equals(that.database)} below is equivalent to {@code this.database == that.database}.
-     * <p>
-     * Since within each GUI call we use a fixed list of databases, it is OK.
-     * <p>
-     * CitationLookupResult.equals is used in CitedKey.addPath to check the added Citation refers to the same source as the others. As long as we look up each citation key only once (in CitationGroups.lookupCitations), the default implementation for equals would be sufficient (and could also omit hashCode below).
-     */
+    /// Note: BibEntry overrides Object.equals, but BibDatabase does not.
+    ///
+    /// Consequently, `this.database.equals(that.database)` below is equivalent to `this.database == that.database`.
+    ///
+    /// Since within each GUI call we use a fixed list of databases, it is OK.
+    ///
+    /// CitationLookupResult.equals is used in CitedKey.addPath to check the added Citation refers to the same source as the others. As long as we look up each citation key only once (in CitationGroups.lookupCitations), the default implementation for equals would be sufficient (and could also omit hashCode below).
     @Override
     public boolean equals(Object otherObject) {
         if (otherObject == this) {

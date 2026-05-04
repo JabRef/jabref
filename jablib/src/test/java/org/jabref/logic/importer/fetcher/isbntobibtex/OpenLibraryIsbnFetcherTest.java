@@ -67,9 +67,7 @@ class OpenLibraryIsbnFetcherTest extends AbstractIsbnFetcherTest {
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
-    /**
-     * Checks whether the given ISBN is <emph>NOT</emph> available at any ISBN fetcher
-     */
+    /// Checks whether the given ISBN is <emph>NOT</emph> available at any ISBN fetcher
     @Test
     void isbnNeitherAvailableOnEbookDeNorOrViaOpenLibrary() {
         // In this test, the ISBN needs to be a valid (syntax+checksum) ISBN number

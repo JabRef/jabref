@@ -2,11 +2,11 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
@@ -19,6 +19,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,7 +175,13 @@ public class RepecNepImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
+        return isRecognizedFormat(new BufferedReader(reader));
+    }
+
+    @Override
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
+        reader.mark(5_000);
         // read the first couple of lines
         // NEP message usually contain the String 'NEP: New Economics Papers'
         // or, they are from nep.repec.org
@@ -184,6 +191,7 @@ public class RepecNepImporter extends Importer {
             startOfMessage.append(tmpLine);
             tmpLine = reader.readLine();
         }
+        reader.reset();
         return startOfMessage.toString().contains("NEP: New Economics Papers") || startOfMessage.toString().contains(
                 "nep.repec.org");
     }
@@ -203,46 +211,40 @@ public class RepecNepImporter extends Importer {
         this.lastLine = in.readLine();
     }
 
-    /**
-     * Read multiple lines.
-     * <p>
-     * <p>Reads multiple lines until either
-     * <ul>
-     * <li>an empty line</li>
-     * <li>the end of file</li>
-     * <li>the next working paper or</li>
-     * <li>a keyword</li>
-     * </ul>
-     * is found. Whitespace at start or end of lines is trimmed except for one blank character.</p>
-     *
-     * @return result
-     */
+    /// Read multiple lines.
+    ///
+    /// Reads multiple lines until either
+    ///
+    /// - an empty line
+    /// - the end of file
+    /// - the next working paper or
+    /// - a keyword
+    ///
+    /// is found. Whitespace at start or end of lines is trimmed except for one blank character.
+    ///
+    /// @return result
     private String readMultipleLines(BufferedReader in) throws IOException {
         StringBuilder result = new StringBuilder(this.lastLine.trim());
         readLine(in);
-        while ((this.lastLine != null) && !this.lastLine.trim().isEmpty() && !startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS) && !isStartOfWorkingPaper()) {
+        while ((this.lastLine != null) && !this.lastLine.isBlank() && !startsWithKeyword(RepecNepImporter.RECOGNIZED_FIELDS) && !isStartOfWorkingPaper()) {
             result.append(this.lastLine.isEmpty() ? this.lastLine.trim() : " " + this.lastLine.trim());
             readLine(in);
         }
         return result.toString();
     }
 
-    /**
-     * Implements grammar rule "TitleString".
-     *
-     * @throws IOException in case of error
-     */
+    /// Implements grammar rule "TitleString".
+    ///
+    /// @throws IOException in case of error
     private void parseTitleString(BibEntry be, BufferedReader in) throws IOException {
         // skip article number
         this.lastLine = this.lastLine.substring(this.lastLine.indexOf('.') + 1);
         be.setField(StandardField.TITLE, readMultipleLines(in));
     }
 
-    /**
-     * Implements grammar rule "Authors"
-     *
-     * @throws IOException in case of error
-     */
+    /// Implements grammar rule "Authors"
+    ///
+    /// @throws IOException in case of error
     private void parseAuthors(BibEntry be, BufferedReader in) throws IOException {
         // read authors and institutions
         List<String> authors = new ArrayList<>();
@@ -257,9 +259,9 @@ public class RepecNepImporter extends Importer {
                 institutionDone = this.lastLine.indexOf(')') >= 1;
                 institution
                         .append(this.lastLine.substring(this.lastLine.indexOf('(') + 1,
-                                institutionDone && (this.lastLine
-                                        .indexOf(')') > (this.lastLine.indexOf('(') + 1)) ? this.lastLine
-                                        .indexOf(')') : this.lastLine.length())
+                                            institutionDone && (this.lastLine
+                                                    .indexOf(')') > (this.lastLine.indexOf('(') + 1)) ? this.lastLine
+                                                    .indexOf(')') : this.lastLine.length())
                                              .trim());
             } else {
                 author = this.lastLine.trim();
@@ -278,7 +280,7 @@ public class RepecNepImporter extends Importer {
 
             if (!institution.isEmpty()) {
                 institutions.append(
-                        institutions.isEmpty() ? institution.toString() : " and " + institution.toString());
+                        institutions.isEmpty() ? institution.toString() : " and " + institution);
             }
         }
 
@@ -290,11 +292,9 @@ public class RepecNepImporter extends Importer {
         }
     }
 
-    /**
-     * Implements grammar rule "Abstract".
-     *
-     * @throws IOException in case of error
-     */
+    /// Implements grammar rule "Abstract".
+    ///
+    /// @throws IOException in case of error
     private void parseAbstract(BibEntry be, BufferedReader in) throws IOException {
         String theabstract = readMultipleLines(in);
 
@@ -303,15 +303,13 @@ public class RepecNepImporter extends Importer {
         }
     }
 
-    /**
-     * Implements grammar rule "AdditionalFields".
-     *
-     */
+    /// Implements grammar rule "AdditionalFields".
+    ///
     private void parseAdditionalFields(BibEntry be, boolean multilineUrlFieldAllowed, BufferedReader in)
             throws IOException {
 
         // one empty line is possible before fields start
-        if ((this.lastLine != null) && this.lastLine.trim().isEmpty()) {
+        if ((this.lastLine != null) && this.lastLine.isBlank()) {
             readLine(in);
         }
 
@@ -354,18 +352,14 @@ public class RepecNepImporter extends Importer {
         }
     }
 
-    /**
-     * if line starts with a string of the form 'x. ' and we are not in the overview
-     * section, we have a working paper entry we are interested in
-     */
+    /// if line starts with a string of the form 'x. ' and we are not in the overview
+    /// section, we have a working paper entry we are interested in
     private boolean isStartOfWorkingPaper() {
-        return this.lastLine.matches("\\d+\\.\\s.*") && !this.inOverviewSection && this.preLine.trim().isEmpty();
+        return this.lastLine.matches("\\d+\\.\\s.*") && !this.inOverviewSection && this.preLine.isBlank();
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
-
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         String paperNoStr = null;
         this.line = 0;

@@ -6,9 +6,9 @@ import java.nio.file.Path;
 
 import org.jabref.logic.util.NotificationService;
 
-import jakarta.annotation.Nullable;
 import org.h2.mvstore.MVStore;
 import org.h2.mvstore.MVStoreException;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,15 +17,17 @@ public abstract class MVStoreBase implements AutoCloseable {
 
     protected MVStore mvStore;
 
-    public MVStoreBase(Path path, NotificationService dialogService) {
-        @Nullable Path mvStorePath = path;
+    public MVStoreBase(@NonNull Path path, NotificationService dialogService) {
+        Path mvStorePath = path;
 
-        try {
-            Files.createDirectories(path.getParent());
-        } catch (IOException e) {
-            LOGGER.error(errorMessageForOpening(), e);
-            dialogService.notify(errorMessageForOpeningLocalized());
-            mvStorePath = null;
+        if (path.getParent() != null) {
+            try {
+                Files.createDirectories(path.getParent());
+            } catch (IOException e) {
+                LOGGER.error(errorMessageForOpening(), e);
+                dialogService.notify(errorMessageForOpeningLocalized());
+                mvStorePath = null;
+            }
         }
 
         try {
@@ -34,20 +36,32 @@ public abstract class MVStoreBase implements AutoCloseable {
                     .fileName(mvStorePath == null ? null : mvStorePath.toString())
                     .open();
         } catch (MVStoreException e) {
-            this.mvStore = new MVStore.Builder()
-                    .autoCommitDisabled()
-                    .fileName(null) // creates an in memory store
-                    .open();
+            this.mvStore = openInMemoryStore();
             LOGGER.error(errorMessageForOpening(), e);
         }
     }
 
+    protected MVStoreBase() {
+        this.mvStore = openInMemoryStore();
+    }
+
+    private MVStore openInMemoryStore() {
+        return new MVStore.Builder()
+                .autoCommitDisabled()
+                .fileName(null) // creates an in memory store
+                .open();
+    }
+
     public void commit() {
-        mvStore.commit();
+        if (mvStore != null) {
+            mvStore.commit();
+        }
     }
 
     public void close() {
-        mvStore.close();
+        if (mvStore != null) {
+            mvStore.close();
+        }
     }
 
     protected abstract String errorMessageForOpening();

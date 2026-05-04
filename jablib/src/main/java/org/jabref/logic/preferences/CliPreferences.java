@@ -14,6 +14,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
@@ -26,6 +27,7 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
+import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
@@ -58,13 +60,7 @@ public interface CliPreferences {
 
     Map<String, Object> getDefaults();
 
-    LayoutFormatterPreferences getLayoutFormatterPreferences();
-
-    ImportFormatPreferences getImportFormatPreferences();
-
-    /**
-     * Returns the export configuration. The contained SaveConfiguration is a {@link org.jabref.model.metadata.SelfContainedSaveOrder}
-     */
+    /// Returns the export configuration. The contained SaveConfiguration is a {@link org.jabref.model.metadata.SelfContainedSaveOrder}
     SelfContainedSaveConfiguration getSelfContainedExportConfiguration();
 
     BibEntryTypesManager getCustomEntryTypesRepository();
@@ -114,4 +110,26 @@ public interface CliPreferences {
     LastFilesOpenedPreferences getLastFilesOpenedPreferences();
 
     OpenOfficePreferences getOpenOfficePreferences(JournalAbbreviationRepository journalAbbreviationRepository);
+
+    PushToApplicationPreferences getPushToApplicationPreferences();
+
+    GitPreferences getGitPreferences();
+
+    default ImportFormatPreferences getImportFormatPreferences() {
+        return new ImportFormatPreferences(
+                getBibEntryPreferences(),
+                getCitationKeyPatternPreferences(),
+                getFieldPreferences(),
+                getXmpPreferences(),
+                getDOIPreferences(),
+                getGrobidPreferences(),
+                getFilePreferences());
+    }
+
+    default LayoutFormatterPreferences getLayoutFormatterPreferences() {
+        return new LayoutFormatterPreferences(
+                getNameFormatterPreferences(),
+                getDOIPreferences(),
+                getFilePreferences().mainFileDirectoryProperty());
+    }
 }

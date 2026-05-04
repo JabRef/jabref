@@ -6,8 +6,11 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class MonthTest {
@@ -360,5 +363,29 @@ class MonthTest {
                 arguments("11", Month.NOVEMBER),
                 arguments("12", Month.DECEMBER)
         );
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "6",
+            "12",
+            "#jun#",
+            "#jul#",
+    })
+    void isStrictFormat(String input) {
+        assertTrue(Month.isStrictFormat(input));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "June",
+            "July",
+            "jun",
+            "NotAMonth",
+            "#not#strict#format#",
+            "''"
+    })
+    void isNotStrictFormat(String input) {
+        assertFalse(Month.isStrictFormat(input));
     }
 }

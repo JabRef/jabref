@@ -19,17 +19,13 @@ Example:
 
 ```markdown
 ### Example
-` req~ai.example~1`
+`req~ai.example~1`
 ```
 
 It is important that there is no empty line directly after the heading.
 
 {: note}
 One needs to add `<!-- markdownlint-disable-file MD022 -->` to the end of the file, because the ID of the requirement needs to follow the heading directly.
-
-{: note}
-The space has to be absent in real use.
-Above, the space is put to have `traceRequirements` not treating this example as real requirement.
 
 After putting a heading and an identifier, one writes down at the requirement.
 Directly at the end, one writes that it requires an implementation:
@@ -60,4 +56,3 @@ In case of a tracing error, one can inspect `build/tracing.txt` to see which req
 
 - [General reading on traceability](https://www.sodiuswillert.com/en/blog/implementing-requirements-traceability-in-systems-software-engineering)
 - [User manual of OpenFastTrace](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md)
-- We cannot copy and paste real examples here, because of [openfasttrace#280](https://github.com/itsallcode/openfasttrace/issues/280).

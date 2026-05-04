@@ -1,6 +1,7 @@
 package org.jabref.logic.exporter;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -22,6 +23,9 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
@@ -29,6 +33,8 @@ import org.xmlunit.matchers.CompareMatcher;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("exporter")
 public class OpenOfficeDocumentCreatorTest {
     public BibDatabaseContext databaseContext;
     public Charset charset;
@@ -72,15 +78,18 @@ public class OpenOfficeDocumentCreatorTest {
         unzipContentXml(zipPath, testFolder.resolve(unzipFolder));
         Path contentXmlPath = unzipFolder.resolve("content.xml");
 
-        Input.Builder control = Input.from(Files.newInputStream(xmlFile));
-        Input.Builder test = Input.from(Files.newInputStream(contentXmlPath));
         // for debugging purposes
-       // Path testPath = xmlFile.resolveSibling("test.xml");
-       // Files.copy(Files.newInputStream(contentXmlPath), testPath, StandardCopyOption.REPLACE_EXISTING);
+        // Files.copy(contentXmlPath, xmlFile.resolveSibling("test.xml"), StandardCopyOption.REPLACE_EXISTING);
 
-        assertThat(test, CompareMatcher.isSimilarTo(control)
-                                       .normalizeWhitespace()
-                                       .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+        try (InputStream xmlFileInputStream = Files.newInputStream(xmlFile);
+             InputStream contentXmlInputStream = Files.newInputStream(contentXmlPath)
+        ) {
+            Input.Builder control = Input.from(xmlFileInputStream);
+            Input.Builder test = Input.from(contentXmlInputStream);
+            assertThat(test, CompareMatcher.isSimilarTo(control)
+                                           .normalizeWhitespace()
+                                           .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)));
+        }
     }
 
     private static void unzipContentXml(Path zipFile, Path unzipFolder) throws IOException {

@@ -1,25 +1,22 @@
 package org.jabref.logic.util.io;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.FilePreferences;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-/**
- * Search class for files. <br>
- * <br>
- * This class provides some functionality to search in a {@link BibDatabase} for files. <br>
- */
+import org.jspecify.annotations.NonNull;
+
+/// Search class for files. <br>
+/// <br>
+/// This class provides some functionality to search in a {@link org.jabref.model.database.BibDatabase} for files. <br>
 public class DatabaseFileLookup {
 
     private final Set<Path> fileCache = new HashSet<>();
@@ -28,11 +25,8 @@ public class DatabaseFileLookup {
 
     private final Path pathOfDatabase;
 
-    /**
-     * Creates an instance by passing a {@link BibDatabase} which will be used for the searches.
-     */
-    public DatabaseFileLookup(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
-        Objects.requireNonNull(databaseContext);
+    /// Creates an instance by passing a {@link org.jabref.model.database.BibDatabase} which will be used for the searches.
+    public DatabaseFileLookup(@NonNull BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectories(filePreferences))
                                     .orElse(new ArrayList<>());
 
@@ -42,26 +36,21 @@ public class DatabaseFileLookup {
         this.pathOfDatabase = databaseContext.getDatabasePath().orElse(Path.of(""));
     }
 
-    /**
-     * Returns whether the File <code>file</code> is present in the database
-     * as an attached File to an {@link BibEntry}. <br>
-     * <br>
-     * To do this, the field specified by the key <b>file</b> will be searched
-     * for the provided file for every {@link BibEntry} in the database. <br>
-     * <br>
-     * For the matching, the absolute file paths will be used.
-     *
-     * @param pathname A {@link File} Object.
-     * @return <code>true</code>, if the file Object is stored in at least one
-     * entry in the database, otherwise <code>false</code>.
-     */
+    /// Returns whether the File `file` is present in the database
+    /// as an attached File to an {@link BibEntry}. <br>
+    /// <br>
+    /// To do this, the field specified by the key **file** will be searched
+    /// for the provided file for every {@link BibEntry} in the database. <br>
+    /// <br>
+    /// For the matching, the absolute file paths will be used.
+    ///
+    /// @return `true`, if the file Object is stored in at least one
+    /// entry in the database, otherwise `false`.
     public boolean lookupDatabase(Path pathname) {
         return fileCache.contains(pathname);
     }
 
-    private List<Path> parseFileField(BibEntry entry) {
-        Objects.requireNonNull(entry);
-
+    private List<Path> parseFileField(@NonNull BibEntry entry) {
         return entry.getFiles().stream()
                     .filter(file -> !file.isOnlineLink()) // Do not query external file links (huge performance leak)
                     .map(file -> file.findIn(possibleFilePaths))
@@ -70,9 +59,7 @@ public class DatabaseFileLookup {
                     .collect(Collectors.toList());
     }
 
-    /**
-     * @return "" if the path does not exist
-     */
+    /// @return "" if the path does not exist
     public Path getPathOfDatabase() {
         return pathOfDatabase;
     }

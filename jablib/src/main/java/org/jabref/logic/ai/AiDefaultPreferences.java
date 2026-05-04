@@ -20,13 +20,11 @@ public class AiDefaultPreferences {
         // "mixtral" is not a typo.
         OPEN_MIXTRAL_8X7B(AiProvider.MISTRAL_AI, "open-mixtral-8x7b", 32000),
         OPEN_MIXTRAL_8X22B(AiProvider.MISTRAL_AI, "open-mixtral-8x22b", 64000),
-        GEMINI_1_5_FLASH(AiProvider.GEMINI, "gemini-1.5-flash", 1048576),
-        GEMINI_1_5_PRO(AiProvider.GEMINI, "gemini-1.5-pro", 2097152),
-        GEMINI_1_0_PRO(AiProvider.GEMINI, "gemini-1.0-pro", 32000),
+        GEMINI_3_0_FLASH(AiProvider.GEMINI, "gemini-3-flash-preview", 1048576),
+        GEMINI_3_1_PRO(AiProvider.GEMINI, "gemini-3.1-pro-preview", 1048576),
         // Dummy variant for Hugging Face models.
         // Blank entry used for cases where the model name is not specified.
-        BLANK_HUGGING_FACE(AiProvider.HUGGING_FACE, "", 0),
-        BLANK_GPT4ALL(AiProvider.GPT4ALL, "", 0);
+        BLANK_HUGGING_FACE(AiProvider.HUGGING_FACE, "", 0);
 
         private final AiProvider aiProvider;
         private final String name;
@@ -58,15 +56,16 @@ public class AiDefaultPreferences {
     public static final boolean ENABLE_CHAT = false;
     public static final boolean AUTO_GENERATE_EMBEDDINGS = false;
     public static final boolean AUTO_GENERATE_SUMMARIES = false;
+    public static final boolean GENERATE_FOLLOW_UP_QUESTIONS = true;
+    public static final int FOLLOW_UP_QUESTIONS_COUNT = 3;
 
     public static final AiProvider PROVIDER = AiProvider.OPEN_AI;
 
     public static final Map<AiProvider, PredefinedChatModel> CHAT_MODELS = Map.of(
             AiProvider.OPEN_AI, PredefinedChatModel.GPT_4O_MINI,
             AiProvider.MISTRAL_AI, PredefinedChatModel.OPEN_MIXTRAL_8X22B,
-            AiProvider.GEMINI, PredefinedChatModel.GEMINI_1_5_FLASH,
-            AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE,
-            AiProvider.GPT4ALL, PredefinedChatModel.BLANK_GPT4ALL
+            AiProvider.GEMINI, PredefinedChatModel.GEMINI_3_0_FLASH,
+            AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE
     );
 
     public static final boolean CUSTOMIZE_SETTINGS = false;
@@ -102,20 +101,33 @@ public class AiDefaultPreferences {
                     #end""",
 
             AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE, """
-                Please provide an overview of the following text. It is a part of a scientific paper.
-                The summary should include the main objectives, methodologies used, key findings, and conclusions.
-                Mention any significant experiments, data, or discussions presented in the paper.""",
+                    Please provide an overview of the following text. It is a part of a scientific paper.
+                    The summary should include the main objectives, methodologies used, key findings, and conclusions.
+                    Mention any significant experiments, data, or discussions presented in the paper.""",
 
             AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE, "$text",
 
             AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, """
-                You have written an overview of a scientific paper. You have been collecting notes from various parts
-                of the paper. Now your task is to combine all of the notes in one structured message.""",
+                    You have written an overview of a scientific paper. You have been collecting notes from various parts
+                    of the paper. Now your task is to combine all of the notes in one structured message.""",
 
             AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, "$chunks",
 
             AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, "You are a bot to convert a plain text citation to a BibTeX entry. The user you talk to understands only BibTeX code, so provide it plainly without any wrappings.",
-            AiTemplate.CITATION_PARSING_USER_MESSAGE, "Please convert this plain text citation to a BibTeX entry:\n$citation\nIn your output, please provide only BibTex code as your message."
+            AiTemplate.CITATION_PARSING_USER_MESSAGE, "Please convert this plain text citation to a BibTeX entry:\n$citation\nIn your output, please provide only BibTeX code as your message.",
+
+            AiTemplate.FOLLOW_UP_QUESTIONS, """
+                    Based on this conversation:
+                    User: $userMessage
+                    Assistant: $aiResponse
+
+                    Generate $count short follow-up questions (maximum 10 words each) that the user might want to ask next.
+                    Format your response as a numbered list:
+                    1. [question]
+                    2. [question]
+                    3. [question]
+
+                    Only provide the numbered list, nothing else."""
     );
 
     public static List<String> getAvailableModels(AiProvider aiProvider) {

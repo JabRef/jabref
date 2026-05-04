@@ -25,12 +25,16 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.dlsc.gemsfx.EnhancedPasswordField;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import org.controlsfx.control.textfield.CustomPasswordField;
+
+import static javafx.beans.binding.Bindings.not;
 
 public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> implements PreferencesTab {
     @FXML private CheckBox versionCheck;
+
+    // region Proxy configuration
     @FXML private CheckBox proxyUse;
     @FXML private Label proxyHostnameLabel;
     @FXML private TextField proxyHostname;
@@ -40,11 +44,23 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private Label proxyUsernameLabel;
     @FXML private TextField proxyUsername;
     @FXML private Label proxyPasswordLabel;
-    @FXML private CustomPasswordField proxyPassword;
-    @FXML private Button checkConnectionButton;
+    @FXML private EnhancedPasswordField proxyPassword;
     @FXML private CheckBox proxyPersistPassword;
     @FXML private SplitPane persistentTooltipWrapper; // The disabled persistPassword control does not show tooltips
+    @FXML private Button checkConnectionButton;
 
+    private String proxyPasswordText = "";
+    private int proxyPasswordCaretPosition = 0;
+    // endregion
+
+    @FXML private TextField gitUsername;
+    @FXML private EnhancedPasswordField gitPat;
+    @FXML private CheckBox gitPersistPat;
+    @FXML private SplitPane persistGitPatTooltipWrapper;
+    private String gitPatText = "";
+    private int gitPatCaretPosition = 0;
+
+    // region SSL configuration
     @FXML private TableView<CustomCertificateViewModel> customCertificatesTable;
     @FXML private TableColumn<CustomCertificateViewModel, String> certIssuer;
     @FXML private TableColumn<CustomCertificateViewModel, String> certSerialNumber;
@@ -53,9 +69,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private TableColumn<CustomCertificateViewModel, String> certValidTo;
     @FXML private TableColumn<CustomCertificateViewModel, String> certVersion;
     @FXML private TableColumn<CustomCertificateViewModel, String> actionsColumn;
-
-    private String proxyPasswordText = "";
-    private int proxyPasswordCaretPosition = 0;
+    // endregion
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -96,17 +110,17 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
         proxyPersistPassword.disableProperty().bind(
                 proxyCustomAndAuthentication.and(viewModel.passwordPersistAvailable()).not());
         EasyBind.subscribe(viewModel.passwordPersistAvailable(), available -> {
-            if (!available) {
-                persistentTooltipWrapper.setTooltip(new Tooltip(Localization.lang("Credential store not available.")));
-            } else {
+            if (available) {
                 persistentTooltipWrapper.setTooltip(null);
+            } else {
+                persistentTooltipWrapper.setTooltip(new Tooltip(Localization.lang("Credential store not available.")));
             }
         });
 
         proxyPassword.setRight(IconTheme.JabRefIcons.PASSWORD_REVEALED.getGraphicNode());
-        proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_PRESSED, this::proxyPasswordReveal);
-        proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_RELEASED, this::proxyPasswordMask);
-        proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_EXITED, this::proxyPasswordMask);
+        proxyPassword.setOnMouseClicked(event -> {
+            proxyPassword.setShowPassword(!proxyPassword.isShowPassword());
+        });
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {
@@ -114,6 +128,22 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
             validationVisualizer.initVisualization(viewModel.proxyPortValidationStatus(), proxyPort);
             validationVisualizer.initVisualization(viewModel.proxyUsernameValidationStatus(), proxyUsername);
             validationVisualizer.initVisualization(viewModel.proxyPasswordValidationStatus(), proxyPassword);
+        });
+
+        gitUsername.textProperty().bindBidirectional(viewModel.gitUsernameProperty());
+        gitPat.textProperty().bindBidirectional(viewModel.gitPatProperty());
+        gitPersistPat.disableProperty().bind(not(viewModel.passwordPersistAvailable()));
+        EasyBind.subscribe(viewModel.passwordPersistAvailable(), available -> {
+            if (available) {
+                persistGitPatTooltipWrapper.setTooltip(null);
+            } else {
+                persistGitPatTooltipWrapper.setTooltip(new Tooltip(Localization.lang("Credential store not available.")));
+            }
+        });
+
+        gitPat.setRight(IconTheme.JabRefIcons.PASSWORD_REVEALED.getGraphicNode());
+        gitPat.setOnMouseClicked(event -> {
+            gitPat.setShowPassword(!gitPat.isShowPassword());
         });
 
         certSerialNumber.setCellValueFactory(data -> data.getValue().serialNumberProperty());

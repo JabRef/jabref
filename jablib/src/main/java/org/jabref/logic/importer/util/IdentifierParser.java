@@ -1,8 +1,8 @@
 package org.jabref.logic.importer.util;
 
-import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -12,13 +12,13 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.entry.identifier.MathSciNetId;
-import org.jabref.model.strings.StringUtil;
+
+import org.jspecify.annotations.NonNull;
 
 public class IdentifierParser {
     private final BibEntry entry;
 
-    public IdentifierParser(BibEntry entry) {
-        Objects.requireNonNull(entry);
+    public IdentifierParser(@NonNull BibEntry entry) {
         this.entry = entry;
     }
 

@@ -12,24 +12,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DOIStripTest {
 
-  LayoutFormatter layoutFormatter = new DOIStrip();
+    LayoutFormatter layoutFormatter = new DOIStrip();
 
     @ParameterizedTest
     @MethodSource("provideDOI")
     void formatDOIStrip(String formattedDOI, String originalDOI) {
-      assertEquals(formattedDOI, layoutFormatter.format(originalDOI));
-  }
+        assertEquals(formattedDOI, layoutFormatter.format(originalDOI));
+    }
 
-  private static Stream<Arguments> provideDOI() {
-    return Stream.of(
-            Arguments.of("", ""),
-            Arguments.of(null, null),
-            Arguments.of("10.1000/ISBN1-900512-44-0", "10.1000/ISBN1-900512-44-0"),
-            Arguments.of("10.1000/ISBN1-900512-44-0", "http://dx.doi.org/10.1000/ISBN1-900512-44-0"),
-            Arguments.of("10.1000/ISBN1-900512-44-0", "http://doi.acm.org/10.1000/ISBN1-900512-44-0"),
-            Arguments.of("10.1145/354401.354407", "http://doi.acm.org/10.1145/354401.354407"),
-            Arguments.of("10", "10"),
-            Arguments.of("1", "1")
-    );
-  }
+    private static Stream<Arguments> provideDOI() {
+        return Stream.of(
+                Arguments.of("", ""),
+                Arguments.of(null, null),
+                Arguments.of("10.1000/ISBN1-900512-44-0", "10.1000/ISBN1-900512-44-0"),
+                Arguments.of("10.1000/ISBN1-900512-44-0", "http://dx.doi.org/10.1000/ISBN1-900512-44-0"),
+                Arguments.of("10.1000/ISBN1-900512-44-0", "http://doi.acm.org/10.1000/ISBN1-900512-44-0"),
+                Arguments.of("10.1145/354401.354407", "http://doi.acm.org/10.1145/354401.354407"),
+                Arguments.of("10", "10"),
+                Arguments.of("1", "1")
+        );
+    }
 }

@@ -3,7 +3,7 @@ package org.jabref.gui.mergeentries;
 import java.util.HashSet;
 import java.util.List;
 
-import org.jabref.gui.mergeentries.newmergedialog.ThreeWayMergeViewModel;
+import org.jabref.gui.mergeentries.threewaymerge.ThreeWayMergeViewModel;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;

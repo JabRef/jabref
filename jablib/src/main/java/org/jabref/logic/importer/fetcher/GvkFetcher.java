@@ -18,18 +18,16 @@ import org.jabref.logic.importer.fetcher.transformers.GVKQueryTransformer;
 import org.jabref.logic.importer.fileformat.PicaXmlParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.search.query.BaseQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class GvkFetcher extends AbstractIsbnFetcher implements SearchBasedParserFetcher {
 
     private static final String URL_PATTERN = "https://sru.k10plus.de/opac-de-627?";
 
-    /**
-     * Searchkeys are used to specify a search request. For example "tit" stands for "title".
-     * If no searchkey is used, the default searchkey "all" is used.
-     */
+    /// Searchkeys are used to specify a search request. For example "tit" stands for "title".
+    /// If no searchkey is used, the default searchkey "all" is used.
     private final Collection<String> searchKeys = Arrays.asList("all", "tit", "per", "thm", "slw", "txt", "num", "kon", "ppn", "bkl", "erj");
 
     public GvkFetcher(ImportFormatPreferences importFormatPreferences) {
@@ -47,11 +45,11 @@ public class GvkFetcher extends AbstractIsbnFetcher implements SearchBasedParser
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
         uriBuilder.addParameter("version", "1.1");
         uriBuilder.addParameter("operation", "searchRetrieve");
-        uriBuilder.addParameter("query", new GVKQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
+        uriBuilder.addParameter("query", new GVKQueryTransformer().transformSearchQuery(queryNode).orElse(""));
         uriBuilder.addParameter("maximumRecords", "50");
         uriBuilder.addParameter("recordSchema", "picaxml");
         uriBuilder.addParameter("sortKeys", "Year,,1");

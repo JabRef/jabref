@@ -37,10 +37,16 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<String> defaultFileNamePatternsProperty =
             new SimpleListProperty<>(FXCollections.observableArrayList(FilePreferences.DEFAULT_FILENAME_PATTERNS));
     private final BooleanProperty fulltextIndex = new SimpleBooleanProperty();
+    private final BooleanProperty autoRenameFilesOnChangeProperty = new SimpleBooleanProperty();
     private final StringProperty fileNamePatternProperty = new SimpleStringProperty();
     private final StringProperty fileDirectoryPatternProperty = new SimpleStringProperty();
     private final BooleanProperty confirmLinkedFileDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrashProperty = new SimpleBooleanProperty();
+
+    private final BooleanProperty adjustLinkedFilesOnTransferProperty = new SimpleBooleanProperty();
+    private final BooleanProperty copyLinkedFilesOnTransferProperty = new SimpleBooleanProperty();
+    private final BooleanProperty moveFilesOnTransferProperty = new SimpleBooleanProperty();
+
     private final BooleanProperty openFileExplorerInFilesDirectory = new SimpleBooleanProperty();
     private final BooleanProperty openFileExplorerInLastDirectory = new SimpleBooleanProperty();
 
@@ -82,18 +88,25 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         useMainFileDirectoryProperty.setValue(!filePreferences.shouldStoreFilesRelativeToBibFile());
         useBibLocationAsPrimaryProperty.setValue(filePreferences.shouldStoreFilesRelativeToBibFile());
         fulltextIndex.setValue(filePreferences.shouldFulltextIndexLinkedFiles());
+        autoRenameFilesOnChangeProperty.setValue(filePreferences.shouldAutoRenameFilesOnChange());
         fileNamePatternProperty.setValue(filePreferences.getFileNamePattern());
         fileDirectoryPatternProperty.setValue(filePreferences.getFileDirectoryPattern());
         confirmLinkedFileDeleteProperty.setValue(filePreferences.confirmDeleteLinkedFile());
         moveToTrashProperty.setValue(filePreferences.moveToTrash());
         openFileExplorerInFilesDirectory.setValue(filePreferences.shouldOpenFileExplorerInFileDirectory());
         openFileExplorerInLastDirectory.setValue(filePreferences.shouldOpenFileExplorerInLastUsedDirectory());
+        adjustLinkedFilesOnTransferProperty.setValue(filePreferences.shouldAdjustFileLinksOnTransfer());
+        copyLinkedFilesOnTransferProperty.setValue(filePreferences.shouldCopyLinkedFilesOnTransfer());
+        moveFilesOnTransferProperty.setValue(filePreferences.shouldMoveLinkedFilesOnTransfer());
 
         // Autolink preferences
         switch (autoLinkPreferences.getCitationKeyDependency()) {
-            case START -> autolinkFileStartsBibtexProperty.setValue(true);
-            case EXACT -> autolinkFileExactBibtexProperty.setValue(true);
-            case REGEX -> autolinkUseRegexProperty.setValue(true);
+            case START ->
+                    autolinkFileStartsBibtexProperty.setValue(true);
+            case EXACT ->
+                    autolinkFileExactBibtexProperty.setValue(true);
+            case REGEX ->
+                    autolinkUseRegexProperty.setValue(true);
         }
 
         autolinkRegexKeyProperty.setValue(autoLinkPreferences.getRegularExpression());
@@ -104,6 +117,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         // External files preferences / Attached files preferences / File preferences
         filePreferences.setMainFileDirectory(mainFileDirectoryProperty.getValue());
         filePreferences.setStoreFilesRelativeToBibFile(useBibLocationAsPrimaryProperty.getValue());
+        filePreferences.setAutoRenameFilesOnChange(autoRenameFilesOnChangeProperty.getValue());
         filePreferences.setFileNamePattern(fileNamePatternProperty.getValue());
         filePreferences.setFileDirectoryPattern(fileDirectoryPatternProperty.getValue());
         filePreferences.setFulltextIndexLinkedFiles(fulltextIndex.getValue());
@@ -122,6 +136,9 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         autoLinkPreferences.setRegularExpression(autolinkRegexKeyProperty.getValue());
         filePreferences.confirmDeleteLinkedFile(confirmLinkedFileDeleteProperty.getValue());
         filePreferences.moveToTrash(moveToTrashProperty.getValue());
+        filePreferences.setAdjustFileLinksOnTransfer(adjustLinkedFilesOnTransferProperty.getValue());
+        filePreferences.setCopyLinkedFilesOnTransfer(copyLinkedFilesOnTransferProperty.getValue());
+        filePreferences.setMoveLinkedFilesOnTransfer(moveFilesOnTransferProperty.getValue());
     }
 
     ValidationStatus mainFileDirValidationStatus() {
@@ -179,6 +196,10 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         return defaultFileNamePatternsProperty;
     }
 
+    public BooleanProperty autoRenameFilesOnChangeProperty() {
+        return autoRenameFilesOnChangeProperty;
+    }
+
     public StringProperty fileNamePatternProperty() {
         return fileNamePatternProperty;
     }
@@ -197,6 +218,18 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty moveToTrashProperty() {
         return this.moveToTrashProperty;
+    }
+
+    public BooleanProperty adjustLinkedFilesOnTransferProperty() {
+        return adjustLinkedFilesOnTransferProperty;
+    }
+
+    public BooleanProperty copyLinkedFilesOnTransferProperty() {
+        return copyLinkedFilesOnTransferProperty;
+    }
+
+    public BooleanProperty moveFilesOnTransferProperty() {
+        return moveFilesOnTransferProperty;
     }
 
     public BooleanProperty openFileExplorerInFilesDirectoryProperty() {

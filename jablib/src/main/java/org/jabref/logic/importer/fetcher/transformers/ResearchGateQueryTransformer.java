@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class ResearchGateQueryTransformer extends AbstractQueryTransformer {
 

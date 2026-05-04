@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
+import org.jabref.logic.formatter.bibtexfields.ConvertMSCCodesFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeAmpersandsFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeDollarSignFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeUnderscoresFormatter;
@@ -19,6 +18,7 @@ import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
 import org.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeIssn;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
@@ -28,6 +28,7 @@ import org.jabref.logic.formatter.bibtexfields.RegexFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveWordEnclosingAndOuterEnclosingBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.ShortenDOIFormatter;
+import org.jabref.logic.formatter.bibtexfields.TransliterateFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import org.jabref.logic.formatter.casechanger.CamelFormatter;
@@ -44,6 +45,8 @@ import org.jabref.logic.formatter.minifier.MinifyNameListFormatter;
 import org.jabref.logic.formatter.minifier.TruncateFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
+
+import org.jspecify.annotations.NonNull;
 
 public class Formatters {
     private static final Pattern TRUNCATE_PATTERN = Pattern.compile("\\Atruncate\\d+\\z");
@@ -62,7 +65,9 @@ public class Formatters {
                 new HtmlToLatexFormatter(),
                 new HtmlToUnicodeFormatter(),
                 new LatexToUnicodeFormatter(),
-                new UnicodeToLatexFormatter()
+                new UnicodeToLatexFormatter(),
+                new ConvertMSCCodesFormatter(),
+                new TransliterateFormatter()
         );
     }
 
@@ -83,9 +88,11 @@ public class Formatters {
                 new LatexCleanupFormatter(),
                 new MinifyNameListFormatter(),
                 new NormalizeDateFormatter(),
+                new NormalizeIssn(),
                 new NormalizeMonthFormatter(),
                 new NormalizeNamesFormatter(),
                 new NormalizePagesFormatter(),
+                new NormalizeUnicodeFormatter(),
                 new OrdinalsToSuperscriptFormatter(),
                 new RemoveEnclosingBracesFormatter(),
                 new RemoveWordEnclosingAndOuterEnclosingBracesFormatter(),
@@ -94,7 +101,6 @@ public class Formatters {
                 new EscapeAmpersandsFormatter(),
                 new EscapeDollarSignFormatter(),
                 new ShortenDOIFormatter(),
-                new NormalizeUnicodeFormatter(),
                 new ReplaceUnicodeLigaturesFormatter(),
                 new UnprotectTermsFormatter()
         );
@@ -117,14 +123,11 @@ public class Formatters {
         return all;
     }
 
-    public static Optional<Formatter> getFormatterForKey(String name) {
-        Objects.requireNonNull(name);
+    public static Optional<Formatter> getFormatterForKey(@NonNull String name) {
         return keyToFormatterMap.containsKey(name) ? Optional.of(keyToFormatterMap.get(name)) : Optional.empty();
     }
 
-    public static Optional<Formatter> getFormatterForModifier(String modifier) {
-        Objects.requireNonNull(modifier);
-
+    public static Optional<Formatter> getFormatterForModifier(@NonNull String modifier) {
         switch (modifier) {
             case "lower":
                 return Optional.of(new LowerCaseFormatter());

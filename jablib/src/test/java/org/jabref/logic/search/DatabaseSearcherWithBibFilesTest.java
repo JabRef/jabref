@@ -32,6 +32,9 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -43,6 +46,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 /// Note: Postgres is `new`ed at each test - maybe put it tgo `@BeforeAll`
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("embeddedPostgres")
 class DatabaseSearcherWithBibFilesTest {
     private static final TaskExecutor TASK_EXECUTOR = new CurrentThreadTaskExecutor();
     private static final BibEntry TITLE_SENTENCE_CASED = new BibEntry(StandardEntryType.Misc)
@@ -90,7 +95,7 @@ class DatabaseSearcherWithBibFilesTest {
 
     @AfterEach
     void tearDown() {
-        postgreServer.shutdown();
+        postgreServer.close();
     }
 
     private BibDatabaseContext initializeDatabaseFromPath(String testFile) throws URISyntaxException, IOException {
@@ -124,14 +129,14 @@ class DatabaseSearcherWithBibFilesTest {
                 Arguments.of(List.of(), "test-library-title-casing.bib", "title = NotExisting", false),
                 Arguments.of(List.of(TITLE_SENTENCE_CASED, TITLE_MIXED_CASED, TITLE_UPPER_CASED), "test-library-title-casing.bib", "title = Title", false),
 
-                 Arguments.of(List.of(), "test-library-title-casing.bib", "title =! TiTLE", false),
-                 Arguments.of(List.of(TITLE_SENTENCE_CASED), "test-library-title-casing.bib", "title =! Title", false),
+                Arguments.of(List.of(), "test-library-title-casing.bib", "title =! TiTLE", false),
+                Arguments.of(List.of(TITLE_SENTENCE_CASED), "test-library-title-casing.bib", "title =! Title", false),
 
-                 Arguments.of(List.of(), "test-library-title-casing.bib", "any =! TiTLE", false),
-                 Arguments.of(List.of(TITLE_MIXED_CASED), "test-library-title-casing.bib", "any =! TiTle", false),
+                Arguments.of(List.of(), "test-library-title-casing.bib", "any =! TiTLE", false),
+                Arguments.of(List.of(TITLE_MIXED_CASED), "test-library-title-casing.bib", "any =! TiTle", false),
 
-                 Arguments.of(List.of(), "test-library-title-casing.bib", "title =! NotExisting", false),
-                 Arguments.of(List.of(TITLE_MIXED_CASED), "test-library-title-casing.bib", "title =! TiTle", false),
+                Arguments.of(List.of(), "test-library-title-casing.bib", "title =! NotExisting", false),
+                Arguments.of(List.of(TITLE_MIXED_CASED), "test-library-title-casing.bib", "title =! TiTle", false),
 
                 Arguments.of(List.of(), "test-library-title-casing.bib", "any =~ [Y]", false),
 

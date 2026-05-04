@@ -60,7 +60,8 @@ public class FieldEditors {
                 databaseContext,
                 preferences.getFilePreferences(),
                 journalAbbreviationRepository,
-                preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex());
+                preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex(),
+                preferences.getCitationKeyPatternPreferences().getUnwantedCharacters());
 
         boolean isMultiLine = FieldFactory.isMultiLineField(field, preferences.getFieldPreferences().getNonWrappableFields());
 
@@ -75,12 +76,14 @@ public class FieldEditors {
         } else if (fieldProperties.contains(FieldProperty.IDENTIFIER) && field != StandardField.PMID || field == StandardField.ISBN) {
             // Identifier editor does not support PMID, therefore excluded at the condition above
             return new IdentifierEditor(field, suggestionProvider, fieldCheckers);
+        } else if (field == StandardField.CITATIONCOUNT) {
+            return new CitationCountEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == StandardField.ISSN) {
             return new ISSNEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
         } else if (field == StandardField.OWNER) {
             return new OwnerEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
         } else if (field == StandardField.GROUPS) {
-            return new GroupEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager, undoAction, redoAction);
+            return new GroupsEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == StandardField.FILE) {
             return new LinkedFilesEditor(field, databaseContext, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.YES_NO)) {
@@ -107,11 +110,13 @@ public class FieldEditors {
         } else if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
             return new PersonsEditor(field, suggestionProvider, fieldCheckers, isMultiLine, undoManager, undoAction, redoAction);
         } else if (StandardField.KEYWORDS == field) {
-            return new KeywordsEditor(field, suggestionProvider, fieldCheckers);
+            return new KeywordsEditor(field, suggestionProvider, fieldCheckers, preferences);
         } else if (field == InternalField.KEY_FIELD) {
             return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.MARKDOWN)) {
-            return new MarkdownEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager, undoAction, redoAction);
+            return new MarkdownEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager, undoAction, redoAction, databaseContext);
+        } else if (field == StandardField.ICORERANKING) {
+            return new ICORERankingEditor(field, suggestionProvider, fieldCheckers);
         } else {
             // There was no specific editor found
 

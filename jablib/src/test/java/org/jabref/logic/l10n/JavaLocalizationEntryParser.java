@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.junit.jupiter.api.parallel.ResourceLock;
+
+@ResourceLock("Localization.lang")
 class JavaLocalizationEntryParser {
 
     private static final String INFINITE_WHITESPACE = "\\s*";
@@ -38,7 +41,7 @@ class JavaLocalizationEntryParser {
                 throw new RuntimeException("\"" + languageKey + "\" ends with a space. As this is a localization key, this is illegal!");
             }
 
-            if (!languagePropertyKey.trim().isEmpty()) {
+            if (!languagePropertyKey.isBlank()) {
                 result.add(languagePropertyKey);
             }
         }

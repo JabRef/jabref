@@ -5,11 +5,9 @@ import java.util.Objects;
 
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
-/**
- * This formatter preprocesses JabRef fields before they are run through the layout of the bibliography style. It handles translation of LaTeX italic/bold commands into HTML tags.
- */
+/// This formatter preprocesses JabRef fields before they are run through the layout of the bibliography style. It handles translation of LaTeX italic/bold commands into HTML tags.
 public class OOPreFormatter implements LayoutFormatter {
 
     private static final Map<String, String> CHARS = HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
@@ -145,20 +143,32 @@ public class OOPreFormatter implements LayoutFormatter {
     }
 
     private String getHTMLTag(String latexCommand) {
-        String result = "";
-        switch (latexCommand) {
+        return switch (latexCommand) {
             // Should really separate between emphasized and italic but since in later stages both are converted to italic...
-            case "textit", "it", "emph", "em" -> result = "i";  // Italic
-            case "textbf", "bf" -> result = "b";                // Bold font
-            case "textsc" -> result = "smallcaps";              // Small caps
-                                                                // Not a proper HTML tag, but used here for convenience
-            case "underline" -> result = "u";                   // Underline
-            case "sout" -> result = "s";                        // Strikeout
-                                                                // sout is the "standard" command, although it is actually based on the package ulem
-            case "texttt" -> result = "tt";                     // Monospace font
-            case "textsuperscript" -> result = "sup";           // Superscript
-            case "textsubscript" -> result = "sub";             // Subscript
-        }
-        return result;
+            case "textit",
+                 "it",
+                 "emph",
+                 "em" ->
+                    "i";  // Italic
+            case "textbf",
+                 "bf" ->
+                    "b";                // Bold font
+            case "textsc" ->
+                    "smallcaps";              // Small caps
+            // Not a proper HTML tag, but used here for convenience
+            case "underline" ->
+                    "u";                   // Underline
+            case "sout" ->
+                    "s";                        // Strikeout
+            // sout is the "standard" command, although it is actually based on the package ulem
+            case "texttt" ->
+                    "tt";                     // Monospace font
+            case "textsuperscript" ->
+                    "sup";           // Superscript
+            case "textsubscript" ->
+                    "sub";
+            default ->
+                    "";             // Subscript
+        };
     }
 }

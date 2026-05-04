@@ -106,9 +106,9 @@ public class ReferImporterTest {
                 """;
 
         BibEntry entry = referImporter.importDatabase(new BufferedReader(Reader.of(refEntry)))
-                                                   .getDatabase()
-                                                   .getEntries()
-                                                   .getFirst();
+                                      .getDatabase()
+                                      .getEntries()
+                                      .getFirst();
 
         assertEquals(StandardEntryType.Book, entry.getType());
         assertEquals(Optional.empty(), entry.getField(StandardField.AUTHOR));
@@ -186,5 +186,14 @@ public class ReferImporterTest {
         assertEquals(conferencePaperEntry, bibEntries.get(1));
         assertEquals(encyclopediaEntry, bibEntries.get(2));
         assertEquals(thesisEntry, bibEntries.get(3));
+    }
+
+    @Test
+    void importPreservesDiacriticalCitationKey() throws IOException {
+        String input = "%0 Journal\n%A Author\n%T Title\n%F Müller2020";
+        List<BibEntry> entries = referImporter.importDatabase(new BufferedReader(Reader.of(input)))
+                                              .getDatabase().getEntries();
+
+        assertEquals(Optional.of("Müller2020"), entries.getFirst().getCitationKey());
     }
 }

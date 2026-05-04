@@ -5,10 +5,10 @@ import java.util.Objects;
 
 import org.jabref.logic.openoffice.style.OOStyle;
 
-/**
- * Representation of a CitationStyle. Stores its name, the file path and the style itself.
- * This is a pure model class. For loading/parsing functionality, see {@link CSLStyleUtils} and {@link CSLStyleLoader}.
- */
+import org.jspecify.annotations.NonNull;
+
+/// Representation of a CitationStyle. Stores its name, the file path and the style itself.
+/// This is a pure model class. For loading/parsing functionality, see {@link CSLStyleUtils} and {@link CSLStyleLoader}.
 public class CitationStyle implements OOStyle {
 
     // Currently, we have support for only one alphanumeric style, so we hardcode it
@@ -16,31 +16,35 @@ public class CitationStyle implements OOStyle {
 
     private final String filePath;
     private final String title;
+    private final String shortTitle;
     private final boolean isNumericStyle;
     private final boolean hasBibliography;
     private final boolean usesHangingIndent;
     private final String source;
     private final boolean isInternalStyle;
 
-    public CitationStyle(String filePath, String title, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, String source, boolean isInternalStyle) {
-        this.filePath = Path.of(Objects.requireNonNull(filePath)).toString(); // wrapping with Path.of takes care of extra slashes in path due to subsequent storage and retrieval (observed on Windows)
-        this.title = Objects.requireNonNull(title);
+    public CitationStyle(@NonNull String filePath, @NonNull String title, @NonNull String shortTitle, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, @NonNull String source, boolean isInternalStyle) {
+        this.filePath = Path.of(filePath).toString(); // wrapping with Path.of takes care of extra slashes in path due to subsequent storage and retrieval (observed on Windows)
+        this.title = title;
+        this.shortTitle = shortTitle;
         this.isNumericStyle = isNumericStyle;
         this.hasBibliography = hasBibliography;
         this.usesHangingIndent = hasBibliography && usesHangingIndent;
-        this.source = Objects.requireNonNull(source);
+        this.source = source;
         this.isInternalStyle = isInternalStyle;
     }
 
-    /**
-     * Creates a new citation style with an auto-determined internal/external state.
-     */
-    public CitationStyle(String filePath, String title, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, String source) {
-        this(filePath, title, isNumericStyle, hasBibliography, usesHangingIndent, source, !Path.of(filePath).isAbsolute());
+    /// Creates a new citation style with an auto-determined internal/external state.
+    public CitationStyle(@NonNull String filePath, @NonNull String title, @NonNull String shortTitle, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, @NonNull String source) {
+        this(filePath, title, shortTitle, isNumericStyle, hasBibliography, usesHangingIndent, source, !Path.of(filePath).isAbsolute());
     }
 
     public String getTitle() {
         return title;
+    }
+
+    public String getShortTitle() {
+        return shortTitle;
     }
 
     public boolean isNumericStyle() {
@@ -55,11 +59,9 @@ public class CitationStyle implements OOStyle {
         return usesHangingIndent;
     }
 
-    /**
-     * Currently, we have support for one alphanumeric CSL style.
-     * There is no tag or field in .csl style files that can be parsed to determine if it is an alphanumeric style.
-     * Thus, to determine alphanumeric nature, we currently manually check for equality with "DIN 1505-2".
-     */
+    /// Currently, we have support for one alphanumeric CSL style.
+    /// There is no tag or field in .csl style files that can be parsed to determine if it is an alphanumeric style.
+    /// Thus, to determine alphanumeric nature, we currently manually check for equality with "DIN 1505-2".
     public boolean isAlphanumericStyle() {
         return ALPHANUMERIC_STYLE.equals(this.title);
     }

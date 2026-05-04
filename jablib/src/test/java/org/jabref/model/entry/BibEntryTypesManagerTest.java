@@ -15,6 +15,7 @@ import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
+import org.jabref.model.entry.types.BiblatexNonStandardEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
@@ -79,8 +80,36 @@ class BibEntryTypesManagerTest {
         TreeSet<BibEntryType> defaultTypes = new TreeSet<>(BiblatexEntryTypeDefinitions.ALL);
         defaultTypes.addAll(BiblatexSoftwareEntryTypeDefinitions.ALL);
         defaultTypes.addAll(BiblatexAPAEntryTypeDefinitions.ALL);
+        defaultTypes.addAll(BiblatexNonStandardEntryTypeDefinitions.ALL);
 
         assertEquals(defaultTypes, entryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
+    void nonStandardTypesNotInBibtexMode() {
+        Set<EntryType> nonStandardTypes = BiblatexNonStandardEntryTypeDefinitions.ALL.stream()
+                                                                                     .map(BibEntryType::getType)
+                                                                                     .collect(Collectors.toSet());
+
+        Set<EntryType> bibtexTypes = entryTypesManager.getAllTypes(BibDatabaseMode.BIBTEX).stream()
+                                                      .map(BibEntryType::getType)
+                                                      .collect(Collectors.toSet());
+
+        for (EntryType nonStandardType : nonStandardTypes) {
+            assertFalse(bibtexTypes.contains(nonStandardType),
+                    "Non-standard type " + nonStandardType.getName() + " should not be in BibTeX mode");
+        }
+    }
+
+    @Test
+    void nonStandardTypesCanBeEnrichedInBiblatexMode() {
+        for (BibEntryType nonStandardType : BiblatexNonStandardEntryTypeDefinitions.ALL) {
+            Optional<BibEntryType> enriched = entryTypesManager.enrich(nonStandardType.getType(), BibDatabaseMode.BIBLATEX);
+
+            assertTrue(enriched.isPresent(),
+                    "Type " + nonStandardType.getType().getName() + " should be enrichable in BibLaTeX mode");
+            assertEquals(nonStandardType.getType(), enriched.get().getType());
+        }
     }
 
     @ParameterizedTest
@@ -172,12 +201,12 @@ class BibEntryTypesManagerTest {
     @EnumSource(BibDatabaseMode.class)
     void modifyingArticle(BibDatabaseMode mode) {
         overwrittenStandardType = new BibEntryType(
-                                                   StandardEntryType.Article,
-                                                   List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
-                                                           new BibField(StandardField.NUMBER, FieldPriority.IMPORTANT),
-                                                           new BibField(StandardField.LANGUAGEID, FieldPriority.IMPORTANT),
-                                                           new BibField(StandardField.COMMENT, FieldPriority.IMPORTANT)),
-                                                   Set.of());
+                StandardEntryType.Article,
+                List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
+                        new BibField(StandardField.NUMBER, FieldPriority.IMPORTANT),
+                        new BibField(StandardField.LANGUAGEID, FieldPriority.IMPORTANT),
+                        new BibField(StandardField.COMMENT, FieldPriority.IMPORTANT)),
+                Set.of());
 
         entryTypesManager.addCustomOrModifiedType(overwrittenStandardType, mode);
         assertEquals(List.of(overwrittenStandardType), entryTypesManager.getAllTypes(mode).stream().filter(t -> "article".equals(t.getType().getName())).collect(Collectors.toList()));
@@ -187,12 +216,12 @@ class BibEntryTypesManagerTest {
     @EnumSource(BibDatabaseMode.class)
     void modifyingArticleWithParsing(BibDatabaseMode mode) {
         overwrittenStandardType = new BibEntryType(
-                                                   StandardEntryType.Article,
-                                                   List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
-                                                           new BibField(StandardField.NUMBER, FieldPriority.IMPORTANT),
-                                                           new BibField(StandardField.LANGUAGEID, FieldPriority.IMPORTANT),
-                                                           new BibField(StandardField.COMMENT, FieldPriority.IMPORTANT)),
-                                                   Set.of());
+                StandardEntryType.Article,
+                List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
+                        new BibField(StandardField.NUMBER, FieldPriority.IMPORTANT),
+                        new BibField(StandardField.LANGUAGEID, FieldPriority.IMPORTANT),
+                        new BibField(StandardField.COMMENT, FieldPriority.IMPORTANT)),
+                Set.of());
 
         entryTypesManager.addCustomOrModifiedType(overwrittenStandardType, mode);
         String serialized = MetaDataSerializer.serializeCustomEntryTypes(overwrittenStandardType);
@@ -205,12 +234,12 @@ class BibEntryTypesManagerTest {
     @EnumSource(BibDatabaseMode.class)
     void modifyingArticleWithParsingKeepsListOrder(BibDatabaseMode mode) {
         overwrittenStandardType = new BibEntryType(
-                                                   StandardEntryType.Article,
-                                                   List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
-                                                           new BibField(StandardField.NUMBER, FieldPriority.IMPORTANT),
-                                                           new BibField(StandardField.LANGUAGEID, FieldPriority.IMPORTANT),
-                                                           new BibField(StandardField.COMMENT, FieldPriority.IMPORTANT)),
-                                                   Set.of());
+                StandardEntryType.Article,
+                List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
+                        new BibField(StandardField.NUMBER, FieldPriority.IMPORTANT),
+                        new BibField(StandardField.LANGUAGEID, FieldPriority.IMPORTANT),
+                        new BibField(StandardField.COMMENT, FieldPriority.IMPORTANT)),
+                Set.of());
 
         entryTypesManager.addCustomOrModifiedType(overwrittenStandardType, mode);
         String serialized = MetaDataSerializer.serializeCustomEntryTypes(overwrittenStandardType);

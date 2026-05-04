@@ -1,0 +1,64 @@
+name: Fetcher Tests
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/main/java/org/jabref/logic/importer/fetcher/**'
+      - 'src/test/java/org/jabref/logic/importer/fetcher/**'
+      - 'src/main/java/org/jabref/logic/importer/fileformat/PdfMergeMetadataImporter.java'
+      - 'src/test/java/org/jabref/logic/importer/fileformat/PdfMergeMetadataImporterTest.java'
+      - 'src/main/java/org/jabref/logic/crawler/**'
+      - 'src/test/java/org/jabref/logic/crawler/**'
+      - '.github/workflows/tests-code-fetchers.yml'
+      - '.github/actions/setup-gradle/action.yml'
+      - 'jablib/build.gradle.kts'
+  pull_request:
+    paths:
+      - 'src/main/java/org/jabref/logic/importer/fetcher/**'
+      - 'src/test/java/org/jabref/logic/importer/fetcher/**'
+      - 'src/main/java/org/jabref/logic/importer/fileformat/PdfMergeMetadataImporter.java'
+      - 'src/test/java/org/jabref/logic/importer/fileformat/PdfMergeMetadataImporterTest.java'
+      - 'src/main/java/org/jabref/logic/crawler/**'
+      - 'src/test/java/org/jabref/logic/crawler/**'
+      - '.github/actions/setup-gradle/action.yml'
+      - '.github/workflows/tests-code-fetchers.yml'
+      - 'jablib/build.gradle.kts'
+  schedule:
+    # run on each Monday
+    - cron: '2 3 * * 1'
+  workflow_dispatch:
+
+env:
+  BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey_FOR_TESTS }}
+  AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey_FOR_TESTS }}
+  IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}
+  MedlineApiKey: ${{ secrets.MedlineApiKey_FOR_TESTS }}
+  OpenAlexApiKey: ${{ secrets.OpenAlexApiKey_FOR_TESTS }}
+  SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  fetchertests:
+    if: github.repository == 'JabRef/jabref' || github.event_name != 'schedule'
+    name: Fetcher tests
+    # On ubuntu-slim, it takes more than 15 minutes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
+      - name: Run fetcher tests
+        run: gradle fetcherTest
+        env:
+          CI: "true"

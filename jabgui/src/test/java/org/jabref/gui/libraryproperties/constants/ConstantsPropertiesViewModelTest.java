@@ -21,9 +21,7 @@ class ConstantsPropertiesViewModelTest {
     private final DialogService service = mock(DialogService.class);
     private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
 
-    /**
-     * Check that the list of strings is sorted according to their keys
-     */
+    /// Check that the list of strings is sorted according to their keys
     @Test
     void stringsListPropertySorting() {
         BibtexString string1 = new BibtexString("TSE", "Transactions on Software Engineering");
@@ -37,16 +35,14 @@ class ConstantsPropertiesViewModelTest {
         model.setValues();
 
         List<String> actual = model.stringsListProperty().stream()
-                .map(ConstantsItemModel::labelProperty)
-                .map(StringProperty::getValue)
-                .toList();
+                                   .map(ConstantsItemModel::labelProperty)
+                                   .map(StringProperty::getValue)
+                                   .toList();
 
         assertEquals(expected, actual);
     }
 
-    /**
-     * Check that the list of strings is sorted after resorting it
-     */
+    /// Check that the list of strings is sorted after resorting it
     @Test
     void stringsListPropertyResorting() {
         BibDatabase db = new BibDatabase();
@@ -61,9 +57,9 @@ class ConstantsPropertiesViewModelTest {
         model.resortStrings();
 
         List<String> actual = model.stringsListProperty().stream()
-                .map(ConstantsItemModel::labelProperty)
-                .map(StringProperty::getValue)
-                .toList();
+                                   .map(ConstantsItemModel::labelProperty)
+                                   .map(StringProperty::getValue)
+                                   .toList();
 
         assertEquals(expected, actual);
     }

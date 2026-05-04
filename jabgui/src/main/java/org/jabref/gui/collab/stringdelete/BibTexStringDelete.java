@@ -2,7 +2,7 @@ package org.jabref.gui.collab.stringdelete;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableRemoveString;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -23,7 +23,7 @@ public final class BibTexStringDelete extends DatabaseChange {
     }
 
     @Override
-    public void applyChange(NamedCompound undoEdit) {
+    public void applyChange(NamedCompoundEdit undoEdit) {
         try {
             databaseContext.getDatabase().removeString(deletedString.getId());
             undoEdit.addEdit(new UndoableRemoveString(databaseContext.getDatabase(), deletedString));

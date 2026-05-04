@@ -6,6 +6,10 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -16,12 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Execution(ExecutionMode.SAME_THREAD)
 class CSLStyleUtilsTest {
 
     // internal styles
     private static final String APA = "apa.csl";
     private static final String IEEE = "ieee.csl";
-    private static final String VANCOUVER = "vancouver.csl";
+    private static final String NLM_CITATION_SEQUENCE_VANCOUVER = "nlm-citation-sequence.csl";
     private static final String CHICAGO_AUTHOR_DATE = "chicago-author-date.csl";
     private static final String NATURE = "nature.csl";
     private static final String MLA = "modern-language-association.csl";
@@ -37,7 +42,7 @@ class CSLStyleUtilsTest {
             "ieee.csl",
             "apa.csl",
             "harvard.csl",
-            "vancouver.csl",
+            "nlm-citation-sequence.csl",
             "ieee.modified.csl",
             "apa.v7.csl",
             "/path/to/style/nature.csl",
@@ -63,7 +68,7 @@ class CSLStyleUtilsTest {
 
     @ParameterizedTest
     @MethodSource("styleTestData")
-    void parseStyleInfo(String styleName, String expectedTitle, boolean expectedNumericNature, boolean expectedBibliographicNature, boolean expectedUsesHangingIndent) throws IOException {
+    void parseStyleInfo(String styleName, String expectedTitle, String expectedShortTitle, boolean expectedNumericNature, boolean expectedBibliographicNature, boolean expectedUsesHangingIndent) throws IOException {
         String styleContent;
         try (InputStream inputStream = CSLStyleUtilsTest.class.getResourceAsStream(styleName)) {
             styleContent = new String(inputStream.readAllBytes());
@@ -73,14 +78,26 @@ class CSLStyleUtilsTest {
 
         assertTrue(styleInfo.isPresent());
         assertEquals(expectedTitle, styleInfo.get().title());
+        assertEquals(expectedShortTitle, styleInfo.get().shortTitle());
         assertEquals(expectedNumericNature, styleInfo.get().isNumericStyle());
         assertEquals(expectedBibliographicNature, styleInfo.get().hasBibliography());
         assertEquals(expectedUsesHangingIndent, styleInfo.get().usesHangingIndent());
     }
 
+    @EnabledOnOs(OS.WINDOWS)
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "\\\\ieee.csl",
+            "//ieee.csl",
+    })
+    void createStyleFromFileReturnsEmptyOptionalForInvalidPath(String filename) {
+        Optional<CitationStyle> citationStyle = CSLStyleUtils.createCitationStyleFromFile(filename);
+        assertEquals(Optional.empty(), citationStyle);
+    }
+
     @ParameterizedTest
     @MethodSource("styleTestData")
-    void createCitationStyleFromFileReturnsValidCitationStyle(String styleName, String expectedTitle, boolean expectedNumericNature, boolean expectedBibliographicNature, boolean expectedUsesHangingIndent) {
+    void createCitationStyleFromFileReturnsValidCitationStyle(String styleName, String expectedTitle, String expectedShortTitle, boolean expectedNumericNature, boolean expectedBibliographicNature, boolean expectedUsesHangingIndent) {
         // use absolute path to test csl so that it is treated as external file
         Path resourcePath = Path.of("").toAbsolutePath()
                                 .resolve("src/test/resources/org/jabref/logic/citationstyle")
@@ -90,6 +107,7 @@ class CSLStyleUtilsTest {
 
         assertTrue(citationStyle.isPresent());
         assertEquals(expectedTitle, citationStyle.get().getTitle());
+        assertEquals(expectedShortTitle, citationStyle.get().getShortTitle());
         assertEquals(expectedNumericNature, citationStyle.get().isNumericStyle());
         assertEquals(expectedBibliographicNature, citationStyle.get().hasBibliography());
         assertEquals(expectedUsesHangingIndent, citationStyle.get().usesHangingIndent());
@@ -99,9 +117,9 @@ class CSLStyleUtilsTest {
 
     private static Stream<Arguments> styleTestData() {
         return Stream.of(
-                Arguments.of(MODIFIED_IEEE, "IEEE - Bold Author", true, true, false),
-                Arguments.of(MODIFIED_APA, "Modified American Psychological Association 7th edition", false, true, true),
-                Arguments.of(LITERATURA, "Literatūra", false, true, true) // Literatūra uses author-date format, so non-numeric
+                Arguments.of(MODIFIED_IEEE, "IEEE - Bold Author", "", true, true, false),
+                Arguments.of(MODIFIED_APA, "Modified American Psychological Association 7th edition", "APA", false, true, true),
+                Arguments.of(LITERATURA, "Literatūra", "Literatūra", false, true, true) // Literatūra uses author-date format, so non-numeric
         );
     }
 
@@ -116,7 +134,7 @@ class CSLStyleUtilsTest {
         return Stream.of(
                 Arguments.of(IEEE),
                 Arguments.of(APA),
-                Arguments.of(VANCOUVER),
+                Arguments.of(NLM_CITATION_SEQUENCE_VANCOUVER),
                 Arguments.of(CHICAGO_AUTHOR_DATE),
                 Arguments.of(NATURE),
                 Arguments.of(MLA),
@@ -133,12 +151,12 @@ class CSLStyleUtilsTest {
 
     static Stream<Arguments> titleMatches() {
         return Stream.of(
-                Arguments.of("IEEE", IEEE),
-                Arguments.of("American Psychological Association 7th edition", APA),
-                Arguments.of("Vancouver", VANCOUVER),
-                Arguments.of("Chicago Manual of Style 17th edition (author-date)", CHICAGO_AUTHOR_DATE),
+                Arguments.of("IEEE Reference Guide version 11.29.2023", IEEE),
+                Arguments.of("APA Style 7th edition", APA),
+                Arguments.of("NLM/Vancouver: Citing Medicine 2nd edition (citation-sequence)", NLM_CITATION_SEQUENCE_VANCOUVER),
+                Arguments.of("Chicago Manual of Style 18th edition (author-date)", CHICAGO_AUTHOR_DATE),
                 Arguments.of("Nature", NATURE),
-                Arguments.of("Modern Language Association 9th edition", MLA),
+                Arguments.of("MLA Handbook 9th edition (in-text citations)", MLA),
                 Arguments.of("The Journal of Clinical Ethics", JOURNAL_OF_CLINICAL_ETHICS)
         );
     }
@@ -154,7 +172,7 @@ class CSLStyleUtilsTest {
         return Stream.of(
                 Arguments.of(true, IEEE),
                 Arguments.of(false, APA),
-                Arguments.of(true, VANCOUVER),
+                Arguments.of(true, NLM_CITATION_SEQUENCE_VANCOUVER),
                 Arguments.of(false, CHICAGO_AUTHOR_DATE),
                 Arguments.of(true, NATURE),
                 Arguments.of(false, MLA),
@@ -173,7 +191,7 @@ class CSLStyleUtilsTest {
         return Stream.of(
                 Arguments.of(true, IEEE),
                 Arguments.of(true, APA),
-                Arguments.of(true, VANCOUVER),
+                Arguments.of(true, NLM_CITATION_SEQUENCE_VANCOUVER),
                 Arguments.of(true, CHICAGO_AUTHOR_DATE),
                 Arguments.of(true, NATURE),
                 Arguments.of(true, MLA),
@@ -192,7 +210,7 @@ class CSLStyleUtilsTest {
         return Stream.of(
                 Arguments.of(false, IEEE),
                 Arguments.of(true, APA),
-                Arguments.of(false, VANCOUVER),
+                Arguments.of(false, NLM_CITATION_SEQUENCE_VANCOUVER),
                 Arguments.of(true, CHICAGO_AUTHOR_DATE),
                 Arguments.of(false, NATURE),
                 Arguments.of(true, MLA),

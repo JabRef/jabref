@@ -1,8 +1,6 @@
 package org.jabref.model.entry.event;
 
-/**
- * This enum represents the context EntriesEvents were sent from.
- */
+/// This enum represents the context EntriesEvents were sent from.
 public enum EntriesEventSource {
     LOCAL,
     SHARED,

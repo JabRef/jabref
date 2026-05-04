@@ -20,11 +20,16 @@ import org.jabref.model.entry.field.StandardField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("exporter")
 class XmpExporterTest {
 
     private Exporter exporter;
@@ -47,8 +52,8 @@ class XmpExporterTest {
         exporter.export(databaseContext, file, List.of(entry));
         String actual = String.join("\n", Files.readAllLines(file)); // we are using \n to join, so we need it in the expected string as well, \r\n would fail
         String expected = """
-                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-                    <rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about="">
+                  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                    <rdf:Description rdf:about="">
                       <dc:creator>
                         <rdf:Seq>
                           <rdf:li>Alan Turing</rdf:li>
@@ -83,40 +88,40 @@ class XmpExporterTest {
         String actual = String.join("\n", Files.readAllLines(file)); // we are using \n to join, so we need it in the expected string as well, \r\n would fail
 
         String expected = """
-                    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-                      <rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about="">
-                        <dc:creator>
-                          <rdf:Seq>
-                            <rdf:li>Alan Turing</rdf:li>
-                          </rdf:Seq>
-                        </dc:creator>
-                        <dc:format>application/pdf</dc:format>
-                        <dc:type>
-                          <rdf:Bag>
-                            <rdf:li>Misc</rdf:li>
-                          </rdf:Bag>
-                        </dc:type>
-                      </rdf:Description>
-                      <rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about="">
-                        <dc:creator>
-                          <rdf:Seq>
-                            <rdf:li>Michael Armbrust</rdf:li>
-                          </rdf:Seq>
-                        </dc:creator>
-                        <dc:relation>
-                          <rdf:Bag>
-                            <rdf:li>bibtex/citationkey/Armbrust2010</rdf:li>
-                          </rdf:Bag>
-                        </dc:relation>
-                        <dc:format>application/pdf</dc:format>
-                        <dc:type>
-                          <rdf:Bag>
-                            <rdf:li>Misc</rdf:li>
-                          </rdf:Bag>
-                        </dc:type>
-                      </rdf:Description>
-                    </rdf:RDF>
-                  """.stripTrailing();
+                  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                    <rdf:Description rdf:about="">
+                      <dc:creator>
+                        <rdf:Seq>
+                          <rdf:li>Alan Turing</rdf:li>
+                        </rdf:Seq>
+                      </dc:creator>
+                      <dc:format>application/pdf</dc:format>
+                      <dc:type>
+                        <rdf:Bag>
+                          <rdf:li>Misc</rdf:li>
+                        </rdf:Bag>
+                      </dc:type>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="">
+                      <dc:creator>
+                        <rdf:Seq>
+                          <rdf:li>Michael Armbrust</rdf:li>
+                        </rdf:Seq>
+                      </dc:creator>
+                      <dc:relation>
+                        <rdf:Bag>
+                          <rdf:li>bibtex/citationkey/Armbrust2010</rdf:li>
+                        </rdf:Bag>
+                      </dc:relation>
+                      <dc:format>application/pdf</dc:format>
+                      <dc:type>
+                        <rdf:Bag>
+                          <rdf:li>Misc</rdf:li>
+                        </rdf:Bag>
+                      </dc:type>
+                    </rdf:Description>
+                  </rdf:RDF>
+                """.stripTrailing();
         assertEquals(expected, actual);
     }
 
@@ -143,22 +148,22 @@ class XmpExporterTest {
         // we are using \n to join, so we need it in the expected string as well, \r\n would fail
         String actualTuring = String.join("\n", Files.readAllLines(fileTuring));
         String expectedTuring = """
-                <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-                  <rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about="">
-                    <dc:creator>
-                      <rdf:Seq>
-                        <rdf:li>Alan Turing</rdf:li>
-                      </rdf:Seq>
-                    </dc:creator>
-                    <dc:format>application/pdf</dc:format>
-                    <dc:type>
-                      <rdf:Bag>
-                        <rdf:li>Misc</rdf:li>
-                      </rdf:Bag>
-                    </dc:type>
-                  </rdf:Description>
-                </rdf:RDF>
-              """.stripTrailing();
+                  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                    <rdf:Description rdf:about="">
+                      <dc:creator>
+                        <rdf:Seq>
+                          <rdf:li>Alan Turing</rdf:li>
+                        </rdf:Seq>
+                      </dc:creator>
+                      <dc:format>application/pdf</dc:format>
+                      <dc:type>
+                        <rdf:Bag>
+                          <rdf:li>Misc</rdf:li>
+                        </rdf:Bag>
+                      </dc:type>
+                    </rdf:Description>
+                  </rdf:RDF>
+                """.stripTrailing();
         assertEquals(expectedTuring, actualTuring);
 
         // armbrust contains the armbrust entry only
@@ -166,8 +171,8 @@ class XmpExporterTest {
         // we are using \n to join, so we need it in the expected string as well, \r\n would fail
         String actualArmbrust = String.join("\n", Files.readAllLines(fileArmbrust));
         String expectedArmbrust = """
-                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-                    <rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about="">
+                  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                    <rdf:Description rdf:about="">
                       <dc:creator>
                         <rdf:Seq>
                           <rdf:li>Michael Armbrust</rdf:li>
@@ -205,8 +210,8 @@ class XmpExporterTest {
 
         String actual = String.join("\n", Files.readAllLines(file));
         String expected = """
-                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-                    <rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about="">
+                  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                    <rdf:Description rdf:about="">
                       <dc:format>application/pdf</dc:format>
                       <dc:type>
                         <rdf:Bag>

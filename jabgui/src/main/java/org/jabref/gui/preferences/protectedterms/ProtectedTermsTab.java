@@ -23,9 +23,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
-/**
- * Dialog for managing term list files.
- */
+/// Dialog for managing term list files.
 public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsTabViewModel> implements PreferencesTab {
     @FXML private TableView<ProtectedTermsListItemModel> filesTable;
     @FXML private TableColumn<ProtectedTermsListItemModel, Boolean> filesTableEnabledColumn;
@@ -121,18 +119,26 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
 
             this.executable.bind(BindingsHelper.constantOf(
                     switch (command) {
-                        case EDIT_LIST, REMOVE_LIST, RELOAD_LIST -> !itemModel.getTermsList().isInternalList();
-                        default -> true;
+                        case EDIT_LIST,
+                             REMOVE_LIST,
+                             RELOAD_LIST ->
+                                !itemModel.getTermsList().isInternalList();
+                        default ->
+                                true;
                     }));
         }
 
         @Override
         public void execute() {
             switch (command) {
-                case EDIT_LIST -> viewModel.edit(itemModel);
-                case VIEW_LIST -> viewModel.displayContent(itemModel);
-                case REMOVE_LIST -> viewModel.removeList(itemModel);
-                case RELOAD_LIST -> viewModel.reloadList(itemModel);
+                case EDIT_LIST ->
+                        viewModel.edit(itemModel);
+                case VIEW_LIST ->
+                        viewModel.displayContent(itemModel);
+                case REMOVE_LIST ->
+                        viewModel.removeList(itemModel);
+                case RELOAD_LIST ->
+                        viewModel.reloadList(itemModel);
             }
         }
     }

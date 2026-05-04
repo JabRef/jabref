@@ -43,7 +43,10 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.DateGranularity;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.SearchFlags;
@@ -81,6 +84,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private RadioButton searchRadioButton;
     @FXML private RadioButton autoRadioButton;
     @FXML private RadioButton texRadioButton;
+    @FXML private RadioButton entryTypeRadioButton;
 
     // Option Groups
     @FXML private TextField keywordGroupSearchTerm;
@@ -100,6 +104,11 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private TextField autoGroupPersonsField;
 
     @FXML private TextField texGroupFilePath;
+
+    @FXML private RadioButton dateRadioButton;
+    @FXML private ComboBox<Field> dateGroupFieldCombo;
+    @FXML private ComboBox<DateGranularity> dateGroupOptionCombo;
+    @FXML private CheckBox dateGroupIncludeEmpty;
 
     private final EnumMap<GroupHierarchyType, String> hierarchyText = new EnumMap<>(GroupHierarchyType.class);
     private final EnumMap<GroupHierarchyType, String> hierarchyToolTip = new EnumMap<>(GroupHierarchyType.class);
@@ -201,6 +210,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         searchRadioButton.selectedProperty().bindBidirectional(viewModel.typeSearchProperty());
         autoRadioButton.selectedProperty().bindBidirectional(viewModel.typeAutoProperty());
         texRadioButton.selectedProperty().bindBidirectional(viewModel.typeTexProperty());
+        entryTypeRadioButton.selectedProperty().bindBidirectional(viewModel.typeEntryTypeProperty());
 
         keywordGroupSearchTerm.textProperty().bindBidirectional(viewModel.keywordGroupSearchTermProperty());
         keywordGroupSearchField.textProperty().bindBidirectional(viewModel.keywordGroupSearchFieldProperty());
@@ -221,6 +231,16 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         autoGroupPersonsField.textProperty().bindBidirectional(viewModel.autoGroupPersonsFieldProperty());
 
         texGroupFilePath.textProperty().bindBidirectional(viewModel.texGroupFilePathProperty());
+
+        // Date Group bindings
+        dateRadioButton.selectedProperty().bindBidirectional(viewModel.dateRadioButtonSelectedProperty());
+        dateGroupFieldCombo.valueProperty().bindBidirectional(viewModel.dateGroupFieldProperty());
+        dateGroupOptionCombo.valueProperty().bindBidirectional(viewModel.dateGroupOptionProperty());
+        dateGroupIncludeEmpty.selectedProperty().bindBidirectional(viewModel.dateGroupIncludeEmptyProperty());
+
+        // Initialize Date Group ComboBoxes
+        dateGroupFieldCombo.setItems(FXCollections.observableArrayList(FieldFactory.getDateFields()));
+        dateGroupOptionCombo.setItems(FXCollections.observableArrayList(DateGranularity.values()));
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {
@@ -245,10 +265,12 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 viewModel.colorFieldProperty().setValue(IconTheme.getDefaultGroupColor());
                 return;
             }
-            List<Color> colorsOfSiblings = parentNode.getChildren().stream().map(child -> child.getGroup().getColor())
+            List<Color> colorsOfSiblings = parentNode.getChildren().stream()
+                                                     .map(child -> child.getGroup().getColor())
                                                      .flatMap(Optional::stream)
+                                                     .map(Color::valueOf)
                                                      .toList();
-            Optional<Color> parentColor = parentGroup().getColor();
+            Optional<Color> parentColor = parentGroup().getColor().map(Color::valueOf);
             Color color;
             color = parentColor.map(value -> GroupColorPicker.generateColor(colorsOfSiblings, value)).orElseGet(() -> GroupColorPicker.generateColor(colorsOfSiblings));
             viewModel.colorFieldProperty().setValue(color);

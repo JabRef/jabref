@@ -10,7 +10,6 @@ import javafx.collections.FXCollections;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -165,5 +164,26 @@ class PdfMergeMetadataImporterTest {
                 .withField(StandardField.FILE, ":minimal.pdf:PDF");
 
         assertEquals(List.of(expected), result);
+    }
+
+    @Test
+    void filenameLikeTitleFromXmpIsOverriddenByContentTitle() throws URISyntaxException {
+        GrobidPreferences noGrobid = mock(GrobidPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(noGrobid.isGrobidEnabled()).thenReturn(false);
+
+        ImportFormatPreferences offlinePreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(offlinePreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
+        when(offlinePreferences.grobidPreferences()).thenReturn(noGrobid);
+
+        PdfMergeMetadataImporter offlineImporter = new PdfMergeMetadataImporter(offlinePreferences);
+
+        Path file = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/PdfContentImporter/Kriha2018.pdf").toURI());
+        List<BibEntry> result = offlineImporter.importDatabase(file).getDatabase().getEntries();
+
+        // Kriha2018.pdf has Microsoft Word - ieee_on_how_we_teach_jul_01.docx as its XMP title
+        // The merge should prefer the real title extracted from the PDF content instead
+        assertEquals(
+                Optional.of("On How We Can Teach – Exploring New Ways in Professional Software Development for Students"),
+                result.getFirst().getTitle());
     }
 }

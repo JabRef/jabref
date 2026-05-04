@@ -1,15 +1,25 @@
 package org.jabref.logic.push;
 
+import java.util.regex.Pattern;
+
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public record CitationCommandString(String prefix, String delimiter, String suffix) {
+public record CitationCommandString(@NonNull String prefix, @NonNull String delimiter, @NonNull String suffix) {
+    public static final String CITE_KEY1 = "key1";
+    public static final String CITE_KEY2 = "key2";
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationCommandString.class);
-    private static final String CITE_KEY1 = "key1";
-    private static final String CITE_KEY2 = "key2";
+    private static final Pattern ALLOWED_PREFIX = Pattern.compile("[a-zA-Z\\\\*]+\\{?");
+
+    public CitationCommandString {
+        if (!ALLOWED_PREFIX.matcher(prefix).matches()) {
+            LOGGER.warn("Invalid prefix: {}", prefix);
+        }
+    }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return prefix + CITE_KEY1 + delimiter + CITE_KEY2 + suffix;
     }
 
@@ -17,7 +27,7 @@ public record CitationCommandString(String prefix, String delimiter, String suff
         int indexKey1 = completeCiteCommand.indexOf(CITE_KEY1);
         int indexKey2 = completeCiteCommand.indexOf(CITE_KEY2);
         if (indexKey1 < 0 || indexKey2 < 0 || indexKey2 < (indexKey1 + CITE_KEY1.length())) {
-            LOGGER.info("Wrong indexes {} {} for completeCiteCommand {}. Using default delimiter and suffix.", indexKey1, indexKey2, completeCiteCommand);
+            LOGGER.warn("Wrong indexes {} {} for completeCiteCommand {}. Using default delimiter and suffix.", indexKey1, indexKey2, completeCiteCommand);
             if (completeCiteCommand.isEmpty()) {
                 completeCiteCommand = "\\cite{";
             } else if (!completeCiteCommand.endsWith("{")) {

@@ -7,13 +7,16 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.TreeTableView;
+import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -24,35 +27,34 @@ import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
 
-/**
- * Preferences dialog. Contains a TabbedPane, and tabs will be defined in separate classes. Tabs MUST implement the
- * PreferencesTab interface, since this dialog will call the storeSettings() method of all tabs when the user presses
- * ok.
- */
+/// Preferences dialog. Contains a TabbedPane, and tabs will be defined in separate classes. Tabs MUST implement the
+/// PreferencesTab interface, since this dialog will call the storeSettings() method of all tabs when the user presses
+/// ok.
 public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel> {
 
+    public static final String DIALOG_TITLE = Localization.lang("JabRef preferences");
     @FXML private CustomTextField searchBox;
     @FXML private ListView<PreferencesTab> preferenceTabList;
     @FXML private ScrollPane preferencesContainer;
     @FXML private ButtonType saveButton;
+    @FXML private ButtonType cancelButton;
     @FXML private ToggleButton memoryStickMode;
 
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
-    @Inject private ThemeManager themeManager;
 
     private PreferencesDialogViewModel viewModel;
     private final Class<? extends PreferencesTab> preferencesTabToSelectClass;
 
     public PreferencesDialogView(Class<? extends PreferencesTab> preferencesTabToSelectClass) {
-        this.setTitle(Localization.lang("JabRef preferences"));
+        this.setTitle(DIALOG_TITLE);
         this.preferencesTabToSelectClass = preferencesTabToSelectClass;
 
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
 
-        ControlHelper.setAction(saveButton, getDialogPane(), event -> savePreferencesAndCloseDialog());
+        ControlHelper.setAction(saveButton, getDialogPane(), _ -> savePreferencesAndCloseDialog());
 
         // Stop the default button from firing when the user hits enter within the search box
         searchBox.setOnKeyPressed(event -> {
@@ -60,8 +62,6 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
                 event.consume();
             }
         });
-
-        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     public PreferencesDialogViewModel getViewModel() {
@@ -96,6 +96,14 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
                 preferencesContainer.setContent(preferencesTab.getBuilder());
                 preferencesTab.prefWidthProperty().bind(preferencesContainer.widthProperty().subtract(10d));
                 preferencesTab.getStyleClass().add("preferencesTab");
+                this.getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                    if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+                        if (event.getTarget() instanceof ListView || event.getTarget() instanceof TableView || event.getTarget() instanceof TreeView || event.getTarget() instanceof TreeTableView) {
+                            this.closeDialog();
+                            event.consume();
+                        }
+                    }
+                });
             } else {
                 preferencesContainer.setContent(null);
             }
@@ -140,7 +148,11 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     void importPreferences() {
-        viewModel.importPreferences();
+        if (viewModel.importPreferences()) {
+            // Hint the user that preferences are already loaded into the UI
+            // ToDo: Import into the ui directly and save changes on click on Save button
+            this.getDialogPane().lookupButton(cancelButton).setDisable(true);
+        }
     }
 
     @FXML
@@ -150,6 +162,10 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     void resetPreferences() {
-        viewModel.resetPreferences();
+        if (viewModel.resetPreferences()) {
+            // Hint the user that preferences are already loaded into the UI
+            // ToDo: Reset the ui and save changes on click on Save button
+            this.getDialogPane().lookupButton(cancelButton).setDisable(true);
+        }
     }
 }

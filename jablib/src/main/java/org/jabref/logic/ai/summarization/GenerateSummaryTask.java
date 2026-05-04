@@ -34,13 +34,11 @@ import dev.langchain4j.model.chat.ChatModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This task generates a new summary for an entry.
- * It will check if summary was already generated.
- * And it also will store the summary.
- * <p>
- * This task is created in the {@link SummariesService}, and stored then in a {@link SummariesStorage}.
- */
+/// This task generates a new summary for an entry.
+/// It will check if summary was already generated.
+/// And it also will store the summary.
+///
+/// This task is created in the {@link SummariesService}, and stored then in a {@link SummariesStorage}.
 public class GenerateSummaryTask extends BackgroundTask<Summary> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateSummaryTask.class);
 
@@ -83,7 +81,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
 
     private void configure() {
         showToUser(true);
-        titleProperty().set(Localization.lang("Waiting summary for %0...", citationKey));
+        titleProperty().set(Localization.lang("Summarizing %0...", citationKey));
 
         progressCounter.listenToAllProperties(this::updateProgress);
     }
@@ -124,7 +122,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
 
         if (bibDatabaseContext.getDatabasePath().isEmpty()) {
             LOGGER.info("No database path is present. Summary will not be stored in the next sessions");
-        } else if (CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, entry)) {
+        } else if (!CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, entry)) {
             LOGGER.info("No valid citation key is present. Summary will not be stored in the next sessions");
         } else {
             summariesStorage.set(bibDatabaseContext.getDatabasePath().get(), entry.getCitationKey().get(), summary);
@@ -208,7 +206,9 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
 
         int passes = 0;
 
+        // @formatter:off
         do {
+            // @formatter:on
             passes++;
             LOGGER.debug("Summarizing chunk(s) for file \"{}\" of entry {} ({} pass)", filePath, citationKey, passes);
 

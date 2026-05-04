@@ -12,9 +12,7 @@ import java.util.LinkedHashSet;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-/**
- * Reads abbreviation files (CSV format) into a list of Abbreviations.
- */
+/// Reads abbreviation files (CSV format) into a list of Abbreviations.
 public class AbbreviationParser {
     private static final Character[] DELIMITERS = {';', ','};
     private static final char NO_DELIMITER = '\0'; // empty char

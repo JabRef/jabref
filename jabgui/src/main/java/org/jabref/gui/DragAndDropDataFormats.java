@@ -6,9 +6,7 @@ import javafx.scene.input.DataFormat;
 
 import org.jabref.logic.preview.PreviewLayout;
 
-/**
- * Contains all the different {@link DataFormat}s that may occur in JabRef.
- */
+/// Contains all the different {@link DataFormat}s that may occur in JabRef.
 public class DragAndDropDataFormats {
 
     public static final DataFormat FIELD = new DataFormat("dnd/org.jabref.model.entry.field.Field");

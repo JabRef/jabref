@@ -7,10 +7,8 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 
-/**
- * Sends attachments for selected entries to the
- * configured Kindle email
- */
+/// Sends attachments for selected entries to the
+/// configured Kindle email
 public class SendAsKindleEmailAction extends SendAsEMailAction {
     private final GuiPreferences preferences;
 

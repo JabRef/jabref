@@ -19,11 +19,16 @@ import org.jabref.model.metadata.SaveOrder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("exporter")
 class YamlExporterTest {
 
     private static Exporter yamlExporter;
@@ -111,11 +116,11 @@ class YamlExporterTest {
     @Test
     void passesModifiedCharset(@TempDir Path tempFile) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
-            .withCitationKey("test")
-            .withField(StandardField.AUTHOR, "谷崎 潤一郎")
-            .withField(StandardField.TITLE, "細雪")
-            .withField(StandardField.URL, "http://example.com")
-            .withField(StandardField.DATE, "2020-10-14");
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "谷崎 潤一郎")
+                .withField(StandardField.TITLE, "細雪")
+                .withField(StandardField.URL, "http://example.com")
+                .withField(StandardField.DATE, "2020-10-14");
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
@@ -139,11 +144,11 @@ class YamlExporterTest {
     @Test
     void passesModifiedCharsetNull(@TempDir Path tempFile) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
-            .withCitationKey("test")
-            .withField(StandardField.AUTHOR, "谷崎 潤一郎")
-            .withField(StandardField.TITLE, "細雪")
-            .withField(StandardField.URL, "http://example.com")
-            .withField(StandardField.DATE, "2020-10-14");
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "谷崎 潤一郎")
+                .withField(StandardField.TITLE, "細雪")
+                .withField(StandardField.URL, "http://example.com")
+                .withField(StandardField.DATE, "2020-10-14");
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);

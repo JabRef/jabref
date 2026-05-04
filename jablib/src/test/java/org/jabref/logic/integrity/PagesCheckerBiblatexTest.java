@@ -7,12 +7,14 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+@ResourceLock("Localization.lang")
 public class PagesCheckerBiblatexTest {
 
     private PagesChecker checker;
@@ -37,8 +39,24 @@ public class PagesCheckerBiblatexTest {
                 // bibTexAcceptsNoSimpleRangeOfNumbers
                 "43+",
                 // bibTexAcceptsMorePageNumbersWithRangeOfNumbers
-                "7+,41--43,73"
-                );
+                "7+,41--43,73",
+                // suffix
+                "436S-439S",
+                // prefix
+                "S436-S439",
+                // prefix and suffix
+                "S436S-S439S",
+                // affix and more following range
+                "S10A+",
+                // unicode separator
+                "1\u201310",
+                // other separators
+                "A10S/90", "1/10",
+                // sequens and sequents
+                "1f", "1ff", "1 f.", "1 ff.", "1sq", "1sqq", "1 sq.", "1 sqq.",
+                // roman numerals
+                "i", "ivxlcdm", "IVXLCDM", "iS", "i-vi", "VII-xii"
+        );
     }
 
     @ParameterizedTest
@@ -54,8 +72,12 @@ public class PagesCheckerBiblatexTest {
                 // bibTexDoesNotAcceptMorePageNumbersWithoutComma
                 "1 2",
                 // bibTexDoesNotAcceptBrackets
-                "{1}-{2}"
-                );
+                "{1}-{2}",
+                // More than one suffix forbidden
+                "436SS-439S",
+                // invalid ranges
+                "10-", "-10", "10--", "--10", "+10", "10+-10"
+        );
     }
 
     @ParameterizedTest

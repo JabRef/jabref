@@ -12,6 +12,7 @@ import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,8 +30,8 @@ public class SearchQuery {
         this(searchExpression, EnumSet.noneOf(SearchFlags.class));
     }
 
-    public SearchQuery(String searchExpression, EnumSet<SearchFlags> searchFlags) {
-        this.searchExpression = Objects.requireNonNull(searchExpression);
+    public SearchQuery(@NonNull String searchExpression, EnumSet<SearchFlags> searchFlags) {
+        this.searchExpression = searchExpression;
         this.searchFlags = searchFlags;
         try {
             this.context = getStartContext(searchExpression);
@@ -38,7 +39,7 @@ public class SearchQuery {
         } catch (ParseCancellationException e) {
             // We use getCause here as the real exception is nested and this avoids that the stack trace get too large
             // and we don't see the root cause
-            LOGGER.error("Search query Parsing error", e.getCause());
+            LOGGER.debug("Search query Parsing error", e.getCause());
             isValidExpression = false;
         }
     }

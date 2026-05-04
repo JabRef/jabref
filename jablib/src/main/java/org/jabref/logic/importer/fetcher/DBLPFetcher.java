@@ -4,12 +4,11 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -21,15 +20,14 @@ import org.jabref.logic.layout.LayoutFormatterBasedFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.search.query.BaseQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.jspecify.annotations.NonNull;
 
-/**
- * Fetches BibTeX data from DBLP (dblp.org)
- *
- * @see <a href="https://dblp.dagstuhl.de/faq/13501473">Basic API documentation</a>
- */
+/// Fetches BibTeX data from DBLP (dblp.org)
+///
+/// @see <a href="https://dblp.dagstuhl.de/faq/13501473">Basic API documentation</a>
 public class DBLPFetcher implements SearchBasedParserFetcher {
     public static final String FETCHER_NAME = "DBLP";
 
@@ -37,15 +35,14 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
 
     private final ImportFormatPreferences importFormatPreferences;
 
-    public DBLPFetcher(ImportFormatPreferences importFormatPreferences) {
-        Objects.requireNonNull(importFormatPreferences);
+    public DBLPFetcher(@NonNull ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
-        uriBuilder.addParameter("q", new DBLPQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
+        uriBuilder.addParameter("q", new DBLPQueryTransformer().transformSearchQuery(queryNode).orElse(""));
         uriBuilder.addParameter("h", String.valueOf(100)); // number of hits
         uriBuilder.addParameter("c", String.valueOf(0)); // no need for auto-completion
         uriBuilder.addParameter("f", String.valueOf(0)); // "from", index of first hit to download
@@ -64,7 +61,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
         DoiCleanup doiCleaner = new DoiCleanup();
         doiCleaner.cleanup(entry);
 
-        FieldFormatterCleanups cleanups = new FieldFormatterCleanups(true,
+        FieldFormatterCleanupActions cleanups = new FieldFormatterCleanupActions(true,
                 List.of(
                         new FieldFormatterCleanup(StandardField.TIMESTAMP, new ClearFormatter()),
                         // unescape the contents of the URL field, e.g., some\_url\_part becomes some_url_part

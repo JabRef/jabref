@@ -4,9 +4,7 @@ import java.util.Objects;
 
 import org.jabref.model.entry.field.Field;
 
-/**
- * Matches entries based on a search phrase relative to the content in a specified field.
- */
+/// Matches entries based on a search phrase relative to the content in a specified field.
 public abstract class KeywordGroup extends AbstractGroup {
     protected final Field searchField;
     protected final String searchExpression;

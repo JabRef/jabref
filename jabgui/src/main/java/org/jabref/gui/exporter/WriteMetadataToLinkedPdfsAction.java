@@ -32,9 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
-/**
- * Writes XMP Metadata to all the linked pdfs of the selected entries according to the linking entry
- */
+/// Writes XMP Metadata to all the linked pdfs of the selected entries according to the linking entry
 public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(WriteMetadataToLinkedPdfsAction.class);
 
@@ -84,7 +82,7 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
                 return;
             } else {
                 boolean confirm = dialogService.showConfirmationDialogAndWait(
-                        Localization.lang("Write metadata to PDF files"),
+                        Localization.lang("Write metadata to PDF file(s)"),
                         Localization.lang("Write metadata for all PDFs in current library?"));
                 if (!confirm) {
                     return;

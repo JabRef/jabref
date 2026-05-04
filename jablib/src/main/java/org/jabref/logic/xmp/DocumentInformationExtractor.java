@@ -17,9 +17,7 @@ import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 
-/**
- * Related class: {@link org.jabref.logic.xmp.DublinCoreExtractor}
- */
+/// Related class: {@link org.jabref.logic.xmp.DublinCoreExtractor}
 public class DocumentInformationExtractor {
 
     private static final Map<COSName, Field> FIELD_MAPPING = Map.ofEntries(
@@ -67,30 +65,29 @@ public class DocumentInformationExtractor {
                 String fieldName = key.substring(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX.length());
                 Field field = FieldFactory.parseField(fieldName);
                 switch (field) {
-                    case InternalField.TYPE_HEADER -> bibEntry.setType(EntryTypeFactory.parse(value));
+                    case InternalField.TYPE_HEADER ->
+                            bibEntry.setType(EntryTypeFactory.parse(value));
                     case StandardField.MONTH -> {
                         value = Month.parse(value).map(Month::getJabRefFormat).orElse(value);
                         bibEntry.setField(StandardField.MONTH, value);
                     }
                     default ->
-                        bibEntry.setField(field, value);
+                            bibEntry.setField(field, value);
                 }
             }
         }
     }
 
-    /**
-     * Function for retrieving a BibEntry from the
-     * PDDocumentInformation in a PDF file.
-     *
-     * To understand how to get hold of a PDDocumentInformation have a look in
-     * the test cases for XMPUtilTest.
-     *
-     * The BibEntry is build by mapping individual fields in the document
-     * information (like author, title, keywords) to fields in a bibtex entry.
-     *
-     * @return The bibtex entry found in the document information.
-     */
+    /// Function for retrieving a BibEntry from the
+    /// PDDocumentInformation in a PDF file.
+    ///
+    /// To understand how to get hold of a PDDocumentInformation have a look in
+    /// the test cases for XMPUtilTest.
+    ///
+    /// The BibEntry is build by mapping individual fields in the document
+    /// information (like author, title, keywords) to fields in a bibtex entry.
+    ///
+    /// @return The bibtex entry found in the document information.
     public Optional<BibEntry> extractBibtexEntry() {
         this.extractAuthor();
         this.extractOtherFields();

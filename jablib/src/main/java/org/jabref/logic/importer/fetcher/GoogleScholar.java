@@ -9,7 +9,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,20 +27,19 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.paging.Page;
+import org.jabref.model.search.query.BaseQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * FulltextFetcher implementation that attempts to find a PDF URL at GoogleScholar.
- * <p>
- * Search String infos: https://scholar.google.com/intl/en/scholar/help.html#searching
- */
+/// FulltextFetcher implementation that attempts to find a PDF URL at GoogleScholar.
+///
+/// Search String infos: https://scholar.google.com/intl/en/scholar/help.html#searching
 public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleScholar.class);
 
@@ -53,15 +51,12 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
 
     private final ImportFormatPreferences importFormatPreferences;
 
-    public GoogleScholar(ImportFormatPreferences importFormatPreferences) {
-        Objects.requireNonNull(importFormatPreferences);
+    public GoogleScholar(@NonNull ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
-        Objects.requireNonNull(entry);
-
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException, FetcherException {
         // Search in title
         if (!entry.hasField(StandardField.TITLE)) {
             return Optional.empty();
@@ -179,9 +174,9 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     }
 
     @Override
-    public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
+    public Page<BibEntry> performSearchPaged(BaseQueryNode queryNode, int pageNumber) throws FetcherException {
         ScholarQueryTransformer queryTransformer = new ScholarQueryTransformer();
-        String transformedQuery = queryTransformer.transformLuceneQuery(luceneQuery).orElse("");
+        String transformedQuery = queryTransformer.transformSearchQuery(queryNode).orElse("");
 
         obtainAndModifyCookie();
 

@@ -1,8 +1,9 @@
 package org.jabref.gui.maintable;
 
+import javafx.application.Platform;
+import javafx.concurrent.Worker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -16,24 +17,30 @@ public class MainTableTooltip extends Tooltip {
 
     private final PreviewViewer preview;
     private final GuiPreferences preferences;
-    private final VBox tooltipContent = new VBox();
     private final Label fieldValueLabel = new Label();
 
     public MainTableTooltip(DialogService dialogService, GuiPreferences preferences, ThemeManager themeManager, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.preview = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
-        this.tooltipContent.getChildren().addAll(fieldValueLabel, preview);
+
+        preview.resizeForTooltipContent();
+
+        preview.getEngine().getLoadWorker().stateProperty().addListener((_, _, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                Platform.runLater(this::sizeToScene);
+            }
+        });
     }
 
     public Tooltip createTooltip(BibDatabaseContext databaseContext, BibEntry entry, String fieldValue) {
-        fieldValueLabel.setText(fieldValue + "\n");
         if (preferences.getPreviewPreferences().shouldShowPreviewEntryTableTooltip()) {
             preview.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
             preview.setDatabaseContext(databaseContext);
             preview.setEntry(entry);
-            this.setGraphic(tooltipContent);
+            setGraphic(preview);
         } else {
-            this.setGraphic(fieldValueLabel);
+            fieldValueLabel.setText(fieldValue);
+            setGraphic(fieldValueLabel);
         }
         return this;
     }

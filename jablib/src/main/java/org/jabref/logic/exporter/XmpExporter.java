@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -13,11 +12,11 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 
-/**
- * A custom exporter to write bib entries to a .xmp file for further processing
- * in other scenarios and applications. The xmp metadata are written in dublin
- * core format.
- */
+import org.jspecify.annotations.NonNull;
+
+/// A custom exporter to write bib entries to a .xmp file for further processing
+/// in other scenarios and applications. The xmp metadata are written in dublin
+/// core format.
 public class XmpExporter extends Exporter {
 
     public static final String XMP_SPLIT_DIRECTORY_INDICATOR = "split";
@@ -29,17 +28,13 @@ public class XmpExporter extends Exporter {
         this.xmpPreferences = xmpPreferences;
     }
 
-    /**
-     * @param databaseContext the database to export from
-     * @param file            the file to write to. If it contains "split", then the output is split into different files
-     * @param entries         a list containing all entries that should be exported
-     */
+    /// @param databaseContext the database to export from
+    /// @param file            the file to write to. If it contains "split", then the output is split into different files
+    /// @param entries         a list containing all entries that should be exported
     @Override
-    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws IOException {
-        Objects.requireNonNull(databaseContext);
-        Objects.requireNonNull(file);
-        Objects.requireNonNull(entries);
-
+    public void export(@NonNull BibDatabaseContext databaseContext,
+                       @NonNull Path file,
+                       @NonNull List<BibEntry> entries) throws IOException {
         if (entries.isEmpty()) {
             return;
         }

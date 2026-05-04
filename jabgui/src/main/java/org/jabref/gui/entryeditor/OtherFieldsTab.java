@@ -74,8 +74,8 @@ public class OtherFieldsTab extends FieldsEditorTab {
             Set<Field> allKnownFields = entryType.get().getAllFields();
             // Remove all fields being required or optional
             SequencedSet<Field> otherFields = entry.getFields().stream()
-                                          .filter(field -> !allKnownFields.contains(field))
-                                          .collect(Collectors.toCollection(LinkedHashSet::new));
+                                                   .filter(field -> !allKnownFields.contains(field))
+                                                   .collect(Collectors.toCollection(LinkedHashSet::new));
             // The key field is in the required tab, but has a special treatment
             otherFields.remove(InternalField.KEY_FIELD);
             // Remove all fields contained in JabRef's tab "Deprecated"

@@ -5,10 +5,12 @@ import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.RemoveBrackets;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
-import org.jabref.model.strings.StringUtil;
+
+import org.jspecify.annotations.Nullable;
 
 public class PersonNamesChecker implements ValueChecker {
 
@@ -19,7 +21,7 @@ public class PersonNamesChecker implements ValueChecker {
     }
 
     @Override
-    public Optional<String> checkValue(String value) {
+    public Optional<String> checkValue(@Nullable String value) {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();
         }
@@ -31,17 +33,27 @@ public class PersonNamesChecker implements ValueChecker {
             return Optional.of(Localization.lang("should end with a name"));
         }
 
+        // Check format with brackets first to support protected institutional authors
+        if (isStandardFormat(value)) {
+            return Optional.empty();
+        }
+
         // Remove all brackets to handle corporate names correctly, e.g., {JabRef}
-        value = new RemoveBrackets().format(value);
+        String valueWithoutBrackets = new RemoveBrackets().format(value);
+
         // Check that the value is in one of the two standard BibTeX formats:
         //  Last, First and ...
         //  First Last and ...
-        AuthorList authorList = AuthorList.parse(value);
-        if (!authorList.getAsLastFirstNamesWithAnd(false).equals(value)
-                && !authorList.getAsFirstLastNamesWithAnd().equals(value)) {
+        if (!isStandardFormat(valueWithoutBrackets)) {
             return Optional.of(Localization.lang("Names are not in the standard %0 format.", bibMode.getFormattedName()));
         }
 
         return Optional.empty();
+    }
+
+    private boolean isStandardFormat(String name) {
+        AuthorList authorList = AuthorList.parse(name);
+        return authorList.getAsLastFirstNamesWithAnd(false).equals(name)
+                || authorList.getAsFirstLastNamesWithAnd().equals(name);
     }
 }

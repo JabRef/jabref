@@ -11,9 +11,7 @@ import org.jabref.logic.importer.fileformat.ModsImporter;
 
 import org.apache.hc.core5.net.URIBuilder;
 
-/**
- * Fetcher for the Library of Congress Control Number (LCCN) using https://lccn.loc.gov/
- */
+/// Fetcher for the Library of Congress Control Number (LCCN) using https://lccn.loc.gov/
 public class LibraryOfCongress implements IdBasedParserFetcher {
 
     private final ImportFormatPreferences importFormatPreferences;

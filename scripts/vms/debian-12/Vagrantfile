@@ -5,7 +5,7 @@ NAME = "jabref-debian-12"
 
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "alvistack/debian-12"
+  config.vm.box = "debian/bookworm64"
 
   config.vm.define NAME
   config.vm.hostname = NAME
@@ -13,7 +13,13 @@ Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |v|
     v.name = NAME
     v.gui = true
-    v.customize ["modifyvm", :id, "--memory", "2048", "--cpus", "2"]
+    v.customize ["modifyvm", :id, "--memory", "4096", "--cpus", "2"]
+  end
+
+  # Issues with the kernel header at vagrant up
+  # Source: https://stackoverflow.com/a/52811930/873282
+  if Vagrant.has_plugin?("vagrant-vbguest")
+    config.vbguest.auto_update = false
   end
 
   config.vm.provision "shell", inline: <<-SHELL
@@ -21,39 +27,40 @@ Vagrant.configure("2") do |config|
     sudo apt-get -y upgrade
 
     # enable building of the virtual box guest addons
-    # hint from https://forums.virtualbox.org/viewtopic.php?p=508680&sid=fe86fb0f6c03c7443f1fba9a5c29a861#p508680
-    # sudo apt install -y build-essential dkms
+    # hint from "vagrant up" output
+    sudo apt install -y linux-headers-`uname -r` build-essential dkms
 
-    sudo apt-get install -y git
-
+    sudo apt-get install -y curl git xinit icewm
     # sudo apt-get install -y task-cinnamon-desktop
+  SHELL
 
+  config.ssh.forward_x11 = true
+
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+    # Install "Just Perfection GNOME Shell Extension"
+    # cd /tmp
+    # wget https://extensions.gnome.org/extension-data/just-perfection-desktopjust-perfection.v26.shell-extension.zip -O shell-extension.zip
+    # gnome-extensions install --force shell-extension.zip
+
+    # Install mise, clone JabRef's source code, and do an initial build
+    curl https://mise.run | sh
+    echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc
+  SHELL
+
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+    git clone --recurse-submodules https://github.com/JabRef/jabref.git
+    cd jabref
+    mise settings add idiomatic_version_file_enable_tools java
+    mise doctor
+    mise install
+    mise exec -- ./gradlew :jabgui:assemble
+  SHELL
+
+  config.vm.provision "shell", inline: <<-SHELL
     # install IntelliJ Community Edition - source: https://snapcraft.io/install/intellij-idea-community/debian
     sudo rm /etc/apt/preferences.d/nosnap.pref # source: https://stackoverflow.com/a/77235743/873282
     sudo apt-get install -y snapd
     sudo snap install snapd
     sudo snap install intellij-idea-community --classic
   SHELL
-
-  config.vm.provision "shell", privileged: false, inline: <<-SHELL
-    # Install "Just Perfection GNOME Shell Extension"
-    cd /tmp
-    wget https://extensions.gnome.org/extension-data/just-perfection-desktopjust-perfection.v26.shell-extension.zip -O shell-extension.zip
-    gnome-extensions install --force shell-extension.zip
-
-    # Install JDK, clone JabRef's source code, and do an initial build
-    curl -s "https://get.sdkman.io" | bash
-    source "$HOME/.sdkman/bin/sdkman-init.sh"
-    sdk install java 21.0.4-tem < /dev/null
-
-    cd ~
-    git clone --recurse-submodules https://github.com/JabRef/jabref.git
-    cd jabref
-    sdk use java 21.0.4-tem
-    ./gradlew jar
-  SHELL
-
-  config.vm.provision "shell", inline: "sudo reboot"
-
-  config.ssh.forward_x11 = true
 end

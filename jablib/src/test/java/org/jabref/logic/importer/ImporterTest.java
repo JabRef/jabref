@@ -1,6 +1,5 @@
 package org.jabref.logic.importer;
 
-import java.io.BufferedReader;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -16,35 +15,25 @@ import org.jabref.logic.importer.fileformat.MedlinePlainImporter;
 import org.jabref.logic.importer.fileformat.ModsImporter;
 import org.jabref.logic.importer.fileformat.MsBibImporter;
 import org.jabref.logic.importer.fileformat.OvidImporter;
-import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
-import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ResourceLock("Localization.lang")
 public class ImporterTest {
 
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
-    void isRecognizedFormatWithNullForBufferedReaderThrowsException(Importer format) {
-        assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((BufferedReader) null));
-    }
-
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
-    void isRecognizedFormatWithNullForStringThrowsException(Importer format) {
-        assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((String) null));
-    }
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s");
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
@@ -67,8 +56,7 @@ public class ImporterTest {
     @ParameterizedTest
     @MethodSource("instancesToTest")
     void getIdDoesNotContainWhitespace(Importer format) {
-        Pattern whitespacePattern = Pattern.compile("\\s");
-        assertFalse(whitespacePattern.matcher(format.getId()).find());
+        assertFalse(WHITESPACE_PATTERN.matcher(format.getId()).find());
     }
 
     @ParameterizedTest
@@ -80,7 +68,6 @@ public class ImporterTest {
     public static Stream<Importer> instancesToTest() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
-        XmpPreferences xmpPreferences = mock(XmpPreferences.class);
         return Stream.of(
                 // all classes implementing {@link Importer}
                 // sorted alphabetically

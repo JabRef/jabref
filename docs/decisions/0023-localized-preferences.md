@@ -10,7 +10,7 @@ Note: This is not implemented yet
 
 Currently, JabRef uses some localized preferences.
 Example: The email subject for sending references should be localized. A German user should use "Referenzen", whereas the English default is "References".
-In JabRef 5.x, it is implemented using `defaults.put(EMAIL_SUBJECT, Localization.lang("References"));` and `org.jabref.logic.preferences.JabRefCliPreferences#setLanguageDependentDefaultValues`.
+In JabRef 5.x, it is implemented using `defaults.put(EMAIL_SUBJECT, Localization.lang("References"));`.
 
 We want to remove the localization-dependency from `JabRefPreferences`.
 The aim is to move the Localization to where the string is used.

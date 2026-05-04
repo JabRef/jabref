@@ -4,9 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.MultipleSelectionModel;
 
-/**
- * Disables selection
- */
+/// Disables selection
 public class NoSelectionModel<T> extends MultipleSelectionModel<T> {
 
     @Override

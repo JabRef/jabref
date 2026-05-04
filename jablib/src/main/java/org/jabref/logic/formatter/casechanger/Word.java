@@ -3,19 +3,16 @@ package org.jabref.logic.formatter.casechanger;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Represents a word in a title of a bibtex entry.
- * <p>
- * A word can have protected chars (enclosed in '{' '}') and may be a small (a, an, the, ...) word.
- */
+import org.jspecify.annotations.NonNull;
+
+/// Represents a word in a title of a bibtex entry.
+///
+/// A word can have protected chars (enclosed in '{' '}') and may be a small (a, an, the, ...) word.
 public final class Word {
-    /**
-     * Set containing common lowercase function words
-     */
+    /// Set containing common lowercase function words
     public static final Set<String> SMALLER_WORDS;
 
     public static final Set<Character> DASHES = Set.of('-', '~', '⸗', '〰', '᐀', '֊', '־', '‐', '‑', '‒',
@@ -46,25 +43,21 @@ public final class Word {
                                     .collect(Collectors.toUnmodifiableSet());
     }
 
-    public Word(char[] chars, boolean[] protectedChars) {
-        this.chars = Objects.requireNonNull(chars);
-        this.protectedChars = Objects.requireNonNull(protectedChars);
+    public Word(char @NonNull [] chars, boolean @NonNull [] protectedChars) {
+        this.chars = chars;
+        this.protectedChars = protectedChars;
 
         if (this.chars.length != this.protectedChars.length) {
             throw new IllegalArgumentException("the chars and the protectedChars array must be of same length");
         }
     }
 
-    /**
-     * Case-insensitive check against {@link Word#SMALLER_WORDS}. Checks for common function words.
-     */
+    /// Case-insensitive check against {@link Word#SMALLER_WORDS}. Checks for common function words.
     public static boolean isSmallerWord(String word) {
         return SMALLER_WORDS.contains(word.toLowerCase(Locale.ROOT));
     }
 
-    /**
-     * Only change letters of the word that are unprotected to upper case.
-     */
+    /// Only change letters of the word that are unprotected to upper case.
     public void toUpperCase() {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
@@ -73,9 +66,7 @@ public final class Word {
         }
     }
 
-    /**
-     * Only change letters of the word that are unprotected to lower case.
-     */
+    /// Only change letters of the word that are unprotected to lower case.
     public void toLowerCase() {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
@@ -88,8 +79,8 @@ public final class Word {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
                 chars[i] = i == 0 ?
-                        Character.toUpperCase(chars[i]) :
-                        Character.toLowerCase(chars[i]);
+                           Character.toUpperCase(chars[i]) :
+                           Character.toLowerCase(chars[i]);
             }
         }
     }
@@ -98,8 +89,8 @@ public final class Word {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
                 chars[i] = i == 0 || (DASHES.contains(chars[i - 1])) ?
-                        Character.toUpperCase(chars[i]) :
-                        Character.toLowerCase(chars[i]);
+                           Character.toUpperCase(chars[i]) :
+                           Character.toLowerCase(chars[i]);
             }
         }
     }
@@ -108,18 +99,18 @@ public final class Word {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
                 chars[i] = i == 0 || (DASHES.contains(chars[i - 1]) && isConjunction(chars, i)) ?
-                        Character.toUpperCase(chars[i]) :
-                        Character.toLowerCase(chars[i]);
+                           Character.toUpperCase(chars[i]) :
+                           Character.toLowerCase(chars[i]);
             }
         }
     }
 
     private boolean isConjunction(char[] chars, int i) {
         StringBuilder word = new StringBuilder();
-            while (i < chars.length && !DASHES.contains(chars[i])) {
-                word.append(chars[i]);
-                i++;
-            }
+        while (i < chars.length && !DASHES.contains(chars[i])) {
+            word.append(chars[i]);
+            i++;
+        }
         return !CONJUNCTIONS.contains(word.toString());
     }
 
@@ -127,8 +118,8 @@ public final class Word {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
                 chars[i] = i == 0 || DASHES.contains(chars[i - 1]) ?
-                        Character.toUpperCase(chars[i]) :
-                        Character.toLowerCase(chars[i]);
+                           Character.toUpperCase(chars[i]) :
+                           Character.toLowerCase(chars[i]);
             }
         }
     }

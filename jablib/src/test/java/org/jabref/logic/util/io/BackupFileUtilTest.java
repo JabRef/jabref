@@ -44,11 +44,14 @@ class BackupFileUtilTest {
     @Test
     void getPathOfBackupFileAndCreateDirectoryReturnsSameDirectoryInCaseOfException() {
         backupDir = Directories.getBackupDirectory();
-        try (MockedStatic<Files> files = Mockito.mockStatic(Files.class, Answers.RETURNS_DEEP_STUBS)) {
+        try (MockedStatic<Files> files = Mockito.mockStatic(Files.class, Answers.CALLS_REAL_METHODS)) { // REAL_METHODS are required because of class loading of "BackupFileType"
             files.when(() -> Files.createDirectories(Directories.getBackupDirectory()))
                  .thenThrow(new IOException());
             Path testPath = Path.of("tmp", "test.bib");
-            Path result = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(testPath, BackupFileType.BACKUP, backupDir);
+            Path result = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(
+                    testPath,
+                    BackupFileType.BACKUP,
+                    backupDir);
             // The intended fallback behavior is to put the .bak file in the same directory as the .bib file
             assertEquals(Path.of("tmp", "test.bib.bak"), result);
         }

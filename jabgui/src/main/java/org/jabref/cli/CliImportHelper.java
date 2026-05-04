@@ -24,14 +24,12 @@ import org.slf4j.LoggerFactory;
 public class CliImportHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(CliImportHelper.class);
 
-    /**
-     * Reads URIs as input
-     *
-     * @param location URL or file path to import
-     */
+    /// Reads URIs as input
+    ///
+    /// @param location URL or file path to import
     public static Optional<ParserResult> importFile(String location,
-                                             CliPreferences cliPreferences,
-                                             boolean porcelain) {
+                                                    CliPreferences cliPreferences,
+                                                    boolean porcelain) {
         LOGGER.debug("Importing file from locaiton {}", location);
         String[] data = location.split(",");
 
@@ -42,7 +40,7 @@ public class CliImportHelper {
             try {
                 file = new URLDownload(address).toTemporaryFile();
             } catch (FetcherException |
-                    MalformedURLException e) {
+                     MalformedURLException e) {
                 System.err.println(Localization.lang("Problem downloading from %0: %1", address, e.getLocalizedMessage()));
                 return Optional.empty();
             }
@@ -63,9 +61,9 @@ public class CliImportHelper {
         return importResult;
     }
 
-   public static Optional<ParserResult> importFile(Path file,
-                                             CliPreferences cliPreferences,
-                                             boolean porcelain) {
+    public static Optional<ParserResult> importFile(Path file,
+                                                    CliPreferences cliPreferences,
+                                                    boolean porcelain) {
         try {
             ImportFormatReader importFormatReader = new ImportFormatReader(
                     cliPreferences.getImporterPreferences(),

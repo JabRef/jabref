@@ -14,13 +14,15 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
+import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
 import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 import org.jabref.logic.util.Version;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
@@ -32,15 +34,12 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Writing is done at {@link org.jabref.logic.exporter.MetaDataSerializer}.
- */
+/// Writing is done at {@link org.jabref.logic.exporter.MetaDataSerializer}.
 public class MetaDataParser {
 
     public static final List<FieldFormatterCleanup> DEFAULT_SAVE_ACTIONS;
@@ -90,19 +89,15 @@ public class MetaDataParser {
         return Optional.of(entryTypeBuilder.build());
     }
 
-    /**
-     * Parses the given data map and returns a new resulting {@link MetaData} instance.
-     */
-    public MetaData parse(Map<String, String> data, Character keywordSeparator) throws ParseException {
-        return parse(new MetaData(), data, keywordSeparator);
+    /// Parses the given data map and returns a new resulting {@link MetaData} instance.
+    public MetaData parse(Map<String, String> data, Character keywordSeparator, String userAndHost) throws ParseException {
+        return parse(new MetaData(), data, keywordSeparator, userAndHost);
     }
 
-    /**
-     * Parses the data map and changes the given {@link MetaData} instance respectively.
-     *
-     * @return the given metaData instance (which is modified, too)
-     */
-    public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator) throws ParseException {
+    /// Parses the data map and changes the given {@link MetaData} instance respectively.
+    ///
+    /// @return the given metaData instance (which is modified, too)
+    public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator, String userAndHost) throws ParseException {
         CitationKeyPattern defaultCiteKeyPattern = CitationKeyPattern.NULL_CITATION_KEY_PATTERN;
         Map<EntryType, CitationKeyPattern> nonDefaultCiteKeyPatterns = new HashMap<>();
 
@@ -128,10 +123,9 @@ public class MetaDataParser {
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
                 metaData.setUserFileDirectory(user, parseDirectory(entry.getValue()));
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY_LATEX)) {
-                // The user name starts directly after FILE_DIRECTORY_LATEX + '-'
-                String user = entry.getKey().substring(MetaData.FILE_DIRECTORY_LATEX.length() + 1);
-                Path path = Path.of(parseDirectory(entry.getValue())).normalize();
-                metaData.setLatexFileDirectory(user, path);
+                // The user-host string starts directly after FILE_DIRECTORY_LATEX + '-'
+                String userHostString = entry.getKey().substring(MetaData.FILE_DIRECTORY_LATEX.length() + 1);
+                metaData.setLatexFileDirectory(userHostString, parseDirectory(entry.getValue()));
             } else if (MetaData.SAVE_ACTIONS.equals(entry.getKey())) {
                 metaData.setSaveActions(fieldFormatterCleanupsParse(values));
             } else if (MetaData.DATABASE_TYPE.equals(entry.getKey())) {
@@ -147,7 +141,7 @@ public class MetaDataParser {
             } else if (MetaData.SAVE_ORDER_CONFIG.equals(entry.getKey())) {
                 metaData.setSaveOrder(SaveOrder.parse(values));
             } else if (MetaData.GROUPSTREE.equals(entry.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(entry.getKey())) {
-                metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData));
+                metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData, userAndHost));
             } else if (MetaData.GROUPS_SEARCH_SYNTAX_VERSION.equals(entry.getKey())) {
                 Version version = Version.parse(getSingleItem(values));
                 metaData.setGroupSearchSyntaxVersion(version);
@@ -166,16 +160,14 @@ public class MetaDataParser {
         return metaData;
     }
 
-    /**
-     * Parse the content of the value as provided by "raw" content.
-     *
-     * We do not use unescaped value (created by @link{#getAsList(java.lang.String)}),
-     * because this leads to difficulties with UNC names.
-     *
-     * No normalization is done - the library-specific file directory could be passed as Mac OS X path, but the user could sit on Windows.
-     *
-     * @param value the raw value (as stored in the .bib file)
-     */
+    /// Parse the content of the value as provided by "raw" content.
+    ///
+    /// We do not use unescaped value (created by @link{#getAsList(java.lang.String)}),
+    /// because this leads to difficulties with UNC names.
+    ///
+    /// No normalization is done - the library-specific file directory could be passed as Mac OS X path, but the user could sit on Windows.
+    ///
+    /// @param value the raw value (as stored in the .bib file)
     static String parseDirectory(String value) {
         value = StringUtil.removeStringAtTheEnd(value, MetaData.SEPARATOR_STRING);
         if (value.contains("\\\\\\\\")) {
@@ -192,13 +184,11 @@ public class MetaDataParser {
 
     private static Comparator<? super Map.Entry<String, String>> groupsLast() {
         return (s1, s2) -> MetaData.GROUPSTREE.equals(s1.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(s1.getKey()) ? 1 :
-                MetaData.GROUPSTREE.equals(s2.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(s2.getKey()) ? -1 : 0;
+                           MetaData.GROUPSTREE.equals(s2.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(s2.getKey()) ? -1 : 0;
     }
 
-    /**
-     * Returns the first item in the list.
-     * If the specified list does not contain exactly one item, then a {@link ParseException} will be thrown.
-     */
+    /// Returns the first item in the list.
+    /// If the specified list does not contain exactly one item, then a {@link ParseException} will be thrown.
     private static String getSingleItem(List<String> value) throws ParseException {
         if (value.size() == 1) {
             return value.getFirst();
@@ -224,9 +214,7 @@ public class MetaDataParser {
         return orderedValue;
     }
 
-    /**
-     * Reads the next unit. Units are delimited by ';' (MetaData.SEPARATOR_CHARACTER).
-     */
+    /// Reads the next unit. Units are delimited by ';' (MetaData.SEPARATOR_CHARACTER).
     private static Optional<String> getNextUnit(Reader reader) throws IOException {
         int c;
         boolean escape = false;
@@ -250,30 +238,28 @@ public class MetaDataParser {
                 res.append((char) c);
             }
         }
-        if (res.length() > 0) {
+        if (!res.isEmpty()) {
             return Optional.of(res.toString());
         }
         return Optional.empty();
     }
 
-    public static FieldFormatterCleanups fieldFormatterCleanupsParse(List<String> formatterMetaList) {
+    public static FieldFormatterCleanupActions fieldFormatterCleanupsParse(List<String> formatterMetaList) {
         if ((formatterMetaList != null) && (formatterMetaList.size() >= 2)) {
-            boolean enablementStatus = FieldFormatterCleanups.ENABLED.equals(formatterMetaList.getFirst());
+            boolean enablementStatus = FieldFormatterCleanupActions.ENABLED.equals(formatterMetaList.getFirst());
             String formatterString = formatterMetaList.get(1);
 
-            return new FieldFormatterCleanups(enablementStatus, FieldFormatterCleanups.parse(formatterString));
+            return new FieldFormatterCleanupActions(enablementStatus, FieldFormatterCleanupMapper.parseActions(formatterString));
         } else {
             // return default actions
-            return new FieldFormatterCleanups(false, DEFAULT_SAVE_ACTIONS);
+            return new FieldFormatterCleanupActions(false, DEFAULT_SAVE_ACTIONS);
         }
     }
 
-    /**
-     * Handles a blgFilePath-* metadata entry. Expects exactly one valid path.
-     *
-     * @param entry the metadata entry containing the user-specific .blg path.
-     * @param metaData the MetaData object to update.
-     */
+    /// Handles a blgFilePath-* metadata entry. Expects exactly one valid path.
+    ///
+    /// @param entry    the metadata entry containing the user-specific .blg path.
+    /// @param metaData the MetaData object to update.
     private void handleBlgFilePathEntry(Map.Entry<String, String> entry, MetaData metaData) {
         String user = entry.getKey().substring(MetaData.BLG_FILE_PATH.length() + 1);
         List<String> values;

@@ -2,3 +2,18 @@
 # JabRef database specific files for persistence, not relevant to persist
 *.sav
 *.bak
+
+### macOS ###
+.DS_Store
+.AppleDouble
+.LSOverride
+
+### Windows ###
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+### Misc temp ###
+*.tmp
+*.temp
+*~

@@ -5,7 +5,7 @@ import java.util.List;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -25,7 +25,7 @@ public class ChangeEntryTypeAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        NamedCompound compound = new NamedCompound(Localization.lang("Change entry type"));
+        NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("Change entry type"));
         entries.forEach(e -> e.setType(type)
                               .ifPresent(change -> compound.addEdit(new UndoableChangeType(change))));
         undoManager.addEdit(compound);

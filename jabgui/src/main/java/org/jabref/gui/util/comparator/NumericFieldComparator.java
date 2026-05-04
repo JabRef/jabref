@@ -2,12 +2,10 @@ package org.jabref.gui.util.comparator;
 
 import java.util.Comparator;
 
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
-/**
- * Comparator for numeric cases. The purpose of this class is to add the numeric comparison, because values are sorted
- * as if they were strings.
- */
+/// Comparator for numeric cases. The purpose of this class is to add the numeric comparison, because values are sorted
+/// as if they were strings.
 public class NumericFieldComparator implements Comparator<String> {
 
     @Override

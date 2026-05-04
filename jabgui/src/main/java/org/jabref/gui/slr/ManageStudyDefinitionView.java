@@ -27,7 +27,6 @@ import javafx.scene.input.MouseButton;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -37,16 +36,10 @@ import org.jabref.model.study.Study;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-/**
- * This class controls the user interface of the study definition management dialog. The UI elements and their layout
- * are defined in the FXML file.
- */
+/// This class controls the user interface of the study definition management dialog. The UI elements and their layout
+/// are defined in the FXML file.
 public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ManageStudyDefinitionView.class);
-
     @FXML private TextField studyTitle;
     @FXML private TextField addAuthor;
     @FXML private TextField addResearchQuestion;
@@ -75,9 +68,15 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
     @FXML private Label directoryWarning;
 
+    @FXML private Label validationHeaderLabel;
+    @FXML private Label titleValidationLabel;
+    @FXML private Label authorsValidationLabel;
+    @FXML private Label questionsValidationLabel;
+    @FXML private Label queriesValidationLabel;
+    @FXML private Label catalogsValidationLabel;
+
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
-    @Inject private ThemeManager themeManager;
 
     private ManageStudyDefinitionViewModel viewModel;
 
@@ -89,11 +88,9 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     // or the "real" directory of the study
     private final Path pathToStudyDataDirectory;
 
-    /**
-     * This is used to create a new study
-     *
-     * @param pathToStudyDataDirectory This directory is proposed in the file chooser
-     */
+    /// This is used to create a new study
+    ///
+    /// @param pathToStudyDataDirectory This directory is proposed in the file chooser
     public ManageStudyDefinitionView(Path pathToStudyDataDirectory) {
         this.pathToStudyDataDirectory = pathToStudyDataDirectory;
         this.setTitle(Localization.lang("Define study parameters"));
@@ -104,16 +101,12 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                   .setAsDialogPane(this);
 
         setupSaveSurveyButton(false);
-
-        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
-    /**
-     * This is used to edit an existing study.
-     *
-     * @param study the study to edit
-     * @param studyDirectory the directory of the study
-     */
+    /// This is used to edit an existing study.
+    ///
+    /// @param study          the study to edit
+    /// @param studyDirectory the directory of the study
     public ManageStudyDefinitionView(Study study, Path studyDirectory) {
         this.pathToStudyDataDirectory = studyDirectory;
         this.setTitle(Localization.lang("Manage study definition"));
@@ -124,8 +117,6 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                   .setAsDialogPane(this);
 
         setupSaveSurveyButton(true);
-
-        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     private void setupSaveSurveyButton(boolean isEdit) {
@@ -138,10 +129,10 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         saveSurveyButton.disableProperty().bind(Bindings.or(Bindings.or(Bindings.or(Bindings.or(Bindings.or(
                                                 Bindings.isEmpty(viewModel.getQueries()),
                                                 Bindings.isEmpty(viewModel.getCatalogs())),
-                                                Bindings.isEmpty(viewModel.getAuthors())),
-                                                viewModel.getTitle().isEmpty()),
-                                                viewModel.getDirectory().isEmpty()),
-                                                directoryWarning.visibleProperty()));
+                                        Bindings.isEmpty(viewModel.getAuthors())),
+                                viewModel.getTitle().isEmpty()),
+                        viewModel.getDirectory().isEmpty()),
+                directoryWarning.visibleProperty()));
 
         setResultConverter(button -> {
             if (button == saveSurveyButtonType) {
@@ -160,6 +151,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                     preferences.getImportFormatPreferences(),
                     preferences.getImporterPreferences(),
                     preferences.getWorkspacePreferences(),
+                    preferences.getGitPreferences(),
                     dialogService);
         } else {
             viewModel = new ManageStudyDefinitionViewModel(
@@ -168,6 +160,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                     preferences.getImportFormatPreferences(),
                     preferences.getImporterPreferences(),
                     preferences.getWorkspacePreferences(),
+                    preferences.getGitPreferences(),
                     dialogService);
 
             // The directory of the study cannot be changed
@@ -183,6 +176,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         initQuestionsTab();
         initQueriesTab();
         initCatalogsTab();
+        initValidationBindings();
     }
 
     private void updateDirectoryWarning(Path directory) {
@@ -255,6 +249,34 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         catalogColumn.setCellValueFactory(param -> param.getValue().nameProperty());
 
         catalogTable.setItems(viewModel.getCatalogs());
+    }
+
+    private void initValidationBindings() {
+        // Header label
+        validationHeaderLabel.textProperty().bind(viewModel.validationHeaderMessageProperty());
+        validationHeaderLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.validationHeaderMessageProperty()));
+        validationHeaderLabel.managedProperty().bind(validationHeaderLabel.visibleProperty());
+
+        // Specific validation messages
+        titleValidationLabel.textProperty().bind(viewModel.titleValidationMessageProperty());
+        titleValidationLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.titleValidationMessageProperty()));
+        titleValidationLabel.managedProperty().bind(titleValidationLabel.visibleProperty());
+
+        authorsValidationLabel.textProperty().bind(viewModel.authorsValidationMessageProperty());
+        authorsValidationLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.authorsValidationMessageProperty()));
+        authorsValidationLabel.managedProperty().bind(authorsValidationLabel.visibleProperty());
+
+        questionsValidationLabel.textProperty().bind(viewModel.questionsValidationMessageProperty());
+        questionsValidationLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.questionsValidationMessageProperty()));
+        questionsValidationLabel.managedProperty().bind(questionsValidationLabel.visibleProperty());
+
+        queriesValidationLabel.textProperty().bind(viewModel.queriesValidationMessageProperty());
+        queriesValidationLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.queriesValidationMessageProperty()));
+        queriesValidationLabel.managedProperty().bind(queriesValidationLabel.visibleProperty());
+
+        catalogsValidationLabel.textProperty().bind(viewModel.catalogsValidationMessageProperty());
+        catalogsValidationLabel.visibleProperty().bind(Bindings.isNotEmpty(viewModel.catalogsValidationMessageProperty()));
+        catalogsValidationLabel.managedProperty().bind(catalogsValidationLabel.visibleProperty());
     }
 
     private void setupCommonPropertiesForTables(Node addControl,

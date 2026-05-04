@@ -1,7 +1,6 @@
 package org.jabref.gui.specialfields;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -22,16 +21,20 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
 
+import org.jspecify.annotations.NonNull;
+
 public class SpecialFieldViewModel {
 
     private final SpecialField field;
     private final CliPreferences preferences;
     private final UndoManager undoManager;
 
-    public SpecialFieldViewModel(SpecialField field, CliPreferences preferences, UndoManager undoManager) {
-        this.field = Objects.requireNonNull(field);
-        this.preferences = Objects.requireNonNull(preferences);
-        this.undoManager = Objects.requireNonNull(undoManager);
+    public SpecialFieldViewModel(@NonNull SpecialField field,
+                                 @NonNull CliPreferences preferences,
+                                 @NonNull UndoManager undoManager) {
+        this.field = field;
+        this.preferences = preferences;
+        this.undoManager = undoManager;
     }
 
     public SpecialField getField() {
@@ -65,12 +68,18 @@ public class SpecialFieldViewModel {
 
     public Action getAction() {
         return switch (field) {
-            case PRINTED -> StandardActions.PRINTED;
-            case PRIORITY -> StandardActions.PRIORITY;
-            case QUALITY -> StandardActions.QUALITY;
-            case RANKING -> StandardActions.RANKING;
-            case READ_STATUS -> StandardActions.READ_STATUS;
-            case RELEVANCE -> StandardActions.RELEVANCE;
+            case PRINTED ->
+                    StandardActions.PRINTED;
+            case PRIORITY ->
+                    StandardActions.PRIORITY;
+            case QUALITY ->
+                    StandardActions.QUALITY;
+            case RANKING ->
+                    StandardActions.RANKING;
+            case READ_STATUS ->
+                    StandardActions.READ_STATUS;
+            case RELEVANCE ->
+                    StandardActions.RELEVANCE;
         };
     }
 

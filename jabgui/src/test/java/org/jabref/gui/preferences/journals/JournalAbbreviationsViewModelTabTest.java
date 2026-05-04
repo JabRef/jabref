@@ -92,9 +92,9 @@ class JournalAbbreviationsViewModelTabTest {
     }
 
     private static String csvListOfAbbreviations(List<TestAbbreviation> testAbbreviations) {
-       return testAbbreviations.stream()
-               .map(TestAbbreviation::toString)
-               .collect(Collectors.joining("\n"));
+        return testAbbreviations.stream()
+                                .map(TestAbbreviation::toString)
+                                .collect(Collectors.joining("\n"));
     }
 
     private static String csvListOfAbbreviations(TestAbbreviation... testAbbreviations) {
@@ -113,9 +113,7 @@ class JournalAbbreviationsViewModelTabTest {
             List<String> finalContentsOfFile2,
             List<String> finalContentsOfFile3
     ) {
-        /**
-         * Note that we have a **different** ordering at the constructor, because Java generics have "type erasure"
-         */
+        /// Note that we have a **different** ordering at the constructor, because Java generics have "type erasure"
         public TestData(
                 List<CsvFileNameAndContent> csvFiles,
                 List<TestAbbreviation> finalContentsOfFile2,
@@ -511,9 +509,7 @@ class JournalAbbreviationsViewModelTabTest {
         assertEquals(testData.finalContentsOfFile3, actual);
     }
 
-    /**
-     * Select the last abbreviation in the list of abbreviations
-     */
+    /// Select the last abbreviation in the list of abbreviations
     private void selectLastAbbreviation() {
         viewModel.currentAbbreviationProperty()
                  .set(viewModel.abbreviationsProperty().get(viewModel.abbreviationsCountProperty().get() - 1));

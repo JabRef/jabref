@@ -1,14 +1,12 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.util.Objects;
-
-import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.AuthorList;
 
-/**
- * Formatter normalizing a list of person names to the BibTeX format.
- */
+import org.jspecify.annotations.NonNull;
+
+/// Formatter normalizing a list of person names to the BibTeX format.
 public class NormalizeNamesFormatter extends Formatter {
 
     @Override
@@ -22,8 +20,7 @@ public class NormalizeNamesFormatter extends Formatter {
     }
 
     @Override
-    public String format(String nameList) {
-        Objects.requireNonNull(nameList);
+    public String format(@NonNull String nameList) {
         AuthorList authorList = AuthorList.parse(nameList);
         return authorList.getAsLastFirstNamesWithAnd(false);
     }

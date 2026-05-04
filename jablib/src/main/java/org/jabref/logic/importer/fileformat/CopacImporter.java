@@ -2,9 +2,9 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.Importer;
@@ -18,11 +18,11 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 
-/**
- * Importer for COPAC format.
- * <p>
- * Documentation can be found online at: <a href="http://copac.ac.uk/faq/#format">http://copac.ac.uk/faq/#format</a>
- */
+import org.jspecify.annotations.NonNull;
+
+/// Importer for COPAC format.
+///
+/// Documentation can be found online at: <a href="http://copac.ac.uk/faq/#format">http://copac.ac.uk/faq/#format</a>
 public class CopacImporter extends Importer {
 
     private static final Pattern COPAC_PATTERN = Pattern.compile("^\\s*TI- ");
@@ -48,9 +48,10 @@ public class CopacImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(reader);
         String str;
-        while ((str = reader.readLine()) != null) {
+        while ((str = bufferedReader.readLine()) != null) {
             if (CopacImporter.COPAC_PATTERN.matcher(str).find()) {
                 return true;
             }
@@ -67,9 +68,7 @@ public class CopacImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
-
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         List<String> entries = new LinkedList<>();
         StringBuilder sb = new StringBuilder();
 

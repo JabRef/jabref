@@ -20,4 +20,9 @@ class MetaDataTest {
     void emptyGroupsIfNotSet() {
         assertEquals(Optional.empty(), metaData.getGroups());
     }
+
+    @Test
+    void getLatexFileDirectoryReturnsEmptyWhenNotSet() {
+        assertEquals(Optional.empty(), metaData.getLatexFileDirectory("user-host"));
+    }
 }

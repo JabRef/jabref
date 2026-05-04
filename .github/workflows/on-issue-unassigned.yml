@@ -2,18 +2,22 @@ name: On issue unassigned
 
 on:
   issues:
-     types:
-       - unassigned
+    types:
+      - unassigned
 
 jobs:
   columns_and_labels:
     if: ${{ github.repository_owner == 'JabRef' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       issues: write
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: Check assignees
         id: check_assignee
         run: |
@@ -51,11 +55,6 @@ jobs:
       - name: Remove labels assigned, reminder-sent, pinned, and "FirstTimeCodeContribution"
         if: steps.check_assignee.outputs.assigned == 'no'
         run: |
-          set -e
-
-          gh issue edit ${{ github.event.issue.number }} --remove-label "📍 Assigned"
-          gh issue edit ${{ github.event.issue.number }} --remove-label "🔔 reminder-sent"
-          gh issue edit ${{ github.event.issue.number }} --remove-label "📌 Pinned"
-          gh issue edit ${{ github.event.issue.number }} --remove-label "FirstTimeCodeContribution"
+          gh issue edit ${{ github.event.issue.number }} --remove-label "📍 Assigned,🔔 reminder-sent,📌 Pinned,FirstTimeCodeContribution"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

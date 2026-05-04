@@ -60,7 +60,7 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
 
     @Test
     void searchByTitle() throws FetcherException {
-        List<BibEntry> entries = fetcher.performSearch("title: \"Test Anxiety Analysis of Chinese College Students in Computer-based Spoken English Test\"");
+        List<BibEntry> entries = fetcher.performSearch("title= \"Test Anxiety Analysis of Chinese College Students in Computer-based Spoken English Test\"");
         assertEquals(List.of(bibEntry), entries);
     }
 

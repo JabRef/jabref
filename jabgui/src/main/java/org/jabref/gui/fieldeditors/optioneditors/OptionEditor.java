@@ -13,9 +13,7 @@ import org.jabref.model.entry.BibEntry;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-/**
- * Field editor that provides various pre-defined options as a drop-down combobox.
- */
+/// Field editor that provides various pre-defined options as a drop-down combobox.
 public class OptionEditor<T> extends HBox implements FieldEditorFX {
 
     @FXML private final OptionEditorViewModel<T> viewModel;

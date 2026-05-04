@@ -22,8 +22,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,12 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-/**
- * This class tests the BibtexImporter.
- * <p>
- * Tests for writing can be found at {@link org.jabref.logic.exporter.BibtexDatabaseWriterTest}.
- * Tests for parsing single entry BibTeX can be found at {@link BibtexParserTest}
- */
+/// This class tests the BibtexImporter.
+///
+/// Tests for writing can be found at {@link org.jabref.logic.exporter.BibDatabaseWriterTest}.
+/// Tests for parsing single entry BibTeX can be found at {@link BibtexParserTest}
 class BibtexImporterTest {
 
     private BibtexImporter importer;
@@ -156,7 +154,7 @@ class BibtexImporterTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"encoding-windows-1252-with-header.bib", "encoding-windows-1252-without-header.bib"})
+    @ValueSource(strings = {"encoding-windows-1252-with-header.bib", "encoding-windows-1252-without-header.bib"})
     void parsingOfWindows1252EncodedFileReadsDegreeCharacterCorrectly(String filename) throws URISyntaxException, IOException {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
@@ -166,7 +164,7 @@ class BibtexImporterTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"encoding-utf-8-with-header.bib", "encoding-utf-8-without-header.bib",
+    @ValueSource(strings = {"encoding-utf-8-with-header.bib", "encoding-utf-8-without-header.bib",
             "encoding-utf-16BE-with-header.bib", "encoding-utf-16BE-without-header.bib"})
     void parsingFilesReadsUmlautCharacterCorrectly(String filename) throws URISyntaxException, IOException {
         ParserResult parserResult = importer.importDatabase(

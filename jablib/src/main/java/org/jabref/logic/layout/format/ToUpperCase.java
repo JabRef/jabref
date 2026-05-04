@@ -4,9 +4,7 @@ import java.util.Locale;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-/**
- * Convert the contents to upper case.
- */
+/// Convert the contents to upper case.
 public class ToUpperCase implements LayoutFormatter {
 
     @Override

@@ -36,9 +36,7 @@ public class EditMerge {
     private EditMerge() {
     }
 
-    /**
-     * @return true if modified document
-     */
+    /// @return true if modified document
     public static boolean mergeCitationGroups(XTextDocument doc, OOFrontend frontend, JStyle style)
             throws
             CreationException,
@@ -60,8 +58,8 @@ public class EditMerge {
                 List<CitationGroup> groups = joinableGroupData.group;
 
                 List<Citation> newCitations = groups.stream()
-                                                     .flatMap(group -> group.citationsInStorageOrder.stream())
-                                                     .collect(Collectors.toList());
+                                                    .flatMap(group -> group.citationsInStorageOrder.stream())
+                                                    .collect(Collectors.toList());
 
                 CitationType citationType = groups.getFirst().citationType;
                 List<Optional<OOText>> pageInfos = frontend.backend.combinePageInfos(groups);
@@ -93,10 +91,8 @@ public class EditMerge {
         return madeModifications;
     }
 
-    /**
-     * @param group       A list of consecutive citation groups only separated by spaces.
-     * @param groupCursor A cursor covering the XTextRange of each entry in group (and the spaces between them)
-     */
+    /// @param group       A list of consecutive citation groups only separated by spaces.
+    /// @param groupCursor A cursor covering the XTextRange of each entry in group (and the spaces between them)
     private record JoinableGroupData(List<CitationGroup> group, XTextCursor groupCursor) {
     }
 
@@ -135,17 +131,17 @@ public class EditMerge {
         }
     }
 
-    /**
-     * Decide if group could be added to state.currentGroup
-     *
-     * @param group        The CitationGroup to test
-     * @param currentRange The XTextRange corresponding to group.
-     * @return false if cannot add, true if can.  If returned true, then state.cursorBetween and state.currentGroupCursor are expanded to end at the start of currentRange.
-     */
+    /// Decide if group could be added to state.currentGroup
+    ///
+    /// @param group        The CitationGroup to test
+    /// @param currentRange The XTextRange corresponding to group.
+    /// @return false if cannot add, true if can.  If returned true, then state.cursorBetween and state.currentGroupCursor are expanded to end at the start of currentRange.
     private static boolean checkAddToGroup(ScanState state, CitationGroup group, XTextRange currentRange) {
         if (state.currentGroup.isEmpty()) {
             return false;
         }
+
+        final String loggerMessage = "MergeCitationGroups: cursorBetween.end != currentGroupCursor.end";
 
         Objects.requireNonNull(state.currentGroupCursor);
         Objects.requireNonNull(state.cursorBetween);
@@ -177,8 +173,8 @@ public class EditMerge {
                                 state.prevRange.getString(),
                                 currentRange.getString(),
                                 (textOrder == 0
-                                        ? "they start at the same position"
-                                        : "the start of the latter precedes the start of the first"));
+                                 ? "they start at the same position"
+                                 : "the start of the latter precedes the start of the first"));
                 LOGGER.warn(msg);
                 return false;
             }
@@ -193,10 +189,20 @@ public class EditMerge {
 
         // assume: currentGroupCursor.getEnd() == cursorBetween.getEnd()
         if (UnoTextRange.compareEnds(state.cursorBetween, state.currentGroupCursor) != 0) {
-            LOGGER.warn("MergeCitationGroups: cursorBetween.end != currentGroupCursor.end");
-            throw new IllegalStateException("MergeCitationGroups failed");
+            LOGGER.warn(loggerMessage);
+            return false;
         }
 
+        return checkCouldExpand(state, currentRange, loggerMessage);
+    }
+
+    /// Helper method for checkAddToGroup. Tries to expand state.currentGroupCursor and state.cursorBetween by going right to reach rangeStart.
+    ///
+    /// @param state         The CitationGroup to test.
+    /// @param currentRange  The XTextRange corresponding to group.
+    /// @param loggerMessage The failure message for the LOGGER.
+    /// @return false if cannot expand, true if can.
+    private static boolean checkCouldExpand(ScanState state, XTextRange currentRange, String loggerMessage) {
         /*
          * Try to expand state.currentGroupCursor and state.cursorBetween by going right to reach
          * rangeStart.
@@ -213,7 +219,7 @@ public class EditMerge {
             couldExpand = thisCharCursor.goRight((short) 1, true);
             String thisChar = thisCharCursor.getString();
             thisCharCursor.collapseToEnd();
-            if (thisChar.isEmpty() || "\n".equals(thisChar) || !thisChar.trim().isEmpty()) {
+            if (thisChar.isEmpty() || "\n".equals(thisChar) || !thisChar.isBlank()) {
                 couldExpand = false;
                 if (!thisChar.isEmpty()) {
                     thisCharCursor.goLeft((short) 1, false);
@@ -225,17 +231,14 @@ public class EditMerge {
 
             // These two should move in sync:
             if (UnoTextRange.compareEnds(state.cursorBetween, state.currentGroupCursor) != 0) {
-                LOGGER.warn("MergeCitationGroups: cursorBetween.end != currentGroupCursor.end (during expand)");
-                throw new IllegalStateException("MergeCitationGroups failed");
+                LOGGER.warn("{} (during expand)", loggerMessage);
+                return false;
             }
         }
-
         return couldExpand;
     }
 
-    /**
-     * Add group to state.currentGroup Set state.cursorBetween to start at currentRange.getEnd() Expand state.currentGroupCursor to also cover currentRange Set state.prev to group, state.prevRange to currentRange
-     */
+    /// Add group to state.currentGroup Set state.cursorBetween to start at currentRange.getEnd() Expand state.currentGroupCursor to also cover currentRange Set state.prev to group, state.prevRange to currentRange
     private static void addToCurrentGroup(ScanState state, CitationGroup group, XTextRange currentRange) {
         final boolean isNewGroup = state.currentGroup.isEmpty();
         if (!isNewGroup) {
@@ -255,7 +258,7 @@ public class EditMerge {
         // If new group, create currentGroupCursor
         if (isNewGroup) {
             state.currentGroupCursor = currentRange.getText()
-                                                    .createTextCursorByRange(currentRange.getStart());
+                                                   .createTextCursorByRange(currentRange.getStart());
         }
 
         // include currentRange in currentGroupCursor
@@ -263,7 +266,7 @@ public class EditMerge {
 
         if (UnoTextRange.compareEnds(state.cursorBetween, state.currentGroupCursor) != 0) {
             LOGGER.warn("MergeCitationGroups: cursorBetween.end != currentGroupCursor.end");
-            throw new IllegalStateException("MergeCitationGroups failed");
+            return;
         }
 
         /* Store data about last entry in currentGroup */
@@ -271,9 +274,7 @@ public class EditMerge {
         state.prevRange = currentRange;
     }
 
-    /**
-     * Scan the document for joinable groups. Return those found.
-     */
+    /// Scan the document for joinable groups. Return those found.
     private static List<JoinableGroupData> scan(XTextDocument doc, OOFrontend frontend)
             throws
             NoDocumentException,
@@ -289,7 +290,7 @@ public class EditMerge {
 
         for (CitationGroup group : groups) {
             XTextRange currentRange = frontend.getMarkRange(doc, group)
-                                               .orElseThrow(IllegalStateException::new);
+                                              .orElseThrow(IllegalStateException::new);
 
             /*
              * Decide if we add group to the group. False when the group is empty.

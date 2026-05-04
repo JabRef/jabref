@@ -25,10 +25,11 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    if: github.repository == 'JabRef/jabref'
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           show-progress: 'false'
       - name: Setup Ruby
@@ -40,13 +41,13 @@ jobs:
           working-directory: docs/
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: Build with Jekyll
         run: |
           cd docs
           bundle exec jekyll build
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: docs/_site/
 
@@ -55,9 +56,9 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: build
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

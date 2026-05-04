@@ -3,11 +3,9 @@ package org.jabref.logic.layout.format;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.model.entry.AuthorList;
 
-/**
- * Duplicate of AuthorLastFirstAbbreviator.
- *
- * @see AuthorLastFirstAbbreviator
- */
+/// Duplicate of AuthorLastFirstAbbreviator.
+///
+/// @see AuthorLastFirstAbbreviator
 public class AuthorAbbreviator implements LayoutFormatter {
 
     /*

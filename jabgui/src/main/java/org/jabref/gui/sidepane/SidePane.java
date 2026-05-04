@@ -10,11 +10,11 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.collections.ListChangeListener;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.ai.AiService;
@@ -64,13 +64,13 @@ public class SidePane extends VBox {
         updateView();
     }
 
-     private void updateView() {
+    private void updateView() {
         getChildren().clear();
-         for (SidePaneType type : stateManager.getVisibleSidePaneComponents()) {
-             SidePaneComponent view = viewModel.getSidePaneComponent(type);
-             getChildren().add(view);
-         }
-     }
+        for (SidePaneType type : stateManager.getVisibleSidePaneComponents()) {
+            SidePaneComponent view = viewModel.getSidePaneComponent(type);
+            getChildren().add(view);
+        }
+    }
 
     public BooleanBinding paneVisibleBinding(SidePaneType pane) {
         BooleanBinding visibility = Bindings.createBooleanBinding(

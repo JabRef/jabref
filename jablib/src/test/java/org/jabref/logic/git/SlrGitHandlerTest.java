@@ -6,25 +6,57 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jabref.logic.git.preferences.GitPreferences;
+import org.jabref.logic.git.util.NoopGitSystemReader;
+
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.internal.storage.file.WindowCache;
+import org.eclipse.jgit.lib.RepositoryCache;
+import org.eclipse.jgit.storage.file.WindowCacheConfig;
+import org.eclipse.jgit.util.SystemReader;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+@Execution(ExecutionMode.SAME_THREAD)
+@ResourceLock("git")
 class SlrGitHandlerTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(SlrGitHandlerTest.class);
 
     @TempDir
     Path repositoryPath;
+
     private SlrGitHandler gitHandler;
 
     @BeforeEach
     void setUpGitHandler() {
-        gitHandler = new SlrGitHandler(repositoryPath);
+        SystemReader.setInstance(new NoopGitSystemReader());
+
+        GitPreferences gitPreferences = mock(GitPreferences.class);
+        when(gitPreferences.getUsername()).thenReturn("");
+        when(gitPreferences.getPat()).thenReturn("");
+
+        gitHandler = new SlrGitHandler(repositoryPath, gitPreferences);
+        gitHandler.initIfNeeded();
+    }
+
+    @AfterEach
+    void cleanUp() {
+        // Required by JGit
+        // See https://github.com/eclipse-jgit/jgit/issues/155#issuecomment-2765437816 for details
+        RepositoryCache.clear();
+        // See https://github.com/eclipse-jgit/jgit/issues/155#issuecomment-3095957214
+        WindowCache.reconfigure(new WindowCacheConfig());
     }
 
     @Test

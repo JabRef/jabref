@@ -8,9 +8,7 @@ import java.util.regex.Pattern;
 
 import javafx.scene.text.Text;
 
-/**
- * Utility class with static methods for javafx {@link Text} objects
- */
+/// Utility class with static methods for javafx {@link Text} objects
 public class TooltipTextUtil {
 
     // (?s) tells Java that "." also matches the newline character
@@ -46,10 +44,8 @@ public class TooltipTextUtil {
         return createText(textString, TextType.NORMAL);
     }
 
-    /**
-     * Creates a list of Text elements respecting <code>tt</code> and <code>b</code> markers.
-     * Nesting of these markers is not possible.
-     */
+    /// Creates a list of Text elements respecting `tt` and `b` markers.
+    /// Nesting of these markers is not possible.
     public static List<Text> createTextsFromHtml(String htmlString) {
         List<Text> result = new ArrayList<>();
 
@@ -94,9 +90,7 @@ public class TooltipTextUtil {
         return result;
     }
 
-    /**
-     * Formats a String to multiple Texts by replacing some parts and adding font characteristics.
-     */
+    /// Formats a String to multiple Texts by replacing some parts and adding font characteristics.
     public static List<Text> formatToTexts(String original, TextReplacement... replacements) {
         List<Text> textList = new ArrayList<>();
         textList.add(new Text(original));

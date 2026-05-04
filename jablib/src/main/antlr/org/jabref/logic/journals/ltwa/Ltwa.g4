@@ -59,7 +59,14 @@ HYPHEN: '-';
 
 SYMBOLS: [.,;!?&+=*#%@$] | '\'';
 
-fragment LETTER: 'A'..'Z' | 'À'..'Ö' | 'ø'..'ÿ' | '\u0100'..'\u017F' | '\u4E00'..'\u9FFF';
+fragment LETTER:
+    [A-Z]
+  | [a-z]
+  | '\u00C0'..'\u00D6'   // À–Ö
+  | '\u00D8'..'\u00F6'   // Ø–ö
+  | '\u00F8'..'\u00FF'   // ø–ÿ
+  | '\u0100'..'\u017F'   // Extended Latin letters: Ā–ſ
+  | '\u4E00'..'\u9FFF';  // Chinese/Japanese/Korean characters
 
 WORD: (LETTER+ '\'' + [a-z]) {isNextBoundary()}?              // e.g., Shi'a, parent's
     | (LETTER+ '\'') {isNextBoundary()}?                      // Word ending with apostrophe, e.g., Parents' (plural possessive)

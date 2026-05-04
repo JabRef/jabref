@@ -9,9 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
- */
+/// Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
 class MinifyNameListFormatterTest {
 
     private MinifyNameListFormatter formatter;
@@ -35,6 +33,6 @@ class MinifyNameListFormatterTest {
                 Arguments.of("Simon Harrer and others", "Simon Harrer and Jörg Lenhard and Guido Wirtz"),
                 Arguments.of("Simon Harrer and others", "Simon Harrer and Jörg Lenhard and Guido Wirtz and others"),
                 Arguments.of("Stefan Kolb and others", new MinifyNameListFormatter().getExampleInput())
-                );
+        );
     }
 }

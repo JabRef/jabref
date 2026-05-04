@@ -7,17 +7,15 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.model.study.StudyDatabase;
+import org.jspecify.annotations.NonNull;
 
-/**
- * View representation of {@link StudyDatabase}
- */
+/// View representation of {@link org.jabref.model.study.StudyDatabase}
 public class StudyCatalogItem {
     private final StringProperty name;
     private final BooleanProperty enabled;
 
-    public StudyCatalogItem(String name, boolean enabled) {
-        this.name = new SimpleStringProperty(Objects.requireNonNull(name));
+    public StudyCatalogItem(@NonNull String name, boolean enabled) {
+        this.name = new SimpleStringProperty(name);
         this.enabled = new SimpleBooleanProperty(enabled);
     }
 

@@ -3,21 +3,24 @@ package org.jabref.gui.preferences.ai;
 import java.util.Optional;
 
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -28,22 +31,25 @@ import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.dlsc.gemsfx.EnhancedPasswordField;
 import com.dlsc.unitfx.IntegerInputField;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.SearchableComboBox;
-import org.controlsfx.control.textfield.CustomPasswordField;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
-    private static final String HUGGING_FACE_CHAT_MODEL_PROMPT = "TinyLlama/TinyLlama_v1.1 (or any other model name)";
-    private static final String GPT_4_ALL_CHAT_MODEL_PROMPT = "Phi-3.1-mini (or any other local model name from GPT4All)";
 
     @FXML private CheckBox enableAi;
     @FXML private CheckBox autoGenerateEmbeddings;
     @FXML private CheckBox autoGenerateSummaries;
+    @FXML private CheckBox generateFollowUpQuestions;
+    @FXML private Spinner<Integer> followUpQuestionsCountSpinner;
+    @FXML private Tab followUpQuestionsTab;
+    @FXML private TextArea followUpQuestionsTextArea;
+    @FXML private Label followUpQuestionsCountLabel;
 
     @FXML private ComboBox<AiProvider> aiProviderComboBox;
     @FXML private ComboBox<String> chatModelComboBox;
-    @FXML private CustomPasswordField apiKeyTextField;
+    @FXML private EnhancedPasswordField apiKeyTextField;
 
     @FXML private CheckBox customizeExpertSettingsCheckbox;
     @FXML private VBox expertSettingsPane;
@@ -89,7 +95,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     }
 
     public void initialize() {
-        this.viewModel = new AiTabViewModel(preferences);
+        this.viewModel = new AiTabViewModel(preferences, taskExecutor);
 
         initializeEnableAi();
         initializeAiProvider();
@@ -117,10 +123,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         summarizationCombineUserMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE));
         citationParsingSystemMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE));
         citationParsingUserMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CITATION_PARSING_USER_MESSAGE));
-
-        templatesTabPane.getSelectionModel().selectedItemProperty().addListener(_ -> {
-            viewModel.selectedTemplateProperty().set(getAiTemplate());
-        });
+        followUpQuestionsTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.FOLLOW_UP_QUESTIONS));
+        templatesTabPane.getSelectionModel().selectedItemProperty().addListener(_ -> viewModel.selectedTemplateProperty().set(getAiTemplate()));
     }
 
     private void initializeValidations() {
@@ -208,13 +212,20 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
     private void initializeApiKey() {
         apiKeyTextField.textProperty().bindBidirectional(viewModel.apiKeyProperty());
-        // Disable if GPT4ALL is selected
-        apiKeyTextField.disableProperty().bind(
-                Bindings.or(
-                        viewModel.disableBasicSettingsProperty(),
-                        aiProviderComboBox.valueProperty().isEqualTo(AiProvider.GPT4ALL)
-                )
-        );
+        apiKeyTextField.disableProperty().bind(viewModel.disableBasicSettingsProperty());
+
+        Button revealApiKeyButton = IconTheme.JabRefIcons.PASSWORD_REVEALED.asButton();
+        revealApiKeyButton.disableProperty().bind(apiKeyTextField.disableProperty());
+        revealApiKeyButton.setOnAction(_ -> apiKeyTextField.setShowPassword(!apiKeyTextField.isShowPassword()));
+
+        Button clearApiKeyButton = IconTheme.JabRefIcons.DELETE_ENTRY.asButton();
+        clearApiKeyButton.disableProperty().bind(apiKeyTextField.disableProperty());
+        clearApiKeyButton.setOnAction(_ -> {
+            apiKeyTextField.clear();
+            apiKeyTextField.requestFocus();
+        });
+
+        apiKeyTextField.setRight(new HBox(revealApiKeyButton, clearApiKeyButton));
     }
 
     private void initializeChatModel() {
@@ -227,10 +238,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
         this.aiProviderComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == AiProvider.HUGGING_FACE) {
-                chatModelComboBox.setPromptText(HUGGING_FACE_CHAT_MODEL_PROMPT);
-            }
-            if (newValue == AiProvider.GPT4ALL) {
-                chatModelComboBox.setPromptText(GPT_4_ALL_CHAT_MODEL_PROMPT);
+                chatModelComboBox.setPromptText(Localization.lang("TinyLlama/TinyLlama_v1.1 (or any other model name)"));
             }
         });
     }
@@ -250,6 +258,11 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         autoGenerateSummaries.disableProperty().bind(viewModel.disableAutoGenerateSummaries());
         autoGenerateEmbeddings.selectedProperty().bindBidirectional(viewModel.autoGenerateEmbeddings());
         autoGenerateEmbeddings.disableProperty().bind(viewModel.disableAutoGenerateEmbeddings());
+        generateFollowUpQuestions.selectedProperty().bindBidirectional(viewModel.generateFollowUpQuestions());
+        followUpQuestionsCountSpinner.setValueFactory(AiTabViewModel.followUpQuestionsCountValueFactory);
+        followUpQuestionsCountSpinner.getValueFactory().valueProperty().bindBidirectional(viewModel.followUpQuestionsCountProperty().asObject());
+        followUpQuestionsCountSpinner.disableProperty().bind(generateFollowUpQuestions.selectedProperty().not());
+        followUpQuestionsCountLabel.disableProperty().bind(generateFollowUpQuestions.selectedProperty().not());
     }
 
     @Override
@@ -294,6 +307,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
             return Optional.of(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE);
         } else if (selectedTab == citationParsingUserMessageTab) {
             return Optional.of(AiTemplate.CITATION_PARSING_USER_MESSAGE);
+        } else if (selectedTab == followUpQuestionsTab) {
+            return Optional.of(AiTemplate.FOLLOW_UP_QUESTIONS);
         }
 
         return Optional.empty();

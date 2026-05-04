@@ -152,14 +152,14 @@ class HTMLCharsTest {
 
     private static Stream<Arguments> provideBracesKeepFormattingData() {
         return Stream.of(
-            Arguments.of("{&auml;}", "{\\\"{a}}"),
-            Arguments.of("{&auml;}", "{\\\"a}"),
-            Arguments.of("{&Ccedil;}", "{\\c{C}}"),
-            Arguments.of("{<em>hallo</em>}", "{\\emph hallo}"),
-            Arguments.of("{<b>hallo</b>}", "{\\textbf hallo}"),
-            Arguments.of("{<b>hallo</b>}", "{\\bf hallo}"),
-            Arguments.of("{&#39;}", "{\\textquotesingle}"),
-            Arguments.of("{{ test }}", "{{ test }}")
+                Arguments.of("{&auml;}", "{\\\"{a}}"),
+                Arguments.of("{&auml;}", "{\\\"a}"),
+                Arguments.of("{&Ccedil;}", "{\\c{C}}"),
+                Arguments.of("{<em>hallo</em>}", "{\\emph hallo}"),
+                Arguments.of("{<b>hallo</b>}", "{\\textbf hallo}"),
+                Arguments.of("{<b>hallo</b>}", "{\\bf hallo}"),
+                Arguments.of("{&#39;}", "{\\textquotesingle}"),
+                Arguments.of("{{ test }}", "{{ test }}")
         );
     }
 

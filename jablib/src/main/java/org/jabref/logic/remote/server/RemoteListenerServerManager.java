@@ -3,12 +3,10 @@ package org.jabref.logic.remote.server;
 import java.io.IOException;
 import java.net.BindException;
 
-import org.jabref.logic.util.HeadlessExecutorService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Manages the TeleServerThread through typical life cycle methods.
+/// Manages the RemoteServerThread through typical life cycle methods.
 ///
 /// open -> start -> stop
 /// openAndStart -> stop
@@ -21,16 +19,17 @@ public class RemoteListenerServerManager implements AutoCloseable {
     private RemoteListenerServerThread remoteServerThread;
 
     public void stop() {
+        LOGGER.debug("Stopping RemoteListenerServerManager");
         if (isOpen()) {
             remoteServerThread.interrupt();
             remoteServerThread = null;
-            HeadlessExecutorService.INSTANCE.stopRemoteThread();
+            LOGGER.debug("RemoteListenerServerManager stopped successfully.");
+        } else {
+            LOGGER.debug("RemoteListenerServerManager was not open, nothing to stop.");
         }
     }
 
-    /**
-     * Acquire any resources needed for the server.
-     */
+    /// Acquire any resources needed for the server.
     public void open(RemoteMessageHandler messageHandler, int port) {
         if (isOpen()) {
             return;
@@ -55,7 +54,7 @@ public class RemoteListenerServerManager implements AutoCloseable {
     public void start() {
         if (isOpen() && isNotStartedBefore()) {
             // threads can only be started when in state NEW
-            HeadlessExecutorService.INSTANCE.startRemoteThread(remoteServerThread);
+            remoteServerThread.start();
         }
     }
 
@@ -71,6 +70,7 @@ public class RemoteListenerServerManager implements AutoCloseable {
 
     @Override
     public void close() {
+        LOGGER.debug("Closing RemoteListenerServerManager");
         stop();
     }
 }

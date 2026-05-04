@@ -21,8 +21,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -63,7 +63,7 @@ class MedlinePlainImporterTest {
 
     @Test
     void doesNotRecognizeEmptyFiles() throws IOException {
-        assertFalse(importer.isRecognizedFormat(readerForString("")));
+        assertFalse(importer.isRecognizedFormat((Reader) readerForString("")));
     }
 
     @Test
@@ -106,12 +106,12 @@ class MedlinePlainImporterTest {
 
         BibEntry expectedEntry5 = new BibEntry(StandardEntryType.Proceedings)
                 .withField(StandardField.KEYWORDS, "Female")
-                        .withField(StandardField.PMID, "96578310");
+                .withField(StandardField.PMID, "96578310");
         assertEquals(expectedEntry5, entries.get(5));
 
         BibEntry expectedEntry6 = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.KEYWORDS, "Female")
-                        .withField(StandardField.PMID, "45984220");
+                .withField(StandardField.PMID, "45984220");
         assertEquals(expectedEntry6, entries.get(6));
     }
 
@@ -122,7 +122,7 @@ class MedlinePlainImporterTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
+    @ValueSource(strings = {
             "MedlinePlainImporterTestCompleteEntry",
             "MedlinePlainImporterTestMultiAbstract",
             "MedlinePlainImporterTestMultiTitle",

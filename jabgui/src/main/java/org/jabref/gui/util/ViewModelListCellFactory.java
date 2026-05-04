@@ -8,6 +8,7 @@ import java.util.function.BiConsumer;
 
 import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
+import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
@@ -20,16 +21,14 @@ import javafx.scene.paint.Color;
 import javafx.util.Callback;
 
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import com.tobiasdiez.easybind.Subscription;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 
-/**
- * Constructs a {@link ListCell} based on the view model of the row and a bunch of specified converter methods.
- *
- * @param <T> cell value
- */
+/// Constructs a {@link ListCell} based on the view model of the row and a bunch of specified converter methods.
+///
+/// @param <T> cell value
 public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCell<T>> {
 
     private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
@@ -45,6 +44,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     private BiConsumer<T, ? super DragEvent> toOnDragEntered;
     private BiConsumer<T, ? super DragEvent> toOnDragExited;
     private BiConsumer<T, ? super DragEvent> toOnDragOver;
+    private BiConsumer<T, ? super DragEvent> toOnDragDone;
     private final Map<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClasses = new HashMap<>();
     private Callback<T, ValidationStatus> validationStatusProperty;
 
@@ -130,6 +130,11 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
         return this;
     }
 
+    public ViewModelListCellFactory<T> setOnDragDone(BiConsumer<T, DragEvent> toOnDragDone) {
+        this.toOnDragDone = toOnDragDone;
+        return this;
+    }
+
     public ViewModelListCellFactory<T> withPseudoClass(PseudoClass pseudoClass, Callback<T, ObservableValue<Boolean>> toCondition) {
         this.pseudoClasses.putIfAbsent(pseudoClass, toCondition);
         return this;
@@ -193,9 +198,16 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     }
                     if (toOnDragDropped != null) {
                         setOnDragDropped(event -> {
-                            // The parent is the box for dropping; that should be used as target (and not this cell)
+                            // For reordering we need to accept the event so that the local handlers get it
+                            toOnDragDropped.accept(viewModel, event);
+                            Node parent = getParent();
+                            if (parent != null) {
+                                // The parent is the box for dropping from external files; that should be used as target (and not this cell)
+                                // We need to send a copy of the event before consuming the original one
+                                DragEvent forwarded = event.copyFor(parent, parent);
+                                Event.fireEvent(parent, forwarded);
+                            }
                             event.consume();
-                            getParent().fireEvent(event);
                         });
                     }
                     if (toOnDragEntered != null) {
@@ -206,9 +218,18 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     }
                     if (toOnDragOver != null) {
                         setOnDragOver(event -> {
-                            event.consume(); // Prevent cells from acting as drop targets
-                            getParent().fireEvent(event); // The action performed was not look at the parent, the drop box
+                            // For reordering we need to accept the event so that the local handlers get it
+                            toOnDragOver.accept(viewModel, event);
+                            Node parent = getParent();
+                            if (parent != null) {
+                                DragEvent forwarded = event.copyFor(parent, parent);
+                                Event.fireEvent(parent, forwarded);
+                            }
+                            event.consume();
                         });
+                    }
+                    if (toOnDragDone != null) {
+                        setOnDragDone(event -> toOnDragDone.accept(viewModel, event));
                     }
                     for (Map.Entry<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClassWithCondition : pseudoClasses.entrySet()) {
                         ObservableValue<Boolean> condition = pseudoClassWithCondition.getValue().call(viewModel);

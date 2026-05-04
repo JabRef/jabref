@@ -58,9 +58,7 @@ public class ParseLatexResultViewModel extends AbstractViewModel {
         return importButtonDisabled;
     }
 
-    /**
-     * Update the citation list depending on the selected reference.
-     */
+    /// Update the citation list depending on the selected reference.
     public void activeReferenceChanged(ReferenceViewModel reference) {
         if (reference == null) {
             citationList.clear();
@@ -69,9 +67,7 @@ public class ParseLatexResultViewModel extends AbstractViewModel {
         }
     }
 
-    /**
-     * Search and import unknown references from associated BIB files.
-     */
+    /// Search and import unknown references from associated BIB files.
     public void importButtonClicked() {
         DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         ImportEntriesDialog dialog = new ImportEntriesDialog(databaseContext, BackgroundTask.wrap(() -> new ParserResult(resolverResult.getNewEntries())));

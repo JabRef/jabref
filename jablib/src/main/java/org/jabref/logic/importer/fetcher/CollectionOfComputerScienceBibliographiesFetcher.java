@@ -4,12 +4,14 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.RemoveDigitsFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveRedundantSpacesFormatter;
 import org.jabref.logic.formatter.bibtexfields.ReplaceTabsBySpaceFormater;
+import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
@@ -19,9 +21,9 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.search.query.BaseQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class CollectionOfComputerScienceBibliographiesFetcher implements SearchBasedParserFetcher {
 
@@ -34,9 +36,9 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(BaseQueryNode query) throws URISyntaxException, MalformedURLException {
         return new URIBuilder(BASIC_SEARCH_URL)
-                .addParameter("query", new CollectionOfComputerScienceBibliographiesQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""))
+                .addParameter("query", new CollectionOfComputerScienceBibliographiesQueryTransformer().transformSearchQuery(query).orElse(""))
                 .addParameter("sort", "score")
                 .build()
                 .toURL();
@@ -50,6 +52,11 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
     @Override
     public String getName() {
         return "Collection of Computer Science Bibliographies";
+    }
+
+    @Override
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_COLLECTION_OF_COMPUTER_SCIENCE_BIBLIOGRAPHIES);
     }
 
     @Override

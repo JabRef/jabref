@@ -12,9 +12,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.injection.Injector;
 
-/**
- * This class is just a simple wrapper for the soon to be refactored SaveDatabaseAction.
- */
+/// This class is just a simple wrapper for the soon to be refactored SaveDatabaseAction.
 public class SaveAction extends SimpleCommand {
 
     public enum SaveMethod { SAVE, SAVE_AS, SAVE_SELECTED }
@@ -54,9 +52,12 @@ public class SaveAction extends SimpleCommand {
                 stateManager);
 
         switch (saveMethod) {
-            case SAVE -> saveDatabaseAction.save();
-            case SAVE_AS -> saveDatabaseAction.saveAs();
-            case SAVE_SELECTED -> saveDatabaseAction.saveSelectedAsPlain();
+            case SAVE ->
+                    saveDatabaseAction.save();
+            case SAVE_AS ->
+                    saveDatabaseAction.saveAs();
+            case SAVE_SELECTED ->
+                    saveDatabaseAction.saveSelectedAsPlain();
         }
     }
 }

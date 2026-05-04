@@ -54,9 +54,7 @@ public class DBMSConnection implements DatabaseConnection {
         return this.properties;
     }
 
-    /**
-     * Returns a Set of {@link DBMSType} which is supported by available drivers.
-     */
+    /// Returns a Set of {@link DBMSType} which is supported by available drivers.
     public static Set<DBMSType> getAvailableDBMSTypes() {
         Set<DBMSType> dbmsTypes = new HashSet<>();
 

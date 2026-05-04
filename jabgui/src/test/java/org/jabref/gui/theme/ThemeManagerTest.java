@@ -55,7 +55,7 @@ class ThemeManagerTest {
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(workspacePreferences.getTheme()).thenReturn(new Theme(testCss.toString()));
 
-        ThemeManager themeManager = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor(), Runnable::run);
+        ThemeManager themeManager = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor());
 
         assertEquals(Theme.Type.CUSTOM, themeManager.getActiveTheme().getType());
         assertEquals(testCss.toString(), themeManager.getActiveTheme().getName());
@@ -76,7 +76,7 @@ class ThemeManagerTest {
         when(workspacePreferences.getTheme()).thenReturn(new Theme(testCss.toString()));
 
         // ActiveTheme should provide the additionalStylesheet that was created before
-        ThemeManager themeManagerCreatedBeforeFileDeleted = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor(), Runnable::run);
+        ThemeManager themeManagerCreatedBeforeFileDeleted = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor());
 
         Files.delete(testCss);
 
@@ -88,14 +88,12 @@ class ThemeManagerTest {
         assertEquals(TEST_CSS_DATA, cssLocationAfterDeletion.get());
     }
 
-    /**
-     * This test was orinially part of a more complex test. After a major refactor and simplification of the theme
-     * subsystem, it was decided to drop this functionality in particular, as there is no use case for it and removing
-     * this does simplify the implementation of the theme system.
-     * See https://github.com/JabRef/jabref/pull/7336#issuecomment-874267375
-     *
-     * @throws IOException when the testfile cannot be created
-     */
+    /// This test was orinially part of a more complex test. After a major refactor and simplification of the theme
+    /// subsystem, it was decided to drop this functionality in particular, as there is no use case for it and removing
+    /// this does simplify the implementation of the theme system.
+    /// See https://github.com/JabRef/jabref/pull/7336#issuecomment-874267375
+    ///
+    /// @throws IOException when the testfile cannot be created
     @Disabled
     @Test
     void customThemeBecomesAvailableAfterFileIsCreated() throws IOException {
@@ -104,7 +102,7 @@ class ThemeManagerTest {
         when(workspacePreferences.getTheme()).thenReturn(new Theme(testCss.toString()));
 
         // ActiveTheme should provide no additionalStylesheet when no file exists
-        ThemeManager themeManagerCreatedBeforeFileExists = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor(), Runnable::run);
+        ThemeManager themeManagerCreatedBeforeFileExists = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor());
         assertEquals(Optional.empty(), themeManagerCreatedBeforeFileExists.getActiveTheme()
                                                                           .getAdditionalStylesheet(),
                 "didn't expect additional stylesheet to be available because it didn't exist when theme was created");
@@ -135,7 +133,7 @@ class ThemeManagerTest {
         when(workspacePreferences.getTheme()).thenReturn(new Theme(largeCssTestFile.toString()));
 
         // ActiveTheme should provide the large additionalStylesheet that was created before
-        ThemeManager themeManager = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor(), Runnable::run);
+        ThemeManager themeManager = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor());
         Optional<String> cssLocationBeforeRemoved = themeManager.getActiveTheme()
                                                                 .getAdditionalStylesheet()
                                                                 .map(StyleSheet::getWebEngineStylesheet);
@@ -169,9 +167,9 @@ class ThemeManagerTest {
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(workspacePreferences.getTheme()).thenReturn(new Theme(testCss.toString()));
 
-        ThemeManager themeManager = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor(), Runnable::run);
+        ThemeManager themeManager = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor());
 
-        themeManager.installCss(scene);
+        themeManager.installCssOnScene(scene);
 
         assertEquals(2, scene.getStylesheets().size());
         assertTrue(scene.getStylesheets().contains(testCss.toUri().toURL().toExternalForm()));
@@ -184,13 +182,13 @@ class ThemeManagerTest {
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(workspacePreferences.getTheme()).thenReturn(new Theme(testCss.toString()));
 
-        ThemeManager themeManager = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor(), Runnable::run);
+        ThemeManager themeManager = new ThemeManager(workspacePreferences, new DummyFileUpdateMonitor());
 
         CompletableFuture<String> webEngineStyleSheetLocation = new CompletableFuture<>();
 
         Platform.runLater(() -> {
             WebEngine webEngine = new WebEngine();
-            themeManager.installCss(webEngine);
+            themeManager.installCssOnWebEngine(webEngine);
 
             webEngineStyleSheetLocation.complete(webEngine.getUserStyleSheetLocation());
         });
@@ -200,10 +198,8 @@ class ThemeManagerTest {
         });
     }
 
-    /**
-     * Since the DefaultFileUpdateMonitor runs in a separate thread we have to wait for some arbitrary number of msecs
-     * for the thread to start up and the changed css to reload.
-     */
+    /// Since the DefaultFileUpdateMonitor runs in a separate thread we have to wait for some arbitrary number of msecs
+    /// for the thread to start up and the changed css to reload.
     @Test
     void liveReloadCssDataUrl() throws IOException, InterruptedException {
         Path testCss = tempFolder.resolve("reload.css");
@@ -220,13 +216,13 @@ class ThemeManagerTest {
         // Wait for the watch service to start
         Thread.sleep(500);
 
-        themeManager = new ThemeManager(workspacePreferences, fileUpdateMonitor, Runnable::run);
+        themeManager = new ThemeManager(workspacePreferences, fileUpdateMonitor);
 
         Scene scene = mock(Scene.class);
         when(scene.getStylesheets()).thenReturn(FXCollections.observableArrayList());
         when(scene.getRoot()).thenReturn(mock(Parent.class));
 
-        themeManager.installCss(scene);
+        themeManager.installCssOnScene(scene);
 
         Files.writeString(testCss, """
                 /* And now for something slightly different */

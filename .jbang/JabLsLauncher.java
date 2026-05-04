@@ -1,0 +1,51 @@
+///usr/bin/env jbang "$0" "$@" ; exit $?
+
+//DESCRIPTION jabls - start a bibtex languageserver
+
+//JAVA 25+
+//RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
+
+// raw is for https://github.com/unicode-org/icu/pull/2127
+//REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
+
+//DEPS org.jabref:jablib:6.0-SNAPSHOT
+// see  https://github.com/gradlex-org/extra-java-module-info/issues/237 why we include e-adr here
+//DEPS io.github.adr:e-adr:2.0.0
+
+// from jabls-cli
+//DEPS info.picocli:picocli:4.7.7
+
+// from jabls
+//DEPS com.fasterxml.jackson.core:jackson-annotations:2.21
+//DEPS info.picocli:picocli:4.7.7
+//DEPS org.apache.commons:commons-lang3:3.20.0
+//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.4
+//DEPS org.eclipse.lsp4j:org.eclipse.lsp4j:1.0.0
+//DEPS org.slf4j:jul-to-slf4j:2.0.17
+//DEPS org.slf4j:slf4j-api:2.0.17
+//DEPS org.tinylog:slf4j-tinylog:2.7.0
+//DEPS org.tinylog:tinylog-impl:2.7.0
+
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/BibtexTextDocumentService.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/BibtexWorkspaceService.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/controller/LanguageServerController.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/ExtensionSettings.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/LspClientHandler.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/LspLauncher.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/LspConsistencyCheck.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/LspDiagnosticBuilder.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/LspDiagnosticHandler.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/LspIntegrityCheck.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/LspLinkHandler.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/LspParserHandler.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/LspRangeUtil.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/definition/BibDefinitionProvider.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/definition/DefinitionProvider.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/definition/DefinitionProviderFactory.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/definition/LatexDefinitionProvider.java
+//SOURCES ../jabls/src/main/java/org/jabref/languageserver/util/definition/MarkdownDefinitionProvider.java
+
+//FILES tinylog.properties=../jabls-cli/src/main/resources/tinylog.properties
+
+// This is the main class - directly called by JBang
+//SOURCES ../jabls-cli/src/main/java/org/jabref/languageserver/cli/ServerCli.java

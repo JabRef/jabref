@@ -70,9 +70,10 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
                 return "/" + term + "/";
             }
-            return isQuoted ? "\"" + escapeQuotes(term) + "\"" : QueryParser.escape(term);
+            return isQuoted ? "\"" + escapeQuotes(term) + "\"" : escapeForLucene(term);
         }
 
+        // TODO: Here, there is no unescaping of the term (e.g., field\=thing=value does not work as expected)
         String field = ctx.FIELD().getText().toLowerCase(Locale.ROOT);
         if (!isValidField(field)) {
             return "";
@@ -83,6 +84,9 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
         return buildFieldExpression(field, term, operator, isQuoted);
     }
 
+    /// A valid field is a field that is supported by the Lucene index.
+    /// Currently, Lucene is used for files only. Metadata of the files is stored in the BibEntry.
+    /// Thus, it does not make sense to search for "author" as field name as this is not stored in the Lucene index.
     private boolean isValidField(String field) {
         return "any".equals(field) || "anyfield".equals(field) || LinkedFilesConstants.PDF_FIELDS.contains(field);
     }
@@ -95,7 +99,7 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             String expression = field + "/" + term + "/";
             return isNegationOp ? "NOT " + expression : expression;
         } else {
-            term = isQuoted ? "\"" + escapeQuotes(term) + "\"" : QueryParser.escape(term);
+            term = isQuoted ? "\"" + escapeQuotes(term) + "\"" : escapeForLucene(term);
             String expression = field + term;
             return isNegationOp ? "NOT " + expression : expression;
         }
@@ -105,6 +109,12 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
         return term.replace("\"", "\\\"");
     }
 
+    private static String escapeForLucene(String term) {
+        return QueryParser.escape(term)
+                          .replace("\\*", "*")
+                          .replace("\\?", "?");
+    }
+
     private static boolean isNegationOperator(int operator) {
         return switch (operator) {
             case SearchParser.NEQUAL,
@@ -112,8 +122,10 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
                  SearchParser.NEEQUAL,
                  SearchParser.NCEEQUAL,
                  SearchParser.NREQUAL,
-                 SearchParser.NCREEQUAL -> true;
-            default -> false;
+                 SearchParser.NCREEQUAL ->
+                    true;
+            default ->
+                    false;
         };
     }
 
@@ -122,8 +134,10 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             case SearchParser.REQUAL,
                  SearchParser.CREEQUAL,
                  SearchParser.NREQUAL,
-                 SearchParser.NCREEQUAL -> true;
-            default -> false;
+                 SearchParser.NCREEQUAL ->
+                    true;
+            default ->
+                    false;
         };
     }
 }

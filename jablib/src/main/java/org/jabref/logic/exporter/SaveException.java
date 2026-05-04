@@ -3,10 +3,8 @@ package org.jabref.logic.exporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-/**
- * Exception thrown if saving goes wrong. If caused by a specific
- * entry, keeps track of which entry caused the problem.
- */
+/// Exception thrown if saving goes wrong. If caused by a specific
+/// entry, keeps track of which entry caused the problem.
 public class SaveException extends Exception {
 
     public static final SaveException FILE_LOCKED = new SaveException(

@@ -6,22 +6,21 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
-import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -100,9 +99,10 @@ class ResearchGateTest {
                 .withField(StandardField.AUTHOR, "Petruzzi, Leonardo and Campaniello, Daniela and Corbo," +
                         " Maria and Speranza, Barbara and Altieri, Clelia and Sinigaglia, Milena and Bevilacqua, Antonio");
 
-        QueryNode queryNode = new StandardSyntaxParser().parse("Wine Microbiology and Predictive " +
-                "Microbiology: A Short Overview on Application, and Perspectives", NO_EXPLICIT_FIELD);
-        assertEquals(Optional.of(master), fetcher.performSearch(queryNode).stream().findFirst());
+        SearchQuery searchQueryObject = new SearchQuery("Wine Microbiology and Predictive " +
+                "Microbiology: A Short Overview on Application, and Perspectives");
+        SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
+        assertEquals(Optional.of(master), fetcher.performSearch(visitor.visitStart(searchQueryObject.getContext())).stream().findFirst());
     }
 
     @Test
@@ -136,7 +136,7 @@ class ResearchGateTest {
                 .withField(StandardField.DOI, "10.13140/RG.2.2.36822.78406"));
 
         Optional<BibEntry> actual = fetcher.performSearch(entryInput)
-                                                     .stream().findFirst();
+                                           .stream().findFirst();
         assertEquals(expected, actual);
     }
 }

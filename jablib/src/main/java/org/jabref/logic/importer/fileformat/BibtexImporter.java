@@ -10,7 +10,6 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.exporter.SaveConfiguration;
@@ -22,12 +21,11 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This is a full class to read .bib files. It is used for <code>--import</code> and <code>--importToOpen </code>, too.
- */
+/// This is a full class to read .bib files. It is used for `--import` and `--importToOpen `, too.
 public class BibtexImporter extends Importer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexImporter.class);
@@ -43,32 +41,34 @@ public class BibtexImporter extends Importer {
         this.fileMonitor = fileMonitor;
     }
 
-    /**
-     * @return true as we have no effective way to decide whether a file is in bibtex format or not. See
-     *         https://github.com/JabRef/jabref/pull/379#issuecomment-158685726 for more details.
-     */
+    /// @return true as we have no effective way to decide whether a file is in BibTeX format or not. See
+    /// https://github.com/JabRef/jabref/pull/379#issuecomment-158685726 for more details.
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) {
-        Objects.requireNonNull(reader);
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) {
         return true;
     }
 
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
-        EncodingResult result = getEncodingResult(filePath);
+        EncodingResult encodingResult = getEncodingResult(filePath);
+        ParserResult parserResult = importDatabase(Files.newInputStream(filePath), encodingResult);
+        parserResult.setPath(filePath);
+        return parserResult;
+    }
 
+    public ParserResult importDatabase(InputStream filePath, EncodingResult result) throws IOException {
         // We replace unreadable characters
         // Unfortunately, no warning will be issued to the user
         // As this is a very seldom case, we accept that
         CharsetDecoder decoder = result.encoding().newDecoder();
         decoder.onMalformedInput(CodingErrorAction.REPLACE);
 
-        try (InputStreamReader inputStreamReader = new InputStreamReader(Files.newInputStream(filePath), decoder);
+        try (InputStreamReader inputStreamReader = new InputStreamReader(filePath, decoder);
              BufferedReader reader = new BufferedReader(inputStreamReader)) {
             ParserResult parserResult = this.importDatabase(reader);
             parserResult.getMetaData().setEncoding(result.encoding());
             parserResult.getMetaData().setEncodingExplicitlySupplied(result.encodingExplicitlySupplied());
-            parserResult.setPath(filePath);
+
             if (parserResult.getMetaData().getMode().isEmpty()) {
                 parserResult.getMetaData().setMode(BibDatabaseModeDetection.inferMode(parserResult.getDatabase()));
             }
@@ -80,10 +80,8 @@ public class BibtexImporter extends Importer {
         return getEncodingResult(filePath).encoding();
     }
 
-    /**
-     * Determines the encoding of the supplied BibTeX file. If a JabRef encoding information is present, this information is used.
-     * If there is none present, {@link com.ibm.icu.text.CharsetDetector#CharsetDetector()} is used.
-     */
+    /// Determines the encoding of the supplied BibTeX file. If a JabRef encoding information is present, this information is used.
+    /// If there is none present, {@link com.ibm.icu.text.CharsetDetector#CharsetDetector()} is used.
     private static EncodingResult getEncodingResult(Path filePath) throws IOException {
         // We want to check if there is a JabRef encoding heading in the file, because that would tell us
         // which character encoding is used.
@@ -115,15 +113,13 @@ public class BibtexImporter extends Importer {
         return new EncodingResult(encoding, encodingExplicitlySupplied);
     }
 
-    private record EncodingResult(Charset encoding, boolean encodingExplicitlySupplied) {
+    public record EncodingResult(Charset encoding, boolean encodingExplicitlySupplied) {
     }
 
-    /**
-     * This method does not set the metadata encoding information. The caller needs to set the encoding of the supplied
-     * reader manually to the metadata
-     */
+    /// This method does not set the metadata encoding information. The caller needs to set the encoding of the supplied
+    /// reader manually to the metadata
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         return new BibtexParser(importFormatPreferences, fileMonitor).parse(reader);
     }
 
@@ -147,9 +143,7 @@ public class BibtexImporter extends Importer {
         return Localization.lang("This importer enables \"--importToOpen someEntry.bib\"");
     }
 
-    /**
-     * Searches the file for "Encoding: myEncoding" and returns the found supplied encoding.
-     */
+    /// Searches the file for "Encoding: myEncoding" and returns the found supplied encoding.
     private static Optional<Charset> getSuppliedEncoding(BufferedReader reader) {
         try {
             String line;

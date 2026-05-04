@@ -14,12 +14,11 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.l10n.Localization;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Reads abbreviation files (property files using NAME = ABBREVIATION as a format) into a list of Abbreviations.
- */
+/// Reads abbreviation files (property files using NAME = ABBREVIATION as a format) into a list of Abbreviations.
 public class ProtectedTermsParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsParser.class);
@@ -29,10 +28,10 @@ public class ProtectedTermsParser {
 
     private String location;
 
-    public void readTermsFromResource(String resourceFileName, String descriptionString) {
+    public void readTermsFromResource(@NonNull String resourceFileName, String descriptionString) {
         description = descriptionString;
         location = resourceFileName;
-        try (InputStream inputStream = ProtectedTermsLoader.class.getResourceAsStream(Objects.requireNonNull(resourceFileName))) {
+        try (InputStream inputStream = ProtectedTermsLoader.class.getResourceAsStream(resourceFileName)) {
             if (inputStream == null) {
                 LOGGER.error("Cannot find resource '{}' ({})", resourceFileName, descriptionString);
                 return;
@@ -66,11 +65,9 @@ public class ProtectedTermsParser {
         }
     }
 
-    /**
-     * Parse the description that starts after the # but don't include it in the terms
-     *
-     * @return line or null if the line contains the description
-     */
+    /// Parse the description that starts after the # but don't include it in the terms
+    ///
+    /// @return line or null if the line contains the description
     private String setDescription(String line) {
         if (line.startsWith("#")) {
             description = line.substring(1).trim();

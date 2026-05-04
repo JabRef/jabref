@@ -9,12 +9,15 @@ import javax.sql.DataSource;
 import org.jabref.model.search.PostgreConstants;
 
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.jabref.model.search.PostgreConstants.BIB_FIELDS_SCHEME;
 
-public class PostgreServer {
+@NullMarked
+public class PostgreServer implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgreServer.class);
     private final EmbeddedPostgres embeddedPostgres;
     private final DataSource dataSource;
@@ -25,7 +28,7 @@ public class PostgreServer {
             embeddedPostgres = EmbeddedPostgres.builder()
                                                .setOutputRedirector(ProcessBuilder.Redirect.DISCARD)
                                                .start();
-            LOGGER.info("Postgres server started, connection port: {}", embeddedPostgres.getPort());
+            LOGGER.debug("Postgres server started, connection port: {}", embeddedPostgres.getPort());
         } catch (IOException e) {
             LOGGER.error("Could not start Postgres server", e);
             this.embeddedPostgres = null;
@@ -76,7 +79,7 @@ public class PostgreServer {
         }
     }
 
-    public Connection getConnection() {
+    public @Nullable Connection getConnection() {
         if (dataSource != null) {
             try {
                 return dataSource.getConnection();
@@ -87,7 +90,8 @@ public class PostgreServer {
         return null;
     }
 
-    public void shutdown() {
+    @Override
+    public void close() {
         if (embeddedPostgres != null) {
             try {
                 embeddedPostgres.close();

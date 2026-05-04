@@ -10,34 +10,22 @@ import org.jabref.model.openoffice.util.OOPair;
 
 public class Citation implements ComparableCitation, CitationMarkerEntry, CitationMarkerNumericEntry {
 
-    /**
-     * key in database
-     */
+    /// key in database
     public final String citationKey;
 
-    /**
-     * Result from database lookup. Optional.empty() if not found.
-     */
+    /// Result from database lookup. Optional.empty() if not found.
     private Optional<CitationLookupResult> db;
 
-    /**
-     * The number used for numbered citation styles .
-     */
+    /// The number used for numbered citation styles .
     private Optional<Integer> number;
 
-    /**
-     * Letter that makes the in-text citation unique.
-     */
+    /// Letter that makes the in-text citation unique.
     private Optional<String> uniqueLetter;
 
-    /**
-     * pageInfo
-     */
+    /// pageInfo
     private Optional<OOText> pageInfo;
 
-    /**
-     * isFirstAppearanceOfSource
-     */
+    /// isFirstAppearanceOfSource
     private boolean isFirstAppearanceOfSource;
 
     public Citation(String citationKey) {
@@ -77,10 +65,10 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
 
     public static Optional<CitationLookupResult> lookup(List<BibDatabase> databases, String key) {
         return databases.stream()
-                         .map(database -> Citation.lookup(database, key))
-                         .filter(Optional::isPresent)
-                         .map(Optional::get)
-                         .findFirst();
+                        .map(database -> Citation.lookup(database, key))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .findFirst();
     }
 
     public void lookupInDatabases(List<BibDatabase> databases) {

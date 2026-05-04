@@ -3,11 +3,10 @@ package org.jabref.model.entry;
 import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldWriter;
-/**
- * Language identifiers based on BibLaTeX manual specifications.
- * See the BibLaTeX documentation for full details:
- * <a href="http://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/biblatex.pdfhangelo">BibLaTeX manual</a>
- */
+
+/// Language identifiers based on BibLaTeX manual specifications.
+/// See the BibLaTeX documentation for full details:
+/// <a href="http://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/biblatex.pdfhangelo">BibLaTeX manual</a>
 
 public enum Langid {
     BASQUE("Basque", "basque"),
@@ -58,7 +57,6 @@ public enum Langid {
     SWEDISH("Swedish", "swedish"),
     TURKISH("Turkish", "turkish"),
     UKRAINIAN("Ukrainian", "ukrainian");
-
 
     private final String name;
     private final String langid;

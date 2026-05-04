@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DialogPane?>
-<?import javafx.scene.control.ScrollBar?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.ToolBar?>

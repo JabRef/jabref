@@ -8,9 +8,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ResourceLock("Localization.lang")
 class DoiDuplicationCheckerTest {
 
     private final DoiDuplicationChecker checker = new DoiDuplicationChecker();
@@ -28,7 +30,7 @@ class DoiDuplicationCheckerTest {
         List<BibEntry> entries = List.of(doiA_entry1, doiA_entry2, doiC_entry1);
         BibDatabase database = new BibDatabase(entries);
         List<IntegrityMessage> results = List.of(new IntegrityMessage(Localization.lang("Same DOI used in multiple entries"), doiA_entry1, StandardField.DOI),
-        new IntegrityMessage(Localization.lang("Same DOI used in multiple entries"), doiA_entry2, StandardField.DOI));
+                new IntegrityMessage(Localization.lang("Same DOI used in multiple entries"), doiA_entry2, StandardField.DOI));
         assertEquals(results, checker.check(database));
     }
 

@@ -8,12 +8,14 @@ import org.jabref.model.database.BibDatabaseMode;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+@ResourceLock("Localization.lang")
 class PersonNamesCheckerTest {
 
     private PersonNamesChecker checker;
@@ -56,6 +58,12 @@ class PersonNamesCheckerTest {
     void complainAboutPersonStringWithTwoManyCommas() {
         assertEquals(Optional.of("Names are not in the standard BibTeX format."),
                 checker.checkValue("Test1, Test2, Test3, Test4, Test5, Test6"));
+    }
+
+    @Test
+    void institutionalAuthorWithSpaceInListDoesNotTriggerWarnings() {
+        assertEquals(Optional.empty(),
+                checker.checkValue("Last, F. I. and {Institutional Author}"));
     }
 
     @ParameterizedTest

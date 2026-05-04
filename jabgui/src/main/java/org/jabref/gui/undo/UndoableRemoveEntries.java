@@ -3,21 +3,19 @@ package org.jabref.gui.undo;
 import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEventSource;
-import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class represents the removal of entries. The constructor needs
- * references to the database, the entries, and the map of open entry editors.
- * TODO is this map still being used?
- * The latter to be able to close the entry's editor if it is opened after
- * an undo, and the removal is then undone.
- */
+/// This class represents the removal of entries. The constructor needs
+/// references to the database, the entries, and the map of open entry editors.
+/// TODO is this map still being used?
+/// The latter to be able to close the entry's editor if it is opened after
+/// an undo, and the removal is then undone.
 public class UndoableRemoveEntries extends AbstractUndoableJabRefEdit {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UndoableRemoveEntries.class);

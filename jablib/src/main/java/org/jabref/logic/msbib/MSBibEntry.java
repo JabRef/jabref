@@ -8,25 +8,30 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
-import org.jabref.model.strings.StringUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-/**
- * MSBib entry representation
- *
- * @see <a href="http://mahbub.wordpress.com/2007/03/24/details-of-microsoft-office-2007-bibliographic-format-compared-to-bibtex/">ms office 2007 bibliography format compared to bibtex</a>
- * @see <a href="http://mahbub.wordpress.com/2007/03/22/deciphering-microsoft-office-2007-bibliography-format/">deciphering ms office 2007 bibliography format</a>
- * @see <a href="http://www.ecma-international.org/publications/standards/Ecma-376.htm">ECMA Standard</a>
- */
+/// MSBib entry representation
+///
+/// @see <a href="http://mahbub.wordpress.com/2007/03/24/details-of-microsoft-office-2007-bibliographic-format-compared-to-bibtex/">ms office 2007 bibliography format compared to bibtex</a>
+/// @see <a href="http://mahbub.wordpress.com/2007/03/22/deciphering-microsoft-office-2007-bibliography-format/">deciphering ms office 2007 bibliography format</a>
+/// @see <a href="http://www.ecma-international.org/publications/standards/Ecma-376.htm">ECMA Standard</a>
 class MSBibEntry {
+
+    /// reduced subset, supports only "CITY , STATE, COUNTRY" <br>
+    /// **\b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w*)\b** <br>
+    /// WORD SPACE , SPACE WORD SPACE (Can be zero or more) , SPACE WORD (Can be zero or more) <br>
+    /// Matches both single locations (only city) like Berlin and full locations like Stroudsburg, PA, USA <br>
+    /// tested using http://www.regexpal.com/
+    private static final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w*)\\s?[,]?\\s?(\\w*)\\b");
 
     public Map<String, String> fields = new HashMap<>();
 
@@ -67,22 +72,11 @@ class MSBibEntry {
 
     private String bibtexEntryType;
 
-    /**
-     * reduced subset, supports only "CITY , STATE, COUNTRY" <br>
-     *  <b>\b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w*)\b</b> <br>
-     *  WORD SPACE , SPACE WORD SPACE (Can be zero or more) , SPACE WORD (Can be zero or more) <br>
-     *  Matches both single locations (only city) like Berlin and full locations like Stroudsburg, PA, USA <br>
-     *  tested using http://www.regexpal.com/
-     */
-    private final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w*)\\s?[,]?\\s?(\\w*)\\b");
-
     public MSBibEntry() {
         // empty
     }
 
-    /**
-     * Create a new {@link MSBibEntry} to import from an XML element
-     */
+    /// Create a new {@link MSBibEntry} to import from an XML element
     public MSBibEntry(Element entry) {
         populateFromXml(entry);
     }
@@ -232,12 +226,10 @@ class MSBibEntry {
         return result;
     }
 
-    /**
-     * Gets the dom representation for one entry, used for export
-     *
-     * @param document XmlDocument
-     * @return XmlElement represenation of one entry
-     */
+    /// Gets the dom representation for one entry, used for export
+    ///
+    /// @param document XmlDocument
+    /// @return XmlElement represenation of one entry
     public Element getEntryDom(Document document) {
         Element rootNode = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Source");
 
@@ -336,15 +328,15 @@ class MSBibEntry {
     private void addDateAcessedFields(Document document, Element rootNode) {
         Optional<Date> parsedDateAcesseField = Date.parse(dateAccessed);
         parsedDateAcesseField.flatMap(Date::getYear)
-            .map(Object::toString)
-            .ifPresent(yearAccessed -> addField(document, rootNode, "Year" + "Accessed", yearAccessed));
+                             .map(Object::toString)
+                             .ifPresent(yearAccessed -> addField(document, rootNode, "Year" + "Accessed", yearAccessed));
 
         parsedDateAcesseField.flatMap(Date::getMonth)
                              .map(Month::getFullName)
                              .ifPresent(monthAcessed -> addField(document, rootNode, "Month" + "Accessed", monthAcessed));
         parsedDateAcesseField.flatMap(Date::getDay)
-            .map(Object::toString)
-            .ifPresent(dayAccessed -> addField(document, rootNode, "Day" + "Accessed", dayAccessed));
+                             .map(Object::toString)
+                             .ifPresent(dayAccessed -> addField(document, rootNode, "Day" + "Accessed", dayAccessed));
     }
 
     private void addAddress(Document document, Element parent, String addressToSplit) {

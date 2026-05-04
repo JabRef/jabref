@@ -21,17 +21,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @AllowedToUseClassGetResource("to determine the root directory")
-public class MathMLParser {
+public final class MathMLParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(MathMLParser.class);
     private static final String XSLT_FILE_PATH = "/xslt/mathml_latex/mmltex.xsl";
 
-    /**
-     * Parses the MathML element into its corresponding
-     * LaTeX representation, using an XSLT transformation file
-     *
-     * @param reader the stream reader
-     * @return Returns the LaTeX representation
-     */
+    private MathMLParser() {
+        throw new UnsupportedOperationException("Cannot instantiate a utility class");
+    }
+
+    /// Parses the MathML element into its corresponding
+    /// LaTeX representation, using an XSLT transformation file
+    ///
+    /// @param reader the stream reader
+    /// @return Returns the LaTeX representation
     public static String parse(XMLStreamReader reader) {
         String xmlContent = "";
         String latexResult;
@@ -55,12 +57,11 @@ public class MathMLParser {
 
             latexResult = writer.getBuffer().toString();
         } catch (XMLStreamException
-                | TransformerException
-                | IOException e) {
+                 | TransformerException
+                 | IOException e) {
             LOGGER.error("Could not transform", e);
             return "<Unsupported MathML expression>";
         }
         return latexResult;
     }
 }
-

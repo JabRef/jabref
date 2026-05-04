@@ -56,23 +56,14 @@ Please see our [Installation Guide](https://docs.jabref.org/installation).
 
 JabRef offers a CLI application.
 
-You can run it using docker:
+You can run it using JBang.
+We provide details at [`.jbang/README.md`](.jbang/README.md).
+
+You can also run JabKit using docker:
 
 ```terminal
 docker run ghcr.io/jabref/jabkit:edge --help
 ```
-
-### Running JabKit using `JBang`
-
-[`JBang`](https://www.jbang.dev/) allows for running Java applications without having a JDK installed (before).
-
-Steps:
-
-1. [Install `JBang`](https://www.jbang.dev/download/). E.g., by `brew install jbangdev/tap/jbang` or `choco install jbang`
-2. Make `jabkit` available on the command line: `jbang app install jabkit@jabref`
-3. Run `jabkit --help`
-
-Now, you have all JabKit functionality available as `jabkit`.
 
 ## Bug Reports, Suggestions, Other Feedback
 
@@ -127,14 +118,4 @@ DOI (also includes [full text](https://tug.org/TUGboat/tb44-3/tb138kopp-jabref.p
 JabRef development is powered by YourKit Java Profiler  
 [![YourKit Java Profiler](https://www.yourkit.com/images/yk_logo.svg)](https://www.yourkit.com/java/profiler/)
 
-## ProductMap File Analysis Result
-
-This section contains an analysis of ProductMap files. Each file has a link to its source.
-
-| Github File | ProductMap File URL |
-|-------------|---------------------|
-| [src/main/java/org/jabref/gui/maintable/MainTableTooltip.java](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/gui/maintable/MainTableTooltip.java) | [View File](https://product-map.ai/app/public?url=https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/gui/maintable/MainTableTooltip.java ) |
-
-### ProductMap - Contact Us
-
-For any inquiries, feel free to [contact ProductMap.ai](https://product-map.ai).
+<!-- markdownlint-disable-file MD060 -->

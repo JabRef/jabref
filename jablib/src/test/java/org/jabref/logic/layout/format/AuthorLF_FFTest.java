@@ -6,9 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AuthorLF_FFTest {
 
-    /**
-     * Test method for {@link org.jabref.logic.layout.format.AuthorLF_FF#format(java.lang.String)}.
-     */
+    /// Test method for {@link org.jabref.logic.layout.format.AuthorLF_FF#format(java.lang.String)}.
     @Test
     void format() {
         assertEquals("von Neumann, John and John Smith and Peter Black Brown, Jr",

@@ -2,9 +2,7 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-/**
- * Change type of record to match the one used by OpenOffice formatter.
- */
+/// Change type of record to match the one used by OpenOffice formatter.
 public class GetOpenOfficeType implements LayoutFormatter {
 
     @Override

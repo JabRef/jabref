@@ -1,9 +1,11 @@
 package org.jabref.gui.preferences.general;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
@@ -20,9 +22,9 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.frame.UiMessageHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.remote.CLIMessageHandler;
@@ -30,8 +32,11 @@ import org.jabref.gui.theme.Theme;
 import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.http.manager.HttpServerManager;
+import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
+import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ssl.TrustStoreManager;
@@ -39,11 +44,9 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.FileUpdateMonitor;
 
-import com.airhacks.afterburner.injection.Injector;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -63,7 +66,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(ThemeTypes.values()));
     private final ObjectProperty<ThemeTypes> selectedThemeProperty = new SimpleObjectProperty<>();
 
-    private final BooleanProperty themeSyncOsProperty = new SimpleBooleanProperty();
+    private final BooleanProperty themeSyncOsProperty = new SimpleBooleanProperty() {
+        @Override
+        protected void invalidated() {
+            if (themeSyncOsProperty.get()) {
+                selectedThemeProperty.set(null);
+            }
+        }
+    };
 
     // init with empty string to avoid npe in accessing
     private final StringProperty customPathToThemeProperty = new SimpleStringProperty("");
@@ -73,10 +83,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty openLastStartupProperty = new SimpleBooleanProperty();
     private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();
-    private final BooleanProperty inspectionWarningDuplicateProperty = new SimpleBooleanProperty();
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty shouldAskForIncludingCrossReferencesProperty = new SimpleBooleanProperty();
     private final BooleanProperty hideTabBarProperty = new SimpleBooleanProperty();
+    private final BooleanProperty donationNeverShowProperty = new SimpleBooleanProperty();
 
     private final ListProperty<BibDatabaseMode> bibliographyModeListProperty = new SimpleListProperty<>();
     private final ObjectProperty<BibDatabaseMode> selectedBiblatexModeProperty = new SimpleObjectProperty<>();
@@ -93,29 +103,50 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final LibraryPreferences libraryPreferences;
     private final FilePreferences filePreferences;
     private final RemotePreferences remotePreferences;
+    private final HttpServerManager httpServerManager;
+    private final LanguageServerController languageServerController;
+    private final UiMessageHandler uiMessageHandler;
+    private final RemoteListenerServerManager remoteListenerServerManager;
+    private final StateManager stateManager;
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
+    private final Validator themeValidator;
 
     private final List<String> restartWarning = new ArrayList<>();
     private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
     private final StringProperty remotePortProperty = new SimpleStringProperty("");
     private final Validator remotePortValidator;
-    private final FileUpdateMonitor fileUpdateMonitor;
+    private final BooleanProperty enableHttpServerProperty = new SimpleBooleanProperty();
+    private final StringProperty httpPortProperty = new SimpleStringProperty("");
+    private final Validator httpPortValidator;
+    private final Validator languageServerPortValidator;
+    private final BooleanProperty enableLanguageServerProperty = new SimpleBooleanProperty();
+    private final StringProperty languageServerPortProperty = new SimpleStringProperty("");
     private final TrustStoreManager trustStoreManager;
 
-    public GeneralTabViewModel(DialogService dialogService, GuiPreferences preferences, FileUpdateMonitor fileUpdateMonitor) {
+    public GeneralTabViewModel(DialogService dialogService,
+                               GuiPreferences preferences,
+                               HttpServerManager httpServerManager,
+                               LanguageServerController languageServerController,
+                               UiMessageHandler uiMessageHandler,
+                               RemoteListenerServerManager remoteListenerServerManager,
+                               StateManager stateManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.workspacePreferences = preferences.getWorkspacePreferences();
         this.libraryPreferences = preferences.getLibraryPreferences();
         this.filePreferences = preferences.getFilePreferences();
         this.remotePreferences = preferences.getRemotePreferences();
-        this.fileUpdateMonitor = fileUpdateMonitor;
+        this.httpServerManager = httpServerManager;
+        this.languageServerController = languageServerController;
+        this.uiMessageHandler = uiMessageHandler;
+        this.remoteListenerServerManager = remoteListenerServerManager;
+        this.stateManager = stateManager;
 
         fontSizeValidator = new FunctionBasedValidator<>(
                 fontSizeProperty,
-                input -> {
+                _ -> {
                     try {
                         return Integer.parseInt(fontSizeProperty().getValue()) > 8;
                     } catch (NumberFormatException ex) {
@@ -135,20 +166,31 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("Visual theme"),
                         Localization.lang("Please specify a css theme file."))));
 
+        themeValidator = new FunctionBasedValidator<>(
+                selectedThemeProperty,
+                Objects::nonNull,
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
+                        Localization.lang("General"),
+                        Localization.lang("Visual theme"),
+                        Localization.lang("Please set a theme."))));
+
         remotePortValidator = new FunctionBasedValidator<>(
                 remotePortProperty,
-                input -> {
-                    try {
-                        int portNumber = Integer.parseInt(remotePortProperty().getValue());
-                        return RemoteUtil.isUserPort(portNumber);
-                    } catch (NumberFormatException ex) {
-                        return false;
-                    }
-                },
+                RemoteUtil::isStringUserPort,
                 ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("Network"),
                         Localization.lang("Remote operation"),
                         Localization.lang("You must enter an integer value in the interval 1025-65535"))));
+
+        httpPortValidator = new FunctionBasedValidator<>(
+                httpPortProperty,
+                RemoteUtil::isStringUserPort,
+                ValidationMessage.error("%s".formatted(Localization.lang("You must enter an integer value in the interval 1025-65535"))));
+
+        languageServerPortValidator = new FunctionBasedValidator<>(
+                languageServerPortProperty,
+                RemoteUtil::isStringUserPort,
+                ValidationMessage.error(Localization.lang("You must enter an integer value in the interval 1025-65535")));
 
         this.trustStoreManager = new TrustStoreManager(Path.of(preferences.getSSLPreferences().getTruststorePath()));
     }
@@ -157,21 +199,29 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return remotePortValidator.getValidationStatus();
     }
 
+    public ValidationStatus httpPortValidationStatus() {
+        return httpPortValidator.getValidationStatus();
+    }
+
+    public ValidationStatus languageServerPortValidationStatus() {
+        return languageServerPortValidator.getValidationStatus();
+    }
+
     @Override
     public void setValues() {
         selectedLanguageProperty.setValue(workspacePreferences.getLanguage());
 
-        // The light theme is in fact the absence of any theme modifying 'base.css'. Another embedded theme like
-        // 'dark.css', stored in the classpath, can be introduced in {@link org.jabref.gui.theme.Theme}.
         switch (workspacePreferences.getTheme().getType()) {
-            case DEFAULT ->
+            case LIGHT ->
                     selectedThemeProperty.setValue(ThemeTypes.LIGHT);
-            case EMBEDDED ->
+            case DARK ->
                     selectedThemeProperty.setValue(ThemeTypes.DARK);
             case CUSTOM -> {
                 selectedThemeProperty.setValue(ThemeTypes.CUSTOM);
                 customPathToThemeProperty.setValue(workspacePreferences.getTheme().getName());
             }
+            case SYSTEM ->
+                    selectedThemeProperty.setValue(null);
         }
         themeSyncOsProperty.setValue(workspacePreferences.shouldThemeSyncOs());
 
@@ -180,11 +230,11 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         openLastStartupProperty.setValue(workspacePreferences.shouldOpenLastEdited());
         showAdvancedHintsProperty.setValue(workspacePreferences.shouldShowAdvancedHints());
-        inspectionWarningDuplicateProperty.setValue(workspacePreferences.shouldWarnAboutDuplicatesInInspection());
 
         confirmDeleteProperty.setValue(workspacePreferences.shouldConfirmDelete());
         shouldAskForIncludingCrossReferencesProperty.setValue(preferences.getCopyToPreferences().getShouldAskForIncludingCrossReferences());
         hideTabBarProperty.setValue(workspacePreferences.shouldHideTabBar());
+        donationNeverShowProperty.setValue(preferences.getDonationPreferences().isNeverShowAgain());
 
         bibliographyModeListProperty.setValue(FXCollections.observableArrayList(BibDatabaseMode.values()));
         selectedBiblatexModeProperty.setValue(libraryPreferences.getDefaultBibDatabaseMode());
@@ -195,8 +245,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         createBackupProperty.setValue(filePreferences.shouldCreateBackup());
         backupDirectoryProperty.setValue(filePreferences.getBackupDirectory().toString());
 
-        remoteServerProperty.setValue(remotePreferences.useRemoteServer());
-        remotePortProperty.setValue(String.valueOf(remotePreferences.getPort()));
+        remoteServerProperty.setValue(remotePreferences.shouldEnableRemoteServer());
+        remotePortProperty.setValue(String.valueOf(remotePreferences.getRemoteServerPort()));
+
+        enableHttpServerProperty.setValue(remotePreferences.shouldEnableHttpServer());
+        httpPortProperty.setValue(String.valueOf(remotePreferences.getHttpServerPort()));
+
+        enableLanguageServerProperty.setValue(remotePreferences.shouldEnableLanguageServer());
+        languageServerPortProperty.setValue(String.valueOf(remotePreferences.getLanguageServerPort()));
     }
 
     @Override
@@ -211,23 +267,29 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         workspacePreferences.setShouldOverrideDefaultFontSize(fontOverrideProperty.getValue());
         workspacePreferences.setMainFontSize(Integer.parseInt(fontSizeProperty.getValue()));
 
-        switch (selectedThemeProperty.get()) {
-            case LIGHT ->
-                    workspacePreferences.setTheme(Theme.light());
-            case DARK ->
-                    workspacePreferences.setTheme(Theme.dark());
-            case CUSTOM ->
-                    workspacePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
+        boolean themeSyncOs = themeSyncOsProperty.getValue();
+        workspacePreferences.setThemeSyncOs(themeSyncOs);
+
+        if (themeSyncOs) {
+            workspacePreferences.setTheme(Theme.system());
+        } else {
+            switch (selectedThemeProperty.get()) {
+                case LIGHT ->
+                        workspacePreferences.setTheme(Theme.light());
+                case DARK ->
+                        workspacePreferences.setTheme(Theme.dark());
+                case CUSTOM ->
+                        workspacePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
+            }
         }
-        workspacePreferences.setThemeSyncOs(themeSyncOsProperty.getValue());
 
         workspacePreferences.setOpenLastEdited(openLastStartupProperty.getValue());
         workspacePreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
-        workspacePreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
 
         workspacePreferences.setConfirmDelete(confirmDeleteProperty.getValue());
         preferences.getCopyToPreferences().setShouldAskForIncludingCrossReferences(shouldAskForIncludingCrossReferencesProperty.getValue());
         workspacePreferences.setHideTabBar(confirmHideTabBarProperty().getValue());
+        preferences.getDonationPreferences().setNeverShowAgain(donationNeverShowProperty.getValue());
 
         libraryPreferences.setDefaultBibDatabaseMode(selectedBiblatexModeProperty.getValue());
 
@@ -238,40 +300,55 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         filePreferences.backupDirectoryProperty().setValue(Path.of(backupDirectoryProperty.getValue()));
 
         getPortAsInt(remotePortProperty.getValue()).ifPresent(newPort -> {
-            if (remotePreferences.isDifferentPort(newPort)) {
-                remotePreferences.setPort(newPort);
+            if (remotePreferences.isDifferentRemoteServerPort(newPort)) {
+                remotePreferences.setRemoteServerPort(newPort);
             }
         });
 
-        getPortAsInt(remotePortProperty.getValue()).ifPresent(newPort -> {
-            if (remotePreferences.isDifferentPort(newPort)) {
-                remotePreferences.setPort(newPort);
-            }
-        });
-
-        UiMessageHandler uiMessageHandler = Injector.instantiateModelOrService(UiMessageHandler.class);
-        RemoteListenerServerManager remoteListenerServerManager = Injector.instantiateModelOrService(RemoteListenerServerManager.class);
-        remoteListenerServerManager.stop(); // stop in all cases, because the port might have changed
-
+        CLIMessageHandler messageHandler = new CLIMessageHandler(uiMessageHandler, preferences);
+        // stop in all cases, because the port might have changed
+        remoteListenerServerManager.stop();
         if (remoteServerProperty.getValue()) {
-            remotePreferences.setUseRemoteServer(true);
-            remoteListenerServerManager.openAndStart(
-                    new CLIMessageHandler(uiMessageHandler, preferences),
-                    remotePreferences.getPort());
+            remotePreferences.setEnableRemoteServer(true);
+            remoteListenerServerManager.openAndStart(messageHandler, remotePreferences.getRemoteServerPort());
         } else {
-            remotePreferences.setUseRemoteServer(false);
-        }
-        trustStoreManager.flush();
-
-        if (remoteServerProperty.getValue()) {
-            remotePreferences.setUseRemoteServer(true);
-            remoteListenerServerManager.openAndStart(
-                    new CLIMessageHandler(uiMessageHandler, preferences),
-                    remotePreferences.getPort());
-        } else {
-            remotePreferences.setUseRemoteServer(false);
+            remotePreferences.setEnableRemoteServer(false);
             remoteListenerServerManager.stop();
         }
+
+        getPortAsInt(httpPortProperty.getValue()).ifPresent(newPort -> {
+            if (remotePreferences.isDifferentHttpServerPort(newPort)) {
+                remotePreferences.setHttpServerPort(newPort);
+            }
+        });
+
+        getPortAsInt(languageServerPortProperty.getValue()).ifPresent(newPort -> {
+            if (remotePreferences.isDifferentLanguageServerPort(newPort)) {
+                remotePreferences.setLanguageServerPort(newPort);
+            }
+        });
+
+        // stop in all cases, because the port might have changed
+        httpServerManager.stop();
+        if (enableHttpServerProperty.getValue()) {
+            remotePreferences.setEnableHttpServer(true);
+            URI uri = remotePreferences.getHttpServerUri();
+            httpServerManager.start(preferences, stateManager, uiMessageHandler, uri);
+        } else {
+            remotePreferences.setEnableHttpServer(false);
+            httpServerManager.stop();
+        }
+
+        // stop in all cases, because the port might have changed (or other settings that can't be easily tracked https://github.com/JabRef/jabref/pull/13697#discussion_r2285997003)
+        languageServerController.stop();
+        if (enableLanguageServerProperty.getValue()) {
+            remotePreferences.setEnableLanguageServer(true);
+            languageServerController.start(messageHandler, remotePreferences.getLanguageServerPort());
+        } else {
+            remotePreferences.setEnableLanguageServer(false);
+            languageServerController.stop();
+        }
+
         trustStoreManager.flush();
     }
 
@@ -283,6 +360,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return customPathToThemeValidator.getValidationStatus();
     }
 
+    public ValidationStatus themeValidationStatus() {
+        return themeValidator.getValidationStatus();
+    }
+
     @Override
     public boolean validateSettings() {
         CompositeValidator validator = new CompositeValidator();
@@ -291,12 +372,24 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             validator.addValidators(remotePortValidator);
         }
 
+        if (enableHttpServerProperty.getValue()) {
+            validator.addValidators(httpPortValidator);
+        }
+
+        if (enableLanguageServerProperty.getValue()) {
+            validator.addValidators(languageServerPortValidator);
+        }
+
         if (fontOverrideProperty.getValue()) {
             validator.addValidators(fontSizeValidator);
         }
 
         if (selectedThemeProperty.getValue() == ThemeTypes.CUSTOM) {
             validator.addValidators(customPathToThemeValidator);
+        }
+
+        if (!themeSyncOsProperty.get() && selectedThemeProperty.getValue() == null) {
+            validator.addValidators(themeValidator);
         }
 
         ValidationStatus validationStatus = validator.getValidationStatus();
@@ -339,7 +432,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public void importCSSFile() {
         String fileDir = customPathToThemeProperty.getValue().isEmpty() ? preferences.getInternalPreferences().getLastPreferencesExportPath().toString()
-                : customPathToThemeProperty.getValue();
+                                                                        : customPathToThemeProperty.getValue();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.CSS)
@@ -366,10 +459,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return this.showAdvancedHintsProperty;
     }
 
-    public BooleanProperty inspectionWarningDuplicateProperty() {
-        return this.inspectionWarningDuplicateProperty;
-    }
-
     public BooleanProperty confirmDeleteProperty() {
         return this.confirmDeleteProperty;
     }
@@ -380,6 +469,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty confirmHideTabBarProperty() {
         return this.hideTabBarProperty;
+    }
+
+    public BooleanProperty donationNeverShowProperty() {
+        return this.donationNeverShowProperty;
     }
 
     public ListProperty<BibDatabaseMode> biblatexModeListProperty() {
@@ -419,6 +512,26 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty remotePortProperty() {
         return remotePortProperty;
+    }
+
+    public BooleanProperty enableHttpServerProperty() {
+        return enableHttpServerProperty;
+    }
+
+    public StringProperty httpPortProperty() {
+        return httpPortProperty;
+    }
+
+    public BooleanProperty directHttpImportProperty() {
+        return remotePreferences.directHttpImportProperty();
+    }
+
+    public BooleanProperty enableLanguageServerProperty() {
+        return enableLanguageServerProperty;
+    }
+
+    public StringProperty languageServerPortProperty() {
+        return languageServerPortProperty;
     }
 
     public void openBrowser() {

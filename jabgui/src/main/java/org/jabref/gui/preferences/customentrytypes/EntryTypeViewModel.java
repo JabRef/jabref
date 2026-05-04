@@ -23,11 +23,11 @@ public class EntryTypeViewModel {
     public EntryTypeViewModel(BibEntryType entryType, Predicate<Field> isMultiline) {
         this.entryType.set(entryType);
         List<FieldViewModel> allFieldsForType = entryType.getAllBibFields()
-                       .stream().map(bibField -> new FieldViewModel(bibField.field(),
-                                   entryType.isRequired(bibField.field()) ? Mandatory.REQUIRED : Mandatory.OPTIONAL,
-                                   bibField.priority(),
-                                   isMultiline.test(bibField.field())))
-                                                 .collect(Collectors.toList());
+                                                         .stream().map(bibField -> new FieldViewModel(bibField.field(),
+                        entryType.isRequired(bibField.field()) ? Mandatory.REQUIRED : Mandatory.OPTIONAL,
+                        bibField.priority(),
+                        isMultiline.test(bibField.field())))
+                                                         .collect(Collectors.toList());
         fields = FXCollections.observableArrayList(allFieldsForType);
     }
 

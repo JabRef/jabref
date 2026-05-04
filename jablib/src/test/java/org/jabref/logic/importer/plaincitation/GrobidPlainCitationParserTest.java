@@ -63,16 +63,16 @@ public class GrobidPlainCitationParserTest {
 
     static String example3 = "Turk, J., Graham, P., & Verhulst, F. (2007). Child and adolescent psychiatry : A developmental approach. Oxford, England: Oxford University Press.";
     static BibEntry example3AsBibEntry = new BibEntry(StandardEntryType.InBook).withCitationKey("-1")
-                                                                            .withField(StandardField.AUTHOR, "Turk, Jeremy and Graham, Philip and Verhulst, Frank")
-                                                                            .withField(StandardField.TITLE, "Developmental psychopathology")
-                                                                            .withField(StandardField.BOOKTITLE, "Child and Adolescent Psychiatry")
-                                                                            .withField(StandardField.PUBLISHER, "Oxford University Press")
-                                                                            .withField(StandardField.DATE, "2007-02")
-                                                                            .withField(StandardField.YEAR, "2007")
-                                                                            .withField(StandardField.MONTH, "2")
-                                                                            .withField(StandardField.PAGES, "191-264")
-                                                                            .withField(StandardField.DOI, "10.1093/med/9780199216697.003.0004")
-                                                                            .withField(StandardField.ADDRESS, "Oxford, England");
+                                                                               .withField(StandardField.AUTHOR, "Turk, Jeremy and Graham, Philip and Verhulst, Frank")
+                                                                               .withField(StandardField.TITLE, "Developmental psychopathology")
+                                                                               .withField(StandardField.BOOKTITLE, "Child and Adolescent Psychiatry")
+                                                                               .withField(StandardField.PUBLISHER, "Oxford University Press")
+                                                                               .withField(StandardField.DATE, "2007-02")
+                                                                               .withField(StandardField.YEAR, "2007")
+                                                                               .withField(StandardField.MONTH, "2")
+                                                                               .withField(StandardField.PAGES, "191-264")
+                                                                               .withField(StandardField.DOI, "10.1093/med/9780199216697.003.0004")
+                                                                               .withField(StandardField.ADDRESS, "Oxford, England");
 
     static String example4 = "Carr, I., & Kidner, R. (2003). Statutes and conventions on international trade law (4th ed.). London, England: Cavendish.";
     static BibEntry example4AsBibEntry = new BibEntry(StandardEntryType.InBook).withCitationKey("-1")

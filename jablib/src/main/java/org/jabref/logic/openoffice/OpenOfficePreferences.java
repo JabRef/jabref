@@ -38,6 +38,7 @@ public class OpenOfficePreferences {
     private final StringProperty cslBibliographyHeaderFormat;
     private final StringProperty cslBibliographyBodyFormat;
     private final ObservableList<String> externalCslStyles;
+    private final BooleanProperty addSpaceAfter;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
@@ -49,7 +50,8 @@ public class OpenOfficePreferences {
                                  String cslBibliographyTitle,
                                  String cslBibliographyHeaderFormat,
                                  String cslBibliographyBodyFormat,
-                                 List<String> externalCslStyles) {
+                                 List<String> externalCslStyles,
+                                 boolean addSpaceAfter) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
@@ -61,6 +63,7 @@ public class OpenOfficePreferences {
         this.cslBibliographyHeaderFormat = new SimpleStringProperty(cslBibliographyHeaderFormat);
         this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat);
         this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
+        this.addSpaceAfter = new SimpleBooleanProperty(addSpaceAfter);
     }
 
     public void clearConnectionSettings() {
@@ -71,9 +74,7 @@ public class OpenOfficePreferences {
         this.currentJStyle.set("");
     }
 
-    /**
-     * path to soffice-file
-     */
+    /// path to soffice-file
     public String getExecutablePath() {
         return executablePath.get();
     }
@@ -86,9 +87,7 @@ public class OpenOfficePreferences {
         this.executablePath.setValue(executablePath);
     }
 
-    /**
-     * true if all databases should be used when citing
-     */
+    /// true if all databases should be used when citing
     public boolean getUseAllDatabases() {
         return useAllDatabases.get();
     }
@@ -101,9 +100,7 @@ public class OpenOfficePreferences {
         this.useAllDatabases.set(useAllDatabases);
     }
 
-    /**
-     * true if the reference list is updated when adding a new citation
-     */
+    /// true if the reference list is updated when adding a new citation
     public boolean getSyncWhenCiting() {
         return syncWhenCiting.get();
     }
@@ -116,9 +113,7 @@ public class OpenOfficePreferences {
         this.syncWhenCiting.setValue(syncWhenCiting);
     }
 
-    /**
-     * list with paths to external style files
-     */
+    /// list with paths to external style files
     public ObservableList<String> getExternalJStyles() {
         return externalJStyles;
     }
@@ -128,9 +123,7 @@ public class OpenOfficePreferences {
         externalJStyles.addAll(list);
     }
 
-    /**
-     * path to the used style file
-     */
+    /// path to the used style file
     public String getCurrentJStyle() {
         return currentJStyle.get();
     }
@@ -213,5 +206,17 @@ public class OpenOfficePreferences {
     public void setExternalCslStyles(List<String> paths) {
         externalCslStyles.clear();
         externalCslStyles.addAll(paths);
+    }
+
+    public boolean getAddSpaceAfter() {
+        return addSpaceAfter.get();
+    }
+
+    public BooleanProperty addSpaceAfterProperty() {
+        return addSpaceAfter;
+    }
+
+    public void setAddSpaceAfter(boolean addSpaceAfter) {
+        this.addSpaceAfter.setValue(addSpaceAfter);
     }
 }

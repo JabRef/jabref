@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.actions.ActionFactory;
@@ -12,7 +11,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.push.PushToApplication;
+import org.jabref.gui.push.GuiPushToApplication;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
@@ -20,12 +19,13 @@ import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import org.controlsfx.control.SearchableComboBox;
 
 public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel> implements PreferencesTab {
 
     @FXML private TextField eMailReferenceSubject;
     @FXML private CheckBox autoOpenAttachedFolders;
-    @FXML private ComboBox<PushToApplication> pushToApplicationCombo;
+    @FXML private SearchableComboBox<GuiPushToApplication> pushToApplicationCombo;
     @FXML private TextField citeCommand;
     @FXML private Button autolinkExternalHelp;
 
@@ -53,9 +53,9 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     public void initialize() {
         this.viewModel = new ExternalTabViewModel(dialogService, preferences);
 
-        new ViewModelListCellFactory<PushToApplication>()
-                .withText(PushToApplication::getDisplayName)
-                .withIcon(PushToApplication::getApplicationIcon)
+        new ViewModelListCellFactory<GuiPushToApplication>()
+                .withText(GuiPushToApplication::getDisplayName)
+                .withIcon(GuiPushToApplication::getApplicationIcon)
                 .install(pushToApplicationCombo);
 
         eMailReferenceSubject.textProperty().bindBidirectional(viewModel.eMailReferenceSubjectProperty());
@@ -81,6 +81,7 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
         Platform.runLater(() -> {
             validationVisualizer.initVisualization(viewModel.terminalCommandValidationStatus(), customTerminalCommand);
             validationVisualizer.initVisualization(viewModel.fileBrowserCommandValidationStatus(), customFileBrowserCommand);
+            validationVisualizer.initVisualization(viewModel.citeCommandValidationStatus(), citeCommand);
         });
 
         ActionFactory actionFactory = new ActionFactory();

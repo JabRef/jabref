@@ -17,6 +17,19 @@ This section explains how you get the JabRef code onto your machine in a form al
 
 A longer explanation is available at <https://help.github.com/en/articles/fork-a-repo>.
 
+## Disable GitHub actions
+
+JabRef's CI checks take much time.
+They could hit your fee limit.
+Therefore, we advise to disable them - unless you know what you are doing.
+
+1. Go to your JabRef repository.
+2. Go to Settings
+3. On the left, click on "Actions"
+4. Click on "General"
+5. Select "Disable actions"
+6. Click on "Save"
+
 ## Clone your forked repository on your local machine
 
 In a command line, navigate to the folder where you want to place the source code (parent folder of `jabref`).
@@ -71,3 +84,13 @@ origin     https://github.com/YOURUSERNAME/jabref.git (push)
 upstream     https://github.com/JabRef/jabref.git (fetch)
 upstream     https://github.com/JabRef/jabref.git (push)
 ```
+
+## Have `git blame` working
+
+You need to tell git to ignore some commits when doing `git blame`:
+
+```terminal
+git config --global blame.ignoreRevsFile .git-blame-ignore-revs
+```
+
+<!-- background: https://docs.github.com/en/repositories/working-with-files/using-files/viewing-and-understanding-files#ignore-commits-in-the-blame-view -->

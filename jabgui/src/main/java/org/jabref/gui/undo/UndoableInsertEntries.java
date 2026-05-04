@@ -3,18 +3,16 @@ package org.jabref.gui.undo;
 import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class represents the removal of entries. The constructor needs
- * references to the database, entries, and a boolean marked true if the undo
- * is from a call to paste().
- */
+/// This class represents the removal of entries. The constructor needs
+/// references to the database, entries, and a boolean marked true if the undo
+/// is from a call to paste().
 public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UndoableInsertEntries.class);

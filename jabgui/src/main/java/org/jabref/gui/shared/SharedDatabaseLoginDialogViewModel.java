@@ -22,11 +22,11 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -124,7 +124,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
         EasyBind.subscribe(selectedDBMSType, selected -> port.setValue(Integer.toString(selected.getDefaultPort())));
 
-        Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
+        Predicate<String> notEmpty = input -> (input != null) && !input.isBlank();
         Predicate<String> fileExists = input -> Files.exists(Path.of(input));
         Predicate<String> notEmptyAndfilesExist = notEmpty.and(fileExists);
 
@@ -236,7 +236,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     ButtonType.OK, openHelp);
 
             result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, preferences.getExternalApplicationsPreferences()).execute());
-            result.filter(btn -> ButtonType.OK.equals(btn)).ifPresent(btn -> openSharedDatabase(connectionProperties));
+            result.filter(ButtonType.OK::equals).ifPresent(btn -> openSharedDatabase(connectionProperties));
         }
         loading.set(false);
         return false;
@@ -268,9 +268,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         sharedDatabasePreferences.setAutosave(autosave.get());
     }
 
-    /**
-     * Fetches possibly saved data and configures the control elements respectively.
-     */
+    /// Fetches possibly saved data and configures the control elements respectively.
     private void applyPreferences() {
         Optional<String> sharedDatabaseType = sharedDatabasePreferences.getType();
         Optional<String> sharedDatabaseHost = sharedDatabasePreferences.getHost();

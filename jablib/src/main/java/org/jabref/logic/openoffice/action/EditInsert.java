@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.UpdateCitationMarkers;
 import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.ootext.OOText;
@@ -19,7 +20,6 @@ import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoScreenRefresh;
 import org.jabref.model.openoffice.util.OOListUtil;
-import org.jabref.model.strings.StringUtil;
 
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
@@ -33,13 +33,11 @@ public class EditInsert {
     private EditInsert() {
     }
 
-    /**
-     * In insertEntry we receive BibEntry values from the GUI.
-     * <p>
-     * In the document we store citations by their citation key.
-     * <p>
-     * If the citation key is missing, the best we can do is to notify the user. Or the programmer, that we cannot accept such input.
-     */
+    /// In insertEntry we receive BibEntry values from the GUI.
+    ///
+    /// In the document we store citations by their citation key.
+    ///
+    /// If the citation key is missing, the best we can do is to notify the user. Or the programmer, that we cannot accept such input.
     private static String insertEntryGetCitationKey(BibEntry entry) {
         Optional<String> key = entry.getCitationKey();
         if (key.isEmpty()) {
@@ -48,10 +46,8 @@ public class EditInsert {
         return key.get();
     }
 
-    /**
-     * @param cursor   Where to insert.
-     * @param pageInfo A single pageInfo for a list of entries. This is what we get from the GUI.
-     */
+    /// @param cursor   Where to insert.
+    /// @param pageInfo A single pageInfo for a list of entries. This is what we get from the GUI.
     public static void insertCitationGroup(XTextDocument doc,
                                            OOFrontend frontend,
                                            XTextCursor cursor,

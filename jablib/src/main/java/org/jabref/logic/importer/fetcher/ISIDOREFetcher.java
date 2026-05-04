@@ -8,14 +8,12 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.StringJoiner;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
@@ -25,10 +23,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.search.query.BaseQueryNode;
 
 import jakarta.ws.rs.core.MediaType;
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jooq.lambda.Unchecked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,11 +36,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-/**
- * Fetcher for <a href="https://isidore.science">ISIDORE</a>```
- * Will take in the link to the website or the last six digits that identify the reference
- * Uses <a href="https://isidore.science/api">ISIDORE's API</a>.
- */
+/// Fetcher for <a href="https://isidore.science">ISIDORE</a>```
+/// Will take in the link to the website or the last six digits that identify the reference
+/// Uses <a href="https://isidore.science/api">ISIDORE's API</a>.
 public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ISIDOREFetcher.class);
@@ -84,7 +80,7 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
             } catch (ParserConfigurationException | IOException | SAXException e) {
                 Unchecked.throwChecked(new FetcherException("Issue with parsing link", e));
             }
-            return null;
+            return List.of();
         };
     }
 
@@ -96,9 +92,9 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
         ISIDOREQueryTransformer queryTransformer = new ISIDOREQueryTransformer();
-        String transformedQuery = queryTransformer.transformLuceneQuery(luceneQuery).orElse("");
+        String transformedQuery = queryTransformer.transformSearchQuery(queryNode).orElse("");
         URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);
         uriBuilder.addParameter("q", transformedQuery);
         if (pageNumber > 1) {
@@ -149,10 +145,8 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
         return "";
     }
 
-    /**
-     * Get the type of the document, ISIDORE only seems to have select types, also their types are different to
-     * those used by JabRef.
-     */
+    /// Get the type of the document, ISIDORE only seems to have select types, also their types are different to
+    /// those used by JabRef.
     private EntryType getType(NodeList list) {
         for (int i = 0; i < list.getLength(); i++) {
             String type = list.item(i).getTextContent();
@@ -184,9 +178,7 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
         return stringJoiner.toString().substring(0, stringJoiner.length()).trim().replaceAll("\\s+", " ");
     }
 
-    /**
-     * Remove numbers from a string and everything after the number, (helps with the author field).
-     */
+    /// Remove numbers from a string and everything after the number, (helps with the author field).
     private String removeNumbers(String string) {
         for (int i = 0; i < string.length(); i++) {
             if (Character.isDigit(string.charAt(i))) {
@@ -230,10 +222,5 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
     @Override
     public String getName() {
         return "ISIDORE";
-    }
-
-    @Override
-    public Optional<HelpFile> getHelpPage() {
-        return Optional.of(HelpFile.FETCHER_ISIDORE);
     }
 }

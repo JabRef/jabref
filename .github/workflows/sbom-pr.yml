@@ -1,0 +1,55 @@
+name: Update SBOM and open PR
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  generate-and-pr:
+    runs-on: ubuntu-slim
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-gradle
+
+      - name: Generate aggregated CycloneDX SBOM
+        run: gradle cyclonedxBom
+
+      - name: Copy SBOMs to repository root
+        run: |
+          set -euo pipefail
+          src_dir="build/reports/cyclonedx"
+          if [ ! -f "$src_dir/bom.json" ] || [ ! -f "$src_dir/bom.xml" ]; then
+            echo "SBOM files not found in $src_dir" 1>&2
+            ls -la "$src_dir" || true
+            exit 1
+          fi
+          cp "$src_dir/bom.json" bom.json
+          cp "$src_dir/bom.xml"  bom.xml
+          echo "" >> bom.xml
+          echo "" >> bom.json
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(sbom): update CycloneDX SBOM files"
+          title: "[Bot] Update SBOM files"
+          body: |
+            This automated PR updates the aggregated CycloneDX SBOM files (bom.json and bom.xml) in the repository root.
+
+            Generated via Gradle task `cyclonedxBom` using the org.cyclonedx.bom plugin configured in the build.
+          branch: chore/update-sbom
+          delete-branch: true
+          labels: "dev: dependencies"
+          add-paths: |
+            bom.json
+            bom.xml

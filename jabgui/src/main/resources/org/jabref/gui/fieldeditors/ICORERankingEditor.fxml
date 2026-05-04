@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.HBox?>
+<?import org.jabref.gui.fieldeditors.EditorTextField?>
+<?import org.jabref.gui.icon.JabRefIconView?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
+         fx:controller="org.jabref.gui.fieldeditors.ICORERankingEditor">
+    <EditorTextField fx:id="textField"/>
+        <Button fx:id="lookupICORERankButton"
+                onAction="#lookupRank"
+                styleClass="icon-button">
+            <graphic>
+                <JabRefIconView glyph="LOOKUP_IDENTIFIER"/>
+            </graphic>
+        </Button>
+        <Button fx:id="visitICOREConferencePageButton"
+                onAction="#openExternalLink"
+                styleClass="icon-button">
+            <graphic>
+                <JabRefIconView glyph="OPEN_LINK"/>
+            </graphic>
+        </Button>
+</fx:root>
