@@ -21,9 +21,9 @@ public class DocBookAuthorFormatter {
             }
             Author a = al.getAuthor(i);
             a.getGivenName().filter(not(String::isEmpty)).ifPresent(first -> sb.append("<firstname>")
-                                                                                    .append(XML_CHARS.format(first)).append("</firstname>"));
+                                                                               .append(XML_CHARS.format(first)).append("</firstname>"));
             a.getNamePrefix().filter(not(String::isEmpty)).ifPresent(von -> sb.append("<othername>")
-                                                                               .append(XML_CHARS.format(von)).append("</othername>"));
+                                                                              .append(XML_CHARS.format(von)).append("</othername>"));
             a.getFamilyName().filter(not(String::isEmpty)).ifPresent(last -> {
                 sb.append("<surname>").append(XML_CHARS.format(last));
                 a.getNameSuffix().filter(not(String::isEmpty))
