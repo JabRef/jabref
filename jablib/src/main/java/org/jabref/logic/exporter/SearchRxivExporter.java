@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.jabref.model.study.Study;
@@ -50,7 +51,7 @@ public class SearchRxivExporter {
     private String buildJson(Study study, String query, String platform) throws IOException {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("search_string", query);
-        data.put("platform", platform.toLowerCase());
+        data.put("platform", platform.toLowerCase(Locale.ROOT));
         data.put("authors", study.getAuthors().stream()
                                  .map(author -> Map.of("name", author))
                                  .toList());
