@@ -1,7 +1,5 @@
 package org.jabref.logic.layout.format;
 
-import java.util.function.Predicate;
-
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 
