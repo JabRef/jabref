@@ -104,6 +104,40 @@ class ManageStudyDefinitionViewModelTest {
         ), manageStudyDefinitionViewModel.getCatalogs());
     }
 
+    @Test
+    void studyConstructorPreservesCatalogReason(@TempDir Path tempDir) {
+        List<StudyCatalog> catalogs = List.of(
+                new StudyCatalog("ACM Portal", true, "Primary source"));
+        Study study = new Study(
+                List.of("Name"),
+                "title",
+                List.of("Q1"),
+                List.of(),
+                catalogs
+        );
+        ManageStudyDefinitionViewModel viewModel = new ManageStudyDefinitionViewModel(
+                study,
+                tempDir,
+                importFormatPreferences,
+                importerPreferences,
+                workspacePreferences,
+                gitPreferences,
+                dialogService);
+        String reason = viewModel.getCatalogs().stream()
+                .filter(item -> "ACM Portal".equals(item.getName()))
+                .findFirst()
+                .map(StudyCatalogItem::getReason)
+                .orElse("");
+        assertEquals("Primary source", reason);
+    }
+
+    @Test
+    void saveStudyHasCurrentSchemaVersion(@TempDir Path tempDir) {
+        ManageStudyDefinitionViewModel viewModel = getManageStudyDefinitionViewModel(tempDir);
+        SlrStudyAndDirectory result = viewModel.saveStudy();
+        assertEquals(Study.CURRENT_SCHEMA_VERSION, result.getStudy().getVersion());
+    }
+
     private ManageStudyDefinitionViewModel getManageStudyDefinitionViewModel(Path tempDir) {
         List<StudyCatalog> catalogs = List.of(
                 new StudyCatalog("ACM Portal", true));
