@@ -146,9 +146,8 @@ public class ActionHelper {
     }
 
     public static BooleanExpression noCatalogEnabled(ObservableList<StudyCatalogItem> catalogs) {
-        return BooleanExpression.booleanExpression(
-                Bindings.createBooleanBinding(
-                        () -> catalogs.stream().noneMatch(StudyCatalogItem::isEnabled),
-                        catalogs));
+        return Bindings.createBooleanBinding(
+                () -> catalogs.stream().noneMatch(StudyCatalogItem::isEnabled),
+                catalogs);
     }
 }
