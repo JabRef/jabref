@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
@@ -65,6 +66,7 @@ public class SearchRxivExporter {
 
     private String buildFileName(String query, String databaseName, int index) {
         String queryPart = query.isBlank() ? "query" : query;
-        return FileUtil.getValidFileName(databaseName + "-" + queryPart + "-" + index + ".json");
+        String name = FileNameCleaner.cleanFileName(databaseName) + "-" + FileNameCleaner.cleanFileName(queryPart) + "-" + index + ".json";
+        return FileUtil.getValidFileName(name);
     }
 }
