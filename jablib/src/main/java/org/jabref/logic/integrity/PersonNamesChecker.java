@@ -10,6 +10,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
 
+import org.jspecify.annotations.Nullable;
+
 public class PersonNamesChecker implements ValueChecker {
 
     private final BibDatabaseMode bibMode;
@@ -19,7 +21,7 @@ public class PersonNamesChecker implements ValueChecker {
     }
 
     @Override
-    public Optional<String> checkValue(String value) {
+    public Optional<String> checkValue(@Nullable String value) {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();
         }

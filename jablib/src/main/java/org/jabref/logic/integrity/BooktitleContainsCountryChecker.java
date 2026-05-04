@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 
+import org.jspecify.annotations.Nullable;
+
 public class BooktitleContainsCountryChecker implements ValueChecker {
 
     private static final Pattern CONTAINS_COUNTRY;
@@ -25,7 +27,7 @@ public class BooktitleContainsCountryChecker implements ValueChecker {
     }
 
     @Override
-    public Optional<String> checkValue(String value) {
+    public Optional<String> checkValue(@Nullable String value) {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();
         }

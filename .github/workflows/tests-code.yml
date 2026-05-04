@@ -83,10 +83,8 @@ jobs:
       - name: Run OpenRewrite
         run: |
           gradle --no-configuration-cache :rewriteRun
-      - name: Output diff
-        if: failure()
-        run: |
-          cat /home/runner/work/jabref/jabref/build/reports/rewrite/rewrite.patch
+      - name: Fail if working directory is unclean
+        run: git diff --exit-code
 
   format:
     # ubuntu-slim doesn't offer docker
@@ -188,7 +186,7 @@ jobs:
       - name: Lint CHANGELOG.md
         run: |
           # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.16.1:bin check CHANGELOG.md | tee heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.17.1:bin check CHANGELOG.md | tee heylogs.txt || true
 
           # We have two acceptable errors
           if ! grep -q "1 problem" heylogs.txt; then
