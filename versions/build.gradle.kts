@@ -47,8 +47,8 @@ dependencies.constraints {
     api("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta:1.0.0")
     api("com.github.ben-manes.caffeine:caffeine:3.2.3")
     api("com.github.javakeyring:java-keyring:1.0.4")
-    api("com.github.javaparser:javaparser-core:3.28.0")
-    api("com.github.javaparser:javaparser-symbol-solver-core:3.28.0")
+    api("com.github.javaparser:javaparser-core:3.28.1")
+    api("com.github.javaparser:javaparser-symbol-solver-core:3.28.1")
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.github.tomtung:latex2unicode_2.13:0.3.2")
     api("com.google.errorprone:error_prone_core:2.48.0")
