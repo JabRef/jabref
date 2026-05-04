@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor.citationrelationtab;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.undo.UndoManager;
 
@@ -37,6 +38,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -158,16 +160,12 @@ class CitationsRelationsTabViewModelTest {
         List<CitationRelationItem> citationItems = List.of(
                 new CitationRelationItem(firstEntryToImport, false));
 
-        BibEntry[] caughtEntry = new BibEntry[1];
-        viewModel.lastImportedEntryProperty().addListener((obs, old, val) -> {
-            if (val != null) {
-                caughtEntry[0] = val;
-            }
-        });
-
         viewModel.importEntries(citationItems, CitationFetcher.SearchType.CITES, existingEntry);
 
-        assertEquals(firstEntryToImport.getAuthorTitleYear(), caughtEntry[0].getAuthorTitleYear());
+        BibEntry lastImported = viewModel.lastImportedEntryProperty().get();
+
+        assertNotNull(lastImported);
+        assertEquals(firstEntryToImport.getAuthorTitleYear(), lastImported.getAuthorTitleYear());
     }
 
     @Test
@@ -175,15 +173,8 @@ class CitationsRelationsTabViewModelTest {
         existingEntry.setCitationKey("");
         List<CitationRelationItem> citationItems = List.of(new CitationRelationItem(firstEntryToImport, false));
 
-        BibEntry[] caughtEntry = new BibEntry[1];
-        viewModel.lastImportedEntryProperty().addListener((obs, old, val) -> {
-            if (val != null) {
-                caughtEntry[0] = val;
-            }
-        });
-
         viewModel.importEntries(citationItems, CitationFetcher.SearchType.CITED_BY, existingEntry);
 
-        assertNull(caughtEntry[0]);
+        assertNull(viewModel.lastImportedEntryProperty().get());
     }
 }

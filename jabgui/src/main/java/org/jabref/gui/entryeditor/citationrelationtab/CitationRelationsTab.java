@@ -157,12 +157,11 @@ public class CitationRelationsTab extends EntryEditorTab {
                 fileUpdateMonitor,
                 taskExecutor
         );
-        // Listen for imported actions
-        citationsRelationsTabViewModel.lastImportedEntryProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
+        // Subscribe for imported actions
+        EasyBind.subscribe(citationsRelationsTabViewModel.lastImportedEntryProperty(), entry -> {
+            if (entry != null) {
                 stateManager.activeTabProperty().get().ifPresent(tab ->
-                        tab.showAndEdit(newValue)
-                );
+                        tab.showAndEdit(entry));
             }
         });
 

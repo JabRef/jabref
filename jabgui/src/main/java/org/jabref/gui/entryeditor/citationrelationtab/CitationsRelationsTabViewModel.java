@@ -96,8 +96,8 @@ public class CitationsRelationsTabViewModel {
                     importCitedBy(entries, existingEntry, importHandler, generator, generateNewKeyOnImport);
         };
         if (!importedEntries.isEmpty()) {
-            lastImportedEntry.set(importedEntries.getFirst());
             lastImportedEntry.set(null);
+            lastImportedEntry.set(importedEntries.getFirst());
         }
     }
 
