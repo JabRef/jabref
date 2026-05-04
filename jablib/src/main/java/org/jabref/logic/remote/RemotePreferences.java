@@ -68,11 +68,10 @@ public class RemotePreferences {
                 23119, // httpServerPort
                 false, // enableLanguageServer
                 2087,  // languageServerPort
-                List.of("chrome-extension://","moz-extension://","https://jabref.github.io", "https://jabref.org"), // allowed origins
+                List.of("chrome-extension://", "moz-extension://", "https://jabref.github.io", "https://jabref.org"), // allowed origins
                 "", // api token
                 false,  // directHttpImport,
                 false // allowUnauthenticatedAccessWithoutOrigin
-
 
         );
     }
@@ -175,7 +174,6 @@ public class RemotePreferences {
         return getLanguageServerPort() != otherLanguageServerPort;
     }
 
-
     public ObservableList<String> getAllowedOrigins() {
         return allowedOrigins;
     }
@@ -195,7 +193,6 @@ public class RemotePreferences {
     public void setApiToken(String apiToken) {
         this.apiToken.setValue(apiToken);
     }
-
 
     public boolean directHttpImport() {
         return directHttpImport.getValue();

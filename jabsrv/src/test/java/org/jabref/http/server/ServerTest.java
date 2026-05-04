@@ -143,7 +143,12 @@ public abstract class ServerTest extends JerseyTest {
         when(importFormatPreferences.filePreferences()).thenReturn(filePreferences);
 
         serverTestRemotePreferences = new RemotePreferences(
-                6050, true, 23119, false, false, 2087,
+                true,
+                6050,
+                false,
+                23119,
+                false,
+                2087,
                 List.of("chrome-extension://", "moz-extension://", "https://jabref.github.io", "https://jabref.org"),
                 "",
                 false,
