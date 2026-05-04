@@ -64,14 +64,14 @@ class AuthorTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    @ValueSource(strings = """
-                    # Lower-case letters
-                    asdf
-                    a
-                    # Numbers
-                    1
-                    1 23
-                    """)
+    @ValueSource(strings = {
+            // Lower-case letters
+            "asdf",
+            "a",
+            // Numbers
+            "1",
+            "1 23"
+    })
     void addDotIfAbbreviation(String input) {
         assertEquals(input, Author.addDotIfAbbreviation(input));
     }
