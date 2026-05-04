@@ -20,12 +20,12 @@ val pdfbox = "3.0.7"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.13.1"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.14.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.3.0"))
     api(platform("org.junit:junit-bom:6.0.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.1"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
-    api(platform("tools.jackson:jackson-bom:3.1.2"))
+    api(platform("tools.jackson:jackson-bom:3.1.3"))
 }
 
 dependencies.constraints {
@@ -39,7 +39,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.1")
 
-    api("com.dlsc.gemsfx:gemsfx:4.0.1")
+    api("com.dlsc.gemsfx:gemsfx:4.0.3")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
     api("com.fasterxml:aalto-xml:1.3.4")
@@ -133,6 +133,7 @@ dependencies.constraints {
     api("org.jsoup:jsoup:1.22.2")
     api("org.jspecify:jspecify:1.0.0")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
+    api("org.kordamp.ikonli:ikonli-material-pack:12.4.0")
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
     api("org.libreoffice:libreoffice:26.2.2")
     api("org.libreoffice:unoloader:26.2.2")
