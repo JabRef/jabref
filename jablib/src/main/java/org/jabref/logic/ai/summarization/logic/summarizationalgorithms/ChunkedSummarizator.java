@@ -36,7 +36,6 @@ public class ChunkedSummarizator implements Summarizator {
         this.summarizationCombineSystemMessageTemplate = summarizationCombineSystemMessageTemplate;
     }
 
-    @SuppressWarnings("ConditionalBreakInInfiniteLoop")
     @Override
     public String summarize(ChatModel chatModel, String text) throws InterruptedException {
         LOGGER.debug("Summarizing text ({} chars)", text.length());
@@ -46,18 +45,14 @@ public class ChunkedSummarizator implements Summarizator {
 
         int passes = 0;
 
-        // Originally used a do-while loop, but the formatter places the opening brace
-        // on the next line after `do`, while Checkstyle requires it to be on the same line.
-        for (; ; ) {
+        // @formatter:off
+        do {
+            // @formatter:on
             passes++;
             LOGGER.debug("Summarizing pass {} ({} chunks)", passes, summaries.size());
 
             summaries = summarizeChunks(chatModel, summaries, passes);
-
-            if (!needsAnotherPass(chatModel, summaries)) {
-                break;
-            }
-        }
+        } while (needsAnotherPass(chatModel, summaries));
 
         return combineFinalSummaries(chatModel, summaries);
     }
