@@ -78,7 +78,7 @@ public class UpdateField {
     /// Sets empty or non-existing owner fields of bibtex entries inside a List to a specified default value. Timestamp
     /// field is also set. Preferences are checked to see if these options are enabled.
     public static void setAutomaticFields(Collection<BibEntry> entries, OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
-        boolean globalSetOwner = ownerPreferences.isUseOwner();
+        boolean globalSetOwner = ownerPreferences.shouldUseOwner();
         boolean setTimeStamp = timestampPreferences.shouldAddCreationDate();
 
         // Do not need to do anything if all options are disabled
@@ -87,7 +87,7 @@ public class UpdateField {
         }
 
         String defaultOwner = ownerPreferences.getDefaultOwner();
-        boolean overwriteOwner = ownerPreferences.isOverwriteOwner();
+        boolean overwriteOwner = ownerPreferences.shouldOverwriteOwner();
         String timestamp = timestampPreferences.now();
 
         for (BibEntry curEntry : entries) {

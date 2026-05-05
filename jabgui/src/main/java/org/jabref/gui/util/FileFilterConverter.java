@@ -22,7 +22,7 @@ import org.jabref.logic.util.strings.StringUtil;
 
 public class FileFilterConverter {
 
-    public static FileChooser.ExtensionFilter ANY_FILE = new FileChooser.ExtensionFilter(Localization.lang("Any file"), "*.*");
+    public static FileChooser.ExtensionFilter ANY_FILE = new FileChooser.ExtensionFilter(Localization.lang("Any file"), "*");
 
     private FileFilterConverter() {
     }

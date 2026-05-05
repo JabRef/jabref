@@ -23,6 +23,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
+import org.jabref.logic.citationstyle.CSLStyleUtils;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -193,42 +194,56 @@ public class StyleSelectDialogViewModel {
         Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
 
         path.map(Path::toAbsolutePath).map(Path::toString).ifPresent(stylePath -> {
-            Optional<CitationStyle> newStyleOptional = cslStyleLoader.addStyleIfValid(stylePath);
+            // Create a citation style
+            Optional<CitationStyle> citationStyleToAddOptional = CSLStyleUtils.createCitationStyleFromFile(stylePath);
 
-            if (newStyleOptional.isPresent()) {
-                CitationStyle newStyle = newStyleOptional.get();
-
-                List<CitationStyle> allStyles = CSLStyleLoader.getStyles();
-                List<CitationStylePreviewLayout> updatedLayouts = allStyles.stream()
-                                                                           .map(style -> new CitationStylePreviewLayout(style, bibEntryTypesManager))
-                                                                           .toList();
-
-                availableCslLayouts.setAll(updatedLayouts);
-
-                Optional<CitationStylePreviewLayout> newLayoutOptional = updatedLayouts.stream()
-                                                                                       .filter(layout -> layout.getFilePath().equals(stylePath))
-                                                                                       .findFirst();
-
-                if (newLayoutOptional.isPresent()) {
-                    CitationStylePreviewLayout newLayout = newLayoutOptional.get();
-                    selectedCslLayoutProperty.set(newLayout);
-
-                    openOfficePreferences.setCurrentStyle(newStyle);
-
-                    dialogService.showInformationDialogAndWait(
-                            Localization.lang("Style added"),
-                            Localization.lang("The CSL style has been added successfully.")
-                    );
-                } else {
-                    dialogService.showErrorDialogAndWait(
-                            Localization.lang("Style not found"),
-                            Localization.lang("The CSL style was added but could not be found in the list.")
-                    );
-                }
-            } else {
+            // Check if citation style is valid
+            if (citationStyleToAddOptional.isEmpty()) {
                 dialogService.showErrorDialogAndWait(
                         Localization.lang("Invalid style selected"),
                         Localization.lang("You must select a valid CSL style file.")
+                );
+                return;
+            }
+
+            CitationStyle citationStyleToAdd = citationStyleToAddOptional.get();
+
+            // Check if citation style is duplicate in the list
+            if (isDuplicate(citationStyleToAdd)) {
+                dialogService.showInformationDialogAndWait(
+                        Localization.lang("Style already available"),
+                        Localization.lang("The selected CSL style is already available in the list.")
+                );
+                return;
+            }
+
+            // Citation style is good to add
+            cslStyleLoader.addExternalStyle(citationStyleToAdd);
+
+            List<CitationStyle> allStyles = CSLStyleLoader.getStyles();
+            List<CitationStylePreviewLayout> updatedLayouts = allStyles.stream()
+                                                                       .map(style -> new CitationStylePreviewLayout(style, bibEntryTypesManager))
+                                                                       .toList();
+
+            Optional<CitationStylePreviewLayout> newLayoutOptional = updatedLayouts.stream()
+                                                                                   .filter(layout -> layout.getFilePath().equals(stylePath))
+                                                                                   .findFirst();
+
+            if (newLayoutOptional.isPresent()) {
+                CitationStylePreviewLayout newLayout = newLayoutOptional.get();
+                selectedCslLayoutProperty.set(newLayout);
+                availableCslLayouts.setAll(updatedLayouts);
+
+                openOfficePreferences.setCurrentStyle(citationStyleToAdd);
+
+                dialogService.showInformationDialogAndWait(
+                        Localization.lang("Style added"),
+                        Localization.lang("The CSL style has been added successfully.")
+                );
+            } else {
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("Style not found"),
+                        Localization.lang("The CSL style was added but could not be found in the list.")
                 );
             }
         });
@@ -272,6 +287,15 @@ public class StyleSelectDialogViewModel {
         }
     }
 
+    private boolean isDuplicate(CitationStyle styleToAdd) {
+        return CSLStyleLoader.getStyles().stream()
+                             .anyMatch(existingStyle -> hasSameStyleName(existingStyle, styleToAdd));
+    }
+
+    private boolean hasSameStyleName(CitationStyle existingStyle, CitationStyle styleToAdd) {
+        return existingStyle.getTitle().equals(styleToAdd.getTitle())
+                || (!styleToAdd.getShortTitle().isBlank() && existingStyle.getShortTitle().equals(styleToAdd.getShortTitle()));
+    }
     // endregion
 
     // region - jstyle-specific methods

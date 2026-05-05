@@ -59,7 +59,6 @@ public class PrivacyNoticeComponent extends ScrollPane {
         addPrivacyHyperlink(aiPolicies, AiProvider.MISTRAL_AI);
         addPrivacyHyperlink(aiPolicies, AiProvider.GEMINI);
         addPrivacyHyperlink(aiPolicies, AiProvider.HUGGING_FACE);
-        addPrivacyHyperlink(aiPolicies, AiProvider.GPT4ALL);
 
         String newEmbeddingModelText = embeddingModelText.getText().replaceAll("%0", aiPreferences.getEmbeddingModel().sizeInfo());
         embeddingModelText.setText(newEmbeddingModelText);

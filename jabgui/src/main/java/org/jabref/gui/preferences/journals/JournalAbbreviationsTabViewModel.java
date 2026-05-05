@@ -110,6 +110,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         createFileObjects();
         selectLastJournalFile();
         addBuiltInList();
+
+        useFJournal.set(abbreviationsPreferences.shouldUseFJournalField());
     }
 
     /// Read all saved file paths and read their abbreviations.
@@ -236,11 +238,11 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     }
 
     private void setCurrentAbbreviationNameAndAbbreviationIfValid(Abbreviation abbreviationObject) {
-        if (abbreviationObject.getName().trim().isEmpty()) {
+        if (abbreviationObject.getName().isBlank()) {
             dialogService.showErrorDialogAndWait(Localization.lang("Name cannot be empty"));
             return;
         }
-        if (abbreviationObject.getAbbreviation().trim().isEmpty()) {
+        if (abbreviationObject.getAbbreviation().isBlank()) {
             dialogService.showErrorDialogAndWait(Localization.lang("Abbreviation cannot be empty"));
             return;
         }
@@ -315,7 +317,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                         shouldWriteLists = false;
                     }
                 })
-                .onSuccess(success -> Injector.setModelOrService(
+                .onSuccess(_ -> Injector.setModelOrService(
                         JournalAbbreviationRepository.class,
                         JournalAbbreviationLoader.loadRepository(abbreviationsPreferences)))
                 .onFailure(exception -> LOGGER.error("Failed to store journal preferences.", exception))

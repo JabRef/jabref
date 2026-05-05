@@ -16,3 +16,5 @@ ignorePatterns:
   - pattern: "dl\\.acm\\.org"
   # works locally, but not in the checker
   - pattern: "^https://www.pdflib.com/pdf-knowledge-base/xmp/free-xmp-validator"
+  # Automated access blocked by Cloudflare, see issue for context: https://github.com/JabRef/jabref/issues/13404
+  - pattern: "onlinelibrary\\.wiley\\.com"
