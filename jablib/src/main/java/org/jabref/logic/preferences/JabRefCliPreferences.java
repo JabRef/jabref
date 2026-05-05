@@ -126,9 +126,9 @@ import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Singleton;
-import org.jspecify.annotations.NonNull;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -895,7 +895,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getCitationKeyPatternPreferences().setAll(
                 CitationKeyPatternPreferences.getDefault()
                                              .withKeywordDelimiter(getBibEntryPreferences().keywordSeparatorProperty()));
-                    }
+    }
 
     private void clearTruststoreFromCustomCertificates() {
         TrustStoreManager trustStoreManager = new TrustStoreManager(Path.of(defaults.get(SSL_TRUSTSTORE_PATH).toString()));
@@ -1014,7 +1014,6 @@ public class JabRefCliPreferences implements CliPreferences {
                     ex);
         }
     }
-
 
     /// Imports Preferences from an XML file.
     ///
@@ -1468,6 +1467,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return citationKeyPatternPreferences;
     }
+
     // region: CiteDrive Preferences
     @Override
     public CiteDrivePreferences getCiteDrivePreferences() {
