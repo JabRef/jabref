@@ -2,6 +2,7 @@ package org.jabref.gui.shared;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
@@ -138,7 +139,20 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         Predicate<String> fileExists = input -> Files.exists(Path.of(input));
         Predicate<String> notEmptyAndfilesExist = notEmpty.and(fileExists);
         Predicate<String> keyStoreRule = input -> !useSSL.get() || notEmptyAndfilesExist.test(input);
-        Predicate<String> folderRule = input -> !autosave.get() || notEmptyAndfilesExist.test(input);
+        Predicate<String> folderRule = input -> {
+            if (!autosave.get()) {
+                return true;
+            } else if (input != null) {
+                try {
+                    Path p = Path.of(input.trim());
+                    p = p.getParent();
+                    return (p != null) && Files.isDirectory(p);
+                } catch (InvalidPathException e) {
+                    return false;
+                }
+            }
+            return false;
+        };
 
         databaseValidator = new FunctionBasedValidator<>(database, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Library"))));
         hostValidator = new FunctionBasedValidator<>(host, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Host"))));
