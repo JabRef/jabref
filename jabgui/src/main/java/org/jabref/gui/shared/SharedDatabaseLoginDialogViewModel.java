@@ -125,12 +125,12 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         EasyBind.subscribe(selectedDBMSType, selected -> port.setValue(Integer.toString(selected.getDefaultPort())));
         EasyBind.subscribe(useSSL, selected-> {
             String current = keystore.getValue();
-            keystore.setValue(" ");
+            keystore.setValue(null);
             keystore.setValue(current);
         });
         EasyBind.subscribe(autosave, selected-> {
             String current = folder.getValue();
-            folder.setValue(" ");
+            folder.setValue(null);
             folder.setValue(current);
         });
 
