@@ -1343,7 +1343,7 @@ class BibtexParserTest {
         BibEntryType entryType = result.getEntryTypes().iterator().next();
         Optional<Field> customField = entryType.getOptionalFields().stream()
                                                .map(BibField::field)
-                                               .filter(field -> field.getName().equalsIgnoreCase("customfield"))
+                                               .filter(field -> "customfield".equalsIgnoreCase(field.getName()))
                                                .findFirst();
         assertTrue(customField.isPresent());
         assertTrue(customField.get().getProperties().contains(FieldProperty.VERBATIM));
@@ -1359,17 +1359,17 @@ class BibtexParserTest {
 
         Optional<Field> requiredName = entryType.getRequiredFields().stream()
                                                 .flatMap(orFields -> orFields.getFields().stream())
-                                                .filter(field -> field.getName().equalsIgnoreCase("name"))
+                                                .filter(field -> "name".equalsIgnoreCase(field.getName()))
                                                 .findFirst();
         assertEquals(Optional.of(EnumSet.of(FieldProperty.PERSON_NAMES)), requiredName.map(Field::getProperties));
 
         Optional<Field> googleScholar = entryType.getOptionalFields().stream()
                                                  .map(BibField::field)
-                                                 .filter(field -> field.getName().equalsIgnoreCase("googlescholar"))
+                                                 .filter(field -> "googlescholar".equalsIgnoreCase(field.getName()))
                                                  .findFirst();
         Optional<Field> orcid = entryType.getOptionalFields().stream()
                                          .map(BibField::field)
-                                         .filter(field -> field.getName().equalsIgnoreCase("orcid"))
+                                         .filter(field -> "orcid".equalsIgnoreCase(field.getName()))
                                          .findFirst();
         assertEquals(Optional.of(EnumSet.of(FieldProperty.EXTERNAL)), googleScholar.map(Field::getProperties));
         assertEquals(Optional.of(EnumSet.of(FieldProperty.EXTERNAL)), orcid.map(Field::getProperties));
