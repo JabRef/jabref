@@ -7,9 +7,7 @@ import org.jabref.model.entry.field.StandardField;
 
 import com.google.common.eventbus.Subscribe;
 
-/**
- * Updates the timestamp of changed entries if the feature is enabled
- */
+/// Updates the timestamp of changed entries if the feature is enabled
 class UpdateTimestampListener {
     private final CliPreferences preferences;
 

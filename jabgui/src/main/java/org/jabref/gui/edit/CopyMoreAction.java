@@ -28,6 +28,8 @@ import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.function.Predicate.not;
+
 public class CopyMoreAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CopyMoreAction.class);
@@ -207,11 +209,9 @@ public class CopyMoreAction extends SimpleCommand {
         }
     }
 
-    /**
-     * This method will copy each selected entry's citation key as a hyperlink to its url to the clipboard. In case an
-     * entry doesn't have a citation key it will not be copied. In case an entry doesn't have an url this will only copy
-     * the citation key.
-     */
+    /// This method will copy each selected entry's citation key as a hyperlink to its url to the clipboard. In case an
+    /// entry doesn't have a citation key it will not be copied. In case an entry doesn't have an url this will only copy
+    /// the citation key.
     private void copyKeyAndLink() {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
@@ -257,7 +257,7 @@ public class CopyMoreAction extends SimpleCommand {
         List<String> fieldValues = selectedBibEntries.stream()
                                                      .filter(bibEntry -> bibEntry.getFieldOrAlias(field).isPresent())
                                                      .map(bibEntry -> LatexToUnicodeAdapter.format(bibEntry.getFieldOrAlias(field).orElse("")))
-                                                     .filter(value -> !value.isEmpty())
+                                                     .filter(not(String::isEmpty))
                                                      .toList();
 
         if (fieldValues.isEmpty()) {

@@ -27,9 +27,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Writes XMP metadata to the selected file according to the linking entry
- */
+/// Writes XMP metadata to the selected file according to the linking entry
 public class WriteMetadataToSinglePdfAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WriteMetadataToSinglePdfAction.class);

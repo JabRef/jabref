@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.jabref.logic.FilePreferences;
@@ -20,9 +21,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Moves the file into the default file directory. Does <em>not</em> rename the file.
- */
+/// Moves the file into the default file directory. Does *not* rename the file.
 public class MoveFilesCleanup implements CleanupJob {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MoveFilesCleanup.class);
@@ -36,6 +35,12 @@ public class MoveFilesCleanup implements CleanupJob {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
         this.ioExceptions = new ArrayList<>();
+    }
+
+    @Override
+    public List<FieldChange> cleanup(BibEntry entry, Consumer<Runnable> mutationScheduler) {
+        // File I/O must run on the background thread; bypass the scheduler entirely.
+        return cleanup(entry);
     }
 
     @Override

@@ -8,16 +8,14 @@ import org.jabref.logic.util.strings.StringUtil;
 
 import org.jspecify.annotations.NullMarked;
 
-/**
- * Removes start and end brace both at the complete string and at beginning/end of a word
- * <p>
- * E.g.,
- * <ul>
- *     <li>{Vall{\'e}e Poussin} -> Vall{\'e}e Poussin</li>
- *     <li>{Vall{\'e}e} {Poussin} -> Vall{\'e}e Poussin</li>
- *     <li>Vall{\'e}e Poussin -> Vall{\'e}e Poussin</li>
- * </ul>
- */
+/// Removes start and end brace both at the complete string and at beginning/end of a word
+///
+/// E.g.,
+///
+/// - {Vall{\'e}e Poussin} -> Vall{\'e}e Poussin
+/// - {Vall{\'e}e} {Poussin} -> Vall{\'e}e Poussin
+/// - Vall{\'e}e Poussin -> Vall{\'e}e Poussin
+///
 @NullMarked
 public class RemoveWordEnclosingAndOuterEnclosingBracesFormatter extends Formatter {
 
@@ -79,9 +77,7 @@ public class RemoveWordEnclosingAndOuterEnclosingBracesFormatter extends Formatt
         return result.toString();
     }
 
-    /**
-     * @return true iff the brackets in s are properly paired
-     */
+    /// @return true iff the brackets in s are properly paired
     private boolean properBrackets(String s) {
         // nested construct is there, check for "proper" nesting
         int i = 0;

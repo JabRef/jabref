@@ -14,11 +14,9 @@ import org.jabref.model.entry.field.InternalField;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * A custom exporter to write bib entries to a .xmp file for further processing
- * in other scenarios and applications. The xmp metadata are written in dublin
- * core format.
- */
+/// A custom exporter to write bib entries to a .xmp file for further processing
+/// in other scenarios and applications. The xmp metadata are written in dublin
+/// core format.
 public class XmpExporter extends Exporter {
 
     public static final String XMP_SPLIT_DIRECTORY_INDICATOR = "split";
@@ -30,11 +28,9 @@ public class XmpExporter extends Exporter {
         this.xmpPreferences = xmpPreferences;
     }
 
-    /**
-     * @param databaseContext the database to export from
-     * @param file            the file to write to. If it contains "split", then the output is split into different files
-     * @param entries         a list containing all entries that should be exported
-     */
+    /// @param databaseContext the database to export from
+    /// @param file            the file to write to. If it contains "split", then the output is split into different files
+    /// @param entries         a list containing all entries that should be exported
     @Override
     public void export(@NonNull BibDatabaseContext databaseContext,
                        @NonNull Path file,

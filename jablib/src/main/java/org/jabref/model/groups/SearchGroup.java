@@ -14,10 +14,8 @@ import io.github.adr.linked.ADR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This group matches entries by a complex search pattern, which might include conditions about the values of
- * multiple fields.
- */
+/// This group matches entries by a complex search pattern, which might include conditions about the values of
+/// multiple fields.
 public class SearchGroup extends AbstractGroup {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchGroup.class);
 
@@ -31,10 +29,8 @@ public class SearchGroup extends AbstractGroup {
         this.searchQuery = new SearchQuery(searchExpression, searchFlags);
     }
 
-    /**
-     * Used by {@link org.jabref.gui.importer.actions.SearchGroupsMigrationAction} to update the search expression.
-     * <em>Do not use otherwise</em>.
-     */
+    /// Used by {@link org.jabref.gui.importer.actions.SearchGroupsMigrationAction} to update the search expression.
+    /// *Do not use otherwise*.
     public void setSearchExpression(String searchExpression) {
         LOGGER.debug("Setting search expression {}", searchExpression);
         this.searchQuery = new SearchQuery(searchExpression, searchQuery.getSearchFlags());

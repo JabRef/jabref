@@ -21,10 +21,8 @@ import com.tngtech.archunit.library.GeneralCodingRules;
 import static com.tngtech.archunit.base.DescribedPredicate.not;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAnyPackage;
 
-/**
- * This class checks JabRef's shipped classes for architecture quality.
- * Does not analyze test classes. Hint from <a href="https://stackoverflow.com/a/44681895/873282">StackOverflow</a>
- */
+/// This class checks JabRef's shipped classes for architecture quality.
+/// Does not analyze test classes. Hint from <a href="https://stackoverflow.com/a/44681895/873282">StackOverflow</a>
 @AnalyzeClasses(packages = "org.jabref", importOptions = ImportOption.DoNotIncludeTests.class)
 public class CommonArchitectureTest {
 

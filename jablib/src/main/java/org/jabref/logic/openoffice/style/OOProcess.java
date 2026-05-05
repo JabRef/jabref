@@ -32,15 +32,13 @@ public class OOProcess {
         return new FieldComparatorStack<>(yat);
     }
 
-    /**
-     * The comparator used to sort within a group of merged
-     * citations.
-     * <p>
-     * The term used here is "multicite". The option controlling the
-     * order is "MultiCiteChronological" in style files.
-     * <p>
-     * Yes, they are always sorted one way or another.
-     */
+    /// The comparator used to sort within a group of merged
+    /// citations.
+    ///
+    /// The term used here is "multicite". The option controlling the
+    /// order is "MultiCiteChronological" in style files.
+    ///
+    /// Yes, they are always sorted one way or another.
     public static Comparator<BibEntry> comparatorForMulticite(JStyle style) {
         if (style.getMultiCiteChronological()) {
             return OOProcess.YEAR_AUTHOR_TITLE_COMPARATOR;
@@ -49,10 +47,8 @@ public class OOProcess {
         }
     }
 
-    /**
-     * Fill citationGroups.bibliography and cgs.citationGroupsUnordered//CitationMarker
-     * according to style.
-     */
+    /// Fill citationGroups.bibliography and cgs.citationGroupsUnordered//CitationMarker
+    /// according to style.
     public static void produceCitationMarkers(CitationGroups citationGroups, List<BibDatabase> databases, JStyle style) {
         if (!citationGroups.hasGlobalOrder()) {
             throw new IllegalStateException("produceCitationMarkers: globalOrder is misssing in citationGroups");

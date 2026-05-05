@@ -20,11 +20,9 @@ import dev.langchain4j.data.document.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This task generates embeddings for a {@link LinkedFile}.
- * It will check if embeddings were already generated.
- * And it also will store the embeddings.
- */
+/// This task generates embeddings for a {@link LinkedFile}.
+/// It will check if embeddings were already generated.
+/// And it also will store the embeddings.
 public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEmbeddingsTask.class);
 

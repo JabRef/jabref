@@ -10,6 +10,7 @@ public record Reference(
         String pageCount,
         String volume,
         String doi,
-        String isbn
+        String isbn,
+        String citationKey
 ) {
 }

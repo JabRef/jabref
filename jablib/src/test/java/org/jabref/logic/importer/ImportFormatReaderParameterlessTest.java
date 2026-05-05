@@ -31,19 +31,9 @@ class ImportFormatReaderParameterlessTest {
     }
 
     @Test
-    void importUnknownFormatThrowsExceptionIfNoMatchingImporterWasFound() throws URISyntaxException {
+    void importWithAutoDetectionThrowsExceptionIfNoMatchingImporterWasFound() throws URISyntaxException {
         Path file = Path.of(ImportFormatReaderParameterlessTest.class.getResource("fileformat/emptyFile.xml").toURI());
-        assertThrows(ImportException.class, () -> reader.importUnknownFormat(file, fileMonitor));
-    }
-
-    @Test
-    void importUnknownFormatThrowsExceptionIfPathIsNull() {
-        assertThrows(NullPointerException.class, () -> reader.importUnknownFormat(null, fileMonitor));
-    }
-
-    @Test
-    void importUnknownFormatThrowsExceptionIfDataIsNull() {
-        assertThrows(NullPointerException.class, () -> reader.importUnknownFormat(null));
+        assertThrows(ImportException.class, () -> reader.importWithAutoDetection(file));
     }
 
     @Test

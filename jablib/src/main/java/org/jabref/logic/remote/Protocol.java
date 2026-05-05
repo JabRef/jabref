@@ -13,10 +13,8 @@ import javafx.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @implNote The first byte of every message identifies its type as a {@link RemoteMessage}.
- * Every message is terminated with '\0'.
- */
+/// @implNote The first byte of every message identifies its type as a {@link RemoteMessage}.
+/// Every message is terminated with '\0'.
 public class Protocol implements AutoCloseable {
     public static final String IDENTIFIER = "jabref";
 

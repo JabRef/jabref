@@ -7,9 +7,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
-/**
- * This class represents the change of type for an entry.
- */
+/// This class represents the change of type for an entry.
 public class UndoableChangeType extends AbstractUndoableJabRefEdit {
     private final EntryType oldType;
     private final EntryType newType;

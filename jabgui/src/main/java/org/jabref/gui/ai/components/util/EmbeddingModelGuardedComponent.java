@@ -15,10 +15,8 @@ import org.jabref.logic.l10n.Localization;
 
 import com.google.common.eventbus.Subscribe;
 
-/**
- * Class that has similar logic to {@link AiPrivacyNoticeGuardedComponent}. It extends from it, so that means,
- * if a component needs embedding model, then it should also be guarded with accepting AI privacy policy.
- */
+/// Class that has similar logic to {@link AiPrivacyNoticeGuardedComponent}. It extends from it, so that means,
+/// if a component needs embedding model, then it should also be guarded with accepting AI privacy policy.
 public abstract class EmbeddingModelGuardedComponent extends AiPrivacyNoticeGuardedComponent {
     private final AiService aiService;
 

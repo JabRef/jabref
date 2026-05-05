@@ -59,9 +59,7 @@ public class RedownloadMissingFilesAction extends SimpleCommand {
         }
     }
 
-    /**
-     * @implNote Similar method {@link org.jabref.gui.fieldeditors.LinkedFileViewModel#redownload}
-     */
+    /// @implNote Similar method {@link org.jabref.gui.fieldeditors.LinkedFileViewModel#redownload}
     private void redownloadMissing(BibDatabaseContext databaseContext) {
         LOGGER.info("Redownloading missing files");
         databaseContext.getEntries().forEach(entry ->

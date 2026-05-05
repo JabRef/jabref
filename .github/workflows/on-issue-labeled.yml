@@ -2,15 +2,15 @@ name: On issue labeled
 
 on:
   issues:
-     types:
-       - labeled
+    types:
+      - labeled
 
 jobs:
   assigned:
     # Triggered when manually assigned the label "📍 Assigned" to trigger the automatic unassignment after 30 days
     name: "📍 Assigned"
     if: ${{ github.event.label.name == '📍 Assigned' && github.repository_owner == 'JabRef' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       issues: write
     steps:
@@ -36,58 +36,63 @@ jobs:
           skip-if-not-in-project: true
   FirstTimeCodeContribution:
     if: ${{ github.event.label.name == 'FirstTimeCodeContribution' && github.repository_owner == 'JabRef' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       issues: write
     steps:
-    - name: GreetingFirstTimeCodeContribution
-      uses: peter-evans/create-or-update-comment@v5
-      with:
-        issue-number: ${{ github.event.issue.number || github.event.pull_request.number }}
-        body: |
-          Welcome to the vibrant world of open-source development with JabRef!
+      - name: GreetingFirstTimeCodeContribution
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.issue.number || github.event.pull_request.number }}
+          body: |
+            Welcome to the vibrant world of open-source development with JabRef!
 
-          Newcomers, we're excited to have you on board. Start by exploring our [Contributing](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) guidelines, and don't forget to check out our [workspace setup guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace) to get started smoothly.
+            Newcomers, we're excited to have you on board. Start by exploring our [Contributing](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) guidelines, and don't forget to check out our [workspace setup guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace) to get started smoothly.
 
-          In case you encounter failing tests during development, please check our [developer FAQs](https://devdocs.jabref.org/code-howtos/faq.html)!
+            In case you encounter failing tests during development, please check our [developer FAQs](https://devdocs.jabref.org/code-howtos/faq.html)!
 
-          Having any questions or issues? Feel free to ask here on GitHub. Need help setting up your local workspace? Join the conversation on [JabRef's Gitter chat](https://gitter.im/JabRef/jabref). And don't hesitate to open a (draft) pull request early on to show the direction it is heading towards. This way, you will receive valuable feedback.
+            Having any questions or issues? Feel free to ask here on GitHub. Need help setting up your local workspace? Join the conversation on [JabRef's Gitter chat](https://gitter.im/JabRef/jabref). And don't hesitate to open a (draft) pull request early on to show the direction it is heading towards. This way, you will receive valuable feedback.
 
-          ⚠ Note that this issue will become unassigned if it isn't closed within **30 days**.
+            ⚠ Note that this issue will become unassigned if it isn't closed within **30 days**.
 
-          🔧 A maintainer can also add the **`Pinned`** label to prevent it from being unassigned automatically.
+            🔧 A maintainer can also add the **`Pinned`** label to prevent it from being unassigned automatically.
 
-          Happy coding! 🚀
-    - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
-      uses: m7kvqbe1/github-action-move-issues@main
-      with:
-        github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
-        project-url: "https://github.com/orgs/JabRef/projects/3"
-        target-labels: "FirstTimeCodeContribution"
-        target-column: "Assigned"
-        ignored-columns: ""
-        default-column: "Free to take"
-        skip-if-not-in-project: true
-    - name: Move Issue to "Assigned" Column in "Good First Issues"
-      uses: m7kvqbe1/github-action-move-issues@main
-      with:
-        github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
-        project-url: "https://github.com/orgs/JabRef/projects/5"
-        target-labels: "FirstTimeCodeContribution"
-        target-column: "Assigned"
-        ignored-columns: ""
-        default-column: "Free to take"
-        skip-if-not-in-project: true
-    - name: Remove label
-      run: |
-        gh issue edit ${{ github.event.issue.number }} --remove-label "FirstTimeCodeContribution"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            Happy coding! 🚀
+      - name: Move Issue to "Assigned" Column in "Candidates for University Projects"
+        uses: m7kvqbe1/github-action-move-issues@main
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/3"
+          target-labels: "FirstTimeCodeContribution"
+          target-column: "Assigned"
+          ignored-columns: ""
+          default-column: "Free to take"
+          skip-if-not-in-project: true
+      - name: Move Issue to "Assigned" Column in "Good First Issues"
+        uses: m7kvqbe1/github-action-move-issues@main
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/5"
+          target-labels: "FirstTimeCodeContribution"
+          target-column: "Assigned"
+          ignored-columns: ""
+          default-column: "Free to take"
+          skip-if-not-in-project: true
+      - uses: actions/checkout@v6
+      - name: Remove label
+        run: |
+          gh issue edit ${{ github.event.issue.number }} --remove-label "FirstTimeCodeContribution"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   good-first-issue:
     name: "good first issue"
     if: "${{ github.event.label.name == 'good first issue' && github.repository_owner == 'JabRef' }}"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: "good first issue"
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN_PROJECT_ITEM_ADD }}
@@ -96,8 +101,12 @@ jobs:
           gh project item-add 5 --owner JabRef --url $ISSUE_URL
   needs-refinement:
     if: github.event.label.name == 'needs-refinement' && github.repository_owner == 'JabRef'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: needs-refinement
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN_PROJECT_ITEM_ADD }}
@@ -107,8 +116,12 @@ jobs:
   status-freeze:
     name: "status: freeze"
     if: "${{ github.event.label.name == 'status: freeze' && github.repository_owner == 'JabRef' }}"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: jq
+          version: 1.0
       - name: "status: freeze"
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN_PROJECT_ITEM_ADD }}
@@ -118,7 +131,7 @@ jobs:
   wisdom:
     name: "dev: wisdom"
     if: "${{ github.event.label.name == 'dev: wisdom' && github.repository_owner == 'JabRef' }}"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       issues: write
       contents: read

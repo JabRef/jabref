@@ -16,6 +16,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -34,13 +35,15 @@ public class LspDiagnosticHandler {
     private final LspClientHandler clientHandler;
     private final LspParserHandler parserHandler;
     private final CliPreferences cliPreferences;
+    private final BibEntryTypesManager bibEntryTypesManager;
     private final Map<String, List<Diagnostic>> integrityDiagnosticsCache; // Maps file URIs to the corresponding list of integrity diagnostics
     private final Map<String, List<Diagnostic>> consistencyDiagnosticsCache; // Maps file URIs to the corresponding list of consistency diagnostics
 
-    public LspDiagnosticHandler(LspClientHandler clientHandler, LspParserHandler parserHandler, CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
+    public LspDiagnosticHandler(LspClientHandler clientHandler, LspParserHandler parserHandler, CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository, BibEntryTypesManager bibEntryTypesManager) {
         this.clientHandler = clientHandler;
         this.parserHandler = parserHandler;
         this.cliPreferences = cliPreferences;
+        this.bibEntryTypesManager = bibEntryTypesManager;
         this.lspIntegrityCheck = new LspIntegrityCheck(cliPreferences, abbreviationRepository);
         this.lspConsistencyCheck = new LspConsistencyCheck(clientHandler.getSettings());
         this.integrityDiagnosticsCache = new ConcurrentHashMap<>();
@@ -88,7 +91,7 @@ public class LspDiagnosticHandler {
         }
 
         if (clientHandler.getSettings().isConsistencyCheck()) {
-            consistencyDiagnosticsCache.put(uri, lspConsistencyCheck.check(parserResult));
+            consistencyDiagnosticsCache.put(uri, lspConsistencyCheck.check(parserResult, bibEntryTypesManager));
             LOGGER.debug("Cached consistency diagnostics for {}", uri);
         }
 

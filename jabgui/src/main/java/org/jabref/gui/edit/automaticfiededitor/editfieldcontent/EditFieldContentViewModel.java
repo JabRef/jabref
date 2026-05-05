@@ -13,9 +13,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
-import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
+import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorUndoableEdit;
+import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.util.strings.StringUtil;
@@ -30,8 +32,6 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabViewModel {
-    public static final int TAB_INDEX = 0;
-
     private final List<BibEntry> selectedEntries;
 
     private final StringProperty fieldValue = new SimpleStringProperty("");
@@ -43,9 +43,16 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
     private final Validator fieldValidator;
     private final BooleanBinding canAppend;
 
-    public EditFieldContentViewModel(BibDatabase database, List<BibEntry> selectedEntries, StateManager stateManager) {
-        super(database, stateManager);
+    public EditFieldContentViewModel(BibDatabase database,
+                                     List<BibEntry> selectedEntries,
+                                     NamedCompoundEdit compoundEdit,
+                                     DialogService dialogService,
+                                     StateManager stateManager) {
+        super(database, compoundEdit, dialogService, stateManager);
         this.selectedEntries = new ArrayList<>(selectedEntries);
+
+        FieldHelper.getSetFieldsOnly(selectedEntries, getAllFields())
+                   .stream().findFirst().ifPresent(selectedField::set);
 
         fieldValidator = new FunctionBasedValidator<>(selectedField, field -> {
             if (StringUtil.isBlank(field.getName())) {
@@ -68,32 +75,30 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
     }
 
     public void setFieldValue() {
-        NamedCompoundEdit setFieldEdit = new NamedCompoundEdit("CHANGE_SELECTED_FIELD");
+        AutomaticFieldEditorUndoableEdit edits = new AutomaticFieldEditorUndoableEdit("CHANGE_SELECTED_FIELD");
         String toSetFieldValue = fieldValue.getValue();
         int affectedEntriesCount = 0;
         for (BibEntry entry : selectedEntries) {
             Optional<String> oldFieldValue = entry.getField(selectedField.get());
             if (oldFieldValue.isEmpty() || overwriteFieldContent.get()) {
                 entry.setField(selectedField.get(), toSetFieldValue)
-                     .ifPresent(fieldChange -> setFieldEdit.addEdit(new UndoableFieldChange(fieldChange)));
+                     .ifPresent(fieldChange -> edits.addEdit(new UndoableFieldChange(fieldChange)));
                 fieldValue.set("");
                 // TODO: increment affected entries only when UndoableFieldChange.isPresent()
                 affectedEntriesCount++;
             }
         }
+        edits.setAffectedEntries(affectedEntriesCount);
 
-        if (setFieldEdit.hasEdits()) {
-            setFieldEdit.end();
+        if (edits.hasEdits()) {
+            edits.end();
         }
-        stateManager.setLastAutomaticFieldEditorEdit(new LastAutomaticFieldEditorEdit(
-                affectedEntriesCount,
-                TAB_INDEX,
-                setFieldEdit
-        ));
+
+        addEdit(edits);
     }
 
     public void appendToFieldValue() {
-        NamedCompoundEdit appendToFieldEdit = new NamedCompoundEdit("APPEND_TO_SELECTED_FIELD");
+        AutomaticFieldEditorUndoableEdit edits = new AutomaticFieldEditorUndoableEdit("APPEND_TO_SELECTED_FIELD");
         String toAppendFieldValue = fieldValue.getValue();
         int affectedEntriesCount = 0;
         for (BibEntry entry : selectedEntries) {
@@ -103,21 +108,19 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
                 String newFieldValue = oldFieldValue.orElse("").concat(toAppendFieldValue);
 
                 entry.setField(selectedField.get(), newFieldValue)
-                     .ifPresent(fieldChange -> appendToFieldEdit.addEdit(new UndoableFieldChange(fieldChange)));
+                     .ifPresent(fieldChange -> edits.addEdit(new UndoableFieldChange(fieldChange)));
 
                 fieldValue.set("");
                 affectedEntriesCount++;
             }
         }
+        edits.setAffectedEntries(affectedEntriesCount);
 
-        if (appendToFieldEdit.hasEdits()) {
-            appendToFieldEdit.end();
+        if (edits.hasEdits()) {
+            edits.end();
         }
-        stateManager.setLastAutomaticFieldEditorEdit(new LastAutomaticFieldEditorEdit(
-                affectedEntriesCount,
-                TAB_INDEX,
-                appendToFieldEdit
-        ));
+
+        addEdit(edits);
     }
 
     public ObjectProperty<Field> selectedFieldProperty() {

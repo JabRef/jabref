@@ -1,7 +1,7 @@
-FROM gradle:jdk24-noble AS build
+FROM maven:3.9.14-amazoncorretto-25-debian AS build
 
-LABEL org.opencontainers.image.title="jabkit"
-LABEL org.opencontainers.image.description="JabRef's CLI tool"
+# Is not debian-based
+# FROM amazoncorretto:26-jdk AS build
 
 ARG VERSION="100.0.0"
 ARG VERSION_INFO="100.0.0"
@@ -9,18 +9,58 @@ ARG TAG_BUILD="false"
 
 WORKDIR /build
 
+COPY --from=jbangdev/jbang:0.136.0-java-21 /jbang-0.136.0/ /jbang/
+
+ENV PATH="${PATH}:/jbang/bin"
+ENV JBANG_DIR="/jbang/.jbang"
+
+COPY gradlew .
+COPY gradle gradle
+
+RUN ./gradlew || true
+
+COPY settings.gradle.kts .
+COPY build.gradle.kts .
+COPY gradle.properties .
+COPY build-logic/ build-logic/
+COPY build-support/ build-support/
+COPY jabgui/build.gradle.kts jabgui/
+COPY jabkit/build.gradle.kts jabkit/
+COPY jablib/build.gradle.kts jablib/
+COPY jabls/build.gradle.kts jabls/
+COPY jabls-cli/build.gradle.kts jabls-cli/
+COPY jabsrv/build.gradle.kts jabsrv/
+COPY jabsrv-cli/build.gradle.kts jabsrv-cli/
+COPY test-support test-support
+COPY ./jabgui/src/main/java/module-info.java ./jabgui/src/main/java/module-info.java
+COPY ./jabkit/src/main/java/module-info.java ./jabkit/src/main/java/module-info.java
+COPY ./jablib/src/main/java/module-info.java ./jablib/src/main/java/module-info.java
+COPY ./jabls/src/main/java/module-info.java ./jabls/src/main/java/module-info.java
+COPY ./jabls-cli/src/main/java/module-info.java ./jabls-cli/src/main/java/module-info.java
+COPY ./jabsrv/src/main/java/module-info.java ./jabsrv/src/main/java/module-info.java
+COPY ./jabsrv-cli/src/main/java/module-info.java ./jabsrv-cli/src/main/java/module-info.java
+COPY ./test-support/src/main/java/module-info.java ./test-support/src/main/java/module-info.java
+
+COPY versions versions
+
+# Cache gradle and build-logic
+RUN ./gradlew --no-daemon :build-logic:jar
+
 COPY . .
 
-RUN gradle --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabkit:jpackage
+RUN ./gradlew --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabkit:jpackage
 
 RUN mkdir /dist
 
 RUN mv jabkit/build/packages/*/* /dist
 
-# jpackage needs glibc; alpine does not work
-FROM debian:bookworm-slim AS runtime
 
-LABEL org.opencontainers.image.source=https://github.com/JabRef/jabref
+# jpackage needs glibc; alpine does not work
+FROM debian:trixie-slim AS runtime
+
+LABEL org.opencontainers.image.title="jabkit"
+LABEL org.opencontainers.image.description="JabRef's CLI tool"
+LABEL org.opencontainers.image.source="https://github.com/JabRef/jabref"
 
 WORKDIR /work
 

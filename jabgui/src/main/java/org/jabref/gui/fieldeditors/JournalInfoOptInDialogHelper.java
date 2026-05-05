@@ -6,9 +6,7 @@ import org.jabref.logic.l10n.Localization;
 
 public class JournalInfoOptInDialogHelper {
 
-    /**
-     * Using the journal information data fetcher service needs to be opt-in for GDPR compliance.
-     */
+    /// Using the journal information data fetcher service needs to be opt-in for GDPR compliance.
     public static boolean isJournalInfoEnabled(DialogService dialogService, EntryEditorPreferences preferences) {
         if (preferences.shouldEnableJournalPopup() == EntryEditorPreferences.JournalPopupEnabled.ENABLED) {
             return true;

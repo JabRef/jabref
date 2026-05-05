@@ -35,9 +35,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * TemplateExporter for exporting in MODS XML format.
- */
+/// TemplateExporter for exporting in MODS XML format.
 class ModsExporter extends Exporter {
 
     private static final String MODS_NAMESPACE_URI = "http://www.loc.gov/mods/v3";

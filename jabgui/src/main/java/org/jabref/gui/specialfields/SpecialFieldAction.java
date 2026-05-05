@@ -38,9 +38,7 @@ public class SpecialFieldAction extends SimpleCommand {
     private final UndoManager undoManager;
     private final StateManager stateManager;
 
-    /**
-     * @param nullFieldIfValueIsTheSame - false also causes that doneTextPattern has two place holders %0 for the value and %1 for the sum of entries
-     */
+    /// @param nullFieldIfValueIsTheSame - false also causes that doneTextPattern has two place holders %0 for the value and %1 for the sum of entries
     public SpecialFieldAction(Supplier<LibraryTab> tabSupplier,
                               SpecialField specialField,
                               String value,

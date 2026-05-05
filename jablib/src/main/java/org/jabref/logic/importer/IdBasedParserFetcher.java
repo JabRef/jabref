@@ -14,26 +14,20 @@ import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Provides a convenient interface for ID-based fetcher, which follow the usual three-step procedure:
- * 1. Open a URL based on the search query
- * 2. Parse the response to get a list of {@link BibEntry}
- * 3. Post-process fetched entries
- */
+/// Provides a convenient interface for ID-based fetcher, which follow the usual three-step procedure:
+/// 1. Open a URL based on the search query
+/// 2. Parse the response to get a list of {@link BibEntry}
+/// 3. Post-process fetched entries
 public interface IdBasedParserFetcher extends IdBasedFetcher, ParserFetcher {
 
     Logger LOGGER = LoggerFactory.getLogger(IdBasedParserFetcher.class);
 
-    /**
-     * Constructs a URL based on the query.
-     *
-     * @param identifier the ID
-     */
+    /// Constructs a URL based on the query.
+    ///
+    /// @param identifier the ID
     URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException;
 
-    /**
-     * Returns the parser used to convert the response to a list of {@link BibEntry}.
-     */
+    /// Returns the parser used to convert the response to a list of {@link BibEntry}.
     Parser getParser();
 
     @Override

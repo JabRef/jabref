@@ -8,10 +8,8 @@ import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
 import org.fxmisc.richtext.StyleClassedTextArea;
 
-/**
- * A diff highlighter in which changes are split between source and target text view.
- * They are represented by an addition in the target text view and deletion in the source text view.
- */
+/// A diff highlighter in which changes are split between source and target text view.
+/// They are represented by an addition in the target text view and deletion in the source text view.
 public final class SplitDiffHighlighter extends DiffHighlighter {
 
     public SplitDiffHighlighter(StyleClassedTextArea sourceTextview, StyleClassedTextArea targetTextview, DiffMethod diffMethod) {

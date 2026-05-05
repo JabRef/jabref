@@ -5,9 +5,7 @@ import org.jabref.logic.l10n.Localization;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Replaces three or more authors with and others
- */
+/// Replaces three or more authors with and others
 public class MinifyNameListFormatter extends Formatter {
     @Override
     public String getName() {
@@ -19,16 +17,14 @@ public class MinifyNameListFormatter extends Formatter {
         return "minify_name_list";
     }
 
-    /**
-     * Replaces three or more authors with and others.
-     *
-     * <h4>Example</h4>
-     * <pre>{@code
-     *     Stefan Kolb -> Stefan Kolb
-     *     Stefan Kolb and Simon Harrer -> Stefan Kolb and Simon Harrer
-     *     Stefan Kolb and Simon Harrer and Jörg Lenhard -> Stefan Kolb and others
-     * }</pre>
-     */
+    /// Replaces three or more authors with and others.
+    ///
+    /// <h4>Example</h4>
+    /// <pre>{@code
+    /// Stefan Kolb -> Stefan Kolb
+    /// Stefan Kolb and Simon Harrer -> Stefan Kolb and Simon Harrer
+    /// Stefan Kolb and Simon Harrer and Jörg Lenhard -> Stefan Kolb and others
+    /// }</pre>
     @Override
     public String format(@NonNull String value) {
         if (value.isEmpty()) {

@@ -22,14 +22,10 @@ import org.jabref.model.openoffice.style.PageInfo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class OOBibStyleTestHelper {
-    /*
-     * Minimal implementation for CitationMarkerNumericEntry
-     */
+    // Minimal implementation for CitationMarkerNumericEntry
     static class CitationMarkerNumericEntryImpl implements CitationMarkerNumericEntry {
 
-        /*
-         * The number encoding "this entry is unresolved" for the constructor.
-         */
+        // The number encoding "this entry is unresolved" for the constructor.
         public final static int UNRESOLVED_ENTRY_NUMBER = 0;
 
         private final String citationKey;
@@ -84,11 +80,9 @@ class OOBibStyleTestHelper {
         return new CitationMarkerNumericBibEntryImpl(key, number);
     }
 
-    /**
-     * Reproduce old method
-     *
-     * @param inList true means label for the bibliography
-     */
+    /// Reproduce old method
+    ///
+    /// @param inList true means label for the bibliography
     static String runGetNumCitationMarker2a(JStyle style,
                                             List<Integer> num, int minGroupingCount, boolean inList) {
         if (inList) {
@@ -153,10 +147,8 @@ class OOBibStyleTestHelper {
         return result;
     }
 
-    /**
-     * @implNote Similar to old API. pageInfo is new, and unlimAuthors is
-     * replaced with isFirstAppearanceOfSource
-     */
+    /// @implNote Similar to old API. pageInfo is new, and unlimAuthors is
+    /// replaced with isFirstAppearanceOfSource
     static String getCitationMarker2ab(JStyle style,
                                        List<BibEntry> entries,
                                        Map<BibEntry, BibDatabase> entryDBMap,

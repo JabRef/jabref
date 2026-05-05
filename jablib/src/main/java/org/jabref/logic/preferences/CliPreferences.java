@@ -61,13 +61,7 @@ public interface CliPreferences {
 
     Map<String, Object> getDefaults();
 
-    LayoutFormatterPreferences getLayoutFormatterPreferences();
-
-    ImportFormatPreferences getImportFormatPreferences();
-
-    /**
-     * Returns the export configuration. The contained SaveConfiguration is a {@link org.jabref.model.metadata.SelfContainedSaveOrder}
-     */
+    /// Returns the export configuration. The contained SaveConfiguration is a {@link org.jabref.model.metadata.SelfContainedSaveOrder}
     SelfContainedSaveConfiguration getSelfContainedExportConfiguration();
 
     BibEntryTypesManager getCustomEntryTypesRepository();
@@ -123,4 +117,22 @@ public interface CliPreferences {
     PushToApplicationPreferences getPushToApplicationPreferences();
 
     GitPreferences getGitPreferences();
+
+    default ImportFormatPreferences getImportFormatPreferences() {
+        return new ImportFormatPreferences(
+                getBibEntryPreferences(),
+                getCitationKeyPatternPreferences(),
+                getFieldPreferences(),
+                getXmpPreferences(),
+                getDOIPreferences(),
+                getGrobidPreferences(),
+                getFilePreferences());
+    }
+
+    default LayoutFormatterPreferences getLayoutFormatterPreferences() {
+        return new LayoutFormatterPreferences(
+                getNameFormatterPreferences(),
+                getDOIPreferences(),
+                getFilePreferences().mainFileDirectoryProperty());
+    }
 }

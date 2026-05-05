@@ -35,11 +35,11 @@ public class PushToApplicationDetector {
     }
 
     public static boolean isValidAbsolutePath(String path) {
-        if (path == null || path.trim().isEmpty()) {
+        if (path == null || path.isBlank()) {
             return false;
         }
         Path p = Path.of(path);
-        return p.isAbsolute() && p.toFile().exists();
+        return p.isAbsolute() && Files.exists(p);
     }
 
     private static @Nullable String findApplicationPath(PushToApplication app) {
@@ -61,7 +61,7 @@ public class PushToApplicationDetector {
 
         for (Path base : paths) {
             try {
-                if (base.toFile().exists()) {
+                if (Files.exists(base)) {
                     String result = findExecutableInDirectory(base, names);
                     if (result != null) {
                         return result;
@@ -122,7 +122,7 @@ public class PushToApplicationDetector {
     }
 
     private static boolean isValidExecutable(Path path, String[] names) {
-        if (!path.toFile().exists()) {
+        if (Files.notExists(path)) {
             return false;
         }
 
@@ -185,7 +185,7 @@ public class PushToApplicationDetector {
         result = trySystemCommand("where", exe);
         if (result != null) {
             String[] lines = result.split("\n");
-            return lines.length > 0 && !lines[0].trim().isEmpty() ? lines[0].trim() : null;
+            return lines.length > 0 && !lines[0].isBlank() ? lines[0].trim() : null;
         }
 
         return null;

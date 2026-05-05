@@ -7,9 +7,7 @@ import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import org.jabref.logic.util.strings.StringUtil;
 
-/**
- * This formatter preprocesses JabRef fields before they are run through the layout of the bibliography style. It handles translation of LaTeX italic/bold commands into HTML tags.
- */
+/// This formatter preprocesses JabRef fields before they are run through the layout of the bibliography style. It handles translation of LaTeX italic/bold commands into HTML tags.
 public class OOPreFormatter implements LayoutFormatter {
 
     private static final Map<String, String> CHARS = HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
@@ -145,32 +143,32 @@ public class OOPreFormatter implements LayoutFormatter {
     }
 
     private String getHTMLTag(String latexCommand) {
-        String result = "";
-        switch (latexCommand) {
+        return switch (latexCommand) {
             // Should really separate between emphasized and italic but since in later stages both are converted to italic...
             case "textit",
                  "it",
                  "emph",
                  "em" ->
-                    result = "i";  // Italic
+                    "i";  // Italic
             case "textbf",
                  "bf" ->
-                    result = "b";                // Bold font
+                    "b";                // Bold font
             case "textsc" ->
-                    result = "smallcaps";              // Small caps
+                    "smallcaps";              // Small caps
             // Not a proper HTML tag, but used here for convenience
             case "underline" ->
-                    result = "u";                   // Underline
+                    "u";                   // Underline
             case "sout" ->
-                    result = "s";                        // Strikeout
+                    "s";                        // Strikeout
             // sout is the "standard" command, although it is actually based on the package ulem
             case "texttt" ->
-                    result = "tt";                     // Monospace font
+                    "tt";                     // Monospace font
             case "textsuperscript" ->
-                    result = "sup";           // Superscript
+                    "sup";           // Superscript
             case "textsubscript" ->
-                    result = "sub";             // Subscript
-        }
-        return result;
+                    "sub";
+            default ->
+                    "";             // Subscript
+        };
     }
 }

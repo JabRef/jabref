@@ -24,11 +24,14 @@
         </CustomTextField>
 
         <TreeTableView fx:id="keyBindingsTable" showRoot="false" styleClass="keybinding-table">
+            <padding>
+                <Insets right="10.0"/>
+            </padding>
             <columns>
                 <TreeTableColumn fx:id="actionColumn" prefWidth="200.0" text="%Action"/>
                 <TreeTableColumn fx:id="shortcutColumn" prefWidth="100.0" text="%Shortcut"/>
-                <TreeTableColumn fx:id="resetColumn" maxWidth="25.0" prefWidth="25.0" minWidth="25.0"/>
-                <TreeTableColumn fx:id="clearColumn" maxWidth="25.0" prefWidth="25.0" minWidth="25.0"/>
+                <TreeTableColumn fx:id="resetColumn" maxWidth="30.0" prefWidth="30.0" minWidth="30.0"/>
+                <TreeTableColumn fx:id="clearColumn" maxWidth="30.0" prefWidth="30.0" minWidth="30.0"/>
             </columns>
             <columnResizePolicy>
                 <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>

@@ -5,9 +5,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-/**
- * Converts number to ordinal
- */
+/// Converts number to ordinal
 public class Ordinal implements LayoutFormatter {
 
     // Detect last digit in number not directly followed by a letter plus the number 11

@@ -11,8 +11,8 @@ on:
       - '**/*.tex'
   pull_request:
     paths:
-        - '**/*.bib'
-        - '**/*.tex'
+      - '**/*.bib'
+      - '**/*.tex'
   schedule:
     - cron: '1 2 5 * *'
   workflow_dispatch:
@@ -24,24 +24,29 @@ concurrency:
 jobs:
   cache:
     if: ${{ github.repository_owner == 'JabRef' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Check out code
         uses: actions/checkout@v6
       - name: Install TeX Live
         uses: zauguin/install-texlive@v4
         with:
-           package_file: jablib/src/test/latex/Texlivefile
+          package_file: jablib/src/test/latex/Texlivefile
   check-latex:
-    needs: [cache]
+    needs: [ cache ]
+    # texlive doesn't run on ubuntu-slim
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          #  IEEE paper
+          #  IEEE papers
           - directory: jablib/src/test/latex/pdfs/IEEE
             tex: ieee-paper
+            engine: pdflatex
+            bibengine: bibtex
+          - directory: jablib/src/test/latex/pdfs/IEEE
+            tex: ieee-paper-reference-text
             engine: pdflatex
             bibengine: bibtex
           # minimal search examples
@@ -99,7 +104,7 @@ jobs:
         working-directory: ${{ matrix.directory }}
 
       - name: Upload build result
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: PDF-${{ matrix.tex }}
           path: |

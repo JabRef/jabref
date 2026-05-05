@@ -2,17 +2,13 @@ package org.jabref.logic.l10n;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Model for a localization to translate. The key is the English text.
- */
+/// Model for a localization to translate. The key is the English text.
 public class LocalizationKey {
 
     private final String key;
     private final String escapedPropertyKey;
 
-    /**
-     * @param key plain key - no escaping. E.g., "Copy \cite{key}" or "Newline follows\nsecond line" are valid parameters.
-     */
+    /// @param key plain key - no escaping. E.g., "Copy \cite{key}" or "Newline follows\nsecond line" are valid parameters.
     private LocalizationKey(String key) {
         this.key = key;
         // space, #, !, = and : are not allowed in properties file keys
@@ -26,9 +22,7 @@ public class LocalizationKey {
                 .replace(":", "\\:");
     }
 
-    /**
-     * @param key plain key - no escaping. E.g., "Copy \cite{key}" or "Newline follows\nsecond line" are valid parameters.
-     */
+    /// @param key plain key - no escaping. E.g., "Copy \cite{key}" or "Newline follows\nsecond line" are valid parameters.
     public static LocalizationKey fromKey(@NonNull String key) {
         return new LocalizationKey(key);
     }

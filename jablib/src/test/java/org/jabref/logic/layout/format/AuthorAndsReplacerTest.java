@@ -9,9 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AuthorAndsReplacerTest {
 
-    /**
-     * Test method for {@link org.jabref.logic.layout.format.AuthorAndsReplacer#format(java.lang.String)}.
-     */
+    /// Test method for {@link org.jabref.logic.layout.format.AuthorAndsReplacer#format(java.lang.String)}.
     @ParameterizedTest
     @CsvSource(
             delimiterString = "->",

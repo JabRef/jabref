@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -19,10 +20,12 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupTabSelection;
 import org.jabref.logic.cleanup.CleanupWorker;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
@@ -31,38 +34,51 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 public class CleanupDialogViewModel extends AbstractViewModel {
 
     private final BibDatabaseContext databaseContext;
+
     private final CliPreferences preferences;
+
     private final DialogService dialogService;
+
     private final StateManager stateManager;
+
     private final UndoManager undoManager;
+
+    @Nullable
     private final Supplier<LibraryTab> tabSupplier;
+
+    @Nullable
     private final TaskExecutor taskExecutor;
+
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     private final ObservableList<BibEntry> targetEntries = FXCollections.observableArrayList();
     private int modifiedEntriesCount;
 
+    @NullMarked
     public CleanupDialogViewModel(
-            @NonNull BibDatabaseContext databaseContext,
-            @NonNull CliPreferences preferences,
-            @NonNull DialogService dialogService,
-            @NonNull StateManager stateManager,
-            @NonNull UndoManager undoManager,
-            Supplier<LibraryTab> tabSupplier,
-            TaskExecutor taskExecutor
+            BibDatabaseContext databaseContext,
+            CliPreferences preferences,
+            DialogService dialogService,
+            StateManager stateManager,
+            UndoManager undoManager,
+            @Nullable Supplier<LibraryTab> tabSupplier,
+            @Nullable TaskExecutor taskExecutor,
+            JournalAbbreviationRepository journalAbbreviationRepository
     ) {
         this.databaseContext = databaseContext;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
-
-        this.tabSupplier = tabSupplier; // can be null
-        this.taskExecutor = taskExecutor; // can be null
+        this.tabSupplier = tabSupplier;
+        this.taskExecutor = taskExecutor;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
     }
 
     public void setTargetEntries(List<BibEntry> entries) {
@@ -70,6 +86,10 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     }
 
     public void apply(CleanupTabSelection selectedTab) {
+        apply(selectedTab, true);
+    }
+
+    public void apply(CleanupTabSelection selectedTab, boolean showFeedback) {
         if (stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
@@ -112,31 +132,46 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         selectedTab.formatters().ifPresent(cleanupPreset::setFieldFormatterCleanups);
 
         if (taskExecutor != null) {
-            BackgroundTask.wrap(() -> cleanup(cleanupPreset, entriesToProcess))
-                          .onSuccess(result -> showResults())
-                          .onFailure(dialogService::showErrorDialogAndWait)
-                          .executeWith(taskExecutor);
+            new BackgroundTask<Void>() {
+                @Override
+                public Void call() {
+                    cleanupWithProgress(cleanupPreset, entriesToProcess, this);
+                    return null;
+                }
+            }
+                    .onSuccess(result -> {
+                        if (showFeedback) {
+                            showResults();
+                        }
+                    })
+                    .onFailure(dialogService::showErrorDialogAndWait)
+                    .executeWith(taskExecutor);
         } else {
             cleanup(cleanupPreset, entriesToProcess);
+            if (showFeedback) {
+                showResults();
+            }
         }
     }
 
-    /**
-     * Runs the cleanup on the entry and records the change.
-     *
-     * @return true iff entry was modified
-     */
+    /// Runs the cleanup on the entry and records the change.
+    ///
+    /// @param mutationScheduler routes BibEntry field mutations to the correct thread
+    /// @return true iff entry was modified
     private boolean doCleanup(CleanupPreferences preset,
                               BibEntry entry,
                               NamedCompoundEdit compoundEdit,
-                              List<JabRefException> failures) {
+                              List<JabRefException> failures,
+                              Consumer<Runnable> mutationScheduler) {
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
                 preferences.getFilePreferences(),
-                preferences.getTimestampPreferences()
+                preferences.getTimestampPreferences(),
+                preferences.getJournalAbbreviationPreferences().shouldUseFJournalField(),
+                journalAbbreviationRepository
         );
 
-        List<FieldChange> changes = cleaner.cleanup(preset, entry);
+        List<FieldChange> changes = cleaner.cleanup(preset, entry, mutationScheduler);
 
         for (FieldChange change : changes) {
             compoundEdit.addEdit(new UndoableFieldChange(change));
@@ -151,17 +186,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         if (modifiedEntriesCount > 0 && tabSupplier != null) {
             tabSupplier.get().markBaseChanged();
         }
-
-        String message = switch (modifiedEntriesCount) {
-            case 0 ->
-                    Localization.lang("No entry needed a clean up");
-            case 1 ->
-                    Localization.lang("One entry needed a clean up");
-            default ->
-                    Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
-        };
-
-        dialogService.notify(message);
+        dialogService.notify(Localization.lang("%0 entry(s) needed a clean up", Integer.toString(modifiedEntriesCount)));
     }
 
     private void cleanup(CleanupPreferences cleanupPreferences, List<BibEntry> entries) {
@@ -172,10 +197,55 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         NamedCompoundEdit compoundEdit = new NamedCompoundEdit(editName);
 
         for (BibEntry entry : entries) {
-            if (doCleanup(cleanupPreferences, entry, compoundEdit, failures)) {
+            if (doCleanup(cleanupPreferences, entry, compoundEdit, failures, Runnable::run)) {
                 modifiedEntriesCount++;
             }
         }
+
+        compoundEdit.end();
+
+        if (compoundEdit.hasEdits()) {
+            undoManager.addEdit(compoundEdit);
+        }
+
+        if (!failures.isEmpty()) {
+            showFailures(failures);
+        }
+    }
+
+    private void cleanupWithProgress(CleanupPreferences cleanupPreferences,
+                                     List<BibEntry> entries,
+                                     BackgroundTask<?> task) {
+        int count = entries.size();
+        if (count > 1) {
+            task.showToUser(true);
+            task.setTitle(Localization.lang("Cleaning up entries"));
+        }
+
+        List<JabRefException> failures = new ArrayList<>();
+
+        String editName = Localization.lang("Clean up entry(s)");
+        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(editName);
+
+        for (int i = 0; i < count; i++) {
+            if (task.isCancelled()) {
+                break;
+            }
+
+            // BibEntry uses ObservableMap which fires FX listeners on mutation.
+            // Heavy computation stays on this background thread; only field mutations are dispatched
+            // to the FX thread via UiTaskExecutor::runAndWaitInJavaFXThread (blocking).
+            if (doCleanup(cleanupPreferences, entries.get(i), compoundEdit, failures, UiTaskExecutor::runAndWaitInJavaFXThread)) {
+                modifiedEntriesCount++;
+            }
+
+            task.updateProgress(i, count);
+            task.updateMessage(Localization.lang("%0 of %1 entries cleaned up.",
+                    String.valueOf(i + 1),
+                    String.valueOf(count)));
+        }
+
+        task.updateProgress(count, count);
 
         compoundEdit.end();
 

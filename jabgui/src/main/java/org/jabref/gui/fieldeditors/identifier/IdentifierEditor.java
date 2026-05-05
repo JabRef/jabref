@@ -91,6 +91,8 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         textField.initContextMenu(new DefaultMenu(textField), preferences.getKeyBindingRepository());
 
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
+
+        // whether a button is shown or disabled is done in .fmxl
     }
 
     public BaseIdentifierEditorViewModel<?> getViewModel() {

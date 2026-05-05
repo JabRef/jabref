@@ -3,6 +3,7 @@ package org.jabref.gui.preferences.customentrytypes;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -89,8 +90,8 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
         addNewField.disableProperty().bind(viewModel.selectedEntryTypeProperty().isNull());
 
-        addNewEntryType.setOnAction(event -> viewModel.addNewCustomEntryType());
-        addNewField.setOnAction(event -> viewModel.addNewField());
+        addNewEntryType.setOnAction(event -> addEntryType());
+        addNewField.setOnAction(event -> addNewField());
 
         addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeValidationStatus().validProperty().not());
         addNewFieldButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));
@@ -184,7 +185,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         makeRotatedColumnHeader(fieldTypeColumn, Localization.lang("Required"));
 
         fieldTypeMultilineColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeMultilineColumn));
-        fieldTypeMultilineColumn.setCellValueFactory(item -> item.getValue().multilineProperty());
+        fieldTypeMultilineColumn.setCellValueFactory(this::createMultilinePropertyListener);
         makeRotatedColumnHeader(fieldTypeMultilineColumn, Localization.lang("Multiline"));
 
         fieldTypeActionColumn.setSortable(false);
@@ -266,6 +267,19 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     @FXML
     void addEntryType() {
+        if (!viewModel.entryTypeValidationStatus().isValid()) {
+            return;
+        }
+
+        String entryTypeName = viewModel.entryTypeToAddProperty().getValue();
+        for (EntryTypeViewModel existingEntryType : entryTypesTable.getItems()) {
+            if (existingEntryType.entryType().getValue().getType().getName().equalsIgnoreCase(entryTypeName)) {
+                this.entryTypesTable.getSelectionModel().select(existingEntryType);
+                this.entryTypesTable.scrollTo(existingEntryType);
+                return;
+            }
+        }
+
         EntryTypeViewModel newlyAdded = viewModel.addNewCustomEntryType();
         this.entryTypesTable.getSelectionModel().select(newlyAdded);
         this.entryTypesTable.scrollTo(newlyAdded);
@@ -273,7 +287,14 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     @FXML
     void addNewField() {
-        viewModel.addNewField();
+        if (!viewModel.fieldValidationStatus().isValid()) {
+            return;
+        }
+
+        viewModel.addNewField().ifPresent(newlyAdded -> {
+            this.fields.getSelectionModel().select(newlyAdded);
+            this.fields.scrollTo(newlyAdded);
+        });
     }
 
     @FXML
@@ -284,10 +305,24 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                 Localization.lang("Reset to default"));
         if (reset) {
             viewModel.resetAllCustomEntryTypes();
+            viewModel.resetMultilineFieldsToDefault();
             fields.getSelectionModel().clearSelection();
             entryTypesTable.getSelectionModel().clearSelection();
             viewModel.setValues();
             entryTypesTable.refresh();
         }
+    }
+
+    /// For multiline property, fields with the same name in each entry type will be updated as the standard fields are global.
+    private BooleanProperty createMultilinePropertyListener(TableColumn.CellDataFeatures<FieldViewModel, Boolean> item) {
+        BooleanProperty property = item.getValue().multilineProperty();
+        property.addListener((obs, wasSelected, isSelected) -> {
+            viewModel.entryTypes().forEach(typeViewModel -> {
+                typeViewModel.fields().stream()
+                             .filter(field -> field.displayNameProperty().get().equals(item.getValue().displayNameProperty().get()))
+                             .forEach(field -> field.multilineProperty().set(isSelected));
+            });
+        });
+        return property;
     }
 }

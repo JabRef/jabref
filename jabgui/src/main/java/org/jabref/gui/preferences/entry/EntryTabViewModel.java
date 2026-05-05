@@ -57,9 +57,9 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
         resolvableTagsFieldProperty.setValue(FXCollections.observableArrayList(fieldPreferences.getResolvableFields()));
         nonWrappableTagsFieldProperty.setValue(FXCollections.observableArrayList(fieldPreferences.getNonWrappableFields()));
 
-        markOwnerProperty.setValue(ownerPreferences.isUseOwner());
+        markOwnerProperty.setValue(ownerPreferences.shouldUseOwner());
         markOwnerNameProperty.setValue(ownerPreferences.getDefaultOwner());
-        markOwnerOverwriteProperty.setValue(ownerPreferences.isOverwriteOwner());
+        markOwnerOverwriteProperty.setValue(ownerPreferences.shouldOverwriteOwner());
 
         addCreationDateProperty.setValue(timestampPreferences.shouldAddCreationDate());
         addModificationDateProperty.setValue(timestampPreferences.shouldAddModificationDate());

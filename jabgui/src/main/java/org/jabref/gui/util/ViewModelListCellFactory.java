@@ -26,11 +26,9 @@ import org.jabref.logic.util.strings.StringUtil;
 import com.tobiasdiez.easybind.Subscription;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 
-/**
- * Constructs a {@link ListCell} based on the view model of the row and a bunch of specified converter methods.
- *
- * @param <T> cell value
- */
+/// Constructs a {@link ListCell} based on the view model of the row and a bunch of specified converter methods.
+///
+/// @param <T> cell value
 public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCell<T>> {
 
     private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
@@ -46,6 +44,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     private BiConsumer<T, ? super DragEvent> toOnDragEntered;
     private BiConsumer<T, ? super DragEvent> toOnDragExited;
     private BiConsumer<T, ? super DragEvent> toOnDragOver;
+    private BiConsumer<T, ? super DragEvent> toOnDragDone;
     private final Map<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClasses = new HashMap<>();
     private Callback<T, ValidationStatus> validationStatusProperty;
 
@@ -128,6 +127,11 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
 
     public ViewModelListCellFactory<T> setOnDragOver(BiConsumer<T, ? super DragEvent> toOnDragOver) {
         this.toOnDragOver = toOnDragOver;
+        return this;
+    }
+
+    public ViewModelListCellFactory<T> setOnDragDone(BiConsumer<T, DragEvent> toOnDragDone) {
+        this.toOnDragDone = toOnDragDone;
         return this;
     }
 
@@ -223,6 +227,9 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                             }
                             event.consume();
                         });
+                    }
+                    if (toOnDragDone != null) {
+                        setOnDragDone(event -> toOnDragDone.accept(viewModel, event));
                     }
                     for (Map.Entry<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClassWithCondition : pseudoClasses.entrySet()) {
                         ObservableValue<Boolean> condition = pseudoClassWithCondition.getValue().call(viewModel);

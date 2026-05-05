@@ -31,9 +31,7 @@ import org.jabref.model.entry.field.SpecialFieldValue;
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.Rating;
 
-/**
- * A column that displays a SpecialField
- */
+/// A column that displays a SpecialField
 public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldValueViewModel>> {
 
     private final CliPreferences preferences;

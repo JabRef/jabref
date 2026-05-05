@@ -8,35 +8,34 @@ import com.github.tomtung.latex2unicode.LaTeX2Unicode;
 import fastparse.Parsed;
 import org.jspecify.annotations.NonNull;
 
-/**
- * Adapter class for the latex2unicode lib. This is an alternative to our LatexToUnicode class
- */
+/// Adapter class for the latex2unicode lib. This is an alternative to our LatexToUnicode class.
 public class LatexToUnicodeAdapter {
 
     private static final Pattern UNDERSCORE_MATCHER = Pattern.compile("_(?!\\{)");
+
+    private static final Pattern TILDE_MATCHER = Pattern.compile("(?<!\\\\)~");
+
+    private static final String NO_BREAK_SPACE = "\u00a0";
 
     private static final String REPLACEMENT_CHAR = "\uFFFD";
 
     private static final Pattern UNDERSCORE_PLACEHOLDER_MATCHER = Pattern.compile(REPLACEMENT_CHAR);
 
-    /**
-     * Attempts to resolve all LaTeX in the String.
-     *
-     * @param inField a String containing LaTeX
-     * @return a String with LaTeX resolved into Unicode, or the original String if the LaTeX could not be parsed
-     */
+    /// Attempts to resolve all LaTeX in the given string.
+    ///
+    /// @param inField a string containing LaTeX
+    /// @return a string with LaTeX resolved into Unicode, or the original string if the LaTeX could not be parsed.
     public static String format(@NonNull String inField) {
         return parse(inField).orElse(Normalizer.normalize(inField, Normalizer.Form.NFC));
     }
 
-    /**
-     * Attempts to resolve all LaTeX in the String.
-     *
-     * @param inField a String containing LaTeX
-     * @return an {@code Optional<String>} with LaTeX resolved into Unicode or {@code empty} on failure.
-     */
+    /// Attempts to resolve all LaTeX in the String.
+    ///
+    /// @param inField a String containing LaTeX
+    /// @return an `Optional<String>` with LaTeX resolved into Unicode or `empty` on failure.
     public static Optional<String> parse(@NonNull String inField) {
-        String toFormat = UNDERSCORE_MATCHER.matcher(inField).replaceAll(REPLACEMENT_CHAR);
+        String toFormat = TILDE_MATCHER.matcher(inField).replaceAll(NO_BREAK_SPACE);
+        toFormat = UNDERSCORE_MATCHER.matcher(toFormat).replaceAll(REPLACEMENT_CHAR);
         Parsed<String> parsingResult = LaTeX2Unicode.parse(toFormat);
         if (parsingResult instanceof Parsed.Success) {
             String text = parsingResult.get().value();

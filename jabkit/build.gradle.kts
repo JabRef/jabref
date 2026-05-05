@@ -1,65 +1,21 @@
 plugins {
     id("org.jabref.gradle.module")
+    id("org.jabref.gradle.feature.shadowjar")
     id("application")
 }
 
 group = "org.jabref.jabkit"
-version = project.findProperty("projVersion") ?: "100.0.0"
+version = providers.gradleProperty("projVersion")
+    .orElse(providers.environmentVariable("VERSION"))
+    .orElse("100.0.0")
+    .get()
 
-
-dependencies {
-    implementation(project(":jablib"))
-
-    // FIXME: Injector needs to be removed, no JavaFX dependencies, etc.
-    implementation("org.jabref:afterburner.fx")
-
-    implementation("org.openjfx:javafx-base")
-    implementation("org.openjfx:javafx-controls")
-    implementation("org.openjfx:javafx-fxml")
-    // implementation("org.openjfx:javafx-graphics:$javafxVersion")
-
-    implementation("info.picocli:picocli")
-    annotationProcessor("info.picocli:picocli-codegen")
-
-    implementation("com.github.ben-manes.caffeine:caffeine")
-    // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
-    implementation("org.jspecify:jspecify")
-
-    implementation("org.slf4j:slf4j-api")
-    // implementation("org.tinylog:tinylog-api")
-    implementation("org.tinylog:slf4j-tinylog")
-    implementation("org.tinylog:tinylog-impl")
-    // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
-    implementation("org.slf4j:jul-to-slf4j")
-    // route all requests to log4j to SLF4J
-    implementation("org.apache.logging.log4j:log4j-to-slf4j")
-
-    implementation("com.google.guava:guava")
-
-    implementation("org.slf4j:slf4j-api")
-    // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog in the CLI and GUI)
-    implementation("org.slf4j:jul-to-slf4j")
-    // route all requests to log4j to SLF4J
-    implementation("org.apache.logging.log4j:log4j-to-slf4j")
-
-    implementation("org.jabref:afterburner.fx")
-
-    implementation("org.apache.lucene:lucene-queryparser")
-
-    implementation("io.github.adr:e-adr")
-
-    implementation("io.github.darvil82:terminal-text-formatter")
-
-    testImplementation(project(":test-support"))
-    testImplementation("org.mockito:mockito-core")
-    testImplementation("net.bytebuddy:byte-buddy")
-}
-
-javaModuleTesting.whitebox(testing.suites["test"]) {
-    requires.add("org.jabref.testsupport")
-    requires.add("org.junit.jupiter.api")
-    requires.add("org.junit.jupiter.params")
-    requires.add("org.mockito")
+testModuleInfo {
+    requires("org.jabref.testsupport")
+    requires("org.junit.jupiter.api")
+    requires("org.junit.jupiter.params")
+    requires("org.mockito")
+    requires("com.google.common")
 }
 
 tasks.withType<Test>().configureEach {
@@ -67,29 +23,30 @@ tasks.withType<Test>().configureEach {
 }
 
 application {
-    mainClass.set("org.jabref.toolkit.JabKitLauncher")
-    mainModule.set("org.jabref.jabkit")
+    mainClass = "org.jabref.toolkit.JabKitLauncher"
 
     // Also passed to launcher by java-module-packaging plugin
     applicationDefaultJvmArgs = listOf(
         // JEP 158: Disable all java util logging
         "-Xlog:disable",
 
-        // Enable JEP 450: Compact Object Headers
-        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+        "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core",
 
-        // Default garbage collector is sufficient for CLI APP
         // "-XX:+UseZGC", "-XX:+ZUncommit",
+        // "-XX:+UseG1GC",
+        "-XX:+UseSerialGC",
         // "-XX:+UseStringDeduplication",
 
-        "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders"
     )
 }
 
 javaModulePackaging {
     applicationName = "jabkit"
     addModules.add("jdk.incubator.vector")
-    jlinkOptions.addAll("--generate-cds-archive")
+
+    // general jLinkOptions are set in org.jabref.gradle.base.targets.gradle.kts
 
     // All targets have to have "app-image" as sole target, since we do not distribute an installer
     targetsWithOs("windows") {
@@ -105,4 +62,15 @@ javaModulePackaging {
     targetsWithOs("macos") {
         packageTypes = listOf("app-image")
     }
+}
+
+tasks.register<JavaExec>("runJabKitPortableSmokeTest") {
+    group = "test"
+    description = "Runs JabKit from test resources dir"
+    mainClass = "org.jabref.toolkit.JabKitLauncher"
+    mainModule = "org.jabref.jabkit"
+    classpath = sourceSets.main.get().runtimeClasspath
+    jvmArgs(application.applicationDefaultJvmArgs)
+    workingDir = file("src/test/resources")
+    args("--debug", "check-consistency", "--input=empty.bib")
 }

@@ -44,7 +44,7 @@ public class ConvertTest extends AbstractJabKitTest {
                 "--output-format=" + format,
                 "--output=" + outputPath);
 
-        assertTrue(outputPath.toFile().exists());
+        assertFileExists(outputPath);
     }
 
     @Test
@@ -60,7 +60,7 @@ public class ConvertTest extends AbstractJabKitTest {
                 "--output-format=bibtex",
                 "--output=" + outputPath);
 
-        assertTrue(outputPath.toFile().exists());
+        assertFileExists(outputPath);
         assertTrue(Files.readString(outputPath).contains("Darwin1888"));
     }
 
@@ -77,7 +77,7 @@ public class ConvertTest extends AbstractJabKitTest {
                 "--output-format=ffasdfasd",
                 "--output=" + outputPath);
 
-        assertFalse(outputPath.toFile().exists());
+        assertFileDoesntExist(outputPath);
     }
 
     @Test
@@ -95,7 +95,7 @@ public class ConvertTest extends AbstractJabKitTest {
     }
 
     @Test
-    void convertBibtexToTableRefsAsBib(@TempDir Path tempDir) throws URISyntaxException {
+    void convertBibtexToTableRefsAsBib(@TempDir Path tempDir) throws IOException, URISyntaxException {
         Path originBib = getClassResourceAsPath("origin.bib");
         String originBibFile = originBib.toAbsolutePath().toString();
 
@@ -116,6 +116,39 @@ public class ConvertTest extends AbstractJabKitTest {
 
         commandLine.execute(args.toArray(String[]::new));
 
-        assertTrue(Files.exists(outputHtml));
+        assertFileExists(outputHtml);
+    }
+
+    @Test
+    void fieldFormattersAreAppliedDuringConversion(@TempDir Path tempDir) throws IOException {
+        Path newPath = tempDir.resolve("origin.bib");
+        String originBibtex = """
+                @Article{test_energy,
+                  title   = {my ﬁrst research},
+                  pages   = {1-10},
+                  month   = {January},
+                  comment = {private note}
+                }""";
+        Files.writeString(newPath, originBibtex);
+
+        Path outputPath = tempDir.resolve("output");
+
+        commandLine.execute("convert",
+                "--input=" + newPath,
+                "--input-format=bibtex",
+                "--output=" + outputPath,
+                "--output-format=bibtex",
+                "--field-formatters=pages[normalize_page_numbers],month[normalize_month],All-text-fields[replace_unicode_ligatures],comment[clear]");
+
+        assertFileExists(outputPath);
+        String outputContent = Files.readString(outputPath);
+
+        assertTrue(outputContent.contains("1--10"));
+
+        assertTrue(outputContent.contains("#jan#"));
+
+        assertTrue(outputContent.contains("first"));
+
+        assertFalse(outputContent.contains("private note"));
     }
 }

@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,9 +24,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-/**
- * Importer for the MS Office 2007 XML bibliography format
- */
+/// Importer for the MS Office 2007 XML bibliography format
 @NullMarked
 public class MsBibImporter extends Importer {
 
@@ -34,13 +33,11 @@ public class MsBibImporter extends Importer {
     private static final String DISABLEEXTERNALDTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = makeSafeDocBuilderFactory(DocumentBuilderFactory.newInstance());
 
-    /**
-     * The correct behavior is to return false if it is certain that the file is
-     * not of the MsBib type, and true otherwise. Returning true is the safe choice
-     * if not certain.
-     */
+    /// The correct behavior is to return false if it is certain that the file is
+    /// not of the MsBib type, and true otherwise. Returning true is the safe choice
+    /// if not certain.
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(Reader reader) throws IOException {
         Document docin;
         try {
             DocumentBuilder dbuild = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
@@ -94,13 +91,11 @@ public class MsBibImporter extends Importer {
         return Localization.lang("Importer for the MS Office 2007 XML bibliography format.");
     }
 
-    /**
-     * DocumentBuilderFactory makes a XXE safe Builder factory from dBuild. If not supported by current
-     * XML then returns original builder given and logs error.
-     *
-     * @param dBuild | DocumentBuilderFactory to be made XXE safe.
-     * @return If supported, XXE safe DocumentBuilderFactory. Else, returns original builder given
-     */
+    /// DocumentBuilderFactory makes a XXE safe Builder factory from dBuild. If not supported by current
+    /// XML then returns original builder given and logs error.
+    ///
+    /// @param dBuild | DocumentBuilderFactory to be made XXE safe.
+    /// @return If supported, XXE safe DocumentBuilderFactory. Else, returns original builder given
     private static DocumentBuilderFactory makeSafeDocBuilderFactory(DocumentBuilderFactory dBuild) {
         String feature = null;
 

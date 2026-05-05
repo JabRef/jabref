@@ -6,15 +6,11 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -26,7 +22,6 @@ import javafx.scene.Node;
 import javafx.util.Pair;
 
 import org.jabref.gui.ai.components.aichat.AiChatWindow;
-import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -45,22 +40,21 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.PreboundBinding;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class manages the GUI-state of JabRef, including:
- *
- * <ul>
- *   <li>currently selected database</li>
- *   <li>currently selected group</li>
- *   <li>active search</li>
- *   <li>active number of search results</li>
- *   <li>focus owner</li>
- *   <li>dialog window sizes/positions</li>
- *   <li>opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})</li>
- * </ul>
- */
+/// This class manages the GUI-state of JabRef, including:
+///
+///
+/// - currently selected database
+/// - currently selected group
+/// - active search
+/// - active number of search results
+/// - focus owner
+/// - dialog window sizes/positions
+/// - opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})
+///
 public class JabRefGuiStateManager implements StateManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiStateManager.class);
@@ -80,12 +74,9 @@ public class JabRefGuiStateManager implements StateManager {
     private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasksPairs = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
     private final ObservableList<Task<?>> backgroundTasks = EasyBind.map(backgroundTasksPairs, Pair::getValue);
     private final FilteredList<Task<?>> runningBackgroundTasks = new FilteredList<>(backgroundTasks, Task::isRunning);
-    private final BooleanBinding anyTaskRunning = Bindings.createBooleanBinding(() -> !runningBackgroundTasks.isEmpty(), runningBackgroundTasks);
     private final EasyBinding<Boolean> anyTasksThatWillNotBeRecoveredRunning = EasyBind.reduce(backgroundTasksPairs, tasks -> tasks.anyMatch(task -> !task.getKey().willBeRecoveredAutomatically() && task.getValue().isRunning()));
-    private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasksPairs, tasks -> tasks.map(Pair::getValue).filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
-    private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
     private final List<AiChatWindow> aiChatWindows = new ArrayList<>();
     private final BooleanProperty editorShowing = new SimpleBooleanProperty(false);
@@ -174,13 +165,11 @@ public class JabRefGuiStateManager implements StateManager {
     }
 
     @Override
-    public void setActiveDatabase(BibDatabaseContext database) {
+    public void setActiveDatabase(@Nullable BibDatabaseContext database) {
         if (database == null) {
-            LOGGER.info("No open database detected");
-            activeDatabaseProperty().set(Optional.empty());
-        } else {
-            activeDatabaseProperty().set(Optional.of(database));
+            LOGGER.debug("No open database detected");
         }
+        activeDatabaseProperty().set(Optional.ofNullable(database));
     }
 
     @Override
@@ -209,18 +198,8 @@ public class JabRefGuiStateManager implements StateManager {
     }
 
     @Override
-    public BooleanBinding getAnyTaskRunning() {
-        return anyTaskRunning;
-    }
-
-    @Override
     public EasyBinding<Boolean> getAnyTasksThatWillNotBeRecoveredRunning() {
         return anyTasksThatWillNotBeRecoveredRunning;
-    }
-
-    @Override
-    public EasyBinding<Double> getTasksProgress() {
-        return tasksProgress;
     }
 
     @Override
@@ -231,16 +210,6 @@ public class JabRefGuiStateManager implements StateManager {
     @Override
     public void setDialogWindowState(String className, DialogWindowState state) {
         dialogWindowStates.put(className, state);
-    }
-
-    @Override
-    public ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEditProperty() {
-        return lastAutomaticFieldEditorEdit;
-    }
-
-    @Override
-    public void setLastAutomaticFieldEditorEdit(LastAutomaticFieldEditorEdit automaticFieldEditorEdit) {
-        lastAutomaticFieldEditorEditProperty().set(automaticFieldEditorEdit);
     }
 
     @Override

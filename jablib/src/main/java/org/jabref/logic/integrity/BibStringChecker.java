@@ -12,9 +12,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
-/**
- * Checks, if there is an even number of unescaped # (FieldWriter.BIBTEX_STRING_START_END_SYMBOL)
- */
+/// Checks, if there is an even number of unescaped # (FieldWriter.BIBTEX_STRING_START_END_SYMBOL)
 public class BibStringChecker implements EntryChecker {
 
     // Detect FieldWriter.BIBTEX_STRING_START_END_SYMBOL (#) if it doesn't have a \ in front of it or if it starts the string

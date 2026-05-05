@@ -19,6 +19,7 @@ public class ServerCli implements Callable<Void> {
     @CommandLine.Option(names = {"-p", "--port"}, description = "the port")
     private Integer port = 2087;
 
+    /// @implNote method needs to be public, because JabLsLauncher calls it.
     public static void main(final String[] args) throws InterruptedException {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();

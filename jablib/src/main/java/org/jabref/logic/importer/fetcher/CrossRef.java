@@ -3,6 +3,8 @@ package org.jabref.logic.importer.fetcher;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,11 +38,9 @@ import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
 
-/**
- * A class for fetching DOIs from CrossRef
- * <p>
- * See <a href="https://github.com/CrossRef/rest-api-doc">their GitHub page</a> for documentation.
- */
+/// A class for fetching DOIs from CrossRef
+///
+/// See <a href="https://github.com/CrossRef/rest-api-doc">their GitHub page</a> for documentation.
 public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, SearchBasedParserFetcher, IdBasedParserFetcher {
 
     private static final String API_URL = "https://api.crossref.org/works";
@@ -65,8 +65,8 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
         entry.getFieldLatexFree(StandardField.YEAR).ifPresent(year ->
                 uriBuilder.addParameter("filter", "from-pub-date:" + year)
         );
-        uriBuilder.addParameter("rows", "20"); // = API default
-        uriBuilder.addParameter("offset", "0"); // start at beginning
+        uriBuilder.addParameter("rows", "20");  // = API default
+        uriBuilder.addParameter("offset", "0"); // start at the beginning
         return uriBuilder.build().toURL();
     }
 
@@ -79,7 +79,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
 
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
-        URIBuilder uriBuilder = new URIBuilder(API_URL + "/" + identifier);
+        URIBuilder uriBuilder = new URIBuilder(API_URL + "/" + URLEncoder.encode(identifier, StandardCharsets.UTF_8));
         return uriBuilder.build().toURL();
     }
 

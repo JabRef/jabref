@@ -10,11 +10,9 @@ import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class represents the removal of entries. The constructor needs
- * references to the database, entries, and a boolean marked true if the undo
- * is from a call to paste().
- */
+/// This class represents the removal of entries. The constructor needs
+/// references to the database, entries, and a boolean marked true if the undo
+/// is from a call to paste().
 public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UndoableInsertEntries.class);

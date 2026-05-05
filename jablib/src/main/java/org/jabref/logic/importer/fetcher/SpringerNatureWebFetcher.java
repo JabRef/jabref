@@ -53,12 +53,10 @@ public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, 
         this.importerPreferences = importerPreferences;
     }
 
-    /**
-     * Convert a JSONObject obtained from <a href="https://dev.springernature.com/docs/api-endpoints/metadata-api/?source=jabref">the Metadata API</a> to a BibEntry
-     *
-     * @param springerJsonEntry the JSONObject from search results
-     * @return the converted BibEntry
-     */
+    /// Convert a JSONObject obtained from <a href="https://dev.springernature.com/docs/api-endpoints/metadata-api/?source=jabref">the Metadata API</a> to a BibEntry
+    ///
+    /// @param springerJsonEntry the JSONObject from search results
+    /// @return the converted BibEntry
     public static BibEntry parseSpringerJSONtoBibtex(JSONObject springerJsonEntry) {
         // Fields that are directly accessible at the top level Json object
         Field[] singleFieldStrings = {StandardField.ISSN, StandardField.VOLUME, StandardField.ABSTRACT, StandardField.DOI, StandardField.TITLE, StandardField.NUMBER,
@@ -186,13 +184,11 @@ public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, 
         return "https://api.springernature.com/meta/v2/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key=" + apiKey;
     }
 
-    /**
-     * Gets the query URL
-     *
-     * @param queryNode  the search query
-     * @param pageNumber the number of the page indexed from 0
-     * @return URL
-     */
+    /// Gets the query URL
+    ///
+    /// @param queryNode  the search query
+    /// @param pageNumber the number of the page indexed from 0
+    /// @return URL
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);

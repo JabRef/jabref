@@ -1,5 +1,6 @@
 package org.jabref.gui.welcome.quicksettings.viewmodel;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import javafx.beans.property.ObjectProperty;
@@ -24,6 +25,7 @@ public class ThemeDialogViewModel extends AbstractViewModel {
     private final WorkspacePreferences workspacePreferences;
     private final GuiPreferences preferences;
     private final DialogService dialogService;
+    private boolean shouldThemeSyncOs;
 
     public ThemeDialogViewModel(GuiPreferences preferences, DialogService dialogService) {
         this.preferences = preferences;
@@ -34,11 +36,13 @@ public class ThemeDialogViewModel extends AbstractViewModel {
     }
 
     private void initializeFromCurrentTheme() {
+        shouldThemeSyncOs = workspacePreferences.shouldThemeSyncOs();
+
         Theme currentTheme = workspacePreferences.getTheme();
         switch (currentTheme.getType()) {
-            case DEFAULT ->
+            case LIGHT ->
                     selectedThemeProperty.set(ThemeTypes.LIGHT);
-            case EMBEDDED ->
+            case DARK ->
                     selectedThemeProperty.set(ThemeTypes.DARK);
             case CUSTOM -> {
                 selectedThemeProperty.set(ThemeTypes.CUSTOM);
@@ -80,21 +84,34 @@ public class ThemeDialogViewModel extends AbstractViewModel {
 
     public boolean isValidConfiguration() {
         if (selectedThemeProperty.get() == ThemeTypes.CUSTOM) {
-            return !customPathProperty.get().trim().isEmpty() &&
-                    Path.of(customPathProperty.get()).toFile().exists();
+            return !customPathProperty.get().isBlank() && Files.exists(Path.of(customPathProperty.get()));
         }
         return selectedThemeProperty.get() != null;
     }
 
     public void saveSettings() {
-        Theme newTheme = switch (selectedThemeProperty.get()) {
-            case LIGHT ->
-                    Theme.light();
-            case DARK ->
-                    Theme.dark();
-            case CUSTOM ->
-                    Theme.custom(customPathProperty.get().trim());
-        };
-        workspacePreferences.setTheme(newTheme);
+        workspacePreferences.setThemeSyncOs(shouldThemeSyncOs);
+
+        if (shouldThemeSyncOs) {
+            workspacePreferences.setTheme(Theme.system());
+        } else if (selectedThemeProperty.get() != null) {
+            Theme newTheme = switch (selectedThemeProperty.get()) {
+                case LIGHT ->
+                        Theme.light();
+                case DARK ->
+                        Theme.dark();
+                case CUSTOM ->
+                        Theme.custom(customPathProperty.get().trim());
+            };
+            workspacePreferences.setTheme(newTheme);
+        }
+    }
+
+    public void setThemeSyncOs(boolean selected) {
+        this.shouldThemeSyncOs = selected;
+    }
+
+    public boolean shouldThemeSyncOs() {
+        return shouldThemeSyncOs;
     }
 }

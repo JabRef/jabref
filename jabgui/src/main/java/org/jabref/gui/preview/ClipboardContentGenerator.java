@@ -4,20 +4,20 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.scene.input.ClipboardContent;
 
-import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
-import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
-import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preview.CitationStylePreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -70,10 +70,8 @@ public record ClipboardContentGenerator(
         }
     }
 
-    /**
-     * Generates a plain text string out of the preview (based on {@link TextBasedPreviewLayout} or {@link BstPreviewLayout})
-     * and copies it additionally to the html to the clipboard (WYSIWYG Editors use the HTML, plain text editors the text)
-     */
+    /// Generates a plain text string out of the preview (based on {@link TextBasedPreviewLayout} or {@link org.jabref.logic.preview.BstPreviewLayout})
+    /// and copies it additionally to the html to the clipboard (WYSIWYG Editors use the HTML, plain text editors the text)
     @VisibleForTesting
     static ClipboardContent processPreview(List<String> citations) {
         ClipboardContent content = new ClipboardContent();
@@ -82,9 +80,7 @@ public record ClipboardContentGenerator(
         return content;
     }
 
-    /**
-     * Joins every citation with a newline and returns it.
-     */
+    /// Joins every citation with a newline and returns it.
     @VisibleForTesting
     static ClipboardContent processText(List<String> citations) {
         ClipboardContent content = new ClipboardContent();
@@ -92,10 +88,8 @@ public record ClipboardContentGenerator(
         return content;
     }
 
-    /**
-     * Inserts each citation into a HTML body and copies it to the clipboard.
-     * The given preview is based on {@link CitationStylePreviewLayout}.
-     */
+    /// Inserts each citation into a HTML body and copies it to the clipboard.
+    /// The given preview is based on {@link CitationStylePreviewLayout}.
     @VisibleForTesting
     static ClipboardContent processHtml(List<String> citations) {
         String result = "<!DOCTYPE html>" + OS.NEWLINE +
@@ -116,22 +110,20 @@ public record ClipboardContentGenerator(
         return content;
     }
 
-    /**
-     * Joins each citation using the platform-specific newline into a single Markdown string (from citeproc) and copies it to the clipboard.
-     * <p>
-     * A trailing newline is appended if missing to keep the behavior consistent with other output formats
-     * and to satisfy tests expecting a newline-terminated string.
-     *
-     * @param citations the list of already-formatted citation strings to be combined as Markdown
-     * @return clipboard content containing the Markdown representation in its plain string flavor
-     */
+    /// Joins each citation using the platform-specific newline into a single Markdown string (from citeproc) and copies it to the clipboard.
+    ///
+    /// A trailing newline is appended if missing to keep the behavior consistent with other output formats
+    /// and to satisfy tests expecting a newline-terminated string.
+    ///
+    /// @param citations the list of already-formatted citation strings to be combined as Markdown
+    /// @return clipboard content containing the Markdown representation in its plain string flavor
     @VisibleForTesting
     static ClipboardContent processMarkdown(List<String> citations) {
         String markdown = String.join(OS.NEWLINE, citations);
 
         // Ensure trailing newline at end for consistency with other output formats/tests
         if (!markdown.endsWith(OS.NEWLINE)) {
-            markdown = markdown + OS.NEWLINE;
+            markdown += OS.NEWLINE;
         }
 
         ClipboardContent content = new ClipboardContent();
@@ -140,7 +132,15 @@ public record ClipboardContentGenerator(
     }
 
     private List<String> generateTextBasedPreviewLayoutCitations(List<BibEntry> selectedEntries, BibDatabaseContext bibDatabaseContext) throws IOException {
-        TextBasedPreviewLayout customPreviewLayout = previewPreferences.getCustomPreviewLayout();
+        Optional<TextBasedPreviewLayout> layoutOpt = previewPreferences.getLayoutCycle().stream()
+                                                                       .filter(TextBasedPreviewLayout.class::isInstance)
+                                                                       .map(TextBasedPreviewLayout.class::cast)
+                                                                       .findFirst();
+        TextBasedPreviewLayout customPreviewLayout = layoutOpt.orElse(TextBasedPreviewLayout.of(
+                previewPreferences.getCustomPreviewLayout(),
+                layoutFormatterPreferences,
+                abbreviationRepository));
+
         Reader customLayoutReader = Reader.of(customPreviewLayout.getText().replace("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(customLayoutReader, layoutFormatterPreferences, abbreviationRepository).getLayoutFromText();
         List<String> citations = new ArrayList<>(selectedEntries.size());

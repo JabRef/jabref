@@ -11,32 +11,32 @@ import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
 import io.github.thibaultmeyer.cuid.CUID;
 
-/**
- * Class to model a reference mark. See {@link CSLReferenceMarkManager} for the usage and management of all reference marks.
- */
+/// Class to model a reference mark. See {@link CSLReferenceMarkManager} for the usage and management of all reference marks.
 public class CSLReferenceMark {
     private ReferenceMark referenceMark;
     private XTextContent textContent;
     private final List<String> citationKeys;
     private List<Integer> citationNumbers;
+    private CSLCitationType citationType;
 
     public CSLReferenceMark(XNamed named, ReferenceMark referenceMark) {
         this.referenceMark = referenceMark;
         this.textContent = UnoRuntime.queryInterface(XTextContent.class, named);
         this.citationKeys = referenceMark.getCitationKeys();
         this.citationNumbers = referenceMark.getCitationNumbers();
+        this.citationType = referenceMark.getCitationType();
     }
 
-    public static CSLReferenceMark of(List<String> citationKeys, List<Integer> citationNumbers, XMultiServiceFactory factory) throws Exception {
+    public static CSLReferenceMark of(List<String> citationKeys, List<Integer> citationNumbers, CSLCitationType citationType, XMultiServiceFactory factory) throws Exception {
         String uniqueId = CUID.randomCUID2(8).toString();
-        String name = buildReferenceName(citationKeys, citationNumbers, uniqueId);
+        String name = buildReferenceName(citationKeys, citationNumbers, uniqueId, citationType);
         XNamed named = UnoRuntime.queryInterface(XNamed.class, factory.createInstance("com.sun.star.text.ReferenceMark"));
         named.setName(name);
-        ReferenceMark referenceMark = new ReferenceMark(name, citationKeys, citationNumbers, uniqueId);
+        ReferenceMark referenceMark = new ReferenceMark(name, citationKeys, citationNumbers, uniqueId, citationType);
         return new CSLReferenceMark(named, referenceMark);
     }
 
-    private static String buildReferenceName(List<String> citationKeys, List<Integer> citationNumbers, String uniqueId) {
+    private static String buildReferenceName(List<String> citationKeys, List<Integer> citationNumbers, String uniqueId, CSLCitationType citationType) {
         StringBuilder nameBuilder = new StringBuilder();
         for (int i = 0; i < citationKeys.size(); i++) {
             if (i > 0) {
@@ -46,6 +46,16 @@ public class CSLReferenceMark {
                        .append(" ").append(ReferenceMark.PREFIXES[1]).append(citationNumbers.get(i));
         }
         nameBuilder.append(" ").append(uniqueId);
+
+        // Embed citation nature into reference mark
+        switch (citationType) {
+            case IN_TEXT ->
+                    nameBuilder.append(" ").append(ReferenceMark.IN_TEXT_MARKER);
+            case EMPTY ->
+                    nameBuilder.append(" ").append(ReferenceMark.EMPTY_MARKER);
+            case NORMAL ->
+                    nameBuilder.append(" ").append(ReferenceMark.NORMAL_MARKER);
+        }
         return nameBuilder.toString();
     }
 
@@ -70,6 +80,6 @@ public class CSLReferenceMark {
     }
 
     public void updateName(String newName) {
-        this.referenceMark = new ReferenceMark(newName, this.citationKeys, this.citationNumbers, this.referenceMark.getUniqueId());
+        this.referenceMark = new ReferenceMark(newName, this.citationKeys, this.citationNumbers, this.referenceMark.getUniqueId(), this.citationType);
     }
 }

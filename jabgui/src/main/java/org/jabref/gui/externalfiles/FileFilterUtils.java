@@ -83,10 +83,8 @@ public class FileFilterUtils {
         return isInDateRange;
     }
 
-    /**
-     * Sorts a list of Path objects according to the last edited date
-     * of their corresponding files, from newest to oldest.
-     */
+    /// Sorts a list of Path objects according to the last edited date
+    /// of their corresponding files, from newest to oldest.
     public List<Path> sortByDateAscending(List<Path> files) {
         return files.stream()
                     .sorted(Comparator.comparingLong(file -> FileFilterUtils.getFileTime(file)
@@ -96,10 +94,8 @@ public class FileFilterUtils {
                     .collect(Collectors.toList());
     }
 
-    /**
-     * Sorts a list of Path objects according to the last edited date
-     * of their corresponding files, from oldest to newest.
-     */
+    /// Sorts a list of Path objects according to the last edited date
+    /// of their corresponding files, from oldest to newest.
     public List<Path> sortByDateDescending(List<Path> files) {
         return files.stream()
                     .sorted(Comparator.comparingLong(file -> -FileFilterUtils.getFileTime(file)
@@ -109,10 +105,8 @@ public class FileFilterUtils {
                     .collect(Collectors.toList());
     }
 
-    /**
-     * Sorts a list of Path objects according to the last edited date
-     * the order depends on the specified sorter type.
-     */
+    /// Sorts a list of Path objects according to the last edited date
+    /// the order depends on the specified sorter type.
     public static List<Path> sortByDate(List<Path> files, ExternalFileSorter sortType) {
         FileFilterUtils fileFilter = new FileFilterUtils();
         List<Path> sortedFiles = switch (sortType) {

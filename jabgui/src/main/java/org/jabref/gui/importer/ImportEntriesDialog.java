@@ -10,6 +10,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -93,14 +94,12 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
 
-    /**
-     * Creates an import dialog for entries from file sources.
-     * This constructor is used for importing entries from local files, BibTeX files,
-     * or other file-based sources that don't require pagination or search functionality.
-     *
-     * @param database the database to import into
-     * @param task     the task executed for parsing the selected files(s).
-     */
+    /// Creates an import dialog for entries from file sources.
+    /// This constructor is used for importing entries from local files, BibTeX files,
+    /// or other file-based sources that don't require pagination or search functionality.
+    ///
+    /// @param database the database to import into
+    /// @param task     the task executed for parsing the selected files(s).
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task) {
         this.database = database;
         this.task = task;
@@ -110,15 +109,13 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         initializeDialog();
     }
 
-    /**
-     * Creates an import dialog for entries from web-based search sources.
-     * This constructor is used for importing entries that support pagination and require search queries.
-     *
-     * @param database database where the imported entries will be added
-     * @param task     task that handles parsing and loading entries from the search results
-     * @param fetcher  the search-based fetcher implementation used to retrieve entries from the web source
-     * @param query    the search string used to find relevant entries
-     */
+    /// Creates an import dialog for entries from web-based search sources.
+    /// This constructor is used for importing entries that support pagination and require search queries.
+    ///
+    /// @param database database where the imported entries will be added
+    /// @param task     task that handles parsing and loading entries from the search results
+    /// @param fetcher  the search-based fetcher implementation used to retrieve entries from the web source
+    /// @param query    the search string used to find relevant entries
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task, SearchBasedFetcher fetcher, String query) {
         this.database = database;
         this.task = task;
@@ -253,7 +250,12 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
             allGroups.sort((g1, g2) -> g1.getName().compareToIgnoreCase(g2.getName()));
 
             groupListView.getItems().addAll(allGroups);
-            groupListView.getSelectionModel().select(stateManager.getSelectedGroups(selectedDb).getFirst());
+
+            // If the group "Imported Entries" was created on the fly, there is no selected group yet.
+            ObservableList<GroupTreeNode> selectedGroups = stateManager.getSelectedGroups(selectedDb);
+            selectedGroups.stream()
+                          .findFirst()
+                          .ifPresent(groupListView.getSelectionModel()::select);
         } else {
             // No groups defined -> only "All entries"
             GroupTreeNode noGroup = new GroupTreeNode(new AllEntriesGroup(Localization.lang("All entries")));

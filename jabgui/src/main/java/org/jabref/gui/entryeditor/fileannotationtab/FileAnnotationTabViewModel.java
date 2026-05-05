@@ -114,9 +114,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         });
     }
 
-    /**
-     * Copies the meta and content information of the pdf annotation to the clipboard
-     */
+    /// Copies the meta and content information of the pdf annotation to the clipboard
     public void copyCurrentAnnotation() {
         if (null == getCurrentAnnotation()) {
             return;

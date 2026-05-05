@@ -50,7 +50,7 @@ concurrency:
 
 jobs:
   detect_changes:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: github.repository == 'JabRef/jabref'
     outputs:
       changed: ${{ steps.changed.outputs.any_changed }}
@@ -97,28 +97,7 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
-      - name: Setup JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: '24'
-          distribution: 'corretto'
-          check-latest: true
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-      - name: Generate JBang cache key
-        id: cache-key
-        shell: bash
-        run: |
-          echo "cache_key=jbang-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.jbang
-          key: ${{ steps.cache-key.outputs.cache_key }}
-          restore-keys:
-            jbang-
-      - name: Setup JBang
-        uses: jbangdev/setup-jbang@main
+      - uses: ./.github/actions/setup-gradle
 
       # region Publish JabLib on Maven Central
       - id: istagbuild
@@ -130,7 +109,7 @@ jobs:
           fi
       - name: Decode secretKeyRingFile
         id: secring
-        uses: timheuer/base64-to-file@v1
+        uses: timheuer/base64-to-file@v2
         with:
           fileName: 'secring.gpg'
           encodedString: ${{ secrets.KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64 }}
@@ -155,5 +134,6 @@ jobs:
           else
             tagbuild="false"
           fi
-          ./gradlew -PprojVersion="${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="$tagbuild" :jablib:publishAllPublicationsToMavenCentralRepository
+          gradle -PprojVersion="${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="$tagbuild" :jablib:publishAllPublicationsToMavenCentralRepository
+        # no API keys included
       # endregion

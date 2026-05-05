@@ -1,11 +1,9 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
-/**
- *
- * Medline/Pubmed specific transformer which uses suffixes for searches
- * see <a href="https://pubmed.ncbi.nlm.nih.gov/help/#search-tags">Pubmed help</a> for details
- *
- */
+///
+/// Medline/Pubmed specific transformer which uses suffixes for searches
+/// see <a href="https://pubmed.ncbi.nlm.nih.gov/help/#search-tags">Pubmed help</a> for details
+///
 public class MedlineQueryTransformer extends AbstractQueryTransformer {
 
     @Override

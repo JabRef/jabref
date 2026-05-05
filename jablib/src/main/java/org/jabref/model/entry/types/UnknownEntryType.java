@@ -8,6 +8,7 @@ import org.jabref.logic.util.strings.StringUtil;
 
 import org.jspecify.annotations.NonNull;
 
+/// Can be created using [org.jabref.model.entry.types.EntryTypeFactory#parse]
 @AllowedToUseLogic("Uses StringUtil temporarily")
 public class UnknownEntryType implements EntryType {
     private final String name;

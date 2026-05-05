@@ -7,8 +7,8 @@ updates:
       - "/versions"      # versions of 3rd party dependencies of all JabRef modules
       - "/"              # plugins
     schedule:
-      interval: weekly
-      day: sunday
+      interval: daily
+    open-pull-requests-limit: 10
     labels: [ ]
     ignore:
       - dependency-name: com.microsoft.azure:applicationinsights-core
@@ -21,18 +21,18 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
-      day: sunday
+      day: wednesday
     labels: [ ]
   - package-ecosystem: "gitsubmodule"
     directory: "/"
     schedule:
       interval: weekly
-      day: sunday
+      day: wednesday
     labels: [ ]
   - package-ecosystem: "maven"
     directories:
       - "jablib-examples/maven3/doi-to-bibtex"
     schedule:
       interval: weekly
-      day: sunday
+      day: wednesday
     labels: [ ]

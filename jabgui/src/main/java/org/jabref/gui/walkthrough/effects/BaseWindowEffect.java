@@ -24,8 +24,7 @@ public sealed abstract class BaseWindowEffect permits Spotlight, FullScreenDarke
     /// Constructor for WalkthroughEffect. No scene graph modification is done here. The effect is not attached to the
     /// pane until [#attach(Node)] is called.
     ///
-    /// @param pane The pane where the effect will be applied. Usually obtained from [Window#getScene()] and
-    ///                         [Scene#getRoot()]
+    /// @param pane The pane where the effect will be applied. Usually obtained from [Window#getScene()] and [Scene#getRoot()]
     protected BaseWindowEffect(@NonNull Pane pane) {
         this.pane = pane;
         this.debouncedUpdater = WalkthroughUtils.debounced(_ -> this.updateLayout());

@@ -9,9 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AuthorFirstLastOxfordCommasTest {
 
-    /**
-     * Test method for {@link org.jabref.logic.layout.format.AuthorFirstLastOxfordCommas#format(java.lang.String)}.
-     */
+    /// Test method for {@link org.jabref.logic.layout.format.AuthorFirstLastOxfordCommas#format(java.lang.String)}.
     @ParameterizedTest
     @CsvSource(
             delimiterString = "->",

@@ -20,10 +20,8 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Sends the selected entries to any specifiable email
- * by populating the email body
- */
+/// Sends the selected entries to any specifiable email
+/// by populating the email body
 public class SendAsStandardEmailAction extends SendAsEMailAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SendAsStandardEmailAction.class);
     private final GuiPreferences preferences;

@@ -20,13 +20,11 @@ import tools.jackson.databind.json.JsonMapper;
 public class MscCodeUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MscCodeUtils.class);
 
-    /**
-     * Load MSC codes and descriptions from a JSON resource URL into a HashMap
-     *
-     * @param resourceUrl URL to the JSON resource containing MSC codes
-     * @return Map with MSC codes as keys and descriptions as values
-     * @throws MscCodeLoadingException If there is an issue loading or parsing the JSON
-     */
+    /// Load MSC codes and descriptions from a JSON resource URL into a HashMap
+    ///
+    /// @param resourceUrl URL to the JSON resource containing MSC codes
+    /// @return Map with MSC codes as keys and descriptions as values
+    /// @throws MscCodeLoadingException If there is an issue loading or parsing the JSON
     @NonNull
     public static Optional<HashBiMap<String, String>> loadMscCodesFromJson(URL resourceUrl) throws MscCodeLoadingException {
 

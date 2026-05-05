@@ -19,10 +19,8 @@ import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.AbbreviationWriter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 
-/**
- * This class provides a model for abbreviation files. It actually doesn't save the files as objects but rather saves
- * their paths. This also allows to specify pseudo files as placeholder objects.
- */
+/// This class provides a model for abbreviation files. It actually doesn't save the files as objects but rather saves
+/// their paths. This also allows to specify pseudo files as placeholder objects.
 public class AbbreviationsFileViewModel {
 
     private final SimpleListProperty<AbbreviationViewModel> abbreviations = new SimpleListProperty<>(
@@ -37,11 +35,9 @@ public class AbbreviationsFileViewModel {
         this.isBuiltInList = new SimpleBooleanProperty(false);
     }
 
-    /**
-     * This constructor should only be called to create a pseudo abbreviation file for built in lists. This means it is
-     * a placeholder and its path will be null meaning it has no place on the filesystem. Its isPseudoFile property
-     * will therefore be set to true.
-     */
+    /// This constructor should only be called to create a pseudo abbreviation file for built in lists. This means it is
+    /// a placeholder and its path will be null meaning it has no place on the filesystem. Its isPseudoFile property
+    /// will therefore be set to true.
     public AbbreviationsFileViewModel(List<AbbreviationViewModel> abbreviations, String name) {
         this.abbreviations.addAll(abbreviations);
         this.name = name;
@@ -58,11 +54,9 @@ public class AbbreviationsFileViewModel {
         }
     }
 
-    /**
-     * This method will write all abbreviations of this abbreviation file to the file on the file system.
-     * It essentially will check if the current file is a builtin list and if not it will call
-     * {@link AbbreviationWriter#writeOrCreate}.
-     */
+    /// This method will write all abbreviations of this abbreviation file to the file on the file system.
+    /// It essentially will check if the current file is a builtin list and if not it will call
+    /// {@link AbbreviationWriter#writeOrCreate}.
     public void writeOrCreate() throws IOException {
         if (!isBuiltInList.get()) {
             List<Abbreviation> actualAbbreviations =

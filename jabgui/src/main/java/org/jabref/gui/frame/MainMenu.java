@@ -21,6 +21,7 @@ import org.jabref.gui.citedrive.CiteDriveLoginAction;
 import org.jabref.gui.citedrive.CiteDrivePushAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.collab.MergeLibraryAction;
 import org.jabref.gui.consistency.ConsistencyCheckAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
@@ -47,13 +48,12 @@ import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.help.SearchForUpdateAction;
-import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.NewEntryAction;
+import org.jabref.gui.importer.actions.ImportCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.integrity.IntegrityCheckAction;
-import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.linkedfile.RedownloadMissingFilesAction;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOffline;
@@ -61,6 +61,7 @@ import org.jabref.gui.maintable.NewLibraryFromPdfActionOnline;
 import org.jabref.gui.maintable.RightClickMenu;
 import org.jabref.gui.mergeentries.BatchEntryMergeWithFetchedDataAction;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
+import org.jabref.gui.mergeentries.UpdateWithBibliographicInformationByWebFetchers;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesAction;
 import org.jabref.gui.newentry.NewEntryDialogTab;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -68,6 +69,7 @@ import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preview.PreviewControls;
 import org.jabref.gui.pseudonymize.PseudonymizeAction;
 import org.jabref.gui.push.GuiPushToApplicationCommand;
+import org.jabref.gui.relatedwork.RelatedWorkAction;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
@@ -116,6 +118,7 @@ public class MainMenu extends MenuBar {
     private final AiService aiService;
     private final PreviewControls previewControls;
     private final GitHandlerRegistry gitHandlerRegistry;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     public MainMenu(JabRefFrame frame,
                     FileHistoryMenu fileHistoryMenu,
@@ -133,7 +136,9 @@ public class MainMenu extends MenuBar {
                     Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
                     AiService aiService,
                     PreviewControls previewControls,
-                    GitHandlerRegistry gitHandlerRegistry) {
+                    GitHandlerRegistry gitHandlerRegistry,
+                    JournalAbbreviationRepository journalAbbreviationRepository
+    ) {
         this.frame = frame;
         this.fileHistoryMenu = fileHistoryMenu;
         this.sidePane = sidePane;
@@ -151,6 +156,7 @@ public class MainMenu extends MenuBar {
         this.aiService = aiService;
         this.previewControls = previewControls;
         this.gitHandlerRegistry = gitHandlerRegistry;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         createMenu();
     }
@@ -177,13 +183,15 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
+                factory.createMenuItem(StandardActions.MERGE_LIBRARY, new MergeLibraryAction(dialogService, stateManager, preferences, taskExecutor, undoManager, frame)),
+
                 factory.createSubMenu(StandardActions.IMPORT,
                         factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.TO_EXISTING, preferences, stateManager, fileUpdateMonitor, taskExecutor, dialogService)),
                         factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.AS_NEW, preferences, stateManager, fileUpdateMonitor, taskExecutor, dialogService))),
 
                 factory.createSubMenu(StandardActions.EXPORT,
-                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, frame::getCurrentLibraryTab, stateManager, dialogService, preferences, entryTypesManager, abbreviationRepository, taskExecutor)),
-                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(ExportCommand.ExportMethod.EXPORT_SELECTED, frame::getCurrentLibraryTab, stateManager, dialogService, preferences, entryTypesManager, abbreviationRepository, taskExecutor)),
+                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, stateManager, dialogService, preferences, abbreviationRepository, taskExecutor)),
+                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(ExportCommand.ExportMethod.EXPORT_SELECTED, stateManager, dialogService, preferences, abbreviationRepository, taskExecutor)),
                         factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, frame::getCurrentLibraryTab, dialogService, preferences, stateManager))),
 
                 new SeparatorMenuItem(),
@@ -278,21 +286,11 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, (UiTaskExecutor) taskExecutor, abbreviationRepository)),
                 factory.createMenuItem(StandardActions.CHECK_CONSISTENCY, new ConsistencyCheckAction(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, (UiTaskExecutor) taskExecutor)),
-                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager)),
+                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager, journalAbbreviationRepository)),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(dialogService, preferences, stateManager, undoManager, (UiTaskExecutor) taskExecutor)),
-
-                new SeparatorMenuItem(),
-
-                factory.createSubMenu(StandardActions.ABBREVIATE,
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DOTLESS, new AbbreviateAction(StandardActions.ABBREVIATE_DOTLESS, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_LTWA, new AbbreviateAction(StandardActions.ABBREVIATE_LTWA, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager))),
-
-                factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager))
+                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(dialogService, preferences, stateManager, undoManager, (UiTaskExecutor) taskExecutor))
         );
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
@@ -312,6 +310,10 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(
                         StandardActions.BATCH_MERGE_WITH_FETCHED_ENTRY,
                         new BatchEntryMergeWithFetchedDataAction(stateManager, undoManager, preferences, dialogService, taskExecutor)),
+
+                factory.createMenuItem(
+                        StandardActions.UPDATE_WITH_WEB_INFO,
+                        new UpdateWithBibliographicInformationByWebFetchers(dialogService, preferences, stateManager, taskExecutor)),
                 // endregion
 
                 new SeparatorMenuItem(),
@@ -330,6 +332,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(frame, stateManager, dialogService)),
                 factory.createMenuItem(StandardActions.NEW_LIBRARY_FROM_PDF_ONLINE, new NewLibraryFromPdfActionOnline(frame, stateManager, dialogService, preferences, taskExecutor)),
                 factory.createMenuItem(StandardActions.NEW_LIBRARY_FROM_PDF_OFFLINE, new NewLibraryFromPdfActionOffline(frame, stateManager, dialogService, preferences, taskExecutor)),
+                factory.createMenuItem(StandardActions.EXTRACT_RELATED_WORK_COMMENTS, new RelatedWorkAction(dialogService, stateManager, preferences)),
                 factory.createMenuItem(StandardActions.PSEUDONYMIZE_LIBRARY, new PseudonymizeAction(stateManager, dialogService, preferences)),
 
                 new SeparatorMenuItem(),

@@ -155,4 +155,13 @@ class EndnoteImporterTest {
         assertEquals(Optional.of("http://d-nb.info/107601965X"), entry.getField(StandardField.URL));
         assertEquals(Optional.of("2016"), entry.getField(StandardField.YEAR));
     }
+
+    @Test
+    void importPreservesDiacriticalCitationKey() throws IOException {
+        String input = "%0 Journal\n%A Author\n%T Title\n%F kṛṣṇā";
+        List<BibEntry> entries = importer.importDatabase(new BufferedReader(Reader.of(input)))
+                                         .getDatabase().getEntries();
+
+        assertEquals(Optional.of("kṛṣṇā"), entries.getFirst().getCitationKey());
+    }
 }

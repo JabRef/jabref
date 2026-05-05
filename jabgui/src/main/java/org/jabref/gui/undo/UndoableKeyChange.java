@@ -5,11 +5,9 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 
-/**
- * This class represents a change in any field value. The relevant
- * information is the BibEntry, the field name, the old and the
- * new value. Old/new values can be null.
- */
+/// This class represents a change in any field value. The relevant
+/// information is the BibEntry, the field name, the old and the
+/// new value. Old/new values can be null.
 public class UndoableKeyChange extends AbstractUndoableJabRefEdit {
 
     private final BibEntry entry;

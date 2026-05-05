@@ -30,9 +30,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Processes all incoming or outgoing bib data to external SQL Database and manages its structure.
- */
+/// Processes all incoming or outgoing bib data to external SQL Database and manages its structure.
 public abstract class DBMSProcessor {
 
     public static final String PROCESSOR_ID = UUID.randomUUID().toString();
@@ -48,12 +46,10 @@ public abstract class DBMSProcessor {
         this.connectionProperties = dbmsConnection.getProperties();
     }
 
-    /**
-     * Scans the database for required tables.
-     *
-     * @return <code>true</code> if the structure matches the requirements, <code>false</code> if not.
-     * @throws SQLException in case of error
-     */
+    /// Scans the database for required tables.
+    ///
+    /// @return `true` if the structure matches the requirements, `false` if not.
+    /// @throws SQLException in case of error
     public boolean checkBaseIntegrity() throws SQLException {
         boolean databasePassesIntegrityCheck = false;
         DBMSType type = this.connectionProperties.getType();
@@ -68,11 +64,9 @@ public abstract class DBMSProcessor {
         return databasePassesIntegrityCheck;
     }
 
-    /**
-     * Determines whether the database is using an pre-3.6 structure.
-     *
-     * @return <code>true</code> if the structure is old, else <code>false</code>.
-     */
+    /// Determines whether the database is using an pre-3.6 structure.
+    ///
+    /// @return `true` if the structure is old, else `false`.
     public boolean databaseIsAtMostJabRef35() throws SQLException {
         return checkTableAvailability(
                 "ENTRIES",
@@ -84,12 +78,10 @@ public abstract class DBMSProcessor {
                 "STRINGS"); // old tables
     }
 
-    /**
-     * Checks whether all given table names (<b>case insensitive</b>) exist in database.
-     *
-     * @param tableNames Table names to be checked
-     * @return <code>true</code> if <b>all</b> given tables are present, else <code>false</code>.
-     */
+    /// Checks whether all given table names (**case insensitive**) exist in database.
+    ///
+    /// @param tableNames Table names to be checked
+    /// @return `true` if **all** given tables are present, else `false`.
     protected boolean checkTableAvailability(String... tableNames) throws SQLException {
         List<String> requiredTables = new ArrayList<>();
         for (String name : tableNames) {
@@ -107,12 +99,10 @@ public abstract class DBMSProcessor {
         }
     }
 
-    /**
-     * Creates and sets up the needed tables and columns according to the database type and performs a check whether the
-     * needed tables are present.
-     *
-     * @throws SQLException in case of error
-     */
+    /// Creates and sets up the needed tables and columns according to the database type and performs a check whether the
+    /// needed tables are present.
+    ///
+    /// @throws SQLException in case of error
     public void setupSharedDatabase() throws SQLException {
         setUp();
 
@@ -122,42 +112,34 @@ public abstract class DBMSProcessor {
         }
     }
 
-    /**
-     * Creates and sets up the needed tables and columns according to the database type.
-     *
-     * @throws SQLException in case of error
-     */
+    /// Creates and sets up the needed tables and columns according to the database type.
+    ///
+    /// @throws SQLException in case of error
     protected abstract void setUp() throws SQLException;
 
-    /**
-     * Escapes parts of SQL expressions such as a table name or a field name to match the conventions of the database
-     * system using the current dbmsType.
-     * <p>
-     * This method is package private, because of DBMSProcessorTest
-     *
-     * @param expression Table or field name
-     * @return Correctly escaped expression
-     */
+    /// Escapes parts of SQL expressions such as a table name or a field name to match the conventions of the database
+    /// system using the current dbmsType.
+    ///
+    /// This method is package private, because of DBMSProcessorTest
+    ///
+    /// @param expression Table or field name
+    /// @return Correctly escaped expression
     abstract String escape(String expression);
 
     abstract String escape_Table(String expression);
 
     abstract Integer getCURRENT_VERSION_DB_STRUCT();
 
-    /**
-     * For use in test only. Inserts the BibEntry into the shared database.
-     *
-     * @param bibEntry {@link BibEntry} to be inserted.
-     */
+    /// For use in test only. Inserts the BibEntry into the shared database.
+    ///
+    /// @param bibEntry {@link BibEntry} to be inserted.
     public void insertEntry(BibEntry bibEntry) {
         insertEntries(List.of(bibEntry));
     }
 
-    /**
-     * Inserts the List of BibEntry into the shared database.
-     *
-     * @param bibEntries List of {@link BibEntry} to be inserted
-     */
+    /// Inserts the List of BibEntry into the shared database.
+    ///
+    /// @param bibEntries List of {@link BibEntry} to be inserted
     public void insertEntries(List<BibEntry> bibEntries) {
         List<BibEntry> notYetExistingEntries = getNotYetExistingEntries(bibEntries);
         if (notYetExistingEntries.isEmpty()) {
@@ -167,11 +149,9 @@ public abstract class DBMSProcessor {
         insertIntoFieldTable(notYetExistingEntries);
     }
 
-    /**
-     * Inserts the given List of BibEntry into the ENTRY table.
-     *
-     * @param bibEntries List of {@link BibEntry} to be inserted
-     */
+    /// Inserts the given List of BibEntry into the ENTRY table.
+    ///
+    /// @param bibEntries List of {@link BibEntry} to be inserted
     protected void insertIntoEntryTable(List<BibEntry> bibEntries) {
         StringBuilder insertIntoEntryQuery = new StringBuilder()
                 .append("INSERT INTO ")
@@ -205,12 +185,10 @@ public abstract class DBMSProcessor {
         }
     }
 
-    /**
-     * Filters a list of BibEntry to and returns those which do not exist in the database
-     *
-     * @param bibEntries {@link BibEntry} to be checked
-     * @return <code>true</code> if existent, else <code>false</code>
-     */
+    /// Filters a list of BibEntry to and returns those which do not exist in the database
+    ///
+    /// @param bibEntries {@link BibEntry} to be checked
+    /// @return `true` if existent, else `false`
     private List<BibEntry> getNotYetExistingEntries(List<BibEntry> bibEntries) {
         List<Integer> remoteIds = new ArrayList<>();
         List<Integer> localIds = bibEntries.stream()
@@ -239,11 +217,9 @@ public abstract class DBMSProcessor {
                          .collect(Collectors.toList());
     }
 
-    /**
-     * Inserts the given list of BibEntry into FIELD table.
-     *
-     * @param bibEntries {@link BibEntry} to be inserted
-     */
+    /// Inserts the given list of BibEntry into FIELD table.
+    ///
+    /// @param bibEntries {@link BibEntry} to be inserted
     protected void insertIntoFieldTable(List<BibEntry> bibEntries) {
         try {
             // Inserting into FIELD table
@@ -290,12 +266,10 @@ public abstract class DBMSProcessor {
         }
     }
 
-    /**
-     * Updates the whole {@link BibEntry} on shared database.
-     *
-     * @param localBibEntry {@link BibEntry} affected by changes
-     * @throws SQLException in case of error
-     */
+    /// Updates the whole {@link BibEntry} on shared database.
+    ///
+    /// @param localBibEntry {@link BibEntry} affected by changes
+    /// @throws SQLException in case of error
     public void updateEntry(BibEntry localBibEntry) throws OfflineLockException, SQLException {
         connection.setAutoCommit(false); // disable auto commit due to transaction
 
@@ -347,9 +321,7 @@ public abstract class DBMSProcessor {
         }
     }
 
-    /**
-     * Helping method. Removes shared fields which do not exist locally
-     */
+    /// Helping method. Removes shared fields which do not exist locally
     private void removeSharedFieldsByDifference(BibEntry localBibEntry, BibEntry sharedBibEntry) throws SQLException {
         Set<Field> nullFields = new HashSet<>(sharedBibEntry.getFields());
         nullFields.removeAll(localBibEntry.getFields());
@@ -371,10 +343,8 @@ public abstract class DBMSProcessor {
         }
     }
 
-    /**
-     * Helping method. Inserts a key-value pair into FIELD table for every field if not existing. Otherwise only an
-     * update is performed.
-     */
+    /// Helping method. Inserts a key-value pair into FIELD table for every field if not existing. Otherwise only an
+    /// update is performed.
     private void insertOrUpdateFields(BibEntry localBibEntry) throws SQLException {
         for (Field field : localBibEntry.getFields()) {
             // avoiding to use deprecated BibEntry.getField() method. null values are accepted by PreparedStatement!
@@ -440,11 +410,9 @@ public abstract class DBMSProcessor {
         }
     }
 
-    /**
-     * Removes the shared bibEntry.
-     *
-     * @param bibEntries {@link BibEntry} to be deleted
-     */
+    /// Removes the shared bibEntry.
+    ///
+    /// @param bibEntries {@link BibEntry} to be deleted
     public void removeEntries(@NonNull List<BibEntry> bibEntries) {
         if (bibEntries.isEmpty()) {
             return;
@@ -468,10 +436,8 @@ public abstract class DBMSProcessor {
         }
     }
 
-    /**
-     * @param sharedID Entry ID
-     * @return instance of {@link BibEntry}
-     */
+    /// @param sharedID Entry ID
+    /// @return instance of {@link BibEntry}
     public Optional<BibEntry> getSharedEntry(int sharedID) {
         List<BibEntry> sharedEntries = getSharedEntries(List.of(sharedID));
         if (sharedEntries.isEmpty()) {
@@ -481,12 +447,10 @@ public abstract class DBMSProcessor {
         }
     }
 
-    /**
-     * Queries the database for shared entries in 500 element batches.
-     * Optionally, they are filtered by the given list of sharedIds
-     *
-     * @param sharedIDs the list of Ids to filter. If list is empty, then no filter is applied
-     */
+    /// Queries the database for shared entries in 500 element batches.
+    /// Optionally, they are filtered by the given list of sharedIds
+    ///
+    /// @param sharedIDs the list of Ids to filter. If list is empty, then no filter is applied
     public List<BibEntry> partitionAndGetSharedEntries(List<Integer> sharedIDs) {
         List<List<Integer>> partitions = Lists.partition(sharedIDs, 500);
         List<BibEntry> result = new ArrayList<>();
@@ -497,11 +461,9 @@ public abstract class DBMSProcessor {
         return result;
     }
 
-    /**
-     * Queries the database for shared entries. Optionally, they are filtered by the given list of sharedIds
-     *
-     * @param sharedIDs the list of Ids to filter. If list is empty, then no filter is applied
-     */
+    /// Queries the database for shared entries. Optionally, they are filtered by the given list of sharedIds
+    ///
+    /// @param sharedIDs the list of Ids to filter. If list is empty, then no filter is applied
     public List<BibEntry> getSharedEntries(@NonNull List<Integer> sharedIDs) {
         List<BibEntry> sharedEntries = new ArrayList<>();
 
@@ -571,9 +533,7 @@ public abstract class DBMSProcessor {
         return getSharedEntries(List.of());
     }
 
-    /**
-     * Retrieves a mapping between the columns SHARED_ID and VERSION.
-     */
+    /// Retrieves a mapping between the columns SHARED_ID and VERSION.
     public Map<Integer, Integer> getSharedIDVersionMapping() {
         Map<Integer, Integer> sharedIDVersionMapping = new HashMap<>();
         String selectEntryQuery = "SELECT * FROM " +
@@ -592,9 +552,7 @@ public abstract class DBMSProcessor {
         return sharedIDVersionMapping;
     }
 
-    /**
-     * Fetches and returns all shared meta data.
-     */
+    /// Fetches and returns all shared meta data.
     public Map<String, String> getSharedMetaData() {
         Map<String, String> data = new HashMap<>();
 
@@ -609,11 +567,9 @@ public abstract class DBMSProcessor {
         return data;
     }
 
-    /**
-     * Clears and sets all shared meta data.
-     *
-     * @param data JabRef meta data as map
-     */
+    /// Clears and sets all shared meta data.
+    ///
+    /// @param data JabRef meta data as map
     public void setSharedMetaData(Map<String, String> data) throws SQLException {
         StringBuilder updateQuery = new StringBuilder()
                 .append("UPDATE ")
@@ -654,9 +610,7 @@ public abstract class DBMSProcessor {
         }
     }
 
-    /**
-     * Returns a new instance of the abstract type {@link DBMSProcessor}
-     */
+    /// Returns a new instance of the abstract type {@link DBMSProcessor}
     public static DBMSProcessor getProcessorInstance(DatabaseConnection connection) {
         return new PostgreSQLProcessor(connection);
     }
@@ -665,26 +619,20 @@ public abstract class DBMSProcessor {
         return this.connectionProperties;
     }
 
-    /**
-     * Listens for notifications from DBMS. Needs to be implemented if LiveUpdate is supported by the DBMS
-     *
-     * @param dbmsSynchronizer {@link DBMSSynchronizer} which handles the notification.
-     */
+    /// Listens for notifications from DBMS. Needs to be implemented if LiveUpdate is supported by the DBMS
+    ///
+    /// @param dbmsSynchronizer {@link DBMSSynchronizer} which handles the notification.
     public void startNotificationListener(@SuppressWarnings("unused") DBMSSynchronizer dbmsSynchronizer) {
         // nothing to do
     }
 
-    /**
-     * Terminates the notification listener. Needs to be implemented if LiveUpdate is supported by the DBMS
-     */
+    /// Terminates the notification listener. Needs to be implemented if LiveUpdate is supported by the DBMS
     public void stopNotificationListener() {
         // nothing to do
     }
 
-    /**
-     * Notifies all clients ({@link DBMSSynchronizer}) which are connected to the same DBMS. Needs to be implemented if
-     * LiveUpdate is supported by the DBMS
-     */
+    /// Notifies all clients ({@link DBMSSynchronizer}) which are connected to the same DBMS. Needs to be implemented if
+    /// LiveUpdate is supported by the DBMS
     public void notifyClients() {
         // nothing to do
     }

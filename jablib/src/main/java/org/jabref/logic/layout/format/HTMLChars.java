@@ -8,9 +8,7 @@ import org.jabref.logic.layout.ParamLayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import org.jabref.logic.util.strings.StringUtil;
 
-/**
- * This formatter escapes characters so that they are suitable for HTML.
- */
+/// This formatter escapes characters so that they are suitable for HTML.
 public class HTMLChars implements ParamLayoutFormatter {
 
     private static final Map<String, String> HTML_CHARS = HTMLUnicodeConversionMaps.LATEX_HTML_CONVERSION_MAP;

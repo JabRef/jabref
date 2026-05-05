@@ -5,7 +5,10 @@ import java.util.function.Supplier;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
@@ -15,6 +18,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.CleanupPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
@@ -26,37 +30,40 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class CleanupDialog extends BaseDialog<Void> {
 
     @FXML private TabPane tabPane;
+    @FXML private ButtonType cleanUpButton;
 
     private final CleanupDialogViewModel viewModel;
 
-    // Constructor for multiple-entry cleanup
+    /// Constructor for multiple-entry cleanup
     public CleanupDialog(BibDatabaseContext databaseContext,
                          CliPreferences preferences,
                          DialogService dialogService,
                          StateManager stateManager,
                          UndoManager undoManager,
                          Supplier<LibraryTab> tabSupplier,
-                         TaskExecutor taskExecutor) {
-
+                         TaskExecutor taskExecutor,
+                         JournalAbbreviationRepository journalAbbreviationRepository) {
+        super();
         this.viewModel = new CleanupDialogViewModel(
                 databaseContext, preferences, dialogService,
-                stateManager, undoManager, tabSupplier, taskExecutor
+                stateManager, undoManager, tabSupplier, taskExecutor, journalAbbreviationRepository
         );
 
         init(databaseContext, preferences);
     }
 
-    // Constructor for single-entry cleanup
+    /// Constructor for single-entry cleanup
     public CleanupDialog(BibEntry targetEntry,
                          BibDatabaseContext databaseContext,
                          CliPreferences preferences,
                          DialogService dialogService,
                          StateManager stateManager,
-                         UndoManager undoManager) {
+                         UndoManager undoManager,
+                         JournalAbbreviationRepository journalAbbreviationRepository) {
 
         this.viewModel = new CleanupDialogViewModel(
                 databaseContext, preferences, dialogService,
-                stateManager, undoManager, null, null
+                stateManager, undoManager, null, null, journalAbbreviationRepository
         );
 
         viewModel.setTargetEntries(List.of(targetEntry));
@@ -77,11 +84,30 @@ public class CleanupDialog extends BaseDialog<Void> {
         CleanupSingleFieldPanel singleFieldPanel = new CleanupSingleFieldPanel(initialPreset, viewModel);
         CleanupFileRelatedPanel fileRelatedPanel = new CleanupFileRelatedPanel(databaseContext, initialPreset, filePreferences, viewModel);
         CleanupMultiFieldPanel multiFieldPanel = new CleanupMultiFieldPanel(initialPreset, viewModel);
+        CleanupJournalRelatedPanel journalRelatedPanel = new CleanupJournalRelatedPanel(initialPreset, viewModel);
 
         tabPane.getTabs().setAll(
                 new Tab(Localization.lang("Single field"), singleFieldPanel),
                 new Tab(Localization.lang("File-related"), fileRelatedPanel),
-                new Tab(Localization.lang("Multi-field"), multiFieldPanel)
+                new Tab(Localization.lang("Multi-field"), multiFieldPanel),
+                new Tab(Localization.lang("Journal-related"), journalRelatedPanel)
         );
+
+        Button btn = (Button) getDialogPane().lookupButton(cleanUpButton);
+
+        btn.addEventFilter(ActionEvent.ACTION, event -> {
+            Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+            if (selectedTab != null && selectedTab.getContent() instanceof CleanupPanel panel) {
+                viewModel.apply(panel.getSelectedTab());
+            }
+            event.consume();
+        });
+
+        setResultConverter(button -> {
+            if (button == ButtonType.CANCEL) {
+                return null;
+            }
+            return null;
+        });
     }
 }

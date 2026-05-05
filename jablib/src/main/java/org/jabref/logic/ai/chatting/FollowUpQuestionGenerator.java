@@ -18,6 +18,7 @@ public class FollowUpQuestionGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(FollowUpQuestionGenerator.class);
     private static final int MIN_QUESTION_LENGTH = 5;
     private static final int MAX_QUESTION_LENGTH = 100;
+    private static final Pattern NUMBERED_PATTERN = Pattern.compile("^\\s*\\d+\\.\\s*(.+)$", Pattern.MULTILINE);
 
     private final ChatModel chatLanguageModel;
     private final AiTemplatesService aiTemplatesService;
@@ -58,8 +59,7 @@ public class FollowUpQuestionGenerator {
     private List<String> parseQuestions(String response) {
         List<String> questions = new ArrayList<>();
 
-        Pattern numberedPattern = Pattern.compile("^\\s*\\d+\\.\\s*(.+)$", Pattern.MULTILINE);
-        Matcher matcher = numberedPattern.matcher(response);
+        Matcher matcher = NUMBERED_PATTERN.matcher(response);
 
         while (matcher.find() && questions.size() < aiPreferences.getFollowUpQuestionsCount()) {
             String question = matcher.group(1).trim();

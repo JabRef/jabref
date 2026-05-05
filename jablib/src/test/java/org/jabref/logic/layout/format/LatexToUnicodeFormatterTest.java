@@ -54,7 +54,7 @@ class LatexToUnicodeFormatterTest {
 
     @Test
     void equationsMoreComplicatedFormatting() {
-        assertEquals("A 32 mA ΣΔ-modulator", formatter.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
+        assertEquals("A 32\u00a0mA ΣΔ-modulator", formatter.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
     }
 
     @Test
@@ -174,9 +174,7 @@ class LatexToUnicodeFormatterTest {
         assertEquals("Lorem ipsum_(lorem ipsum)", formatter.format("Lorem ipsum_{lorem ipsum}"));
     }
 
-    /**
-     * <a href="https://github.com/JabRef/jabref/issues/5547">Issue 5547</a>
-     */
+    /// <a href="https://github.com/JabRef/jabref/issues/5547">Issue 5547</a>
     @Test
     void twoDifferentMacrons() {
         assertEquals("Puṇya-pattana-vidyā-pı̄ṭhādhi-kṛtaiḥ prā-kaśyaṃ nı̄taḥ", formatter.format("Pu{\\d{n}}ya-pattana-vidy{\\={a}}-p{\\={\\i}}{\\d{t}}h{\\={a}}dhi-k{\\d{r}}tai{\\d{h}} pr{\\={a}}-ka{{\\'{s}}}ya{\\d{m}} n{\\={\\i}}ta{\\d{h}}"));
@@ -205,5 +203,10 @@ class LatexToUnicodeFormatterTest {
     @Test
     void conversionOfOrdinal9th() {
         assertEquals("9ᵗʰ", formatter.format("9\\textsuperscript{th}"));
+    }
+
+    @Test
+    void formatPreservesNoBreakSpaces() {
+        assertEquals("Y.\u00a0Matsumoto", formatter.format("Y.~Matsumoto"));
     }
 }

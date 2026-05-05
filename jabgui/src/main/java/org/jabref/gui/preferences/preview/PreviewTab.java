@@ -5,7 +5,6 @@ import java.util.List;
 
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -34,8 +33,9 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.logic.bst.BstPreviewLayout;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preview.BstPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TestEntry;
@@ -64,9 +64,11 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     @FXML private Tab previewTab;
     @FXML private CodeArea editArea;
     @FXML private CustomTextField searchBox;
+    @FXML private CheckBox bookCoverDownload;
 
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
+    @Inject private JournalAbbreviationRepository abbreviationRepository;
 
     private final ContextMenu contextMenu = new ContextMenu();
 
@@ -113,7 +115,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     }
 
     @FXML
-    private void selectBstFile(ActionEvent event) {
+    private void selectBstFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.BST)
                 .withDefaultExtension(StandardFileType.BST)
@@ -124,11 +126,13 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new PreviewTabViewModel(dialogService, preferences.getPreviewPreferences(), taskExecutor, stateManager);
+        this.viewModel = new PreviewTabViewModel(dialogService, preferences, taskExecutor, stateManager, abbreviationRepository);
         lastKeyPressTime = System.currentTimeMillis();
 
         showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());
         showPreviewTooltipCheckBox.selectedProperty().bindBidirectional(viewModel.showPreviewInEntryTableTooltip());
+
+        bookCoverDownload.selectedProperty().bindBidirectional(viewModel.shouldDownloadCoversProperty());
 
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
@@ -155,7 +159,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         availableListView.setOnKeyTyped(event -> jumpToSearchKey(availableListView, event));
         availableListView.setOnMouseClicked(this::mouseClickedAvailable);
         availableListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        availableListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+        availableListView.selectionModelProperty().getValue().selectedItemProperty().addListener((_, _, newValue) ->
                 viewModel.setPreviewLayout(newValue));
 
         chosenListView.itemsProperty().bindBidirectional(viewModel.chosenListProperty());
@@ -171,7 +175,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         chosenListView.setOnKeyTyped(event -> jumpToSearchKey(chosenListView, event));
         chosenListView.setOnMouseClicked(this::mouseClickedChosen);
         chosenListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+        chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((_, _, newValue) ->
                 viewModel.setPreviewLayout(newValue));
 
         toRightButton.disableProperty().bind(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNull());
@@ -202,16 +206,16 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
                     viewModel.refreshPreview();
                 });
 
-        editArea.textProperty().addListener((obs, oldValue, newValue) ->
+        editArea.textProperty().addListener((_, _, newValue) ->
                 editArea.setStyleSpans(0, viewModel.computeHighlighting(newValue)));
 
-        editArea.focusedProperty().addListener((observable, oldValue, newValue) -> {
+        editArea.focusedProperty().addListener((_, _, newValue) -> {
             if (!newValue) {
                 viewModel.refreshPreview();
             }
         });
 
-        searchBox.textProperty().addListener((observable, previousText, searchTerm) -> viewModel.setAvailableFilter(searchTerm));
+        searchBox.textProperty().addListener((_, _, searchTerm) -> viewModel.setAvailableFilter(searchTerm));
 
         readOnlyLabel.visibleProperty().bind(viewModel.selectedIsEditableProperty().not());
         resetDefaultButton.disableProperty().bind(viewModel.selectedIsEditableProperty().not());
@@ -223,13 +227,11 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.chosenListValidationStatus(), chosenListView));
     }
 
-    /**
-     * This is called, if a user starts typing some characters into the keyboard with focus on one ListView. The
-     * ListView will scroll to the next cell with the name of the PreviewLayout fitting those characters.
-     *
-     * @param list       The ListView currently focused
-     * @param keypressed The pressed character
-     */
+    /// This is called, if a user starts typing some characters into the keyboard with focus on one ListView. The
+    /// ListView will scroll to the next cell with the name of the PreviewLayout fitting those characters.
+    ///
+    /// @param list       The ListView currently focused
+    /// @param keypressed The pressed character
 
     private void jumpToSearchKey(ListView<PreviewLayout> list, KeyEvent keypressed) {
         if (keypressed.getCharacter() == null) {
@@ -320,7 +322,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         if (layout instanceof BstPreviewLayout) {
             ContextMenu menu = new ContextMenu();
             MenuItem deleteItem = new MenuItem(Localization.lang("Remove"));
-            deleteItem.setOnAction(event -> viewModel.removeCustomStyle(layout));
+            deleteItem.setOnAction(_ -> viewModel.removeCustomStyle(layout));
             menu.getItems().add(deleteItem);
             return menu;
         }

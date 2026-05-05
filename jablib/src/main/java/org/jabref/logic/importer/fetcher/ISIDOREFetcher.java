@@ -36,11 +36,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-/**
- * Fetcher for <a href="https://isidore.science">ISIDORE</a>```
- * Will take in the link to the website or the last six digits that identify the reference
- * Uses <a href="https://isidore.science/api">ISIDORE's API</a>.
- */
+/// Fetcher for <a href="https://isidore.science">ISIDORE</a>```
+/// Will take in the link to the website or the last six digits that identify the reference
+/// Uses <a href="https://isidore.science/api">ISIDORE's API</a>.
 public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ISIDOREFetcher.class);
@@ -147,10 +145,8 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
         return "";
     }
 
-    /**
-     * Get the type of the document, ISIDORE only seems to have select types, also their types are different to
-     * those used by JabRef.
-     */
+    /// Get the type of the document, ISIDORE only seems to have select types, also their types are different to
+    /// those used by JabRef.
     private EntryType getType(NodeList list) {
         for (int i = 0; i < list.getLength(); i++) {
             String type = list.item(i).getTextContent();
@@ -182,9 +178,7 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
         return stringJoiner.toString().substring(0, stringJoiner.length()).trim().replaceAll("\\s+", " ");
     }
 
-    /**
-     * Remove numbers from a string and everything after the number, (helps with the author field).
-     */
+    /// Remove numbers from a string and everything after the number, (helps with the author field).
     private String removeNumbers(String string) {
         for (int i = 0; i < string.length(); i++) {
             if (Character.isDigit(string.charAt(i))) {

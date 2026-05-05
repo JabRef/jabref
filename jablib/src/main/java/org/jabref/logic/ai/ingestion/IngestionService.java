@@ -24,10 +24,8 @@ import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 
-/**
- * Main class for generating embedding for files.
- * Use this class in the logic and UI.
- */
+/// Main class for generating embedding for files.
+/// Use this class in the logic and UI.
 public class IngestionService {
     // We use a {@link TreeMap} here for the same reasons we use it in {@link ChatHistoryService}.
     private final TreeMap<LinkedFile, ProcessingInfo<LinkedFile, Void>> ingestionStatusMap = new TreeMap<>(Comparator.comparing(LinkedFile::getLink));
@@ -96,12 +94,10 @@ public class IngestionService {
         }
     }
 
-    /**
-     * Start ingesting of a {@link LinkedFile}, if it was not ingested.
-     * This method returns a {@link ProcessingInfo} that can be used for tracking state of the ingestion.
-     * Returned {@link ProcessingInfo} is related to the passed {@link LinkedFile}, so if you call this method twice
-     * on the same {@link LinkedFile}, the method will return the same {@link ProcessingInfo}.
-     */
+    /// Start ingesting of a {@link LinkedFile}, if it was not ingested.
+    /// This method returns a {@link ProcessingInfo} that can be used for tracking state of the ingestion.
+    /// Returned {@link ProcessingInfo} is related to the passed {@link LinkedFile}, so if you call this method twice
+    /// on the same {@link LinkedFile}, the method will return the same {@link ProcessingInfo}.
     public ProcessingInfo<LinkedFile, Void> ingest(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext) {
         ProcessingInfo<LinkedFile, Void> processingInfo = getProcessingInfo(linkedFile);
 
@@ -112,10 +108,8 @@ public class IngestionService {
         return processingInfo;
     }
 
-    /**
-     * Get {@link ProcessingInfo} of a {@link LinkedFile}. Initially, it is in state {@link ProcessingState#STOPPED}.
-     * This method will not start ingesting. If you need to start it, use {@link IngestionService#ingest(LinkedFile, BibDatabaseContext)}.
-     */
+    /// Get {@link ProcessingInfo} of a {@link LinkedFile}. Initially, it is in state {@link ProcessingState#STOPPED}.
+    /// This method will not start ingesting. If you need to start it, use {@link IngestionService#ingest(LinkedFile, BibDatabaseContext)}.
     public ProcessingInfo<LinkedFile, Void> getProcessingInfo(LinkedFile linkedFile) {
         return ingestionStatusMap.computeIfAbsent(linkedFile, file -> new ProcessingInfo<>(linkedFile, ProcessingState.STOPPED));
     }

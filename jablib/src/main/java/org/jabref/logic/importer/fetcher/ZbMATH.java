@@ -32,9 +32,7 @@ import kong.unirest.core.json.JSONArray;
 import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NonNull;
 
-/**
- * Fetches data from the Zentralblatt Math (https://www.zbmath.org/)
- */
+/// Fetches data from the Zentralblatt Math (https://www.zbmath.org/)
 public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, EntryBasedParserFetcher {
 
     private final ImportFormatPreferences preferences;

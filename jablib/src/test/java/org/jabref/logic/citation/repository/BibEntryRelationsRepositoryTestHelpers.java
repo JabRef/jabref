@@ -7,17 +7,13 @@ import java.util.function.Function;
 
 import org.jabref.model.entry.BibEntry;
 
-/**
- * Provide helpers methods and classes for tests to manage {@link BibEntryCitationsAndReferencesRepository} mocks.
- */
+/// Provide helpers methods and classes for tests to manage {@link BibEntryCitationsAndReferencesRepository} mocks.
 public class BibEntryRelationsRepositoryTestHelpers {
 
-    /**
-     * Provide mocks factories for {@link BibEntryCitationsAndReferencesRepository} mocks.
-     * <br>
-     * Those implementations should help to test the values passed to an injected repository instance
-     * when it is called from {@link org.jabref.logic.citation.SearchCitationsRelationsService}.
-     */
+    /// Provide mocks factories for {@link BibEntryCitationsAndReferencesRepository} mocks.
+    /// <br>
+    /// Those implementations should help to test the values passed to an injected repository instance
+    /// when it is called from {@link org.jabref.logic.citation.SearchCitationsRelationsService}.
     public static class Mocks {
         public static BibEntryCitationsAndReferencesRepository from(
                 Function<BibEntry, List<BibEntry>> retrieveCitations,
@@ -29,12 +25,12 @@ public class BibEntryRelationsRepositoryTestHelpers {
         ) {
             return new BibEntryCitationsAndReferencesRepository() {
                 @Override
-                public void insertCitations(BibEntry entry, List<BibEntry> citations) {
+                public void addCitations(BibEntry entry, List<BibEntry> citations) {
                     insertCitations.accept(entry, citations);
                 }
 
                 @Override
-                public List<BibEntry> readCitations(BibEntry entry) {
+                public List<BibEntry> getCitations(BibEntry entry) {
                     return retrieveCitations.apply(entry);
                 }
 
@@ -49,12 +45,12 @@ public class BibEntryRelationsRepositoryTestHelpers {
                 }
 
                 @Override
-                public void insertReferences(BibEntry entry, List<BibEntry> citations) {
+                public void addReferences(BibEntry entry, List<BibEntry> citations) {
                     insertReferences.accept(entry, citations);
                 }
 
                 @Override
-                public List<BibEntry> readReferences(BibEntry entry) {
+                public List<BibEntry> getReferences(BibEntry entry) {
                     return retrieveReferences.apply(entry);
                 }
 
@@ -80,12 +76,12 @@ public class BibEntryRelationsRepositoryTestHelpers {
         ) {
             return new BibEntryCitationsAndReferencesRepository() {
                 @Override
-                public void insertCitations(BibEntry entry, List<BibEntry> citations) {
+                public void addCitations(BibEntry entry, List<BibEntry> citations) {
                     citationsDB.put(entry, citations);
                 }
 
                 @Override
-                public List<BibEntry> readCitations(BibEntry entry) {
+                public List<BibEntry> getCitations(BibEntry entry) {
                     return citationsDB.getOrDefault(entry, List.of());
                 }
 
@@ -100,12 +96,12 @@ public class BibEntryRelationsRepositoryTestHelpers {
                 }
 
                 @Override
-                public void insertReferences(BibEntry entry, List<BibEntry> citations) {
+                public void addReferences(BibEntry entry, List<BibEntry> citations) {
                     referencesDB.put(entry, citations);
                 }
 
                 @Override
-                public List<BibEntry> readReferences(BibEntry entry) {
+                public List<BibEntry> getReferences(BibEntry entry) {
                     return referencesDB.getOrDefault(entry, List.of());
                 }
 

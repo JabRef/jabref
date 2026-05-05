@@ -41,12 +41,10 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
         return new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse("");
     }
 
-    /**
-     * Constructing the url for the searchpage.
-     *
-     * @param queryNode the first query node
-     * @return query URL
-     */
+    /// Constructing the url for the searchpage.
+    ///
+    /// @param queryNode the first query node
+    /// @return query URL
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
@@ -54,11 +52,9 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
         return uriBuilder.build().toURL();
     }
 
-    /**
-     * Gets an instance of ACMPortalParser.
-     *
-     * @return the parser which can process the results returned from the ACM Portal search page
-     */
+    /// Gets an instance of ACMPortalParser.
+    ///
+    /// @return the parser which can process the results returned from the ACM Portal search page
     @Override
     public Parser getParser() {
         return new ACMPortalParser();

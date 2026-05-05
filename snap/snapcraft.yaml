@@ -9,16 +9,22 @@ description: |
   To access files in external media (i.e., USB drives) you must run:
   `snap connect jabref:removable-media`
 grade: stable
+title: JabRef
+donation: https://donations.jabref.org
+issues: https://github.com/JabRef/jabref/issues
+website: https://www.jabref.org/
+source-code: https://github.com/JabRef/jabref
+contact: web@jabref.org
 confinement: strict
 base: core24
 compression: lzo
 platforms:
   amd64:
-    build-on: [amd64]
-    build-for: [amd64]
+    build-on: [ amd64 ]
+    build-for: [ amd64 ]
   arm64:
-    build-on: [arm64]
-    build-for: [arm64]
+    build-on: [ arm64 ]
+    build-for: [ arm64 ]
 plugs:
   home:
   unity7:
@@ -28,11 +34,11 @@ plugs:
   hostfs-mozilla-native-messaging-jabref:
     interface: system-files
     write:
-    - /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
+      - /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
   etc-opt-chrome-native-messaging-jabref:
     interface: system-files
     write:
-    - /etc/opt/chrome/native-messaging-hosts/org.jabref.jabref.json
+      - /etc/opt/chrome/native-messaging-hosts/org.jabref.jabref.json
   etc-opt-edge-native-messaging-jabref:
     interface: system-files
     write:
@@ -40,7 +46,7 @@ plugs:
   etc-chromium-native-messaging-jabref:
     interface: system-files
     write:
-    - /etc/chromium/native-messaging-hosts/org.jabref.jabref.json
+      - /etc/chromium/native-messaging-hosts/org.jabref.jabref.json
 
 layout:
   /usr/share/libdrm:
@@ -49,21 +55,25 @@ layout:
 apps:
   jabref:
     command: bin/JabRef
-    extensions: [gnome]
+    extensions: [ gnome ]
   browser-proxy:
     command: lib/jabrefHost.py
-    extensions: [gnome]
+    extensions: [ gnome ]
 
 environment:
   _JAVA_OPTIONS: "-Duser.home=$SNAP_USER_DATA"
   GTK_USE_PORTAL: "1"
 
 parts:
+  mesa-fix:
+    plugin: nil
+    build-snaps:
+      - mesa-2404/candidate  # Force it to look in candidate
   jabref:
     plugin: dump
     source:
-      - on amd64 to amd64: https://builds.jabref.org/main/JabRef-portable_linux.tar.gz
-      - on arm64 to arm64: https://builds.jabref.org/main/JabRef-portable_linux_arm64.tar.gz
+      - on amd64 to amd64: https://builds.jabref.org/main/linux-amd64/JabRef-portable_linux.tar.gz
+      - on arm64 to arm64: https://builds.jabref.org/main/linux-arm/JabRef-portable_linux_arm64.tar.gz
     stage-packages:
       - x11-utils
     override-build: |
@@ -87,6 +97,7 @@ parts:
     plugin: nil
     build-snaps:
       - gnome-46-2404
+      - mesa-2404/candidate
     override-prime: |
       set -eux
       for snap in "gnome-46-2404"; do  # List all content-snaps you're using here

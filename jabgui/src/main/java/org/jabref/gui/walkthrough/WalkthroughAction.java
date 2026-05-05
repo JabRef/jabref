@@ -626,7 +626,7 @@ public class WalkthroughAction extends SimpleCommand {
                 )
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Click on \"Preferences\""))
-                        .resolver(NodeResolver.menuItem("Preferences"))
+                        .resolver(NodeResolver.menuItem(Localization.lang("Preferences")))
                         .trigger(Trigger.create().withWindowChangeListener().onClick())
                         .position(TooltipPosition.RIGHT)
                         .activeWindow(WindowResolver.clazz(ContextMenu.class))

@@ -66,6 +66,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -75,11 +76,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Tests for reading whole bib files can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
- * <p>
- * Tests cannot be executed concurrently, because Localization is used at {@link BibtexParser#parseAndAddEntry(String)}
- */
+/// Tests for reading whole bib files can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
+///
+/// Tests cannot be executed concurrently, because Localization is used at {@link BibtexParser#parseAndAddEntry(String)}
 @SuppressWarnings("checkstyle:NoMultipleClosingBracesAtEndOfLine")
 @ResourceLock("Localization.lang")
 class BibtexParserTest {
@@ -490,9 +489,7 @@ class BibtexParserTest {
         );
     }
 
-    /**
-     * JabRef's heuristics is not able to parse this special case.
-     */
+    /// JabRef's heuristics is not able to parse this special case.
     @Test
     void parseFailsWithFinalSlashAsSlashWhenSingleLine() throws IOException {
         ParserResult parserResult = parser.parse(Reader.of("@misc{, test = {wired\\}}"));
@@ -1061,9 +1058,7 @@ class BibtexParserTest {
         assertEquals(Optional.of("H'{e}lne Fiaux"), parsedEntry.getField(StandardField.AUTHOR));
     }
 
-    /**
-     * Test for <a href="https://github.com/JabRef/jabref/issues/669">#669</a>
-     */
+    /// Test for <a href="https://github.com/JabRef/jabref/issues/669">#669</a>
     @Test
     void parsePreambleAndEntryWithoutNewLine() throws IOException {
         ParserResult result = parser
@@ -1400,9 +1395,7 @@ class BibtexParserTest {
                 ((ExplicitGroup) root.getChildren().get(2).getGroup()).getLegacyEntryKeys());
     }
 
-    /**
-     * Checks that BibDesk Static Groups are available after parsing the library
-     */
+    /// Checks that BibDesk Static Groups are available after parsing the library
     @Test
     void integrationTestBibDeskStaticGroup() throws IOException {
         ParserResult result = parser.parse(Reader.of("""
@@ -1471,9 +1464,7 @@ class BibtexParserTest {
         assertEquals(List.of(root.getGroup(), firstTestGroupExpected), root.getContainingGroups(db.getEntryByCitationKey("Heyl:2023aa").stream().toList(), false).stream().map(GroupTreeNode::getGroup).toList());
     }
 
-    /**
-     * Checks that BibDesk Smart Groups are available after parsing the library
-     */
+    /// Checks that BibDesk Smart Groups are available after parsing the library
     @Test
     @Disabled("Not yet supported")
     void integrationTestBibDeskSmartGroup() throws IOException {
@@ -1590,9 +1581,7 @@ class BibtexParserTest {
         assertFalse(root.getChildren().get(1).getGroup().contains(db.getEntryByCitationKey("Swain:2023aa").get()));
     }
 
-    /**
-     * Checks that both BibDesk Static Groups and Smart Groups are available after parsing the library
-     */
+    /// Checks that both BibDesk Static Groups and Smart Groups are available after parsing the library
     @Test
     @Disabled("Not yet supported")
     void integrationTestBibDeskMultipleGroup() throws IOException {
@@ -1705,9 +1694,7 @@ class BibtexParserTest {
         assertTrue(root.getChildren().getFirst().getGroup().containsAll(smartGroupEntriesExpected));
     }
 
-    /**
-     * Checks that a TexGroup finally gets the required data, after parsing the library.
-     */
+    /// Checks that a TexGroup finally gets the required data, after parsing the library.
     @Test
     void integrationTestTexGroup() throws IOException {
         String userHostInfo = new UserHostInfo(System.getProperty("user.name"), OS.getHostName()).getUserHostString();
@@ -1824,7 +1811,7 @@ class BibtexParserTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
+    @ValueSource(strings = {
             // single backslash kept
             "C:\\temp\\test",
             "\\\\servername\\path\\to\\file",

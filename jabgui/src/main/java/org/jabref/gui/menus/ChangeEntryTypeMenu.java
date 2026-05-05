@@ -1,5 +1,6 @@
 package org.jabref.gui.menus;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexNonStandardEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
@@ -62,18 +64,22 @@ public class ChangeEntryTypeMenu {
         ObservableList<MenuItem> items = FXCollections.observableArrayList();
 
         if (bibDatabaseContext.isBiblatexMode()) {
-            // Default BibLaTeX - exclude non-standard types to avoid duplicates
-            Set<EntryType> nonStandardEntryTypes = BiblatexNonStandardEntryTypeDefinitions.ALL.stream()
-                                                                                              .<EntryType>map(BibEntryType::getType)
-                                                                                              .collect(Collectors.toSet());
+            // Combine non-standard and APA types for the submenu
+            List<BibEntryType> nonStandardAndApaTypes = new ArrayList<>(BiblatexNonStandardEntryTypeDefinitions.ALL);
+            nonStandardAndApaTypes.addAll(BiblatexAPAEntryTypeDefinitions.ALL);
+
+            // Default BibLaTeX - exclude non-standard and APA types from the main menu
+            Set<EntryType> nonStandardEntryTypes = nonStandardAndApaTypes.stream()
+                                                                         .<EntryType>map(BibEntryType::getType)
+                                                                         .collect(Collectors.toSet());
             Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX);
             Collection<BibEntryType> standardTypes = allTypes.stream()
                                                              .filter(type -> !nonStandardEntryTypes.contains(type.getType()))
                                                              .toList();
             items.addAll(fromEntryTypes(standardTypes, entries, undoManager));
 
-            // Non-standard types
-            createSubMenu(Localization.lang("Non-standard types"), BiblatexNonStandardEntryTypeDefinitions.ALL, entries, undoManager)
+            // Non-standard types (includes BibLaTeX non-standard and APA types)
+            createSubMenu(Localization.lang("Non-standard types"), nonStandardAndApaTypes, entries, undoManager)
                     .ifPresent(subMenu -> items.addAll(
                             new SeparatorMenuItem(),
                             subMenu

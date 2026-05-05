@@ -7,10 +7,8 @@ import org.jabref.logic.openoffice.style.OOStyle;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Representation of a CitationStyle. Stores its name, the file path and the style itself.
- * This is a pure model class. For loading/parsing functionality, see {@link CSLStyleUtils} and {@link CSLStyleLoader}.
- */
+/// Representation of a CitationStyle. Stores its name, the file path and the style itself.
+/// This is a pure model class. For loading/parsing functionality, see {@link CSLStyleUtils} and {@link CSLStyleLoader}.
 public class CitationStyle implements OOStyle {
 
     // Currently, we have support for only one alphanumeric style, so we hardcode it
@@ -36,9 +34,7 @@ public class CitationStyle implements OOStyle {
         this.isInternalStyle = isInternalStyle;
     }
 
-    /**
-     * Creates a new citation style with an auto-determined internal/external state.
-     */
+    /// Creates a new citation style with an auto-determined internal/external state.
     public CitationStyle(@NonNull String filePath, @NonNull String title, @NonNull String shortTitle, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, @NonNull String source) {
         this(filePath, title, shortTitle, isNumericStyle, hasBibliography, usesHangingIndent, source, !Path.of(filePath).isAbsolute());
     }
@@ -63,11 +59,9 @@ public class CitationStyle implements OOStyle {
         return usesHangingIndent;
     }
 
-    /**
-     * Currently, we have support for one alphanumeric CSL style.
-     * There is no tag or field in .csl style files that can be parsed to determine if it is an alphanumeric style.
-     * Thus, to determine alphanumeric nature, we currently manually check for equality with "DIN 1505-2".
-     */
+    /// Currently, we have support for one alphanumeric CSL style.
+    /// There is no tag or field in .csl style files that can be parsed to determine if it is an alphanumeric style.
+    /// Thus, to determine alphanumeric nature, we currently manually check for equality with "DIN 1505-2".
     public boolean isAlphanumericStyle() {
         return ALPHANUMERIC_STYLE.equals(this.title);
     }

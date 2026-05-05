@@ -2,6 +2,8 @@ package org.jabref.logic.citationkeypattern;
 
 import java.util.Optional;
 
+import javafx.beans.property.SimpleObjectProperty;
+
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -14,9 +16,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Bracketed patterns themselves are tested at {@link org.jabref.logic.citationkeypattern.BracketedPatternTest}.
- */
+/// Bracketed patterns themselves are tested at {@link org.jabref.logic.citationkeypattern.BracketedPatternTest}.
 @Execution(ExecutionMode.CONCURRENT)
 class MakeLabelWithDatabaseTest {
 
@@ -47,8 +47,7 @@ class MakeLabelWithDatabaseTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 pattern,
-                "",
-                ',');
+                new SimpleObjectProperty<>(','));
     }
 
     @Test
@@ -80,8 +79,7 @@ class MakeLabelWithDatabaseTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 pattern,
-                "",
-                ',');
+                new SimpleObjectProperty<>(','));
 
         new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Doe2016a"), entry.getCitationKey());
@@ -99,8 +97,7 @@ class MakeLabelWithDatabaseTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 pattern,
-                "",
-                ',');
+                new SimpleObjectProperty<>(','));
 
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(bibtexKeyPattern, database, preferences);
         keyGenerator.generateAndSetKey(entry);
@@ -123,8 +120,7 @@ class MakeLabelWithDatabaseTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 pattern,
-                "",
-                ',');
+                new SimpleObjectProperty<>(','));
 
         new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Doe2016"), entry.getCitationKey());
@@ -142,8 +138,7 @@ class MakeLabelWithDatabaseTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 pattern,
-                "",
-                ',');
+                new SimpleObjectProperty<>(','));
 
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(bibtexKeyPattern, database, preferences);
         keyGenerator.generateAndSetKey(entry);
@@ -444,8 +439,7 @@ class MakeLabelWithDatabaseTest {
                 "3",
                 DEFAULT_UNWANTED_CHARACTERS,
                 pattern,
-                "",
-                ',');
+                new SimpleObjectProperty<>(','));
 
         bibtexKeyPattern.setDefaultValue("[auth][year]");
         entry.setField(StandardField.AUTHOR, "John Doe and Donald Smith and Will Wonder");

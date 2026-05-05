@@ -7,9 +7,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
- */
+/// Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
 class CapitalizeFormatterTest {
 
     private CapitalizeFormatter formatter;

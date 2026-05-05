@@ -137,13 +137,13 @@ public class MarcXmlParser implements Parser {
     private void putIsbn(BibEntry bibEntry, Element datafield) {
         String isbn = getSubfield("a", datafield);
         if (StringUtil.isNullOrEmpty(isbn)) {
-            LOGGER.debug("Empty ISBN recieved");
+            LOGGER.debug("Empty ISBN received");
             return;
         }
 
         int length = isbn.length();
         if (length != 10 && length != 13) {
-            LOGGER.debug("Malformed ISBN recieved, length: {}", length);
+            LOGGER.debug("Malformed ISBN received, length: {}", length);
             return;
         }
 

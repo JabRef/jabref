@@ -14,6 +14,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.importer.ImportEntriesDialog;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.pdf.RuleBasedBibliographyPdfImporter;
 import org.jabref.logic.importer.util.GrobidService;
@@ -29,24 +30,23 @@ import org.jabref.model.entry.field.StandardField;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-/**
- * SIDE EFFECT: Sets the "cites" field of the entry having the linked files
- *
- * <ul>
- *   <li>Mode choice A: online or offline</li>
- *   <li>Mode choice B: complete entry or single file (the latter is not implemented)</li>
- * </ul>
- * <p>
- * The mode is selected by the preferences whether to use Grobid or not.
- */
+/// SIDE EFFECT: Sets the "cites" field of the entry having the linked files
+///
+///
+/// - Mode choice A: online or offline
+/// - Mode choice B: complete entry or single file (the latter is not implemented)
+///
+///
+/// The mode is selected by the preferences whether to use Grobid or not.
 public class ExtractReferencesAction extends SimpleCommand {
+    private static final Pattern COMMENT_NUMBER_PATTERN = Pattern.compile("^\\[(\\d+)\\]");
+
     private final int FILES_LIMIT = 10;
 
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final CliPreferences preferences;
     private final BibEntry entry;
-    private final LinkedFile linkedFile;
 
     private final RuleBasedBibliographyPdfImporter ruleBasedBibliographyPdfImporter;
 
@@ -56,12 +56,10 @@ public class ExtractReferencesAction extends SimpleCommand {
         this(dialogService, stateManager, preferences, null, null);
     }
 
-    /**
-     * Can be used to bind the action on a context menu in the linked file view (future work)
-     *
-     * @param entry      the entry to handle (can be null)
-     * @param linkedFile the linked file (can be null)
-     */
+    /// Can be used to bind the action on a context menu in the linked file view (future work)
+    ///
+    /// @param entry      the entry to handle (can be null)
+    /// @param linkedFile the linked file (can be null)
     private ExtractReferencesAction(@NonNull DialogService dialogService,
                                     @NonNull StateManager stateManager,
                                     @NonNull CliPreferences preferences,
@@ -71,10 +69,9 @@ public class ExtractReferencesAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.entry = entry;
-        this.linkedFile = linkedFile;
         ruleBasedBibliographyPdfImporter = new RuleBasedBibliographyPdfImporter(preferences.getCitationKeyPatternPreferences());
 
-        if (this.linkedFile == null) {
+        if (linkedFile == null) {
             this.executable.bind(
                     ActionHelper.needsEntriesSelected(stateManager)
                                 .and(ActionHelper.hasLinkedFileForSelectedEntries(stateManager))
@@ -159,16 +156,16 @@ public class ExtractReferencesAction extends SimpleCommand {
         }
 
         String cites = getCites(result.getDatabase().getEntries(), currentEntry);
-        currentEntry.setField(StandardField.CITES, cites);
+        UiTaskExecutor.runInJavaFXThread(() -> {
+            currentEntry.setField(StandardField.CITES, cites);
+        });
     }
 
-    /**
-     * Creates the field content for the "cites" field. The field contains the citation keys of the imported entries.
-     * <p>
-     * TODO: Move this part to logic somehow
-     *
-     * @param currentEntry used to create citation keys if the importer did not provide one from the imported entry
-     */
+    /// Creates the field content for the "cites" field. The field contains the citation keys of the imported entries.
+    ///
+    /// TODO: Move this part to logic somehow
+    ///
+    /// @param currentEntry used to create citation keys if the importer did not provide one from the imported entry
     private static String getCites(List<BibEntry> entries, BibEntry currentEntry) {
         StringJoiner cites = new StringJoiner(",");
         int count = 0;
@@ -187,8 +184,7 @@ public class ExtractReferencesAction extends SimpleCommand {
                 String newCitationKey;
                 // Could happen if no author and no year is present
                 // We use the number of the comment field (because there is no other way to get the number reliable)
-                Pattern pattern = Pattern.compile("^\\[(\\d+)\\]");
-                Matcher matcher = pattern.matcher(importedEntry.getField(StandardField.COMMENT).orElse(""));
+                Matcher matcher = COMMENT_NUMBER_PATTERN.matcher(importedEntry.getField(StandardField.COMMENT).orElse(""));
                 if (matcher.hasMatch()) {
                     newCitationKey = sourceCitationKey + "-" + matcher.group(1);
                 } else {

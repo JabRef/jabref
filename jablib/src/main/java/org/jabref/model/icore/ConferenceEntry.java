@@ -1,8 +1,6 @@
 package org.jabref.model.icore;
 
-/**
- * A Conference Entry built from a subset of fields in the ICORE Ranking data
- */
+/// A Conference Entry built from a subset of fields in the ICORE Ranking data
 public record ConferenceEntry(
         String id,
         String title,

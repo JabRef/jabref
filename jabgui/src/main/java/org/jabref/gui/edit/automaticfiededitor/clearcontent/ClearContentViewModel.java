@@ -1,43 +1,43 @@
 package org.jabref.gui.edit.automaticfiededitor.clearcontent;
 
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
+import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel;
+import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorUndoableEdit;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
-public class ClearContentViewModel {
-    public static final int TAB_INDEX = 2;
-    private final StateManager stateManager;
+public class ClearContentViewModel extends AbstractAutomaticFieldEditorTabViewModel {
+    private final List<BibEntry> selectedEntries;
 
-    public ClearContentViewModel(StateManager stateManager) {
-        this.stateManager = stateManager;
+    public ClearContentViewModel(BibDatabase bibDatabase,
+                                 List<BibEntry> selectedEntries,
+                                 NamedCompoundEdit compoundEdit,
+                                 DialogService dialogService,
+                                 StateManager stateManager) {
+        super(bibDatabase, compoundEdit, dialogService, stateManager);
+        this.selectedEntries = new ArrayList<>(selectedEntries);
     }
 
-    public Set<Field> getAllFields() {
-        return FieldFactory.getAllFieldsWithOutInternal();
-    }
-
-    public Set<Field> getSetFieldsOnly() {
-        return stateManager.getSelectedEntries().stream()
-                           .flatMap(entry -> entry.getFields().stream()
-                                                  .filter(f -> entry.getField(f).isPresent() && !entry.getField(f).get().isBlank()))
-                           .collect(Collectors.toCollection(LinkedHashSet::new));
+    public ObservableList<Field> getAllFields() {
+        return FXCollections.observableArrayList(FieldFactory.getAllFieldsWithOutInternal());
     }
 
     public void clearField(Field field) {
-        NamedCompoundEdit edits = new NamedCompoundEdit("CLEAR_SELECTED_FIELD");
-        List<BibEntry> selected = stateManager.getSelectedEntries();
+        AutomaticFieldEditorUndoableEdit edits = new AutomaticFieldEditorUndoableEdit("CLEAR_SELECTED_FIELD");
         int affectedEntriesCount = 0;
-        for (BibEntry entry : selected) {
+        for (BibEntry entry : this.selectedEntries) {
             Optional<String> oldFieldValue = entry.getField(field);
             if (oldFieldValue.isPresent()) {
                 entry.clearField(field)
@@ -45,15 +45,12 @@ public class ClearContentViewModel {
                 affectedEntriesCount++;
             }
         }
+        edits.setAffectedEntries(affectedEntriesCount);
 
         if (edits.hasEdits()) {
             edits.end();
         }
-        stateManager.setLastAutomaticFieldEditorEdit(
-                new LastAutomaticFieldEditorEdit(
-                        affectedEntriesCount,
-                        TAB_INDEX,
-                        edits)
-        );
+
+        addEdit(edits);
     }
 }

@@ -28,7 +28,8 @@ public class IntegrityCheck {
         fieldCheckers = new FieldCheckers(bibDatabaseContext,
                 filePreferences,
                 journalAbbreviationRepository,
-                allowIntegerEdition);
+                allowIntegerEdition,
+                citationKeyPatternPreferences.getUnwantedCharacters());
 
         entryCheckers = new ArrayList<>(List.of(
                 new CitationKeyChecker(),

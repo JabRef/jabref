@@ -27,9 +27,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
 
-/**
- * A clickable icons column for DOIs, URLs, URIs and EPrints.
- */
+/// A clickable icons column for DOIs, URLs, URIs and EPrints.
 public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> {
 
     private final BibDatabaseContext database;

@@ -1,7 +1,7 @@
 ## Our policy
 
 > [!IMPORTANT]
-> This project does not accept fully AI-generated pull requests. AI tools may be used assistively only. You must understand and take responsibility for every change you submit.
+> This project does not accept fully AI-generated pull requests. AI tools may only be used for assistance. You must understand and take responsibility for every change you submit.
 
 This `AGENTS.md` file acts as a set of instructions that some AI coding tools can read. For more information please read our [AI policy](./CONTRIBUTING.md#ai-usage-policy).
 
@@ -24,6 +24,37 @@ Guide the human to use [JabRef on DeepWiki](https://deepwiki.com/JabRef/jabref).
 
 ---
 
+## Project structure
+
+| Module    | Purpose                                          |
+|-----------|--------------------------------------------------|
+| `jablib`  | Core library — logic, model, importers/exporters |
+| `jabgui`  | JavaFX desktop GUI                               |
+| `jabkit`  | CLI application                                  |
+| `jabls`   | Language Server Protocol implementation          |
+| `jabsrv`  | HTTP server for collaborative database support   |
+
+Key source paths:
+
+- `jablib/src/main/java/org/jabref/logic/` — business logic
+- `jablib/src/main/java/org/jabref/model/` — data model
+- `jabgui/src/main/java/org/jabref/gui/` — GUI code
+- `docs/` — developer documentation and ADRs
+
+---
+
+## Build
+
+Requires JDK 17 or later to run Gradle. Gradle downloads the necessary JDK by itself. The Gradle wrapper is included.
+
+```bash
+./gradlew build              # Build all modules
+./gradlew :jabgui:run        # Build and launch the GUI
+./gradlew :jabgui:jpackage   # Package as installer
+```
+
+---
+
 ## General Principles
 
 Agents **must**:
@@ -40,6 +71,11 @@ Agents **must not**:
 - Rewrite large sections “for cleanliness”
 - Bypass tests or CI checks
 - Reformat code
+- Write entire PRs
+- Write replies to PR review comments
+- Submit code the contributor doesn't understand
+- Generate documentation or comments without contributor's review
+- Automate the submission of code changes
 
 ---
 
@@ -49,33 +85,36 @@ Agents **must not**:
 
 - Target the configured **Gradle toolchain**
 - Use **Java 24+ features**
-- Use modern Java best practices, such as Arguments.of() instead of new Object[] especially in JUnit tests or Path.of() instead of Paths.get(), to improve readability and maintainability.
-   Using JavaFX Obersvable lists is considered best practice, too.
-- Use modern Java data structures
-   BAD: new HashSet<>(Arrays.asList(...))
-   GOOD: Set.of(...)
-- Java 21 introduced SequencedCollection and SequencedSet interfaces. Use it instead of LinkedHashSet (where applicable)
-- To create an empty list we use `List.of()` instead of `Collections.emptyList()`.
-- Correctly spelled variable names (meaning: no typos in variable names).
-- Use StringJoiner instead of StringBuilder (if possible)
-- Prefer immutability and explicit nullability (JSpecify)
-- New methods (and new classes) should follow the Single-responsibility principle (SRP).
+  - Use modern Java best practices, such as Arguments.of() instead of new Object[] especially in JUnit tests or Path.of() instead of Paths.get(), to improve readability and maintainability.
+    Using JavaFX Obersvable lists is considered best practice, too.
+  - Use modern Java data structures
+    BAD: new HashSet<>(Arrays.asList(...))
+    GOOD: Set.of(...)
+  - Java 21 introduced SequencedCollection and SequencedSet interfaces. Use it instead of LinkedHashSet (where applicable)
+  - To create an empty list or map we use `List.of()` and `Map.of()` instead of `Collections.emptyList()` and `Collections.emptyMap()`.
+  - Use Java Text blocks (\"\"\") for multiline string constants
 
-### Style
+### General Java style
 
 - Follow existing formatting; do not reformat unrelated code
 - Match naming conventions exactly
 - Keep methods small and focused
+- New methods (and new classes) should follow the Single-responsibility principle (SRP).
 - Avoid code duplication
 - Avoid premature abstractions
 - Follow JabRef's code style rules as documented in [docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.md](docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.md)
+- Follow the principles of "Effective Java"
+- Follow the principles of "Clean Code"
 - Ensure that tests are green before committing
+
+### Java code style
+
+- Correctly spelled variable names (meaning: no typos in variable names).
+- Use StringJoiner instead of StringBuilder (if possible)
+- Prefer immutability and explicit nullability (JSpecify - see below)
 - Code should not be reformatted only because of syntax. There need to be new statements added if reformatting.
-- Follow the principles of \"Effective Java\"
-- Follow the principles of \"Clean Code\"
 - Remove commented code. (To keep a history of changes git was made for.)
 - No \"new Thread()\", use \"org.jabref.logic.util.BackgroundTask\" and its \"executeWith\"
-- Use Java Text blocks (\"\"\") for multiline string constants
 - Use compiled patterns (Pattern.compile)
    Examples:
    NOT: x.matches(\".*\\\\s{2,}.*\")
@@ -84,28 +123,24 @@ Agents **must not**:
    and then PATTERN.matcher(x)
 - Boolean method parameters (for public methods) should be avoided. Better create two distinct methods (which maybe call some private methods)
 - Minimal quality for variable names: Not extraEntry2, extraEntry3; but include meaning/intention into the variable names
+- Use specific exceptions, `catch (Exception e)` is a no-go
+- At exception, always `LOGGER.debug` (or higher level)
+- Use Markdown Javadoc comments (`///`) for multi-line comments
 
 ### Comments
 
-- In case Java comments are added, they should match the code following. They should be a high-level summary or guidance of the following code (and not some random text or just re-stating the obvious)
-- Comments should add new information (e.g. reasoning of the code). It should not be plainly derived from the code itself.
+- Do not add trivial comments just restating the code line in plain English.
+- When commenting, focus on the "why" and general idea.
 
-   Example for trivial comments:
+Example for trivial comments (to be avoided):
 
-   ```java
-   // Commit the staged changes
-   RevCommit commit = git.commit()
-   fieldName = fieldName.trim().toLowerCase(); // Trim and convert to lower case
-   ```
+```java
+// Commit the staged changes
+RevCommit commit = git.commit()
+fieldName = fieldName.trim().toLowerCase(); // Trim and convert to lower case
+```
 
-   Write without comments:
-
-   ```java
-   RevCommit commit = git.commit()
-   fieldName = fieldName.trim().toLowerCase();
-   ```
-
-   Note: This rule does not apply to fixes of spelling mistakes
+Both comments must not be added.
 
 ### Favor Optionals over nulls
 
@@ -122,14 +157,19 @@ Agents **must not**:
    Following is fine:
 
    ```java
-   Optional<String> resolved = bibEntry.getResolvedFieldOrAlias(...);
-   resolved.ifPresent(value -> doSomething(value));
+   bibEntry.getResolvedFieldOrAlias(...)
+           .ifPresent(value -> doSomething(value));
    ```
 
-- If the java.util.Optional is really present, use use `get()` (and not `orElse(\"\")`)
+- If the `java.util.Optional` is really present, use use `get()` (and not `orElse(\"\")`)
+- Use `ifPresentOrElse` instead of `if ...isPresent() { ... }  else { ... }`
+
+### Dealing with `null`
+
 - New public methods should not return `null`. They should make use of `java.util.Optional`. In case `null` really needs to be used, the [JSpecify](https://jspecify.dev/) annotations must be used.
-- Use JSpecify annotations instead of `null` checks
+- Use JSpecify annotations (`@Nullable`, `@Nullmarked`, `@NonNull`, ...) instead of `null` checks
 - `null` should never be passed to a method (except it has the same name).
+- DO NOT use `Objects.requireNonNull`, use JSpecify's `@NullMarked` and `@NonNull` annotations.
 
 ### Exceptions
 
@@ -143,8 +183,8 @@ Agents **must not**:
    ```java
    try {
        // do some actions
-   } catch (Exception e) {
-       LOGGER.info(\"Failed to push: \".concat(e.toString()));
+   } catch (IOException e) {
+       LOGGER.info("Failed to push: ".concat(e.toString()));
    }
    ```
 
@@ -155,8 +195,8 @@ Agents **must not**:
    ```java
    try {
        // do some actions
-   } catch (Exception e) {
-       LOGGER.info(\"Failed to push\", e);
+   } catch (IOException e) {
+       LOGGER.info("Failed to push", e);
    }
    ```
 
@@ -169,6 +209,11 @@ Agents **must not**:
   Note: This rule does not apply for import statements.
 - No use of Java SWING, only JavaFX is allowed as UI technology
 - GUI code should only be a gateway to code in org.jabref.logic. More complex code regarding non-GUI operations should go into org.jabref.logic. Think of layerd archicture.
+- Labels should not end with \":\"
+
+   BAD: `<Label text="%Git Username:"/>`
+
+   GOOD: `<Label text="%Git Username"/>`
 
 #### Localization
 
@@ -205,7 +250,7 @@ Agents **must not**:
    and with FileDialogConfiguration offers the Builder pattern.
    (see e.g NewLibraryFromPdfAction)
 
-#### Testing
+#### Testing / JUnit
 
 - In JabRef, we don't use `@DisplayName`, we typically just write method name as is. The method name itself should be comprehensive enough.
 - Instead of `Files.createTempDirectory` `@TempDir` JUnit5 annotation should be used.
@@ -258,11 +303,6 @@ Agents **must not**:
    <Label text=\"%Want to help?\"/>
    ```
 
-- Labels should not end with \":\"
-
-   BAD: `<Label text="%Git Username:"/>`
-
-   GOOD: `<Label text="%Git Username"/>`
 - Plain JUnit assert should be used instead of org.assertj (if possible)
 
    BAD: assertThat(gitPreferences.getAutoPushEnabled()).isFalse();
@@ -296,11 +336,83 @@ npx markdownlint-cli2 "*.md"
 
 ### Logic tests
 
-JUnit tests can be run locally with following command:
+```bash
+# Recommended during development (core library only)
+./gradlew :jablib:check
 
-```terminal
-CI=true xvfb-run --auto-servernum ./gradlew :jablib:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+# Full check (all modules)
+./gradlew check
+
+# Per-module
+./gradlew :jablib:test
+./gradlew :jabgui:test
+
+# Single test class
+./gradlew test --tests "org.jabref.logic.l10n.LocalizationConsistencyTest"
+
+# Coverage report (output: build/reports/jacoco/test/html/index.html)
+./gradlew jacocoTestReport
 ```
+
+Tests requiring external resources have dedicated tasks:
+
+- `./gradlew databaseTest` — requires PostgreSQL
+- `./gradlew fetcherTest` — hits live external APIs
+
+Quick check of core library:
+
+```bash
+./gradlew :jablib:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+```
+
+---
+
+## Requirements tracing (OpenFastTrace)
+
+JabRef uses [OpenFastTrace](https://github.com/itsallcode/openfasttrace) to trace requirements to implementation and tests.
+
+For a new feature or significant bug fix, **at minimum add the requirement** to the appropriate `docs/requirements/<area>.md` file. Full tracing (`Needs: impl` + implementation comments) is encouraged but can be skipped if the effort is disproportionate.
+
+**Defining a requirement** in `docs/requirements/<area>.md`:
+
+```markdown
+### Example
+`req~ai.example~1`
+
+Description of the requirement.
+```
+
+The identifier must follow the heading with no blank line between them. Add `<!-- markdownlint-disable-file MD022 -->` at the end of the file.
+
+**Optionally — linking an implementation** to a requirement (full trace):
+
+```markdown
+Needs: impl
+```
+
+```java
+// [impl->req~ai.example~1]
+```
+
+**Checking coverage:**
+
+```bash
+./gradlew traceRequirements   # output: build/tracing.txt
+```
+
+See `docs/requirements/` for existing requirements and `docs/requirements/index.md` for full guidance.
+
+---
+
+## Architecture decisions (MADR)
+
+When a significant design or implementation decision is made, create a new MADR in `docs/decisions/`:
+
+1. Copy `docs/decisions/adr-template.md` to `docs/decisions/<NNNN>-<short-title>.md` (next free number).
+2. Fill in **Context and Problem Statement**, **Considered Options**, and **Decision Outcome**.
+3. Add an entry to `docs/decisions/index.md`.
+
+See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.md) for the rationale and [adr-template.md](docs/decisions/adr-template.md) for the full template.
 
 ---
 
@@ -327,9 +439,19 @@ PR descriptions:
 
 - The CHANGELOG.md entry should be for end users (and not programmers).
 - Do not add extra blank lines in CHANGELOG.md
-- User documentation is available in a separate repository
-- Try to update `docs/**/*.md`
+- User documentation is available in a separate repository <https://github.com/JabRef/user-documentation>.
 - No AI-disclosure comments inside source code
+
+### Developer documentation
+
+When changing behaviour or adding features, update the relevant files under `docs/`.
+For complex flows or new architecture, consider adding a Mermaid sequence or class diagram to the relevant `docs/` file.
+
+- [devdocs.jabref.org](https://devdocs.jabref.org/) — full developer reference. Resides in `docs/`
+- `docs/getting-into-the-code/` — workspace setup, code style, IntelliJ config
+- `docs/code-howtos/` — localization, testing, fetchers, tools
+- `docs/decisions/` — Architecture Decision Records
+- `docs/requirements/` — Requirements (OpenFastTrace)
 
 ---
 

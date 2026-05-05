@@ -13,24 +13,15 @@ permissions:
 
 jobs:
   generate-and-pr:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
-      - name: Check out repository
+      - name: Checkout source
         uses: actions/checkout@v6
 
-      - name: Set up JDK
-        uses: actions/setup-java@v5
-        with:
-          distribution: 'corretto'
-          java-version: '24'
-          check-latest: true
-          cache: 'gradle'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+      - uses: ./.github/actions/setup-gradle
 
       - name: Generate aggregated CycloneDX SBOM
-        run: ./gradlew cyclonedxBom
+        run: gradle cyclonedxBom
 
       - name: Copy SBOMs to repository root
         run: |

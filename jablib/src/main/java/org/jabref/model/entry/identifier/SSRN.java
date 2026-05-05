@@ -10,9 +10,7 @@ import org.jabref.logic.util.URLUtil;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Represents an SSRN article, identified by its abstract ID.
- */
+/// Represents an SSRN article, identified by its abstract ID.
 @AllowedToUseLogic("Because URL utility is needed")
 public class SSRN extends EprintIdentifier {
 
@@ -22,13 +20,11 @@ public class SSRN extends EprintIdentifier {
 
     private final Integer abstractId;
 
-    /**
-     * Tries to parse an SSRN identifier
-     *
-     * @param string Either a number or a SSRN url that has the abstract ID in it
-     * @throws NullPointerException     If you pass a null to the constructor
-     * @throws IllegalArgumentException Invalid string passed to the constructor
-     */
+    /// Tries to parse an SSRN identifier
+    ///
+    /// @param string Either a number or a SSRN url that has the abstract ID in it
+    /// @throws NullPointerException     If you pass a null to the constructor
+    /// @throws IllegalArgumentException Invalid string passed to the constructor
     public SSRN(@NonNull String string) {
         string = string.trim();
 
@@ -71,11 +67,9 @@ public class SSRN extends EprintIdentifier {
         return Optional.of(uri);
     }
 
-    /**
-     * Generate the DOI based on the SSRN
-     *
-     * @return a DOI formatted as <code>10.2139/ssrn.[article]</code>
-     */
+    /// Generate the DOI based on the SSRN
+    ///
+    /// @return a DOI formatted as `10.2139/ssrn.[article]`
     public DOI toDoi() {
         return new DOI("10.2139/ssrn." + abstractId);
     }

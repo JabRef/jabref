@@ -1,20 +1,30 @@
 ---
 parent: Code Howtos
 ---
-# JPackage: Creating a binary and debug it
+# jpackage: Creating a binary and debug it
 
 JabRef uses [jpackage](https://docs.oracle.com/en/java/javase/25/jpackage/) to build binary application bundles and installers for Windows, Linux, and macOS. For Gradle, we use the [Java Module Packaging Gradle plugin](https://github.com/gradlex-org/java-module-packaging).
 
-## Build Windows binaries locally
+## Building locally
 
-Preparation: Install [WiX Toolset](https://wixtoolset.org)
+### Preparation on Debian/Ubuntu
+
+Install `rpm` package to enable `.rpm` building: `sudo apt-get install -y rpm`
+
+### Preparation on Windows
+
+Install [WiX Toolset](https://wixtoolset.org)
 
 1. Open administrative shell
 2. Use [Chocolatey](https://chocolatey.org) to install it: `choco install wixtoolset`
 
-Create the installer:
+### Build the installer
 
-`./gradlew -PprojVersion="6.0.50013" -PprojVersionInfo="6.0-ci.13--2025-12-19--c8e5924" :jabgui:jpackage`
+```terminal
+./gradlew -PprojVersion="6.0.50013" -PprojVersionInfo="6.0-ci.13--2025-12-19--c8e5924" :jabgui:jpackage
+```
+
+`jabgui/build/packages/` contains a subdir for the operating systems with the packages.
 
 ## Debugging jpackage installations
 

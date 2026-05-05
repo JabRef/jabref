@@ -9,9 +9,7 @@ import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Cleanup of imported entries to be processable by JabRef
- */
+/// Cleanup of imported entries to be processable by JabRef
 public abstract class ImportCleanup {
 
     private final NormalizeWhitespacesCleanup normalizeWhitespacesCleanup;
@@ -20,9 +18,7 @@ public abstract class ImportCleanup {
         this.normalizeWhitespacesCleanup = new NormalizeWhitespacesCleanup(fieldPreferences);
     }
 
-    /**
-     * Kind of builder for a cleanup
-     */
+    /// Kind of builder for a cleanup
     public static ImportCleanup targeting(BibDatabaseMode mode, @NonNull FieldPreferences fieldPreferences) {
         return switch (mode) {
             case BIBTEX ->
@@ -32,17 +28,13 @@ public abstract class ImportCleanup {
         };
     }
 
-    /**
-     * @implNote Related method: {@link ParserFetcher#doPostCleanup(BibEntry)}
-     */
+    /// @implNote Related method: {@link ParserFetcher#doPostCleanup(BibEntry)}
     public BibEntry doPostCleanup(BibEntry entry) {
         normalizeWhitespacesCleanup.cleanup(entry);
         return entry;
     }
 
-    /**
-     * Performs a format conversion of the given entry collection into the targeted format.
-     */
+    /// Performs a format conversion of the given entry collection into the targeted format.
     public void doPostCleanup(Collection<BibEntry> entries) {
         entries.forEach(this::doPostCleanup);
     }

@@ -12,14 +12,10 @@ import tools.jackson.dataformat.yaml.YAMLFactory;
 import tools.jackson.dataformat.yaml.YAMLMapper;
 import tools.jackson.dataformat.yaml.YAMLWriteFeature;
 
-/**
- * Example use: <code>new StudyYamlParser().parseStudyYamlFile(studyDefinitionFile);</code>
- */
+/// Example use: `new StudyYamlParser().parseStudyYamlFile(studyDefinitionFile);`
 public class StudyYamlParser {
 
-    /**
-     * Parses the given yaml study definition file into a study instance
-     */
+    /// Parses the given yaml study definition file into a study instance
     public Study parseStudyYamlFile(Path studyYamlFile) throws IOException {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         try (InputStream fileInputStream = Files.newInputStream(studyYamlFile)) {
@@ -27,9 +23,7 @@ public class StudyYamlParser {
         }
     }
 
-    /**
-     * Writes the given study instance into a yaml file to the given path
-     */
+    /// Writes the given study instance into a yaml file to the given path
     public void writeStudyYamlFile(Study study, Path studyYamlFile) throws IOException {
 
         ObjectMapper yamlMapper = new YAMLMapper(YAMLFactory.builder()

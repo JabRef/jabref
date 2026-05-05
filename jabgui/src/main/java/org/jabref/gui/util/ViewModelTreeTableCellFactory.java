@@ -11,20 +11,24 @@ import javafx.util.Callback;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.util.strings.StringUtil;
 
-/**
- * Constructs a {@link TreeTableCell} based on the view model of the row and a bunch of specified converter methods.
- *
- * @param <S> view model
- */
+/// Constructs a {@link TreeTableCell} based on the view model of the row and a bunch of specified converter methods.
+///
+/// @param <S> view model
 public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColumn<S, S>, TreeTableCell<S, S>> {
 
     private Callback<S, String> toText;
     private Callback<S, Node> toGraphic;
     private Callback<S, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
     private Callback<S, String> toTooltip;
+    private Callback<S, String> toStyleClass;
 
     public ViewModelTreeTableCellFactory<S> withText(Callback<S, String> toText) {
         this.toText = toText;
+        return this;
+    }
+
+    public ViewModelTreeTableCellFactory<S> withStyleClass(Callback<S, String> toStyleClass) {
+        this.toStyleClass = toStyleClass;
         return this;
     }
 
@@ -75,6 +79,9 @@ public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColum
                     }
                     if (toOnMouseClickedEvent != null) {
                         setOnMouseClicked(toOnMouseClickedEvent.call(viewModel));
+                    }
+                    if (toStyleClass != null) {
+                        getStyleClass().add(toStyleClass.call(viewModel));
                     }
                 }
             }

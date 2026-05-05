@@ -33,9 +33,7 @@ public class ArXivQueryTransformer extends YearRangeByFilteringQueryTransformer 
         return createKeyValuePair("jr", journalTitle);
     }
 
-    /**
-     * Manual testing shows that this works if added as an unfielded term, might lead to false positives
-     */
+    /// Manual testing shows that this works if added as an unfielded term, might lead to false positives
     @Override
     protected String handleYear(String year) {
         startYear = Math.min(startYear, Integer.parseInt(year));

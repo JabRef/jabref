@@ -3,6 +3,7 @@ package org.jabref.logic.cleanup;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.formatter.bibtexfields.NormalizeWhitespaceFormatter;
@@ -23,16 +24,23 @@ public class NormalizeWhitespacesCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
+        return cleanup(entry, Runnable::run);
+    }
+
+    @Override
+    public List<FieldChange> cleanup(BibEntry entry, Consumer<Runnable> mutationScheduler) {
         List<FieldChange> changes = new ArrayList<>();
         for (Field field : entry.getFields()) {
             if (NO_TEXT_FIELDS.contains(field)) {
                 continue;
             }
             // We are sure that the field is set, because this is the assertion of getFields()
+            // Computation runs on the calling (background) thread:
             String oldValue = entry.getField(field).orElseThrow();
             String newValue = formatter.format(oldValue, field);
             if (!newValue.equals(oldValue)) {
-                entry.setField(field, newValue).ifPresent(changes::add);
+                // Only the actual field mutation is dispatched via the scheduler:
+                mutationScheduler.accept(() -> entry.setField(field, newValue).ifPresent(changes::add));
             }
         }
         return changes;

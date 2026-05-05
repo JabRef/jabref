@@ -26,10 +26,8 @@ import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
 
-/**
- * fetches books from https://www.doabooks.org/ through
- * <a href="https://www.doabooks.org/en/resources/metadata-harvesting-and-content-dissemination">their API</a>.
- */
+/// fetches books from https://www.doabooks.org/ through
+/// <a href="https://www.doabooks.org/en/resources/metadata-harvesting-and-content-dissemination">their API</a>.
 public class DOABFetcher implements SearchBasedParserFetcher {
     private static final String SEARCH_URL = "https://directory.doabooks.org/rest/search?";
 

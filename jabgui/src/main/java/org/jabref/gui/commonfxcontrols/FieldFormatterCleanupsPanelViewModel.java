@@ -2,8 +2,10 @@ package org.jabref.gui.commonfxcontrols;
 
 import java.util.Comparator;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -22,6 +24,8 @@ import org.jabref.model.entry.field.FieldTextMapper;
 
 public class FieldFormatterCleanupsPanelViewModel {
 
+    private final BooleanProperty cleanupEnabledManagedProperty = new SimpleBooleanProperty(true);
+    private final BooleanProperty cleanupsDisableProperty = new SimpleBooleanProperty();
     private final ListProperty<FieldFormatterCleanup> cleanupsListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<SelectionModel<FieldFormatterCleanup>> selectedCleanupProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
     private final ListProperty<Field> availableFieldsProperty = new SimpleListProperty<>(new SortedList<>(FXCollections.observableArrayList(FieldFactory.getCommonFields()), Comparator.comparing(FieldTextMapper::getDisplayName)));
@@ -65,6 +69,14 @@ public class FieldFormatterCleanupsPanelViewModel {
 
     public void removeCleanup(FieldFormatterCleanup cleanup) {
         cleanupsListProperty.remove(cleanup);
+    }
+
+    public BooleanProperty cleanupsDisableProperty() {
+        return cleanupsDisableProperty;
+    }
+
+    public BooleanProperty cleanupEnabledManagedProperty() {
+        return cleanupEnabledManagedProperty;
     }
 
     public ListProperty<FieldFormatterCleanup> cleanupsListProperty() {

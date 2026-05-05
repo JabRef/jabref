@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -57,9 +58,10 @@ public class RisImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(reader);
         // Our strategy is to look for the "TY  - *" line.
-        return reader.lines().anyMatch(line -> RECOGNIZED_FORMAT_PATTERN.matcher(line).find());
+        return bufferedReader.lines().anyMatch(line -> RECOGNIZED_FORMAT_PATTERN.matcher(line).find());
     }
 
     @Override
@@ -304,7 +306,7 @@ public class RisImporter extends Importer {
             }
 
             // Remove empty fields
-            fields.entrySet().removeIf(key -> (key.getValue() == null) || key.getValue().trim().isEmpty());
+            fields.entrySet().removeIf(key -> (key.getValue() == null) || key.getValue().isBlank());
 
             // Create final entry
             BibEntry entry = new BibEntry(type);

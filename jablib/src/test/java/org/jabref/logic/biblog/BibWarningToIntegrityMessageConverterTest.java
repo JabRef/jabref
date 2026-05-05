@@ -45,9 +45,7 @@ public class BibWarningToIntegrityMessageConverterTest {
         assertEquals(expectedMessages, actualMessages);
     }
 
-    /**
-     * Skips warnings for entries not found in the database.
-     */
+    /// Skips warnings for entries not found in the database.
     @Test
     void skipsWarningsForMissingEntries() {
         // Arrange: only one entry

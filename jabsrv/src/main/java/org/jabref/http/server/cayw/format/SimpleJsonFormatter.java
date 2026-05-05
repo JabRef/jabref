@@ -28,7 +28,9 @@ public class SimpleJsonFormatter implements CAYWFormatter {
     @Override
     public String format(CAYWQueryParams queryParams, List<CAYWEntry> caywEntries) {
         List<SimpleJson> simpleJsons = caywEntries.stream()
-                                                  .map(caywEntry -> SimpleJson.fromBibEntry(caywEntry.bibEntry()))
+                                                  .map(entry -> SimpleJson.fromBibEntry(
+                                                          entry.bibEntry(),
+                                                          entry.citationProperties()))
                                                   .toList();
         return gson.toJson(simpleJsons);
     }

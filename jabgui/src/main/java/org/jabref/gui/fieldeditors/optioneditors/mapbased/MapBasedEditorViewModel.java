@@ -15,9 +15,7 @@ import com.google.common.collect.BiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * View model for a field editor that shows various options backed by a map.
- */
+/// View model for a field editor that shows various options backed by a map.
 public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MapBasedEditorViewModel.class);

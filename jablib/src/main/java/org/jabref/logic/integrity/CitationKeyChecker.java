@@ -9,9 +9,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 
-/**
- * Currently only checks the key if there is an author, year, and title present.
- */
+/// Currently only checks the key if there is an author, year, and title present.
 public class CitationKeyChecker implements EntryChecker {
 
     @Override

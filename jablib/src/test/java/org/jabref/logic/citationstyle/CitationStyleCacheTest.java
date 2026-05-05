@@ -3,8 +3,8 @@ package org.jabref.logic.citationstyle;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -22,12 +22,6 @@ import static org.mockito.Mockito.when;
 
 @Execution(ExecutionMode.SAME_THREAD)
 class CitationStyleCacheTest {
-
-    private BibEntry bibEntry;
-    private List<BibEntry> entries;
-    private BibDatabase database;
-    private BibDatabaseContext databaseContext;
-    private CitationStyleCache csCache;
 
     @Test
     void getCitationForTest() {

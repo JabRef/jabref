@@ -26,8 +26,7 @@
             </VBox.margin>
         </VBox>
         <CheckBox fx:id="cleanupDeletedFiles" text="Remove links to non existent files" />
+        <CheckBox fx:id="cleanupRemoveXmpMetadata" text="%Remove XMP metadata" />
     </VBox>
-
-    <Button text="%Apply" onAction="#onApply" />
 
 </fx:root>

@@ -1,6 +1,5 @@
 package org.jabref.gui.mergeentries;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -37,15 +36,20 @@ import org.jabref.model.entry.types.EntryType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Class for fetching and merging bibliographic information
- */
+/// Class for fetching and merging bibliographic information
 public class FetchAndMergeEntry {
 
-    // All identifiers listed here should also appear at {@link org.jabref.logic.importer.CompositeIdFetcher#performSearchById}
-    public static List<Field> SUPPORTED_FIELDS = Arrays.asList(StandardField.DOI, StandardField.EPRINT, StandardField.ISBN);
+    // All identifiers listed here should also appear at {@link org.jabref.logic.importer.WebFetchers#getIdBasedFetcherFoIdentifier}
+    public static List<Field> SUPPORTED_FIELDS =
+            List.of(
+                    StandardField.EPRINT, // arXiv
+                    StandardField.DOI,
+                    StandardField.ISBN,
+                    StandardField.ISSN
+            );
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FetchAndMergeEntry.class);
+
     private final DialogService dialogService;
     private final UndoManager undoManager;
     private final StateManager stateManager;
@@ -94,11 +98,11 @@ public class FetchAndMergeEntry {
                                                          .onFailure(exception -> {
                                                              LOGGER.error("Error while fetching bibliographic information", exception);
                                                              if (exception instanceof FetcherClientException) {
-                                                                 dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", idBasedFetcher.getName()), Localization.lang("No data was found for the identifier"));
+                                                                 dialogService.notify(Localization.lang("No data was found for the identifier"));
                                                              } else if (exception instanceof FetcherServerException) {
-                                                                 dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", idBasedFetcher.getName()), Localization.lang("Server not available"));
+                                                                 dialogService.notify(Localization.lang("Server not available"));
                                                              } else {
-                                                                 dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", idBasedFetcher.getName()), Localization.lang("Error occurred %0", exception.getMessage()));
+                                                                 dialogService.notify(Localization.lang("Error while fetching from %0", idBasedFetcher.getName()));
                                                              }
                                                          })
                                                          .executeWith(taskExecutor),
@@ -184,7 +188,7 @@ public class FetchAndMergeEntry {
                       })
                       .onFailure(exception -> {
                           LOGGER.error("Error while fetching entry with {} ", fetcher.getName(), exception);
-                          dialogService.showErrorDialogAndWait(Localization.lang("Error while fetching from %0", fetcher.getName()), exception);
+                          dialogService.notify(Localization.lang("Error while fetching from %0", fetcher.getName()));
                       })
                       .executeWith(taskExecutor);
     }

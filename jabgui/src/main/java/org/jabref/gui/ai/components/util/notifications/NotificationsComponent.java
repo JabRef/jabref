@@ -7,10 +7,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 
-/**
- * A {@link ScrollPane} for displaying AI chat {@link Notification}s. See the documentation of {@link Notification} for
- * more details.
- */
+/// A {@link ScrollPane} for displaying AI chat {@link Notification}s. See the documentation of {@link Notification} for
+/// more details.
 public class NotificationsComponent extends ScrollPane {
     private static final double SCROLL_PANE_MAX_HEIGHT = 300;
 

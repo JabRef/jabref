@@ -19,7 +19,7 @@ import org.jabref.model.entry.field.StandardField;
 import com.airhacks.afterburner.views.ViewLoader;
 import org.jspecify.annotations.NonNull;
 
-public class CleanupFileRelatedPanel extends VBox {
+public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
 
     @FXML private Label cleanupRenamePdfLabel;
 
@@ -29,6 +29,7 @@ public class CleanupFileRelatedPanel extends VBox {
     @FXML private CheckBox cleanupRenamePdfOnlyRelativePaths;
     @FXML private CheckBox cleanupDeletedFiles;
     @FXML private CheckBox cleanupUpgradeExternalLinks;
+    @FXML private CheckBox cleanupRemoveXmpMetadata;
 
     private final CleanupFileViewModel viewModel;
     private final CleanupDialogViewModel dialogViewModel;
@@ -76,13 +77,11 @@ public class CleanupFileRelatedPanel extends VBox {
         cleanupRenamePdfOnlyRelativePaths.selectedProperty().bindBidirectional(viewModel.renamePdfOnlyRelativeSelected);
         cleanupDeletedFiles.selectedProperty().bindBidirectional(viewModel.deleteFilesSelected);
         cleanupUpgradeExternalLinks.selectedProperty().bindBidirectional(viewModel.upgradeLinksSelected);
+        cleanupRemoveXmpMetadata.selectedProperty().bindBidirectional(viewModel.removeXmpMetadataSelected);
     }
 
-    @FXML
-    private void onApply() {
+    public CleanupTabSelection getSelectedTab() {
         EnumSet<CleanupPreferences.CleanupStep> selectedJobs = viewModel.getSelectedJobs();
-        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(CleanupFileViewModel.FILE_RELATED_JOBS, selectedJobs);
-        dialogViewModel.apply(selectedTab);
-        getScene().getWindow().hide();
+        return CleanupTabSelection.ofJobs(CleanupFileViewModel.FILE_RELATED_JOBS, selectedJobs);
     }
 }

@@ -236,11 +236,9 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         return true;
     }
 
-    /**
-     * Check the connection by using the given url. Used for validating the http proxy. The checking result will be appearing when request finished.
-     * The checking result could be either success or fail.
-     * If fail, the cause will be displayed.
-     */
+    /// Check the connection by using the given url. Used for validating the http proxy. The checking result will be appearing when request finished.
+    /// The checking result could be either success or fail.
+    /// If fail, the cause will be displayed.
     public void checkConnection() {
         final String connectionSuccessText = Localization.lang("Connection successful!");
         final String connectionFailedText = Localization.lang("Connection failed!");

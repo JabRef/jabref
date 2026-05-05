@@ -4,9 +4,7 @@ import java.util.Locale;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-/**
- * Convert the contents to lower case.
- */
+/// Convert the contents to lower case.
 public class ToLowerCase implements LayoutFormatter {
 
     @Override

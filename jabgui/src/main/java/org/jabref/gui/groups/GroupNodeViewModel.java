@@ -37,10 +37,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.AutomaticDateGroup;
+import org.jabref.model.groups.AutomaticEntryTypeGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.DateGroup;
+import org.jabref.model.groups.EntryTypeGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
@@ -257,11 +259,9 @@ public class GroupNodeViewModel {
         return groupNode;
     }
 
-    /**
-     * Gets invoked if an entry in the current database changes.
-     *
-     * @implNote Search groups are updated in {@link SearchIndexListener}.
-     */
+    /// Gets invoked if an entry in the current database changes.
+    ///
+    /// @implNote Search groups are updated in {@link SearchIndexListener}.
     private void onDatabaseChanged(ListChangeListener.Change<? extends BibEntry> change) {
         if (groupNode.getGroup() instanceof SearchGroup) {
             return;
@@ -347,13 +347,11 @@ public class GroupNodeViewModel {
         return groupNode.getChildByPath(pathToSource).map(this::toViewModel);
     }
 
-    /**
-     * Decides if the content stored in the given {@link Dragboard} can be dropped on the given target row. Currently, the following sources are allowed:
-     * <ul>
-     *     <li>another group (will be added as subgroup on drop)</li>
-     *     <li>entries if the group implements {@link GroupEntryChanger} (will be assigned to group on drop)</li>
-     * </ul>
-     */
+    /// Decides if the content stored in the given {@link Dragboard} can be dropped on the given target row. Currently, the following sources are allowed:
+    ///
+    /// - another group (will be added as subgroup on drop)
+    /// - entries if the group implements {@link GroupEntryChanger} (will be assigned to group on drop)
+    ///
     public boolean acceptableDrop(Dragboard dragboard) {
         // TODO: we should also check isNodeDescendant
         boolean canDropOtherGroup = dragboard.hasContent(DragAndDropDataFormats.GROUP);
@@ -466,6 +464,10 @@ public class GroupNodeViewModel {
             return false;
         } else if (group instanceof DateGroup) {
             return false;
+        } else if (group instanceof AutomaticEntryTypeGroup) {
+            return false;
+        } else if (group instanceof EntryTypeGroup) {
+            return false;
         } else {
             throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
         }
@@ -481,6 +483,8 @@ public class GroupNodeViewModel {
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
                  AutomaticDateGroup _,
+                 AutomaticEntryTypeGroup _,
+                 EntryTypeGroup _,
                  TexGroup _ ->
                     true;
             case KeywordGroup _ ->
@@ -509,7 +513,9 @@ public class GroupNodeViewModel {
             case AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
                  AutomaticDateGroup _,
-                 DateGroup _ ->
+                 DateGroup _,
+                 AutomaticEntryTypeGroup _,
+                 EntryTypeGroup _ ->
                     false;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
@@ -534,7 +540,9 @@ public class GroupNodeViewModel {
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
                  AutomaticDateGroup _,
+                 AutomaticEntryTypeGroup _,
                  DateGroup _,
+                 EntryTypeGroup _,
                  TexGroup _ ->
                     true;
             case KeywordGroup _ ->
@@ -554,13 +562,15 @@ public class GroupNodeViewModel {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
             case AllEntriesGroup _,
-                 DateGroup _ ->
+                 DateGroup _,
+                 EntryTypeGroup _ ->
                     false;
             case ExplicitGroup _,
                  SearchGroup _,
                  AutomaticKeywordGroup _,
                  AutomaticPersonsGroup _,
                  AutomaticDateGroup _,
+                 AutomaticEntryTypeGroup _,
                  TexGroup _ ->
                     true;
             case KeywordGroup _ ->
@@ -577,19 +587,17 @@ public class GroupNodeViewModel {
         };
     }
 
-    /**
-     * Returns whether the given entry should be considered part of this group
-     * for the purpose of the groups sidebar (hit counter, highlighting, etc.).
-     *
-     * We cannot simply use groupNode.matches(entry) here. That only checks
-     * the rule of this single group and ignores the configured hierarchy type and
-     * any child groups created in the view model (for example automatic subgroups)
-     *
-     * This method applies the hierarchy type:
-     * INDEPENDENT: match this group only,
-     * INCLUDING: match this group or any child group,
-     * REFINING: match this group and all ancestor groups.
-     */
+    /// Returns whether the given entry should be considered part of this group
+    /// for the purpose of the groups sidebar (hit counter, highlighting, etc.).
+    ///
+    /// We cannot simply use groupNode.matches(entry) here. That only checks
+    /// the rule of this single group and ignores the configured hierarchy type and
+    /// any child groups created in the view model (for example automatic subgroups)
+    ///
+    /// This method applies the hierarchy type:
+    /// INDEPENDENT: match this group only,
+    /// INCLUDING: match this group or any child group,
+    /// REFINING: match this group and all ancestor groups.
     private boolean isMatchEffective(GroupNodeViewModel vm, BibEntry entry) {
         GroupTreeNode node = vm.groupNode;
         return switch (node.getGroup().getHierarchicalContext()) {
@@ -608,7 +616,7 @@ public class GroupNodeViewModel {
                 if (!node.matches(entry)) {
                     yield false;
                 }
-                var parent = node.getParent();
+                Optional<GroupTreeNode> parent = node.getParent();
                 while (parent.isPresent()) {
                     if (!parent.get().matches(entry)) {
                         yield false;
@@ -635,19 +643,21 @@ public class GroupNodeViewModel {
         @Subscribe
         public void listen(IndexAddedOrUpdatedEvent event) {
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
-                stateManager.getIndexManager(databaseContext).ifPresent(indexManager -> BackgroundTask.wrap(() -> {
-                    for (BibEntry entry : event.entries()) {
-                        searchGroup.updateMatches(entry, indexManager.isEntryMatched(entry, searchGroup.getSearchQuery()));
-                    }
-                }).onFinished(() -> {
-                    for (BibEntry entry : event.entries()) {
-                        if (GroupNodeViewModel.this.isMatchEffective(GroupNodeViewModel.this, entry)) {
-                            matchedEntries.add(entry.getId());
-                        } else {
-                            matchedEntries.remove(entry.getId());
-                        }
-                    }
-                }).executeWith(taskExecutor));
+                stateManager.getIndexManager(databaseContext).ifPresent(indexManager ->
+                        BackgroundTask.wrap(() -> {
+                            for (BibEntry entry : event.entries()) {
+                                searchGroup.updateMatches(entry, indexManager.isEntryMatched(entry, searchGroup.getSearchQuery()));
+                            }
+                        }).onFinished(() -> {
+                            for (BibEntry entry : event.entries()) {
+                                if (GroupNodeViewModel.this.isMatchEffective(GroupNodeViewModel.this, entry)) {
+                                    matchedEntries.add(entry.getId());
+                                } else {
+                                    matchedEntries.remove(entry.getId());
+                                }
+                            }
+                            databaseContext.getMetaData().groupsBinding().invalidate();
+                        }).executeWith(taskExecutor));
             }
         }
 
@@ -658,6 +668,7 @@ public class GroupNodeViewModel {
                     searchGroup.updateMatches(entry, false);
                     matchedEntries.remove(entry.getId());
                 }
+                databaseContext.getMetaData().groupsBinding().invalidate();
             }
         }
 

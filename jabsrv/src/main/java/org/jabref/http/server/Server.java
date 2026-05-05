@@ -13,6 +13,8 @@ import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.cayw.CAYWResource;
 import org.jabref.http.server.cayw.format.FormatterService;
+import org.jabref.http.server.resources.EntriesResource;
+import org.jabref.http.server.resources.EntryResource;
 import org.jabref.http.server.resources.LibrariesResource;
 import org.jabref.http.server.resources.LibraryResource;
 import org.jabref.http.server.resources.MapResource;
@@ -21,6 +23,7 @@ import org.jabref.http.server.resources.callback.CallbackResource;
 import org.jabref.http.server.resources.command.CommandResource;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.citedrive.OAuthSessionRegistry;
+import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 
@@ -32,9 +35,12 @@ import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
     private final CliPreferences preferences;
@@ -48,7 +54,7 @@ public class Server {
     /// Entry point for the CLI
     public HttpServer run(List<Path> files, URI uri) {
         List<Path> filesToServeList;
-        if (files == null || files.isEmpty()) {
+        if (files.isEmpty()) {
             LOGGER.debug("No library available to serve, serving the demo library...");
             // Server.class.getResource("...") is always null here, thus trying relative path
             // Path bibPath = Path.of(Server.class.getResource("http-server-demo.bib").toURI());
@@ -88,11 +94,19 @@ public class Server {
 
     /// Entry point for the GUI
     public HttpServer run(SrvStateManager srvStateManager, URI uri) {
+        return run(srvStateManager, null, uri);
+    }
+
+    /// Entry point for the GUI with UiMessageHandler
+    public HttpServer run(SrvStateManager srvStateManager, @Nullable UiMessageHandler uiMessageHandler, URI uri) {
         FilesToServe filesToServe = new FilesToServe();
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
         ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, "statemanager", SrvStateManager.class);
+        if (uiMessageHandler != null) {
+            ServiceLocatorUtilities.addOneConstant(serviceLocator, uiMessageHandler, "uimessagehandler", UiMessageHandler.class);
+        }
 
         return startServer(serviceLocator, uri);
     }
@@ -101,7 +115,7 @@ public class Server {
         // Add remaining services - the difference between CLI and GUI is the SrvStateManager added before
         ServiceLocatorUtilities.addOneConstant(serviceLocator, new FormatterService());
         ServiceLocatorUtilities.addOneConstant(serviceLocator, oAuthSessionRegistry);
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, preferences);
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, preferences, "preferences", CliPreferences.class);
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
 
         // see https://stackoverflow.com/a/33794265/873282
@@ -114,11 +128,13 @@ public class Server {
         resourceConfig.register(LibrariesResource.class);
         resourceConfig.register(LibraryResource.class);
         resourceConfig.register(MapResource.class);
+        resourceConfig.register(EntriesResource.class);
+        resourceConfig.register(EntryResource.class);
 
         // Other resources
-        resourceConfig.register(CAYWResource.class);
-        resourceConfig.register(CallbackResource.class);
         resourceConfig.register(CommandResource.class);
+        resourceConfig.register(CallbackResource.class);
+        resourceConfig.register(CAYWResource.class);
 
         // Supporting classes
         resourceConfig.register(CORSFilter.class);

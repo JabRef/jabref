@@ -150,14 +150,16 @@ public class GlobalSearchBar extends HBox {
 
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (keyBindingRepository.matches(event, KeyBinding.CLEAR_SEARCH)) {
-                searchField.clear();
-                if (searchType == SearchType.NORMAL_SEARCH) {
-                    LibraryTab currentLibraryTab = tabContainer.getCurrentLibraryTab();
-                    if (currentLibraryTab != null) {
-                        currentLibraryTab.getMainTable().requestFocus();
+                if (!searchField.getText().isEmpty()) {
+                    searchField.clear();
+                    if (searchType == SearchType.NORMAL_SEARCH) {
+                        LibraryTab currentLibraryTab = tabContainer.getCurrentLibraryTab();
+                        if (currentLibraryTab != null) {
+                            currentLibraryTab.getMainTable().requestFocus();
+                        }
                     }
+                    event.consume();
                 }
-                event.consume();
             }
         });
 
@@ -363,9 +365,7 @@ public class GlobalSearchBar extends HBox {
         searchButton.visibleProperty().bind(searchField.editableProperty());
     }
 
-    /**
-     * Focuses the search field if it is not focused.
-     */
+    /// Focuses the search field if it is not focused.
     @Override
     public void requestFocus() {
         if (!searchField.isFocused()) {
@@ -401,9 +401,7 @@ public class GlobalSearchBar extends HBox {
         }
     }
 
-    /**
-     * The popup has private access in {@link AutoCompletionBinding}, so we use reflection to access it.
-     */
+    /// The popup has private access in {@link AutoCompletionBinding}, so we use reflection to access it.
     @SuppressWarnings("unchecked")
     private <T> AutoCompletePopup<T> getPopup(AutoCompletionBinding<T> autoCompletionBinding) {
         try {

@@ -36,10 +36,8 @@ import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
 
-/**
- * This class controls the user interface of the journal abbreviations dialog. The UI elements and their layout are
- * defined in the FXML file.
- */
+/// This class controls the user interface of the journal abbreviations dialog. The UI elements and their layout are
+/// defined in the FXML file.
 public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAbbreviationsTabViewModel> implements PreferencesTab {
 
     @FXML private Label loadingLabel;

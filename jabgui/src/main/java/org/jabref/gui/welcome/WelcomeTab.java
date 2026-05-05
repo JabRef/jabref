@@ -31,8 +31,8 @@ import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.frame.FileHistoryMenu;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.NewDatabaseAction;
+import org.jabref.gui.importer.actions.ImportCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -241,7 +241,7 @@ public class WelcomeTab extends Tab {
         Hyperlink newLibraryLink = createActionLink(Localization.lang("New empty library"),
                 () -> new NewDatabaseAction(tabContainer, preferences).execute());
 
-        Hyperlink openLibraryLink = createActionLink(Localization.lang("Open library"),
+        Hyperlink openLibraryLink = createActionLink(Localization.lang("Open library..."),
                 () -> new OpenDatabaseAction(tabContainer, preferences, aiService, dialogService,
                         stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager,
                         taskExecutor).execute());

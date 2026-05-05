@@ -31,10 +31,8 @@ class FormatterTest {
                         List.of(), List.of()));
     }
 
-    /**
-     * When a new formatter is added by copy and pasting another formatter, it may happen that the <code>getKey()</code>
-     * method is not adapted. This results in duplicate keys, which this test tests for.
-     */
+    /// When a new formatter is added by copy and pasting another formatter, it may happen that the `getKey()`
+    /// method is not adapted. This results in duplicate keys, which this test tests for.
     @Test
     void allFormatterKeysAreUnique() {
         // idea for uniqueness checking by https://stackoverflow.com/a/44032568/873282

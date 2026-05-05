@@ -29,6 +29,7 @@ class MedlineFetcherTest {
     private static final Optional<String> API_KEY = Optional.of(new BuildInfo().medlineApiKey);
 
     private MedlineFetcher fetcher;
+
     private BibEntry entryWijedasa;
     private BibEntry entryEndharti;
     private BibEntry bibEntryIchikawa;

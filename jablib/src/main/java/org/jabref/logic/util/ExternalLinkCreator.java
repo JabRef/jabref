@@ -34,12 +34,10 @@ public class ExternalLinkCreator {
 
     // Note: We use configurable templates due to the requirement stated at https://github.com/JabRef/jabref/issues/12268#issuecomment-2523108605
 
-    /**
-     * Get a URL to the search results of Google Scholar for the BibEntry's title
-     *
-     * @param entry The entry to search for. Expects the BibEntry's title to be set for a successful return.
-     * @return The URL if it was successfully created
-     */
+    /// Get a URL to the search results of Google Scholar for the BibEntry's title
+    ///
+    /// @param entry The entry to search for. Expects the BibEntry's title to be set for a successful return.
+    /// @return The URL if it was successfully created
     public Optional<String> getGoogleScholarSearchURL(BibEntry entry) {
         return entry.getField(StandardField.TITLE).flatMap(title -> {
             String baseUrl = importerPreferences.getSearchEngineUrlTemplates()
@@ -49,12 +47,10 @@ public class ExternalLinkCreator {
         });
     }
 
-    /**
-     * Get a URL to the search results of Semantic Scholar for the BibEntry's title
-     *
-     * @param entry The entry to search for. Expects the BibEntry's title to be set for a successful return.
-     * @return The URL if it was successfully created
-     */
+    /// Get a URL to the search results of Semantic Scholar for the BibEntry's title
+    ///
+    /// @param entry The entry to search for. Expects the BibEntry's title to be set for a successful return.
+    /// @return The URL if it was successfully created
     public Optional<String> getSemanticScholarSearchURL(BibEntry entry) {
         return entry.getField(StandardField.TITLE).flatMap(title -> {
             String baseUrl = importerPreferences.getSearchEngineUrlTemplates()
@@ -64,12 +60,10 @@ public class ExternalLinkCreator {
         });
     }
 
-    /**
-     * Get a URL to the search results of ShortScience for the BibEntry's title
-     *
-     * @param entry The entry to search for. Expects the BibEntry's title to be set for a successful return.
-     * @return The URL if it was successfully created
-     */
+    /// Get a URL to the search results of ShortScience for the BibEntry's title
+    ///
+    /// @param entry The entry to search for. Expects the BibEntry's title to be set for a successful return.
+    /// @return The URL if it was successfully created
     public Optional<String> getShortScienceSearchURL(BibEntry entry) {
         return entry.getField(StandardField.TITLE).flatMap(title -> {
             String baseUrl = importerPreferences.getSearchEngineUrlTemplates()
@@ -79,17 +73,15 @@ public class ExternalLinkCreator {
         });
     }
 
-    /**
-     * Builds a search URL using either template replacement or query parameters
-     *
-     * @param baseUrl The custom or default base URL
-     * @param defaultUrl The fallback default URL
-     * @param title The title to search for
-     * @param author Optional author to include in search (null if not present)
-     * @param serviceName Name of the service for logging
-     * @param addAuthorIndex formats all authors as separate keys with indexing ("author[0]", "author[1]", etc.)
-     * @return Optional containing the constructed URL, or empty if construction failed
-     */
+    /// Builds a search URL using either template replacement or query parameters
+    ///
+    /// @param baseUrl        The custom or default base URL
+    /// @param defaultUrl     The fallback default URL
+    /// @param title          The title to search for
+    /// @param author         Optional author to include in search (null if not present)
+    /// @param serviceName    Name of the service for logging
+    /// @param addAuthorIndex formats all authors as separate keys with indexing ("author[0]", "author[1]", etc.)
+    /// @return Optional containing the constructed URL, or empty if construction failed
     private Optional<String> buildSearchUrl(String baseUrl, String defaultUrl, String title, @Nullable String author, String serviceName, boolean addAuthorIndex) {
         // Converting LaTeX-formatted titles (e.g., containing braces) to plain Unicode to ensure compatibility with ShortScience's search URL.
         // LatexToUnicodeAdapter.format() is being used because it attempts to parse LaTeX, but gracefully degrades to a normalized title on failure.
@@ -137,11 +129,9 @@ public class ExternalLinkCreator {
         }
     }
 
-    /**
-     * Builds a URL using query parameters (fallback method).
-     * <p>
-     * The parameter addAuthorIndex is used for Semantic Scholar service because it does not understand "author=XYZ", but it uses "author[0]=XYZ&author[1]=ABC".
-     */
+    /// Builds a URL using query parameters (fallback method).
+    ///
+    /// The parameter addAuthorIndex is used for Semantic Scholar service because it does not understand "author=XYZ", but it uses "author[0]=XYZ&author[1]=ABC".
     private Optional<String> buildUrlWithQueryParams(String baseUrl, String title, @Nullable String author, String serviceName, boolean addAuthorIndex) {
         try {
             URIBuilder uriBuilder = new URIBuilder(baseUrl);

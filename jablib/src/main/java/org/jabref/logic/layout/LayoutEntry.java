@@ -309,7 +309,7 @@ class LayoutEntry {
 
                 if (fieldText == null) {
                     if ((i + 1) < layoutEntries.size()) {
-                        if (layoutEntries.get(i + 1).doLayout(bibtex, database).trim().isEmpty()) {
+                        if (layoutEntries.get(i + 1).doLayout(bibtex, database).isBlank()) {
                             i++;
                             previousSkipped = true;
                             continue;
@@ -341,11 +341,9 @@ class LayoutEntry {
         }
     }
 
-    /**
-     * Do layout for general formatters (no bibtex-entry fields).
-     *
-     * @param databaseContext Bibtex Database
-     */
+    /// Do layout for general formatters (no bibtex-entry fields).
+    ///
+    /// @param databaseContext Bibtex Database
     public String doLayout(BibDatabaseContext databaseContext, Charset encoding) {
         switch (type) {
             case LayoutHelper.IS_LAYOUT_TEXT:
@@ -570,9 +568,7 @@ class LayoutEntry {
         };
     }
 
-    /**
-     * Return an array of LayoutFormatters found in the given formatterName string (in order of appearance).
-     */
+    /// Return an array of LayoutFormatters found in the given formatterName string (in order of appearance).
     private List<LayoutFormatter> getOptionalLayout(String formatterName) {
         List<List<String>> formatterStrings = parseMethodsCalls(formatterName);
         List<LayoutFormatter> results = new ArrayList<>(formatterStrings.size());

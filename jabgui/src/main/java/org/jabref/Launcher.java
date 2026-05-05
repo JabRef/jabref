@@ -43,6 +43,7 @@ import org.tinylog.configuration.Configuration;
 /// - Start the JavaFX application
 public class Launcher {
     private static Logger LOGGER;
+    private static final BuildInfo BUILD_INFO = new BuildInfo();
 
     public enum MultipleInstanceAction {
         CONTINUE,
@@ -50,11 +51,12 @@ public class Launcher {
         FOCUS
     }
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         try {
             initLogging(args);
+            LOGGER.info("Starting JabRef v{}", BUILD_INFO.version);
 
-            Injector.setModelOrService(BuildInfo.class, new BuildInfo());
+            Injector.setModelOrService(BuildInfo.class, BUILD_INFO);
 
             final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();
 
@@ -74,7 +76,7 @@ public class Launcher {
                 } else if (instanceAction == MultipleInstanceAction.FOCUS) {
                     // Send focus command to running instance
                     RemotePreferences remotePreferences = preferences.getRemotePreferences();
-                    RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
+                    RemoteClient remoteClient = new RemoteClient(remotePreferences.getRemoteServerPort());
                     remoteClient.sendFocus();
                     systemExit();
                 }
@@ -103,10 +105,8 @@ public class Launcher {
         }
     }
 
-    /**
-     * This needs to be called as early as possible. After the first log write, it
-     * is not possible to alter the log configuration programmatically anymore.
-     */
+    /// This needs to be called as early as possible. After the first log write, it
+    /// is not possible to alter the log configuration programmatically anymore.
     public static void initLogging(String[] args) {
         // routeLoggingToSlf4J
         SLF4JBridgeHandler.removeHandlersForRootLogger();
@@ -135,7 +135,7 @@ public class Launcher {
 
         // addLogToDisk
         // We cannot use `Injector.instantiateModelOrService(BuildInfo.class).version` here, because this initializes logging
-        Path directory = Directories.getLogDirectory(new BuildInfo().version);
+        Path directory = Directories.getLogDirectory(BUILD_INFO.version);
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
@@ -167,15 +167,13 @@ public class Launcher {
         System.exit(0);
     }
 
-    /**
-     * @return MultipleInstanceAction: CONTINUE if JabRef should continue starting up, SHUTDOWN if it should quit, FOCUS if it should focus the existing instance.
-     */
+    /// @return MultipleInstanceAction: CONTINUE if JabRef should continue starting up, SHUTDOWN if it should quit, FOCUS if it should focus the existing instance.
     private static MultipleInstanceAction handleMultipleAppInstances(String[] args, RemotePreferences remotePreferences) {
         LOGGER.trace("Checking for remote handling...");
 
-        if (remotePreferences.useRemoteServer()) {
+        if (remotePreferences.shouldEnableRemoteServer()) {
             // Try to contact already running JabRef
-            RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
+            RemoteClient remoteClient = new RemoteClient(remotePreferences.getRemoteServerPort());
             if (remoteClient.ping()) {
                 LOGGER.debug("Pinging other instance succeeded.");
                 if (args.length == 0) {

@@ -34,8 +34,7 @@ public interface WindowResolver {
 
     /// Creates a resolver that finds a window that's not the window specified.
     ///
-    /// @param window the window to exclude from the search. Usually this is the current
-    ///                             window.
+    /// @param window the window to exclude from the search. Usually this is the current window.
     /// @return a resolver that finds any window except the specified one
     static WindowResolver not(Window window) {
         return () -> {

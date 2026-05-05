@@ -33,7 +33,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -657,15 +656,6 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void writeThrowsErrorIfFieldContainsUnbalancedBraces() {
-        BibEntry entry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.NOTE, "some text with unbalanced { braces")
-                .withChanged(true);
-
-        assertThrows(IOException.class, () -> bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX));
-    }
-
-    @Test
     void roundTripWithPrecedingCommentTest() throws Exception {
         String bibtexEntry = """
                 % Some random comment that should stay here
@@ -846,11 +836,9 @@ class BibEntryWriterTest {
         assertEquals(expected, BibEntryWriter.getLengthOfLongestFieldName(entry));
     }
 
-    /**
-     * Provides the first entry, from the database, built of the given textual representation.
-     * <p>
-     * Instance import preferences object used.
-     */
+    /// Provides the first entry, from the database, built of the given textual representation.
+    ///
+    /// Instance import preferences object used.
     private BibEntry firstEntryFrom(final String bibContentText) throws JabRefException {
         return BibDatabaseContext
                 .of(bibContentText, importFormatPreferences)

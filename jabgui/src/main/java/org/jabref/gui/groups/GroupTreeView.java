@@ -32,6 +32,7 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
@@ -55,6 +56,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -89,6 +91,11 @@ public class GroupTreeView extends BorderPane {
     private static final PseudoClass PSEUDOCLASS_ROOTELEMENT = PseudoClass.getPseudoClass("root");
     private static final PseudoClass PSEUDOCLASS_SUBELEMENT = PseudoClass.getPseudoClass("sub"); // > 1 deep
 
+    private static final double NUMBER_COL_WIDTH = 60D;
+    private static final double EXPANSION_COL_WIDTH = 20D;
+    private static final double ADD_SUBGROUP_COL_WIDTH = 28D;
+    private static final double SCROLLBAR_WIDTH = 15D;
+
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final AiService aiService;
@@ -104,6 +111,7 @@ public class GroupTreeView extends BorderPane {
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> expansionNodeColumn;
+    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> addSubgroupColumn;
     private CustomTextField searchField;
     private GroupTreeViewModel viewModel;
     private CustomLocalDragboard localDragboard;
@@ -117,9 +125,7 @@ public class GroupTreeView extends BorderPane {
     private double lowerBorder;
     private double baseFactor;
 
-    /**
-     * Note: This panel is deliberately not created in fxml, since parsing equivalent fxml takes about 500 msecs
-     */
+    /// Note: This panel is deliberately not created in fxml, since parsing equivalent fxml takes about 500 msecs
     public GroupTreeView(StateManager stateManager,
                          BibEntryTypesManager entryTypesManager,
                          GuiPreferences preferences,
@@ -145,7 +151,7 @@ public class GroupTreeView extends BorderPane {
     }
 
     private void createNodes() {
-        searchField = SearchTextField.create(keyBindingRepository);
+        searchField = SearchTextField.create(keyBindingRepository, IconTheme.JabRefIcons.FILTER);
         searchField.setPromptText(Localization.lang("Filter groups..."));
         searchField.setId("groupFilterBar");
         this.setTop(searchField);
@@ -155,23 +161,30 @@ public class GroupTreeView extends BorderPane {
         mainColumn.setResizable(true);
         numberColumn = new TreeTableColumn<>();
         numberColumn.getStyleClass().add("numberColumn");
-        numberColumn.setMinWidth(60d);
-        numberColumn.setMaxWidth(60d);
-        numberColumn.setPrefWidth(60d);
+        numberColumn.setMinWidth(NUMBER_COL_WIDTH);
+        numberColumn.setMaxWidth(NUMBER_COL_WIDTH);
+        numberColumn.setPrefWidth(NUMBER_COL_WIDTH);
         numberColumn.setResizable(false);
         expansionNodeColumn = new TreeTableColumn<>();
         expansionNodeColumn.getStyleClass().add("expansionNodeColumn");
-        expansionNodeColumn.setMaxWidth(20d);
-        expansionNodeColumn.setMinWidth(20d);
-        expansionNodeColumn.setPrefWidth(20d);
+        expansionNodeColumn.setMaxWidth(EXPANSION_COL_WIDTH);
+        expansionNodeColumn.setMinWidth(EXPANSION_COL_WIDTH);
+        expansionNodeColumn.setPrefWidth(EXPANSION_COL_WIDTH);
         expansionNodeColumn.setResizable(false);
+
+        addSubgroupColumn = new TreeTableColumn<>();
+        addSubgroupColumn.getStyleClass().add("addSubgroupColumn");
+        addSubgroupColumn.setMinWidth(ADD_SUBGROUP_COL_WIDTH);
+        addSubgroupColumn.setMaxWidth(ADD_SUBGROUP_COL_WIDTH);
+        addSubgroupColumn.setPrefWidth(ADD_SUBGROUP_COL_WIDTH);
+        addSubgroupColumn.setResizable(false);
 
         groupTree = new TreeTableView<>();
         groupTree.setId("groupTree");
         groupTree.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-        groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, expansionNodeColumn));
+        groupTree.getColumns().addAll(List.of(mainColumn, numberColumn, addSubgroupColumn, expansionNodeColumn));
         groupTree.setOnKeyPressed(event -> {
-            if (event.getCode().toString().equals(KeyBinding.GROUP_SUBGROUP_RENAME.getDefaultKeyBinding())) {
+            if (event.getCode().toString().equals(KeyBinding.GROUP_RENAME.getDefaultKeyBinding())) {
                 TreeItem<GroupNodeViewModel> selectedItem = groupTree.getSelectionModel().getSelectedItem();
                 if (selectedItem != null && selectedItem.getParent() != null) {
                     viewModel.editGroup(selectedItem.getValue());
@@ -180,7 +193,11 @@ public class GroupTreeView extends BorderPane {
         });
         this.setCenter(groupTree);
 
-        mainColumn.prefWidthProperty().bind(groupTree.widthProperty().subtract(80d).subtract(15d));
+        mainColumn.prefWidthProperty().bind(groupTree.widthProperty()
+                                                     .subtract(NUMBER_COL_WIDTH)
+                                                     .subtract(EXPANSION_COL_WIDTH)
+                                                     .subtract(ADD_SUBGROUP_COL_WIDTH)
+                                                     .subtract(SCROLLBAR_WIDTH));
 
         Button addNewGroup = new Button(Localization.lang("Add group"));
         addNewGroup.setMaxWidth(Double.MAX_VALUE);
@@ -195,7 +212,7 @@ public class GroupTreeView extends BorderPane {
 
     private void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
-        viewModel = new GroupTreeViewModel(stateManager, entryTypesManager, preferences, preferences.getFieldPreferences(), dialogService, aiService, adaptVisibleTabs, localDragboard, taskExecutor);
+        viewModel = new GroupTreeViewModel(stateManager, entryTypesManager, preferences, dialogService, aiService, adaptVisibleTabs, localDragboard, taskExecutor);
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -217,7 +234,10 @@ public class GroupTreeView extends BorderPane {
         // for larger group structures.
         final Timer searchTask = FxTimer.create(Duration.ofMillis(400), () -> {
             LOGGER.debug("Run group search {}", searchField.getText());
+            // Ensure that group selection is changed only by the user
+            final List<GroupNodeViewModel> previouslySelectedGroup = new ArrayList<>(viewModel.selectedGroupsProperty());
             viewModel.filterTextProperty().setValue(searchField.textProperty().getValue());
+            viewModel.selectedGroupsProperty().setAll(previouslySelectedGroup);
         });
         searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
 
@@ -255,6 +275,51 @@ public class GroupTreeView extends BorderPane {
                     event.consume();
                 })
                 .install(expansionNodeColumn);
+
+        // "Add subgroup" button shown on row hover
+        addSubgroupColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
+        addSubgroupColumn.setCellFactory(col -> {
+            Button button = IconTheme.JabRefIcons.ADD.asButton();
+            button.setVisible(false);
+            button.managedProperty().bind(button.visibleProperty());
+            StackPane pane = new StackPane(button);
+            pane.setMinHeight(0);
+            pane.setPrefHeight(0);
+            pane.setMaxHeight(0);
+
+            TreeTableCell<GroupNodeViewModel, GroupNodeViewModel> cell = new TreeTableCell<>() {
+                @Override
+                protected void updateItem(GroupNodeViewModel group, boolean empty) {
+                    super.updateItem(group, empty);
+                    if (empty || group == null) {
+                        setGraphic(null);
+                    } else if (group.isRoot() || group.isEditable() && group.canAddGroupsIn()) {
+                        if (group.isRoot()) {
+                            button.setTooltip(new Tooltip(Localization.lang("New group")));
+                        } else {
+                            button.setTooltip(new Tooltip(Localization.lang("Add subgroup")));
+                        }
+                        setGraphic(pane);
+                        button.setOnAction(event -> viewModel.addNewSubgroup(
+                                group,
+                                group.isRoot() ? GroupDialogHeader.GROUP : GroupDialogHeader.SUBGROUP));
+                    } else {
+                        setGraphic(null);
+                    }
+                }
+            };
+
+            cell.tableRowProperty().addListener((obs, oldRow, newRow) -> {
+                button.visibleProperty().unbind();
+                if (newRow != null) {
+                    button.visibleProperty().bind(newRow.hoverProperty());
+                } else {
+                    button.setVisible(false);
+                }
+            });
+
+            return cell;
+        });
 
         new ViewModelTreeTableRowFactory<GroupNodeViewModel>()
                 .withContextMenu(this::createContextMenuForGroup)
@@ -603,6 +668,7 @@ public class GroupTreeView extends BorderPane {
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.GROUP_EDIT, new ContextAction(StandardActions.GROUP_EDIT, group)),
+                factory.createMenuItem(StandardActions.GROUP_RENAME, new ContextAction(StandardActions.GROUP_RENAME, group)),
                 factory.createMenuItem(StandardActions.GROUP_GENERATE_EMBEDDINGS, new ContextAction(StandardActions.GROUP_GENERATE_EMBEDDINGS, group)),
                 factory.createMenuItem(StandardActions.GROUP_GENERATE_SUMMARIES, new ContextAction(StandardActions.GROUP_GENERATE_SUMMARIES, group)),
                 removeGroup,
@@ -616,7 +682,6 @@ public class GroupTreeView extends BorderPane {
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
-                factory.createMenuItem(StandardActions.GROUP_SUBGROUP_RENAME, new ContextAction(StandardActions.GROUP_SUBGROUP_RENAME, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
                 new Menu(Localization.lang("Sort"), null,
                         factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT,
@@ -629,7 +694,8 @@ public class GroupTreeView extends BorderPane {
                                 new GroupTreeView.ContextAction(StandardActions.GROUP_SUBGROUP_SORT_ENTRIES_REVERSE, group))),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_ENTRIES_ADD, new ContextAction(StandardActions.GROUP_ENTRIES_ADD, group)),
-                factory.createMenuItem(StandardActions.GROUP_ENTRIES_REMOVE, new ContextAction(StandardActions.GROUP_ENTRIES_REMOVE, group))
+                factory.createMenuItem(StandardActions.GROUP_ENTRIES_REMOVE, new ContextAction(StandardActions.GROUP_ENTRIES_REMOVE, group)),
+                factory.createMenuItem(StandardActions.GROUP_ENTRIES_CLEAR, new ContextAction(StandardActions.GROUP_ENTRIES_CLEAR, group))
         );
 
         contextMenu.getItems().forEach(item -> item.setGraphic(null));
@@ -664,9 +730,7 @@ public class GroupTreeView extends BorderPane {
         }
     }
 
-    /**
-     * Creates an observable boolean value that is true if no database is open
-     */
+    /// Creates an observable boolean value that is true if no database is open
     private ObservableBooleanValue groupsDisabledProperty() {
         return Bindings.createBooleanBinding(
                 () -> stateManager.getOpenDatabases().isEmpty(),
@@ -710,7 +774,7 @@ public class GroupTreeView extends BorderPane {
             this.executable.bind(BindingsHelper.constantOf(
                     switch (command) {
                         case GROUP_EDIT,
-                             GROUP_SUBGROUP_RENAME ->
+                             GROUP_RENAME ->
                                 group.isEditable();
                         case GROUP_REMOVE,
                              GROUP_REMOVE_WITH_SUBGROUPS,
@@ -728,7 +792,8 @@ public class GroupTreeView extends BorderPane {
                                 group.isEditable() && group.hasSubgroups() && group.canAddEntriesIn()
                                         || group.isRoot();
                         case GROUP_ENTRIES_ADD,
-                             GROUP_ENTRIES_REMOVE ->
+                             GROUP_ENTRIES_REMOVE,
+                             GROUP_ENTRIES_CLEAR ->
                                 group.canAddEntriesIn();
                         default ->
                                 true;
@@ -745,7 +810,7 @@ public class GroupTreeView extends BorderPane {
                 case GROUP_REMOVE_WITH_SUBGROUPS ->
                         viewModel.removeGroupAndSubgroups(group);
                 case GROUP_EDIT,
-                     GROUP_SUBGROUP_RENAME ->
+                     GROUP_RENAME ->
                         viewModel.editGroup(group);
                 case GROUP_GENERATE_EMBEDDINGS ->
                         viewModel.generateEmbeddings(group);
@@ -771,14 +836,14 @@ public class GroupTreeView extends BorderPane {
                         viewModel.addSelectedEntries(group);
                 case GROUP_ENTRIES_REMOVE ->
                         viewModel.removeSelectedEntries(group);
+                case GROUP_ENTRIES_CLEAR ->
+                        viewModel.clearGroup(group);
             }
             groupTree.refresh();
         }
     }
 
-    /**
-     * Focus on GroupTree
-     */
+    /// Focus on GroupTree
     public void requestFocusGroupTree() {
         groupTree.requestFocus();
     }

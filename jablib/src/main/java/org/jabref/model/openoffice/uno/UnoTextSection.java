@@ -18,9 +18,7 @@ import com.sun.star.uno.Any;
 
 public class UnoTextSection {
 
-    /**
-     * @return An XNameAccess to find sections by name.
-     */
+    /// @return An XNameAccess to find sections by name.
     public static XNameAccess getNameAccess(XTextDocument doc)
             throws
             NoDocumentException {
@@ -33,9 +31,7 @@ public class UnoTextSection {
         }
     }
 
-    /**
-     * Get an XTextSection by name.
-     */
+    /// Get an XTextSection by name.
     public static Optional<XTextSection> getByName(XTextDocument doc, String name)
             throws
             WrappedTargetException,
@@ -48,12 +44,10 @@ public class UnoTextSection {
         }
     }
 
-    /**
-     * Get the XTextRange covering to the named section.
-     *
-     * @param name The name of the section to find.
-     * @return The XTextRange for the section, or Optional.empty().
-     */
+    /// Get the XTextRange covering to the named section.
+    ///
+    /// @param name The name of the section to find.
+    /// @return The XTextRange for the section, or Optional.empty().
     public static Optional<XTextRange> getAnchor(XTextDocument doc, String name)
             throws
             WrappedTargetException,
@@ -63,10 +57,8 @@ public class UnoTextSection {
         return UnoNameAccess.getTextContentByName(nameAccess, name).map(XTextContent::getAnchor);
     }
 
-    /**
-     * Create a text section with the provided name and insert it at the provided cursor.
-     * If an XTextSection by that name already exists, LibreOffice (6.4.6.2) creates a section with a name different from what we requested, in "Section {number}" format
-     */
+    /// Create a text section with the provided name and insert it at the provided cursor.
+    /// If an XTextSection by that name already exists, LibreOffice (6.4.6.2) creates a section with a name different from what we requested, in "Section {number}" format
     public static XNamed create(DocumentAnnotation documentAnnotation)
             throws
             CreationException {

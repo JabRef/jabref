@@ -36,10 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Integration test of the components used for SLR support
- * Marked as FetcherTest as it calls fetcher
- */
+/// Integration test of the components used for SLR support
+/// Marked as FetcherTest as it calls fetcher
 @FetcherTest
 class CrawlerTest {
     @TempDir
@@ -54,9 +52,7 @@ class CrawlerTest {
 
     CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
-    /**
-     * Set up mocks and copies the study definition file into the test repository
-     */
+    /// Set up mocks and copies the study definition file into the test repository
     @BeforeEach
     void setUp() throws GitAPIException, URISyntaxException {
         setUpRepository();

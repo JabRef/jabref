@@ -401,6 +401,23 @@ public class DuplicateCheckTest {
     }
 
     @Test
+    void twoEntriesWithSameDoiButDifferentCasingAreDuplicates() {
+        simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
+        unrelatedArticle.setField(StandardField.DOI, "10.1016/J.IS.2004.02.002");
+
+        assertTrue(duplicateChecker.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void twoEntriesWithSameDoiButDifferentCasingAndDifferentTypesAreDuplicates() {
+        simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
+        unrelatedArticle.setField(StandardField.DOI, "10.1016/J.IS.2004.02.002");
+        unrelatedArticle.setType(StandardEntryType.Misc);
+
+        assertTrue(duplicateChecker.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
     void twoEntriesWithDoiContainingUnderscoresAreNotEqual() {
         simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
         // An underscore in a DOI can indicate a totally different DOI
@@ -555,9 +572,7 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
     }
 
-    /**
-     * Journal articles can have the same ISBN due to the journal has one unique ISBN, but hundreds of different articles.
-     */
+    /// Journal articles can have the same ISBN due to the journal has one unique ISBN, but hundreds of different articles.
     @Test
     void differentArticlesFromTheSameBookAreNotDuplicates() {
         BibEntry entryOne = new BibEntry(StandardEntryType.Article)

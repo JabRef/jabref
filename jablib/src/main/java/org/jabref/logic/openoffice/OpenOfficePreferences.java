@@ -74,9 +74,7 @@ public class OpenOfficePreferences {
         this.currentJStyle.set("");
     }
 
-    /**
-     * path to soffice-file
-     */
+    /// path to soffice-file
     public String getExecutablePath() {
         return executablePath.get();
     }
@@ -89,9 +87,7 @@ public class OpenOfficePreferences {
         this.executablePath.setValue(executablePath);
     }
 
-    /**
-     * true if all databases should be used when citing
-     */
+    /// true if all databases should be used when citing
     public boolean getUseAllDatabases() {
         return useAllDatabases.get();
     }
@@ -104,9 +100,7 @@ public class OpenOfficePreferences {
         this.useAllDatabases.set(useAllDatabases);
     }
 
-    /**
-     * true if the reference list is updated when adding a new citation
-     */
+    /// true if the reference list is updated when adding a new citation
     public boolean getSyncWhenCiting() {
         return syncWhenCiting.get();
     }
@@ -119,9 +113,7 @@ public class OpenOfficePreferences {
         this.syncWhenCiting.setValue(syncWhenCiting);
     }
 
-    /**
-     * list with paths to external style files
-     */
+    /// list with paths to external style files
     public ObservableList<String> getExternalJStyles() {
         return externalJStyles;
     }
@@ -131,9 +123,7 @@ public class OpenOfficePreferences {
         externalJStyles.addAll(list);
     }
 
-    /**
-     * path to the used style file
-     */
+    /// path to the used style file
     public String getCurrentJStyle() {
         return currentJStyle.get();
     }

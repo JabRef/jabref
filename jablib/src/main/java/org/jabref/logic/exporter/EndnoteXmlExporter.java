@@ -59,10 +59,8 @@ public class EndnoteXmlExporter extends Exporter {
         ENTRY_TYPE_MAPPING.put(StandardEntryType.Misc, new EndNoteType("Generic", 15));
     }
 
-    /**
-     * Contains the mapping of all fields not explicitly handled by mapX methods.
-     * We need a fixed order here, so we use a SequencedMap
-     */
+    /// Contains the mapping of all fields not explicitly handled by mapX methods.
+    /// We need a fixed order here, so we use a SequencedMap
     private static final SequencedMap<Field, String> STANDARD_FIELD_MAPPING = new LinkedHashMap<>();
 
     static {

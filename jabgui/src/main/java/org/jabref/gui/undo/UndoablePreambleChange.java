@@ -3,9 +3,7 @@ package org.jabref.gui.undo;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 
-/**
- * This class represents a change in any field value. The relevant information is the BibEntry, the field name, the old and the new value. Old/new values can be null.
- */
+/// This class represents a change in any field value. The relevant information is the BibEntry, the field name, the old and the new value. Old/new values can be null.
 public class UndoablePreambleChange extends AbstractUndoableJabRefEdit {
 
     private final BibDatabase base;

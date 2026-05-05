@@ -4,7 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 
+import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
+import org.jabref.gui.theme.Theme;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 
@@ -18,6 +20,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -80,23 +83,59 @@ class GuiPreferencesMigrationsTest {
 
     @Test
     void previewStyleReviewToComment() {
-        String oldPreviewStyle = "<font face=\"sans-serif\">__NEWLINE__"
-                + "Customized preview style using reviews and comments:__NEWLINE__"
-                + "\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}__NEWLINE__"
-                + "\\begin{comment} Something: \\format[HTMLChars]{\\comment} special \\end{comment}__NEWLINE__"
-                + "</font>__NEWLINE__";
+        String oldPreviewStyle = """
+                <font face="sans-serif">__NEWLINE__\
+                Customized preview style using reviews and comments:__NEWLINE__\
+                \\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}__NEWLINE__\
+                \\begin{comment} Something: \\format[HTMLChars]{\\comment} special \\end{comment}__NEWLINE__\
+                </font>__NEWLINE__\
+                \\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__\
+                \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__""";
 
-        String newPreviewStyle = "<font face=\"sans-serif\">__NEWLINE__"
-                + "Customized preview style using reviews and comments:__NEWLINE__"
-                + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment} \\end{comment}__NEWLINE__"
-                + "\\begin{comment} Something: \\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment} special \\end{comment}__NEWLINE__"
-                + "</font>__NEWLINE__";
+        String newPreviewStyle = """
+                <font face="sans-serif">__NEWLINE__\
+                Customized preview style using reviews and comments:__NEWLINE__\
+                \\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment} \\end{comment}__NEWLINE__\
+                \\begin{comment} Something: \\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment} special \\end{comment}__NEWLINE__\
+                </font>__NEWLINE__\
+                \\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__\
+                \\begin{doi}<BR>doi <a href="https://doi.org/\\format[DOIStrip]{\\doi}">\\format[DOIStrip]{\\doi}</a>\\end{doi}__NEWLINE__\
+                \\begin{url}<BR>URL <a href="\\url">\\url</a>\\end{url}__NEWLINE__\
+                \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__""";
 
-        when(preferences.get(JabRefGuiPreferences.PREVIEW_STYLE)).thenReturn(oldPreviewStyle);
+        when(preferences.get(eq(JabRefGuiPreferences.PREVIEW_STYLE), anyString())).thenReturn(oldPreviewStyle);
 
         PreferencesMigrations.upgradePreviewStyle(preferences);
 
         verify(preferences).put(JabRefGuiPreferences.PREVIEW_STYLE, newPreviewStyle);
+    }
+
+    @Test
+    void previewStyleUnchangedWhenMigrationPatternIsMissing() {
+        String unchangedPreviewStyle = """
+                <font face="sans-serif">__NEWLINE__\
+                Custom preview style with no migration patterns.__NEWLINE__\
+                \\begin{title}<BR><b>\\format[HTMLChars]{\\title}</b>\\end{title}__NEWLINE__\
+                \\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__\
+                \\begin{note}<BR>\\format[HTMLChars]{\\note}\\end{note}__NEWLINE__\
+                \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__\
+                </font>__NEWLINE__""";
+
+        when(preferences.get(eq(JabRefGuiPreferences.PREVIEW_STYLE), anyString())).thenReturn(unchangedPreviewStyle);
+
+        PreferencesMigrations.upgradePreviewStyle(preferences);
+
+        verify(preferences).put(JabRefGuiPreferences.PREVIEW_STYLE, unchangedPreviewStyle);
+    }
+
+    @Test
+    void previewStyleNameChanged() {
+        String oldCycle = "Customized preview style;ieee.csl";
+        when(preferences.get(eq(JabRefGuiPreferences.PREVIEW_CYCLE), anyString())).thenReturn(oldCycle);
+
+        PreferencesMigrations.upgradeBuiltinPreviewName(preferences);
+
+        verify(preferences).put(JabRefGuiPreferences.PREVIEW_CYCLE, "PREVIEW;ieee.csl");
     }
 
     @Test
@@ -229,5 +268,28 @@ class GuiPreferencesMigrationsTest {
 
         PreferencesMigrations.upgradeResolveBibTeXStringsFields(preferences);
         verify(preferences).put(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS, expectedValue);
+    }
+
+    @Test
+    void upgradeThemeMigratesOldDarkCssToDarkTheme() {
+        WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class);
+        when(preferences.get("fxTheme", "")).thenReturn("Dark.css");
+        when(preferences.getWorkspacePreferences()).thenReturn(workspacePreferences);
+
+        PreferencesMigrations.upgradeTheme(preferences);
+
+        verify(workspacePreferences).setTheme(Theme.dark());
+    }
+
+    @Test
+    void upgradeThemeMigratesEmptyThemeToLightWhenThemeSyncOsIsDisabled() {
+        WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class);
+        when(preferences.get("fxTheme", "")).thenReturn("");
+        when(preferences.getBoolean("themeSyncOs", false)).thenReturn(false);
+        when(preferences.getWorkspacePreferences()).thenReturn(workspacePreferences);
+
+        PreferencesMigrations.upgradeTheme(preferences);
+
+        verify(workspacePreferences).setTheme(Theme.light());
     }
 }

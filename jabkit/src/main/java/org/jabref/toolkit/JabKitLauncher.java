@@ -60,6 +60,8 @@ public class JabKitLauncher {
 
     /// Note: To test with gradle, use jabkit -> Tasks -> application -> run
     ///       Use `--args="..."` as parameters to "Run"
+    ///
+    /// @implNote method needs to be public, because JabKitLauncher calls it.
     public static void main(String[] args) {
         initLogging(args);
 
@@ -75,6 +77,7 @@ public class JabKitLauncher {
 
             JabKit jabKit = new JabKit(preferences, entryTypesManager);
             CommandLine commandLine = new CommandLine(jabKit);
+            // [impl->req~jabkit.cli.banner-shown~1]
             String usageHeader = BuildInfo.JABREF_BANNER.formatted(buildInfo.version) + "\n" + JABKIT_BRAND;
             commandLine.getCommandSpec().usageMessage().header(usageHeader);
             applyUsageFooters(commandLine,
@@ -105,10 +108,8 @@ public class JabKitLauncher {
         }
     }
 
-    /**
-     * Applies appropriate usage footers to each subcommand based on their supported options.
-     * Distinguishes between input formats, output formats, and export formats.
-     */
+    /// Applies appropriate usage footers to each subcommand based on their supported options.
+    /// Distinguishes between input formats, output formats, and export formats.
     private static void applyUsageFooters(CommandLine commandLine,
                                           List<Pair<String, String>> inputFormats,
                                           List<Pair<String, String>> outputFormats,

@@ -2,21 +2,23 @@
 
 //DESCRIPTION jabkit - mange BibTeX files using JabRef
 
-//JAVA 24+
+//JAVA 25+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 // raw is for https://github.com/unicode-org/icu/pull/2127
 //REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
+// see  https://github.com/gradlex-org/extra-java-module-info/issues/237 why we include e-adr here
+//DEPS io.github.adr:e-adr:2.0.0
 
 // requirements needed by jabkit projecxt need to be listed; requirements by jablib are loaded transitively
 //DEPS info.picocli:picocli:4.7.7
 
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/arguments/Provider.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CaseInsensitiveEnumConverter.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CitationFetcherTypeConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CygWinPathConverter.java
-//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/ProviderConverter.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/KeySuffixConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckConsistency.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckIntegrity.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CitationKeys.java

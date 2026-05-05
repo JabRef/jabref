@@ -1,11 +1,14 @@
 package org.jabref.toolkit.commands;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 
@@ -22,6 +25,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Answers;
 import picocli.CommandLine;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -61,20 +66,18 @@ public abstract class AbstractJabKitTest {
         errWriter = new ByteArrayOutputStream();
     }
 
-    /**
-     * Executes the configured {@link picocli.CommandLine} command while capturing its
-     * standard output and error streams.
-     *
-     * <p>This method temporarily redirects {@code System.out} and {@code System.err} to
-     * internal buffers during the command execution, allowing the captured output to be
-     * retrieved later using {@link #getStandardOutput()} and {@link #getErrorOutput()}.</p>
-     *
-     * @param args the command line arguments to parse
-     * @return the error code
-     */
+    /// Executes the configured {@link picocli.CommandLine} command while capturing its
+    /// standard output and error streams.
+    ///
+    /// This method temporarily redirects `System.out` and `System.err` to
+    /// internal buffers during the command execution, allowing the captured output to be
+    /// retrieved later using {@link #getStandardOutput()} and {@link #getErrorOutput()}.
+    ///
+    /// @param args the command line arguments to parse
+    /// @return the error code
     int executeToLog(String... args) {
-        var or = System.out;
-        var orErr = System.err;
+        PrintStream or = System.out;
+        PrintStream orErr = System.err;
 
         System.setOut(new PrintStream(outWriter, true));
         System.setErr(new PrintStream(errWriter, true));
@@ -87,53 +90,55 @@ public abstract class AbstractJabKitTest {
         return result;
     }
 
-    /**
-     * Returns the captured standard output from the command line execution.
-     *
-     * @return The captured stdout string.
-     */
+    /// Returns the captured standard output from the command line execution.
+    ///
+    /// @return The captured stdout string.
     protected String getStandardOutput() {
         return outWriter.toString().replace("\r\n", "\n");
     }
 
-    /**
-     * Returns the captured error output from the command line execution.
-     *
-     * @return The captured stderr string.
-     */
+    /// Returns the captured error output from the command line execution.
+    ///
+    /// @return The captured stderr string.
     protected String getErrorOutput() {
         return errWriter.toString().replace("\r\n", "\n");
     }
 
-    /**
-     * Gets class resource as fully qualified string.
-     * Useful for scenarios where you want a resource as a command line argument
-     * <p>
-     * Throws a runtime exception if the resource URL cannot be turned into a URI.
-     *
-     * @param resourceName the resource name
-     * @return the class resource as fully qualified string
-     */
+    /// Gets class resource as fully qualified string.
+    /// Useful for scenarios where you want a resource as a command line argument
+    ///
+    /// Throws a runtime exception if the resource URL cannot be turned into a URI.
+    ///
+    /// @param resourceName the resource name
+    /// @return the class resource as fully qualified string
     String getClassResourceAsFullyQualifiedString(String resourceName) {
         return getClassResourceAsPath(resourceName).toAbsolutePath().toString();
     }
 
-    /**
-     * Gets class resource as a path.
-     * <p>
-     * Throws a runtime exception if the resource URL cannot be turned into a URI.
-     *
-     * @param resourceName the resource name
-     * @return the class resource as path
-     */
+    /// Gets class resource as a path.
+    ///
+    /// Throws a runtime exception if the resource URL cannot be turned into a URI.
+    ///
+    /// @param resourceName the resource name
+    /// @return the class resource as path
     Path getClassResourceAsPath(String resourceName) {
         try {
             return Path.of(Objects.requireNonNull(this.getClass().getResource(resourceName), "Could not find resource: " + resourceName).toURI())
                        .toAbsolutePath();
         } catch (URISyntaxException e) {
-            throw new RuntimeException(
-                    "Wrong resource name %s for class %s".formatted(resourceName, this.getClass()), e
-            );
+            throw new RuntimeException("Wrong resource name %s for class %s".formatted(resourceName, this.getClass()), e);
         }
+    }
+
+    static void assertFileExists(Path file) throws IOException {
+        String listedFiles = Files.list(file.getParent())
+                                  .map(path -> "'" + path.getFileName().toString() + "'")
+                                  .collect(Collectors.joining(", "));
+
+        assertTrue(Files.exists(file), "file  '" + file.getFileName().toString() + "' doesn't exist, but found " + listedFiles);
+    }
+
+    static void assertFileDoesntExist(Path file) throws IOException {
+        assertFalse(Files.exists(file), "file '" + file.getFileName().toString() + "' shouldn't exist, but does");
     }
 }

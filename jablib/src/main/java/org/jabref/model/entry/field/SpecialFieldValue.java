@@ -30,9 +30,7 @@ public enum SpecialFieldValue {
     // keyword used in keyword field
     private final Optional<Keyword> keyword;
 
-    /**
-     * @param keyword - The keyword to be used at BibTex's keyword field. May be "null" if no keyword is to be set
-     */
+    /// @param keyword - The keyword to be used at BibTex's keyword field. May be "null" if no keyword is to be set
     SpecialFieldValue(String keyword) {
         this.keyword = Optional.ofNullable(keyword).map(Keyword::new);
     }

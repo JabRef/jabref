@@ -63,6 +63,39 @@ class EprintCleanupTest {
                                 .withField(StandardField.INSTITUTION, "OtherInstitution")
                 ),
 
+                // arXiv:1503.05173 in EPRINT field should be split-up
+                Arguments.of(
+                        new BibEntry()
+                                .withField(StandardField.EPRINT, "arXiv:1503.05173"),
+                        new BibEntry()
+                                .withField(StandardField.EPRINT, "1503.05173")
+                                .withField(StandardField.EPRINTTYPE, "arxiv")
+                ),
+
+                // prefix exists but the value is empty
+                Arguments.of(
+                        new BibEntry()
+                                .withField(StandardField.EPRINT, "arXiv:"),
+                        new BibEntry()
+                                .withField(StandardField.EPRINT, "")
+                                .withField(StandardField.EPRINTTYPE, "arxiv")
+                ),
+
+                // prefix exists but the value is invalid data
+                Arguments.of(
+                        new BibEntry()
+                                .withField(StandardField.EPRINT, "arXiv:junkData"),
+                        new BibEntry()
+                                .withField(StandardField.EPRINT, "junkData")
+                                .withField(StandardField.EPRINTTYPE, "arxiv")
+                ),
+
+                // Fields with other prefixes (non-arXiv) should remain unchanged
+                Arguments.of(
+                        new BibEntry().withField(StandardField.EPRINT, "other:12345"),
+                        new BibEntry().withField(StandardField.EPRINT, "other:12345")
+                ),
+
                 // LLM-generated BibEntry with "arxiv" field
                 Arguments.of(
                         new BibEntry()

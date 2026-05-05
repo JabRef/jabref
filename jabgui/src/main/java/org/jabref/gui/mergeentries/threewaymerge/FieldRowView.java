@@ -27,9 +27,7 @@ import org.fxmisc.richtext.StyleClassedTextArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * A controller class to control left, right and merged field values
- */
+/// A controller class to control left, right and merged field values
 public class FieldRowView {
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldRowView.class);
 

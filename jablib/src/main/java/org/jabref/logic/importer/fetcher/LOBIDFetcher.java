@@ -30,11 +30,11 @@ import org.apache.hc.core5.net.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Fetches data from the LOBID API
- *
- * @see <a href="https://lobid.org/resources/api">API documentation</a> for more details
- */
+import static java.util.function.Predicate.not;
+
+/// Fetches data from the LOBID API
+///
+/// @see <a href="https://lobid.org/resources/api">API documentation</a> for more details
 public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParserFetcher {
 
     public static final String FETCHER_NAME = "LOBID";
@@ -43,13 +43,11 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParse
 
     private static final String API_URL = "https://lobid.org/resources/search";
 
-    /**
-     * Gets the query URL
-     *
-     * @param queryNode  the first parsed node
-     * @param pageNumber the number of the page indexed from 0
-     * @return URL
-     */
+    /// Gets the query URL
+    ///
+    /// @param queryNode  the first parsed node
+    /// @param pageNumber the number of the page indexed from 0
+    /// @return URL
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
@@ -101,7 +99,7 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParse
         if (typeArray != null) {
             List<String> typeList = IntStream.range(0, typeArray.length())
                                              .mapToObj(typeArray::optString)
-                                             .filter(type -> !type.isEmpty())
+                                             .filter(not(String::isEmpty))
                                              .toList();
             types = String.join(", ", typeList);
             entry.setField(StandardField.TYPE, types);
@@ -176,7 +174,7 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParse
         if (keywordArray != null) {
             List<String> keywordList = IntStream.range(0, keywordArray.length())
                                                 .mapToObj(keywordArray::optString)
-                                                .filter(keyword -> !keyword.isEmpty())
+                                                .filter(not(String::isEmpty))
                                                 .toList();
             entry.setField(StandardField.KEYWORDS, String.join(", ", keywordList));
         }

@@ -6,14 +6,14 @@ This directory contains JBang scripts for JabRef.
 Four use cases:
 
 - Runing `JabKit` - JabRef's CLI tool.
-- Runing `JabLs` - JabRef's Language Server.
+- Runing `JabLs` - JabRef's LSP Server.
 - Runing `JabSrv` - JabRef's HTTP server.
 - Try out any pull request with minimal installation. See [our blog entry](https://blog.jabref.org/2025/05/31/run-pr/) for details.
 
 ## Running `JabKit`
 
 ```bash
-$ jbang jabkit@jabref --help
+$ jbang --fresh jabkit@jabref --help
 
    &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
    &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
@@ -49,10 +49,9 @@ Commands:
   search                  Search in a library.
 ```
 
-> [!NOTE]
-> Due to the high development pace, you need to sometimes refresh the dependencies
->
-> `jbang --fresh jabkit@jabref --help`
+> [!NOTE]`
+> Due to the high development pace, `--fresh` is used to update `org.jabref:jablib:6.0-SNAPSHOT`.
+> As soon as JabRef 6.0 is released, this won't be required any more.
 
 ### Installing and Running `JabKit` with JBang
 
@@ -93,19 +92,19 @@ Then you enable `alias jabkit='gg.cmd jbang jabkit@jabref`.
 In case you have [JBang installed], just run following command:
 
 ```terminal
-jbang jabls@jabref
+jbang --fresh jabls@jabref
 ```
 
 With `gg.cmd`:
 
 ```terminal
-sh ./gg.cmd jbang jabls@jabref
+sh ./gg.cmd jbang --fresh jabls@jabref
 ```
 
 With `npx`:
 
 ```terminal
-npx @jbangdev/jbang jabls@jabref
+npx @jbangdev/jbang --fresh jabls@jabref
 ```
 
 One can add `--help` to see available options.
@@ -115,24 +114,24 @@ One can add `--help` to see available options.
 In case you have [JBang installed], just run following command:
 
 ```terminal
-jbang jabsrv@jabref
+jbang --fresh jabsrv@jabref
 ```
 
 With `gg.cmd`:
 
 ```terminal
-sh ./gg.cmd jbang jabsrv@jabref
+sh ./gg.cmd jbang --fresh jabsrv@jabref
 ```
 
 With `npx`:
 
 ```terminal
-npx @jbangdev/jbang jabsrv@jabref
+npx @jbangdev/jbang --fresh jabsrv@jabref
 ```
 
 One can add `--help` to see available options. E.g., how to set another port and how to specify served libraries.
 
-JBang installed: https://www.jbang.dev/download/
+JBang installed: <https://www.jbang.dev/download/>
 
 ## Try out any pull request
 

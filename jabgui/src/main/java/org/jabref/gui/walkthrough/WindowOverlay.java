@@ -37,11 +37,13 @@ import com.airhacks.afterburner.injection.Injector;
 import com.sun.javafx.scene.NodeHelper;
 import org.controlsfx.control.PopOver;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Manages the overlay for displaying walkthrough steps in a single window.
+@NullMarked
 class WindowOverlay {
     private static final Logger LOGGER = LoggerFactory.getLogger(WindowOverlay.class);
     private static final int POPOVER_CREATION_DELAY = 200;
@@ -76,17 +78,16 @@ class WindowOverlay {
 
     /// Display a tooltip for the given step at the specified node.
     ///
+    /// Note on `beforeNavigate` runnable: The runnable to execute immediately upon
+    /// the button press before Walkthrough's state change to the
+    /// next step and before the original button/node's action is
+    /// executed. Usually used to prevent automatic revert from
+    /// unexpected reverting to the previous step when the node is
+    /// not yet ready to be displayed.
+    ///
     /// @param step           The step to display.
-    /// @param node           The node to anchor the tooltip to, or null to show it at
-    ///                                             the window. The node is expected to be positionable by
-    ///                                             [WalkthroughUtils#cannotPositionNode(Node)] standard.
+    /// @param node           The node to anchor the tooltip to, or null to show it at the window. The node is expected to be positionable by [WalkthroughUtils#cannotPositionNode(Node)] standard.
     /// @param beforeNavigate A runnable to execute before navigating to the next step.
-    ///                                             More precisely, the runnable to execute immediately upon
-    ///                                             the button press before Walkthrough's state change to the
-    ///                                             next step and before the original button/node's action is
-    ///                                             executed. Usually used to prevent automatic revert from
-    ///                                             unexpected reverting to the previous step when the node is
-    ///                                             not yet ready to be displayed
     /// @implNote The requirement for the node to be positionable by
     /// [WalkthroughUtils#cannotPositionNode(Node)] standard is just to make things
     /// easier to define. This requirement come from
@@ -185,16 +186,8 @@ class WindowOverlay {
     /// Display a Panel for the given step at the specified node.
     ///
     /// @param step           The step to display.
-    /// @param node           The node to anchor highlight to (e.g., BackdropHighlight
-    ///                                             may poke a hole at the position of the node), or null to
-    ///                                             use fallback effect of corresponding position.
-    /// @param beforeNavigate A runnable to execute before navigating to the next step.
-    ///                                             More precisely, the runnable to execute immediately upon
-    ///                                             the button press before Walkthrough's state change to the
-    ///                                             next step and before the original button/node's action is
-    ///                                             executed. Usually used to prevent automatic revert from
-    ///                                             unexpected reverting to the previous step when the node is
-    ///                                             not yet ready to be displayed
+    /// @param node           The node to anchor highlight to (e.g., BackdropHighlight may poke a hole at the position of the node), or null to use fallback effect of corresponding position.
+    /// @param beforeNavigate A runnable to execute before navigating to the next step. More precisely, the runnable to execute immediately upon the button press before Walkthrough's state change to the next step and before the original button/node's action is executed. Usually used to prevent automatic revert from unexpected reverting to the previous step when the node is not yet ready to be displayed
     /// @see WindowOverlay#showPanel(PanelStep, Runnable)
     /// @see WindowOverlay#showTooltip(TooltipStep, Node, Runnable)
     public void showPanel(PanelStep step, @Nullable Node node, Runnable beforeNavigate) {

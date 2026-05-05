@@ -30,9 +30,7 @@ public class MergeEntriesDialog extends BaseDialog<EntriesMergeResult> {
         init();
     }
 
-    /**
-     * Sets up the dialog
-     */
+    /// Sets up the dialog
     private void init() {
         this.setX(20);
         this.setY(20);

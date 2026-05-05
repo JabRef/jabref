@@ -3,9 +3,7 @@ package org.jabref.logic.layout.format;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.model.entry.AuthorList;
 
-/**
- * Natbib style: Last names only. Two authors are separated by "and", three or more authors are given as "Smith et al."
- */
+/// Natbib style: Last names only. Two authors are separated by "and", three or more authors are given as "Smith et al."
 public class AuthorNatBib implements LayoutFormatter {
 
     @Override

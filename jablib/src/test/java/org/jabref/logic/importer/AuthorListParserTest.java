@@ -13,9 +13,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Similar tests are available in {@link org.jabref.model.entry.AuthorListTest}
- */
+/// Similar tests are available in {@link org.jabref.model.entry.AuthorListTest}
 class AuthorListParserTest {
 
     AuthorListParser parser = new AuthorListParser();

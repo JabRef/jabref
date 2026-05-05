@@ -5,9 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
- */
+/// Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
 class NormalizeDateFormatterTest {
 
     private NormalizeDateFormatter formatter;
@@ -135,5 +133,10 @@ class NormalizeDateFormatterTest {
     @Test
     void formatExample() {
         assertEquals("2003-11-29", formatter.format(formatter.getExampleInput()));
+    }
+
+    @Test
+    void formatDateRange() {
+        assertEquals("2020/2021", formatter.format("2020/2021"));
     }
 }

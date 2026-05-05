@@ -22,36 +22,40 @@ permissions:
 
 jobs:
   build:
-    if: ${{ github.repository_owner == 'JabRef' }}
     strategy:
+      max-parallel: 1
       matrix:
-        component: [jabkit, jabsrv]
+        component: [ jabkit, jabsrv ]
     runs-on: ubuntu-latest
     steps:
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: |
-            ghcr.io/JabRef/${{ matrix.component }}
+            ghcr.io/${{ github.repository_owner }}/${{ matrix.component }}
           tags: |
             type=schedule,pattern={{date 'YYYY-MM-DD'}}
             type=ref,event=tag
             type=edge,branch=main
             type=ref,event=pr
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.title=${{ matrix.component }}
+            org.opencontainers.image.description=${{ matrix.component == 'jabkit' && 'JabRef''s CLI tool' || 'JabRef''s HTTP server' }}
       - name: Login to GitHub Container Registry
         if: >
           (github.event_name == 'push' && github.repository == 'JabRef/jabref') ||
           (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'JabRef/jabref')
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: koppor
           password: ${{ secrets.CR_PAT }}
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v6
         with:
@@ -66,7 +70,7 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
       - name: Build and push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: >
             ${{
@@ -80,3 +84,5 @@ jobs:
           build-args: |
             VERSION=${{ steps.gitversion.outputs.AssemblySemVer }}
             VERSION_INFO=${{ steps.gitversion.outputs.InformationalVersion }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

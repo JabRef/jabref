@@ -39,12 +39,10 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
 
     private final CitationKeyPatternPreferences keyPatternPreferences;
 
-    /**
-     * The preference for whether to use the key generator on import is different from how it is configured.
-     * In the UI, there is no better place to put the option than the Citation Key Generator tab.
-     * However, shifting the preference to {@link CitationKeyPatternPreferences} would break the abstraction or hierarchy.
-     * Hence, we keep the preference in {@link ImporterPreferences}, but for the UI, we initialize it here.
-     */
+    /// The preference for whether to use the key generator on import is different from how it is configured.
+    /// In the UI, there is no better place to put the option than the Citation Key Generator tab.
+    /// However, shifting the preference to {@link CitationKeyPatternPreferences} would break the abstraction or hierarchy.
+    /// Hence, we keep the preference in {@link ImporterPreferences}, but for the UI, we initialize it here.
     private final ImporterPreferences importerPreferences;
 
     public CitationKeyPatternTabViewModel(CitationKeyPatternPreferences keyPatternPreferences, ImporterPreferences importerPreferences) {
@@ -88,13 +86,13 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
         patternListProperty.forEach(item -> {
             String patternString = item.getPattern();
             if (!"default".equals(item.getEntryType().getName())) {
-                if (!patternString.trim().isEmpty()) {
+                if (!patternString.isBlank()) {
                     newKeyPattern.addCitationKeyPattern(item.getEntryType(), patternString);
                 }
             }
         });
 
-        if (!defaultKeyPatternProperty.getValue().getPattern().trim().isEmpty()) {
+        if (!defaultKeyPatternProperty.getValue().getPattern().isBlank()) {
             // we do not trim the value at the assignment to enable users to have spaces at the beginning and
             // at the end of the pattern
             newKeyPattern.setDefaultValue(defaultKeyPatternProperty.getValue().getPattern());

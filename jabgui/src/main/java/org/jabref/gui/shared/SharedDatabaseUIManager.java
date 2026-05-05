@@ -16,7 +16,6 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
-import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -155,12 +154,10 @@ public class SharedDatabaseUIManager {
         }
     }
 
-    /**
-     * Opens a new shared database tab with the given {@link DBMSConnectionProperties}.
-     *
-     * @param dbmsConnectionProperties Connection data
-     * @return BasePanel which also used by {@link SaveDatabaseAction}
-     */
+    /// Opens a new shared database tab with the given {@link DBMSConnectionProperties}.
+    ///
+    /// @param dbmsConnectionProperties Connection data
+    /// @return BasePanel which also used by {@link org.jabref.gui.exporter.SaveDatabaseAction}
     public LibraryTab openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
 

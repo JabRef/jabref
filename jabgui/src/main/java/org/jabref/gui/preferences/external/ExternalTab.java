@@ -81,6 +81,7 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
         Platform.runLater(() -> {
             validationVisualizer.initVisualization(viewModel.terminalCommandValidationStatus(), customTerminalCommand);
             validationVisualizer.initVisualization(viewModel.fileBrowserCommandValidationStatus(), customFileBrowserCommand);
+            validationVisualizer.initVisualization(viewModel.citeCommandValidationStatus(), citeCommand);
         });
 
         ActionFactory actionFactory = new ActionFactory();
