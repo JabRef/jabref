@@ -82,4 +82,19 @@ class MonthCheckerTest {
     void bibLaTexAcceptsInteger() {
         assertEquals(Optional.empty(), checkerBiblatex.checkValue("10"));
     }
+
+    @Test
+    void checkValueDoesNotAcceptPartialMatches() {
+        // These should FAIL
+        assertEquals(Optional.of("should be an integer or normalized"), checker.checkValue("January123"));
+        assertEquals(Optional.of("should be an integer or normalized"), checker.checkValue("#jan#trailing"));
+        assertEquals(Optional.of("should be an integer or normalized"), checker.checkValue("1abc"));
+    }
+
+    @Test
+    void checkValueAcceptsZeroPaddedMonths() {
+        // These should PASS with the new 0? regex
+        assertEquals(Optional.empty(), checker.checkValue("01"));
+        assertEquals(Optional.empty(), checker.checkValue("09"));
+    }
 }
