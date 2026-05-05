@@ -33,8 +33,7 @@ final class StyleSheetFile extends StyleSheet {
     /// At the time of writing this comment:
     ///
     ///
-    /// - src/main/java/org/jabref/gui/Base.css is 33k
-    /// - src/main/java/org/jabref/gui/Dark.css is 4k
+    /// - src/main/java/org/jabref/gui/jabref-theme.css is 33k
     /// - The dark custom theme in the Jabref documentation is 2k, see
     /// <a href="https://docs.jabref.org/advanced/custom-themes">Custom themes</a>
     ///

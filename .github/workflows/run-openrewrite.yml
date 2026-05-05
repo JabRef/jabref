@@ -10,10 +10,10 @@ on:
       - '.github/workflows/run-openrewrite.yml'
   workflow_dispatch:
     inputs:
-      pr_number:
-        description: 'Pull Request number'
+      branch:
+        description: 'Branch name to run OpenRewrite on'
         required: true
-        type: number
+        type: string
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}"
@@ -21,24 +21,24 @@ concurrency:
 
 jobs:
   rewrite:
+    if: github.event_name == 'workflow_dispatch' || github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout
         uses: actions/checkout@v6
         with:
           submodules: 'true'
-
-      - name: Checkout PR branch
-        run: |
-          gh pr checkout ${{ inputs.pr_number || github.event.pull_request.number }}
-        env:
-          GH_TOKEN: ${{secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE}}
+          ref: ${{ inputs.branch || github.event.pull_request.head.ref }}
+          token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
 
       - uses: ./.github/actions/setup-gradle
 
       - name: Run rewrite
         run: gradle --no-configuration-cache :rewriteRun
+
+      # Reformat code (because OpenRewrite does different indents)
+      - uses: ./.github/actions/format-java
 
       - name: Commit and push changes
         run: |
