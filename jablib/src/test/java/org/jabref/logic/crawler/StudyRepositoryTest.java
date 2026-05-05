@@ -199,7 +199,7 @@ class StudyRepositoryTest {
         List<QueryResult> mockResults = getMockResults();
 
         List<BibEntry> arxivEntries = getArXivQuantumMockResultsWithGroups();
-        arxivEntries.get(0).setField(StandardField.GROUPS, "ArXiv, Springer");
+        arxivEntries.getFirst().setField(StandardField.GROUPS, "ArXiv, Springer");
 
         List<BibEntry> expected = new ArrayList<>();
         expected.addAll(arxivEntries);
