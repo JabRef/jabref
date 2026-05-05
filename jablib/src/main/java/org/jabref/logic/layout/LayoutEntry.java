@@ -303,7 +303,16 @@ class LayoutEntry {
             StringBuilder sb = new StringBuilder(100);
             String fieldText;
             boolean previousSkipped = false;
+        } else {
+            if (type == LayoutHelper.IS_GROUP_START) {
+                LayoutHelper.setCurrentGroup(field.get());
+            }
+            StringBuilder sb = new StringBuilder(100);
+            String fieldText;
+            boolean previousSkipped = false;
 
+            for (int i = 0; i < layoutEntries.size(); i++) {
+                fieldText = layoutEntries.get(i).doLayout(bibtex, database);
             for (int i = 0; i < layoutEntries.size(); i++) {
                 fieldText = layoutEntries.get(i).doLayout(bibtex, database);
 
