@@ -23,6 +23,7 @@ import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.git.SlrGitHandler;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -33,8 +34,8 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -440,13 +441,14 @@ public class StudyRepository {
         }
     }
 
-    /// Tags each entry's groups field with the fetcher name.
+    /// Tags each entry's groups field with the fetcher name, preserving any existing groups.
     private void tagEntriesWithFetcherGroup(Collection<BibEntry> entries, String fetcherName) {
-        ExplicitGroup group = new ExplicitGroup(
-                fetcherName,
-                GroupHierarchyType.INDEPENDENT,
-                preferences.getBibEntryPreferences().getKeywordSeparator());
-        entries.forEach(entry -> entry.setField(StandardField.GROUPS, fetcherName));
+        char separator = preferences.getBibEntryPreferences().getKeywordSeparator();
+        entries.forEach(entry -> {
+            String existing = entry.getField(StandardField.GROUPS).orElse("");
+            String merged = KeywordList.merge(existing, fetcherName, separator).getAsString(separator);
+            entry.setField(StandardField.GROUPS, merged);
+        });
     }
 
     /// Adds a fetcher group node to the database context metadata.
@@ -456,7 +458,7 @@ public class StudyRepository {
                                         .getGroups()
                                         .orElseGet(() -> {
                                             GroupTreeNode newRoot = GroupTreeNode.fromGroup(
-                                                    new AllEntriesGroup("All entries"));
+                                                    GroupsFactory.createAllEntriesGroup());
                                             context.getMetaData().setGroups(newRoot);
                                             return newRoot;
                                         });
