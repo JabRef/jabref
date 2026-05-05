@@ -22,8 +22,8 @@ import org.jabref.http.server.resources.RootResource;
 import org.jabref.http.server.resources.callback.CallbackResource;
 import org.jabref.http.server.resources.command.CommandResource;
 import org.jabref.http.server.services.FilesToServe;
-import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.UiMessageHandler;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 
