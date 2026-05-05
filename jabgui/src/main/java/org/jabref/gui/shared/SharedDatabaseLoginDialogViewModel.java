@@ -123,6 +123,16 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
 
         EasyBind.subscribe(selectedDBMSType, selected -> port.setValue(Integer.toString(selected.getDefaultPort())));
+        EasyBind.subscribe(useSSL, selected-> {
+            String current = keystore.getValue();
+            keystore.setValue(" ");
+            keystore.setValue(current);
+        });
+        EasyBind.subscribe(autosave, selected-> {
+            String current = folder.getValue();
+            folder.setValue(" ");
+            folder.setValue(current);
+        });
 
         Predicate<String> notEmpty = input -> (input != null) && !input.isBlank();
         Predicate<String> fileExists = input -> Files.exists(Path.of(input));
@@ -139,16 +149,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
         formValidator = new CompositeValidator();
         formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator, keystoreValidator, folderValidator);
-        EasyBind.subscribe(useSSL, selected-> {
-            String current = keystore.getValue();
-            keystore.setValue(null);
-            keystore.setValue(current);
-        });
-        EasyBind.subscribe(autosave, selected-> {
-            String current = folder.getValue();
-            folder.setValue(null);
-            folder.setValue(current);
-        });
 
         applyPreferences();
     }
