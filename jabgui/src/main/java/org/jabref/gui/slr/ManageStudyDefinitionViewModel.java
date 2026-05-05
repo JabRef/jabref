@@ -57,12 +57,12 @@ public class ManageStudyDefinitionViewModel {
     private final ObservableList<String> authors = FXCollections.observableArrayList();
     private final ObservableList<String> researchQuestions = FXCollections.observableArrayList();
     private final ObservableList<String> queries = FXCollections.observableArrayList();
-  
+
     // Observe changes to each item's enabledProperty so bindings re-evaluate when catalogs are toggled
     private final ObservableList<StudyCatalogItem> catalogs = FXCollections.observableArrayList(
             item -> new javafx.beans.Observable[] {item.enabledProperty()}
     );
-  
+
     // Hold the complement of databases for the selector
     private final SimpleStringProperty directory = new SimpleStringProperty();
 
@@ -268,9 +268,9 @@ public class ManageStudyDefinitionViewModel {
                 researchQuestions,
                 queries.stream().map(StudyQuery::new).collect(Collectors.toList()),
                 catalogs.stream()
-                         .map(item -> new StudyCatalog(item.getName(), item.isEnabled(), item.getReason))
-                         .filter(StudyCatalogItem::isEnabled)
-                         .collect(Collectors.toList()));
+                        .filter(StudyCatalogItem::isEnabled)
+                        .map(item -> new StudyCatalog(item.getName(), item.isEnabled(), item.getReason()))
+                        .collect(Collectors.toList()));
     }
 
     public Property<String> titleProperty() {

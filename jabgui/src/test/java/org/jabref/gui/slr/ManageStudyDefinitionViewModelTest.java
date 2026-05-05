@@ -124,10 +124,10 @@ class ManageStudyDefinitionViewModelTest {
                 gitPreferences,
                 dialogService);
         String reason = viewModel.getCatalogs().stream()
-                .filter(item -> "ACM Portal".equals(item.getName()))
-                .findFirst()
-                .map(StudyCatalogItem::getReason)
-                .orElse("");
+                                 .filter(item -> "ACM Portal".equals(item.getName()))
+                                 .findFirst()
+                                 .map(StudyCatalogItem::getReason)
+                                 .orElse("");
         assertEquals("Primary source", reason);
     }
 
