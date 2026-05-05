@@ -127,16 +127,22 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         Predicate<String> notEmpty = input -> (input != null) && !input.isBlank();
         Predicate<String> fileExists = input -> Files.exists(Path.of(input));
         Predicate<String> notEmptyAndfilesExist = notEmpty.and(fileExists);
+        Predicate<String> keyStoreRule = input -> !useSSL.get() || notEmptyAndfilesExist.test(input);
 
         databaseValidator = new FunctionBasedValidator<>(database, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Library"))));
-        hostValidator = new FunctionBasedValidator<>(host, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Port"))));
-        portValidator = new FunctionBasedValidator<>(port, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Host"))));
+        hostValidator = new FunctionBasedValidator<>(host, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Host"))));
+        portValidator = new FunctionBasedValidator<>(port, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Port"))));
         userValidator = new FunctionBasedValidator<>(user, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("User"))));
         folderValidator = new FunctionBasedValidator<>(folder, notEmptyAndfilesExist, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
-        keystoreValidator = new FunctionBasedValidator<>(keystore, notEmptyAndfilesExist, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
+        keystoreValidator = new FunctionBasedValidator<>(keystore, keyStoreRule, ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
 
         formValidator = new CompositeValidator();
-        formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator);
+        formValidator.addValidators(databaseValidator, hostValidator, portValidator, userValidator, keystoreValidator);
+        EasyBind.subscribe(useSSL, selected-> {
+            String current = keystore.getValue();
+            keystore.setValue(null);
+            keystore.setValue(current);
+        });
 
         applyPreferences();
     }
