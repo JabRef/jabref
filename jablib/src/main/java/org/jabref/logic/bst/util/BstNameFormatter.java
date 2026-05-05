@@ -9,6 +9,7 @@ import org.jabref.logic.bst.BstVMException;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
 /// complains and pushes the null string."
 ///
 /// Sounds easy - is a nightmare... X-(
-///
+@NullMarked
 public class BstNameFormatter {
     private static final Logger LOGGER = LoggerFactory.getLogger(BstNameFormatter.class);
 

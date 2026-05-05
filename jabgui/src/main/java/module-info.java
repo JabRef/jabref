@@ -37,6 +37,7 @@ open module org.jabref {
 
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.javafx;
+    requires /*runtime*/ org.kordamp.ikonli.material;
     requires org.kordamp.ikonli.materialdesign2;
     uses org.kordamp.ikonli.IkonHandler;
     uses org.kordamp.ikonli.IkonProvider;

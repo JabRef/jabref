@@ -356,7 +356,6 @@ jobs:
           SHOULD_NOTARIZE: ${{ needs.conditions.outputs.should-notarize }}
         run: |
           # if you change the os version rename all other occurrences
-          # ./gradlew on Windows is because of https://github.com/gradle/gradle/pull/34227
           MATRIX_JSON='{
             "include": [
               {
@@ -382,7 +381,7 @@ jobs:
               {
                 "os": "windows-latest",
                 "displayName": "windows-amd64",
-                "gradleCommand": "./gradlew",
+                "gradleCommand": "gradle",
                 "archivePortable": "7z a -r jabgui/build/packages/windows-latest/JabRef-portable_windows.zip ./jabgui/build/packages/windows-latest/JabRef && rm -R jabgui/build/packages/windows-latest/JabRef",
                 "archivePortableJabKit": "7z a -r jabkit/build/packages/windows-latest/jabkit-portable_windows.zip ./jabkit/build/packages/windows-latest/jabkit && rm -R jabkit/build/packages/windows-latest/jabkit",
                 "archivePortableJabLS": "7z a -r jabls-cli/build/packages/windows-latest/jabls-portable_windows.zip ./jabls-cli/build/packages/windows-latest/jabls && rm -R jabls-cli/build/packages/windows-latest/jabls",
@@ -392,7 +391,7 @@ jobs:
               {
                 "os": "macos-15-intel",
                 "displayName": "macOS-intel",
-                "gradleCommand": "./gradlew",
+                "gradleCommand": "gradle",
                 "archivePortable": "7z a -r jabgui/build/packages/macos-15-intel/JabRef-portable_macos-intel.zip ./jabgui/build/packages/macos-15-intel/JabRef.app && rm -R jabgui/build/packages/macos-15-intel/JabRef.app",
                 "archivePortableJabKit": "7z a -r jabkit/build/packages/macos-15-intel/jabkit-portable_macos-intel.zip ./jabkit/build/packages/macos-15-intel/jabkit.app && rm -R jabkit/build/packages/macos-15-intel/jabkit.app",
                 "archivePortableJabLS": "7z a -r jabls-cli/build/packages/macos-15-intel/jabls-portable_macos-intel.zip ./jabls-cli/build/packages/macos-15-intel/jabls.app && rm -R jabls-cli/build/packages/macos-15-intel/jabls.app",
@@ -402,7 +401,7 @@ jobs:
               {
                 "os": "macos-15",
                 "displayName": "macOS-silicon",
-                "gradleCommand": "./gradlew",
+                "gradleCommand": "gradle",
                 "archivePortable": "7z a -r jabgui/build/packages/macos-15/JabRef-portable_macos-silicon.zip ./jabgui/build/packages/macos-15/JabRef.app && rm -R jabgui/build/packages/macos-15/JabRef.app",
                 "archivePortableJabKit": "7z a -r jabkit/build/packages/macos-15/jabkit-portable_macos-silicon.zip ./jabkit/build/packages/macos-15/jabkit.app && rm -R jabkit/build/packages/macos-15/jabkit.app",
                 "archivePortableJabLS": "7z a -r jabls-cli/build/packages/macos-15/jabls-portable_macos-silicon.zip ./jabls-cli/build/packages/macos-15/jabls.app && rm -R jabls-cli/build/packages/macos-15/jabls.app",
