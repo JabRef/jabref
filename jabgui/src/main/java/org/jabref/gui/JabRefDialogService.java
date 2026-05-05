@@ -545,7 +545,6 @@ public class JabRefDialogService implements DialogService {
         if (window.getOwner() == null) {
             window.initOwner(mainWindow);
         }
-        window.applyStylesheets(mainWindow.getScene().getStylesheets());
         window.show();
     }
 
