@@ -76,9 +76,9 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SelectedItemsContainer.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/callback/CallbackResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/Command.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/FocusCommand.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/OpenLibrariesCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/CommandResource.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/FocusCommand.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/OpenLibrariesCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/SelectEntriesCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibrariesResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibraryResource.java
