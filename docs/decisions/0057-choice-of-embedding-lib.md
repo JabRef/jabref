@@ -8,11 +8,9 @@ parent: Decision Records
 
 ## Context and Problem Statement
 
-[Ad](./0055-embedding-implementation-approach.md)
+Following the decision to use a comprehensive library for embedding implementation (see [ADR 0056](./0056-embedding-implementation-approach.md)), we must select a specific Java library.
 
-Following the decision to use a comprehensive library for embedding implementation (see [ADR 0055](./0054-embedding-implementation-approach.md)), we must select a specific Java library.
-
-The features that the library must support are described in "Context and Problem Statement" section of the [ADR 0055](./0054-embedding-implementation-approach.md).
+The features that the library must support are described in "Context and Problem Statement" section of the [ADR 0056](./0056-embedding-implementation-approach.md).
 
 The Java AI ecosystem is not as diverse as the Python AI ecosystem, so the choice must be careful to ensure stability and ease of use for end users.
 

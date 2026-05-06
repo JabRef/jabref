@@ -16,13 +16,13 @@ The features are built on [LangChain4j](https://github.com/langchain4j/langchain
 
 ## Architectural Decisions
 
-See [ADR-0037](../decisions/0037-rag-architecture-implementation.md) for the decision regarding the RAG infrastructure.
+See [ADR-0037](./../decisions/0037-rag-architecture-implementation.md) for the decision regarding the RAG infrastructure.
 
-The [ADR-0032](../decisions/0032-store-chats-in-local-user-folder.md) and [ADR-0033](../decisions/0033-store-chats-in-mvstore.md) are important ones, because they explain the decisions regarding the storage of AI artifacts (summaries, chat histories, embeddings, etc.).
+The [ADR-0032](./../decisions/0032-store-chats-in-local-user-folder.md) and [ADR-0033](./../decisions/0033-store-chats-in-mvstore.md) are important ones, because they explain the decisions regarding the storage of AI artifacts (summaries, chat histories, embeddings, etc.).
 
 ## Requirements
 
-See [the requirements page of AI features](../requirements/ai.md).
+See [the requirements page of AI features](./../requirements/ai.md).
 
 ## Features
 
