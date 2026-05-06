@@ -975,27 +975,14 @@ public class MedlineImporter extends Importer implements Parser {
     }
 
     private void addMeshHeading(Map<Field, String> fields, List<MeshHeading> meshHeadingList) {
-        List<String> keywords = new ArrayList<>();
-
-        if (!meshHeadingList.isEmpty()) {
-            for (MeshHeading meshHeading : meshHeadingList) {
-                String descriptor = meshHeading.descriptorName();
-                if (meshHeading.descriptorMajor()) {
-                    descriptor += "*";
-                }
-
-                if (meshHeading.qualifierNames() == null || meshHeading.qualifierNames().isEmpty()) {
-                    keywords.add(descriptor);
-                } else {
-                    for (MeshHeading.QualifierName qualifier : meshHeading.qualifierNames()) {
-                        String qualifierStr = qualifier.major() ? qualifier.name() + "*" : qualifier.name();
-                        keywords.add(descriptor + "/" + qualifierStr);
-                    }
-                }
-            }
-
-            fields.put(StandardField.KEYWORDS, String.join(KEYWORD_SEPARATOR, keywords));
+        if (meshHeadingList.isEmpty()) {
+            return;
         }
+        List<String> keywords = new ArrayList<>();
+        for (MeshHeading meshHeading : meshHeadingList) {
+            keywords.addAll(meshHeading.toKeywords());
+        }
+        fields.put(StandardField.KEYWORDS, String.join(KEYWORD_SEPARATOR, keywords));
     }
 
     private void addPubDate(XMLStreamReader reader, Map<Field, String> fields, String startElement) throws XMLStreamException {

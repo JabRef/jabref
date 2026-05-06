@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.medline.MeshHeading;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
@@ -397,38 +398,26 @@ public class MedlinePlainImporter extends Importer {
         }
     }
 
-    /// Parses a MeSH term from MEDLINE plain format into individual heading/qualifier keywords.
-    /// For example, {@code *Kidney Diseases/diagnosis/epidemiology} becomes
-    /// {@code ["Kidney Diseases*/diagnosis", "Kidney Diseases*/epidemiology"]}.
-    /// A heading without qualifiers for example, {@code *Humans}) becomes {@code ["Humans*"]}.
+    /// Parses a MeSH term from MEDLINE plain format (e.g. {@code *Kidney Diseases/diagnosis/epidemiology})
+    /// into a {@link MeshHeading} and renders it as individual keywords
+    /// (e.g. {@code ["Kidney Diseases*/diagnosis", "Kidney Diseases*/epidemiology"]}).
     private List<String> parseMeshTerm(String meshTerm) {
         String term = meshTerm.trim();
-
         boolean descriptorMajor = term.startsWith("*");
         if (descriptorMajor) {
             term = term.substring(1);
         }
-
         String[] parts = term.split("/");
-        String descriptor = parts[0];
-        if (descriptorMajor) {
-            descriptor += "*";
-        }
-
-        if (parts.length == 1) {
-            return List.of(descriptor);
-        }
-
-        List<String> keywords = new ArrayList<>();
+        List<MeshHeading.QualifierName> qualifiers = new ArrayList<>();
         for (int i = 1; i < parts.length; i++) {
             String qualifier = parts[i];
             boolean qualifierMajor = qualifier.startsWith("*");
             if (qualifierMajor) {
-                qualifier = qualifier.substring(1) + "*";
+                qualifier = qualifier.substring(1);
             }
-            keywords.add(descriptor + "/" + qualifier);
+            qualifiers.add(new MeshHeading.QualifierName(qualifier, qualifierMajor));
         }
-        return keywords;
+        return new MeshHeading(parts[0], descriptorMajor, qualifiers).toKeywords();
     }
 
     private boolean isCreateDateFormat(String value) {
