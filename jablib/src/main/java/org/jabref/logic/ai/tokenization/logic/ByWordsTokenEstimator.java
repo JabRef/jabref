@@ -7,7 +7,7 @@ import org.jabref.model.ai.chatting.ChatMessage;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
 public class ByWordsTokenEstimator implements TokenEstimator {
-    private static final float WORD_FACTOR = 0.75f;
+    private static final float WORD_FACTOR = 0.75F;
 
     @Override
     public int estimate(ChatMessage.Role role, String content) {

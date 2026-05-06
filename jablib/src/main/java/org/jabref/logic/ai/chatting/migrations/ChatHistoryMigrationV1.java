@@ -171,7 +171,7 @@ public final class ChatHistoryMigrationV1 {
             int index = oldMapName.lastIndexOf(GROUP_CHAT_HISTORY_INFIX);
             chatName = oldMapName.substring(index + GROUP_CHAT_HISTORY_INFIX.length());
         } else {
-            LOGGER.warn("Unknown chat history map format: {}", oldMapName);
+            LOGGER.error("Unknown chat history map format: {}", oldMapName);
             return false;
         }
 
@@ -211,8 +211,8 @@ public final class ChatHistoryMigrationV1 {
                     index++;
                 }
             } catch (Exception e) {
-                LOGGER.warn("Failed to deserialize chat history record at index {}: {}",
-                        entry.getKey(), e.getMessage());
+                LOGGER.error("Failed to deserialize chat history record at index {}: {}",
+                        entry.getKey(), e.getMessage(), e);
             }
         }
 
@@ -236,7 +236,7 @@ public final class ChatHistoryMigrationV1 {
             LOGGER.warn("Deserialized object is not ChatHistoryRecord: {}", obj.getClass());
             return null;
         } catch (Exception e) {
-            LOGGER.warn("Failed to deserialize old chat history record: {}", e.getMessage());
+            LOGGER.error("Failed to deserialize old chat history record: {}", e.getMessage(), e);
             return null;
         }
     }

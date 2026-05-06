@@ -90,7 +90,7 @@ public class AiSummaryShowingViewModel extends AbstractViewModel {
         if (isMarkdown.get()) {
             return MARKDOWN_FORMATTER.format(content);
         } else {
-            return String.format(HTML_TEMPLATE, content);
+            return HTML_TEMPLATE.formatted(content);
         }
     }
 

@@ -162,7 +162,7 @@ public final class SummariesMigrationV1 {
                     migratedCount++;
                     LOGGER.debug("Migrated summary for: {}", citationKey);
                 } catch (Exception e) {
-                    LOGGER.warn("Failed to migrate summary for {}: {}", citationKey, e.getMessage());
+                    LOGGER.error("Failed to migrate summary for {}: {}", citationKey, e.getMessage(), e);
                     failedCount++;
                 }
             }

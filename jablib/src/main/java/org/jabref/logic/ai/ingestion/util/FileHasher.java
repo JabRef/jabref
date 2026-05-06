@@ -52,10 +52,10 @@ public final class FileHasher {
     /// @param bytes the byte array
     /// @return the hex-encoded string
     private static String bytesToHex(byte[] bytes) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
-            sb.append(String.format("%02x", b));
+        StringBuilder stringBuilder = new StringBuilder();
+        for (byte theByte : bytes) {
+            stringBuilder.append("%02x".formatted(theByte));
         }
-        return sb.toString();
+        return stringBuilder.toString();
     }
 }

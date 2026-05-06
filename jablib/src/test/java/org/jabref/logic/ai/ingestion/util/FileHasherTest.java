@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class FileHasherTest {
 
     @Test
-    void testComputeHashProducesConsistentHash(@TempDir Path tempDir) throws IOException {
+    void computeHashProducesConsistentHash(@TempDir Path tempDir) throws IOException {
         Path testFile = tempDir.resolve("test.txt");
         Files.writeString(testFile, "Test content", StandardOpenOption.CREATE);
 
@@ -27,7 +27,7 @@ class FileHasherTest {
     }
 
     @Test
-    void testComputeHashDifferentForDifferentContent(@TempDir Path tempDir) throws IOException {
+    void computeHashDifferentForDifferentContent(@TempDir Path tempDir) throws IOException {
         Path file1 = tempDir.resolve("file1.txt");
         Files.writeString(file1, "Content 1", StandardOpenOption.CREATE);
 
@@ -46,7 +46,7 @@ class FileHasherTest {
     }
 
     @Test
-    void testComputeHashProducesHexString(@TempDir Path tempDir) throws IOException {
+    void computeHashProducesHexString(@TempDir Path tempDir) throws IOException {
         Path testFile = tempDir.resolve("test.txt");
         Files.writeString(testFile, "Test", StandardOpenOption.CREATE);
 

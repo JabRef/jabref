@@ -58,7 +58,7 @@ class ChatHistoryRepositoryTest {
         repo.addMessage(IDENTIFIER, new ChatMessage(first.id(), Instant.ofEpochMilli(1000), first.role(), first.content(), first.relevantInformation()));
 
         List<ChatMessage> all = repo.getAllMessages(IDENTIFIER);
-        assertEquals("first", all.get(0).content());
+        assertEquals("first", all.getFirst().content());
         assertEquals("second", all.get(1).content());
     }
 

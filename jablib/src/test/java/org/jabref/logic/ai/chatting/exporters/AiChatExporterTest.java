@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AiChatExporterTest {
@@ -95,7 +96,7 @@ class AiChatExporterTest {
         String result = exporter.export(metadata, entries, BibDatabaseMode.BIBTEX, messages);
 
         assertTrue(result.contains("visible user message"));
-        assertTrue(!result.contains("top secret system prompt"));
+        assertFalse(result.contains("top secret system prompt"));
     }
 
     @ParameterizedTest
