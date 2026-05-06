@@ -203,7 +203,6 @@ open module org.jabref.jablib {
     requires tools.jackson.dataformat.yaml;
     requires tools.jackson.core;
     requires transitive com.fasterxml.jackson.annotation;
-    requires com.fasterxml.jackson.datatype.jsr310;
     // endregion
 
     // region HTTP clients

@@ -11,17 +11,12 @@ import org.jabref.logic.util.NotificationService;
 import org.jabref.model.ai.chatting.ChatIdentifier;
 import org.jabref.model.ai.chatting.ChatMessage;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jspecify.annotations.NonNull;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 public class MVStoreChatHistoryRepository extends MVStoreBase implements ChatHistoryRepository {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    static {
-        OBJECT_MAPPER.registerModule(new JavaTimeModule());
-    }
+    private static final JsonMapper JSON_MAPPER = new JsonMapper();
 
     public MVStoreChatHistoryRepository(@NonNull Path path, NotificationService dialogService) {
         super(path, dialogService);
@@ -41,8 +36,8 @@ public class MVStoreChatHistoryRepository extends MVStoreBase implements ChatHis
     public void addMessage(ChatIdentifier chatIdentifier, ChatMessage chatMessage) {
         Map<String, String> map = openMap(chatIdentifier);
         try {
-            map.put(chatMessage.id(), OBJECT_MAPPER.writeValueAsString(chatMessage));
-        } catch (JsonProcessingException e) {
+            map.put(chatMessage.id(), JSON_MAPPER.writeValueAsString(chatMessage));
+        } catch (JacksonException e) {
             // NOTE: This is a highly not probable exception, so wrapping in try/catch and turning to a
             // RuntimeException to ignore it.
             throw new RuntimeException(e);
@@ -67,8 +62,8 @@ public class MVStoreChatHistoryRepository extends MVStoreBase implements ChatHis
 
         return map.values().stream().map(s -> {
             try {
-                return OBJECT_MAPPER.readValue(s, ChatMessage.class);
-            } catch (JsonProcessingException e) {
+                return JSON_MAPPER.readValue(s, ChatMessage.class);
+            } catch (JacksonException e) {
                 // NOTE: This is a highly not probable exception, so wrapping in try/catch and turning to a
                 // RuntimeException to ignore it.
                 throw new RuntimeException(e);

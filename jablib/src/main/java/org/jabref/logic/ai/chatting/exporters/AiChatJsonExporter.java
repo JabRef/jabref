@@ -18,26 +18,25 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 /// Exports an AI chat conversation to JSON format.
 ///
 /// The JSON output includes export metadata (provider, model, timestamp), BibTeX entry data,
 /// and the conversation messages with role/content pairs.
 ///
-/// The JSON schema of the export is handcrafted, because there is no well-established export format.
+/// The JSON schema of the export is handcrafted because there is no well-established export format.
 public class AiChatJsonExporter implements AiChatExporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiChatJsonExporter.class);
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-            .registerModule(new JavaTimeModule())
+    private static final JsonMapper OBJECT_MAPPER = JsonMapper
+            .builder()
             .enable(SerializationFeature.INDENT_OUTPUT)
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            .build();
 
     private final BibEntryTypesManager entryTypesManager;
     private final FieldPreferences fieldPreferences;
@@ -96,7 +95,7 @@ public class AiChatJsonExporter implements AiChatExporter {
 
         try {
             return OBJECT_MAPPER.writeValueAsString(root);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             // Should not happen for a plain Map<String, Object> with String values
             throw new RuntimeException("Failed to serialize chat export to JSON", e);
         }
