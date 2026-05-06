@@ -39,7 +39,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.1")
 
-    api("com.dlsc.gemsfx:gemsfx:4.0.4")
+    api("com.dlsc.gemsfx:gemsfx:4.0.5")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
     api("com.fasterxml:aalto-xml:1.3.4")
@@ -123,7 +123,7 @@ dependencies.constraints {
     api("org.glassfish.jaxb:jaxb-runtime:4.0.8")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.0.Final")
-    api("org.hisp.dhis:json-tree:1.9.1")
+    api("org.hisp.dhis:json-tree:1.9.2")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
     api("org.jabref:mslinks:1.2")
