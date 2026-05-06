@@ -39,8 +39,6 @@ open module org.jabref.jablib {
     exports org.jabref.model.groups;
     exports org.jabref.model.groups.event;
     exports org.jabref.logic.preview;
-    exports org.jabref.logic.ai;
-    exports org.jabref.logic.ai.models;
     exports org.jabref.logic.pdf;
     exports org.jabref.model.database.event;
     exports org.jabref.model.entry.event;
@@ -59,10 +57,6 @@ open module org.jabref.jablib {
     exports org.jabref.logic.openoffice.style;
     exports org.jabref.model.metadata;
     exports org.jabref.model.metadata.event;
-    exports org.jabref.logic.ai.chatting;
-    exports org.jabref.logic.ai.util;
-    exports org.jabref.logic.ai.summarization;
-    exports org.jabref.logic.ai.summarization.repositories;
     exports org.jabref.logic.layout.format;
     exports org.jabref.logic.auxparser;
     exports org.jabref.logic.cleanup;
@@ -122,6 +116,12 @@ open module org.jabref.jablib {
     exports org.jabref.logic.bibtex.comparator.plausibility;
 
     // region: AI
+    exports org.jabref.logic.ai;
+    exports org.jabref.logic.ai.models;
+    exports org.jabref.logic.ai.chatting;
+    exports org.jabref.logic.ai.util;
+    exports org.jabref.logic.ai.summarization;
+    exports org.jabref.logic.ai.summarization.repositories;
     exports org.jabref.logic.ai.ingestion;
     exports org.jabref.logic.ai.ingestion.logic.documentsplitting;
     exports org.jabref.logic.ai.ingestion.logic.ingestion;
@@ -304,6 +304,6 @@ open module org.jabref.jablib {
     requires transitive org.antlr.antlr4.runtime;
     requires org.jooq.jool;
     requires transitive org.libreoffice.uno;
-    requires transitive org.jspecify;
+    requires /* runtime */ transitive org.jspecify;
     // endregion
 }
