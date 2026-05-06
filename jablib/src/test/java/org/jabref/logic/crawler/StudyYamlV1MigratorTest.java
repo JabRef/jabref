@@ -18,7 +18,7 @@ class StudyYamlV1MigratorTest {
         String input = Files.readString(Path.of(inputUrl.toURI()));
         String expected = Files.readString(Path.of(expectedUrl.toURI()));
 
-        assertEquals(expected.trim(), StudyYamlV1Migrator.migrate(input).trim());
+        assertEquals(expected.replace("\r\n", "\n").trim(), StudyYamlV1Migrator.migrate(input).replace("\r\n", "\n").trim());
     }
 
     @Test
@@ -29,6 +29,6 @@ class StudyYamlV1MigratorTest {
         String input = Files.readString(Path.of(inputUrl.toURI()));
         String expected = Files.readString(Path.of(expectedUrl.toURI()));
 
-        assertEquals(expected.trim(), StudyYamlV1Migrator.migrate(input).trim());
+        assertEquals(expected.replace("\r\n", "\n").trim(), StudyYamlV1Migrator.migrate(input).replace("\r\n", "\n").trim());
     }
 }

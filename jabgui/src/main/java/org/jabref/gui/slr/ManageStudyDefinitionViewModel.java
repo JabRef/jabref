@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
@@ -266,11 +265,11 @@ public class ManageStudyDefinitionViewModel {
                 authors,
                 title.getValueSafe(),
                 researchQuestions,
-                queries.stream().map(StudyQuery::new).collect(Collectors.toList()),
+                queries.stream().map(StudyQuery::new).toList(),
                 catalogs.stream()
                         .filter(StudyCatalogItem::isEnabled)
                         .map(item -> new StudyCatalog(item.getName(), item.isEnabled(), item.getReason()))
-                        .collect(Collectors.toList()));
+                        .toList());
     }
 
     public Property<String> titleProperty() {
@@ -304,7 +303,7 @@ public class ManageStudyDefinitionViewModel {
         List<String> selectedCatalogsList = catalogs.stream()
                                                     .filter(StudyCatalogItem::isEnabled)
                                                     .map(StudyCatalogItem::getName)
-                                                    .collect(Collectors.toList());
+                                                    .toList();
 
         workspacePreferences.setSelectedSlrCatalogs(selectedCatalogsList);
     }

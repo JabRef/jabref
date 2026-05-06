@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class StudyQuery {
     private String query;
 
-    @JsonProperty("catalogue-specific")
+    @JsonProperty("catalog-specific")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, String> catalogSpecific;
 

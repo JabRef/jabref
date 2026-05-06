@@ -182,7 +182,7 @@ public class StudyRepository {
         return study.getCatalogs()
                     .parallelStream()
                     .filter(StudyCatalog::isEnabled)
-                    .collect(Collectors.toList());
+                    .toList();
     }
 
     public Study getStudy() {

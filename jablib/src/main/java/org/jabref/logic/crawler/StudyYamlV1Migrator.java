@@ -17,23 +17,23 @@ import tools.jackson.dataformat.yaml.YAMLWriteFeature;
 public class StudyYamlV1Migrator {
 
     public static String migrate(String v1YamlContent) throws IOException {
-        var mapper = new ObjectMapper(new YAMLFactory());
-        LinkedHashMap<String, Object> v1Map = mapper.readValue(v1YamlContent, new TypeReference<>() {
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        LinkedHashMap<String, Object> v1Mapping = mapper.readValue(v1YamlContent, new TypeReference<>() {
         });
 
-        var v2Map = new LinkedHashMap<String, Object>();
-        v2Map.put("version", Study.CURRENT_SCHEMA_VERSION);
-        v2Map.putAll(v1Map);
+        LinkedHashMap<String, Object> v2Mapping = new LinkedHashMap<>();
+        v2Mapping.put("version", Study.CURRENT_SCHEMA_VERSION);
+        v2Mapping.putAll(v1Mapping);
 
-        if (v2Map.containsKey("databases")) {
-            var databasesValue = v2Map.remove("databases");
+        if (v2Mapping.containsKey("databases")) {
+            Object databasesValue = v2Mapping.remove("databases");
             if (databasesValue instanceof List<?> databasesList) {
-                var catalogs = new ArrayList<Map<String, Object>>();
-                for (var entry : databasesList) {
+                List<Map<String, Object>> catalogs = new ArrayList<>();
+                for (Object entry : databasesList) {
                     if (entry instanceof Map<?, ?> entryMap) {
-                        var catalogEntry = new LinkedHashMap<String, Object>();
-                        for (var e : entryMap.entrySet()) {
-                            catalogEntry.put((String) e.getKey(), e.getValue());
+                        LinkedHashMap<String, Object> catalogEntry = new LinkedHashMap<>();
+                        for (Map.Entry<?, ?> mapEntry : entryMap.entrySet()) {
+                            catalogEntry.put((String) mapEntry.getKey(), mapEntry.getValue());
                         }
                         if (!catalogEntry.containsKey("reason")) {
                             catalogEntry.put("reason", "");
@@ -41,14 +41,14 @@ public class StudyYamlV1Migrator {
                         catalogs.add(catalogEntry);
                     }
                 }
-                v2Map.put("catalogs", catalogs);
+                v2Mapping.put("catalogs", catalogs);
             }
         }
 
-        var writeMapper = new YAMLMapper(YAMLFactory.builder()
-                                                    .disable(YAMLWriteFeature.WRITE_DOC_START_MARKER)
-                                                    .enable(YAMLWriteFeature.MINIMIZE_QUOTES).build());
-        return writeMapper.writeValueAsString(v2Map);
+        YAMLMapper writeMapper = new YAMLMapper(YAMLFactory.builder()
+                                                           .disable(YAMLWriteFeature.WRITE_DOC_START_MARKER)
+                                                           .enable(YAMLWriteFeature.MINIMIZE_QUOTES).build());
+        return writeMapper.writeValueAsString(v2Mapping);
     }
 }
 

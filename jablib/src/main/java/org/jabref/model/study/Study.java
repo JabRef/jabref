@@ -1,5 +1,6 @@
 package org.jabref.model.study;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,6 +46,10 @@ public class Study {
     /// Used for Jackson deserialization
     private Study() {
         this.version = CURRENT_SCHEMA_VERSION;
+        this.authors = new ArrayList<>();
+        this.researchQuestions = new ArrayList<>();
+        this.queries = new ArrayList<>();
+        this.catalogs = new ArrayList<>();
     }
 
     public String getVersion() {
