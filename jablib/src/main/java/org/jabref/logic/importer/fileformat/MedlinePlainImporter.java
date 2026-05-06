@@ -96,6 +96,7 @@ public class MedlinePlainImporter extends Importer {
             StringBuilder editor = new StringBuilder();
             StringBuilder comment = new StringBuilder();
             Map<Field, String> fieldConversionMap = new HashMap<>();
+            String keywordSeparator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator() + " ";
 
             String[] lines = entry1.split("\n");
 
@@ -191,17 +192,13 @@ public class MedlinePlainImporter extends Importer {
                          "FIR" ->
                             fieldConversionMap.merge(new UnknownField("investigator"), value, (a, b) -> a + ", " + b);
                     case "MH" -> {
-                        List<String> meshKeywords = parseMeshTerm(value);
-                        Character separator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator();
-                        String meshString = String.join(separator + " ", meshKeywords);
+                        String meshString = String.join(keywordSeparator, parseMeshTerm(value));
                         fieldConversionMap.merge(StandardField.KEYWORDS, meshString,
-                                (existing, newVal) -> existing + separator + " " + newVal);
+                                (existing, newVal) -> existing + keywordSeparator + newVal);
                     }
-                    case "OT" -> {
-                        Character separator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator();
-                        fieldConversionMap.merge(StandardField.KEYWORDS, value,
-                                (existing, newVal) -> existing + separator + " " + newVal);
-                    }
+                    case "OT" ->
+                            fieldConversionMap.merge(StandardField.KEYWORDS, value,
+                                    (existing, newVal) -> existing + keywordSeparator + newVal);
                     case "CON",
                          "CIN",
                          "EIN",
