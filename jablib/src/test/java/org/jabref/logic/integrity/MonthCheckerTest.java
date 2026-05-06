@@ -2,7 +2,6 @@ package org.jabref.logic.integrity;
 
 import java.util.Optional;
 
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 
@@ -86,16 +85,12 @@ class MonthCheckerTest {
 
     @Test
     void checkValueDoesNotAcceptPartialMatches() {
-        assertEquals(Optional.of(Localization.lang("should be an integer or normalized")),
-                checkerBiblatex.checkValue("January123"));
-
-        assertEquals(Optional.of(Localization.lang("should be an integer or normalized")),
-                checkerBiblatex.checkValue("#jan#trailing"));
+        assertEquals(Optional.of("should be an integer or normalized"), checkerBiblatex.checkValue("January123"));
+        assertEquals(Optional.of("should be an integer or normalized"), checkerBiblatex.checkValue("#jan#trailing"));
     }
 
     @Test
     void checkValueAcceptsZeroPaddedMonths() {
-        // Confirms that the optional zero (0?) in the regex works for Biblatex mode
         assertEquals(Optional.empty(), checkerBiblatex.checkValue("01"));
         assertEquals(Optional.empty(), checkerBiblatex.checkValue("09"));
     }
