@@ -9,6 +9,7 @@ import org.jabref.logic.util.URLUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -36,27 +37,7 @@ class URLUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource(
-            textBlock = """
-                    # malformed Google URL
-                    https://www.google.de/url♥
-                    # no queries
-                    https://www.google.de/url
-                    https://www.google.de/url?
-                    # no multiple queries
-                    https://www.google.de/url?key=value
-                    # no key values
-                    https://www.google.de/url?key
-                    https://www.google.de/url?url
-                    https://www.google.de/url?key=
-                    # no url param
-                    https://www.google.de/url?key=value&key2=value2
-                    # no url param value
-                    https://www.google.de/url?url=
-                    # url param value no URL
-                    https://www.google.de/url?url=this+is+no+url
-                    """
-    )
+    @ValueSource(strings = {"https://www.google.de/url♥", "https://www.google.de/url", "https://www.google.de/url?", "https://www.google.de/url?key=value", "https://www.google.de/url?key", "https://www.google.de/url?url", "https://www.google.de/url?key=", "https://www.google.de/url?key=value&key2=value2", "https://www.google.de/url?url=", "https://www.google.de/url?url=this+is+no+url"})
     void cleanGoogleSearchUrlKeepsGoogleOnlyUrls(String input) {
         assertEquals(input, URLUtil.cleanGoogleSearchURL(input));
     }
@@ -84,23 +65,13 @@ class URLUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource(
-            textBlock = """
-                    http://www.google.com
-                    https://www.google.com
-                    """
-    )
+    @ValueSource(strings = {"http://www.google.com", "https://www.google.com"})
     void isURLshouldAcceptValidURL(String url) {
         assertTrue(URLUtil.isURL(url));
     }
 
     @ParameterizedTest
-    @CsvSource(
-            textBlock = """
-                    www.google.com
-                    google.com
-                    """
-    )
+    @ValueSource(strings = {"www.google.com", "google.com"})
     void isURLshouldRejectInvalidURL(String url) {
         assertFalse(URLUtil.isURL(url));
     }
@@ -165,43 +136,13 @@ class URLUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource(
-            textBlock = """
-                    http://www.google.com
-                    https://www.google.com
-                    http://example.com
-                    https://example.com
-                    http://example.com/path
-                    https://example.com/path/to/resource
-                    http://example.com:8080
-                    https://example.com:443/path?query=value
-                    HTTP://EXAMPLE.COM
-                    HTTPS://EXAMPLE.COM
-                    http://example.com/path/to/resource
-                    https://sub.example.com
-                    """
-    )
+    @ValueSource(strings = {"http://www.google.com", "https://www.google.com", "http://example.com", "https://example.com", "http://example.com/path", "https://example.com/path/to/resource", "http://example.com:8080", "https://example.com:443/path?query=value", "HTTP://EXAMPLE.COM", "HTTPS://EXAMPLE.COM", "http://example.com/path/to/resource", "https://sub.example.com"})
     void isValidHttpUrlShouldAcceptValidHttpUrls(String url) {
         assertTrue(URLUtil.isValidHttpUrl(url));
     }
 
     @ParameterizedTest
-    @CsvSource(
-            textBlock = """
-                    ftp://example.com
-                    file:///path/to/file
-                    mailto:someone@example.com
-                    www.google.com
-                    example.com
-                    //example.com
-                    http
-                    https
-                    http://example.com/test|file
-                    http://example.com/test<>file
-                    http://example.com/test{file}
-                    http://[invalid-url]
-                    """
-    )
+    @ValueSource(strings = {"ftp://example.com", "file:///path/to/file", "mailto:someone@example.com", "www.google.com", "example.com", "//example.com", "http", "https", "http://example.com/test|file", "http://example.com/test<>file", "http://example.com/test{file}", "http://[invalid-url]"})
     void isValidHttpUrlShouldRejectNonHttpUrls(String url) {
         assertFalse(URLUtil.isValidHttpUrl(url));
     }
