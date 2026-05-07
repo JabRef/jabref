@@ -55,12 +55,12 @@ public class OSX extends NativeDesktop {
         }
 
         if (pageNumber > 1 && BrowserUtils.isSkim(appNameLower)) {
-            String appleScript = String.format(
+            String appleScript = (
                     "tell application \"Skim\"\n" +
                             "  activate\n" +
                             "  set myDoc to open POSIX file \"%s\"\n" +
                             "  tell myDoc to go to page %d\n" +
-                            "end tell", filePath, pageNumber);
+                            "end tell").formatted(filePath, pageNumber);
 
             new ProcessBuilder("/usr/bin/osascript", "-e", appleScript).start();
             return;

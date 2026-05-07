@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
@@ -27,6 +28,8 @@ import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.io.FileUtil;
 
 import org.slf4j.LoggerFactory;
+
+import static java.util.function.Predicate.not;
 
 /// This class contains Linux specific implementations for file directories and file/application open handling methods.
 ///
@@ -61,7 +64,7 @@ public class Linux extends NativeDesktop {
     public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences, int pageNumber) throws IOException {
         Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
         String viewer = type.map(ExternalFileType::getOpenWithApplication)
-                            .filter(app -> !app.isEmpty())
+                            .filter(not(String::isEmpty))
                             .orElse("");
 
         if (!viewer.isEmpty()) {

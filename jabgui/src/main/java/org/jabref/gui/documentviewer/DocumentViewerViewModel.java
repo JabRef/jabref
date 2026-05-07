@@ -150,7 +150,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         }
 
         String link = file.getLink();
-        if (link == null || link.trim().isEmpty()) {
+        if (link == null || link.isBlank()) {
             return false;
         }
 

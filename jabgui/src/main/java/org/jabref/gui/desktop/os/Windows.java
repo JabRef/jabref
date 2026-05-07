@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.BrowserUtils;
@@ -21,6 +22,8 @@ import com.sun.jna.platform.win32.ShlObj;
 import com.sun.jna.platform.win32.Win32Exception;
 import org.slf4j.LoggerFactory;
 
+import static java.util.function.Predicate.not;
+
 /// This class contains Windows specific implementations for file directories and file/application open handling methods.
 ///
 /// We cannot use a static logger instance here in this class as the Logger first needs to be configured in the {@link JabKit#initLogging}.
@@ -32,7 +35,7 @@ public class Windows extends NativeDesktop {
     public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences, int pageNumber) throws IOException {
         Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
         String application = type.map(ExternalFileType::getOpenWithApplication)
-                                 .filter(app -> !app.isEmpty())
+                                 .filter(not(String::isEmpty))
                                  .orElse("");
 
         if (!application.isEmpty()) {
