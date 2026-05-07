@@ -84,7 +84,8 @@ graalvmNative {
             buildArgs.addAll(
                 "--no-fallback",
                 "-H:+ReportExceptionStackTraces",
-                "-H:+IncludeAllLocales"
+                "-H:+IncludeAllLocales",
+                "-H:+EnableAllSecurityServices"
             )
         }
     }
