@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import javafx.beans.binding.Bindings;
@@ -36,6 +37,7 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
+import org.jabref.model.study.StudyQuery;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -66,9 +68,9 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TableColumn<String, String> questionsColumn;
     @FXML private TableColumn<String, String> questionsActionColumn;
 
-    @FXML private TableView<String> queryTableView;
-    @FXML private TableColumn<String, String> queriesColumn;
-    @FXML private TableColumn<String, String> queriesActionColumn;
+    @FXML private TableView<StudyQuery> queryTableView;
+    @FXML private TableColumn<StudyQuery, String> queriesColumn;
+    @FXML private TableColumn<StudyQuery, String> queriesActionColumn;
 
     @FXML private TableView<StudyCatalogItem> catalogTable;
     @FXML private TableColumn<StudyCatalogItem, Boolean> catalogEnabledColumn;
@@ -214,19 +216,19 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
     private void initAuthorTab() {
         setupCommonPropertiesForTables(addAuthor, this::addAuthor, authorsColumn, authorsActionColumn);
-        setupCellFactories(authorsColumn, authorsActionColumn, viewModel::deleteAuthor);
+        setupCellFactories(authorsColumn, authorsActionColumn, Function.identity(), viewModel::deleteAuthor);
         authorTableView.setItems(viewModel.getAuthors());
     }
 
     private void initQuestionsTab() {
         setupCommonPropertiesForTables(addResearchQuestion, this::addResearchQuestion, questionsColumn, questionsActionColumn);
-        setupCellFactories(questionsColumn, questionsActionColumn, viewModel::deleteQuestion);
+        setupCellFactories(questionsColumn, questionsActionColumn, Function.identity(), viewModel::deleteQuestion);
         questionTableView.setItems(viewModel.getResearchQuestions());
     }
 
     private void initQueriesTab() {
         setupCommonPropertiesForTables(addQuery, this::addQuery, queriesColumn, queriesActionColumn);
-        setupCellFactories(queriesColumn, queriesActionColumn, viewModel::deleteQuery);
+        setupCellFactories(queriesColumn, queriesActionColumn, StudyQuery::getQuery, viewModel::deleteQuery);
         queryTableView.setItems(viewModel.getQueries());
 
         // TODO: Keep until PR #7279 is merged
@@ -347,16 +349,17 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         viewModel.shareOnSearchRxiv(pathToStudyDataDirectory);
     }
 
-    private void setupCellFactories(TableColumn<String, String> contentColumn,
-                                    TableColumn<String, String> actionColumn,
-                                    Consumer<String> removeAction) {
-        contentColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
-        actionColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
-        new ValueTableCellFactory<String, String>()
+    private <T> void setupCellFactories(TableColumn<T, String> contentColumn,
+                                        TableColumn<T, String> actionColumn,
+                                        Function<T, String> displayExtractor,
+                                        Consumer<T> removeAction) {
+        contentColumn.setCellValueFactory(param -> new SimpleStringProperty(displayExtractor.apply(param.getValue())));
+        actionColumn.setCellValueFactory(param -> new SimpleStringProperty(displayExtractor.apply(param.getValue())));
+        new ValueTableCellFactory<T, String>()
                 .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(name -> Localization.lang("Remove"))
-                .withOnMouseClickedEvent(item -> evt ->
-                        removeAction.accept(item))
+                .withOnMouseClickedEvent((rowItem, cellValue) -> evt ->
+                        removeAction.accept(rowItem))
                 .install(actionColumn);
     }
 

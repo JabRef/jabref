@@ -55,7 +55,7 @@ public class ManageStudyDefinitionViewModel {
     private final StringProperty title = new SimpleStringProperty();
     private final ObservableList<String> authors = FXCollections.observableArrayList();
     private final ObservableList<String> researchQuestions = FXCollections.observableArrayList();
-    private final ObservableList<String> queries = FXCollections.observableArrayList();
+    private final ObservableList<StudyQuery> queries = FXCollections.observableArrayList();
 
     // Observe changes to each item's enabledProperty so bindings re-evaluate when catalogs are toggled
     private final ObservableList<StudyCatalogItem> catalogs = FXCollections.observableArrayList(
@@ -117,7 +117,7 @@ public class ManageStudyDefinitionViewModel {
         authors.addAll(study.getAuthors());
         title.setValue(study.getTitle());
         researchQuestions.addAll(study.getResearchQuestions());
-        queries.addAll(study.getQueries().stream().map(StudyQuery::getQuery).toList());
+        queries.addAll(study.getQueries());
         List<StudyCatalog> studyCatalogs = study.getCatalogs();
         catalogs.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                    .stream()
@@ -195,7 +195,7 @@ public class ManageStudyDefinitionViewModel {
         return researchQuestions;
     }
 
-    public ObservableList<String> getQueries() {
+    public ObservableList<StudyQuery> getQueries() {
         return queries;
     }
 
@@ -221,7 +221,7 @@ public class ManageStudyDefinitionViewModel {
         if (query.isBlank()) {
             return;
         }
-        queries.add(query);
+        queries.add(new StudyQuery(query));
     }
 
     public SlrStudyAndDirectory saveStudy() {
@@ -265,7 +265,7 @@ public class ManageStudyDefinitionViewModel {
                 authors,
                 title.getValueSafe(),
                 researchQuestions,
-                queries.stream().map(StudyQuery::new).toList(),
+                queries.stream().toList(),
                 catalogs.stream()
                         .filter(StudyCatalogItem::isEnabled)
                         .map(item -> new StudyCatalog(item.getName(), item.isEnabled(), item.getReason()))
@@ -288,7 +288,7 @@ public class ManageStudyDefinitionViewModel {
         researchQuestions.remove(item);
     }
 
-    public void deleteQuery(String item) {
+    public void deleteQuery(StudyQuery item) {
         queries.remove(item);
     }
 
