@@ -65,7 +65,7 @@ class DocumentViewerViewModelTest {
         DocumentViewerViewModel viewModel = new DocumentViewerViewModel(stateManager, mock(CliPreferences.class), dialogService);
 
         assertEquals(1, viewModel.filesProperty().size());
-        assertEquals("proceedings.pdf", viewModel.filesProperty().get(0).getLink());
+        assertEquals("proceedings.pdf", viewModel.filesProperty().getFirst().getLink());
         assertEquals(72, viewModel.currentPageProperty().get());
         verify(dialogService, never()).notify(org.mockito.ArgumentMatchers.anyString());
     }

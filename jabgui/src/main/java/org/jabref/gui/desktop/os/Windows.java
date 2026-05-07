@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.BrowserUtils;
