@@ -83,7 +83,8 @@ graalvmNative {
             mainClass.set("org.jabref.toolkit.JabKitLauncher")
             buildArgs.addAll(
                 "--no-fallback",
-                "-H:+ReportExceptionStackTraces"
+                "-H:+ReportExceptionStackTraces",
+                "-H:+IncludeAllLocales"
             )
         }
     }
