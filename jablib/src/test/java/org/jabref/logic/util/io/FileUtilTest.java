@@ -194,7 +194,14 @@ class FileUtilTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"JustTextNotASingleDot", ".StartsWithADotIsNotAnExtension", "path/to/JustTextNotASingleDot", "path/to/.StartsWithADotIsNotAnExtension", "path/.to/FileInsideAHiddenFolder", "path/.to/.StartsWithADotInsideAHiddenFolder"})
+    @CsvSource(textBlock = """
+                JustTextNotASingleDot
+                .StartsWithADotIsNotAnExtension
+                path/to/JustTextNotASingleDot
+                path/to/.StartsWithADotIsNotAnExtension
+                path/.to/FileInsideAHiddenFolder
+                path/.to/.StartsWithADotInsideAHiddenFolder
+            """)
     void getAbsentFileExtension(String file) {
         file = file.replace('/', File.separatorChar);
         Optional<String> result = FileUtil.getFileExtension(file);
@@ -221,7 +228,18 @@ class FileUtilTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"test.pdf", "other.txt", "path/test.pdf", "path/to/file.pdf", "JustTextNotASingleDot", ".StartsWithADotIsNotAnExtension", "path/to/JustTextNotASingleDot", "path/to/.StartsWithADotIsNotAnExtension", "path/.to/FileInsideAHiddenFolder", "path/.to/.StartsWithADotInsideAHiddenFolder"})
+    @CsvSource(textBlock = """
+                test.pdf
+                other.txt
+                path/test.pdf
+                path/to/file.pdf
+                JustTextNotASingleDot
+                .StartsWithADotIsNotAnExtension
+                path/to/JustTextNotASingleDot
+                path/to/.StartsWithADotIsNotAnExtension
+                path/.to/FileInsideAHiddenFolder
+                path/.to/.StartsWithADotInsideAHiddenFolder
+            """)
     void fileExtensionAreTheSameForStringsAndPaths(String file) {
         file = file.replace('/', File.separatorChar);
         Optional<String> resultFromString = FileUtil.getFileExtension(file);

@@ -17,7 +17,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -251,7 +250,10 @@ class StringUtilTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"[]", "[a]"})
+    @CsvSource(textBlock = """
+            []
+            [a]
+            """)
     void isInSquareBrackets(String input) {
         assertTrue(StringUtil.isInSquareBrackets(input));
     }
@@ -268,7 +270,10 @@ class StringUtilTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"\"\"", "\"a\""})
+    @CsvSource(textBlock = """
+            ""
+            "a"
+            """)
     void isInCitationMarks(String input) {
         assertTrue(StringUtil.isInCitationMarks(input));
     }

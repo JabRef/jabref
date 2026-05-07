@@ -2,7 +2,7 @@ package org.jabref.model.entry.identifier;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -41,7 +41,13 @@ class ISSNTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"0027-9633", "2434-561X", "2434-561x"})
+    @CsvSource(
+            textBlock = """
+                    0027-9633
+                    2434-561X
+                    2434-561x
+                    """
+    )
     void isValidChecksumCorrect(String issn) {
         assertTrue(new ISSN(issn).isValidChecksum());
     }

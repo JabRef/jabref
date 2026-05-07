@@ -2,7 +2,7 @@ package org.jabref.model.entry.identifier;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -10,7 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ISBNTest {
 
     @ParameterizedTest
-    @ValueSource(strings = {"0-123456-47-9", "0-9752298-0-X"})
+    @CsvSource(
+            textBlock = """
+                    0-123456-47-9
+                    0-9752298-0-X
+                    """
+    )
     void isValidFormat10Correct(String isbn) {
         assertTrue(new ISBN(isbn).isValidFormat());
     }
@@ -21,7 +26,13 @@ class ISBNTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"0-123456-47-9", "0-9752298-0-X", "0-9752298-0-x"})
+    @CsvSource(
+            textBlock = """
+                    0-123456-47-9
+                    0-9752298-0-X
+                    0-9752298-0-x
+                    """
+    )
     void isValidChecksum10Correct(String isbn) {
         assertTrue(new ISBN(isbn).isValidChecksum());
     }
@@ -52,7 +63,12 @@ class ISBNTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"0-123456-47-9", "0-9752298-0-X"})
+    @CsvSource(
+            textBlock = """
+                    0-123456-47-9
+                    0-9752298-0-X
+                    """
+    )
     void isIsbn10Correct(String isbn) {
         assertTrue(new ISBN(isbn).isIsbn10());
     }
