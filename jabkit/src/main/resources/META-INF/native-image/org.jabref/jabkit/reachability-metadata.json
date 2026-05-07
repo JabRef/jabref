@@ -1021,7 +1021,6 @@
       "glob": "build.properties"
     },
     {
-      "module": "org.jabref.jablib",
       "glob": "csl-styles/ieee.csl"
     },
     {
@@ -1041,19 +1040,15 @@
       "glob": "l10n/JabRef_en.properties"
     },
     {
-      "module": "org.jabref.jablib",
       "glob": "protectedterms/computer_science.terms"
     },
     {
-      "module": "org.jabref.jablib",
       "glob": "protectedterms/countries_territories.terms"
     },
     {
-      "module": "org.jabref.jablib",
       "glob": "protectedterms/electrical_engineering.terms"
     },
     {
-      "module": "org.jabref.jablib",
       "glob": "protectedterms/months_weekdays.terms"
     },
     {
