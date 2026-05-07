@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
@@ -74,7 +75,7 @@ public class RelatedWorkInserter {
 
         String updatedComment = existingComment
                 .filter(comment -> !comment.isBlank())
-                .map(comment -> StringUtil.unifyLineBreaks(comment.stripTrailing(), "\n") + "\n\n" + formattedComment)
+                .map(comment -> StringUtil.unifyLineBreaks(comment.stripTrailing(), OS.NEWLINE) + OS.NEWLINE + OS.NEWLINE + formattedComment)
                 .orElse(formattedComment);
 
         return matchedLibraryEntry.setField(userSpecificCommentField, updatedComment);

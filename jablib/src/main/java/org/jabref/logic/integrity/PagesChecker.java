@@ -9,6 +9,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 
+import org.jspecify.annotations.Nullable;
+
 public class PagesChecker implements ValueChecker {
 
     public static final String ROMAN_NUMBER = "[ivxlcdmIVXLCDM]+";
@@ -72,7 +74,7 @@ public class PagesChecker implements ValueChecker {
     /// biblatex:
     /// same as above but allows single dash as well
     @Override
-    public Optional<String> checkValue(String value) {
+    public Optional<String> checkValue(@Nullable String value) {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();
         }
