@@ -1,0 +1,8 @@
+{
+  "resources": {
+    "includes": [
+      { "pattern": "csl-styles/ieee\\.csl" },
+      { "pattern": "protectedterms/.*\\.terms" }
+    ]
+  }
+}
