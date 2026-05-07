@@ -11,6 +11,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.LinkedFilesResolver;
+import org.jabref.gui.slr.StudyCatalogItem;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -145,5 +146,11 @@ public class ActionHelper {
                 entries -> stateManager.getActiveDatabase()
                                        .map(databaseContext -> entries.anyMatch(entry -> !LinkedFilesResolver.getLinkedFilesToOpen(entry, databaseContext).isEmpty()))
                                        .orElseGet(() -> entries.anyMatch(entry -> !entry.getFiles().isEmpty()))));
+    }
+
+    public static BooleanExpression noCatalogEnabled(ObservableList<StudyCatalogItem> catalogs) {
+        return Bindings.createBooleanBinding(
+                () -> catalogs.stream().noneMatch(StudyCatalogItem::isEnabled),
+                catalogs);
     }
 }
