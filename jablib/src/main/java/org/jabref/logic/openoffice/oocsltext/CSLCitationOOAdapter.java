@@ -320,6 +320,7 @@ public class CSLCitationOOAdapter {
         return CSLFormatUtils.transformHTML(citation);
     }
 
+    /// Helper method for creating citation group for `insertInTextCitation` and `updateAllCitationsWithNewStyle`
     private @NonNull String createInTextCitationGroupText(CitationStyle style, boolean isAlphaNumericStyle, boolean isNumericStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext) {
         StringJoiner citations = new StringJoiner(", ");
         for (BibEntry entry : entries) {
