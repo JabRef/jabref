@@ -1,5 +1,6 @@
 package org.jabref.gui.ai.chat;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -36,6 +37,7 @@ import org.jabref.logic.ai.ingestion.repositories.IngestedDocumentsRepository;
 import org.jabref.logic.ai.ingestion.tasks.generateembeddings.GenerateEmbeddingsTask;
 import org.jabref.logic.ai.ingestion.tasks.generateembeddings.GenerateEmbeddingsTaskRequest;
 import org.jabref.logic.ai.ingestion.util.DocumentSplitterFactory;
+import org.jabref.logic.ai.ingestion.util.FileHasher;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.ai.rag.logic.AnswerEngine;
 import org.jabref.logic.ai.rag.util.AnswerEngineFactory;
@@ -46,6 +48,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.chatting.ChatMessage;
 import org.jabref.model.ai.identifiers.FullBibEntry;
+import org.jabref.model.entry.LinkedFile;
 
 import com.google.common.collect.Comparators;
 import com.tobiasdiez.easybind.EasyBind;
@@ -230,6 +233,10 @@ public class AiChatViewModel extends AbstractViewModel {
 
         entries.forEach(identifier ->
                 identifier.entry().getFiles().forEach(file -> {
+                            if (checkIngested(identifier, file)) {
+                                return;
+                            }
+
                             // [impl->req~ai.ingestion.trigger-on-demand~1]
                             GenerateEmbeddingsTask task = ingestionTaskAggregator.start(
                                     new GenerateEmbeddingsTaskRequest(
@@ -249,12 +256,25 @@ public class AiChatViewModel extends AbstractViewModel {
         );
     }
 
+    private boolean checkIngested(FullBibEntry fullBibEntry, LinkedFile linkedFile) {
+        Optional<Path> path = linkedFile.findIn(fullBibEntry.databaseContext(), filePreferences);
+
+        if (path.isEmpty()) {
+            return false;
+        }
+
+        Optional<String> hash = FileHasher.computeHash(path.get());
+
+        return hash.map(ingestedDocumentsRepository::isDocumentIngested).orElse(false);
+    }
+
     public void showInfo() {
         AiChatStatusWindow window = new AiChatStatusWindow();
 
         window.chatModelProperty().bind(chatModel);
         window.entriesProperty().bind(entries);
         window.generateEmbeddingsTasksProperty().bind(generateEmbeddingsTasks);
+        window.chatHistoryProperty().bind(chatHistory);
 
         window.setAnswerEngine(answerEngine.get());
 
