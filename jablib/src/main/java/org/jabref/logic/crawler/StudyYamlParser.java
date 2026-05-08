@@ -31,6 +31,12 @@ public class StudyYamlParser {
             LOGGER.debug("Migrating study.yml from v1 to v2 format");
             yamlToDeserialize = StudyYamlV1Migrator.migrate(rawString);
         } else {
+            Object versionValue = rawMap.get("version");
+            String version = versionValue == null ? "" : versionValue.toString();
+            if (!Study.CURRENT_SCHEMA_VERSION.equals(version)) {
+                LOGGER.warn("study.yml has schema version {} but JabRef expects {}; attempting to read anyway",
+                        version, Study.CURRENT_SCHEMA_VERSION);
+            }
             yamlToDeserialize = rawString;
         }
         return yamlMapper.readValue(yamlToDeserialize, Study.class);

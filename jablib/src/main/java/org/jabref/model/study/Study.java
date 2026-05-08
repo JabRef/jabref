@@ -7,6 +7,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.jspecify.annotations.NonNull;
 
 /// This class represents a scientific study.
 ///
@@ -56,7 +57,7 @@ public class Study {
         return version;
     }
 
-    public void setVersion(String version) {
+    public void setVersion(@NonNull String version) {
         this.version = version;
     }
 
