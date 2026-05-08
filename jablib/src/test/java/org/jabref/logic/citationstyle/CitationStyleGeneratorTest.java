@@ -73,10 +73,11 @@ class CitationStyleGeneratorTest {
     }
 
     @Test
-    void aPACitation2Authors() {
-        testEntryContext.setMode(BibDatabaseMode.BIBLATEX);
+    void aPACitation2AuthorsCombined() {
+        BibDatabaseContext testEntryContextTwoAuthors = new BibDatabaseContext(new BibDatabase(List.of(testEntry, testEntry2)));
+        testEntryContextTwoAuthors.setMode(BibDatabaseMode.BIBLATEX);
         CitationStyle style = STYLE_LIST.stream().filter(e -> "APA Style 7th edition".equals(e.getTitle())).findAny().get();
-        String citation = CitationStyleGenerator.generateCitation(List.of(testEntry, testEntry2), style.getSource(), HTML_OUTPUT_FORMAT, testEntryContext, ENTRY_TYPES_MANAGER);
+        String citation = CitationStyleGenerator.generateCitation(List.of(testEntry, testEntry2), style.getSource(), HTML_OUTPUT_FORMAT, testEntryContextTwoAuthors, ENTRY_TYPES_MANAGER);
 
         String expected = "(Harrer et al., 2018; Smith et al., 2016)";
 
