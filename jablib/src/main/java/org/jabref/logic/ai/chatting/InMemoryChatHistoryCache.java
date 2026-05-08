@@ -164,7 +164,7 @@ public class InMemoryChatHistoryCache {
         boolean nameChanged = !originalName.equals(currentName);
 
         // If name/key changed: clear old location first (only if old location was valid, not a placeholder)
-        if (nameChanged && !originalName.equals("<empty>")) {
+        if (nameChanged && !"<empty>".equals(originalName)) {
             ChatIdentifier oldIdentifier = new ChatIdentifier(
                     currentIdentifier.libraryId(),
                     currentIdentifier.chatType(),
@@ -175,7 +175,7 @@ public class InMemoryChatHistoryCache {
 
             LOGGER.debug("Cleared old chat history for {} with old {}: {}",
                     entityType,
-                    entityType.equals("entry") ? "key" : "name",
+                    "entry".equals(entityType) ? "key" : "name",
                     originalName);
         }
 
@@ -184,7 +184,7 @@ public class InMemoryChatHistoryCache {
         chatHistory.forEach(message -> repository.addMessage(currentIdentifier, message));
 
         if (nameChanged) {
-            if (entityType.equals("entry")) {
+            if ("entry".equals(entityType)) {
                 LOGGER.debug("Transferred chat history from {} to {} ({} messages)",
                         originalName, currentName, chatHistory.size());
             } else {

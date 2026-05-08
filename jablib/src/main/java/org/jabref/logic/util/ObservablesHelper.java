@@ -57,7 +57,7 @@ public final class ObservablesHelper {
     ///
     /// @param <T>          The type of the closable resource, which must implement {@link AutoCloseable}.
     /// @param func         The factory {@link Callable} used to compute the new resource.
-    /// This executes lazily when the binding's value is requested.
+    ///                     This executes lazily when the binding's value is requested.
     /// @param dependencies The observables that this binding should listen to for invalidation.
     /// @return An `ObjectBinding<T>` that automatically closes previous instances upon recalculation or disposal.
     public static <T extends AutoCloseable> ObjectBinding<T> createClosableObjectBinding(final Callable<T> func, final Observable... dependencies) {
