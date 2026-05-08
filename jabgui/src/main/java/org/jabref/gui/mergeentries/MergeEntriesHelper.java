@@ -100,7 +100,7 @@ public final class MergeEntriesHelper {
             if (FieldFactory.isInternalField(field) || field == StandardField.GROUPS) {
                 continue;
             }
-            
+
             Optional<String> value = entryFromLibrary.getField(field);
             if (value.isPresent()) {
                 LOGGER.debug("Removing obsolete field {} with value {}", field, value.get());
