@@ -21,6 +21,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.WebViewStore;
+import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.identifiers.FullBibEntry;
@@ -55,8 +56,8 @@ public class AiSummaryShowingView extends VBox {
 
         return Localization.lang("Generated at %0 by %1 (algorithm %2)")
                            .replaceAll("%0", formatTimestamp(summary.metadata().timestamp()))
-                           .replaceAll("%1", summary.metadata().aiProvider().getDisplayName() + " " + summary.metadata().model())
-                           .replaceAll("%2", summary.summarizationAlgorithm().getDisplayName());
+                           .replaceAll("%1", AiNamingUtils.getDisplayName(summary.metadata().aiProvider()) + " " + summary.metadata().model())
+                           .replaceAll("%2", AiNamingUtils.getDisplayName(summary.summarizationAlgorithm()));
     }
 
     private static String formatTimestamp(Instant timestamp) {

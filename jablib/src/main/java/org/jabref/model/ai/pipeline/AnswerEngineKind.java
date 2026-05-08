@@ -1,21 +1,10 @@
 package org.jabref.model.ai.pipeline;
 
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.ai.AiDefaultEnums;
 
 public enum AnswerEngineKind {
-    EMBEDDINGS_SEARCH(Localization.lang("Embeddings Search")),
-    FULL_DOCUMENT(Localization.lang("Full Document"));
-
-    private final String displayName;
-
-    AnswerEngineKind(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
+    EMBEDDINGS_SEARCH,
+    FULL_DOCUMENT;
 
     public static AnswerEngineKind safeValueOf(String name) {
         try {

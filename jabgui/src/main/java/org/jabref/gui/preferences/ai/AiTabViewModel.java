@@ -19,6 +19,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
 import org.jabref.logic.ai.preferences.AiDefaultExpertSettings;
 import org.jabref.logic.ai.preferences.AiDefaultTemplates;
 import org.jabref.logic.ai.preferences.AiPreferences;
@@ -28,7 +29,6 @@ import org.jabref.logic.util.LocalizedNumbersUtils;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
-import org.jabref.model.ai.llm.PredefinedChatModel;
 import org.jabref.model.ai.pipeline.AnswerEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
@@ -148,7 +148,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         );
 
         this.selectedAiProvider.addListener((_, oldValue, newValue) -> {
-            List<String> models = PredefinedChatModel.getAvailableModels(newValue);
+            List<String> models = PredefinedChatModelUtil.getAvailableModels(newValue);
 
             disableApiBaseUrl.set(newValue == AiProvider.HUGGING_FACE || newValue == AiProvider.GEMINI);
 
@@ -223,7 +223,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                         huggingFaceChatModel.set(newValue);
             }
 
-            contextWindowSize.set(PredefinedChatModel.getContextWindowSize(selectedAiProvider.get(), newValue));
+            contextWindowSize.set(PredefinedChatModelUtil.getContextWindowSize(selectedAiProvider.get(), newValue));
         });
 
         this.currentApiKey.addListener((_, _, newValue) -> {
@@ -421,7 +421,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         String resetApiBaseUrl = selectedAiProvider.get().getApiUrl();
         currentApiBaseUrl.set(resetApiBaseUrl);
 
-        contextWindowSize.set(PredefinedChatModel.getContextWindowSize(selectedAiProvider.get(), currentChatModel.get()));
+        contextWindowSize.set(PredefinedChatModelUtil.getContextWindowSize(selectedAiProvider.get(), currentChatModel.get()));
 
         answerEngineProperty.set(AiDefaultExpertSettings.ANSWER_ENGINE_KIND);
         summarizationAlgorithmProperty.set(AiDefaultExpertSettings.SUMMARIZATOR_KIND);

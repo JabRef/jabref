@@ -2,8 +2,8 @@ package org.jabref.logic.ai.models;
 
 import java.util.List;
 
+import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
 import org.jabref.model.ai.llm.AiProvider;
-import org.jabref.model.ai.llm.PredefinedChatModel;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -34,7 +34,7 @@ public class AiModelService {
             return dynamicModels;
         }
 
-        List<String> staticModels = PredefinedChatModel.getAvailableModels(aiProvider);
+        List<String> staticModels = PredefinedChatModelUtil.getAvailableModels(aiProvider);
         LOGGER.debug("Using {} hardcoded models for {}", staticModels.size(), aiProvider.getDisplayName());
         return staticModels;
     }
@@ -44,7 +44,7 @@ public class AiModelService {
     /// @param aiProvider The AI provider
     /// @return A list of available model names
     public List<String> getStaticModels(AiProvider aiProvider) {
-        return PredefinedChatModel.getAvailableModels(aiProvider);
+        return PredefinedChatModelUtil.getAvailableModels(aiProvider);
     }
 
     /// Synchronously fetches the list of available models from the API.

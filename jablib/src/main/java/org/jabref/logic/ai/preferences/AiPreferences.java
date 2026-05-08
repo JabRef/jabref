@@ -15,10 +15,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
-import org.jabref.model.ai.llm.PredefinedChatModel;
 import org.jabref.model.ai.pipeline.AnswerEngineKind;
 import org.jabref.model.ai.pipeline.DocumentSplitterKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
@@ -410,13 +410,13 @@ public class AiPreferences {
         } else {
             return switch (aiProvider.get()) {
                 case OPEN_AI ->
-                        PredefinedChatModel.getContextWindowSize(AiProvider.OPEN_AI, openAiChatModel.get());
+                        PredefinedChatModelUtil.getContextWindowSize(AiProvider.OPEN_AI, openAiChatModel.get());
                 case MISTRAL_AI ->
-                        PredefinedChatModel.getContextWindowSize(AiProvider.MISTRAL_AI, mistralAiChatModel.get());
+                        PredefinedChatModelUtil.getContextWindowSize(AiProvider.MISTRAL_AI, mistralAiChatModel.get());
                 case HUGGING_FACE ->
-                        PredefinedChatModel.getContextWindowSize(AiProvider.HUGGING_FACE, huggingFaceChatModel.get());
+                        PredefinedChatModelUtil.getContextWindowSize(AiProvider.HUGGING_FACE, huggingFaceChatModel.get());
                 case GEMINI ->
-                        PredefinedChatModel.getContextWindowSize(AiProvider.GEMINI, geminiChatModel.get());
+                        PredefinedChatModelUtil.getContextWindowSize(AiProvider.GEMINI, geminiChatModel.get());
             };
         }
     }

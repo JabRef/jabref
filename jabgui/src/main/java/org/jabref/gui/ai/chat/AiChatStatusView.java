@@ -18,6 +18,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chatting.ChatModel;
 import org.jabref.logic.ai.ingestion.tasks.generateembeddings.GenerateEmbeddingsTask;
@@ -163,7 +164,7 @@ public class AiChatStatusView extends VBox {
         chatModelLabel.textProperty().bind(viewModel.chatModelProperty().map(AiChatStatusView::formatChatModelLabel));
 
         new ViewModelListCellFactory<AnswerEngineKind>()
-                .withText(AnswerEngineKind::getDisplayName)
+                .withText(AiNamingUtils::getDisplayName)
                 .install(answerEngineComboBox);
         answerEngineComboBox.setItems(viewModel.answerEngineKindsProperty());
         answerEngineComboBox.valueProperty().bindBidirectional(viewModel.selectedAnswerEngineKindProperty());
@@ -173,7 +174,7 @@ public class AiChatStatusView extends VBox {
         if (model == null) {
             return "";
         }
-        return Localization.lang("%0 %1", model.getAiProvider().getDisplayName(), model.getName());
+        return Localization.lang("%0 %1", AiNamingUtils.getDisplayName(model.getAiProvider()), model.getName());
     }
 
     public void setAnswerEngine(AnswerEngine answerEngine) {

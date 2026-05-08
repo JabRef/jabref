@@ -19,6 +19,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.component.HistoryTextArea;
 import org.jabref.gui.util.component.ListScrollPane;
 import org.jabref.gui.util.component.SimpleListView;
+import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chatting.ChatModel;
 import org.jabref.logic.l10n.Localization;
@@ -125,7 +126,7 @@ public class AiChatView extends StackPane {
     }
 
     private static String formatNoticeText(ChatModel model) {
-        String modelName = model.getAiProvider().getDisplayName() + " " + model.getName();
+        String modelName = AiNamingUtils.getDisplayName(model.getAiProvider()) + " " + model.getName();
         return Localization.lang("Current AI model: %0. The AI may generate inaccurate or inappropriate responses. Please verify any information provided", modelName);
     }
 

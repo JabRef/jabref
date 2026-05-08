@@ -13,6 +13,7 @@ import javafx.scene.text.Text;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.URLs;
+import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.model.ai.llm.AiProvider;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -74,7 +75,7 @@ public class AiPrivacyNoticeView extends ScrollPane {
 
     private void addPrivacyHyperlink(GridPane gridPane, AiProvider aiProvider) {
         int row = gridPane.getRowCount();
-        Label aiName = new Label(aiProvider.getDisplayName());
+        Label aiName = new Label(AiNamingUtils.getDisplayName(aiProvider));
         gridPane.add(aiName, 0, row);
 
         Hyperlink hyperlink = new Hyperlink(aiProvider.getPrivacyPolicyUrl());

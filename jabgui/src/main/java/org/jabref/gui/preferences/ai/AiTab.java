@@ -23,6 +23,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
@@ -211,21 +212,21 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         contextWindowSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         new ViewModelListCellFactory<AnswerEngineKind>()
-                .withText(AnswerEngineKind::getDisplayName)
+                .withText(AiNamingUtils::getDisplayName)
                 .install(answerEngineComboBox);
         answerEngineComboBox.setItems(viewModel.answerEngineKindsProperty());
         answerEngineComboBox.valueProperty().bindBidirectional(viewModel.answerEngineProperty());
         answerEngineComboBox.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         new ViewModelListCellFactory<SummarizatorKind>()
-                .withText(SummarizatorKind::getDisplayName)
+                .withText(AiNamingUtils::getDisplayName)
                 .install(summarizationAlgorithmComboBox);
         summarizationAlgorithmComboBox.setItems(viewModel.summarizationAlgorithmsProperty());
         summarizationAlgorithmComboBox.valueProperty().bindBidirectional(viewModel.summarizationAlgorithmProperty());
         summarizationAlgorithmComboBox.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         new ViewModelListCellFactory<TokenEstimatorKind>()
-                .withText(TokenEstimatorKind::getDisplayName)
+                .withText(AiNamingUtils::getDisplayName)
                 .install(tokenEstimationAlgorithmComboBox);
         tokenEstimationAlgorithmComboBox.setItems(viewModel.tokenEstimationAlgorithmsProperty());
         tokenEstimationAlgorithmComboBox.valueProperty().bindBidirectional(viewModel.tokenEstimationAlgorithmProperty());
@@ -297,7 +298,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
     private void initializeAiProvider() {
         new ViewModelListCellFactory<AiProvider>()
-                .withText(AiProvider::toString)
+                .withText(AiNamingUtils::getDisplayName)
                 .install(aiProviderComboBox);
         aiProviderComboBox.itemsProperty().bind(viewModel.aiProvidersProperty());
         aiProviderComboBox.valueProperty().bindBidirectional(viewModel.selectedAiProviderProperty());

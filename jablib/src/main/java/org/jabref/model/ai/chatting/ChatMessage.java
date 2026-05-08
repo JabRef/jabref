@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.ai.pipeline.RelevantInformation;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -18,20 +17,10 @@ import dev.langchain4j.data.message.UserMessage;
 // [model->req~ai.chat.groups.history-storage~1]
 public record ChatMessage(String id, Instant timestamp, Role role, String content, List<RelevantInformation> relevantInformation) {
     public enum Role {
-        SYSTEM(Localization.lang("System")),
-        USER(Localization.lang("User")),
-        AI(Localization.lang("AI")),
-        ERROR(Localization.lang("Error"));
-
-        private final String displayName;
-
-        Role(String displayName) {
-            this.displayName = displayName;
-        }
-
-        public String getDisplayName() {
-            return displayName;
-        }
+        SYSTEM,
+        USER,
+        AI,
+        ERROR;
 
         public boolean canRegenerate() {
             return this == AI || this == ERROR;

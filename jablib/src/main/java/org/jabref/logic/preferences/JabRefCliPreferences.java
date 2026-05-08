@@ -35,6 +35,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.LibraryPreferences;
+import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
 import org.jabref.logic.ai.preferences.AiDefaultExpertSettings;
 import org.jabref.logic.ai.preferences.AiDefaultTemplates;
 import org.jabref.logic.ai.preferences.AiPreferences;
@@ -102,7 +103,6 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
-import org.jabref.model.ai.llm.PredefinedChatModel;
 import org.jabref.model.ai.pipeline.AnswerEngineKind;
 import org.jabref.model.ai.pipeline.DocumentSplitterKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
@@ -685,7 +685,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(AI_TOKEN_ESTIMATOR_KIND, AiDefaultExpertSettings.TOKEN_ESTIMATOR_KIND.name());
         defaults.put(AI_TEMPERATURE, AiDefaultExpertSettings.TEMPERATURE);
         defaults.put(AI_CONTEXT_WINDOW_SIZE,
-                PredefinedChatModel.getContextWindowSize(
+                PredefinedChatModelUtil.getContextWindowSize(
                         AiProvider.valueOf((String) defaults.get(AI_PROVIDER)),
                         AiProviderDefaultChatModels.getDefaultChatModel(AiProvider.valueOf((String) defaults.get(AI_PROVIDER))).getName()
                 )

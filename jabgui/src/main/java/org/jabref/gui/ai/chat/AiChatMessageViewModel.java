@@ -18,6 +18,7 @@ import javafx.scene.input.ClipboardContent;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.chatting.ChatMessage;
 
@@ -47,7 +48,7 @@ public class AiChatMessageViewModel extends AbstractViewModel {
         id.bind(chatMessage.map(ChatMessage::id));
         source.bind(chatMessage
                 .map(ChatMessage::role)
-                .map(ChatMessage.Role::getDisplayName));
+                .map(AiNamingUtils::getDisplayName));
         messageContent.bind(chatMessage.map(ChatMessage::content).map(StringUtil::makeSafe));
         timestamp.bind(chatMessage.map(ChatMessage::timestamp));
 

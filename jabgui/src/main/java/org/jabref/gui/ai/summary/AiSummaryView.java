@@ -10,6 +10,7 @@ import org.jabref.gui.ai.AiPrivacyNoticeView;
 import org.jabref.gui.ai.statuspane.UniversalStatusPaneView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ExceptionsUtil;
+import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chatting.ChatModel;
 import org.jabref.logic.ai.summarization.logic.summarizationalgorithms.Summarizator;
@@ -98,9 +99,9 @@ public class AiSummaryView extends StackPane {
 
         return Localization.lang(
                 "Your entry is being summarized by %0 %1 using algorithm %2",
-                chatModel.getAiProvider().getDisplayName(),
+                AiNamingUtils.getDisplayName(chatModel.getAiProvider()),
                 chatModel.getName(),
-                summarizator.getKind().getDisplayName()
+                AiNamingUtils.getDisplayName(summarizator.getKind())
         );
     }
 

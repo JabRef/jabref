@@ -7,6 +7,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.summarization.logic.summarizationalgorithms.Summarizator;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 
@@ -38,7 +39,7 @@ public class AiSummaryParametersView extends VBox {
 
     private void setupBindings() {
         new ViewModelListCellFactory<SummarizatorKind>()
-                .withText(SummarizatorKind::getDisplayName)
+                .withText(AiNamingUtils::getDisplayName)
                 .install(summarizatorCombo);
 
         summarizatorCombo.itemsProperty().bind(viewModel.summarizatorKindsProperty());

@@ -1,10 +1,5 @@
 package org.jabref.model.ai.llm;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.jabref.logic.ai.preferences.AiDefaultExpertSettings;
-
 public enum PredefinedChatModel {
     GPT_4O_MINI(AiProvider.OPEN_AI, "gpt-4o-mini", 128000),
     GPT_4O(AiProvider.OPEN_AI, "gpt-4o", 128000),
@@ -20,7 +15,7 @@ public enum PredefinedChatModel {
     GEMINI_1_5_PRO(AiProvider.GEMINI, "gemini-1.5-pro", 2097152),
     GEMINI_1_0_PRO(AiProvider.GEMINI, "gemini-1.0-pro", 32000),
     // Dummy variant for Hugging Face models.
-    // Blank entry used for cases where the model name is not specified.
+    // Blank entry is used for cases where the model name is not specified.
     BLANK_HUGGING_FACE(AiProvider.HUGGING_FACE, "", 0);
 
     private final AiProvider aiProvider;
@@ -31,21 +26,6 @@ public enum PredefinedChatModel {
         this.aiProvider = aiProvider;
         this.name = name;
         this.contextWindowSize = contextWindowSize;
-    }
-
-    public static List<String> getAvailableModels(AiProvider aiProvider) {
-        return Arrays.stream(values())
-                     .filter(model -> model.getAiProvider() == aiProvider)
-                     .map(PredefinedChatModel::getName)
-                     .toList();
-    }
-
-    public static int getContextWindowSize(AiProvider aiProvider, String modelName) {
-        return Arrays.stream(values())
-                     .filter(model -> model.getAiProvider() == aiProvider && model.getName().equals(modelName))
-                     .map(PredefinedChatModel::getContextWindowSize)
-                     .findFirst()
-                     .orElse(AiDefaultExpertSettings.CONTEXT_WINDOW_SIZE);
     }
 
     public AiProvider getAiProvider() {
