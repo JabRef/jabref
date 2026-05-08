@@ -66,7 +66,7 @@ There are 3 core models in the AI features:
 3. Embeddings.
 4. Fully ingested documents.
 
-The code strictly follows the repository pattern, where an interface is created to access the internal storage for the purpose of abstraction. At the moment of writing, all of these models are implemented by using the [`MVStore`](https://www.h2database.com/html/mvstore.html). For the details of this decisions take a look at the [ADR 0033](./../0033-store-chats-in-mvstore.md). A helper class was made `MVStoreBase` so that it would be possible to use an in-memory `MVStore` in case there are some errors while opening on-disk storage.
+The code strictly follows the repository pattern, where an interface is created to access the internal storage for the purpose of abstraction. At the moment of writing, all of these models are implemented by using the [`MVStore`](https://www.h2database.com/html/mvstore.html). For the details of this decisions take a look at the [ADR 0033](./../decisions/0033-store-chats-in-mvstore.md). A helper class was made `MVStoreBase` so that it would be possible to use an in-memory `MVStore` in case there are some errors while opening on-disk storage.
 
 A note needs to be made for embeddings: the embeddings storage is also implementing the internal LangChain4j interface for embeddings so that it could be used in LangChain4j algorithms. Additionally, there is a "fully ingested" repository, which simply contains a "list" of files that were fully ingested. This helps with checking if a file needs to be ingested or not, as there is no 1 to 1 correspondense with embeddings to file (which is many to one).
 

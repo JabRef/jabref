@@ -13,7 +13,7 @@ parent: Requirements
 - [Ingestion](./ai/ingestion.md)
 - [Expert settings](./ai/expert-settings.md)
 - [LLMs](./ai/llms.md)
-- [Future features](./ai/future-features.md)
+- [Future features](./ai/future.md)
 
 ## How to write AI Requirements
 
