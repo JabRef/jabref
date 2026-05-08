@@ -52,6 +52,8 @@ public class DatabaseMerger {
         mergeMetaData(target.getMetaData(), other.getMetaData(), otherFileName, other.getEntries());
     }
 
+    /// Merges all entries of the other database into the target database.
+    /// Duplicate entries are not inserted. If a duplicate is detected, its groups field is union-merged into the existing entry.
     private void mergeEntries(BibDatabase target, BibDatabase other) {
         DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         List<BibEntry> entriesToInsert = new ArrayList<>();
