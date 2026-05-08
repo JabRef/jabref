@@ -97,14 +97,10 @@ public final class MergeEntriesHelper {
         boolean anyFieldsRemoved = false;
 
         for (Field field : obsoleteFields) {
-            if (FieldFactory.isInternalField(field)) {
+            if (FieldFactory.isInternalField(field) || field == StandardField.GROUPS) {
                 continue;
             }
-
-            if (field == StandardField.GROUPS) {
-                continue;
-            }
-
+            
             Optional<String> value = entryFromLibrary.getField(field);
             if (value.isPresent()) {
                 LOGGER.debug("Removing obsolete field {} with value {}", field, value.get());
