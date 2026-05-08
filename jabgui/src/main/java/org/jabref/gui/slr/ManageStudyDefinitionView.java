@@ -25,7 +25,6 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionHelper;
@@ -280,7 +279,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                     }
                 }
             };
-            textField.focusedProperty().addListener((_obs, _wasFocused, isNowFocused) -> {
+            textField.focusedProperty().addListener((_, _, isNowFocused) -> {
                 if (!isNowFocused) {
                     TableView<StudyCatalogItem> tableView = cell.getTableView();
                     int index = cell.getIndex();
@@ -289,7 +288,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                     }
                 }
             });
-            textField.addEventFilter(MouseEvent.MOUSE_CLICKED, MouseEvent::consume);
+            textField.setOnAction(event -> cell.getTableView().requestFocus());
             return cell;
         });
         Label catalogReasonHeader = new Label(catalogReasonColumn.getText());
