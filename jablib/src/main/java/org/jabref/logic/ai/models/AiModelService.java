@@ -30,12 +30,12 @@ public class AiModelService {
         List<String> dynamicModels = fetchModelsSynchronously(aiProvider, apiBaseUrl, apiKey);
 
         if (!dynamicModels.isEmpty()) {
-            LOGGER.info("Using {} dynamic models for {}", dynamicModels.size(), aiProvider.getDisplayName());
+            LOGGER.info("Using {} dynamic models for {}", dynamicModels.size(), aiProvider.name());
             return dynamicModels;
         }
 
         List<String> staticModels = PredefinedChatModelUtil.getAvailableModels(aiProvider);
-        LOGGER.debug("Using {} hardcoded models for {}", staticModels.size(), aiProvider.getDisplayName());
+        LOGGER.debug("Using {} hardcoded models for {}", staticModels.size(), aiProvider.name());
         return staticModels;
     }
 

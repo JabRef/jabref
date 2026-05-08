@@ -27,7 +27,7 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
     @Override
     public List<String> fetchModels(AiProvider aiProvider, String apiBaseUrl, @Nullable String apiKey) {
         if (apiKey == null || apiKey.isBlank()) {
-            LOGGER.debug("API key is not provided for {}, skipping model fetch", aiProvider.getDisplayName());
+            LOGGER.debug("API key is not provided for {}, skipping model fetch", aiProvider.name());
             return List.of();
         }
 
@@ -42,12 +42,12 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
             if (response.getStatus() == 200) {
                 models = parseModelsFromResponse(response.getBody());
-                LOGGER.info("Successfully fetched {} models from {}", models.size(), aiProvider.getDisplayName());
+                LOGGER.info("Successfully fetched {} models from {}", models.size(), aiProvider.name());
             } else {
-                LOGGER.info("Failed to fetch models from {} (status: {})", aiProvider.getDisplayName(), response.getStatus());
+                LOGGER.info("Failed to fetch models from {} (status: {})", aiProvider.name(), response.getStatus());
             }
         } catch (UnirestException e) {
-            LOGGER.error("Failed to fetch models from {}", aiProvider.getDisplayName(), e);
+            LOGGER.error("Failed to fetch models from {}", aiProvider.name(), e);
         }
 
         return models;

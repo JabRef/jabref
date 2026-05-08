@@ -164,10 +164,10 @@ public class AiPreferences {
         try (final Keyring keyring = Keyring.create()) {
             return keyring.getPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
         } catch (PasswordAccessException e) {
-            LOGGER.debug("No API key stored for provider {}. Returning an empty string", aiProvider.getDisplayName());
+            LOGGER.debug("No API key stored for provider {}. Returning an empty string", aiProvider.name());
             return "";
         } catch (Exception e) {
-            LOGGER.warn("JabRef could not open keyring for retrieving {} API token", aiProvider.getDisplayName(), e);
+            LOGGER.warn("JabRef could not open keyring for retrieving {} API token", aiProvider.name(), e);
             return "";
         }
     }
@@ -178,13 +178,13 @@ public class AiPreferences {
                 try {
                     keyring.deletePassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
                 } catch (PasswordAccessException ex) {
-                    LOGGER.debug("API key for provider {} not stored in keyring. JabRef does not store an empty key.", aiProvider.getDisplayName());
+                    LOGGER.debug("API key for provider {} not stored in keyring. JabRef does not store an empty key.", aiProvider.name());
                 }
             } else {
                 keyring.setPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name(), newKey);
             }
         } catch (Exception e) {
-            LOGGER.warn("JabRef could not open keyring for storing {} API token", aiProvider.getDisplayName(), e);
+            LOGGER.warn("JabRef could not open keyring for storing {} API token", aiProvider.name(), e);
         }
     }
 
