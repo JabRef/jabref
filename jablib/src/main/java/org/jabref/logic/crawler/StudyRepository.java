@@ -464,7 +464,8 @@ public class StudyRepository {
                                         });
 
         boolean groupExists = rootNode.getChildren().stream()
-                                      .anyMatch(child -> child.getGroup().getName().equals(fetcherName));
+                                      .anyMatch(child -> child.getGroup() instanceof ExplicitGroup
+                                              && child.getGroup().getName().equals(fetcherName));
 
         if (!groupExists) {
             ExplicitGroup fetcherGroup = new ExplicitGroup(
