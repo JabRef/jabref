@@ -42,6 +42,7 @@ class ChatHistoryMigrationV1Test {
 
     private static final String LIBRARY_ID = "00000000-0000-0000-0000-000000000002";
     private static final String ENTRY_INFIX = "-entry-";
+    private static final String GROUP_INFIX = "-group-";
 
     @TempDir
     Path tempDir;
@@ -154,6 +155,11 @@ class ChatHistoryMigrationV1Test {
                     Path dbPath = Path.of(mapName.substring(0, idx));
                     String citationKey = mapName.substring(idx + ENTRY_INFIX.length());
                     result.add(new DiscoveredEntry(dbPath, ChatType.WITH_ENTRY, citationKey));
+                } else if (mapName.contains(GROUP_INFIX)) {
+                    int idx = mapName.lastIndexOf(GROUP_INFIX);
+                    Path dbPath = Path.of(mapName.substring(0, idx));
+                    String groupName = mapName.substring(idx + GROUP_INFIX.length());
+                    result.add(new DiscoveredEntry(dbPath, ChatType.WITH_GROUP, groupName));
                 }
             }
         }
@@ -168,7 +174,14 @@ class ChatHistoryMigrationV1Test {
         BibDatabase database = new BibDatabase(bibEntries);
         MetaData metaData = new MetaData();
         metaData.setAiLibraryId(LIBRARY_ID);
-        return new BibDatabaseContext(database, metaData);
+        BibDatabaseContext ctx = new BibDatabaseContext(database, metaData);
+        if (!entries.isEmpty()) {
+            // Set the database path so the path filter in the migration can match the prefix
+            // embedded in the old map names. toAbsolutePath() ensures the endsWith check works
+            // even when the fixture path is relative.
+            ctx.setDatabasePath(entries.getFirst().dbPath().toAbsolutePath());
+        }
+        return ctx;
     }
 
     private record DiscoveredEntry(Path dbPath, ChatType chatType, String chatName) {

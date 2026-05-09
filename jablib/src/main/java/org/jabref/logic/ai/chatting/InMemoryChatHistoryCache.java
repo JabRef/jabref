@@ -24,26 +24,22 @@ import org.slf4j.LoggerFactory;
 public class InMemoryChatHistoryCache {
     private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryChatHistoryCache.class);
 
-    // Cached entry chat: stores the original citation key for transfer detection on close
     private record CachedEntryChat(
             BibDatabaseContext databaseContext,
-            Optional<String> originalCitationKey,  // Citation key when loaded from repository
+            Optional<String> originalCitationKey,
             ObservableList<ChatMessage> chatHistory
     ) {
     }
 
-    // Cached group chat: stores the original group name for transfer detection on close
     private record CachedGroupChat(
             BibDatabaseContext databaseContext,
-            String originalGroupName,  // Group name when loaded from repository
+            String originalGroupName,
             GroupTreeNode group,
             ObservableList<ChatMessage> chatHistory
     ) {
     }
 
     // IdentityHashMap: compares keys by reference (==), NOT by equals()/hashCode().
-    // This is exactly what we need — two BibEntry objects with the same citation key are distinct
-    // cache slots. No citation key is required at all.
     private final Map<BibEntry, CachedEntryChat> entryChats = Collections.synchronizedMap(new IdentityHashMap<>());
     private final Map<GroupTreeNode, CachedGroupChat> groupChats = Collections.synchronizedMap(new IdentityHashMap<>());
 
@@ -65,18 +61,16 @@ public class InMemoryChatHistoryCache {
             ObservableList<ChatMessage> chatHistory;
             Optional<String> originalCitationKey = Optional.empty();
 
-            // Try to load from repository if database path and citation key are available
             Optional<ChatIdentifier> identifierOpt = ChatIdentifier.from(databaseContext, entry);
             if (identifierOpt.isPresent()) {
                 chatHistory = FXCollections.observableArrayList(
                         repository.getAllMessages(identifierOpt.get())
                 );
-                // Remember the original citation key for transfer detection on close
+
                 originalCitationKey = entry.getCitationKey();
                 LOGGER.debug("Loaded chat history for entry {} from repository ({} messages)",
                         originalCitationKey.orElse("<no key>"), chatHistory.size());
             } else {
-                // No valid identifier - create empty list (won't be persisted on close), unless the citation key is changed.
                 chatHistory = FXCollections.observableArrayList();
                 LOGGER.debug("Created new in-memory chat history for entry {} (no valid identifier)",
                         entry.getCitationKey().orElse("<no key>"));
@@ -98,17 +92,17 @@ public class InMemoryChatHistoryCache {
             ObservableList<ChatMessage> chatHistory;
             String originalGroupName = group.getName();
 
-            // Try to load from repository if database path is available
             Optional<ChatIdentifier> identifierOpt = ChatIdentifier.from(databaseContext, group);
             if (identifierOpt.isPresent()) {
                 chatHistory = FXCollections.observableArrayList(
                         repository.getAllMessages(identifierOpt.get())
                 );
+
                 LOGGER.debug("Loaded chat history for group {} from repository ({} messages)",
                         originalGroupName, chatHistory.size());
             } else {
-                // No valid identifier - create empty list (won't be persisted on close)
                 chatHistory = FXCollections.observableArrayList();
+
                 LOGGER.debug("Created new in-memory chat history for group {} (no valid identifier)",
                         originalGroupName);
             }
@@ -129,14 +123,6 @@ public class InMemoryChatHistoryCache {
         groupChats.remove(group);
     }
 
-    /// Writes all cached chat histories to the persistent repository using intelligent transfer logic.
-    ///
-    /// For each entry:
-    /// 1. If current citation key is invalid: skip with warning
-    /// 2. If current citation key is valid and same as original: replace in storage
-    /// 3. If current citation key is valid and different from original: clear old, write to new
-    ///
-    /// Call this when the application is closing so chat histories survive the next restart.
     public synchronized void close() {
         LOGGER.debug("Flushing {} entry chats and {} group chats to repository",
                 entryChats.size(), groupChats.size());
@@ -147,57 +133,6 @@ public class InMemoryChatHistoryCache {
         LOGGER.debug("Finished flushing chat histories to repository");
     }
 
-    /// Generic flush logic for both entry and group chats
-    private void flushChat(
-            boolean entityExists,
-            ChatIdentifier currentIdentifier,
-            String originalName,
-            String currentName,
-            ObservableList<ChatMessage> chatHistory,
-            String entityType
-    ) {
-        // If the entity was deleted from the database, the chat history must not be saved.
-        if (!entityExists) {
-            return;
-        }
-
-        boolean nameChanged = !originalName.equals(currentName);
-
-        // If name/key changed: clear old location first (only if old location was valid, not a placeholder)
-        if (nameChanged && !"<empty>".equals(originalName)) {
-            ChatIdentifier oldIdentifier = new ChatIdentifier(
-                    currentIdentifier.libraryId(),
-                    currentIdentifier.chatType(),
-                    originalName
-            );
-
-            repository.clear(oldIdentifier);
-
-            LOGGER.debug("Cleared old chat history for {} with old {}: {}",
-                    entityType,
-                    "entry".equals(entityType) ? "key" : "name",
-                    originalName);
-        }
-
-        // Write to current location (whether name/key changed or not)
-        repository.clear(currentIdentifier);
-        chatHistory.forEach(message -> repository.addMessage(currentIdentifier, message));
-
-        if (nameChanged) {
-            if ("entry".equals(entityType)) {
-                LOGGER.debug("Transferred chat history from {} to {} ({} messages)",
-                        originalName, currentName, chatHistory.size());
-            } else {
-                LOGGER.debug("Transferred chat history from {} '{}' to '{}' ({} messages)",
-                        entityType, originalName, currentName, chatHistory.size());
-            }
-        } else {
-            LOGGER.debug("Flushed chat history for {} {} ({} messages)",
-                    entityType, currentName, chatHistory.size());
-        }
-    }
-
-    /// Flush a single entry's chat history to the repository
     private void flushEntryChat(BibEntry entry, CachedEntryChat cached) {
         Optional<ChatIdentifier> currentIdentifierOpt = ChatIdentifier.from(cached.databaseContext(), entry);
         if (currentIdentifierOpt.isEmpty()) {
@@ -214,7 +149,6 @@ public class InMemoryChatHistoryCache {
         );
     }
 
-    /// Flush a single group's chat history to the repository
     private void flushGroupChat(GroupTreeNode group, CachedGroupChat cached) {
         Optional<ChatIdentifier> currentIdentifierOpt = ChatIdentifier.from(cached.databaseContext(), cached.group());
         if (currentIdentifierOpt.isEmpty()) {
@@ -229,5 +163,57 @@ public class InMemoryChatHistoryCache {
                 cached.chatHistory(),
                 "group"
         );
+    }
+
+    /// Generic flush logic for both entry and group chats
+    private void flushChat(
+            boolean entityExists,
+            ChatIdentifier currentIdentifier,
+            String originalName,
+            String currentName,
+            ObservableList<ChatMessage> chatHistory,
+            String entityType
+    ) {
+        // Algorithm:
+        // 1. If the entity was deleted from the database, the chat history must not be saved.
+        // 2. If name/key changed: clear old location first (only if old location was valid, not a placeholder)
+        // 3. Write to current location (whether name/key changed or not)
+
+        if (!entityExists) {
+            return;
+        }
+
+        boolean nameChanged = !originalName.equals(currentName);
+
+        if (nameChanged && !"<empty>".equals(originalName)) {
+            ChatIdentifier oldIdentifier = new ChatIdentifier(
+                    currentIdentifier.libraryId(),
+                    currentIdentifier.chatType(),
+                    originalName
+            );
+
+            repository.clear(oldIdentifier);
+
+            LOGGER.debug("Cleared old chat history for {} with old {}: {}",
+                    entityType,
+                    "entry".equals(entityType) ? "key" : "name",
+                    originalName);
+        }
+
+        repository.clear(currentIdentifier);
+        chatHistory.forEach(message -> repository.addMessage(currentIdentifier, message));
+
+        if (nameChanged) {
+            if ("entry".equals(entityType)) {
+                LOGGER.debug("Transferred chat history from {} to {} ({} messages)",
+                        originalName, currentName, chatHistory.size());
+            } else {
+                LOGGER.debug("Transferred chat history from {} '{}' to '{}' ({} messages)",
+                        entityType, originalName, currentName, chatHistory.size());
+            }
+        } else {
+            LOGGER.debug("Flushed chat history for {} {} ({} messages)",
+                    entityType, currentName, chatHistory.size());
+        }
     }
 }

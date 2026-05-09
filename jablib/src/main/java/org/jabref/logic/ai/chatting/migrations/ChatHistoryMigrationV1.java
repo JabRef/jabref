@@ -81,11 +81,16 @@ public final class ChatHistoryMigrationV1 {
             return;
         }
 
+        if (bibDatabaseContext.getDatabasePath().isEmpty()) {
+            LOGGER.warn("Cannot migrate chat history: database path is not set");
+            return;
+        }
+
         String libraryId = bibDatabaseContext.getMetaData().getAiLibraryId().get();
 
         Path oldFilePath = Directories.getAiFilesDirectory()
-                                      .getParent()  // Go from ai/2/ to ai/
-                                      .resolve("1")  // Go to ai/1/
+                                      .getParent()
+                                      .resolve("1")
                                       .resolve(OLD_CHAT_HISTORY_FILE_NAME);
 
         migrate(oldFilePath, libraryId, bibDatabaseContext, repository, notificationService);
@@ -154,14 +159,20 @@ public final class ChatHistoryMigrationV1 {
     ) {
         ChatType chatType;
         String chatName;
+        String pathPrefix;
 
-        // Parse old map name to extract chat type and name
         if (oldMapName.contains(ENTRY_CHAT_HISTORY_INFIX)) {
             chatType = ChatType.WITH_ENTRY;
             int index = oldMapName.lastIndexOf(ENTRY_CHAT_HISTORY_INFIX);
+            pathPrefix = oldMapName.substring(0, index);
             chatName = oldMapName.substring(index + ENTRY_CHAT_HISTORY_INFIX.length());
 
-            // Check if entry with this citation key exists
+            if (!pathMatchesCurrentLibrary(pathPrefix, bibDatabaseContext)) {
+                LOGGER.debug("Skipping chat history migration for {}: path prefix '{}' does not match current library '{}'",
+                        oldMapName, pathPrefix, bibDatabaseContext.getDatabasePath().map(Path::toString).orElse("<none>"));
+                return false;
+            }
+
             if (bibDatabaseContext.getDatabase().getEntriesByCitationKey(chatName).isEmpty()) {
                 LOGGER.debug("Skipping chat history migration for non-existent entry: {}", chatName);
                 return false;
@@ -169,7 +180,14 @@ public final class ChatHistoryMigrationV1 {
         } else if (oldMapName.contains(GROUP_CHAT_HISTORY_INFIX)) {
             chatType = ChatType.WITH_GROUP;
             int index = oldMapName.lastIndexOf(GROUP_CHAT_HISTORY_INFIX);
+            pathPrefix = oldMapName.substring(0, index);
             chatName = oldMapName.substring(index + GROUP_CHAT_HISTORY_INFIX.length());
+
+            if (!pathMatchesCurrentLibrary(pathPrefix, bibDatabaseContext)) {
+                LOGGER.debug("Skipping chat history migration for {}: path prefix '{}' does not match current library '{}'",
+                        oldMapName, pathPrefix, bibDatabaseContext.getDatabasePath().map(Path::toString).orElse("<none>"));
+                return false;
+            }
         } else {
             LOGGER.error("Unknown chat history map format: {}", oldMapName);
             return false;
@@ -189,7 +207,6 @@ public final class ChatHistoryMigrationV1 {
 
         ChatIdentifier newIdentifier = new ChatIdentifier(libraryId, chatType, chatName);
 
-        // Skip if new format already has data for this chat
         if (!repository.isEmpty(newIdentifier)) {
             LOGGER.debug("Skipping migration for {} - new format already has data", oldMapName);
             return false;
@@ -222,6 +239,26 @@ public final class ChatHistoryMigrationV1 {
 
         LOGGER.debug("Migrated {} messages from {}", newMessages.size(), oldMapName);
         return true;
+    }
+
+    /// Returns {@code true} if {@code pathPrefix} (extracted from an old map name) refers to the
+    /// same file as the current library.
+    ///
+    /// - If the prefix is an **absolute** path, it is compared after normalization.
+    /// - If the prefix is a **relative** path, the current library's absolute path is checked with
+    ///   {@link Path#endsWith(Path)}, so {@code a/lib1.bib} matches {@code D:/my/a/lib1.bib}.
+    private static boolean pathMatchesCurrentLibrary(String pathPrefix, BibDatabaseContext bibDatabaseContext) {
+        if (pathPrefix.isEmpty() || bibDatabaseContext.getDatabasePath().isEmpty()) {
+            return false;
+        }
+
+        Path oldPath = Path.of(pathPrefix);
+        Path currentAbsolute = bibDatabaseContext.getDatabasePath().get().toAbsolutePath().normalize();
+
+        if (oldPath.isAbsolute()) {
+            return oldPath.normalize().equals(currentAbsolute);
+        }
+        return currentAbsolute.endsWith(oldPath);
     }
 
     /// Deserializes old ChatHistoryRecord bytes using a remapping ObjectInputStream.
