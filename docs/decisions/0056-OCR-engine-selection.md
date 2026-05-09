@@ -229,6 +229,7 @@ Kreuzberg is a Rust-core document intelligence framework with Java bindings. It 
 - Bad, because **Elastic License 2.0 is not an OSI-approved open-source license**. ELv2 is incompatible with JabRef's MIT license and distribution model. Kreuzberg is excluded on license grounds.
 
 ---
+
 ## More Links
 
 - Meta issue: [#13267](https://github.com/JabRef/jabref/issues/13267)
