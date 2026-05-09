@@ -9,6 +9,7 @@ JabRef requires an OCR engine to extract text from scanned academic PDFs especia
 Which OCR engines should JabRef support to serve its academic user base?
 
 ---
+
 ## Decision Drivers
 
 - GPL and non-open-source are not acceptable.
@@ -17,6 +18,7 @@ Which OCR engines should JabRef support to serve its academic user base?
 - Engines must support the accuracy requirements of academic documents: mathematical eauations, tables, and multiple languages including non-latin scripts.
 
 ---
+
 ## Considered Options
 
 - OCRmyPDF subprocess, MPL-2.0
@@ -32,6 +34,7 @@ Which OCR engines should JabRef support to serve its academic user base?
 - Kreuzberg Java API (FFI), Elastic License 2.0
 
 ---
+
 ## Decision Outcome
 
 Chosen option: A prioritized set of engines based on availability, quality, and implementation complexity.
@@ -61,11 +64,12 @@ The integration will be confirmed by a `DocumentReaderTest` that verifies:
 2. After OCR processing, `PDFTextStripper` returns non-empty content from the same file.
 
 ---
+
 ## Pros and Cons of the Options
 
 ### OCRmyPDF
 
-Homepage: https://github.com/ocrmypdf/OCRmyPDF
+Homepage: [https://github.com/ocrmypdf/OCRmyPDF](https://github.com/ocrmypdf/OCRmyPDF)
 License: [MPL-2.0](https://github.com/ocrmypdf/OCRmyPDF#MPL-2.0-1-ov-file)
 Integration: Subprocess via `ProcessBuilder`
 
@@ -82,9 +86,9 @@ OCRmyPDF is a Python command-line tool that takes a scanned PDF, OCRs each page 
 
 ### Tesseract via Tess4J
 
-Homepage: https://github.com/nguyenq/tess4j
-Tesseract homepage: https://tesseract-ocr.github.io/
-Baeldung integration guide: https://www.baeldung.com/java-ocr-tesseract
+Homepage: [https://github.com/nguyenq/tess4j](https://github.com/nguyenq/tess4j)
+Tesseract homepage: [https://tesseract-ocr.github.io/](https://tesseract-ocr.github.io/)
+Baeldung integration guide: [https://www.baeldung.com/java-ocr-tesseract](https://www.baeldung.com/java-ocr-tesseract)
 License: [Apache 2.0](https://github.com/nguyenq/tess4j?tab=Apache-2.0-1-ov-file#readme)
 Integration: Java API via JNA (Java Native Access)
 
@@ -99,8 +103,8 @@ Tess4J is a Java wrapper for the Tesseract C++ OCR library. It calls `tesseract.
 
 ### Apache Tika with Tesseract
 
-Homepage: https://tika.apache.org/
-Tika OCR documentation: https://cwiki.apache.org/confluence/display/tika/tikaocr
+Homepage: [https://tika.apache.org/](https://tika.apache.org/)
+Tika OCR documentation: [https://cwiki.apache.org/confluence/display/tika/tikaocr](https://cwiki.apache.org/confluence/display/tika/tikaocr)
 License: [Apache 2.0](https://github.com/apache/tika/blob/main/LICENSE.txt)
 Integration: Java API
 
@@ -113,7 +117,7 @@ Apache Tika is a content extraction toolkit it can invoke Tesseract under the ho
 
 ### Docling
 
-Homepage: https://github.com/docling-project/docling
+Homepage: [https://github.com/docling-project/docling](https://github.com/docling-project/docling)
 License: [MIT](https://github.com/docling-project/docling?tab=MIT-1-ov-file#readme)
 Integration: Subprocess via `ProcessBuilder`
 
@@ -128,7 +132,7 @@ Docling is a Python document intelligence library from IBM Research. It performs
 
 ### olmOCR
 
-Homepage: https://github.com/allenai/olmocr
+Homepage: [https://github.com/allenai/olmocr](https://github.com/allenai/olmocr)
 License: [Apache 2.0](https://github.com/allenai/olmocr?tab=Apache-2.0-1-ov-file#readme)
 Integration: Subprocess via `ProcessBuilder`
 
@@ -143,8 +147,8 @@ olmOCR is an OCR toolkit from the Allen Institute for AI (AI2), specifically tra
 
 ### PaddleOCR-VL via llama.cpp
 
-Homepage: https://huggingface.co/PaddlePaddle/PaddleOCR-VL
-llama.cpp integration: https://github.com/ggml-org/llama.cpp/pull/16701
+Homepage: [https://huggingface.co/PaddlePaddle/PaddleOCR-VL](https://huggingface.co/PaddlePaddle/PaddleOCR-VL)
+llama.cpp integration: [https://github.com/ggml-org/llama.cpp/pull/16701](https://github.com/ggml-org/llama.cpp/pull/16701)
 License: [Apache 2.0](https://huggingface.co/datasets/choosealicense/licenses/blob/main/markdown/apache-2.0.md)
 Integration: HTTP API via locally running llama.cpp server
 
@@ -159,7 +163,7 @@ PaddleOCR-VL is a vision-language model achieving state-of-the-art accuracy on O
 
 ### TurboOCR
 
-Homepage: https://github.com/aiptimizer/TurboOCR
+Homepage: [https://github.com/aiptimizer/TurboOCR](https://github.com/aiptimizer/TurboOCR)
 License: [MIT](https://github.com/aiptimizer/TurboOCR?tab=MIT-1-ov-file#readme)
 Integration: HTTP API
 
@@ -173,7 +177,7 @@ TurboOCR is a C++/CUDA server wrapping PaddleOCR's PP-OCRv5 with TensorRT FP16 a
 
 ### deepdoctection
 
-Homepage: https://github.com/deepdoctection/deepdoctection
+Homepage: [https://github.com/deepdoctection/deepdoctection](https://github.com/deepdoctection/deepdoctection)
 License: [Apache 2.0](https://github.com/deepdoctection/deepdoctection?tab=Apache-2.0-1-ov-file#readme)
 Integration: Subprocess via `ProcessBuilder`
 
@@ -188,7 +192,7 @@ deepdoctection is not selected for this project phase but is retained as the ref
 
 ### SimpleHTR
 
-Homepage: https://github.com/githubharald/SimpleHTR
+Homepage: [https://github.com/githubharald/SimpleHTR](https://github.com/githubharald/SimpleHTR)
 License: [MIT](https://github.com/githubharald/SimpleHTR?tab=MIT-1-ov-file#readme)
 Integration: Subprocess via `ProcessBuilder`
 
@@ -204,7 +208,7 @@ SimpleHTR is not selected for this project phase but is documented as a future o
 
 ### Surya
 
-Homepage: https://github.com/VikParuchuri/surya
+Homepage: [https://github.com/VikParuchuri/surya](https://github.com/VikParuchuri/surya)
 License: [GPL-3.0](https://github.com/datalab-to/surya?tab=GPL-3.0-1-ov-file#readme)
 
 Surya is a Python OCR engine with strong performance on non-Latin scripts and complex multi-column layouts.
@@ -214,7 +218,7 @@ Surya is a Python OCR engine with strong performance on non-Latin scripts and co
 
 ### Kreuzberg
 
-Homepage: https://github.com/kreuzberg-dev/kreuzberg
+Homepage: [https://github.com/kreuzberg-dev/kreuzberg](https://github.com/kreuzberg-dev/kreuzberg)
 License: [Elastic License 2.0 (ELv2)](https://github.com/kreuzberg-dev/kreuzberg?tab=License-1-ov-file#readme)
 Integration: Java API
 
