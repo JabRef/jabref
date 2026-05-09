@@ -99,8 +99,8 @@ public class EmbeddingsSearchAnswerEngine implements AnswerEngine {
                     String citationKey = fileHash == null
                                          ? null
                                          : findEntryByFileHash(entriesFilter, fileHash)
-                                                .flatMap(BibEntry::getCitationKey)
-                                                .orElse(null);
+                                                 .flatMap(BibEntry::getCitationKey)
+                                                 .orElse(null);
                     return new RelevantInformation(citationKey, textSegment.text());
                 })
                 .toList();
