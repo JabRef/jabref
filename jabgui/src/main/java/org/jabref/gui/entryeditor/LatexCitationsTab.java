@@ -122,7 +122,7 @@ public class LatexCitationsTab extends EntryEditorTab {
     private VBox getCitationsPane() {
         VBox citationsBox = new VBox(30, citationsDisplay);
         VBox.setVgrow(citationsDisplay, Priority.ALWAYS);
-        citationsBox.getStyleClass().add("latex-citations-box");
+        citationsBox.getStyleClass().add("padding-0");
         return citationsBox;
     }
 

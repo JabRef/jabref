@@ -205,7 +205,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         VBox vBox = new VBox();
         vBox.getChildren().add(progressIndicator);
-        vBox.getStyleClass().add("centered-container");
+        vBox.getStyleClass().add("align-center");
 
         sciteResultsPane.add(vBox, 0, 0);
 
@@ -225,7 +225,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         vBox.getChildren().add(progressIndicator);
         vBox.getChildren().add(label);
         vBox.setSpacing(2d);
-        vBox.getStyleClass().add("centered-container");
+        vBox.getStyleClass().add("align-center");
 
         sciteResultsPane.add(vBox, 0, 0);
 
@@ -247,7 +247,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         hBox.getChildren().add(label);
         hBox.getChildren().add(link);
         hBox.setSpacing(2d);
-        hBox.getStyleClass().add("centered-container");
+        hBox.getStyleClass().add("align-center");
 
         sciteResultsPane.add(hBox, 0, 0);
 

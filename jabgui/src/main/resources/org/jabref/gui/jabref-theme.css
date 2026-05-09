@@ -1260,10 +1260,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-weight: bold;
 }
 
-#entryEditor .latex-citations-box {
-    -fx-padding: 0;
-}
-
 #entryEditor .latex-citations-message-box {
     -fx-padding: 30 0 0 30;
 }
@@ -1688,11 +1684,11 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* CitationRelationsTab */
 
-#citationRelationsTab .padding-5px {
+.padding-5px {
     -fx-padding: 5px;
 }
 
-#citationRelationsTab .align-center {
+.align-center {
     -fx-alignment: center;
 }
 
