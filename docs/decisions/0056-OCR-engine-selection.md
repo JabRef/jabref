@@ -1,6 +1,8 @@
-# ADR for OCR engine selection
-
 ---
+parent: Decision Records
+nav_order: 56
+---
+# ADR for OCR engine selection
 
 ## Context and Problem Statement
 
