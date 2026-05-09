@@ -647,11 +647,11 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0;
 }
 
-.main-table-column-no-padding {
+.padding-0 {
     -fx-padding: 0;
 }
 
-.right-aligned-column {
+.align-center-right {
     -fx-alignment: CENTER-RIGHT;
 }
 
@@ -1271,7 +1271,7 @@ We want to have a look that matches our icons in the tool-bar */
 #entryEditor .latex-citations-error-label {
     -fx-font-size: 1.5em;
     -fx-font-weight: bold;
-    -fx-text-fill: -jr-error;
+    -fx-text-fill: -fx-accent;
 }
 
 /* ErrorConsole */
@@ -1688,11 +1688,11 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* CitationRelationsTab */
 
-#citationRelationsTab .padded-label {
+#citationRelationsTab .padding-5px {
     -fx-padding: 5px;
 }
 
-#citationRelationsTab .centered-container {
+#citationRelationsTab .align-center {
     -fx-alignment: center;
 }
 

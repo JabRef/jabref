@@ -173,7 +173,7 @@ public class MainTableColumnFactory {
         header.getStyleClass().add("mainTable-header");
         Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.INDEX.getDisplayName()));
         column.setGraphic(header);
-        column.getStyleClass().add("right-aligned-column");
+        column.getStyleClass().add("align-center-right");
         column.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(
                 String.valueOf(cellData.getTableView().getItems().indexOf(cellData.getValue()) + 1)));
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
@@ -196,7 +196,7 @@ public class MainTableColumnFactory {
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
                 .withGraphic(this::createGroupColorRegion)
                 .install(column);
-        column.getStyleClass().add("main-table-column-no-padding");
+        column.getStyleClass().add("padding-0");
         column.setSortable(true);
         return column;
     }
@@ -213,7 +213,7 @@ public class MainTableColumnFactory {
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
                 .withGraphic(this::createGroupIconRegion)
                 .install(column);
-        column.getStyleClass().add("main-table-column-no-padding");
+        column.getStyleClass().add("padding-0");
         column.setSortable(true);
         return column;
     }

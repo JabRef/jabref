@@ -668,7 +668,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     /// @param label       label to style
     /// @param tooltipText tooltip text
     private void styleLabel(Label label, String tooltipText) {
-        label.getStyleClass().add("padded-label");
+        label.getStyleClass().add("padding-5px");
         label.setAlignment(Pos.CENTER);
         label.setTooltip(new Tooltip(tooltipText));
         label.setMaxWidth(Double.MAX_VALUE);
@@ -814,7 +814,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         hBox.getChildren().add(label);
         hBox.getChildren().add(link);
         hBox.setSpacing(2d);
-        hBox.getStyleClass().add("centered-container");
+        hBox.getStyleClass().add("align-center");
         hBox.setFillHeight(true);
 
         citationComponents.listView().getItems().clear();
