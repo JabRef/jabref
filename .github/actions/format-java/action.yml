@@ -1,0 +1,13 @@
+name: Format Java sources
+description: Reformat Java sources using IntelliJ IDEA's code style
+
+runs:
+  using: composite
+  steps:
+    - uses: leventeBajczi/intellij-idea-format@master
+      with:
+        file-mask: "*.java"
+        settings-file: ".idea/codeStyles/Project.xml"
+    - name: Undo JBang changes # IntelliJ issue: https://youtrack.jetbrains.com/issue/IDEA-https://youtrack.jetbrains.com/issue/IDEA-384956/Skip-formatting-of-shebang-headers/Skip-formatting-of-shebang-headers
+      shell: bash
+      run: git checkout HEAD -- jablib-examples/jbang/*.java

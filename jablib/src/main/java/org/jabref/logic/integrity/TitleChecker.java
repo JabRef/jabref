@@ -8,6 +8,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 
+import org.jspecify.annotations.Nullable;
+
 public class TitleChecker implements ValueChecker {
 
     private static final Pattern INSIDE_CURLY_BRAKETS = Pattern.compile("\\{[^}\\{]*\\}");
@@ -29,7 +31,7 @@ public class TitleChecker implements ValueChecker {
     /// -    ignore first letter as this can always be written in caps
     /// -    check if at least one capital letter is in the subtitle
     @Override
-    public Optional<String> checkValue(String value) {
+    public Optional<String> checkValue(@Nullable String value) {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();
         }

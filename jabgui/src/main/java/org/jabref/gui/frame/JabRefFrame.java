@@ -284,8 +284,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             horizontalSplit.getItems().remove(sidePane);
         } else {
             if (!horizontalSplit.getItems().contains(sidePane)) {
+                horizontalSplit.setVisible(false);
                 horizontalSplit.getItems().addFirst(sidePane);
-                updateHorizontalDividerPosition();
+                Platform.runLater(() -> {
+                    updateHorizontalDividerPosition();
+                    horizontalSplit.setVisible(true);
+                });
             }
         }
     }
@@ -609,6 +613,16 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                             LibraryTab currentTab = getCurrentLibraryTab();
                             return (currentTab == null) ? null : currentTab.getBibDatabaseContext();
                         }, stateManager, preferences, dialogService)),
+                factory.createMenuItem(StandardActions.SORT_TABS_ALPHABETICALLY, new SimpleCommand() {
+                    @Override
+                    public void execute() {
+                        tabbedPane.getTabs().sort((tab1, tab2) -> {
+                            String text1 = tab1.getText() != null ? tab1.getText() : "";
+                            String text2 = tab2.getText() != null ? tab2.getText() : "";
+                            return text1.compareToIgnoreCase(text2);
+                        });
+                    }
+                }),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY,
                         new CloseDatabaseAction(this, tab, stateManager)),

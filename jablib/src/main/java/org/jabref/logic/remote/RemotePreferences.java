@@ -19,72 +19,88 @@ public class RemotePreferences {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemotePreferences.class);
 
-    private final IntegerProperty port;
-    private final BooleanProperty useRemoteServer;
+    private final BooleanProperty enableRemoteServer;
+    private final IntegerProperty remoteServerPort;
 
-    private final IntegerProperty httpPort;
     private final BooleanProperty enableHttpServer;
+    private final IntegerProperty httpServerPort;
 
     private final BooleanProperty enableLanguageServer;
     private final IntegerProperty languageServerPort;
 
     private final BooleanProperty directHttpImport;
 
-    public RemotePreferences(int port, boolean useRemoteServer, int httpPort, boolean enableHttpServer, boolean enableLanguageServer, int languageServerPort, boolean directHttpImport) {
-        this.port = new SimpleIntegerProperty(port);
-        this.useRemoteServer = new SimpleBooleanProperty(useRemoteServer);
-        this.httpPort = new SimpleIntegerProperty(httpPort);
+    public RemotePreferences(boolean enableRemoteServer,
+                             int remoteServerPort,
+                             boolean enableHttpServer,
+                             int httpServerPort,
+                             boolean enableLanguageServer,
+                             int languageServerPort,
+                             boolean directHttpImport) {
+        this.enableRemoteServer = new SimpleBooleanProperty(enableRemoteServer);
+        this.remoteServerPort = new SimpleIntegerProperty(remoteServerPort);
         this.enableHttpServer = new SimpleBooleanProperty(enableHttpServer);
+        this.httpServerPort = new SimpleIntegerProperty(httpServerPort);
         this.enableLanguageServer = new SimpleBooleanProperty(enableLanguageServer);
         this.languageServerPort = new SimpleIntegerProperty(languageServerPort);
         this.directHttpImport = new SimpleBooleanProperty(directHttpImport);
     }
 
-    public int getPort() {
-        return port.getValue();
+    private RemotePreferences() {
+        this(
+                true,  // enableRemoteServer
+                6050,  // remoteServerPort
+                false, // enableHttpServer
+                23119, // httpServerPort
+                false, // enableLanguageServer
+                2087,  // languageServerPort
+                false  // directHttpImport
+        );
     }
 
-    public IntegerProperty portProperty() {
-        return port;
+    public static RemotePreferences getDefault() {
+        return new RemotePreferences();
     }
 
-    public void setPort(int port) {
-        this.port.setValue(port);
+    public void setAll(RemotePreferences preferences) {
+        enableRemoteServer.setValue(preferences.shouldEnableRemoteServer());
+        remoteServerPort.setValue(preferences.getRemoteServerPort());
+        enableHttpServer.setValue(preferences.shouldEnableHttpServer());
+        httpServerPort.setValue(preferences.getHttpServerPort());
+        enableLanguageServer.setValue(preferences.shouldEnableLanguageServer());
+        languageServerPort.setValue(preferences.getLanguageServerPort());
+        directHttpImport.setValue(preferences.directHttpImport());
     }
 
-    public boolean isDifferentPort(int otherPort) {
-        return getPort() != otherPort;
+    public boolean shouldEnableRemoteServer() {
+        return enableRemoteServer.getValue();
     }
 
-    public boolean useRemoteServer() {
-        return useRemoteServer.getValue();
+    public BooleanProperty enableRemoteServerProperty() {
+        return enableRemoteServer;
     }
 
-    public BooleanProperty useRemoteServerProperty() {
-        return useRemoteServer;
+    public void setEnableRemoteServer(boolean enableRemoteServer) {
+        this.enableRemoteServer.setValue(enableRemoteServer);
     }
 
-    public void setUseRemoteServer(boolean useRemoteServer) {
-        this.useRemoteServer.setValue(useRemoteServer);
+    public int getRemoteServerPort() {
+        return remoteServerPort.getValue();
     }
 
-    public int getHttpPort() {
-        return httpPort.getValue();
+    public IntegerProperty remoteServerPortProperty() {
+        return remoteServerPort;
     }
 
-    public IntegerProperty httpPortProperty() {
-        return httpPort;
+    public void setRemoteServerPort(int remoteServerPort) {
+        this.remoteServerPort.setValue(remoteServerPort);
     }
 
-    public void setHttpPort(int httpPort) {
-        this.httpPort.setValue(httpPort);
+    public boolean isDifferentRemoteServerPort(int otherPort) {
+        return getRemoteServerPort() != otherPort;
     }
 
-    public boolean isDifferentHttpPort(int otherHttpPort) {
-        return getHttpPort() != otherHttpPort;
-    }
-
-    public boolean enableHttpServer() {
+    public boolean shouldEnableHttpServer() {
         return enableHttpServer.getValue();
     }
 
@@ -94,6 +110,34 @@ public class RemotePreferences {
 
     public void setEnableHttpServer(boolean enableHttpServer) {
         this.enableHttpServer.setValue(enableHttpServer);
+    }
+
+    public int getHttpServerPort() {
+        return httpServerPort.getValue();
+    }
+
+    public IntegerProperty httpServerPortProperty() {
+        return httpServerPort;
+    }
+
+    public void setHttpServerPort(int httpServerPort) {
+        this.httpServerPort.setValue(httpServerPort);
+    }
+
+    public boolean isDifferentHttpServerPort(int otherHttpPort) {
+        return getHttpServerPort() != otherHttpPort;
+    }
+
+    public boolean shouldEnableLanguageServer() {
+        return enableLanguageServer.getValue();
+    }
+
+    public BooleanProperty enableLanguageServerProperty() {
+        return enableLanguageServer;
+    }
+
+    public void setEnableLanguageServer(boolean enableLanguageServer) {
+        this.enableLanguageServer.setValue(enableLanguageServer);
     }
 
     public int getLanguageServerPort() {
@@ -110,18 +154,6 @@ public class RemotePreferences {
 
     public boolean isDifferentLanguageServerPort(int otherLanguageServerPort) {
         return getLanguageServerPort() != otherLanguageServerPort;
-    }
-
-    public boolean enableLanguageServer() {
-        return enableLanguageServer.getValue();
-    }
-
-    public BooleanProperty enableLanguageServerProperty() {
-        return enableLanguageServer;
-    }
-
-    public void setEnableLanguageServer(boolean enableLanguageServer) {
-        this.enableLanguageServer.setValue(enableLanguageServer);
     }
 
     public boolean directHttpImport() {
@@ -143,7 +175,7 @@ public class RemotePreferences {
 
     public @NonNull URI getHttpServerUri() {
         try {
-            return new URI("http", null, RemotePreferences.getIpAddress().getHostAddress(), getHttpPort(), null, null, null);
+            return new URI("http", null, RemotePreferences.getIpAddress().getHostAddress(), getHttpServerPort(), null, null, null);
         } catch (UnknownHostException | URISyntaxException e) {
             LOGGER.error("Could not create HTTP server URI. Falling back to default.", e);
             try {

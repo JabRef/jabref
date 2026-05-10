@@ -9,13 +9,14 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class MonthChecker implements ValueChecker {
 
-    private static final Predicate<String> ONLY_AN_INTEGER = Pattern.compile("[1-9]|10|11|12")
+    private static final Predicate<String> ONLY_AN_INTEGER = Pattern.compile("^(0?[1-9]|10|11|12)$")
                                                                     .asPredicate();
     private static final Predicate<String> MONTH_NORMALIZED = Pattern
-            .compile("#jan#|#feb#|#mar#|#apr#|#may#|#jun#|#jul#|#aug#|#sep#|#oct#|#nov#|#dec#")
+            .compile("^(#jan#|#feb#|#mar#|#apr#|#may#|#jun#|#jul#|#aug#|#sep#|#oct#|#nov#|#dec#)$")
             .asPredicate();
 
     private final BibDatabaseContext bibDatabaseContextMonth;
@@ -31,7 +32,7 @@ public class MonthChecker implements ValueChecker {
     /// jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec.
     /// Note that these abbreviations are BibTeX strings which must be given without any braces or quotes.
     @Override
-    public Optional<String> checkValue(String value) {
+    public Optional<String> checkValue(@Nullable String value) {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();
         }

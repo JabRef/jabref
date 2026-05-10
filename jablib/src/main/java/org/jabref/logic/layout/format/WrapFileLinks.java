@@ -169,7 +169,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     public void setArgument(String arg) {
         List<String> parts = AbstractParamLayoutFormatter.parseArgument(arg);
         format = parseFormatString(parts.getFirst());
-        if ((parts.size() > 1) && !parts.get(1).trim().isEmpty()) {
+        if ((parts.size() > 1) && !parts.get(1).isBlank()) {
             fileType = parts.get(1);
         }
         if (parts.size() > 2) {

@@ -76,7 +76,7 @@ public class Launcher {
                 } else if (instanceAction == MultipleInstanceAction.FOCUS) {
                     // Send focus command to running instance
                     RemotePreferences remotePreferences = preferences.getRemotePreferences();
-                    RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
+                    RemoteClient remoteClient = new RemoteClient(remotePreferences.getRemoteServerPort());
                     remoteClient.sendFocus();
                     systemExit();
                 }
@@ -171,9 +171,9 @@ public class Launcher {
     private static MultipleInstanceAction handleMultipleAppInstances(String[] args, RemotePreferences remotePreferences) {
         LOGGER.trace("Checking for remote handling...");
 
-        if (remotePreferences.useRemoteServer()) {
+        if (remotePreferences.shouldEnableRemoteServer()) {
             // Try to contact already running JabRef
-            RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
+            RemoteClient remoteClient = new RemoteClient(remotePreferences.getRemoteServerPort());
             if (remoteClient.ping()) {
                 LOGGER.debug("Pinging other instance succeeded.");
                 if (args.length == 0) {
