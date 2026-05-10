@@ -101,7 +101,7 @@ Tess4J is a Java wrapper for the Tesseract C++ OCR library. It calls `tesseract.
 - Good, because Tesseract supports 100+ languages via downloadable `.traineddata` files.
 - Bad, because `module-info.java` requires explicit JNA module access declarations.
 - Bad, because correct multi-page text layer embedding requires per-page hOCR processing, adding significant implementation complexity compared to OCRmyPDF.
-- Bad, because tessdata path discovery differs across Windows, macOS, and Linux.
+- Bad, because `tessdata` path discovery differs across Windows, macOS, and Linux.
 
 ### Apache Tika with Tesseract
 
