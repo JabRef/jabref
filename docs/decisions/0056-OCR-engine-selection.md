@@ -80,7 +80,7 @@ OCRmyPDF is a Python command-line tool that takes a scanned PDF, OCRs each page 
 - Good, because both OCR extraction and text layer embedding are handled in a single subprocess call, and no separate step is needed for embedding the text layer into the PDF.
 - Good, because it uses hOCR to position words producing accurately located invisible text, enabling correct copy-paste and PDF viewer search highlighting.
 - Good, because `--skip-text` correctly handles partially searchable PDFs without re-OCRing already-good pages.
-- Good, because it [plugins](https://github.com/ocrmypdf/OCRmyPDF#plugins) that uses different engines from Tesseract like [OCRmyPDF-PaddleOCR](https://github.com/clefru/ocrmypdf-paddleocr) that replaces the standard Tesseract OCR engine with PaddleOCR.
+- Good, because it has [plugins](https://github.com/ocrmypdf/OCRmyPDF#plugins) that uses different engines from Tesseract like [OCRmyPDF-PaddleOCR](https://github.com/clefru/ocrmypdf-paddleocr) that replaces the standard Tesseract OCR engine with PaddleOCR.
 - Good, because MPL-2.0 is compatible with JabRef's MIT license for subprocess invocation with no source modification.
 - Good, because it is available via `pip`, `apt`, `brew`, and standalone installers on all three supported platforms.
 - Bad, because it requires Python 3.x and pip to be available on the user's machine.
