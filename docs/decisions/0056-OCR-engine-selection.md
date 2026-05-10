@@ -77,7 +77,7 @@ Integration: Subprocess via `ProcessBuilder`
 
 OCRmyPDF is a Python command-line tool that takes a scanned PDF, OCRs each page using Tesseract internally, and outputs a new PDF with an invisible text layer. The output PDF is immediately readable by Lucene, requiring no further PDF production.
 
-- Good, because both OCR extraction and text layer embedding are handled in a single subprocess call no separate step needed for embedding the text layer into the PDF.
+- Good, because both OCR extraction and text layer embedding are handled in a single subprocess call, and no separate step is needed for embedding the text layer into the PDF.
 - Good, because it uses hOCR to position words producing accurately located invisible text, enabling correct copy-paste and PDF viewer search highlighting.
 - Good, because `--skip-text` correctly handles partially searchable PDFs without re-OCRing already-good pages.
 - Good, because it [plugins](https://github.com/ocrmypdf/OCRmyPDF#plugins) that uses different engines from Tesseract like [OCRmyPDF-PaddleOCR](https://github.com/clefru/ocrmypdf-paddleocr) that replaces the standard Tesseract OCR engine with PaddleOCR.
