@@ -62,7 +62,7 @@ Apache Tika is not selected as a primary OCR path because it abstracts away fine
 
 The integration will be confirmed by a `DocumentReaderTest` that verifies:
 
-1. `PDFTextStripper` returns empty content for a scanned PDFs before performing OCR (established in PR [#15428](https://github.com/JabRef/jabref/pull/15428)).
+1. `PDFTextStripper` returns empty content for a scanned PDF before performing OCR (established in PR [#15428](https://github.com/JabRef/jabref/pull/15428)).
 2. After OCR processing, `PDFTextStripper` returns non-empty content from the same file.
 
 ---
