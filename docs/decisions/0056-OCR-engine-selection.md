@@ -6,7 +6,7 @@ nav_order: 56
 
 ## Context and Problem Statement
 
-JabRef requires an OCR engine to extract text from scanned academic PDFs especially, the historic and old documents. Academic documents present unique challenges: mathematical notation, multiple languages, complex layouts, tables, and mixed handwritten/printed content.
+JabRef requires an OCR engine to extract text from scanned academic PDFs, especially historic and old documents. Academic documents present unique challenges: mathematical notation, multiple languages, complex layouts, tables, and mixed handwritten/printed content.
 
 Which OCR engines should JabRef support to serve its academic user base?
 
@@ -158,12 +158,16 @@ Integration: HTTP API via locally running llama.cpp server
 
 PaddleOCR-VL is a vision-language model achieving state-of-the-art accuracy on OCR benchmarks as of October 2025. llama.cpp PR 16701 adds support for running PaddleOCR-VL locally via llama.cpp's server, which exposes an HTTP API. For JabRef, integration is as a `RemoteOcrEngine` sending requests to a user-provisioned llama.cpp instance.
 
-- Good, because state-of-the-art accuracy on diverse document types and scripts including non-Latin.
+- Good, because depending on the OCR model, there can be state-of-the-art accuracy on diverse document types and scripts including non-Latin. Model makers regularly release new models.
 - Good, because Apache 2.0 license is fully compatible.
 - Good, because the HTTP API integration pattern is reusable for other remote OCR engines.
+- Good, because inference is fast as a wide variety of GPU backends is supported.
 - Bad, because the user must separately install and run a llama.cpp server instance.
 - Bad, because model weights must be downloaded separately (several GB depending on model variant).
 - Bad, because llama.cpp PR 16701 is recent and less tested than OCRmyPDF or Tesseract.
+
+[https://github.com/ggml-org/llama.cpp/blob/master/docs/multimodal.md](https://github.com/ggml-org/llama.cpp/blob/master/docs/multimodal.md)
+[https://github.com/ggml-org/llama.cpp/blob/master/docs/ops.md](https://github.com/ggml-org/llama.cpp/blob/master/docs/ops.md)
 
 ### TurboOCR
 
@@ -176,8 +180,9 @@ TurboOCR is a C++/CUDA server wrapping PaddleOCR's PP-OCRv5 with TensorRT FP16 a
 - Good, because MIT license is fully compatible.
 - Good, because JSON response includes bounding boxes for accurately positioned text layer embedding.
 - Good, because the HTTP adapter pattern it establishes covers TurboOCR, Google Cloud Vision, Azure Computer Vision, and any other HTTP-based OCR service a single `RemoteOcrEngine` implementation serves all.
-- Bad, because it requires a dedicated NVIDIA GPU server, making it unsuitable as a default engine for individual researchers.
+- Bad, because to date, it requires NVIDIA GPU hardware, thereby excluding a wide range of users, making it unsuitable as a default engine.
 - Bad, because it raises privacy concerns when documents contain unpublished research materials.
+- Bad, because to date, the project only supports a few select language family bundles (Latin, Chinese, Greek, Korean, Arabic, eslav, thai).
 
 ### deepdoctection
 
