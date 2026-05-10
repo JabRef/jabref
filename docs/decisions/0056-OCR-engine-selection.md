@@ -14,7 +14,7 @@ Which OCR engines should JabRef support to serve its academic user base?
 
 ## Decision Drivers
 
-- GPL and non-open-source are not acceptable (Online services are okay).
+- GPL and non-open-source are not acceptable (with exception to online services).
 - No engine will be bundled in JabRef's distribution. Engines must be installed by the user.
 - The output of OCR must be embeddable as a text layer in the PDF so that Lucene (or another search engine) can subsequently extract it. This allows Lucene to index the document through the existing logic with no changes.
 - OCR Engines must support the accuracy requirements of academic documents: mathematical equations, tables, and multiple languages including non-latin scripts.
