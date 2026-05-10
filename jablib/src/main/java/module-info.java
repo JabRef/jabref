@@ -303,6 +303,6 @@ open module org.jabref.jablib {
     requires transitive org.antlr.antlr4.runtime;
     requires org.jooq.jool;
     requires transitive org.libreoffice.uno;
-    requires /* runtime */ transitive org.jspecify;
+    requires org.jspecify;
     // endregion
 }
