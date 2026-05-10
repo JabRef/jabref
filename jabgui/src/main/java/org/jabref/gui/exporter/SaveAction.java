@@ -8,6 +8,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -49,7 +50,8 @@ public class SaveAction extends SimpleCommand {
                 dialogService,
                 preferences,
                 Injector.instantiateModelOrService(BibEntryTypesManager.class),
-                stateManager);
+                stateManager,
+                Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
 
         switch (saveMethod) {
             case SAVE ->

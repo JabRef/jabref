@@ -6,10 +6,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
+import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -118,6 +121,20 @@ public class MetaDataParserTest {
 
         assertEquals(Optional.of(Path.of("/path/for/host1")), parsed.getLatexFileDirectory(userHost1));
         assertEquals(Optional.of(Path.of("/path/for/host2")), parsed.getLatexFileDirectory(userHost2));
+    }
+
+    @Test
+    void libraryAbbreviationTypeRoundTrip() throws ParseException {
+        MetaData original = new MetaData();
+        original.setLibraryAbbreviationType(AbbreviationType.LTWA);
+
+        GlobalCitationKeyPatterns globalPattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
+        Map<String, String> serialized = MetaDataSerializer.getSerializedStringMap(original, globalPattern);
+
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = parser.parse(new MetaData(), serialized, ',', "userAndHost");
+
+        assertEquals(Optional.of(AbbreviationType.LTWA), parsed.getLibraryAbbreviationType());
     }
 
     @Test

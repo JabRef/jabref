@@ -13,6 +13,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.util.MetaDataParser;
+import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.os.OS;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
@@ -143,6 +144,17 @@ public class MetaDataSerializerTest {
     @MethodSource
     void serializeCustomizedEntryType(BibEntryTypeBuilder bibEntryTypeBuilder, String expected) {
         assertEquals(expected, MetaDataSerializer.serializeCustomEntryTypes(bibEntryTypeBuilder.build()));
+    }
+
+    @Test
+    void serializeLibraryAbbreviationTypeLtwa() {
+        metaData.setLibraryAbbreviationType(AbbreviationType.LTWA);
+
+        Map<String, String> serialized = MetaDataSerializer.getSerializedStringMap(metaData, pattern);
+
+        Map<String, String> expected = new TreeMap<>();
+        expected.put(MetaData.LIBRARY_ABBREVIATION_TYPE, "LTWA;");
+        assertEquals(expected, serialized);
     }
 
     /// Ensures that user-specific .blg path is correctly serialized

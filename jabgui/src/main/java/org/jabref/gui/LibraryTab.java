@@ -675,7 +675,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         if (buttonType.equals(saveChanges)) {
             try {
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferences, Injector.instantiateModelOrService(BibEntryTypesManager.class), stateManager);
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferences, Injector.instantiateModelOrService(BibEntryTypesManager.class), stateManager, Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
                 if (saveAction.save()) {
                     return true;
                 }

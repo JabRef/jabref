@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a per-library journal abbreviation preference to Library Properties, allowing automatic LTWA abbreviation on save. [#15495](https://github.com/JabRef/jabref/issues/15495)
 - We fixed a glitch with the sidepane divider position on startup. [#15394](https://github.com/JabRef/jabref/issues/15394)
 - We added a label to the Group dropdown in the Import Dialog. [#15567](https://github.com/JabRef/jabref/issues/15567)
 - We added a related work text extractor, which finds and inserts the related work text into bib entries from references in the texts. [#9840](https://github.com/JabRef/jabref/issues/9840)
