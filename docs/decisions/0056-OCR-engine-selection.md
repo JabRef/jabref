@@ -88,7 +88,7 @@ OCRmyPDF is a Python command-line tool that takes a scanned PDF, OCRs each page 
 
 ### Tesseract via Tess4J
 
-Homepage: [https://github.com/nguyenq/tess4j](https://github.com/nguyenq/tess4j)
+Tess4j homepage: [https://github.com/nguyenq/tess4j](https://github.com/nguyenq/tess4j)
 Tesseract homepage: [https://tesseract-ocr.github.io/](https://tesseract-ocr.github.io/)
 Baeldung integration guide: [https://www.baeldung.com/java-ocr-tesseract](https://www.baeldung.com/java-ocr-tesseract)
 License: [Apache 2.0](https://github.com/nguyenq/tess4j?tab=Apache-2.0-1-ov-file#readme)
