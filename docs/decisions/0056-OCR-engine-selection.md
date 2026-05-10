@@ -14,10 +14,10 @@ Which OCR engines should JabRef support to serve its academic user base?
 
 ## Decision Drivers
 
-- GPL and non-open-source are not acceptable.
+- GPL and non-open-source are not acceptable (Online services are okay).
 - No engine will be bundled in JabRef's distribution. Engines must be installed by the user.
-- The output of OCR must be embeddable as a text layer in the PDF so that Lucene can subsequently extract it. This allows Lucene to index the document through the existing logic with no changes.
-- Engines must support the accuracy requirements of academic documents: mathematical eauations, tables, and multiple languages including non-latin scripts.
+- The output of OCR must be embeddable as a text layer in the PDF so that Lucene (or another search engine) can subsequently extract it. This allows Lucene to index the document through the existing logic with no changes.
+- OCR Engines must support the accuracy requirements of academic documents: mathematical equations, tables, and multiple languages including non-latin scripts.
 
 ---
 
@@ -62,8 +62,8 @@ Apache Tika is not selected as a primary OCR path because it abstracts away fine
 
 The integration will be confirmed by a `DocumentReaderTest` that verifies:
 
-1. `PDFTextStripper` returns empty content for a scanned PDF before performing OCR (established in PR [#15428](https://github.com/JabRef/jabref/pull/15428)).
-2. After OCR processing, `PDFTextStripper` returns non-empty content from the same file.
+1. `PDFTextStripper` returns empty content for scanned PDFs before performing OCR (established in PR [#15428](https://github.com/JabRef/jabref/pull/15428)) for only the PDFs that are fully scanned and have no text at all (some PDFs have partially selectable text).
+2. After OCR processing, `PDFTextStripper` returns more selectable content than before from the same file.
 
 ---
 
@@ -113,9 +113,11 @@ Integration: Java API
 Apache Tika is a content extraction toolkit it can invoke Tesseract under the hood via its `TesseractOCRParser` when it encounters image-based content.
 
 - Good, because Apache 2.0 license is fully compatible.
+- Good, because Apache Tike is already used in JabRef.
 - Bad, because Tika's OCR output is raw extracted text without bounding box coordinates. A separate text layer embedding step is still required, with the same multi-page complexity as the direct Tess4J approach.
 - Bad, because Tika abstracts away fine-grained OCR settings, making expert user configuration harder than with direct Tess4J or OCRmyPDF.
 - Bad, because Tika internally still calls a system-installed Tesseract binary no installation advantage over direct Tess4J use.
+- Bad, because it is not extendable. There is no common OCR interface.
 
 ### Docling
 
