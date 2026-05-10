@@ -121,7 +121,6 @@ Docling is a Python document intelligence library from IBM Research. It performs
 
 - Good, because it produces significantly better output quality for complex academic documents: correct multi-column reading order, table recognition, and formula identification.
 - Good, because MIT license is fully compatible.
-- Good, because 53k+ GitHub stars indicate strong community adoption and longevity.
 - Bad, because output is Markdown text, not a pre-built searchable PDF a text layer embedding step is still required.
 - Bad, because ML model weights (~1–2 GB) are downloaded on first use.
 - Bad, because it requires Python 3.x.
