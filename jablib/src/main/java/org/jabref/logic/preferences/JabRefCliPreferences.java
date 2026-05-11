@@ -376,6 +376,9 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String SERVER_LANGUAGE_ENABLE = "enableLanguageServer";
     private static final String SERVER_LANGUAGE_PORT = "languageServerPort";
     private static final String SERVER_DIRECT_HTTP_IMPORT = "directHttpImport";
+    private static final String ALLOWED_ORIGINS = "allowedOrigins";
+    private static final String API_TOKEN = "apiToken";
+    private static final String HTTP_SERVER_ALLOW_UNAUTHENTICATED_WITHOUT_ORIGIN = "httpServerAllowUnauthenticatedAccessWithoutOrigin";
     // endregion
 
     // region AiPreferences
@@ -1316,18 +1319,28 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(remotePreferences.enableHttpServerProperty(), (_, _, newValue) -> putBoolean(SERVER_HTTP_ENABLE, newValue));
         EasyBind.listen(remotePreferences.languageServerPortProperty(), (_, _, newValue) -> putInt(SERVER_LANGUAGE_PORT, newValue));
         EasyBind.listen(remotePreferences.enableLanguageServerProperty(), (_, _, newValue) -> putBoolean(SERVER_LANGUAGE_ENABLE, newValue));
+        EasyBind.listen(remotePreferences.apiTokenProperty(), (_, _, newValue) -> put(API_TOKEN, newValue));
+        remotePreferences.getAllowedOrigins().addListener((InvalidationListener) _ ->
+                putStringList(ALLOWED_ORIGINS, remotePreferences.getAllowedOrigins()));
         EasyBind.listen(remotePreferences.directHttpImportProperty(), (_, _, newValue) -> putBoolean(SERVER_DIRECT_HTTP_IMPORT, newValue));
+        EasyBind.listen(remotePreferences.allowUnauthenticatedAccessWithoutOriginProperty(), (_, _, newValue) ->
+                putBoolean(HTTP_SERVER_ALLOW_UNAUTHENTICATED_WITHOUT_ORIGIN, newValue));
 
         return remotePreferences;
     }
 
     private @NonNull RemotePreferences getRemotePreferencesFromBackingStore(RemotePreferences defaults) {
         return new RemotePreferences(
-                getBoolean(SERVER_REMOTE_ENABLE, defaults.shouldEnableRemoteServer()), getInt(SERVER_REMOTE_PORT, defaults.getRemoteServerPort()),
-                getBoolean(SERVER_HTTP_ENABLE, defaults.shouldEnableHttpServer()), getInt(SERVER_HTTP_PORT, defaults.getHttpServerPort()),
+                getBoolean(SERVER_REMOTE_ENABLE, defaults.shouldEnableRemoteServer()),
+                getInt(SERVER_REMOTE_PORT, defaults.getRemoteServerPort()),
+                getBoolean(SERVER_HTTP_ENABLE, defaults.shouldEnableHttpServer()),
+                getInt(SERVER_HTTP_PORT, defaults.getHttpServerPort()),
                 getBoolean(SERVER_LANGUAGE_ENABLE, defaults.shouldEnableLanguageServer()),
                 getInt(SERVER_LANGUAGE_PORT, defaults.getLanguageServerPort()),
-                getBoolean(SERVER_DIRECT_HTTP_IMPORT, defaults.directHttpImport()));
+                getStringList(ALLOWED_ORIGINS),
+                get(ALLOWED_ORIGINS),
+                getBoolean(SERVER_DIRECT_HTTP_IMPORT, defaults.directHttpImport()),
+                getBoolean(HTTP_SERVER_ALLOW_UNAUTHENTICATED_WITHOUT_ORIGIN, defaults.allowUnauthenticatedAccessWithoutOrigin()));
     }
     // endregion
 

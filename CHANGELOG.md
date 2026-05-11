@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added security hardening to the HTTP server (jabsrv): CORS origin whitelisting replaces the wildcard `*` policy, a new security filter validates custom headers and origins, and configurable allowed origins support browser extensions and JabMap. Requests without an `Origin` header require a bearer token by default. You can allow those requests without a token in General preferences (for local tools such as CAYW clients). [#15295](https://github.com/JabRef/jabref/pull/15295)
+- We added PIN-based pairing and bearer token authentication for browser extensions connecting to the HTTP server. A PIN can be generated in the preferences to pair an extension, and paired tokens can be revoked. [#15295](https://github.com/JabRef/jabref/pull/15295)
 - We fixed a glitch with the sidepane divider position on startup. [#15394](https://github.com/JabRef/jabref/issues/15394)
 - We added a label to the Group dropdown in the Import Dialog. [#15567](https://github.com/JabRef/jabref/issues/15567)
 - We added a related work text extractor, which finds and inserts the related work text into bib entries from references in the texts. [#9840](https://github.com/JabRef/jabref/issues/9840)
