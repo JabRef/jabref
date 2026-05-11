@@ -107,6 +107,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final HttpServerManager httpServerManager;
     private final LanguageServerController languageServerController;
     private final UiMessageHandler uiMessageHandler;
+    private final OAuthSessionRegistry oAuthSessionRegistry;
     private final RemoteListenerServerManager remoteListenerServerManager;
     private final StateManager stateManager;
 
@@ -131,6 +132,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                                HttpServerManager httpServerManager,
                                LanguageServerController languageServerController,
                                UiMessageHandler uiMessageHandler,
+                               OAuthSessionRegistry oAuthSessionRegistry,
                                RemoteListenerServerManager remoteListenerServerManager,
                                StateManager stateManager) {
         this.dialogService = dialogService;
@@ -142,6 +144,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.httpServerManager = httpServerManager;
         this.languageServerController = languageServerController;
         this.uiMessageHandler = uiMessageHandler;
+        this.oAuthSessionRegistry = oAuthSessionRegistry;
         this.remoteListenerServerManager = remoteListenerServerManager;
         this.stateManager = stateManager;
 
@@ -334,9 +337,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         if (enableHttpServerProperty.getValue()) {
             remotePreferences.setEnableHttpServer(true);
             URI uri = remotePreferences.getHttpServerUri();
-            // TODO: Fix OAuthSessionRegistry parameter
 
-            httpServerManager.start(preferences, stateManager, uiMessageHandler, new OAuthSessionRegistry(), uri);
+            httpServerManager.start(preferences, stateManager, uiMessageHandler, oAuthSessionRegistry, uri);
         } else {
             remotePreferences.setEnableHttpServer(false);
             httpServerManager.stop();

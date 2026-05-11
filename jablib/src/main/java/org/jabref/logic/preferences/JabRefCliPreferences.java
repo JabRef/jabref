@@ -1490,7 +1490,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         EasyBind.listen(citeDrivePreferences.getRefreshTokenProperty(), (_, _, newValue) -> {
             if (citeDrivePreferences.shouldPersistRefreshToken()) {
-                put(CITE_DRIVE_TOKEN, newValue.toJSONObject().toJSONString());
+                setCiteDriveToken(newValue);
             }
         });
 
@@ -1506,10 +1506,35 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private @Nullable RefreshToken getCiteDriveToken() {
         try (final Keyring keyring = Keyring.create()) {
-            return parseCiteDriveToken(keyring.getPassword("org.jabref", "citedrive"));
+            RefreshToken token = parseCiteDriveToken(keyring.getPassword("org.jabref", "citedrive"));
+            if (token != null) {
+                return token;
+            }
         } catch (Exception ex) {
-            LOGGER.warn("Unable to read citedrive token");
-            return new RefreshToken();
+            LOGGER.warn("Unable to read citedrive token", ex);
+        }
+
+        return parseCiteDriveToken(get(CITE_DRIVE_TOKEN));
+    }
+
+    private void setCiteDriveToken(@Nullable RefreshToken refreshToken) {
+        if (refreshToken == null) {
+            try (final Keyring keyring = Keyring.create()) {
+                keyring.deletePassword("org.jabref", "citedrive");
+            } catch (Exception ex) {
+                LOGGER.warn("Unable to remove citedrive token", ex);
+            }
+            remove(CITE_DRIVE_TOKEN);
+            return;
+        }
+
+        String refreshTokenJson = refreshToken.toJSONObject().toJSONString();
+        try (final Keyring keyring = Keyring.create()) {
+            keyring.setPassword("org.jabref", "citedrive", refreshTokenJson);
+            remove(CITE_DRIVE_TOKEN);
+        } catch (Exception ex) {
+            LOGGER.warn("Unable to store citedrive token in keyring", ex);
+            put(CITE_DRIVE_TOKEN, refreshTokenJson);
         }
     }
 

@@ -22,6 +22,7 @@ import com.nimbusds.oauth2.sdk.AuthorizationRequest;
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.RefreshTokenGrant;
 import com.nimbusds.oauth2.sdk.ResponseType;
+import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.TokenErrorResponse;
 import com.nimbusds.oauth2.sdk.TokenRequest;
 import com.nimbusds.oauth2.sdk.TokenResponse;
@@ -112,6 +113,7 @@ public class CiteDriveOAuthService {
                 .endpointURI(AUTH_ENDPOINT)
                 .redirectionURI(getCallBackUri())
                 .state(new State(state))
+                .scope(new Scope("read", "write")) // required for CiteDrive API
                 // .scope(new Scope("openid", "read", "write")) // only required for https://github.com/navikt/mock-oauth2-server
                 .codeChallenge(codeVerifier, CodeChallengeMethod.S256)
                 .build()
@@ -170,7 +172,24 @@ public class CiteDriveOAuthService {
             return authorizeInteractive();
         }
 
-        return CompletableFuture.supplyAsync(() -> refreshToken(cachedRefreshToken));
+        return CompletableFuture.supplyAsync(() -> {
+            Optional<AccessToken> token = refreshToken(cachedRefreshToken);
+            if (token.isEmpty()) {
+                LOGGER.info("Refresh token failed, falling back to interactive authentication");
+                citeDrivePreferences.setRefreshToken(null);
+                try {
+                    return authorizeInteractive().get();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    LOGGER.error("Interactive authentication interrupted", e);
+                    return Optional.empty();
+                } catch (Exception e) {
+                    LOGGER.error("Interactive authentication failed", e);
+                    return Optional.empty();
+                }
+            }
+            return token;
+        });
     }
 
     private Optional<AccessToken> refreshToken(RefreshToken refreshToken) {
@@ -184,6 +203,7 @@ public class CiteDriveOAuthService {
             if (!response.indicatesSuccess()) {
                 TokenErrorResponse errorResponse = response.toErrorResponse();
                 LOGGER.warn("Refresh token failed: {}", errorResponse.getErrorObject().toJSONObject());
+                citeDrivePreferences.setRefreshToken(null);
                 return Optional.empty();
             }
 

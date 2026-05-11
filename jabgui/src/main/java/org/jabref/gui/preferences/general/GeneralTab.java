@@ -25,6 +25,7 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.http.server.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiMessageHandler;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
@@ -42,6 +43,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @Inject private HttpServerManager httpServerManager;
     @Inject private LanguageServerController languageServerController;
     @Inject private UiMessageHandler uiMessageHandler;
+    @Inject private OAuthSessionRegistry oAuthSessionRegistry;
     @Inject private RemoteListenerServerManager remoteListenerServerManager;
     @Inject private StateManager stateManager;
 
@@ -104,6 +106,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
                 httpServerManager,
                 languageServerController,
                 uiMessageHandler,
+                oAuthSessionRegistry,
                 remoteListenerServerManager,
                 stateManager);
 

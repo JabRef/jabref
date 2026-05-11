@@ -96,6 +96,7 @@ public class JabRefGUI extends Application {
 
     private static RemoteListenerServerManager remoteListenerServerManager;
     private static HttpServerManager httpServerManager;
+    private static OAuthSessionRegistry oAuthSessionRegistry;
     private static LanguageServerController languageServerController;
 
     private Stage mainStage;
@@ -126,7 +127,8 @@ public class JabRefGUI extends Application {
                     clipBoardManager,
                     taskExecutor,
                     gitHandlerRegistry,
-                    journalAbbreviationRepository);
+                    journalAbbreviationRepository,
+                    oAuthSessionRegistry);
 
             openWindow();
 
@@ -190,6 +192,9 @@ public class JabRefGUI extends Application {
 
         JabRefGUI.httpServerManager = new HttpServerManager();
         Injector.setModelOrService(HttpServerManager.class, JabRefGUI.httpServerManager);
+
+        JabRefGUI.oAuthSessionRegistry = new OAuthSessionRegistry();
+        Injector.setModelOrService(OAuthSessionRegistry.class, JabRefGUI.oAuthSessionRegistry);
 
         JabRefGUI.languageServerController = new LanguageServerController(preferences, journalAbbreviationRepository, entryTypesManager);
         Injector.setModelOrService(LanguageServerController.class, JabRefGUI.languageServerController);
@@ -465,7 +470,7 @@ public class JabRefGUI extends Application {
         }
 
         if (remotePreferences.shouldEnableHttpServer()) {
-            httpServerManager.start(preferences, stateManager, mainFrame, new OAuthSessionRegistry(), remotePreferences.getHttpServerUri());
+            httpServerManager.start(preferences, stateManager, mainFrame, oAuthSessionRegistry, remotePreferences.getHttpServerUri());
         }
         if (remotePreferences.shouldEnableLanguageServer()) {
             languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());
@@ -476,10 +481,9 @@ public class JabRefGUI extends Application {
         RemotePreferences remotePreferences = preferences.getRemotePreferences();
         EasyBind.listen(remotePreferences.enableHttpServerProperty(), (_, _, newValue) -> {
             // stop in all cases, because the port might have changed
-            // TODO: Fix OAuthSessionRegistry - should be more global
             httpServerManager.stop();
             if (newValue) {
-                httpServerManager.start(preferences, stateManager, mainFrame, new OAuthSessionRegistry(), remotePreferences.getHttpServerUri());
+                httpServerManager.start(preferences, stateManager, mainFrame, oAuthSessionRegistry, remotePreferences.getHttpServerUri());
             }
         });
     }
