@@ -412,15 +412,15 @@ class BibDatabaseWriterTest {
         databaseWriter.writeDatabase(bibtexContext);
 
         assertEquals("""
-                        @Person{key,
-                        }
+                @Person{key,
+                }
 
-                        @Comment{jabref-meta: databaseType:bibtex;}
+                @Comment{jabref-meta: databaseType:bibtex;}
 
-                        @Comment{jabref-entrytype-v2: person: req[Name|PERSON_NAMES] opt[Googlescholar|EXTERNAL;Orcid|EXTERNAL]}
+                @Comment{jabref-entrytype-v2: person: req[Name|PERSON_NAMES] opt[Googlescholar|EXTERNAL;Orcid|EXTERNAL]}
 
-                        @Comment{jabref-entrytype: person: req[Name] opt[Googlescholar;Orcid]}
-                        """.replace("\n", OS.NEWLINE), stringWriter.toString());
+                @Comment{jabref-entrytype: person: req[Name] opt[Googlescholar;Orcid]}
+                """.replace("\n", OS.NEWLINE), stringWriter.toString());
     }
 
     @Test
