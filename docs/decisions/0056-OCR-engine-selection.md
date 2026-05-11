@@ -140,25 +140,59 @@ olmOCR is an OCR toolkit from the Allen Institute for AI (AI2), specifically tra
 - Bad, because model weights are downloaded on first use.
 - Bad, because it is newer and less tested than OCRmyPDF or Tesseract.
 
-### PaddleOCR-VL via llama.cpp
+### llama.cpp
+
+Homepage:<https://github.com/ggml-org/llama.cpp>
+License: [MIT](https://github.com/ggml-org/llama.cpp#MIT-1-ov-file)
+Integration: HTTP API via locally running llama.cpp server
+Model file formats: GGUF
+
+Llama.cpp features LLM inference in C/C++, which includes Text, Audio and Vision (OCR) based language models, as well as embedding models.
+
+- Good, because MIT license is fully compatible.
+- Good, because the vast majority of model makers release models in Llama.cpp's GGUF format.
+- Good, because a great amount of inference backends are supported (CPU, CUDA, Vulkan, SYCL and others), which means compatibility with a wide range of hardware.
+- Good, because depending on hardware and backend, inference can be MUCH faster than pure CPU based inference.
+- Good, because detailed backend support status: [Table of supported operands](https://github.com/ggml-org/llama.cpp/blob/master/docs/ops.md).
+- Good, because model makers regularly release new models and llama.cpp now supports multiple OCR models.
+- Good, because users can swap models based on their needs.
+- Good, because the HTTP API integration pattern is reusable for other remote OCR engines.
+- Good, because text, audio, vision, embeddings and OCR inference is combined in a single framework.
+- Good, because it is one of the major frameworks. It has a large community; many stars on GitHub, hence fast development speed.
+- Bad, because the framework is a "can do it all" and not a dedicated OCR engine/framework.
+- Bad, because only a [limited number of OCR models](<https://github.com/ggml-org/llama.cpp/blob/master/docs/multimodal.md>) are supported at present.
+- Bad, because requires a separate framework for running a VLM.
+- Bad, because java bindings are not well supported.
+- Bad, because either the user is forced to separately install and run a llama.cpp server instance or JabRef developers have to maintain bindings to bundle it natively into JabRef.
+- Bad, because size of model weights can require users having to download several GB depending on model variant.
+
+### PaddleOCR-VL model via llama.cpp
 
 Homepage:<https://huggingface.co/PaddlePaddle/PaddleOCR-VL>
 llama.cpp integration: <https://github.com/ggml-org/llama.cpp/pull/16701>
 License: [Apache 2.0](https://huggingface.co/datasets/choosealicense/licenses/blob/main/markdown/apache-2.0.md)
 Integration: HTTP API via locally running llama.cpp server
+Model file format: GGUF
 
 PaddleOCR-VL is a vision-language model achieving state-of-the-art accuracy on OCR benchmarks as of October 2025. llama.cpp PR 16701 adds support for running PaddleOCR-VL locally via llama.cpp's server, which exposes an HTTP API. For JabRef, integration is as a `RemoteOcrEngine` sending requests to a user-provisioned llama.cpp instance.
 
-- Good, because users can choose and swap the model based on their needs.
 - Good, because Apache 2.0 license is fully compatible.
-- Good, because the HTTP API integration pattern is reusable for other remote OCR engines.
-- Good, because inference is fast as a wide variety of GPU backends is supported.
-- Bad, because the user should separately install and run a llama.cpp server instance.
-- Bad, because model weights should be downloaded separately (several GB depending on model variant).
+- Good, because users can simply download and run the model with a preconfigured fixed system prompt.
 - Bad, because llama.cpp PR 16701 is recent and less tested than OCRmyPDF or Tesseract.
+- Bad, because it has all the typical architectural drawbacks of Vision Language Models: confabulation and hallucination.
+- Bad, because there is no guarantee PaddleOCR will support successor models in llama.cpp
 
-<https://github.com/ggml-org/llama.cpp/blob/master/docs/multimodal.md>
-<https://github.com/ggml-org/llama.cpp/blob/master/docs/ops.md>
+### PaddleOCR
+
+Homepage: <https://github.com/PaddlePaddle/PaddleOCR>
+License: [Apache 2.0](https://github.com/PaddlePaddle/PaddleOCR#Apache-2.0-1-ov-file)
+Language: Python
+Model file formats: PaddlePaddle static graph models, ONNX
+
+PaddleOCR turns any PDF or image document into structured data for your AI. A powerful, lightweight OCR toolkit that bridges the gap between images/PDFs and LLMs.
+
+Good, because supports 100+ languages. 
+Good, because supports local offline option
 
 ### TurboOCR
 
