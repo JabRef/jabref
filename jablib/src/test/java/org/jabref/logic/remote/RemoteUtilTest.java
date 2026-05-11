@@ -2,7 +2,7 @@ package org.jabref.logic.remote;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,12 +15,7 @@ class RemoteUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource(
-            textBlock = """
-                    0
-                    1023
-                    """
-    )
+    @ValueSource(ints = {0, 1023})
     void rejectReservedSystemPorts(int port) {
         assertFalse(RemoteUtil.isUserPort(port));
     }
@@ -32,13 +27,7 @@ class RemoteUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource(
-            textBlock = """
-                    # ports 1024 -> 65535
-                    1024
-                    65535
-                    """
-    )
+    @ValueSource(ints = {1024, 65535})
     void acceptPortsAboveSystemPorts(int port) {
         assertTrue(RemoteUtil.isUserPort(port));
     }
