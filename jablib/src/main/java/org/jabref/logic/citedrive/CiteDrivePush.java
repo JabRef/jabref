@@ -3,6 +3,7 @@ package org.jabref.logic.citedrive;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.importer.util.MediaTypes;
@@ -21,7 +22,15 @@ import org.slf4j.LoggerFactory;
 
 public class CiteDrivePush {
     private static final Logger LOGGER = LoggerFactory.getLogger(CiteDrivePush.class);
-    private static final URI PUSH_ENDPOINT = URI.create("https://api-dev.citedrive.com/jabref/push/");
+    private static final URI PUSH_ENDPOINT;
+
+    static {
+        try {
+            PUSH_ENDPOINT = new URI("https://api-dev.citedrive.com/jabref/push/");
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static void push(BibDatabaseContext context, AccessToken accessToken, CliPreferences cliPreferences, NotificationService notificationService) throws IOException {
         push(context, accessToken, cliPreferences, notificationService, PUSH_ENDPOINT);

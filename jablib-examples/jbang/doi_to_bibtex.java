@@ -21,6 +21,8 @@ import org.tinylog.Logger;
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 // JabRef relies on PR https://github.com/unicode-org/icu/pull/2127; for experiments the release version is OK.
 //DEPS com.ibm.icu:icu4j:78.1
+//DEPS com.nimbusds:oauth2-oidc-sdk:11.30.1
+//DEPS net.minidev:json-smart:2.6.0
 
 void main() throws Exception {
     var preferences = JabRefCliPreferences.getInstance();
