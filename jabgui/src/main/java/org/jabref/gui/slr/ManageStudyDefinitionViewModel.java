@@ -126,7 +126,7 @@ public class ManageStudyDefinitionViewModel {
                                    // The fetcher summarizing ALL fetchers can be emulated by selecting ALL fetchers (which happens rarely when doing an SLR)
                                    .filter(name -> !CompositeSearchBasedFetcher.FETCHER_NAME.equals(name))
                                    .map(name -> {
-                                       Optional<StudyCatalog> match = studyCatalogs.stream().filter(c -> c.getName().equals(name)).findFirst();
+                                       Optional<StudyCatalog> match = studyCatalogs.stream().filter(catalog -> catalog.getName().equals(name)).findFirst();
                                        boolean enabled = match.map(StudyCatalog::isEnabled).orElse(false);
                                        String reason = match.map(StudyCatalog::getReason).orElse("");
                                        return new StudyCatalogItem(name, enabled, reason);
