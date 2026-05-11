@@ -180,8 +180,8 @@ open module org.jabref.jablib {
     // endregion
 
     // region nimbusds / OAuth2
-    requires nimbusds.oauth2.oidc.sdk;
-    // requires json.smart;
+    requires json.smart;
+    requires transitive nimbusds.oauth2.oidc.sdk;
     // endregion
 
     // region: SQL databases
