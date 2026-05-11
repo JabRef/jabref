@@ -421,7 +421,7 @@ class BibDatabaseWriterTest {
 
                         @Comment{jabref-entrytype: person: req[Name] opt[Googlescholar;Orcid]}
                         """,
-                stringWriter.toString());
+                stringWriter.toString().replace("\r\n", "\n"));
     }
 
     @Test
