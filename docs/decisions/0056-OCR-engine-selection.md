@@ -24,7 +24,9 @@ Which OCR engines should JabRef support to serve its academic user base?
 - Apache Tika with Tesseract Java API, Apache 2.0
 - Docling subprocess, MIT
 - olmOCR subprocess, Apache 2.0
-- PaddleOCR via llama.cpp HTTP API, Apache 2.0
+- Llama.cpp HTTP API, MIT
+- PaddleOCR-VL model via llama.cpp HTTP API, Apache 2.0
+- PaddleOCR HTTP API, Apache 2.0
 - TurboOCR HTTP API, MIT
 - deepdoctection subprocess, Apache 2.0
 - SimpleHTR subprocess, MIT
@@ -187,12 +189,19 @@ PaddleOCR-VL is a vision-language model achieving state-of-the-art accuracy on O
 Homepage: <https://github.com/PaddlePaddle/PaddleOCR>
 License: [Apache 2.0](https://github.com/PaddlePaddle/PaddleOCR#Apache-2.0-1-ov-file)
 Language: Python
+Integration: HTTP API via locally running PaddleOCR server
 Model file formats: PaddlePaddle static graph models, ONNX
 
 PaddleOCR turns any PDF or image document into structured data for your AI. A powerful, lightweight OCR toolkit that bridges the gap between images/PDFs and LLMs.
 
-Good, because supports 100+ languages. 
-Good, because supports local offline option
+- Good, because supports 100+ languages.
+- Good, because supports local offline option.
+- Good, because Java API bindings.
+- Good, because aspires to be a dedicated OCR framework.
+- Bad, because only supports a limited set of OCR vision language models
+- Bad, because to date, performance benchmarks for common hardware are unknown.
+- Bad, because the framework is relatively new. Maturity unknown.
+- Bad, because introduces another separate framework for running a VLM unnecessarily; At present, JabRef already has Langchain4j and DJL. 
 
 ### TurboOCR
 
