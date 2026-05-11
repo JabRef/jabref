@@ -66,7 +66,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         super.clearSelection();
         getChildren().clear();
 
-        if (markdownText.trim().isEmpty()) {
+        if (markdownText.isBlank()) {
             return;
         }
 
