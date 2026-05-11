@@ -230,7 +230,7 @@ recipeList:
   # - org.openrewrite.java.testing.cleanup.TestsShouldNotBePublic -- does not work due to https://github.com/openrewrite/rewrite-testing-frameworks/issues/458
   - org.openrewrite.java.testing.junit5.AddParameterizedTestAnnotation
   - org.openrewrite.java.testing.junit5.CleanupAssertions
-  - org.openrewrite.java.testing.junit5.CsvSourceToValueSource
+ # - org.openrewrite.java.testing.junit5.CsvSourceToValueSource -- converts textBlocks which may not always be wanted, wait for https://github.com/junit-team/junit-framework/issues/5017
   - org.openrewrite.java.testing.junit5.RemoveDuplicateTestTemplates
   - org.openrewrite.java.testing.junit5.RemoveTryCatchFailBlocks
   - org.openrewrite.java.testing.junit5.LifecycleNonPrivate
