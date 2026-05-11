@@ -342,7 +342,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
                 line = line.substring(0, line.length() - 1);
             }
             // Check for empty line or comment:
-            if (line.trim().isEmpty() || (line.charAt(0) == '#')) {
+            if (line.isBlank() || (line.charAt(0) == '#')) {
                 continue;
             }
             // Check if we should change mode:
@@ -368,7 +368,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
 
             switch (mode) {
                 case NAME:
-                    if (!line.trim().isEmpty()) {
+                    if (!line.isBlank()) {
                         name = line.trim();
                     }
                     break;
@@ -452,7 +452,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
 
     /// Parse a line providing a journal name for which this style is valid.
     private void handleJournalsLine(String line) {
-        if (!line.trim().isEmpty()) {
+        if (!line.isBlank()) {
             journals.add(line.trim());
         }
     }

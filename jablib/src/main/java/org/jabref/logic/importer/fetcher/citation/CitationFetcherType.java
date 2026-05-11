@@ -32,6 +32,7 @@ public enum CitationFetcherType {
         return name;
     }
 
+    /// @param aiService required for {@link org.jabref.logic.importer.plaincitation.PlainCitationParser}
     public static CitationFetcher getCitationFetcher(
             CitationFetcherType citationFetcherName,
             ImporterPreferences importerPreferences,

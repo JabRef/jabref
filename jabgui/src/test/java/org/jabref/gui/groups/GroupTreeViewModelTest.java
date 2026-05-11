@@ -203,25 +203,23 @@ class GroupTreeViewModelTest {
     }
 
     @Test
-    void shouldCreateImportedEntriesGroupWhenEnabled() {
+    void shouldNotCreateImportedEntriesGroupWhenEnabled() {
         preferences.getLibraryPreferences().setAddImportedEntries(true);
 
-        List<GroupNodeViewModel> prevModel = groupTree.rootGroupProperty().getValue().getChildren();
         GroupTreeViewModel model = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), mock(AdaptVisibleTabs.class), new CustomLocalDragboard(), taskExecutor);
-        String actualGrpName = model.rootGroupProperty().getValue().getChildren().getFirst().getDisplayName();
+        List<GroupNodeViewModel> groups = model.rootGroupProperty().getValue().getChildren();
 
-        assertEquals(0, prevModel.size());
-        assertEquals("Imported entries", actualGrpName);
+        assertEquals(0, groups.size());
     }
 
     @Test
-    void shouldReflectUpdatedNameForImportedEntriesGroup() {
+    void shouldNotCreateImportedEntriesGroupWhenCustomNameIsSet() {
         preferences.getLibraryPreferences().setAddImportedEntries(true);
         preferences.getLibraryPreferences().setAddImportedEntriesGroupName("Review list");
 
         GroupTreeViewModel model = new GroupTreeViewModel(stateManager, mock(BibEntryTypesManager.class), preferences, dialogService, mock(AiService.class), mock(AdaptVisibleTabs.class), new CustomLocalDragboard(), taskExecutor);
-        String actualGrpName = model.rootGroupProperty().getValue().getChildren().getFirst().getDisplayName();
+        List<GroupNodeViewModel> groups = model.rootGroupProperty().getValue().getChildren();
 
-        assertEquals("Review list", actualGrpName);
+        assertEquals(0, groups.size());
     }
 }
