@@ -420,8 +420,7 @@ class BibDatabaseWriterTest {
                         @Comment{jabref-entrytype-v2: person: req[Name|PERSON_NAMES] opt[Googlescholar|EXTERNAL;Orcid|EXTERNAL]}
 
                         @Comment{jabref-entrytype: person: req[Name] opt[Googlescholar;Orcid]}
-                        """,
-                stringWriter.toString().replace("\r\n", "\n"));
+                        """.replace("\n", OS.NEWLINE), stringWriter.toString());
     }
 
     @Test
