@@ -1350,6 +1350,21 @@ class BibtexParserTest {
     }
 
     @Test
+    void integrationTestBibEntryTypeReadV1First() throws IOException {
+        ParserResult result = parser.parse(
+                Reader.of("@comment{jabref-entrytype: Customtype: req[title] opt[customfield]}" + OS.NEWLINE
+                        + "@comment{jabref-entrytype-v2: Customtype: req[title] opt[customfield|VERBATIM]}"));
+
+        assertEquals(1, result.getEntryTypes().size());
+        BibEntryType entryType = result.getEntryTypes().iterator().next();
+        Optional<Field> customField = entryType.getOptionalFields().stream()
+                                               .map(BibField::field)
+                                               .filter(field -> "customfield".equalsIgnoreCase(field.getName()))
+                                               .findFirst();
+        assertEquals(Optional.of(EnumSet.of(FieldProperty.VERBATIM)), customField.map(Field::getProperties));
+    }
+
+    @Test
     void integrationTestBibEntryTypeV2WithProperties() throws IOException {
         ParserResult result = parser.parse(
                 Reader.of("@Comment{jabref-entrytype-v2: person: req[Name|PERSON_NAMES] opt[Googlescholar|EXTERNAL;Orcid|EXTERNAL]}"));
