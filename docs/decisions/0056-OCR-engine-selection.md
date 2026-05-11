@@ -172,7 +172,6 @@ TurboOCR is a C++/CUDA server wrapping PaddleOCR's PP-OCRv5 with TensorRT FP16 a
 - Good, because JSON response includes bounding boxes for accurately positioned text layer embedding.
 - Good, because the HTTP adapter pattern it establishes covers TurboOCR, Google Cloud Vision, Azure Computer Vision, and any other HTTP-based OCR service a single `RemoteOcrEngine` implementation serves all.
 - Bad, because to date, it requires NVIDIA GPU hardware, thereby excluding a wide range of users, making it unsuitable as a default engine.
-- Bad, because it raises privacy concerns when documents contain unpublished research materials.
 - Bad, because to date, the project only supports a few select language family bundles (Latin, Chinese, Greek, Korean, Arabic, eslav, thai).
 
 ### deepdoctection
