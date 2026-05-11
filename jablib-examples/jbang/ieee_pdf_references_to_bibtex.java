@@ -24,6 +24,7 @@ import org.tinylog.Logger;
 //DEPS tools.jackson.core:jackson-core:3.0.2
 //DEPS tools.jackson.core:jackson-databind:3.0.2
 //DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.0.2
+//DEPS com.nimbusds:oauth2-oidc-sdk:11.30.1
 
 void main() throws Exception {
     var preferences = JabRefCliPreferences.getInstance();
