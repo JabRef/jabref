@@ -52,14 +52,12 @@ public class OcrMyPdfEngine implements OcrEngine {
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
 
-            StringBuilder processOutput = new StringBuilder();
-
             // Get the output and the errors of the process
             StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(OcrMyPdfEngine.class)::debug);
             StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(OcrMyPdfEngine.class)::debug);
             HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
             HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
-            
+
             boolean finished = process.waitFor(TIMEOUT_MINS, TimeUnit.MINUTES);
             if (!finished) {
                 process.destroyForcibly();
@@ -67,7 +65,6 @@ public class OcrMyPdfEngine implements OcrEngine {
             }
 
             if (process.exitValue() == 0) {
-                String result = "A searchable PDF has been created with OCRmyPDF at: " + outputFile;
                 return OcrResult.success(outputPath);
             } else {
                 return OcrResult.failure(OcrFailureReason.NON_ZERO_EXIT);
