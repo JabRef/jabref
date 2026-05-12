@@ -56,6 +56,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where users could cite inside another citations, which break the integrity. [#15701](https://github.com/JabRef/jabref/issues/15701)
 - We fixed an issue where multiple entries are not cited as a single citation for CSL in-text. [#15703](https://github.com/JabRef/jabref/issues/15703)
 - We fixed an issue where the citation key generator did not show the date for child entries due to orphaned crossref links. [#9071](https://github.com/JabRef/jabref/issues/9071)
 - We fixed an issue with the `Normalize date` save action truncating date ranges. [#8902](https://github.com/JabRef/jabref/issues/8902)
