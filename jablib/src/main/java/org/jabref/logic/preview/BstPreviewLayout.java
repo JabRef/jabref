@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.bst.BstVM;
@@ -32,7 +33,7 @@ public final class BstPreviewLayout implements PreviewLayout {
     private static final Pattern BIBITEM_PATTERN = Pattern.compile("\\\\bibitem[{].*[}]");
     private static final Pattern LATEX_COMMAND_PATTERN = Pattern.compile("(?m)^\\\\.*$");
     private static final Pattern MULTIPLE_SPACES_PATTERN = Pattern.compile("  +");
-
+    private static final Pattern MATH_EXPR_PATTERN = Pattern.compile("\\{\\{\\$\\\\([^$]+)\\$\\}\\}");
     private final Path path;
     private String source;
     private final String name;
@@ -81,15 +82,14 @@ public final class BstPreviewLayout implements PreviewLayout {
         // getFieldLatexFree cannot be used here because it does not wrap symbols in braces,
         // causing BstCaseChanger to lowercase Unicode symbols (e.g. Σ → σ)
         LatexToUnicodeFormatter preFormatter = new LatexToUnicodeFormatter();
-        Pattern mathPattern = Pattern.compile("\\{\\{\\$\\\\([^$]+)\\$\\}\\}");
         for (Field field : entry.getFields()) {
             entry.getField(field).ifPresent(value -> {
-                java.util.regex.Matcher matcher = mathPattern.matcher(value);
-                StringBuffer sb = new StringBuffer();
+                Matcher matcher = MATH_EXPR_PATTERN.matcher(value);
+                StringBuilder sb = new StringBuilder();
                 while (matcher.find()) {
                     String latexCmd = "\\" + matcher.group(1);
                     String unicode = preFormatter.format(latexCmd);
-                    matcher.appendReplacement(sb, "{" + java.util.regex.Matcher.quoteReplacement(unicode) + "}");
+                    matcher.appendReplacement(sb, "{" + Matcher.quoteReplacement(unicode) + "}");
                 }
                 matcher.appendTail(sb);
                 entry.setField(field, sb.toString());
