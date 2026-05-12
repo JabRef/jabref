@@ -46,10 +46,12 @@ import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 @AllowedToUseAwt("Requires java.awt.datatransfer.Clipboard")
 @Path("better-bibtex/cayw")
 public class CAYWResource {
@@ -169,7 +171,7 @@ public class CAYWResource {
     /// - Invalid expression (e.g. user is mid-typing `author=`) → fall back to a plain
     ///   substring match across the CAYW labels so the list stays useful as the user types.
     private List<CAYWEntry> filterEntries(List<CAYWEntry> entries, String searchText, InMemoryLibrarySearcher searcher) {
-        if (searchText == null || searchText.isEmpty()) {
+        if (searchText.isEmpty()) {
             return entries;
         }
         SearchQuery query = new SearchQuery(searchText);
