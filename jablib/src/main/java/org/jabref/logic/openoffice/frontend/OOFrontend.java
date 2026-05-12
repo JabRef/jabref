@@ -305,8 +305,9 @@ public class OOFrontend {
                 continue;
             }
 
-            String description = range.get().getString();
-            result.add(new RangeForOverlapCheck<>(range.get(),
+            XTextRange textRange = range.get();
+            String description = textRange.getString();
+            result.add(new RangeForOverlapCheck<>(textRange,
                     new CitationGroupId(name),
                     RangeForOverlapCheck.REFERENCE_MARK_KIND,
                     description));
