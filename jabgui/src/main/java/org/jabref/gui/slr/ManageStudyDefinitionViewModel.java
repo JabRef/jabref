@@ -121,7 +121,7 @@ public class ManageStudyDefinitionViewModel {
         researchQuestions.addAll(study.getResearchQuestions());
         queries.addAll(study.getQueries());
         Map<String, StudyCatalog> catalogsByName = study.getCatalogs().stream()
-                .collect(Collectors.toMap(StudyCatalog::getName, catalog -> catalog));
+                                                        .collect(Collectors.toMap(StudyCatalog::getName, catalog -> catalog));
         catalogs.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                    .stream()
                                    .map(SearchBasedFetcher::getName)
