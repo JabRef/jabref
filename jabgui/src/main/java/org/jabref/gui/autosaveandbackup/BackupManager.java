@@ -22,7 +22,6 @@ import javafx.scene.control.TableColumn;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
-import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
@@ -272,7 +271,7 @@ public class BackupManager {
             // Thus, we currently do not need any new backup
             this.needsBackup = false;
         } catch (IOException e) {
-            logIfCritical(backupPath, e);
+            LOGGER.error("Error while saving to file {}", backupPath, e);
         }
     }
 
@@ -290,19 +289,6 @@ public class BackupManager {
             Files.createFile(path);
         } catch (IOException e) {
             LOGGER.info("Could not create backup file {}", path, e);
-        }
-    }
-
-    private void logIfCritical(Path backupPath, IOException e) {
-        Throwable innermostCause = e;
-        while (innermostCause.getCause() != null) {
-            innermostCause = innermostCause.getCause();
-        }
-        boolean isErrorInField = innermostCause instanceof InvalidFieldValueException;
-
-        // do not print errors in field values into the log during autosave
-        if (!isErrorInField) {
-            LOGGER.error("Error while saving to file {}", backupPath, e);
         }
     }
 

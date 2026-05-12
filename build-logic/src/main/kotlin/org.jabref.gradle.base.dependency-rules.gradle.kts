@@ -472,9 +472,7 @@ extraJavaModuleInfo {
         preserveExisting()
         exports("com.sun.javafx.scene")
         opens("com.sun.javafx.application", "org.testfx")
-        opens("com.sun.javafx.tk.quantum", "com.pixelduke.fxthemes")
         opens("javafx.scene", "org.controlsfx.controls")
-        opens("javafx.stage", "com.pixelduke.fxthemes")
     }
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {

@@ -142,7 +142,7 @@ For UI changes, we know that test cases are hard to write.
 Therefore, you can omit them.
 However, please at least add a screenshot showing your changes to the request.
 
-<!-- In case you do not have time to add a test case, we nevertheless ask you to at least run `gradlew check` to ensure that your change does not break anything else. -->
+<!-- In case you do not have time to add a test case, we nevertheless ask you to at least run `./gradlew check` to ensure that your change does not break anything else. -->
 
 #### Write a good commit message
 

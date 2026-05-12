@@ -6,10 +6,12 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.identifier.ISBN;
 
+import org.jspecify.annotations.Nullable;
+
 public class ISBNChecker implements ValueChecker {
 
     @Override
-    public Optional<String> checkValue(String value) {
+    public Optional<String> checkValue(@Nullable String value) {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();
         }

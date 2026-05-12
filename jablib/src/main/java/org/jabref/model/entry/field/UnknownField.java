@@ -1,6 +1,7 @@
 package org.jabref.model.entry.field;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -22,6 +23,12 @@ public class UnknownField implements Field {
     public UnknownField(String name, FieldProperty first, FieldProperty... rest) {
         this.name = name;
         this.properties = EnumSet.of(first, rest);
+    }
+
+    /// This constructor accepts a list of field properties
+    public UnknownField(String name, List<FieldProperty> properties) {
+        this.name = name;
+        this.properties = EnumSet.copyOf(properties);
     }
 
     @Override

@@ -25,6 +25,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
@@ -36,16 +37,21 @@ import org.jabref.model.study.Study;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// This class controls the user interface of the study definition management dialog. The UI elements and their layout
 /// are defined in the FXML file.
 public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ManageStudyDefinitionView.class);
+
     @FXML private TextField studyTitle;
     @FXML private TextField addAuthor;
     @FXML private TextField addResearchQuestion;
     @FXML private TextField addQuery;
     @FXML private TextField studyDirectory;
     @FXML private Button selectStudyDirectory;
+    @FXML private Button shareOnSearchRxivButton;
 
     @FXML private ButtonType saveSurveyButtonType;
     @FXML private Label helpIcon;
@@ -177,6 +183,11 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         initQueriesTab();
         initCatalogsTab();
         initValidationBindings();
+        shareOnSearchRxivButton.disableProperty().bind(
+                Bindings.or(
+                        Bindings.isEmpty(viewModel.getQueries()),
+                        ActionHelper.noCatalogEnabled(viewModel.getCatalogs())
+                ));
     }
 
     private void updateDirectoryWarning(Path directory) {
@@ -293,6 +304,11 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         contentColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         actionColumn.setReorderable(false);
         actionColumn.setResizable(false);
+    }
+
+    @FXML
+    private void shareOnSearchRxiv() {
+        viewModel.shareOnSearchRxiv(pathToStudyDataDirectory);
     }
 
     private void setupCellFactories(TableColumn<String, String> contentColumn,
