@@ -193,7 +193,7 @@ public class StringUtil {
         // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
         addWrappedLine(result, CharMatcher.whitespace().trimTrailingFrom(lines[0]), wrapAmount, newline);
         for (int i = 1; i < lines.length; i++) {
-            if (lines[i].trim().isEmpty()) {
+            if (lines[i].isBlank()) {
                 result.append(newline);
                 result.append('\t');
             } else {

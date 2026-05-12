@@ -47,6 +47,7 @@ import org.jabref.model.groups.AbstractGroup;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,6 +85,7 @@ public class MainTableColumnFactory {
         this.tooltip = new MainTableTooltip(dialogService, preferences, themeManager, taskExecutor);
     }
 
+    @Nullable
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
         TableColumn<BibEntryTableViewModel, ?> returnColumn = null;
         switch (column.getType()) {
@@ -171,7 +173,7 @@ public class MainTableColumnFactory {
         header.getStyleClass().add("mainTable-header");
         Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.INDEX.getDisplayName()));
         column.setGraphic(header);
-        column.setStyle("-fx-alignment: CENTER-RIGHT;");
+        column.getStyleClass().add("align-center-right");
         column.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(
                 String.valueOf(cellData.getTableView().getItems().indexOf(cellData.getValue()) + 1)));
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
@@ -194,7 +196,7 @@ public class MainTableColumnFactory {
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
                 .withGraphic(this::createGroupColorRegion)
                 .install(column);
-        column.setStyle("-fx-padding: 0 0 0 0;");
+        column.getStyleClass().add("padding-0");
         column.setSortable(true);
         return column;
     }
@@ -211,7 +213,7 @@ public class MainTableColumnFactory {
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
                 .withGraphic(this::createGroupIconRegion)
                 .install(column);
-        column.setStyle("-fx-padding: 0 0 0 0;");
+        column.getStyleClass().add("padding-0");
         column.setSortable(true);
         return column;
     }
