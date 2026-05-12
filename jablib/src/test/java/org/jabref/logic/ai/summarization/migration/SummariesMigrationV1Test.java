@@ -1,5 +1,6 @@
 package org.jabref.logic.ai.summarization.migration;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,9 +27,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /// Tests that {@link SummariesMigrationV1} correctly migrates every v1 summaries MVStore
-/// found under {@code test/resources/…/summarization/v1/} into the v2 repository.
+/// found under {@code src/test/resources/…/summarization/migration/} into the v2 repository.
 ///
 /// Entries (database path + citation key) are discovered dynamically from the MVStore,
 /// so adding {@code summariesN.mv} alongside its matching {@code summariesN.json} is enough
@@ -37,18 +39,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 /// The fixed library ID acts as the new identifier created during v1 → v2 migration.
 class SummariesMigrationV1Test {
 
+    private static final String TEST_RESOURCES = "src/test/resources/org/jabref/logic/ai/summarization/migrations";
     private static final String LIBRARY_ID = "00000000-0000-0000-0000-000000000001";
     private static final String SUMMARIES_MAP_PREFIX = "summaries-";
 
     @TempDir
     Path tempDir;
 
-    static List<String> mvStoreFiles() throws Exception {
-        URL dir = SummariesMigrationV1Test.class
-                .getResource("/org/jabref/logic/ai/summarization/v1/");
-        Objects.requireNonNull(dir, "Resource directory not found");
+    static List<String> mvStoreFiles() throws IOException {
         List<String> names = new ArrayList<>();
-        try (var stream = Files.list(Path.of(dir.toURI()))) {
+        try (var stream = Files.list(Path.of(TEST_RESOURCES))) {
             for (Path p : stream.toList()) {
                 if (p.getFileName().toString().endsWith(".mv")) {
                     names.add(p.getFileName().toString());
@@ -61,14 +61,17 @@ class SummariesMigrationV1Test {
     @ParameterizedTest
     @MethodSource("mvStoreFiles")
     void allEntriesAreMigratedCorrectly(String fileName) throws Exception {
-        Path oldFilePath = copyResource("/org/jabref/logic/ai/summarization/v1/" + fileName, fileName);
+        Path oldFilePath = copyResource(fileName);
 
         List<DiscoveredEntry> entries = discoverEntries(oldFilePath);
         assertFalse(entries.isEmpty(), "Test resource " + fileName + " contains no summaries");
 
+        boolean onWindows = System.getProperty("os.name").toLowerCase(java.util.Locale.ROOT).contains("windows");
+        assumeTrue(onWindows || !hasWindowsAbsolutePaths(entries),
+                "Skipping " + fileName + ": contains Windows-style paths, not runnable on this OS");
+
         String jsonName = fileName.replace(".mv", ".json");
-        URL jsonUrl = getClass().getResource("/org/jabref/logic/ai/summarization/v1/" + jsonName);
-        Objects.requireNonNull(jsonUrl, "JSON companion file not found: " + jsonName);
+        URL jsonUrl = Path.of(TEST_RESOURCES, jsonName).toUri().toURL();
 
         JsonSummariesFile jsonFile = JsonSummariesFile.parse(jsonUrl);
 
@@ -107,13 +110,21 @@ class SummariesMigrationV1Test {
         }
     }
 
-    private Path copyResource(String resourcePath, String fileName) throws Exception {
-        URL resource = Objects.requireNonNull(getClass().getResource(resourcePath));
+    private Path copyResource(String fileName) throws IOException {
+        Path source = Path.of(TEST_RESOURCES, fileName);
         Path dest = tempDir.resolve(fileName);
-        try (var in = resource.openStream()) {
-            Files.copy(in, dest, StandardCopyOption.REPLACE_EXISTING);
-        }
+        Files.copy(source, dest, StandardCopyOption.REPLACE_EXISTING);
         return dest;
+    }
+
+    private static boolean hasWindowsAbsolutePaths(List<DiscoveredEntry> entries) {
+        return entries.stream().map(DiscoveredEntry::dbPath).anyMatch(p -> {
+            String raw = p.toString();
+            return raw.length() >= 3
+                    && Character.isLetter(raw.charAt(0))
+                    && raw.charAt(1) == ':'
+                    && (raw.charAt(2) == '\\' || raw.charAt(2) == '/');
+        });
     }
 
     private List<DiscoveredEntry> discoverEntries(Path oldFilePath) {

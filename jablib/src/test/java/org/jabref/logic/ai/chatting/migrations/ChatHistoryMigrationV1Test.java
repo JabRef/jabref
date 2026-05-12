@@ -1,5 +1,6 @@
 package org.jabref.logic.ai.chatting.migrations;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -29,9 +30,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /// Tests that {@link ChatHistoryMigrationV1} correctly migrates every v1 chat-history MVStore
-/// found under {@code test/resources/…/chatting/v1/} into the v2 repository.
+/// found under {@code src/test/resources/…/chatting/migrations/} into the v2 repository.
 ///
 /// Entries (database path + citation key) are discovered dynamically from the MVStore map names,
 /// so adding {@code historiesN.mv} alongside its matching {@code historiesN.json} is enough
@@ -40,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 /// The fixed library ID acts as the new identifier created during v1 → v2 migration.
 class ChatHistoryMigrationV1Test {
 
+    private static final String TEST_RESOURCES = "src/test/resources/org/jabref/logic/ai/chatting/migrations";
     private static final String LIBRARY_ID = "00000000-0000-0000-0000-000000000002";
     private static final String ENTRY_INFIX = "-entry-";
     private static final String GROUP_INFIX = "-group-";
@@ -47,12 +50,9 @@ class ChatHistoryMigrationV1Test {
     @TempDir
     Path tempDir;
 
-    static List<String> mvStoreFiles() throws Exception {
-        URL dir = ChatHistoryMigrationV1Test.class
-                .getResource("/org/jabref/logic/ai/chatting/v1/");
-        Objects.requireNonNull(dir, "Resource directory not found");
+    static List<String> mvStoreFiles() throws IOException {
         List<String> names = new ArrayList<>();
-        try (var stream = Files.list(Path.of(dir.toURI()))) {
+        try (var stream = Files.list(Path.of(TEST_RESOURCES))) {
             for (Path p : stream.toList()) {
                 if (p.getFileName().toString().endsWith(".mv")) {
                     names.add(p.getFileName().toString());
@@ -65,10 +65,14 @@ class ChatHistoryMigrationV1Test {
     @ParameterizedTest
     @MethodSource("mvStoreFiles")
     void allEntriesAreMigrated(String fileName) throws Exception {
-        Path oldFilePath = copyResource("/org/jabref/logic/ai/chatting/v1/" + fileName, fileName);
+        Path oldFilePath = copyResource(fileName);
 
         List<DiscoveredEntry> entries = discoverEntries(oldFilePath);
         assertFalse(entries.isEmpty(), "Test resource " + fileName + " contains no chat history maps");
+
+        boolean onWindows = System.getProperty("os.name").toLowerCase(java.util.Locale.ROOT).contains("windows");
+        assumeTrue(onWindows || !hasWindowsAbsolutePaths(entries),
+                "Skipping " + fileName + ": contains Windows-style paths, not runnable on this OS");
 
         BibDatabaseContext ctx = buildContext(entries);
         MVStoreChatHistoryRepository repo = new MVStoreChatHistoryRepository(
@@ -89,9 +93,14 @@ class ChatHistoryMigrationV1Test {
     @ParameterizedTest
     @MethodSource("mvStoreFiles")
     void migratedMessageRolesAndContentsMatchJsonCompanion(String fileName) throws Exception {
-        Path oldFilePath = copyResource("/org/jabref/logic/ai/chatting/v1/" + fileName, fileName);
+        Path oldFilePath = copyResource(fileName);
 
         List<DiscoveredEntry> entries = discoverEntries(oldFilePath);
+
+        boolean onWindows = System.getProperty("os.name").toLowerCase(java.util.Locale.ROOT).contains("windows");
+        assumeTrue(onWindows || !hasWindowsAbsolutePaths(entries),
+                "Skipping " + fileName + ": contains Windows-style paths, not runnable on this OS");
+
         BibDatabaseContext ctx = buildContext(entries);
         MVStoreChatHistoryRepository repo = new MVStoreChatHistoryRepository(
                 tempDir.resolve("v2-msg-" + fileName), _ -> {
@@ -102,7 +111,7 @@ class ChatHistoryMigrationV1Test {
         });
 
         String jsonName = fileName.replace(".mv", ".json");
-        URL jsonUrl = getClass().getResource("/org/jabref/logic/ai/chatting/v1/" + jsonName);
+        URL jsonUrl = getClass().getResource(jsonName);
         if (jsonUrl == null) {
             return;
         }
@@ -134,13 +143,23 @@ class ChatHistoryMigrationV1Test {
         }
     }
 
-    private Path copyResource(String resourcePath, String fileName) throws Exception {
-        URL resource = Objects.requireNonNull(getClass().getResource(resourcePath));
+    private Path copyResource(String fileName) throws IOException {
+        URL resource = Objects.requireNonNull(getClass().getResource(fileName));
         Path dest = tempDir.resolve(fileName);
         try (var in = resource.openStream()) {
             Files.copy(in, dest, StandardCopyOption.REPLACE_EXISTING);
         }
         return dest;
+    }
+
+    private static boolean hasWindowsAbsolutePaths(List<DiscoveredEntry> entries) {
+        return entries.stream().map(DiscoveredEntry::dbPath).anyMatch(p -> {
+            String raw = p.toString();
+            return raw.length() >= 3
+                    && Character.isLetter(raw.charAt(0))
+                    && raw.charAt(1) == ':'
+                    && (raw.charAt(2) == '\\' || raw.charAt(2) == '/');
+        });
     }
 
     private List<DiscoveredEntry> discoverEntries(Path oldFilePath) {
@@ -176,9 +195,6 @@ class ChatHistoryMigrationV1Test {
         metaData.setAiLibraryId(LIBRARY_ID);
         BibDatabaseContext ctx = new BibDatabaseContext(database, metaData);
         if (!entries.isEmpty()) {
-            // Set the database path so the path filter in the migration can match the prefix
-            // embedded in the old map names. toAbsolutePath() ensures the endsWith check works
-            // even when the fixture path is relative.
             ctx.setDatabasePath(entries.getFirst().dbPath().toAbsolutePath());
         }
         return ctx;
