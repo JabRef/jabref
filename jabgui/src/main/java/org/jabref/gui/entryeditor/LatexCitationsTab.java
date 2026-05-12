@@ -110,7 +110,7 @@ public class LatexCitationsTab extends EntryEditorTab {
         Text latexDirectoryText = new Text(Localization.lang("Current search directory:"));
         Text latexDirectoryPath = new Text();
         latexDirectoryPath.textProperty().bind(viewModel.directoryProperty().asString());
-        latexDirectoryPath.setStyle("-fx-font-family:monospace;-fx-font-weight: bold;");
+        latexDirectoryPath.getStyleClass().add("latex-citations-directory-path");
         Button latexDirectoryButton = new Button(Localization.lang("Set LaTeX file directory"));
         latexDirectoryButton.setGraphic(IconTheme.JabRefIcons.LATEX_FILE_DIRECTORY.getGraphicNode());
         latexDirectoryButton.setOnAction(event -> viewModel.setLatexDirectory());
@@ -122,7 +122,7 @@ public class LatexCitationsTab extends EntryEditorTab {
     private VBox getCitationsPane() {
         VBox citationsBox = new VBox(30, citationsDisplay);
         VBox.setVgrow(citationsDisplay, Priority.ALWAYS);
-        citationsBox.setStyle("-fx-padding: 0;");
+        citationsBox.getStyleClass().add("padding-0");
         return citationsBox;
     }
 
@@ -134,17 +134,17 @@ public class LatexCitationsTab extends EntryEditorTab {
         notFoundText.getStyleClass().add("description");
 
         VBox notFoundBox = new VBox(30, titleLabel, notFoundText);
-        notFoundBox.setStyle("-fx-padding: 30 0 0 30;");
+        notFoundBox.getStyleClass().add("latex-citations-message-box");
         return notFoundBox;
     }
 
     private VBox getErrorPane() {
         Label titleLabel = new Label(Localization.lang("Error"));
-        titleLabel.setStyle("-fx-font-size: 1.5em;-fx-font-weight: bold;-fx-text-fill: -fx-accent;");
+        titleLabel.getStyleClass().add("latex-citations-error-label");
         Text errorMessageText = new Text();
         errorMessageText.textProperty().bind(viewModel.searchErrorProperty());
         VBox errorMessageBox = new VBox(30, titleLabel, errorMessageText);
-        errorMessageBox.setStyle("-fx-padding: 30 0 0 30;");
+        errorMessageBox.getStyleClass().add("latex-citations-message-box");
         return errorMessageBox;
     }
 
