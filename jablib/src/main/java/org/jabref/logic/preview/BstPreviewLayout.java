@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.bst.BstVM;
@@ -17,6 +16,7 @@ import org.jabref.logic.layout.format.RemoveTilde;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,6 @@ public final class BstPreviewLayout implements PreviewLayout {
     private static final Pattern BIBITEM_PATTERN = Pattern.compile("\\\\bibitem[{].*[}]");
     private static final Pattern LATEX_COMMAND_PATTERN = Pattern.compile("(?m)^\\\\.*$");
     private static final Pattern MULTIPLE_SPACES_PATTERN = Pattern.compile("  +");
-    private static final Pattern MATH_EXPR_PATTERN = Pattern.compile("\\{\\{\\$\\\\([^$]+)\\$\\}\\}");
 
     private final String name;
     private String source;
@@ -71,15 +70,18 @@ public final class BstPreviewLayout implements PreviewLayout {
 
         // Pre-process: convert {{$\Cmd$}} math expressions to Unicode wrapped in braces
         // The braces protect the symbol from case conversion by BstCaseChanger
+        // getFieldLatexFree cannot be used here because it does not wrap symbols in braces,
+        // causing BstCaseChanger to lowercase Unicode symbols (e.g. Σ → σ)
         LatexToUnicodeFormatter preFormatter = new LatexToUnicodeFormatter();
-        for (org.jabref.model.entry.field.Field field : entry.getFields()) {
+        Pattern mathPattern = Pattern.compile("\\{\\{\\$\\\\([^$]+)\\$\\}\\}");
+        for (Field field : entry.getFields()) {
             entry.getField(field).ifPresent(value -> {
-                Matcher matcher = MATH_EXPR_PATTERN.matcher(value);
+                java.util.regex.Matcher matcher = mathPattern.matcher(value);
                 StringBuffer sb = new StringBuffer();
                 while (matcher.find()) {
                     String latexCmd = "\\" + matcher.group(1);
                     String unicode = preFormatter.format(latexCmd);
-                    matcher.appendReplacement(sb, "{" + Matcher.quoteReplacement(unicode) + "}");
+                    matcher.appendReplacement(sb, "{" + java.util.regex.Matcher.quoteReplacement(unicode) + "}");
                 }
                 matcher.appendTail(sb);
                 entry.setField(field, sb.toString());
@@ -128,6 +130,7 @@ public final class BstPreviewLayout implements PreviewLayout {
         return source;
     }
 
+    /// Checks if the given style file is a BST file by checking the extension
     public static boolean isBstStyleFile(String styleFile) {
         return StandardFileType.BST.getExtensions().stream().anyMatch(styleFile::endsWith);
     }

@@ -12,6 +12,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BstPreviewLayoutTest {
 
@@ -62,6 +63,7 @@ class BstPreviewLayoutTest {
                 .withField(StandardField.EPRINTCLASS, "math-ph")
                 .withField(StandardField.KEYWORDS, "math-ph, math.DG, math.MP, math.SG, 58B99, 58Z05, 58B25, 22E65, 58D19, 53D20, 53D42");
     }
+
     @Test
     void mathSymbolsInDoubleBracesAreCorrectlyRendered() throws URISyntaxException {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("IEEEtran.bst").toURI()));
@@ -73,7 +75,7 @@ class BstPreviewLayoutTest {
                 .withField(StandardField.PAGES, "2465--2468")
                 .withField(StandardField.PUBLISHER, "{IEEE}");
         String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
-        org.junit.jupiter.api.Assertions.assertTrue(preview.contains("ΣΔ"),
+        assertTrue(preview.contains("ΣΔ"),
                 "Preview should contain ΣΔ but was: " + preview);
     }
 }
