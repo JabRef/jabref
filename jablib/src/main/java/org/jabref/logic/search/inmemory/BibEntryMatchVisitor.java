@@ -27,8 +27,6 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntryMatchVisitor.class);
     private static final String GROUPS_FIELD_NAME = StandardField.GROUPS.getName();
 
-    private enum MatchType { INEXACT, EXACT, REGEX }
-
     private final BibEntry entry;
     private final EnumSet<SearchFlags> searchBarFlags;
     private final Character keywordSeparator;
@@ -84,10 +82,10 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
         if (ctx.FIELD() == null) {
             // Unfielded bareword: apply search-bar flags
             boolean caseSensitive = searchBarFlags.contains(SearchFlags.CASE_SENSITIVE);
-            MatchType matchType = searchBarFlags.contains(SearchFlags.REGULAR_EXPRESSION)
-                    ? MatchType.REGEX
-                    : MatchType.INEXACT;
-            return matchAnyField(term, matchType, caseSensitive);
+            SearchFlags matchKind = searchBarFlags.contains(SearchFlags.REGULAR_EXPRESSION)
+                    ? SearchFlags.REGULAR_EXPRESSION
+                    : SearchFlags.INEXACT_MATCH;
+            return matchAnyField(term, matchKind, caseSensitive);
         }
 
         String fieldName = ctx.FIELD().getText().toLowerCase(Locale.ROOT);
@@ -100,7 +98,7 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
             return flags.negation ? present : !present;
         }
 
-        boolean matched = matchField(fieldName, term, flags.matchType, flags.caseSensitive);
+        boolean matched = matchField(fieldName, term, flags.matchKind, flags.caseSensitive);
         return flags.negation != matched;
     }
 
@@ -116,56 +114,58 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
         };
     }
 
-    private boolean matchField(String fieldName, String term, MatchType matchType, boolean caseSensitive) {
+    private boolean matchField(String fieldName, String term, SearchFlags matchKind, boolean caseSensitive) {
         return switch (fieldName) {
             case "key", "citationkey" -> entry.getCitationKey()
-                    .map(v -> matchValue(v, term, matchType, caseSensitive))
+                    .map(v -> matchValue(v, term, matchKind, caseSensitive))
                     .orElse(false);
-            case "entrytype" -> matchValue(entry.getType().getName(), term, matchType, caseSensitive);
-            case "any", "anyfield" -> matchAnyField(term, matchType, caseSensitive);
-            case "anykeyword" -> matchAnyKeyword(term, matchType, caseSensitive);
-            default -> matchNamedField(fieldName, term, matchType, caseSensitive);
+            case "entrytype" -> matchValue(entry.getType().getName(), term, matchKind, caseSensitive);
+            case "any", "anyfield" -> matchAnyField(term, matchKind, caseSensitive);
+            case "anykeyword" -> matchAnyKeyword(term, matchKind, caseSensitive);
+            default -> matchNamedField(fieldName, term, matchKind, caseSensitive);
         };
     }
 
-    private boolean matchNamedField(String fieldName, String term, MatchType matchType, boolean caseSensitive) {
+    private boolean matchNamedField(String fieldName, String term, SearchFlags matchKind, boolean caseSensitive) {
         for (Field field : entry.getFields()) {
             if (!field.getName().equalsIgnoreCase(fieldName)) {
                 continue;
             }
             Optional<String> value = entry.getField(field);
-            if (value.isPresent() && matchValue(value.get(), term, matchType, caseSensitive)) {
+            if (value.isPresent() && matchValue(value.get(), term, matchKind, caseSensitive)) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean matchAnyField(String term, MatchType matchType, boolean caseSensitive) {
+    private boolean matchAnyField(String term, SearchFlags matchKind, boolean caseSensitive) {
         for (Field field : entry.getFields()) {
             if (GROUPS_FIELD_NAME.equals(field.getName())) {
                 continue;
             }
             Optional<String> value = entry.getField(field);
-            if (value.isPresent() && matchValue(value.get(), term, matchType, caseSensitive)) {
+            if (value.isPresent() && matchValue(value.get(), term, matchKind, caseSensitive)) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean matchAnyKeyword(String term, MatchType matchType, boolean caseSensitive) {
+    private boolean matchAnyKeyword(String term, SearchFlags matchKind, boolean caseSensitive) {
         List<String> keywords = entry.getKeywords(keywordSeparator).stream().map(Object::toString).toList();
-        return keywords.stream().anyMatch(k -> matchValue(k, term, matchType, caseSensitive));
+        return keywords.stream().anyMatch(k -> matchValue(k, term, matchKind, caseSensitive));
     }
 
-    private static boolean matchValue(String value, String term, MatchType matchType, boolean caseSensitive) {
-        return switch (matchType) {
-            case INEXACT -> caseSensitive
+    /// @param matchKind one of [SearchFlags#INEXACT_MATCH], [SearchFlags#EXACT_MATCH], [SearchFlags#REGULAR_EXPRESSION]
+    private static boolean matchValue(String value, String term, SearchFlags matchKind, boolean caseSensitive) {
+        return switch (matchKind) {
+            case INEXACT_MATCH -> caseSensitive
                     ? value.contains(term)
                     : value.toLowerCase(Locale.ROOT).contains(term.toLowerCase(Locale.ROOT));
-            case EXACT -> caseSensitive ? value.equals(term) : value.equalsIgnoreCase(term);
-            case REGEX -> matchRegex(value, term, caseSensitive);
+            case EXACT_MATCH -> caseSensitive ? value.equals(term) : value.equalsIgnoreCase(term);
+            case REGULAR_EXPRESSION -> matchRegex(value, term, caseSensitive);
+            default -> throw new IllegalArgumentException("matchKind must be INEXACT_MATCH, EXACT_MATCH, or REGULAR_EXPRESSION, got " + matchKind);
         };
     }
 
@@ -179,24 +179,24 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
         }
     }
 
-    private record OperatorFlags(MatchType matchType, boolean caseSensitive, boolean negation) { }
+    /// @param matchKind one of [SearchFlags#INEXACT_MATCH], [SearchFlags#EXACT_MATCH], [SearchFlags#REGULAR_EXPRESSION]
+    private record OperatorFlags(SearchFlags matchKind, boolean caseSensitive, boolean negation) { }
 
     private static OperatorFlags mapOperator(int tokenType) {
         return switch (tokenType) {
-            case SearchParser.EQUAL, SearchParser.CONTAINS -> new OperatorFlags(MatchType.INEXACT, false, false);
-            case SearchParser.CEQUAL -> new OperatorFlags(MatchType.INEXACT, true, false);
-            case SearchParser.EEQUAL, SearchParser.MATCHES -> new OperatorFlags(MatchType.EXACT, false, false);
-            case SearchParser.CEEQUAL -> new OperatorFlags(MatchType.EXACT, true, false);
-            case SearchParser.REQUAL -> new OperatorFlags(MatchType.REGEX, false, false);
-            case SearchParser.CREEQUAL -> new OperatorFlags(MatchType.REGEX, true, false);
-            case SearchParser.NEQUAL -> new OperatorFlags(MatchType.INEXACT, false, true);
-            case SearchParser.NCEQUAL -> new OperatorFlags(MatchType.INEXACT, true, true);
-            case SearchParser.NEEQUAL -> new OperatorFlags(MatchType.EXACT, false, true);
-            case SearchParser.NCEEQUAL -> new OperatorFlags(MatchType.EXACT, true, true);
-            case SearchParser.NREQUAL -> new OperatorFlags(MatchType.REGEX, false, true);
-            case SearchParser.NCREEQUAL -> new OperatorFlags(MatchType.REGEX, true, true);
-            default -> new OperatorFlags(MatchType.INEXACT, false, false);
+            case SearchParser.EQUAL, SearchParser.CONTAINS -> new OperatorFlags(SearchFlags.INEXACT_MATCH, false, false);
+            case SearchParser.CEQUAL -> new OperatorFlags(SearchFlags.INEXACT_MATCH, true, false);
+            case SearchParser.EEQUAL, SearchParser.MATCHES -> new OperatorFlags(SearchFlags.EXACT_MATCH, false, false);
+            case SearchParser.CEEQUAL -> new OperatorFlags(SearchFlags.EXACT_MATCH, true, false);
+            case SearchParser.REQUAL -> new OperatorFlags(SearchFlags.REGULAR_EXPRESSION, false, false);
+            case SearchParser.CREEQUAL -> new OperatorFlags(SearchFlags.REGULAR_EXPRESSION, true, false);
+            case SearchParser.NEQUAL -> new OperatorFlags(SearchFlags.INEXACT_MATCH, false, true);
+            case SearchParser.NCEQUAL -> new OperatorFlags(SearchFlags.INEXACT_MATCH, true, true);
+            case SearchParser.NEEQUAL -> new OperatorFlags(SearchFlags.EXACT_MATCH, false, true);
+            case SearchParser.NCEEQUAL -> new OperatorFlags(SearchFlags.EXACT_MATCH, true, true);
+            case SearchParser.NREQUAL -> new OperatorFlags(SearchFlags.REGULAR_EXPRESSION, false, true);
+            case SearchParser.NCREEQUAL -> new OperatorFlags(SearchFlags.REGULAR_EXPRESSION, true, true);
+            default -> new OperatorFlags(SearchFlags.INEXACT_MATCH, false, false);
         };
     }
-
 }
