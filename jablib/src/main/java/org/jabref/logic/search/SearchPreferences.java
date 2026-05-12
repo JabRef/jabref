@@ -24,6 +24,7 @@ public class SearchPreferences {
     private final DoubleProperty searchWindowWidth;
     private final DoubleProperty searchWindowDividerPosition;
     private final BooleanProperty keepSearchString;
+    private final BooleanProperty usePostgresSearch;
     private final ObjectProperty<SearchDisplayMode> searchDisplayMode;
 
     public SearchPreferences(SearchDisplayMode searchDisplayMode,
@@ -34,8 +35,9 @@ public class SearchPreferences {
                              boolean keepWindowOnTop,
                              double searchWindowHeight,
                              double searchWindowWidth,
-                             double searchWindowDividerPosition) {
-        this(searchDisplayMode, EnumSet.noneOf(SearchFlags.class), keepSearchString, keepWindowOnTop, searchWindowHeight, searchWindowWidth, searchWindowDividerPosition);
+                             double searchWindowDividerPosition,
+                             boolean usePostgresSearch) {
+        this(searchDisplayMode, EnumSet.noneOf(SearchFlags.class), keepSearchString, keepWindowOnTop, searchWindowHeight, searchWindowWidth, searchWindowDividerPosition, usePostgresSearch);
         if (isRegularExpression) {
             searchFlags.add(SearchFlags.REGULAR_EXPRESSION);
         }
@@ -48,7 +50,7 @@ public class SearchPreferences {
     }
 
     @VisibleForTesting
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags, boolean keepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition) {
+    public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags, boolean keepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition, boolean usePostgresSearch) {
         this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
         this.searchFlags = FXCollections.observableSet(searchFlags);
 
@@ -57,6 +59,7 @@ public class SearchPreferences {
         this.searchWindowWidth = new SimpleDoubleProperty(searchWindowWidth);
         this.searchWindowDividerPosition = new SimpleDoubleProperty(searchWindowDividerPosition);
         this.keepSearchString = new SimpleBooleanProperty(keepSearchString);
+        this.usePostgresSearch = new SimpleBooleanProperty(usePostgresSearch);
     }
 
     public EnumSet<SearchFlags> getSearchFlags() {
@@ -161,5 +164,17 @@ public class SearchPreferences {
 
     public void setKeepSearchString(boolean keepSearchString) {
         this.keepSearchString.set(keepSearchString);
+    }
+
+    public boolean shouldUsePostgresSearch() {
+        return usePostgresSearch.get();
+    }
+
+    public BooleanProperty usePostgresSearchProperty() {
+        return usePostgresSearch;
+    }
+
+    public void setUsePostgresSearch(boolean usePostgresSearch) {
+        this.usePostgresSearch.set(usePostgresSearch);
     }
 }

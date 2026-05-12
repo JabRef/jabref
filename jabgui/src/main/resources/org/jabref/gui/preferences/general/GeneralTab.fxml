@@ -116,6 +116,8 @@
         </padding>
     </HBox>
 
+    <CheckBox fx:id="usePostgresSearch" text="%Use Postgres-backed search (slower startup, supports fulltext search in linked files)"/>
+
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <CheckBox fx:id="createBackup" text="%Create backup"/>
         <TextField fx:id="backupDirectory" HBox.hgrow="ALWAYS"/>

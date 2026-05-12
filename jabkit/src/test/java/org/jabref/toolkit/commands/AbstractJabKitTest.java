@@ -57,7 +57,8 @@ public abstract class AbstractJabKitTest {
                 false,
                 0,
                 0,
-                0));
+                0,
+                false));
 
         JabKit jabKit = new JabKit(preferences, entryTypesManager);
         commandLine = new CommandLine(jabKit);
