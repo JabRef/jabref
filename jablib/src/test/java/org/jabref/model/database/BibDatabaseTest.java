@@ -486,4 +486,79 @@ class BibDatabaseTest {
         assertEquals(1, database.indexOf(entryD));
         assertEquals(-1, database.indexOf(entryA));
     }
+
+    @Test
+    void crossrefChangeUpdatesCitationIndex() {
+        BibDatabase database = new BibDatabase();
+        BibEntry parent = new BibEntry(StandardEntryType.Proceedings)
+                .withCitationKey("TestParent");
+        BibEntry child = new BibEntry(StandardEntryType.InProceedings);
+
+        database.insertEntry(parent);
+        database.insertEntry(child);
+
+        // setting the crossref field after insertion triggers the FieldChangedEvent
+        child.setField(StandardField.CROSSREF, "TestParent");
+
+        // verify the child was actually added to the citationIndex
+        Set<BibEntry> indexedChildren = database.getEntriesForCitationKey("TestParent");
+        assertTrue(indexedChildren.contains(child), "The citationIndex should contain the child entry under the parent's key");
+    }
+
+    @Test
+    void childCrossrefFollowsParentDoubleRename() {
+        BibDatabase database = new BibDatabase();
+        BibEntry parent = new BibEntry(StandardEntryType.Article).withCitationKey("ParentA");
+        BibEntry child = new BibEntry(StandardEntryType.Article);
+
+        // insert entry
+        database.insertEntry(parent);
+        database.insertEntry(child);
+
+        // setting crossref in child
+        child.setField(StandardField.CROSSREF, "ParentA");
+
+        // ensure it is in the first parent set
+        assertTrue(database.getEntriesForCitationKey("ParentA").contains(child), "Child should be indexed under ParentA");
+
+        // first rename of parent
+        parent.setCitationKey("ParentB");
+        assertTrue(database.getEntriesForCitationKey("ParentB").contains(child), "Child should have moved to the ParentB index set");
+
+        // second rename of parent
+        parent.setCitationKey("ParentC");
+        assertTrue(database.getEntriesForCitationKey("ParentC").contains(child), "Child should have moved to the ParentC index set");
+    }
+
+    @Test
+    void childIsIndexedUnderEachKeyInCommaSeparatedField() {
+        BibDatabase database = new BibDatabase();
+        BibEntry child = new BibEntry(StandardEntryType.Article);
+        database.insertEntry(child);
+
+        // set multiple links in related field
+        child.setField(StandardField.RELATED, " ParentA ,   ParentB ");
+
+        // verify all keys have child
+        assertTrue(database.getEntriesForCitationKey("ParentA").contains(child), "Child should be indexed under ParentA");
+        assertTrue(database.getEntriesForCitationKey("ParentB").contains(child), "Child should be indexed under ParentB");
+    }
+
+    @Test
+    void changingOneKeyInCommaSeparatedFieldUpdatesIndex() {
+        BibDatabase database = new BibDatabase();
+        BibEntry child = new BibEntry(StandardEntryType.Article);
+        database.insertEntry(child);
+
+        // set multiple links in related field
+        child.setField(StandardField.RELATED, "ParentA, ParentB");
+
+        // change a key in multiple key entries field
+        child.setField(StandardField.RELATED, "ParentC, ParentB");
+
+        // verify if the change is done in  the child related multiple entry field
+        assertTrue(database.getEntriesForCitationKey("ParentC").contains(child), "Child should be in the new ParentC set");
+        assertTrue(database.getEntriesForCitationKey("ParentB").contains(child), "Child should still be in the ParentB set");
+        assertFalse(database.getEntriesForCitationKey("ParentA").contains(child), "Child should be removed from the old ParentA set");
+    }
 }

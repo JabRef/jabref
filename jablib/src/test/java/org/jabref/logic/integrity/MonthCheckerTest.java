@@ -82,4 +82,16 @@ class MonthCheckerTest {
     void bibLaTexAcceptsInteger() {
         assertEquals(Optional.empty(), checkerBiblatex.checkValue("10"));
     }
+
+    @Test
+    void checkValueDoesNotAcceptPartialMatches() {
+        assertEquals(Optional.of("should be an integer or normalized"), checkerBiblatex.checkValue("January123"));
+        assertEquals(Optional.of("should be an integer or normalized"), checkerBiblatex.checkValue("#jan#trailing"));
+    }
+
+    @Test
+    void checkValueAcceptsZeroPaddedMonths() {
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("01"));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("09"));
+    }
 }
