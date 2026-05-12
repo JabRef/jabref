@@ -224,12 +224,12 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
     public static final String SEARCH_REG_EXP = "regExpSearch";
     public static final String SEARCH_FULLTEXT = "fulltextSearch";
+    public static final String SEARCH_USE_POSTGRES = "searchUsePostgres";
     public static final String SEARCH_KEEP_SEARCH_STRING = "keepSearchString";
     public static final String SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP = "keepOnTop";
     public static final String SEARCH_WINDOW_HEIGHT = "searchWindowHeight";
     public static final String SEARCH_WINDOW_WIDTH = "searchWindowWidth";
     public static final String SEARCH_WINDOW_DIVIDER_POS = "searchWindowDividerPos";
-    public static final String SEARCH_USE_POSTGRES = "searchUsePostgres";
     public static final String SEARCH_CATALOGS = "searchCatalogs";
     public static final String DEFAULT_PLAIN_CITATION_PARSER = "defaultPlainCitationParser";
     public static final String CITATIONS_RELATIONS_STORE_TTL = "citationsRelationsStoreTTL";
@@ -507,12 +507,12 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
         defaults.put(SEARCH_FULLTEXT, Boolean.FALSE);
+        defaults.put(SEARCH_USE_POSTGRES, Boolean.FALSE);
         defaults.put(SEARCH_KEEP_SEARCH_STRING, Boolean.FALSE);
         defaults.put(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, Boolean.TRUE);
         defaults.put(SEARCH_WINDOW_HEIGHT, 176.0);
         defaults.put(SEARCH_WINDOW_WIDTH, 600.0);
         defaults.put(SEARCH_WINDOW_DIVIDER_POS, 0.5);
-        defaults.put(SEARCH_USE_POSTGRES, Boolean.FALSE);
         defaults.put(SEARCH_CATALOGS, convertListToString(List.of(
                 ACMPortalFetcher.FETCHER_NAME,
                 SpringerNatureWebFetcher.FETCHER_NAME,
@@ -2058,12 +2058,12 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(SEARCH_REG_EXP),
                 getBoolean(SEARCH_CASE_SENSITIVE),
                 getBoolean(SEARCH_FULLTEXT),
+                getBoolean(SEARCH_USE_POSTGRES),
                 getBoolean(SEARCH_KEEP_SEARCH_STRING),
                 getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP),
                 getDouble(SEARCH_WINDOW_HEIGHT),
                 getDouble(SEARCH_WINDOW_WIDTH),
-                getDouble(SEARCH_WINDOW_DIVIDER_POS),
-                getBoolean(SEARCH_USE_POSTGRES));
+                getDouble(SEARCH_WINDOW_DIVIDER_POS));
 
         searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchFlags>) _ ->
                 putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchFlags.FULLTEXT)));

@@ -19,25 +19,25 @@ import com.google.common.annotations.VisibleForTesting;
 public class SearchPreferences {
 
     private final ObservableSet<SearchFlags> searchFlags;
+    private final BooleanProperty usePostgresSearch;
     private final BooleanProperty keepWindowOnTop;
     private final DoubleProperty searchWindowHeight;
     private final DoubleProperty searchWindowWidth;
     private final DoubleProperty searchWindowDividerPosition;
     private final BooleanProperty keepSearchString;
-    private final BooleanProperty usePostgresSearch;
     private final ObjectProperty<SearchDisplayMode> searchDisplayMode;
 
     public SearchPreferences(SearchDisplayMode searchDisplayMode,
                              boolean isRegularExpression,
                              boolean isCaseSensitive,
                              boolean isFulltext,
+                             boolean usePostgresSearch,
                              boolean keepSearchString,
                              boolean keepWindowOnTop,
                              double searchWindowHeight,
                              double searchWindowWidth,
-                             double searchWindowDividerPosition,
-                             boolean usePostgresSearch) {
-        this(searchDisplayMode, EnumSet.noneOf(SearchFlags.class), keepSearchString, keepWindowOnTop, searchWindowHeight, searchWindowWidth, searchWindowDividerPosition, usePostgresSearch);
+                             double searchWindowDividerPosition) {
+        this(searchDisplayMode, EnumSet.noneOf(SearchFlags.class), usePostgresSearch, keepSearchString, keepWindowOnTop, searchWindowHeight, searchWindowWidth, searchWindowDividerPosition);
         if (isRegularExpression) {
             searchFlags.add(SearchFlags.REGULAR_EXPRESSION);
         }
@@ -50,16 +50,16 @@ public class SearchPreferences {
     }
 
     @VisibleForTesting
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags, boolean keepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition, boolean usePostgresSearch) {
+    public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags, boolean usePostgresSearch, boolean keepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition) {
         this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
         this.searchFlags = FXCollections.observableSet(searchFlags);
 
+        this.usePostgresSearch = new SimpleBooleanProperty(usePostgresSearch);
         this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
         this.searchWindowHeight = new SimpleDoubleProperty(searchWindowHeight);
         this.searchWindowWidth = new SimpleDoubleProperty(searchWindowWidth);
         this.searchWindowDividerPosition = new SimpleDoubleProperty(searchWindowDividerPosition);
         this.keepSearchString = new SimpleBooleanProperty(keepSearchString);
-        this.usePostgresSearch = new SimpleBooleanProperty(usePostgresSearch);
     }
 
     public EnumSet<SearchFlags> getSearchFlags() {
