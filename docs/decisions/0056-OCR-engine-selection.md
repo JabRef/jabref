@@ -201,7 +201,7 @@ PaddleOCR turns any PDF or image document into structured data for your AI. A po
 - Bad, because only supports a limited set of OCR vision language models
 - Bad, because to date, performance benchmarks for common hardware are unknown.
 - Bad, because the framework is relatively new. Maturity unknown.
-- Bad, because introduces another separate framework for running a VLM unnecessarily; At present, JabRef already has Langchain4j and DJL. 
+- Bad, because introduces another separate framework for running a VLM unnecessarily; At present, JabRef already has Langchain4j and DJL.
 
 ### TurboOCR
 
