@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -135,21 +136,9 @@ public class CSLCitationOOAdapter {
 
         boolean isNumericStyle = selectedStyle.isNumericStyle();
         boolean isAlphanumericStyle = selectedStyle.isAlphanumericStyle();
-
-        Iterator<BibEntry> iterator = entries.iterator();
-        while (iterator.hasNext()) {
-            BibEntry currentEntry = iterator.next();
-
-            String citation = createInTextCitationText(selectedStyle, isAlphanumericStyle, isNumericStyle, currentEntry, bibDatabaseContext);
-            String finalText = citation;
-
-            if (iterator.hasNext()) {
-                finalText += ",";
-            }
-
-            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalText));
-            insertReferences(cursor, List.of(currentEntry), ooText, isNumericStyle, CSLCitationType.IN_TEXT);
-        }
+        String citation = createInTextCitationGroupText(selectedStyle, isAlphanumericStyle, isNumericStyle, entries, bibDatabaseContext);
+        OOText ooText = OOFormat.setLocaleNone(OOText.fromString(citation));
+        insertReferences(cursor, entries, ooText, isNumericStyle, CSLCitationType.IN_TEXT);
     }
 
     /// Inserts "empty" citations for a list of entries at the cursor to the document.
@@ -298,24 +287,8 @@ public class CSLCitationOOAdapter {
                                                      .map(unifiedDatabase::getEntryByCitationKey)
                                                      .flatMap(Optional::stream)
                                                      .toList();
-
-                StringBuilder finalText = new StringBuilder();
-                Iterator<BibEntry> iterator = entries.iterator();
-
-                while (iterator.hasNext()) {
-                    BibEntry currentEntry = iterator.next();
-
-                    // We re-generate the citation in the new style and update it in the document
-                    String citation = createInTextCitationText(style, isAlphaNumericStyle, isNumericStyle, currentEntry, unifiedBibDatabaseContext);
-
-                    finalText.append(citation);
-
-                    if (iterator.hasNext()) {
-                        finalText.append(",");
-                    }
-                }
-
-                markManager.updateMarkAndTextWithNewStyle(mark, finalText.toString(), CSLCitationType.IN_TEXT);
+                String citation = createInTextCitationGroupText(style, isAlphaNumericStyle, isNumericStyle, entries, unifiedBibDatabaseContext);
+                markManager.updateMarkAndTextWithNewStyle(mark, citation, CSLCitationType.IN_TEXT);
             }
         } else {
             // Same flow as above - for each such reference mark, we get the entries to be updated
@@ -345,6 +318,16 @@ public class CSLCitationOOAdapter {
         }
 
         return CSLFormatUtils.transformHTML(citation);
+    }
+
+    /// Helper method for creating citation group for `insertInTextCitation` and `updateAllCitationsWithNewStyle`
+    private @NonNull String createInTextCitationGroupText(CitationStyle style, boolean isAlphaNumericStyle, boolean isNumericStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext) {
+        StringJoiner citations = new StringJoiner(", ");
+        for (BibEntry entry : entries) {
+            citations.add(createInTextCitationText(style, isAlphaNumericStyle, isNumericStyle, entry, bibDatabaseContext));
+        }
+
+        return citations.toString();
     }
 
     ///  Helper method for creating in-text citations for `updateAllCitationsWithNewStyle` and `insertInTextCitation`.
