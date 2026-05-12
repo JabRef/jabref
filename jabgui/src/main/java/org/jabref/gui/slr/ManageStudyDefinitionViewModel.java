@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
@@ -118,7 +120,8 @@ public class ManageStudyDefinitionViewModel {
         title.setValue(study.getTitle());
         researchQuestions.addAll(study.getResearchQuestions());
         queries.addAll(study.getQueries());
-        List<StudyCatalog> studyCatalogs = study.getCatalogs();
+        Map<String, StudyCatalog> catalogsByName = study.getCatalogs().stream()
+                .collect(Collectors.toMap(StudyCatalog::getName, catalog -> catalog));
         catalogs.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                    .stream()
                                    .map(SearchBasedFetcher::getName)
@@ -126,9 +129,9 @@ public class ManageStudyDefinitionViewModel {
                                    // The fetcher summarizing ALL fetchers can be emulated by selecting ALL fetchers (which happens rarely when doing an SLR)
                                    .filter(name -> !CompositeSearchBasedFetcher.FETCHER_NAME.equals(name))
                                    .map(name -> {
-                                       Optional<StudyCatalog> match = studyCatalogs.stream().filter(catalog -> catalog.getName().equals(name)).findFirst();
-                                       boolean enabled = match.map(StudyCatalog::isEnabled).orElse(false);
-                                       String reason = match.map(StudyCatalog::getReason).orElse("");
+                                       StudyCatalog savedCatalog = catalogsByName.get(name);
+                                       boolean enabled = savedCatalog != null && savedCatalog.isEnabled();
+                                       String reason = savedCatalog != null ? savedCatalog.getReason() : "";
                                        return new StudyCatalogItem(name, enabled, reason);
                                    })
                                    .toList());
