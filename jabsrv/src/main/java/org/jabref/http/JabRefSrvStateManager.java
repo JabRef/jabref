@@ -8,7 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.command.CommandSelectionTab;
-import org.jabref.logic.search.sqlbased.IndexManager;
+import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -31,7 +31,7 @@ public class JabRefSrvStateManager implements SrvStateManager {
     }
 
     @Override
-    public Optional<IndexManager> getIndexManager(BibDatabaseContext database) {
+    public Optional<SearchContext> getSearchContext(BibDatabaseContext database) {
         return Optional.empty();
     }
 

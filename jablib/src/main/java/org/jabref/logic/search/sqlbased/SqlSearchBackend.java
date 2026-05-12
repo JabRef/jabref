@@ -44,6 +44,11 @@ public class SqlSearchBackend implements SearchBackend {
     }
 
     @Override
+    public void rebuildFullTextIndex() {
+        indexManager.rebuildFullTextIndex();
+    }
+
+    @Override
     public void close() {
         indexManager.closeAndWait();
     }

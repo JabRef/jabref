@@ -17,7 +17,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.http.SrvStateManager;
-import org.jabref.logic.search.sqlbased.IndexManager;
+import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
@@ -52,7 +52,7 @@ public interface StateManager extends SrvStateManager {
 
     IntegerProperty searchResultSize(SearchType type);
 
-    void setIndexManager(BibDatabaseContext database, IndexManager indexManager);
+    void setSearchContext(BibDatabaseContext database, SearchContext searchContext);
 
     void setSelectedEntries(List<BibEntry> newSelectedEntries);
 

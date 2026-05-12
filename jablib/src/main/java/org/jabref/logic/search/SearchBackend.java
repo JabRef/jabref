@@ -31,6 +31,9 @@ public interface SearchBackend {
 
     void updateEntry(FieldChangedEvent event);
 
+    /// Re-index linked-file fulltext from scratch. Backends without a fulltext index implement as a no-op.
+    void rebuildFullTextIndex();
+
     /// Release backend resources (DB connections, Lucene index handles, …). Idempotent.
     void close();
 }

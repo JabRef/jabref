@@ -90,6 +90,11 @@ public class SearchContext implements SearchBackend {
     }
 
     @Override
+    public synchronized void rebuildFullTextIndex() {
+        backend.rebuildFullTextIndex();
+    }
+
+    @Override
     public synchronized void close() {
         preferenceSubscription.unsubscribe();
         backend.close();

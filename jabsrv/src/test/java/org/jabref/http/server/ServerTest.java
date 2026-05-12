@@ -114,6 +114,7 @@ public abstract class ServerTest extends JerseyTest {
 
         BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(bibEntryPreferences);
+        when(preferences.getBibEntryPreferences()).thenReturn(bibEntryPreferences);
         when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
 
         FieldPreferences fieldWriterPreferences = mock(FieldPreferences.class);

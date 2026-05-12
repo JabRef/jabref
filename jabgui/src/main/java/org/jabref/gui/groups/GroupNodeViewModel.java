@@ -111,8 +111,8 @@ public class GroupNodeViewModel {
         if (groupNode.getGroup() instanceof TexGroup) {
             databaseContext.getMetaData().groupsBinding().addListener(new WeakInvalidationListener(onInvalidatedGroup));
         } else if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
-            stateManager.getIndexManager(databaseContext).ifPresent(indexManager -> {
-                searchGroup.setMatchedEntries(indexManager.search(searchGroup.getSearchQuery()).getMatchedEntries());
+            stateManager.getSearchContext(databaseContext).ifPresent(searchContext -> {
+                searchGroup.setMatchedEntries(searchContext.search(searchGroup.getSearchQuery()).getMatchedEntries());
                 refreshGroup();
                 databaseContext.getMetaData().groupsBinding().invalidate();
             });
@@ -632,8 +632,8 @@ public class GroupNodeViewModel {
         @Subscribe
         public void listen(IndexStartedEvent event) {
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
-                stateManager.getIndexManager(databaseContext).ifPresent(indexManager -> {
-                    searchGroup.setMatchedEntries(indexManager.search(searchGroup.getSearchQuery()).getMatchedEntries());
+                stateManager.getSearchContext(databaseContext).ifPresent(searchContext -> {
+                    searchGroup.setMatchedEntries(searchContext.search(searchGroup.getSearchQuery()).getMatchedEntries());
                     refreshGroup();
                     databaseContext.getMetaData().groupsBinding().invalidate();
                 });
@@ -643,10 +643,10 @@ public class GroupNodeViewModel {
         @Subscribe
         public void listen(IndexAddedOrUpdatedEvent event) {
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
-                stateManager.getIndexManager(databaseContext).ifPresent(indexManager ->
+                stateManager.getSearchContext(databaseContext).ifPresent(searchContext ->
                         BackgroundTask.wrap(() -> {
                             for (BibEntry entry : event.entries()) {
-                                searchGroup.updateMatches(entry, indexManager.isEntryMatched(entry, searchGroup.getSearchQuery()));
+                                searchGroup.updateMatches(entry, searchContext.isEntryMatched(entry, searchGroup.getSearchQuery()));
                             }
                         }).onFinished(() -> {
                             for (BibEntry entry : event.entries()) {

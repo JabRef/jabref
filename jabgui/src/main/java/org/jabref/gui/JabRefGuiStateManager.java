@@ -28,7 +28,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.logic.command.CommandSelectionTab;
-import org.jabref.logic.search.sqlbased.IndexManager;
+import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
@@ -64,7 +64,7 @@ public class JabRefGuiStateManager implements StateManager {
     private final OptionalObjectProperty<LibraryTab> activeTab = OptionalObjectProperty.empty();
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<String, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
-    private final ObservableMap<String, IndexManager> indexManagers = FXCollections.observableHashMap();
+    private final ObservableMap<String, SearchContext> searchContexts = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final OptionalObjectProperty<SearchQuery> activeGlobalSearchQuery = OptionalObjectProperty.empty();
     private final StringProperty searchQueryProperty = new SimpleStringProperty();
@@ -150,13 +150,13 @@ public class JabRefGuiStateManager implements StateManager {
     }
 
     @Override
-    public void setIndexManager(BibDatabaseContext database, IndexManager indexManager) {
-        indexManagers.put(database.getUid(), indexManager);
+    public void setSearchContext(BibDatabaseContext database, SearchContext searchContext) {
+        searchContexts.put(database.getUid(), searchContext);
     }
 
     @Override
-    public Optional<IndexManager> getIndexManager(BibDatabaseContext database) {
-        return Optional.ofNullable(indexManagers.get(database.getUid()));
+    public Optional<SearchContext> getSearchContext(BibDatabaseContext database) {
+        return Optional.ofNullable(searchContexts.get(database.getUid()));
     }
 
     @Override

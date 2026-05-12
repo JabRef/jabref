@@ -55,6 +55,11 @@ public class InMemorySearchBackend implements SearchBackend {
     }
 
     @Override
+    public void rebuildFullTextIndex() {
+        // no fulltext index to rebuild
+    }
+
+    @Override
     public void close() {
         // no resources to release
     }
