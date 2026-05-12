@@ -33,10 +33,12 @@ import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.push.PushToApplications;
+import org.jabref.logic.search.inmemory.InMemoryLibrarySearcher;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import jakarta.inject.Inject;
@@ -104,7 +106,7 @@ public class CAYWResource {
                                                      .map(this::createCAYWEntry)
                                                      .collect(Collectors.toList());
             initializeGUI();
-            searchResults = openSearchGui(entries);
+            searchResults = openSearchGui(entries, databaseContext);
         }
 
         if (searchResults.isEmpty()) {
@@ -146,28 +148,39 @@ public class CAYWResource {
         return Response.ok(formattedResponse).type(formatter.getMediaType()).build();
     }
 
-    private List<CAYWEntry> openSearchGui(List<CAYWEntry> entries) throws InterruptedException, ExecutionException {
-        // TODO: switch the in-dialog filter to LibrarySearcher (likely
-        //       org.jabref.logic.search.inmemory.InMemoryLibrarySearcher — it needs only a
-        //       BibDatabaseContext, no Postgres/Lucene). The old SqlBasedLibrarySearcher
-        //       attempt here threw a lot of exceptions; the in-memory variant should sidestep
-        //       that and let the SearchDialog accept a `SearchQuery` directly.
-        //       Example:
-        //           LibrarySearcher searcher = new InMemoryLibrarySearcher(databaseContext, preferences.getBibEntryPreferences());
-        //           searchDialog.set(new SearchDialog<>(s -> searcher.getMatches(new SearchQuery(s)), entries));
+    private List<CAYWEntry> openSearchGui(List<CAYWEntry> entries, BibDatabaseContext databaseContext) throws InterruptedException, ExecutionException {
+        InMemoryLibrarySearcher searcher = new InMemoryLibrarySearcher(databaseContext, preferences.getBibEntryPreferences());
 
         CompletableFuture<List<CAYWEntry>> future = new CompletableFuture<>();
         Platform.runLater(() -> {
             SearchDialog dialog = new SearchDialog();
             List<CAYWEntry> results = dialog.show(
-                    searchQuery ->
-                            entries.stream()
-                                   .filter(caywEntry -> matches(caywEntry, searchQuery)).toList(),
+                    searchText -> filterEntries(entries, searchText, searcher),
                     entries);
             future.complete(results);
         });
 
         return future.get();
+    }
+
+    /// Filter strategy:
+    /// - Empty input → return everything.
+    /// - Valid Search.g4 expression → grammar-based filter via [InMemoryLibrarySearcher].
+    /// - Invalid expression (e.g. user is mid-typing `author=`) → fall back to a plain
+    ///   substring match across the CAYW labels so the list stays useful as the user types.
+    private List<CAYWEntry> filterEntries(List<CAYWEntry> entries, String searchText, InMemoryLibrarySearcher searcher) {
+        if (searchText == null || searchText.isEmpty()) {
+            return entries;
+        }
+        SearchQuery query = new SearchQuery(searchText);
+        if (query.isValid()) {
+            return entries.stream()
+                          .filter(caywEntry -> searcher.matches(caywEntry.bibEntry(), query))
+                          .toList();
+        }
+        return entries.stream()
+                      .filter(caywEntry -> matchesSubstring(caywEntry, searchText))
+                      .toList();
     }
 
     private BibDatabaseContext getBibDatabaseContext(CAYWQueryParams queryParams) throws IOException {
@@ -266,10 +279,7 @@ public class CAYWResource {
         return new CAYWEntry(entry, label, shortLabel, description, new CitationProperties());
     }
 
-    private boolean matches(CAYWEntry entry, String searchText) {
-        if (searchText == null || searchText.isEmpty()) {
-            return true;
-        }
+    private boolean matchesSubstring(CAYWEntry entry, String searchText) {
         String lowerSearchText = searchText.toLowerCase();
         return entry.label().toLowerCase().contains(lowerSearchText) ||
                 entry.description().toLowerCase().contains(lowerSearchText) ||

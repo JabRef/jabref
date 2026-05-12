@@ -41,8 +41,21 @@ public class InMemoryLibrarySearcher implements LibrarySearcher {
             LOGGER.warn("In-memory searcher does not support FULLTEXT search; matching against metadata only");
         }
         return databaseContext.getDatabase().getEntries().stream()
-                              .filter(entry -> Boolean.TRUE.equals(
-                                      new BibEntryMatchVisitor(entry, query.getSearchFlags(), keywordSeparator).visit(query.getContext())))
+                              .filter(entry -> matchesParsedQuery(entry, query))
                               .toList();
+    }
+
+    /// Test a single entry against a query without iterating the library.
+    /// Returns `false` for invalid queries.
+    public boolean matches(BibEntry entry, SearchQuery query) {
+        if (!query.isValid()) {
+            return false;
+        }
+        return matchesParsedQuery(entry, query);
+    }
+
+    private boolean matchesParsedQuery(BibEntry entry, SearchQuery query) {
+        return Boolean.TRUE.equals(
+                new BibEntryMatchVisitor(entry, query.getSearchFlags(), keywordSeparator).visit(query.getContext()));
     }
 }
