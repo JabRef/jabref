@@ -1,13 +1,13 @@
 package org.jabref.logic.ocr;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.io.FileUtil;
 
 import org.slf4j.Logger;
@@ -55,15 +55,11 @@ public class OcrMyPdfEngine implements OcrEngine {
             StringBuilder processOutput = new StringBuilder();
 
             // Get the output and the errors of the process
-            try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    processOutput.append(line).append("\n");
-                    LOGGER.debug("OCRmyPDF: {}", line);
-                }
-            }
-
+            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(OcrMyPdfEngine.class)::debug);
+            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(OcrMyPdfEngine.class)::debug);
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
+            
             boolean finished = process.waitFor(TIMEOUT_MINS, TimeUnit.MINUTES);
             if (!finished) {
                 process.destroyForcibly();
