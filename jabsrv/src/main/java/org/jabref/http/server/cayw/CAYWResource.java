@@ -147,21 +147,18 @@ public class CAYWResource {
     }
 
     private List<CAYWEntry> openSearchGui(List<CAYWEntry> entries) throws InterruptedException, ExecutionException {
-        /* unused until DatabaseSearcher is fixed
-        PostgreServer postgreServer = new PostgreServer();
-        IndexManager.clearOldSearchIndices();
-        searcher = new DatabaseSearcher(
-                databaseContext,
-                new CurrentThreadTaskExecutor(),
-                preferences,
-                postgreServer);
-          */
+        // TODO: switch the in-dialog filter to LibrarySearcher (likely
+        //       org.jabref.logic.search.inmemory.InMemoryLibrarySearcher — it needs only a
+        //       BibDatabaseContext, no Postgres/Lucene). The old SqlBasedLibrarySearcher
+        //       attempt here threw a lot of exceptions; the in-memory variant should sidestep
+        //       that and let the SearchDialog accept a `SearchQuery` directly.
+        //       Example:
+        //           LibrarySearcher searcher = new InMemoryLibrarySearcher(databaseContext);
+        //           searchDialog.set(new SearchDialog<>(s -> searcher.getMatches(new SearchQuery(s)), entries));
 
         CompletableFuture<List<CAYWEntry>> future = new CompletableFuture<>();
         Platform.runLater(() -> {
             SearchDialog dialog = new SearchDialog();
-            // TODO: Using the DatabaseSearcher directly here results in a lot of exceptions being thrown, so we use an alternative for now until we have a nice way of using the DatabaseSearcher class.
-            //       searchDialog.set(new SearchDialog<>(s -> searcher.getMatches(new SearchQuery(s)), entries));
             List<CAYWEntry> results = dialog.show(
                     searchQuery ->
                             entries.stream()

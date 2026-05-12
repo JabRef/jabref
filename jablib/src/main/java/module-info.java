@@ -4,7 +4,9 @@ open module org.jabref.jablib {
 
     exports org.jabref.search;
     exports org.jabref.logic.search;
+    exports org.jabref.logic.search.inmemory;
     exports org.jabref.logic.search.query;
+    exports org.jabref.logic.search.sqlbased;
     exports org.jabref.model.entry.field;
     exports org.jabref.model.search;
     exports org.jabref.model.search.query;

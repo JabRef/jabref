@@ -136,7 +136,7 @@ public class CommonArchitectureTest {
     public void restrictUsagesInLogic(JavaClasses classes) {
         ArchRuleDefinition.noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
                           .and().areNotAnnotatedWith(AllowedToUseSwing.class)
-                          .and().areNotAssignableFrom("org.jabref.logic.search.DatabaseSearcherWithBibFilesTest")
+                          .and().areNotAssignableFrom("org.jabref.logic.search.sqlbased.SqlBasedLibrarySearcherWithBibFilesTest")
                           .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
                           .check(classes);
     }

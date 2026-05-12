@@ -2,8 +2,10 @@ package org.jabref.http.server.resources;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.http.SrvStateManager;
@@ -11,13 +13,17 @@ import org.jabref.http.dto.LibraryQueryMatch;
 import org.jabref.http.dto.LibraryQueryRequest;
 import org.jabref.http.dto.LibraryQueryResponse;
 import org.jabref.http.server.services.FilesToServe;
+import org.jabref.http.server.services.LibraryQueryExpressionBuilder;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.search.inmemory.InMemoryLibrarySearcher;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.query.SearchQuery;
 
 import com.google.gson.Gson;
 import jakarta.inject.Inject;
@@ -73,11 +79,19 @@ public class LibrariesResource {
                                              .map(doi -> doi.asString().toLowerCase(Locale.ROOT))
                                              .toList();
 
+        Optional<String> expression = LibraryQueryExpressionBuilder.build(normalizedDois, request.urls());
+        if (expression.isEmpty()) {
+            return gson.toJson(new LibraryQueryResponse(List.of()));
+        }
+
+        SearchQuery searchQuery = new SearchQuery(expression.get(), EnumSet.noneOf(SearchFlags.class));
+
         List<LibraryQueryMatch> matches = new ArrayList<>();
         for (String libraryId : openLibraryIds()) {
             try {
                 BibDatabaseContext context = ServerUtils.getBibDatabaseContext(libraryId, filesToServe, srvStateManager, preferences.getImportFormatPreferences());
-                searchEntries(context.getDatabase().getEntries(), libraryId, normalizedDois, request.urls(), matches);
+                List<BibEntry> hits = new InMemoryLibrarySearcher(context).getMatches(searchQuery);
+                attributeMatches(hits, libraryId, normalizedDois, request.urls(), matches);
             } catch (IOException e) {
                 LOGGER.warn("Could not load library {} for query", libraryId, e);
             }
@@ -99,8 +113,11 @@ public class LibrariesResource {
                          .toList();
     }
 
-    private void searchEntries(List<BibEntry> entries, String libraryId, List<String> normalizedDois, List<String> urls, List<LibraryQueryMatch> matches) {
-        for (BibEntry entry : entries) {
+    /// The searcher returns matching entries but not which input DOI/URL matched.
+    /// Re-derive that attribution by comparing each matched entry's DOI/URL field
+    /// against the normalized input lists.
+    private void attributeMatches(List<BibEntry> hits, String libraryId, List<String> normalizedDois, List<String> urls, List<LibraryQueryMatch> matches) {
+        for (BibEntry entry : hits) {
             String entryId = entry.getCitationKey().orElse("");
             if (!normalizedDois.isEmpty()) {
                 entry.getDOI()

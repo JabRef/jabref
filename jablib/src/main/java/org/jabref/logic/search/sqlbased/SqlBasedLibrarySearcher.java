@@ -1,9 +1,12 @@
-package org.jabref.logic.search;
+package org.jabref.logic.search.sqlbased;
 
 import java.io.IOException;
 import java.util.List;
 
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.search.IndexManager;
+import org.jabref.logic.search.LibrarySearcher;
+import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabases;
@@ -13,21 +16,23 @@ import org.jabref.model.search.query.SearchQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DatabaseSearcher {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseSearcher.class);
+/// SQL/Lucene-backed implementation of [LibrarySearcher].
+/// Boots an [IndexManager] (embedded Postgres + Lucene linked-files index) per instance.
+public class SqlBasedLibrarySearcher implements LibrarySearcher {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SqlBasedLibrarySearcher.class);
 
     private final BibDatabaseContext databaseContext;
     private final IndexManager indexManager;
 
-    public DatabaseSearcher(BibDatabaseContext databaseContext,
-                            TaskExecutor taskExecutor,
-                            CliPreferences preferences,
-                            PostgreServer postgreServer) throws IOException {
+    public SqlBasedLibrarySearcher(BibDatabaseContext databaseContext,
+                                   TaskExecutor taskExecutor,
+                                   CliPreferences preferences,
+                                   PostgreServer postgreServer) throws IOException {
         this.databaseContext = databaseContext;
         this.indexManager = new IndexManager(databaseContext, taskExecutor, preferences, postgreServer);
     }
 
-    /// @return The matches in the order they appear in the library.
+    @Override
     public List<BibEntry> getMatches(SearchQuery query) {
         LOGGER.debug("Search term: {}", query);
 
