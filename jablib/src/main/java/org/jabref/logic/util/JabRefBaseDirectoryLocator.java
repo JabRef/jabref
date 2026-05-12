@@ -4,10 +4,8 @@ import java.nio.file.Path;
 
 import org.jabref.logic.os.OS;
 
-/**
- * Returns the base directory used for the packaged application.
- * Uses the jpackage.app-path system property when available.
- */
+/// Returns the base directory used for the packaged application.
+/// Uses the {@code jpackage.app-path} system property when available.
 public class JabRefBaseDirectoryLocator {
 
     private static Path getMacAppBundle(Path path) {
