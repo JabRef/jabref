@@ -15,7 +15,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;

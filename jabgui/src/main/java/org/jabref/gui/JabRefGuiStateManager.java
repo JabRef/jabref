@@ -28,7 +28,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.logic.command.CommandSelectionTab;
-import org.jabref.logic.search.IndexManager;
+import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;

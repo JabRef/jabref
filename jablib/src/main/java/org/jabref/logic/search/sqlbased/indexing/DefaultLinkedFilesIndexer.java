@@ -1,4 +1,4 @@
-package org.jabref.logic.search.indexing;
+package org.jabref.logic.search.sqlbased.indexing;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,7 +19,7 @@ import javafx.util.Pair;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.LuceneIndexer;
+import org.jabref.logic.search.sqlbased.LuceneIndexer;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StandardFileType;

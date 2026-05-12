@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.search.LibrarySearcher;
-import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabases;

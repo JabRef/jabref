@@ -8,7 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.command.CommandSelectionTab;
-import org.jabref.logic.search.IndexManager;
+import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

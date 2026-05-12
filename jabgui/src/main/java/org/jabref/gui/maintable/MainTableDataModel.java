@@ -18,7 +18,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FilteredListProxy;
-import org.jabref.logic.search.IndexManager;
+import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;

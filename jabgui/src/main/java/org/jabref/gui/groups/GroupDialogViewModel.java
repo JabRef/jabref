@@ -32,7 +32,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.IndexManager;
+import org.jabref.logic.search.sqlbased.IndexManager;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.strings.StringUtil;
