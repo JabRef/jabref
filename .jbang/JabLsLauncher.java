@@ -21,8 +21,8 @@
 //DEPS org.apache.commons:commons-lang3:3.20.0
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.26.0
 //DEPS org.eclipse.lsp4j:org.eclipse.lsp4j:1.0.0
-//DEPS org.slf4j:jul-to-slf4j:2.0.17
-//DEPS org.slf4j:slf4j-api:2.0.17
+//DEPS org.slf4j:jul-to-slf4j:2.0.18
+//DEPS org.slf4j:slf4j-api:2.0.18
 //DEPS org.tinylog:slf4j-tinylog:2.7.0
 //DEPS org.tinylog:tinylog-impl:2.7.0
 
