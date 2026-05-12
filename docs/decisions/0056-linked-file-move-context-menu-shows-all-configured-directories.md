@@ -4,7 +4,7 @@ parent: Decision Records
 status: accepted
 date: 2026-04-20
 ---
-# Linked file move context menu shows all configured directories
+# Context menu for moving linked files should show all configured directories
 
 ## Context and Problem Statement
 
