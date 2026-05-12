@@ -76,7 +76,7 @@ class Search implements Runnable {
         SearchQuery searchQuery = new SearchQuery(query, searchPreferences.getSearchFlags());
 
         BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
-        LibrarySearcher searcher = new InMemoryLibrarySearcher(databaseContext);
+        LibrarySearcher searcher = new InMemoryLibrarySearcher(databaseContext, argumentProcessor.cliPreferences.getBibEntryPreferences());
         List<BibEntry> matches = searcher.getMatches(searchQuery);
 
         if (matches.isEmpty()) {

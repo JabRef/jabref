@@ -153,7 +153,7 @@ public class CAYWResource {
         //       attempt here threw a lot of exceptions; the in-memory variant should sidestep
         //       that and let the SearchDialog accept a `SearchQuery` directly.
         //       Example:
-        //           LibrarySearcher searcher = new InMemoryLibrarySearcher(databaseContext);
+        //           LibrarySearcher searcher = new InMemoryLibrarySearcher(databaseContext, preferences.getBibEntryPreferences());
         //           searchDialog.set(new SearchDialog<>(s -> searcher.getMatches(new SearchQuery(s)), entries));
 
         CompletableFuture<List<CAYWEntry>> future = new CompletableFuture<>();

@@ -5,6 +5,7 @@ import java.util.List;
 import org.jabref.logic.search.LibrarySearcher;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
 
@@ -23,9 +24,11 @@ public class InMemoryLibrarySearcher implements LibrarySearcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryLibrarySearcher.class);
 
     private final BibDatabaseContext databaseContext;
+    private final Character keywordSeparator;
 
-    public InMemoryLibrarySearcher(BibDatabaseContext databaseContext) {
+    public InMemoryLibrarySearcher(BibDatabaseContext databaseContext, BibEntryPreferences bibEntryPreferences) {
         this.databaseContext = databaseContext;
+        this.keywordSeparator = bibEntryPreferences.getKeywordSeparator();
     }
 
     @Override
@@ -39,7 +42,7 @@ public class InMemoryLibrarySearcher implements LibrarySearcher {
         }
         return databaseContext.getDatabase().getEntries().stream()
                               .filter(entry -> Boolean.TRUE.equals(
-                                      new BibEntryMatchVisitor(entry, query.getSearchFlags()).visit(query.getContext())))
+                                      new BibEntryMatchVisitor(entry, query.getSearchFlags(), keywordSeparator).visit(query.getContext())))
                               .toList();
     }
 }

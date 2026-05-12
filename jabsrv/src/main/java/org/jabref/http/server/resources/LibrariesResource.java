@@ -90,7 +90,7 @@ public class LibrariesResource {
         for (String libraryId : openLibraryIds()) {
             try {
                 BibDatabaseContext context = ServerUtils.getBibDatabaseContext(libraryId, filesToServe, srvStateManager, preferences.getImportFormatPreferences());
-                List<BibEntry> hits = new InMemoryLibrarySearcher(context).getMatches(searchQuery);
+                List<BibEntry> hits = new InMemoryLibrarySearcher(context, preferences.getBibEntryPreferences()).getMatches(searchQuery);
                 attributeMatches(hits, libraryId, normalizedDois, request.urls(), matches);
             } catch (IOException e) {
                 LOGGER.warn("Could not load library {} for query", libraryId, e);

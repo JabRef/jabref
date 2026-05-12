@@ -26,16 +26,17 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntryMatchVisitor.class);
     private static final String GROUPS_FIELD_NAME = StandardField.GROUPS.getName();
-    private static final char KEYWORD_SEPARATOR = ',';
 
     private enum MatchType { INEXACT, EXACT, REGEX }
 
     private final BibEntry entry;
     private final EnumSet<SearchFlags> searchBarFlags;
+    private final Character keywordSeparator;
 
-    BibEntryMatchVisitor(BibEntry entry, EnumSet<SearchFlags> searchBarFlags) {
+    BibEntryMatchVisitor(BibEntry entry, EnumSet<SearchFlags> searchBarFlags, Character keywordSeparator) {
         this.entry = entry;
         this.searchBarFlags = searchBarFlags;
+        this.keywordSeparator = keywordSeparator;
     }
 
     @Override
@@ -154,7 +155,7 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
     }
 
     private boolean matchAnyKeyword(String term, MatchType matchType, boolean caseSensitive) {
-        List<String> keywords = entry.getKeywords(KEYWORD_SEPARATOR).stream().map(Object::toString).toList();
+        List<String> keywords = entry.getKeywords(keywordSeparator).stream().map(Object::toString).toList();
         return keywords.stream().anyMatch(k -> matchValue(k, term, matchType, caseSensitive));
     }
 
