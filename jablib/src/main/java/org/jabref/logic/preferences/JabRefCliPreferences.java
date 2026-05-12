@@ -1987,6 +1987,7 @@ public class JabRefCliPreferences implements CliPreferences {
                                                .map(Path::toString)
                                                .toList());
     }
+
     // endregion
 
     // region other preferences

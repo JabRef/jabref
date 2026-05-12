@@ -4,7 +4,25 @@ import java.nio.file.Path;
 
 import org.jabref.logic.os.OS;
 
+/**
+ * Returns the base directory used for the packaged application.
+ * Uses the jpackage.app-path system property when available.
+ */
 public class JabRefBaseDirectoryLocator {
+
+    private static Path getMacAppBundle(Path path) {
+        while (path != null) {
+            Path fileName = path.getFileName();
+
+            if (fileName != null && fileName.toString().endsWith(".app")) {
+                return path;
+            }
+
+            path = path.getParent();
+        }
+
+        return null;
+    }
 
     public static Path getBaseDirectoryPath() {
         String appPath = System.getProperty("jpackage.app-path");
@@ -18,20 +36,7 @@ public class JabRefBaseDirectoryLocator {
         Path jabRefBaseDirectory = Path.of(appPath);
 
         if (OS.OS_X) {
-            while (jabRefBaseDirectory != null) {
-                Path fileName = jabRefBaseDirectory.getFileName();
-
-                if (fileName == null) {
-                    jabRefBaseDirectory = null;
-                    break;
-                }
-
-                if (fileName.toString().endsWith(".app")) {
-                    break;
-                }
-
-                jabRefBaseDirectory = jabRefBaseDirectory.getParent();
-            }
+            jabRefBaseDirectory = getMacAppBundle(jabRefBaseDirectory);
         }
 
         if (jabRefBaseDirectory == null) {

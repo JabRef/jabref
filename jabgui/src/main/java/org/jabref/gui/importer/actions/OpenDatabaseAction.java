@@ -186,15 +186,6 @@ public class OpenDatabaseAction extends SimpleCommand {
             for (LibraryTab libraryTab : tabContainer.getLibraryTabs()) {
                 if ((libraryTab.getBibDatabaseContext().getDatabasePath().isPresent())
                         && libraryTab.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
-                    if (preferences.getInternalPreferences().isMemoryStickMode()) {
-                        try {
-                            file = baseDirectoryPath.relativize(file).normalize();
-                        } catch (IllegalArgumentException e) {
-                            file = file.normalize();
-                        }
-                    }
-
-                    fileHistory.newFile(file);
                     iterator.remove();
                     removed++;
                     // See if we removed the final one. If so, we must perhaps

@@ -56,6 +56,9 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
 
         Path baseDirectoryPath = getBaseDirectoryPath();
 
+        // The history may contain both absolute and base-directory-relative paths,
+        // depending on how the file was added previously. Remove all equivalent
+        // representations to ensure the entry is fully cleared from the history.
         if (file.isAbsolute()) {
             try {
                 this.remove(baseDirectoryPath.relativize(file).normalize());
