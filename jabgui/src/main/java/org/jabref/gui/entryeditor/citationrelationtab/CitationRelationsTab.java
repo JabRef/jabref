@@ -576,31 +576,36 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                     return hContainer;
                 })
-                .withOnMouseClickedEvent((item, event) -> {
-                    if (event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
-                        event.consume();
-                        listView.getCheckModel().check(item);
-
-                        if (item.isLocal()) {
-                            // Jump if item is already in the database
-                            jumpToEntry(item);
-                        } else {
-                            // if not, import
-                            importEntries(List.of(item), citationComponents.searchType(), currentEntry);
-                        }
-                        return;
-                    }
-                    if (!item.isLocal()) {
-                        // standard behavior with one click
-                        listView.getCheckModel().toggleCheckState(item);
-                    }
-                })
+                .withOnMouseClickedEvent((item, event) -> handleItemClick(item, event, listView, citationComponents))
                 .setOnDragDetected((item, event) -> handleDragDetected(listView, item, event))
                 .setOnDragDone((_, event) -> handleDragDone(listView, event))
                 .withPseudoClass(entrySelected, listView::getItemBooleanProperty)
                 .install(listView);
 
         listView.setSelectionModel(new NoSelectionModel<>());
+    }
+
+    private void handleItemClick(CitationRelationItem item,
+                                 MouseEvent event,
+                                 CheckListView<CitationRelationItem> listView,
+                                 CitationComponents citationComponents){
+        if (event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
+            event.consume();
+            listView.getCheckModel().check(item);
+
+            if (item.isLocal()) {
+                // Jump if item is already in the database
+                jumpToEntry(item);
+            } else {
+                // if not, import
+                importEntries(List.of(item), citationComponents.searchType(), currentEntry);
+            }
+            return;
+        }
+        if (!item.isLocal()) {
+            // standard behavior with one click
+            listView.getCheckModel().toggleCheckState(item);
+        }
     }
 
     private void handleDragDetected(CheckListView<CitationRelationItem> listView, CitationRelationItem item, MouseEvent event) {
