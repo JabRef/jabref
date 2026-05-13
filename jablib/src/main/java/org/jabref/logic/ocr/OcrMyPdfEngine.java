@@ -13,7 +13,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Implementation of the OcrEngine interface using OCRmyPDF.
+/// Implementation of the {@link OcrEngine} interface using OCRmyPDF.
 public class OcrMyPdfEngine implements OcrEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OcrMyPdfEngine.class);

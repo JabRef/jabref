@@ -173,6 +173,7 @@ public enum StandardActions implements Action {
     EDIT_FILE_LINK(Localization.lang("Edit"), IconTheme.JabRefIcons.EDIT, KeyBinding.OPEN_CLOSE_ENTRY_EDITOR),
     DOWNLOAD_FILE(Localization.lang("Download file(s)"), IconTheme.JabRefIcons.DOWNLOAD_FILE),
     REDOWNLOAD_FILE(Localization.lang("Redownload file(s)"), IconTheme.JabRefIcons.DOWNLOAD_FILE),
+    PERFORM_OCR(Localization.lang("Perform OCR and embed text a new PDF file"), KeyBinding.PERFORM_OCR),
     RENAME_FILE_TO_PATTERN(Localization.lang("Rename file to defined pattern"), IconTheme.JabRefIcons.AUTO_RENAME),
     RENAME_FILE_TO_NAME(Localization.lang("Rename file(s) to configured filename format pattern"), IconTheme.JabRefIcons.RENAME, KeyBinding.RENAME_FILE_TO_NAME),
     MOVE_FILE_TO_FOLDER(Localization.lang("Move file(s) to file directory"), IconTheme.JabRefIcons.MOVE_TO_FOLDER),

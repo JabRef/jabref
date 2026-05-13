@@ -297,4 +297,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     public ReadOnlyBooleanProperty fulltextLookupInProgressProperty() {
         return fulltextLookupInProgress;
     }
+
+    public TaskExecutor getTaskExecutor() {
+        return taskExecutor;
+    }
 }
