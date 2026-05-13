@@ -273,7 +273,7 @@ public class OOFrontend {
     }
 
     /// @return A RangeForOverlapCheck for each citation group. result.size() == nRefMarks
-    public List<RangeForOverlapCheck<CitationGroupId>> JStyleCitationRanges(XTextDocument doc)
+    public List<RangeForOverlapCheck<CitationGroupId>> getJStyleCitationRanges(XTextDocument doc)
             throws
             NoDocumentException,
             WrappedTargetException {
@@ -292,7 +292,7 @@ public class OOFrontend {
         return result;
     }
 
-    private List<RangeForOverlapCheck<CitationGroupId>> CSLCitationRanges(XTextDocument doc)
+    private List<RangeForOverlapCheck<CitationGroupId>> getCSLCitationRanges(XTextDocument doc)
             throws
             NoDocumentException,
             WrappedTargetException {
@@ -426,9 +426,9 @@ public class OOFrontend {
 
         List<RangeForOverlapCheck<CitationGroupId>> citationRanges;
         if (style instanceof JStyle) {
-            citationRanges = JStyleCitationRanges(doc);
+            citationRanges = getJStyleCitationRanges(doc);
         } else {
-            citationRanges = CSLCitationRanges(doc);
+            citationRanges = getCSLCitationRanges(doc);
         }
 
         List<RangeForOverlapCheck<CitationGroupId>> ranges = new ArrayList<>();
@@ -461,7 +461,7 @@ public class OOFrontend {
             NoDocumentException,
             WrappedTargetException {
 
-        List<RangeForOverlapCheck<CitationGroupId>> citationRanges = JStyleCitationRanges(doc);
+        List<RangeForOverlapCheck<CitationGroupId>> citationRanges = getJStyleCitationRanges(doc);
         List<RangeForOverlapCheck<CitationGroupId>> ranges = new ArrayList<>();
         ranges.addAll(userRanges);
         ranges.addAll(bibliographyRanges(doc));
