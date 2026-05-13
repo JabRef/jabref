@@ -370,6 +370,10 @@ public class SourceTab extends EntryEditorTab {
             );
         }
 
+        stateManager.getActiveDatabase()
+                    .flatMap(stateManager::getIndexManager)
+                    .ifPresent(indexManager -> indexManager.addToIndex(List.of(outOfFocusEntry)));
+
         validationMessage.setValue(null);
     }
 
