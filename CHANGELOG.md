@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a new data format and property selection feature, enabling users to select one or more field properties for custom fields. [#9840](https://github.com/JabRef/jabref/issues/9840)
 - We fixed a glitch with the sidepane divider position on startup. [#15394](https://github.com/JabRef/jabref/issues/15394)
 - We added a label to the Group dropdown in the Import Dialog. [#15567](https://github.com/JabRef/jabref/issues/15567)
 - We added a related work text extractor, which finds and inserts the related work text into bib entries from references in the texts. [#9840](https://github.com/JabRef/jabref/issues/9840)
@@ -28,6 +29,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "All" option to the citation fetcher combo box, which queries all providers (CrossRef, OpenAlex, OpenCitations, SemanticScholar) and merges the results into a single deduplicated list.
 - We added a quick setting toggle to enable cover images download. [#15322](https://github.com/JabRef/jabref/pull/15322)
 - We now support refreshing existing CSL citations with respect to their in-text nature in the LibreOffice integration. [#15369](https://github.com/JabRef/jabref/pull/15369)
+- We added [SearchRxiv](https://www.cabidigitallibrary.org/journal/searchrxiv) integration to the SLR feature. [#12618](https://github.com/JabRef/jabref/issues/12618)
 - Added context menu entry "Sort tabs alphabetically" to the library tabs. [#15425](https://github.com/JabRef/jabref/pull/15425)
 - We added a "Merge" action in the File menu to compare the current library with a selected BibTeX file and review changes. [#15401](https://github.com/JabRef/jabref/issues/15401)
 - We added integrity checks that warn when the `booktitle` field contains a year, a country/location, or page numbers that should live in dedicated fields. [#12271](https://github.com/JabRef/jabref/issues/12271)
@@ -55,6 +57,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where multiple entries are not cited as a single citation for CSL in-text. [#15703](https://github.com/JabRef/jabref/issues/15703)
 - We fixed an issue where the citation key generator did not show the date for child entries due to orphaned crossref links. [#9071](https://github.com/JabRef/jabref/issues/9071)
 - We fixed an issue with the `Normalize date` save action truncating date ranges. [#8902](https://github.com/JabRef/jabref/issues/8902)
 - We fixed an issue where removed CSL files were not immediately cleared from the UI upon style removal. [#15438](https://github.com/JabRef/jabref/issues/15438)
@@ -102,8 +105,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue for marking a library as modified when "imported entries" group was enabled. [#15610](https://github.com/JabRef/jabref/pull/15610)
 - We fixed an issue where the invisible delete button area was shown for internal CSL styles in the OpenOffice/LibreOffice style selection dialog. External CSL styles remain deletable. [#15397](https://github.com/JabRef/jabref/issues/15397)
 - We fixed an issue that prevented files without a file extension from being shown in various file select dialogs [#11786](https://github.com/JabRef/jabref/issues/11786)
+- We fixed an issue where a warning was printed when the column name was empty. [#15571](https://github.com/JabRef/jabref/issues/15571)
 - We fixed the Hayagriva YAML exporter producing a multi-document YAML file, which broke Typst compilation. [#15617](https://github.com/JabRef/jabref/issues/15617)
 - We fixed security issues where it was possible to execute arbitary commands on the user's machine when the CAYW feature was used in combination with TexShop or Sublime Text [#15628](https://github.com/JabRef/jabref/pull/15628)
+- We fixed the Shared Database Login Dialog by ensuring that fields were required based on the autosave/useSSL preferences. [#15660](https://github.com/JabRef/jabref/issues/15660)
+- We fixed an issue where MonthChecker allowed partial matches for month values. [#15577](https://github.com/JabRef/jabref/issues/15577)
 
 ### Removed
 
