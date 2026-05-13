@@ -1,0 +1,14 @@
+serial-entry:
+  type: article
+  title: Serial Number Test
+  author:
+    - Brown, Bob
+  date: 2022-11-01
+  serial-number:
+    doi: 10.1128/MBio.00033-11
+    pmid: "12345678"
+  parent:
+    type: periodical
+    title: Serial Journal
+    volume: 2
+    issue: 4

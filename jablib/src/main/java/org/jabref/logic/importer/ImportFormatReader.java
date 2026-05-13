@@ -20,6 +20,7 @@ import org.jabref.logic.importer.fileformat.CitaviXmlImporter;
 import org.jabref.logic.importer.fileformat.CopacImporter;
 import org.jabref.logic.importer.fileformat.EndnoteImporter;
 import org.jabref.logic.importer.fileformat.EndnoteXmlImporter;
+import org.jabref.logic.importer.fileformat.HayagrivaYamlImporter;
 import org.jabref.logic.importer.fileformat.InspecImporter;
 import org.jabref.logic.importer.fileformat.IsiImporter;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
@@ -96,6 +97,7 @@ public class ImportFormatReader {
         importers.add(new ReferImporter());
         importers.add(new RisImporter());
         importers.add(new CffImporter(citationKeyPatternPreferences));
+        importers.add(new HayagrivaYamlImporter());
         importers.add(new BiblioscapeImporter());
         importers.add(new CitaviXmlImporter());
 

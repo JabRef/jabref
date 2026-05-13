@@ -1,0 +1,13 @@
+zygos:
+  type: article
+  title: A Test Article
+  author:
+    - Smith, John
+    - Doe, Jane
+  date: 2023-05-01
+  page-range: 1-10
+  parent:
+    type: periodical
+    title: Journal of Testing
+    volume: 5
+    issue: 2

@@ -1,0 +1,22 @@
+article-entry:
+  type: article
+  title: An Article Entry
+  author:
+    - Smith, John
+  date: 2021-03-15
+  doi: 10.1000/test
+  parent:
+    type: periodical
+    title: Testing Journal
+    volume: 3
+    issue: 1
+
+book-entry:
+  type: book
+  title: A Book Entry
+  author:
+    - Jones, Alice
+  date: 2019
+  isbn: 978-3-16-148410-0
+  publisher: Test Publisher
+  location: Berlin
