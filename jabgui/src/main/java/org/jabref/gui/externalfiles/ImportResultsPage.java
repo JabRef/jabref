@@ -53,7 +53,7 @@ public class ImportResultsPage extends WizardPane {
 
         /// Progress pane
         progressPane = new VBox(10);
-        progressPane.setStyle("-fx-alignment: center; -fx-padding: 20;");
+        progressPane.getStyleClass().add("file-selection-progress-pane");
         progressPane.setMaxWidth(Double.MAX_VALUE);
         progressPane.setMaxHeight(Double.MAX_VALUE);
 
@@ -73,7 +73,7 @@ public class ImportResultsPage extends WizardPane {
         contentPane.setPrefSize(550, 450);
 
         summaryLabel = new Label();
-        summaryLabel.setStyle("-fx-font-weight: bold;");
+        summaryLabel.getStyleClass().add("bold");
 
         /// TableView with explicit size constraints
         resultsTable = new TableView<>();
