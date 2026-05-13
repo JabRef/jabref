@@ -588,7 +588,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private void handleItemClick(CitationRelationItem item,
                                  MouseEvent event,
                                  CheckListView<CitationRelationItem> listView,
-                                 CitationComponents citationComponents){
+                                 CitationComponents citationComponents) {
         if (event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
             event.consume();
             listView.getCheckModel().check(item);
