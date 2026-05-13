@@ -1,0 +1,463 @@
+zygos:
+    type: Article
+    author:
+        - Prekas, George
+        - Kogias, Marios
+        - Bugnion, Edouard
+    title:
+        value: "ZygOS: Achieving Low Tail Latency for Microsecond-Scale Networked Tasks"
+        verbatim: true
+    date: 2017
+    page-range: 325-341
+    serial-number:
+        doi: 10.1145/3132747.3132780
+    parent:
+        - type: Proceedings
+          title: Proceedings of the 26th Symposium on Operating Systems Principles
+          publisher: Association for Computing Machinery
+          location: New York, NY, USA
+          serial-number: { isbn: "978-1450350853" }
+
+wwdc-network:
+    type: Article
+    author:  ["Mehta, Jiten", "Kinnear, Eric"]
+    title: Boost Performance and Security with Modern Networking
+    date: 2020-06-26
+    parent:
+        - type: Conference
+          title:
+              value: "{World Wide Developer Conference 2020}"
+              short: WWDC 2020
+          organization: Apple Inc.
+          location: Mountain View, CA
+        - type: Video
+          runtime: "00:13:42"
+          url: { value: https://developer.apple.com/videos/play/wwdc2020/10111/, date: 2020-09-17 }
+
+omarova-libra:
+    type: Article
+    author: ["Omarova, Saule", "Steele, Graham"]
+    title:
+        value: There’s a Lot We Still Don’t Know About Libra
+        sentence-case: There’s a lot we still don’t know about Libra
+    date: 2019-11-04
+    url: https://www.nytimes.com/2019/11/04/opinion/facebook-libra-cryptocurrency.html
+    parent:
+        type: Newspaper
+        title:
+            value: The New York Times
+            verbatim: true
+        location: "New York, NY, USA"
+
+donne:
+    type: Book
+    title: The "Anniversaries" and the "Epicedes and Obsequies"
+    author: Donne, John
+    editor: ["Stringer, Gary A.", "Pebworth, Ted-Larry"]
+    location: Bloomington
+    volume: 6
+    publisher: Indiana University Press
+    date: 1995
+    parent:
+        type: Book
+        title: The Variorum Edition of the Poetry of John Donne
+        editor: Stringer, Gary A.
+
+swedish:
+    type: Article
+    editor: Brown, George C.
+    title:
+        value: "A Swedish Traveller in Early Wisconsin: The Observations of Fredrika Bremer"
+        short: Swedish Traveller
+    volume: 1-2
+    parent:
+        type: Periodical
+        title: Wisconsin Magazine of History
+        volume: 61-62
+        date: 1978
+        edition: 2
+
+harry:
+    type: Chapter
+    page-range: 135-139
+    serial-number: 3
+    parent:
+        title: Harry Potter and the Order of the Phoenix
+        author: Rowling, J. K.
+        volume: 5
+        volume-total: 7
+        serial-number: { isbn: 978-0747551003 }
+        page-total: 768
+        date: ~2003-06-21
+
+science-e-issue:
+    type: Web
+    title: Tokenization of + and - with scientific notation
+    url: https://github.com/typst/typstc/issues/3
+    serial-number: 3
+    author:
+        - name: "Mädje"
+          given-name: "Laurenz"
+          alias: "laurmaedje"
+    date: 2020-07-18
+    parent: 
+        type: Repository
+        title: Typst
+        url: https://github.com/typst/typst
+
+terminator-2:
+    type: Video
+    title: "Terminator 2: Judgment Day"
+    publisher: Carolco Pictures; Pacific Western Productions; Lightstorm Entertainment; Le Studio Canal+ S.A.
+    affiliated:
+        - role: director
+          names: Cameron, James
+        - role: cast-member
+          names: ["Schwarzenegger, Arnold", "Hamilton, Linda", "Patrick, Robert"]
+        - role: composer
+          names: Fiedel, Brad
+    date: 1991-07-01
+    runtime: "137:00"
+    time-range: "17:05-17:48"
+
+interior:
+    type: Video
+    title: "Conspiracy Theories and Interior Design"
+    affiliated:
+        - role: director
+          names: Davidson, Adam
+        - role: writer
+          names: McKenna, Chris
+    date: 2010-11-18
+    runtime: "22:00"
+    volume: 2
+    issue: 9
+    parent:
+        title: Community
+        affiliated:
+            - role: executive-producer
+              names: Harmon, Dan
+        publisher: Universal Television; Sony Pictures Television; Krasnoff Foster Productions; Harmonious Claptrap; Russo Brothers Film
+        volume-total: 6
+
+wire:
+    type: Video
+    title: The wire
+    date: 2002
+    publisher: Blown Deadline Productions
+    volume-total: 5
+    # From Wikipedia, the free encyclopedia: https://en.wikipedia.org/wiki/The_Wire
+    abstract: |
+        The Wire is an American crime drama television series created and
+        primarily written by American author and former police reporter David
+        Simon. The series was broadcast by the cable network HBO in the United
+        States. The Wire premiered on June 2, 2002, and ended on March 9, 2008,
+        comprising sixty episodes over five seasons. The idea for the show
+        started out as a police drama loosely based on the experiences of
+        Simon's writing partner Ed Burns, a former homicide detective and
+        public school teacher.
+    note: The Wire is noted to be solid
+    genre: Drama
+    affiliated:
+        - role: executive-producer
+          names: ["Simon, David", "Colesberry, Robert F.", "Noble, Nina Kostroff"]
+
+kinetics:
+    type: Article
+    title: Kinetics and luminescence of the excitations of a nonequilibrium polariton condensate
+    author: ["Doan, T. D.", "Tran Thoai, D. B.", "Haug, Hartmut"]
+    serial-number:
+        doi: 10.1103/PhysRevB.102.165126
+    page-total: 13
+    page-range: 165126-165139
+    date: 2020-10-14
+    parent:
+        title:
+            value: Physical Review B
+            verbatim: true
+        volume: 102
+        issue: 16
+        publisher: American Physical Society
+
+house:
+    type: Article
+    title: Teaching medicine with the help of "Dr. House"
+    author: ["Jerrentrup, Andreas", "Mueller, Tobias", "Glowalla, Ulrich", "Herder, Meike", "Henrichs, Nadine", "Neubauer, Andreas", "Schaefer, Juergen R."]
+    serial-number:
+        doi: 10.1371/journal.pone.0193972
+        serial: e0193972
+    date: 2018-03-13
+    parent:
+        title:
+            value: PLoS ONE
+            verbatim: true
+        volume: 13
+        issue: 3
+
+plaque:
+    type: Misc
+    title: Informational plaque about Jacoby's 1967 photos
+    publisher: Stiftung Reinbeckhallen
+    location: Berlin, Germany
+    date: 2020
+    parent:
+        type: Artwork
+        date: 1967
+        author: Jacoby, Max
+        parent:
+            type: Anthology
+            title: Bleibtreustraße
+            archive: Landesmuseum Koblenz
+            archive-location: Koblenz, Germany
+
+oiseau:
+    type: Exhibition
+    title: L'oiseau rare, de l'hirondelle au kakapo
+    date: 2020-12-18
+    organization: Musée des Confluences
+    location: Lyon, France
+    url:
+        value: https://www.museedesconfluences.fr/fr/evenements/l%E2%80%99oiseau-rare-de-l%E2%80%99hirondelle-au-kakapo
+        date: 2020-11-04
+
+renaissance:
+    type: Book
+    title:
+        value: Renaissance, Les Déracinés
+        translation: Renaissance, The Unrooted
+    language: fr-FR
+    author: Duval, Fred
+    affiliated:
+        - role: illustrator
+          names: ["Emem", "Blanchard, Fred"]
+    date: 2018
+    publisher: Dargaud
+    edition: 1
+    volume: 1
+    volume-total: 3
+
+gedanken:
+    type: Anthos
+    title: Gedanken-experiments on sequential machines
+    author: Moore, Edward F.
+    page-range: 129-153
+    parent:
+        type: Anthology
+        title: Automata studies
+        editor: ["Shannon, C. E.", "McCarthy, J."]
+        volume: 34
+        date: 1956-04
+        serial-number: { isbn: 978-0-691-07916-5 }
+        location: Princeton, NJ, USA
+        publisher: NBS
+        parent:
+            type: Anthology
+            title: Annals of Mathematics Studies
+
+georgia:
+    type: post
+    author: Silver, Nate
+    title: Trump's claim to have won Georgia is highly dubious. No network has called it. He's only ahead by 2.5 points there, and the outstanding votes are mostly mail votes in very blue counties, likely very Democratic. Biden may even be a slight favorite there.
+    url: https://twitter.com/NateSilver538/status/1323889051037028353
+    date: 2020-11-04
+
+really-habitable:
+    type: Article
+    title: Defining the Really Habitable Zone
+    author: ["Pedbost, Marven F.", "Pomalgu, Trillean", "Lintott, Chris", "Eisner, Nora", "Nicholson, Belinda"]
+    date: 2020
+    serial-number: 2003.13722
+    url: https://arxiv.org/abs/2003.13722
+    parent:
+        type: Repository
+        title: arXiv
+
+electronic-music:
+    type: Web
+    title: Ishkur's Guide to Electronic Music
+    serial-number: v2.5
+    author: Ishkur
+    url: { value: http://www.techno.org/electronic-music-guide/, date: 2020-11-12 }
+
+mattermost:
+    type: Web
+    title: Mattermost Privacy Policy
+    author: Mattermost
+    url:
+        value: https://mattermost.com/privacy-policy/
+        date: 2020-11-29
+    parent:
+        type: Web
+        title: Policies
+
+worth:
+    type: Blog
+    title: Jon Worth Euroblog
+    author: Worth, Jon
+    url: https://jonworth.eu/
+
+wrong:
+    type: Article
+    title: It is fast or it is wrong
+    date: 2018-12-29
+    author: Prokopov, Nikita
+    url: https://tonsky.me/blog/slow-wrong/
+    parent:
+        type: Blog
+        title: tonsky.me
+
+un-hdr:
+    type: Report
+    author: United Nations Development Programme
+    title: Human Development Report 2019
+    location: New York
+    serial-number: { issn: 2412-3129 }
+    url: http://hdr.undp.org/sites/default/files/hdr2019.pdf
+    date: 2019
+
+audio-descriptions:
+    type: Audio
+    title: Audio Descriptions
+    issue: 8
+    date: 2017-02-07
+    author: Barrows, Miellyn Fitzwater
+    affiliated:
+        - names: Taylor, Dallas
+          role: narrator
+    url: https://www.20k.org/episodes/audio
+    parent:
+        type: Audio
+        title: Twenty Thousand Hertz
+        author: Taylor, Dallas
+
+drill:
+    type: Artwork
+    title: Drill
+    author: Steyerl, Hito
+    date: 2019-06-20
+    location: New York
+    organization: Thompson Arts Center
+
+camb:
+    type: Entry
+    title: authoritative
+    url:
+        value: https://dictionary.cambridge.org/dictionary/english/authoritative
+        date: 2020-11-29
+    parent:
+        type: Reference
+        title: Cambridge Dictionary
+
+logician:
+    type: Entry
+    title: Logician
+    serial-number: n10269785
+    url:
+        value: http://image-net.org/api/text/wordnet.structure.hyponym?wnid=n10269785
+        date: 2019-12-02
+    parent:
+        type: Repository
+        title: ImageNet
+        url: http://image-net.org
+
+dns-encryption:
+    type: Reference
+    title: Secret Key Transaction Authentication for DNS
+    serial-number: RFC 2845
+    author: Internet Engineering Task Force
+    url: https://tools.ietf.org/html/rfc2845
+    date: 2000
+
+roe-wade:
+    type: Case
+    title: Roe v. Wade
+    serial-number: 93 S. Ct. 705
+    date: 1973
+
+foia:
+    type: Legislation
+    title: Freedom of Information Act
+    serial-number : Pub. L. No. 107-296, 80 Stat. 250
+    date: 1967
+
+overleaf:
+    type: Article
+    title: Celebrating over five million users, a quarter million daily actives, and over five years of dedicated user support
+    date: 2019-11-08
+    author: John
+    url: https://de.overleaf.com/blog/celebrating-over-five-million-users-and-a-quarter-million-daily-actives
+    parent:
+        type: Blog
+        title: Overleaf Blog
+
+latex-users:
+    type: Article
+    title: How many scholarly articles are written in LaTeX?
+    serial-number:
+        doi: 10.22541/au.148771883.35456290
+    author: Pepe, Alberto
+    date: 2017-02-21
+    parent:
+        type: Repository
+        title: Authorea
+
+editors:
+    type: Artwork
+    title: Types of Editors
+    author: Munroe, Randall
+    date: 2014-03-12
+    url: https://xkcd.com/1341/
+
+barb:
+    type: Book
+    title: Den Boden unter den Füßen verlieren
+    author: Günther-Haug, Barbara
+    date: 2020
+    publisher: MVG
+    location: München
+    language: de-DE
+
+lamb:
+    type: Book
+    title: The life of a friendly lamb
+    author: Kell-Nehrer, Felips
+    date: 2011
+    chapter: 20
+    volume: 10
+    page-range: 22-23
+    tongus: 2
+
+snail:
+    type: Book
+    title: A Snail Study
+    author: Kell-Nehrer, Felips
+    date: 2011
+    chapter: 2A
+    volume: 4B
+    page-range: 28
+
+lamb-chapter:
+    type: Chapter
+    page-range: 10-12
+    chapter: 3
+    parent:
+        type: Book
+        title: The life of a friendly lamb
+        author: Kell-Nehrer, Felips
+        date: 2011
+        chapter: 20
+        volume: 10
+        page-range: 22-23
+        tongus: 2
+
+snail-chapter:
+    type: Chapter
+    page-range: 10-12
+    serial-number: 3
+    parent:
+        type: Book
+        title: A Snail Study
+        author: Kell-Nehrer, Felips
+        date: 2011
+        volume: 4B
+        page-range: 28
