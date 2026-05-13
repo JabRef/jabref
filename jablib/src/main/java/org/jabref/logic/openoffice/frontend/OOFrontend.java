@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.openoffice.ReferenceMark;
 import org.jabref.logic.openoffice.backend.Backend52;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
@@ -300,6 +301,10 @@ public class OOFrontend {
         List<RangeForOverlapCheck<CitationGroupId>> result = new ArrayList<>();
 
         for (String name : UnoReferenceMark.getListOfNames(doc)) {
+            if (!ReferenceMark.isReferenceMarkName(name)) {
+                continue;
+            }
+
             Optional<XTextRange> range = UnoReferenceMark.getAnchor(doc, name);
             if (range.isEmpty()) {
                 continue;
