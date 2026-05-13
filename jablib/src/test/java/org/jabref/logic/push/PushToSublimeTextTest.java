@@ -10,6 +10,8 @@ import org.jabref.logic.util.NotificationService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.mockito.Mockito.mock;
@@ -32,6 +34,7 @@ class PushToSublimeTextTest {
     }
 
     @Test
+    @DisabledOnOs(OS.WINDOWS)
     void getCommandLineEscapingUnix() {
         CitationCommandString maliciousCommand = new CitationCommandString("\\cite{'; touch /tmp/pwned; #", ",", "}");
         when(preferences.getCiteCommand()).thenReturn(maliciousCommand);

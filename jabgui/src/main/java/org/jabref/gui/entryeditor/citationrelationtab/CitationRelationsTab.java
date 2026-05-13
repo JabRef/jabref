@@ -205,7 +205,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         VBox vBox = new VBox();
         vBox.getChildren().add(progressIndicator);
-        vBox.setStyle("-fx-alignment: center;");
+        vBox.getStyleClass().add("align-center");
 
         sciteResultsPane.add(vBox, 0, 0);
 
@@ -225,7 +225,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         vBox.getChildren().add(progressIndicator);
         vBox.getChildren().add(label);
         vBox.setSpacing(2d);
-        vBox.setStyle("-fx-alignment: center;");
+        vBox.getStyleClass().add("align-center");
 
         sciteResultsPane.add(vBox, 0, 0);
 
@@ -247,7 +247,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         hBox.getChildren().add(label);
         hBox.getChildren().add(link);
         hBox.setSpacing(2d);
-        hBox.setStyle("-fx-alignment: center;");
+        hBox.getStyleClass().add("align-center");
 
         sciteResultsPane.add(hBox, 0, 0);
 
@@ -668,7 +668,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     /// @param label       label to style
     /// @param tooltipText tooltip text
     private void styleLabel(Label label, String tooltipText) {
-        label.setStyle("-fx-padding: 5px");
+        label.getStyleClass().add("padding-5px");
         label.setAlignment(Pos.CENTER);
         label.setTooltip(new Tooltip(tooltipText));
         label.setMaxWidth(Double.MAX_VALUE);
@@ -814,7 +814,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         hBox.getChildren().add(label);
         hBox.getChildren().add(link);
         hBox.setSpacing(2d);
-        hBox.setStyle("-fx-alignment: center;");
+        hBox.getStyleClass().add("align-center");
         hBox.setFillHeight(true);
 
         citationComponents.listView().getItems().clear();

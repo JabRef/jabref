@@ -11,6 +11,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.entry.BibEntryTypeBuilder;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.UnknownEntryType;
@@ -55,6 +56,23 @@ public class MetaDataParserTest {
                                 .withType(new UnknownEntryType("test"))
                                 .withRequiredFields(new UnknownField("tEST"), new UnknownField("tEsT2")),
                         "jabref-entrytype: test: req[tEST;tEsT2] opt[]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("person"))
+                                .withRequiredFields(new UnknownField("Name", FieldProperty.PERSON_NAMES))
+                                .withImportantFields(
+                                        new UnknownField("Googlescholar", FieldProperty.EXTERNAL),
+                                        new UnknownField("Orcid", FieldProperty.EXTERNAL)
+                                ),
+                        "jabref-entrytype-v2: person: req[Name|PERSON_NAMES] opt[Googlescholar|EXTERNAL;Orcid|EXTERNAL]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("customizedtype"))
+                                .withRequiredFields(StandardField.TITLE, StandardField.AUTHOR, StandardField.DATE)
+                                .withImportantFields(StandardField.YEAR, StandardField.MONTH, StandardField.PUBLISHER),
+                        "jabref-entrytype-v2: customizedtype: req[title;author;date] opt[year;month;publisher]"
                 )
         );
     }
