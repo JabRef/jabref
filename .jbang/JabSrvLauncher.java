@@ -12,6 +12,14 @@
 // see  https://github.com/gradlex-org/extra-java-module-info/issues/237 why we include e-adr here
 //DEPS io.github.adr:e-adr:2.0.0
 
+// Pin JavaFX 26 to override afterburner.fx 2.0.0's transitive javafx-*:20 (Maven nearest-wins).
+// Required because jabsrv CAYW endpoint calls Platform.startup(); mixing javafx.graphics:20 with
+// javafx.base:26 fails with NoClassDefFoundError: javafx/util/FXPermission (removed in javafx 25+).
+//DEPS org.openjfx:javafx-base:26.0.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-graphics:26.0.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-controls:26.0.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-fxml:26.0.1:${os.detected.jfxname}
+
 // from jabsrv-cli
 //DEPS info.picocli:picocli:4.7.7
 
