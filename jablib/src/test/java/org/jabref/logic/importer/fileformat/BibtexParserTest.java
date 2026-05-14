@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +44,7 @@ import org.jabref.model.entry.Season;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldPriority;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
@@ -66,6 +68,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -1331,6 +1334,63 @@ class BibtexParserTest {
     }
 
     @Test
+    void integrationTestBibEntryTypeReadV2First() throws IOException {
+        ParserResult result = parser.parse(
+                Reader.of("@comment{jabref-entrytype-v2: Customtype: req[title] opt[customfield|VERBATIM]}" + OS.NEWLINE
+                        + "@comment{jabref-entrytype: Customtype: req[title] opt[customfield]}"));
+
+        assertEquals(1, result.getEntryTypes().size());
+        BibEntryType entryType = result.getEntryTypes().iterator().next();
+        Optional<Field> customField = entryType.getOptionalFields().stream()
+                                               .map(BibField::field)
+                                               .filter(field -> "customfield".equalsIgnoreCase(field.getName()))
+                                               .findFirst();
+        assertTrue(customField.isPresent());
+        assertTrue(customField.get().getProperties().contains(FieldProperty.VERBATIM));
+    }
+
+    @Test
+    void integrationTestBibEntryTypeReadV1First() throws IOException {
+        ParserResult result = parser.parse(
+                Reader.of("@comment{jabref-entrytype: Customtype: req[title] opt[customfield]}" + OS.NEWLINE
+                        + "@comment{jabref-entrytype-v2: Customtype: req[title] opt[customfield|VERBATIM]}"));
+
+        assertEquals(1, result.getEntryTypes().size());
+        BibEntryType entryType = result.getEntryTypes().iterator().next();
+        Optional<Field> customField = entryType.getOptionalFields().stream()
+                                               .map(BibField::field)
+                                               .filter(field -> "customfield".equalsIgnoreCase(field.getName()))
+                                               .findFirst();
+        assertEquals(Optional.of(EnumSet.of(FieldProperty.VERBATIM)), customField.map(Field::getProperties));
+    }
+
+    @Test
+    void integrationTestBibEntryTypeV2WithProperties() throws IOException {
+        ParserResult result = parser.parse(
+                Reader.of("@Comment{jabref-entrytype-v2: person: req[Name|PERSON_NAMES] opt[Googlescholar|EXTERNAL;Orcid|EXTERNAL]}"));
+
+        assertEquals(1, result.getEntryTypes().size());
+        BibEntryType entryType = result.getEntryTypes().iterator().next();
+
+        Optional<Field> requiredName = entryType.getRequiredFields().stream()
+                                                .flatMap(orFields -> orFields.getFields().stream())
+                                                .filter(field -> "name".equalsIgnoreCase(field.getName()))
+                                                .findFirst();
+        assertEquals(Optional.of(EnumSet.of(FieldProperty.PERSON_NAMES)), requiredName.map(Field::getProperties));
+
+        Optional<Field> googleScholar = entryType.getOptionalFields().stream()
+                                                 .map(BibField::field)
+                                                 .filter(field -> "googlescholar".equalsIgnoreCase(field.getName()))
+                                                 .findFirst();
+        Optional<Field> orcid = entryType.getOptionalFields().stream()
+                                         .map(BibField::field)
+                                         .filter(field -> "orcid".equalsIgnoreCase(field.getName()))
+                                         .findFirst();
+        assertEquals(Optional.of(EnumSet.of(FieldProperty.EXTERNAL)), googleScholar.map(Field::getProperties));
+        assertEquals(Optional.of(EnumSet.of(FieldProperty.EXTERNAL)), orcid.map(Field::getProperties));
+    }
+
+    @Test
     void integrationTestSaveOrderConfig() throws IOException {
         ParserResult result = parser.parse(
                 Reader.of(
@@ -1810,7 +1870,7 @@ class BibtexParserTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
+    @ValueSource(strings = {
             // single backslash kept
             "C:\\temp\\test",
             "\\\\servername\\path\\to\\file",
