@@ -27,7 +27,6 @@ import org.jabref.model.search.query.SearchQuery;
 
 import com.google.gson.Gson;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -66,14 +65,9 @@ public class LibrariesResource {
     @Path("query")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String query(String requestBody) {
+    public LibraryQueryResponse query(LibraryQueryRequest request) {
         // [impl->req~jabsrv.query.doi~1]
         // [impl->req~jabsrv.query.url~1]
-        LibraryQueryRequest request = gson.fromJson(requestBody, LibraryQueryRequest.class);
-        if (request == null) {
-            throw new BadRequestException("Request body must not be empty");
-        }
-
         List<String> normalizedDois = request.dois().stream()
                                              .flatMap(raw -> DOI.parse(raw).stream())
                                              .map(doi -> doi.asString().toLowerCase(Locale.ROOT))
@@ -81,7 +75,7 @@ public class LibrariesResource {
 
         Optional<String> expression = LibraryQueryExpressionBuilder.build(normalizedDois, request.urls());
         if (expression.isEmpty()) {
-            return gson.toJson(new LibraryQueryResponse(List.of()));
+            return new LibraryQueryResponse(List.of());
         }
 
         SearchQuery searchQuery = new SearchQuery(expression.get(), EnumSet.noneOf(SearchFlags.class));
@@ -97,7 +91,7 @@ public class LibrariesResource {
             }
         }
 
-        return gson.toJson(new LibraryQueryResponse(matches));
+        return new LibraryQueryResponse(matches);
     }
 
     private List<String> openLibraryIds() {

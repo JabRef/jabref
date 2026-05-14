@@ -11,6 +11,8 @@ import org.jabref.http.JabRefSrvStateManager;
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
+import org.jabref.http.dto.GsonMessageBodyReader;
+import org.jabref.http.dto.GsonMessageBodyWriter;
 import org.jabref.http.server.cayw.CAYWResource;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.command.CommandResource;
@@ -132,6 +134,8 @@ public class Server {
         // Supporting classes
         resourceConfig.register(CORSFilter.class);
         resourceConfig.register(GlobalExceptionMapper.class);
+        resourceConfig.register(GsonMessageBodyReader.class);
+        resourceConfig.register(GsonMessageBodyWriter.class);
 
         LOGGER.debug("Starting HTTP server...");
 

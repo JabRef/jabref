@@ -60,6 +60,8 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GlobalExceptionMapper.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonFactory.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonMessageBodyReader.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonMessageBodyWriter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryMatch.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryRequest.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryResponse.java
