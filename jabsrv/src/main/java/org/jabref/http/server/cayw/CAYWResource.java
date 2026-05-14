@@ -261,8 +261,8 @@ public class CAYWResource {
             LOGGER.error("Could not initialize JavaFX runtime for CAYW resource.", e);
             throw new WebApplicationException(
                     Response.status(Response.Status.SERVICE_UNAVAILABLE)
-                           .entity("CAYW unavailable: JavaFX runtime could not be initialized (" + e.getClass().getName() + ": " + e.getMessage() + "). The CAYW endpoint requires a working, version-consistent JavaFX runtime on the module path.")
-                           .build());
+                            .entity("CAYW unavailable: JavaFX runtime could not be initialized (" + e.getClass().getName() + ": " + e.getMessage() + "). The CAYW endpoint requires a working, version-consistent JavaFX runtime on the module path.")
+                            .build());
         }
         try {
             latch.await();
