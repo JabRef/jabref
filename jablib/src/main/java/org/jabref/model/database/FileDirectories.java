@@ -4,10 +4,23 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// Holds the configured file directories in a fixed order.
 @NullMarked
-public record FileDirectories(Optional<Path> userDirectory,
-                              Optional<Path> libraryDirectory,
-                              Optional<Path> fallbackDirectory) {
+public record FileDirectories(@Nullable Path userDirectory,
+                              @Nullable Path libraryDirectory,
+                              @Nullable Path fallbackDirectory) {
+
+    public Optional<Path> getUserDirectory() {
+        return Optional.ofNullable(userDirectory);
+    }
+
+    public Optional<Path> getLibraryDirectory() {
+        return Optional.ofNullable(libraryDirectory);
+    }
+
+    public Optional<Path> getFallbackDirectory() {
+        return Optional.ofNullable(fallbackDirectory);
+    }
 }

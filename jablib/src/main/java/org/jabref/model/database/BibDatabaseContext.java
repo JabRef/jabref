@@ -166,9 +166,9 @@ public class BibDatabaseContext {
         SequencedSet<Path> result = new LinkedHashSet<>();
         FileDirectories directories = getAllFileDirectories(preferences);
 
-        directories.userDirectory().ifPresent(result::add);
-        directories.libraryDirectory().ifPresent(result::add);
-        directories.fallbackDirectory().ifPresent(result::add);
+        directories.getUserDirectory().ifPresent(result::add);
+        directories.getLibraryDirectory().ifPresent(result::add);
+        directories.getFallbackDirectory().ifPresent(result::add);
 
         return new ArrayList<>(result);
     }
@@ -183,16 +183,16 @@ public class BibDatabaseContext {
     /// @param preferences The file directory preferences
     /// @return fixed-size record containing absolute paths (if configured)
     public FileDirectories getAllFileDirectories(FilePreferences preferences) {
-        Optional<Path> userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(this::getFileDirectoryPath);
-        Optional<Path> librarySpecificFileDirectory = metaData.getLibrarySpecificFileDirectory().map(this::getFileDirectoryPath);
+        Path userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(this::getFileDirectoryPath).orElse(null);
+        Path librarySpecificFileDirectory = metaData.getLibrarySpecificFileDirectory().map(this::getFileDirectoryPath).orElse(null);
 
-        Optional<Path> bibOrMainFileDirectory;
+        Path bibOrMainFileDirectory;
 
         // BIB file directory or Main file directory (according to (global) preferences)
         if (preferences.shouldStoreFilesRelativeToBibFile()) {
-            bibOrMainFileDirectory = getDatabaseDirectory();
+            bibOrMainFileDirectory = getDatabaseDirectory().orElse(null);
         } else {
-            bibOrMainFileDirectory = preferences.getMainFileDirectory();
+            bibOrMainFileDirectory = preferences.getMainFileDirectory().orElse(null);
         }
 
         return new FileDirectories(

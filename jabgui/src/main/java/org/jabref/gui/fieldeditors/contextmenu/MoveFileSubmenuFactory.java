@@ -52,12 +52,12 @@ class MoveFileSubmenuFactory {
         ));
         menu.getItems().add(createItem(
                 Localization.lang("Library-specific file directory"),
-                fileDirectories.libraryDirectory(),
+                fileDirectories.getLibraryDirectory(),
                 selectedFiles
         ));
         menu.getItems().add(createItem(
                 Localization.lang("User-specific file directory"),
-                fileDirectories.userDirectory(),
+                fileDirectories.getUserDirectory(),
                 selectedFiles
         ));
         menu.getItems().add(createItem(
@@ -86,14 +86,14 @@ class MoveFileSubmenuFactory {
         ));
         menu.getItems().add(createItem(
                 Localization.lang("Library-specific file directory"),
-                fileDirectories.libraryDirectory(),
+                fileDirectories.getLibraryDirectory(),
                 linkedFileViewModel,
                 action,
                 renameAfterMove
         ));
         menu.getItems().add(createItem(
                 Localization.lang("User-specific file directory"),
-                fileDirectories.userDirectory(),
+                fileDirectories.getUserDirectory(),
                 linkedFileViewModel,
                 action,
                 renameAfterMove
