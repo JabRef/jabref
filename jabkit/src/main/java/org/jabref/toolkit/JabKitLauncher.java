@@ -77,6 +77,7 @@ public class JabKitLauncher {
 
             JabKit jabKit = new JabKit(preferences, entryTypesManager);
             CommandLine commandLine = new CommandLine(jabKit);
+            // [impl->req~jabkit.cli.banner-shown~1]
             String usageHeader = BuildInfo.JABREF_BANNER.formatted(buildInfo.version) + "\n" + JABKIT_BRAND;
             commandLine.getCommandSpec().usageMessage().header(usageHeader);
             applyUsageFooters(commandLine,

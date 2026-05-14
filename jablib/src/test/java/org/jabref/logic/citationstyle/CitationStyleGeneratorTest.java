@@ -36,6 +36,7 @@ class CitationStyleGeneratorTest {
     private static final BibEntryTypesManager ENTRY_TYPES_MANAGER = new BibEntryTypesManager();
 
     private final BibEntry testEntry = TestEntry.getTestEntry();
+    private final BibEntry testEntry2 = TestEntry.getTestEntryBook();
     private final BibDatabaseContext testEntryContext = new BibDatabaseContext(new BibDatabase(List.of(testEntry)));
 
     @Test
@@ -63,10 +64,22 @@ class CitationStyleGeneratorTest {
     @Test
     void aPACitation() {
         testEntryContext.setMode(BibDatabaseMode.BIBLATEX);
-        CitationStyle style = STYLE_LIST.stream().filter(e -> "ACM SIGGRAPH".equals(e.getTitle())).findAny().get();
+        CitationStyle style = STYLE_LIST.stream().filter(e -> "APA Style 7th edition".equals(e.getTitle())).findAny().get();
         String citation = CitationStyleGenerator.generateCitation(List.of(testEntry), style.getSource(), HTML_OUTPUT_FORMAT, testEntryContext, ENTRY_TYPES_MANAGER);
 
-        String expected = "[Smith et al. 2016]";
+        String expected = "(Smith et al., 2016)";
+
+        assertEquals(expected, citation);
+    }
+
+    @Test
+    void aPACitation2AuthorsCombined() {
+        BibDatabaseContext testEntryContextTwoAuthors = new BibDatabaseContext(new BibDatabase(List.of(testEntry, testEntry2)));
+        testEntryContextTwoAuthors.setMode(BibDatabaseMode.BIBLATEX);
+        CitationStyle style = STYLE_LIST.stream().filter(e -> "APA Style 7th edition".equals(e.getTitle())).findAny().get();
+        String citation = CitationStyleGenerator.generateCitation(List.of(testEntry, testEntry2), style.getSource(), HTML_OUTPUT_FORMAT, testEntryContextTwoAuthors, ENTRY_TYPES_MANAGER);
+
+        String expected = "(Harrer et al., 2018; Smith et al., 2016)";
 
         assertEquals(expected, citation);
     }
