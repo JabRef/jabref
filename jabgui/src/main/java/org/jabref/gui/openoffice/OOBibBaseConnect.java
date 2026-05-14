@@ -24,6 +24,7 @@ import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XEnumeration;
 import com.sun.star.container.XEnumerationAccess;
 import com.sun.star.frame.XDesktop;
+import com.sun.star.lang.DisposedException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
@@ -187,8 +188,10 @@ public class OOBibBaseConnect {
 
             this.xTextDocument = selected;
             return OOVoidResult.ok();
+        } catch (DisposedException e) {
+            return OOVoidResult.error(OOError.from(e).setTitle(Localization.lang("Problem connecting")));
         } catch (NoSuchElementException | WrappedTargetException e) {
-            return OOVoidResult.error(OOError.fromMisc(e));
+            return OOVoidResult.error(OOError.fromMisc(e).setTitle(Localization.lang("Problem connecting")));
         }
     }
 
