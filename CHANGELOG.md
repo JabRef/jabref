@@ -7,6 +7,12 @@ In case there is no issue present, the pull request implementing the feature is 
 
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- We added `POST /libraries/query` to the HTTP server to search for entries by DOI or URL across all open libraries in a single request. [#15599](https://github.com/JabRef/jabref/pull/15599)
+
 ## [6.0-alpha.6] – 2026-05-14
 
 ### Added
@@ -34,7 +40,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Added context menu entry "Sort tabs alphabetically" to the library tabs. [#15425](https://github.com/JabRef/jabref/pull/15425)
 - We added a "Merge" action in the File menu to compare the current library with a selected BibTeX file and review changes. [#15401](https://github.com/JabRef/jabref/issues/15401)
 - We added integrity checks that warn when the `booktitle` field contains a year, a country/location, or page numbers that should live in dedicated fields. [#12271](https://github.com/JabRef/jabref/issues/12271)
-- We added `POST /libraries/query` to the HTTP server to search for entries by DOI or URL across all open libraries in a single request. [#15599](https://github.com/JabRef/jabref/pull/15599)
 
 ### Changed
 
