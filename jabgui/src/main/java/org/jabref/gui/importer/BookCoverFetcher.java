@@ -62,7 +62,7 @@ public class BookCoverFetcher {
         final String name = "isbn-" + isbn.asString();
         if (findExistingImage(name, directory).isEmpty()) {
             Optional<Duration> timeSincePreviousAttempt = timeSincePreviousAttempt(name, directory);
-            if (!timeSincePreviousAttempt.isEmpty() && timeSincePreviousAttempt.get().toHours() < IMAGE_DOWNLOAD_COOLDOWN_HOURS) {
+            if (timeSincePreviousAttempt.isPresent() && timeSincePreviousAttempt.get().toHours() < IMAGE_DOWNLOAD_COOLDOWN_HOURS) {
                 LOGGER.info("Skipped download attempt for {}, attempted less than 24 hours ago", name);
                 return;
             }
