@@ -7,11 +7,12 @@ In case there is no issue present, the pull request implementing the feature is 
 
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [6.0-alpha.6] – 2026-05-14
 
 ### Added
 
 - We added support for selecting answer engines and summarization algorithms, allowing users to change the underlying AI behavior. [#15688](https://github.com/JabRef/jabref/pull/15688)
+- Book covers now download automatically when you open an entry with an ISBN. [#14848](https://github.com/JabRef/jabref/issues/14848)
 - We added a new data format and property selection feature, enabling users to select one or more field properties for custom fields. [#9840](https://github.com/JabRef/jabref/issues/9840)
 - We fixed a glitch with the sidepane divider position on startup. [#15394](https://github.com/JabRef/jabref/issues/15394)
 - We added a label to the Group dropdown in the Import Dialog. [#15567](https://github.com/JabRef/jabref/issues/15567)
@@ -57,6 +58,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue in the LibreOffice integration where the user could insert a CSL citation inside an existing one. [#15701](https://github.com/JabRef/jabref/issues/15701)
 - We fixed an issue where multiple entries are not cited as a single citation for CSL in-text. [#15703](https://github.com/JabRef/jabref/issues/15703)
 - We fixed an issue where the citation key generator did not show the date for child entries due to orphaned crossref links. [#9071](https://github.com/JabRef/jabref/issues/9071)
 - We fixed an issue with the `Normalize date` save action truncating date ranges. [#8902](https://github.com/JabRef/jabref/issues/8902)
@@ -2008,9 +2010,9 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v6.0-alpha.5...HEAD
-[6.0-alpha.5]: https://github.com/JabRef/jabref/compare/v6.0-alpha.4...HEAD
-[6.0-alpha.4]: https://github.com/JabRef/jabref/compare/v6.0-alpha.3...HEAD
+[6.0-alpha.6]: https://github.com/JabRef/jabref/compare/v6.0-alpha.5...v6.0-alpha.6
+[6.0-alpha.5]: https://github.com/JabRef/jabref/compare/v6.0-alpha.4...v6.0-alpha.5
+[6.0-alpha.4]: https://github.com/JabRef/jabref/compare/v6.0-alpha.3...v6.0-alpha.4
 [6.0-alpha.3]: https://github.com/JabRef/jabref/compare/v6.0-alpha2...v6.0-alpha.3
 [6.0-alpha2]: https://github.com/JabRef/jabref/compare/v6.0-alpha...v6.0-alpha2
 [6.0-alpha]: https://github.com/JabRef/jabref/compare/v5.15...v6.0-alpha

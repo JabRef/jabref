@@ -30,8 +30,8 @@
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.26.0
 //DEPS org.bouncycastle:bcprov-jdk18on:1.84
 //DEPS org.postgresql:postgresql:42.7.11
-//DEPS org.slf4j:slf4j-api:2.0.17
-//DEPS org.slf4j:jul-to-slf4j:2.0.17
+//DEPS org.slf4j:slf4j-api:2.0.18
+//DEPS org.slf4j:jul-to-slf4j:2.0.18
 //DEPS org.tinylog:slf4j-tinylog:2.7.0
 //DEPS org.tinylog:tinylog-impl:2.7.0
 //DEPS org.glassfish.grizzly:grizzly-framework:5.0.1

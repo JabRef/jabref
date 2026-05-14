@@ -41,20 +41,6 @@ jobs:
           name: pr_number
           path: pr_number.txt
 
-  checkstyle:
-    name: Checkstyle
-    # too slow on ubuntu-slim
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v6
-        with:
-          submodules: 'true'
-          show-progress: 'false'
-      - uses: ./.github/actions/setup-gradle
-      - name: Run checkstyle using gradle
-        run: gradle checkstyleMain checkstyleTest checkstyleJmh
-
   dependencyscopes:
     name: Dependency Scopes
     # too slow on ubuntu-slim
@@ -68,27 +54,6 @@ jobs:
       - uses: ./.github/actions/setup-gradle
       - name: Run checkAllModuleInfo using gradle
         run: gradle checkAllModuleInfo
-
-  openrewrite:
-    name: OpenRewrite
-    # too slow on ubuntu-slim
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v6
-        with:
-          submodules: 'true'
-          show-progress: 'false'
-      - uses: ./.github/actions/setup-gradle
-      - name: Run OpenRewrite
-        run: |
-          gradle --no-configuration-cache :rewriteRun
-
-      # Reformat code (because OpenRewrite does different indents)
-      - uses: ./.github/actions/format-java
-
-      - name: Fail if working directory is unclean
-        run: git diff --exit-code
 
   format:
     # ubuntu-slim doesn't offer docker
@@ -124,6 +89,43 @@ jobs:
         run: |
           cd jabref
           git diff --exit-code
+
+  checkstyle:
+    name: Checkstyle
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
+    needs: format
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
+      - name: Run checkstyle using gradle
+        run: gradle checkstyleMain checkstyleTest checkstyleJmh
+
+  openrewrite:
+    name: OpenRewrite
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
+    needs: checkstyle
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
+      - name: Run OpenRewrite
+        run: |
+          gradle --no-configuration-cache :rewriteRun
+
+      # Reformat code (because OpenRewrite does different indents)
+      - uses: ./.github/actions/format-java
+
+      - name: Fail if working directory is unclean
+        run: git diff --exit-code
 
   modernizer:
     name: Modernizer
