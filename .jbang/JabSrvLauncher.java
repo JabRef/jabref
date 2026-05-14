@@ -52,6 +52,9 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GlobalExceptionMapper.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonFactory.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryMatch.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryRequest.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryResponse.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LinkedPdfFileDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabrefMediaType.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabRefSrvStateManager.java
@@ -86,9 +89,18 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/MapResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/RootResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/FilesToServe.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/LibraryQueryExpressionBuilder.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ServerUtils.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
+
+// new jablib sources not yet in the 6.0-SNAPSHOT artifact
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/LibrarySearcher.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/SearchBackend.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/SearchContext.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/inmemory/BibEntryMatchVisitor.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/inmemory/InMemoryLibrarySearcher.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/inmemory/InMemorySearchBackend.java
 
 //FILES tinylog.properties=../jabsrv-cli/src/main/resources/tinylog.properties
 
