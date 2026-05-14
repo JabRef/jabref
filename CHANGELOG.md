@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added `POST /libraries/query` to the HTTP server to search for entries by DOI or URL across all open libraries in a single request. [#15599](https://github.com/JabRef/jabref/pull/15599)
+
 ### Changed
 
 ### Fixed
