@@ -163,14 +163,19 @@ public class BibDatabaseContext {
     /// @param preferences The fileDirectory preferences
     /// @return List of existing absolute paths
     public List<Path> getFileDirectories(FilePreferences preferences) {
-        SequencedSet<Path> result = new LinkedHashSet<>();
+        SequencedSet<Path> fileDirs = new LinkedHashSet<>();
         FileDirectories directories = getAllFileDirectories(preferences);
 
-        directories.getUserDirectory().ifPresent(result::add);
-        directories.getLibraryDirectory().ifPresent(result::add);
-        directories.getFallbackDirectory().ifPresent(result::add);
+        directories.getUserDirectory().ifPresent(fileDirs::add);
+        directories.getLibraryDirectory().ifPresent(fileDirs::add);
 
-        return new ArrayList<>(result);
+        // fileDirs.isEmpty() is true after these two if there are no directories set in the BIB file itself:
+        // 1) no user-specific file directory set (in the metadata of the bib file) and
+        // 2) no library-specific file directory is set (in the metadata of the bib file)
+
+        directories.getFallbackDirectory().ifPresent(fileDirs::add);
+
+        return new ArrayList<>(fileDirs);
     }
 
     /// Look up all configured file directories of this database.

@@ -61,7 +61,7 @@ class MoveFileSubmenuFactory {
                 selectedFiles
         ));
         menu.getItems().add(createItem(
-                Localization.lang("Next to library"),
+                Localization.lang("Next to library file"),
                 databaseContext.getDatabaseDirectory(),
                 selectedFiles
         ));
@@ -99,7 +99,7 @@ class MoveFileSubmenuFactory {
                 renameAfterMove
         ));
         menu.getItems().add(createItem(
-                Localization.lang("Next to library"),
+                Localization.lang("Next to library file"),
                 databaseContext.getDatabaseDirectory(),
                 linkedFileViewModel,
                 action,
