@@ -18,6 +18,7 @@ import org.jabref.model.search.query.SearchResults;
 public interface SearchBackend {
 
     /// Run the query against this backend.
+    ///
     /// @return a [SearchResults] capturing matched-entry membership and (if supported) fulltext hits.
     SearchResults search(SearchQuery query);
 
