@@ -877,7 +877,7 @@ public class OOBibBase {
     /// @param doc           Text document.
     /// @param fcursor       Used to synchronize document.
     private OOVoidResult<OOError> updateCSLBibliography(List<BibDatabase> databases, CitationStyle citationStyle, XTextDocument doc,
-                                                         OOResult<FunctionalTextViewCursor, OOError> fcursor, String errorTitle) {
+                                                        OOResult<FunctionalTextViewCursor, OOError> fcursor, String errorTitle) {
         try {
             UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
 
