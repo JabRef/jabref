@@ -40,7 +40,6 @@ public class EditMerge {
 
     /// @return true if modified document
     public static OOResult<Boolean, JabRefException> mergeCitationGroups(XTextDocument doc, OOFrontend frontend, JStyle style) {
-
         try {
             boolean madeModifications;
 

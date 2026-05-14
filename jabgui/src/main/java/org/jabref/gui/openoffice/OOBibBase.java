@@ -49,7 +49,6 @@ import org.jabref.model.openoffice.util.OOVoidResult;
 import com.airhacks.afterburner.injection.Injector;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
-import com.sun.star.lang.DisposedException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
