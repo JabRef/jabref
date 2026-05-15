@@ -43,6 +43,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -235,25 +236,40 @@ public class CAYWResource {
 
     private synchronized void initializeGUI() {
         // TODO: Implement a better way to handle the window popup since this is a bit hacky.
-        if (!initialized) {
-            if (!(srvStateManager instanceof JabRefSrvStateManager)) {
-                LOGGER.debug("Running inside JabRef UI, no need to initialize JavaFX for CAYW resource.");
-                initialized = true;
-                return;
-            }
-            LOGGER.debug("Initializing JavaFX for CAYW resource.");
-            CountDownLatch latch = new CountDownLatch(1);
+        if (initialized) {
+            return;
+        }
+        if (!(srvStateManager instanceof JabRefSrvStateManager)) {
+            LOGGER.debug("Running inside JabRef UI, no need to initialize JavaFX for CAYW resource.");
+            initialized = true;
+            return;
+        }
+        LOGGER.debug("Initializing JavaFX for CAYW resource.");
+        CountDownLatch latch = new CountDownLatch(1);
+        try {
             Platform.startup(() -> {
                 Platform.setImplicitExit(false);
-                initialized = true;
                 latch.countDown();
             });
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException("JavaFX initialization interrupted", e);
-            }
+        } catch (IllegalStateException alreadyInitialized) {
+            LOGGER.debug("JavaFX runtime already initialized.", alreadyInitialized);
+            initialized = true;
+            return;
+        } catch (Throwable e) {
+            // Catches NoClassDefFoundError/UnsatisfiedLinkError when the JavaFX runtime is missing or version-mismatched
+            // (e.g., javafx.graphics from an older version paired with a newer javafx.base where javafx.util.FXPermission was removed).
+            LOGGER.error("Could not initialize JavaFX runtime for CAYW resource.", e);
+            throw new WebApplicationException(
+                    Response.status(Response.Status.SERVICE_UNAVAILABLE)
+                            .entity("CAYW unavailable: JavaFX runtime could not be initialized (" + e.getClass().getName() + ": " + e.getMessage() + "). The CAYW endpoint requires a working, version-consistent JavaFX runtime on the module path.")
+                            .build());
+        }
+        try {
+            latch.await();
+            initialized = true;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("JavaFX initialization interrupted", e);
         }
     }
 
