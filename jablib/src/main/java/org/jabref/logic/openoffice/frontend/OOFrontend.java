@@ -9,7 +9,10 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.openoffice.ReferenceMark;
 import org.jabref.logic.openoffice.backend.Backend52;
+import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.model.openoffice.CitationEntry;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.rangesort.FunctionalTextViewCursor;
@@ -28,6 +31,7 @@ import org.jabref.model.openoffice.style.OODataModel;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoCursor;
+import org.jabref.model.openoffice.uno.UnoReferenceMark;
 import org.jabref.model.openoffice.uno.UnoTextRange;
 import org.jabref.model.openoffice.util.OOListUtil;
 import org.jabref.model.openoffice.util.OOVoidResult;
@@ -270,7 +274,7 @@ public class OOFrontend {
     }
 
     /// @return A RangeForOverlapCheck for each citation group. result.size() == nRefMarks
-    public List<RangeForOverlapCheck<CitationGroupId>> citationRanges(XTextDocument doc)
+    public List<RangeForOverlapCheck<CitationGroupId>> getJStyleCitationRanges(XTextDocument doc)
             throws
             NoDocumentException,
             WrappedTargetException {
@@ -280,12 +284,40 @@ public class OOFrontend {
 
         for (CitationGroup group : citationGroups.getCitationGroupsUnordered()) {
             XTextRange range = this.getMarkRange(doc, group).orElseThrow(IllegalStateException::new);
-            String description = group.groupId.citationGroupIdAsString();
+            String description = range.getString();
             result.add(new RangeForOverlapCheck<>(range,
                     group.groupId,
                     RangeForOverlapCheck.REFERENCE_MARK_KIND,
                     description));
         }
+        return result;
+    }
+
+    private List<RangeForOverlapCheck<CitationGroupId>> getCSLCitationRanges(XTextDocument doc)
+            throws
+            NoDocumentException,
+            WrappedTargetException {
+
+        List<RangeForOverlapCheck<CitationGroupId>> result = new ArrayList<>();
+
+        for (String name : UnoReferenceMark.getListOfNames(doc)) {
+            if (!ReferenceMark.isReferenceMarkName(name)) {
+                continue;
+            }
+
+            Optional<XTextRange> range = UnoReferenceMark.getAnchor(doc, name);
+            if (range.isEmpty()) {
+                continue;
+            }
+
+            XTextRange textRange = range.get();
+            String description = textRange.getString();
+            result.add(new RangeForOverlapCheck<>(textRange,
+                    new CitationGroupId(name),
+                    RangeForOverlapCheck.REFERENCE_MARK_KIND,
+                    description));
+        }
+
         return result;
     }
 
@@ -391,12 +423,19 @@ public class OOFrontend {
     public OOVoidResult<JabRefException>
     checkRangeOverlapsWithCursor(XTextDocument doc,
                                  List<RangeForOverlapCheck<CitationGroupId>> userRanges,
-                                 boolean requireSeparation)
+                                 boolean requireSeparation,
+                                 OOStyle style)
             throws
             NoDocumentException,
             WrappedTargetException {
 
-        List<RangeForOverlapCheck<CitationGroupId>> citationRanges = citationRanges(doc);
+        List<RangeForOverlapCheck<CitationGroupId>> citationRanges;
+        if (style instanceof JStyle) {
+            citationRanges = getJStyleCitationRanges(doc);
+        } else {
+            citationRanges = getCSLCitationRanges(doc);
+        }
+
         List<RangeForOverlapCheck<CitationGroupId>> ranges = new ArrayList<>();
 
         // ranges.addAll(userRanges);
@@ -427,7 +466,7 @@ public class OOFrontend {
             NoDocumentException,
             WrappedTargetException {
 
-        List<RangeForOverlapCheck<CitationGroupId>> citationRanges = citationRanges(doc);
+        List<RangeForOverlapCheck<CitationGroupId>> citationRanges = getJStyleCitationRanges(doc);
         List<RangeForOverlapCheck<CitationGroupId>> ranges = new ArrayList<>();
         ranges.addAll(userRanges);
         ranges.addAll(bibliographyRanges(doc));
