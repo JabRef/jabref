@@ -72,7 +72,7 @@ Agents **must not**:
 - Introduce new dependencies without justification
 - Rewrite large sections “for cleanliness”
 - Bypass tests or CI checks
-- Reformat code
+- Reformat existing code
 - Write entire PRs
 - Write replies to PR review comments
 - Submit code the contributor doesn't understand
@@ -98,7 +98,7 @@ Agents **must not**:
 
 ### General Java style
 
-- Follow existing formatting; do not reformat unrelated code
+- Follow existing formatting
 - Match naming conventions exactly
 - Keep methods small and focused
 - New methods (and new classes) should follow the Single-responsibility principle (SRP).
@@ -335,6 +335,11 @@ If a change cannot be reasonably tested, explain **why**.
 npx markdownlint-cli2 "docs/**/*.md"
 npx markdownlint-cli2 "*.md"
 ```
+
+### Fix formatting issues
+
+- Run `./gradlew rewriteRun` to fix Java formatting issues.
+- Run `docker run -v $pwd:/github/workspace ghcr.io/leventebajczi/intellij-format:master "*.java" "" ".idea/codeStyles/Project.xml"` to fix more Java formatting issues.
 
 ### Logic tests
 
