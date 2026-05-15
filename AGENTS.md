@@ -16,6 +16,8 @@ This document defines rules and expectations for **automated agents** (AI tools,
 
 JabRef is an open-source, research-grade reference manager with high standards for correctness, reproducibility, and maintainability.
 
+After a code change, go through each point of `CHECLIST.md` and ensure that all points are fulfilled. If not, fix the code until all points are fulfilled. Do not skip any point of the checklist.
+
 ---
 
 ## Human Guidance
@@ -45,7 +47,7 @@ Key source paths:
 
 ## Build
 
-Requires JDK 17 or later to run Gradle. Gradle downloads the necessary JDK by itself. The Gradle wrapper is included.
+Requires JDK 25 or later to run Gradle. Gradle downloads the necessary JDK by itself. The Gradle wrapper is included.
 
 ```bash
 ./gradlew build              # Build all modules
@@ -84,9 +86,9 @@ Agents **must not**:
 ### Java / JVM
 
 - Target the configured **Gradle toolchain**
-- Use **Java 24+ features**
+- Use **Java 25+ features**
   - Use modern Java best practices, such as Arguments.of() instead of new Object[] especially in JUnit tests or Path.of() instead of Paths.get(), to improve readability and maintainability.
-    Using JavaFX Obersvable lists is considered best practice, too.
+    Using JavaFX Observable lists is considered best practice, too.
   - Use modern Java data structures
     BAD: new HashSet<>(Arrays.asList(...))
     GOOD: Set.of(...)
@@ -136,7 +138,7 @@ Example for trivial comments (to be avoided):
 
 ```java
 // Commit the staged changes
-RevCommit commit = git.commit()
+RevCommit commit = git.commit();
 fieldName = fieldName.trim().toLowerCase(); // Trim and convert to lower case
 ```
 
@@ -431,7 +433,7 @@ PR descriptions:
 - Must explain **intent**, not implementation trivia.
 - AI-disclosure
 - The pull request title should contain a short title of the issue fixed (or what the PR adresses) and not just \"Fix issue xyz\"
-- The \"Mandatory checks\" are Markdown TODOs. They should be formatted as that. Wrong: `- [ x]`. Either `- [ ]` or `- [x]`.
+- The \"Mandatory checks\" are Markdown TODOs. They should be formatted as that. Wrong: `- [ x]`. Either `- [ ]`, `- [x]`, or `- [/]`.
 
 ---
 
