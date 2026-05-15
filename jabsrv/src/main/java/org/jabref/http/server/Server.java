@@ -68,7 +68,7 @@ public class Server {
         FilesToServe filesToServe = new FilesToServe();
         filesToServe.setFilesToServe(filesToServeList);
 
-        SrvStateManager srvStateManager = new JabRefSrvStateManager();
+        SrvStateManager srvStateManager = new JabRefSrvStateManager(preferences);
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);

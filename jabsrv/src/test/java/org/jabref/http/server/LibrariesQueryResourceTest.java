@@ -115,6 +115,29 @@ class LibrariesQueryResourceTest extends ServerTest {
     }
 
     @Test
+    void freeTextQueryReturnsEntryWithoutDoiOrUrl() {
+        String body = """
+                {"query": "author = \\"Test Author\\""}""";
+        String result = target("/libraries/query")
+                .request(MediaType.APPLICATION_JSON)
+                .post(Entity.json(body), String.class);
+        String expected = """
+                {
+                  "matches": [
+                    {
+                      "libraryId": "%s",
+                      "entryId": "doi2023entry"
+                    },
+                    {
+                      "libraryId": "%s",
+                      "entryId": "url2023entry"
+                    }
+                  ]
+                }""".formatted(TestBibFile.GENERAL_SERVER_TEST.id, TestBibFile.GENERAL_SERVER_TEST.id);
+        assertEquals(expected, result);
+    }
+
+    @Test
     void doiNormalisationStripsHttpsPrefix() {
         // [utest->req~jabsrv.query.doi~1]
         String body = """

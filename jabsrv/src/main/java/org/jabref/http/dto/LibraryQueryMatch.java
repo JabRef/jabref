@@ -12,4 +12,8 @@ public record LibraryQueryMatch(@Nullable String doi, @Nullable String url, Stri
     public static LibraryQueryMatch forUrl(String url, String libraryId, String entryId) {
         return new LibraryQueryMatch(null, url, libraryId, entryId);
     }
+
+    public static LibraryQueryMatch forEntry(String libraryId, String entryId) {
+        return new LibraryQueryMatch(null, null, libraryId, entryId);
+    }
 }

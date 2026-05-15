@@ -16,14 +16,16 @@ import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.LibraryQueryExpressionBuilder;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.search.inmemory.InMemoryLibrarySearcher;
+import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.io.BackupFileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.search.query.SearchResults;
 
 import com.google.gson.Gson;
 import jakarta.inject.Inject;
@@ -66,14 +68,20 @@ public class LibrariesResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public LibraryQueryResponse query(LibraryQueryRequest request) {
+        boolean freeText = !StringUtil.isBlank(request.query());
+
         // [impl->req~jabsrv.query.doi~1]
-        // [impl->req~jabsrv.query.url~1]
         List<String> normalizedDois = request.dois().stream()
                                              .flatMap(raw -> DOI.parse(raw).stream())
                                              .map(doi -> doi.asString().toLowerCase(Locale.ROOT))
                                              .toList();
 
-        Optional<String> expression = LibraryQueryExpressionBuilder.build(normalizedDois, request.urls());
+        // [impl->req~jabsrv.query.url~1]
+        List<String> urls = request.urls();
+
+        Optional<String> expression = freeText
+                                      ? Optional.of(request.query())
+                                      : LibraryQueryExpressionBuilder.build(normalizedDois, urls);
         if (expression.isEmpty()) {
             return new LibraryQueryResponse(List.of());
         }
@@ -84,14 +92,33 @@ public class LibrariesResource {
         for (String libraryId : openLibraryIds()) {
             try {
                 BibDatabaseContext context = ServerUtils.getBibDatabaseContext(libraryId, filesToServe, srvStateManager, preferences.getImportFormatPreferences());
-                List<BibEntry> hits = new InMemoryLibrarySearcher(context, preferences.getBibEntryPreferences()).getMatches(searchQuery);
-                attributeMatches(hits, libraryId, normalizedDois, request.urls(), matches);
+                List<BibEntry> hits = runSearch(context, searchQuery);
+                if (freeText) {
+                    for (BibEntry entry : hits) {
+                        matches.add(LibraryQueryMatch.forEntry(libraryId, entry.getCitationKey().orElse("")));
+                    }
+                } else {
+                    attributeMatches(hits, libraryId, normalizedDois, urls, matches);
+                }
             } catch (IOException e) {
                 LOGGER.warn("Could not load library {} for query", libraryId, e);
             }
         }
 
         return new LibraryQueryResponse(matches);
+    }
+
+    /// Delegate to whichever [SearchContext] the state manager provides. In GUI
+    /// mode this is the live orchestrator that may use the Postgres backend; in
+    /// stand-alone mode this is a fresh in-memory context.
+    private List<BibEntry> runSearch(BibDatabaseContext context, SearchQuery query) {
+        SearchContext searchContext = srvStateManager.getSearchContext(context)
+                                                     .orElseThrow(() -> new IllegalStateException(
+                                                             "SrvStateManager did not provide a SearchContext for the requested library"));
+        SearchResults results = searchContext.search(query);
+        return context.getDatabase().getEntries().stream()
+                      .filter(results::isMatched)
+                      .toList();
     }
 
     private List<String> openLibraryIds() {
