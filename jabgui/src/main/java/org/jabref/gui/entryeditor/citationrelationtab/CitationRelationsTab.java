@@ -502,7 +502,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         return container;
     }
 
-    /// Styles a given CheckListView to display BibEntries either with a hyperlink or an add button
+    /// Styles a given CheckListView to display BibEntries either with a hyperlink or an add button.
+    /// Also adds the handling of mouse clicks.
     ///
     /// @param listView CheckListView to style
     private void styleFetchedListView(CheckListView<CitationRelationItem> listView, CitationComponents citationComponents) {
@@ -593,10 +594,10 @@ public class CitationRelationsTab extends EntryEditorTab {
             listView.getCheckModel().check(item);
 
             if (item.isLocal()) {
-                // Jump if item is already in the database
+                // Jump if item is already in the library
                 jumpToEntry(item);
             } else {
-                // if not, import
+                // Entry not in library -> import it
                 importEntries(List.of(item), citationComponents.searchType(), currentEntry);
             }
             return;
