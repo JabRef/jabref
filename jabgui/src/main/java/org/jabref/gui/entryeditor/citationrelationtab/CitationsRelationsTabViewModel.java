@@ -52,7 +52,7 @@ public class CitationsRelationsTabViewModel {
 
     private final SciteAiFetcher sciteAiFetcher;
 
-    private final ObjectProperty<BibEntry> lastImportedEntry = new SimpleObjectProperty<>();
+    private final ObjectProperty<@Nullable BibEntry> lastImportedEntry = new SimpleObjectProperty<>();
     private final ObjectProperty<SciteStatus> status;
     private final StringProperty searchError;
     private Optional<TalliesResponse> currentResult = Optional.empty();
