@@ -492,8 +492,8 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         // Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citingVBox, citedByVBox);
-        styleFetchedListView(citedByListView, citedByComponents, entry);
-        styleFetchedListView(citingListView, citingComponents, entry);
+        styleFetchedListView(citedByListView, citedByComponents);
+        styleFetchedListView(citingListView, citingComponents);
 
         // switch to the tab will not trigger refresh from the remote
         searchForRelations(citingComponents, citedByComponents, false);
@@ -505,7 +505,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     /// Styles a given CheckListView to display BibEntries either with a hyperlink or an add button
     ///
     /// @param listView CheckListView to style
-    private void styleFetchedListView(CheckListView<CitationRelationItem> listView, CitationComponents citationComponents, BibEntry currentEntry) {
+    private void styleFetchedListView(CheckListView<CitationRelationItem> listView, CitationComponents citationComponents) {
         PseudoClass entrySelected = PseudoClass.getPseudoClass("selected");
         new ViewModelListCellFactory<CitationRelationItem>()
                 .withGraphic(entry -> {
