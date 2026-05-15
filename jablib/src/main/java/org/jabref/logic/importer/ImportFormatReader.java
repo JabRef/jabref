@@ -75,7 +75,7 @@ public class ImportFormatReader {
 
     public void reset() {
         importers.add(new CopacImporter());
-        importers.add(new EndnoteImporter());
+        importers.add(new EndnoteImporter(citationKeyPatternPreferences));
         importers.add(new EndnoteXmlImporter(importFormatPreferences));
         importers.add(new InspecImporter());
         importers.add(new IsiImporter());

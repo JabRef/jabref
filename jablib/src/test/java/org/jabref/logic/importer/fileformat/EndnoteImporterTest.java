@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -21,6 +23,8 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ResourceLock("Localization.lang")
 class EndnoteImporterTest {
@@ -29,7 +33,9 @@ class EndnoteImporterTest {
 
     @BeforeEach
     void setUp() {
-        importer = new EndnoteImporter();
+        CitationKeyPatternPreferences citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class);
+        when(citationKeyPatternPreferences.getUnwantedCharacters()).thenReturn(CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS);
+        importer = new EndnoteImporter(citationKeyPatternPreferences);
     }
 
     @Test

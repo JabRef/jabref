@@ -17,6 +17,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- EndNote importer now respects the citation key preferences for unwanted characters.
+
 ### Removed
 
 ## [6.0-alpha.6] – 2026-05-14
