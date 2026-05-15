@@ -48,7 +48,7 @@ public class SearchResultsTableDataModel {
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
 
-        EasyBind.listen(stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH), (observable, oldValue, newValue) -> updateSearchMatches(newValue));
+        EasyBind.listen(stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH), (_, _, newValue) -> updateSearchMatches(newValue));
         stateManager.searchResultSize(SearchType.GLOBAL_SEARCH).bind(Bindings.size(entriesFiltered));
     }
 
