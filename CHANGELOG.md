@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added support for selecting answer engines and summarization algorithms, allowing users to change the underlying AI behavior. [#15688](https://github.com/JabRef/jabref/pull/15688)
+
 ### Changed
 
 ### Fixed
@@ -21,7 +23,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added support for selecting answer engines and summarization algorithms, allowing users to change the underlying AI behavior. [#15688](https://github.com/JabRef/jabref/pull/15688)
 - Book covers now download automatically when you open an entry with an ISBN. [#14848](https://github.com/JabRef/jabref/issues/14848)
 - We added a new data format and property selection feature, enabling users to select one or more field properties for custom fields. [#9840](https://github.com/JabRef/jabref/issues/9840)
 - We fixed a glitch with the sidepane divider position on startup. [#15394](https://github.com/JabRef/jabref/issues/15394)
