@@ -388,8 +388,8 @@ public class ImportHandler {
                 targetBibDatabaseContext.getDatabase(),
                 preferences.getCitationKeyPatternPreferences());
         entries.stream()
-                .filter(entry -> entry.getCitationKey().isEmpty() || preferences.getImporterPreferences().shouldGenerateNewKeyOnImport())
-                .forEach(keyGenerator::generateAndSetKey);
+               .filter(entry -> entry.getCitationKey().isEmpty() || preferences.getImporterPreferences().shouldGenerateNewKeyOnImport())
+               .forEach(keyGenerator::generateAndSetKey);
     }
 
     public @NonNull List<@NonNull BibEntry> handleBibTeXData(@NonNull String entries) {
