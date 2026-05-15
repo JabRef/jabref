@@ -213,7 +213,8 @@ public class HayagrivaYamlImporter extends Importer {
     public boolean isRecognizedFormat(@NonNull Reader reader) throws IOException {
         ObjectMapper mapper = new YAMLMapper(new YAMLFactory());
         try {
-            Map<String, Object> root = mapper.readValue(reader, new TypeReference<>() { });
+            Map<String, Object> root = mapper.readValue(reader, new TypeReference<>() {
+            });
             if (root == null || root.isEmpty()) {
                 return false;
             }
@@ -228,7 +229,8 @@ public class HayagrivaYamlImporter extends Importer {
     @Override
     public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         ObjectMapper mapper = createMapper();
-        Map<String, HayagrivaEntry> entries = mapper.readValue(reader, new TypeReference<>() { });
+        Map<String, HayagrivaEntry> entries = mapper.readValue(reader, new TypeReference<>() {
+        });
 
         if (entries == null) {
             return new ParserResult();
@@ -245,8 +247,8 @@ public class HayagrivaYamlImporter extends Importer {
 
     private BibEntry toBibEntry(String citationKey, HayagrivaEntry data) {
         EntryType entryType = data.type == null
-                ? StandardEntryType.Misc
-                : TYPES_MAP.getOrDefault(data.type.toLowerCase(), StandardEntryType.Misc);
+                              ? StandardEntryType.Misc
+                              : TYPES_MAP.getOrDefault(data.type.toLowerCase(), StandardEntryType.Misc);
 
         Map<Field, String> fields = new HashMap<>();
 
