@@ -29,8 +29,10 @@ public class CitationKeyGenerator extends BracketedPattern {
     /// Note that `+` is a wanted character to indicate "et al." in authorsAlpha.
     /// Example: `ABC+`. See `org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()` for examples.
     ///
+    /// Should never be used directly - use [CitationKeyPatternPreferences#getUnwantedCharacters()] instead, which respects the user's preferences
+    ///
     /// See also #DISALLOWED_CHARACTERS
-    public static final String DEFAULT_UNWANTED_CHARACTERS = "?!;^`ʹ";
+    public static final String DEFAULT_UNWANTED_CHARACTERS = "-`ʹ:!;?^$";
 
     /// Source of disallowed characters: <https://tex.stackexchange.com/a/408548/9075>
     /// These characters are disallowed in BibTeX keys.

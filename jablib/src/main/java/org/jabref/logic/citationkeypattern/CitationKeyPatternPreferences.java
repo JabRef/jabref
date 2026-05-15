@@ -65,7 +65,7 @@ public class CitationKeyPatternPreferences {
                 KeySuffix.SECOND_WITH_A,
                 "",                           // keyPatternRegex
                 "",                           // keyPatternReplacement
-                "-`ʹ:!;?^$",                  // unwantedCharacters
+                CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,                  // unwantedCharacters
                 DEFAULT_CITATION_KEY_PATTERN,
                 new SimpleObjectProperty<>()  // keywordDelimiter
         );
