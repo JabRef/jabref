@@ -15,6 +15,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,11 +74,12 @@ public class CitationKeyGenerator extends BracketedPattern {
         }
     }
 
-    public static String removeDefaultUnwantedCharacters(String key) {
+    static String removeDefaultUnwantedCharacters(String key) {
         return removeUnwantedCharacters(key, DEFAULT_UNWANTED_CHARACTERS);
     }
 
-    public static String removeUnwantedCharacters(String key, String unwantedCharacters) {
+    @VisibleForTesting
+    static String removeUnwantedCharacters(String key, String unwantedCharacters) {
         String newKey = key.chars()
                            .filter(c -> unwantedCharacters.indexOf(c) == -1)
                            .filter(c -> !DISALLOWED_CHARACTERS.contains((char) c))
