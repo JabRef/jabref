@@ -12,9 +12,8 @@ import javafx.scene.input.KeyEvent;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.JabRefBaseDirectoryLocator;
 import org.jabref.logic.util.io.FileHistory;
-
-import static org.jabref.logic.util.JabRefBaseDirectoryLocator.getBaseDirectoryPath;
 
 public class FileHistoryMenu extends Menu {
 
@@ -94,7 +93,7 @@ public class FileHistoryMenu extends Menu {
         Path resolvedFile = file;
 
         if (!file.isAbsolute()) {
-            Path baseDir = getBaseDirectoryPath();
+            Path baseDir = JabRefBaseDirectoryLocator.getBaseDirectoryPath();
             resolvedFile = baseDir.resolve(file).normalize();
         }
 

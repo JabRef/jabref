@@ -35,6 +35,7 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.Directories;
+import org.jabref.logic.util.JabRefBaseDirectoryLocator;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileHistory;
@@ -46,8 +47,6 @@ import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.jabref.logic.util.JabRefBaseDirectoryLocator.getBaseDirectoryPath;
 
 /// The action concerned with opening an existing database.
 public class OpenDatabaseAction extends SimpleCommand {
@@ -168,7 +167,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     public void openFiles(List<Path> filesToOpen) {
         // Resolve any shortcuts to their targets and filter to only .bib files.
         // The resulting list must remain modifiable for downstream processing (iterator.remove() calls below).
-        Path baseDirectoryPath = getBaseDirectoryPath();
+        Path baseDirectoryPath = JabRefBaseDirectoryLocator.getBaseDirectoryPath();
         List<Path> resolvedFiles = filesToOpen.stream()
                                               .map(FileUtil::resolveIfShortcut)
                                               .filter(FileUtil::isBibFile)

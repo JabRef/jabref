@@ -6,9 +6,13 @@ import java.util.List;
 
 import javafx.collections.ModifiableObservableListBase;
 
-import static org.jabref.logic.util.JabRefBaseDirectoryLocator.getBaseDirectoryPath;
+import org.jabref.logic.util.JabRefBaseDirectoryLocator;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileHistory extends ModifiableObservableListBase<Path> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileHistory.class);
 
     private static final int HISTORY_SIZE = 8;
 
@@ -54,7 +58,7 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
     public void removeItem(Path file) {
         this.remove(file);
 
-        Path baseDirectoryPath = getBaseDirectoryPath();
+        Path baseDirectoryPath = JabRefBaseDirectoryLocator.getBaseDirectoryPath();
 
         // The history may contain both absolute and base-directory-relative paths,
         // depending on how the file was added previously. Remove all equivalent
@@ -63,6 +67,7 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
             try {
                 this.remove(baseDirectoryPath.relativize(file).normalize());
             } catch (IllegalArgumentException e) {
+                LOGGER.debug("Could not relativize file path: {}", file, e);
                 return;
             }
             return;
