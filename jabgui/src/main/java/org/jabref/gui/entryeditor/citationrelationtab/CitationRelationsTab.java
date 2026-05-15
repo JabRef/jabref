@@ -964,7 +964,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         if (citedByTask != null) {
             citedByTask.cancel(false);
         }
-
         citationsRelationsTabViewModel.importEntries(entriesToImport, searchType, existingEntry);
         dialogService.notify(Localization.lang("%0 entry(s) imported", entriesToImport.size()));
     }
