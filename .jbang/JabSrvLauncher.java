@@ -106,6 +106,7 @@
 
 // new jablib sources not yet in the 6.0-SNAPSHOT artifact
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/LibrarySearcher.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/NoOpSearchBackend.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/SearchBackend.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/SearchContext.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/inmemory/BibEntryMatchVisitor.java

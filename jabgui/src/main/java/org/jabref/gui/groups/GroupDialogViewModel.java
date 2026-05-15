@@ -346,11 +346,9 @@ public class GroupDialogViewModel {
                     }
                 }
 
-                Optional<SearchContext> searchContext = stateManager.getSearchContext(currentDatabase);
-                if (searchContext.isPresent()) {
-                    SearchGroup searchGroup = (SearchGroup) resultingGroup;
-                    searchGroup.setMatchedEntries(searchContext.get().search(searchGroup.getSearchQuery()).getMatchedEntries());
-                }
+                SearchContext searchContext = stateManager.getSearchContext(currentDatabase);
+                SearchGroup searchGroup = (SearchGroup) resultingGroup;
+                searchGroup.setMatchedEntries(searchContext.search(searchGroup.getSearchQuery()).getMatchedEntries());
             } else if (Boolean.TRUE.equals(typeAutoProperty.getValue())) {
                 if (Boolean.TRUE.equals(autoGroupKeywordsOptionProperty.getValue())) {
                     // Set default value for delimiters: ',' for base and '>' for hierarchical

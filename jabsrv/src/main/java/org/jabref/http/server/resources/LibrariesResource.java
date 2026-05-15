@@ -112,10 +112,7 @@ public class LibrariesResource {
     /// mode this is the live orchestrator that may use the Postgres backend; in
     /// stand-alone mode this is a fresh in-memory context.
     private List<BibEntry> runSearch(BibDatabaseContext context, SearchQuery query) {
-        SearchContext searchContext = srvStateManager.getSearchContext(context)
-                                                     .orElseThrow(() -> new IllegalStateException(
-                                                             "SrvStateManager did not provide a SearchContext for the requested library"));
-        SearchResults results = searchContext.search(query);
+        SearchResults results = srvStateManager.getSearchContext(context).search(query);
         return context.getDatabase().getEntries().stream()
                       .filter(results::isMatched)
                       .toList();

@@ -26,5 +26,9 @@ public interface SrvStateManager {
 
     List<String> getAllDatabasePaths();
 
-    Optional<SearchContext> getSearchContext(BibDatabaseContext database);
+    /// Returns the [SearchContext] for the given database. Implementations must
+    /// register a context before the database is exposed via [#getOpenDatabases()];
+    /// callers therefore never need to deal with `null` or `Optional`. Throws
+    /// `IllegalStateException` if the lifecycle invariant is violated.
+    SearchContext getSearchContext(BibDatabaseContext database);
 }

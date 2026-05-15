@@ -28,6 +28,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.logic.command.CommandSelectionTab;
+import org.jabref.logic.search.NoOpSearchBackend;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;
@@ -155,8 +156,20 @@ public class JabRefGuiStateManager implements StateManager {
     }
 
     @Override
-    public Optional<SearchContext> getSearchContext(BibDatabaseContext database) {
-        return Optional.ofNullable(searchContexts.get(database.getUid()));
+    public SearchContext getSearchContext(BibDatabaseContext database) {
+        SearchContext context = searchContexts.get(database.getUid());
+        if (context != null) {
+            return context;
+        }
+        assert false : "No SearchContext registered for database '" + database.getUid() + "'";
+        LOGGER.error(
+                "No SearchContext registered for database '{}'. Returning inert fallback. "
+                        + "LibraryTab should register one via setSearchContext on open.",
+                database.getUid());
+        return new SearchContext(
+                new SimpleBooleanProperty(false),
+                NoOpSearchBackend::new,
+                NoOpSearchBackend::new);
     }
 
     @Override

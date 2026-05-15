@@ -45,12 +45,12 @@ public class JabRefSrvStateManager implements SrvStateManager {
     /// path because the CLI server has no preference toggle. Each call builds a
     /// fresh context; the in-memory backend has no startup cost.
     @Override
-    public Optional<SearchContext> getSearchContext(BibDatabaseContext database) {
+    public SearchContext getSearchContext(BibDatabaseContext database) {
         Supplier<SearchBackend> inMemory = () -> new InMemorySearchBackend(database, preferences.getBibEntryPreferences());
         Supplier<SearchBackend> sqlNotAvailable = () -> {
             throw new UnsupportedOperationException("Postgres backend is not available in the stand-alone HTTP server");
         };
-        return Optional.of(new SearchContext(new SimpleBooleanProperty(false), sqlNotAvailable, inMemory));
+        return new SearchContext(new SimpleBooleanProperty(false), sqlNotAvailable, inMemory);
     }
 
     @Override
