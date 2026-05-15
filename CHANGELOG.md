@@ -8,7 +8,9 @@ In case there is no issue present, the pull request implementing the feature is 
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+
 ### Added
+
 - We added support for importing Hayagriva YAML files, the citation format used by the Typst typesetting system. [#15714](https://github.com/JabRef/jabref/issues/15714)
 
 ### Changed
