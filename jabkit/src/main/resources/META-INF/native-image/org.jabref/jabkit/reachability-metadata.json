@@ -228,14 +228,6 @@
       "type": "org.h2.store.fs.zip.FilePathZip"
     },
     {
-      "type": "org.jabref.logic.journals.Abbreviation",
-      "serializable": true
-    },
-    {
-      "type": "org.jabref.logic.journals.ltwa.LtwaEntry",
-      "serializable": true
-    },
-    {
       "type": "org.jabref.toolkit.commands.CheckConsistency",
       "fields": [
         {
