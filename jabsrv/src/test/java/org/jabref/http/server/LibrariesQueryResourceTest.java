@@ -115,7 +115,7 @@ class LibrariesQueryResourceTest extends ServerTest {
     }
 
     @Test
-    void freeTextQueryReturnsEntryWithoutDoiOrUrl() {
+    void searchQueryReturnsEntryWithoutDoiOrUrl() {
         String body = """
                 {"query": "author = \\"Test Author\\""}""";
         String result = target("/libraries/query")

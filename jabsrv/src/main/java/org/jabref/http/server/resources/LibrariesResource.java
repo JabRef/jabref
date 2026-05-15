@@ -68,7 +68,7 @@ public class LibrariesResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public LibraryQueryResponse query(LibraryQueryRequest request) {
-        boolean freeText = !StringUtil.isBlank(request.query());
+        boolean hasSearchQuery = !StringUtil.isBlank(request.query());
 
         // [impl->req~jabsrv.query.doi~1]
         List<String> normalizedDois = request.dois().stream()
@@ -79,7 +79,7 @@ public class LibrariesResource {
         // [impl->req~jabsrv.query.url~1]
         List<String> urls = request.urls();
 
-        Optional<String> expression = freeText
+        Optional<String> expression = hasSearchQuery
                                       ? Optional.of(request.query())
                                       : LibraryQueryExpressionBuilder.build(normalizedDois, urls);
         if (expression.isEmpty()) {
@@ -93,7 +93,7 @@ public class LibrariesResource {
             try {
                 BibDatabaseContext context = ServerUtils.getBibDatabaseContext(libraryId, filesToServe, srvStateManager, preferences.getImportFormatPreferences());
                 List<BibEntry> hits = runSearch(context, searchQuery);
-                if (freeText) {
+                if (hasSearchQuery) {
                     for (BibEntry entry : hits) {
                         matches.add(LibraryQueryMatch.forEntry(libraryId, entry.getCitationKey().orElse("")));
                     }
