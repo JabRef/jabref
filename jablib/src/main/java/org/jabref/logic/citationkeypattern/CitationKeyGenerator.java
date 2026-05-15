@@ -20,7 +20,6 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// This is the utility class of the LabelPattern package.
 public class CitationKeyGenerator extends BracketedPattern {
 
     /// All single characters that we can use for extending a key to make it unique.
