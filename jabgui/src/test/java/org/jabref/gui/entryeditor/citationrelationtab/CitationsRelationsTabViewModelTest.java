@@ -38,7 +38,6 @@ import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -170,10 +169,9 @@ class CitationsRelationsTabViewModelTest {
     @Test
     void importEntriesUpdatesEvenIfCitationKeyIsMissing() {
         existingEntry.clearCitationKey();
-        List<CitationRelationItem> citationItems = List.of(new CitationRelationItem(firstEntryToImport, false));
-
+        List<CitationRelationItem> citationItems = List.of(
+                new CitationRelationItem(firstEntryToImport, false));
         viewModel.importEntries(citationItems, CitationFetcher.SearchType.CITED_BY, existingEntry);
-
-        assertNull(viewModel.lastImportedEntryProperty().get());
+        assertEquals(citationItems.getFirst().entry(), viewModel.lastImportedEntryProperty().get());
     }
 }
