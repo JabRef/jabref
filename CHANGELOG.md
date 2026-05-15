@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added the ability to import and focus an entry from the Citation tab by doubl click. [#15460](https://github.com/JabRef/jabref/issues/15460)
+
 ### Changed
 
 ### Fixed
@@ -44,7 +46,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Added context menu entry "Sort tabs alphabetically" to the library tabs. [#15425](https://github.com/JabRef/jabref/pull/15425)
 - We added a "Merge" action in the File menu to compare the current library with a selected BibTeX file and review changes. [#15401](https://github.com/JabRef/jabref/issues/15401)
 - We added integrity checks that warn when the `booktitle` field contains a year, a country/location, or page numbers that should live in dedicated fields. [#12271](https://github.com/JabRef/jabref/issues/12271)
-- We added the ability to import and focus on entries in the Citation Relations tab by double-clicking them. [#15460](https://github.com/JabRef/jabref/issues/15460)
 
 ### Changed
 
