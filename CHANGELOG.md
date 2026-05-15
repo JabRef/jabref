@@ -8,8 +8,8 @@ In case there is no issue present, the pull request implementing the feature is 
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
-
 ### Added
+- We added support for importing Hayagriva YAML files, the citation format used by the Typst typesetting system. [#15714](https://github.com/JabRef/jabref/issues/15714)
 
 ### Changed
 
@@ -22,7 +22,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - Book covers now download automatically when you open an entry with an ISBN. [#14848](https://github.com/JabRef/jabref/issues/14848)
-- We added support for importing Hayagriva YAML files, the citation format used by the Typst typesetting system. [#15714](https://github.com/JabRef/jabref/issues/15714)
 - We added a new data format and property selection feature, enabling users to select one or more field properties for custom fields. [#9840](https://github.com/JabRef/jabref/issues/9840)
 - We fixed a glitch with the sidepane divider position on startup. [#15394](https://github.com/JabRef/jabref/issues/15394)
 - We added a label to the Group dropdown in the Import Dialog. [#15567](https://github.com/JabRef/jabref/issues/15567)
