@@ -93,7 +93,7 @@ public class ImportFormatReader {
         }
         importers.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
         importers.add(new RepecNepImporter(importFormatPreferences));
-        importers.add(new ReferImporter());
+        importers.add(new ReferImporter(citationKeyPatternPreferences));
         importers.add(new RisImporter());
         importers.add(new CffImporter(citationKeyPatternPreferences));
         importers.add(new BiblioscapeImporter());
