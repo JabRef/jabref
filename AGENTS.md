@@ -16,7 +16,7 @@ This document defines rules and expectations for **automated agents** (AI tools,
 
 JabRef is an open-source, research-grade reference manager with high standards for correctness, reproducibility, and maintainability.
 
-After a code change, go through each point of `CHECLIST.md` and ensure that all points are fulfilled. If not, fix the code until all points are fulfilled. Do not skip any point of the checklist.
+After a code change, go through each point of `CHECKLIST.md` and ensure that all points are fulfilled. If not, fix the code until all points are fulfilled. Do not skip any point of the checklist.
 
 ---
 
