@@ -233,6 +233,8 @@ public class ImportHandler {
     }
 
     /// Cleans up the given entries and adds them to the library.
+    ///
+    /// Actions include generating a citation key if configured
     public void importEntries(List<BibEntry> entries) {
         ImportCleanup cleanup = ImportCleanup.targeting(targetBibDatabaseContext.getMode(), preferences.getFieldPreferences());
         cleanup.doPostCleanup(entries);
@@ -376,19 +378,18 @@ public class ImportHandler {
         }
     }
 
-    /// Generate keys for given entries.
+    /// Generate keys for given entries if globally configured - or citation key is empty
     ///
     /// @param entries entries to generate keys for
     private void generateKeys(List<BibEntry> entries) {
-        if (!preferences.getImporterPreferences().shouldGenerateNewKeyOnImport()) {
-            return;
-        }
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
                 targetBibDatabaseContext.getMetaData().getCiteKeyPatterns(preferences.getCitationKeyPatternPreferences()
                                                                                      .getKeyPatterns()),
                 targetBibDatabaseContext.getDatabase(),
                 preferences.getCitationKeyPatternPreferences());
-        entries.forEach(keyGenerator::generateAndSetKey);
+        entries.stream()
+                .filter(entry -> entry.getCitationKey().isEmpty() || preferences.getImporterPreferences().shouldGenerateNewKeyOnImport())
+                .forEach(keyGenerator::generateAndSetKey);
     }
 
     public @NonNull List<@NonNull BibEntry> handleBibTeXData(@NonNull String entries) {
