@@ -649,7 +649,7 @@ public class BibDatabase {
     /// {@link BibDatabase#insertEntries(List, EntriesEventSource) insertEntries}.
     /// Therefore, using binary search to find the index.
     /// @implNote IDs are zero-padded strings, so there is no need to convert them to integers for comparison.
-    public int indexOf(BibEntry bibEntry) {
+    public int indexOf(@NonNull BibEntry bibEntry) {
         int index = Collections.binarySearch(entries, bibEntry, Comparator.comparing(BibEntry::getId));
         if (index >= 0) {
             return index;

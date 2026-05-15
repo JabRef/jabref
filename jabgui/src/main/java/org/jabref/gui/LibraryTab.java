@@ -560,13 +560,13 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return searchAutoCompleter;
     }
 
-    public void showAndEdit(BibEntry entry) {
+    public void showAndEdit(@NonNull BibEntry entry) {
         this.clearAndSelect(entry);
         stateManager.getEditorShowing().setValue(true);
     }
 
     /// This method selects the given entry, and scrolls it into view in the table. If an entryEditor is shown, it is given focus afterwards.
-    public void clearAndSelect(final BibEntry bibEntry) {
+    public void clearAndSelect(@NonNull BibEntry bibEntry) {
         mainTable.clearAndSelect(bibEntry);
     }
 

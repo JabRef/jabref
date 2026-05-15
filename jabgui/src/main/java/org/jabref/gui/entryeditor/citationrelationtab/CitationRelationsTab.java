@@ -159,10 +159,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         );
         // Subscribe for imported actions
         EasyBind.subscribe(citationsRelationsTabViewModel.lastImportedEntryProperty(), entry -> {
-            if (entry != null) {
-                stateManager.activeTabProperty().get().ifPresent(tab ->
-                        tab.showAndEdit(entry));
-            }
+            assert entry != null;
+            stateManager.activeTabProperty().get().ifPresent(tab -> tab.showAndEdit(entry));
         });
 
         this.progressIndicator = new ProgressIndicator();
