@@ -11,13 +11,13 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- The citation key generator also normalizes super and subscript characters.
+- The citation key generator also normalizes super and subscript characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
 
 ### Changed
 
 ### Fixed
 
-- EndNote and Refer importers now respect the citation key preferences for unwanted characters.
+- EndNote and Refer importers now respect the citation key preferences for unwanted characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
 
 ### Removed
 
