@@ -168,8 +168,8 @@ class CitationsRelationsTabViewModelTest {
     }
 
     @Test
-    void importEntriesDoesNotUpdatePropertyOnEarlyReturn() {
-        existingEntry.setCitationKey("");
+    void importEntriesUpdatesEvenIfCitationKeyIsMissing() {
+        existingEntry.clearCitationKey();
         List<CitationRelationItem> citationItems = List.of(new CitationRelationItem(firstEntryToImport, false));
 
         viewModel.importEntries(citationItems, CitationFetcher.SearchType.CITED_BY, existingEntry);

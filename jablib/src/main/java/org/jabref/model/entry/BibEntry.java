@@ -377,7 +377,7 @@ public class BibEntry {
     /// Sets the citation key. Note: This is *not* the internal Id of this entry.
     /// The internal Id is always present, whereas the citation key might not be present.
     ///
-    /// @param newKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
+    /// @param newKey The cite key to set. Must not be null; use {@link #clearCitationKey()} to remove the cite key.
     public Optional<FieldChange> setCitationKey(String newKey) {
         return setField(InternalField.KEY_FIELD, newKey);
     }
@@ -397,6 +397,10 @@ public class BibEntry {
 
     public boolean hasCitationKey() {
         return getCitationKey().isPresent();
+    }
+
+    public Optional<FieldChange> clearCitationKey() {
+        return clearField(InternalField.KEY_FIELD);
     }
 
     /// Returns this entry's type.
@@ -997,10 +1001,6 @@ public class BibEntry {
             fieldsAsKeywords.put(standardField, keywordSeparator, keywords);
         }
         return keywords;
-    }
-
-    public Optional<FieldChange> clearCiteKey() {
-        return clearField(InternalField.KEY_FIELD);
     }
 
     private void invalidateFieldCache(Field field) {
