@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- The citation key generator also normalizes super and subscript characters.
+
 ### Changed
 
 ### Fixed

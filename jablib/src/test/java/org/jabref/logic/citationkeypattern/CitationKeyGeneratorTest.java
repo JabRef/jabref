@@ -287,6 +287,26 @@ class CitationKeyGeneratorTest {
         assertEquals("key", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("k#e%y", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
     }
 
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            # Latin-1 superscript digits
+            Balqis1,     Balqis¹
+            x2,          x²
+            x3,          x³
+            # Superscripts and Subscripts block (U+2070..U+209F)
+            x4,          x⁴
+            H2O,         H₂O
+            # superscript zero
+            x0,          x⁰
+            # non-digit superscript characters are stripped
+            x,           xⁿ
+            # mixed with regular digits
+            Balqis12025, Balqis¹2025
+            """)
+    void removeUnwantedCharactersNormalizesSuperscriptsAndSubscripts(String expected, String input) {
+        assertEquals(expected, CitationKeyGenerator.removeUnwantedCharacters(input, DEFAULT_UNWANTED_CHARACTERS));
+    }
+
     @Test
     void crossrefUniversity() {
         BibDatabase database = new BibDatabase();

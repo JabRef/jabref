@@ -82,6 +82,8 @@ public class CitationKeyGenerator extends BracketedPattern {
         String newKey = key.chars()
                            .filter(c -> unwantedCharacters.indexOf(c) == -1)
                            .filter(c -> !DISALLOWED_CHARACTERS.contains((char) c))
+                           .map(CitationKeyGenerator::normalizeSuperscriptOrSubscript)
+                           .filter(c -> c != -1)
                            .collect(
                                    StringBuilder::new,
                                    StringBuilder::appendCodePoint,
@@ -94,14 +96,12 @@ public class CitationKeyGenerator extends BracketedPattern {
         return StringUtil.replaceSpecialCharacters(newKey);
     }
 
-    public static String cleanKey(String key, String unwantedCharacters) {
-        return removeUnwantedCharacters(key, unwantedCharacters).replaceAll("\\s", "");
-    }
-
     /// Removes characters, unwanted characters that are illegal in citation keys
-    /// preserving Unicode and diacritical characters.
+    /// preserving Unicode (e.g., ²) and diacritical characters.
     ///
     /// @param key the citation key to sanitize
+    /// @param unwantedCharacters - pass through [org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences#getUnwantedCharacters()]
+    ///
     /// @return the key with illegal and unwanted characters removed
     public static String removeUnwantedCharactersWithKeepDiacritics(String key, String unwantedCharacters) {
         return key.chars()
@@ -114,6 +114,42 @@ public class CitationKeyGenerator extends BracketedPattern {
                           StringBuilder::append
                   )
                   .toString();
+    }
+
+    /// Maps Unicode superscript and subscript digits to their ASCII counterparts (e.g., ¹ → 1, ₂ → 2).
+    /// Other characters in the Superscripts and Subscripts block (e.g., ⁿ ⁱ ⁺ ⁻ ⁽ ⁾) are stripped by returning -1.
+    /// All other code points are returned unchanged.
+    private static int normalizeSuperscriptOrSubscript(int codePoint) {
+        // Latin-1 superscript digits ¹²³ live in the Latin-1 Supplement block at non-contiguous code points.
+        if (codePoint == 0x00B9) {
+            return '1';
+        }
+        if (codePoint == 0x00B2) {
+            return '2';
+        }
+        if (codePoint == 0x00B3) {
+            return '3';
+        }
+        // Superscript digits 0, 4..9 (U+2070, U+2074..U+2079)
+        if (codePoint == 0x2070) {
+            return '0';
+        }
+        if (codePoint >= 0x2074 && codePoint <= 0x2079) {
+            return '0' + (codePoint - 0x2070);
+        }
+        // Subscript digits 0..9 (U+2080..U+2089)
+        if (codePoint >= 0x2080 && codePoint <= 0x2089) {
+            return '0' + (codePoint - 0x2080);
+        }
+        // Strip remaining characters in the Superscripts and Subscripts block (non-digit modifiers and signs).
+        if (Character.UnicodeBlock.of(codePoint) == Character.UnicodeBlock.SUPERSCRIPTS_AND_SUBSCRIPTS) {
+            return -1;
+        }
+        return codePoint;
+    }
+
+    public static String cleanKey(String key, String unwantedCharacters) {
+        return removeUnwantedCharacters(key, unwantedCharacters).replaceAll("\\s", "");
     }
 
     /// Generate a citation key for the given {@link BibEntry}.
