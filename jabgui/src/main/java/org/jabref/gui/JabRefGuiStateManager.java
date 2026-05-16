@@ -40,6 +40,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.PreboundBinding;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -164,13 +165,11 @@ public class JabRefGuiStateManager implements StateManager {
     }
 
     @Override
-    public void setActiveDatabase(BibDatabaseContext database) {
+    public void setActiveDatabase(@Nullable BibDatabaseContext database) {
         if (database == null) {
             LOGGER.debug("No open database detected");
-            activeDatabaseProperty().set(Optional.empty());
-        } else {
-            activeDatabaseProperty().set(Optional.of(database));
         }
+        activeDatabaseProperty().set(Optional.ofNullable(database));
     }
 
     @Override
