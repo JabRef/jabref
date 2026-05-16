@@ -67,7 +67,7 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
             try {
                 this.remove(baseDirectoryPath.relativize(file).normalize());
             } catch (IllegalArgumentException e) {
-                LOGGER.debug("Could not relativize file path: {}", file, e);
+                LOGGER.warn("Could not relativize file path: {}", file, e);
                 return;
             }
             return;
