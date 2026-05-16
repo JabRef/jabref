@@ -12,6 +12,14 @@
 // see  https://github.com/gradlex-org/extra-java-module-info/issues/237 why we include e-adr here
 //DEPS io.github.adr:e-adr:2.0.0
 
+// Pin JavaFX 26 to override afterburner.fx 2.0.0's transitive javafx-*:20 (Maven nearest-wins).
+// Required because jabsrv CAYW endpoint calls Platform.startup(); mixing javafx.graphics:20 with
+// javafx.base:26 fails with NoClassDefFoundError: javafx/util/FXPermission (removed in javafx 25+).
+//DEPS org.openjfx:javafx-base:26.0.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-graphics:26.0.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-controls:26.0.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-fxml:26.0.1:${os.detected.jfxname}
+
 // from jabsrv-cli
 //DEPS info.picocli:picocli:4.7.7
 
@@ -19,7 +27,7 @@
 //DEPS com.fasterxml.jackson.core:jackson-annotations:2.21
 //DEPS com.github.ben-manes.caffeine:caffeine:3.2.4
 //DEPS com.google.guava:guava:33.6.0-jre
-//DEPS com.konghq:unirest-modules-gson:4.9.0
+//DEPS com.konghq:unirest-modules-gson:4.10.0
 //DEPS de.undercouch:citeproc-java:3.5.0
 //DEPS info.picocli:picocli:4.7.7
 //DEPS jakarta.servlet:jakarta.servlet-api:6.1.0
@@ -30,8 +38,8 @@
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.26.0
 //DEPS org.bouncycastle:bcprov-jdk18on:1.84
 //DEPS org.postgresql:postgresql:42.7.11
-//DEPS org.slf4j:slf4j-api:2.0.17
-//DEPS org.slf4j:jul-to-slf4j:2.0.17
+//DEPS org.slf4j:slf4j-api:2.0.18
+//DEPS org.slf4j:jul-to-slf4j:2.0.18
 //DEPS org.tinylog:slf4j-tinylog:2.7.0
 //DEPS org.tinylog:tinylog-impl:2.7.0
 //DEPS org.glassfish.grizzly:grizzly-framework:5.0.1
