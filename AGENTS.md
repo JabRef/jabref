@@ -161,7 +161,16 @@ Both comments must not be added.
            .ifPresent(value -> doSomething(value));
    ```
 
-- If the `java.util.Optional` is really present, use `get()` (and not `orElse(\"\")`)
+- If the `java.util.Optional` is really present, use one of the following:`get()`
+
+    ```java
+    opt.ifPresent(...)
+    opt.map(...)
+    opt.orElseThrow(...)
+    ```
+
+    but never just `orElse({someValueNeverUsed})`. You can add `assert ...isPresent();` in the line before.
+
 - Use `ifPresentOrElse` instead of `if ...isPresent() { ... }  else { ... }`
 
 ### Dealing with `null`
