@@ -9,6 +9,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ## [Unreleased]
 
+- We enabled usage of relative or absolute file paths depending on your file directory settings. [#3590](https://github.com/JabRef/jabref/issues/3590)
+
 ### Added
 
 - We added support for importing Hayagriva YAML files, the citation format used by the Typst typesetting system. [#15714](https://github.com/JabRef/jabref/issues/15714)
