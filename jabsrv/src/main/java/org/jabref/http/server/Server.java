@@ -18,6 +18,7 @@ import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.command.CommandResource;
 import org.jabref.http.server.resources.EntriesResource;
 import org.jabref.http.server.resources.EntryResource;
+import org.jabref.http.server.resources.GroupsResource;
 import org.jabref.http.server.resources.LibrariesResource;
 import org.jabref.http.server.resources.LibraryResource;
 import org.jabref.http.server.resources.MapResource;
@@ -126,6 +127,7 @@ public class Server {
         resourceConfig.register(MapResource.class);
         resourceConfig.register(EntriesResource.class);
         resourceConfig.register(EntryResource.class);
+        resourceConfig.register(GroupsResource.class);
 
         // Other resources
         resourceConfig.register(CommandResource.class);

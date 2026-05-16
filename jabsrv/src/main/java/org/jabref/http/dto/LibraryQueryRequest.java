@@ -3,20 +3,19 @@ package org.jabref.http.dto;
 import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 /// Request body for `POST /libraries/query`.
 ///
-/// `query` carries a raw Search.g4 expression and takes precedence over `dois` / `urls`
-/// when present. The doi/url lists are a convenience that the server translates into a
-/// Search.g4 expression internally.
-/// All three fields are optional on the wire. `query` stays null if absent. The
-/// list fields are normalized to an empty list so downstream code is free of
-/// null checks; the accessors `dois()` and `urls()` therefore never return null.
+/// `queries` is an ordered list of raw Search.g4 expressions. Each query is run
+/// independently against all open libraries; the position of a query is preserved
+/// in the response so callers can map, e.g., the n-th reference of a web page to
+/// the n-th query result.
+///
+/// The list is normalized to an empty list so downstream code is free of null
+/// checks; the accessor `queries()` therefore never returns null.
 @NullMarked
-public record LibraryQueryRequest(@Nullable String query, List<String> dois, List<String> urls) {
+public record LibraryQueryRequest(List<String> queries) {
     public LibraryQueryRequest {
-        dois = dois != null ? dois : List.of();
-        urls = urls != null ? urls : List.of();
+        queries = queries != null ? queries : List.of();
     }
 }

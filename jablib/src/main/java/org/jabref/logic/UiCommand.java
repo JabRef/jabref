@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public sealed interface UiCommand {
@@ -26,7 +27,11 @@ public sealed interface UiCommand {
     }
 
     /// "Twin" to [#AppendToCurrentLibrary]. Accepts BibTeX as text instead stored in a file.
-    record AppendBibTeXToCurrentLibrary(String bibtex) implements UiCommand {
+    ///
+    /// @param targetGroup name of a group the imported entries are additionally assigned to.
+    ///                     If the group does not exist, it is created as a top-level group.
+    ///                     `null` means no group assignment.
+    record AppendBibTeXToCurrentLibrary(String bibtex, @Nullable String targetGroup) implements UiCommand {
     }
 
     record Focus() implements UiCommand {

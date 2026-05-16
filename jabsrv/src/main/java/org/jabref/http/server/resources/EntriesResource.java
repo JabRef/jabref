@@ -30,7 +30,9 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import org.jspecify.annotations.Nullable;
 
 @Path("libraries/{id}/entries")
 public class EntriesResource {
@@ -50,9 +52,14 @@ public class EntriesResource {
     @Inject
     UiMessageHandler uiMessageHandler;
 
+    /// Appends BibTeX entries to the currently selected library.
+    ///
+    /// @param group optional name of a group the imported entries are additionally assigned to.
+    ///              If the group does not exist, it is created as a top-level group. JabRef merges
+    ///              the entries into the library (duplicate handling applies).
     @POST
     @Consumes(MediaTypes.APPLICATION_BIBTEX)
-    public void addBibtex(@PathParam("id") String id, String bibtex) {
+    public void addBibtex(@PathParam("id") String id, @QueryParam("group") @Nullable String group, String bibtex) {
         if (uiMessageHandler == null) {
             throw new BadRequestException("Only possible in GUI mode.");
         }
@@ -62,7 +69,7 @@ public class EntriesResource {
         if (bibtex == null || bibtex.isBlank()) {
             throw new BadRequestException("BibTeX data must not be empty.");
         }
-        uiMessageHandler.handleUiCommands(List.of(new UiCommand.AppendBibTeXToCurrentLibrary(bibtex)));
+        uiMessageHandler.handleUiCommands(List.of(new UiCommand.AppendBibTeXToCurrentLibrary(bibtex, group)));
     }
 
     @POST

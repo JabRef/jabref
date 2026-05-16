@@ -60,11 +60,13 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GlobalExceptionMapper.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonFactory.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GroupDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonMessageBodyReader.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonMessageBodyWriter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryMatch.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryRequest.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryResponse.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryResult.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LinkedPdfFileDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabrefMediaType.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabRefSrvStateManager.java
@@ -96,15 +98,16 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibraryResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/EntriesResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/EntryResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/GroupsResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/MapResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/RootResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/FilesToServe.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/LibraryQueryExpressionBuilder.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ServerUtils.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
 
 // new jablib sources not yet in the 6.0-SNAPSHOT artifact
+//SOURCES ../jablib/src/main/java/org/jabref/logic/UiCommand.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/LibrarySearcher.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/NoOpSearchBackend.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/SearchBackend.java

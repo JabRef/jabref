@@ -35,6 +35,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
@@ -49,11 +50,15 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -198,7 +203,7 @@ public class JabRefFrameViewModel {
 
             uiCommands.stream().filter(UiCommand.AppendBibTeXToCurrentLibrary.class::isInstance)
                       .map(UiCommand.AppendBibTeXToCurrentLibrary.class::cast)
-                      .findAny().ifPresent(importBibTex -> importBibtexStringAndOpen(importBibTex.bibtex()));
+                      .findAny().ifPresent(importBibTex -> importBibtexStringAndOpen(importBibTex.bibtex(), importBibTex.targetGroup()));
         }
 
         // Handle jumpToEntry
@@ -216,7 +221,7 @@ public class JabRefFrameViewModel {
     }
 
     /// @deprecated used by the browser extension only
-    private void importBibtexStringAndOpen(String importStr) {
+    private void importBibtexStringAndOpen(String importStr, @Nullable String targetGroup) {
         LOGGER.debug("ImportBibtex {} requested", importStr);
         BackgroundTask.wrap(() -> {
                           BibtexParser parser = new BibtexParser(preferences.getImportFormatPreferences());
@@ -224,7 +229,7 @@ public class JabRefFrameViewModel {
                           return new ParserResult(entries);
                       }).onSuccess(parserResult -> {
                           if (preferences.getRemotePreferences().directHttpImport()) {
-                              directImportEntries(parserResult);
+                              directImportEntries(parserResult, targetGroup);
                           } else {
                               addParserResult(parserResult);
                           }
@@ -242,17 +247,45 @@ public class JabRefFrameViewModel {
                       .executeWith(taskExecutor);
     }
 
-    private void directImportEntries(ParserResult parserResult) {
+    private void directImportEntries(ParserResult parserResult, @Nullable String targetGroup) {
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
+        BibDatabaseContext databaseContext = libraryTab.getBibDatabaseContext();
         ImportHandler importHandler = new ImportHandler(
-                libraryTab.getBibDatabaseContext(),
+                databaseContext,
                 preferences,
                 fileUpdateMonitor,
                 undoManager,
                 stateManager,
                 dialogService,
                 taskExecutor);
-        importHandler.importEntries(parserResult.getDatabase().getEntries());
+        List<BibEntry> entries = parserResult.getDatabase().getEntries();
+        importHandler.importEntries(entries);
+        if (targetGroup != null && !targetGroup.isBlank()) {
+            assignToGroup(databaseContext, entries, targetGroup);
+        }
+    }
+
+    /// Assigns the imported entries to the group named {@code groupName}, creating it as a
+    /// top-level group if it does not exist yet. Group names are unique within a library,
+    /// so the name identifies the group anywhere in the tree.
+    ///
+    /// Open point: if an existing group is not assignable (e.g. a search or automatic group),
+    /// the assignment silently does nothing - no error is reported to the caller.
+    private void assignToGroup(BibDatabaseContext databaseContext, List<BibEntry> entries, String groupName) {
+        GroupTreeNode root = databaseContext.getMetaData().getGroups().orElseGet(() -> {
+            GroupTreeNode newRoot = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
+            databaseContext.getMetaData().setGroups(newRoot);
+            return newRoot;
+        });
+        GroupTreeNode target = root.iterateOverTree()
+                                   .filter(node -> node != root)
+                                   .filter(node -> groupName.equals(node.getName()))
+                                   .findFirst()
+                                   .orElseGet(() -> root.addSubgroup(new ExplicitGroup(
+                                           groupName,
+                                           GroupHierarchyType.INDEPENDENT,
+                                           preferences.getBibEntryPreferences().getKeywordSeparator())));
+        target.addEntriesToGroup(entries);
     }
 
     private void checkForBibInUpperDir() {
