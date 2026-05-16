@@ -57,11 +57,14 @@ public class IndexManager {
     private final BibFieldsSearcher bibFieldsSearcher;
     private final LinkedFilesSearcher linkedFilesSearcher;
     private final DelayTaskThrottler indexUpdateThrottler;
-    private final ConcurrentHashMap<BibEntry, Set<Field>> pendingFieldsByEntry = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<BibEntry, FileDelta> pendingFileValuesByEntry = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, PendingFieldUpdates> pendingFieldsByEntry = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, FileDelta> pendingFileValuesByEntry = new ConcurrentHashMap<>();
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
     private record FileDelta(String oldValue, String newValue) {
+    }
+
+    private record PendingFieldUpdates(BibEntry entry, Set<Field> fields) {
     }
 
     public IndexManager(BibDatabaseContext databaseContext,
@@ -175,16 +178,28 @@ public class IndexManager {
         }
 
         BibEntry entry = event.getBibEntry();
+        String entryId = entry.getId();
         Field field = event.getField();
 
         /// Accumulate which fields need updating for this entry
-        pendingFieldsByEntry.computeIfAbsent(entry, _ -> ConcurrentHashMap.newKeySet()).add(field);
+        /// Use `entryId` because hashcode of `entry` changes when fields are updated.
+        /// Instead, `entryId` is stable.
+        pendingFieldsByEntry.compute(entryId, (_, pendingUpdates) -> {
+            if (pendingUpdates == null) {
+                Set<Field> fields = ConcurrentHashMap.newKeySet();
+                fields.add(field);
+                return new PendingFieldUpdates(entry, fields);
+            }
+
+            pendingUpdates.fields().add(field);
+            return new PendingFieldUpdates(entry, pendingUpdates.fields());
+        });
 
         /// FILE field updates rely on oldValue/newValue diffing in linkedFilesIndexer
         /// Intermediate events dropped by the throttler would corrupt the baseline,
         /// so we preserve the first oldValue seen and always update to the latest newValue
         if (field.equals(StandardField.FILE)) {
-            pendingFileValuesByEntry.compute(entry, (_, existing) -> {
+            pendingFileValuesByEntry.compute(entryId, (_, existing) -> {
                 if (existing == null) {
                     return new FileDelta(event.getOldValue(), event.getNewValue());
                 } else {
@@ -194,8 +209,8 @@ public class IndexManager {
         }
 
         if (closed.get()) {
-            pendingFieldsByEntry.remove(entry);
-            pendingFileValuesByEntry.remove(entry);
+            pendingFieldsByEntry.remove(entryId);
+            pendingFileValuesByEntry.remove(entryId);
             return;
         }
 
@@ -205,9 +220,10 @@ public class IndexManager {
             }
 
             /// Snapshot and clear pending state atomically
-            pendingFieldsByEntry.forEach((pendingEntry, fields) -> {
-                if (pendingFieldsByEntry.remove(pendingEntry, fields)) {
-                    Set<Field> fieldsSnapshot = Set.copyOf(fields);
+            pendingFieldsByEntry.forEach((pendingEntryId, updates) -> {
+                if (pendingFieldsByEntry.remove(pendingEntryId, updates)) {
+                    BibEntry pendingEntry = updates.entry();
+                    Set<Field> fieldsSnapshot = Set.copyOf(updates.fields());
 
                     new BackgroundTask<>() {
                         @Override
@@ -222,7 +238,7 @@ public class IndexManager {
                      .executeWith(taskExecutor);
 
                     if (shouldIndexLinkedFiles.get() && fieldsSnapshot.contains(StandardField.FILE)) {
-                        FileDelta fileValues = pendingFileValuesByEntry.remove(pendingEntry);
+                        FileDelta fileValues = pendingFileValuesByEntry.remove(pendingEntryId);
                         if (fileValues != null) {
                             new BackgroundTask<>() {
                                 @Override
