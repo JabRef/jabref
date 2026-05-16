@@ -2,6 +2,7 @@ package org.jabref.gui.maintable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
@@ -66,6 +67,7 @@ public class MainTableDataModel {
     @Nullable private final IndexManager indexManager;
 
     private Optional<MatcherSet> groupsMatcher;
+    private final AtomicInteger searchGeneration = new AtomicInteger(0);
 
     public MainTableDataModel(BibDatabaseContext context,
                               GuiPreferences preferences,
@@ -102,13 +104,16 @@ public class MainTableDataModel {
     }
 
     private void updateSearchMatches(Optional<SearchQuery> query) {
-        BackgroundTask.wrap(() -> {
-            if (query.isPresent()) {
-                setSearchMatches(indexManager.search(query.get()));
-            } else {
-                clearSearchMatches();
+        int myGeneration = searchGeneration.incrementAndGet();
+        BackgroundTask.wrap(() -> query.isPresent()
+                ? Optional.of(indexManager.search(query.get()))
+                : Optional.<SearchResults>empty()
+        ).onSuccess(results -> {
+            if (myGeneration == searchGeneration.get()) {
+                results.ifPresentOrElse(this::setSearchMatches, this::clearSearchMatches);
+                FilteredListProxy.refilterListReflection(entriesFiltered);
             }
-        }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+        }).executeWith(taskExecutor);
     }
 
     /// Refresh the current search
