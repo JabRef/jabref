@@ -106,8 +106,8 @@ public class MainTableDataModel {
     private void updateSearchMatches(Optional<SearchQuery> query) {
         int myGeneration = searchGeneration.incrementAndGet();
         BackgroundTask.wrap(() -> query.isPresent()
-                ? Optional.of(indexManager.search(query.get()))
-                : Optional.<SearchResults>empty()
+                                  ? Optional.of(indexManager.search(query.get()))
+                                  : Optional.<SearchResults>empty()
         ).onSuccess(results -> {
             if (myGeneration == searchGeneration.get()) {
                 results.ifPresentOrElse(this::setSearchMatches, this::clearSearchMatches);

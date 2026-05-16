@@ -183,9 +183,9 @@ class MainTableDataModelTest {
         pool.awaitTermination(2, TimeUnit.SECONDS);
 
         List<BibEntry> matchedEntries = model.getEntriesFilteredAndSorted().stream()
-                .filter(vm -> vm.isMatchedBySearch().get())
-                .map(BibEntryTableViewModel::getEntry)
-                .toList();
+                                             .filter(vm -> vm.isMatchedBySearch().get())
+                                             .map(BibEntryTableViewModel::getEntry)
+                                             .toList();
 
         model.unbind();
 
