@@ -42,23 +42,12 @@ public class ContextAction extends SimpleCommand {
 
         this.executable.bind(
                 switch (command) {
-                    case RENAME_FILE_TO_PATTERN ->
+                    case RENAME_FILE_TO_PATTERN,
+                         RENAME_FILE_TO_NAME ->
                             Bindings.createBooleanBinding(
                                     () -> !linkedFile.getFile().isOnlineLink()
                                             && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
                                             && !linkedFile.isGeneratedNameSameAsOriginal(),
-                                    nonNullDependencies(
-                                            linkedFile.getFile().linkProperty(),
-                                            entryFieldsObservable
-                                    )
-                            );
-
-                    case MOVE_FILE_TO_FOLDER,
-                         MOVE_FILE_TO_FOLDER_AND_RENAME ->
-                            Bindings.createBooleanBinding(
-                                    () -> !linkedFile.getFile().isOnlineLink()
-                                            && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
-                                            && !linkedFile.isGeneratedPathSameAsOriginal(),
                                     nonNullDependencies(
                                             linkedFile.getFile().linkProperty(),
                                             entryFieldsObservable
@@ -85,7 +74,6 @@ public class ContextAction extends SimpleCommand {
 
                     case OPEN_FILE,
                          OPEN_FOLDER,
-                         RENAME_FILE_TO_NAME,
                          DELETE_FILE ->
                             Bindings.createBooleanBinding(
                                     () -> !linkedFile.getFile().isOnlineLink()
@@ -125,10 +113,6 @@ public class ContextAction extends SimpleCommand {
                     linkedFile.renameToSuggestion();
             case RENAME_FILE_TO_NAME ->
                     linkedFile.askForNameAndRename();
-            case MOVE_FILE_TO_FOLDER ->
-                    linkedFile.moveToDefaultDirectory();
-            case MOVE_FILE_TO_FOLDER_AND_RENAME ->
-                    linkedFile.moveToDefaultDirectoryAndRename();
             case DELETE_FILE ->
                     viewModel.deleteFile(linkedFile);
             case REMOVE_LINK,

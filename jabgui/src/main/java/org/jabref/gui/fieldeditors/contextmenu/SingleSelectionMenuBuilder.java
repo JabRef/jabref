@@ -82,12 +82,9 @@ record SingleSelectionMenuBuilder(
                 StandardActions.RENAME_FILE_TO_NAME,
                 new ContextAction(StandardActions.RENAME_FILE_TO_NAME, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
 
-        items.add(factory.createMenuItem(
-                StandardActions.MOVE_FILE_TO_FOLDER,
-                new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
-        items.add(factory.createMenuItem(
-                StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME,
-                new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
+        MoveFileSubmenuFactory moveFileSubmenuFactory = new MoveFileSubmenuFactory(factory, databaseContext, preferences);
+        items.add(moveFileSubmenuFactory.createSingle(selectedLinkedFile));
+        items.add(moveFileSubmenuFactory.createSingleAndRename(selectedLinkedFile));
 
         items.add(factory.createMenuItem(
                 StandardActions.COPY_FILE_TO_FOLDER,
