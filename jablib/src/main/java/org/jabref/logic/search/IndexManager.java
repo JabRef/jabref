@@ -182,7 +182,7 @@ public class IndexManager {
         Field field = event.getField();
 
         /// Accumulate which fields need updating for this entry
-        /// Use `entryId` because hashcode of `entry` changes when fields are updated.
+        /// Use `entryId` because hashCode of `entry` changes when fields are updated.
         /// Instead, `entryId` is stable.
         pendingFieldsByEntry.compute(entryId, (_, pendingUpdates) -> {
             if (pendingUpdates == null) {
