@@ -1,11 +1,12 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
@@ -16,6 +17,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.FileDirectories;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 class MoveFileSubmenuFactory {
 
     private final ActionFactory actionFactory;
@@ -31,143 +36,125 @@ class MoveFileSubmenuFactory {
     }
 
     public Menu createSingle(LinkedFileViewModel linkedFileViewModel) {
-        return createSingleMenu(StandardActions.MOVE_FILE_TO_FOLDER, linkedFileViewModel, false);
+        return createMenuItem(List.of(linkedFileViewModel), MoveFileCommand.Operation.SINGLE_MOVE);
     }
 
     public Menu createSingleAndRename(LinkedFileViewModel linkedFileViewModel) {
-        return createSingleMenu(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFileViewModel, true);
+        return createMenuItem(List.of(linkedFileViewModel), MoveFileCommand.Operation.SINGLE_MOVE_AND_RENAME);
     }
 
     public Menu createForMulti(ObservableList<LinkedFileViewModel> selectedFiles) {
+        return createMenuItem(selectedFiles, MoveFileCommand.Operation.MULTI_MOVE);
+    }
+
+    private Menu createMenuItem(List<LinkedFileViewModel> linkedFileViewModels, MoveFileCommand.Operation operation) {
         FileDirectories fileDirectories = databaseContext.getAllFileDirectories(preferences.getFilePreferences());
         Optional<Path> mainFileDirectory = preferences.getFilePreferences()
                                                       .getMainFileDirectory()
                                                       .map(path -> path.toAbsolutePath().normalize());
 
-        Menu menu = actionFactory.createMenu(StandardActions.MOVE_FILE_TO_FOLDER);
-        menu.getItems().add(createItem(
-                Localization.lang("Main file directory"),
-                mainFileDirectory,
-                selectedFiles
-        ));
-        menu.getItems().add(createItem(
-                Localization.lang("Library-specific file directory"),
-                fileDirectories.getLibraryDirectory(),
-                selectedFiles
-        ));
-        menu.getItems().add(createItem(
-                Localization.lang("User-specific file directory"),
-                fileDirectories.getUserDirectory(),
-                selectedFiles
-        ));
-        menu.getItems().add(createItem(
-                Localization.lang("Next to library file"),
-                databaseContext.getDatabaseDirectory(),
-                selectedFiles
-        ));
+        Map<String, Optional<Path>> targetDirectories = Map.of(
+                Localization.lang("Main file directory: %0"), mainFileDirectory,
+                Localization.lang("Library-specific file directory: %0"), fileDirectories.getLibraryDirectory(),
+                Localization.lang("User-specific file directory: %0"), fileDirectories.getUserDirectory(),
+                Localization.lang("Next to library file: %0"), databaseContext.getDatabaseDirectory());
+
+        Menu menu = actionFactory.createMenu(operation.getAction());
+        for (Map.Entry<String, Optional<Path>> entry : targetDirectories.entrySet()) {
+            Path targetDirectory = entry.getValue().orElse(null);
+            String label = entry.getValue()
+                                .map(path -> entry.getKey().formatted(path))
+                                .orElse(entry.getKey().formatted(Localization.lang("Unavailable")));
+            menu.getItems().add(actionFactory.createCustomMenuItem(
+                    operation.getAction(),
+                    new MoveFileCommand(targetDirectory, linkedFileViewModels, operation),
+                    label
+            ));
+        }
         return menu;
     }
 
-    private Menu createSingleMenu(StandardActions action,
-                                  LinkedFileViewModel linkedFileViewModel,
-                                  boolean renameAfterMove) {
-        FileDirectories fileDirectories = databaseContext.getAllFileDirectories(preferences.getFilePreferences());
-        Optional<Path> mainFileDirectory = preferences.getFilePreferences()
-                                                      .getMainFileDirectory()
-                                                      .map(path -> path.toAbsolutePath().normalize());
+    private class MoveFileCommand extends SimpleCommand {
 
-        Menu menu = actionFactory.createMenu(action);
-        menu.getItems().add(createItem(
-                Localization.lang("Main file directory"),
-                mainFileDirectory,
-                linkedFileViewModel,
-                action,
-                renameAfterMove
-        ));
-        menu.getItems().add(createItem(
-                Localization.lang("Library-specific file directory"),
-                fileDirectories.getLibraryDirectory(),
-                linkedFileViewModel,
-                action,
-                renameAfterMove
-        ));
-        menu.getItems().add(createItem(
-                Localization.lang("User-specific file directory"),
-                fileDirectories.getUserDirectory(),
-                linkedFileViewModel,
-                action,
-                renameAfterMove
-        ));
-        menu.getItems().add(createItem(
-                Localization.lang("Next to library file"),
-                databaseContext.getDatabaseDirectory(),
-                linkedFileViewModel,
-                action,
-                renameAfterMove
-        ));
-        return menu;
-    }
+        private enum Operation {
+            SINGLE_MOVE(StandardActions.MOVE_FILE_TO_FOLDER),
+            SINGLE_MOVE_AND_RENAME(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME),
+            MULTI_MOVE(StandardActions.MOVE_FILE_TO_FOLDER);
 
-    private MenuItem createItem(String directoryType,
-                                Optional<Path> targetDirectory,
-                                LinkedFileViewModel linkedFileViewModel,
-                                StandardActions action,
-                                boolean renameAfterMove) {
-        String label = getMenuItemLabel(directoryType, targetDirectory);
-        boolean movable = isMovable(linkedFileViewModel);
-        boolean isMenuItemExecutable = movable
-                && targetDirectory.isPresent()
-                && (!linkedFileViewModel.isInCurrentDirectory(targetDirectory.get())
-                || (renameAfterMove && !linkedFileViewModel.isGeneratedNameSameAsOriginal()));
-        SimpleCommand command = new SimpleCommand() {
-            @Override
-            public void execute() {
-                if (renameAfterMove) {
-                    targetDirectory.ifPresent(linkedFileViewModel::moveToDirectoryAndRename);
-                } else {
-                    targetDirectory.ifPresent(linkedFileViewModel::moveToDirectory);
-                }
+            private final StandardActions action;
+
+            Operation(StandardActions action) {
+                this.action = action;
             }
-        };
-        command.setExecutable(isMenuItemExecutable);
-        return actionFactory.createCustomMenuItem(action, command, label);
-    }
 
-    private MenuItem createItem(String directoryType,
-                                Optional<Path> targetDirectory,
-                                ObservableList<LinkedFileViewModel> selectedFiles) {
-        String label = getMenuItemLabel(directoryType, targetDirectory);
-        boolean hasMovableFile = selectedFiles.stream().anyMatch(this::isMovable);
-        boolean isMenuItemExecutable = hasMovableFile && targetDirectory.isPresent();
-        SimpleCommand command = new SimpleCommand() {
-            @Override
-            public void execute() {
-                if (targetDirectory.isEmpty()) {
-                    return;
-                }
-
-                Path destinationDirectory = targetDirectory.get();
-                selectedFiles.forEach(linkedFileViewModel -> {
-                    if (isMovable(linkedFileViewModel) && !linkedFileViewModel.isInCurrentDirectory(destinationDirectory)) {
-                        linkedFileViewModel.moveToDirectory(destinationDirectory);
-                    }
-                });
+            private StandardActions getAction() {
+                return action;
             }
-        };
-        command.setExecutable(isMenuItemExecutable);
-        return actionFactory.createCustomMenuItem(StandardActions.MOVE_FILE_TO_FOLDER, command, label);
-    }
+        }
 
-    private String getMenuItemLabel(String directoryType, Optional<Path> directoryPath) {
-        return directoryPath
-                .map(path -> Localization.lang("%0: %1", directoryType, path.toAbsolutePath().normalize().toString()))
-                .orElseGet(() -> Localization.lang("%0: %1", directoryType, Localization.lang("Unavailable")));
-    }
+        private final @Nullable Path targetDirectory;
+        private final List<LinkedFileViewModel> linkedFileViewModels;
+        private final Operation operation;
 
-    private boolean isMovable(LinkedFileViewModel linkedFileViewModel) {
-        return !linkedFileViewModel.getFile().isOnlineLink()
-                && linkedFileViewModel.getFile()
-                                      .findIn(databaseContext, preferences.getFilePreferences())
-                                      .isPresent();
+        private MoveFileCommand(@Nullable Path targetDirectory,
+                                List<LinkedFileViewModel> linkedFileViewModels,
+                                Operation operation) {
+            this.targetDirectory = targetDirectory;
+            this.linkedFileViewModels = linkedFileViewModels;
+            this.operation = operation;
+
+            setExecutable(isMenuItemExecutable(targetDirectory, linkedFileViewModels, operation));
+        }
+
+        private boolean isMenuItemExecutable(@Nullable Path targetDirectory,
+                                             List<LinkedFileViewModel> linkedFileViewModels,
+                                             Operation operation) {
+            if (targetDirectory == null) {
+                return false;
+            }
+
+            return switch (operation) {
+                case SINGLE_MOVE -> {
+                    LinkedFileViewModel linkedFileViewModel = linkedFileViewModels.getFirst();
+                    yield isMovable(linkedFileViewModel)
+                            && !linkedFileViewModel.isInCurrentDirectory(targetDirectory);
+                }
+                case SINGLE_MOVE_AND_RENAME -> {
+                    LinkedFileViewModel linkedFileViewModel = linkedFileViewModels.getFirst();
+                    yield isMovable(linkedFileViewModel)
+                            && (!linkedFileViewModel.isInCurrentDirectory(targetDirectory)
+                            || !linkedFileViewModel.isGeneratedNameSameAsOriginal());
+                }
+                case MULTI_MOVE ->
+                        linkedFileViewModels.stream().anyMatch(this::isMovable);
+            };
+        }
+
+        @Override
+        public void execute() {
+            if (targetDirectory == null) {
+                return;
+            }
+
+            switch (operation) {
+                case SINGLE_MOVE ->
+                        linkedFileViewModels.getFirst().moveToDirectory(targetDirectory);
+                case SINGLE_MOVE_AND_RENAME ->
+                        linkedFileViewModels.getFirst().moveToDirectoryAndRename(targetDirectory);
+                case MULTI_MOVE ->
+                        linkedFileViewModels.forEach(linkedFileViewModel -> {
+                            if (isMovable(linkedFileViewModel) && !linkedFileViewModel.isInCurrentDirectory(targetDirectory)) {
+                                linkedFileViewModel.moveToDirectory(targetDirectory);
+                            }
+                        });
+            }
+        }
+
+        private boolean isMovable(LinkedFileViewModel linkedFileViewModel) {
+            return !linkedFileViewModel.getFile().isOnlineLink()
+                    && linkedFileViewModel.getFile()
+                                          .findIn(databaseContext, preferences.getFilePreferences())
+                                          .isPresent();
+        }
     }
 }
