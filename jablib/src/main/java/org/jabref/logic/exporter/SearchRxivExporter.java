@@ -11,7 +11,7 @@ import java.util.Map;
 import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.study.Study;
-import org.jabref.model.study.StudyDatabase;
+import org.jabref.model.study.StudyCatalog;
 import org.jabref.model.study.StudyQuery;
 
 import tools.jackson.databind.ObjectMapper;
@@ -32,17 +32,17 @@ public class SearchRxivExporter {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     /// Exports the study's search queries as JSON files to the given directory.
-    /// One file per query and database combination is created.
+    /// One file per query and catalog combination is created.
     ///
-    /// @param study     The study containing queries, databases, and authors
+    /// @param study     The study containing queries, catalogs, and authors
     /// @param directory The target directory to write the JSON files into
     /// @throws IOException if a file cannot be written
     public void export(Study study, Path directory) throws IOException {
         int index = 0;
         for (StudyQuery studyQuery : study.getQueries()) {
-            for (StudyDatabase database : study.getDatabases()) {
-                Path file = directory.resolve(buildFileName(studyQuery.getQuery(), database.getName(), index));
-                Files.writeString(file, buildJson(study, studyQuery.getQuery(), database.getName()));
+            for (StudyCatalog catalog : study.getCatalogs()) {
+                Path file = directory.resolve(buildFileName(studyQuery.getQuery(), catalog.getName(), index));
+                Files.writeString(file, buildJson(study, studyQuery.getQuery(), catalog.getName()));
                 index++;
             }
         }
@@ -64,9 +64,9 @@ public class SearchRxivExporter {
         return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(data);
     }
 
-    private String buildFileName(String query, String databaseName, int index) {
+    private String buildFileName(String query, String catalogName, int index) {
         String queryPart = query.isBlank() ? "query" : query;
-        String name = FileNameCleaner.cleanFileName(databaseName) + "-" + FileNameCleaner.cleanFileName(queryPart) + "-" + index + ".json";
+        String name = FileNameCleaner.cleanFileName(catalogName) + "-" + FileNameCleaner.cleanFileName(queryPart) + "-" + index + ".json";
         return FileUtil.getValidFileName(name);
     }
 }

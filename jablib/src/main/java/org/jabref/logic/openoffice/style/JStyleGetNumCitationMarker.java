@@ -37,10 +37,10 @@ class JStyleGetNumCitationMarker {
     /// the optional "BracketBeforeInList" and "BracketAfterInList" strings
     /// to be used in the bibliography instead of "BracketBefore" and "BracketAfter"
     ///
-    /// @return "[${number}]" where
-    /// "[" stands for BRACKET_BEFORE_IN_LIST (with fallback BRACKET_BEFORE)
-    /// "]" stands for BRACKET_AFTER_IN_LIST (with fallback BRACKET_AFTER)
-    /// "${number}" stands for the formatted number.
+    /// @return `"[${number}]"` where
+    /// `"["` stands for `BRACKET_BEFORE_IN_LIST` (with fallback `BRACKET_BEFORE`)
+    /// `"]"` stands for `BRACKET_AFTER_IN_LIST` (with fallback `BRACKET_AFTER`)
+    /// `"${number}"` stands for the formatted number.
     public static OOText getNumCitationMarkerForBibliography(JStyle style,
                                                              CitationMarkerNumericBibEntry entry) {
         // prefer BRACKET_BEFORE_IN_LIST and BRACKET_AFTER_IN_LIST

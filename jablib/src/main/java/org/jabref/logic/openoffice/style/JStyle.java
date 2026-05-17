@@ -595,7 +595,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     }
 
     /// The String to add between author names except the last two:
-    /// "[Smith{, }Jones and Brown]"
+    /// `"[Smith{, }Jones and Brown]"`
     protected String getAuthorSeparator() {
         return getStringCitProperty(JStyle.AUTHOR_SEPARATOR);
     }
