@@ -41,6 +41,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.PreboundBinding;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,7 +137,8 @@ public class JabRefGuiStateManager implements StateManager {
     }
 
     @Override
-    public void setSelectedGroups(BibDatabaseContext context, @NonNull List<GroupTreeNode> newSelectedGroups) {
+    @NullMarked
+    public void setSelectedGroups(BibDatabaseContext context, List<GroupTreeNode> newSelectedGroups) {
         selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).setAll(newSelectedGroups);
     }
 
