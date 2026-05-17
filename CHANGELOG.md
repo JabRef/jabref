@@ -9,6 +9,20 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ## [Unreleased]
 
+- We enabled usage of relative or absolute file paths depending on your file directory settings. [#3590](https://github.com/JabRef/jabref/issues/3590)
+
+### Added
+
+- We added automatic source groups to SLR results and fixed group merging to preserve all source groups. [#12542](https://github.com/JabRef/jabref/issues/12542)
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [6.0-alpha.6] – 2026-05-14
+
 ### Added
 
 - Book covers now download automatically when you open an entry with an ISBN. [#14848](https://github.com/JabRef/jabref/issues/14848)
@@ -38,6 +52,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Changed
 
 - We made the `Move file to directory` operation for Linked Files show every configured JabRef directory as possible options. [#12287](https://github.com/JabRef/jabref/issues/12287)
+- We updated the Systematic Literature Review (SLR) study format to v2, adding per-catalog inclusion reasons. Existing study.yml files are migrated automatically on read. [#12642](https://github.com/JabRef/jabref/issues/12642)
 - We replaced deprecated Gemini Models from the AI chat model selection and with current ones. [#15398](https://github.com/JabRef/jabref/issues/15398)
 - We changed CSL reference format by adding citation type at the end.  [#15370](https://github.com/JabRef/jabref/issues/15370) [#15434](https://github.com/JabRef/jabref/issues/15434)
 - We changed the groups filter field to use a filter icon. [#15402](https://github.com/JabRef/jabref/issues/15402)
@@ -2010,9 +2025,10 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v6.0-alpha.5...HEAD
-[6.0-alpha.5]: https://github.com/JabRef/jabref/compare/v6.0-alpha.4...HEAD
-[6.0-alpha.4]: https://github.com/JabRef/jabref/compare/v6.0-alpha.3...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v6.0-alpha.6...HEAD
+[6.0-alpha.6]: https://github.com/JabRef/jabref/compare/v6.0-alpha.5...v6.0-alpha.6
+[6.0-alpha.5]: https://github.com/JabRef/jabref/compare/v6.0-alpha.4...v6.0-alpha.5
+[6.0-alpha.4]: https://github.com/JabRef/jabref/compare/v6.0-alpha.3...v6.0-alpha.4
 [6.0-alpha.3]: https://github.com/JabRef/jabref/compare/v6.0-alpha2...v6.0-alpha.3
 [6.0-alpha2]: https://github.com/JabRef/jabref/compare/v6.0-alpha...v6.0-alpha2
 [6.0-alpha]: https://github.com/JabRef/jabref/compare/v5.15...v6.0-alpha

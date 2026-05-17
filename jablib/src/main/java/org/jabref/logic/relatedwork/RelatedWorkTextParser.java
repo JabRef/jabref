@@ -9,7 +9,7 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class RelatedWorkTextParser {
-    /// Support [1] / [1-3] / [1, 2, 3]  / [1-3, 7, 9]
+    /// Support `[1]` / `[1-3]` / `[1, 2, 3]` / `[1-3, 7, 9]`
     private static final Pattern CITE_PATTERN = Pattern.compile("\\[(\\d{1,3}(?:\\s*(?:,|-|–)\\s*\\d{1,3})*)\\]");
     private static final Pattern SEGMENT_SPLIT_PATTERN = Pattern.compile("(?<=[.!?])\\s+|(?<=[.!?])(?=\\p{Lu})");
     private static final Pattern HYPHENATED_LINE_BREAK_PATTERN = Pattern.compile("-\\R");
