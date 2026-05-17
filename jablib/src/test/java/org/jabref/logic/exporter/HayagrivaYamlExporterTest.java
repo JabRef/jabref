@@ -330,6 +330,8 @@ class HayagrivaYamlExporterTest {
                 "  url: http://example.com",
                 "  serial-number:",
                 "    issn: \"0896-3207\"");
+
+        assertEquals(expected, Files.readAllLines(file));
     }
 }
 
