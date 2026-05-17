@@ -161,7 +161,16 @@ Both comments must not be added.
            .ifPresent(value -> doSomething(value));
    ```
 
-- If the `java.util.Optional` is really present, use `get()` (and not `orElse(\"\")`)
+- If the `java.util.Optional` is really present, use one of the following:`get()`
+
+    ```java
+    opt.ifPresent(...)
+    opt.map(...)
+    opt.orElseThrow(...)
+    ```
+
+    but never just `orElse({someValueNeverUsed})`. You can add `assert ...isPresent();` in the line before.
+
 - Use `ifPresentOrElse` instead of `if ...isPresent() { ... }  else { ... }`
 
 ### Dealing with `null`
@@ -432,17 +441,25 @@ When creating commits:
 - Avoid force-pushes
 - No generated artifacts unless required
 
-PR descriptions:
+PR title:
 
-- Must explain **intent**, not implementation trivia.
-- AI-disclosure
-- The pull request title should contain a short title of the issue fixed (or what the PR addresses) and not just \"Fix issue xyz\"
-- The \"Mandatory checks\" are Markdown TODOs. They should be formatted as that. Wrong: `- [ x]`. Either `- [ ]`, `- [x]`, or `- [/]`.
+- Contains a short title of the issue fixed (or what the PR addresses), not just \"Fix issue xyz\".
+
+PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
+
+1. Read `.github/PULL_REQUEST_TEMPLATE.md`.
+2. Fill every section: \"Related issues and pull requests\", \"PR Description\", \"Steps to test\", \"AI usage\".
+3. The PR Description must explain **intent**, not implementation trivia. Do not list modified classes one by one.
+4. Fill \"AI usage\": disclose every AI tool used **and the exact model ID** (for example `Claude Code (model claude-opus-4-7)`).
+5. Keep **all** checklist items. Mark each `[x]` (done), `[ ]` (TODO), or `[/]` (not applicable). Never `[ x]` or `[.]`.
+6. Remove **all** HTML comments before opening the PR.
+7. Write the body to a temp file and run `gh pr create --body-file <file>` — never `--body`, which bypasses the template.
 
 ---
 
 ## Documentation
 
+- Add a CHANGELOG.md entry only if the change is visible to the user.
 - The CHANGELOG.md entry should be for end users (and not programmers).
 - Do not add extra blank lines in CHANGELOG.md
 - User documentation is available in a separate repository <https://github.com/JabRef/user-documentation>.
