@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,18 +54,20 @@ class MoveFileSubmenuFactory {
                                                       .getMainFileDirectory()
                                                       .map(path -> path.toAbsolutePath().normalize());
 
-        Map<String, Optional<Path>> targetDirectories = Map.of(
-                Localization.lang("Main file directory: %0"), mainFileDirectory,
-                Localization.lang("Library-specific file directory: %0"), fileDirectories.getLibraryDirectoryOpt(),
-                Localization.lang("User-specific file directory: %0"), fileDirectories.getUserDirectoryOpt(),
-                Localization.lang("Next to library file: %0"), databaseContext.getDatabaseDirectory());
+        Map<String, Optional<Path>> directories = new LinkedHashMap<>();
+        directories.put(Localization.lang("Main file directory: %0"), mainFileDirectory);
+        directories.put(Localization.lang("Library-specific file directory: %0"), fileDirectories.getLibraryDirectoryOpt());
+        directories.put(Localization.lang("User-specific file directory: %0"), fileDirectories.getUserDirectoryOpt());
+        directories.put(Localization.lang("Next to library file: %0"), databaseContext.getDatabaseDirectory());
 
         Menu menu = actionFactory.createMenu(operation.getAction());
-        for (Map.Entry<String, Optional<Path>> entry : targetDirectories.entrySet()) {
+        for (Map.Entry<String, Optional<Path>> entry : directories.entrySet()) {
             Path targetDirectory = entry.getValue().orElse(null);
             String label = entry.getValue()
-                                .map(path -> entry.getKey().formatted(path))
-                                .orElse(entry.getKey().formatted(Localization.lang("Unavailable")));
+                                // Dirty hack: String formatted expects %s, Localization.lang %0 as placeholders.
+                                // Since localization strings are reused, we replace here
+                                .map(path -> entry.getKey().replace("%0", "%s").formatted(path))
+                                .orElseGet(() -> entry.getKey().replace("%0", "%s").formatted(Localization.lang("Unavailable")));
             menu.getItems().add(actionFactory.createCustomMenuItem(
                     operation.getAction(),
                     new MoveFileCommand(targetDirectory, linkedFileViewModels, operation),
