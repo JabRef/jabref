@@ -166,14 +166,14 @@ public class BibDatabaseContext {
         SequencedSet<Path> fileDirs = new LinkedHashSet<>();
         FileDirectories directories = getAllFileDirectories(preferences);
 
-        directories.getUserDirectory().ifPresent(fileDirs::add);
-        directories.getLibraryDirectory().ifPresent(fileDirs::add);
+        directories.getUserDirectoryOpt().ifPresent(fileDirs::add);
+        directories.getLibraryDirectoryOpt().ifPresent(fileDirs::add);
 
         // fileDirs.isEmpty() is true after these two if there are no directories set in the BIB file itself:
         // 1) no user-specific file directory set (in the metadata of the bib file) and
         // 2) no library-specific file directory is set (in the metadata of the bib file)
 
-        directories.getFallbackDirectory().ifPresent(fileDirs::add);
+        directories.getFallbackDirectoryOpt().ifPresent(fileDirs::add);
 
         return new ArrayList<>(fileDirs);
     }
@@ -188,8 +188,12 @@ public class BibDatabaseContext {
     /// @param preferences The file directory preferences
     /// @return fixed-size record containing absolute paths (if configured)
     public FileDirectories getAllFileDirectories(FilePreferences preferences) {
-        Path userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(this::getFileDirectoryPath).orElse(null);
-        Path librarySpecificFileDirectory = metaData.getLibrarySpecificFileDirectory().map(this::getFileDirectoryPath).orElse(null);
+        Path userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost())
+                                         .map(this::getFileDirectoryPath)
+                                         .orElse(null);
+        Path librarySpecificFileDirectory = metaData.getLibrarySpecificFileDirectory()
+                                                    .map(this::getFileDirectoryPath)
+                                                    .orElse(null);
 
         Path bibOrMainFileDirectory;
 
