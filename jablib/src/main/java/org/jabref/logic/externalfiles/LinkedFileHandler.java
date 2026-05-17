@@ -54,11 +54,7 @@ public class LinkedFileHandler {
             LOGGER.warn("No existing file directory found");
             return false;
         }
-        Path databaseFileDirectory = databaseFileDirectoryOpt.get();
-        return copyOrMoveToDirectory(databaseFileDirectory, shouldMove, shouldRenameToFilenamePattern);
-    }
 
-    private boolean copyOrMoveToDirectory(Path databaseFileDirectory, boolean shouldMove, boolean shouldRenameToFilenamePattern) throws IOException {
         String targetDirectoryName = "";
         if (!filePreferences.getFileDirectoryPattern().isEmpty()) {
             targetDirectoryName = FileUtil.createDirNameFromPattern(
@@ -67,7 +63,7 @@ public class LinkedFileHandler {
                     filePreferences.getFileDirectoryPattern());
         }
 
-        Path targetDirectory = databaseFileDirectory.resolve(targetDirectoryName);
+        Path targetDirectory = databaseFileDirectoryOpt.get().resolve(targetDirectoryName);
         return copyOrMoveToExactDirectory(targetDirectory, shouldMove, shouldRenameToFilenamePattern);
     }
 

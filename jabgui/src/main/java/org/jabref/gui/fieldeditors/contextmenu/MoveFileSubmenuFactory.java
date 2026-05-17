@@ -55,8 +55,8 @@ class MoveFileSubmenuFactory {
 
         Map<String, Optional<Path>> targetDirectories = Map.of(
                 Localization.lang("Main file directory: %0"), mainFileDirectory,
-                Localization.lang("Library-specific file directory: %0"), fileDirectories.getLibraryDirectory(),
-                Localization.lang("User-specific file directory: %0"), fileDirectories.getUserDirectory(),
+                Localization.lang("Library-specific file directory: %0"), fileDirectories.getLibraryDirectoryOpt(),
+                Localization.lang("User-specific file directory: %0"), fileDirectories.getUserDirectoryOpt(),
                 Localization.lang("Next to library file: %0"), databaseContext.getDatabaseDirectory());
 
         Menu menu = actionFactory.createMenu(operation.getAction());

@@ -12,15 +12,15 @@ public record FileDirectories(@Nullable Path userDirectory,
                               @Nullable Path libraryDirectory,
                               @Nullable Path fallbackDirectory) {
 
-    public Optional<Path> getUserDirectory() {
+    public Optional<Path> getUserDirectoryOpt() {
         return Optional.ofNullable(userDirectory);
     }
 
-    public Optional<Path> getLibraryDirectory() {
+    public Optional<Path> getLibraryDirectoryOpt() {
         return Optional.ofNullable(libraryDirectory);
     }
 
-    public Optional<Path> getFallbackDirectory() {
+    public Optional<Path> getFallbackDirectoryOpt() {
         return Optional.ofNullable(fallbackDirectory);
     }
 }
