@@ -4,7 +4,7 @@ description: Reformat Java sources using IntelliJ IDEA's code style
 runs:
   using: composite
   steps:
-    - uses: leventeBajczi/intellij-idea-format@master
+    - uses: leventeBajczi/intellij-idea-format@idea-2025.3.1
       with:
         file-mask: "*.java"
         settings-file: ".idea/codeStyles/Project.xml"
