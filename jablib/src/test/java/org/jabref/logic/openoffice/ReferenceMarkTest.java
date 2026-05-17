@@ -95,4 +95,19 @@ class ReferenceMarkTest {
                 )
         );
     }
+
+    @ParameterizedTest
+    @MethodSource
+    void isReferenceMarkName(String name, boolean expected) {
+        assertEquals(expected, ReferenceMark.isReferenceMarkName(name));
+    }
+
+    private static Stream<Arguments> isReferenceMarkName() {
+        return Stream.of(
+                Arguments.of("JABREF_Smith2000 CID_12345 uniqueId1 NORMAL", true),
+                Arguments.of("JABREF_John2026 CID_7 uniqueId8 IN_TEXT", true),
+                Arguments.of("JR_cite0_1_key1", false),
+                Arguments.of("Unrelated citations", false)
+        );
+    }
 }
