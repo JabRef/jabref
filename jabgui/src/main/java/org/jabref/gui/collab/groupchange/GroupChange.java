@@ -18,7 +18,7 @@ public final class GroupChange extends DatabaseChange {
         super(databaseContext, databaseChangeResolverFactory);
         this.groupDiff = groupDiff;
         setChangeName(groupDiff.getOriginalGroupRoot() == null ? Localization.lang("Removed all groups") : Localization
-                                                                                                           .lang("Modified groups tree"));
+                .lang("Modified groups tree"));
     }
 
     @Override
