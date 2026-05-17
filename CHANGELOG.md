@@ -52,6 +52,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We updated the Systematic Literature Review (SLR) study format to v2, adding per-catalog inclusion reasons. Existing study.yml files are migrated automatically on read. [#12642](https://github.com/JabRef/jabref/issues/12642)
 - We replaced deprecated Gemini Models from the AI chat model selection and with current ones. [#15398](https://github.com/JabRef/jabref/issues/15398)
 - We changed CSL reference format by adding citation type at the end.  [#15370](https://github.com/JabRef/jabref/issues/15370) [#15434](https://github.com/JabRef/jabref/issues/15434)
 - We changed the groups filter field to use a filter icon. [#15402](https://github.com/JabRef/jabref/issues/15402)
