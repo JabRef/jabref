@@ -62,9 +62,6 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonFactory.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonMessageBodyReader.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonMessageBodyWriter.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryMatch.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryRequest.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryResponse.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LinkedPdfFileDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabrefMediaType.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabRefSrvStateManager.java
@@ -99,7 +96,6 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/MapResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/RootResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/FilesToServe.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/LibraryQueryExpressionBuilder.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ServerUtils.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
