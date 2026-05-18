@@ -174,7 +174,7 @@ public class OOBibBaseConnect {
             XTextDocument selected;
             List<XTextDocument> textDocumentList = getTextDocuments(this.xDesktop);
             if (textDocumentList.isEmpty()) {
-                return OOVoidResult.error(OOError.from(new NoDocumentFoundException("No Writer documents found")));
+                return OOVoidResult.error(OOError.from(new NoDocumentFoundException()));
             } else if ((textDocumentList.size() == 1) && autoSelectForSingle) {
                 selected = textDocumentList.getFirst(); // Get the only one
             } else { // Bring up a dialog
