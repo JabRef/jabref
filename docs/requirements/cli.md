@@ -20,3 +20,5 @@ The banner for the CLI ("JabKit") is only shown if the help is output.
 Meaning: If there is no command given (falling back to help) or explicitly `--help` requested.
 
 This increases the accessibility. Source: [Accessibility of Command Line Interfaces](https://dl.acm.org/doi/10.1145/3411764.3445544)
+
+Needs: impl

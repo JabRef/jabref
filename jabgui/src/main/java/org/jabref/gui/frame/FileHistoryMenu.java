@@ -12,6 +12,7 @@ import javafx.scene.input.KeyEvent;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.JabRefBaseDirectoryLocator;
 import org.jabref.logic.util.io.FileHistory;
 
 public class FileHistoryMenu extends Menu {
@@ -89,13 +90,21 @@ public class FileHistoryMenu extends Menu {
     }
 
     public void openFile(Path file) {
-        if (!Files.exists(file)) {
+        Path resolvedFile = file;
+
+        if (!file.isAbsolute()) {
+            Path baseDir = JabRefBaseDirectoryLocator.getBaseDirectoryPath();
+            resolvedFile = baseDir.resolve(file).normalize();
+        }
+
+        if (!Files.exists(resolvedFile)) {
             this.dialogService.showErrorDialogAndWait(
                     Localization.lang("File not found"),
                     Localization.lang("File not found") + ": " + file);
             return;
         }
-        openDatabaseAction.openFile(file);
+
+        openDatabaseAction.openFile(resolvedFile);
     }
 
     public void clearLibrariesHistory() {

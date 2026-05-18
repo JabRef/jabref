@@ -167,6 +167,18 @@ public class MetaDataSerializer {
                 "]";
     }
 
+    public static String serializeCustomEntryTypesV2(BibEntryType entryType) {
+        return MetaData.ENTRYTYPE_FLAG_V2 +
+                entryType.getType().getName() +
+                ": req[" +
+                FieldFactory.serializeOrFieldsListV2(entryType.getRequiredFields()) +
+                "] opt[" +
+                FieldFactory.serializeFieldsListV2(entryType.getOptionalFields().stream()
+                                                            .map(BibField::field)
+                                                            .toList()) +
+                "]";
+    }
+
     public static List<String> getAsStringList(FieldFormatterCleanupActions fieldFormatterCleanupActions, String delimiter) {
         List<String> stringRepresentation = new ArrayList<>();
 
