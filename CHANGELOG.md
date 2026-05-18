@@ -76,7 +76,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an issue where keyboard navigation shortcuts (Alt+UP/DOWN) in the entry editor caused focus to jump to the search field instead of staying in the current field. [#14943](https://github.com/JabRef/jabref/issues/14943)
 - We fixed an issue in the LibreOffice integration where the user could insert a CSL citation inside an existing one. [#15701](https://github.com/JabRef/jabref/issues/15701)
 - We fixed an issue where multiple entries are not cited as a single citation for CSL in-text. [#15703](https://github.com/JabRef/jabref/issues/15703)
 - We fixed an issue where the citation key generator did not show the date for child entries due to orphaned crossref links. [#9071](https://github.com/JabRef/jabref/issues/9071)
