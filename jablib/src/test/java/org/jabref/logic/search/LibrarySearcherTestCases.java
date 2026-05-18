@@ -17,9 +17,6 @@ import org.junit.jupiter.params.provider.Arguments;
 /// belong in the per-implementation test class.
 public final class LibrarySearcherTestCases {
 
-    private LibrarySearcherTestCases() {
-    }
-
     public static final BibEntry EMPTY_ENTRY = new BibEntry();
 
     public static final BibEntry ARTICLE_HARRER = new BibEntry(StandardEntryType.Article)
@@ -41,6 +38,9 @@ public final class LibrarySearcherTestCases {
     public static final BibEntry TITLE_UPPER_CASED = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("title-upper-cased")
             .withField(StandardField.TITLE, "TITLE UPPER CASED");
+
+    private LibrarySearcherTestCases() {
+    }
 
     /// Cases that any [LibrarySearcher] implementation must pass.
     /// Argument tuple: `(expectedMatches, query, libraryEntries)`.
