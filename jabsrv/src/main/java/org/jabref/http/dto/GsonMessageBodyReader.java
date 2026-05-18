@@ -26,9 +26,15 @@ public class GsonMessageBodyReader implements MessageBodyReader<Object> {
     @Inject
     private Gson gson;
 
+    /// Decline types handled by the container's built-in readers (raw JSON text / streams).
+    /// Resources such as `CommandResource` and `MapResource` take the body as `String` and
+    /// parse it themselves; Gson would fail those unless the body were a quoted JSON string.
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return true;
+        return type != String.class
+                && type != byte[].class
+                && !InputStream.class.isAssignableFrom(type)
+                && !Reader.class.isAssignableFrom(type);
     }
 
     @Override

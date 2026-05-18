@@ -31,12 +31,13 @@ public class InMemorySearchBackend implements SearchBackend {
         for (BibEntry entry : searcher.getMatches(query)) {
             results.addSearchResult(entry.getId(), marker);
         }
+        query.setSearchResults(results);
         return results;
     }
 
     @Override
     public boolean isEntryMatched(BibEntry entry, SearchQuery query) {
-        return searcher.getMatches(query).contains(entry);
+        return searcher.matches(entry, query);
     }
 
     @Override
