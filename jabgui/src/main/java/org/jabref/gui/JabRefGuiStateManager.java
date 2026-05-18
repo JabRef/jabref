@@ -40,7 +40,6 @@ import org.jabref.model.search.query.SearchQuery;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.PreboundBinding;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -164,10 +163,7 @@ public class JabRefGuiStateManager implements StateManager {
             return context;
         }
         assert false : "No SearchContext registered for database '" + database.getUid() + "'";
-        LOGGER.error(
-                "No SearchContext registered for database '{}'. Returning inert fallback. "
-                        + "LibraryTab should register one via setSearchContext on open.",
-                database.getUid());
+        LOGGER.error("No SearchContext registered for database '{}'. Returning inert fallback. LibraryTab should register one via setSearchContext on open.", database.getUid());
         return new SearchContext(
                 new SimpleBooleanProperty(false),
                 NoOpSearchBackend::new,

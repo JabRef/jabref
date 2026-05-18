@@ -78,6 +78,14 @@ public class CommonArchitectureTest {
     }
 
     @ArchTest
+    public void doNotUseGuavaCache(JavaClasses classes) {
+        ArchRuleDefinition.noClasses()
+                          .should().dependOnClassesThat().resideInAPackage("com.google.common.cache..")
+                          .because("Caffeine (com.github.benmanes.caffeine.cache) should be used for caching")
+                          .check(classes);
+    }
+
+    @ArchTest
     public void doNotUseJavaAWT(JavaClasses classes) {
         ArchRuleDefinition.noClasses().that().areNotAnnotatedWith(AllowedToUseAwt.class)
                           .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVA_AWT)

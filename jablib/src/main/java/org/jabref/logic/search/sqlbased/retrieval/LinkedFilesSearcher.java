@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.logic.FilePreferences;
-import org.jabref.logic.search.sqlbased.LuceneIndexer;
 import org.jabref.logic.search.query.SearchQueryConversion;
+import org.jabref.logic.search.sqlbased.LuceneIndexer;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
