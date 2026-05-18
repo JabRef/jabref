@@ -40,15 +40,11 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /// The main class for the AI functionality.
 /// Holds all the AI components: LLM and embedding model, chat history and embedding cache.
 public class AiService implements AutoCloseable {
     public static final String VERSION = "2";
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(AiService.class);
 
     private static final String CHAT_HISTORY_FILE_NAME = "chat-histories.mv";
     private static final String EMBEDDINGS_FILE_NAME = "embeddings.mv";
@@ -174,21 +170,17 @@ public class AiService implements AutoCloseable {
     }
 
     private void migrateDatabase(BibDatabaseContext context) {
-        try {
-            ChatHistoryMigrationV1.migrate(
-                    context,
-                    mvStoreChatHistoryRepository,
-                    notificationService
-            );
+        ChatHistoryMigrationV1.migrate(
+                context,
+                mvStoreChatHistoryRepository,
+                notificationService
+        );
 
-            SummariesMigrationV1.migrate(
-                    context,
-                    mvStoreSummariesRepository,
-                    notificationService
-            );
-        } catch (Exception e) {
-            LOGGER.error("Error during AI data migration", e);
-        }
+        SummariesMigrationV1.migrate(
+                context,
+                mvStoreSummariesRepository,
+                notificationService
+        );
     }
 
     public ChatHistoryRepository getChatHistoryRepository() {

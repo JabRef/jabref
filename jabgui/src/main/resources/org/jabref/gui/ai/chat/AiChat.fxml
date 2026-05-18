@@ -77,7 +77,7 @@
                 <HBox fx:id="followUpQuestionsArea"
                       spacing="5"
                       alignment="CENTER">
-                    <Label text="%Follow-up questions:"/>
+                    <Label text="%Follow-up questions"/>
 
                     <SimpleListView
                             fx:id="followUpQuestionsSimpleListView"

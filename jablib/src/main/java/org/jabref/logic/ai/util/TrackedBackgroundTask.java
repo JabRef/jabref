@@ -38,9 +38,16 @@ public abstract class TrackedBackgroundTask<V> extends BackgroundTask<V> {
     public V call() throws Exception {
         try {
             status.set(Status.PROCESSING);
+
             V output = perform();
+
+            if (status.get() == Status.CANCELLED) {
+                return null;
+            }
+
             result.set(output);
             status.set(Status.SUCCESS);
+            
             return output;
         } catch (Exception e) {
             exception.set(e);
