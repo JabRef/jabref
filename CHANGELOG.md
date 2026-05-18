@@ -13,12 +13,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added `POST /libraries/query` to the HTTP server to search for entries by DOI or URL across all open libraries in a single request. [#15599](https://github.com/JabRef/jabref/pull/15599)
 - We added automatic source groups to SLR results and fixed group merging to preserve all source groups. [#12542](https://github.com/JabRef/jabref/issues/12542)
 
 ### Changed
 
 - We made the `Move file to directory` operation for Linked Files show every configured JabRef directory as possible options. [#12287](https://github.com/JabRef/jabref/issues/12287)
-- The search within a library happens InMemory as default. [#15599](https://github.com/JabRef/jabref/pull/15599)
 
 ### Fixed
 
