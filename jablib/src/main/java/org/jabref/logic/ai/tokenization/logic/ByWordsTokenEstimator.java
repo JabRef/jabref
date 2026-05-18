@@ -30,6 +30,6 @@ public class ByWordsTokenEstimator implements TokenEstimator {
 
     @Override
     public TokenEstimatorKind getKind() {
-        return null;
+        return TokenEstimatorKind.WORDS;
     }
 }

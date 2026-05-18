@@ -15,9 +15,13 @@ import org.jabref.model.ai.identifiers.FullBibEntry;
 import org.jabref.model.ai.pipeline.RelevantInformation;
 
 import dev.langchain4j.model.chat.response.ChatResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// The task responsible for generating a RAG (retrieval-augmented generation) response. Before sending a user message to the LLM, the [AnswerEngine] is called which finds the relevant context for the message.
 public class GenerateRagResponseTask extends BackgroundTask<ChatMessage> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateRagResponseTask.class);
+
     private final ChatModel chatModel;
     private final AnswerEngine answerEngine;
     private final List<ChatMessage> chatHistory;
@@ -49,7 +53,11 @@ public class GenerateRagResponseTask extends BackgroundTask<ChatMessage> {
         List<ChatMessage> workingChatHistory = new ArrayList<>(chatHistory);
 
         Optional<ChatMessage> userMessage = ChatHistoryUtils.getLastUserMessage(workingChatHistory);
-        assert userMessage.isPresent();
+
+        if (userMessage.isEmpty()) {
+            LOGGER.error("A chat history without a user message at the end was sent to GenerateRagResponseTask. This should not happen, returning an empty AI message.");
+            return ChatMessage.aiMessage("", List.of());
+        }
 
         List<RelevantInformation> relevantInformation = answerEngine.process(
                 userMessage.get().content(),

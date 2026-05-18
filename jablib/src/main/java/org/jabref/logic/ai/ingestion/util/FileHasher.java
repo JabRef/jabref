@@ -40,7 +40,7 @@ public final class FileHasher {
             return Optional.of(bytesToHex(digest.digest()));
         } catch (NoSuchAlgorithmException e) {
             LOGGER.error("SHA-256 algorithm not available", e);
-            throw new RuntimeException("SHA-256 algorithm not available", e);
+            return Optional.empty();
         } catch (IOException e) {
             LOGGER.error("Could not compute hash for file \"{}\"", path, e);
             return Optional.empty();

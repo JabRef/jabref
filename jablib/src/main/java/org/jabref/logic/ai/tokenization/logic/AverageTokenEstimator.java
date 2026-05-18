@@ -31,6 +31,6 @@ public class AverageTokenEstimator implements TokenEstimator {
 
     @Override
     public TokenEstimatorKind getKind() {
-        return null;
+        return TokenEstimatorKind.AVERAGE;
     }
 }

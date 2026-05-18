@@ -30,6 +30,6 @@ public class ByCharacterTokenEstimator implements TokenEstimator {
 
     @Override
     public TokenEstimatorKind getKind() {
-        return null;
+        return TokenEstimatorKind.CHARS;
     }
 }
