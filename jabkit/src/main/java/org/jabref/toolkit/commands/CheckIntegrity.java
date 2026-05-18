@@ -30,7 +30,7 @@ import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 
-@Command(name = "check-integrity", description = "Check integrity of the database.")
+@Command(name = "check-integrity", description = "Check integrity of the library.")
 class CheckIntegrity implements Callable<Integer> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckIntegrity.class);
