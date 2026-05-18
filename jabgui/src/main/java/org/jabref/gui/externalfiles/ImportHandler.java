@@ -288,8 +288,8 @@ public class ImportHandler {
                         dialogService.showWarningDialogAndWait(
                                 Localization.lang("Import error"),
                                 Localization.lang("Please check your library file for wrong syntax.")
-                                    + "\n\n"
-                                    + e.getLocalizedMessage()));
+                                        + "\n\n"
+                                        + e.getLocalizedMessage()));
             }
         }
 
