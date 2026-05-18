@@ -343,7 +343,7 @@
     <HBox spacing="10"
           alignment="CENTER_LEFT">
         <Button fx:id="resetCurrentTemplateButton"
-                text="Reset current template"
+                text="%Reset current template"
                 onAction="#onResetCurrentTemplateButtonClick">
             <graphic>
                 <JabRefIconView

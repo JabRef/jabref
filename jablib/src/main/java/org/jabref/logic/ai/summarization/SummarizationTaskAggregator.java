@@ -61,25 +61,16 @@ public class SummarizationTaskAggregator {
     private synchronized GenerateSummaryTask startNewTask(GenerateSummaryTaskRequest request) {
         GenerateSummaryTask task = new GenerateSummaryTask(request);
 
-        // Remove from map when the task finishes (success or failure).
-        // Runs on the JavaFX thread via BackgroundTask.getOnSuccess/getOnException chaining.
         task.onFinished(() -> tasks.remove(request.fullEntry().entry()));
 
-        // Write the result to RAM cache on success (after onFinished removes from map).
-        // This ensures a view that re-binds to this entry after the task finished can still
-        // retrieve the result via InMemorySummaryCache, even without a citation key.
-        task.onSuccess(result -> {
-            if (result != null) {
-                inMemoryCache.put(request.fullEntry(), result);
-            }
-        });
+        task.onSuccess(result -> inMemoryCache.put(request.fullEntry(), result));
+
+        tasks.put(request.fullEntry().entry(), task);
 
         taskExecutor.execute(task);
         return task;
     }
 
-    /// Returns the currently running {@link GenerateSummaryTask} for `entry`, or
-    /// {@link Optional#empty()} if no task is active for that entry.
     public synchronized Optional<GenerateSummaryTask> getTask(BibEntry entry) {
         return Optional.ofNullable(tasks.get(entry));
     }
