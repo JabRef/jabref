@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class OcrLinkedFileAction extends SimpleCommand {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OcrLinkedFileAction.class);
+
     private LinkedFile linkedFile;
     private BibDatabaseContext databaseContext;
     private DialogService dialogService;
@@ -27,8 +29,6 @@ public class OcrLinkedFileAction extends SimpleCommand {
     private TaskExecutor taskExecutor;
     private OcrEngine ocrEngine;
     private BibEntry entry;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(OcrLinkedFileAction.class);
 
     public OcrLinkedFileAction(LinkedFile linkedFile,
                                BibEntry bibEntry,
