@@ -9,6 +9,52 @@
       "serializable": true
     }
   ],
-  "resources": [],
-  "bundles": []
+  "resources": [
+    {
+      "glob": "csl-styles/ieee.csl"
+    },
+    {
+      "glob": "l10n/JabRef.properties"
+    },
+    {
+      "glob": "msc_codes.json"
+    },
+    {
+      "glob": "protectedterms/computer_science.terms"
+    },
+    {
+      "glob": "protectedterms/countries_territories.terms"
+    },
+    {
+      "glob": "protectedterms/electrical_engineering.terms"
+    },
+    {
+      "glob": "protectedterms/months_weekdays.terms"
+    },
+    {
+      "module": "org.jabref.jablib",
+      "glob": "build.properties"
+    },
+    {
+      "module": "org.jabref.jablib",
+      "glob": "journals/journal-list.mv"
+    },
+    {
+      "module": "org.jabref.jablib",
+      "glob": "journals/ltwa-list.mv"
+    },
+    {
+      "module": "org.jabref.jablib",
+      "glob": "l10n/JabRef.properties"
+    },
+    {
+      "module": "org.jabref.jablib",
+      "glob": "l10n/JabRef_en.properties"
+    }
+  ],
+  "bundles": [
+    {
+      "name": "l10n/JabRef"
+    }
+  ]
 }

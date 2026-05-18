@@ -746,12 +746,6 @@
       "glob": "META-INF/services/org.tinylog.writers.Writer"
     },
     {
-      "glob": "l10n/JabRef.properties"
-    },
-    {
-      "glob": "msc_codes.json"
-    },
-    {
       "glob": "tinylog-dev.properties"
     },
     {
@@ -771,44 +765,6 @@
     {
       "module": "jkeychain",
       "glob": "osxkeychain.so"
-    },
-    {
-      "module": "org.jabref.jablib",
-      "glob": "build.properties"
-    },
-    {
-      "glob": "csl-styles/ieee.csl"
-    },
-    {
-      "module": "org.jabref.jablib",
-      "glob": "journals/journal-list.mv"
-    },
-    {
-      "module": "org.jabref.jablib",
-      "glob": "journals/ltwa-list.mv"
-    },
-    {
-      "module": "org.jabref.jablib",
-      "glob": "l10n/JabRef.properties"
-    },
-    {
-      "module": "org.jabref.jablib",
-      "glob": "l10n/JabRef_en.properties"
-    },
-    {
-      "glob": "protectedterms/computer_science.terms"
-    },
-    {
-      "glob": "protectedterms/countries_territories.terms"
-    },
-    {
-      "glob": "protectedterms/electrical_engineering.terms"
-    },
-    {
-      "glob": "protectedterms/months_weekdays.terms"
-    },
-    {
-      "bundle": "l10n/JabRef"
     }
   ]
 }
