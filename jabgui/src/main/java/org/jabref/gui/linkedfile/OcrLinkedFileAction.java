@@ -16,6 +16,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class OcrLinkedFileAction extends SimpleCommand {
     private LinkedFile linkedFile;
     private BibDatabaseContext databaseContext;
@@ -24,6 +27,8 @@ public class OcrLinkedFileAction extends SimpleCommand {
     private TaskExecutor taskExecutor;
     private OcrEngine ocrEngine;
     private BibEntry entry;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OcrLinkedFileAction.class);
 
     public OcrLinkedFileAction(LinkedFile linkedFile,
                                BibEntry bibEntry,
@@ -76,7 +81,8 @@ public class OcrLinkedFileAction extends SimpleCommand {
                 }
             }
         });
-        ocrTask.onFailure(_ -> {
+        ocrTask.onFailure(exception -> {
+            LOGGER.error("Unexpected error during OCR", exception);
             dialogService.notify(Localization.lang("OCR failed"));
         });
         taskExecutor.execute(ocrTask);
