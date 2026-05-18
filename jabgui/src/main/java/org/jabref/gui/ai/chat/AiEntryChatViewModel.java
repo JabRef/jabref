@@ -45,7 +45,7 @@ public class AiEntryChatViewModel extends AbstractViewModel {
     }
 
     private void load(FullBibEntry identifier) {
-        if (selectedEntry.get() == null || !enabled.get()) {
+        if (identifier == null || !enabled.get()) {
             return;
         }
 
