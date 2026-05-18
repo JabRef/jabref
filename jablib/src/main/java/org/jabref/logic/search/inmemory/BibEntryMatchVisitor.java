@@ -3,7 +3,6 @@ package org.jabref.logic.search.inmemory;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -146,8 +145,9 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
             if (!field.getName().equalsIgnoreCase(fieldName)) {
                 continue;
             }
-            Optional<String> value = entry.getField(field);
-            if (value.isPresent() && matchValue(value.get(), term, matchKind, caseSensitive)) {
+            if (entry.getField(field)
+                     .filter(value -> matchValue(value, term, matchKind, caseSensitive))
+                     .isPresent()) {
                 return true;
             }
         }
@@ -159,8 +159,9 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
             if (GROUPS_FIELD_NAME.equals(field.getName())) {
                 continue;
             }
-            Optional<String> value = entry.getField(field);
-            if (value.isPresent() && matchValue(value.get(), term, matchKind, caseSensitive)) {
+            if (entry.getField(field)
+                     .filter(value -> matchValue(value, term, matchKind, caseSensitive))
+                     .isPresent()) {
                 return true;
             }
         }
