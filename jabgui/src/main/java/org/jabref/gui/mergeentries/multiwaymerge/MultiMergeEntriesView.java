@@ -4,6 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javafx.collections.FXCollections;
@@ -47,6 +51,7 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldTextMapper;
@@ -87,6 +92,9 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     private final TaskExecutor taskExecutor;
 
     private final GuiPreferences preferences;
+
+
+    private Set<String> scheduledFetchedDois;
 
     public MultiMergeEntriesView(GuiPreferences preferences,
                                  TaskExecutor taskExecutor) {
@@ -216,7 +224,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     /// Adds ToggleButtons for all fields that are set for this BibEntry
     ///
     /// @param entrySourceColumn the entry to write
-    /// @param columnIndex       the index of the column to write this entry to
+    /// @param columnIndex the index of the column to write this entry to
     private void writeBibEntryToColumn(MultiMergeEntriesViewModel.EntrySource entrySourceColumn, int columnIndex) {
         for (Map.Entry<Field, String> entry : entrySourceColumn.entryProperty().get().getFieldsObservable().entrySet()) {
             Field key = entry.getKey();
@@ -230,7 +238,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     /// selected.
     ///
     /// @param sourceButton the header button to setup
-    /// @param column       the column this button is heading
+    /// @param column the column this button is heading
     private void setupSourceButtonAction(ToggleButton sourceButton, int column) {
         sourceButton.selectedProperty().addListener((_, _, newValue) -> {
             if (newValue) {
@@ -263,10 +271,10 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         public Cell(String content, Field field, int columnIndex) {
             this.content = content;
 
-            /*
-            If this is not explicitly done on the JavaFX thread, the bindings to the text fields don't work properly.
-            The text only shows up after one text in that same row is selected by the user.
-             */
+ /*
+ If this is not explicitly done on the JavaFX thread, the bindings to the text fields don't work properly.
+ The text only shows up after one text in that same row is selected by the user.
+ */
             UiTaskExecutor.runInJavaFXThread(() -> {
 
                 FieldRow row = fieldRows.get(field);
@@ -337,6 +345,70 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         public String getContent() {
             return content;
         }
+    }
+
+
+    public void enableAutomaticFetchedDoiColumnForPdfExtractions() {
+        scheduledFetchedDois = ConcurrentHashMap.newKeySet();
+
+        Consumer<MultiMergeEntriesViewModel.EntrySource> whenPdfSourceProducesEntry = pdfSourceColumn -> {
+            if (!pdfSourceColumn.isLoadingProperty().getValue()) {
+                scheduleFetchedDoiColumnIfNecessary(pdfSourceColumn.entryProperty().get());
+            } else {
+                pdfSourceColumn.isLoadingProperty().addListener((_, _, doneLoading) -> {
+                    if (doneLoading) {
+                        scheduleFetchedDoiColumnIfNecessary(pdfSourceColumn.entryProperty().get());
+                    }
+                });
+            }
+        };
+
+        viewModel.entriesProperty().addListener((ListChangeListener<MultiMergeEntriesViewModel.EntrySource>) c -> {
+            while (c.next()) {
+                if (c.wasAdded()) {
+                    for (MultiMergeEntriesViewModel.EntrySource entrySourceColumn : c.getAddedSubList()) {
+                        whenPdfSourceProducesEntry.accept(entrySourceColumn);
+                    }
+                }
+            }
+        });
+        for (MultiMergeEntriesViewModel.EntrySource entrySourceColumn : viewModel.entriesProperty()) {
+            whenPdfSourceProducesEntry.accept(entrySourceColumn);
+        }
+    }
+
+
+    private void scheduleFetchedDoiColumnIfNecessary(BibEntry extracted) {
+        if (extracted == null || scheduledFetchedDois == null) {
+            return;
+        }
+
+        Optional<String> rawDoi = extracted.getField(StandardField.DOI);
+        if (rawDoi.isEmpty()) {
+            return;
+        }
+
+        Optional<DOI> doiOptional = DOI.findInText(rawDoi.get());
+        if (doiOptional.isEmpty()) {
+            return;
+        }
+
+        String canonicalKey = doiOptional.get().asString().trim().toLowerCase();
+        if (!scheduledFetchedDois.add(canonicalKey)) {
+            return;
+        }
+
+        String lookupId = doiOptional.get().asString();
+        DoiFetcher doiFetcher = new DoiFetcher(preferences.getImportFormatPreferences());
+
+        addSource(Localization.lang("From DOI"), () -> {
+            try {
+                return doiFetcher.performSearchById(lookupId).orElse(null);
+            } catch (FetcherException e) {
+                LOGGER.warn("Failed to fetch BibEntry for DOI {}", lookupId, e);
+                return null;
+            }
+        });
     }
 
     public void addSource(String title, BibEntry entry) {
