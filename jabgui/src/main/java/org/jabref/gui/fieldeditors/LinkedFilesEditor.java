@@ -131,7 +131,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 preferences,
                 databaseContext,
                 bibEntry,
-                viewModel
+                viewModel,
+                taskExecutor
         );
 
         new ViewModelListCellFactory<LinkedFileViewModel>()

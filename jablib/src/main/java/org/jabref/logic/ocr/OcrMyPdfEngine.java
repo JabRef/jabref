@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 /// Implementation of the {@link OcrEngine} interface using OCRmyPDF.
 public class OcrMyPdfEngine implements OcrEngine {
 
+    private static final String OCR_PDF_PREFIX = "_ocr.pdf";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OcrMyPdfEngine.class);
     private static final int TIMEOUT_MINS = 10;
 
@@ -53,10 +55,8 @@ public class OcrMyPdfEngine implements OcrEngine {
             Process process = processBuilder.start();
 
             // Get the output and the errors of the process
-            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(OcrMyPdfEngine.class)::debug);
-            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(OcrMyPdfEngine.class)::debug);
+            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
             HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
-            HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
 
             boolean finished = process.waitFor(TIMEOUT_MINS, TimeUnit.MINUTES);
             if (!finished) {
@@ -87,7 +87,7 @@ public class OcrMyPdfEngine implements OcrEngine {
     /// @return the output path of the searchable OCRed PDF.
     private Path makeOutputFilePath(Path inputPath) {
         String baseName = FileUtil.getBaseName(inputPath.toString());
-        Path outputPath = inputPath.resolveSibling(baseName + "_ocr.pdf");
+        Path outputPath = inputPath.resolveSibling(baseName + OCR_PDF_PREFIX);
         return outputPath;
     }
 }

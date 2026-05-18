@@ -11,6 +11,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -25,9 +26,10 @@ public class ContextMenuFactory {
                               @NonNull GuiPreferences preferences,
                               @NonNull BibDatabaseContext databaseContext,
                               @NonNull ObservableOptionalValue<BibEntry> bibEntry,
-                              @NonNull LinkedFilesEditorViewModel viewModel) {
+                              @NonNull LinkedFilesEditorViewModel viewModel,
+                              @NonNull TaskExecutor taskExecutor) {
         this.menuBuilders = List.of(
-                new SingleSelectionMenuBuilder(dialogService, databaseContext, bibEntry, preferences, viewModel),
+                new SingleSelectionMenuBuilder(dialogService, databaseContext, bibEntry, preferences, viewModel, taskExecutor),
                 new MultiSelectionMenuBuilder(dialogService, databaseContext, bibEntry, preferences, viewModel)
         );
     }

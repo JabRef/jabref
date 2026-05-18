@@ -16,6 +16,7 @@ import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.FileDirectories;
 import org.jabref.model.entry.BibEntry;
@@ -64,7 +65,8 @@ class ContextMenuFactoryTest {
                 guiPreferences,
                 bibDatabaseContext,
                 bibEntry,
-                mock(LinkedFilesEditorViewModel.class)
+                mock(LinkedFilesEditorViewModel.class),
+                mock(TaskExecutor.class)
         );
     }
 

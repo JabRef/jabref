@@ -17,6 +17,7 @@ import org.jabref.gui.linkedfile.OcrLinkedFileAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.ocr.OcrEngine;
 import org.jabref.logic.ocr.OcrMyPdfEngine;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -28,19 +29,22 @@ record SingleSelectionMenuBuilder(
         BibDatabaseContext databaseContext,
         ObservableOptionalValue<BibEntry> bibEntry,
         GuiPreferences preferences,
-        LinkedFilesEditorViewModel viewModel
+        LinkedFilesEditorViewModel viewModel,
+        TaskExecutor taskExecutor
 ) implements ContextMenuBuilder {
 
     SingleSelectionMenuBuilder(@NonNull DialogService dialogService,
                                @NonNull BibDatabaseContext databaseContext,
                                @NonNull ObservableOptionalValue<BibEntry> bibEntry,
                                @NonNull GuiPreferences preferences,
-                               @NonNull LinkedFilesEditorViewModel viewModel) {
+                               @NonNull LinkedFilesEditorViewModel viewModel,
+                               @NonNull TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.bibEntry = bibEntry;
         this.preferences = preferences;
         this.viewModel = viewModel;
+        this.taskExecutor = taskExecutor;
     }
 
     @Override
@@ -81,7 +85,7 @@ record SingleSelectionMenuBuilder(
         OcrEngine ocrEngine = new OcrMyPdfEngine();
         items.add(factory.createMenuItem(
                 StandardActions.PERFORM_OCR,
-                new OcrLinkedFileAction(selectedLinkedFile.getFile(), bibEntry.getValueOrElse(new BibEntry()), databaseContext, dialogService, preferences, viewModel.getTaskExecutor(), ocrEngine)));
+                new OcrLinkedFileAction(selectedLinkedFile.getFile(), bibEntry.getValueOrElse(new BibEntry()), databaseContext, dialogService, preferences, taskExecutor, ocrEngine)));
 
         items.add(factory.createMenuItem(
                 StandardActions.RENAME_FILE_TO_PATTERN,

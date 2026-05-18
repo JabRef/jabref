@@ -1,14 +1,12 @@
 package org.jabref.gui.linkedfile;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.OcrEngine;
 import org.jabref.logic.ocr.OcrResult;
@@ -22,7 +20,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
     private LinkedFile linkedFile;
     private BibDatabaseContext databaseContext;
     private DialogService dialogService;
-    private FilePreferences filePreferences;
+    private GuiPreferences preferences;
     private TaskExecutor taskExecutor;
     private OcrEngine ocrEngine;
     private BibEntry entry;
@@ -38,57 +36,48 @@ public class OcrLinkedFileAction extends SimpleCommand {
         this.entry = bibEntry;
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
-        this.filePreferences = preferences.getFilePreferences();
+        this.preferences = preferences;
         this.taskExecutor = taskExecutor;
         this.ocrEngine = ocrEngine;
     }
 
     @Override
     public void execute() {
-        Optional<Path> pdfPath = linkedFile.findIn(databaseContext, filePreferences);
-        BackgroundTask<OcrResult> ocrTask = new BackgroundTask<>() {
-            @Override
-            public OcrResult call() {
-                if (pdfPath.isPresent()) {
-                    return ocrEngine.performOcrAndEmbedText(pdfPath.get());
-                } else {
-                    return null;
-                }
-            }
-        };
+        Optional<Path> pdfPath = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
+        if (!pdfPath.isPresent()) {
+            return;
+        }
+        BackgroundTask<OcrResult> ocrTask = BackgroundTask.wrap(() -> ocrEngine.performOcrAndEmbedText(pdfPath.get()));
 
-        ocrTask.titleProperty().set(Localization.lang("OCRing"));
+        ocrTask.titleProperty().set(Localization.lang("Performing OCR"));
         ocrTask.showToUser(true);
         ocrTask.onSuccess(result -> {
             switch (result) {
-                case OcrResult.Success s -> {
-                    dialogService.notify(Localization.lang("OCR Success"));
-                    LinkedFile ocredPdf = new LinkedFile(s.outputFile());
-                    List<LinkedFile> ocredFiles = new ArrayList<>();
-                    ocredFiles.add(ocredPdf);
+                case OcrResult.Success success -> {
+                    dialogService.notify(Localization.lang("OCR succeeded"));
+                    LinkedFile ocredPdf = new LinkedFile(success.outputFile());
+                    List<LinkedFile> ocredFiles = List.of(ocredPdf);
                     entry.setFiles(ocredFiles);
                 }
-                case OcrResult.Failure f -> {
-                    dialogService.showErrorDialogAndWait(
-                            Localization.lang("OCR failed"),
-                            Localization.lang(switch (f.reason()) {
-                                case NOT_AVAILABLE ->
-                                        "OCRmyPDF is not installed.";
-                                case TIMEOUT ->
-                                        "OCR timed out.";
-                                case NON_ZERO_EXIT ->
-                                        "OCR process failed.";
-                                case IO_ERROR ->
-                                        "Could not start OCR process.";
-                                case INTERRUPTED ->
-                                        "OCR was cancelled.";
-                            })
-                    );
+                case OcrResult.Failure failure -> {
+                    String failureReason = switch (failure.reason()) {
+                        case NOT_AVAILABLE ->
+                                "OCRmyPDF is not available";
+                        case TIMEOUT ->
+                                "OCR timed out";
+                        case NON_ZERO_EXIT ->
+                                "OCR process failed";
+                        case IO_ERROR ->
+                                "Could not start OCR process";
+                        case INTERRUPTED ->
+                                "OCR was cancelled";
+                    };
+                    dialogService.showErrorDialogAndWait(Localization.lang("OCR failed"), Localization.lang(failureReason));
                 }
             }
         });
         ocrTask.onFailure(_ -> {
-            dialogService.notify(Localization.lang("OCR failed."));
+            dialogService.notify(Localization.lang("OCR failed"));
         });
         taskExecutor.execute(ocrTask);
     }
