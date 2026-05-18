@@ -609,14 +609,18 @@ public class OOBibBase {
                                                       String pageInfo,
                                                       OOResult<FunctionalTextViewCursor,
                                                               OOError> fcursor) {
-        EditInsert.insertCitationGroup(doc,
+        OOVoidResult<OOError> insertResult = EditInsert.insertCitationGroup(doc,
                 frontend.get(),
                 cursor.get(),
                 entries,
                 bibDatabaseContext.getDatabase(),
                 jStyle,
                 citationType,
-                pageInfo);
+                pageInfo).mapError(OOError::from);
+
+        if (insertResult.isError()) {
+            return insertResult;
+        }
 
         if (syncOptions.isPresent()) {
             return Update.resyncDocument(doc, jStyle, fcursor.get(), syncOptions.get()).asVoidResult().mapError(OOError::from);
