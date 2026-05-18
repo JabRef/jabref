@@ -553,13 +553,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 // - Bottom + top -> import entries
                 case TOP,
                      BOTTOM -> {
-                        if (droppedFileImportPlan.hasBibliographyFiles()) {
-                            importHandler.importBibliographyFilesWithDialog(droppedFileImportPlan.bibliographyFiles());
-                        }
-                        if (!droppedFileImportPlan.remainingFiles().isEmpty()) {
-                            importHandler.importFilesInBackground(droppedFileImportPlan.remainingFiles(), transferMode).executeWith(taskExecutor);
-                        }
+                    if (droppedFileImportPlan.hasBibliographyFiles()) {
+                        importHandler.importBibliographyFilesWithDialog(droppedFileImportPlan.bibliographyFiles());
                     }
+                    if (!droppedFileImportPlan.remainingFiles().isEmpty()) {
+                        importHandler.importFilesInBackground(droppedFileImportPlan.remainingFiles(), transferMode).executeWith(taskExecutor);
+                    }
+                }
                 // - Center -> modify entry: link files to entry
                 case CENTER -> {
                     if (droppedFileImportPlan.hasBibliographyFiles()) {
