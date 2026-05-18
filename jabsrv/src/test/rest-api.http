@@ -13,25 +13,6 @@ GET http://localhost:23119
 GET http://localhost:23119/libraries
 Accept: application/json
 
-### Query entries by DOI across all open libraries
-
-POST http://localhost:23119/libraries/query
-Content-Type: application/json
-
-{
-  "dois": ["10.1000/xyz123"]
-}
-
-### Query entries by DOI and URL across all open libraries
-
-POST http://localhost:23119/libraries/query
-Content-Type: application/json
-
-{
-  "dois": ["10.1000/xyz123"],
-  "urls": ["https://example.com/paper"]
-}
-
 ## demo cases
 
 // JabRef ships with "Chocolate.bib", which is "magically" served when asking for "demo"
