@@ -36,7 +36,7 @@ class CheckConsistency implements Callable<Integer> {
     @Mixin
     private InputOption inputOption = new InputOption();
 
-    @Option(names = {"--output-format"}, description = "Output format: errorformat, txt or csv", defaultValue = "errorformat")
+    @Option(names = {"--output-format"}, description = "Output format: errorformat, txt or csv", defaultValue = Check.FORMAT_ERRORFORMAT)
     private String outputFormat;
 
     @Override
@@ -92,7 +92,7 @@ class CheckConsistency implements Callable<Integer> {
         Writer writer = new OutputStreamWriter(System.out);
         BibliographyConsistencyCheckResultWriter checkResultWriter;
 
-        if ("errorformat".equalsIgnoreCase(outputFormat)) {
+        if (Check.FORMAT_ERRORFORMAT.equalsIgnoreCase(outputFormat)) {
             checkResultWriter = new BibliographyConsistencyCheckResultErrorFormatWriter(
                     result,
                     writer,
@@ -101,7 +101,7 @@ class CheckConsistency implements Callable<Integer> {
                     databaseContext.getMode(),
                     parserResult,
                     inputFile);
-        } else if ("txt".equalsIgnoreCase(outputFormat)) {
+        } else if (Check.FORMAT_TXT.equalsIgnoreCase(outputFormat)) {
             checkResultWriter = new BibliographyConsistencyCheckResultTxtWriter(
                     result,
                     writer,

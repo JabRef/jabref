@@ -18,6 +18,12 @@ import static picocli.CommandLine.ParentCommand;
         })
 class Check implements Callable<Integer> {
 
+    /// Output formats accepted by `--output-format`. Kept lowercase so they can also serve as
+    /// `case` labels for a switch over `outputFormat.toLowerCase(...)`.
+    static final String FORMAT_ERRORFORMAT = "errorformat";
+    static final String FORMAT_TXT = "txt";
+    static final String FORMAT_CSV = "csv";
+
     @ParentCommand
     protected JabKit jabKit;
 
@@ -30,7 +36,7 @@ class Check implements Callable<Integer> {
             description = "Input file. When given without a subcommand, both the consistency and integrity checks run.")
     private Path inputFile;
 
-    @Option(names = {"--output-format"}, description = "Output format: errorformat, txt or csv", defaultValue = "errorformat")
+    @Option(names = {"--output-format"}, description = "Output format: errorformat, txt or csv", defaultValue = FORMAT_ERRORFORMAT)
     private String outputFormat;
 
     @Override

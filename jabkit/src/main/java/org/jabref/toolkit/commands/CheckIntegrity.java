@@ -43,7 +43,7 @@ class CheckIntegrity implements Callable<Integer> {
     @Mixin
     private InputOption inputOption = new InputOption();
 
-    @Option(names = {"--output-format"}, description = "Output format: errorformat, txt or csv", defaultValue = "errorformat")
+    @Option(names = {"--output-format"}, description = "Output format: errorformat, txt or csv", defaultValue = Check.FORMAT_ERRORFORMAT)
     private String outputFormat;
 
     // in BibTeX it could be preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex()
@@ -100,11 +100,11 @@ class CheckIntegrity implements Callable<Integer> {
         Writer writer = new OutputStreamWriter(System.out);
         IntegrityCheckResultWriter checkResultWriter;
         switch (outputFormat.toLowerCase(Locale.ROOT)) {
-            case "errorformat" ->
+            case Check.FORMAT_ERRORFORMAT ->
                     checkResultWriter = new IntegrityCheckResultErrorFormatWriter(writer, messages, parserResult.get(), inputFile);
-            case "txt" ->
+            case Check.FORMAT_TXT ->
                     checkResultWriter = new IntegrityCheckResultTxtWriter(writer, messages);
-            case "csv" ->
+            case Check.FORMAT_CSV ->
                     checkResultWriter = new IntegrityCheckResultCsvWriter(writer, messages);
             default -> {
                 System.out.println(Localization.lang("Unknown output format '%0'.", outputFormat));
