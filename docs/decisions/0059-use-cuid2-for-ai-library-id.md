@@ -71,7 +71,7 @@ Java port used: [thibaultmeyer/cuid-java](https://github.com/thibaultmeyer/cuid-
 * Good, because the textual form is shorter and lowercase alphanumeric, blending in with other identifiers researchers already see (citation keys, DOIs).
 * Good, because the spec is explicit about collision resistance under distributed generation.
 * Good, because it is a modern, actively maintained scheme (the original CUID has been deprecated in favor of CUID2).
-* Good, because a Java implementation is already available in the dependency tree.
+* Good, because already used in indexing and OpenOffice integration.
 * Bad, because it is one more dependency to track.
 * Bad, because it is slightly less familiar to developers than UUID.
 
