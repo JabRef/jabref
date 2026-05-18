@@ -377,7 +377,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             LOGGER.debug("User interrupted loading. Not showing any library.");
             return;
         }
-        if (tabPane.getSelectionModel().selectedItemProperty().get().equals(this)) {
+        Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+        if (selectedTab == this) {
             isSelectedTab = true;
         }
 
