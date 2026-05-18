@@ -50,7 +50,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
     public void execute() {
         Optional<Path> pdfPath = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
         if (!pdfPath.isPresent()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Can't find file"));
+            dialogService.showErrorDialogAndWait(Localization.lang("Could not find a file to OCR"));
             return;
         }
         BackgroundTask<OcrResult> ocrTask = BackgroundTask.wrap(() -> ocrEngine.performOcrAndEmbedText(pdfPath.get()));
