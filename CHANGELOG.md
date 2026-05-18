@@ -54,6 +54,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where the PDF metadata merge dialog did not automatically add a DOI-fetched source even when extracted metadata already contained a DOI. [#15415](https://github.com/JabRef/jabref/issues/15415)
 - We fixed an issue where the citation key generator did not show the date for child entries due to orphaned crossref links. [#9071](https://github.com/JabRef/jabref/issues/9071)
 - We fixed an issue with the `Normalize date` save action truncating date ranges. [#8902](https://github.com/JabRef/jabref/issues/8902)
 - We fixed an issue where removed CSL files were not immediately cleared from the UI upon style removal. [#15438](https://github.com/JabRef/jabref/issues/15438)
@@ -101,7 +102,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the invisible delete button area was shown for internal CSL styles in the OpenOffice/LibreOffice style selection dialog. External CSL styles remain deletable. [#15397](https://github.com/JabRef/jabref/issues/15397)
 - We fixed an issue that prevented files without a file extension from being shown in various file select dialogs [#11786](https://github.com/JabRef/jabref/issues/11786)
 - We fixed the Hayagriva YAML exporter producing a multi-document YAML file, which broke Typst compilation. [#15617](https://github.com/JabRef/jabref/issues/15617)
-- We fixed an issue where the PDF metadata merge dialog did not automatically add a DOI-fetched source even when extracted metadata already contained a DOI. [#15415](https://github.com/JabRef/jabref/issues/15415)
 ### Removed
 
 - We removed GPT4All as AI-provider as this project is currently unmaintained and does not receive any security updates. [#15439](https://github.com/JabRef/jabref/pull/15439)
