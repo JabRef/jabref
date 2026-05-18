@@ -61,7 +61,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
             switch (result) {
                 case OcrResult.Success success -> {
                     dialogService.notify(Localization.lang("OCR succeeded"));
-                    LinkedFile ocredPdf = new LinkedFile(success.outputFile());
+                    LinkedFile ocredPdf = new LinkedFile(success.outputFile(), "PDF");
                     List<LinkedFile> ocredFiles = List.of(ocredPdf);
                     entry.addFiles(ocredFiles);
                 }
