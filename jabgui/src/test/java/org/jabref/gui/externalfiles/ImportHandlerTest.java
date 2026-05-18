@@ -1,5 +1,8 @@
 package org.jabref.gui.externalfiles;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import javax.swing.undo.UndoManager;
@@ -12,8 +15,10 @@ import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -25,6 +30,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -38,6 +44,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class ImportHandlerTest {
+
+    @TempDir
+    Path tempDir;
 
     private ImportHandler importHandler;
     private BibDatabaseContext bibDatabaseContext;
@@ -53,8 +62,13 @@ class ImportHandlerTest {
         MockitoAnnotations.initMocks(this);
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
+        CitationKeyPatternPreferences citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class);
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
         when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
+        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.observableSet());
 
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
@@ -114,6 +128,36 @@ class ImportHandlerTest {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Clear Author");
         BibEntry cleanedEntry = importHandler.cleanUpEntry(entry);
         assertEquals(new BibEntry().withField(StandardField.AUTHOR, "Clear Author"), cleanedEntry);
+    }
+
+    @Test
+    void shouldShowImportDialogForRisFile() throws IOException {
+        Path risFile = tempDir.resolve("test.ris");
+        Files.writeString(risFile, """
+                TY  - JOUR
+                TI  - Drag and drop test
+                AU  - Doe, Jane
+                PY  - 2024
+                ER  -
+                """);
+
+        assertTrue(importHandler.shouldShowImportDialog(List.of(risFile)));
+    }
+
+    @Test
+    void shouldNotShowImportDialogForPdfFile() throws IOException {
+        Path pdfFile = tempDir.resolve("test.pdf");
+        Files.writeString(pdfFile, "not really a pdf");
+
+        assertFalse(importHandler.shouldShowImportDialog(List.of(pdfFile)));
+    }
+
+    @Test
+    void shouldNotShowImportDialogForPlainTextFile() throws IOException {
+        Path textFile = tempDir.resolve("notes.txt");
+        Files.writeString(textFile, "plain text");
+
+        assertFalse(importHandler.shouldShowImportDialog(List.of(textFile)));
     }
 
     @Test

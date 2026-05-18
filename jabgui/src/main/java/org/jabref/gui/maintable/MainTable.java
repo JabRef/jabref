@@ -551,13 +551,22 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 // Different actions depending on where the user releases the drop in the target row
                 // - Bottom + top -> import entries
                 case TOP,
-                     BOTTOM ->
-                        importHandler.importFilesInBackground(files, transferMode).executeWith(taskExecutor);
+                     BOTTOM -> {
+                            if (importHandler.shouldShowImportDialog(files)) {
+                                importHandler.importBibliographyFilesWithDialog(files);
+                            } else {
+                                importHandler.importFilesInBackground(files, transferMode).executeWith(taskExecutor);
+                            }
+                        }
                 // - Center -> modify entry: link files to entry
                 case CENTER -> {
-                    BibEntry entry = target.getEntry();
-                    ExternalFilesEntryLinker fileLinker = importHandler.getFileLinker();
-                    DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
+                    if (importHandler.shouldShowImportDialog(files)) {
+                        importHandler.importBibliographyFilesWithDialog(files);
+                    } else {
+                        BibEntry entry = target.getEntry();
+                        ExternalFilesEntryLinker fileLinker = importHandler.getFileLinker();
+                        DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
+                    }
                 }
             }
 
@@ -576,9 +585,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                     .map(File::toPath)
                                     .map(FileUtil::resolveIfShortcut)
                                     .toList();
-            importHandler
-                    .importFilesInBackground(files, event.getTransferMode())
-                    .executeWith(taskExecutor);
+            if (importHandler.shouldShowImportDialog(files)) {
+                importHandler.importBibliographyFilesWithDialog(files);
+            } else {
+                importHandler
+                        .importFilesInBackground(files, event.getTransferMode())
+                        .executeWith(taskExecutor);
+            }
             success = true;
         }
 

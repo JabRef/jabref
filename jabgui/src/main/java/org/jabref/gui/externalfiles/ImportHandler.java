@@ -18,6 +18,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
 import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -39,6 +40,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
+import org.jabref.logic.importer.util.ImportResultsMerger;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BackgroundTask;
@@ -112,6 +114,17 @@ public class ImportHandler {
 
     public ExternalFilesEntryLinker getFileLinker() {
         return fileLinker;
+    }
+
+    public boolean shouldShowImportDialog(List<Path> files) {
+        return !files.isEmpty() && files.stream().allMatch(this::isImportableBibliographyFile);
+    }
+
+    public void importBibliographyFilesWithDialog(List<Path> files) {
+        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> parseBibliographyFiles(files));
+        ImportEntriesDialog dialog = new ImportEntriesDialog(targetBibDatabaseContext, task);
+        dialog.setTitle(Localization.lang("Import"));
+        dialogService.showCustomDialogAndWait(dialog);
     }
 
     public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files, TransferMode transferMode) {
@@ -230,6 +243,62 @@ public class ImportHandler {
         entry.setField(StandardField.TITLE, file.getFileName().toString());
         fileLinker.linkFilesToEntry(entry, List.of(file));
         return entry;
+    }
+
+    @VisibleForTesting
+    boolean isImportableBibliographyFile(Path file) {
+        if (FileUtil.isPDFFile(file)) {
+            return false;
+        }
+
+        try {
+            ImportResult importResult = createImportFormatReader().importWithAutoDetection(file);
+            return importResult.parserResult().getDatabase().hasEntries();
+        } catch (ImportException e) {
+            LOGGER.debug("Dropped file is not an importable bibliography file: {}", file, e);
+            return false;
+        }
+    }
+
+    private ParserResult parseBibliographyFiles(List<Path> files) {
+        ImportFormatReader importFormatReader = createImportFormatReader();
+        List<ImportResult> imports = new ArrayList<>();
+
+        for (Path file : files) {
+            try {
+                imports.add(importFormatReader.importWithAutoDetection(file));
+            } catch (ImportException e) {
+                LOGGER.error("Error importing bibliography file {}", file, e);
+                UiTaskExecutor.runAndWaitInJavaFXThread(() ->
+                        dialogService.showWarningDialogAndWait(
+                                Localization.lang("Import error"),
+                                Localization.lang("Please check your library file for wrong syntax.")
+                                        + "\n\n"
+                                        + e.getLocalizedMessage()));
+            }
+        }
+
+        if (imports.isEmpty()) {
+            UiTaskExecutor.runAndWaitInJavaFXThread(() ->
+                    dialogService.showWarningDialogAndWait(
+                            Localization.lang("Import error"),
+                            Localization.lang("No entries found. Please make sure you are using the correct import filter.")));
+            return new ParserResult();
+        }
+
+        return ImportResultsMerger.mergeImportResults(
+                imports,
+                preferences.getBibEntryPreferences().getKeywordSeparator(),
+                preferences.getOwnerPreferences(),
+                preferences.getTimestampPreferences());
+    }
+
+    private ImportFormatReader createImportFormatReader() {
+        return new ImportFormatReader(
+                preferences.getImporterPreferences(),
+                preferences.getImportFormatPreferences(),
+                preferences.getCitationKeyPatternPreferences(),
+                fileUpdateMonitor);
     }
 
     /// Cleans up the given entries and adds them to the library.
