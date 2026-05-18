@@ -15,8 +15,6 @@ import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.linkedfile.OcrLinkedFileAction;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.ocr.OcrEngine;
-import org.jabref.logic.ocr.OcrMyPdfEngine;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -82,10 +80,9 @@ record SingleSelectionMenuBuilder(
                 StandardActions.DOWNLOAD_FILE,
                 new ContextAction(StandardActions.DOWNLOAD_FILE, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
 
-        OcrEngine ocrEngine = new OcrMyPdfEngine();
         items.add(factory.createMenuItem(
                 StandardActions.PERFORM_OCR,
-                new OcrLinkedFileAction(selectedLinkedFile.getFile(), selectedLinkedFile.getBibEntry(), databaseContext, dialogService, preferences, taskExecutor, ocrEngine)));
+                new OcrLinkedFileAction(selectedLinkedFile.getFile(), selectedLinkedFile.getBibEntry(), databaseContext, dialogService, preferences, taskExecutor)));
 
         items.add(factory.createMenuItem(
                 StandardActions.RENAME_FILE_TO_PATTERN,

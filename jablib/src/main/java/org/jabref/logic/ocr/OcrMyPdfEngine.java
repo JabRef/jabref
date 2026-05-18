@@ -2,7 +2,6 @@ package org.jabref.logic.ocr;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -43,12 +42,9 @@ public class OcrMyPdfEngine implements OcrEngine {
         if (!isAvailable()) {
             return OcrResult.failure(OcrFailureReason.NOT_AVAILABLE);
         }
-        List<String> command = new ArrayList<>();
-        command.add("ocrmypdf");
-        command.add(pdfPath.toString());
         Path outputPath = makeOutputFilePath(pdfPath);
         String outputFile = outputPath.toString();
-        command.add(outputFile);
+        List<String> command = List.of("ocrmypdf", pdfPath.toString(), outputFile);
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectErrorStream(true);
