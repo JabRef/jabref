@@ -31,19 +31,19 @@ public class OcrMyPdfEngine implements OcrEngine {
             ProcessBuilder processBuilder = new ProcessBuilder("ocrmypdf", "--version");
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
-            boolean finished = process.waitFor(30, TimeUnit.SECONDS);
+            boolean finished = process.waitFor(5, TimeUnit.SECONDS);
             if (!finished) {
                 process.destroyForcibly();
-                LOGGER.warn("Checking OCRmyPDF availability timed out.");
+                LOGGER.debug("Checking OCRmyPDF availability timed out");
                 return false;
             }
             return process.exitValue() == 0;
         } catch (IOException e) {
-            LOGGER.error("OCRmyPDF is not available: IOException occurred.", e);
+            LOGGER.error("OCRmyPDF is not available: IOException occurred", e);
             return false;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            LOGGER.error("Checking OCRmyPDF availability was interrupted.", e);
+            LOGGER.error("Checking OCRmyPDF availability was interrupted", e);
             return false;
         }
     }
