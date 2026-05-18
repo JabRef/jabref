@@ -11,6 +11,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCsvWriter;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultErrorFormatWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.model.database.BibDatabaseContext;
@@ -35,7 +36,7 @@ class CheckConsistency implements Callable<Integer> {
     @Mixin
     private InputOption inputOption = new InputOption();
 
-    @Option(names = {"--output-format"}, description = "Output format: txt or csv", defaultValue = "txt")
+    @Option(names = {"--output-format"}, description = "Output format: errorformat, txt or csv", defaultValue = "errorformat")
     private String outputFormat;
 
     @Override
@@ -71,14 +72,26 @@ class CheckConsistency implements Callable<Integer> {
             }
         });
 
-        return writeCheckResult(result, databaseContext);
+        return writeCheckResult(result, databaseContext, parserResult.get(), inputFile);
     }
 
-    private int writeCheckResult(BibliographyConsistencyCheck.Result result, BibDatabaseContext databaseContext) {
+    private int writeCheckResult(BibliographyConsistencyCheck.Result result,
+                                 BibDatabaseContext databaseContext,
+                                 ParserResult parserResult,
+                                 Path inputFile) {
         Writer writer = new OutputStreamWriter(System.out);
         BibliographyConsistencyCheckResultWriter checkResultWriter;
 
-        if ("txt".equalsIgnoreCase(outputFormat)) {
+        if ("errorformat".equalsIgnoreCase(outputFormat)) {
+            checkResultWriter = new BibliographyConsistencyCheckResultErrorFormatWriter(
+                    result,
+                    writer,
+                    sharedOptions.porcelain,
+                    check.jabKit.entryTypesManager,
+                    databaseContext.getMode(),
+                    parserResult,
+                    inputFile);
+        } else if ("txt".equalsIgnoreCase(outputFormat)) {
             checkResultWriter = new BibliographyConsistencyCheckResultTxtWriter(
                     result,
                     writer,
