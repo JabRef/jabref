@@ -27,6 +27,13 @@ code until all points are fulfilled. Do not skip any point.
 
 ## Documentation
 
-- [ ] `CHANGELOG.md` entry added (end-user wording, no extra blank lines).
-- [ ] Requirement added to `docs/requirements/<area>.md` for a new feature or significant bug fix.
+- [ ] `CHANGELOG.md` entry added if the change is visible to the user (end-user wording, no extra blank lines).
+- [ ] Requirement added to `docs/requirements/<area>.md` if the change is a new feature or significant bug fix (skip for refactors, minor fixes, and internal changes).
 - [ ] Developer documentation under `docs/` updated if behavior or architecture changed.
+
+## Pull request
+
+- [ ] PR body built from `.github/PULL_REQUEST_TEMPLATE.md`, every section filled.
+- [ ] All checklist items kept and marked `[x]`, `[ ]`, or `[/]`.
+- [ ] All HTML comments removed from the PR body.
+- [ ] PR created with `gh pr create --body-file <file>` (not `--body`).

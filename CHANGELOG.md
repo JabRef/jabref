@@ -9,15 +9,23 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ## [Unreleased]
 
+- We enabled usage of relative or absolute file paths depending on your file directory settings. [#3590](https://github.com/JabRef/jabref/issues/3590)
+
 ### Added
 
 - We added `POST /libraries/query` to the HTTP server to search for entries across all open libraries with a list of search queries in a single request. [#15599](https://github.com/JabRef/jabref/pull/15599)
 - We added `GET /libraries/{id}/groups` to the HTTP server to list a library's groups as a flat breadcrumb list. [#15599](https://github.com/JabRef/jabref/pull/15599)
 - We added an optional `group` query parameter to `POST /libraries/{id}/entries` so imported entries can be assigned to a group, which is created if it does not exist. [#15599](https://github.com/JabRef/jabref/pull/15599)
+- We added `POST /libraries/query` to the HTTP server to search for entries by DOI or URL across all open libraries in a single request. [#15599](https://github.com/JabRef/jabref/pull/15599)
+- We added automatic source groups to SLR results and fixed group merging to preserve all source groups. [#12542](https://github.com/JabRef/jabref/issues/12542)
 
 ### Changed
 
+- We made the `Move file to directory` operation for Linked Files show every configured JabRef directory as possible options. [#12287](https://github.com/JabRef/jabref/issues/12287)
+
 ### Fixed
+
+- We fixed an issue where newly added entries could not be found in search. [#15719](https://github.com/JabRef/jabref/issues/15719)
 
 ### Removed
 
@@ -51,6 +59,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We updated the Systematic Literature Review (SLR) study format to v2, adding per-catalog inclusion reasons. Existing study.yml files are migrated automatically on read. [#12642](https://github.com/JabRef/jabref/issues/12642)
 - We replaced deprecated Gemini Models from the AI chat model selection and with current ones. [#15398](https://github.com/JabRef/jabref/issues/15398)
 - We changed CSL reference format by adding citation type at the end.  [#15370](https://github.com/JabRef/jabref/issues/15370) [#15434](https://github.com/JabRef/jabref/issues/15434)
 - We changed the groups filter field to use a filter icon. [#15402](https://github.com/JabRef/jabref/issues/15402)
