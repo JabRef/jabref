@@ -75,6 +75,7 @@ import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
+import org.jabref.logic.net.CiteDrivePreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
@@ -121,9 +122,14 @@ import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
+import com.nimbusds.oauth2.sdk.ParseException;
+import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Singleton;
+import net.minidev.json.JSONObject;
+import net.minidev.json.parser.JSONParser;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -341,6 +347,11 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String PROXY_PERSIST_PASSWORD = "persistPassword";
     // endregion
 
+    // CiteDrive
+    // RefreshToken
+    private static final String CITE_DRIVE_TOKEN = "citeDriveToken";
+    private static final String CITE_DRIVE_PERSIST_TOKEN = "citeDrivePersistToken";
+
     // Web search
     private static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
     private static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
@@ -472,6 +483,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private FilePreferences filePreferences;
     private RemotePreferences remotePreferences;
     private ProxyPreferences proxyPreferences;
+    private CiteDrivePreferences citeDrivePreferences;
     private SSLPreferences sslPreferences;
     private SearchPreferences searchPreferences;
     private AutoLinkPreferences autoLinkPreferences;
@@ -860,6 +872,33 @@ public class JabRefCliPreferences implements CliPreferences {
         return StringUtil.isNotBlank(rawPath) ? Path.of(rawPath) : defaultValue;
     }
 
+    /// Clear all preferences.
+    ///
+    /// @throws BackingStoreException if JabRef is unable to write to the registry/the preference storage
+    @Override
+    public void clear() throws BackingStoreException {
+        clearAllBibEntryTypes();
+        clearCitationKeyPatterns();
+        clearTruststoreFromCustomCertificates();
+        clearCustomFetcherKeys();
+        PREFS_NODE.clear();
+        new SharedDatabasePreferences().clear();
+
+        getFieldPreferences().setAll(FieldPreferences.getDefault());
+        getProxyPreferences().setAll(ProxyPreferences.getDefault());
+        getCiteDrivePreferences().setAll(CiteDrivePreferences.getDefault());
+        getPushToApplicationPreferences().setAll(PushToApplicationPreferences.getDefault());
+        getJournalAbbreviationPreferences().setAll(JournalAbbreviationPreferences.getDefault());
+        getLibraryPreferences().setAll(LibraryPreferences.getDefault());
+        getDOIPreferences().setAll(DOIPreferences.getDefault());
+        getOwnerPreferences().setAll(OwnerPreferences.getDefault());
+        getTimestampPreferences().setAll(TimestampPreferences.getDefault());
+        getRemotePreferences().setAll(RemotePreferences.getDefault());
+        getCitationKeyPatternPreferences().setAll(
+                CitationKeyPatternPreferences.getDefault()
+                                             .withKeywordDelimiter(getBibEntryPreferences().keywordSeparatorProperty()));
+    }
+
     private void clearTruststoreFromCustomCertificates() {
         TrustStoreManager trustStoreManager = new TrustStoreManager(Path.of(defaults.get(SSL_TRUSTSTORE_PATH).toString()));
         trustStoreManager.clearCustomCertificates();
@@ -976,32 +1015,6 @@ public class JabRefCliPreferences implements CliPreferences {
                     Localization.lang("Could not export preferences"),
                     ex);
         }
-    }
-
-    /// Clear all preferences.
-    ///
-    /// @throws BackingStoreException if JabRef is unable to write to the registry/the preference storage
-    @Override
-    public void clear() throws BackingStoreException {
-        clearAllBibEntryTypes();
-        clearCitationKeyPatterns();
-        clearTruststoreFromCustomCertificates();
-        clearCustomFetcherKeys();
-        PREFS_NODE.clear();
-        new SharedDatabasePreferences().clear();
-
-        getFieldPreferences().setAll(FieldPreferences.getDefault());
-        getProxyPreferences().setAll(ProxyPreferences.getDefault());
-        getPushToApplicationPreferences().setAll(PushToApplicationPreferences.getDefault());
-        getJournalAbbreviationPreferences().setAll(JournalAbbreviationPreferences.getDefault());
-        getLibraryPreferences().setAll(LibraryPreferences.getDefault());
-        getDOIPreferences().setAll(DOIPreferences.getDefault());
-        getOwnerPreferences().setAll(OwnerPreferences.getDefault());
-        getTimestampPreferences().setAll(TimestampPreferences.getDefault());
-        getRemotePreferences().setAll(RemotePreferences.getDefault());
-        getCitationKeyPatternPreferences().setAll(
-                CitationKeyPatternPreferences.getDefault()
-                                             .withKeywordDelimiter(getBibEntryPreferences().keywordSeparatorProperty()));
     }
 
     /// Imports Preferences from an XML file.
@@ -1486,6 +1499,95 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return citationKeyPatternPreferences;
     }
+
+    // region: CiteDrive Preferences
+    @Override
+    public CiteDrivePreferences getCiteDrivePreferences() {
+        if (citeDrivePreferences != null) {
+            return citeDrivePreferences;
+        }
+
+        citeDrivePreferences = getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences.getDefault());
+
+        EasyBind.listen(citeDrivePreferences.persistRefreshTokenProperty(), (_, _, newValue) -> {
+            putBoolean(CITE_DRIVE_PERSIST_TOKEN, newValue);
+            if (!newValue) {
+                try (final Keyring keyring = Keyring.create()) {
+                    keyring.deletePassword("org.jabref", "citedrive");
+                } catch (Exception ex) {
+                    LOGGER.warn("Unable to remove citedrive token");
+                }
+            }
+        });
+
+        EasyBind.listen(citeDrivePreferences.getRefreshTokenProperty(), (_, _, newValue) -> {
+            if (citeDrivePreferences.shouldPersistRefreshToken()) {
+                setCiteDriveToken(newValue);
+            }
+        });
+
+        return citeDrivePreferences;
+    }
+
+    private CiteDrivePreferences getCiteDrivePreferencesFromBackingStore(CiteDrivePreferences defaults) {
+        return new CiteDrivePreferences(
+                getCiteDriveToken(),
+                getBoolean(CITE_DRIVE_PERSIST_TOKEN, defaults.shouldPersistRefreshToken())
+        );
+    }
+
+    private @Nullable RefreshToken getCiteDriveToken() {
+        try (final Keyring keyring = Keyring.create()) {
+            RefreshToken token = parseCiteDriveToken(keyring.getPassword("org.jabref", "citedrive"));
+            if (token != null) {
+                return token;
+            }
+        } catch (Exception ex) {
+            LOGGER.warn("Unable to read citedrive token", ex);
+        }
+
+        return parseCiteDriveToken(get(CITE_DRIVE_TOKEN));
+    }
+
+    private void setCiteDriveToken(@Nullable RefreshToken refreshToken) {
+        if (refreshToken == null) {
+            try (final Keyring keyring = Keyring.create()) {
+                keyring.deletePassword("org.jabref", "citedrive");
+            } catch (Exception ex) {
+                LOGGER.warn("Unable to remove citedrive token", ex);
+            }
+            remove(CITE_DRIVE_TOKEN);
+            return;
+        }
+
+        String refreshTokenJson = refreshToken.toJSONObject().toJSONString();
+        try (final Keyring keyring = Keyring.create()) {
+            keyring.setPassword("org.jabref", "citedrive", refreshTokenJson);
+            remove(CITE_DRIVE_TOKEN);
+        } catch (Exception ex) {
+            LOGGER.warn("Unable to store citedrive token in keyring", ex);
+            put(CITE_DRIVE_TOKEN, refreshTokenJson);
+        }
+    }
+
+    private @Nullable RefreshToken parseCiteDriveToken(@Nullable String json) {
+        if (json == null || json.isBlank()) {
+            return null;
+        }
+
+        try {
+            JSONObject jsonObject = (JSONObject) new JSONParser(JSONParser.MODE_PERMISSIVE).parse(json);
+            return RefreshToken.parse(jsonObject);
+        } catch (ParseException | net.minidev.json.parser.ParseException e) {
+            LOGGER.warn("Invalid CiteDrive refresh token JSON", e);
+            return null;
+        }
+    }
+    // endRegion: CiteDrive Preferences
+
+    //*************************************************************************************************************
+    // CitationKeyPatternPreferences
+    //*************************************************************************************************************
 
     private @NonNull CitationKeyPatternPreferences getCitationKeyPatternPreferencesFromBackingStore(CitationKeyPatternPreferences defaults) {
         return new CitationKeyPatternPreferences(
@@ -2270,7 +2372,6 @@ public class JabRefCliPreferences implements CliPreferences {
         for (int i = 0; i < names.size(); i++) {
             fetcherApiKeys.add(new FetcherApiKey(
                     names.get(i),
-                    // i < uses.size() ? Boolean.parseBoolean(uses.get(i)) : false
                     (i < uses.size()) && Boolean.parseBoolean(uses.get(i)),
                     i < keys.size() ? keys.get(i) : ""));
         }

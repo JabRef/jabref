@@ -170,6 +170,11 @@ open module org.jabref {
 
     requires transitive org.jspecify;
 
+    // region nimbusds / OAuth2
+    requires nimbusds.oauth2.oidc.sdk;
+    requires json.smart;
+    // endregion
+
     // region: other libraries (alphabetically)
     // requires cuid;
     requires com.dlsc.pdfviewfx;

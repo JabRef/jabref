@@ -123,6 +123,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.git.merge.execution;
     exports org.jabref.model.sciteTallies;
     exports org.jabref.logic.bibtex.comparator.plausibility;
+    exports org.jabref.logic.citedrive;
 
     requires java.base;
 
@@ -176,6 +177,11 @@ open module org.jabref.jablib {
     requires transitive org.jsoup;
     requires transitive unirest.java.core;
     requires /*runtime*/ unirest.modules.gson;
+    // endregion
+
+    // region nimbusds / OAuth2
+    requires json.smart;
+    requires transitive nimbusds.oauth2.oidc.sdk;
     // endregion
 
     // region: SQL databases

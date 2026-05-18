@@ -32,11 +32,12 @@ import org.jabref.gui.theme.Theme;
 import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.http.manager.HttpServerManager;
+import org.jabref.http.server.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.UiMessageHandler;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ssl.TrustStoreManager;
@@ -106,6 +107,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final HttpServerManager httpServerManager;
     private final LanguageServerController languageServerController;
     private final UiMessageHandler uiMessageHandler;
+    private final OAuthSessionRegistry oAuthSessionRegistry;
     private final RemoteListenerServerManager remoteListenerServerManager;
     private final StateManager stateManager;
 
@@ -130,6 +132,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                                HttpServerManager httpServerManager,
                                LanguageServerController languageServerController,
                                UiMessageHandler uiMessageHandler,
+                               OAuthSessionRegistry oAuthSessionRegistry,
                                RemoteListenerServerManager remoteListenerServerManager,
                                StateManager stateManager) {
         this.dialogService = dialogService;
@@ -141,6 +144,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.httpServerManager = httpServerManager;
         this.languageServerController = languageServerController;
         this.uiMessageHandler = uiMessageHandler;
+        this.oAuthSessionRegistry = oAuthSessionRegistry;
         this.remoteListenerServerManager = remoteListenerServerManager;
         this.stateManager = stateManager;
 
@@ -333,7 +337,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         if (enableHttpServerProperty.getValue()) {
             remotePreferences.setEnableHttpServer(true);
             URI uri = remotePreferences.getHttpServerUri();
-            httpServerManager.start(preferences, stateManager, uiMessageHandler, uri);
+
+            httpServerManager.start(preferences, stateManager, uiMessageHandler, oAuthSessionRegistry, uri);
         } else {
             remotePreferences.setEnableHttpServer(false);
             httpServerManager.stop();

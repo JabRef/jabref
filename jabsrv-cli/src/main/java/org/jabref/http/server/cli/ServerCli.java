@@ -10,6 +10,7 @@ import java.util.concurrent.Callable;
 
 import org.jabref.architecture.AllowedToUseStandardStreams;
 import org.jabref.http.server.Server;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -76,7 +77,8 @@ public class ServerCli implements Callable<Void> {
             return null;
         }
 
-        Server server = new Server(JabRefCliPreferences.getInstance());
+        // TODO: Fix parameter
+        Server server = new Server(JabRefCliPreferences.getInstance(), new OAuthSessionRegistry());
         HttpServer httpServer = server.run(filesToServe, uri);
 
         // Keep the http server running until user kills the process (e.g., presses Ctrl+C)

@@ -55,6 +55,8 @@
 //DEPS tools.jackson.core:jackson-core:3.1.3
 //DEPS tools.jackson.core:jackson-databind:3.1.3
 //DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.1.3
+//DEPS com.nimbusds:oauth2-oidc-sdk:11.30.1
+//DEPS net.minidev:json-smart:2.6.0
 
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
@@ -82,11 +84,12 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchField.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchResultContainer.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SelectedItemsContainer.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/Command.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/CommandResource.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/FocusCommand.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/OpenLibrariesCommand.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/SelectEntriesCommand.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/callback/CallbackResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/Command.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/FocusCommand.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/OpenLibrariesCommand.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/CommandResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/command/SelectEntriesCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibrariesResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibraryResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/EntriesResource.java

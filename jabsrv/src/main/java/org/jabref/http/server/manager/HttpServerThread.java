@@ -1,10 +1,11 @@
-package org.jabref.http.manager;
+package org.jabref.http.server.manager;
 
 import java.net.URI;
 
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.Server;
 import org.jabref.logic.UiMessageHandler;
+import org.jabref.logic.citedrive.OAuthSessionRegistry;
 import org.jabref.logic.preferences.CliPreferences;
 
 import jakarta.ws.rs.ProcessingException;
@@ -31,11 +32,11 @@ public class HttpServerThread extends Thread {
     private HttpServer httpServer;
 
     /// @param uiMessageHandler - non-null for GUI usage
-    public HttpServerThread(CliPreferences cliPreferences, SrvStateManager srvStateManager, @Nullable UiMessageHandler uiMessageHandler, URI uri) {
+    public HttpServerThread(CliPreferences cliPreferences, SrvStateManager srvStateManager, @Nullable UiMessageHandler uiMessageHandler, OAuthSessionRegistry oAuthSessionRegistry, URI uri) {
         this.srvStateManager = srvStateManager;
         this.uiMessageHandler = uiMessageHandler;
         this.uri = uri;
-        this.server = new Server(cliPreferences);
+        this.server = new Server(cliPreferences, oAuthSessionRegistry);
         this.setName("JabSrv - JabRef HTTP Server on " + uri.getHost() + ":" + uri.getPort());
     }
 
