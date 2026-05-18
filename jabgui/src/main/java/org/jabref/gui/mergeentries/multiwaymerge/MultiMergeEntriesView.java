@@ -222,7 +222,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     /// Adds ToggleButtons for all fields that are set for this BibEntry
     ///
     /// @param entrySourceColumn the entry to write
-    /// @param columnIndex the index of the column to write this entry to
+    /// @param columnIndex       the index of the column to write this entry to
     private void writeBibEntryToColumn(MultiMergeEntriesViewModel.EntrySource entrySourceColumn, int columnIndex) {
         for (Map.Entry<Field, String> entry : entrySourceColumn.entryProperty().get().getFieldsObservable().entrySet()) {
             Field key = entry.getKey();
@@ -236,7 +236,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     /// selected.
     ///
     /// @param sourceButton the header button to setup
-    /// @param column the column this button is heading
+    /// @param column       the column this button is heading
     private void setupSourceButtonAction(ToggleButton sourceButton, int column) {
         sourceButton.selectedProperty().addListener((_, _, newValue) -> {
             if (newValue) {
@@ -373,7 +373,6 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
             whenPdfSourceProducesEntry.accept(entrySourceColumn);
         }
     }
-
 
     private void scheduleFetchedDoiColumnIfNecessary(BibEntry extracted) {
         if (extracted == null || scheduledFetchedDois == null) {
