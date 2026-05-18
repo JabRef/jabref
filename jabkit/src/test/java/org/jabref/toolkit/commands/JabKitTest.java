@@ -34,7 +34,8 @@ class JabKitTest extends AbstractJabKitTest {
         Path testBib = getClassResourceAsPath("origin.bib");
         String testBibFile = testBib.toAbsolutePath().toString();
 
-        List<String> args = List.of("check-consistency", "--input", testBibFile, "--output-format", "txt");
+        // The input file is passed as a positional argument (see ADR-0057).
+        List<String> args = List.of("check", "consistency", testBibFile, "--output-format", "txt");
 
         int executionResult = executeToLog(args.toArray(String[]::new));
 
@@ -49,13 +50,37 @@ class JabKitTest extends AbstractJabKitTest {
         Path testBib = getClassResourceAsPath("origin.bib");
         String testBibFile = testBib.toAbsolutePath().toString();
 
-        // "txt" is the default output format; thus not provided here
-        List<String> args = List.of("check-consistency", "--input", testBibFile, "--porcelain");
+        // "txt" is the default output format; thus not provided here.
+        // The legacy --input option is still accepted as an alias for the positional argument.
+        List<String> args = List.of("check", "consistency", "--input", testBibFile, "--porcelain");
 
         int executionResult = executeToLog(args.toArray(String[]::new));
 
         String output = getStandardOutput();
         assertEquals("", output);
         assertEquals(0, executionResult);
+    }
+
+    @Test
+    void checkIntegrity() {
+        Path testBib = getClassResourceAsPath("origin.bib");
+        String testBibFile = testBib.toAbsolutePath().toString();
+
+        // "txt" is the default output format; thus not provided here.
+        List<String> args = List.of("check", "integrity", testBibFile);
+
+        int executionResult = executeToLog(args.toArray(String[]::new));
+
+        String output = getStandardOutput();
+        assertTrue(output.contains("Checking integrity of"), "Expected output to contain sentence: Checking integrity of");
+        assertEquals(0, executionResult);
+    }
+
+    @Test
+    void checkConsistencyFailsWithoutInputFile() {
+        int executionResult = executeToLog("check", "consistency");
+
+        // picocli reports a usage error (exit code 2) when no input file is supplied.
+        assertEquals(2, executionResult);
     }
 }

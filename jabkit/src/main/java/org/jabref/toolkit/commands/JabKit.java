@@ -45,8 +45,7 @@ import static picocli.CommandLine.Option;
         mixinStandardHelpOptions = true,
         // sorted alphabetically
         subcommands = {
-                CheckConsistency.class,
-                CheckIntegrity.class,
+                Check.class,
                 CitationKeys.class,
                 Convert.class,
                 DoiToBibtex.class,

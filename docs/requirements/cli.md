@@ -3,11 +3,13 @@ parent: Requirements
 ---
 # CLI
 
-## Unified `--input` option across all commands
-`req~jabkit.cli.input-flag~1`
+## Input file as positional argument across all commands
+`req~jabkit.cli.input-flag~2`
 
-All `jabkit` commands that need a file input must have the `--input` option to specify the input file.
-See [ADR 45](../decisions/0045-use-input-flag-always-for-input-files.md) for more details.
+All `jabkit` commands that need a file input must accept it as a positional `FILE` argument.
+For backward compatibility, the `--input` option is also accepted as an alias.
+Exactly one of the two forms must be supplied.
+See [ADR 57](../decisions/0057-allow-positional-input-file-argument.md) for more details.
 
 Needs: impl
 

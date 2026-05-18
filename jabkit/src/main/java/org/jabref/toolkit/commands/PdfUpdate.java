@@ -23,7 +23,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -50,9 +49,8 @@ class PdfUpdate implements Runnable {
     @Option(names = {"-k", "--citation-key"}, description = "Citation keys", required = true)
     private List<String> citationKeys = List.of(); // ToDo: check dedault value
 
-    // [impl->req~jabkit.cli.input-flag~1]
-    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
-    private Path inputFile;
+    @Mixin
+    private InputOption inputOption = new InputOption();
 
     @Option(names = "--input-format", description = "Input format of the file", required = true)
     private String inputFormat = "*";
@@ -67,6 +65,7 @@ class PdfUpdate implements Runnable {
             return;
         }
 
+        Path inputFile = inputOption.getInputFile();
         Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
                 inputFormat,

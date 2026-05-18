@@ -14,7 +14,6 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCs
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,29 +22,30 @@ import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParentCommand;
 
-@Command(name = "check-consistency", description = "Check consistency of the library.")
+@Command(name = "consistency", description = "Check consistency of the library.")
 class CheckConsistency implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckConsistency.class);
 
     @ParentCommand
-    private JabKit jabKit;
+    private Check check;
 
     @Mixin
     private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
-    // [impl->req~jabkit.cli.input-flag~1]
-    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
-    private Path inputFile;
+    @Mixin
+    private InputOption inputOption = new InputOption();
 
     @Option(names = {"--output-format"}, description = "Output format: txt or csv", defaultValue = "txt")
     private String outputFormat;
 
     @Override
     public Integer call() {
+        Path inputFile = inputOption.getInputFile();
+
         Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
                 "bibtex",
-                jabKit.cliPreferences,
+                check.jabKit.cliPreferences,
                 sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
@@ -65,7 +65,7 @@ class CheckConsistency implements Callable<Integer> {
         BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
 
         BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-        BibliographyConsistencyCheck.Result result = consistencyCheck.check(databaseContext, jabKit.entryTypesManager, (count, total) -> {
+        BibliographyConsistencyCheck.Result result = consistencyCheck.check(databaseContext, check.jabKit.entryTypesManager, (count, total) -> {
             if (!sharedOptions.porcelain) {
                 System.out.println(Localization.lang("Checking consistency for entry type %0 of %1", count + 1, total));
             }
@@ -83,14 +83,14 @@ class CheckConsistency implements Callable<Integer> {
                     result,
                     writer,
                     sharedOptions.porcelain,
-                    jabKit.entryTypesManager,
+                    check.jabKit.entryTypesManager,
                     databaseContext.getMode());
         } else {
             checkResultWriter = new BibliographyConsistencyCheckResultCsvWriter(
                     result,
                     writer,
                     sharedOptions.porcelain,
-                    jabKit.entryTypesManager,
+                    check.jabKit.entryTypesManager,
                     databaseContext.getMode());
         }
 

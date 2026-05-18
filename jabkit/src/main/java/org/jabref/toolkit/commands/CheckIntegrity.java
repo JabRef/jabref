@@ -20,7 +20,6 @@ import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,22 +29,21 @@ import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 
-@Command(name = "check-integrity", description = "Check integrity of the library.")
+@Command(name = "integrity", description = "Check integrity of the library.")
 class CheckIntegrity implements Callable<Integer> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckIntegrity.class);
 
     @CommandLine.ParentCommand
-    private JabKit jabKit;
+    private Check check;
 
     @Mixin
     private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
-    // [impl->req~jabkit.cli.input-flag~1]
-    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
-    private Path inputFile;
+    @Mixin
+    private InputOption inputOption = new InputOption();
 
-    @Option(names = {"--output-format"}, description = "Output format: errorformat, txt or csv", defaultValue = "errorformat")
+    @Option(names = {"--output-format"}, description = "Output format: errorformat, txt or csv", defaultValue = "txt")
     private String outputFormat;
 
     // in BibTeX it could be preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex()
@@ -54,10 +52,12 @@ class CheckIntegrity implements Callable<Integer> {
 
     @Override
     public Integer call() {
+        Path inputFile = inputOption.getInputFile();
+
         Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
                 "bibtex",
-                jabKit.cliPreferences,
+                check.jabKit.cliPreferences,
                 sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
@@ -78,9 +78,9 @@ class CheckIntegrity implements Callable<Integer> {
 
         IntegrityCheck integrityCheck = new IntegrityCheck(
                 databaseContext,
-                jabKit.cliPreferences.getFilePreferences(),
-                jabKit.cliPreferences.getCitationKeyPatternPreferences(),
-                JournalAbbreviationLoader.loadRepository(jabKit.cliPreferences.getJournalAbbreviationPreferences()),
+                check.jabKit.cliPreferences.getFilePreferences(),
+                check.jabKit.cliPreferences.getCitationKeyPatternPreferences(),
+                JournalAbbreviationLoader.loadRepository(check.jabKit.cliPreferences.getJournalAbbreviationPreferences()),
                 allowIntegerEdition
         );
 

@@ -19,6 +19,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CitationFetcherTypeConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/CygWinPathConverter.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/converter/KeySuffixConverter.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Check.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckConsistency.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CheckIntegrity.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/CitationKeys.java
@@ -29,6 +30,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GenerateCitationKeys.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GetCitedWorks.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GetCitingWorks.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/InputOption.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/JabKit.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Pdf.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/PdfUpdate.java

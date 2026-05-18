@@ -13,7 +13,6 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.toolkit.converter.CygWinPathConverter;
 
-import io.github.adr.linked.ADR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
@@ -34,9 +33,8 @@ class Pseudonymize implements Runnable {
     @Mixin
     private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
-    @ADR(45)
-    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "BibTeX file to be pseudonymized", required = true)
-    private Path inputPath;
+    @Mixin
+    private InputOption inputOption = new InputOption();
 
     @Option(names = {"--output"}, converter = CygWinPathConverter.class, description = "Output pseudo-bib file")
     private Path outputFile;
@@ -49,6 +47,7 @@ class Pseudonymize implements Runnable {
 
     @Override
     public void run() {
+        Path inputPath = inputOption.getInputFile();
         String fileName = FileUtil.getBaseName(inputPath);
         Path pseudoBibPath = resolveOutputPath(outputFile, inputPath, fileName + PSEUDO_SUFFIX + BIB_EXTENSION);
         Path pseudoKeyPath = resolveOutputPath(keyFile, inputPath, fileName + PSEUDO_SUFFIX + CSV_EXTENSION);

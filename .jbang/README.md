@@ -34,8 +34,7 @@ Usage: jabkit [-dhpv] [COMMAND]
   -p, --porcelain   Enable script-friendly output
   -v, --version     display version info
 Commands:
-  check-consistency       Check consistency of the library.
-  check-integrity         Check integrity of the database.
+  check                   Check the integrity and consistency of a library.
   convert                 Convert between bibliography formats.
   doi-to-bibtex           Converts a DOI to BibTeX
   fetch                   Fetch entries from a provider.

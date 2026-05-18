@@ -17,6 +17,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Changed
 
 - We made the `Move file to directory` operation for Linked Files show every configured JabRef directory as possible options. [#12287](https://github.com/JabRef/jabref/issues/12287)
+- The `jabkit` subcommands now accept the input file as a positional argument (e.g. `jabkit check integrity references.bib`); the `--input` option remains available as an alias.
+- We grouped the `jabkit` consistency and integrity checks under a new `check` command (`jabkit check consistency`, `jabkit check integrity`), and `jabkit check integrity` now defaults to the `txt` output format.
 
 ### Fixed
 

@@ -1,4 +1,13 @@
+---
+nav_order: 45
+parent: Decision Records
+status: "superseded by ADR-0057"
+---
 # Use `--input` Flag Consistently for Reading Input Files
+
+> [!NOTE]
+> This decision is **superseded by [ADR-0057](0057-allow-positional-input-file-argument.md)**.
+> The positional `FILE` argument is now the preferred form for passing the input file; `--input` is retained only as a backward-compatible alias.
 
 ## Context and Problem Statement
 

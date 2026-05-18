@@ -38,9 +38,8 @@ class Convert implements Runnable {
     @Mixin
     private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
-    // [impl->req~jabkit.cli.input-flag~1]
-    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input file", required = true)
-    private Path inputFile;
+    @Mixin
+    private InputOption inputOption = new InputOption();
 
     @Option(names = {"--input-format"}, description = "Input format")
     private String inputFormat;
@@ -56,6 +55,7 @@ class Convert implements Runnable {
 
     @Override
     public void run() {
+        Path inputFile = inputOption.getInputFile();
         Optional<ParserResult> parserResult = JabKit.importFile(inputFile, inputFormat, jabKit.cliPreferences, sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));

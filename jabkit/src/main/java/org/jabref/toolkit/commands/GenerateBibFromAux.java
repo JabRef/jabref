@@ -14,7 +14,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +36,8 @@ class GenerateBibFromAux implements Runnable {
     @Option(names = "--aux", required = true)
     private Path auxFile;
 
-    // [impl->req~jabkit.cli.input-flag~1]
-    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
-    private Path inputFile;
+    @Mixin
+    private InputOption inputOption = new InputOption();
 
     @Option(names = "--output")
     private Path outputFile;
@@ -49,6 +47,7 @@ class GenerateBibFromAux implements Runnable {
 
     @Override
     public void run() {
+        Path inputFile = inputOption.getInputFile();
         Optional<ParserResult> pr = JabKit.importFile(
                 inputFile,
                 "bibtex",

@@ -16,7 +16,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.UnknownEntryType;
-import org.jabref.toolkit.converter.CygWinPathConverter;
 import org.jabref.toolkit.converter.KeySuffixConverter;
 
 import org.jspecify.annotations.NonNull;
@@ -39,9 +38,8 @@ class GenerateCitationKeys implements Runnable {
     @Mixin
     private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
-    // [impl->req~jabkit.cli.input-flag~1]
-    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input .bib file", required = true)
-    private Path inputFile;
+    @Mixin
+    private InputOption inputOption = new InputOption();
 
     @Option(names = "--output", description = "Output .bib file")
     private Path outputFile;
@@ -81,6 +79,7 @@ class GenerateCitationKeys implements Runnable {
 
     @Override
     public void run() {
+        Path inputFile = inputOption.getInputFile();
         Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
                 "bibtex",
