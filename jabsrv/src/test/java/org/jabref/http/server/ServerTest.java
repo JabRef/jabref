@@ -72,7 +72,7 @@ public abstract class ServerTest extends JerseyTest {
         resourceConfig.register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bind(new JabRefSrvStateManager(preferences)).to(SrvStateManager.class);
+                bind(new JabRefSrvStateManager(preferences.getBibEntryPreferences(), List.of())).to(SrvStateManager.class);
             }
         });
     }

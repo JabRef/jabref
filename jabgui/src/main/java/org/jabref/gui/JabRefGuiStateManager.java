@@ -27,9 +27,8 @@ import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.walkthrough.Walkthrough;
+import org.jabref.http.AbstractSrvStateManager;
 import org.jabref.logic.command.CommandSelectionTab;
-import org.jabref.logic.search.NoOpSearchBackend;
-import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
@@ -56,7 +55,7 @@ import org.slf4j.LoggerFactory;
 /// - dialog window sizes/positions
 /// - opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})
 ///
-public class JabRefGuiStateManager implements StateManager {
+public class JabRefGuiStateManager extends AbstractSrvStateManager implements StateManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiStateManager.class);
     private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
@@ -65,7 +64,6 @@ public class JabRefGuiStateManager implements StateManager {
     private final OptionalObjectProperty<LibraryTab> activeTab = OptionalObjectProperty.empty();
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<String, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
-    private final ObservableMap<String, SearchContext> searchContexts = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final OptionalObjectProperty<SearchQuery> activeGlobalSearchQuery = OptionalObjectProperty.empty();
     private final StringProperty searchQueryProperty = new SimpleStringProperty();
@@ -149,25 +147,6 @@ public class JabRefGuiStateManager implements StateManager {
     @Override
     public void clearSelectedGroups(BibDatabaseContext context) {
         selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).clear();
-    }
-
-    @Override
-    public void setSearchContext(BibDatabaseContext database, SearchContext searchContext) {
-        searchContexts.put(database.getUid(), searchContext);
-    }
-
-    @Override
-    public SearchContext getSearchContext(BibDatabaseContext database) {
-        SearchContext context = searchContexts.get(database.getUid());
-        if (context != null) {
-            return context;
-        }
-        assert false : "No SearchContext registered for database '" + database.getUid() + "'";
-        LOGGER.error("No SearchContext registered for database '{}'. Returning inert fallback. LibraryTab should register one via setSearchContext on open.", database.getUid());
-        return new SearchContext(
-                new SimpleBooleanProperty(false),
-                NoOpSearchBackend::new,
-                NoOpSearchBackend::new);
     }
 
     @Override

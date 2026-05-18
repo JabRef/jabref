@@ -10,25 +10,41 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.command.CommandSelectionTab;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.search.SearchBackend;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.search.inmemory.InMemorySearchBackend;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
 
-public class JabRefSrvStateManager implements SrvStateManager {
+/// [SrvStateManager] for the stand-alone HTTP server.
+///
+/// Unlike the GUI, the server serves a fixed set of libraries known at startup and has no
+/// preference toggle. It therefore parses every library once (see
+/// [org.jabref.http.server.Server]) and builds an in-memory [SearchContext] for each in
+/// this constructor; [#getSearchContext] then only ever returns these pre-built contexts
+/// (handled by [AbstractSrvStateManager]). There is no Postgres path: the in-memory backend
+/// has no startup cost, and the toggle is hardwired to `false`.
+public class JabRefSrvStateManager extends AbstractSrvStateManager {
 
-    private final CliPreferences preferences;
+    private final ObservableList<BibDatabaseContext> openDatabases;
 
-    public JabRefSrvStateManager(CliPreferences preferences) {
-        this.preferences = preferences;
+    public JabRefSrvStateManager(BibEntryPreferences bibEntryPreferences, List<BibDatabaseContext> databases) {
+        this.openDatabases = FXCollections.observableArrayList(databases);
+        for (BibDatabaseContext database : databases) {
+            Supplier<SearchBackend> inMemory = () -> new InMemorySearchBackend(database, bibEntryPreferences);
+            SimpleBooleanProperty usePostgres = new SimpleBooleanProperty(false);
+            assert !usePostgres.get() : "Stand-alone HTTP server must never use the Postgres backend";
+            // The in-memory supplier is wired into the SQL slot too: should the toggle ever
+            // flip, an unexpected backend swap stays harmless instead of throwing at runtime.
+            setSearchContext(database, new SearchContext(usePostgres, inMemory, inMemory));
+        }
     }
 
     @Override
     public ObservableList<BibDatabaseContext> getOpenDatabases() {
-        return FXCollections.emptyObservableList();
+        return openDatabases;
     }
 
     @Override
@@ -41,21 +57,6 @@ public class JabRefSrvStateManager implements SrvStateManager {
         return FXCollections.emptyObservableList();
     }
 
-    /// Stand-alone server: always returns an in-memory [SearchContext]. No Postgres
-    /// path because the CLI server has no preference toggle. Each call builds a
-    /// fresh context; the in-memory backend has no startup cost.
-    ///
-    /// Both backend slots use the in-memory supplier: the toggle is hardwired to
-    /// `false`, but wiring in-memory into the SQL slot too keeps an unexpected
-    /// backend swap harmless instead of throwing at runtime.
-    @Override
-    public SearchContext getSearchContext(BibDatabaseContext database) {
-        Supplier<SearchBackend> inMemory = () -> new InMemorySearchBackend(database, preferences.getBibEntryPreferences());
-        SimpleBooleanProperty usePostgres = new SimpleBooleanProperty(false);
-        assert !usePostgres.get() : "Stand-alone HTTP server must never use the Postgres backend";
-        return new SearchContext(usePostgres, inMemory, inMemory);
-    }
-
     @Override
     public Optional<BibDatabaseContext> getActiveDatabase() {
         return Optional.empty();
@@ -63,7 +64,11 @@ public class JabRefSrvStateManager implements SrvStateManager {
 
     @Override
     public List<String> getAllDatabasePaths() {
-        return List.of();
+        return openDatabases.stream()
+                            .map(BibDatabaseContext::getDatabasePath)
+                            .flatMap(Optional::stream)
+                            .map(path -> path.toAbsolutePath().toString())
+                            .toList();
     }
 
     @Override
