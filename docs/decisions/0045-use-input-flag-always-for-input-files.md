@@ -57,9 +57,9 @@ jabkit format --input references.bib
 ### Use specialized syntax tailored to each subcommand
 
 * Good, because "intuitive" command-line options for each subcommand
-* Bad, becauuse inconsistency
-* Bad, becauuse increased cognitive load
-* Bad, becauuse more complex parsing logic
+* Bad, because inconsistency
+* Bad, because increased cognitive load
+* Bad, because more complex parsing logic
 
 ## Links
 
