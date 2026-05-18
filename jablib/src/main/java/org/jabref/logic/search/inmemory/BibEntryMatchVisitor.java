@@ -3,6 +3,7 @@ package org.jabref.logic.search.inmemory;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -15,6 +16,8 @@ import org.jabref.model.search.SearchFlags;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +29,17 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntryMatchVisitor.class);
     private static final String GROUPS_FIELD_NAME = StandardField.GROUPS.getName();
+
+    /// Compiled regexes shared across all visitor instances (one instance is created per [BibEntry],
+    /// so an instance-level cache would not help when scanning a library). Keyed by pattern + case mode.
+    private static final Cache<RegexKey, Pattern> COMPILED_PATTERNS =
+            CacheBuilder.newBuilder()
+                        .expireAfterWrite(15, TimeUnit.MINUTES)
+                        .expireAfterAccess(15, TimeUnit.MINUTES)
+                        .build();
+
+    private record RegexKey(String pattern, boolean caseSensitive) {
+    }
 
     private final BibEntry entry;
     private final EnumSet<SearchFlags> searchBarFlags;
@@ -191,8 +205,10 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
 
     private static boolean matchRegex(String value, String pattern, boolean caseSensitive) {
         try {
-            int flags = caseSensitive ? 0 : Pattern.CASE_INSENSITIVE;
-            return Pattern.compile(pattern, flags).matcher(value).find();
+            Pattern compiled = COMPILED_PATTERNS.asMap().computeIfAbsent(
+                    new RegexKey(pattern, caseSensitive),
+                    key -> Pattern.compile(key.pattern(), key.caseSensitive() ? 0 : Pattern.CASE_INSENSITIVE));
+            return compiled.matcher(value).find();
         } catch (PatternSyntaxException e) {
             LOGGER.debug("Invalid regex pattern '{}': {}", pattern, e.getMessage());
             return false;
