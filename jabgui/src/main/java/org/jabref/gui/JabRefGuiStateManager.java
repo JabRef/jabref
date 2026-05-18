@@ -40,7 +40,6 @@ import org.jabref.model.search.query.SearchQuery;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.PreboundBinding;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
