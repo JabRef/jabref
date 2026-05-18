@@ -657,6 +657,10 @@ public class OOBibBase {
                 OOFrontend frontend = ofrontend.get();
 
                 OOResult<Boolean, JabRefException> mergeResult = EditMerge.mergeCitationGroups(doc, frontend, jStyle);
+                if (testDialog(errorTitle, mergeResult.asVoidResult().mapError(OOError::from))) {
+                    return;
+                }
+
                 if (mergeResult.get()) {
                     UnoCrossRef.refresh(doc);
                     Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
