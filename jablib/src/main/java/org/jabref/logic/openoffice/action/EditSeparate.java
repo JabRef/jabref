@@ -1,6 +1,7 @@
 package org.jabref.logic.openoffice.action;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
@@ -49,10 +50,11 @@ public class EditSeparate {
                 UnoScreenRefresh.lockControllers(doc);
 
                 for (CitationGroup group : groups) {
-                    XTextRange range1 = frontend
-                            .getMarkRange(doc, group)
-                            .orElseThrow(IllegalStateException::new);
-                    XTextCursor textCursor = range1.getText().createTextCursorByRange(range1);
+                    Optional<XTextRange> markRange = frontend.getMarkRange(doc, group);
+                    if (markRange.isEmpty()) {
+                        return OOResult.error(new JabRefException("Could not find mark range for citation group"));
+                    }
+                    XTextCursor textCursor = markRange.get().getText().createTextCursorByRange(markRange.get());
 
                     List<Citation> citations = group.citationsInStorageOrder;
                     if (citations.size() <= 1) {
