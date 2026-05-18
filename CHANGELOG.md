@@ -13,6 +13,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We added automatic source groups to SLR results and fixed group merging to preserve all source groups. [#12542](https://github.com/JabRef/jabref/issues/12542)
 - We enabled usage of relative or absolute file paths depending on your file directory settings. [#3590](https://github.com/JabRef/jabref/issues/3590)
+- We added OCR feature using OCRmyPDF to extract text from scanned PDFs and create searchable PDFs including the extracted text. [#15712](https://github.com/JabRef/jabref/pull/15712)
 
 ### Changed
 
