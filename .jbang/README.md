@@ -52,6 +52,16 @@ Commands:
 > Due to the high development pace, `--fresh` is used to update `org.jabref:jablib:6.0-SNAPSHOT`.
 > As soon as JabRef 6.0 is released, this won't be required any more.
 
+> [!NOTE]
+> The script depends on the published `org.jabref:jablib:6.0-SNAPSHOT`.
+> When testing local, unmerged `jablib` changes, build them into your local Maven repository first:
+>
+> ```console
+> ./gradlew :jablib:publishToMavenLocal
+> ```
+>
+> Then run the script with `--fresh` so the locally built `jablib` is picked up.
+
 ### Installing and Running `JabKit` with JBang
 
 To have `jbang` working, you need to [install jbang](https://www.jbang.dev/download/).
