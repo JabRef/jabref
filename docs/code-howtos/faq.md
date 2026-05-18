@@ -121,7 +121,7 @@ What's strange (mostly an IntelliJ bug): Regardless of CLI or GUI, These changes
   
 ### Fix
 
-For `csl-styles`, `csl-locales`, and `abbrev.jabref.org`:
+For `abbrev.jabref.org`, `csl-styles`, `csl-locales`, and `ltwa`:
 
 ```bash
 git merge origin/main
