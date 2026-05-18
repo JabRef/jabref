@@ -52,13 +52,20 @@ class CheckIntegrity implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        Path inputFile = inputOption.getInputFile();
+        return execute(inputOption.getInputFile(), outputFormat, allowIntegerEdition, sharedOptions.porcelain, check.jabKit);
+    }
 
+    /// Runs the integrity check on `inputFile` and writes the findings to `System.out`.
+    ///
+    /// Shared with the parent `check` command, which runs both checks at once.
+    ///
+    /// @return the exit code (0 = success, 2/3 = error)
+    static int execute(Path inputFile, String outputFormat, boolean allowIntegerEdition, boolean porcelain, JabKit jabKit) {
         Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
                 "bibtex",
-                check.jabKit.cliPreferences,
-                sharedOptions.porcelain);
+                jabKit.cliPreferences,
+                porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return 2;
@@ -69,7 +76,7 @@ class CheckIntegrity implements Callable<Integer> {
             return 2;
         }
 
-        if (!sharedOptions.porcelain) {
+        if (!porcelain) {
             System.out.println(Localization.lang("Checking integrity of '%0'.", inputFile));
             System.out.flush();
         }
@@ -78,9 +85,9 @@ class CheckIntegrity implements Callable<Integer> {
 
         IntegrityCheck integrityCheck = new IntegrityCheck(
                 databaseContext,
-                check.jabKit.cliPreferences.getFilePreferences(),
-                check.jabKit.cliPreferences.getCitationKeyPatternPreferences(),
-                JournalAbbreviationLoader.loadRepository(check.jabKit.cliPreferences.getJournalAbbreviationPreferences()),
+                jabKit.cliPreferences.getFilePreferences(),
+                jabKit.cliPreferences.getCitationKeyPatternPreferences(),
+                JournalAbbreviationLoader.loadRepository(jabKit.cliPreferences.getJournalAbbreviationPreferences()),
                 allowIntegerEdition
         );
 

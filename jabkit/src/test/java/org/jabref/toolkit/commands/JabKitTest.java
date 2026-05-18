@@ -83,4 +83,20 @@ class JabKitTest extends AbstractJabKitTest {
         // picocli reports a usage error (exit code 2) when no input file is supplied.
         assertEquals(2, executionResult);
     }
+
+    @Test
+    void checkWithoutSubcommandRunsBothChecks() {
+        Path testBib = getClassResourceAsPath("origin.bib");
+        String testBibFile = testBib.toAbsolutePath().toString();
+
+        // No subcommand: passing the file directly to "check" runs consistency and integrity.
+        List<String> args = List.of("check", testBibFile, "--output-format", "txt");
+
+        int executionResult = executeToLog(args.toArray(String[]::new));
+
+        String output = getStandardOutput();
+        assertTrue(output.contains("Checking consistency of"), "Expected the consistency check to run");
+        assertTrue(output.contains("Checking integrity of"), "Expected the integrity check to run");
+        assertEquals(0, executionResult);
+    }
 }

@@ -41,13 +41,20 @@ class CheckConsistency implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        Path inputFile = inputOption.getInputFile();
+        return execute(inputOption.getInputFile(), outputFormat, sharedOptions.porcelain, check.jabKit);
+    }
 
+    /// Runs the consistency check on `inputFile` and writes the findings to `System.out`.
+    ///
+    /// Shared with the parent `check` command, which runs both checks at once.
+    ///
+    /// @return the exit code (0 = consistent, 1 = inconsistencies found, 2/3 = error)
+    static int execute(Path inputFile, String outputFormat, boolean porcelain, JabKit jabKit) {
         Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
                 "bibtex",
-                check.jabKit.cliPreferences,
-                sharedOptions.porcelain);
+                jabKit.cliPreferences,
+                porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return 2;
@@ -58,7 +65,7 @@ class CheckConsistency implements Callable<Integer> {
             return 2;
         }
 
-        if (!sharedOptions.porcelain) {
+        if (!porcelain) {
             System.out.println(Localization.lang("Checking consistency of '%0'.", inputFile));
             System.out.flush();
         }
@@ -66,19 +73,22 @@ class CheckConsistency implements Callable<Integer> {
         BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
 
         BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-        BibliographyConsistencyCheck.Result result = consistencyCheck.check(databaseContext, check.jabKit.entryTypesManager, (count, total) -> {
-            if (!sharedOptions.porcelain) {
+        BibliographyConsistencyCheck.Result result = consistencyCheck.check(databaseContext, jabKit.entryTypesManager, (count, total) -> {
+            if (!porcelain) {
                 System.out.println(Localization.lang("Checking consistency for entry type %0 of %1", count + 1, total));
             }
         });
 
-        return writeCheckResult(result, databaseContext, parserResult.get(), inputFile);
+        return writeCheckResult(result, databaseContext, parserResult.get(), inputFile, outputFormat, porcelain, jabKit);
     }
 
-    private int writeCheckResult(BibliographyConsistencyCheck.Result result,
-                                 BibDatabaseContext databaseContext,
-                                 ParserResult parserResult,
-                                 Path inputFile) {
+    private static int writeCheckResult(BibliographyConsistencyCheck.Result result,
+                                        BibDatabaseContext databaseContext,
+                                        ParserResult parserResult,
+                                        Path inputFile,
+                                        String outputFormat,
+                                        boolean porcelain,
+                                        JabKit jabKit) {
         Writer writer = new OutputStreamWriter(System.out);
         BibliographyConsistencyCheckResultWriter checkResultWriter;
 
@@ -86,8 +96,8 @@ class CheckConsistency implements Callable<Integer> {
             checkResultWriter = new BibliographyConsistencyCheckResultErrorFormatWriter(
                     result,
                     writer,
-                    sharedOptions.porcelain,
-                    check.jabKit.entryTypesManager,
+                    porcelain,
+                    jabKit.entryTypesManager,
                     databaseContext.getMode(),
                     parserResult,
                     inputFile);
@@ -95,15 +105,15 @@ class CheckConsistency implements Callable<Integer> {
             checkResultWriter = new BibliographyConsistencyCheckResultTxtWriter(
                     result,
                     writer,
-                    sharedOptions.porcelain,
-                    check.jabKit.entryTypesManager,
+                    porcelain,
+                    jabKit.entryTypesManager,
                     databaseContext.getMode());
         } else {
             checkResultWriter = new BibliographyConsistencyCheckResultCsvWriter(
                     result,
                     writer,
-                    sharedOptions.porcelain,
-                    check.jabKit.entryTypesManager,
+                    porcelain,
+                    jabKit.entryTypesManager,
                     databaseContext.getMode());
         }
 
@@ -120,7 +130,7 @@ class CheckConsistency implements Callable<Integer> {
             return 1;
         }
 
-        if (!sharedOptions.porcelain) {
+        if (!porcelain) {
             System.out.println(Localization.lang("Consistency check completed"));
         }
         return 0;

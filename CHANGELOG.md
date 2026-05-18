@@ -16,6 +16,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The `jabkit` subcommands now accept the input file as a positional argument (e.g. `jabkit check integrity references.bib`); the `--input` option remains available as an alias. [#15759](https://github.com/JabRef/jabref/pull/15759)
 - We grouped the `jabkit` consistency and integrity checks under a new `check` command (`jabkit check consistency`, `jabkit check integrity`). [#15759](https://github.com/JabRef/jabref/pull/15759)
 - The `jabkit check consistency` command now supports the `errorformat` output format (`file:line:column: message`), which is the default output format for both `check` subcommands. [#15759](https://github.com/JabRef/jabref/pull/15759)
+- The `jabkit check` command now runs both the consistency and integrity checks when given an input file without a subcommand (e.g. `jabkit check references.bib`). [#15759](https://github.com/JabRef/jabref/pull/15759)
 
 ### Changed
 
