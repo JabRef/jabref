@@ -63,7 +63,7 @@ public class OcrMyPdfEngine implements OcrEngine {
         Path outputPath = makeOutputFilePath(pdfPath);
         String outputFile = outputPath.toString();
         // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
-        List<String> command = List.of("ocrmypdf", pdfPath.toString(), outputFile);
+        List<String> command = List.of("ocrmypdf", "--skip-text", pdfPath.toString(), outputFile);
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectErrorStream(true);
