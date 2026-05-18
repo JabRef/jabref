@@ -86,7 +86,7 @@ public class JabRefGUI extends Application {
     private static StateManager stateManager;
     private static ThemeManager themeManager;
     private static CountingUndoManager countingUndoManager;
-    public static TaskExecutor taskExecutor;
+    private static TaskExecutor taskExecutor;
     private static ClipBoardManager clipBoardManager;
     private static DialogService dialogService;
     private static JabRefFrame mainFrame;
