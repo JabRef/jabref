@@ -287,7 +287,9 @@ public class ImportHandler {
                 UiTaskExecutor.runAndWaitInJavaFXThread(() ->
                         dialogService.showWarningDialogAndWait(
                                 Localization.lang("Import error"),
-                        Localization.lang("Please check your library file for wrong syntax.%0", "\n\n" + e.getLocalizedMessage())));
+                        Localization.lang("Please check your library file for wrong syntax.")
+                            + "\n\n"
+                            + e.getLocalizedMessage()));
             }
         }
 
