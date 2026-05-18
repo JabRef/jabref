@@ -1,9 +1,9 @@
 package org.jabref.logic.search.inmemory;
 
+import java.time.Duration;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -16,8 +16,8 @@ import org.jabref.model.search.SearchFlags;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,10 +33,10 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
     /// Compiled regexes shared across all visitor instances (one instance is created per [BibEntry],
     /// so an instance-level cache would not help when scanning a library). Keyed by pattern + case mode.
     private static final Cache<RegexKey, Pattern> COMPILED_PATTERNS =
-            CacheBuilder.newBuilder()
-                        .expireAfterWrite(15, TimeUnit.MINUTES)
-                        .expireAfterAccess(15, TimeUnit.MINUTES)
-                        .build();
+            Caffeine.newBuilder()
+                    .expireAfterWrite(Duration.ofMinutes(15))
+                    .expireAfterAccess(Duration.ofMinutes(15))
+                    .build();
 
     private record RegexKey(String pattern, boolean caseSensitive) {
     }
