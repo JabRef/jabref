@@ -9,8 +9,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ## [Unreleased]
 
-- We enabled usage of relative or absolute file paths depending on your file directory settings. [#3590](https://github.com/JabRef/jabref/issues/3590)
-
 ### Added
 
 - We added `POST /libraries/query` to the HTTP server to search for entries across all open libraries with a list of search queries in a single request. [#15599](https://github.com/JabRef/jabref/pull/15599)
@@ -18,10 +16,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an optional `group` query parameter to `POST /libraries/{id}/entries` so imported entries can be assigned to a group, which is created if it does not exist. [#15599](https://github.com/JabRef/jabref/pull/15599)
 - We added `POST /libraries/query` to the HTTP server to search for entries by DOI or URL across all open libraries in a single request. [#15599](https://github.com/JabRef/jabref/pull/15599)
 - We added automatic source groups to SLR results and fixed group merging to preserve all source groups. [#12542](https://github.com/JabRef/jabref/issues/12542)
+- We enabled usage of relative or absolute file paths depending on your file directory settings. [#3590](https://github.com/JabRef/jabref/issues/3590)
 
 ### Changed
 
 - We made the `Move file to directory` operation for Linked Files show every configured JabRef directory as possible options. [#12287](https://github.com/JabRef/jabref/issues/12287)
+- We introduced a leightweight search engine without fulltext search in linked files as default variant. [#15599](https://github.com/JabRef/jabref/pull/15599)
 
 ### Fixed
 
