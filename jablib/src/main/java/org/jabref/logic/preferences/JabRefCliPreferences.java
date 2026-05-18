@@ -1984,7 +1984,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private void storeFileHistory(FileHistory history) {
         putStringList(RECENT_DATABASES, history.stream()
-                                               .map(Path::toAbsolutePath)
                                                .map(Path::toString)
                                                .toList());
     }
