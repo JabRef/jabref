@@ -1,6 +1,9 @@
 .zenflow/
 # AI tooling
 
+CLAUDE.md
+.mcp.json
+
 .claude/*
 !.claude/settings.json
 !.claude/hooks/
