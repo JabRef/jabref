@@ -160,6 +160,25 @@ class ImportHandlerTest {
         assertFalse(importHandler.shouldShowImportDialog(List.of(textFile)));
     }
 
+        @Test
+        void planDroppedFilesSeparatesBibliographyFilesFromOtherFiles() throws IOException {
+                Path risFile = tempDir.resolve("test.ris");
+                Files.writeString(risFile, """
+                                TY  - JOUR
+                                TI  - Drag and drop test
+                                AU  - Doe, Jane
+                                PY  - 2024
+                                ER  -
+                                """);
+                Path textFile = tempDir.resolve("notes.txt");
+                Files.writeString(textFile, "plain text");
+
+                ImportHandler.DroppedFileImportPlan droppedFileImportPlan = importHandler.planDroppedFiles(List.of(risFile, textFile));
+
+                assertEquals(List.of(risFile), droppedFileImportPlan.bibliographyFiles());
+                assertEquals(List.of(textFile), droppedFileImportPlan.remainingFiles());
+        }
+
     @Test
     void findDuplicateTest() {
         // Assume there is no duplicate initially

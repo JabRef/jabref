@@ -542,6 +542,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                     .map(File::toPath)
                                     .map(FileUtil::resolveIfShortcut)
                                     .collect(Collectors.toList());
+            ImportHandler.DroppedFileImportPlan droppedFileImportPlan = importHandler.planDroppedFiles(files);
 
             // Depending on the pressed modifier, move/copy/link files to drop target
             // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
@@ -552,20 +553,22 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 // - Bottom + top -> import entries
                 case TOP,
                      BOTTOM -> {
-                            if (importHandler.shouldShowImportDialog(files)) {
-                                importHandler.importBibliographyFilesWithDialog(files);
-                            } else {
-                                importHandler.importFilesInBackground(files, transferMode).executeWith(taskExecutor);
+                            if (droppedFileImportPlan.hasBibliographyFiles()) {
+                                importHandler.importBibliographyFilesWithDialog(droppedFileImportPlan.bibliographyFiles());
+                            }
+                            if (!droppedFileImportPlan.remainingFiles().isEmpty()) {
+                                importHandler.importFilesInBackground(droppedFileImportPlan.remainingFiles(), transferMode).executeWith(taskExecutor);
                             }
                         }
                 // - Center -> modify entry: link files to entry
                 case CENTER -> {
-                    if (importHandler.shouldShowImportDialog(files)) {
-                        importHandler.importBibliographyFilesWithDialog(files);
-                    } else {
+                    if (droppedFileImportPlan.hasBibliographyFiles()) {
+                        importHandler.importBibliographyFilesWithDialog(droppedFileImportPlan.bibliographyFiles());
+                    }
+                    if (!droppedFileImportPlan.remainingFiles().isEmpty()) {
                         BibEntry entry = target.getEntry();
                         ExternalFilesEntryLinker fileLinker = importHandler.getFileLinker();
-                        DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
+                        DragDrop.handleDropOfFiles(droppedFileImportPlan.remainingFiles(), transferMode, fileLinker, entry);
                     }
                 }
             }
@@ -585,11 +588,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                     .map(File::toPath)
                                     .map(FileUtil::resolveIfShortcut)
                                     .toList();
-            if (importHandler.shouldShowImportDialog(files)) {
-                importHandler.importBibliographyFilesWithDialog(files);
-            } else {
+            ImportHandler.DroppedFileImportPlan droppedFileImportPlan = importHandler.planDroppedFiles(files);
+            if (droppedFileImportPlan.hasBibliographyFiles()) {
+                importHandler.importBibliographyFilesWithDialog(droppedFileImportPlan.bibliographyFiles());
+            }
+            if (!droppedFileImportPlan.remainingFiles().isEmpty()) {
                 importHandler
-                        .importFilesInBackground(files, event.getTransferMode())
+                        .importFilesInBackground(droppedFileImportPlan.remainingFiles(), event.getTransferMode())
                         .executeWith(taskExecutor);
             }
             success = true;

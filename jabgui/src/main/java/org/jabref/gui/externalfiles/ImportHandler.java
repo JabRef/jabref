@@ -117,7 +117,22 @@ public class ImportHandler {
     }
 
     public boolean shouldShowImportDialog(List<Path> files) {
-        return !files.isEmpty() && files.stream().allMatch(this::isImportableBibliographyFile);
+        return planDroppedFiles(files).hasBibliographyFiles();
+    }
+
+    public DroppedFileImportPlan planDroppedFiles(List<Path> files) {
+        List<Path> bibliographyFiles = new ArrayList<>();
+        List<Path> remainingFiles = new ArrayList<>();
+
+        for (Path file : files) {
+            if (isImportableBibliographyFile(file)) {
+                bibliographyFiles.add(file);
+            } else {
+                remainingFiles.add(file);
+            }
+        }
+
+        return new DroppedFileImportPlan(List.copyOf(bibliographyFiles), List.copyOf(remainingFiles));
     }
 
     public void importBibliographyFilesWithDialog(List<Path> files) {
@@ -272,9 +287,7 @@ public class ImportHandler {
                 UiTaskExecutor.runAndWaitInJavaFXThread(() ->
                         dialogService.showWarningDialogAndWait(
                                 Localization.lang("Import error"),
-                                Localization.lang("Please check your library file for wrong syntax.")
-                                        + "\n\n"
-                                        + e.getLocalizedMessage()));
+                        Localization.lang("Please check your library file for wrong syntax.%0", "\n\n" + e.getLocalizedMessage())));
             }
         }
 
@@ -299,6 +312,12 @@ public class ImportHandler {
                 preferences.getImportFormatPreferences(),
                 preferences.getCitationKeyPatternPreferences(),
                 fileUpdateMonitor);
+    }
+
+    public record DroppedFileImportPlan(List<Path> bibliographyFiles, List<Path> remainingFiles) {
+        public boolean hasBibliographyFiles() {
+            return !bibliographyFiles.isEmpty();
+        }
     }
 
     /// Cleans up the given entries and adds them to the library.
