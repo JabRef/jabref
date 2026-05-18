@@ -535,7 +535,15 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         if (lastFocusedFieldName != null) {
             String fieldToRestore = lastFocusedFieldName;
             lastFocusedFieldName = null;
-            Platform.runLater(() -> selectField(fieldToRestore));
+            Platform.runLater(() -> {
+                selectField(fieldToRestore);
+                Platform.runLater(() -> Platform.runLater(() -> {
+                    Node focused = getScene().getFocusOwner();
+                    if (focused instanceof TextInputControl textInput) {
+                        textInput.end();
+                    }
+                }));
+            });
         }
     }
 
