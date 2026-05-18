@@ -521,6 +521,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
         return linkedFile;
     }
 
+    public BibEntry getBibEntry() {
+        return entry;
+    }
+
     public ValidationStatus fileExistsValidationStatus() {
         return fileExistsValidator.getValidationStatus();
     }

@@ -85,7 +85,7 @@ record SingleSelectionMenuBuilder(
         OcrEngine ocrEngine = new OcrMyPdfEngine();
         items.add(factory.createMenuItem(
                 StandardActions.PERFORM_OCR,
-                new OcrLinkedFileAction(selectedLinkedFile.getFile(), bibEntry.getValueOrElse(new BibEntry()), databaseContext, dialogService, preferences, taskExecutor, ocrEngine)));
+                new OcrLinkedFileAction(selectedLinkedFile.getFile(), selectedLinkedFile.getBibEntry(), databaseContext, dialogService, preferences, taskExecutor, ocrEngine)));
 
         items.add(factory.createMenuItem(
                 StandardActions.RENAME_FILE_TO_PATTERN,

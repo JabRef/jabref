@@ -62,7 +62,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
                     dialogService.notify(Localization.lang("OCR succeeded"));
                     LinkedFile ocredPdf = new LinkedFile(success.outputFile());
                     List<LinkedFile> ocredFiles = List.of(ocredPdf);
-                    entry.setFiles(ocredFiles);
+                    entry.addFiles(ocredFiles);
                 }
                 case OcrResult.Failure failure -> {
                     String failureReason = switch (failure.reason()) {
