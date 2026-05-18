@@ -10,12 +10,9 @@ import org.jabref.model.entry.field.Field;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /// Filters change events and only relays major changes.
 public class CoarseChangeFilter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CoarseChangeFilter.class);
 
     private final BibDatabaseContext context;
     private final EventBus eventBus = new EventBus();
@@ -62,11 +59,7 @@ public class CoarseChangeFilter {
     }
 
     public void unregisterListener(Object listener) {
-        try {
-            eventBus.unregister(listener);
-        } catch (IllegalArgumentException e) {
-            LOGGER.debug("Listener was not registered before: {}", listener, e);
-        }
+        eventBus.unregister(listener);
     }
 
     public void shutdown() {
@@ -74,3 +67,4 @@ public class CoarseChangeFilter {
         context.getMetaData().unregisterListener(this);
     }
 }
+
