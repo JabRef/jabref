@@ -49,7 +49,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
     @Override
     public void execute() {
         Optional<Path> pdfPath = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
-        if (!pdfPath.isPresent()) {
+        if (pdfPath.isEmpty()) {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not find a file to OCR"));
             return;
         }
