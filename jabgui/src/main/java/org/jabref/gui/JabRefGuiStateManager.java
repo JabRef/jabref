@@ -163,10 +163,7 @@ public class JabRefGuiStateManager implements StateManager {
             return context;
         }
         assert false : "No SearchContext registered for database '" + database.getUid() + "'";
-        LOGGER.error(
-                "No SearchContext registered for database '{}'. Returning inert fallback. "
-                        + "LibraryTab should register one via setSearchContext on open.",
-                database.getUid());
+        LOGGER.error("No SearchContext registered for database '{}'. Returning inert fallback. LibraryTab should register one via setSearchContext on open.", database.getUid());
         return new SearchContext(
                 new SimpleBooleanProperty(false),
                 NoOpSearchBackend::new,
