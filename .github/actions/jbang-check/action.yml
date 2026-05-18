@@ -1,0 +1,25 @@
+name: 'JBang check'
+description: 'Builds all JBang scripts and verifies the launchers support --help'
+runs:
+  using: 'composite'
+  steps:
+    - name: Build .jbang scripts
+      shell: bash
+      run: |
+        for f in .jbang/*.java; do
+          echo "Building $f..."
+          jbang build --fresh "$f"
+        done
+    - name: Build jablib-examples JBang scripts
+      shell: bash
+      run: |
+        for f in jablib-examples/jbang/*.java; do
+          echo "Building $f..."
+          jbang build --fresh "$f"
+        done
+    - name: Launchers support --help
+      shell: bash
+      run: |
+        jbang run --fresh .jbang/JabKitLauncher.java --help
+        jbang run --fresh .jbang/JabLsLauncher.java --help
+        jbang run --fresh .jbang/JabSrvLauncher.java --help

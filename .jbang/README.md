@@ -48,19 +48,20 @@ Commands:
   search                  Search in a library.
 ```
 
-> [!NOTE]`
+> [!NOTE]
 > Due to the high development pace, `--fresh` is used to update `org.jabref:jablib:6.0-SNAPSHOT`.
 > As soon as JabRef 6.0 is released, this won't be required any more.
 
 > [!NOTE]
-> The script depends on the published `org.jabref:jablib:6.0-SNAPSHOT`.
-> When testing local, unmerged `jablib` changes, build them into your local Maven repository first:
+> The scripts depend on the published `org.jabref:jablib:6.0-SNAPSHOT`.
+> When testing local, unmerged `jablib` changes, publish them to your local Maven repository first:
 >
 > ```console
-> ./gradlew :jablib:publishToMavenLocal
+> ./gradlew -PprojVersion=6.0 :jablib:publishToMavenLocal
 > ```
 >
-> Then run the script with `--fresh` so the locally built `jablib` is picked up.
+> `-PprojVersion=6.0` is required: without it the artifact is published as `0.1.0-SNAPSHOT` and JBang will not pick it up.
+> The `mavenlocal` repository is listed first in the scripts, so the locally published `jablib` takes precedence.
 
 ### Installing and Running `JabKit` with JBang
 
