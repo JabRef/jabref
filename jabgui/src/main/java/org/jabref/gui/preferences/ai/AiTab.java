@@ -56,6 +56,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private VBox expertSettingsPane;
     @FXML private TextField apiBaseUrlTextField;
     @FXML private SearchableComboBox<PredefinedEmbeddingModel> embeddingModelComboBox;
+    // [impl->req~ai.answer-engines.default~1]
     @FXML private ComboBox<AnswerEngineKind> answerEngineComboBox;
     // [impl->req~ai.summarization.algorithm.default~1]
     @FXML private ComboBox<SummarizatorKind> summarizationAlgorithmComboBox;

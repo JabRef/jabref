@@ -13,14 +13,12 @@ Needs: impl
 
 Covers: `feat~ai.chatting~1`
 
-<!-- oft:off -->
 ## Allow users to select a default summarization algorithm
-`feat~ai.answer-engines.default~1`
+`req~ai.answer-engines.default~1`
 
 Needs: impl
 
 Covers: `feat~ai.answer-engines~1`
-<!-- oft:on -->
 
 ## "Embedding search" AI answer engine
 `feat~ai.answer-engines.embeddings-search~1`

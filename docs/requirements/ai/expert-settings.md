@@ -36,26 +36,6 @@ Needs: impl
 
 Covers: `feat~ai.expert-settings~1`
 
-<!-- oft:off -->
-## Allow modification of local RAG parameters in AI expert settings
-`req~ai.expert-settings.rag-local~1`
-
-Rationale: users need to adjust the RAG parameters to refine AI outputs
-
-Needs: impl
-
-Covers: `feat~ai.expert-settings~1`
-
-## Allow modification of global summarization parameters in AI expert settings
-`req~ai.expert-settings.summarization-global~1`
-
-Rationale: users need to adjust the underlying prompt structures to refine AI outputs
-
-Needs: impl
-
-Covers: `feat~ai.expert-settings~1`
-<!-- oft:on -->
-
 ## Allow modification of local summarization parameters in AI expert settings
 `req~ai.expert-settings.summarization-local~1`
 

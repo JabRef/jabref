@@ -17,7 +17,7 @@ parent: Requirements
 
 ## How to write AI Requirements
 
-Currently these rules are only applied in the AI features and a bit experimental:
+Currently these rules are only applied in the AI features and are a bit experimental:
 
 1. For a "big" AI feature, create a separate file (for example, chatting and summarization).
 2. Use `feat` type to group requirements.

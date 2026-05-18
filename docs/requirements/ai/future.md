@@ -49,6 +49,15 @@ Needs: impl, dsn, utest
 
 Covers: `feat~ai.chatting~1`
 
+## Allow modification of local RAG parameters in AI expert settings
+`req~ai.expert-settings.rag-local~1`
+
+Rationale: users need to adjust the RAG parameters to refine AI outputs
+
+Needs: impl
+
+Covers: `feat~ai.expert-settings~1`
+
 <!-- oft:on -->
 
 <!-- markdownlint-disable-file MD022 -->
