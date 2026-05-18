@@ -92,8 +92,6 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     private final TaskExecutor taskExecutor;
 
     private final GuiPreferences preferences;
-
-
     private Set<String> scheduledFetchedDois;
 
     public MultiMergeEntriesView(GuiPreferences preferences,
@@ -271,10 +269,10 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         public Cell(String content, Field field, int columnIndex) {
             this.content = content;
 
- /*
- If this is not explicitly done on the JavaFX thread, the bindings to the text fields don't work properly.
- The text only shows up after one text in that same row is selected by the user.
- */
+            /*
+             If this is not explicitly done on the JavaFX thread, the bindings to the text fields don't work properly.
+             The text only shows up after one text in that same row is selected by the user.
+             */
             UiTaskExecutor.runInJavaFXThread(() -> {
 
                 FieldRow row = fieldRows.get(field);
@@ -346,7 +344,6 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
             return content;
         }
     }
-
 
     public void enableAutomaticFetchedDoiColumnForPdfExtractions() {
         scheduledFetchedDois = ConcurrentHashMap.newKeySet();

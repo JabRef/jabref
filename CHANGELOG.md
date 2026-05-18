@@ -70,7 +70,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed vertical cursor movement shortcuts (Command+Up/Down for document start/end, Option+Up/Down for paragraph start/end) not working correctly in the BibTeX source editor on macOS. [#5937](https://github.com/JabRef/jabref/issues/5937)
 - We fixed text cursor movement shortcuts (Command+Left/Right for line start/end, Option+Left/Right for word navigation) not working correctly in the BibTeX source editor on macOS. [#5937](https://github.com/JabRef/jabref/issues/5937)
 - We fixed PDF import to prefer the content extracted title over filename like XMP metadata titles. [#11999](https://github.com/JabRef/jabref/issues/11999)
-- We fixed an issue where the PDF metadata merge dialog did not automatically add a DOI-fetched source even when extracted metadata already contained a DOI. [#15415](https://github.com/JabRef/jabref/issues/15415)
 - We fixed RIS export writing the full page range into both start page and end page fields instead of splitting them correctly. [#15106](https://github.com/JabRef/jabref/issues/15106)
 - We fixed an issue where shortcut keys did not work for linked files in the entry editor. [#12564](https://github.com/JabRef/jabref/issues/12564)
 - We fixed the issue where incomplete search produced noisy error logs when entering input in the search bar. [#14632](https://github.com/JabRef/jabref/issues/14632)
@@ -102,7 +101,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the invisible delete button area was shown for internal CSL styles in the OpenOffice/LibreOffice style selection dialog. External CSL styles remain deletable. [#15397](https://github.com/JabRef/jabref/issues/15397)
 - We fixed an issue that prevented files without a file extension from being shown in various file select dialogs [#11786](https://github.com/JabRef/jabref/issues/11786)
 - We fixed the Hayagriva YAML exporter producing a multi-document YAML file, which broke Typst compilation. [#15617](https://github.com/JabRef/jabref/issues/15617)
-
+- We fixed an issue where the PDF metadata merge dialog did not automatically add a DOI-fetched source even when extracted metadata already contained a DOI. [#15415](https://github.com/JabRef/jabref/issues/15415)
 ### Removed
 
 - We removed GPT4All as AI-provider as this project is currently unmaintained and does not receive any security updates. [#15439](https://github.com/JabRef/jabref/pull/15439)
