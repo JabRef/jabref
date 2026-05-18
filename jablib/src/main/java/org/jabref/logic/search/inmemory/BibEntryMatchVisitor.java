@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.jabref.logic.search.query.SearchFieldConstants;
 import org.jabref.logic.search.query.SearchQueryConversion;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -104,16 +105,16 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
 
     private boolean isFieldPresent(String fieldName) {
         return switch (fieldName) {
-            case "key",
-                 "citationkey" ->
+            case SearchFieldConstants.KEY,
+                 SearchFieldConstants.CITATION_KEY ->
                     entry.getCitationKey().isPresent();
-            case "entrytype" ->
+            case SearchFieldConstants.ENTRY_TYPE ->
                     true; // every entry has a type
-            case "any",
-                 "anyfield" ->
+            case SearchFieldConstants.ANY_FIELD,
+                 SearchFieldConstants.ANY_FIELD_ALIAS ->
                     entry.getFields().stream()
                          .anyMatch(f -> !GROUPS_FIELD_NAME.equals(f.getName()));
-            case "anykeyword" ->
+            case SearchFieldConstants.ANY_KEYWORD ->
                     entry.getField(StandardField.KEYWORDS).isPresent();
             default ->
                     entry.getFields().stream()
@@ -123,17 +124,17 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
 
     private boolean matchField(String fieldName, String term, SearchFlags matchKind, boolean caseSensitive) {
         return switch (fieldName) {
-            case "key",
-                 "citationkey" ->
+            case SearchFieldConstants.KEY,
+                 SearchFieldConstants.CITATION_KEY ->
                     entry.getCitationKey()
                          .map(v -> matchValue(v, term, matchKind, caseSensitive))
                          .orElse(false);
-            case "entrytype" ->
+            case SearchFieldConstants.ENTRY_TYPE ->
                     matchValue(entry.getType().getName(), term, matchKind, caseSensitive);
-            case "any",
-                 "anyfield" ->
+            case SearchFieldConstants.ANY_FIELD,
+                 SearchFieldConstants.ANY_FIELD_ALIAS ->
                     matchAnyField(term, matchKind, caseSensitive);
-            case "anykeyword" ->
+            case SearchFieldConstants.ANY_KEYWORD ->
                     matchAnyKeyword(term, matchKind, caseSensitive);
             default ->
                     matchNamedField(fieldName, term, matchKind, caseSensitive);
