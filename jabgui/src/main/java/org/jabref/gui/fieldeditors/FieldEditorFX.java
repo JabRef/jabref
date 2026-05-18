@@ -137,11 +137,14 @@ public interface FieldEditorFX {
     Parent getNode();
 
     default void focus() {
-        getNode().getChildrenUnmodifiable()
-                 .stream()
-                 .findFirst()
-                 .orElse(getNode())
-                 .requestFocus();
+        var node = getNode().getChildrenUnmodifiable()
+                           .stream()
+                           .findFirst()
+                           .orElse(getNode());
+        node.requestFocus();
+        if (node instanceof TextInputControl textInput) {
+            Platform.runLater(textInput::end);
+        }
     }
 
     /// Returns relative size of the field editor in terms of display space.

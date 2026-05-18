@@ -319,7 +319,6 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         });
     }
 
-    /// Captures the currently focused field name before entry navigation
     private void captureFocusedField() {
         Node focusedNode = getScene().getFocusOwner();
         if (focusedNode instanceof TextInputControl textInput && textInput.getId() != null) {
@@ -492,6 +491,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     public void setCurrentlyEditedEntry(@NonNull BibEntry currentlyEditedEntry) {
         if (Objects.equals(this.currentlyEditedEntry, currentlyEditedEntry)) {
+            lastFocusedFieldName = null;
             return;
         }
 
