@@ -236,12 +236,14 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                         stateManager,
                         dialogService,
                         taskExecutor);
-                if (importHandler.shouldShowImportDialog(files)) {
-                    importHandler.importBibliographyFilesWithDialog(files);
-                } else {
+                ImportHandler.DroppedFileImportPlan droppedFileImportPlan = importHandler.planDroppedFiles(files);
+                if (droppedFileImportPlan.hasBibliographyFiles()) {
+                    importHandler.importBibliographyFilesWithDialog(droppedFileImportPlan.bibliographyFiles());
+                }
+                if (!droppedFileImportPlan.remainingFiles().isEmpty()) {
                     // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
                     // Similar code as org.jabref.gui.externalfiles.ImportHandler.importFilesInBackground
-                    DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
+                    DragDrop.handleDropOfFiles(droppedFileImportPlan.remainingFiles(), transferMode, fileLinker, entry);
                 }
                 success = true;
             }
