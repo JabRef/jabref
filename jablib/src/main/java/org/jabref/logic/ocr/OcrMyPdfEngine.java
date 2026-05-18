@@ -27,7 +27,25 @@ public class OcrMyPdfEngine implements OcrEngine {
 
     @Override
     public boolean isAvailable() {
-        return true;
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder("ocrmypdf", "--version");
+            processBuilder.redirectErrorStream(true);
+            Process process = processBuilder.start();
+            boolean finished = process.waitFor(30, TimeUnit.SECONDS);
+            if (!finished) {
+                process.destroyForcibly();
+                LOGGER.warn("Checking OCRmyPDF availability timed out.");
+                return false;
+            }
+            return process.exitValue() == 0;
+        } catch (IOException e) {
+            LOGGER.error("OCRmyPDF is not available: IOException occurred.", e);
+            return false;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            LOGGER.error("Checking OCRmyPDF availability was interrupted.", e);
+            return false;
+        }
     }
 
     /// OCRmyPDF writes the searchable PDF to a new file alongside the original file.
