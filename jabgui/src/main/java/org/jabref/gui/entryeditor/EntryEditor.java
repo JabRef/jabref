@@ -44,6 +44,7 @@ import org.jabref.gui.entryeditor.citationrelationtab.CitationRelationsTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
+import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -224,10 +225,24 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
                 TransferMode transferMode = event.getTransferMode();
-                List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
-                // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
-                // Similar code as org.jabref.gui.externalfiles.ImportHandler.importFilesInBackground
-                DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
+                List<Path> files = event.getDragboard().getFiles().stream()
+                                        .map(File::toPath)
+                                        .collect(Collectors.toList());
+                ImportHandler importHandler = new ImportHandler(
+                        tabSupplier.get().getBibDatabaseContext(),
+                        preferences,
+                        fileMonitor,
+                        undoManager,
+                        stateManager,
+                        dialogService,
+                        taskExecutor);
+                if (importHandler.shouldShowImportDialog(files)) {
+                    importHandler.importBibliographyFilesWithDialog(files);
+                } else {
+                    // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
+                    // Similar code as org.jabref.gui.externalfiles.ImportHandler.importFilesInBackground
+                    DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);
+                }
                 success = true;
             }
 
