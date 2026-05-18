@@ -1,4 +1,4 @@
-package org.jabref.logic.search;
+package org.jabref.logic.search.sqlbased;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -19,11 +19,11 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ChangeListener;
 
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.search.indexing.BibFieldsIndexer;
-import org.jabref.logic.search.indexing.DefaultLinkedFilesIndexer;
-import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;
-import org.jabref.logic.search.retrieval.BibFieldsSearcher;
-import org.jabref.logic.search.retrieval.LinkedFilesSearcher;
+import org.jabref.logic.search.sqlbased.indexing.BibFieldsIndexer;
+import org.jabref.logic.search.sqlbased.indexing.DefaultLinkedFilesIndexer;
+import org.jabref.logic.search.sqlbased.indexing.ReadOnlyLinkedFilesIndexer;
+import org.jabref.logic.search.sqlbased.retrieval.BibFieldsSearcher;
+import org.jabref.logic.search.sqlbased.retrieval.LinkedFilesSearcher;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.Directories;

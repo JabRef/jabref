@@ -1,4 +1,4 @@
-package org.jabref.logic.search.retrieval;
+package org.jabref.logic.search.sqlbased.retrieval;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.logic.FilePreferences;
-import org.jabref.logic.search.LuceneIndexer;
 import org.jabref.logic.search.query.SearchQueryConversion;
+import org.jabref.logic.search.sqlbased.LuceneIndexer;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
