@@ -138,9 +138,9 @@ public interface FieldEditorFX {
 
     default void focus() {
         var node = getNode().getChildrenUnmodifiable()
-                           .stream()
-                           .findFirst()
-                           .orElse(getNode());
+                            .stream()
+                            .findFirst()
+                            .orElse(getNode());
         node.requestFocus();
         if (node instanceof TextInputControl textInput) {
             Platform.runLater(textInput::end);

@@ -20,6 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where keyboard navigation shortcuts (Alt+UP/DOWN) in the entry editor caused focus to jump to the search field instead of staying in the current field. [#14943](https://github.com/JabRef/jabref/issues/14943)
 - We fixed an issue where newly added entries could not be found in search. [#15719](https://github.com/JabRef/jabref/issues/15719)
 
 ### Removed

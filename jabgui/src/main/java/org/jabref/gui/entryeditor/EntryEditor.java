@@ -532,7 +532,6 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             Platform.runLater(() -> selectedTab.notifyAboutFocus(currentlyEditedEntry));
         }
 
-        // Restore focus to the same field after navigation
         if (lastFocusedFieldName != null) {
             String fieldToRestore = lastFocusedFieldName;
             lastFocusedFieldName = null;
