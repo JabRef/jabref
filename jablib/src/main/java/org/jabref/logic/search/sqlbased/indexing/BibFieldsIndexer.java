@@ -1,4 +1,4 @@
-package org.jabref.logic.search.indexing;
+package org.jabref.logic.search.sqlbased.indexing;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

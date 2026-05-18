@@ -1,9 +1,9 @@
-package org.jabref.logic.search.indexing;
+package org.jabref.logic.search.sqlbased.indexing;
 
 import java.io.IOException;
 import java.util.Collection;
 
-import org.jabref.logic.search.LuceneIndexer;
+import org.jabref.logic.search.sqlbased.LuceneIndexer;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
