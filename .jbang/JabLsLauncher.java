@@ -2,7 +2,7 @@
 
 //DESCRIPTION jabls - start a bibtex languageserver
 
-//JAVA 25+
+//JAVA 25
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 // mavenlocal is listed first so a locally built jablib (./gradlew :jablib:publishToMavenLocal)
