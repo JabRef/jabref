@@ -28,8 +28,8 @@ class InputOption {
     /// @return the resolved input file
     Path getInputFile() {
         return inputSource.positionalInput != null
-                ? inputSource.positionalInput
-                : inputSource.optionInput;
+               ? inputSource.positionalInput
+               : inputSource.optionInput;
     }
 
     private static class InputSource {
