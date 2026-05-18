@@ -323,34 +323,77 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
-    public void moveToDefaultDirectory() {
+    public void moveToDirectory(Path destinationDirectory) {
         if (linkedFile.isOnlineLink()) {
-            // Cannot move remote links
             return;
         }
 
-        // Get target folder
-        Optional<Path> fileDir = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
-        if (fileDir.isEmpty()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Move file"), Localization.lang("File directory is not set or does not exist."));
+        Optional<Path> currentFile = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
+        if (currentFile.isEmpty()) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("File not found"),
+                    Localization.lang("Could not find file '%0'.", linkedFile.getLink())
+            );
             return;
         }
 
-        Optional<Path> file = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
-        if (file.isPresent()) {
-            // Found the linked file, so move it
-            try {
-                linkedFileHandler.moveToDefaultDirectory();
-            } catch (IOException exception) {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("Move file"),
-                        Localization.lang("Could not move file '%0'.", file.get().toString()),
-                        exception);
-            }
-        } else {
-            // File doesn't exist, so we can't move it.
-            dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+        Path destDirectoryWithPattern = getFullDestinationDirectory(destinationDirectory);
+
+        try {
+            linkedFileHandler.moveToExactDirectory(destDirectoryWithPattern);
+        } catch (IOException exception) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Move file"),
+                    Localization.lang("Could not move file '%0'.", currentFile.get().toString()),
+                    exception);
         }
+    }
+
+    public void moveToDirectoryAndRename(Path destinationDirectory) {
+        if (!isInCurrentDirectory(destinationDirectory)) {
+            moveToDirectory(destinationDirectory);
+        }
+        renameToSuggestion();
+    }
+
+    /// Checks if the current linked file is already located in the target directory (considering also the directory pattern if exists).
+    public boolean isInCurrentDirectory(Path destinationDirectory) {
+        Optional<Path> currentDirectory = getCurrentFileDirectory();
+        if (currentDirectory.isEmpty()) {
+            return false;
+        }
+
+        Path destDirectoryWithPattern = getFullDestinationDirectory(destinationDirectory);
+        try {
+            return Files.isSameFile(currentDirectory.get(), destDirectoryWithPattern);
+        } catch (IOException e) {
+            LOGGER.debug("Could not compare directories {} and {}.", currentDirectory.get(), destDirectoryWithPattern, e);
+            return false;
+        }
+    }
+
+    private Optional<Path> getCurrentFileDirectory() {
+        return linkedFile.findIn(databaseContext, preferences.getFilePreferences())
+                         .map(Path::getParent);
+    }
+
+    /// Constructs the target directory by appending the directory pattern (if exists) to the given base directory.
+    private Path getFullDestinationDirectory(Path targetBaseDirectory) {
+        return targetBaseDirectory.resolve(getFileDirectoryPattern()).normalize();
+    }
+
+    private Path getFileDirectoryPattern() {
+        String directoryPattern = preferences.getFilePreferences().getFileDirectoryPattern();
+        if (directoryPattern.isEmpty()) {
+            return Path.of("");
+        }
+
+        String targetDirectoryName = FileUtil.createDirNameFromPattern(
+                databaseContext.getDatabase(),
+                entry,
+                directoryPattern);
+
+        return Path.of(targetDirectoryName);
     }
 
     /// Gets the filename for the current linked file and compares it to the new suggested filename.
@@ -397,11 +440,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
             }
         };
         return OptionalUtil.equals(targetDir, currentDir, equality);
-    }
-
-    public void moveToDefaultDirectoryAndRename() {
-        moveToDefaultDirectory();
-        renameToSuggestion();
     }
 
     /// Asks the user for confirmation that he really wants to the delete the file from disk (or just remove the link)
