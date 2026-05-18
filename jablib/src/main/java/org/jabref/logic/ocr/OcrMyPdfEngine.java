@@ -19,6 +19,7 @@ public class OcrMyPdfEngine implements OcrEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OcrMyPdfEngine.class);
     private static final int TIMEOUT_MINS = 10;
+    private static final int CHECKING_TIMEOUT = 5;
 
     @Override
     public String getName() {
@@ -31,7 +32,7 @@ public class OcrMyPdfEngine implements OcrEngine {
             ProcessBuilder processBuilder = new ProcessBuilder("ocrmypdf", "--version");
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
-            boolean finished = process.waitFor(5, TimeUnit.SECONDS);
+            boolean finished = process.waitFor(CHECKING_TIMEOUT, TimeUnit.SECONDS);
             if (!finished) {
                 process.destroyForcibly();
                 LOGGER.debug("Checking OCRmyPDF availability timed out");
