@@ -78,7 +78,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
             if (newValue != null) {
                 previewViewer.setEntry(newValue.getEntry());
             } else {
-                previewViewer.setEntry(null);
+                previewViewer.clearEntry();
             }
         });
 
