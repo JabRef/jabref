@@ -145,55 +145,81 @@ public class BibDatabaseContext {
     }
 
     /// Look up the directories set up for this database.
-    /// There can be up to four directories definitions for these files:
-    /// <ol>
-    /// - next to the .bib file.
-    /// - the preferences can specify a default one.
-    /// - the database's metadata can specify a library-specific directory.
-    /// - the database's metadata can specify a user-specific directory.
-    /// </ol>
+    /// There can be up to four directory definitions for these files:
+    ///
+    /// 1. next to the .bib file.
+    /// 2. the preferences can specify a default one.
+    /// 3. the database's metadata can specify a library-specific directory.
+    /// 4. the database's metadata can specify a user-specific directory.
+    ///
     ///
     /// The settings are prioritized in the following order, and the first defined setting is used:
-    /// <ol>
-    /// - user-specific metadata directory
-    /// - general metadata directory
-    /// - BIB file directory (if configured in the preferences AND none of the two above directories are configured)
-    /// - preferences directory (if .bib file directory should not be used according to the (global) preferences)
-    /// </ol>
+    ///
+    /// 1. user-specific metadata directory
+    /// 2. general metadata directory
+    /// 3. BIB file directory (if configured in the preferences AND none of the two above directories are configured)
+    /// 4. preferences directory (if .bib file directory should not be used according to the (global) preferences)
     ///
     /// @param preferences The fileDirectory preferences
     /// @return List of existing absolute paths
     public List<Path> getFileDirectories(FilePreferences preferences) {
-        // Paths are a) ordered and b) should be contained only once in the result
-        SequencedSet<Path> fileDirs = new LinkedHashSet<>(3);
+        SequencedSet<Path> fileDirs = new LinkedHashSet<>();
+        FileDirectories directories = getAllFileDirectories(preferences);
 
-        Optional<Path> userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(this::getFileDirectoryPath);
-        userFileDirectory.ifPresent(fileDirs::add);
-
-        Optional<Path> librarySpecificFileDirectory = metaData.getLibrarySpecificFileDirectory().map(this::getFileDirectoryPath);
-        librarySpecificFileDirectory.ifPresent(fileDirs::add);
+        directories.getUserDirectoryOpt().ifPresent(fileDirs::add);
+        directories.getLibraryDirectoryOpt().ifPresent(fileDirs::add);
 
         // fileDirs.isEmpty() is true after these two if there are no directories set in the BIB file itself:
-        //   1) no user-specific file directory set (in the metadata of the bib file) and
-        //   2) no library-specific file directory is set (in the metadata of the bib file)
+        // 1) no user-specific file directory set (in the metadata of the bib file) and
+        // 2) no library-specific file directory is set (in the metadata of the bib file)
 
-        // BIB file directory or main file directory (according to (global) preferences)
-        if (preferences.shouldStoreFilesRelativeToBibFile()) {
-            getDatabasePath().ifPresent(dbPath -> {
-                Path parentPath = dbPath.getParent();
-                if (parentPath == null) {
-                    parentPath = Path.of(System.getProperty("user.dir"));
-                    LOGGER.warn("Parent path of database file {} is null. Falling back to {}.", dbPath, parentPath);
-                }
-                Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
-                fileDirs.add(parentPath.toAbsolutePath());
-            });
-        } else {
-            preferences.getMainFileDirectory()
-                       .ifPresent(fileDirs::add);
-        }
+        directories.getFallbackDirectoryOpt().ifPresent(fileDirs::add);
 
         return new ArrayList<>(fileDirs);
+    }
+
+    /// Look up all configured file directories of this database.
+    /// The returned record contains the following directories:
+    ///
+    /// 1. user-specific directory
+    /// 2. library-specific directory
+    /// 3. BIB file directory or Main file directory (depending on preferences)
+    ///
+    /// @param preferences The file directory preferences
+    /// @return fixed-size record containing absolute paths (if configured)
+    public FileDirectories getAllFileDirectories(FilePreferences preferences) {
+        Path userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost())
+                                         .map(this::getFileDirectoryPath)
+                                         .orElse(null);
+        Path librarySpecificFileDirectory = metaData.getLibrarySpecificFileDirectory()
+                                                    .map(this::getFileDirectoryPath)
+                                                    .orElse(null);
+
+        Path bibOrMainFileDirectory;
+
+        // BIB file directory or Main file directory (according to (global) preferences)
+        if (preferences.shouldStoreFilesRelativeToBibFile()) {
+            bibOrMainFileDirectory = getDatabaseDirectory().orElse(null);
+        } else {
+            bibOrMainFileDirectory = preferences.getMainFileDirectory().orElse(null);
+        }
+
+        return new FileDirectories(
+                userFileDirectory,
+                librarySpecificFileDirectory,
+                bibOrMainFileDirectory
+        );
+    }
+
+    public Optional<Path> getDatabaseDirectory() {
+        return getDatabasePath().map(dbPath -> {
+            Path parentPath = dbPath.getParent();
+            if (parentPath == null) {
+                parentPath = Path.of(System.getProperty("user.dir"));
+                LOGGER.warn("Parent path of database file {} is null. Falling back to {}.", dbPath, parentPath);
+            }
+            return parentPath.toAbsolutePath();
+        });
     }
 
     /// Returns the first existing file directory from  {@link #getFileDirectories(FilePreferences)}

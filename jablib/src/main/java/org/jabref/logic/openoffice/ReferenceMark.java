@@ -120,6 +120,10 @@ public class ReferenceMark {
         return citationType;
     }
 
+    public static boolean isReferenceMarkName(String name) {
+        return REFERENCE_MARK_FORMAT.matcher(name).matches();
+    }
+
     public static Optional<ReferenceMark> of(String name) {
         ReferenceMark mark = new ReferenceMark(name);
         return mark.citationKeys.isEmpty() ? Optional.empty() : Optional.of(mark);

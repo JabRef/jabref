@@ -63,6 +63,10 @@
     -rtfx-background-color: -jr-error;
 }
 
+.bold {
+    -fx-font-weight: bold;
+}
+
 .merge-header-cell {
     -fx-border-color: -fx-outer-border;
     -fx-background-color: -jr-row-odd-background;
@@ -630,11 +634,25 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: transparent;
 }
 
+/* CitationKeyPatternsPanel */
+
+.citation-key-pattern-default-row {
+    -fx-background-color: -fx-default-button;
+}
+
 /* MainTable */
 
 .main-table .column-icon {
     -fx-alignment: baseline-center;
     -fx-padding: 0;
+}
+
+.padding-0 {
+    -fx-padding: 0;
+}
+
+.align-center-right {
+    -fx-alignment: CENTER-RIGHT;
 }
 
 .main-table .column-header.column-icon > .label {
@@ -1237,6 +1255,21 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -jr-error;
 }
 
+#entryEditor .latex-citations-directory-path {
+    -fx-font-family: monospace;
+    -fx-font-weight: bold;
+}
+
+#entryEditor .latex-citations-message-box {
+    -fx-padding: 30 0 0 30;
+}
+
+#entryEditor .latex-citations-error-label {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-accent;
+}
+
 /* ErrorConsole */
 #errorConsole .list-content {
     -fx-padding: 0em;
@@ -1516,6 +1549,10 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-color: -jr-sidepane-background;
 }
 
+#parseLatexResultDialog .parse-latex-reference-text {
+    -fx-fill: -fx-accent;
+}
+
 /* PreferenceDialog */
 #preferencesDialog #sidepane {
     -fx-background-color: -jr-sidepane-background;
@@ -1646,6 +1683,14 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 /* CitationRelationsTab */
+
+.padding-5px {
+    -fx-padding: 5px;
+}
+
+.align-center {
+    -fx-alignment: center;
+}
 
 #citationRelationsTab .addEntryButton {
     -fx-font-size: 2em;
@@ -2194,6 +2239,19 @@ journalInfo .grid-cell-b {
     -fx-spacing: 1em;
     -fx-max-width: 48em;
     -fx-fill-width: true;
+}
+
+/* FileSelectionPage */
+
+.file-selection-progress-pane {
+    -fx-alignment: center;
+    -fx-padding: 20;
+}
+
+/* TextFlowLimited */
+
+.text-flow-more-link {
+    -fx-background-color: -jr-white;
 }
 
 /* Markdown styles */
