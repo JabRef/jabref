@@ -100,6 +100,7 @@ public final class BstPreviewLayout implements PreviewLayout {
         // Remove all comments
         result = COMMENT_PATTERN.matcher(result).replaceAll("");
         // Remove all LaTeX comments
+        // The RemoveLatexCommandsFormatter keeps the words inside latex environments. Therefore, we remove them manually
         result = result.replace("\\begin{thebibliography}{1}", "");
         result = result.replace("\\end{thebibliography}", "");
         result = BIBITEM_PATTERN.matcher(result).replaceAll("");
