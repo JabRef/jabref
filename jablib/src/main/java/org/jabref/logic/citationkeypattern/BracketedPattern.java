@@ -972,7 +972,8 @@ public class BracketedPattern {
             return "+";
         }
         String lastName = lastAuthor.getFamilyName()
-                                    .map(CitationKeyGenerator::removeDefaultUnwantedCharacters).orElse("");
+                                    .map(name -> name.replaceAll("[-`ʹ:!;?^$]*", ""))
+                                    .orElse("");
         return lastName.length() > n ? lastName.substring(0, n) : lastName;
     }
 

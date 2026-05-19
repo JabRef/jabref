@@ -73,10 +73,6 @@ public class CitationKeyGenerator extends BracketedPattern {
         }
     }
 
-    static String removeDefaultUnwantedCharacters(String key) {
-        return removeUnwantedCharacters(key, DEFAULT_UNWANTED_CHARACTERS);
-    }
-
     @VisibleForTesting
     static String removeUnwantedCharacters(String key, String unwantedCharacters) {
         String newKey = key.chars()
