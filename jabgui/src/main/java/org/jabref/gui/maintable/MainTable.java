@@ -202,6 +202,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.setItems(model.getEntriesFilteredAndSorted());
 
+        getItems().addListener((ListChangeListener<BibEntryTableViewModel>) c ->
+            DefaultTaskExecutor.runInJavaFXThread(this::scrollToCurrentlySelectedEntry));
+
         Button addExampleButton = new Button(Localization.lang("Add example entry"));
         addExampleButton.getStyleClass().add("text-button-blue");
         addExampleButton.setOnAction(_ -> {
@@ -276,6 +279,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     ///
     /// @param sortedColumn The sorted column in {@link MainTable}
     /// @param keyEvent     The pressed character
+
+    // This is to make sure that the current entry is focused on
+    private void scrollToCurrentlySelectedEntry() {
+        getSelectionModel().getSelectedItems().stream()
+                           .findFirst()
+                           .ifPresent(this::scrollTo);
+    }
+
     private void jumpToSearchKey(TableColumn<BibEntryTableViewModel, ?> sortedColumn, KeyEvent keyEvent) {
         if (keyEvent.isAltDown() || keyEvent.isControlDown() || keyEvent.isMetaDown() || keyEvent.isShiftDown()) {
             return;
