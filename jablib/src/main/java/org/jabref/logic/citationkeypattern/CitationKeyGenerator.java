@@ -16,6 +16,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.CharMatcher;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,7 +137,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     }
 
     public static String cleanKey(String key, String unwantedCharacters) {
-        return removeUnwantedCharacters(key, unwantedCharacters).replaceAll("\\s", "");
+        return CharMatcher.whitespace().removeFrom(removeUnwantedCharacters(key, unwantedCharacters));
     }
 
     /// Generate a citation key for the given {@link BibEntry}.
