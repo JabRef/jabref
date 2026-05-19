@@ -328,7 +328,8 @@ jobs:
 
   tests-jabkit-smoke:
     name: "JabKit Smoke Test"
-    runs-on: ubuntu-slim
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
