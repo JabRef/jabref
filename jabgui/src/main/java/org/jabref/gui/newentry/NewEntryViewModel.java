@@ -22,7 +22,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
-import org.jabref.gui.importer.BookCoverFetcher;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -70,8 +69,6 @@ public class NewEntryViewModel {
     private final AiService aiService;
     private final FileUpdateMonitor fileUpdateMonitor;
 
-    private final BookCoverFetcher bookCoverFetcher;
-
     private final BooleanProperty executing;
     private final BooleanProperty executedSuccessfully;
 
@@ -95,6 +92,7 @@ public class NewEntryViewModel {
     private final Map<String, BibEntry> doiCache;
     private BibEntry duplicateEntry;
     private final StringProperty urlText;
+
     public NewEntryViewModel(GuiPreferences preferences,
                              LibraryTab libraryTab,
                              DialogService dialogService,
@@ -110,7 +108,6 @@ public class NewEntryViewModel {
         this.aiService = aiService;
         this.fileUpdateMonitor = fileUpdateMonitor;
 
-        this.bookCoverFetcher = new BookCoverFetcher(preferences.getExternalApplicationsPreferences());
         this.urlText = new SimpleStringProperty();
 
         executing = new SimpleBooleanProperty(false);
@@ -244,13 +241,6 @@ public class NewEntryViewModel {
         return bibtexTextValidator.getValidationStatus().validProperty();
     }
 
-    private BibEntry withCoversDownloaded(BibEntry entry) {
-        if (preferences.getPreviewPreferences().shouldDownloadCovers()) {
-            bookCoverFetcher.downloadCoversForEntry(entry);
-        }
-        return entry;
-    }
-
     private class WorkerLookupId extends Task<Optional<BibEntry>> {
         @Override
         protected Optional<BibEntry> call() throws FetcherException {
@@ -260,8 +250,7 @@ public class NewEntryViewModel {
             }
 
             CompositeIdFetcher fetcher = new CompositeIdFetcher(preferences.getImportFormatPreferences());
-            return fetcher.performSearchById(text)
-                          .map(entry -> withCoversDownloaded(entry));
+            return fetcher.performSearchById(text);
         }
     }
 
@@ -283,8 +272,7 @@ public class NewEntryViewModel {
                 return Optional.empty();
             }
 
-            return fetcher.performSearchById(text)
-                          .map(entry -> withCoversDownloaded(entry));
+            return fetcher.performSearchById(text);
         }
     }
 
@@ -545,20 +533,15 @@ public class NewEntryViewModel {
 
         String url = urlText.getValue();
 
-        // Check if url is blank, if so, set executing to false and return
         if (StringUtil.isBlank(url)) {
             executing.set(false);
             return;
         }
 
         try {
-            // 1. Create a new GenericUrlBasedFetcher
             GenericUrlBasedFetcher fetcher = new GenericUrlBasedFetcher();
-
-            // 2. Call performSearch with the url - it returns List<BibEntry>
             List<BibEntry> entries = fetcher.performSearch(url);
 
-            // 3. Import the entries - copy this exact block from executeSpecifyBibtex
             final ImportHandler handler = new ImportHandler(
                     libraryTab.getBibDatabaseContext(),
                     preferences,
@@ -569,7 +552,6 @@ public class NewEntryViewModel {
                     taskExecutor);
             handler.importEntriesWithDuplicateCheck(null, entries);
 
-            // 4. Set executed successfully
             executedSuccessfully.set(true);
         } catch (FetcherException e) {
             dialogService.showErrorDialogAndWait(

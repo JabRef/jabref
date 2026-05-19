@@ -505,7 +505,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
 
         if (generateButton != null) {
-            generateButton.disableProperty().bind(viewModel.bibtexTextValidatorProperty().not());
+            generateButton.disableProperty().unbind();
+            generateButton.setDisable(false);
             generateButton.setText(Localization.lang("Create"));
         }
     }
