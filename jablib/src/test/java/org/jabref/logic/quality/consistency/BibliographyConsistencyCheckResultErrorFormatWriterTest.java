@@ -60,10 +60,10 @@ class BibliographyConsistencyCheckResultErrorFormatWriterTest {
         assertEquals(3, lines.size(), "Expected one line per deviating field, but got: " + lines);
         // The `pages` field is present in `first` but absent in `second`; `publisher` is an
         // unknown field present in `second` and absent in `first`.
-        assertTrue(lines.stream().anyMatch(line -> line.endsWith("Article 'first': field 'Publisher' is absent")), lines.toString());
-        assertTrue(lines.stream().anyMatch(line -> line.endsWith("Article 'second': field 'Pages' is absent")), lines.toString());
-        assertTrue(lines.stream().anyMatch(line -> line.endsWith("Article 'second': unknown field 'Publisher' is present")), lines.toString());
-        // Every line follows the `file:line:column: message` shape.
+        assertTrue(lines.stream().anyMatch(line -> line.endsWith(":first:publisher: field is absent but used by other entries of entry type Article")), lines.toString());
+        assertTrue(lines.stream().anyMatch(line -> line.endsWith(":second:pages: field is absent but used by other entries of entry type Article")), lines.toString());
+        assertTrue(lines.stream().anyMatch(line -> line.endsWith(":second:publisher: unknown field for entry type Article")), lines.toString());
+        // Every line follows the `file:line:column:citationKey:field: message` shape.
         assertTrue(lines.stream().allMatch(line -> line.contains(".bib:")), lines.toString());
     }
 }
