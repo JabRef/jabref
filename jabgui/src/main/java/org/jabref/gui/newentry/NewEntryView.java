@@ -130,7 +130,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML private Tab tabLookupUrl;
     @FXML private TextField urlText;
 
-
     private BibEntry result;
 
     public NewEntryView(NewEntryDialogTab initialApproach, GuiPreferences preferences, LibraryTab libraryTab, DialogService dialogService) {

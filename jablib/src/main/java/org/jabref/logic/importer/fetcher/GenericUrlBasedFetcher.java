@@ -11,14 +11,14 @@ import org.jabref.model.entry.types.StandardEntryType;
 public class GenericUrlBasedFetcher implements UrlBasedFetcher {
 
     @Override
-   public List<BibEntry> performSearch(String url) throws FetcherException {
+    public List<BibEntry> performSearch(String url) throws FetcherException {
         BibEntry entry = new BibEntry(StandardEntryType.Misc);
         entry.setField(StandardField.URL, url);
         return List.of(entry);
     }
 
     @Override
-   public String getName() {
+    public String getName() {
         return "URL";
-     }
+    }
 }
