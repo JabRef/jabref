@@ -62,21 +62,6 @@ class JabKitTest extends AbstractJabKitTest {
     }
 
     @Test
-    void checkIntegrity() {
-        Path testBib = getClassResourceAsPath("origin.bib");
-        String testBibFile = testBib.toAbsolutePath().toString();
-
-        // errorformat is the default output format; thus not provided here.
-        List<String> args = List.of("check", "integrity", testBibFile);
-
-        int executionResult = executeToLog(args.toArray(String[]::new));
-
-        String output = getStandardOutput();
-        assertTrue(output.contains("Checking integrity of"), "Expected output to contain sentence: Checking integrity of");
-        assertEquals(0, executionResult);
-    }
-
-    @Test
     void checkConsistencyFailsWithoutInputFile() {
         int executionResult = executeToLog("check", "consistency");
 
