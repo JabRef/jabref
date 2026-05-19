@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -33,7 +34,7 @@ import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "search", description = "Search in a library.")
-class Search implements Runnable {
+class Search implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Search.class);
 
     @ParentCommand
@@ -45,9 +46,8 @@ class Search implements Runnable {
     @Option(names = {"--query"}, description = "Search query", required = true)
     private String query;
 
-    // [impl->req~jabkit.cli.input-flag~1]
-    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
-    private Path inputFile;
+    @Mixin
+    private InputOption inputOption = new InputOption();
 
     @Option(names = {"--output"}, converter = CygWinPathConverter.class, description = "Output file")
     private Path outputFile;
@@ -56,20 +56,21 @@ class Search implements Runnable {
     private String outputFormat = "bibtex";
 
     @Override
-    public void run() {
+    public Integer call() {
+        Path inputFile = inputOption.getInputFile();
         Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
                 "bibtex",
                 argumentProcessor.cliPreferences,
                 sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
-            System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return;
+            System.err.println(Localization.lang("Unable to open file '%0'.", inputFile));
+            return 2;
         }
 
         if (parserResult.get().isInvalid()) {
-            System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
-            return;
+            System.err.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
+            return 2;
         }
 
         SearchPreferences searchPreferences = argumentProcessor.cliPreferences.getSearchPreferences();
@@ -81,7 +82,7 @@ class Search implements Runnable {
 
         if (matches.isEmpty()) {
             System.out.println(Localization.lang("No search matches."));
-            return;
+            return 0;
         }
 
         if ("bibtex".equals(outputFormat)) {
@@ -96,8 +97,8 @@ class Search implements Runnable {
             Optional<Exporter> exporter = exporterFactory.getExporterByName(outputFormat);
 
             if (exporter.isEmpty()) {
-                System.out.println(Localization.lang("Unknown export format %0", outputFormat));
-                return;
+                System.err.println(Localization.lang("Unknown export format %0", outputFormat));
+                return 2;
             }
 
             try {
@@ -113,7 +114,9 @@ class Search implements Runnable {
                      | ParserConfigurationException
                      | TransformerException ex) {
                 LOGGER.error("Could not export file '{}}'", outputFile.toAbsolutePath(), ex);
+                return 2;
             }
         }
+        return 0;
     }
 }

@@ -2,11 +2,13 @@
 
 //DESCRIPTION jabsrv - serve BibTeX files using JabRef
 
-//JAVA 25+
+//JAVA 25
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
+// mavenlocal is listed first so a locally built jablib (./gradlew :jablib:publishToMavenLocal)
+// takes precedence over the published 6.0-SNAPSHOT - needed when testing unreleased jablib changes.
 // raw is for https://github.com/unicode-org/icu/pull/2127
-//REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
+//REPOS mavenlocal,mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 // see  https://github.com/gradlex-org/extra-java-module-info/issues/237 why we include e-adr here
@@ -69,6 +71,7 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LibraryQueryResult.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LinkedPdfFileDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabrefMediaType.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/AbstractSrvStateManager.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabRefSrvStateManager.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/SrvStateManager.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWQueryParams.java
