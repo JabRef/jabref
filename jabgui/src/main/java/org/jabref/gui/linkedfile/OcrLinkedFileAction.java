@@ -29,16 +29,16 @@ public class OcrLinkedFileAction extends SimpleCommand {
     private GuiPreferences preferences;
     private TaskExecutor taskExecutor;
     private OcrEngine ocrEngine;
-    private BibEntry entry;
+    private List<BibEntry> linkedEntries;
 
     public OcrLinkedFileAction(LinkedFile linkedFile,
-                               BibEntry bibEntry,
+                               List<BibEntry> bibEntries,
                                BibDatabaseContext databaseContext,
                                DialogService dialogService,
                                GuiPreferences preferences,
                                TaskExecutor taskExecutor) {
         this.linkedFile = linkedFile;
-        this.entry = bibEntry;
+        this.linkedEntries = bibEntries;
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -62,8 +62,9 @@ public class OcrLinkedFileAction extends SimpleCommand {
                 case OcrResult.Success success -> {
                     dialogService.notify(Localization.lang("OCR succeeded"));
                     LinkedFile ocredPdf = new LinkedFile(success.outputFile(), "PDF");
-                    List<LinkedFile> ocredFiles = List.of(ocredPdf);
-                    entry.addFiles(ocredFiles);
+                    for (BibEntry entry : linkedEntries) {
+                        entry.addFile(ocredPdf);
+                    }
                 }
                 case OcrResult.Failure failure -> {
                     String failureReason = switch (failure.reason()) {

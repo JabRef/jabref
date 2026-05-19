@@ -82,7 +82,7 @@ record SingleSelectionMenuBuilder(
 
         items.add(factory.createMenuItem(
                 StandardActions.PERFORM_OCR,
-                new OcrLinkedFileAction(selectedLinkedFile.getFile(), selectedLinkedFile.getBibEntry(), databaseContext, dialogService, preferences, taskExecutor)));
+                new OcrLinkedFileAction(selectedLinkedFile.getFile(), selectedLinkedFile.getLinkedEntries(), databaseContext, dialogService, preferences, taskExecutor)));
 
         items.add(factory.createMenuItem(
                 StandardActions.RENAME_FILE_TO_PATTERN,

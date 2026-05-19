@@ -521,8 +521,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
         return linkedFile;
     }
 
-    public BibEntry getBibEntry() {
-        return entry;
+    public List<BibEntry> getLinkedEntries() {
+        List<BibEntry> entries = new ArrayList<>();
+        for (BibEntry entry : databaseContext.getEntries()) {
+            if (entry.hasFile(linkedFile)) {
+                entries.add(entry);
+            }
+        }
+        return entries;
     }
 
     public ValidationStatus fileExistsValidationStatus() {
