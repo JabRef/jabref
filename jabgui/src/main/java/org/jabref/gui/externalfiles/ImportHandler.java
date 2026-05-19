@@ -286,8 +286,10 @@ public class ImportHandler {
                           BibEntry entryForImport = finalEntry;
                           BackgroundTask.wrap(() -> adjustLinkedFilesForTargetIfRequired(transferInformation, entryForImport))
                                         .onFailure(e -> {
-                                            tracker.markSkipped();
                                             LOGGER.error("Error adjusting linked files for target", e);
+                                            dialogService.notify(Localization.lang("Could not adjust linked files. The entry was imported without linked-file adjustments."));
+                                            importCleanedEntries(transferInformation, List.of(entryForImport));
+                                            tracker.markImported(entryForImport);
                                         })
                                         .onSuccess(adjustedEntry -> {
                                             importCleanedEntries(transferInformation, List.of(adjustedEntry));
