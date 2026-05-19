@@ -384,6 +384,11 @@ jobs:
     needs: publish
     if: github.ref == 'refs/heads/main'
     steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'false'
+          show-progress: 'false'
       - name: Build JBang scripts and run launchers
         uses: ./.github/actions/jbang-check
 
@@ -395,7 +400,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v6
         with:
-          submodules: 'false'
+          submodules: 'true'
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
       # Publish jablib to the local Maven repository so the JBang scripts pick up
