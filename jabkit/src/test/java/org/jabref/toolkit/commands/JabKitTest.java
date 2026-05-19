@@ -50,7 +50,7 @@ class JabKitTest extends AbstractJabKitTest {
         Path testBib = getClassResourceAsPath("origin.bib");
         String testBibFile = testBib.toAbsolutePath().toString();
 
-        // "txt" is the default output format; thus not provided here.
+        // errorformat is the default output format; thus not provided here.
         // The legacy --input option is still accepted as an alias for the positional argument.
         List<String> args = List.of("check", "consistency", "--input", testBibFile, "--porcelain");
 
@@ -66,7 +66,7 @@ class JabKitTest extends AbstractJabKitTest {
         Path testBib = getClassResourceAsPath("origin.bib");
         String testBibFile = testBib.toAbsolutePath().toString();
 
-        // "txt" is the default output format; thus not provided here.
+        // errorformat is the default output format; thus not provided here.
         List<String> args = List.of("check", "integrity", testBibFile);
 
         int executionResult = executeToLog(args.toArray(String[]::new));

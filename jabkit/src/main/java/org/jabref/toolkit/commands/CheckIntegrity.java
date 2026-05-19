@@ -13,7 +13,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityCheckResultCsvWriter;
 import org.jabref.logic.integrity.IntegrityCheckResultErrorFormatWriter;
-import org.jabref.logic.integrity.IntegrityCheckResultTxtWriter;
 import org.jabref.logic.integrity.IntegrityCheckResultWriter;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -90,10 +89,9 @@ class CheckIntegrity implements Callable<Integer> {
         Writer writer = new OutputStreamWriter(System.out);
         IntegrityCheckResultWriter checkResultWriter;
         switch (outputFormat.toLowerCase(Locale.ROOT)) {
-            case Check.FORMAT_ERRORFORMAT ->
+            // "txt" is kept as an alias for the errorformat output.
+            case Check.FORMAT_ERRORFORMAT, Check.FORMAT_TXT ->
                     checkResultWriter = new IntegrityCheckResultErrorFormatWriter(writer, messages, parserResult, inputFile);
-            case Check.FORMAT_TXT ->
-                    checkResultWriter = new IntegrityCheckResultTxtWriter(writer, messages);
             case Check.FORMAT_CSV ->
                     checkResultWriter = new IntegrityCheckResultCsvWriter(writer, messages);
             default -> {
