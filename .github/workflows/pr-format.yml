@@ -159,8 +159,8 @@ jobs:
 
           LINE_COUNT=$(echo "$BOXES" | wc -l)
 
-          if [ "$LINE_COUNT" -ne 7 ]; then
-            echo "❌ Found $LINE_COUNT lines instead of 7 required lines"
+          if [ "$LINE_COUNT" -ne 8 ]; then
+            echo "❌ Found $LINE_COUNT lines instead of 8 required lines"
             exit 1
           fi
 

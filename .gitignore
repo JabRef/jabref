@@ -1,7 +1,12 @@
 .zenflow/
 # AI tooling
 
-.claude/
+CLAUDE.md
+.mcp.json
+
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
 
 # no generated files in version control
 src/main/gen/
