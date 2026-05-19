@@ -228,6 +228,10 @@ Both comments must not be added.
 #### Localization
 
 - Fix localization before committing. See `docs/code-howtos/localization.md`
+- The `LocalizationConsistencyTest` failure output is actionable — follow it literally instead of guessing:
+  - `findMissingLocalizationKeys` failing → its output lists ready-to-paste `key=value` lines to **add** to `jablib/src/main/resources/l10n/JabRef_en.properties`. Place each near semantically related keys; reuse an existing similar key when one exists.
+  - `findObsoleteLocalizationKeys` failing → its output lists keys to **remove** from `JabRef_en.properties` (after confirming each is truly unused).
+  - Only edit `JabRef_en.properties`. Translated `JabRef_<lang>.properties` files are maintained by translators via Crowdin — never hand-edit them.
 - JabRef is a multilingual program, When you write any user-facing text, it should be localized.
 
    To do this in Java code, call `Localization.lang` method, like this:

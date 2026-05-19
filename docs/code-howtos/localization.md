@@ -61,6 +61,13 @@ The tests in `org.jabref.logic.l10n.LocalizationConsistencyTest` check whether t
 3. Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
 4. Please do not add translations for other languages directly in the properties. They will be overwritten by [Crowdin](https://crowdin.com/project/jabref)
 
+## Removing an obsolete key
+
+1. Remove the `Localization.lang("KEY")` call (or `%KEY` from FXML). Run the `org.jabref.logic.l10n.LocalizationConsistencyTest`.
+2. The `findObsoleteLocalizationKeys` test fails. The test output lists the keys that are no longer referenced.
+3. Confirm each listed key is really unused, then remove it from the English translation file at `src/main/resources/l10n/JabRef_en.properties`.
+4. Do not remove the key from the other language properties files. They are managed by [Crowdin](https://crowdin.com/project/jabref).
+
 ## Adding a new Language
 
 1. Add the new Language to the Language enum in [https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/logic/l10n/Language.java](https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/logic/l10n/Language.java)
