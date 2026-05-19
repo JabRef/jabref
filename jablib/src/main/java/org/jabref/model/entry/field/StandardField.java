@@ -74,7 +74,11 @@ public enum StandardField implements Field {
     JOURNAL("journal", FieldProperty.JOURNAL_NAME),
     JOURNALSUBTITLE("journalsubtitle", FieldProperty.JOURNAL_NAME),
     JOURNALTITLE("journaltitle", FieldProperty.JOURNAL_NAME),
+
+    /// This is used for **sorting**, this is **not** the BibTeX key AKA Citation key. See [InternalField.KEY_FIELD] for that.
+    /// This is only used in very rare cases.
     KEY("key"),
+
     KEYWORDS("keywords"),
     LANGUAGE("language", FieldProperty.LANGUAGE),
     LANGUAGEID("langid", FieldProperty.LANGUAGE),
@@ -112,7 +116,11 @@ public enum StandardField implements Field {
     SHORTAUTHOR("shortauthor", FieldProperty.PERSON_NAMES),
     SHORTEDITOR("shorteditor", FieldProperty.PERSON_NAMES),
     SHORTTITLE("shorttitle"),
+
+    /// BibLaTeX field: "A field used to modify the sorting order of the bibliography" - see <https://texdoc.org/serve/biblatex/0>, page 30.
+    /// In BibTeX, this is "key".
     SORTKEY("sortkey"),
+
     SORTNAME("sortname", FieldProperty.PERSON_NAMES),
     SUBTITLE("subtitle"),
     TITLE("title"),
