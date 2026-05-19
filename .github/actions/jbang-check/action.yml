@@ -17,9 +17,12 @@ runs:
           echo "Building $f..."
           jbang build --fresh "$f"
         done
-    - name: Launchers support --help
+    - name: JabKit launcher supports --help
       shell: bash
-      run: |
-        jbang run --fresh .jbang/JabKitLauncher.java --help
-        jbang run --fresh .jbang/JabLsLauncher.java --help
-        jbang run --fresh .jbang/JabSrvLauncher.java --help
+      run: jbang run --fresh .jbang/JabKitLauncher.java --help
+    - name: JabLs launcher supports --help
+      shell: bash
+      run: jbang run --fresh .jbang/JabLsLauncher.java --help
+    - name: JabSrv launcher supports --help
+      shell: bash
+      run: jbang run --fresh .jbang/JabSrvLauncher.java --help
