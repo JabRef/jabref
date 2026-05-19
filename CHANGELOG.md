@@ -25,6 +25,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Removed
 
+- The citation key integrity check now includes the generated citation key in its warning message. [#15776](https://github.com/JabRef/jabref/pull/15776)
+
 ## [6.0-alpha.6] – 2026-05-14
 
 ### Added
