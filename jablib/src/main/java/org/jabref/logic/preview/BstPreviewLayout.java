@@ -17,9 +17,12 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class BstPreviewLayout implements PreviewLayout {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BstPreviewLayout.class);
@@ -29,11 +32,11 @@ public final class BstPreviewLayout implements PreviewLayout {
     private static final Pattern LATEX_COMMAND_PATTERN = Pattern.compile("(?m)^\\\\.*$");
     private static final Pattern MULTIPLE_SPACES_PATTERN = Pattern.compile("  +");
 
-    private final String name;
-    private String source;
-    private BstVM bstVM;
-    private String error;
     private final Path path;
+    private String source;
+    private final String name;
+    @Nullable private BstVM bstVM;
+    @Nullable private String error;
 
     public BstPreviewLayout(Path path) {
         this.path = path;
@@ -63,6 +66,11 @@ public final class BstPreviewLayout implements PreviewLayout {
         if (error != null) {
             return error;
         }
+
+        if (bstVM == null) {
+            return "";
+        }
+
         // Ensure that the entry is of BibTeX format (and do not modify the original entry)
         BibEntry entry = new BibEntry(originalEntry);
         new ConvertToBibtexCleanup().cleanup(entry);
