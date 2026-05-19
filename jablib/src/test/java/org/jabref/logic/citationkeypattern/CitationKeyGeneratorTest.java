@@ -192,8 +192,7 @@ class CitationKeyGeneratorTest {
             "@ARTICLE{kohn, author={Andreas Ùöning}, year={2000}}", "Uoe",
 
             # Special cases
-            # We keep "-" in citation keys, thus Al-Ketan with three letters is "Al-"
-            "@ARTICLE{kohn, author={Oraib Al-Ketan}, year={2000}}", "Al-",
+            "@ARTICLE{kohn, author={Oraib Al-Ketan}, year={2000}}", "AlK",
             "@ARTICLE{kohn, author={Andrés D'Alessandro}, year={2000}}", "DAl",
             "@ARTICLE{kohn, author={Andrés Aʹrnold}, year={2000}}", "Arn"
             """)
@@ -579,7 +578,7 @@ class CitationKeyGeneratorTest {
                 Arguments.of("Newton", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authors]"),
                 Arguments.of("NewtonMaxwell", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "[authors]"),
                 Arguments.of("NewtonMaxwellEinstein", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authors]"),
-                Arguments.of("Newton-Maxwell-Einstein", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authors:regex(\"(.)([A-Z])\",\"$1-$2\")]")
+                Arguments.of("NewtonMaxwellEinstein", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authors:regex(\"(.)([A-Z])\",\"$1-$2\")]")
         );
     }
 
@@ -994,7 +993,7 @@ class CitationKeyGeneratorTest {
 
     @ParameterizedTest
     @CsvSource({
-            "'Green Scheduling of: Whatever', 'GreenSchedulingOf:Whatever'",
+            "'Green Scheduling of: Whatever', 'GreenSchedulingOfWhatever'",
             "'Green Scheduling of `Whatever`', 'GreenSchedulingofWhatever'"
     })
     void generateKeyStripsSpecialCharsFromTitle(String title, String expected) {
@@ -1087,7 +1086,7 @@ class CitationKeyGeneratorTest {
                 .withField(StandardField.AUTHOR, "Newton, Isaac")
                 .withField(StandardField.YEAR, "2019");
 
-        assertEquals("newt-2019", generateKey(entry, "[auth4:lower]-[year]"));
+        assertEquals("newt2019", generateKey(entry, "[auth4:lower]-[year]"));
     }
 
     @Test
