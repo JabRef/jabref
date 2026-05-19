@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -340,9 +341,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void createSearchContext() {
-        java.util.function.Supplier<SearchBackend> sqlFactory = () ->
+        Supplier<SearchBackend> sqlFactory = () ->
                 new SqlSearchBackend(new IndexManager(bibDatabaseContext, taskExecutor, preferences, Injector.instantiateModelOrService(PostgreServer.class)));
-        java.util.function.Supplier<SearchBackend> inMemoryFactory = () ->
+        Supplier<SearchBackend> inMemoryFactory = () ->
                 new InMemorySearchBackend(bibDatabaseContext, preferences.getBibEntryPreferences());
         searchContext = new SearchContext(
                 preferences.getSearchPreferences().usePostgresSearchProperty(),
@@ -370,15 +371,15 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private void setDatabaseContext(@NonNull BibDatabaseContext bibDatabaseContext) {
         TabPane tabPane = this.getTabPane();
+        boolean isSelectedTab = false;
 
         if (tabPane == null) {
             LOGGER.debug("User interrupted loading. Not showing any library.");
             return;
         }
-        if (tabPane.getSelectionModel().selectedItemProperty().get().equals(this)) {
-            LOGGER.debug("This case should not happen.");
-            stateManager.setActiveDatabase(bibDatabaseContext);
-            stateManager.activeTabProperty().set(Optional.of(this));
+        Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+        if (selectedTab == this) {
+            isSelectedTab = true;
         }
 
         // Remove existing dummy BibDatabaseContext and add correct BibDatabaseContext from ParserResult to trigger changes in the openDatabases list in the stateManager
@@ -390,6 +391,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         stateManager.getOpenDatabases().add(bibDatabaseContext);
 
         initializeComponentsAndListeners(false);
+
+        if (isSelectedTab) {
+            stateManager.setActiveDatabase(bibDatabaseContext);
+            stateManager.activeTabProperty().set(Optional.of(this));
+        }
+
         installAutosaveManagerAndBackupManager();
     }
 
