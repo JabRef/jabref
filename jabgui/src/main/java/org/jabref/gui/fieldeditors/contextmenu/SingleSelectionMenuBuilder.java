@@ -3,11 +3,14 @@ package org.jabref.gui.fieldeditors.contextmenu;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.collections.ObservableList;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.copyfiles.CopyLinkedFilesAction;
@@ -18,6 +21,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 import org.jspecify.annotations.NonNull;
@@ -28,7 +32,10 @@ record SingleSelectionMenuBuilder(
         ObservableOptionalValue<BibEntry> bibEntry,
         GuiPreferences preferences,
         LinkedFilesEditorViewModel viewModel,
-        TaskExecutor taskExecutor
+        TaskExecutor taskExecutor,
+        FileUpdateMonitor fileUpdateMonitor,
+        UndoManager undoManager,
+        StateManager stateManager
 ) implements ContextMenuBuilder {
 
     SingleSelectionMenuBuilder(@NonNull DialogService dialogService,
@@ -36,13 +43,19 @@ record SingleSelectionMenuBuilder(
                                @NonNull ObservableOptionalValue<BibEntry> bibEntry,
                                @NonNull GuiPreferences preferences,
                                @NonNull LinkedFilesEditorViewModel viewModel,
-                               @NonNull TaskExecutor taskExecutor) {
+                               @NonNull TaskExecutor taskExecutor,
+                               @NonNull FileUpdateMonitor fileUpdateMonitor,
+                               @NonNull UndoManager undoManager,
+                               @NonNull StateManager stateManager) {
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.bibEntry = bibEntry;
         this.preferences = preferences;
         this.viewModel = viewModel;
         this.taskExecutor = taskExecutor;
+        this.fileUpdateMonitor = fileUpdateMonitor;
+        this.undoManager = undoManager;
+        this.stateManager = stateManager;
     }
 
     @Override
@@ -82,7 +95,7 @@ record SingleSelectionMenuBuilder(
 
         items.add(factory.createMenuItem(
                 StandardActions.PERFORM_OCR,
-                new OcrLinkedFileAction(selectedLinkedFile.getFile(), selectedLinkedFile.getLinkedEntries(), databaseContext, dialogService, preferences, taskExecutor)));
+                new OcrLinkedFileAction(selectedLinkedFile.getFile(), selectedLinkedFile.getLinkedEntries(), databaseContext, dialogService, preferences, taskExecutor, fileUpdateMonitor, undoManager, stateManager)));
 
         items.add(factory.createMenuItem(
                 StandardActions.RENAME_FILE_TO_PATTERN,
