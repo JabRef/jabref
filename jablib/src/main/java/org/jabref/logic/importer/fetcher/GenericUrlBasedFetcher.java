@@ -12,9 +12,9 @@ public class GenericUrlBasedFetcher implements UrlBasedFetcher {
 
     @Override
    public List<BibEntry> performSearch(String url) throws FetcherException {
-        BibEntry entery = new BibEntry(StandardEntryType.Misc);
-        entery.setField(StandardField.URL, url);
-        return List.of(entery);
+        BibEntry entry = new BibEntry(StandardEntryType.Misc);
+        entry.setField(StandardField.URL, url);
+        return List.of(entry);
     }
 
     @Override
