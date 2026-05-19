@@ -88,6 +88,8 @@ public class ImportHandler {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final FilePreferences filePreferences;
+    private final Object duplicateDecisionLock = new Object();
+    private DuplicateResolverDialog.DuplicateResolverResult rememberedBatchDuplicateDecision = BREAK;
 
     public ImportHandler(BibDatabaseContext targetBibDatabaseContext,
                          GuiPreferences preferences,
@@ -246,13 +248,6 @@ public class ImportHandler {
         addToGroups(entries, stateManager.getSelectedGroups(targetBibDatabaseContext));
         addToImportEntriesGroup(entries);
 
-        if (transferInformation != null) {
-            entries.stream().forEach(entry -> {
-                LinkedFileTransferHelper
-                        .adjustLinkedFilesForTarget(filePreferences, transferInformation, targetBibDatabaseContext, entry);
-            });
-        }
-
         // TODO: Should only be done if NOT copied from other library
         entries.stream().forEach(entry -> downloadLinkedFiles(entry));
     }
@@ -288,11 +283,25 @@ public class ImportHandler {
                               }
                               finalEntry = duplicateHandledEntry.get();
                           }
-
-                          importCleanedEntries(transferInformation, List.of(finalEntry));
-
-                          tracker.markImported(finalEntry);
+                          BibEntry entryForImport = finalEntry;
+                          BackgroundTask.wrap(() -> adjustLinkedFilesForTargetIfRequired(transferInformation, entryForImport))
+                                        .onFailure(e -> {
+                                            tracker.markSkipped();
+                                            LOGGER.error("Error adjusting linked files for target", e);
+                                        })
+                                        .onSuccess(adjustedEntry -> {
+                                            importCleanedEntries(transferInformation, List.of(adjustedEntry));
+                                            tracker.markImported(adjustedEntry);
+                                        })
+                                        .executeWith(taskExecutor);
                       }).executeWith(taskExecutor);
+    }
+
+    private BibEntry adjustLinkedFilesForTargetIfRequired(@Nullable TransferInformation transferInformation, BibEntry entry) {
+        if (transferInformation != null) {
+            LinkedFileTransferHelper.adjustLinkedFilesForTarget(filePreferences, transferInformation, targetBibDatabaseContext, entry);
+        }
+        return entry;
     }
 
     @VisibleForTesting
@@ -328,14 +337,28 @@ public class ImportHandler {
     }
 
     public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
-        DuplicateResolverDialog dialog = new DuplicateResolverDialog(duplicateEntry, originalEntry, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, stateManager, dialogService, preferences);
-        if (decision == BREAK) {
-            decision = dialogService.showCustomDialogAndWait(dialog).orElse(BREAK);
+        synchronized (duplicateDecisionLock) {
+            DuplicateResolverDialog dialog = new DuplicateResolverDialog(
+                    duplicateEntry,
+                    originalEntry,
+                    DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK,
+                    stateManager,
+                    dialogService,
+                    preferences
+            );
+            DuplicateResolverDialog.DuplicateResolverResult effectiveDecision = decision;
+            if ((effectiveDecision == BREAK) && (rememberedBatchDuplicateDecision != BREAK)) {
+                effectiveDecision = rememberedBatchDuplicateDecision;
+            }
+            if (effectiveDecision == BREAK) {
+                effectiveDecision = dialogService.showCustomDialogAndWait(dialog).orElse(BREAK);
+            }
+            if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
+                preferences.getMergeDialogPreferences().setAllEntriesDuplicateResolverDecision(effectiveDecision);
+                rememberedBatchDuplicateDecision = effectiveDecision;
+            }
+            return new DuplicateDecisionResult(effectiveDecision, dialog.getMergedEntry());
         }
-        if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
-            preferences.getMergeDialogPreferences().setAllEntriesDuplicateResolverDecision(decision);
-        }
-        return new DuplicateDecisionResult(decision, dialog.getMergedEntry());
     }
 
     public void setAutomaticFields(List<BibEntry> entries) {
@@ -477,6 +500,7 @@ public class ImportHandler {
     }
 
     public void importEntriesWithDuplicateCheck(@Nullable TransferInformation transferInformation, List<BibEntry> entriesToAdd, EntryImportHandlerTracker tracker) {
+        resetBatchDuplicateDecisionState();
         boolean firstEntry = true;
         for (BibEntry entry : entriesToAdd) {
             if (firstEntry) {
@@ -494,6 +518,10 @@ public class ImportHandler {
                 importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker);
             }
         }
+    }
+
+    private void resetBatchDuplicateDecisionState() {
+        rememberedBatchDuplicateDecision = BREAK;
     }
 
     private List<BibEntry> handlePdfUrl(String pdfUrl) throws IOException {
