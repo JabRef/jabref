@@ -77,6 +77,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The "Make/Sync bibliography" button in OO/LO panel now refreshes citations before generating bibliographies. [#14387](https://github.com/JabRef/jabref/issues/14387)
 - Improved responsiveness and user interface of refresh button in Citation Relations tab. [#12247](https://github.com/JabRef/jabref/issues/12247)
 - JabRef keeps the field `review` in BibTeX files. [#15609](https://github.com/JabRef/jabref/pull/15609)
+- The citation key integrity check now includes the generated citation key in its warning message.
 
 ### Fixed
 
