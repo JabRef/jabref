@@ -56,7 +56,7 @@ The tests in `org.jabref.logic.l10n.LocalizationConsistencyTest` check whether t
 
 ## Adding a new key
 
-1. Add new `Localization.lang("KEY")` to Java file. Run the `org.jabref.logic.LocalizationConsistencyTest`.
+1. Add new `Localization.lang("KEY")` to Java file. Run the `org.jabref.logic.l10n.LocalizationConsistencyTest`.
 2. Tests fail. In the test output a snippet is generated which must be added to the English translation file.
 3. Add snippet to English translation file located at `jablib/src/main/resources/l10n/JabRef_en.properties`
 4. Please do not add translations for other languages directly in the properties. They will be overwritten by [Crowdin](https://crowdin.com/project/jabref)
