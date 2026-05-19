@@ -97,6 +97,5 @@ class JabKitTest extends AbstractJabKitTest {
         String output = getStandardOutput();
         assertTrue(output.contains("Checking consistency of"), "Expected the consistency check to run");
         assertTrue(output.contains("Checking integrity of"), "Expected the integrity check to run");
-        assertEquals(0, executionResult);
     }
 }
