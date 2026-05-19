@@ -3,6 +3,7 @@ package org.jabref.toolkit.commands;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.auxparser.AuxParser;
@@ -15,17 +16,13 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "generate-bib-from-aux", description = "Generate small bib from aux file.")
-class GenerateBibFromAux implements Runnable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateBibFromAux.class);
+class GenerateBibFromAux implements Callable<Integer> {
 
     @ParentCommand
     private JabKit argumentProcessor;
@@ -46,7 +43,7 @@ class GenerateBibFromAux implements Runnable {
     private String fieldFormatters;
 
     @Override
-    public void run() {
+    public Integer call() {
         Path inputFile = inputOption.getInputFile();
         Optional<ParserResult> pr = JabKit.importFile(
                 inputFile,
@@ -54,13 +51,13 @@ class GenerateBibFromAux implements Runnable {
                 argumentProcessor.cliPreferences,
                 sharedOptions.porcelain);
         if (pr.isEmpty()) {
-            System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return;
+            System.err.println(Localization.lang("Unable to open file '%0'.", inputFile));
+            return 2;
         }
 
         if (!Files.exists(auxFile)) {
-            System.out.println(Localization.lang("Unable to open file '%0'.", auxFile));
-            return;
+            System.err.println(Localization.lang("Unable to open file '%0'.", auxFile));
+            return 2;
         }
 
         if (!sharedOptions.porcelain) {
@@ -77,7 +74,7 @@ class GenerateBibFromAux implements Runnable {
         BibDatabase subDatabase = result.getGeneratedBibDatabase();
         if (subDatabase == null || !subDatabase.hasEntries()) {
             System.out.println(Localization.lang("No library generated."));
-            return;
+            return 0;
         }
 
         FieldFormatterCleanupMapper.applyFormatters(fieldFormatters, subDatabase.getEntries());
@@ -86,7 +83,7 @@ class GenerateBibFromAux implements Runnable {
             System.out.println(subDatabase.getEntries().stream()
                                           .map(BibEntry::toString)
                                           .collect(Collectors.joining("\n\n")));
-            return;
+            return 0;
         } else {
             JabKit.saveDatabase(
                     argumentProcessor.cliPreferences,
@@ -98,5 +95,6 @@ class GenerateBibFromAux implements Runnable {
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Created library with '%0' entries.", subDatabase.getEntryCount()));
         }
+        return 0;
     }
 }

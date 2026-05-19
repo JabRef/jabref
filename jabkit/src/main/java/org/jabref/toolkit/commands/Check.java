@@ -43,8 +43,8 @@ class Check implements Callable<Integer> {
     @Override
     public Integer call() {
         if (inputFile == null) {
-            System.out.println(Localization.lang("Specify a subcommand (consistency, integrity) or an input file."));
-            return 0;
+            System.err.println(Localization.lang("Specify a subcommand (consistency, integrity) or an input file."));
+            return 2;
         }
 
         int consistencyExit = CheckConsistency.execute(inputFile, outputFormat, sharedOptions.porcelain, jabKit);

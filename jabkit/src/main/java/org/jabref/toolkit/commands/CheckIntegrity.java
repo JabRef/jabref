@@ -96,7 +96,7 @@ class CheckIntegrity implements Callable<Integer> {
             case Check.FORMAT_CSV ->
                     checkResultWriter = new IntegrityCheckResultCsvWriter(writer, messages);
             default -> {
-                System.out.println(Localization.lang("Unknown output format '%0'.", outputFormat));
+                System.err.println(Localization.lang("Unknown output format '%0'.", outputFormat));
                 return 3;
             }
         }

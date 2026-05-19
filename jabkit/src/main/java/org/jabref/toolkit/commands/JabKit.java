@@ -167,11 +167,11 @@ public class JabKit implements Runnable {
     protected static ImportOutcome importBibtexLibrary(Path inputFile, CliPreferences cliPreferences, boolean porcelain) {
         Optional<ParserResult> parserResult = importFile(inputFile, "bibtex", cliPreferences, porcelain);
         if (parserResult.isEmpty()) {
-            System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
+            System.err.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return new ImportOutcome(null, 2);
         }
         if (parserResult.get().isInvalid()) {
-            System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
+            System.err.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
             return new ImportOutcome(null, 2);
         }
         return new ImportOutcome(parserResult.get(), 0);

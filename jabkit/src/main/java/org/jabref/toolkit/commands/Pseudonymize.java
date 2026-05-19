@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -21,7 +22,7 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.ParentCommand;
 
 @Command(name = "pseudonymize", description = "Perform pseudonymization of the library")
-class Pseudonymize implements Runnable {
+class Pseudonymize implements Callable<Integer> {
     private final static Logger LOGGER = LoggerFactory.getLogger(Pseudonymize.class);
     private static final String PSEUDO_SUFFIX = ".pseudo";
     private static final String BIB_EXTENSION = ".bib";
@@ -46,7 +47,7 @@ class Pseudonymize implements Runnable {
     private boolean force;
 
     @Override
-    public void run() {
+    public Integer call() {
         Path inputPath = inputOption.getInputFile();
         String fileName = FileUtil.getBaseName(inputPath);
         Path pseudoBibPath = resolveOutputPath(outputFile, inputPath, fileName + PSEUDO_SUFFIX + BIB_EXTENSION);
@@ -59,13 +60,13 @@ class Pseudonymize implements Runnable {
                 sharedOptions.porcelain);
 
         if (parserResult.isEmpty()) {
-            System.out.println(Localization.lang("Unable to open file '%0'.", inputPath));
-            return;
+            System.err.println(Localization.lang("Unable to open file '%0'.", inputPath));
+            return 2;
         }
 
         if (parserResult.get().isInvalid()) {
-            System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputPath));
-            return;
+            System.err.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputPath));
+            return 2;
         }
 
         System.out.println(Localization.lang("Pseudonymizing library '%0'...", fileName));
@@ -74,7 +75,7 @@ class Pseudonymize implements Runnable {
         Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
 
         if (!fileOverwriteCheck(pseudoBibPath)) {
-            return;
+            return 2;
         }
 
         JabKit.saveDatabaseContext(
@@ -84,7 +85,7 @@ class Pseudonymize implements Runnable {
                 pseudoBibPath);
 
         if (!fileOverwriteCheck(pseudoKeyPath)) {
-            return;
+            return 2;
         }
 
         try {
@@ -92,7 +93,9 @@ class Pseudonymize implements Runnable {
             System.out.println(Localization.lang("Saved %0.", pseudoKeyPath));
         } catch (IOException ex) {
             LOGGER.error("Unable to save keys for pseudonymized library", ex);
+            return 2;
         }
+        return 0;
     }
 
     private Path resolveOutputPath(Path customPath, Path inputPath, String defaultFileName) {
@@ -107,7 +110,7 @@ class Pseudonymize implements Runnable {
         String fileName = filePath.getFileName().toString();
 
         if (!force) {
-            System.out.println(Localization.lang("File '%0' already exists. Use -f or --force to overwrite.", fileName));
+            System.err.println(Localization.lang("File '%0' already exists. Use -f or --force to overwrite.", fileName));
             return false;
         }
 
