@@ -22,6 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed an issue where newly added entries could not be found in search. [#15719](https://github.com/JabRef/jabref/issues/15719)
+- We fixed a performance issue with the duplicate resolving when copying and pasting many entries [#15780](https://github.com/JabRef/jabref/pull/15780)
 
 ### Removed
 
