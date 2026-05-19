@@ -24,11 +24,13 @@ public class IntegrityCheckResultErrorFormatWriter extends IntegrityCheckResultW
     @Override
     public void writeFindings() throws IOException {
         for (IntegrityMessage message : messages) {
-            ParserResult.Range fieldRange = parserResult.getFieldRange(message.entry(), message.field());
             // Entry-level findings (e.g. on the citation key itself) carry only the citation key;
             // field-level findings additionally carry the field name.
             String location = message.entry().getCitationKey().orElse("");
             Field field = message.field();
+            ParserResult.Range fieldRange = field == null
+                                            ? parserResult.getCompleteEntryIndicator(message.entry())
+                                            : parserResult.getFieldRange(message.entry(), field);
             if (field != null && field != InternalField.KEY_FIELD) {
                 location += ":" + field.getName();
             }
