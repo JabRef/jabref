@@ -1,4 +1,4 @@
-package org.jabref.logic.search;
+package org.jabref.logic.search.sqlbased;
 
 import java.io.IOException;
 import java.sql.Connection;

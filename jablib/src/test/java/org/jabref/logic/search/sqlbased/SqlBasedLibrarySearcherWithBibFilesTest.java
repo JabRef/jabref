@@ -1,4 +1,4 @@
-package org.jabref.logic.search;
+package org.jabref.logic.search.sqlbased;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -48,7 +48,7 @@ import static org.mockito.Mockito.when;
 /// Note: Postgres is `new`ed at each test - maybe put it tgo `@BeforeAll`
 @Execution(ExecutionMode.SAME_THREAD)
 @ResourceLock("embeddedPostgres")
-class DatabaseSearcherWithBibFilesTest {
+class SqlBasedLibrarySearcherWithBibFilesTest {
     private static final TaskExecutor TASK_EXECUTOR = new CurrentThreadTaskExecutor();
     private static final BibEntry TITLE_SENTENCE_CASED = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("title-sentence-cased")
@@ -99,7 +99,9 @@ class DatabaseSearcherWithBibFilesTest {
     }
 
     private BibDatabaseContext initializeDatabaseFromPath(String testFile) throws URISyntaxException, IOException {
-        return initializeDatabaseFromPath(Path.of(Objects.requireNonNull(DatabaseSearcherWithBibFilesTest.class.getResource(testFile)).toURI()));
+        // Resources live next to the original test file in org/jabref/logic/search/
+        return initializeDatabaseFromPath(Path.of(Objects.requireNonNull(
+                SqlBasedLibrarySearcherWithBibFilesTest.class.getResource("/org/jabref/logic/search/" + testFile)).toURI()));
     }
 
     private BibDatabaseContext initializeDatabaseFromPath(Path testFile) throws IOException {
@@ -156,7 +158,7 @@ class DatabaseSearcherWithBibFilesTest {
     void searchLibrary(List<BibEntry> expected, String testFile, String query, boolean isFullText) throws URISyntaxException, IOException {
         BibDatabaseContext databaseContext = initializeDatabaseFromPath(testFile);
         EnumSet<SearchFlags> flags = isFullText ? EnumSet.of(SearchFlags.FULLTEXT) : EnumSet.noneOf(SearchFlags.class);
-        List<BibEntry> matches = new DatabaseSearcher(databaseContext, TASK_EXECUTOR, preferences, postgreServer).getMatches(new SearchQuery(query, flags));
+        List<BibEntry> matches = new SqlBasedLibrarySearcher(databaseContext, TASK_EXECUTOR, preferences, postgreServer).getMatches(new SearchQuery(query, flags));
         assertThat(expected, Matchers.containsInAnyOrder(matches.toArray()));
     }
 }

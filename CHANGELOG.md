@@ -17,13 +17,17 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Changed
 
 - We made the `Move file to directory` operation for Linked Files show every configured JabRef directory as possible options. [#12287](https://github.com/JabRef/jabref/issues/12287)
+- We introduced a leightweight search engine without fulltext search in linked files as default variant. [#15599](https://github.com/JabRef/jabref/pull/15599)
 
 ### Fixed
 
 - We fixed an issue where keyboard navigation shortcuts (Alt+UP/DOWN) in the entry editor did not preserve focus on the current field when switching between entries. [#14943](https://github.com/JabRef/jabref/issues/14943)
+- We fixed the Hayagriva YAML exporter to correctly nest DOI, ISBN, and ISSN under `serial-number` as required by the Hayagriva file format specification. [#15713](https://github.com/JabRef/jabref/issues/15713)
 - We fixed an issue where newly added entries could not be found in search. [#15719](https://github.com/JabRef/jabref/issues/15719)
 
 ### Removed
+
+- The citation key integrity check now includes the generated citation key in its warning message. [#15776](https://github.com/JabRef/jabref/pull/15776)
 
 ## [6.0-alpha.6] – 2026-05-14
 

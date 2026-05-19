@@ -60,8 +60,11 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GlobalExceptionMapper.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonFactory.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonMessageBodyReader.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonMessageBodyWriter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LinkedPdfFileDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabrefMediaType.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/AbstractSrvStateManager.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabRefSrvStateManager.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/SrvStateManager.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWQueryParams.java
@@ -97,6 +100,15 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ServerUtils.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
+
+// new jablib sources not yet in the 6.0-SNAPSHOT artifact
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/LibrarySearcher.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/NoOpSearchBackend.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/SearchBackend.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/SearchContext.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/inmemory/BibEntryMatchVisitor.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/inmemory/InMemoryLibrarySearcher.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/inmemory/InMemorySearchBackend.java
 
 //FILES tinylog.properties=../jabsrv-cli/src/main/resources/tinylog.properties
 

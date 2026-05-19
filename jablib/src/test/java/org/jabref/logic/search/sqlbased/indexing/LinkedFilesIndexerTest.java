@@ -1,4 +1,4 @@
-package org.jabref.logic.search.indexing;
+package org.jabref.logic.search.sqlbased.indexing;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.search.LuceneIndexer;
+import org.jabref.logic.search.sqlbased.LuceneIndexer;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
