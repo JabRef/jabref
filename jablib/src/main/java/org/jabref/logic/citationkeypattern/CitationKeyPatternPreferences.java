@@ -8,6 +8,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jetbrains.annotations.VisibleForTesting;
+
 public class CitationKeyPatternPreferences {
 
     public enum KeySuffix {
@@ -23,6 +25,7 @@ public class CitationKeyPatternPreferences {
     /// Should never be used directly - use [CitationKeyPatternPreferences#getUnwantedCharacters()] instead, which respects the user's preferences
     ///
     /// See also #DISALLOWED_CHARACTERS
+    @VisibleForTesting
     public static final String DEFAULT_UNWANTED_CHARACTERS = "-`ʹ:!;?^$";
 
     private static final GlobalCitationKeyPatterns DEFAULT_CITATION_KEY_PATTERN = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
