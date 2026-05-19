@@ -87,9 +87,8 @@ public class CitationKeyGenerator extends BracketedPattern {
     /// Removes characters, unwanted characters that are illegal in citation keys
     /// preserving Unicode (e.g., ²) and diacritical characters.
     ///
-    /// @param key the citation key to sanitize
+    /// @param key                the citation key to sanitize
     /// @param unwantedCharacters - pass through [org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences#getUnwantedCharacters()]
-    ///
     /// @return the key with illegal and unwanted characters removed
     public static String removeUnwantedCharactersWithKeepDiacritics(String key, String unwantedCharacters) {
         return key.chars()
