@@ -90,7 +90,8 @@ class CheckIntegrity implements Callable<Integer> {
         IntegrityCheckResultWriter checkResultWriter;
         switch (outputFormat.toLowerCase(Locale.ROOT)) {
             // "txt" is kept as an alias for the errorformat output.
-            case Check.FORMAT_ERRORFORMAT, Check.FORMAT_TXT ->
+            case Check.FORMAT_ERRORFORMAT,
+                 Check.FORMAT_TXT ->
                     checkResultWriter = new IntegrityCheckResultErrorFormatWriter(writer, messages, parserResult, inputFile);
             case Check.FORMAT_CSV ->
                     checkResultWriter = new IntegrityCheckResultCsvWriter(writer, messages);
