@@ -26,12 +26,10 @@ public class IntegrityCheckResultErrorFormatWriter extends IntegrityCheckResultW
         for (IntegrityMessage message : messages) {
             // Entry-level findings (e.g. on the citation key itself) carry only the citation key;
             // field-level findings additionally carry the field name.
-            String location = message.entry().getCitationKey().orElse("");
+            String location = message.entry().getCitationKey().orElse(message.entry().getAuthorTitleYear(5));
             Field field = message.field();
-            ParserResult.Range fieldRange = field == null
-                                            ? parserResult.getCompleteEntryIndicator(message.entry())
-                                            : parserResult.getFieldRange(message.entry(), field);
-            if (field != null && field != InternalField.KEY_FIELD) {
+            ParserResult.Range fieldRange = parserResult.getFieldRange(message.entry(), field);
+            if (field != InternalField.KEY_FIELD) {
                 location += ":" + field.getName();
             }
             writer.append("%s:%d:%d:%s: %s\n".formatted(
