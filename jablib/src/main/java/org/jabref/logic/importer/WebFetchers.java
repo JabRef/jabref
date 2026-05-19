@@ -2,6 +2,7 @@ package org.jabref.logic.importer;
 
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -27,6 +28,7 @@ import org.jabref.logic.importer.fetcher.DiVA;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.importer.fetcher.EuropePmcFetcher;
+import org.jabref.logic.importer.fetcher.GenericUrlBasedFetcher;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.INSPIREFetcher;
@@ -255,6 +257,10 @@ public class WebFetchers {
         set.add(new CrossRef());
 
         return set;
+    }
+
+    public static List<UrlBasedFetcher> getUrlBasedFetchers() {
+        return List.of(new GenericUrlBasedFetcher());
     }
 
     /// @return set containing fulltext fetchers

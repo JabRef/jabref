@@ -244,6 +244,26 @@
                             wrapText="true"/>
                 </VBox>
             </Tab>
+            <Tab fx:id="tabLookupUrl"
+                 text="%Enter URL"
+                 closable="false">
+            <VBox spacing="10.0">
+                <padding>
+                    <Insets top="10.0"/>
+                </padding>
+                <Label text="%Enter a URL to generate an entry from.">
+                    <font>
+                        <Font name="System Italic"
+                              size="13.0"/>
+                    </font>
+                    <padding>
+                        <Insets bottom="5.0"/>
+                    </padding>
+                </Label>
+                <TextField fx:id="urlText" prefHeight="30.0"/>
+            </VBox>
+            </Tab>
+
         </TabPane>
     </content>
     <ButtonType

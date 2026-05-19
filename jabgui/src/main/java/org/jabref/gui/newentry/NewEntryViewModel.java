@@ -33,6 +33,7 @@ import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.GenericUrlBasedFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
@@ -93,7 +94,7 @@ public class NewEntryViewModel {
     private Task<Optional<List<BibEntry>>> bibtexWorker;
     private final Map<String, BibEntry> doiCache;
     private BibEntry duplicateEntry;
-
+    private final StringProperty urlText;
     public NewEntryViewModel(GuiPreferences preferences,
                              LibraryTab libraryTab,
                              DialogService dialogService,
@@ -110,6 +111,7 @@ public class NewEntryViewModel {
         this.fileUpdateMonitor = fileUpdateMonitor;
 
         this.bookCoverFetcher = new BookCoverFetcher(preferences.getExternalApplicationsPreferences());
+        this.urlText = new SimpleStringProperty();
 
         executing = new SimpleBooleanProperty(false);
         executedSuccessfully = new SimpleBooleanProperty(false);
@@ -180,6 +182,10 @@ public class NewEntryViewModel {
 
     public BibEntry getDuplicateEntry() {
         return duplicateEntry;
+    }
+
+    public StringProperty urlTextProperty() {
+        return urlText;
     }
 
     public ReadOnlyBooleanProperty executingProperty() {
@@ -532,6 +538,45 @@ public class NewEntryViewModel {
         });
 
         taskExecutor.execute(bibtexWorker);
+    }
+
+    public void executeLookupUrl() {
+        executing.setValue(true);
+
+        String url = urlText.getValue();
+
+        // Check if url is blank, if so, set executing to false and return
+        if (StringUtil.isBlank(url)) {
+            executing.set(false);
+            return;
+        }
+
+        try {
+            // 1. Create a new GenericUrlBasedFetcher
+            GenericUrlBasedFetcher fetcher = new GenericUrlBasedFetcher();
+
+            // 2. Call performSearch with the url - it returns List<BibEntry>
+            List<BibEntry> entries = fetcher.performSearch(url);
+
+            // 3. Import the entries - copy this exact block from executeSpecifyBibtex
+            final ImportHandler handler = new ImportHandler(
+                    libraryTab.getBibDatabaseContext(),
+                    preferences,
+                    fileUpdateMonitor,
+                    libraryTab.getUndoManager(),
+                    stateManager,
+                    dialogService,
+                    taskExecutor);
+            handler.importEntriesWithDuplicateCheck(null, entries);
+
+            // 4. Set executed successfully
+            executedSuccessfully.set(true);
+        } catch (FetcherException e) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Failed to fetch URL"), e);
+        }
+
+        executing.set(false);
     }
 
     public void cancel() {
