@@ -8,11 +8,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Comparator;
 import java.util.function.BiConsumer;
 
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
@@ -65,6 +67,18 @@ class AutoSetFileLinksUtilTest {
 
     @Test
     void findAssociatedNotLinkedFilesSuccess() throws IOException {
+        when(databaseContext.getFileDirectories(any())).thenReturn(List.of(path.getParent()));
+        List<LinkedFile> expected = List.of(new LinkedFile("", Path.of("CiteKey.pdf"), "PDF"));
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        Collection<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void findAssociatedNotLinkedFilesWithEmptyUserPrefsUsesDefaults() throws IOException {
+        when(externalApplicationsPreferences.getExternalFileTypes())
+                .thenReturn(FXCollections.observableSet(new TreeSet<>(Comparator.comparing(ExternalFileType::getName))));
+
         when(databaseContext.getFileDirectories(any())).thenReturn(List.of(path.getParent()));
         List<LinkedFile> expected = List.of(new LinkedFile("", Path.of("CiteKey.pdf"), "PDF"));
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
@@ -182,7 +196,6 @@ class AutoSetFileLinksUtilTest {
         assertEquals(expected, Set.copyOf(matchedFiles));
     }
 
-    /// [utest->req~logic.externalfiles.file-transfer.auto-link~1]
     @Nested
     @DisplayName("linkAssociatedFiles")
     class linkAssociatedFiles {

@@ -252,19 +252,23 @@ public class AutoSetFileLinksUtil {
     }
 
     private List<String> getConfiguredExtensions() {
-        return externalApplicationsPreferences
-                .getExternalFileTypes()
-                .stream().map(ExternalFileType::getExtension).toList();
+        List<ExternalFileType> configured = externalApplicationsPreferences.getExternalFileTypes().stream().toList();
+        if (configured.isEmpty()) {
+            return ExternalFileTypes.getDefaultExternalFileTypes().stream().map(ExternalFileType::getExtension).toList();
+        }
+        return configured.stream().map(ExternalFileType::getExtension).toList();
     }
 
     private String checkAndGetFileType(Path associatedFile) {
         return FileUtil.getFileExtension(associatedFile)
-                       .flatMap(extension ->
-                               ExternalFileTypes.getExternalFileTypeByExt(
-                                       extension,
-                                       externalApplicationsPreferences
-                               ))
-                       .map(ExternalFileType::getName).orElse("");
+                       .map(ext -> ext.replace(".", "").replace("*", ""))
+                       .flatMap(extensionCleaned ->
+                               ExternalFileTypes.getExternalFileTypeByExt(extensionCleaned, externalApplicationsPreferences)
+                                                .or(() -> ExternalFileTypes.getDefaultExternalFileTypes().stream()
+                                                                           .filter(t -> t.getExtension().equalsIgnoreCase(extensionCleaned))
+                                                                           .findFirst()))
+                       .map(ExternalFileType::getName)
+                       .orElse("");
     }
 
     private static boolean isFileAlreadyLinked(Path foundFile, List<Path> linkedFiles) {
