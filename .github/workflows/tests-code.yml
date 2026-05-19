@@ -389,6 +389,7 @@ jobs:
         with:
           submodules: 'false'
           show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
       - name: Build JBang scripts and run launchers
         uses: ./.github/actions/jbang-check
 
