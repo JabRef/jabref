@@ -57,7 +57,7 @@ class CheckIntegrity implements Callable<Integer> {
     ///
     /// Shared with the parent `check` command, which runs both checks at once.
     ///
-    /// @return the exit code (0 = success, 2/3 = error)
+    /// @return the exit code (0 = no findings, 1 = integrity findings present, 2/3 = error)
     static int execute(Path inputFile, String outputFormat, boolean allowIntegerEdition, boolean porcelain, JabKit jabKit) {
         JabKit.ImportOutcome importOutcome = JabKit.importBibtexLibrary(inputFile, jabKit.cliPreferences, porcelain);
         ParserResult parserResult = importOutcome.parserResult();
@@ -108,6 +108,8 @@ class CheckIntegrity implements Callable<Integer> {
             LOGGER.error("Error writing results", e);
             return 2;
         }
-        return 0;
+
+        // Signal integrity findings via a non-zero exit so CI can fail on them.
+        return messages.isEmpty() ? 0 : 1;
     }
 }
