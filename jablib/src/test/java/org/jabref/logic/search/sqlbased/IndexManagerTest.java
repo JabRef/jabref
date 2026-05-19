@@ -1,4 +1,4 @@
-package org.jabref.logic.search;
+package org.jabref.logic.search.sqlbased;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;

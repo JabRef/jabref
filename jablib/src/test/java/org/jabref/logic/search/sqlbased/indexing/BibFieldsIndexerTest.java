@@ -1,11 +1,11 @@
-package org.jabref.logic.search.indexing;
+package org.jabref.logic.search.sqlbased.indexing;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
 
-import org.jabref.logic.search.PostgreServer;
+import org.jabref.logic.search.sqlbased.PostgreServer;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

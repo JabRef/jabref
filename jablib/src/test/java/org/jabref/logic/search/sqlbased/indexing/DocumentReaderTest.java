@@ -1,4 +1,4 @@
-package org.jabref.logic.search.indexing;
+package org.jabref.logic.search.sqlbased.indexing;
 
 import java.nio.file.Path;
 import java.util.List;

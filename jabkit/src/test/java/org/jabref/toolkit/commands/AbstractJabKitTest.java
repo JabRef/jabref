@@ -55,6 +55,7 @@ public abstract class AbstractJabKitTest {
                 EnumSet.noneOf(SearchFlags.class),
                 false,
                 false,
+                false,
                 0,
                 0,
                 0));

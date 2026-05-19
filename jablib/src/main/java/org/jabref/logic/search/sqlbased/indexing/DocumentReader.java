@@ -1,4 +1,4 @@
-package org.jabref.logic.search.indexing;
+package org.jabref.logic.search.sqlbased.indexing;
 
 import java.io.IOException;
 import java.nio.file.Files;
