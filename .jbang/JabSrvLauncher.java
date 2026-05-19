@@ -12,14 +12,22 @@
 // see  https://github.com/gradlex-org/extra-java-module-info/issues/237 why we include e-adr here
 //DEPS io.github.adr:e-adr:2.0.0
 
+// Pin JavaFX 26 to override afterburner.fx 2.0.0's transitive javafx-*:20 (Maven nearest-wins).
+// Required because jabsrv CAYW endpoint calls Platform.startup(); mixing javafx.graphics:20 with
+// javafx.base:26 fails with NoClassDefFoundError: javafx/util/FXPermission (removed in javafx 25+).
+//DEPS org.openjfx:javafx-base:26.0.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-graphics:26.0.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-controls:26.0.1:${os.detected.jfxname}
+//DEPS org.openjfx:javafx-fxml:26.0.1:${os.detected.jfxname}
+
 // from jabsrv-cli
 //DEPS info.picocli:picocli:4.7.7
 
 // from jabsrv
 //DEPS com.fasterxml.jackson.core:jackson-annotations:2.21
-//DEPS com.github.ben-manes.caffeine:caffeine:3.2.3
+//DEPS com.github.ben-manes.caffeine:caffeine:3.2.4
 //DEPS com.google.guava:guava:33.6.0-jre
-//DEPS com.konghq:unirest-modules-gson:4.8.1
+//DEPS com.konghq:unirest-modules-gson:4.10.0
 //DEPS de.undercouch:citeproc-java:3.5.0
 //DEPS info.picocli:picocli:4.7.7
 //DEPS jakarta.servlet:jakarta.servlet-api:6.1.0
@@ -27,33 +35,36 @@
 //DEPS jakarta.validation:jakarta.validation-api:3.1.1
 //DEPS net.harawata:appdirs:1.5.0
 //DEPS org.apache.commons:commons-lang3:3.20.0
-//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.4
+//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.26.0
 //DEPS org.bouncycastle:bcprov-jdk18on:1.84
-//DEPS org.postgresql:postgresql:42.7.10
-//DEPS org.slf4j:slf4j-api:2.0.17
-//DEPS org.slf4j:jul-to-slf4j:2.0.17
+//DEPS org.postgresql:postgresql:42.7.11
+//DEPS org.slf4j:slf4j-api:2.0.18
+//DEPS org.slf4j:jul-to-slf4j:2.0.18
 //DEPS org.tinylog:slf4j-tinylog:2.7.0
 //DEPS org.tinylog:tinylog-impl:2.7.0
-//DEPS org.glassfish.grizzly:grizzly-framework:5.0.0
-//DEPS org.glassfish.grizzly:grizzly-http-server:5.0.0
-//DEPS org.glassfish.hk2:hk2-api:4.0.0
-//DEPS org.glassfish.hk2:hk2-locator:4.0.0
-//DEPS org.glassfish.hk2:hk2-utils:4.0.0
+//DEPS org.glassfish.grizzly:grizzly-framework:5.0.1
+//DEPS org.glassfish.grizzly:grizzly-http-server:5.0.1
+//DEPS org.glassfish.hk2:hk2-api:4.0.1
+//DEPS org.glassfish.hk2:hk2-locator:4.0.1
+//DEPS org.glassfish.hk2:hk2-utils:4.0.1
 //DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:4.0.2
 //DEPS org.glassfish.jersey.core:jersey-server:4.0.2
 //DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.2
 //DEPS org.hibernate.validator:hibernate-validator:9.1.0.Final
 //DEPS org.jabref:afterburner.fx:2.0.0
-//DEPS tools.jackson.core:jackson-core:3.1.2
-//DEPS tools.jackson.core:jackson-databind:3.1.2
-//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.1.2
+//DEPS tools.jackson.core:jackson-core:3.1.3
+//DEPS tools.jackson.core:jackson-databind:3.1.3
+//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.1.3
 
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GlobalExceptionMapper.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonFactory.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonMessageBodyReader.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonMessageBodyWriter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LinkedPdfFileDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabrefMediaType.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/AbstractSrvStateManager.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabRefSrvStateManager.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/SrvStateManager.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWQueryParams.java
@@ -89,6 +100,15 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ServerUtils.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
+
+// new jablib sources not yet in the 6.0-SNAPSHOT artifact
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/LibrarySearcher.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/NoOpSearchBackend.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/SearchBackend.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/SearchContext.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/inmemory/BibEntryMatchVisitor.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/inmemory/InMemoryLibrarySearcher.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/inmemory/InMemorySearchBackend.java
 
 //FILES tinylog.properties=../jabsrv-cli/src/main/resources/tinylog.properties
 

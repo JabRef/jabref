@@ -43,6 +43,7 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
+import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
@@ -97,11 +98,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty createBackupProperty = new SimpleBooleanProperty();
     private final StringProperty backupDirectoryProperty = new SimpleStringProperty("");
 
+    private final BooleanProperty usePostgresSearchProperty = new SimpleBooleanProperty();
+
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final WorkspacePreferences workspacePreferences;
     private final LibraryPreferences libraryPreferences;
     private final FilePreferences filePreferences;
+    private final SearchPreferences searchPreferences;
     private final RemotePreferences remotePreferences;
     private final HttpServerManager httpServerManager;
     private final LanguageServerController languageServerController;
@@ -137,6 +141,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.workspacePreferences = preferences.getWorkspacePreferences();
         this.libraryPreferences = preferences.getLibraryPreferences();
         this.filePreferences = preferences.getFilePreferences();
+        this.searchPreferences = preferences.getSearchPreferences();
         this.remotePreferences = preferences.getRemotePreferences();
         this.httpServerManager = httpServerManager;
         this.languageServerController = languageServerController;
@@ -245,6 +250,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         createBackupProperty.setValue(filePreferences.shouldCreateBackup());
         backupDirectoryProperty.setValue(filePreferences.getBackupDirectory().toString());
 
+        usePostgresSearchProperty.setValue(searchPreferences.shouldUsePostgresSearch());
+
         remoteServerProperty.setValue(remotePreferences.shouldEnableRemoteServer());
         remotePortProperty.setValue(String.valueOf(remotePreferences.getRemoteServerPort()));
 
@@ -298,6 +305,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         filePreferences.createBackupProperty().setValue(createBackupProperty.getValue());
         filePreferences.backupDirectoryProperty().setValue(Path.of(backupDirectoryProperty.getValue()));
+
+        searchPreferences.setUsePostgresSearch(usePostgresSearchProperty.getValue());
 
         getPortAsInt(remotePortProperty.getValue()).ifPresent(newPort -> {
             if (remotePreferences.isDifferentRemoteServerPort(newPort)) {
@@ -497,6 +506,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty backupDirectoryProperty() {
         return this.backupDirectoryProperty;
+    }
+
+    public BooleanProperty usePostgresSearchProperty() {
+        return this.usePostgresSearchProperty;
     }
 
     public void backupFileDirBrowse() {

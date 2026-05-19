@@ -231,6 +231,10 @@ public class MainTableColumnModel {
     /// @param rawColumnName the name of the column, e.g. "field:author", or "author"
     /// @return A new `MainTableColumnModel`
     public static MainTableColumnModel parse(String rawColumnName) {
+        if (rawColumnName.isBlank()) {
+            return new MainTableColumnModel(Type.NORMALFIELD, "");
+        }
+
         String[] splittedName = rawColumnName.split(COLUMNS_QUALIFIER_DELIMITER.toString());
 
         Type type = Type.fromString(splittedName[0]);

@@ -225,7 +225,7 @@ public class OOBibBase {
         }
     }
 
-    private static OOVoidResult<OOError> checkRangeOverlapsWithCursor(XTextDocument doc, OOFrontend frontend) {
+    private static OOVoidResult<OOError> checkRangeOverlapsWithCursor(XTextDocument doc, OOFrontend frontend, OOStyle style) {
         final String errorTitle = "Ranges overlapping with cursor";
 
         List<RangeForOverlapCheck<CitationGroupId>> userRanges;
@@ -236,7 +236,8 @@ public class OOBibBase {
         try {
             res = frontend.checkRangeOverlapsWithCursor(doc,
                     userRanges,
-                    requireSeparation);
+                    requireSeparation,
+                    style);
         } catch (NoDocumentException ex) {
             return OOVoidResult.error(OOError.from(ex).setTitle(errorTitle));
         } catch (WrappedTargetException ex) {
@@ -541,7 +542,7 @@ public class OOBibBase {
             return;
         }
 
-        if (testDialog(errorTitle, checkRangeOverlapsWithCursor(doc, frontend.get()))) {
+        if (testDialog(errorTitle, checkRangeOverlapsWithCursor(doc, frontend.get(), style))) {
             return;
         }
 

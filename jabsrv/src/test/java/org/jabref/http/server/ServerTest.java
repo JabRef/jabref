@@ -9,6 +9,8 @@ import org.jabref.http.JabRefSrvStateManager;
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
+import org.jabref.http.dto.GsonMessageBodyReader;
+import org.jabref.http.dto.GsonMessageBodyWriter;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.FilePreferences;
@@ -70,7 +72,7 @@ public abstract class ServerTest extends JerseyTest {
         resourceConfig.register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bind(new JabRefSrvStateManager()).to(SrvStateManager.class);
+                bind(new JabRefSrvStateManager(preferences.getBibEntryPreferences(), List.of())).to(SrvStateManager.class);
             }
         });
     }
@@ -82,6 +84,8 @@ public abstract class ServerTest extends JerseyTest {
                 bind(new GsonFactory().provide()).to(Gson.class).ranked(2);
             }
         });
+        resourceConfig.register(GsonMessageBodyReader.class);
+        resourceConfig.register(GsonMessageBodyWriter.class);
     }
 
     protected void addFormatterServiceToResourceConfig(ResourceConfig resourceConfig) {
@@ -114,6 +118,7 @@ public abstract class ServerTest extends JerseyTest {
 
         BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(bibEntryPreferences);
+        when(preferences.getBibEntryPreferences()).thenReturn(bibEntryPreferences);
         when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
 
         FieldPreferences fieldWriterPreferences = mock(FieldPreferences.class);

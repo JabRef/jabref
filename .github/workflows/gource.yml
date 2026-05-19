@@ -21,9 +21,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - title: 'JabRef v6.0 (since alpha.3) | more information at contribute.jabref.org'
-            # Last alpha release 2025-10-30, but want to have some seconds before
-            start: '2025-10-24'
+          - title: 'JabRef v6.0 (since alpha.6) | more information at contribute.jabref.org'
+            # Last alpha release 2026-02-20, but want to have some seconds before
+            start: '2026-02-14'
             end: ''
             file: 'jabref-v6.0-dev.mp4'
 #          - title: 'JabRef v6.0-alpha2 | more information at contribute.jabref.org'
