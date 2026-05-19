@@ -21,6 +21,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed an issue where LaTeX math symbols in the format `{{$\Cmd$}}` (e.g. `{{$\Sigma$}}`) were not rendered correctly in BST-based entry previews, showing `$$$$` instead of the actual symbol. [#11338](https://github.com/JabRef/jabref/issues/11338)
+- We fixed an issue where the duplicate finder progress counter was incremented on empty queue polls, causing the displayed counter to be out of sync with the actual number of duplicate pairs shown to the user. [#11848](https://github.com/JabRef/jabref/issues/11848)
 - We fixed an issue where newly added entries could not be found in search. [#15719](https://github.com/JabRef/jabref/issues/15719)
 
 ### Removed
