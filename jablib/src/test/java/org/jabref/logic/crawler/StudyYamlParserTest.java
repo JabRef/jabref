@@ -33,7 +33,7 @@ class StudyYamlParserTest {
         URL studyDefinition = StudyYamlParser.class.getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, true);
 
-        List<String> authors = List.of("Jab Ref");
+        List<String> authors = List.of("Haruki Murakami");
         String studyName = "TestStudyName";
         List<String> researchQuestions = List.of("Question1", "Question2");
         List<StudyQuery> queryEntries = List.of(new StudyQuery("Quantum"), new StudyQuery("Cloud Computing"), new StudyQuery("\"Software Engineering\""));
@@ -75,7 +75,7 @@ class StudyYamlParserTest {
         Study study = new StudyYamlParser().parseStudyYamlFile(Path.of(studyDefinition.toURI()));
 
         assertEquals("2.0.0", study.getVersion());
-        assertEquals(List.of("Jab Ref"), study.getAuthors());
+        assertEquals(List.of("Donna Tartt", "Virginia Woolf"), study.getAuthors());
         assertEquals("TestStudyName", study.getTitle());
         assertEquals(List.of("Question1", "Question2"), study.getResearchQuestions());
         assertEquals(3, study.getQueries().size());
@@ -100,7 +100,7 @@ class StudyYamlParserTest {
                 "IEEEXplore", "(Document Title:Quantum)",
                 "ACM Portal", "[Title: Quantum]"));
         Study original = new Study(
-                List.of("Jab Ref"),
+                List.of("Oscar Wilde"),
                 "Round-trip Study",
                 List.of("Q1"),
                 List.of(queryWithOverrides, new StudyQuery("Cloud Computing")),
