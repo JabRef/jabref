@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -34,7 +35,7 @@ import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "update", description = "Update linked PDFs with XMP and/or embedded BibTeX.")
-class PdfUpdate implements Runnable {
+class PdfUpdate implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfUpdate.class);
 
     @ParentCommand
@@ -59,10 +60,10 @@ class PdfUpdate implements Runnable {
     private boolean updateLinkedFiles;
 
     @Override
-    public void run() {
+    public Integer call() {
         if (!formats.contains("xmp") && !formats.contains("bibtex-attachment")) {
-            System.out.println(Localization.lang("The format option must contain either 'xmp' or 'bibtex-attachment'."));
-            return;
+            System.err.println(Localization.lang("The format option must contain either 'xmp' or 'bibtex-attachment'."));
+            return 2;
         }
 
         Path inputFile = inputOption.getInputFile();
@@ -73,12 +74,12 @@ class PdfUpdate implements Runnable {
                 sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return;
+            return 2;
         }
 
         if (parserResult.get().isInvalid()) {
             System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
-            return;
+            return 2;
         }
 
         if (!sharedOptions.porcelain) {
@@ -97,6 +98,8 @@ class PdfUpdate implements Runnable {
                 Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                 formats.contains("xmp"),
                 formats.contains("bibtex-attachment"));
+
+        return 0;
     }
 
     private static void writeMetadataToPdf(List<ParserResult> loaded,
