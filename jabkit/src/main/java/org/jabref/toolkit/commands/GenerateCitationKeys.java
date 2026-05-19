@@ -3,6 +3,7 @@ package org.jabref.toolkit.commands;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -16,13 +17,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.UnknownEntryType;
-import org.jabref.toolkit.converter.CygWinPathConverter;
 import org.jabref.toolkit.converter.KeySuffixConverter;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
@@ -30,8 +28,7 @@ import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "generate", description = "Generate citation keys for entries in a .bib file.")
-class GenerateCitationKeys implements Runnable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateCitationKeys.class);
+class GenerateCitationKeys implements Callable<Integer> {
 
     @ParentCommand
     private CitationKeys parentCommand;
@@ -39,9 +36,8 @@ class GenerateCitationKeys implements Runnable {
     @Mixin
     private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
-    // [impl->req~jabkit.cli.input-flag~1]
-    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input .bib file", required = true)
-    private Path inputFile;
+    @Mixin
+    private InputOption inputOption = new InputOption();
 
     @Option(names = "--output", description = "Output .bib file")
     private Path outputFile;
@@ -80,7 +76,8 @@ class GenerateCitationKeys implements Runnable {
     private Map<String, String> keyPatterns;
 
     @Override
-    public void run() {
+    public Integer call() {
+        Path inputFile = inputOption.getInputFile();
         Optional<ParserResult> parserResult = JabKit.importFile(
                 inputFile,
                 "bibtex",
@@ -88,13 +85,13 @@ class GenerateCitationKeys implements Runnable {
                 sharedOptions.porcelain);
 
         if (parserResult.isEmpty()) {
-            System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return;
+            System.err.println(Localization.lang("Unable to open file '%0'.", inputFile));
+            return 2;
         }
 
         if (parserResult.get().isInvalid()) {
-            System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
-            return;
+            System.err.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
+            return 2;
         }
 
         BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
@@ -114,8 +111,9 @@ class GenerateCitationKeys implements Runnable {
                     parentCommand.getParent().entryTypesManager,
                     parserResult.get().getDatabase(),
                     outputFile);
+            return 0;
         } else {
-            JabKit.outputDatabaseContext(parentCommand.getParent().cliPreferences, parserResult.get().getDatabaseContext());
+            return JabKit.outputDatabaseContext(parentCommand.getParent().cliPreferences, parserResult.get().getDatabaseContext());
         }
     }
 
@@ -152,7 +150,7 @@ class GenerateCitationKeys implements Runnable {
         keyPatternsOption.forEach((type, pattern) -> {
             EntryType passedEntryType = EntryTypeFactory.parse(type);
             if (passedEntryType instanceof UnknownEntryType) {
-                System.out.println(Localization.lang("The default entry type will be used since the invalid key was passed."));
+                System.err.println(Localization.lang("The default entry type will be used since the invalid key was passed."));
             }
             patternsCopy.addCitationKeyPattern(passedEntryType, pattern);
         });

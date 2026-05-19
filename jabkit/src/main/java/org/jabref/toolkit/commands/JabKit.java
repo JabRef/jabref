@@ -33,6 +33,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,8 +46,7 @@ import static picocli.CommandLine.Option;
         mixinStandardHelpOptions = true,
         // sorted alphabetically
         subcommands = {
-                CheckConsistency.class,
-                CheckIntegrity.class,
+                Check.class,
                 CitationKeys.class,
                 Convert.class,
                 DoiToBibtex.class,
@@ -155,6 +155,26 @@ public class JabKit implements Runnable {
             LOGGER.error("Error opening file '{}'", file, ex);
             return Optional.empty();
         }
+    }
+
+    /// Outcome of [#importBibtexLibrary]. On success, [#parserResult()] is non-null. On failure it
+    /// is `null` and [#exitCode()] holds the error code the command should return.
+    record ImportOutcome(@Nullable ParserResult parserResult, int exitCode) {
+    }
+
+    /// Imports `inputFile` as a BibTeX library and validates it. On failure, an error message is
+    /// printed and the returned [ImportOutcome] carries a `null` parser result plus the exit code.
+    protected static ImportOutcome importBibtexLibrary(Path inputFile, CliPreferences cliPreferences, boolean porcelain) {
+        Optional<ParserResult> parserResult = importFile(inputFile, "bibtex", cliPreferences, porcelain);
+        if (parserResult.isEmpty()) {
+            System.err.println(Localization.lang("Unable to open file '%0'.", inputFile));
+            return new ImportOutcome(null, 2);
+        }
+        if (parserResult.get().isInvalid()) {
+            System.err.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
+            return new ImportOutcome(null, 2);
+        }
+        return new ImportOutcome(parserResult.get(), 0);
     }
 
     protected static void saveDatabase(CliPreferences cliPreferences,
