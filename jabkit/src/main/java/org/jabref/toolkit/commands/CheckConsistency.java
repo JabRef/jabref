@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import org.jabref.logic.importer.ParserResult;
@@ -50,19 +49,10 @@ class CheckConsistency implements Callable<Integer> {
     ///
     /// @return the exit code (0 = consistent, 1 = inconsistencies found, 2/3 = error)
     static int execute(Path inputFile, String outputFormat, boolean porcelain, JabKit jabKit) {
-        Optional<ParserResult> parserResult = JabKit.importFile(
-                inputFile,
-                "bibtex",
-                jabKit.cliPreferences,
-                porcelain);
-        if (parserResult.isEmpty()) {
-            System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return 2;
-        }
-
-        if (parserResult.get().isInvalid()) {
-            System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
-            return 2;
+        JabKit.ImportOutcome importOutcome = JabKit.importBibtexLibrary(inputFile, jabKit.cliPreferences, porcelain);
+        ParserResult parserResult = importOutcome.parserResult();
+        if (parserResult == null) {
+            return importOutcome.exitCode();
         }
 
         if (!porcelain) {
@@ -70,7 +60,7 @@ class CheckConsistency implements Callable<Integer> {
             System.out.flush();
         }
 
-        BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
+        BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
 
         BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
         BibliographyConsistencyCheck.Result result = consistencyCheck.check(databaseContext, jabKit.entryTypesManager, (count, total) -> {
@@ -79,7 +69,7 @@ class CheckConsistency implements Callable<Integer> {
             }
         });
 
-        return writeCheckResult(result, databaseContext, parserResult.get(), inputFile, outputFormat, porcelain, jabKit);
+        return writeCheckResult(result, databaseContext, parserResult, inputFile, outputFormat, porcelain, jabKit);
     }
 
     private static int writeCheckResult(BibliographyConsistencyCheck.Result result,

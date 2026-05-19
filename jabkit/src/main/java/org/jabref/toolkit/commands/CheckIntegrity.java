@@ -6,7 +6,6 @@ import java.io.Writer;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -61,19 +60,10 @@ class CheckIntegrity implements Callable<Integer> {
     ///
     /// @return the exit code (0 = success, 2/3 = error)
     static int execute(Path inputFile, String outputFormat, boolean allowIntegerEdition, boolean porcelain, JabKit jabKit) {
-        Optional<ParserResult> parserResult = JabKit.importFile(
-                inputFile,
-                "bibtex",
-                jabKit.cliPreferences,
-                porcelain);
-        if (parserResult.isEmpty()) {
-            System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return 2;
-        }
-
-        if (parserResult.get().isInvalid()) {
-            System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
-            return 2;
+        JabKit.ImportOutcome importOutcome = JabKit.importBibtexLibrary(inputFile, jabKit.cliPreferences, porcelain);
+        ParserResult parserResult = importOutcome.parserResult();
+        if (parserResult == null) {
+            return importOutcome.exitCode();
         }
 
         if (!porcelain) {
@@ -81,7 +71,7 @@ class CheckIntegrity implements Callable<Integer> {
             System.out.flush();
         }
 
-        BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
+        BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
 
         IntegrityCheck integrityCheck = new IntegrityCheck(
                 databaseContext,
@@ -101,7 +91,7 @@ class CheckIntegrity implements Callable<Integer> {
         IntegrityCheckResultWriter checkResultWriter;
         switch (outputFormat.toLowerCase(Locale.ROOT)) {
             case Check.FORMAT_ERRORFORMAT ->
-                    checkResultWriter = new IntegrityCheckResultErrorFormatWriter(writer, messages, parserResult.get(), inputFile);
+                    checkResultWriter = new IntegrityCheckResultErrorFormatWriter(writer, messages, parserResult, inputFile);
             case Check.FORMAT_TXT ->
                     checkResultWriter = new IntegrityCheckResultTxtWriter(writer, messages);
             case Check.FORMAT_CSV ->
