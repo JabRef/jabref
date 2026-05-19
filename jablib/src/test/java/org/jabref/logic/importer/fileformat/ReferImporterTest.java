@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
@@ -31,7 +30,7 @@ public class ReferImporterTest {
     @BeforeEach
     void setUp() {
         CitationKeyPatternPreferences citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class);
-        when(citationKeyPatternPreferences.getUnwantedCharacters()).thenReturn(CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS);
+        when(citationKeyPatternPreferences.getUnwantedCharacters()).thenReturn(CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS);
         referImporter = new ReferImporter(citationKeyPatternPreferences);
     }
 

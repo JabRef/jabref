@@ -16,7 +16,17 @@ public class CitationKeyPatternPreferences {
         SECOND_WITH_B   // CiteKey, CiteKeyB, CiteKeyC ...
     }
 
+    /// List of unwanted characters. These will be removed at the end.
+    /// Note that `+` is a wanted character to indicate "et al." in authorsAlpha.
+    /// Example: `ABC+`. See `org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()` for examples.
+    ///
+    /// Should never be used directly - use [CitationKeyPatternPreferences#getUnwantedCharacters()] instead, which respects the user's preferences
+    ///
+    /// See also #DISALLOWED_CHARACTERS
+    public static final String DEFAULT_UNWANTED_CHARACTERS = "-`ʹ:!;?^$";
+
     private static final GlobalCitationKeyPatterns DEFAULT_CITATION_KEY_PATTERN = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
+
     private static final SimpleObjectProperty<Character> DEFAULT_KEYWORD_DELIMITER = new SimpleObjectProperty<>(',');
 
     private final BooleanProperty shouldTransliterateFieldsForCitationKey;
@@ -65,7 +75,7 @@ public class CitationKeyPatternPreferences {
                 KeySuffix.SECOND_WITH_A,
                 "",                           // keyPatternRegex
                 "",                           // keyPatternReplacement
-                CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,                  // unwantedCharacters
+                DEFAULT_UNWANTED_CHARACTERS,
                 DEFAULT_CITATION_KEY_PATTERN,
                 new SimpleObjectProperty<>()  // keywordDelimiter
         );

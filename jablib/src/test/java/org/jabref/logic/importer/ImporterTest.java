@@ -3,7 +3,6 @@ package org.jabref.logic.importer;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -71,7 +70,7 @@ public class ImporterTest {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         CitationKeyPatternPreferences citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class);
-        when(citationKeyPatternPreferences.getUnwantedCharacters()).thenReturn(CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS);
+        when(citationKeyPatternPreferences.getUnwantedCharacters()).thenReturn(CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS);
         return Stream.of(
                 // all classes implementing {@link Importer}
                 // sorted alphabetically
