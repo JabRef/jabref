@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jetbrains.annotations.VisibleForTesting;
+import com.google.common.annotations.VisibleForTesting;
 
 public class CitationKeyPatternPreferences {
 
