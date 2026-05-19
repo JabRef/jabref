@@ -24,3 +24,14 @@ Meaning: If there is no command given (falling back to help) or explicitly `--he
 This increases the accessibility. Source: [Accessibility of Command Line Interfaces](https://dl.acm.org/doi/10.1145/3411764.3445544)
 
 Needs: impl
+
+## Machine-readable output of the `check` commands
+`req~jabkit.cli.check-errorformat-output~1`
+
+The `jabkit check` subcommands emit their findings in a line-oriented
+`file:line:column:citationKey[:field]: message` format, suitable for editors and CI tooling.
+
+Entry-level findings (for example, on the citation key itself) carry only the citation key.
+Field-level findings additionally carry the affected field name.
+
+Needs: impl
