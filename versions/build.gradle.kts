@@ -20,7 +20,7 @@ val pdfbox = "3.0.7"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.14.1"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.15.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.3.0"))
     api(platform("org.junit:junit-bom:6.0.3"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.1"))
@@ -79,7 +79,7 @@ dependencies.constraints {
     api("io.github.adr:e-adr:2.0.0")
     api("io.github.darvil82:terminal-text-formatter:2.3.0c")
     api("io.github.classgraph:classgraph:4.8.184")
-    api("io.github.java-diff-utils:java-diff-utils:4.16")
+    api("io.github.java-diff-utils:java-diff-utils:4.17")
     api("io.github.stefanbratanov:jvm-openai:0.11.0")
     api("io.github.thibaultmeyer:cuid:2.0.5")
     api("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
@@ -150,5 +150,5 @@ dependencies.constraints {
     api("org.xmlunit:xmlunit-core:2.11.0")
     api("org.xmlunit:xmlunit-matchers:2.11.0")
     api("org.yaml:snakeyaml:2.6")
-    api("tech.units:indriya:2.2.3")
+    api("tech.units:indriya:2.2.4")
 }
