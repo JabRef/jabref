@@ -1077,7 +1077,7 @@ class CitationKeyGeneratorTest {
                 .withField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1)
                 .withField(StandardField.YEAR, "2019");
 
-        assertEquals("Newton-2019", generateKey(entry, "[auth]-[year]"));
+        assertEquals("Newton2019", generateKey(entry, "[auth]-[year]"));
     }
 
     @Test
