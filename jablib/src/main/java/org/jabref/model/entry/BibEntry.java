@@ -192,7 +192,6 @@ public class BibEntry {
                 (targetField == StandardField.XREF) ||
                 (targetField == StandardField.ENTRYSET) ||
                 (targetField == StandardField.RELATED) ||
-                (targetField == StandardField.KEY) ||
                 (targetField == StandardField.SORTKEY)) {
             return Optional.empty();
         }
