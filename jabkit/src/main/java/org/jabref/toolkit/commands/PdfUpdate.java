@@ -61,7 +61,7 @@ class PdfUpdate implements Runnable {
     @Override
     public void run() {
         if (!formats.contains("xmp") && !formats.contains("bibtex-attachment")) {
-            System.out.println("The format option must contain either 'xmp' or 'bibtex-attachment'.");
+            System.out.println(Localization.lang("The format option must contain either 'xmp' or 'bibtex-attachment'."));
             return;
         }
 

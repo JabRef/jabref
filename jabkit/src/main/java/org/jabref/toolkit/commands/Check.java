@@ -3,6 +3,7 @@ package org.jabref.toolkit.commands;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.toolkit.converter.CygWinPathConverter;
 
 import static picocli.CommandLine.Command;
@@ -42,7 +43,7 @@ class Check implements Callable<Integer> {
     @Override
     public Integer call() {
         if (inputFile == null) {
-            System.out.println("Specify a subcommand (consistency, integrity) or an input file.");
+            System.out.println(Localization.lang("Specify a subcommand (consistency, integrity) or an input file."));
             return 0;
         }
 

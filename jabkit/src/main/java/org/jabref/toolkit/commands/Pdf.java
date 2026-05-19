@@ -1,5 +1,7 @@
 package org.jabref.toolkit.commands;
 
+import org.jabref.logic.l10n.Localization;
+
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.ParentCommand;
@@ -20,6 +22,6 @@ class Pdf implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Specify a subcommand (write-xmp, update).");
+        System.out.println(Localization.lang("Specify a subcommand (write-xmp, update)."));
     }
 }

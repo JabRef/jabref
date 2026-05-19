@@ -33,7 +33,7 @@ class Preferences implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Specify a subcommand (reset, import, export).");
+        System.out.println(Localization.lang("Specify a subcommand (reset, import, export)."));
     }
 
     @Command(name = "reset", description = "Reset preferences.")
