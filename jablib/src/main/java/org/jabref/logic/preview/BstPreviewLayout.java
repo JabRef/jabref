@@ -103,9 +103,13 @@ public final class BstPreviewLayout implements PreviewLayout {
         // The RemoveLatexCommandsFormatter keeps the words inside latex environments. Therefore, we remove them manually
         result = result.replace("\\begin{thebibliography}{1}", "");
         result = result.replace("\\end{thebibliography}", "");
+        // The RemoveLatexCommandsFormatter keeps the word inside the latex command, but we want to remove that completely
         result = BIBITEM_PATTERN.matcher(result).replaceAll("");
+        // We want to replace \newblock by a space instead of completely removing it
         result = result.replace("\\newblock", " ");
+        // Remove all latex commands statements - assumption: command in a separate line
         result = LATEX_COMMAND_PATTERN.matcher(result).replaceAll("");
+        // Remove some IEEEtran.bst output (resulting from a multiline \providecommand)
         result = result.replace("#2}}", "");
         // Have quotes right - and more
         result = new LatexToUnicodeFormatter().format(result);
