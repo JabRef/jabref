@@ -41,7 +41,7 @@ class StudyYamlParserTest {
                 new StudyCatalog("Medline/PubMed", true), new StudyCatalog("IEEEXplore", false));
 
         expectedStudy = new Study(authors, studyName, researchQuestions, queryEntries, libraryEntries);
-        expectedStudy.setVersion("2.0");
+        expectedStudy.setVersion("2.0.0");
     }
 
     @Test
@@ -74,7 +74,7 @@ class StudyYamlParserTest {
 
         Study study = new StudyYamlParser().parseStudyYamlFile(Path.of(studyDefinition.toURI()));
 
-        assertEquals("2.0", study.getVersion());
+        assertEquals("2.0.0", study.getVersion());
         assertEquals(List.of("Jab Ref"), study.getAuthors());
         assertEquals("TestStudyName", study.getTitle());
         assertEquals(List.of("Question1", "Question2"), study.getResearchQuestions());
