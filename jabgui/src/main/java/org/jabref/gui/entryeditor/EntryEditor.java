@@ -80,7 +80,10 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import jakarta.inject.Inject;
+import org.jabref.model.entry.field.FieldFactory;
+
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// GUI component that allows editing of the fields of a BibEntry (i.e. the one that shows up, when you double click on
 /// an entry in the table)
@@ -104,7 +107,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     private SourceTab sourceTab;
 
-    private String lastFocusedFieldName;
+    private @Nullable Field lastFocusedField;
 
     @FXML private TabPane tabbed;
 
@@ -322,7 +325,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     private void captureFocusedField() {
         Node focusedNode = getScene().getFocusOwner();
         if (focusedNode instanceof TextInputControl textInput && textInput.getId() != null) {
-            lastFocusedFieldName = textInput.getId();
+            lastFocusedField = FieldFactory.parseField(textInput.getId());
         }
     }
 
@@ -491,7 +494,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     public void setCurrentlyEditedEntry(@NonNull BibEntry currentlyEditedEntry) {
         if (Objects.equals(this.currentlyEditedEntry, currentlyEditedEntry)) {
-            lastFocusedFieldName = null;
+            lastFocusedField = null;
             return;
         }
 
@@ -532,11 +535,11 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             Platform.runLater(() -> selectedTab.notifyAboutFocus(currentlyEditedEntry));
         }
 
-        if (lastFocusedFieldName != null) {
-            String fieldToRestore = lastFocusedFieldName;
-            lastFocusedFieldName = null;
+        if (lastFocusedField != null) {
+            Field fieldToRestore = lastFocusedField;
+            lastFocusedField = null;
             Platform.runLater(() -> {
-                selectField(fieldToRestore);
+                setFocusToField(fieldToRestore);
                 Platform.runLater(() -> Platform.runLater(() -> {
                     Node focused = getScene().getFocusOwner();
                     if (focused instanceof TextInputControl textInput) {
