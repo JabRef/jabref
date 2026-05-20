@@ -11,10 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added `POST /libraries/query` to the HTTP server to search for entries across all open libraries with a list of search queries in a single request. [#15599](https://github.com/JabRef/jabref/pull/15599)
-- We added `GET /libraries/{id}/groups` to the HTTP server to list a library's groups as a flat breadcrumb list. [#15599](https://github.com/JabRef/jabref/pull/15599)
-- We added an optional `group` query parameter to `POST /libraries/{id}/entries` so imported entries can be assigned to a group, which is created if it does not exist. [#15599](https://github.com/JabRef/jabref/pull/15599)
-- We added `POST /libraries/query` to the HTTP server to search for entries by DOI or URL across all open libraries in a single request. [#15599](https://github.com/JabRef/jabref/pull/15599)
+- We extended the HTTP server with library query, groups listing, and group-assignment on import. [#15599](https://github.com/JabRef/jabref/pull/15599)
 - We added support for selecting answer engines and summarization algorithms, allowing users to change the underlying AI behavior. [#15688](https://github.com/JabRef/jabref/pull/15688)
 - The citation key generator also normalizes super and subscript characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
 - We added automatic source groups to SLR results and fixed group merging to preserve all source groups. [#12542](https://github.com/JabRef/jabref/issues/12542)
