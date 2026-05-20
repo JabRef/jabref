@@ -75,7 +75,7 @@ public class ImportFormatReader {
 
     public void reset() {
         importers.add(new CopacImporter());
-        importers.add(new EndnoteImporter());
+        importers.add(new EndnoteImporter(citationKeyPatternPreferences));
         importers.add(new EndnoteXmlImporter(importFormatPreferences));
         importers.add(new InspecImporter());
         importers.add(new IsiImporter());
@@ -93,7 +93,7 @@ public class ImportFormatReader {
         }
         importers.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
         importers.add(new RepecNepImporter(importFormatPreferences));
-        importers.add(new ReferImporter());
+        importers.add(new ReferImporter(citationKeyPatternPreferences));
         importers.add(new RisImporter());
         importers.add(new CffImporter(citationKeyPatternPreferences));
         importers.add(new BiblioscapeImporter());

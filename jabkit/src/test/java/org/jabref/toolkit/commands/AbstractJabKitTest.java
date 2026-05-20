@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.exporter.ExportPreferences;
@@ -64,7 +63,7 @@ public abstract class AbstractJabKitTest {
                 CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
                 "",
                 "",
-                CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,
+                CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS,
                 GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
                 new SimpleObjectProperty<>(',')));
         when(preferences.getSearchPreferences()).thenReturn(new SearchPreferences(
