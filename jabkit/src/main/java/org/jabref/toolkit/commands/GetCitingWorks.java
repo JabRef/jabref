@@ -3,13 +3,13 @@ package org.jabref.toolkit.commands;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.chatting.ChatModel;
+import org.jabref.logic.ai.chatting.util.ChatModelFactory;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.toolkit.converter.CitationFetcherTypeConverter;
@@ -43,35 +43,32 @@ class GetCitingWorks implements Callable<Integer> {
     @Override
     public Integer call() {
         CliPreferences preferences = argumentProcessor.cliPreferences;
-        AiService aiService = new AiService(
-                preferences.getAiPreferences(),
-                preferences.getFilePreferences(),
-                preferences.getCitationKeyPatternPreferences(),
-                LOGGER::info,
-                new CurrentThreadTaskExecutor());
 
-        CitationFetcher citationFetcher = CitationFetcherType.getCitationFetcher(
-                citationFetcherType,
-                preferences.getImporterPreferences(),
-                preferences.getImportFormatPreferences(),
-                preferences.getCitationKeyPatternPreferences(),
-                preferences.getGrobidPreferences(),
-                aiService
-        );
+        try (ChatModel chatModel = ChatModelFactory.create(preferences.getAiPreferences())) {
+            CitationFetcher citationFetcher = CitationFetcherType.getCitationFetcher(
+                    citationFetcherType,
+                    preferences.getImporterPreferences(),
+                    preferences.getImportFormatPreferences(),
+                    preferences.getCitationKeyPatternPreferences(),
+                    preferences.getGrobidPreferences(),
+                    preferences.getAiPreferences(),
+                    chatModel
+            );
 
-        List<BibEntry> entries;
+            List<BibEntry> entries;
 
-        try {
-            entries = citationFetcher.getCitations(new BibEntry().withField(StandardField.DOI, doi));
-        } catch (FetcherException e) {
-            LOGGER.error("Could not fetch citation information based on DOI", e);
-            System.err.print(Localization.lang("No data was found for the identifier"));
-            System.err.println(" - " + doi);
-            System.err.println(e.getLocalizedMessage());
-            System.err.println();
-            return 2;
+            try {
+                entries = citationFetcher.getCitations(new BibEntry().withField(StandardField.DOI, doi));
+            } catch (FetcherException e) {
+                LOGGER.error("Could not fetch citation information based on DOI", e);
+                System.err.print(Localization.lang("No data was found for the identifier"));
+                System.err.println(" - " + doi);
+                System.err.println(e.getLocalizedMessage());
+                System.err.println();
+                return 2;
+            }
+
+            return JabKit.outputEntries(argumentProcessor.cliPreferences, entries);
         }
-
-        return JabKit.outputEntries(argumentProcessor.cliPreferences, entries);
     }
 }

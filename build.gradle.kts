@@ -51,6 +51,18 @@ requirementTracing {
             "jabsrv/src/test/java"
         )
     )
+
+	filteredArtifactTypes =
+        listOf(
+            "impl",
+            "utest",
+            "model",
+            "guard",
+            "pp",
+            "feat",
+            "req"
+		)
+
     // TODO: Short Tag Importer: https://github.com/itsallcode/openfasttrace-gradle#configuring-the-short-tag-importer
 }
 

@@ -127,6 +127,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final NavigationHistory navigationHistory = new NavigationHistory();
     private final BooleanProperty canGoBackProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty canGoForwardProperty = new SimpleBooleanProperty(false);
+
     private boolean backOrForwardNavigationActionTriggered = false;
 
     private BibDatabaseContext bibDatabaseContext;
@@ -165,10 +166,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
+    private final AiService aiService;
+
     private ImportHandler importHandler;
     private SearchContext searchContext;
-
-    private final AiService aiService;
 
     private Runnable autoCompleterChangedListener;
 
@@ -260,7 +261,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         autoRenameFileOnEntryChange = new AutoRenameFileOnEntryChange(bibDatabaseContext, preferences.getFilePreferences());
         coarseChangeFilter.registerListener(autoRenameFileOnEntryChange);
 
-        aiService.setupDatabase(bibDatabaseContext);
+        aiService.setupDatabase(bibDatabaseContext, isDummyContext);
 
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);

@@ -10,7 +10,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 
-import org.jabref.gui.ai.components.aichat.AiChatWindow;
+import org.jabref.gui.ai.chat.AiGroupChatWindow;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -88,7 +88,11 @@ public interface StateManager extends SrvStateManager {
 
     void clearSearchHistory();
 
-    List<AiChatWindow> getAiChatWindows();
+    Optional<AiGroupChatWindow> getAiChatWindowForGroup(BibDatabaseContext context, String groupName);
+
+    void setAiChatWindowForGroup(BibDatabaseContext context, String groupName, AiGroupChatWindow aiGroupChatWindow);
+
+    void removeAiChatWindowForGroup(BibDatabaseContext context, String groupName);
 
     BooleanProperty getEditorShowing();
 
