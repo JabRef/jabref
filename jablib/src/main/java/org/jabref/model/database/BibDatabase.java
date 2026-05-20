@@ -658,8 +658,8 @@ public class BibDatabase {
         return -1;
     }
 
-    public BibEntry getEntryById(String id) {
-        return entriesId.get(id);
+    public Optional<BibEntry> getEntryById(String id) {
+        return Optional.ofNullable(entriesId.get(id));
     }
 
     @Override

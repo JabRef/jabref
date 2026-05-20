@@ -2,6 +2,7 @@ package org.jabref.logic.search.sqlbased;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.search.LibrarySearcher;
@@ -43,6 +44,7 @@ public class SqlBasedLibrarySearcher implements LibrarySearcher {
                                                   .getMatchedEntries()
                                                   .stream()
                                                   .map(entryId -> databaseContext.getDatabase().getEntryById(entryId))
+                                                  .flatMap(Optional::stream)
                                                   .toList();
         indexManager.closeAndWait();
         return BibDatabases.purgeEmptyEntries(matchEntries);
