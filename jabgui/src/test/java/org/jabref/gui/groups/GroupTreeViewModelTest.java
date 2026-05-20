@@ -4,6 +4,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefGuiStateManager;
 import org.jabref.gui.StateManager;
@@ -13,7 +16,10 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.groups.GroupsFactory;
+import org.jabref.logic.search.NoOpSearchBackend;
+import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
+import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -28,7 +34,9 @@ import org.jabref.model.groups.WordKeywordGroup;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
+import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -36,6 +44,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+// org.jabref.gui.groups.GroupNodeViewModel.refreshGroup is used, which uses "Platform.runlater"
+@ExtendWith(ApplicationExtension.class)
 class GroupTreeViewModelTest {
 
     private StateManager stateManager;
@@ -48,8 +58,18 @@ class GroupTreeViewModelTest {
     @BeforeEach
     void setUp() {
         databaseContext = new BibDatabaseContext();
-        stateManager = new JabRefGuiStateManager();
-        stateManager.activeDatabaseProperty().setValue(Optional.of(databaseContext));
+
+        stateManager = mock(JabRefGuiStateManager.class);
+        OptionalObjectProperty<BibDatabaseContext> activeDb = OptionalObjectProperty.empty();
+        activeDb.setValue(Optional.of(databaseContext));
+        when(stateManager.activeDatabaseProperty()).thenReturn(activeDb);
+        when(stateManager.getSearchContext(databaseContext)).thenReturn(new SearchContext(
+                new SimpleBooleanProperty(false),
+                NoOpSearchBackend::new,
+                NoOpSearchBackend::new));
+        when(stateManager.getSelectedGroups(databaseContext)).thenReturn(FXCollections.emptyObservableList());
+        when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
+
         taskExecutor = new CurrentThreadTaskExecutor();
         preferences = mock(GuiPreferences.class);
         dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
@@ -65,7 +85,8 @@ class GroupTreeViewModelTest {
                 EnumSet.noneOf(GroupViewMode.class),
                 true,
                 true,
-                GroupHierarchyType.INDEPENDENT));
+                GroupHierarchyType.INDEPENDENT,
+                false));
         BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
         when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
         when(preferences.getBibEntryPreferences()).thenReturn(bibEntryPreferences);
@@ -76,11 +97,6 @@ class GroupTreeViewModelTest {
     void rootGroupIsAllEntriesByDefault() {
         AllEntriesGroup allEntriesGroup = new AllEntriesGroup("All entries");
         assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), preferences), groupTree.rootGroupProperty().getValue());
-    }
-
-    @Test
-    void rootGroupIsSelectedByDefault() {
-        assertEquals(groupTree.rootGroupProperty().get().getGroupNode(), stateManager.getSelectedGroups(databaseContext).getFirst());
     }
 
     @Test

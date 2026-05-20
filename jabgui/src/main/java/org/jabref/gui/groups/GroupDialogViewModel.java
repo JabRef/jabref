@@ -32,7 +32,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.IndexManager;
+import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.strings.StringUtil;
@@ -346,11 +346,9 @@ public class GroupDialogViewModel {
                     }
                 }
 
-                Optional<IndexManager> indexManager = stateManager.getIndexManager(currentDatabase);
-                if (indexManager.isPresent()) {
-                    SearchGroup searchGroup = (SearchGroup) resultingGroup;
-                    searchGroup.setMatchedEntries(indexManager.get().search(searchGroup.getSearchQuery()).getMatchedEntries());
-                }
+                SearchContext searchContext = stateManager.getSearchContext(currentDatabase);
+                SearchGroup searchGroup = (SearchGroup) resultingGroup;
+                searchGroup.setMatchedEntries(searchContext.search(searchGroup.getSearchQuery()).getMatchedEntries());
             } else if (Boolean.TRUE.equals(typeAutoProperty.getValue())) {
                 if (Boolean.TRUE.equals(autoGroupKeywordsOptionProperty.getValue())) {
                     // Set default value for delimiters: ',' for base and '>' for hierarchical

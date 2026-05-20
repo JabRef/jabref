@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -65,8 +66,12 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
-import org.jabref.logic.search.IndexManager;
-import org.jabref.logic.search.PostgreServer;
+import org.jabref.logic.search.SearchBackend;
+import org.jabref.logic.search.SearchContext;
+import org.jabref.logic.search.inmemory.InMemorySearchBackend;
+import org.jabref.logic.search.sqlbased.IndexManager;
+import org.jabref.logic.search.sqlbased.PostgreServer;
+import org.jabref.logic.search.sqlbased.SqlSearchBackend;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -122,6 +127,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final NavigationHistory navigationHistory = new NavigationHistory();
     private final BooleanProperty canGoBackProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty canGoForwardProperty = new SimpleBooleanProperty(false);
+
     private boolean backOrForwardNavigationActionTriggered = false;
 
     private BibDatabaseContext bibDatabaseContext;
@@ -160,10 +166,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
-    private ImportHandler importHandler;
-    private IndexManager indexManager;
-
     private final AiService aiService;
+
+    private ImportHandler importHandler;
+    private SearchContext searchContext;
 
     private Runnable autoCompleterChangedListener;
 
@@ -216,7 +222,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private void initializeComponentsAndListeners(boolean isDummyContext) {
         if (!isDummyContext) {
-            createIndexManager();
+            createSearchContext();
         }
 
         if (tableModel != null) {
@@ -224,7 +230,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferences, taskExecutor, getIndexManager(), selectedGroupsProperty(), searchQueryProperty, resultSizeProperty());
+        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferences, taskExecutor, getSearchContext(), selectedGroupsProperty(), searchQueryProperty, resultSizeProperty());
 
         new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferences.getFilePreferences());
@@ -255,7 +261,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         autoRenameFileOnEntryChange = new AutoRenameFileOnEntryChange(bibDatabaseContext, preferences.getFilePreferences());
         coarseChangeFilter.registerListener(autoRenameFileOnEntryChange);
 
-        aiService.setupDatabase(bibDatabaseContext);
+        aiService.setupDatabase(bibDatabaseContext, isDummyContext);
 
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
@@ -335,17 +341,24 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         dataLoadingTask = null;
     }
 
-    public void createIndexManager() {
-        indexManager = new IndexManager(bibDatabaseContext, taskExecutor, preferences, Injector.instantiateModelOrService(PostgreServer.class));
-        stateManager.setIndexManager(bibDatabaseContext, indexManager);
+    public void createSearchContext() {
+        Supplier<SearchBackend> sqlFactory = () ->
+                new SqlSearchBackend(new IndexManager(bibDatabaseContext, taskExecutor, preferences, Injector.instantiateModelOrService(PostgreServer.class)));
+        Supplier<SearchBackend> inMemoryFactory = () ->
+                new InMemorySearchBackend(bibDatabaseContext, preferences.getBibEntryPreferences());
+        searchContext = new SearchContext(
+                preferences.getSearchPreferences().usePostgresSearchProperty(),
+                sqlFactory,
+                inMemoryFactory);
+        stateManager.setSearchContext(bibDatabaseContext, searchContext);
     }
 
-    public IndexManager getIndexManager() {
-        return indexManager;
+    public SearchContext getSearchContext() {
+        return searchContext;
     }
 
-    public void closeIndexManger() {
-        indexManager.close();
+    public void closeSearchContext() {
+        searchContext.close();
     }
 
     private void onDatabaseLoadingFailed(Exception ex) {
@@ -359,15 +372,15 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private void setDatabaseContext(@NonNull BibDatabaseContext bibDatabaseContext) {
         TabPane tabPane = this.getTabPane();
+        boolean isSelectedTab = false;
 
         if (tabPane == null) {
             LOGGER.debug("User interrupted loading. Not showing any library.");
             return;
         }
-        if (tabPane.getSelectionModel().selectedItemProperty().get().equals(this)) {
-            LOGGER.debug("This case should not happen.");
-            stateManager.setActiveDatabase(bibDatabaseContext);
-            stateManager.activeTabProperty().set(Optional.of(this));
+        Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+        if (selectedTab == this) {
+            isSelectedTab = true;
         }
 
         // Remove existing dummy BibDatabaseContext and add correct BibDatabaseContext from ParserResult to trigger changes in the openDatabases list in the stateManager
@@ -379,6 +392,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         stateManager.getOpenDatabases().add(bibDatabaseContext);
 
         initializeComponentsAndListeners(false);
+
+        if (isSelectedTab) {
+            stateManager.setActiveDatabase(bibDatabaseContext);
+            stateManager.activeTabProperty().set(Optional.of(this));
+        }
+
         installAutosaveManagerAndBackupManager();
     }
 
@@ -719,11 +738,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             LOGGER.error("Problem when closing change monitor", e);
         }
         try {
-            if (indexManager != null) {
-                indexManager.close();
+            if (searchContext != null) {
+                searchContext.close();
             }
         } catch (RuntimeException e) {
-            LOGGER.error("Problem when closing index manager", e);
+            LOGGER.error("Problem when closing search context", e);
         }
 
         try {
@@ -1147,17 +1166,17 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         @Subscribe
         public void listen(EntriesAddedEvent addedEntryEvent) {
-            indexManager.addToIndex(addedEntryEvent.getBibEntries());
+            searchContext.addToIndex(addedEntryEvent.getBibEntries());
         }
 
         @Subscribe
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
-            indexManager.removeFromIndex(removedEntriesEvent.getBibEntries());
+            searchContext.removeFromIndex(removedEntriesEvent.getBibEntries());
         }
 
         @Subscribe
         public void listen(FieldChangedEvent fieldChangedEvent) {
-            indexManager.updateEntry(fieldChangedEvent);
+            searchContext.updateEntry(fieldChangedEvent);
         }
     }
 

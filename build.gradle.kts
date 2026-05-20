@@ -2,7 +2,7 @@ plugins {
     id("org.jabref.gradle.base.repositories")
     id("org.jabref.gradle.feature.compile") // for openrewrite
     id("org.openrewrite.rewrite") version "7.32.2"
-    id("org.itsallcode.openfasttrace") version "3.1.1"
+    id("org.itsallcode.openfasttrace") version "3.1.2"
     id("org.cyclonedx.bom") version "3.2.4"
 }
 
@@ -51,6 +51,18 @@ requirementTracing {
             "jabsrv/src/test/java"
         )
     )
+
+	filteredArtifactTypes =
+        listOf(
+            "impl",
+            "utest",
+            "model",
+            "guard",
+            "pp",
+            "feat",
+            "req"
+		)
+
     // TODO: Short Tag Importer: https://github.com/itsallcode/openfasttrace-gradle#configuring-the-short-tag-importer
 }
 

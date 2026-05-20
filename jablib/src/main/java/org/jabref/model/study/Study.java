@@ -18,7 +18,7 @@ import org.jspecify.annotations.NonNull;
 // The user might add arbitrary content to the YAML
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Study {
-    public static final String CURRENT_SCHEMA_VERSION = "2.0";
+    public static final String CURRENT_SCHEMA_VERSION = "2.0.0";
 
     @JsonProperty("version")
     private String version;

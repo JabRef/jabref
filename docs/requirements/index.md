@@ -47,12 +47,23 @@ After writing the requirement, at the implementation, a comment is added that th
 
 ## Automated checks
 
-When executing the gradle task `traceRequirements`, `build/tracing.txt` is generated.
+When executing the gradle task `traceRequirements`, `build/reports/tracing.txt` is generated.
 It captures the links between the artifacts (requirement, implementation, ...)
 
 In case of a tracing error, one can inspect `build/tracing.txt` to see which requirements were not covered.
+
+## Custom Artifact Types
+
+- `pp`: means that this requirement should be guarded with a privacy policy banner. The feature should not do anything if the user does not accept the privacy policy. The specific privacy policy depends on the feature.
+- `guard`: means that this action might be dangerous and should be guarded with a confirmation dialog.
+
+While not a custom artifact, but we interpret these OpenFastTrace artifact types as follows:
+
+- `dsn`: means writing an ADR.
 
 ## More Information
 
 - [General reading on traceability](https://www.sodiuswillert.com/en/blog/implementing-requirements-traceability-in-systems-software-engineering)
 - [User manual of OpenFastTrace](https://github.com/itsallcode/openfasttrace/blob/main/doc/user_guide.md)
+
+We recommend using VS Code with `markdownlint` extension to edit requirement files, and not IntelliJ, as VS Code understands `markdownlintdisable` directives.

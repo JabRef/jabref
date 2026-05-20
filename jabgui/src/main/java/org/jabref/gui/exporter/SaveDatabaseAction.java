@@ -137,7 +137,7 @@ public class SaveDatabaseAction {
             // Close AutosaveManager, BackupManager, and IndexManager for original library
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context, this.preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup());
-            libraryTab.closeIndexManger();
+            libraryTab.closeSearchContext();
         }
 
         // Set new location
@@ -159,7 +159,7 @@ public class SaveDatabaseAction {
             // Reset (here: uninstall and install again) AutosaveManager, BackupManager and IndexManager for the new file name
             libraryTab.resetChangeMonitor();
             libraryTab.installAutosaveManagerAndBackupManager();
-            libraryTab.createIndexManager();
+            libraryTab.createSearchContext();
 
             preferences.getLastFilesOpenedPreferences().getFileHistory().newFile(file);
         }

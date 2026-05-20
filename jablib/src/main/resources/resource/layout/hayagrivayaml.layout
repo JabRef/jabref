@@ -27,8 +27,10 @@
 \begin{edition}  edition: \edition\end{edition}
 \begin{pages}  page-range: \pages\end{pages}
 \begin{url}  url: \url\end{url}
-\begin{doi}  doi: "\doi"\end{doi}
-\begin{isbn}  isbn: \isbn\end{isbn}
-\begin{issn}  issn: \issn\end{issn}
+\begin{doi||isbn||issn}
+  serial-number:
+\end{doi||isbn||issn}
+\begin{doi}    doi: "\doi"\end{doi}
+\begin{isbn}    isbn: "\isbn"\end{isbn}
+\begin{issn}    issn: "\issn"\end{issn}
 \begin{note}  note: \note\end{note}
-
