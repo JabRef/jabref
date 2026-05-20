@@ -9,6 +9,11 @@ on:
     paths:
       - '.github/workflows/merge-main.yml'
   workflow_dispatch:
+    inputs:
+      pr:
+        description: 'PR number to merge main into'
+        required: true
+        type: string
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}"
@@ -20,11 +25,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Resolve PR branch
+        if: github.event_name == 'workflow_dispatch'
+        id: resolve
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
+        run: |
+          branch=$(gh pr view "${{ inputs.pr }}" --repo "${{ github.repository }}" --json headRefName -q .headRefName)
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+
       - name: Checkout
         uses: actions/checkout@v6
         with:
           submodules: 'true'
           fetch-depth: 0
+          ref: ${{ steps.resolve.outputs.branch || github.head_ref }}
           token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
 
       - name: Merge main
@@ -32,5 +47,5 @@ jobs:
         with:
           changelog-file: CHANGELOG.md
           changelog-rebase: true
-          source-branch: ${{ github.ref_name }}
+          source-branch: ${{ steps.resolve.outputs.branch || github.head_ref }}
           target-branch: 'main'
