@@ -95,18 +95,14 @@ public class ImportHandler {
     private boolean duplicateDecisionDialogInProgress;
     private DuplicateResolverDialog.DuplicateResolverResult rememberedBatchDuplicateDecision = BREAK;
 
-    private static final class DuplicateDecisionRequest {
-        private final BibEntry originalEntry;
-        private final BibEntry duplicateEntry;
-        private final DuplicateResolverDialog.DuplicateResolverResult decision;
-        private final CompletableFuture<DuplicateDecisionResult> result = new CompletableFuture<>();
-
+    private record DuplicateDecisionRequest(BibEntry originalEntry,
+                                            BibEntry duplicateEntry,
+                                            DuplicateResolverDialog.DuplicateResolverResult decision,
+                                            CompletableFuture<DuplicateDecisionResult> result) {
         private DuplicateDecisionRequest(BibEntry originalEntry,
                                          BibEntry duplicateEntry,
                                          DuplicateResolverDialog.DuplicateResolverResult decision) {
-            this.originalEntry = originalEntry;
-            this.duplicateEntry = duplicateEntry;
-            this.decision = decision;
+            this(originalEntry, duplicateEntry, decision, new CompletableFuture<>());
         }
     }
 
@@ -372,7 +368,7 @@ public class ImportHandler {
     public CompletableFuture<DuplicateDecisionResult> getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
         DuplicateDecisionRequest request = new DuplicateDecisionRequest(originalEntry, duplicateEntry, decision);
         UiTaskExecutor.runNowOrInJavaFXThread(() -> enqueueDuplicateDecisionRequest(request));
-        return request.result;
+        return request.result();
     }
 
     private void enqueueDuplicateDecisionRequest(DuplicateDecisionRequest request) {
@@ -392,10 +388,10 @@ public class ImportHandler {
         }
 
         try {
-            DuplicateDecisionResult result = resolveDuplicateDecision(request.originalEntry, request.duplicateEntry, request.decision);
-            request.result.complete(result);
+            DuplicateDecisionResult result = resolveDuplicateDecision(request.originalEntry(), request.duplicateEntry(), request.decision());
+            request.result().complete(result);
         } catch (RuntimeException exception) {
-            request.result.completeExceptionally(exception);
+            request.result().completeExceptionally(exception);
         }
 
         UiTaskExecutor.runNowOrInJavaFXThread(this::processDuplicateDecisionQueue);
