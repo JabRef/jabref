@@ -396,7 +396,7 @@ jobs:
 
   jbang-pr:
     name: JBang (PR)
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
     steps:
       - name: Checkout source
