@@ -10,7 +10,7 @@ import org.jspecify.annotations.Nullable;
 public class ParsedEntryLink {
 
     private final BibDatabase database;
-    
+
     private String key;
     @Nullable private BibEntry linkedEntry;
 
