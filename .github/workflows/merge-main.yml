@@ -1,0 +1,36 @@
+name: Merge main
+
+permissions:
+  contents: write
+  pull-requests: read
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/merge-main.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}"
+  cancel-in-progress: true
+
+jobs:
+  merge-main:
+    if: github.event_name == 'workflow_dispatch' || github.repository == 'JabRef/jabref'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
+
+      - name: Merge main
+        uses: maven-flow/merge@v1
+        with:
+          changelog-file: CHANGELOG.md
+          changelog-rebase: true
+          source-branch: ${{ github.ref_name }}
+          target-branch: 'main'
