@@ -186,11 +186,12 @@ jobs:
         uses: jbangdev/setup-jbang@main
       - name: Lint CHANGELOG.md
         run: |
-          # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.17.1:bin check CHANGELOG.md | tee heylogs.txt || true
+          # run heylogs verification with GitHub Actions annotations
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.18.0:bin check --format github-actions CHANGELOG.md | tee heylogs.txt || true
 
-          # We have two acceptable errors
-          if ! grep -q "1 problem" heylogs.txt; then
+          # We have one acceptable error
+          error_count=$(grep -c '^::error' heylogs.txt || true)
+          if [ "$error_count" -ne 1 ]; then
             {
               echo "heylogs<<EOF"
               cat heylogs.txt
