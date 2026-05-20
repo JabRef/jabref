@@ -23,6 +23,7 @@ import org.jabref.model.strings.UnicodeToReadableCharMap;
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -569,6 +570,7 @@ public class StringUtil {
         return result;
     }
 
+    @Contract("null -> true")
     public static boolean isNullOrEmpty(@Nullable String toTest) {
         return (toTest == null) || toTest.isEmpty();
     }
