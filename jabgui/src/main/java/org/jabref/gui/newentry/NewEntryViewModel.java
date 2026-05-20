@@ -66,8 +66,8 @@ public class NewEntryViewModel {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final UiTaskExecutor taskExecutor;
-    private final AiService aiService;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final AiService aiService;
 
     private final BookCoverFetcher bookCoverFetcher;
 
@@ -99,15 +99,15 @@ public class NewEntryViewModel {
                              DialogService dialogService,
                              StateManager stateManager,
                              UiTaskExecutor taskExecutor,
-                             AiService aiService,
-                             FileUpdateMonitor fileUpdateMonitor) {
+                             FileUpdateMonitor fileUpdateMonitor,
+                             AiService aiService) {
         this.preferences = preferences;
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
-        this.aiService = aiService;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.aiService = aiService;
 
         this.bookCoverFetcher = new BookCoverFetcher(preferences.getExternalApplicationsPreferences());
 
@@ -375,8 +375,15 @@ public class NewEntryViewModel {
             }
 
             final PlainCitationParser parser = parserChoice == PlainCitationParserChoice.LLM
-                    ? PlainCitationParserFactory.getLlmPlainCitationParser(aiService, preferences.getImportFormatPreferences())
-                    : PlainCitationParserFactory.getPlainCitationParser(parserChoice, preferences.getCitationKeyPatternPreferences(), preferences.getGrobidPreferences(), preferences.getImportFormatPreferences());
+                    ? PlainCitationParserFactory.getLlmPlainCitationParser(
+                            preferences.getImportFormatPreferences(),
+                            preferences.getAiPreferences(),
+                            aiService.getCurrentChatModel())
+                    : PlainCitationParserFactory.getPlainCitationParser(
+                            parserChoice,
+                            preferences.getCitationKeyPatternPreferences(),
+                            preferences.getGrobidPreferences(),
+                            preferences.getImportFormatPreferences());
 
             final List<BibEntry> entries = parser.parseMultiplePlainCitations(text);
 

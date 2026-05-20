@@ -8,7 +8,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.chatting.ChatModel;
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -48,7 +49,8 @@ public class CrossRefCitationFetcher implements CitationFetcher {
     private final ImportFormatPreferences importFormatPreferences;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final GrobidPreferences grobidPreferences;
-    private final AiService aiService;
+    private final AiPreferences aiPreferences;
+    private final ChatModel chatModel;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -59,12 +61,14 @@ public class CrossRefCitationFetcher implements CitationFetcher {
             ImportFormatPreferences importFormatPreferences,
             CitationKeyPatternPreferences citationKeyPatternPreferences,
             GrobidPreferences grobidPreferences,
-            AiService aiService) {
+            AiPreferences aiPreferences,
+            ChatModel chatModel) {
         this.importerPreferences = importerPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
         this.grobidPreferences = grobidPreferences;
-        this.aiService = aiService;
+        this.aiPreferences = aiPreferences;
+        this.chatModel = chatModel;
     }
 
     @Override
@@ -87,7 +91,7 @@ public class CrossRefCitationFetcher implements CitationFetcher {
 
         PlainCitationParserChoice parserChoice = importerPreferences.getDefaultPlainCitationParser();
         final PlainCitationParser parser = parserChoice == PlainCitationParserChoice.LLM
-                ? PlainCitationParserFactory.getLlmPlainCitationParser(aiService, importFormatPreferences)
+                ? PlainCitationParserFactory.getLlmPlainCitationParser(importFormatPreferences, aiPreferences, chatModel)
                 : PlainCitationParserFactory.getPlainCitationParser(parserChoice, citationKeyPatternPreferences, grobidPreferences, importFormatPreferences);
 
         try (InputStream stream = new URLDownload(uri.get().toString()).asInputStream()) {

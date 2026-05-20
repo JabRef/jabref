@@ -150,6 +150,8 @@ public class MetaDataParser {
                 metaData.setGroupSearchSyntaxVersion(version);
             } else if (MetaData.VERSION_DB_STRUCT.equals(entry.getKey())) {
                 metaData.setVersionDBStructure(getSingleItem(values));
+            } else if (MetaData.AI_LIBRARY_ID.equals(entry.getKey())) {
+                metaData.setAiLibraryId(getSingleItem(values));
             } else {
                 // Keep meta data items that we do not know in the file
                 metaData.putUnknownMetaDataItem(entry.getKey(), values);

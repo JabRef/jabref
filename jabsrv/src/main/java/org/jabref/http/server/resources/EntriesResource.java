@@ -16,7 +16,8 @@ import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.UiMessageHandler;
-import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.chatting.ChatModel;
+import org.jabref.logic.ai.chatting.util.ChatModelFactory;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibWriter;
@@ -25,7 +26,6 @@ import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -127,16 +127,14 @@ public class EntriesResource {
 
     private Optional<BibEntry> parsePlainCitation(PlainCitationParserChoice choice, String citationText) throws FetcherException {
         if (choice == PlainCitationParserChoice.LLM) {
-            // The LLM parser needs an AiService; build one for this request and
-            // close it afterwards so its MVStore files are released again.
-            try (AiService aiService = new AiService(
-                    preferences.getAiPreferences(),
-                    preferences.getFilePreferences(),
-                    preferences.getCitationKeyPatternPreferences(),
-                    LOGGER::info,
-                    new CurrentThreadTaskExecutor())) {
-                return PlainCitationParserFactory.getLlmPlainCitationParser(aiService, preferences.getImportFormatPreferences())
-                                                 .parsePlainCitation(citationText);
+            // The LLM parser needs a ChatModel; build one for this request and
+            // close it afterwards so the underlying HTTP client is released.
+            try (ChatModel chatModel = ChatModelFactory.create(preferences.getAiPreferences())) {
+                return PlainCitationParserFactory.getLlmPlainCitationParser(
+                                preferences.getImportFormatPreferences(),
+                                preferences.getAiPreferences(),
+                                chatModel)
+                        .parsePlainCitation(citationText);
             }
         }
         return PlainCitationParserFactory.getPlainCitationParser(

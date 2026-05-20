@@ -96,6 +96,14 @@ public class MetaDataParserTest {
     }
 
     @Test
+    void parsesAiLibraryId() throws ParseException {
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = parser.parse(Map.of(MetaData.AI_LIBRARY_ID, "test-ai-library-id;"), ',', "userAndHost");
+
+        assertEquals(Optional.of("test-ai-library-id"), parsed.getAiLibraryId());
+    }
+
+    @Test
     void parsesUserSpecificBlgPathSuccessfully() throws ParseException {
         String user = "testUser";
         String rawKey = "blgFilePath-" + user;
