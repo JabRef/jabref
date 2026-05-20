@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
@@ -88,8 +91,24 @@ public class ImportHandler {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final FilePreferences filePreferences;
-    private final Object duplicateDecisionLock = new Object();
+    private final Deque<DuplicateDecisionRequest> duplicateDecisionRequests = new ArrayDeque<>();
+    private boolean duplicateDecisionDialogInProgress;
     private DuplicateResolverDialog.DuplicateResolverResult rememberedBatchDuplicateDecision = BREAK;
+
+    private static final class DuplicateDecisionRequest {
+        private final BibEntry originalEntry;
+        private final BibEntry duplicateEntry;
+        private final DuplicateResolverDialog.DuplicateResolverResult decision;
+        private final CompletableFuture<DuplicateDecisionResult> result = new CompletableFuture<>();
+
+        private DuplicateDecisionRequest(BibEntry originalEntry,
+                                         BibEntry duplicateEntry,
+                                         DuplicateResolverDialog.DuplicateResolverResult decision) {
+            this.originalEntry = originalEntry;
+            this.duplicateEntry = duplicateEntry;
+            this.decision = decision;
+        }
+    }
 
     public ImportHandler(BibDatabaseContext targetBibDatabaseContext,
                          GuiPreferences preferences,
@@ -249,7 +268,7 @@ public class ImportHandler {
         addToImportEntriesGroup(entries);
 
         // TODO: Should only be done if NOT copied from other library
-        entries.stream().forEach(entry -> downloadLinkedFiles(entry));
+        entries.forEach(this::downloadLinkedFiles);
     }
 
     public void importEntryWithDuplicateCheck(@Nullable TransferInformation transferInformation, BibEntry entry) {
@@ -274,29 +293,39 @@ public class ImportHandler {
                           LOGGER.error("Error in duplicate search", e);
                       })
                       .onSuccess(existingDuplicateInLibrary -> {
-                          BibEntry finalEntry = entryToInsert;
                           if (existingDuplicateInLibrary.isPresent()) {
-                              Optional<BibEntry> duplicateHandledEntry = handleDuplicates(entryToInsert, existingDuplicateInLibrary.get(), decision);
-                              if (duplicateHandledEntry.isEmpty()) {
-                                  tracker.markSkipped();
-                                  return;
-                              }
-                              finalEntry = duplicateHandledEntry.get();
+                              handleDuplicates(entryToInsert, existingDuplicateInLibrary.get(), decision)
+                                      .thenAccept(duplicateHandledEntry -> {
+                                          if (duplicateHandledEntry.isEmpty()) {
+                                              tracker.markSkipped();
+                                              return;
+                                          }
+                                          continueImportAfterDuplicateHandling(transferInformation, duplicateHandledEntry.get(), tracker);
+                                      })
+                                      .exceptionally(exception -> {
+                                          tracker.markSkipped();
+                                          LOGGER.error("Error while handling duplicates", exception);
+                                          return null;
+                                      });
+                              return;
                           }
-                          BibEntry entryForImport = finalEntry;
-                          BackgroundTask.wrap(() -> adjustLinkedFilesForTargetIfRequired(transferInformation, entryForImport))
-                                        .onFailure(e -> {
-                                            LOGGER.error("Error adjusting linked files for target", e);
-                                            dialogService.notify(Localization.lang("Could not adjust linked files. The entry was imported without linked-file adjustments."));
-                                            importCleanedEntries(transferInformation, List.of(entryForImport));
-                                            tracker.markImported(entryForImport);
-                                        })
-                                        .onSuccess(adjustedEntry -> {
-                                            importCleanedEntries(transferInformation, List.of(adjustedEntry));
-                                            tracker.markImported(adjustedEntry);
-                                        })
-                                        .executeWith(taskExecutor);
+                          continueImportAfterDuplicateHandling(transferInformation, entryToInsert, tracker);
                       }).executeWith(taskExecutor);
+    }
+
+    private void continueImportAfterDuplicateHandling(@Nullable TransferInformation transferInformation, BibEntry entryForImport, EntryImportHandlerTracker tracker) {
+        BackgroundTask.wrap(() -> adjustLinkedFilesForTargetIfRequired(transferInformation, entryForImport))
+                      .onFailure(e -> {
+                          LOGGER.error("Error adjusting linked files for target", e);
+                          dialogService.notify(Localization.lang("Could not adjust linked files. The entry was imported without linked-file adjustments."));
+                          importCleanedEntries(transferInformation, List.of(entryForImport));
+                          tracker.markImported(entryForImport);
+                      })
+                      .onSuccess(adjustedEntry -> {
+                          importCleanedEntries(transferInformation, List.of(adjustedEntry));
+                          tracker.markImported(adjustedEntry);
+                      })
+                      .executeWith(taskExecutor);
     }
 
     private BibEntry adjustLinkedFilesForTargetIfRequired(@Nullable TransferInformation transferInformation, BibEntry entry) {
@@ -318,49 +347,81 @@ public class ImportHandler {
                 .containsDuplicate(targetBibDatabaseContext.getDatabase(), entryToCheck, targetBibDatabaseContext.getMode());
     }
 
-    public Optional<BibEntry> handleDuplicates(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
-        DuplicateDecisionResult decisionResult = getDuplicateDecision(originalEntry, duplicateEntry, decision);
-        switch (decisionResult.decision()) {
-            case KEEP_RIGHT:
-                targetBibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
-                break;
-            case KEEP_BOTH:
-                break;
-            case KEEP_MERGE:
-                targetBibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
-                return Optional.of(decisionResult.mergedEntry());
-            case KEEP_LEFT:
-            case AUTOREMOVE_EXACT:
-            case BREAK:
-            default:
-                return Optional.empty();
-        }
-        return Optional.of(originalEntry);
+    public CompletableFuture<Optional<BibEntry>> handleDuplicates(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
+        return getDuplicateDecision(originalEntry, duplicateEntry, decision)
+                .thenApply(decisionResult -> {
+                    switch (decisionResult.decision()) {
+                        case KEEP_RIGHT:
+                            targetBibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
+                            break;
+                        case KEEP_BOTH:
+                            break;
+                        case KEEP_MERGE:
+                            targetBibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
+                            return Optional.of(decisionResult.mergedEntry());
+                        case KEEP_LEFT:
+                        case AUTOREMOVE_EXACT:
+                        case BREAK:
+                        default:
+                            return Optional.empty();
+                    }
+                    return Optional.of(originalEntry);
+                });
     }
 
-    public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
-        synchronized (duplicateDecisionLock) {
-            DuplicateResolverDialog dialog = new DuplicateResolverDialog(
-                    duplicateEntry,
-                    originalEntry,
-                    DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK,
-                    stateManager,
-                    dialogService,
-                    preferences
-            );
-            DuplicateResolverDialog.DuplicateResolverResult effectiveDecision = decision;
-            if ((effectiveDecision == BREAK) && (rememberedBatchDuplicateDecision != BREAK)) {
-                effectiveDecision = rememberedBatchDuplicateDecision;
-            }
-            if (effectiveDecision == BREAK) {
-                effectiveDecision = dialogService.showCustomDialogAndWait(dialog).orElse(BREAK);
-            }
-            if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
-                preferences.getMergeDialogPreferences().setAllEntriesDuplicateResolverDecision(effectiveDecision);
-                rememberedBatchDuplicateDecision = effectiveDecision;
-            }
-            return new DuplicateDecisionResult(effectiveDecision, dialog.getMergedEntry());
+    public CompletableFuture<DuplicateDecisionResult> getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
+        DuplicateDecisionRequest request = new DuplicateDecisionRequest(originalEntry, duplicateEntry, decision);
+        UiTaskExecutor.runNowOrInJavaFXThread(() -> enqueueDuplicateDecisionRequest(request));
+        return request.result;
+    }
+
+    private void enqueueDuplicateDecisionRequest(DuplicateDecisionRequest request) {
+        duplicateDecisionRequests.addLast(request);
+        if (duplicateDecisionDialogInProgress) {
+            return;
         }
+        duplicateDecisionDialogInProgress = true;
+        processDuplicateDecisionQueue();
+    }
+
+    private void processDuplicateDecisionQueue() {
+        DuplicateDecisionRequest request = duplicateDecisionRequests.pollFirst();
+        if (request == null) {
+            duplicateDecisionDialogInProgress = false;
+            return;
+        }
+
+        try {
+            DuplicateDecisionResult result = resolveDuplicateDecision(request.originalEntry, request.duplicateEntry, request.decision);
+            request.result.complete(result);
+        } catch (RuntimeException exception) {
+            request.result.completeExceptionally(exception);
+        }
+
+        UiTaskExecutor.runNowOrInJavaFXThread(this::processDuplicateDecisionQueue);
+    }
+
+    private DuplicateDecisionResult resolveDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
+        DuplicateResolverDialog dialog = new DuplicateResolverDialog(
+                duplicateEntry,
+                originalEntry,
+                DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK,
+                stateManager,
+                dialogService,
+                preferences
+        );
+        DuplicateResolverDialog.DuplicateResolverResult effectiveDecision = decision;
+        if ((effectiveDecision == BREAK) && (rememberedBatchDuplicateDecision != BREAK)) {
+            effectiveDecision = rememberedBatchDuplicateDecision;
+        }
+        if (effectiveDecision == BREAK) {
+            effectiveDecision = dialogService.showCustomDialogAndWait(dialog).orElse(BREAK);
+        }
+        if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
+            preferences.getMergeDialogPreferences().setAllEntriesDuplicateResolverDecision(effectiveDecision);
+            rememberedBatchDuplicateDecision = effectiveDecision;
+        }
+        return new DuplicateDecisionResult(effectiveDecision, dialog.getMergedEntry());
     }
 
     public void setAutomaticFields(List<BibEntry> entries) {
@@ -516,7 +577,7 @@ public class ImportHandler {
                 LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
                 importEntryWithDuplicateCheck(transferInformation, entry, decision, tracker);
             } else {
-                LOGGER.debug("not first entry, not pref flag, break will  be used");
+                LOGGER.debug("Not first entry, pref flag is false, we use BREAK");
                 importEntryWithDuplicateCheck(transferInformation, entry, BREAK, tracker);
             }
         }
