@@ -7,7 +7,8 @@ import java.util.function.BooleanSupplier;
 
 import javafx.beans.property.ObjectProperty;
 
-import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.chatting.ChatModel;
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citation.repository.BibEntryCitationsAndReferencesRepository;
 import org.jabref.logic.citation.repository.BibEntryCitationsAndReferencesRepositoryShell;
@@ -44,7 +45,8 @@ public class SearchCitationsRelationsService {
                                            ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty,
                                            CitationKeyPatternPreferences citationKeyPatternPreferences,
                                            GrobidPreferences grobidPreferences,
-                                           AiService aiService,
+                                           AiPreferences aiPreferences,
+                                           ChatModel chatModel,
                                            BibEntryTypesManager entryTypesManager,
                                            NotificationService notificationService) {
         this.citationFetcher = CitationFetcherType.getCitationFetcher(
@@ -53,7 +55,8 @@ public class SearchCitationsRelationsService {
                 importFormatPreferences,
                 citationKeyPatternPreferences,
                 grobidPreferences,
-                aiService);
+                aiPreferences,
+                chatModel);
 
         this.citationCountFetcher = CitationCountFetcherType.getCitationCountFetcher(
                 citationCountFetcherTypeProperty.get(),
@@ -66,7 +69,8 @@ public class SearchCitationsRelationsService {
                     importFormatPreferences,
                     citationKeyPatternPreferences,
                     grobidPreferences,
-                    aiService);
+                    aiPreferences,
+                    chatModel);
         });
 
         citationCountFetcherTypeProperty.addListener((_, _, newValue) -> {
