@@ -81,7 +81,6 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import jakarta.inject.Inject;
-
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
