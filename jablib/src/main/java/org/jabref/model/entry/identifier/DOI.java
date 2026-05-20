@@ -186,23 +186,53 @@ public class DOI implements Identifier {
     /// @param text the text which might contain a DOI/Short DOI
     /// @return an Optional containing the DOI or an empty Optional
     public static Optional<DOI> findInText(String text) {
-        Optional<DOI> result = Optional.empty();
-        text = text.replaceAll("[�]", "");
+        return findInTextInternal(removeReplacementCharacters(text)).map(match -> new DOI(match.doi()));
+    }
+
+    /// Replaces the first DOI/Short DOI found in the text with the given
+    /// replacement. The replaced region includes any URL or `doi:` prefix that
+    /// was part of the match. Returns the text unchanged if no DOI is present.
+    ///
+    /// This reuses the same matching as {@link #findInText(String)} so callers
+    /// that need to strip a DOI from text do not have to re-derive the regex.
+    ///
+    /// @param text        the text which might contain a DOI/Short DOI
+    /// @param replacement the string to put in place of the matched DOI
+    /// @return the text with the first DOI occurrence replaced
+    public static String replaceInText(String text, String replacement) {
+        String cleaned = removeReplacementCharacters(text);
+        return findInTextInternal(cleaned)
+                .map(match -> cleaned.substring(0, match.start()) + replacement + cleaned.substring(match.end()))
+                .orElse(text);
+    }
+
+    /// Result of locating a DOI inside a text: the parsed DOI string plus the
+    /// matched region (which may include a URL or `doi:` prefix).
+    private record DoiTextMatch(String doi, int start, int end) {
+    }
+
+    private static String removeReplacementCharacters(String text) {
+        return text.replaceAll("[�]", "");
+    }
+
+    /// @param text text that has already been passed through {@link #removeReplacementCharacters}
+    private static Optional<DoiTextMatch> findInTextInternal(String text) {
+        Optional<DoiTextMatch> result = Optional.empty();
 
         Matcher matcher = FIND_DOI_PATT.matcher(text);
         if (matcher.find()) {
             // match only group \1
-            result = Optional.of(new DOI(matcher.group(1)));
+            result = Optional.of(new DoiTextMatch(matcher.group(1), matcher.start(), matcher.end()));
         }
 
         matcher = FIND_SHORT_DOI_PATT.matcher(text);
         if (matcher.find()) {
-            result = Optional.of(new DOI(matcher.group(1)));
+            result = Optional.of(new DoiTextMatch(matcher.group(1), matcher.start(), matcher.end()));
         }
 
         matcher = FIND_SHORT_DOI_SHORTCUT.matcher(text);
         if (matcher.find()) {
-            result = Optional.of(new DOI(matcher.group(0)));
+            result = Optional.of(new DoiTextMatch(matcher.group(0), matcher.start(), matcher.end()));
         }
 
         return result;

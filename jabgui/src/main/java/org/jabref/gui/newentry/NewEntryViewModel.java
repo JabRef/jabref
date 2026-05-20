@@ -374,7 +374,9 @@ public class NewEntryViewModel {
                 return Optional.empty();
             }
 
-            final PlainCitationParser parser = PlainCitationParserFactory.getPlainCitationParser(parserChoice, preferences.getCitationKeyPatternPreferences(), preferences.getGrobidPreferences(), preferences.getImportFormatPreferences(), aiService);
+            final PlainCitationParser parser = parserChoice == PlainCitationParserChoice.LLM
+                    ? PlainCitationParserFactory.getLlmPlainCitationParser(aiService, preferences.getImportFormatPreferences())
+                    : PlainCitationParserFactory.getPlainCitationParser(parserChoice, preferences.getCitationKeyPatternPreferences(), preferences.getGrobidPreferences(), preferences.getImportFormatPreferences());
 
             final List<BibEntry> entries = parser.parseMultiplePlainCitations(text);
 

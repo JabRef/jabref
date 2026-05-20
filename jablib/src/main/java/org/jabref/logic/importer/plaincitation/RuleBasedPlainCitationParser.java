@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -21,6 +22,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final String URL_TAG = "[url_tag]";
     private static final String YEAR_TAG = "[year_tag]";
     private static final String PAGES_TAG = "[pages_tag]";
+    private static final String DOI_TAG = "[doi_tag]";
 
     private static final String INITIALS_GROUP = "INITIALS";
     private static final String LASTNAME_GROUP = "LASTNAME";
@@ -54,6 +56,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private String year;
     private String pages;
     private String title;
+    private String doi;
     private boolean isArticle;
     private String journalOrPublisher;
 
@@ -64,10 +67,14 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         year = "";
         pages = "";
         title = "";
+        doi = "";
         isArticle = true;
         journalOrPublisher = "";
 
-        String inputWithoutUrls = findUrls(text);
+        // DOI is extracted first so a "doi.org" link is recorded as a DOI
+        // rather than being swallowed by the generic URL rule.
+        String inputWithoutDoi = findDoi(text);
+        String inputWithoutUrls = findUrls(inputWithoutDoi);
         String inputWithoutAuthors = findAuthors(inputWithoutUrls);
         String inputWithoutYear = findYear(inputWithoutAuthors);
         String inputWithoutPages = findPages(inputWithoutYear);
@@ -83,6 +90,9 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         extractedEntity.setField(StandardField.YEAR, year);
         extractedEntity.setField(StandardField.PAGES, pages);
         extractedEntity.setField(StandardField.TITLE, title);
+        if (!doi.isEmpty()) {
+            extractedEntity.setField(StandardField.DOI, doi);
+        }
         if (isArticle) {
             extractedEntity.setField(StandardField.JOURNAL, journalOrPublisher);
         } else {
@@ -98,6 +108,17 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             urls.add(input.substring(matcher.start(1), matcher.end()));
         }
         return fixSpaces(matcher.replaceAll(URL_TAG));
+    }
+
+    private String findDoi(String input) {
+        Optional<DOI> parsedDoi = DOI.findInText(input);
+        if (parsedDoi.isEmpty()) {
+            return input;
+        }
+        doi = parsedDoi.get().asString();
+        // Strip the matched DOI (and any URL/"doi:" prefix) using DOI's own
+        // matcher so the remaining rules don't re-parse it as a URL or title.
+        return fixSpaces(DOI.replaceInText(input, DOI_TAG));
     }
 
     private String findYear(String input) {

@@ -3,10 +3,12 @@ package org.jabref.http.server.resources;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.LinkedPdfFileDTO;
@@ -14,10 +16,20 @@ import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.UiMessageHandler;
+import org.jabref.logic.ai.AiService;
+import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
+import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 
 import com.google.gson.Gson;
@@ -33,9 +45,13 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Path("libraries/{id}/entries")
 public class EntriesResource {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntriesResource.class);
 
     @Inject
     CliPreferences preferences;
@@ -70,6 +86,64 @@ public class EntriesResource {
             throw new BadRequestException("BibTeX data must not be empty.");
         }
         uiMessageHandler.handleUiCommands(List.of(new UiCommand.AppendBibTeXToCurrentLibrary(bibtex, group)));
+    }
+
+    /// Parses a plain-text bibliography reference into a BibTeX entry and appends it to the
+    /// currently selected library.
+    ///
+    /// The reference is run through the plain-citation parser the user selected in JabRef's
+    /// preferences ({@link org.jabref.logic.importer.ImporterPreferences#getDefaultPlainCitationParser()}),
+    /// including the LLM parser.
+    ///
+    /// @param group optional name of a group the imported entry is additionally assigned to.
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    public void addPlainCitation(@PathParam("id") String id, @QueryParam("group") @Nullable String group, String citationText) throws FetcherException, IOException {
+        if (uiMessageHandler == null) {
+            throw new BadRequestException("Only possible in GUI mode.");
+        }
+        if (!"current".equals(id)) {
+            throw new BadRequestException("Only currently selected library possible");
+        }
+        if (citationText == null || citationText.isBlank()) {
+            throw new BadRequestException("Citation text must not be empty.");
+        }
+
+        PlainCitationParserChoice choice = preferences.getImporterPreferences().getDefaultPlainCitationParser();
+        Optional<BibEntry> parsed = parsePlainCitation(choice, citationText);
+        if (parsed.isEmpty()) {
+            throw new BadRequestException("Could not parse a bibliography entry from the given text.");
+        }
+
+        StringWriter rawEntry = new StringWriter();
+        BibWriter bibWriter = new BibWriter(rawEntry, "\n");
+        BibEntryWriter entryWriter = new BibEntryWriter(
+                new FieldWriter(preferences.getFieldPreferences()),
+                new BibEntryTypesManager());
+        entryWriter.write(parsed.get(), bibWriter, BibDatabaseMode.BIBTEX);
+
+        uiMessageHandler.handleUiCommands(List.of(new UiCommand.AppendBibTeXToCurrentLibrary(rawEntry.toString(), group)));
+    }
+
+    private Optional<BibEntry> parsePlainCitation(PlainCitationParserChoice choice, String citationText) throws FetcherException {
+        if (choice == PlainCitationParserChoice.LLM) {
+            // The LLM parser needs an AiService; build one for this request and
+            // close it afterwards so its MVStore files are released again.
+            try (AiService aiService = new AiService(
+                    preferences.getAiPreferences(),
+                    preferences.getFilePreferences(),
+                    preferences.getCitationKeyPatternPreferences(),
+                    LOGGER::info,
+                    new CurrentThreadTaskExecutor())) {
+                return PlainCitationParserFactory.getLlmPlainCitationParser(aiService, preferences.getImportFormatPreferences())
+                                                 .parsePlainCitation(citationText);
+            }
+        }
+        return PlainCitationParserFactory.getPlainCitationParser(
+                choice,
+                preferences.getCitationKeyPatternPreferences(),
+                preferences.getGrobidPreferences(),
+                preferences.getImportFormatPreferences()).parsePlainCitation(citationText);
     }
 
     @POST

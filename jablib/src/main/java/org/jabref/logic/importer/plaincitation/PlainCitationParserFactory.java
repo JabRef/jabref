@@ -10,11 +10,13 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class PlainCitationParserFactory {
+
+    /// Creates a parser for any choice that does not require an {@link AiService}.
+    /// For {@link PlainCitationParserChoice#LLM} use {@link #getLlmPlainCitationParser}.
     public static PlainCitationParser getPlainCitationParser(PlainCitationParserChoice parserChoice,
                                                              CitationKeyPatternPreferences citationKeyPatternPreferences,
                                                              GrobidPreferences grobidPreferences,
-                                                             ImportFormatPreferences importFormatPreferences,
-                                                             AiService aiService) {
+                                                             ImportFormatPreferences importFormatPreferences) {
         return switch (parserChoice) {
             case PlainCitationParserChoice.RULE_BASED_GENERAL ->
                     new RuleBasedPlainCitationParser();
@@ -23,7 +25,12 @@ public class PlainCitationParserFactory {
             case PlainCitationParserChoice.GROBID ->
                     new GrobidPlainCitationParser(grobidPreferences, importFormatPreferences);
             case PlainCitationParserChoice.LLM ->
-                    new LlmPlainCitationParser(aiService.getTemplatesService(), importFormatPreferences, aiService.getChatLanguageModel());
+                    throw new IllegalArgumentException("LLM parser requires an AiService; call getLlmPlainCitationParser instead");
         };
+    }
+
+    public static PlainCitationParser getLlmPlainCitationParser(AiService aiService,
+                                                                ImportFormatPreferences importFormatPreferences) {
+        return new LlmPlainCitationParser(aiService.getTemplatesService(), importFormatPreferences, aiService.getChatLanguageModel());
     }
 }
