@@ -1,4 +1,4 @@
-name: Run OpenRewrite
+name: Fix and merge main
 
 permissions:
   contents: write
@@ -7,11 +7,11 @@ permissions:
 on:
   pull_request:
     paths:
-      - '.github/workflows/run-openrewrite.yml'
+      - '.github/workflows/fix-merge-main.yaml'
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Branch name to run OpenRewrite on'
+        description: 'Branch name to run on'
         required: true
         type: string
 
@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  rewrite:
+  fix-and-merge:
     if: github.event_name == 'workflow_dispatch' || github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest
 
@@ -29,6 +29,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           submodules: 'true'
+          fetch-depth: 0
           ref: ${{ inputs.branch || github.event.pull_request.head.ref }}
           token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
 
@@ -51,3 +52,11 @@ jobs:
             git commit -m "Fix issues using OpenRewrite"
             git push
           fi
+
+      - name: Merge main
+        uses: maven-flow/merge@v1
+        with:
+          changelog-file: CHANGELOG.md
+          changelog-rebase: true
+          source-branch: ${{ github.ref_name }}
+          target-branch: 'main'

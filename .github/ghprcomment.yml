@@ -39,13 +39,6 @@
 
     You can then run these tests in IntelliJ to reproduce the failing tests locally.
     We offer a quick test running howto in the section [Final build system checks](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html#final-build-system-checks) in our setup guide.
-- jobName: format
-  workflowName: 'Source Code Tests'
-  message: >
-    Your code currently does not meet JabRef's code guidelines.
-    IntelliJ auto format covers some cases.
-    There seem to be issues with your code style and autoformat configuration.
-    Please reformat your code (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>L</kbd>) and commit, then push.
 - jobName: format-javadoc
   workflowName: 'Source Code Tests'
   message: >
@@ -66,17 +59,6 @@
 
     Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
     Afterwards, please [run checkstyle locally](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#run-checkstyle) and fix the issues, commit, and push.
-- jobName: OpenRewrite
-  workflowName: 'Source Code Tests'
-  message: >
-    Your code currently does not meet JabRef's code guidelines.
-    We use [OpenRewrite](https://docs.openrewrite.org/) to ensure "modern" Java coding practices.
-    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
-    To see the test output, locate "Source Code Tests / OpenRewrite (pull_request)" and click on it.
-
-
-    The issues found can be **automatically fixed**.
-    Please execute the gradle task *`rewriteRun`* from the [`rewrite` group of the Gradle Tool window](https://devdocs.jabref.org/code-howtos/faq.html#failing-openrewrite-tests) in IntelliJ, then check the results, reformat the code, commit, and push.
 - jobName: Modernizer
   workflowName: 'Source Code Tests'
   message: >
