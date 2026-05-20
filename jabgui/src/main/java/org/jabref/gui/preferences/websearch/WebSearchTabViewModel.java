@@ -96,12 +96,14 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     }
 
     private void setupPlainCitationParsers() {
+        // [pp->feat~ai.citation-parsing~1]
         if (!refAiEnabled.get()) {
             plainCitationParsers.remove(PlainCitationParserChoice.LLM);
         }
 
         refAiEnabled.addListener((_, _, newValue) -> {
             if (newValue) {
+                // [impl->feat~ai.citation-parsing~1]
                 plainCitationParsers.add(PlainCitationParserChoice.LLM);
             } else {
                 PlainCitationParserChoice oldChoice = defaultPlainCitationParser.get();

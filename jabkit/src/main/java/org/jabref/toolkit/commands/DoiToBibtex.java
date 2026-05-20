@@ -40,7 +40,7 @@ class DoiToBibtex implements Callable<Integer> {
             Optional<DOI> doiParsed = DOI.parse(doiString);
             if (doiParsed.isEmpty()) {
                 LOGGER.warn("Skipped DOI {}, because it is not a valid DOI string", doiString);
-                System.out.println(Localization.lang("DOI %0 is invalid", doiString));
+                System.err.println(Localization.lang("DOI %0 is invalid", doiString));
                 System.err.println();
                 continue;
             }

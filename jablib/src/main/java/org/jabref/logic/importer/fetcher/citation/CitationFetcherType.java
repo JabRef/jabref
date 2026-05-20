@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher.citation;
 
-import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.chatting.ChatModel;
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -39,7 +40,8 @@ public enum CitationFetcherType {
             ImportFormatPreferences importFormatPreferences,
             CitationKeyPatternPreferences citationKeyPatternPreferences,
             GrobidPreferences grobidPreferences,
-            AiService aiService) {
+            AiPreferences aiPreferences,
+            ChatModel chatModel) {
 
         return switch (citationFetcherName) {
             case ALL ->
@@ -48,14 +50,16 @@ public enum CitationFetcherType {
                             importFormatPreferences,
                             citationKeyPatternPreferences,
                             grobidPreferences,
-                            aiService);
+                            aiPreferences,
+                            chatModel);
             case CROSSREF ->
                     new CrossRefCitationFetcher(
                             importerPreferences,
                             importFormatPreferences,
                             citationKeyPatternPreferences,
                             grobidPreferences,
-                            aiService);
+                            aiPreferences,
+                            chatModel);
             case OPEN_ALEX ->
                     new OpenAlex(importerPreferences);
             case OPEN_CITATIONS ->
