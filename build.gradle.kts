@@ -52,7 +52,7 @@ requirementTracing {
         )
     )
 
-	filteredArtifactTypes =
+    filteredArtifactTypes =
         listOf(
             "impl",
             "utest",
@@ -61,7 +61,7 @@ requirementTracing {
             "pp",
             "feat",
             "req"
-		)
+        )
 
     // TODO: Short Tag Importer: https://github.com/itsallcode/openfasttrace-gradle#configuring-the-short-tag-importer
 }
