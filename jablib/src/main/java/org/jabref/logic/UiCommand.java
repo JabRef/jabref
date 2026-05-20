@@ -3,9 +3,9 @@ package org.jabref.logic;
 import java.io.Reader;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public sealed interface UiCommand {
@@ -30,8 +30,15 @@ public sealed interface UiCommand {
     ///
     /// @param targetGroup name of a group the imported entries are additionally assigned to.
     ///                     If the group does not exist, it is created as a top-level group.
-    ///                     `null` means no group assignment.
-    record AppendBibTeXToCurrentLibrary(String bibtex, @Nullable String targetGroup) implements UiCommand {
+    ///                     An empty Optional means no group assignment.
+    record AppendBibTeXToCurrentLibrary(String bibtex, Optional<String> targetGroup) implements UiCommand {
+        public AppendBibTeXToCurrentLibrary(String bibtex) {
+            this(bibtex, Optional.empty());
+        }
+
+        public AppendBibTeXToCurrentLibrary(String bibtex, String targetGroup) {
+            this(bibtex, targetGroup.isBlank() ? Optional.empty() : Optional.of(targetGroup));
+        }
     }
 
     record Focus() implements UiCommand {

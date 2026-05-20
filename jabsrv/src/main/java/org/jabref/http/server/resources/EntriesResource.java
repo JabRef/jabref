@@ -85,7 +85,9 @@ public class EntriesResource {
         if (bibtex == null || bibtex.isBlank()) {
             throw new BadRequestException("BibTeX data must not be empty.");
         }
-        uiMessageHandler.handleUiCommands(List.of(new UiCommand.AppendBibTeXToCurrentLibrary(bibtex, group)));
+        uiMessageHandler.handleUiCommands(List.of(group == null
+                ? new UiCommand.AppendBibTeXToCurrentLibrary(bibtex)
+                : new UiCommand.AppendBibTeXToCurrentLibrary(bibtex, group)));
     }
 
     /// Parses a plain-text bibliography reference into a BibTeX entry and appends it to the
@@ -122,7 +124,9 @@ public class EntriesResource {
                 new BibEntryTypesManager());
         entryWriter.write(parsed.get(), bibWriter, BibDatabaseMode.BIBTEX);
 
-        uiMessageHandler.handleUiCommands(List.of(new UiCommand.AppendBibTeXToCurrentLibrary(rawEntry.toString(), group)));
+        uiMessageHandler.handleUiCommands(List.of(group == null
+                ? new UiCommand.AppendBibTeXToCurrentLibrary(rawEntry.toString())
+                : new UiCommand.AppendBibTeXToCurrentLibrary(rawEntry.toString(), group)));
     }
 
     private Optional<BibEntry> parsePlainCitation(PlainCitationParserChoice choice, String citationText) throws FetcherException {

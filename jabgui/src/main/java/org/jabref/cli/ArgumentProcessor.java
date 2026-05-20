@@ -92,7 +92,7 @@ public class ArgumentProcessor {
             uiCommands.add(new UiCommand.AppendFileOrUrlToCurrentLibrary(guiCli.importToOpen));
         }
         if (guiCli.importBibtex != null) {
-            uiCommands.add(new UiCommand.AppendBibTeXToCurrentLibrary(guiCli.importBibtex, null));
+            uiCommands.add(new UiCommand.AppendBibTeXToCurrentLibrary(guiCli.importBibtex));
         }
         return uiCommands;
     }
