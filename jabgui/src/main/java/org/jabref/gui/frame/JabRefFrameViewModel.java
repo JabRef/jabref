@@ -299,8 +299,8 @@ public class JabRefFrameViewModel {
     /// top-level group if it does not exist yet. Group names are unique within a library,
     /// so the name identifies the group anywhere in the tree.
     ///
-    /// Open point: if an existing group is not assignable (e.g. a search or automatic group),
-    /// the assignment silently does nothing - no error is reported to the caller.
+    /// TODO: if an existing group is not assignable (e.g. a search or automatic group),
+    ///       the assignment silently does nothing - no error is reported to the caller.
     private void assignToGroup(BibDatabaseContext databaseContext, List<BibEntry> entries, String groupName) {
         GroupTreeNode root = databaseContext.getMetaData().getGroups().orElseGet(() -> {
             GroupTreeNode newRoot = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());

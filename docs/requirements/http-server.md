@@ -34,7 +34,7 @@ JabRef merges the entries into the library, so the regular duplicate handling ap
 
 This is currently available in GUI mode only (the import is dispatched through the GUI message handler).
 
-Open point: if the named group exists but is not assignable (e.g. a search or automatic group), the assignment silently does nothing and no error is reported. Rejecting such requests is not yet implemented.
+TODO: if the named group exists but is not assignable (e.g. a search or automatic group), the assignment silently does nothing and no error is reported. Rejecting such requests is not yet implemented.
 
 Needs: impl
 
