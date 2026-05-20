@@ -48,5 +48,5 @@ jobs:
           changelog-file: CHANGELOG.md
           changelog-rebase: true
           pom-file: 'match-nothing.txt'
-          source-branch: 'main'
+          source-branch: 'origin/main'
           target-branch: ${{ steps.resolve.outputs.branch || github.head_ref }}
