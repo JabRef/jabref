@@ -18,14 +18,27 @@ jobs:
     runs-on: ubuntu-slim
     permissions:
       actions: write
-      contents: read
+      contents: write
       pull-requests: write
     steps:
       - uses: actions/checkout@v6
         with:
           show-progress: 'false'
+      - name: Get PR info
+        id: pr_info
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+        run: |
+          set -ex
+          INFO=$(gh pr view "$PR_NUMBER" --json headRefName,headRepositoryOwner,headRepository)
+          HEAD_REF=$(echo "$INFO" | jq -r .headRefName)
+          HEAD_REPO=$(echo "$INFO" | jq -r '"\(.headRepositoryOwner.login)/\(.headRepository.name)"')
+          echo "head_ref=$HEAD_REF" >> $GITHUB_OUTPUT
+          echo "head_repo=$HEAD_REPO" >> $GITHUB_OUTPUT
       - name: Check PR mergeability
         id: check_mergeable
+        continue-on-error: true
         run: |
           set -ex
 
@@ -42,6 +55,7 @@ jobs:
             sleep 5
           done
           echo "Result: $MERGEABLE" >> $GITHUB_STEP_SUMMARY
+          echo "mergeable=$MERGEABLE" >> $GITHUB_OUTPUT
 
           if [ "$MERGEABLE" == "CONFLICTING" ]; then
             echo "❌ Merge conflicts"
@@ -101,3 +115,26 @@ jobs:
           EVENT: ${{ github.event_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+
+      - name: Checkout PR head branch
+        if: steps.check_mergeable.outputs.mergeable == 'CONFLICTING' && steps.pr_info.outputs.head_repo == 'JabRef/jabref'
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.pr_info.outputs.head_ref }}
+          submodules: 'true'
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
+
+      - name: Merge main into PR branch
+        if: steps.check_mergeable.outputs.mergeable == 'CONFLICTING' && steps.pr_info.outputs.head_repo == 'JabRef/jabref'
+        uses: maven-flow/merge@1a008472b7a881f9fa6779c53e0118cdaf66da22
+        with:
+          changelog-file: CHANGELOG.md
+          changelog-rebase: true
+          pom-file: 'match-nothing.txt'
+          source-branch: 'main'
+          target-branch: ${{ steps.pr_info.outputs.head_ref }}
+
+      - name: Propagate conflict failure
+        if: steps.check_mergeable.outputs.mergeable == 'CONFLICTING' && github.event_name != 'workflow_dispatch'
+        run: exit 1
