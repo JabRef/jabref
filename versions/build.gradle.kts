@@ -42,7 +42,7 @@ dependencies.constraints {
     api("com.dlsc.gemsfx:gemsfx:4.0.5")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
-    api("com.fasterxml:aalto-xml:1.3.4")
+    api("com.fasterxml:aalto-xml:1.4.0")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j:1.0.0")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta:1.0.0")
     api("com.github.ben-manes.caffeine:caffeine:3.2.4")
