@@ -186,11 +186,12 @@ jobs:
         uses: jbangdev/setup-jbang@main
       - name: Lint CHANGELOG.md
         run: |
-          # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.17.1:bin check CHANGELOG.md | tee heylogs.txt || true
+          # run heylogs verification with GitHub Actions annotations
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.18.0:bin check --format github-actions CHANGELOG.md | tee heylogs.txt || true
 
-          # We have two acceptable errors
-          if ! grep -q "1 problem" heylogs.txt; then
+          # We have one acceptable error
+          error_count=$(grep -c '^::error' heylogs.txt || true)
+          if [ "$error_count" -ne 1 ]; then
             {
               echo "heylogs<<EOF"
               cat heylogs.txt
@@ -328,7 +329,8 @@ jobs:
 
   tests-jabkit-smoke:
     name: "JabKit Smoke Test"
-    runs-on: ubuntu-slim
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -387,119 +389,30 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0
           submodules: 'false'
           show-progress: 'false'
-      - name: Detect changed jablib classes
-        id: changed-jablib-files
-        uses: tj-actions/changed-files@v47
-        with:
-          files: |
-            .jbang/*.java
-            jablib/src/main/java/**/*.java
-            jablib-examples/jbang/**/*.java
-          files_ignore: |
-            jablib/src/main/java/**/*-*.java
-
       - uses: ./.github/actions/setup-gradle
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - name: Setup JDK
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-        uses: actions/setup-java@v5
-        with:
-          java-version: '25'
-          distribution: 'corretto'
-          check-latest: true
-
-      # Build all JBang scripts
-      - run: |
-          for f in .jbang/*.java; do
-            echo "Building $f..."
-            jbang build --fresh "$f"
-          done
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - run: |
-          for f in jablib-examples/jbang/*.java; do
-            echo "Building $f..."
-            jbang build --fresh "$f"
-          done
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-
-      # *Launcher.java should support "--help"
-      - run: jbang run .jbang/JabKitLauncher.java --help
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - run: jbang run .jbang/JabLsLauncher.java --help
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - run: jbang run .jbang/JabSrvLauncher.java --help
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
+      - name: Build JBang scripts and run launchers
+        uses: ./.github/actions/jbang-check
 
   jbang-pr:
     name: JBang (PR)
-    runs-on: ubuntu-slim
-    # does not need publish, because the JBang scripts are modified
+    runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
-    strategy:
-      fail-fast: false
-      matrix:
-        script: [ .jbang/JabKitLauncher.java, .jbang/JabLsLauncher.java, .jbang/JabSrvLauncher.java, jablib-examples/jbang/doi_to_bibtex.java, jablib-examples/jbang/ieee_pdf_references_to_bibtex.java ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
         with:
-          submodules: 'false'
+          submodules: 'true'
           show-progress: 'false'
-      - name: Detect changed jablib classes
-        id: changed-jablib-files
-        uses: tj-actions/changed-files@v47
-        with:
-          files: |
-            .jbang/*.java
-            jabkit/src/main/java/**/*.java
-            jablib/src/main/java/**/*.java
-            jablib-examples/jbang/**/*.java
-          files_ignore: |
-            jablib/src/main/java/**/*-*.java
       - uses: ./.github/actions/setup-gradle
-      - name: Setup JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: '25'
-          distribution: 'corretto'
-          check-latest: true
-      - name: Modify ${{ matrix.script }} to include changed classes
-        shell: bash
-        # We always run, because changes in jabls, jabsrv also could cause JBang to fail
-        run: |
-          # We modify the JBang scripts directly to avoid issues with relative paths
-          for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
-            case "$f" in
-              .jbang/*)
-                # skip scripts
-                continue
-                ;;
-              jablib-examples/*)
-                # skip scripts
-                continue
-                ;;
-              jabkit/*)
-                # only JabKit needs its modified sources if jabkit was modified
-                if [ "${{ matrix.script }}" != ".jbang/JabKitLauncher.java" ]; then
-                  continue
-                fi
-                ;;
-            esac
-            if [[ "${{ matrix.script }}" == .jbang/* ]]; then
-              echo "//SOURCES ../$f" >> "${{ matrix.script }}"
-            else
-              echo "//SOURCES ../../$f" >> "${{ matrix.script }}"
-            fi
-          done
-      - run: cat ${{ matrix.script }}
-      - run: jbang build "${{ matrix.script }}"
-        shell: bash
-      - run: jbang "${{ matrix.script }}" --help
-        if: ${{ contains(matrix.script, 'Launcher.java') }}
-        shell: bash
+      # Publish jablib to the local Maven repository so the JBang scripts pick up
+      # unreleased changes. -PprojVersion=6.0 makes the artifact 6.0-SNAPSHOT
+      # (the default would be 0.1.0-SNAPSHOT, which the scripts do not reference).
+      - name: Publish jablib to the local Maven repository
+        run: ./gradlew -PprojVersion=6.0 :jablib:publishToMavenLocal
+      - name: Build JBang scripts and run launchers
+        uses: ./.github/actions/jbang-check
 
   maven-examples:
     name: Maven examples

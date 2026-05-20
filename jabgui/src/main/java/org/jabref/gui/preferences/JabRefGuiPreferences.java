@@ -179,6 +179,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String GROUP_VIEW_FILTER = "groupFilter";
     private static final String GROUP_VIEW_INVERT = "groupInvert";
     private static final String DEFAULT_HIERARCHICAL_CONTEXT = "defaultHierarchicalContext";
+    private static final String GROUP_SHOW_AI_CHAT = "groupShowAiChat";
     // endregion
 
     // region specialFieldsPreferences
@@ -767,6 +768,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(groupsPreferences.autoAssignGroupProperty(), (_, _, newValue) -> putBoolean(AUTO_ASSIGN_GROUP, newValue));
         EasyBind.listen(groupsPreferences.displayGroupCountProperty(), (_, _, newValue) -> putBoolean(DISPLAY_GROUP_COUNT, newValue));
         EasyBind.listen(groupsPreferences.defaultHierarchicalContextProperty(), (_, _, newValue) -> put(DEFAULT_HIERARCHICAL_CONTEXT, newValue.name()));
+        EasyBind.listen(groupsPreferences.showAiChatButtonProperty(), (_, _, newValue) -> putBoolean(GROUP_SHOW_AI_CHAT, newValue));
 
         return groupsPreferences;
     }
@@ -780,7 +782,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(DISPLAY_GROUP_COUNT, defaults.shouldDisplayGroupCount()),
                 GroupHierarchyType.valueOf(
                         get(DEFAULT_HIERARCHICAL_CONTEXT, defaults.getDefaultHierarchicalContext().name())
-                )
+                ),
+                getBoolean(GROUP_SHOW_AI_CHAT, defaults.showAiChatButton())
         );
     }
     // endregion

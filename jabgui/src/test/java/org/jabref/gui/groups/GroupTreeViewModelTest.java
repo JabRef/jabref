@@ -85,7 +85,8 @@ class GroupTreeViewModelTest {
                 EnumSet.noneOf(GroupViewMode.class),
                 true,
                 true,
-                GroupHierarchyType.INDEPENDENT));
+                GroupHierarchyType.INDEPENDENT,
+                false));
         BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
         when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
         when(preferences.getBibEntryPreferences()).thenReturn(bibEntryPreferences);

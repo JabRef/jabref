@@ -12,6 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -61,7 +62,7 @@ public class BaseDialog<T> extends Dialog<T> {
         dialogWindow.getIcons().add(image);
     }
 
-    ///  Applies a fix to prevent truncating ButtonBar buttons with larger font sizes
+    /// Applies a fix to prevent truncating ButtonBar buttons with larger font sizes
     public static void applyButtonFix(DialogPane pane) {
         // Force the window to fit the new font content bounds
         if (pane.getScene() != null && pane.getScene().getWindow() != null) {
@@ -81,6 +82,16 @@ public class BaseDialog<T> extends Dialog<T> {
                 // Re-trigger CSS to ensure prefWidth is calculated using the new font metrics
                 button.applyCss();
             }
+        }
+    }
+
+    public static void bringToFront(Dialog<?> dialog) {
+        // Using answers from: <https://stackoverflow.com/a/43007782> and <https://stackoverflow.com/a/48798192>.
+
+        Window window = dialog.getDialogPane().getScene().getWindow();
+        if (window instanceof Stage stage) {
+            stage.setAlwaysOnTop(true);
+            stage.setAlwaysOnTop(false);
         }
     }
 }

@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -33,6 +34,12 @@ public class ReferImporter extends Importer {
 
     private static final Pattern Z_PATTERN = Pattern.compile("%0 .*");
     private static final String ENDOFRECORD = "__EOREOR__";
+
+    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+
+    public ReferImporter(CitationKeyPatternPreferences citationKeyPatternPreferences) {
+        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
+    }
 
     @Override
     public String getId() {
@@ -128,7 +135,7 @@ public class ReferImporter extends Importer {
                     case "E" ->
                             addEditor(editor, val);
                     case "F" ->
-                            fieldMap.put(InternalField.KEY_FIELD, CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics(val, CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
+                            fieldMap.put(InternalField.KEY_FIELD, CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics(val, citationKeyPatternPreferences.getUnwantedCharacters()));
                     case "G" ->
                             fieldMap.put(StandardField.LANGUAGE, val);
                     case "I" ->
