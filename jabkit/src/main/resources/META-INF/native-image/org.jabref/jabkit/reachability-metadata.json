@@ -160,39 +160,6 @@
       "type": "java.time.ZonedDateTime"
     },
     {
-      "type": "org.h2.mvstore.MVStore$TxCounter"
-    },
-    {
-      "type": "org.h2.mvstore.Page"
-    },
-    {
-      "type": "org.h2.store.fs.async.FilePathAsync"
-    },
-    {
-      "type": "org.h2.store.fs.mem.FilePathMem"
-    },
-    {
-      "type": "org.h2.store.fs.mem.FilePathMemLZF"
-    },
-    {
-      "type": "org.h2.store.fs.niomapped.FilePathNioMapped"
-    },
-    {
-      "type": "org.h2.store.fs.niomem.FilePathNioMem"
-    },
-    {
-      "type": "org.h2.store.fs.niomem.FilePathNioMemLZF"
-    },
-    {
-      "type": "org.h2.store.fs.retry.FilePathRetryOnInterrupt"
-    },
-    {
-      "type": "org.h2.store.fs.split.FilePathSplit"
-    },
-    {
-      "type": "org.h2.store.fs.zip.FilePathZip"
-    },
-    {
       "type": "org.jabref.toolkit.commands.CheckConsistency",
       "fields": [
         {
