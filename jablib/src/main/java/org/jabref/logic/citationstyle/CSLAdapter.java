@@ -13,6 +13,7 @@ import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.DefaultAbbreviationProvider;
 import de.undercouch.citeproc.output.Bibliography;
 import de.undercouch.citeproc.output.Citation;
+import org.jspecify.annotations.Nullable;
 
 /// Provides an adapter class to CSL. It holds a CSL instance under the hood that is only recreated when
 /// the style changes.
@@ -31,9 +32,10 @@ import de.undercouch.citeproc.output.Citation;
 public class CSLAdapter {
 
     private final JabRefItemDataProvider dataProvider = new JabRefItemDataProvider();
-    private String style;
-    private CitationStyleOutputFormat format;
-    private CSL cslInstance;
+
+    @Nullable private String cachedStyle;
+    @Nullable private CitationStyleOutputFormat cachedFormat;
+    @Nullable private CSL cachedCslInstance;
 
     /// Creates the bibliography of the provided items. This method needs to run synchronized because the underlying
     /// CSL engine is not thread-safe.
@@ -41,16 +43,20 @@ public class CSLAdapter {
     /// @param databaseContext {@link BibDatabaseContext} is used to be able to resolve fields and their aliases
     public synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException, IllegalArgumentException {
         dataProvider.setData(bibEntries, databaseContext, entryTypesManager);
-        initialize(style, outputFormat);
+
+        CSL cslInstance = initialize(style, outputFormat);
         cslInstance.registerCitationItems(dataProvider.getIds());
-        final Bibliography bibliography = cslInstance.makeBibliography();
+
+        Bibliography bibliography = cslInstance.makeBibliography();
         return Arrays.asList(bibliography.getEntries());
     }
 
     public synchronized Citation makeCitation(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {
         dataProvider.setData(bibEntries, databaseContext, entryTypesManager);
-        initialize(style, outputFormat);
+
+        CSL cslInstance = initialize(style, outputFormat);
         cslInstance.registerCitationItems(dataProvider.getIds());
+
         return cslInstance.makeCitation(bibEntries.stream().map(entry -> entry.getCitationKey().orElse("")).toList()).getFirst();
     }
 
@@ -58,19 +64,21 @@ public class CSLAdapter {
     ///
     /// @param newStyle  journal style of the output
     /// @param newFormat usually HTML or RTF.
+    /// @return the initialized CSL instance (or a cached one)
     /// @throws IOException An error occurred in the underlying framework
-    private void initialize(String newStyle, CitationStyleOutputFormat newFormat) throws IOException {
-        final boolean newCslInstanceNeedsToBeCreated = (cslInstance == null) || !Objects.equals(newStyle, style);
-        if (newCslInstanceNeedsToBeCreated) {
+    private CSL initialize(String newStyle, CitationStyleOutputFormat newFormat) throws IOException {
+        if (cachedCslInstance == null || !Objects.equals(newStyle, cachedStyle)) {
             // lang and forceLang are set to the default values of other CSL constructors
-            cslInstance = new CSL(dataProvider, new JabRefLocaleProvider(),
-                    new DefaultAbbreviationProvider(), newStyle, "en-US");
-            style = newStyle;
+            cachedCslInstance = new CSL(dataProvider, new JabRefLocaleProvider(), new DefaultAbbreviationProvider(), newStyle, "en-US");
+            cachedStyle = newStyle;
+            cachedFormat = null; // To trigger the output format update below.
         }
 
-        if (newCslInstanceNeedsToBeCreated || (!Objects.equals(newFormat, format))) {
-            cslInstance.setOutputFormat(newFormat.getFormat());
-            format = newFormat;
+        if (!Objects.equals(newFormat, cachedFormat)) {
+            cachedCslInstance.setOutputFormat(newFormat.getFormat());
+            cachedFormat = newFormat;
         }
+
+        return cachedCslInstance;
     }
 }
