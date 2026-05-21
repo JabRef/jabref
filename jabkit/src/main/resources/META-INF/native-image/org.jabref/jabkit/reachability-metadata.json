@@ -1,15 +1,6 @@
 {
   "reflection": [
     {
-      "type": "com.github.javakeyring.internal.osx.ModernOsxKeychainBackend",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        }
-      ]
-    },
-    {
       "type": "com.sun.crypto.provider.AESCipher$General",
       "methods": [
         {
@@ -56,24 +47,6 @@
     },
     {
       "type": "com.sun.crypto.provider.GaloisCounterMode$AESGCM",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        }
-      ]
-    },
-    {
-      "type": "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        }
-      ]
-    },
-    {
-      "type": "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl",
       "methods": [
         {
           "name": "<init>",
@@ -185,14 +158,6 @@
     },
     {
       "type": "java.time.ZonedDateTime"
-    },
-    {
-      "type": "java.util.ArrayList",
-      "serializable": true
-    },
-    {
-      "type": "java.util.CollSer",
-      "serializable": true
     },
     {
       "type": "org.h2.mvstore.MVStore$TxCounter"
@@ -691,18 +656,6 @@
     },
     {
       "type": "sun.util.resources.cldr.CalendarData"
-    },
-    {
-      "type": "tools.jackson.databind.deser.Deserializers[]"
-    },
-    {
-      "type": "tools.jackson.databind.deser.KeyDeserializers[]"
-    },
-    {
-      "type": "tools.jackson.databind.deser.ValueInstantiators[]"
-    },
-    {
-      "type": "tools.jackson.databind.ser.Serializers[]"
     }
   ],
   "resources": [
