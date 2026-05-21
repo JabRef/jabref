@@ -24,6 +24,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.toolkit.util.ImportService;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -67,7 +68,7 @@ class PdfUpdate implements Callable<Integer> {
         }
 
         Path inputFile = inputOption.getInputFile();
-        Optional<ParserResult> parserResult = JabKit.importFile(
+        Optional<ParserResult> parserResult = ImportService.importFile(
                 inputFile,
                 inputFormat,
                 pdf.argumentProcessor.cliPreferences,

@@ -13,6 +13,7 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.toolkit.util.ExportService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +75,7 @@ class Fetch implements Callable<Integer> {
             }
 
             if (outputFile != null) {
-                JabKit.saveDatabase(
+                ExportService.saveDatabase(
                         argumentProcessor.cliPreferences,
                         argumentProcessor.entryTypesManager,
                         new BibDatabase(matches),

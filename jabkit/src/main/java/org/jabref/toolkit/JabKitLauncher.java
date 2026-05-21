@@ -34,6 +34,8 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.toolkit.commands.JabKit;
+import org.jabref.toolkit.util.ExportService;
+import org.jabref.toolkit.util.ImportService;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -81,8 +83,8 @@ public class JabKitLauncher {
             String usageHeader = BuildInfo.JABREF_BANNER.formatted(buildInfo.version) + "\n" + JABKIT_BRAND;
             commandLine.getCommandSpec().usageMessage().header(usageHeader);
             applyUsageFooters(commandLine,
-                    JabKit.getAvailableImportFormats(preferences),
-                    JabKit.getAvailableExportFormats(preferences),
+                    ImportService.getAvailableImportFormats(preferences),
+                    ExportService.getAvailableExportFormats(preferences),
                     WebFetchers.getSearchBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
 
             // Show help when no arguments are given. Placed after header and footer setup

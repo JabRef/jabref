@@ -15,6 +15,8 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.toolkit.util.ExportService;
+import org.jabref.toolkit.util.ImportService;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
@@ -45,7 +47,7 @@ class GenerateBibFromAux implements Callable<Integer> {
     @Override
     public Integer call() {
         Path inputFile = inputOption.getInputFile();
-        Optional<ParserResult> pr = JabKit.importFile(
+        Optional<ParserResult> pr = ImportService.importFile(
                 inputFile,
                 "bibtex",
                 argumentProcessor.cliPreferences,
@@ -85,7 +87,7 @@ class GenerateBibFromAux implements Callable<Integer> {
                                           .collect(Collectors.joining("\n\n")));
             return 0;
         } else {
-            JabKit.saveDatabase(
+            ExportService.saveDatabase(
                     argumentProcessor.cliPreferences,
                     argumentProcessor.entryTypesManager,
                     subDatabase,

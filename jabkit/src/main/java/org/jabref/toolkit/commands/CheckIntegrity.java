@@ -19,6 +19,7 @@ import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.toolkit.util.ImportService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,7 @@ class CheckIntegrity implements Callable<Integer> {
     ///
     /// @return the exit code (0 = no findings, 1 = integrity findings present, 2/3 = error)
     static int execute(Path inputFile, String outputFormat, boolean allowIntegerEdition, boolean porcelain, JabKit jabKit) {
-        JabKit.ImportOutcome importOutcome = JabKit.importBibtexLibrary(inputFile, jabKit.cliPreferences, porcelain);
+        ImportService.ImportOutcome importOutcome = ImportService.importBibtexLibrary(inputFile, jabKit.cliPreferences, porcelain);
         ParserResult parserResult = importOutcome.parserResult();
         if (parserResult == null) {
             return importOutcome.exitCode();

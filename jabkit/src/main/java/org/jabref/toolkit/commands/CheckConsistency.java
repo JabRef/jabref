@@ -15,6 +15,7 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultGi
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.toolkit.util.ImportService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +51,7 @@ class CheckConsistency implements Callable<Integer> {
     ///
     /// @return the exit code (0 = consistent, 1 = inconsistencies found, 2/3 = error)
     static int execute(Path inputFile, String outputFormat, boolean porcelain, JabKit jabKit) {
-        JabKit.ImportOutcome importOutcome = JabKit.importBibtexLibrary(inputFile, jabKit.cliPreferences, porcelain);
+        ImportService.ImportOutcome importOutcome = ImportService.importBibtexLibrary(inputFile, jabKit.cliPreferences, porcelain);
         ParserResult parserResult = importOutcome.parserResult();
         if (parserResult == null) {
             return importOutcome.exitCode();

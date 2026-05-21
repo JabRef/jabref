@@ -18,6 +18,8 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.toolkit.converter.KeySuffixConverter;
+import org.jabref.toolkit.util.ExportService;
+import org.jabref.toolkit.util.ImportService;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -78,7 +80,7 @@ class GenerateCitationKeys implements Callable<Integer> {
     @Override
     public Integer call() {
         Path inputFile = inputOption.getInputFile();
-        Optional<ParserResult> parserResult = JabKit.importFile(
+        Optional<ParserResult> parserResult = ImportService.importFile(
                 inputFile,
                 "bibtex",
                 parentCommand.getParent().cliPreferences,
@@ -106,14 +108,14 @@ class GenerateCitationKeys implements Callable<Integer> {
         }
 
         if (outputFile != null) {
-            JabKit.saveDatabase(
+            ExportService.saveDatabase(
                     parentCommand.getParent().cliPreferences,
                     parentCommand.getParent().entryTypesManager,
                     parserResult.get().getDatabase(),
                     outputFile);
             return 0;
         } else {
-            return JabKit.outputDatabaseContext(parentCommand.getParent().cliPreferences, parserResult.get().getDatabaseContext());
+            return ExportService.outputDatabaseContext(parentCommand.getParent().cliPreferences, parserResult.get().getDatabaseContext());
         }
     }
 

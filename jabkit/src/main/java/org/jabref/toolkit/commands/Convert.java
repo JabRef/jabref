@@ -1,28 +1,15 @@
 package org.jabref.toolkit.commands;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
-import org.jabref.logic.exporter.Exporter;
-import org.jabref.logic.exporter.ExporterFactory;
-import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.toolkit.converter.CygWinPathConverter;
-
-import com.airhacks.afterburner.injection.Injector;
-import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jabref.toolkit.util.ExportService;
+import org.jabref.toolkit.util.ImportService;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
@@ -31,7 +18,6 @@ import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "convert", description = "Convert between bibliography formats.")
 class Convert implements Callable<Integer> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Convert.class);
 
     @ParentCommand
     private JabKit jabKit;
@@ -57,7 +43,7 @@ class Convert implements Callable<Integer> {
     @Override
     public Integer call() {
         Path inputFile = inputOption.getInputFile();
-        Optional<ParserResult> parserResult = JabKit.importFile(inputFile, inputFormat, jabKit.cliPreferences, sharedOptions.porcelain);
+        Optional<ParserResult> parserResult = ImportService.importFile(inputFile, inputFormat, jabKit.cliPreferences, sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.err.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return 2;
@@ -79,50 +65,6 @@ class Convert implements Callable<Integer> {
             return 0;
         }
 
-        return exportFile(parserResult.get(), outputFile, outputFormat);
-    }
-
-    protected int exportFile(@NonNull ParserResult parserResult, @NonNull Path outputFile, String format) {
-        if (!sharedOptions.porcelain) {
-            System.out.println(Localization.lang("Exporting '%0'.", outputFile));
-        }
-
-        if ("bibtex".equalsIgnoreCase(format)) {
-            JabKit.saveDatabase(
-                    jabKit.cliPreferences,
-                    jabKit.entryTypesManager,
-                    parserResult.getDatabase(),
-                    outputFile);
-            return 0;
-        }
-
-        Path path = parserResult.getPath().get().toAbsolutePath();
-        BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
-        databaseContext.setDatabasePath(path);
-        List<Path> fileDirForDatabase = databaseContext
-                .getFileDirectories(jabKit.cliPreferences.getFilePreferences());
-
-        ExporterFactory exporterFactory = ExporterFactory.create(jabKit.cliPreferences);
-        Optional<Exporter> exporter = exporterFactory.getExporterByName(format);
-        if (exporter.isEmpty()) {
-            System.err.println(Localization.lang("Unknown export format '%0'.", format));
-            return 2;
-        }
-
-        try {
-            exporter.get().export(
-                    parserResult.getDatabaseContext(),
-                    outputFile,
-                    parserResult.getDatabaseContext().getDatabase().getEntries(),
-                    fileDirForDatabase,
-                    Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
-        } catch (IOException
-                 | SaveException
-                 | ParserConfigurationException
-                 | TransformerException ex) {
-            LOGGER.error("Could not export file '{}'.", outputFile, ex);
-            return 2;
-        }
-        return 0;
+        return ExportService.exportFile(parserResult.get(), outputFile, outputFormat, sharedOptions.porcelain, jabKit.cliPreferences, jabKit.entryTypesManager);
     }
 }
