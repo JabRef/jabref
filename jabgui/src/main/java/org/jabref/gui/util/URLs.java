@@ -43,4 +43,7 @@ public class URLs {
     public static final String SEMANTIC_SCHOLAR_URL = "https://www.semanticscholar.org/";
     public static final String SCITE_REPORTS_URL_BASE = "https://scite.ai/reports/";
     public static final String SCITE_URL = "https://scite.ai/";
+
+    // AI URLs
+    public static final String DJL_PRIVACY_POLICY_URL = "https://github.com/deepjavalibrary/djl/discussions/3370#discussioncomment-10233632";
 }

@@ -733,4 +733,8 @@ public class StringUtil {
 
         return sb.toString();
     }
+
+    public static String makeSafe(@Nullable String string) {
+        return Optional.ofNullable(string).orElse("");
+    }
 }

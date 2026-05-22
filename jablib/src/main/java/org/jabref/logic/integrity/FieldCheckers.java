@@ -27,6 +27,8 @@ public class FieldCheckers {
     private static Multimap<Field, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FilePreferences filePreferences, JournalAbbreviationRepository abbreviationRepository, boolean allowIntegerEdition, String unwantedCharacters) {
         ArrayListMultimap<Field, ValueChecker> fieldCheckers = ArrayListMultimap.create(50, 10);
 
+        fieldCheckers.put(InternalField.KEY_FIELD, new ValidCitationKeyChecker(unwantedCharacters));
+
         for (Field field : FieldFactory.getPersonNameFields()) {
             fieldCheckers.put(field, new PersonNamesChecker(databaseContext));
         }
@@ -34,8 +36,12 @@ public class FieldCheckers {
         fieldCheckers.put(StandardField.BOOKTITLE, new BooktitleContainsYearChecker());
         fieldCheckers.put(StandardField.BOOKTITLE, new BooktitleContainsCountryChecker());
         fieldCheckers.put(StandardField.BOOKTITLE, new BooktitleContainsPagesChecker());
+        fieldCheckers.put(StandardField.BOOKTITLE, new NoURLChecker());
+
         fieldCheckers.put(StandardField.TITLE, new BracketChecker());
         fieldCheckers.put(StandardField.TITLE, new TitleChecker(databaseContext));
+        fieldCheckers.put(StandardField.TITLE, new NoURLChecker());
+
         fieldCheckers.put(StandardField.DOI, new DoiValidityChecker());
         fieldCheckers.put(StandardField.EDITION, new EditionChecker(databaseContext, allowIntegerEdition));
         fieldCheckers.put(StandardField.FILE, new FileChecker(databaseContext, filePreferences));
@@ -48,11 +54,6 @@ public class FieldCheckers {
         fieldCheckers.put(StandardField.PAGES, new PagesChecker(databaseContext));
         fieldCheckers.put(StandardField.URL, new UrlChecker());
         fieldCheckers.put(StandardField.YEAR, new YearChecker());
-        fieldCheckers.put(StandardField.KEY, new ValidCitationKeyChecker(unwantedCharacters));
-        fieldCheckers.put(InternalField.KEY_FIELD, new ValidCitationKeyChecker(unwantedCharacters));
-
-        fieldCheckers.put(StandardField.TITLE, new NoURLChecker());
-        fieldCheckers.put(StandardField.BOOKTITLE, new NoURLChecker());
 
         if (databaseContext.isBiblatexMode()) {
             fieldCheckers.put(StandardField.DATE, new DateChecker());

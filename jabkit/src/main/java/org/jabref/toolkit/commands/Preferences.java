@@ -22,7 +22,7 @@ import static picocli.CommandLine.ParentCommand;
                 Preferences.PreferencesImport.class,
                 Preferences.PreferencesExport.class
         })
-class Preferences implements Runnable {
+class Preferences implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Preferences.class);
 
     @ParentCommand
@@ -32,8 +32,9 @@ class Preferences implements Runnable {
     private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     @Override
-    public void run() {
-        System.out.println("Specify a subcommand (reset, import, export).");
+    public Integer call() {
+        System.err.println(Localization.lang("Specify a subcommand (reset, import, export)."));
+        return 2;
     }
 
     @Command(name = "reset", description = "Reset preferences.")
@@ -71,6 +72,7 @@ class Preferences implements Runnable {
                 parent.argumentProcessor.cliPreferences.flush();
             } catch (JabRefException ex) {
                 LOGGER.error("Cannot import preferences", ex);
+                return 2;
             }
             return 0;
         }
@@ -91,6 +93,7 @@ class Preferences implements Runnable {
                 parent.argumentProcessor.cliPreferences.exportPreferences(outputFile);
             } catch (JabRefException ex) {
                 LOGGER.error("Cannot export preferences", ex);
+                return 2;
             }
             return 0;
         }
