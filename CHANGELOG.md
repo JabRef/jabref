@@ -24,6 +24,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We made the `Move file to directory` operation for Linked Files show every configured JabRef directory as possible options. [#12287](https://github.com/JabRef/jabref/issues/12287)
 - We introduced a leightweight search engine without fulltext search in linked files as default variant. [#15599](https://github.com/JabRef/jabref/pull/15599)
+- We fixed an issue where opening a group chat window in one library could show the chat history from a group in a different library, given the two groups had the same name[#14641]
 
 ### Fixed
 
@@ -2016,9 +2017,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where opening the menu 'Library properties' marked the library as modified [#6451](https://github.com/JabRef/jabref/issues/6451)
 - We fixed an issue when importing resulted in an exception [#7343](https://github.com/JabRef/jabref/issues/7343)
 - We fixed an issue where the field in the Field formatter dropdown selection were sorted in random order. [#7710](https://github.com/JabRef/jabref/issues/7710)
-- We fixed an issue where opening a group chat window in one library could show the chat history from a group in a different library, given the two groups had the same name[#14641]
-
-
 
 ### Removed
 
