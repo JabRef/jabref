@@ -15,27 +15,18 @@ import de.undercouch.citeproc.output.Bibliography;
 import de.undercouch.citeproc.output.Citation;
 import org.jspecify.annotations.Nullable;
 
-/// Provides an adapter class to CSL. It holds a CSL instance under the hood that is only recreated when
-/// the style changes.
+/// Synchronized wrapper around the CSL engine that caches the engine.
 ///
-/// Note on the API: The first call to {@link #makeBibliography} is expensive since the
-/// CSL instance will be created. As long as the style stays the same, we can reuse this instance. On style-change, the
-/// engine is re-instantiated. Therefore, the use-case of this class is many calls to {@link #makeBibliography} with the
-/// same style. Changing the output format is cheap.
-///
-/// Note on the implementation:
-/// The main function {@link #makeBibliography} will enforce
-/// synchronized calling. The main CSL engine under the hood is not thread-safe. Since this class is usually called from
-/// a BackgroundTask, the only other option would be to create several CSL instances which is wasting a lot of resources and very slow.
-/// In the current scheme, {@link #makeBibliography} can be called as usual
-/// background task and to the best of my knowledge, concurrent calls will pile up and processed sequentially.
+/// The cache is needed because the creation of a CSL instance is expensive. On style-change, the
+/// engine is re-instantiated, so it is recommended to use this class when you need to generate many bibliographies in one style.
+/// Changing the output format is inexpensive.
 public class CSLAdapter {
 
     private final JabRefItemDataProvider dataProvider = new JabRefItemDataProvider();
 
-    @Nullable private String cachedStyle;
-    @Nullable private CitationStyleOutputFormat cachedFormat;
-    @Nullable private CSL cachedCslInstance;
+    @Nullable private String storedStyle;
+    @Nullable private CitationStyleOutputFormat storedFormat;
+    @Nullable private CSL storedCslInstance;
 
     /// Creates the bibliography of the provided items. This method needs to run synchronized because the underlying
     /// CSL engine is not thread-safe.
@@ -44,7 +35,7 @@ public class CSLAdapter {
     public synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException, IllegalArgumentException {
         dataProvider.setData(bibEntries, databaseContext, entryTypesManager);
 
-        CSL cslInstance = initialize(style, outputFormat);
+        CSL cslInstance = getCslInstance(style, outputFormat);
         cslInstance.registerCitationItems(dataProvider.getIds());
 
         Bibliography bibliography = cslInstance.makeBibliography();
@@ -54,31 +45,31 @@ public class CSLAdapter {
     public synchronized Citation makeCitation(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {
         dataProvider.setData(bibEntries, databaseContext, entryTypesManager);
 
-        CSL cslInstance = initialize(style, outputFormat);
+        CSL cslInstance = getCslInstance(style, outputFormat);
         cslInstance.registerCitationItems(dataProvider.getIds());
 
         return cslInstance.makeCitation(bibEntries.stream().map(entry -> entry.getCitationKey().orElse("")).toList()).getFirst();
     }
 
-    /// Initialized the static CSL instance if needed.
+    /// Return the stored CSL instance (if the same style is used) or reinitialize it.
     ///
     /// @param newStyle  journal style of the output
     /// @param newFormat usually HTML or RTF.
     /// @return the initialized CSL instance (or a cached one)
     /// @throws IOException An error occurred in the underlying framework
-    private CSL initialize(String newStyle, CitationStyleOutputFormat newFormat) throws IOException {
-        if (cachedCslInstance == null || !Objects.equals(newStyle, cachedStyle)) {
+    private CSL getCslInstance(String newStyle, CitationStyleOutputFormat newFormat) throws IOException {
+        if (storedCslInstance == null || !Objects.equals(newStyle, storedStyle)) {
             // lang and forceLang are set to the default values of other CSL constructors
-            cachedCslInstance = new CSL(dataProvider, new JabRefLocaleProvider(), new DefaultAbbreviationProvider(), newStyle, "en-US");
-            cachedStyle = newStyle;
-            cachedFormat = null; // To trigger the output format update below.
+            storedCslInstance = new CSL(dataProvider, new JabRefLocaleProvider(), new DefaultAbbreviationProvider(), newStyle, "en-US");
+            storedStyle = newStyle;
+            storedFormat = null; // To trigger the output format update below.
         }
 
-        if (!Objects.equals(newFormat, cachedFormat)) {
-            cachedCslInstance.setOutputFormat(newFormat.getFormat());
-            cachedFormat = newFormat;
+        if (!Objects.equals(newFormat, storedFormat)) {
+            storedCslInstance.setOutputFormat(newFormat.getFormat());
+            storedFormat = newFormat;
         }
 
-        return cachedCslInstance;
+        return storedCslInstance;
     }
 }
