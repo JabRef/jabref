@@ -65,10 +65,11 @@ public class OcrMyPdfEngine implements OcrEngine {
         String outputFile = outputPath.toString();
         // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
         List<String> command = List.of("ocrmypdf", "--skip-text", pdfPath.toString(), outputFile);
+        Process process = null;
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectErrorStream(true);
-            Process process = processBuilder.start();
+            process = processBuilder.start();
 
             // Get the output and the errors of the process
             StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
@@ -89,6 +90,7 @@ public class OcrMyPdfEngine implements OcrEngine {
             LOGGER.error("Error while running OCRmyPDF.", e);
             return OcrResult.failure(OcrFailureReason.IO_ERROR);
         } catch (InterruptedException e) {
+            process.destroyForcibly();
             Thread.currentThread().interrupt();
             LOGGER.error("OCRmyPDF process was interrupted.", e);
             return OcrResult.failure(OcrFailureReason.INTERRUPTED);
