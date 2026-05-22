@@ -94,7 +94,6 @@ open module org.jabref.jablib {
     exports org.jabref.model.openoffice.uno;
     exports org.jabref.model.openoffice.util;
     exports org.jabref.logic.importer.plaincitation;
-    exports org.jabref.logic.ai.templates;
     exports org.jabref.logic.bst;
     exports org.jabref.model.study;
     exports org.jabref.logic.shared.security;
@@ -121,23 +120,18 @@ open module org.jabref.jablib {
 
     // region: AI
     exports org.jabref.logic.ai;
-    exports org.jabref.logic.ai.models;
     exports org.jabref.logic.ai.chatting;
     exports org.jabref.logic.ai.util;
     exports org.jabref.logic.ai.summarization;
     exports org.jabref.logic.ai.summarization.repositories;
     exports org.jabref.logic.ai.ingestion;
     exports org.jabref.logic.ai.ingestion.logic.documentsplitting;
-    exports org.jabref.logic.ai.ingestion.logic.ingestion;
     exports org.jabref.logic.ai.ingestion.logic.parsing;
     exports org.jabref.logic.ai.summarization.tasks;
-    exports org.jabref.logic.ai.summarization.logic;
     exports org.jabref.logic.ai.summarization.logic.summarizationalgorithms;
-    exports org.jabref.logic.ai.ingestion.tasks;
     exports org.jabref.logic.ai.ingestion.repositories;
     exports org.jabref.logic.ai.ingestion.logic;
     exports org.jabref.logic.ai.chatting.tasks;
-    exports org.jabref.logic.ai.chatting.repositories;
     exports org.jabref.logic.ai.preferences;
     exports org.jabref.model.ai.chatting;
     exports org.jabref.model.ai.pipeline;
@@ -152,16 +146,12 @@ open module org.jabref.jablib {
     exports org.jabref.logic.ai.ingestion.tasks.generateembeddingsforseveral;
     exports org.jabref.logic.ai.ingestion.tasks.generateembeddings;
     exports org.jabref.logic.ai.rag.util;
-    exports org.jabref.logic.ai.tokenization.logic;
     exports org.jabref.logic.ai.ingestion.util;
     exports org.jabref.logic.ai.followup.tasks;
     exports org.jabref.model.ai;
     exports org.jabref.logic.ai.chatting.exporters;
     exports org.jabref.logic.ai.summarization.exporters;
-    exports org.jabref.logic.ai.chatting.migrations;
-    exports org.jabref.logic.ai.summarization.migration;
     exports org.jabref.logic.ai.summarization.util;
-    exports org.jabref.logic.ai.tokenization.util;
     // endregion
 
     requires java.base;
