@@ -55,9 +55,6 @@
       ]
     },
     {
-      "type": "groovy.lang.Closure"
-    },
-    {
       "type": "java.lang.Boolean",
       "jniAccessible": true,
       "methods": [
@@ -77,15 +74,6 @@
       "methods": [
         {
           "name": "current",
-          "parameterTypes": []
-        }
-      ]
-    },
-    {
-      "type": "java.lang.System",
-      "methods": [
-        {
-          "name": "console",
           "parameterTypes": []
         }
       ]
@@ -602,15 +590,6 @@
           "name": "threadContentionMonitoringSupport"
         }
       ]
-    },
-    {
-      "type": "sun.text.resources.BreakIteratorInfo"
-    },
-    {
-      "type": "sun.text.resources.BreakIteratorResources"
-    },
-    {
-      "type": "sun.text.resources.BreakIteratorResources_en"
     }
   ],
   "resources": [
