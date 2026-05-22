@@ -60,7 +60,7 @@ public class LinkedFile implements Serializable {
         this(description, link, fileType.getName());
     }
 
-    /// Better use [LinkedFile(String description, String link, FileType fileType)] constructor
+    /// Better use [LinkedFile(Stringdescription,Stringlink,FileTypefileType)] constructor
     public LinkedFile(String description, Path link, String fileType) {
         this(description, link.toString(), fileType);
     }
@@ -96,10 +96,6 @@ public class LinkedFile implements Serializable {
     /// Constructs a new LinkedFile with an empty file type and an empty description
     public LinkedFile(Path link) {
         this("", link, "");
-    }
-
-    public LinkedFile(Path path, String pdf) {
-        this("", path, pdf);
     }
 
     public StringProperty descriptionProperty() {

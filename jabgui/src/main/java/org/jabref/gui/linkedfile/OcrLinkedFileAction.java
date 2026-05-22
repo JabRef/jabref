@@ -28,14 +28,14 @@ import org.slf4j.LoggerFactory;
 public class OcrLinkedFileAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(OcrLinkedFileAction.class);
 
-    private LinkedFile linkedFile;
-    private BibDatabaseContext databaseContext;
-    private DialogService dialogService;
-    private GuiPreferences preferences;
-    private TaskExecutor taskExecutor;
-    private OcrEngine ocrEngine;
-    private List<BibEntry> linkedEntries;
-    private ImportHandler importHandler;
+    private final LinkedFile linkedFile;
+    private final BibDatabaseContext databaseContext;
+    private final DialogService dialogService;
+    private final GuiPreferences preferences;
+    private final TaskExecutor taskExecutor;
+    private final OcrEngine ocrEngine;
+    private final List<BibEntry> linkedEntries;
+    private final ImportHandler importHandler;
 
     public OcrLinkedFileAction(LinkedFile linkedFile,
                                List<BibEntry> bibEntries,
@@ -85,18 +85,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
                     }
                 }
                 case OcrResult.Failure failure -> {
-                    String failureReason = switch (failure.reason()) {
-                        case NOT_AVAILABLE ->
-                                Localization.lang("OCRmyPDF is not available");
-                        case TIMEOUT ->
-                                Localization.lang("OCR timed out");
-                        case NON_ZERO_EXIT ->
-                                Localization.lang("OCR process failed");
-                        case IO_ERROR ->
-                                Localization.lang("Could not start OCR process");
-                        case INTERRUPTED ->
-                                Localization.lang("OCR was cancelled");
-                    };
+                    String failureReason = getFailureResult(failure).toString();
                     dialogService.showErrorDialogAndWait(Localization.lang("OCR failed"), failureReason);
                 }
             }
@@ -106,5 +95,21 @@ public class OcrLinkedFileAction extends SimpleCommand {
             dialogService.notify(Localization.lang("OCR failed. See the logs for the details"));
         });
         taskExecutor.execute(ocrTask);
+    }
+
+    OcrResult getFailureResult(OcrResult.Failure failure) {
+        switch (failure.reason()) {
+            case NOT_AVAILABLE ->
+                    Localization.lang("OCRmyPDF is not available");
+            case TIMEOUT ->
+                    Localization.lang("OCR timed out");
+            case NON_ZERO_EXIT ->
+                    Localization.lang("OCR process failed");
+            case IO_ERROR ->
+                    Localization.lang("Could not start OCR process");
+            case INTERRUPTED ->
+                    Localization.lang("OCR was cancelled");
+        }
+        return failure;
     }
 }
