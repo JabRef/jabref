@@ -79,7 +79,7 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
-    private final Map<BibDatabaseContext, Map<String, AiGroupChatWindow>> groupAiChatWindows = new HashMap<>();
+    private final Map<String, Map<String, AiGroupChatWindow>> groupAiChatWindows = new HashMap<>();
     private final BooleanProperty editorShowing = new SimpleBooleanProperty(false);
     private final OptionalObjectProperty<Walkthrough> activeWalkthrough = OptionalObjectProperty.empty();
     private final BooleanProperty canGoBack = new SimpleBooleanProperty(false);
@@ -252,23 +252,23 @@ public class JabRefGuiStateManager extends AbstractSrvStateManager implements St
 
     @Override
     public Optional<AiGroupChatWindow> getAiChatWindowForGroup(BibDatabaseContext context, String groupName) {
-        return Optional.ofNullable(groupAiChatWindows.get(context))
+        return Optional.ofNullable(groupAiChatWindows.get(context.getUid()))
                        .flatMap(innerMap -> Optional.ofNullable(innerMap.get(groupName)));
     }
 
     @Override
     public void setAiChatWindowForGroup(BibDatabaseContext context, String groupName, AiGroupChatWindow aiGroupChatWindow) {
-        groupAiChatWindows.computeIfAbsent(context, k -> new HashMap<>())
+        groupAiChatWindows.computeIfAbsent(context.getUid(), k -> new HashMap<>())
                           .put(groupName, aiGroupChatWindow);
     }
 
     @Override
     public void removeAiChatWindowForGroup(BibDatabaseContext context, String groupName) {
-        Map<String, AiGroupChatWindow> innerMap = groupAiChatWindows.get(context);
+        Map<String, AiGroupChatWindow> innerMap = groupAiChatWindows.get(context.getUid());
         if (innerMap != null) {
             innerMap.remove(groupName);
             if (innerMap.isEmpty()) {
-                groupAiChatWindows.remove(context);
+                groupAiChatWindows.remove(context.getUid());
             }
         }
     }

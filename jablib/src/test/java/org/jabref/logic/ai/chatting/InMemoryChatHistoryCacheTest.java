@@ -123,6 +123,28 @@ class InMemoryChatHistoryCacheTest {
     }
 
     @Test
+    void getForGroupReturnsSeparateHistoriesForSameGroupNameInDifferentLibraries() {
+        MetaData metaDataA = new MetaData();
+        metaDataA.setAiLibraryId("library-id-A");
+        BibDatabaseContext contextA = new BibDatabaseContext(new BibDatabase(), metaDataA);
+        GroupTreeNode groupA = GroupTreeNode.fromGroup(new AllEntriesGroup("TestGroup"));
+        contextA.getMetaData().setGroups(groupA);
+
+        MetaData metaDataB = new MetaData();
+        metaDataB.setAiLibraryId("library-id-B");
+        BibDatabaseContext contextB = new BibDatabaseContext(new BibDatabase(), metaDataB);
+        GroupTreeNode groupB = GroupTreeNode.fromGroup(new AllEntriesGroup("TestGroup"));
+        contextB.getMetaData().setGroups(groupB);
+
+        var historyA = cache.getForGroup(contextA, groupA);
+        historyA.add(ChatMessage.userMessage("Hello from Library A"));
+
+        var historyB = cache.getForGroup(contextB, groupB);
+
+        assertTrue(historyB.isEmpty(), "Library B's group chat should not contain Library A's messages");
+    }
+
+    @Test
     void closeFlushesGroupChatsToRepository() {
         GroupTreeNode root = GroupTreeNode.fromGroup(new AllEntriesGroup("All Entries"));
         databaseContext.getMetaData().setGroups(root);
