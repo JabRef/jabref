@@ -6,8 +6,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 
@@ -31,9 +33,11 @@ import org.jabref.logic.ai.util.TrackedBackgroundTask;
 import org.jabref.logic.util.ObservablesHelper;
 import org.jabref.model.ai.identifiers.FullBibEntry;
 import org.jabref.model.ai.summarization.AiSummary;
-import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.StandardField;
 
-import com.tobiasdiez.easybind.EasyBind;
+import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.Nullable;
 
 public class AiSummaryViewModel extends AbstractViewModel {
@@ -58,6 +62,12 @@ public class AiSummaryViewModel extends AbstractViewModel {
 
     private final ObjectProperty<GenerateSummaryTask> currentTask = new SimpleObjectProperty<>();
     private final ChangeListener<TrackedBackgroundTask.Status> taskStateListener = (_, _, value) -> updateByTaskState(value);
+
+    // These properties are used to control the NO_FILES and NO_SUPPORTED_FILE_TYPES states.
+    // They aare made as properties and not as bindings, as we need to listen to the chnages of files in an entry,
+    // which is made by listening to the even bus and manually updating the properties.
+    private final BooleanProperty filesEmpty = new SimpleBooleanProperty(true);
+    private final BooleanProperty noSupportedFileTypes = new SimpleBooleanProperty(true);
 
     private final AiPreferences aiPreferences;
     private final FilePreferences filePreferences;
@@ -95,17 +105,11 @@ public class AiSummaryViewModel extends AbstractViewModel {
                 ),
 
                 Map.entry(State.NO_FILES,
-                        entry.map(FullBibEntry::entry)
-                             .map(BibEntry::getFiles)
-                             .map(List::isEmpty)
+                        filesEmpty
                 ),
 
                 Map.entry(State.NO_SUPPORTED_FILE_TYPES,
-                        entry.map(FullBibEntry::entry)
-                             .map(BibEntry::getFiles)
-                             .map(l -> l.stream()
-                                        .map(f -> Path.of(f.getLink()))
-                                        .noneMatch(UniversalContentParser::isSupportedFileType))
+                        noSupportedFileTypes
                 ),
 
                 Map.entry(State.DONE,
@@ -154,8 +158,43 @@ public class AiSummaryViewModel extends AbstractViewModel {
     }
 
     private void setupListeners() {
-        EasyBind.subscribe(entry, _ -> prepareForEntry());
-        EasyBind.subscribe(entry, this::processEntry);
+        entry.addListener((_, oldVal, newVal) -> {
+            if (oldVal != null) {
+                oldVal.entry().unregisterListener(this);
+            }
+
+            if (newVal == null) {
+                filesEmpty.set(true);
+                noSupportedFileTypes.set(true);
+            } else {
+                newVal.entry().registerListener(this);
+                refreshFileState(newVal.entry().getFiles());
+            }
+        });
+
+        BindingsHelper.listen(this::prepareForEntry, entry);
+        BindingsHelper.listen(this::processEntry, entry, noSupportedFileTypes, filesEmpty);
+    }
+
+    @Subscribe
+    public void onFileFieldChanged(FieldChangedEvent event) {
+        if (!event.getField().equals(StandardField.FILE)) {
+            return;
+        }
+
+        FullBibEntry fullEntry = entry.get();
+        if (fullEntry == null) {
+            return;
+        }
+
+        UiTaskExecutor.runInJavaFXThread(() -> refreshFileState(fullEntry.entry().getFiles()));
+    }
+
+    private void refreshFileState(List<LinkedFile> files) {
+        filesEmpty.set(files.isEmpty());
+        noSupportedFileTypes.set(files.stream()
+                                      .map(f -> Path.of(f.getLink()))
+                                      .noneMatch(UniversalContentParser::isSupportedFileType));
     }
 
     /// Resets the chat model and summarizator to the default values from AI preferences.
@@ -196,8 +235,8 @@ public class AiSummaryViewModel extends AbstractViewModel {
         error.set(null);
     }
 
-    private void processEntry(FullBibEntry fullEntry) {
-        if (fullEntry == null || state.get() != State.READY) {
+    private void processEntry() {
+        if (entry.get() == null || state.get() != State.READY) {
             return;
         }
 
@@ -207,23 +246,24 @@ public class AiSummaryViewModel extends AbstractViewModel {
         // 3. Check if there is a running task.
         // 4. Otherwise, start a new task.
 
-        Optional<AiSummary> persistedSummary = fullEntry.toAiSummaryIdentifier()
-                                                        .flatMap(summariesRepository::get);
+        Optional<AiSummary> persistedSummary = entry.get().toAiSummaryIdentifier()
+                                                    .flatMap(summariesRepository::get);
         if (persistedSummary.isPresent()) {
             this.summary.set(persistedSummary.get());
             return;
         }
 
-        Optional<AiSummary> cachedSummary = inMemoryCache.get(fullEntry.entry());
+        Optional<AiSummary> cachedSummary = inMemoryCache.get(entry.get().entry());
         if (cachedSummary.isPresent()) {
             this.summary.set(cachedSummary.get());
             return;
         }
 
-        Optional<GenerateSummaryTask> runningTask = summarizationTaskAggregator.getTask(fullEntry.entry());
+        Optional<GenerateSummaryTask> runningTask = summarizationTaskAggregator.getTask(entry.get().entry());
         if (runningTask.isPresent()) {
             GenerateSummaryTask task = runningTask.get();
             currentTask.set(task);
+            summarizator.unbind();
             summarizator.set(task.getRequest().summarizator());
             chatModel.set(task.getRequest().chatModel());
 
