@@ -20,6 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We grouped the `jabkit` consistency and integrity checks under a new `check` command (`jabkit check consistency`, `jabkit check integrity`). [#15759](https://github.com/JabRef/jabref/pull/15759)
 - The `jabkit check consistency` command now supports the `errorformat` output format (`file:line:column: message`), which is the default output format for both `check` subcommands. [#15759](https://github.com/JabRef/jabref/pull/15759)
 - The `jabkit check` command now runs both the consistency and integrity checks when given an input file without a subcommand (e.g. `jabkit check references.bib`). [#15759](https://github.com/JabRef/jabref/pull/15759)
+- We added OCR feature using OCRmyPDF to extract text from scanned PDFs and create searchable PDFs including the extracted text. [#15712](https://github.com/JabRef/jabref/pull/15712)
 
 ### Changed
 
