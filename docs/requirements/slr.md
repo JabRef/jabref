@@ -10,24 +10,22 @@ This document captures requirements for SLR functionality. Architectural decisio
 
 ## Requirements sources
 
-- GitHub issue track: [Issues](https://github.com/users/koppor/projects/2/views/1) 
+- GitHub issue track: [Issues](https://github.com/users/koppor/projects/2/views/1)
 - Foundational: [New study.yml format](https://github.com/JabRef/jabref/issues/12642)
 - Background paper: Dominik Voigt, Oliver Kopp, and Karoline Wild [Systematic Literature Tools: Are we there yet?](https://ceur-ws.org/Vol-2839/paper13.pdf)
-- ADR 0015: Lucene-style abstract query syntax
-- ADR 0021: `Study` as a DTO
+- [ADR 0015](../decisions/0015-support-an-abstract-query-syntax-for-query-conversion.md): Lucene-style abstract query syntax
+- [ADR 0021](../decisions/0021-keep-study-as-a-dto.md): `Study` as a DTO
 
 ## Per-catalog query overrides
-
 `req~jabgui.slr.per-catalog-query-override~1`
 
 The system shall accept per-catalog query overrides from the `StudyQuery.catalogSpecific: Map<String, String>` field and send each override as is to its corresponding fetcher, bypassing JabRef's abstract query transformer.
 
-Catalogs without an override in `catalogSpecific` shall continue to receive the query translated from JabRef's abstract syntax (ADR 0015).
+Catalogs without an override in `catalogSpecific` shall continue to receive the query translated from JabRef's abstract syntax ([ADR 0015](../decisions/0015-support-an-abstract-query-syntax-for-query-conversion.md)).
 
 Issue: [#12642](https://github.com/JabRef/jabref/issues/12642)
 
 ## Fetcher raw-query execution
-
 `req~jabgui.slr.fetcher-raw-execution~1`
 
 Fetchers shall expose a `performRawSearch(String)` method that performs the actual API call with the provided string used as is. The existing `performSearch(BaseQueryNode)` method shall delegate to `performRawSearch` after running the abstract-syntax query through `DefaultQueryTransformer`.
@@ -35,7 +33,6 @@ Fetchers shall expose a `performRawSearch(String)` method that performs the actu
 > Implementation in progress. Migrating fetchers incrementally, unmigrated fetchers throw `UnsupportedOperationException` from `performRawSearch`.
 
 ## Lock file for reproducibility
-
 `req~jabgui.slr.lock-file~1`
 
 After each crawl, the system shall write a `study.lock` file recording the actually-sent query per catalog and the mode used (`ansi_translation` for transformed queries, `raw_override` for as is queries from `catalogSpecific`). The lock file shall be deterministic and machine-readable.
