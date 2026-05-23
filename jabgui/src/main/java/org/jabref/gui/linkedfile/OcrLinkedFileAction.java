@@ -85,7 +85,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
                     }
                 }
                 case OcrResult.Failure failure -> {
-                    String failureReason = getFailureResult(failure).toString();
+                    String failureReason = getFailureResult(failure);
                     dialogService.showErrorDialogAndWait(Localization.lang("OCR failed"), failureReason);
                 }
             }
@@ -97,8 +97,8 @@ public class OcrLinkedFileAction extends SimpleCommand {
         taskExecutor.execute(ocrTask);
     }
 
-    OcrResult getFailureResult(OcrResult.Failure failure) {
-        switch (failure.reason()) {
+    String getFailureResult(OcrResult.Failure failure) {
+        return switch (failure.reason()) {
             case NOT_AVAILABLE ->
                     Localization.lang("OCRmyPDF is not available");
             case TIMEOUT ->
@@ -109,7 +109,6 @@ public class OcrLinkedFileAction extends SimpleCommand {
                     Localization.lang("Could not start OCR process");
             case INTERRUPTED ->
                     Localization.lang("OCR was cancelled");
-        }
-        return failure;
+        };
     }
 }
