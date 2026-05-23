@@ -3,6 +3,7 @@ parent: Requirements
 ---
 
 # Systematic Literature Reviews (SLR)
+`feat~slr~1`
 
 JabRef supports researchers conducting Systematic Literature Reviews by letting them define a study and crawl multiple academic catalogs from a single specification. The study definition lives in `study.yml`; crawl results are persisted to a Git-tracked repository for reproducibility.
 
@@ -17,25 +18,31 @@ This document captures requirements for SLR functionality. Architectural decisio
 - [ADR 0021](../decisions/0021-keep-study-as-a-dto.md): `Study` as a DTO
 
 ## Per-catalog query overrides
-`req~jabgui.slr.per-catalog-query-override~1`
+`req~slr.per-catalog-query-override~1`
 
-The system shall accept per-catalog query overrides from the `StudyQuery.catalogSpecific: Map<String, String>` field and send each override as is to its corresponding fetcher, bypassing JabRef's abstract query transformer.
+Covers: `feat~slr~1`
 
-Catalogs without an override in `catalogSpecific` shall continue to receive the query translated from JabRef's abstract syntax ([ADR 0015](../decisions/0015-support-an-abstract-query-syntax-for-query-conversion.md)).
+When defining a study, a researcher shall be able to provide a query in the native syntax of a specific catalog. The system shall send that query unchanged to the catalog, without translating it through JabRef's abstract query syntax.
+
+Catalogs without a per-catalog query shall continue to receive the global study query, translated for that catalog.
 
 Issue: [#12642](https://github.com/JabRef/jabref/issues/12642)
 
 ## Fetcher raw-query execution
-`req~jabgui.slr.fetcher-raw-execution~1`
+`req~slr.fetcher-raw-execution~1`
 
-Fetchers shall expose a `performRawSearch(String)` method that performs the actual API call with the provided string used as is. The existing `performSearch(BaseQueryNode)` method shall delegate to `performRawSearch` after running the abstract-syntax query through `DefaultQueryTransformer`.
+Covers: `feat~slr~1`
 
-> Implementation in progress. Migrating fetchers incrementally, unmigrated fetchers throw `UnsupportedOperationException` from `performRawSearch`.
+Each catalog fetcher shall provide a way to execute a query exactly as written, without applying JabRef's abstract-query translation. Queries written in JabRef's abstract syntax shall continue to be translated for the target catalog before execution.
+
+> Implementation in progress. Catalogs are migrated incrementally.
 
 ## Lock file for reproducibility
-`req~jabgui.slr.lock-file~1`
+`req~slr.lock-file~1`
 
-After each crawl, the system shall write a `study.lock` file recording the actually-sent query per catalog and the mode used (`ansi_translation` for transformed queries, `raw_override` for as is queries from `catalogSpecific`). The lock file shall be deterministic and machine-readable.
+Covers: `feat~slr~1`
+
+After each crawl, the system shall record the exact query sent to each catalog so the crawl can be reproduced. The record shall be machine-readable and produce identical content when the same study is crawled again with no changes.
 
 > Planned. Not yet implemented.
 
