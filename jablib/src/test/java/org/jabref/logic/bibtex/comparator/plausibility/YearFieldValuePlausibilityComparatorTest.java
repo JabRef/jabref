@@ -63,41 +63,41 @@ class YearFieldValuePlausibilityComparatorTest {
     // Year Range Validation 1800 <= year <= currentYear + 2
     @Test
     void leftSideInYearRange() {
-        String left = "2026";
-        String right = "1000";
+        String left = "2020";
+        String right = "1200";
 
         assertEquals(ComparisonResult.LEFT_BETTER, comparator.compare(left, right));
     }
 
     @Test
     void rightSideInYearRange() {
-        String left = "1000";
-        String right = "2026";
+        String left = "1200";
+        String right = "2020";
 
         assertEquals(ComparisonResult.RIGHT_BETTER, comparator.compare(left, right));
     }
 
     @Test
     void bothSidesOutOfYearRange() {
-        String left = "1000";
-        String right = "3000";
+        String left = "1200";
+        String right = "1300";
 
         assertEquals(ComparisonResult.UNDETERMINED, comparator.compare(left, right));
     }
 
-    // NumberOfYears Validation
+    // Year Proximity Validation (diff > 10)
     @Test
     void rightSideIsNewerByMoreThanTenYears() {
-        String left = "1000";
-        String right = "2026";
+        String left = "2000";
+        String right = "2020";
 
         assertEquals(ComparisonResult.RIGHT_BETTER, comparator.compare(left, right));
     }
 
     @Test
     void leftSideIsNewerByMoreThanTenYears() {
-        String left = "2026";
-        String right = "1000";
+        String left = "2020";
+        String right = "2000";
 
         assertEquals(ComparisonResult.LEFT_BETTER, comparator.compare(left, right));
     }
@@ -105,14 +105,22 @@ class YearFieldValuePlausibilityComparatorTest {
     @Test
     void rightSideIsNewerByLessThanTenYears() {
         String left = "2020";
-        String right = "2026";
+        String right = "2025";
 
         assertEquals(ComparisonResult.UNDETERMINED, comparator.compare(left, right));
     }
 
     @Test
     void leftSideIsNewerByLessThanTenYears() {
-        String left = "2026";
+        String left = "2025";
+        String right = "2020";
+
+        assertEquals(ComparisonResult.UNDETERMINED, comparator.compare(left, right));
+    }
+
+    @Test
+    void bothSidesTenYearsApart() {
+        String left = "2010";
         String right = "2020";
 
         assertEquals(ComparisonResult.UNDETERMINED, comparator.compare(left, right));
@@ -120,8 +128,8 @@ class YearFieldValuePlausibilityComparatorTest {
 
     @Test
     void bothSidesSameYear() {
-        String left = "2026";
-        String right = "2026";
+        String left = "2020";
+        String right = "2020";
 
         assertEquals(ComparisonResult.UNDETERMINED, comparator.compare(left, right));
     }
