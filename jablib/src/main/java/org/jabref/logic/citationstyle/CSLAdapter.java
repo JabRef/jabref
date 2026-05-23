@@ -17,8 +17,10 @@ import org.jspecify.annotations.Nullable;
 
 /// Thread-safe wrapper around the CSL engine that caches the engine.
 ///
-/// The cache is needed because the creation of a CSL instance is expensive. On style-change, the
-/// engine is re-instantiated, so it is recommended to use this class when you need to generate many bibliographies in one style.
+/// The creation of a CSL instance is expensive, so the first call to [#makeBibliography] would take some amount of time.
+/// For this reason the class stores the instance and reuses it if the style does not change.
+///
+/// It is recommended to use this class when you need to generate many bibliographies in one style.
 /// Changing the output format is inexpensive.
 public class CSLAdapter {
 
