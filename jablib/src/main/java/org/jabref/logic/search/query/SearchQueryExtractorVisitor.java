@@ -103,12 +103,12 @@ public class SearchQueryExtractorVisitor extends SearchBaseVisitor<List<SearchQu
 
         // Pseudo-fields
         field = switch (field) {
-            case "key" ->
+            case SearchFieldConstants.KEY ->
                     InternalField.KEY_FIELD.getName();
-            case "anykeyword" ->
+            case SearchFieldConstants.ANY_KEYWORD ->
                     StandardField.KEYWORDS.getName();
-            case "anyfield" ->
-                    "any";
+            case SearchFieldConstants.ANY_FIELD_ALIAS ->
+                    SearchFieldConstants.ANY_FIELD;
             default ->
                     field;
         };
@@ -120,7 +120,7 @@ public class SearchQueryExtractorVisitor extends SearchBaseVisitor<List<SearchQu
             }
         }
 
-        if ("any".equals(field)) {
+        if (SearchFieldConstants.ANY_FIELD.equals(field)) {
             return List.of(new SearchQueryNode(Optional.empty(), term));
         }
         return List.of(new SearchQueryNode(Optional.of(FieldFactory.parseField(field)), term));

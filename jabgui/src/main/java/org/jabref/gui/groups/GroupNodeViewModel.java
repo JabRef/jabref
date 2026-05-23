@@ -28,6 +28,7 @@ import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
@@ -111,11 +112,10 @@ public class GroupNodeViewModel {
         if (groupNode.getGroup() instanceof TexGroup) {
             databaseContext.getMetaData().groupsBinding().addListener(new WeakInvalidationListener(onInvalidatedGroup));
         } else if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
-            stateManager.getIndexManager(databaseContext).ifPresent(indexManager -> {
-                searchGroup.setMatchedEntries(indexManager.search(searchGroup.getSearchQuery()).getMatchedEntries());
-                refreshGroup();
-                databaseContext.getMetaData().groupsBinding().invalidate();
-            });
+            SearchContext searchContext = stateManager.getSearchContext(databaseContext);
+            searchGroup.setMatchedEntries(searchContext.search(searchGroup.getSearchQuery()).getMatchedEntries());
+            refreshGroup();
+            databaseContext.getMetaData().groupsBinding().invalidate();
         }
 
         hasChildren = new SimpleBooleanProperty();
@@ -632,32 +632,31 @@ public class GroupNodeViewModel {
         @Subscribe
         public void listen(IndexStartedEvent event) {
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
-                stateManager.getIndexManager(databaseContext).ifPresent(indexManager -> {
-                    searchGroup.setMatchedEntries(indexManager.search(searchGroup.getSearchQuery()).getMatchedEntries());
-                    refreshGroup();
-                    databaseContext.getMetaData().groupsBinding().invalidate();
-                });
+                SearchContext searchContext = stateManager.getSearchContext(databaseContext);
+                searchGroup.setMatchedEntries(searchContext.search(searchGroup.getSearchQuery()).getMatchedEntries());
+                refreshGroup();
+                databaseContext.getMetaData().groupsBinding().invalidate();
             }
         }
 
         @Subscribe
         public void listen(IndexAddedOrUpdatedEvent event) {
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
-                stateManager.getIndexManager(databaseContext).ifPresent(indexManager ->
-                        BackgroundTask.wrap(() -> {
-                            for (BibEntry entry : event.entries()) {
-                                searchGroup.updateMatches(entry, indexManager.isEntryMatched(entry, searchGroup.getSearchQuery()));
-                            }
-                        }).onFinished(() -> {
-                            for (BibEntry entry : event.entries()) {
-                                if (GroupNodeViewModel.this.isMatchEffective(GroupNodeViewModel.this, entry)) {
-                                    matchedEntries.add(entry.getId());
-                                } else {
-                                    matchedEntries.remove(entry.getId());
-                                }
-                            }
-                            databaseContext.getMetaData().groupsBinding().invalidate();
-                        }).executeWith(taskExecutor));
+                SearchContext searchContext = stateManager.getSearchContext(databaseContext);
+                BackgroundTask.wrap(() -> {
+                    for (BibEntry entry : event.entries()) {
+                        searchGroup.updateMatches(entry, searchContext.isEntryMatched(entry, searchGroup.getSearchQuery()));
+                    }
+                }).onFinished(() -> {
+                    for (BibEntry entry : event.entries()) {
+                        if (GroupNodeViewModel.this.isMatchEffective(GroupNodeViewModel.this, entry)) {
+                            matchedEntries.add(entry.getId());
+                        } else {
+                            matchedEntries.remove(entry.getId());
+                        }
+                    }
+                    databaseContext.getMetaData().groupsBinding().invalidate();
+                }).executeWith(taskExecutor);
             }
         }
 

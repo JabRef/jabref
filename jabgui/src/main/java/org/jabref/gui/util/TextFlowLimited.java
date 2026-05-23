@@ -24,7 +24,7 @@ public class TextFlowLimited extends TextFlow {
         this.setPrefWidth(Region.USE_PREF_SIZE);
 
         moreLink.setOnAction(event -> expand());
-        moreLink.setStyle("-fx-background-color: white");
+        moreLink.getStyleClass().add("text-flow-more-link");
 
         this.setOnMouseClicked(event -> expand());
     }

@@ -10,7 +10,6 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -18,10 +17,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import org.jabref.gui.icon.JabRefIconView?>
+<?import com.dlsc.gemsfx.EnhancedPasswordField?>
 <?import com.dlsc.gemsfx.Spacer?>
 <?import com.dlsc.unitfx.IntegerInputField?>
 <?import org.controlsfx.control.SearchableComboBox?>
-<?import com.dlsc.gemsfx.EnhancedPasswordField?>
 <fx:root
         spacing="10.0"
         type="VBox"
@@ -309,23 +308,17 @@
             <TextArea
                     fx:id="summarizationChunkSystemMessageTextArea"/>
         </Tab>
-        <Tab fx:id="summarizationChunkUserMessageTab"
-             text="%User message for summarization of a chunk"
-             closable="false">
-            <TextArea
-                    fx:id="summarizationChunkUserMessageTextArea"/>
-        </Tab>
         <Tab fx:id="summarizationCombineSystemMessageTab"
              text="%System message for summarization of several chunks"
              closable="false">
             <TextArea
                     fx:id="summarizationCombineSystemMessageTextArea"/>
         </Tab>
-        <Tab fx:id="summarizationCombineUserMessageTab"
-             text="%User message for summarization of several chunks"
+        <Tab fx:id="summarizationFullDocumentSystemMessageTab"
+             text="%System message for 'full document' summarization"
              closable="false">
             <TextArea
-                    fx:id="summarizationCombineUserMessageTextArea"/>
+                    fx:id="summarizationFullDocumentSystemMessageTextArea"/>
         </Tab>
         <Tab fx:id="citationParsingSystemMessageTab"
              text="%System message for parsing raw citations"
@@ -333,23 +326,24 @@
             <TextArea
                     fx:id="citationParsingSystemMessageTextArea"/>
         </Tab>
-        <Tab fx:id="citationParsingUserMessageTab"
-             text="%User message for parsing raw citations"
+        <Tab fx:id="markdownChatExportTemplateTab"
+             text="%Markdown chat export template"
              closable="false">
             <TextArea
-                    fx:id="citationParsingUserMessageTextArea"/>
+                    fx:id="markdownChatExportTemplateTextArea"/>
         </Tab>
-        <Tab fx:id="followUpQuestionsTab"
-             text="%Prompt for generating follow-up questions"
+        <Tab fx:id="followUpQuestionsTemplateTab"
+             text="%Template for follow-up questions"
              closable="false">
             <TextArea
-                    fx:id="followUpQuestionsTextArea"/>
+                    fx:id="followUpQuestionsTemplateTextArea"/>
         </Tab>
     </TabPane>
 
     <HBox spacing="10"
           alignment="CENTER_LEFT">
-        <Button text="Reset current template"
+        <Button fx:id="resetCurrentTemplateButton"
+                text="%Reset current template"
                 onAction="#onResetCurrentTemplateButtonClick">
             <graphic>
                 <JabRefIconView
@@ -360,7 +354,8 @@
         <Region fx:id="spacer"
                 HBox.hgrow="ALWAYS"/>
 
-        <Button onAction="#onResetTemplatesButtonClick"
+        <Button fx:id="resetTemplatesButton"
+                onAction="#onResetTemplatesButtonClick"
                 text="%Reset templates to default">
             <graphic>
                 <JabRefIconView
@@ -391,22 +386,44 @@
     <CheckBox
             fx:id="generateFollowUpQuestions"
             mnemonicParsing="false"
-            text="%Generate follow-up questions"
+            text="%Generate follow-up questions after AI response"
             HBox.hgrow="ALWAYS"
             maxWidth="Infinity"/>
 
-    <HBox alignment="CENTER_LEFT"
-          spacing="10.0">
-        <padding>
-            <Insets left="20.0"/>
-        </padding>
-        <Label fx:id="followUpQuestionsCountLabel"
-               alignment="BASELINE_CENTER"
-               text="%Number of follow-up questions"/>
+    <HBox spacing="10"
+          alignment="CENTER_LEFT">
+        <Label text="%Number of follow-up questions"/>
         <Spinner
                 fx:id="followUpQuestionsCountSpinner"
                 editable="true"
                 maxWidth="100"/>
     </HBox>
 
+    <HBox alignment="CENTER_LEFT"
+          spacing="10.0">
+        <Label alignment="BASELINE_CENTER"
+               text="%Default answer engine"/>
+        <ComboBox
+                fx:id="answerEngineComboBox"
+                maxWidth="200"/>
+    </HBox>
+
+    <HBox alignment="CENTER_LEFT"
+          spacing="10.0">
+        <Label alignment="BASELINE_CENTER"
+               text="%Default summarization algorithm"/>
+        <ComboBox
+                fx:id="summarizationAlgorithmComboBox"
+                maxWidth="100"/>
+    </HBox>
+
+
+    <HBox alignment="CENTER_LEFT"
+          spacing="10.0">
+        <Label alignment="BASELINE_CENTER"
+               text="%Default token estimation algorithm"/>
+        <ComboBox
+                fx:id="tokenEstimationAlgorithmComboBox"
+                maxWidth="100"/>
+    </HBox>
 </fx:root>

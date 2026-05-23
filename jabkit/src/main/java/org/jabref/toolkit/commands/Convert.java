@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -29,7 +30,7 @@ import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "convert", description = "Convert between bibliography formats.")
-class Convert implements Runnable {
+class Convert implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Convert.class);
 
     @ParentCommand
@@ -38,9 +39,8 @@ class Convert implements Runnable {
     @Mixin
     private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
-    // [impl->req~jabkit.cli.input-flag~1]
-    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input file", required = true)
-    private Path inputFile;
+    @Mixin
+    private InputOption inputOption = new InputOption();
 
     @Option(names = {"--input-format"}, description = "Input format")
     private String inputFormat;
@@ -55,16 +55,17 @@ class Convert implements Runnable {
     private String fieldFormatters;
 
     @Override
-    public void run() {
+    public Integer call() {
+        Path inputFile = inputOption.getInputFile();
         Optional<ParserResult> parserResult = JabKit.importFile(inputFile, inputFormat, jabKit.cliPreferences, sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
-            System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return;
+            System.err.println(Localization.lang("Unable to open file '%0'.", inputFile));
+            return 2;
         }
 
         if (parserResult.get().isInvalid()) {
-            System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
-            return;
+            System.err.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
+            return 2;
         }
 
         FieldFormatterCleanupMapper.applyFormatters(fieldFormatters, parserResult.get().getDatabase().getEntries());
@@ -75,13 +76,13 @@ class Convert implements Runnable {
 
         if (outputFile == null) {
             System.out.println(parserResult.get().getDatabase());
-            return;
+            return 0;
         }
 
-        exportFile(parserResult.get(), outputFile, outputFormat);
+        return exportFile(parserResult.get(), outputFile, outputFormat);
     }
 
-    protected void exportFile(@NonNull ParserResult parserResult, @NonNull Path outputFile, String format) {
+    protected int exportFile(@NonNull ParserResult parserResult, @NonNull Path outputFile, String format) {
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Exporting '%0'.", outputFile));
         }
@@ -92,7 +93,7 @@ class Convert implements Runnable {
                     jabKit.entryTypesManager,
                     parserResult.getDatabase(),
                     outputFile);
-            return;
+            return 0;
         }
 
         Path path = parserResult.getPath().get().toAbsolutePath();
@@ -104,8 +105,8 @@ class Convert implements Runnable {
         ExporterFactory exporterFactory = ExporterFactory.create(jabKit.cliPreferences);
         Optional<Exporter> exporter = exporterFactory.getExporterByName(format);
         if (exporter.isEmpty()) {
-            System.out.println(Localization.lang("Unknown export format '%0'.", format));
-            return;
+            System.err.println(Localization.lang("Unknown export format '%0'.", format));
+            return 2;
         }
 
         try {
@@ -120,6 +121,8 @@ class Convert implements Runnable {
                  | ParserConfigurationException
                  | TransformerException ex) {
             LOGGER.error("Could not export file '{}'.", outputFile, ex);
+            return 2;
         }
+        return 0;
     }
 }

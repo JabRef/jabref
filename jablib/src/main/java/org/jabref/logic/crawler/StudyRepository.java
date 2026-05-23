@@ -7,7 +7,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -20,6 +23,7 @@ import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.git.SlrGitHandler;
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -28,13 +32,19 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.study.Study;
-import org.jabref.model.study.StudyDatabase;
+import org.jabref.model.study.StudyCatalog;
 import org.jabref.model.study.StudyQuery;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -178,11 +188,11 @@ public class StudyRepository {
     ///
     /// @return List of BibEntries of type Library
     /// @throws IllegalArgumentException If a transformation from Library entry to LibraryDefinition fails
-    public List<StudyDatabase> getActiveLibraryEntries() throws IllegalArgumentException {
-        return study.getDatabases()
+    public List<StudyCatalog> getActiveLibraryEntries() throws IllegalArgumentException {
+        return study.getCatalogs()
                     .parallelStream()
-                    .filter(StudyDatabase::isEnabled)
-                    .collect(Collectors.toList());
+                    .filter(StudyCatalog::isEnabled)
+                    .toList();
     }
 
     public Study getStudy() {
@@ -350,26 +360,39 @@ public class StudyRepository {
     /// Persists the crawling results in the local file based repository.
     ///
     /// @param crawlResults The results that shall be persisted.
-    private void persistResults(List<QueryResult> crawlResults) throws IOException, SaveException {
+    private void persistResults(List<QueryResult> crawlResults) throws IOException, GitAPIException, SaveException {
         DatabaseMerger merger = new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator());
         BibDatabase newStudyResultEntries = new BibDatabase();
+        Set<String> allFetcherNames = new LinkedHashSet<>();
 
         for (QueryResult result : crawlResults) {
             BibDatabase queryResultEntries = new BibDatabase();
+
             for (FetchResult fetcherResult : result.getResultsPerFetcher()) {
                 BibDatabase fetcherEntries = fetcherResult.getFetchResult();
-                BibDatabaseContext existingFetcherResult = getFetcherResultEntries(result.getQuery(), fetcherResult.getFetcherName());
+                String fetcherName = fetcherResult.getFetcherName();
+                BibDatabaseContext existingFetcherResult = getFetcherResultEntries(
+                        result.getQuery(), fetcherName);
+
+                allFetcherNames.add(fetcherName);
+
+                // Tag entries with their source fetcher BEFORE any merging
+                tagEntriesWithFetcherGroup(fetcherEntries.getEntries(), fetcherName);
+
+                // Add fetcher group to per-fetcher .bib metadata
+                addFetcherGroupToMetaData(existingFetcherResult, fetcherName);
 
                 // Merge new entries into fetcher result file
                 merger.merge(existingFetcherResult.getDatabase(), fetcherEntries);
 
                 // Create citation keys for all entries that do not have one
                 generateCiteKeys(existingFetcherResult, fetcherEntries);
-
                 // Aggregate each fetcher result into the query result
                 merger.merge(queryResultEntries, fetcherEntries);
 
-                writeResultToFile(getPathToFetcherResultFile(result.getQuery(), fetcherResult.getFetcherName()), existingFetcherResult);
+                writeResultToFile(
+                        getPathToFetcherResultFile(result.getQuery(), fetcherName),
+                        existingFetcherResult);
             }
             BibDatabaseContext existingQueryEntries = getQueryResultEntries(result.getQuery());
 
@@ -385,6 +408,10 @@ public class StudyRepository {
         // Merge new entries into study result file
         merger.merge(existingStudyResultEntries.getDatabase(), newStudyResultEntries);
 
+        // Add all fetcher groups to study result metadata
+        for (String fetcherName : allFetcherNames) {
+            addFetcherGroupToMetaData(existingStudyResultEntries, fetcherName);
+        }
         writeResultToFile(getPathToStudyResultFile(), existingStudyResultEntries);
     }
 
@@ -411,6 +438,41 @@ public class StudyRepository {
             throw new SaveException(Localization.lang("Character encoding UTF-8 is not supported.", ex));
         } catch (IOException ex) {
             throw new SaveException("Problems saving", ex);
+        }
+    }
+
+    /// Tags each entry's groups field with the fetcher name, preserving any existing groups.
+    private void tagEntriesWithFetcherGroup(Collection<BibEntry> entries, String fetcherName) {
+        char separator = preferences.getBibEntryPreferences().getKeywordSeparator();
+        entries.forEach(entry -> {
+            String existing = entry.getField(StandardField.GROUPS).orElse("");
+            String merged = KeywordList.merge(existing, fetcherName, separator).getAsString(separator);
+            entry.setField(StandardField.GROUPS, merged);
+        });
+    }
+
+    /// Adds a fetcher group node to the database context metadata.
+    /// If the group already exists, does nothing.
+    private void addFetcherGroupToMetaData(BibDatabaseContext context, String fetcherName) {
+        GroupTreeNode rootNode = context.getMetaData()
+                                        .getGroups()
+                                        .orElseGet(() -> {
+                                            GroupTreeNode newRoot = GroupTreeNode.fromGroup(
+                                                    GroupsFactory.createAllEntriesGroup());
+                                            context.getMetaData().setGroups(newRoot);
+                                            return newRoot;
+                                        });
+
+        boolean groupExists = rootNode.getChildren().stream()
+                                      .anyMatch(child -> child.getGroup() instanceof ExplicitGroup
+                                              && child.getGroup().getName().equals(fetcherName));
+
+        if (!groupExists) {
+            ExplicitGroup fetcherGroup = new ExplicitGroup(
+                    fetcherName,
+                    GroupHierarchyType.INDEPENDENT,
+                    preferences.getBibEntryPreferences().getKeywordSeparator());
+            rootNode.addSubgroup(fetcherGroup);
         }
     }
 

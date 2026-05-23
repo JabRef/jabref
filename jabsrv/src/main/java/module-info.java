@@ -9,7 +9,7 @@ module org.jabref.jabsrv {
     exports org.jabref.http.server.cayw to org.glassfish.jersey.core.server;
     exports org.jabref.http.server.command to org.glassfish.jersey.core.server;
     opens org.jabref.http.server.cayw to com.google.gson, org.glassfish.hk2.locator, org.glassfish.hk2.utilities;
-    opens org.jabref.http.dto to com.google.gson;
+    opens org.jabref.http.dto to com.google.gson, org.glassfish.hk2.locator, org.glassfish.hk2.utilities;
     opens org.jabref.http.server.command to com.google.gson, org.glassfish.hk2.locator, org.glassfish.hk2.utilities, tools.jackson.databind;
     exports org.jabref.http.server.services;
     exports org.jabref.http;

@@ -62,6 +62,8 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.function.Predicate.not;
+
 /// Represents a Bib(La)TeX entry, which can be BibTeX or BibLaTeX.
 ///
 /// Example:
@@ -1042,6 +1044,15 @@ public class BibEntry {
         return FileFieldParser.parse(oldValue.get());
     }
 
+    /// Checks if the BibEntry contains the linked file
+    ///
+    /// @param file the file that is checked if it's in the entry or not
+    /// @return true if the entry contains the file
+    public Boolean hasFile(LinkedFile file) {
+        List<LinkedFile> linkedFiles = getFiles();
+        return linkedFiles.contains(file);
+    }
+
     public Optional<FieldChange> addFile(LinkedFile file) {
         List<LinkedFile> linkedFiles = getFiles();
         linkedFiles.add(file);
@@ -1077,7 +1088,7 @@ public class BibEntry {
                    .stream()
                    .flatMap(content -> Arrays.stream(content.split(",")))
                    .map(String::trim)
-                   .filter(key -> !key.isEmpty())
+                   .filter(not(String::isEmpty))
                    .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
