@@ -1044,6 +1044,15 @@ public class BibEntry {
         return FileFieldParser.parse(oldValue.get());
     }
 
+    /// Checks if the BibEntry contains the linked file
+    ///
+    /// @param file the file that is checked if it's in the entry or not
+    /// @return true if the entry contains the file
+    public Boolean hasFile(LinkedFile file) {
+        List<LinkedFile> linkedFiles = getFiles();
+        return linkedFiles.contains(file);
+    }
+
     public Optional<FieldChange> addFile(LinkedFile file) {
         List<LinkedFile> linkedFiles = getFiles();
         linkedFiles.add(file);
