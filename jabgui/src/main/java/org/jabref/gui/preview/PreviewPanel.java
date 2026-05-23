@@ -32,6 +32,8 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preferences.PreferencesDialogView;
+import org.jabref.gui.preferences.preview.PreviewTab;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -173,6 +175,8 @@ public class PreviewPanel extends VBox implements PreviewControls {
         MenuItem nextPreviewLayout = new MenuItem(Localization.lang("Next preview layout"));
         keyBindingRepository.getKeyCombination(KeyBinding.NEXT_PREVIEW_LAYOUT).ifPresent(nextPreviewLayout::setAccelerator);
         nextPreviewLayout.setOnAction(_ -> this.nextPreviewStyle());
+        MenuItem goToPreferences = new MenuItem(Localization.lang("Go to preview preferences..."));
+        goToPreferences.setOnAction(_ -> dialogService.showCustomDialogAndWait(new PreferencesDialogView(PreviewTab.class)));
 
         ContextMenu menu = new ContextMenu();
         menu.getItems().add(copyCitationHtml);
@@ -182,6 +186,7 @@ public class PreviewPanel extends VBox implements PreviewControls {
         menu.getItems().add(new SeparatorMenuItem());
         menu.getItems().add(nextPreviewLayout);
         menu.getItems().add(previousPreviewLayout);
+        menu.getItems().add(goToPreferences);
         menu.getItems().add(new SeparatorMenuItem());
         menu.getItems().add(exportToClipboard);
         return menu;
