@@ -73,17 +73,22 @@ public class CitationsRelationsTabViewModel {
 
     public void importEntries(List<CitationRelationItem> entriesToImport, CitationFetcher.SearchType searchType, BibEntry existingEntry) {
         assert stateManager.getActiveDatabase().isPresent() : "No active database found, but it is required for importing citation relations";
-        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
+        Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
+        if (activeDatabase.isEmpty()) {
+            dialogService.notify(Localization.lang("No library open"));
+            return;
+        }
+        BibDatabaseContext databaseContext = activeDatabase.get();
 
         assert !entriesToImport.isEmpty() : "No entries to import";
+        if (entriesToImport.isEmpty()) {
+            return;
+        }
         List<BibEntry> entries = entriesToImport.stream()
                                                 .map(CitationRelationItem::entry)
                                                 // We need to have a clone of the entry, because we add the entry to the library (and keep it in the citation relation tab, too)
                                                 .map(BibEntry::new)
                                                 .toList();
-        if (entries.isEmpty()) {
-            return;
-        }
 
         ImportHandler importHandler = new ImportHandler(
                 databaseContext,
