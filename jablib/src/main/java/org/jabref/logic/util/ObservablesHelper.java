@@ -2,11 +2,13 @@ package org.jabref.logic.util;
 
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.Property;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -33,6 +35,68 @@ public final class ObservablesHelper {
                 action.run();
             }
         }));
+    }
+
+    /// Binds two properties bidirectionally using conversion functions.
+    ///
+    /// @param propA    The first property.
+    /// @param propB    The second property.
+    /// @param forward  Function to convert from type A to B.
+    /// @param backward Function to convert from type B to A.
+    /// @param <A>      Type of the first property.
+    /// @param <B>      Type of the second property.
+    /// @return A Runnable that removes the listeners to unbind the properties when called.
+    public static <A, B> Runnable bindBidirectional(
+            Property<A> propA,
+            Property<B> propB,
+            Function<A, B> forward,
+            Function<B, A> backward
+    ) {
+
+        // A mutable boolean array prevents infinite recursive loops when properties update each other.
+        boolean[] isUpdating = {false};
+
+        ChangeListener<A> listenerA = (_, _, newVal) -> {
+            if (!isUpdating[0]) {
+                isUpdating[0] = true;
+
+                try {
+                    propB.setValue(forward.apply(newVal));
+                } finally {
+                    isUpdating[0] = false;
+                }
+            }
+        };
+
+        ChangeListener<B> listenerB = (_, _, newVal) -> {
+            if (!isUpdating[0]) {
+                isUpdating[0] = true;
+
+                try {
+                    propA.setValue(backward.apply(newVal));
+                } finally {
+                    isUpdating[0] = false;
+                }
+            }
+        };
+
+        propA.addListener(listenerA);
+        propB.addListener(listenerB);
+
+        if (!isUpdating[0]) {
+            isUpdating[0] = true;
+
+            try {
+                propB.setValue(forward.apply(propA.getValue()));
+            } finally {
+                isUpdating[0] = false;
+            }
+        }
+
+        return () -> {
+            propA.removeListener(listenerA);
+            propB.removeListener(listenerB);
+        };
     }
 
     /// Creates an {@link ObjectBinding} that safely manages the lifecycle of {@link AutoCloseable} resources.

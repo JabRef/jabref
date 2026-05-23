@@ -6,7 +6,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.ClipboardContent;
@@ -16,6 +20,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
@@ -29,8 +34,10 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.DragDrop;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.util.ObservablesHelper;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -71,10 +78,38 @@ public class PreviewPanel extends VBox implements PreviewControls {
         previewView.setOnDragOver(PreviewPanel::onDragOver);
         previewView.setOnDragDropped(this::onDragDropped);
 
-        this.getChildren().add(previewView);
+        HBox previewSelectionBar = constructPreviewSelectionBar(previewPreferences);
+
+        this.getChildren().addAll(previewView, previewSelectionBar);
 
         createKeyBindings();
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
+
+        previewPreferences.layoutCyclePositionProperty().addListener(_ -> this.updatePreview());
+    }
+
+    private static HBox constructPreviewSelectionBar(PreviewPreferences previewPreferences) {
+        HBox previewSelectionBar = new HBox(10);
+        previewSelectionBar.setPadding(new Insets(5));
+        previewSelectionBar.setAlignment(Pos.BASELINE_LEFT);
+
+        Label previewLayoutLabel = new Label(Localization.lang("Preview layout"));
+        ComboBox<PreviewLayout> previewLayoutComboBox = new ComboBox<>();
+
+        new ViewModelListCellFactory<PreviewLayout>()
+                .withText(PreviewLayout::getDisplayName)
+                .install(previewLayoutComboBox);
+        previewLayoutComboBox.setItems(previewPreferences.getLayoutCycle());
+
+        ObservablesHelper.bindBidirectional(
+                previewPreferences.layoutCyclePositionProperty(),
+                previewLayoutComboBox.valueProperty(),
+                position -> previewPreferences.getLayoutCycle().get(position.intValue()),
+                layout -> previewPreferences.getLayoutCycle().indexOf(layout)
+        );
+
+        previewSelectionBar.getChildren().addAll(previewLayoutLabel, previewLayoutComboBox);
+        return previewSelectionBar;
     }
 
     private void onDragDetected(MouseEvent event) {
@@ -168,17 +203,15 @@ public class PreviewPanel extends VBox implements PreviewControls {
 
     @Override
     public void nextPreviewStyle() {
-        cyclePreview(previewPreferences.getLayoutCyclePosition() + 1);
+        previewPreferences.setLayoutCyclePosition(previewPreferences.getLayoutCyclePosition() + 1);
     }
 
     @Override
     public void previousPreviewStyle() {
-        cyclePreview(previewPreferences.getLayoutCyclePosition() - 1);
+        previewPreferences.setLayoutCyclePosition(previewPreferences.getLayoutCyclePosition() - 1);
     }
 
-    private void cyclePreview(int newPosition) {
-        previewPreferences.setLayoutCyclePosition(newPosition);
-
+    private void updatePreview() {
         PreviewLayout layout = previewPreferences.getSelectedPreviewLayout();
         previewView.setLayout(layout);
         dialogService.notify(
