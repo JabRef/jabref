@@ -22,7 +22,7 @@ public class AuthorListParser {
 
     // Avoid partition where these values are contained
     private final static Set<String> AVOID_TERMS_IN_LOWER_CASE = Set.of(
-            "jr", "sr", "jnr", "snr", "von", "zu", "van", "der");
+                                                                        "jr", "sr", "jnr", "snr", "von", "zu", "van", "der");
 
     private static final int TOKEN_GROUP_LENGTH = 4; // number of entries for a token
 
@@ -35,7 +35,7 @@ public class AuthorListParser {
     // "-") comma)
     // Constant HashSet containing names of TeX special characters
     private static final Set<String> TEX_NAMES = Set.of(
-            "aa", "ae", "l", "o", "oe", "i", "AA", "AE", "L", "O", "OE", "j");
+                                                        "aa", "ae", "l", "o", "oe", "i", "AA", "AE", "L", "O", "OE", "j");
 
     private static final Pattern STARTS_WITH_CAPITAL_LETTER_DOT_OR_DASH = Pattern.compile("^[A-Z](\\.[ -]| ?-)");
 
@@ -49,8 +49,7 @@ public class AuthorListParser {
     private int tokenStart;
     /// index of the end in original, for example to point to 'abc' in 'abc xyz', tokenEnd=5
     private int tokenEnd;
-    /// end of token abbreviation (always: tokenStart < tokenAbbrEnd <= tokenEnd), only valid if getToken returns
-    /// Token.WORD
+    /// end of token abbreviation (always: tokenStart < tokenAbbrEnd <= tokenEnd), only valid if getToken returns Token.WORD
     private int tokenAbbrEnd;
     /// either space of dash
     private char tokenTerm;
@@ -111,8 +110,7 @@ public class AuthorListParser {
 
     /// Tries to get a simple BibTeX author list of the given string.
     ///
-    /// This is an intermediate step in {@link #parse}. Since parse does not work in all cases,
-    /// this method can be used to get more valid BibTeX.
+    /// This is an intermediate step in {@link #parse}. Since parse does not work in all cases, this method can be used to get more valid BibTeX.
     ///
     /// @return Optional.empty if there was no normalization.
     public static Optional<String> normalizeSimply(String listOfNames) {
@@ -199,8 +197,7 @@ public class AuthorListParser {
         return AuthorList.of(authors);
     }
 
-    /// Handle cases names in order Firstname Lastname, separated by `","` and a final `", and "`
-    /// E.g, `"I. Podadera, J. M. Carmona, A. Ibarra, and J. Molla"`
+    /// Handle cases names in order Firstname Lastname, separated by `","` and a final `", and "` E.g, `"I. Podadera, J. M. Carmona, A. Ibarra, and J. Molla"`
     ///
     /// @return the original or patched version of listOfNames
     private static String checkNamesCommaSeparated(String listOfNames) {
@@ -382,7 +379,7 @@ public class AuthorListParser {
         String jrPart = jrPartStart < 0 ? null : concatTokens(tokens, jrPartStart, jrPartEnd, OFFSET_TOKEN, false);
 
         if ((commaFirst < 0) && (firstPart != null) && (lastPart != null) && lastPart.equals(lastPart.toUpperCase(Locale.ROOT)) && (lastPart.length() < 5)
-                && (Character.UnicodeScript.of(lastPart.charAt(0)) != Character.UnicodeScript.HAN)) {
+            && (Character.UnicodeScript.of(lastPart.charAt(0)) != Character.UnicodeScript.HAN)) {
             // In case there is NO comma (e.g., Obama B) AND
             // the last part is a small string in complete upper case,
             // we interpret it as initial of the first name
@@ -394,8 +391,7 @@ public class AuthorListParser {
         }
     }
 
-    /// Concatenates list of tokens from 'tokens' Vector. Tokens are separated by spaces or dashes, depending on stored
-    /// in 'tokens'. Callers always ensure that start < end; thus, there exists at least one token to be concatenated.
+    /// Concatenates list of tokens from 'tokens' Vector. Tokens are separated by spaces or dashes, depending on stored in 'tokens'. Callers always ensure that start < end; thus, there exists at least one token to be concatenated.
     ///
     /// @param start    index of the first token to be concatenated in 'tokens' Vector (always divisible by TOKEN_GROUP_LENGTH).
     /// @param end      index of the first token not to be concatenated in 'tokens' Vector (always divisible by TOKEN_GROUP_LENGTH).
@@ -423,26 +419,11 @@ public class AuthorListParser {
 
     /// Parses the next token.
     ///
-    /// The string being parsed is stored in global variable <CODE>original</CODE>, and position which parsing has to
-    /// start from is stored in global variable
-    /// <CODE>token_end</CODE>; thus, <CODE>token_end</CODE> has to be set
-    /// to 0 before the first invocation. Procedure updates <CODE>token_end</CODE>; thus, subsequent invocations do not
-    /// require any additional variable settings.
+    /// The string being parsed is stored in global variable <CODE>original</CODE>, and position which parsing has to start from is stored in global variable <CODE>token_end</CODE>; thus, <CODE>token_end</CODE> has to be set to 0 before the first invocation. Procedure updates <CODE>token_end</CODE>; thus, subsequent invocations do not require any additional variable settings.
     ///
-    /// The type of the token is returned; if it is <CODE>Token.WORD</CODE>, additional information is given in global
-    /// variables <CODE>token_start</CODE>,
-    /// <CODE>token_end</CODE>, <CODE>token_abbr</CODE>, <CODE>token_term</CODE>,
-    /// and <CODE>token_case</CODE>; namely: <CODE>original.substring(token_start,token_end)</CODE> is the text of the
-    /// token, <CODE>original.substring(token_start,token_abbr)</CODE> is the token abbreviation, <CODE>token_term</CODE>
-    /// contains token terminator (space or dash), and <CODE>token_case</CODE> is <CODE>true</CODE>, if token is
-    /// upper-case and <CODE>false</CODE> if token is lower-case.
+    /// The type of the token is returned; if it is <CODE>Token.WORD</CODE>, additional information is given in global variables <CODE>token_start</CODE>, <CODE>token_end</CODE>, <CODE>token_abbr</CODE>, <CODE>token_term</CODE>, and <CODE>token_case</CODE>; namely: <CODE>original.substring(token_start,token_end)</CODE> is the text of the token, <CODE>original.substring(token_start,token_abbr)</CODE> is the token abbreviation, <CODE>token_term</CODE> contains token terminator (space or dash), and <CODE>token_case</CODE> is <CODE>true</CODE>, if token is upper-case and <CODE>false</CODE> if token is lower-case.
     ///
-    /// @return <CODE>Token.EOF</CODE> -- no more tokens, <CODE>Token.COMMA</CODE> --
-    /// token is comma, <CODE>Token.AND</CODE> -- token is the word "and" (or "And", or "aND", etc.) or a semicolon,
-    /// <CODE>Token.WORD</CODE> -- token is a word; additional information is given in global variables
-    /// <CODE>token_start</CODE>, <CODE>token_end</CODE>,
-    /// <CODE>token_abbr</CODE>, <CODE>token_term</CODE>, and
-    /// <CODE>token_case</CODE>.
+    /// @return <CODE>Token.EOF</CODE> -- no more tokens, <CODE>Token.COMMA</CODE> -- token is comma, <CODE>Token.AND</CODE> -- token is the word "and" (or "And", or "aND", etc.) or a semicolon, <CODE>Token.WORD</CODE> -- token is a word; additional information is given in global variables <CODE>token_start</CODE>, <CODE>token_end</CODE>, <CODE>token_abbr</CODE>, <CODE>token_term</CODE>, and <CODE>token_case</CODE>.
     private Token getToken() {
         tokenStart = tokenEnd;
         while (tokenStart < original.length()) {
@@ -485,7 +466,7 @@ public class AuthorListParser {
             }
             if (!firstLetterIsFound && (currentBackslash < 0) && Character.isLetter(c)) {
                 if (bracesLevel == 0) {
-                    tokenCase = Character.isUpperCase(c) || (Character.UnicodeScript.of(c) == Character.UnicodeScript.HAN);
+                    tokenCase = Character.isUpperCase(c) || (Character.UnicodeScript.of(c) == Character.UnicodeScript.HAN || (Character.getType(c) != Character.LOWERCASE_LETTER));
                 } else {
                     // If this is a particle in braces, always treat it as if it starts with
                     // an upper case letter. Otherwise a name such as "{van den Bergen}, Hans"
