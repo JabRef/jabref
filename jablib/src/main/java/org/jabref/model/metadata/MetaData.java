@@ -86,7 +86,7 @@ public class MetaData {
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
     @Nullable private String versionDBStructure;
-    private String aiLibraryId;
+    @Nullable private String aiLibraryId;
 
     /// Constructs an empty metadata.
     public MetaData() {
