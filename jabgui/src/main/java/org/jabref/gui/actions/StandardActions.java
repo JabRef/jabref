@@ -19,7 +19,7 @@ public enum StandardActions implements Action {
     COPY_CITATION_KEY_AND_LINK(Localization.lang("Copy citation key and link"), KeyBinding.COPY_CITATION_KEY_AND_LINK),
     COPY_CITATION_HTML(Localization.lang("Copy citation (html)"), KeyBinding.COPY_PREVIEW),
     COPY_CITATION_TEXT(Localization.lang("Copy citation (text)")),
-    COPY_CITATION_MARKDOWN(Localization.lang("Copy citation (markdown)")),
+    COPY_CITATION_MARKDOWN(Localization.lang("Copy citation (Markdown)")),
     COPY_CITATION_PREVIEW(Localization.lang("Copy preview"), KeyBinding.COPY_PREVIEW),
     COPY_FIELD_CONTENT(Localization.lang("Copy field content")),
     COPY_FIELD_AUTHOR(Localization.lang("Author")),
