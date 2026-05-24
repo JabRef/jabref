@@ -705,6 +705,66 @@ class BibtexParserTest {
     }
 
     @Test
+    void parseRecoversValidEntryWhenFollowedByCorruptedEntry() throws IOException {
+        ParserResult result = parser.parse(
+                Reader.of(
+                        "@article{first,author={Ed von Test}}"
+                                + "@article{second,author={author missing bracket"));
+
+        Collection<BibEntry> parsed = result.getDatabase().getEntries();
+
+        assertEquals(1, parsed.size());
+        BibEntry entry = parsed.iterator().next();
+        assertEquals(StandardEntryType.Article, entry.getType());
+        assertEquals(Optional.of("first"), entry.getCitationKey());
+        assertEquals(Optional.of("Ed von Test"), entry.getField(StandardField.AUTHOR));
+        assertTrue(result.hasWarnings());
+    }
+
+    /// Characterizes the current recovery limit: when a corrupted entry has no closing brace,
+    /// the parser consumes the rest of the input and any valid entries that follow are not
+    /// recovered. If recovery is improved in the future, update this test accordingly.
+    @Test
+    void parseDoesNotRecoverEntriesAfterCorruptedEntryWithMissingClosingBrace() throws IOException {
+        ParserResult result = parser.parse(
+                Reader.of(
+                        "@article{first,author={Ed von Test}}"
+                                + "@article{broken,author={author missing bracket"
+                                + "@article{third,author={Doe, Jane}}"));
+
+        Collection<BibEntry> parsed = result.getDatabase().getEntries();
+        List<Optional<String>> recoveredKeys = parsed.stream()
+                                                     .map(BibEntry::getCitationKey)
+                                                     .toList();
+
+        assertEquals(List.of(Optional.of("first")), recoveredKeys);
+        assertTrue(result.hasWarnings());
+    }
+
+    @Test
+    void parseRecoversStringDefinitionFollowedByCorruptedEntry() throws IOException {
+        ParserResult result = parser.parse(
+                Reader.of(
+                        "@string{publisher = \"Test Publisher\"}"
+                                + "@article{broken,author={author missing bracket"));
+
+        assertEquals(List.of(), result.getDatabase().getEntries());
+        assertEquals(1, result.getDatabase().getStringCount());
+        BibtexString string = result.getDatabase().getStringValues().iterator().next();
+        assertEquals("publisher", string.getName());
+        assertEquals("Test Publisher", string.getContent());
+        assertTrue(result.hasWarnings());
+    }
+
+    @Test
+    void parseReturnsEmptyResultForWhitespaceOnlyInput() throws IOException {
+        ParserResult result = parser.parse(Reader.of("   \n\t  \n   "));
+
+        assertEquals(List.of(), result.getDatabase().getEntries());
+        assertFalse(result.hasWarnings());
+    }
+
+    @Test
     void parseRecognizesMonthFieldsWithFollowingComma() throws IOException {
         ParserResult result = parser
                 .parse(Reader.of("@article{test,author={Ed von Test},month={8,}},"));
