@@ -10,7 +10,7 @@ import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.toolkit.util.ExportService;
+import org.jabref.toolkit.service.ExportService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -13,7 +13,7 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.toolkit.converter.CitationFetcherTypeConverter;
-import org.jabref.toolkit.util.ExportService;
+import org.jabref.toolkit.service.ExportService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

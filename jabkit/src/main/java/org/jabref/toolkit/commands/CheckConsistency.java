@@ -15,7 +15,7 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultGi
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.toolkit.util.ImportService;
+import org.jabref.toolkit.service.ImportService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

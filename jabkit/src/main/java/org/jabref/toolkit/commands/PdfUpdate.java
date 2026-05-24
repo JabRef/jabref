@@ -24,7 +24,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.toolkit.util.ImportService;
+import org.jabref.toolkit.service.ImportService;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;

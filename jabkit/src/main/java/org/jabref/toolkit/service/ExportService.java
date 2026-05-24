@@ -1,4 +1,4 @@
-package org.jabref.toolkit.util;
+package org.jabref.toolkit.service;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;

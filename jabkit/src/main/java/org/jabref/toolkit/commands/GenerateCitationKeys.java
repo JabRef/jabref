@@ -18,8 +18,8 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.toolkit.converter.KeySuffixConverter;
-import org.jabref.toolkit.util.ExportService;
-import org.jabref.toolkit.util.ImportService;
+import org.jabref.toolkit.service.ExportService;
+import org.jabref.toolkit.service.ImportService;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;

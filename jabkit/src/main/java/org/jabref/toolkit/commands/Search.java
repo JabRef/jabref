@@ -14,8 +14,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.toolkit.converter.CygWinPathConverter;
-import org.jabref.toolkit.util.ExportService;
-import org.jabref.toolkit.util.ImportService;
+import org.jabref.toolkit.service.ExportService;
+import org.jabref.toolkit.service.ImportService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
