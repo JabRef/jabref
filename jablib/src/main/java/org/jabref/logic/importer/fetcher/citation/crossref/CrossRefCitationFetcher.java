@@ -91,8 +91,8 @@ public class CrossRefCitationFetcher implements CitationFetcher {
 
         PlainCitationParserChoice parserChoice = importerPreferences.getDefaultPlainCitationParser();
         final PlainCitationParser parser = parserChoice == PlainCitationParserChoice.LLM
-                ? PlainCitationParserFactory.getLlmPlainCitationParser(importFormatPreferences, aiPreferences, chatModel)
-                : PlainCitationParserFactory.getPlainCitationParser(parserChoice, citationKeyPatternPreferences, grobidPreferences, importFormatPreferences);
+                                           ? PlainCitationParserFactory.getLlmPlainCitationParser(importFormatPreferences, aiPreferences, chatModel)
+                                           : PlainCitationParserFactory.getPlainCitationParser(parserChoice, citationKeyPatternPreferences, grobidPreferences, importFormatPreferences);
 
         try (InputStream stream = new URLDownload(uri.get().toString()).asInputStream()) {
             JsonNode node = mapper.readTree(stream);

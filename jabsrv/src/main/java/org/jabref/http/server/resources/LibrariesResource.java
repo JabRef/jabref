@@ -79,6 +79,11 @@ public class LibrariesResource {
         return new LibraryQueryResponse(results);
     }
 
+    /// Entries without a citation key are reported with the sentinel
+    /// [LibraryQueryMatch#UNSET_CITATION_KEY] instead of an empty string, which would
+    /// otherwise look indistinguishable from a present-but-empty key. Multiple
+    /// unkeyed entries still collide on that sentinel — the API identifies entries by
+    /// citation key, so disambiguation requires assigning keys.
     private List<LibraryQueryMatch> runQuery(String rawQuery, List<String> libraryIds) {
         if (StringUtil.isBlank(rawQuery)) {
             return List.of();
@@ -90,7 +95,7 @@ public class LibrariesResource {
             try {
                 BibDatabaseContext context = ServerUtils.getBibDatabaseContext(libraryId, filesToServe, srvStateManager, preferences.getImportFormatPreferences());
                 for (BibEntry entry : runSearch(context, searchQuery)) {
-                    matches.add(new LibraryQueryMatch(libraryId, entry.getCitationKey().orElse("")));
+                    matches.add(new LibraryQueryMatch(libraryId, entry.getCitationKey().orElse(LibraryQueryMatch.UNSET_CITATION_KEY)));
                 }
             } catch (IOException e) {
                 LOGGER.warn("Could not load library {} for query", libraryId, e);

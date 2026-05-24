@@ -111,14 +111,14 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     }
 
     private String findDoi(String input) {
-        Optional<DOI> parsedDoi = DOI.findInText(input);
-        if (parsedDoi.isEmpty()) {
-            return input;
-        }
-        doi = parsedDoi.get().asString();
-        // Strip the matched DOI (and any URL/"doi:" prefix) using DOI's own
-        // matcher so the remaining rules don't re-parse it as a URL or title.
-        return fixSpaces(DOI.replaceInText(input, DOI_TAG));
+        return DOI.findInText(input)
+                  .map(parsed -> {
+                      doi = parsed.asString();
+                      // Strip the matched DOI (and any URL/"doi:" prefix) using DOI's own
+                      // matcher so the remaining rules don't re-parse it as a URL or title.
+                      return fixSpaces(DOI.replaceInText(input, DOI_TAG));
+                  })
+                  .orElse(input);
     }
 
     private String findYear(String input) {

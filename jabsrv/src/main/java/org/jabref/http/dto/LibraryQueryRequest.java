@@ -3,6 +3,7 @@ package org.jabref.http.dto;
 import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// Request body for `POST /libraries/query`.
 ///
@@ -11,11 +12,13 @@ import org.jspecify.annotations.NullMarked;
 /// in the response so callers can map, e.g., the n-th reference of a web page to
 /// the n-th query result.
 ///
-/// The list is normalized to an empty list so downstream code is free of null
-/// checks; the accessor `queries()` therefore never returns null.
+/// The canonical constructor accepts `null` (the JSON body may omit `queries`
+/// entirely) and normalizes it to an empty list so downstream code is free of null
+/// checks; the component itself is non-null and the accessor `queries()`
+/// therefore never returns null.
 @NullMarked
 public record LibraryQueryRequest(List<String> queries) {
-    public LibraryQueryRequest {
-        queries = queries != null ? queries : List.of();
+    public LibraryQueryRequest(@Nullable List<String> queries) {
+        this.queries = queries != null ? queries : List.of();
     }
 }
