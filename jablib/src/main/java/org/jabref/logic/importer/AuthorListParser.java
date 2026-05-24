@@ -22,7 +22,7 @@ public class AuthorListParser {
 
     // Avoid partition where these values are contained
     private final static Set<String> AVOID_TERMS_IN_LOWER_CASE = Set.of(
-                                                                        "jr", "sr", "jnr", "snr", "von", "zu", "van", "der");
+            "jr", "sr", "jnr", "snr", "von", "zu", "van", "der");
 
     private static final int TOKEN_GROUP_LENGTH = 4; // number of entries for a token
 
@@ -35,7 +35,7 @@ public class AuthorListParser {
     // "-") comma)
     // Constant HashSet containing names of TeX special characters
     private static final Set<String> TEX_NAMES = Set.of(
-                                                        "aa", "ae", "l", "o", "oe", "i", "AA", "AE", "L", "O", "OE", "j");
+            "aa", "ae", "l", "o", "oe", "i", "AA", "AE", "L", "O", "OE", "j");
 
     private static final Pattern STARTS_WITH_CAPITAL_LETTER_DOT_OR_DASH = Pattern.compile("^[A-Z](\\.[ -]| ?-)");
 
@@ -379,7 +379,7 @@ public class AuthorListParser {
         String jrPart = jrPartStart < 0 ? null : concatTokens(tokens, jrPartStart, jrPartEnd, OFFSET_TOKEN, false);
 
         if ((commaFirst < 0) && (firstPart != null) && (lastPart != null) && lastPart.equals(lastPart.toUpperCase(Locale.ROOT)) && (lastPart.length() < 5)
-            && (Character.UnicodeScript.of(lastPart.charAt(0)) != Character.UnicodeScript.HAN)) {
+                && (Character.UnicodeScript.of(lastPart.charAt(0)) != Character.UnicodeScript.HAN)) {
             // In case there is NO comma (e.g., Obama B) AND
             // the last part is a small string in complete upper case,
             // we interpret it as initial of the first name
@@ -396,7 +396,7 @@ public class AuthorListParser {
     /// @param start    index of the first token to be concatenated in 'tokens' Vector (always divisible by TOKEN_GROUP_LENGTH).
     /// @param end      index of the first token not to be concatenated in 'tokens' Vector (always divisible by TOKEN_GROUP_LENGTH).
     /// @param offset   offset within token group (used to request concatenation of either full tokens or abbreviation).
-    /// @param dotAfter `true`` -- add period after each token, `false` do not add.
+    /// @param dotAfter `true`` -- add period after each token,`false` do not add.
     /// @return the result of concatenation.
     private String concatTokens(List<Object> tokens, int start, int end, int offset, boolean dotAfter) {
         StringBuilder result = new StringBuilder();
