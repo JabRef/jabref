@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.LibraryQueryMatch;
 import org.jabref.http.dto.LibraryQueryRequest;
 import org.jabref.http.dto.LibraryQueryResponse;
 import org.jabref.http.dto.LibraryQueryResult;
-import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.search.SearchContext;
@@ -41,9 +39,6 @@ public class LibrariesResource {
 
     @Inject
     private SrvStateManager srvStateManager;
-
-    @Inject
-    private FilesToServe filesToServe;
 
     @Inject
     private Gson gson;
@@ -93,7 +88,7 @@ public class LibrariesResource {
         List<LibraryQueryMatch> matches = new ArrayList<>();
         for (String libraryId : libraryIds) {
             try {
-                BibDatabaseContext context = ServerUtils.getBibDatabaseContext(libraryId, filesToServe, srvStateManager, preferences.getImportFormatPreferences());
+                BibDatabaseContext context = ServerUtils.getBibDatabaseContext(libraryId, srvStateManager, preferences.getImportFormatPreferences());
                 for (BibEntry entry : runSearch(context, searchQuery)) {
                     matches.add(new LibraryQueryMatch(libraryId, entry.getCitationKey().orElse(LibraryQueryMatch.UNSET_CITATION_KEY)));
                 }
@@ -115,15 +110,10 @@ public class LibrariesResource {
     }
 
     private List<String> openLibraryIds() {
-        Stream<java.nio.file.Path> pathStream;
-        if (!filesToServe.isEmpty()) {
-            pathStream = filesToServe.getFilesToServe().stream();
-        } else {
-            pathStream = srvStateManager.getOpenDatabases().stream()
-                                        .filter(context -> context.getDatabasePath().isPresent())
-                                        .map(context -> context.getDatabasePath().get());
-        }
-        return pathStream.map(path -> path.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(path))
-                         .toList();
+        return srvStateManager.getOpenDatabases().stream()
+                              .map(BibDatabaseContext::getDatabasePath)
+                              .flatMap(java.util.Optional::stream)
+                              .map(path -> path.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(path))
+                              .toList();
     }
 }

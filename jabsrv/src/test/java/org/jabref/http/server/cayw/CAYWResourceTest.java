@@ -19,7 +19,6 @@ class CAYWResourceTest extends ServerTest {
     @Override
     protected Application configure() {
         ResourceConfig resourceConfig = new ResourceConfig(CAYWResource.class);
-        addFilesToServeToResourceConfig(resourceConfig);
         addPreferencesToResourceConfig(resourceConfig);
         addGsonToResourceConfig(resourceConfig);
         addFormatterServiceToResourceConfig(resourceConfig);

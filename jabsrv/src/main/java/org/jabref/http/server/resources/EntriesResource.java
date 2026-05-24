@@ -12,7 +12,6 @@ import java.util.Optional;
 
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.LinkedPdfFileDTO;
-import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.UiMessageHandler;
@@ -58,9 +57,6 @@ public class EntriesResource {
 
     @Inject
     SrvStateManager srvStateManager;
-
-    @Inject
-    FilesToServe filesToServe;
 
     @Inject
     Gson gson;
@@ -174,7 +170,7 @@ public class EntriesResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public String getPDFFilesAsList(@PathParam("id") String id) throws IOException {
         // get a list of all entries in library (specified by "id")
-        BibDatabaseContext databaseContext = ServerUtils.getBibDatabaseContext(id, filesToServe, srvStateManager, preferences.getImportFormatPreferences());
+        BibDatabaseContext databaseContext = ServerUtils.getBibDatabaseContext(id, srvStateManager, preferences.getImportFormatPreferences());
         List<LinkedPdfFileDTO> response = new ArrayList<>();
         List<BibEntry> entries = databaseContext.getDatabase().getEntries();
         if (entries.isEmpty()) {

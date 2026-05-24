@@ -16,7 +16,6 @@ class GroupsResourceTest extends ServerTest {
     @Override
     protected Application configure() {
         ResourceConfig resourceConfig = new ResourceConfig(GroupsResource.class);
-        addFilesToServeToResourceConfig(resourceConfig);
         addGuiBridgeToResourceConfig(resourceConfig);
         addGsonToResourceConfig(resourceConfig);
         addPreferencesToResourceConfig(resourceConfig);

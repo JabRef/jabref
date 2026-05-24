@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.http.SrvStateManager;
-import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.preferences.CliPreferences;
@@ -43,9 +42,6 @@ public class EntryResource {
 
     @Inject
     SrvStateManager srvStateManager;
-
-    @Inject
-    FilesToServe filesToServe;
 
     /// At http://localhost:23119/libraries/{id}/entries/{entryId} <br><br>
     ///
@@ -184,6 +180,6 @@ public class EntryResource {
 
     /// @param id - also "demo" for the Chocolate.bib file
     private BibDatabaseContext getDatabaseContext(String id) throws IOException {
-        return ServerUtils.getBibDatabaseContext(id, filesToServe, srvStateManager, preferences.getImportFormatPreferences());
+        return ServerUtils.getBibDatabaseContext(id, srvStateManager, preferences.getImportFormatPreferences());
     }
 }

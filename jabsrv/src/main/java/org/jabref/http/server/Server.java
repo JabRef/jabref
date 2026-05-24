@@ -25,7 +25,6 @@ import org.jabref.http.server.resources.LibrariesResource;
 import org.jabref.http.server.resources.LibraryResource;
 import org.jabref.http.server.resources.MapResource;
 import org.jabref.http.server.resources.RootResource;
-import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.os.OS;
@@ -71,15 +70,11 @@ public class Server {
 
         LOGGER.debug("Libraries to serve: {}", filesToServeList);
 
-        FilesToServe filesToServe = new FilesToServe();
-        filesToServe.setFilesToServe(filesToServeList);
-
         SrvStateManager srvStateManager = new JabRefSrvStateManager(
                 preferences.getBibEntryPreferences(),
                 parseLibraries(filesToServeList));
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
         ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, "statemanager", SrvStateManager.class);
         HttpServer httpServer = startServer(serviceLocator, uri);
 
@@ -125,10 +120,7 @@ public class Server {
 
     /// Entry point for the GUI with UiMessageHandler
     public HttpServer run(SrvStateManager srvStateManager, @Nullable UiMessageHandler uiMessageHandler, URI uri) {
-        FilesToServe filesToServe = new FilesToServe();
-
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
         ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, "statemanager", SrvStateManager.class);
         if (uiMessageHandler != null) {
             ServiceLocatorUtilities.addOneConstant(serviceLocator, uiMessageHandler, "uimessagehandler", UiMessageHandler.class);

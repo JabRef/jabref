@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import org.jabref.http.SrvStateManager;
-import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
 
 import jakarta.inject.Inject;
@@ -24,9 +23,6 @@ public class MapResource {
 
     @Inject
     SrvStateManager srvStateManager;
-
-    @Inject
-    FilesToServe filesToServe;
 
     /// At http://localhost:23119/libraries/{id}/map <br><br>
     ///
@@ -91,7 +87,7 @@ public class MapResource {
     }
 
     private java.nio.file.Path getJabMapPath(String id) {
-        java.nio.file.Path libraryPath = ServerUtils.getLibraryPath(id, filesToServe, srvStateManager);
+        java.nio.file.Path libraryPath = ServerUtils.getLibraryPath(id, srvStateManager);
         String newName = libraryPath.getFileName().toString().replaceFirst("\\.bib$", ".jmp");
         return libraryPath.getParent().resolve(newName);
     }

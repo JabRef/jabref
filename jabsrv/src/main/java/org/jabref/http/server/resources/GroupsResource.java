@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.GroupDTO;
-import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -34,13 +33,10 @@ public class GroupsResource {
     @Inject
     SrvStateManager srvStateManager;
 
-    @Inject
-    FilesToServe filesToServe;
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<GroupDTO> get(@PathParam("id") String id) throws IOException {
-        BibDatabaseContext context = ServerUtils.getBibDatabaseContext(id, filesToServe, srvStateManager, preferences.getImportFormatPreferences());
+        BibDatabaseContext context = ServerUtils.getBibDatabaseContext(id, srvStateManager, preferences.getImportFormatPreferences());
         List<GroupDTO> groups = new ArrayList<>();
         context.getMetaData().getGroups().ifPresent(root -> flatten(root, groups));
         return groups;
