@@ -108,14 +108,14 @@ class GenerateCitationKeys implements Callable<Integer> {
         }
 
         if (outputFile != null) {
-            ExportService.saveDatabase(
-                    parentCommand.getParent().cliPreferences,
+            ExportService.create(parentCommand.getParent().cliPreferences).saveDatabase(
                     parentCommand.getParent().entryTypesManager,
                     parserResult.get().getDatabase(),
                     outputFile);
             return 0;
         } else {
-            return ExportService.outputDatabaseContext(parentCommand.getParent().cliPreferences, parserResult.get().getDatabaseContext());
+            return ExportService.create(parentCommand.getParent().cliPreferences)
+                                .outputDatabaseContext(parserResult.get().getDatabaseContext());
         }
     }
 

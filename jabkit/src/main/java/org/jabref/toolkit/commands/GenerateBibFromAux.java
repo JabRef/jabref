@@ -87,8 +87,7 @@ class GenerateBibFromAux implements Callable<Integer> {
                                           .collect(Collectors.joining("\n\n")));
             return 0;
         } else {
-            ExportService.saveDatabase(
-                    argumentProcessor.cliPreferences,
+            ExportService.create(argumentProcessor.cliPreferences).saveDatabase(
                     argumentProcessor.entryTypesManager,
                     subDatabase,
                     outputFile);

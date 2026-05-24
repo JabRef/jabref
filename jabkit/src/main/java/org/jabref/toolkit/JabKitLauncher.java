@@ -84,7 +84,7 @@ public class JabKitLauncher {
             commandLine.getCommandSpec().usageMessage().header(usageHeader);
             applyUsageFooters(commandLine,
                     ImportService.getAvailableImportFormats(preferences),
-                    ExportService.getAvailableExportFormats(preferences),
+                    ExportService.create(preferences).getAvailableExportFormats(),
                     WebFetchers.getSearchBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
 
             // Show help when no arguments are given. Placed after header and footer setup

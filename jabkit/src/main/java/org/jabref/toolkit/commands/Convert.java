@@ -65,6 +65,7 @@ class Convert implements Callable<Integer> {
             return 0;
         }
 
-        return ExportService.exportFile(parserResult.get(), outputFile, outputFormat, sharedOptions.porcelain, jabKit.cliPreferences, jabKit.entryTypesManager);
+        return ExportService.create(jabKit.cliPreferences)
+                            .exportFile(parserResult.get(), outputFile, outputFormat, sharedOptions.porcelain, jabKit.entryTypesManager);
     }
 }

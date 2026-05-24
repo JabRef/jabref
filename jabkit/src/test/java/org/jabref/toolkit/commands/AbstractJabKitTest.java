@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.exporter.ExportPreferences;
@@ -39,6 +40,7 @@ public abstract class AbstractJabKitTest {
     protected final ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     protected final ExportPreferences exportPreferences = mock(ExportPreferences.class, Answers.RETURNS_DEEP_STUBS);
     protected final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+    protected final AiPreferences aiPreferences = mock(AiPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
     protected CommandLine commandLine;
 
@@ -75,6 +77,7 @@ public abstract class AbstractJabKitTest {
                 0,
                 0,
                 0));
+        when(preferences.getAiPreferences()).thenReturn(aiPreferences);
 
         JabKit jabKit = new JabKit(preferences, entryTypesManager);
         commandLine = new CommandLine(jabKit);

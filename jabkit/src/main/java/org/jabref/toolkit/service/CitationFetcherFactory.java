@@ -12,7 +12,7 @@ public class CitationFetcherFactory {
 
     private final CliPreferences cliPreferences;
 
-    public CitationFetcherFactory(CliPreferences cliPreferences) {
+    private CitationFetcherFactory(CliPreferences cliPreferences) {
         this.cliPreferences = cliPreferences;
     }
 

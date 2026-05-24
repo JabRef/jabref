@@ -75,8 +75,7 @@ class Fetch implements Callable<Integer> {
             }
 
             if (outputFile != null) {
-                ExportService.saveDatabase(
-                        argumentProcessor.cliPreferences,
+                ExportService.create(argumentProcessor.cliPreferences).saveDatabase(
                         argumentProcessor.entryTypesManager,
                         new BibDatabase(matches),
                         outputFile);

@@ -27,6 +27,10 @@ class GetCitedWorks implements Callable<Integer> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GetCitedWorks.class);
 
+    CitationFetcherFactory citationFetcherFactory;
+
+    ExportService exportService;
+
     @CommandLine.ParentCommand
     private JabKit argumentProcessor;
 
@@ -56,30 +60,27 @@ class GetCitedWorks implements Callable<Integer> {
     @CommandLine.Parameters(description = "DOI to check")
     private String doi;
 
-    private final ExportService exportService;
-
-    public GetCitedWorks() {
-        this(new ExportService());
-    }
-
     @VisibleForTesting
-    GetCitedWorks(ExportService exportService) {
-        this.exportService = exportService;
+    void init() {
+        citationFetcherFactory = CitationFetcherFactory.create(argumentProcessor.cliPreferences);
+        exportService = ExportService.create(argumentProcessor.cliPreferences);
     }
 
     @Override
     public Integer call() {
         try {
-            CitationFetcher citationFetcher = CitationFetcherFactory.create(argumentProcessor.cliPreferences)
-                                                                    .getCitationFetcher(citationFetcherType);
+            // TODO: validateJSR380(); - i.e. no output-format without output-file
+            init();
+
+            CitationFetcher citationFetcher = citationFetcherFactory.getCitationFetcher(citationFetcherType);
 
             List<BibEntry> entries = citationFetcher.getReferences(new BibEntry().withField(StandardField.DOI, doi));
 
             if (outputFile != null) {
                 BibDatabaseContext dbContext = new BibDatabaseContext(new BibDatabase(entries));
-                return exportService.exportToFile(dbContext, entries, argumentProcessor.cliPreferences, outputFormat, outputFile);
+                return exportService.exportToFile(dbContext, entries, outputFormat, outputFile);
             } else {
-                return exportService.outputEntries(argumentProcessor.cliPreferences, entries);
+                return exportService.outputEntries(entries);
             }
         } catch (FetcherException e) {
             LOGGER.error("Could not fetch citation information based on DOI", e);

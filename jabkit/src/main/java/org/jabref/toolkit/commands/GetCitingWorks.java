@@ -69,7 +69,7 @@ class GetCitingWorks implements Callable<Integer> {
                 return 2;
             }
 
-            return ExportService.outputEntries(argumentProcessor.cliPreferences, entries);
+            return ExportService.create(argumentProcessor.cliPreferences).outputEntries(entries);
         }
     }
 }
