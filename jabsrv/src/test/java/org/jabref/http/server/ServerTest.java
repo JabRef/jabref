@@ -1,9 +1,6 @@
 package org.jabref.http.server;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -19,13 +16,10 @@ import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.LastFilesOpenedPreferences;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.metadata.UserHostInfo;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import com.google.gson.Gson;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -73,26 +67,13 @@ public abstract class ServerTest extends JerseyTest {
         resourceConfig.register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bind(new JabRefSrvStateManager(preferences.getBibEntryPreferences(), parseFilesToServe())).to(SrvStateManager.class);
+                bind(new JabRefSrvStateManager(
+                        preferences.getBibEntryPreferences(),
+                        preferences.getImportFormatPreferences(),
+                        filesToServe))
+                        .to(SrvStateManager.class);
             }
         });
-    }
-
-    /// Parses every library currently in [#filesToServe] so the state manager owns the
-    /// same [BibDatabaseContext] instances that resources will look up by id. Without
-    /// this, [SrvStateManager#getSearchContext] is called with a re-parsed (and therefore
-    /// unregistered) database and fires the lifecycle assertion.
-    private static List<BibDatabaseContext> parseFilesToServe() {
-        BibtexImporter importer = new BibtexImporter(preferences.getImportFormatPreferences(), new DummyFileUpdateMonitor());
-        List<BibDatabaseContext> contexts = new ArrayList<>(filesToServe.size());
-        for (Path file : filesToServe) {
-            try {
-                contexts.add(importer.importDatabase(file).getDatabaseContext());
-            } catch (IOException e) {
-                throw new UncheckedIOException("Could not parse library " + file, e);
-            }
-        }
-        return contexts;
     }
 
     protected void addGsonToResourceConfig(ResourceConfig resourceConfig) {

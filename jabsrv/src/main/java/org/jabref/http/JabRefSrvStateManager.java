@@ -1,6 +1,12 @@
 package org.jabref.http;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -10,6 +16,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.command.CommandSelectionTab;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.search.SearchBackend;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.search.inmemory.InMemorySearchBackend;
@@ -17,34 +25,102 @@ import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
+import org.jabref.model.util.DummyFileUpdateMonitor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// [SrvStateManager] for the stand-alone HTTP server.
 ///
-/// Unlike the GUI, the server serves a fixed set of libraries known at startup and has no
-/// preference toggle. It therefore parses every library once (see
-/// [org.jabref.http.server.Server]) and builds an in-memory [SearchContext] for each in
-/// this constructor; [#getSearchContext] then only ever returns these pre-built contexts
-/// (handled by [AbstractSrvStateManager]). There is no Postgres path: the in-memory backend
-/// has no startup cost, and the toggle is hardwired to `false`.
+/// The server serves a fixed set of libraries known at startup. Each one is parsed
+/// once in the constructor, an in-memory [SearchContext] is built for it, and the
+/// `(BibDatabaseContext, mtime)` pair is held for the lifetime of the process.
+///
+/// Because nothing watches the files asynchronously (jabsrv uses
+/// [DummyFileUpdateMonitor] everywhere), [#getOpenDatabases] does a per-call
+/// `stat` on every tracked file and re-parses any that changed on disk since the
+/// last observation. The cost is one stat per library per request; only an actual
+/// modification triggers re-parsing. This is the cheap middle ground between
+/// "snapshot at startup" (broken when the user edits a `.bib` externally) and
+/// running a real [org.jabref.model.util.FileUpdateMonitor] thread.
+///
+/// There is no Postgres path: the in-memory backend has no startup cost, and the
+/// toggle is hardwired to `false`.
 public class JabRefSrvStateManager extends AbstractSrvStateManager {
 
-    private final ObservableList<BibDatabaseContext> openDatabases;
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefSrvStateManager.class);
 
-    public JabRefSrvStateManager(BibEntryPreferences bibEntryPreferences, List<BibDatabaseContext> databases) {
-        this.openDatabases = FXCollections.observableArrayList(databases);
-        for (BibDatabaseContext database : databases) {
-            Supplier<SearchBackend> inMemory = () -> new InMemorySearchBackend(database, bibEntryPreferences);
-            SimpleBooleanProperty usePostgres = new SimpleBooleanProperty(false);
-            assert !usePostgres.get() : "Stand-alone HTTP server must never use the Postgres backend";
-            // The in-memory supplier is wired into the SQL slot too: should the toggle ever
-            // flip, an unexpected backend swap stays harmless instead of throwing at runtime.
-            setSearchContext(database, new SearchContext(usePostgres, inMemory, inMemory));
+    private final BibEntryPreferences bibEntryPreferences;
+    private final BibtexImporter importer;
+    private final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
+    private final Map<Path, FileTime> lastModified = new HashMap<>();
+
+    public JabRefSrvStateManager(BibEntryPreferences bibEntryPreferences, ImportFormatPreferences importFormatPreferences, List<Path> files) {
+        this.bibEntryPreferences = bibEntryPreferences;
+        this.importer = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
+        for (Path file : files) {
+            parseLibrary(file).ifPresent(context -> {
+                openDatabases.add(context);
+                registerSearchContext(context);
+            });
         }
     }
 
     @Override
-    public ObservableList<BibDatabaseContext> getOpenDatabases() {
+    public synchronized ObservableList<BibDatabaseContext> getOpenDatabases() {
+        refreshStaleLibraries();
         return openDatabases;
+    }
+
+    /// Compares each tracked file's current mtime against the snapshot taken at
+    /// the last parse. If it changed, the library is re-parsed, the context in
+    /// [#openDatabases] is replaced, and a fresh [SearchContext] is registered
+    /// under the new context's uid. The old uid stays in the registry — a small
+    /// leak proportional to the number of edits the server sees in a session.
+    private void refreshStaleLibraries() {
+        for (int i = 0; i < openDatabases.size(); i++) {
+            BibDatabaseContext current = openDatabases.get(i);
+            Optional<Path> pathOpt = current.getDatabasePath();
+            if (pathOpt.isEmpty()) {
+                continue;
+            }
+            Path path = pathOpt.get();
+            try {
+                FileTime now = Files.getLastModifiedTime(path);
+                FileTime previous = lastModified.get(path);
+                if (now.equals(previous)) {
+                    continue;
+                }
+                Optional<BibDatabaseContext> reparsed = parseLibrary(path);
+                if (reparsed.isPresent()) {
+                    openDatabases.set(i, reparsed.get());
+                    registerSearchContext(reparsed.get());
+                }
+            } catch (IOException e) {
+                LOGGER.warn("Could not stat library {} for freshness check", path, e);
+            }
+        }
+    }
+
+    /// Parses a single library. A library that fails to parse is logged and skipped.
+    private Optional<BibDatabaseContext> parseLibrary(Path file) {
+        try {
+            BibDatabaseContext context = importer.importDatabase(file).getDatabaseContext();
+            lastModified.put(file, Files.getLastModifiedTime(file));
+            return Optional.of(context);
+        } catch (IOException e) {
+            LOGGER.error("Could not parse library {}", file, e);
+            return Optional.empty();
+        }
+    }
+
+    private void registerSearchContext(BibDatabaseContext database) {
+        Supplier<SearchBackend> inMemory = () -> new InMemorySearchBackend(database, bibEntryPreferences);
+        SimpleBooleanProperty usePostgres = new SimpleBooleanProperty(false);
+        assert !usePostgres.get() : "Stand-alone HTTP server must never use the Postgres backend";
+        // The in-memory supplier is wired into the SQL slot too: should the toggle ever
+        // flip, an unexpected backend swap stays harmless instead of throwing at runtime.
+        setSearchContext(database, new SearchContext(usePostgres, inMemory, inMemory));
     }
 
     @Override
