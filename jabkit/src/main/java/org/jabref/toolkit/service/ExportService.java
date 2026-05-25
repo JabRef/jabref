@@ -42,9 +42,11 @@ public class ExportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportService.class);
 
     private final CliPreferences cliPreferences;
+    private BibEntryTypesManager entryTypesManager;
 
-    private ExportService(CliPreferences cliPreferences) {
+    public ExportService(CliPreferences cliPreferences) {
         this.cliPreferences = cliPreferences;
+        this.entryTypesManager = cliPreferences.getCustomEntryTypesRepository();
     }
 
     public static ExportService create(CliPreferences cliPreferences) {
@@ -58,13 +60,13 @@ public class ExportService {
                               .toList();
     }
 
-    public int outputEntries(List<BibEntry> entries) {
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(entries));
-        return outputDatabaseContext(bibDatabaseContext);
+    /// Outputs to StdOut. Generates citation keys if missing.
+    public int printBibEntries(List<BibEntry> entries) {
+        return printDatabaseContext(new BibDatabaseContext(new BibDatabase(entries)));
     }
 
     /// Outputs to StdOut. Generates citation keys if missing.
-    public int outputDatabaseContext(BibDatabaseContext bibDatabaseContext) {
+    public int printDatabaseContext(BibDatabaseContext bibDatabaseContext) {
         generateCitationKeys(bibDatabaseContext, cliPreferences.getCitationKeyPatternPreferences());
 
         try (OutputStreamWriter writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
@@ -78,14 +80,15 @@ public class ExportService {
         return 0;
     }
 
-    public void saveDatabase(BibEntryTypesManager entryTypesManager,
-                             BibDatabase newBase,
-                             Path outputFile) {
-        saveDatabaseContext(entryTypesManager, new BibDatabaseContext(newBase), outputFile);
+    public void saveBibEntries(List<BibEntry> matches, Path outputFile1) {
+        saveDatabase(new BibDatabase(matches), outputFile1);
     }
 
-    public void saveDatabaseContext(BibEntryTypesManager entryTypesManager,
-                                    BibDatabaseContext bibDatabaseContext,
+    public void saveDatabase(BibDatabase newBase, Path outputFile) {
+        saveDatabaseContext(new BibDatabaseContext(newBase), outputFile);
+    }
+
+    public void saveDatabaseContext(BibDatabaseContext bibDatabaseContext,
                                     Path outputFile) {
         try {
             if (!FileUtil.isBibFile(outputFile)) {
@@ -115,27 +118,11 @@ public class ExportService {
         }
     }
 
-    /// Generates a citation key if there is no key existing
-    private static void generateCitationKeys(
-            BibDatabaseContext databaseContext,
-            CitationKeyPatternPreferences citationKeyPatternPreferences) {
-
-        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                databaseContext,
-                citationKeyPatternPreferences);
-        for (BibEntry entry : databaseContext.getEntries()) {
-            if (!entry.hasCitationKey()) {
-                keyGenerator.generateAndSetKey(entry);
-            }
-        }
-    }
-
-    public int exportFile(
+    public int exportParserResultToFile(
             @NonNull ParserResult parserResult,
             @NonNull Path outputFile,
             String format,
-            boolean porcelain,
-            BibEntryTypesManager entryTypesManager) {
+            boolean porcelain) {
 
         if (!porcelain) {
             System.out.println(Localization.lang("Exporting '%0'.", outputFile));
@@ -143,7 +130,6 @@ public class ExportService {
 
         if ("bibtex".equalsIgnoreCase(format)) {
             saveDatabase(
-                    entryTypesManager,
                     parserResult.getDatabase(),
                     outputFile);
             return 0;
@@ -179,7 +165,7 @@ public class ExportService {
         return 0;
     }
 
-    public int exportToFile(
+    public int exportBibDatabaseContextToFile(
             BibDatabaseContext databaseContext,
             List<BibEntry> matches,
             String outputFormat1,
@@ -211,7 +197,18 @@ public class ExportService {
         return 0;
     }
 
-    public void saveDatabase(List<BibEntry> matches, BibEntryTypesManager entryTypesManager, Path outputFile1) {
-        saveDatabase(entryTypesManager, new BibDatabase(matches), outputFile1);
+    /// Generates a citation key if there is no key existing
+    private static void generateCitationKeys(
+            BibDatabaseContext databaseContext,
+            CitationKeyPatternPreferences citationKeyPatternPreferences) {
+
+        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
+                databaseContext,
+                citationKeyPatternPreferences);
+        for (BibEntry entry : databaseContext.getEntries()) {
+            if (!entry.hasCitationKey()) {
+                keyGenerator.generateAndSetKey(entry);
+            }
+        }
     }
 }

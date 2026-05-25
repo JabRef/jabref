@@ -68,6 +68,6 @@ class DoiToBibtex implements Callable<Integer> {
             entries.add(entry.get());
         }
 
-        return ExportService.create(argumentProcessor.cliPreferences).outputEntries(entries);
+        return ExportService.create(argumentProcessor.cliPreferences).printBibEntries(entries);
     }
 }

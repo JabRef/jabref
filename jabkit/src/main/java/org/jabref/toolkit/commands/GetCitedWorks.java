@@ -61,7 +61,7 @@ class GetCitedWorks implements Callable<Integer> {
     private String doi;
 
     @VisibleForTesting
-    void init() {
+    void initFields() {
         citationFetcherFactory = CitationFetcherFactory.create(argumentProcessor.cliPreferences);
         exportService = ExportService.create(argumentProcessor.cliPreferences);
     }
@@ -70,7 +70,7 @@ class GetCitedWorks implements Callable<Integer> {
     public Integer call() {
         try {
             // TODO: validateJSR380(); - i.e. no output-format without output-file
-            init();
+            initFields();
 
             CitationFetcher citationFetcher = citationFetcherFactory.getCitationFetcher(citationFetcherType);
 
@@ -78,9 +78,9 @@ class GetCitedWorks implements Callable<Integer> {
 
             if (outputFile != null) {
                 BibDatabaseContext dbContext = new BibDatabaseContext(new BibDatabase(entries));
-                return exportService.exportToFile(dbContext, entries, outputFormat, outputFile);
+                return exportService.exportBibDatabaseContextToFile(dbContext, entries, outputFormat, outputFile);
             } else {
-                return exportService.outputEntries(entries);
+                return exportService.outpautEntries(entries);
             }
         } catch (FetcherException e) {
             LOGGER.error("Could not fetch citation information based on DOI", e);

@@ -32,7 +32,7 @@ class GetCitedWorksTest extends AbstractJabKitTest {
 
         GetCitedWorks sut = new GetCitedWorks() {
             @Override
-            protected void init() {
+            protected void initFields() {
                 this.citationFetcherFactory = mockFetcherFactory;
                 this.exportService = mockExportService;
             }
@@ -60,11 +60,11 @@ class GetCitedWorksTest extends AbstractJabKitTest {
     }
 
     @Test
-    void existingDoiPrintsToStdoutWithDefaults() {
+    void simpleDoiLookupPrintsFetcherResults() {
         // mock the export service to do nothing and capture the argument
         ArgumentCaptor<List<BibEntry>> captor = ArgumentCaptor.captor();
         // TODO refactor outputEntries to only consume (not return int) -> use `doNothing()` instead
-        doReturn(CommandLine.ExitCode.OK).when(mockExportService).outputEntries(captor.capture());
+        doReturn(CommandLine.ExitCode.OK).when(mockExportService).printBibEntries(captor.capture());
 
         int exitCode = commandLine.execute("get-cited-works", "10.3390/su131810256");
 

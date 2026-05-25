@@ -70,7 +70,6 @@ class Pseudonymize implements Callable<Integer> {
         }
 
         ExportService.create(argumentProcessor.cliPreferences).saveDatabaseContext(
-                argumentProcessor.entryTypesManager,
                 result.bibDatabaseContext(),
                 pseudoBibPath);
 

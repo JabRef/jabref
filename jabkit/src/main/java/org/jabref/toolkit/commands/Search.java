@@ -69,10 +69,10 @@ class Search implements Callable<Integer> {
         }
 
         if ("bibtex".equals(outputFormat)) {
-            ExportService.create(argumentProcessor.cliPreferences).saveDatabase(matches, argumentProcessor.entryTypesManager, outputFile);
+            ExportService.create(argumentProcessor.cliPreferences).saveBibEntries(matches, outputFile);
             LOGGER.debug("Finished export");
         } else {
-            return ExportService.create(argumentProcessor.cliPreferences).exportToFile(databaseContext, matches, outputFormat, outputFile);
+            return ExportService.create(argumentProcessor.cliPreferences).exportBibDatabaseContextToFile(databaseContext, matches, outputFormat, outputFile);
         }
         return 0;
     }
