@@ -1,7 +1,6 @@
 package org.jabref.logic.externalfiles;
 
 import java.nio.file.Path;
-import java.util.Optional;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.model.database.BibDatabase;
@@ -41,11 +40,11 @@ public class FileTestConfiguration {
             Path tempDir
     ) {
         if (mainFileDir == null) {
-            when(filePreferences.getMainFileDirectory()).thenReturn(Optional.empty());
+            when(filePreferences.getMainFileDirectory()).thenReturn(Path.of(""));
             this.mainFileDir = null;
         } else {
             this.mainFileDir = tempDir.resolve(mainFileDir);
-            when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(this.mainFileDir));
+            when(filePreferences.getMainFileDirectory()).thenReturn(this.mainFileDir);
         }
 
         when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");

@@ -153,7 +153,7 @@ class PdfMergeMetadataImporterTest {
         // Initialize file and working directory
         Path file = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/minimal.pdf").toURI());
         Path directory = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/").toURI());
-        when(preferences.getMainFileDirectory()).thenReturn(Optional.of(directory));
+        when(preferences.getMainFileDirectory()).thenReturn(directory);
 
         List<BibEntry> result = importer.importDatabase(file, database, preferences).getDatabase().getEntries();
 
