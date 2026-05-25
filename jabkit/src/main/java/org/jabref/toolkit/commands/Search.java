@@ -14,11 +14,13 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.toolkit.converter.CygWinPathConverter;
+import org.jabref.toolkit.exception.ExportException;
 import org.jabref.toolkit.service.ExportService;
 import org.jabref.toolkit.service.ImportService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
@@ -69,10 +71,22 @@ class Search implements Callable<Integer> {
         }
 
         if ("bibtex".equals(outputFormat)) {
-            ExportService.create(argumentProcessor.cliPreferences).saveBibEntries(matches, outputFile);
+            try {
+                ExportService.create(argumentProcessor.cliPreferences).saveBibEntries(matches, outputFile);
+            } catch (ExportException ex) {
+                // TODO this just informs the user, maybe to lax?
+                System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
+                return 1;
+            }
             LOGGER.debug("Finished export");
         } else {
-            return ExportService.create(argumentProcessor.cliPreferences).exportBibDatabaseContextToFile(databaseContext, matches, outputFormat, outputFile);
+            try {
+                ExportService.create(argumentProcessor.cliPreferences).exportBibDatabaseContextToFile(databaseContext, matches, outputFormat, outputFile);
+                return CommandLine.ExitCode.OK;
+            } catch (ExportException ex) {
+                System.err.println(ex.getLocalizedMessage() + " (" + (ex.getCause() == null ? "" : ex.getCause().getLocalizedMessage()) + ")");
+                return ex.getExitCode();
+            }
         }
         return 0;
     }

@@ -13,6 +13,7 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.toolkit.exception.ExportException;
 import org.jabref.toolkit.service.ExportService;
 
 import org.slf4j.Logger;
@@ -84,6 +85,10 @@ class Fetch implements Callable<Integer> {
         } catch (FetcherException e) {
             LOGGER.error("Error while fetching", e);
             return 2;
+        } catch (ExportException ex) {
+            // TODO this just informs the user, maybe to lax?
+            System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
+            return 1;
         }
         return 0;
     }

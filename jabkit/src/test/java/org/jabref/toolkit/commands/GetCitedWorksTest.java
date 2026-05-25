@@ -17,6 +17,7 @@ import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -60,7 +61,7 @@ class GetCitedWorksTest extends AbstractJabKitTest {
         // mock the export service to do nothing and capture the argument
         ArgumentCaptor<List<BibEntry>> captor = ArgumentCaptor.captor();
         // TODO refactor outputEntries to only consume (not return int) -> use `doNothing()` instead
-        doReturn(CommandLine.ExitCode.OK).when(mockExportService).printBibEntries(captor.capture());
+        doNothing().when(mockExportService).printBibEntries(captor.capture());
 
         int exitCode = commandLine.execute("get-cited-works", "10.3390/su131810256");
 
@@ -74,7 +75,7 @@ class GetCitedWorksTest extends AbstractJabKitTest {
         List<BibEntry> citedWorks = List.of();
         when(citationFetcher.getReferences(any())).thenReturn(citedWorks);
 
-        int exitCode = commandLine.execute("get-cited-works", "10.1000/2045-climate101");
+        int exitCode = commandLine.execute("get-cited-works", "10.1000/2045-climate101", "--porcelain");
 
         assertEquals(CommandLine.ExitCode.OK, exitCode);
     }

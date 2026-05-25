@@ -8,8 +8,11 @@ import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.toolkit.converter.CygWinPathConverter;
+import org.jabref.toolkit.exception.ExportException;
 import org.jabref.toolkit.service.ExportService;
 import org.jabref.toolkit.service.ImportService;
+
+import picocli.CommandLine;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
@@ -65,7 +68,14 @@ class Convert implements Callable<Integer> {
             return 0;
         }
 
-        return ExportService.create(jabKit.cliPreferences)
-                            .exportParserResultToFile(parserResult.get(), outputFile, outputFormat, sharedOptions.porcelain);
+        try {
+            ExportService.create(jabKit.cliPreferences)
+                                .exportParserResultToFile(parserResult.get(), outputFile, outputFormat, sharedOptions.porcelain);
+            return CommandLine.ExitCode.OK;
+        } catch (ExportException ex) {
+            // TODO this just informs the user, maybe to lax?
+            System.err.println(ex.getLocalizedMessage() + " (" + (ex.getCause() == null ? "" : ex.getCause().getLocalizedMessage()) + ")");
+            return ex.getExitCode();
+        }
     }
 }

@@ -15,6 +15,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.toolkit.exception.ExportException;
 import org.jabref.toolkit.service.ExportService;
 import org.jabref.toolkit.service.ImportService;
 
@@ -87,9 +88,15 @@ class GenerateBibFromAux implements Callable<Integer> {
                                           .collect(Collectors.joining("\n\n")));
             return 0;
         } else {
-            ExportService.create(argumentProcessor.cliPreferences).saveDatabase(
-                    subDatabase,
-                    outputFile);
+            try {
+                ExportService.create(argumentProcessor.cliPreferences).saveDatabase(
+                        subDatabase,
+                        outputFile);
+            } catch (ExportException ex) {
+                // TODO this just informs the user, maybe to lax?
+                System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
+                return 1;
+            }
         }
 
         if (!sharedOptions.porcelain) {

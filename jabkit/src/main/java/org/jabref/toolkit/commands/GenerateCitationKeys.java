@@ -18,11 +18,14 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.toolkit.converter.KeySuffixConverter;
+import org.jabref.toolkit.exception.ExportException;
 import org.jabref.toolkit.service.ExportService;
 import org.jabref.toolkit.service.ImportService;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
@@ -79,42 +82,49 @@ class GenerateCitationKeys implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        Path inputFile = inputOption.getInputFile();
-        Optional<ParserResult> parserResult = ImportService.importFile(
-                inputFile,
-                "bibtex",
-                parentCommand.getParent().cliPreferences,
-                sharedOptions.porcelain);
+        try {
+            Path inputFile = inputOption.getInputFile();
+            Optional<ParserResult> parserResult = ImportService.importFile(
+                    inputFile,
+                    "bibtex",
+                    parentCommand.getParent().cliPreferences,
+                    sharedOptions.porcelain);
 
-        if (parserResult.isEmpty()) {
-            System.err.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return 2;
-        }
+            if (parserResult.isEmpty()) {
+                System.err.println(Localization.lang("Unable to open file '%0'.", inputFile));
+                return 2;
+            }
 
-        if (parserResult.get().isInvalid()) {
-            System.err.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
-            return 2;
-        }
+            if (parserResult.get().isInvalid()) {
+                System.err.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
+                return 2;
+            }
 
-        BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
+            BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
 
-        if (!sharedOptions.porcelain) {
-            System.out.println(Localization.lang("Regenerating citation keys according to metadata."));
-        }
+            if (!sharedOptions.porcelain) {
+                System.out.println(Localization.lang("Regenerating citation keys according to metadata."));
+            }
 
-        CitationKeyGenerator keyGenerator = getCitationKeyGenerator(databaseContext);
-        for (BibEntry entry : databaseContext.getEntries()) {
-            keyGenerator.generateAndSetKey(entry);
-        }
+            CitationKeyGenerator keyGenerator = getCitationKeyGenerator(databaseContext);
+            for (BibEntry entry : databaseContext.getEntries()) {
+                keyGenerator.generateAndSetKey(entry);
+            }
 
-        if (outputFile != null) {
-            ExportService.create(parentCommand.getParent().cliPreferences).saveDatabase(
-                    parserResult.get().getDatabase(),
-                    outputFile);
-            return 0;
-        } else {
-            return ExportService.create(parentCommand.getParent().cliPreferences)
-                                .printDatabaseContext(parserResult.get().getDatabaseContext());
+            if (outputFile != null) {
+                ExportService.create(parentCommand.getParent().cliPreferences).saveDatabase(
+                        parserResult.get().getDatabase(),
+                        outputFile);
+                return 0;
+            } else {
+                ExportService.create(parentCommand.getParent().cliPreferences)
+                                    .printDatabaseContext(parserResult.get().getDatabaseContext());
+                return CommandLine.ExitCode.OK;
+            }
+        } catch (ExportException ex) {
+            LoggerFactory.getLogger(GenerateCitationKeys.class).error("Could not write BibTeX", ex);
+            System.err.println(Localization.lang("Unable to write to %0.", "stdout"));
+            return CommandLine.ExitCode.SOFTWARE;
         }
     }
 

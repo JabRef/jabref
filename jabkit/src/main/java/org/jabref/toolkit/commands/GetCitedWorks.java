@@ -8,11 +8,10 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.toolkit.converter.CitationFetcherTypeConverter;
+import org.jabref.toolkit.exception.ExportException;
 import org.jabref.toolkit.service.CitationFetcherFactory;
 import org.jabref.toolkit.service.ExportService;
 
@@ -77,10 +76,11 @@ class GetCitedWorks implements Callable<Integer> {
             List<BibEntry> entries = citationFetcher.getReferences(new BibEntry().withField(StandardField.DOI, doi));
 
             if (outputFile != null && outputFormat != null) {
-                return exportService.exportEntriesToFile(entries, outputFormat, outputFile);
+                exportService.exportEntriesToFile(entries, outputFormat, outputFile);
             } else {
-                return exportService.printBibEntries(entries);
+                exportService.printBibEntries(entries);
             }
+            return CommandLine.ExitCode.OK;
         } catch (FetcherException e) {
             LOGGER.error("Could not fetch citation information based on DOI", e);
             System.err.print(Localization.lang("No data was found for the identifier"));
@@ -88,6 +88,9 @@ class GetCitedWorks implements Callable<Integer> {
             System.err.println(e.getLocalizedMessage());
             System.err.println();
             return CommandLine.ExitCode.SOFTWARE;
+        } catch (ExportException ex) {
+            System.err.println(ex.getLocalizedMessage() + " (" + (ex.getCause() == null ? "" : ex.getCause().getLocalizedMessage()) + ")");
+            return ex.getExitCode();
         }
     }
 }

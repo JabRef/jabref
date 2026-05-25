@@ -13,6 +13,7 @@ import org.jabref.logic.pseudonymization.PseudonymizationResultCsvWriter;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.toolkit.converter.CygWinPathConverter;
+import org.jabref.toolkit.exception.ExportException;
 import org.jabref.toolkit.service.ExportService;
 import org.jabref.toolkit.service.ImportService;
 
@@ -69,9 +70,14 @@ class Pseudonymize implements Callable<Integer> {
             return 2;
         }
 
-        ExportService.create(argumentProcessor.cliPreferences).saveDatabaseContext(
-                result.bibDatabaseContext(),
-                pseudoBibPath);
+        try {
+            ExportService.create(argumentProcessor.cliPreferences).saveDatabaseContext(
+                    result.bibDatabaseContext(),
+                    pseudoBibPath);
+        } catch (ExportException ex) {
+            // TODO this just informs the user, maybe to lax?
+            System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
+        }
 
         if (!fileOverwriteCheck(pseudoKeyPath)) {
             return 2;

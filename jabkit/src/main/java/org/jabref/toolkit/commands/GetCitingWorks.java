@@ -13,6 +13,7 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.toolkit.converter.CitationFetcherTypeConverter;
+import org.jabref.toolkit.exception.ExportException;
 import org.jabref.toolkit.service.ExportService;
 
 import org.slf4j.Logger;
@@ -69,7 +70,14 @@ class GetCitingWorks implements Callable<Integer> {
                 return 2;
             }
 
-            return ExportService.create(argumentProcessor.cliPreferences).printBibEntries(entries);
+            try {
+                ExportService.create(argumentProcessor.cliPreferences).printBibEntries(entries);
+                return CommandLine.ExitCode.OK;
+            } catch (ExportException ex) {
+                LoggerFactory.getLogger(GenerateCitationKeys.class).error("Could not write BibTeX", ex);
+                System.err.println(Localization.lang("Unable to write to %0.", "stdout"));
+                return CommandLine.ExitCode.SOFTWARE;
+            }
         }
     }
 }
