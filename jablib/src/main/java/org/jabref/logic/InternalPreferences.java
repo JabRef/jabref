@@ -6,8 +6,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
 import org.jabref.logic.util.Version;
 import org.jabref.model.metadata.UserHostInfo;
@@ -17,18 +15,18 @@ public class InternalPreferences {
     private final ObjectProperty<Version> ignoredVersion;
     private final BooleanProperty versionCheckEnabled;
     private final ObjectProperty<Path> lastPreferencesExportPath;
-    private final StringProperty userAndHost;
+    private final ObjectProperty<UserHostInfo> userAndHost;
     private final BooleanProperty memoryStickMode;
 
     public InternalPreferences(Version ignoredVersion,
                                boolean versionCheck,
                                Path exportPath,
-                               String userAndHost,
+                               UserHostInfo userAndHost,
                                boolean memoryStickMode) {
         this.ignoredVersion = new SimpleObjectProperty<>(ignoredVersion);
         this.versionCheckEnabled = new SimpleBooleanProperty(versionCheck);
         this.lastPreferencesExportPath = new SimpleObjectProperty<>(exportPath);
-        this.userAndHost = new SimpleStringProperty(userAndHost);
+        this.userAndHost = new SimpleObjectProperty<>(userAndHost);
         this.memoryStickMode = new SimpleBooleanProperty(memoryStickMode);
     }
 
@@ -69,10 +67,10 @@ public class InternalPreferences {
     }
 
     public String getUserAndHost() {
-        return userAndHost.get();
+        return userAndHost.get().getUserHostString();
     }
 
-    public StringProperty getUserAndHostProperty() {
+    public ObjectProperty<UserHostInfo> getUserAndHostProperty() {
         return userAndHost;
     }
 
@@ -80,14 +78,14 @@ public class InternalPreferences {
     ///
     /// @return the user and host information
     public UserHostInfo getUserHostInfo() {
-        return UserHostInfo.parse(getUserAndHost());
+        return userAndHost.get();
     }
 
     /// Sets the user and host information from a UserHostInfo object.
     ///
     /// @param userHostInfo the user and host information
     public void setUserHostInfo(UserHostInfo userHostInfo) {
-        userAndHost.set(userHostInfo.getUserHostString());
+        userAndHost.set(userHostInfo);
     }
 
     public boolean isMemoryStickMode() {

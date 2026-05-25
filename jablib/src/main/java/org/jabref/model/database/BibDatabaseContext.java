@@ -201,7 +201,7 @@ public class BibDatabaseContext {
         if (preferences.shouldStoreFilesRelativeToBibFile()) {
             bibOrMainFileDirectory = getDatabaseDirectory().orElse(null);
         } else {
-            bibOrMainFileDirectory = preferences.getMainFileDirectory().orElse(null);
+            bibOrMainFileDirectory = preferences.getMainFileDirectory();
         }
 
         return new FileDirectories(

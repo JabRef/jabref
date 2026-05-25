@@ -21,21 +21,11 @@ public class MainFileDirectoryDialogViewModel extends AbstractViewModel {
         this.filePreferences = preferences.getFilePreferences();
         this.dialogService = dialogService;
 
-        pathProperty.set(filePreferences.getMainFileDirectory()
-                                        .map(Path::toString)
-                                        .orElse(""));
+        pathProperty.set(filePreferences.getMainFileDirectory().toString());
     }
 
     public StringProperty pathProperty() {
         return pathProperty;
-    }
-
-    public String getPath() {
-        return pathProperty.get();
-    }
-
-    public void setPath(String path) {
-        pathProperty.set(path);
     }
 
     public void browseForDirectory() {
@@ -44,11 +34,11 @@ public class MainFileDirectoryDialogViewModel extends AbstractViewModel {
                 .build();
 
         dialogService.showDirectorySelectionDialog(dirConfig)
-                     .ifPresent(selectedDir -> setPath(selectedDir.toString()));
+                     .ifPresent(selectedDir -> pathProperty.set(selectedDir.toString()));
     }
 
     public void saveSettings() {
-        filePreferences.setMainFileDirectory(getPath());
+        filePreferences.setMainFileDirectory(Path.of(pathProperty.get()));
         filePreferences.setStoreFilesRelativeToBibFile(false);
     }
 }

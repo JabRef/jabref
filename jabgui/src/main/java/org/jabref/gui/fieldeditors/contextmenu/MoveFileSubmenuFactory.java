@@ -50,9 +50,7 @@ class MoveFileSubmenuFactory {
 
     private Menu createMenuItem(List<LinkedFileViewModel> linkedFileViewModels, MoveFileCommand.Operation operation) {
         FileDirectories fileDirectories = databaseContext.getAllFileDirectories(preferences.getFilePreferences());
-        Optional<Path> mainFileDirectory = preferences.getFilePreferences()
-                                                      .getMainFileDirectory()
-                                                      .map(path -> path.toAbsolutePath().normalize());
+        Optional<Path> mainFileDirectory = Optional.of(preferences.getFilePreferences().getMainFileDirectory().toAbsolutePath().normalize());
 
         Map<String, Optional<Path>> directories = new LinkedHashMap<>();
         directories.put(Localization.lang("Main file directory: %0"), mainFileDirectory);
