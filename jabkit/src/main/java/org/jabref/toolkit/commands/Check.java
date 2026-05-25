@@ -21,9 +21,10 @@ class Check implements Callable<Integer> {
 
     /// Output formats accepted by `--output-format`. Kept lowercase so they can also serve as
     /// `case` labels for a switch over `outputFormat.toLowerCase(...)`.
-    static final String FORMAT_ERRORFORMAT = "errorformat";
-    static final String FORMAT_TXT = "txt";
     static final String FORMAT_CSV = "csv";
+    static final String FORMAT_ERRORFORMAT = "errorformat";
+    static final String FORMAT_GITHUB_ACTIONS = "github-actions";
+    static final String FORMAT_TXT = "txt";
 
     @ParentCommand
     protected JabKit jabKit;
@@ -37,7 +38,7 @@ class Check implements Callable<Integer> {
             description = "Input file. When given without a subcommand, both the consistency and integrity checks run.")
     private Path inputFile;
 
-    @Option(names = {"--output-format"}, description = "Output format: errorformat, txt or csv", defaultValue = FORMAT_ERRORFORMAT)
+    @Option(names = {"--output-format"}, description = "Output format: csv, errorformat, github-actions or txt", defaultValue = FORMAT_ERRORFORMAT)
     private String outputFormat;
 
     @Override
