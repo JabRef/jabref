@@ -377,7 +377,7 @@ public class BibEntry {
     /// Sets the citation key. Note: This is *not* the internal Id of this entry.
     /// The internal Id is always present, whereas the citation key might not be present.
     ///
-    /// @param newKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
+    /// @param newKey The cite key to set. Must not be null; use {@link #clearCitationKey()} to remove the cite key.
     public Optional<FieldChange> setCitationKey(String newKey) {
         return setField(InternalField.KEY_FIELD, newKey);
     }
@@ -397,6 +397,10 @@ public class BibEntry {
 
     public boolean hasCitationKey() {
         return getCitationKey().isPresent();
+    }
+
+    public Optional<FieldChange> clearCitationKey() {
+        return clearField(InternalField.KEY_FIELD);
     }
 
     /// Returns this entry's type.
@@ -999,10 +1003,6 @@ public class BibEntry {
         return keywords;
     }
 
-    public Optional<FieldChange> clearCiteKey() {
-        return clearField(InternalField.KEY_FIELD);
-    }
-
     private void invalidateFieldCache(Field field) {
         latexFreeFields.remove(field);
         fieldsAsWords.remove(field);
@@ -1042,6 +1042,15 @@ public class BibEntry {
 
         // Extract the path
         return FileFieldParser.parse(oldValue.get());
+    }
+
+    /// Checks if the BibEntry contains the linked file
+    ///
+    /// @param file the file that is checked if it's in the entry or not
+    /// @return true if the entry contains the file
+    public Boolean hasFile(LinkedFile file) {
+        List<LinkedFile> linkedFiles = getFiles();
+        return linkedFiles.contains(file);
     }
 
     public Optional<FieldChange> addFile(LinkedFile file) {
