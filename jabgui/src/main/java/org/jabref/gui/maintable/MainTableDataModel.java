@@ -63,6 +63,7 @@ public class MainTableDataModel {
     private final Subscription groupViewModeSubscription;
     private final SearchIndexListener indexUpdatedListener;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
+    @Nullable private BackgroundTask<?> currentSearchTask;
     @Nullable private final SearchContext searchContext;
 
     private Optional<MatcherSet> groupsMatcher;
@@ -97,30 +98,26 @@ public class MainTableDataModel {
         groupViewModeSubscription = EasyBind.listen(preferences.getGroupsPreferences().groupViewModeProperty(), observable -> updateGroupMatches(selectedGroupsProperty.get()));
 
         resultSizeProperty.bind(Bindings.size(entriesFiltered.filtered(entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_AND_GROUPS).get())));
-        // We need to wrap the list since otherwise sorting in the table does not work
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
 
     private void updateSearchMatches(Optional<SearchQuery> query) {
-        BackgroundTask.wrap(() -> {
+        if (currentSearchTask != null && !currentSearchTask.isDone()) {
+            currentSearchTask.cancel();
+        }
+        currentSearchTask = BackgroundTask.wrap(() -> {
             if (query.isPresent()) {
                 setSearchMatches(searchContext.search(query.get()));
             } else {
                 clearSearchMatches();
             }
-        }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+        }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered));
+        currentSearchTask.executeWith(taskExecutor);
     }
 
-    /// Refresh the current search
-    ///
-    /// We need to call this when the database is switched during a fulltext search since
-    /// the listener on the searchQueryProperty will not fire if the query doesn't change
-    /// (this causes searchResults in FullTextResultsTab to be empty)
-    /// [issue 13241](https://github.com/JabRef/jabref/issues/13241)
     public void refreshSearchMatches() {
         searchQueryProperty.getValue().ifPresent(searchQuery -> {
             searchQuery.getSearchFlags().remove(SearchFlags.FULLTEXT);
-            // There is no need to re-add the flag since the UI is unchanged and the flag will be automatically re-added.
         });
     }
 
@@ -185,7 +182,6 @@ public class MainTableDataModel {
 
     private static Optional<MatcherSet> createGroupMatcher(List<GroupTreeNode> selectedGroups, GroupsPreferences groupsPreferences) {
         if ((selectedGroups == null) || selectedGroups.isEmpty()) {
-            // No selected group, show all entries
             return Optional.empty();
         }
 
@@ -271,10 +267,7 @@ public class MainTableDataModel {
 
         @Subscribe
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
-            // When entries are removed, we need to refresh the search matches
-            // to ensure the filtered list is properly updated and doesn't show stale entries
             BackgroundTask.wrap(() -> {
-                // Re-run the current search to update the filtered results
                 if (searchQueryProperty.get().isPresent()) {
                     setSearchMatches(searchContext.search(searchQueryProperty.get().get()));
                 } else {
