@@ -80,7 +80,7 @@ class GetCitedWorks implements Callable<Integer> {
                 BibDatabaseContext dbContext = new BibDatabaseContext(new BibDatabase(entries));
                 return exportService.exportBibDatabaseContextToFile(dbContext, entries, outputFormat, outputFile);
             } else {
-                return exportService.outpautEntries(entries);
+                return exportService.printBibEntries(entries);
             }
         } catch (FetcherException e) {
             LOGGER.error("Could not fetch citation information based on DOI", e);
@@ -88,7 +88,7 @@ class GetCitedWorks implements Callable<Integer> {
             System.err.println(" - " + doi);
             System.err.println(e.getLocalizedMessage());
             System.err.println();
-            return 2;
+            return CommandLine.ExitCode.SOFTWARE;
         }
     }
 }
