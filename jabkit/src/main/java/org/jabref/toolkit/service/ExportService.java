@@ -48,7 +48,7 @@ public class ExportService {
     private final CliPreferences cliPreferences;
     private final ExporterFactory exporterFactory;
     private final Exporter bibtexExporter;
-    private BibEntryTypesManager entryTypesManager;
+    private final BibEntryTypesManager entryTypesManager;
 
     public ExportService(CliPreferences cliPreferences) {
         this.cliPreferences = cliPreferences;
@@ -61,7 +61,6 @@ public class ExportService {
         return new Exporter("bibtex", "BibTex", StandardFileType.BIBTEX_DB) {
             @Override
             public void export(@NonNull BibDatabaseContext databaseContext, Path file, @NonNull List<BibEntry> entries) throws IOException, TransformerException, ParserConfigurationException, SaveException {
-                // TODO: not sure about the different options (alternative: save entries)
                 internalSaveDatabaseContext(databaseContext, file);
             }
         };
@@ -77,13 +76,11 @@ public class ExportService {
                      .toList();
     }
 
-    /// Outputs to StdOut. Generates citation keys if missing.
-    public void printBibEntries(List<BibEntry> entries) throws ExportException {
-        printDatabaseContext(new BibDatabaseContext(new BibDatabase(entries)));
+    public void printBibEntriesToStdOut(List<BibEntry> entries) throws ExportException {
+        printDatabaseContextToStdOut(new BibDatabaseContext(new BibDatabase(entries)));
     }
 
-    /// Outputs to StdOut. Generates citation keys if missing.
-    public void printDatabaseContext(BibDatabaseContext bibDatabaseContext) throws ExportException {
+    public void printDatabaseContextToStdOut(BibDatabaseContext bibDatabaseContext) throws ExportException {
         try (OutputStreamWriter writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
             generateCitationKeys(bibDatabaseContext, cliPreferences.getCitationKeyPatternPreferences());
             BibDatabaseWriter bibWriter = new BibDatabaseWriter(writer, bibDatabaseContext, cliPreferences);
@@ -95,15 +92,24 @@ public class ExportService {
         }
     }
 
-    public void saveBibEntries(List<BibEntry> matches, Path outputFile) throws ExportException {
+    public void saveBibEntries(
+            List<BibEntry> matches,
+            Path outputFile) throws ExportException {
+
         saveDatabase(new BibDatabase(matches), outputFile);
     }
 
-    public void saveDatabase(BibDatabase newBase, Path outputFile) throws ExportException {
+    public void saveDatabase(
+            BibDatabase newBase,
+            Path outputFile) throws ExportException {
+
         saveDatabaseContext(new BibDatabaseContext(newBase), outputFile);
     }
 
-    public void saveDatabaseContext(BibDatabaseContext bibDatabaseContext, Path outputFile) throws ExportException {
+    public void saveDatabaseContext(
+            BibDatabaseContext bibDatabaseContext,
+            Path outputFile) throws ExportException {
+
         try {
             internalSaveDatabaseContext(bibDatabaseContext, outputFile);
         } catch (IOException ex) {
@@ -113,9 +119,12 @@ public class ExportService {
         }
     }
 
-    private void internalSaveDatabaseContext(BibDatabaseContext bibDatabaseContext, Path outputFile) throws IOException {
+    private void internalSaveDatabaseContext(
+            BibDatabaseContext bibDatabaseContext,
+            Path outputFile) throws IOException {
+
         if (!FileUtil.isBibFile(outputFile)) {
-            System.err.println(Localization.lang("Invalid output file type provided."));
+            System.err.println(Localization.lang("Invalid output file type provided. (wrong extension)"));
         }
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(outputFile, StandardCharsets.UTF_8)) {
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
@@ -138,21 +147,25 @@ public class ExportService {
         }
     }
 
-    public void exportEntriesToFile(List<BibEntry> entries, String outputFormat, Path outputFile) throws ExportException {
+    public void exportEntriesToFile(
+            List<BibEntry> entries,
+            Path outputFile, String outputFormat) throws ExportException {
+
         exportBibDatabaseContextToFile(
                 new BibDatabaseContext(new BibDatabase(entries)),
                 entries,
-                outputFormat,
-                outputFile);
+                outputFile,
+                outputFormat
+        );
     }
 
     public void exportBibDatabaseContextToFile(
             BibDatabaseContext databaseContext,
             List<BibEntry> matches,
-            String format,
-            Path outputFile) throws ExportException {
+            Path outputFile,
+            String outputFormat) throws ExportException {
 
-        Exporter exporter = getExporterByName(format);
+        Exporter exporter = getExporterByName(outputFormat);
         tryExportWithExporter(exporter, outputFile, databaseContext, matches, List.of());
     }
 
@@ -193,8 +206,7 @@ public class ExportService {
         try {
             JournalAbbreviationRepository abbreviationRepository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
             System.out.println(Localization.lang("Exporting %0", outputFile.toAbsolutePath().toString()));
-            exporter.export(databaseContext, outputFile, entries, fileDirForDatabase,
-                    abbreviationRepository);
+            exporter.export(databaseContext, outputFile, entries, fileDirForDatabase, abbreviationRepository);
         } catch (IOException | SaveException | ParserConfigurationException | TransformerException ex) {
             throw new ExportException("Failed to export file.",
                     Localization.lang("Failed to export file."),

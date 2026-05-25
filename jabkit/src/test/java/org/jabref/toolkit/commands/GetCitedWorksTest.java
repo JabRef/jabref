@@ -44,6 +44,7 @@ class GetCitedWorksTest extends AbstractJabKitTest {
         JabKit jabKit = new JabKit(preferences, entryTypesManager);
         CommandFactory factory = new CommandFactory(sut);
         this.commandLine = new CommandLine(jabKit, factory);
+        // TODO: redirect stdout/stderr for capturing and clean unit test output
 
         citationFetcher = mock(CitationFetcher.class);
         when(mockFetcherFactory.getCitationFetcher(any())).thenReturn(citationFetcher);
@@ -60,8 +61,7 @@ class GetCitedWorksTest extends AbstractJabKitTest {
 
         // mock the export service to do nothing and capture the argument
         ArgumentCaptor<List<BibEntry>> captor = ArgumentCaptor.captor();
-        // TODO refactor outputEntries to only consume (not return int) -> use `doNothing()` instead
-        doNothing().when(mockExportService).printBibEntries(captor.capture());
+        doNothing().when(mockExportService).printBibEntriesToStdOut(captor.capture());
 
         int exitCode = commandLine.execute("get-cited-works", "10.3390/su131810256");
 

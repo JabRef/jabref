@@ -118,7 +118,7 @@ class GenerateCitationKeys implements Callable<Integer> {
                 return 0;
             } else {
                 ExportService.create(parentCommand.getParent().cliPreferences)
-                                    .printDatabaseContext(parserResult.get().getDatabaseContext());
+                                    .printDatabaseContextToStdOut(parserResult.get().getDatabaseContext());
                 return CommandLine.ExitCode.OK;
             }
         } catch (ExportException ex) {

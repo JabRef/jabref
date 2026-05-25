@@ -7,7 +7,6 @@ import java.util.concurrent.Callable;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.toolkit.converter.CitationFetcherTypeConverter;
@@ -66,31 +65,20 @@ class GetCitedWorks implements Callable<Integer> {
     }
 
     @Override
-    public Integer call() {
-        try {
-            // TODO: validateJSR380(); - i.e. no output-format without output-file
-            initFields();
+    public Integer call() throws ExportException, FetcherException {
+        // TODO: validateJSR380(); - i.e. no output-format without output-file
+        // TODO: e.g. format needs output; format must be valid
+        initFields();
 
-            CitationFetcher citationFetcher = citationFetcherFactory.getCitationFetcher(citationFetcherType);
+        CitationFetcher citationFetcher = citationFetcherFactory.getCitationFetcher(citationFetcherType);
 
-            List<BibEntry> entries = citationFetcher.getReferences(new BibEntry().withField(StandardField.DOI, doi));
+        List<BibEntry> entries = citationFetcher.getReferences(new BibEntry().withField(StandardField.DOI, doi));
 
-            if (outputFile != null && outputFormat != null) {
-                exportService.exportEntriesToFile(entries, outputFormat, outputFile);
-            } else {
-                exportService.printBibEntries(entries);
-            }
-            return CommandLine.ExitCode.OK;
-        } catch (FetcherException e) {
-            LOGGER.error("Could not fetch citation information based on DOI", e);
-            System.err.print(Localization.lang("No data was found for the identifier"));
-            System.err.println(" - " + doi);
-            System.err.println(e.getLocalizedMessage());
-            System.err.println();
-            return CommandLine.ExitCode.SOFTWARE;
-        } catch (ExportException ex) {
-            System.err.println(ex.getLocalizedMessage() + " (" + (ex.getCause() == null ? "" : ex.getCause().getLocalizedMessage()) + ")");
-            return ex.getExitCode();
+        if (outputFile != null && outputFormat != null) {
+            exportService.exportEntriesToFile(entries, outputFile, outputFormat);
+        } else {
+            exportService.printBibEntriesToStdOut(entries);
         }
+        return CommandLine.ExitCode.OK;
     }
 }

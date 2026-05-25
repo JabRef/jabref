@@ -70,7 +70,7 @@ class DoiToBibtex implements Callable<Integer> {
                 entries.add(entry.get());
             }
 
-            ExportService.create(argumentProcessor.cliPreferences).printBibEntries(entries);
+            ExportService.create(argumentProcessor.cliPreferences).printBibEntriesToStdOut(entries);
             return CommandLine.ExitCode.OK;
         } catch (ExportException ex) {
             LoggerFactory.getLogger(GenerateCitationKeys.class).error("Could not write BibTeX", ex);

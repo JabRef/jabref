@@ -34,6 +34,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.toolkit.commands.JabKit;
+import org.jabref.toolkit.exception.CliExceptionHandler;
 import org.jabref.toolkit.service.ExportService;
 import org.jabref.toolkit.service.ImportService;
 
@@ -79,6 +80,7 @@ public class JabKitLauncher {
 
             JabKit jabKit = new JabKit(preferences, entryTypesManager);
             CommandLine commandLine = new CommandLine(jabKit);
+            commandLine.setExecutionExceptionHandler(new CliExceptionHandler(commandLine.getExecutionExceptionHandler()));
             // [impl->req~jabkit.cli.banner-shown~1]
             String usageHeader = BuildInfo.JABREF_BANNER.formatted(buildInfo.version) + "\n" + JABKIT_BRAND;
             commandLine.getCommandSpec().usageMessage().header(usageHeader);
