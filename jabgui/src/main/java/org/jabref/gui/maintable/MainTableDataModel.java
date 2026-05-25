@@ -102,7 +102,7 @@ public class MainTableDataModel {
     }
 
     private void updateSearchMatches(Optional<SearchQuery> query) {
-        if (currentSearchTask != null && !currentSearchTask.isDone()) {
+        if (currentSearchTask != null) {
             currentSearchTask.cancel();
         }
         currentSearchTask = BackgroundTask.wrap(() -> {
