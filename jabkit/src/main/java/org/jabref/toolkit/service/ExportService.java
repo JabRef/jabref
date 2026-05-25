@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -26,6 +27,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -42,11 +44,25 @@ public class ExportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportService.class);
 
     private final CliPreferences cliPreferences;
+    private final ExporterFactory exporterFactory;
+    private final Exporter bibtexExporter;
     private BibEntryTypesManager entryTypesManager;
 
     public ExportService(CliPreferences cliPreferences) {
         this.cliPreferences = cliPreferences;
-        this.entryTypesManager = cliPreferences.getCustomEntryTypesRepository();
+        entryTypesManager = cliPreferences.getCustomEntryTypesRepository();
+        exporterFactory = ExporterFactory.create(cliPreferences);
+        bibtexExporter = createBibtexExporter();
+    }
+
+    private Exporter createBibtexExporter() {
+        return new Exporter("bibtex", "BibTex", StandardFileType.BIBTEX_DB) {
+            @Override
+            public void export(@NonNull BibDatabaseContext databaseContext, Path file, @NonNull List<BibEntry> entries) throws IOException, TransformerException, ParserConfigurationException, SaveException {
+                // TODO: not sure about the different options (alternative: save entries)
+                saveDatabaseContext(databaseContext, file);
+            }
+        };
     }
 
     public static ExportService create(CliPreferences cliPreferences) {
@@ -54,8 +70,7 @@ public class ExportService {
     }
 
     public List<Pair<String, String>> getAvailableExportFormats() {
-        ExporterFactory exporterFactory = ExporterFactory.create(cliPreferences);
-        return exporterFactory.getExporters().stream()
+        return Stream.concat(exporterFactory.getExporters().stream(), Stream.of(bibtexExporter))
                               .map(format -> new Pair<>(format.getName(), format.getId()))
                               .toList();
     }
@@ -88,8 +103,7 @@ public class ExportService {
         saveDatabaseContext(new BibDatabaseContext(newBase), outputFile);
     }
 
-    public void saveDatabaseContext(BibDatabaseContext bibDatabaseContext,
-                                    Path outputFile) {
+    public void saveDatabaseContext(BibDatabaseContext bibDatabaseContext, Path outputFile) {
         try {
             if (!FileUtil.isBibFile(outputFile)) {
                 System.err.println(Localization.lang("Invalid output file type provided."));
@@ -141,8 +155,7 @@ public class ExportService {
         List<Path> fileDirForDatabase = databaseContext
                 .getFileDirectories(cliPreferences.getFilePreferences());
 
-        ExporterFactory exporterFactory = ExporterFactory.create(cliPreferences);
-        Optional<Exporter> exporter = exporterFactory.getExporterByName(format);
+        Optional<Exporter> exporter = getExporterByName(format);
         if (exporter.isEmpty()) {
             System.err.println(Localization.lang("Unknown export format '%0'.", format));
             return 2;
@@ -183,8 +196,7 @@ public class ExportService {
             String outputFormat1,
             Path outputFile1) {
 
-        ExporterFactory exporterFactory = ExporterFactory.create(cliPreferences);
-        Optional<Exporter> exporter = exporterFactory.getExporterByName(outputFormat1);
+        Optional<Exporter> exporter = getExporterByName(outputFormat1);
 
         if (exporter.isEmpty()) {
             System.err.println(Localization.lang("Unknown export format %0", outputFormat1));
@@ -207,6 +219,14 @@ public class ExportService {
             return 2;
         }
         return 0;
+    }
+
+    private Optional<Exporter> getExporterByName(String exporterId) {
+        return exporterFactory.getExporterByName(exporterId)
+                              .or(() -> bibtexExporter.getId().equalsIgnoreCase(exporterId) ?
+                                        Optional.of(bibtexExporter) :
+                                        Optional.empty());
+//   TODO:                           .orElseThrow();
     }
 
     /// Generates a citation key if there is no key existing
