@@ -573,7 +573,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // Remembers working directory of last import
         defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
-        defaults.put(PREFS_EXPORT_PATH, USER_HOME);
 
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
         defaults.put(SEND_LANGUAGE_DATA, Boolean.FALSE);
@@ -581,7 +580,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(SEND_TIMEZONE_DATA, Boolean.FALSE);
         defaults.put(KEYWORD_SEPARATOR, ", ");
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
-        defaults.put(MEMORY_STICK_MODE, Boolean.FALSE);
 
         defaults.put(PROTECTED_TERMS_ENABLED_INTERNAL, convertListToString(ProtectedTermsLoader.getInternalLists()));
         defaults.put(PROTECTED_TERMS_DISABLED_INTERNAL, "");
@@ -627,10 +625,6 @@ public class JabRefCliPreferences implements CliPreferences {
         String defaultExpression = "**/.*[citationkey].*\\\\.[extension]";
         defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(AUTOLINK_USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
-
-        // version check defaults
-        defaults.put(VERSION_IGNORED_UPDATE, "");
-        defaults.put(VERSION_CHECK_ENABLED, Boolean.TRUE);
 
         // Since some of the preference settings themselves use localized strings, we cannot set the language after
         // the initialization of the preferences in main
@@ -871,7 +865,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /// Calling this method will write all preferences into the preference store.
     @Override
     public void flush() {
-        if (getBoolean(MEMORY_STICK_MODE)) {
+        if (getBoolean(MEMORY_STICK_MODE, false)) {
             try {
                 exportPreferences(Path.of("jabref.xml"));
             } catch (JabRefException e) {
@@ -980,6 +974,7 @@ public class JabRefCliPreferences implements CliPreferences {
         PREFS_NODE.clear();
         new SharedDatabasePreferences().clear();
 
+        getInternalPreferences().setAll(InternalPreferences.getDefault());
         getFieldPreferences().setAll(FieldPreferences.getDefault());
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
         getPushToApplicationPreferences().setAll(PushToApplicationPreferences.getDefault());
@@ -994,7 +989,7 @@ public class JabRefCliPreferences implements CliPreferences {
                                              .withKeywordDelimiter(getBibEntryPreferences().keywordSeparatorProperty())
         );
         getFilePreferences().setAll(FilePreferences.getDefault()
-                                                   .withUserHostInfo(getInternalPreferences().getUserAndHostProperty())
+                                                   .withUserHostInfo(getInternalPreferences().getUserAndHostInfoProperty())
                                                    .withMoveToTrash(moveToTrashSupported())
                                                    .withMainFileDirectory(getDefaultPath())
                                                    .withLastUsedDirectory(getDefaultPath())
@@ -1013,6 +1008,7 @@ public class JabRefCliPreferences implements CliPreferences {
         //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
 
         // in case of incomplete or corrupt XML fall back to current preferences
+        getInternalPreferences().setAll(getInternalPreferencesFromBackingStore(getInternalPreferences()));
         getFieldPreferences().setAll(getFieldPreferencesFromBackingStore(getFieldPreferences()));
         getProxyPreferences().setAll(getProxyPreferencesFromBackingStore(getProxyPreferences()));
         getPushToApplicationPreferences().setAll(getPushToApplicationPreferencesFromBackingStore(getPushToApplicationPreferences()));
@@ -1283,7 +1279,7 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(ownerPreferences.useOwnerProperty(), (_, _, newValue) -> putBoolean(OWNER_ENABLE, newValue));
         EasyBind.listen(ownerPreferences.defaultOwnerProperty(), (_, _, newValue) -> {
             put(OWNER_DEFAULT, newValue);
-            getInternalPreferences().getUserAndHostProperty().setValue(OS.getUserHostInfo(newValue));
+            getInternalPreferences().setUserHostInfo(OS.getUserHostInfo(newValue));
         });
         EasyBind.listen(ownerPreferences.overwriteOwnerProperty(), (_, _, newValue) -> putBoolean(OWNER_OVERWRITE, newValue));
 
@@ -1404,7 +1400,7 @@ public class JabRefCliPreferences implements CliPreferences {
         try (final Keyring keyring = Keyring.create()) {
             return Optional.of(new Password(
                     keyring.getPassword("org.jabref", "proxy"),
-                    getInternalPreferences().getUserAndHost())
+                    getInternalPreferences().getUserHostInfo().getUserHostString())
                     .decrypt());
         } catch (PasswordAccessException ex) {
             LOGGER.warn("JabRef uses proxy password from key store but no password is stored");
@@ -1423,7 +1419,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 } else {
                     keyring.setPassword("org.jabref", "proxy", new Password(
                             password.trim(),
-                            getInternalPreferences().getUserAndHost())
+                            getInternalPreferences().getUserHostInfo().getUserHostString())
                             .encrypt());
                 }
             } catch (Exception ex) {
@@ -1589,12 +1585,7 @@ public class JabRefCliPreferences implements CliPreferences {
             return internalPreferences;
         }
 
-        internalPreferences = new InternalPreferences(
-                Version.parse(get(VERSION_IGNORED_UPDATE)),
-                getBoolean(VERSION_CHECK_ENABLED),
-                getPath(PREFS_EXPORT_PATH, getDefaultPath()),
-                OS.getUserHostInfo(get(OWNER_DEFAULT, OwnerPreferences.getDefault().getDefaultOwner())),
-                getBoolean(MEMORY_STICK_MODE));
+        internalPreferences = getInternalPreferencesFromBackingStore(InternalPreferences.getDefault());
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),
                 (_, _, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
@@ -1615,6 +1606,16 @@ public class JabRefCliPreferences implements CliPreferences {
         });
 
         return internalPreferences;
+    }
+
+    private InternalPreferences getInternalPreferencesFromBackingStore(InternalPreferences defaults) {
+        return new InternalPreferences(
+                Version.parse(get(VERSION_IGNORED_UPDATE, defaults.getIgnoredVersion().toString())),
+                getBoolean(VERSION_CHECK_ENABLED, defaults.isVersionCheckEnabled()),
+                getPath(PREFS_EXPORT_PATH, defaults.getLastPreferencesExportPath()),
+                OS.getUserHostInfo(get(OWNER_DEFAULT, OwnerPreferences.getDefault().getDefaultOwner())),
+                getBoolean(MEMORY_STICK_MODE, defaults.isMemoryStickMode())
+        );
     }
 
     protected Language getLanguage() {
@@ -1686,7 +1687,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private FilePreferences getFilePreferencesFromBackingStore(FilePreferences defaults) {
         return new FilePreferences(
-                getInternalPreferences().getUserAndHostProperty(),
+                getInternalPreferences().getUserAndHostInfoProperty(),
                 getPath(MAIN_FILE_DIRECTORY, defaults.mainFileDirectoryProperty().get()),
                 getBoolean(STORE_RELATIVE_TO_BIB, defaults.shouldStoreFilesRelativeToBibFile()),
                 getBoolean(AUTO_RENAME_FILES_ON_CHANGE, defaults.shouldAutoRenameFilesOnChange()),
@@ -2285,7 +2286,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 try {
                     keys.add(new Password(
                             keyring.getPassword("org.jabref.customapikeys", fetcher),
-                            getInternalPreferences().getUserAndHost())
+                            getInternalPreferences().getUserHostInfo().getUserHostString())
                             .decrypt());
                 } catch (PasswordAccessException ex) {
                     LOGGER.debug("No api key stored for {} fetcher", fetcher);
@@ -2353,7 +2354,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 } else {
                     keyring.setPassword("org.jabref.customapikeys", names.get(i), new Password(
                             keys.get(i),
-                            getInternalPreferences().getUserAndHost())
+                            getInternalPreferences().getUserHostInfo().getUserHostString())
                             .encrypt());
                 }
             }
@@ -2493,7 +2494,7 @@ public class JabRefCliPreferences implements CliPreferences {
             try (final Keyring keyring = Keyring.create()) {
                 return new Password(
                         keyring.getPassword("org.jabref", "github"),
-                        getInternalPreferences().getUserAndHost())
+                        getInternalPreferences().getUserHostInfo().getUserHostString())
                         .decrypt();
             } catch (PasswordAccessException ex) {
                 LOGGER.warn("No GitHub token stored in keyring");
@@ -2512,7 +2513,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 } else {
                     keyring.setPassword("org.jabref", "github", new Password(
                             pat.trim(),
-                            getInternalPreferences().getUserAndHost())
+                            getInternalPreferences().getUserHostInfo().getUserHostString())
                             .encrypt());
                 }
             } catch (Exception ex) {
