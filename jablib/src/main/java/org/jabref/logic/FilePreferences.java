@@ -10,14 +10,17 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.Directories;
 import org.jabref.model.metadata.UserHostInfo;
 
+import org.jspecify.annotations.NullMarked;
+
 /// Preferences for the linked files
+@NullMarked
 public class FilePreferences {
 
     public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] {"[bibtexkey]", "[bibtexkey] - [title]"};
-    private static final ReadOnlyObjectProperty<UserHostInfo> DEFAULT_USER_HOST_INFO = new SimpleObjectProperty<>(new UserHostInfo("", ""));
 
     private final SimpleObjectProperty<UserHostInfo> userAndHost = new SimpleObjectProperty<>();
     private final ObjectProperty<Path> mainFileDirectory = new SimpleObjectProperty<>();
@@ -44,7 +47,7 @@ public class FilePreferences {
 
     private FilePreferences() {
         this(
-                DEFAULT_USER_HOST_INFO,              // userAndHost (needs to be sourced from InternalPreferences)
+                new SimpleObjectProperty<>(OS.getUserHostInfo()), // userAndHost (needs to be sourced from InternalPreferences)
                 Path.of("/"),                        // mainFileDirectory
                 true,                                // storeFilesRelativeToBibFile
                 false,                               // autoRenameFilesOnChange
@@ -369,12 +372,7 @@ public class FilePreferences {
     }
 
     public FilePreferences withUserHostInfo(ReadOnlyObjectProperty<UserHostInfo> newUserHostInfo) {
-        if (newUserHostInfo == null) {
-            this.userAndHost.bind(DEFAULT_USER_HOST_INFO);
-        } else {
-            this.userAndHost.bind(newUserHostInfo);
-        }
-
+        this.userAndHost.bind(newUserHostInfo);
         return this;
     }
 
@@ -383,8 +381,12 @@ public class FilePreferences {
         return this;
     }
 
-    public FilePreferences withDefaultDirectory(Path lastUsedDirectory) {
+    public FilePreferences withMainFileDirectory(Path lastUsedDirectory) {
         this.workingDirectory.set(lastUsedDirectory);
+        return this;
+    }
+
+    public FilePreferences withLastUsedDirectory(Path lastUsedDirectory) {
         this.lastUsedDirectory.set(lastUsedDirectory);
         return this;
     }
