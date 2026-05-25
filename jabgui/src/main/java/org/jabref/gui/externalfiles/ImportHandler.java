@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 
+import javafx.application.Platform;
 import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DialogService;
@@ -347,29 +348,32 @@ public class ImportHandler {
 
     public CompletableFuture<Optional<BibEntry>> handleDuplicates(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
         return getDuplicateDecision(originalEntry, duplicateEntry, decision)
-                .thenApply(decisionResult -> {
-                    switch (decisionResult.decision()) {
-                        case KEEP_RIGHT:
-                            targetBibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
-                            break;
-                        case KEEP_BOTH:
-                            break;
-                        case KEEP_MERGE:
-                            targetBibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
-                            return Optional.of(decisionResult.mergedEntry());
-                        case KEEP_LEFT:
-                        case AUTOREMOVE_EXACT:
-                        case BREAK:
-                        default:
-                            return Optional.empty();
-                    }
-                    return Optional.of(originalEntry);
-                });
+                .thenApply(decisionResult -> handleDecisionResult(originalEntry, duplicateEntry, decisionResult));
+    }
+
+    private @NonNull Optional<BibEntry> handleDecisionResult(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateDecisionResult decisionResult) {
+        switch (decisionResult.decision()) {
+            case KEEP_RIGHT:
+                targetBibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
+                break;
+            case KEEP_BOTH:
+                break;
+            case KEEP_MERGE:
+                targetBibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
+                return Optional.of(decisionResult.mergedEntry());
+            case KEEP_LEFT:
+            case AUTOREMOVE_EXACT:
+            case BREAK:
+            default:
+                return Optional.empty();
+        }
+        return Optional.of(originalEntry);
     }
 
     public CompletableFuture<DuplicateDecisionResult> getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
+        assert Platform.isFxApplicationThread();
         DuplicateDecisionRequest request = new DuplicateDecisionRequest(originalEntry, duplicateEntry, decision);
-        UiTaskExecutor.runNowOrInJavaFXThread(() -> enqueueDuplicateDecisionRequest(request));
+        enqueueDuplicateDecisionRequest(request);
         return request.result();
     }
 
@@ -396,7 +400,7 @@ public class ImportHandler {
             request.result().completeExceptionally(exception);
         }
 
-        UiTaskExecutor.runNowOrInJavaFXThread(this::processDuplicateDecisionQueue);
+        processDuplicateDecisionQueue();
     }
 
     private DuplicateDecisionResult resolveDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
@@ -409,7 +413,7 @@ public class ImportHandler {
                 preferences
         );
         DuplicateResolverDialog.DuplicateResolverResult effectiveDecision = decision;
-        if ((effectiveDecision == BREAK) && (rememberedBatchDuplicateDecision != BREAK)) {
+        if (effectiveDecision == BREAK && rememberedBatchDuplicateDecision != BREAK) {
             effectiveDecision = rememberedBatchDuplicateDecision;
         }
         if (effectiveDecision == BREAK) {
