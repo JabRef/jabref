@@ -165,6 +165,18 @@ public class ExportService {
         return 0;
     }
 
+    public int exportEntriesToFile(
+            List<BibEntry> entries,
+            String outputFormat1,
+            Path outputFile1) {
+
+        return exportBibDatabaseContextToFile(
+                new BibDatabaseContext(new BibDatabase(entries)),
+                entries,
+                outputFormat1,
+                outputFile1);
+    }
+
     public int exportBibDatabaseContextToFile(
             BibDatabaseContext databaseContext,
             List<BibEntry> matches,

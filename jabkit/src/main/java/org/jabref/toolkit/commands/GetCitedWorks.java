@@ -77,8 +77,7 @@ class GetCitedWorks implements Callable<Integer> {
             List<BibEntry> entries = citationFetcher.getReferences(new BibEntry().withField(StandardField.DOI, doi));
 
             if (outputFile != null) {
-                BibDatabaseContext dbContext = new BibDatabaseContext(new BibDatabase(entries));
-                return exportService.exportBibDatabaseContextToFile(dbContext, entries, outputFormat, outputFile);
+                return exportService.exportEntriesToFile(entries, outputFormat, outputFile);
             } else {
                 return exportService.printBibEntries(entries);
             }
