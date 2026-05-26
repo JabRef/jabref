@@ -437,13 +437,28 @@ See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.m
 
 ## Git & PR Etiquette
 
-When creating commits:
+### Syncing with upstream
+
+- **Never** use `git rebase`, `git pull --rebase` / `-r` / `--rebase-merges`, or any force-push (`--force`, `--force-with-lease`, `--force-if-includes`, `-f`, or `+`-prefixed refspecs). Rebasing rewrites commit SHAs already pushed and breaks review threads pinned to commits; force-push would then be required to publish the rewritten history.
+- **Preferred** sync via explicit fetch + merge:
+
+  ```bash
+  git fetch upstream --prune
+  git merge upstream/main
+  ```
+
+- Plain `git pull` is acceptable for updating the branch as long as your local config does not set `pull.rebase=true` (the enforcement hook blocks the explicit rebase variants regardless).
+- Resolve conflicts inside the merge commit. Do not squash or reorder existing commits.
+
+### Commits
 
 - One logical change per commit
 - Clear, technical commit messages
 - Do not reference issues in commits
 - Avoid force-pushes
 - No generated artifacts unless required
+
+### Pull requests
 
 PR title:
 
