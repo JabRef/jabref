@@ -51,9 +51,7 @@ public class MoveFilesCleanup implements CleanupJob {
         }
 
         if (changed) {
-            List<FieldChange> changes = new ArrayList<>();
-            mutationScheduler.accept(() -> entry.setFiles(files).ifPresent(changes::add));
-            return changes;
+            return FileFieldCleanupUpdater.updateFileField(entry, files, mutationScheduler);
         }
 
         return List.of();

@@ -2,7 +2,6 @@ package org.jabref.logic.cleanup;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -57,9 +56,7 @@ public class RenamePdfCleanup implements CleanupJob {
         }
 
         if (changed) {
-            List<FieldChange> changes = new ArrayList<>();
-            mutationScheduler.accept(() -> entry.setFiles(files).ifPresent(changes::add));
-            return changes;
+            return FileFieldCleanupUpdater.updateFileField(entry, files, mutationScheduler);
         }
 
         return List.of();
