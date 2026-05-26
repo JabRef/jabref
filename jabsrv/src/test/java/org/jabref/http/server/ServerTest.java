@@ -108,11 +108,14 @@ public abstract class ServerTest extends JerseyTest {
     /// Restarts the Jersey test container so the state manager is rebuilt with the new
     /// files. Necessary because the state manager snapshots the file list at
     /// `configure()` time (see [#filesToServe]).
+    ///
+    /// Calls `super.setUp()` rather than this class's `setUp()` because the latter resets
+    /// {@link #filesToServe} to the default, which would discard the caller's selection.
     protected void setAvailableLibraries(EnumSet<TestBibFile> files) {
         try {
             tearDown();
             filesToServe = files.stream().map(file -> file.path).toList();
-            setUp();
+            super.setUp();
         } catch (Exception e) {
             throw new IllegalStateException("Could not restart test container with new files", e);
         }
