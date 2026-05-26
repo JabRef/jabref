@@ -377,16 +377,19 @@ public class NewEntryViewModel {
                 return Optional.empty();
             }
 
-            final PlainCitationParser parser = parserChoice == PlainCitationParserChoice.LLM
-                                               ? PlainCitationParserFactory.getLlmPlainCitationParser(
-                    preferences.getImportFormatPreferences(),
-                    preferences.getAiPreferences(),
-                    aiService.getCurrentChatModel())
-                                               : PlainCitationParserFactory.getPlainCitationParser(
-                    parserChoice,
-                    preferences.getCitationKeyPatternPreferences(),
-                    preferences.getGrobidPreferences(),
-                    preferences.getImportFormatPreferences());
+            final PlainCitationParser parser;
+            if (parserChoice == PlainCitationParserChoice.LLM) {
+                parser = PlainCitationParserFactory.getLlmPlainCitationParser(
+                        preferences.getImportFormatPreferences(),
+                        preferences.getAiPreferences(),
+                        aiService.getCurrentChatModel());
+            } else {
+                parser = PlainCitationParserFactory.getPlainCitationParser(
+                        parserChoice,
+                        preferences.getCitationKeyPatternPreferences(),
+                        preferences.getGrobidPreferences(),
+                        preferences.getImportFormatPreferences());
+            }
 
             final List<BibEntry> entries = parser.parseMultiplePlainCitations(text);
 
