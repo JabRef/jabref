@@ -37,7 +37,7 @@ module org.jabref.jabsrv {
     requires transitive com.fasterxml.jackson.annotation;
 
     requires static jakarta.annotation;
-    requires transitive jakarta.inject;
+    requires jakarta.inject;
 
     // Injection framework
     requires transitive org.glassfish.hk2.api;
