@@ -24,23 +24,26 @@ module org.jabref.jabsrv {
     requires afterburner.fx;
     requires java.desktop;
 
-    // For ServiceLocatorUtilities.createAndPopulateServiceLocator()
-    requires /*runtime*/ org.glassfish.hk2.locator;
-
     requires transitive org.jabref.jablib;
 
     requires transitive org.slf4j;
+    requires java.logging;
 
     requires com.google.common;
-    requires transitive com.google.gson;
 
-    requires transitive org.glassfish.hk2.api;
+    requires transitive com.google.gson;
+    requires tools.jackson.core;
+    requires tools.jackson.databind;
+    requires transitive com.fasterxml.jackson.annotation;
 
     requires static jakarta.annotation;
     requires transitive jakarta.inject;
 
     // Injection framework
+    requires transitive org.glassfish.hk2.api;
     requires /*runtime*/ org.glassfish.jersey.inject.hk2;
+    // For ServiceLocatorUtilities.createAndPopulateServiceLocator()
+    requires /*runtime*/ org.glassfish.hk2.locator;
 
     requires org.glassfish.grizzly;
     requires transitive org.glassfish.grizzly.http.server;
@@ -51,9 +54,5 @@ module org.jabref.jabsrv {
 
     requires net.harawata.appdirs;
 
-    requires transitive org.jspecify;
-    requires java.logging;
-    requires tools.jackson.core;
-    requires tools.jackson.databind;
-    requires transitive com.fasterxml.jackson.annotation;
+    requires static org.jspecify;
 }
