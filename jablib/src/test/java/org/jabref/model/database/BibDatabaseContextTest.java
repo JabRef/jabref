@@ -118,6 +118,17 @@ class BibDatabaseContextTest {
     }
 
     @Test
+    void getUserFileDirectoryIfAllAreEmpty() {
+        when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
+        Path userDirJabRef = Directories.getUserDirectory();
+
+        when(fileDirPrefs.getMainFileDirectory()).thenReturn(userDirJabRef);
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(Path.of("biblio.bib"));
+        assertEquals(List.of(userDirJabRef), database.getFileDirectories(fileDirPrefs));
+    }
+
+    @Test
     void typeBasedOnDefaultBiblatex() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
         assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
