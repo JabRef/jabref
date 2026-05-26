@@ -424,13 +424,14 @@ public class AuthorListParser {
     /// Parses the next token.
     ///
     /// The string being parsed is stored in global variable <CODE>original</CODE>, and position which parsing has to
-    /// start from is stored in global variable <CODE>token_end</CODE>; thus,
-    /// <CODE>token_end</CODE> has to be set
+    /// start from is stored in global variable
+    /// <CODE>token_end</CODE>; thus, <CODE>token_end</CODE> has to be set
     /// to 0 before the first invocation. Procedure updates <CODE>token_end</CODE>; thus, subsequent invocations do not
     /// require any additional variable settings.
     ///
     /// The type of the token is returned; if it is <CODE>Token.WORD</CODE>, additional information is given in global
-    /// variables <CODE>token_start</CODE>, <CODE>token_end</CODE>, <CODE>token_abbr</CODE>, <CODE>token_term</CODE>,
+    /// variables <CODE>token_start</CODE>,
+    /// <CODE>token_end</CODE>, <CODE>token_abbr</CODE>, <CODE>token_term</CODE>,
     /// and <CODE>token_case</CODE>; namely: <CODE>original.substring(token_start,token_end)</CODE> is the text of the
     /// token, <CODE>original.substring(token_start,token_abbr)</CODE> is the token abbreviation, <CODE>token_term</CODE>
     /// contains token terminator (space or dash), and <CODE>token_case</CODE> is <CODE>true</CODE>, if token is
