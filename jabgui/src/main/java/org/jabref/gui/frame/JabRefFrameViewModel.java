@@ -48,6 +48,7 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -258,7 +259,7 @@ public class JabRefFrameViewModel {
         BibDatabaseContext databaseContext = libraryTab.getBibDatabaseContext();
         List<BibEntry> entries = parserResult.getDatabase().getEntries();
         newImportHandler(databaseContext).importEntries(entries);
-        if (targetGroup != null && !targetGroup.isBlank()) {
+        if (StringUtil.isNotBlank(targetGroup)) {
             assignToGroup(databaseContext, entries, targetGroup);
         }
     }
