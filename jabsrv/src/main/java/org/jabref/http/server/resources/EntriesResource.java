@@ -25,6 +25,7 @@ import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -101,7 +102,7 @@ public class EntriesResource {
         if (!"current".equals(id)) {
             throw new BadRequestException("Only currently selected library possible");
         }
-        if (citationText == null || citationText.isBlank()) {
+        if (StringUtil.isBlank(citationText)) {
             throw new BadRequestException("Citation text must not be empty.");
         }
 
