@@ -35,3 +35,16 @@ Entry-level findings (for example, on the citation key itself) carry only the ci
 Field-level findings additionally carry the affected field name.
 
 Needs: impl
+
+## GitHub Actions output of the `check` commands
+`req~jabkit.cli.check-github-actions-output~1`
+
+The `jabkit check` subcommands support an additional `github-actions` output format
+that emits each finding as a [GitHub Actions workflow command](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#setting-an-error-message)
+of the shape `::error file=<file>,line=<line>,col=<col>,title=<title>::<message>`.
+
+The `file`, `line`, `col`, and `title` property values are URL-encoded so that
+Windows-style paths (containing `:`) and titles (containing `:` between citation key and field name)
+are parsed correctly by the GitHub Actions runner.
+
+Needs: impl
