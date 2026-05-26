@@ -4,11 +4,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
@@ -217,25 +219,23 @@ public class DOI implements Identifier {
 
     /// @param text text that has already been passed through {@link #removeReplacementCharacters}
     private static Optional<DoiTextMatch> findInTextInternal(String text) {
-        Optional<DoiTextMatch> result = Optional.empty();
+        // Each pattern is tried independently; the earliest match in the text wins so
+        // callers like {@link #replaceInText} strip the first DOI rather than whichever
+        // regex happened to be tried last.
+        return Stream.of(
+                             firstMatch(FIND_DOI_PATT, text, 1),
+                             firstMatch(FIND_SHORT_DOI_PATT, text, 1),
+                             firstMatch(FIND_SHORT_DOI_SHORTCUT, text, 0))
+                     .flatMap(Optional::stream)
+                     .min(Comparator.comparingInt(DoiTextMatch::start));
+    }
 
-        Matcher matcher = FIND_DOI_PATT.matcher(text);
+    private static Optional<DoiTextMatch> firstMatch(Pattern pattern, String text, int doiGroup) {
+        Matcher matcher = pattern.matcher(text);
         if (matcher.find()) {
-            // match only group \1
-            result = Optional.of(new DoiTextMatch(matcher.group(1), matcher.start(), matcher.end()));
+            return Optional.of(new DoiTextMatch(matcher.group(doiGroup), matcher.start(), matcher.end()));
         }
-
-        matcher = FIND_SHORT_DOI_PATT.matcher(text);
-        if (matcher.find()) {
-            result = Optional.of(new DoiTextMatch(matcher.group(1), matcher.start(), matcher.end()));
-        }
-
-        matcher = FIND_SHORT_DOI_SHORTCUT.matcher(text);
-        if (matcher.find()) {
-            result = Optional.of(new DoiTextMatch(matcher.group(0), matcher.start(), matcher.end()));
-        }
-
-        return result;
+        return Optional.empty();
     }
 
     @Override
