@@ -15,13 +15,34 @@ import shlex
 import sys
 
 
-def find_violation(tokens):
+def find_subcommand_index(tokens, git_index):
+    """Return the index of the subcommand after `git`, skipping global
+    options. Only `-C` and `-c` are treated as taking a separate-token
+    value; other dash-prefixed tokens are assumed to be no-arg flags or
+    use the `--foo=value` form."""
+    j = git_index + 1
     n = len(tokens)
-    for i, tok in enumerate(tokens):
-        if tok != "git" or i + 1 >= n:
+    while j < n:
+        tok = tokens[j]
+        if tok in ("-C", "-c"):
+            j += 2
             continue
-        sub = tokens[i + 1]
-        rest = tokens[i + 2:]
+        if tok.startswith("-"):
+            j += 1
+            continue
+        return j
+    return None
+
+
+def find_violation(tokens):
+    for i, tok in enumerate(tokens):
+        if tok != "git":
+            continue
+        sub_idx = find_subcommand_index(tokens, i)
+        if sub_idx is None:
+            continue
+        sub = tokens[sub_idx]
+        rest = tokens[sub_idx + 1:]
 
         if sub == "rebase":
             return (
@@ -32,7 +53,7 @@ def find_violation(tokens):
                 "Resolve conflicts inside the merge commit."
             )
 
-        if sub == "pull" and any(t == "--rebase" or t.startswith("--rebase=") for t in rest):
+        if sub == "pull" and any(t == "-r" or t.startswith("--rebase") for t in rest):
             return (
                 "`git pull --rebase` is forbidden by JabRef policy "
                 "(AGENTS.md > Git & PR Etiquette). Use:\n"
@@ -41,13 +62,23 @@ def find_violation(tokens):
             )
 
         if sub == "push":
-            force_flags = {"--force", "--force-with-lease", "-f"}
-            if any(t in force_flags or t.startswith("--force-with-lease=") for t in rest):
+            force_flags = {"--force", "--force-with-lease",
+                           "--force-if-includes", "-f"}
+            forced = any(
+                t in force_flags
+                or t.startswith("--force-with-lease=")
+                or t.startswith("--force-if-includes=")
+                or t.startswith("+")  # +-prefixed refspec = force update
+                for t in rest
+            )
+            if forced:
                 return (
                     "Force-push is forbidden by JabRef policy (AGENTS.md > "
-                    "Git & PR Etiquette). If branch history diverged because "
-                    "of an attempted rebase, recover via merge instead — do "
-                    "not overwrite the remote."
+                    "Git & PR Etiquette). This includes `--force`, "
+                    "`--force-with-lease`, `--force-if-includes`, `-f`, and "
+                    "`+`-prefixed refspecs (e.g. `+HEAD:main`). If branch "
+                    "history diverged because of an attempted rebase, "
+                    "recover via merge instead — do not overwrite the remote."
                 )
 
     return None

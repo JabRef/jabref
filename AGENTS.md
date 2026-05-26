@@ -439,16 +439,16 @@ See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.m
 
 ### Syncing with upstream
 
-- **Never** use `git rebase` (or `git pull --rebase`). Rebasing rewrites commit SHAs already pushed, breaks review threads pinned to commits, and forces a `--force-push` that this project disallows.
-- **Always** sync via merge:
+- **Never** use `git rebase`, `git pull --rebase` / `-r` / `--rebase-merges`, or any force-push (`--force`, `--force-with-lease`, `--force-if-includes`, `-f`, or `+`-prefixed refspecs). Rebasing rewrites commit SHAs already pushed and breaks review threads pinned to commits; force-push would then be required to publish the rewritten history.
+- **Preferred** sync via explicit fetch + merge:
 
   ```bash
   git fetch upstream --prune
   git merge upstream/main
   ```
 
+- Plain `git pull` is acceptable for updating the branch as long as your local config does not set `pull.rebase=true` (the enforcement hook blocks the explicit rebase variants regardless).
 - Resolve conflicts inside the merge commit. Do not squash or reorder existing commits.
-- Do not use bare `git pull` (it may rebase depending on local config). Use the explicit `fetch` + `merge` pair above.
 
 ### Commits
 
