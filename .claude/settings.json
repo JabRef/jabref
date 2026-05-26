@@ -7,6 +7,10 @@
           {
             "type": "command",
             "command": "python .claude/hooks/pr-template-guard.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/git-rebase-guard.py"
           }
         ]
       }
