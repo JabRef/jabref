@@ -303,8 +303,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         libraryPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
         libraryPreferences.setAutoSave(autosaveLocalLibraries.getValue());
 
-        filePreferences.createBackupProperty().setValue(createBackupProperty.getValue());
-        filePreferences.backupDirectoryProperty().setValue(Path.of(backupDirectoryProperty.getValue()));
+        filePreferences.setCreateBackup(createBackupProperty.getValue());
+        filePreferences.setBackupDirectory(Path.of(backupDirectoryProperty.getValue()));
 
         searchPreferences.setUsePostgresSearch(usePostgresSearchProperty.getValue());
 
