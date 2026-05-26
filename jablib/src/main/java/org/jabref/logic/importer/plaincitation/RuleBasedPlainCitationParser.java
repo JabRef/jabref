@@ -22,8 +22,6 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     private static final String URL_TAG = "[url_tag]";
     private static final String YEAR_TAG = "[year_tag]";
     private static final String PAGES_TAG = "[pages_tag]";
-    private static final String DOI_TAG = "[doi_tag]";
-
     private static final String INITIALS_GROUP = "INITIALS";
     private static final String LASTNAME_GROUP = "LASTNAME";
 
@@ -112,20 +110,24 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
 
     /// Extracts the first DOI found in {@code input}, stores its canonical form in {@link #doi},
     /// and returns {@code input} with the matched DOI (including any leading {@code doi:} or
-    /// {@code https://doi.org/} prefix) replaced by {@link #DOI_TAG} so the remaining rules do
-    /// not re-parse it as a URL or title.
+    /// {@code https://doi.org/} prefix) removed so the remaining rules do not re-parse it as a
+    /// URL or title.
+    ///
+    /// The DOI is replaced with an empty string rather than a placeholder token: {@link #findParts}
+    /// later infers the title and journal/publisher from the count of non-numeric segments, and a
+    /// placeholder would skew that count because DOIs typically contain digits while a token like
+    /// {@code [doi_tag]} would not.
     ///
     /// Called before {@link #findUrls} so a {@code doi.org} link is recorded as a DOI rather
     /// than being swallowed by the generic URL rule.
     ///
     /// @param input raw citation text
-    /// @return the input with the DOI replaced by {@link #DOI_TAG}, or the original input if
-    ///         no DOI was found
+    /// @return the input with the DOI stripped, or the original input if no DOI was found
     private String findDoi(String input) {
         return DOI.findInText(input)
                   .map(parsed -> {
                       doi = parsed.asString();
-                      return fixSpaces(DOI.replaceInText(input, DOI_TAG));
+                      return fixSpaces(DOI.replaceInText(input, ""));
                   })
                   .orElse(input);
     }
