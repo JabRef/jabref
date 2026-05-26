@@ -2,7 +2,8 @@ package org.jabref.logic.bibtex.comparator.plausibility;
 
 import org.jabref.logic.bibtex.comparator.ComparisonResult;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -10,127 +11,32 @@ class YearFieldValuePlausibilityComparatorTest {
 
     private final YearFieldValuePlausibilityComparator comparator = new YearFieldValuePlausibilityComparator();
 
-    // Blank Validation
-    @Test
-    void leftSideIsBlank() {
-        String left = "";
-        String right = "2020";
+    @ParameterizedTest
+    @CsvSource(value = {
+            // Blank Validation
+            ", 2020, RIGHT_BETTER",
+            "2020, , LEFT_BETTER",
+            ", , UNDETERMINED",
 
-        assertEquals(ComparisonResult.RIGHT_BETTER, comparator.compare(left, right));
-    }
+            // Year Format Validation
+            "2020, Twenty-twenty, LEFT_BETTER",
+            "Twenty-twenty, 2020, RIGHT_BETTER",
+            "Twenty-twenty, Twenty-twenty-one, UNDETERMINED",
 
-    @Test
-    void rightSideIsBlank() {
-        String left = "2020";
-        String right = "";
+            // Year Range Validation (1800 <= year <= currentYear + 2)
+            "2020, 1200, LEFT_BETTER",
+            "1200, 2020, RIGHT_BETTER",
+            "1200, 1300, UNDETERMINED",
 
-        assertEquals(ComparisonResult.LEFT_BETTER, comparator.compare(left, right));
-    }
-
-    @Test
-    void bothSidesAreBlank() {
-        String left = "";
-        String right = "";
-
-        assertEquals(ComparisonResult.UNDETERMINED, comparator.compare(left, right));
-    }
-
-    // Year Format Validation
-    @Test
-    void leftSideCorrectlyFormatted() {
-        String left = "2020";
-        String right = "Twenty-twenty";
-
-        assertEquals(ComparisonResult.LEFT_BETTER, comparator.compare(left, right));
-    }
-
-    @Test
-    void rightSideCorrectlyFormatted() {
-        String left = "Twenty-twenty";
-        String right = "2020";
-
-        assertEquals(ComparisonResult.RIGHT_BETTER, comparator.compare(left, right));
-    }
-
-    @Test
-    void bothSidesIncorrectlyFormatted() {
-        String left = "Twenty-twenty";
-        String right = "Twenty-twenty-one";
-
-        assertEquals(ComparisonResult.UNDETERMINED, comparator.compare(left, right));
-    }
-
-    // Year Range Validation 1800 <= year <= currentYear + 2
-    @Test
-    void leftSideInYearRange() {
-        String left = "2020";
-        String right = "1200";
-
-        assertEquals(ComparisonResult.LEFT_BETTER, comparator.compare(left, right));
-    }
-
-    @Test
-    void rightSideInYearRange() {
-        String left = "1200";
-        String right = "2020";
-
-        assertEquals(ComparisonResult.RIGHT_BETTER, comparator.compare(left, right));
-    }
-
-    @Test
-    void bothSidesOutOfYearRange() {
-        String left = "1200";
-        String right = "1300";
-
-        assertEquals(ComparisonResult.UNDETERMINED, comparator.compare(left, right));
-    }
-
-    // Year Proximity Validation (diff > 10)
-    @Test
-    void rightSideIsNewerByMoreThanTenYears() {
-        String left = "2000";
-        String right = "2020";
-
-        assertEquals(ComparisonResult.RIGHT_BETTER, comparator.compare(left, right));
-    }
-
-    @Test
-    void leftSideIsNewerByMoreThanTenYears() {
-        String left = "2020";
-        String right = "2000";
-
-        assertEquals(ComparisonResult.LEFT_BETTER, comparator.compare(left, right));
-    }
-
-    @Test
-    void rightSideIsNewerByLessThanTenYears() {
-        String left = "2020";
-        String right = "2025";
-
-        assertEquals(ComparisonResult.UNDETERMINED, comparator.compare(left, right));
-    }
-
-    @Test
-    void leftSideIsNewerByLessThanTenYears() {
-        String left = "2025";
-        String right = "2020";
-
-        assertEquals(ComparisonResult.UNDETERMINED, comparator.compare(left, right));
-    }
-
-    @Test
-    void bothSidesTenYearsApart() {
-        String left = "2010";
-        String right = "2020";
-
-        assertEquals(ComparisonResult.UNDETERMINED, comparator.compare(left, right));
-    }
-
-    @Test
-    void bothSidesSameYear() {
-        String left = "2020";
-        String right = "2020";
-
-        assertEquals(ComparisonResult.UNDETERMINED, comparator.compare(left, right));
+            // Year Proximity Validation (diff > 10)
+            "2000, 2020, RIGHT_BETTER",
+            "2020, 2000, LEFT_BETTER",
+            "2020, 2025, UNDETERMINED",
+            "2025, 2020, UNDETERMINED",
+            "2010, 2020, UNDETERMINED",
+            "2020, 2020, UNDETERMINED"
+    }, nullValues = {"null", ""})
+    void compare(String left, String right, ComparisonResult expected) {
+        assertEquals(expected, comparator.compare(left, right));
     }
 }
