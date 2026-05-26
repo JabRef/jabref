@@ -59,6 +59,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import com.google.common.annotations.VisibleForTesting;
 import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -203,9 +204,11 @@ public class JabRefFrameViewModel {
 
             uiCommands.stream().filter(UiCommand.AppendBibTeXToCurrentLibrary.class::isInstance)
                       .map(UiCommand.AppendBibTeXToCurrentLibrary.class::cast)
-                      .findAny().ifPresent(importBibTex -> importBibTex.targetGroup().ifPresentOrElse(
-                              group -> importBibtexStringAndOpen(importBibTex.bibtex(), group),
-                              () -> importBibtexStringAndOpen(importBibTex.bibtex())));
+                      .findAny().ifPresent(importBibTex ->
+                              importBibtexStringAndOpen(
+                                      importBibTex.bibtex(),
+                                      // importBibtexStringAndOpen accepts null targetGroup to indicate "no group assignment"
+                                      importBibTex.targetGroup().orElse(null)));
         }
 
         // Handle jumpToEntry
@@ -223,22 +226,7 @@ public class JabRefFrameViewModel {
     }
 
     /// @deprecated used by the browser extension only
-    private void importBibtexStringAndOpen(String importStr) {
-        LOGGER.debug("ImportBibtex {} requested", importStr);
-        BackgroundTask.wrap(() -> parseBibtexEntries(importStr))
-                      .onSuccess(parserResult -> {
-                          if (preferences.getRemotePreferences().directHttpImport()) {
-                              directImportEntries(parserResult);
-                          } else {
-                              addParserResult(parserResult);
-                          }
-                      })
-                      .onFailure(e -> LOGGER.error("Unable to parse provided bibtex {}", importStr, e))
-                      .executeWith(taskExecutor);
-    }
-
-    /// @deprecated used by the browser extension only
-    private void importBibtexStringAndOpen(String importStr, String targetGroup) {
+    private void importBibtexStringAndOpen(String importStr, @Nullable String targetGroup) {
         LOGGER.debug("ImportBibtex {} requested", importStr);
         BackgroundTask.wrap(() -> parseBibtexEntries(importStr))
                       .onSuccess(parserResult -> {
@@ -267,19 +255,12 @@ public class JabRefFrameViewModel {
                       .executeWith(taskExecutor);
     }
 
-    private void directImportEntries(ParserResult parserResult) {
+    private void directImportEntries(ParserResult parserResult, @Nullable String targetGroup) {
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
         BibDatabaseContext databaseContext = libraryTab.getBibDatabaseContext();
         List<BibEntry> entries = parserResult.getDatabase().getEntries();
         newImportHandler(databaseContext).importEntries(entries);
-    }
-
-    private void directImportEntries(ParserResult parserResult, String targetGroup) {
-        LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
-        BibDatabaseContext databaseContext = libraryTab.getBibDatabaseContext();
-        List<BibEntry> entries = parserResult.getDatabase().getEntries();
-        newImportHandler(databaseContext).importEntries(entries);
-        if (!targetGroup.isBlank()) {
+        if (targetGroup != null && !targetGroup.isBlank()) {
             assignToGroup(databaseContext, entries, targetGroup);
         }
     }
