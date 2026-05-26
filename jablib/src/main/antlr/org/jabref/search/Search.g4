@@ -15,6 +15,11 @@ WS: [ \t\n\r]+ -> skip; // whitespace is ignored/skipped
 LPAREN: '(';
 RPAREN: ')';
 
+GTE: '>='; // greater than or equal
+LTE: '<='; // less than or equal
+GT: '>'; // greater than
+LT: '<'; // less than
+
 EQUAL: '='; // case insensitive contains, semantically the same as CONTAINS
 CEQUAL: '=!'; // case sensitive contains
 
@@ -41,7 +46,7 @@ NOT: 'NOT';
 
 FIELD: [A-Z]([A-Z] | '-' | '_')*;           // field name should allow for - or _
 STRING_LITERAL: '"' ('\\"' | ~["])* '"';    // " should be escaped with a backslash
-TERM: ('\\' [=!~()] | ~[ \t\n\r=!~()])+;    // =!~() should be escaped with a backslash
+TERM: ('\\' [=!~()<>] | ~[ \t\n\r=!~()<>])+;    // =!~()<> should be escaped with a backslash
 
 start
     : EOF
@@ -80,6 +85,10 @@ operator
     | NCREEQUAL
     | CONTAINS
     | MATCHES
+    | GT
+    | LT
+    | GTE
+    | LTE
     ;
 
 searchValue

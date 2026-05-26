@@ -20,7 +20,7 @@ public class DateGroup extends AbstractGroup {
         this.date = date;
     }
 
-    static Optional<Date> extractDate(Field field, BibEntry entry) {
+    public static Optional<Date> extractDate(Field field, BibEntry entry) {
         boolean isCore =
                 (field == StandardField.DATE)
                         || (field == StandardField.YEAR)
@@ -43,7 +43,7 @@ public class DateGroup extends AbstractGroup {
     /// @param d             the parsed date
     /// @param dateKeyFormat sample format used only for its number of dashes
     /// @return optional key string in the requested granularity
-    static Optional<String> getDateKey(Date d, String dateKeyFormat) {
+    public static Optional<String> getDateKey(Date d, String dateKeyFormat) {
         int numOfdashes = (int) dateKeyFormat.chars().filter(ch -> ch == '-').count();
         Optional<Integer> y = d.getYear();
         return switch (numOfdashes) {
