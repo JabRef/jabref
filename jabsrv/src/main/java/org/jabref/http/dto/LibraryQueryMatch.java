@@ -17,6 +17,5 @@ import org.jspecify.annotations.NullMarked;
 /// DTO — fix the library by assigning citation keys if disambiguation is required.
 @NullMarked
 public record LibraryQueryMatch(String libraryId, String entryId) {
-
     public static final String UNSET_CITATION_KEY = "{NONE}";
 }
