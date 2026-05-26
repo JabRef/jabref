@@ -16,6 +16,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.DatabaseTest;
 
@@ -52,6 +53,30 @@ class DBMSProcessorTest {
     @AfterEach
     void closeDbmsConnection() throws SQLException {
         this.dbmsConnection.getConnection().close();
+    }
+
+    @Test
+    void insertingEmptyTypeThrowsException() {
+        // Arrange: create a bad entry
+        BibEntry badEntry = new BibEntry();
+        badEntry.setType(new EntryType() {
+            @Override
+            public String getName() {
+                return "";
+            }
+
+            @Override
+            public String getDisplayName() {
+                return "Ghost";
+            }
+        });
+
+        // Act: attempt to insert it (the exception will be caught and logged internally)
+        dbmsProcessor.insertIntoEntryTable(List.of(badEntry));
+
+        // Assert: fetch all entries from the DB and verify it is completely empty
+        List<BibEntry> savedEntries = dbmsProcessor.getSharedEntries();
+        assertTrue(savedEntries.isEmpty(), "Database should have blocked the ghost entry, keeping the table empty.");
     }
 
     @Test

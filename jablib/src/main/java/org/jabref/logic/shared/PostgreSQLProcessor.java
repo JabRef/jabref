@@ -43,8 +43,12 @@ public class PostgreSQLProcessor extends DBMSProcessor {
         connection.createStatement().executeUpdate(
                 "CREATE TABLE IF NOT EXISTS " + escape_Table("ENTRY") + " (" +
                         "\"SHARED_ID\" SERIAL PRIMARY KEY, " +
-                        "\"TYPE\" VARCHAR, " +
+                        "\"TYPE\" VARCHAR NOT NULL CHECK (\"TYPE\" <> ''), " +
                         "\"VERSION\" INTEGER DEFAULT 1)");
+
+        connection.createStatement().executeUpdate(
+                "UPDATE " + escape_Table("ENTRY") + " SET \"TYPE\" = 'Unknown' WHERE \"TYPE\" IS NULL OR \"TYPE\" = ''"
+        );
 
         connection.createStatement().executeUpdate(
                 "CREATE TABLE IF NOT EXISTS " + escape_Table("FIELD") + " (" +
