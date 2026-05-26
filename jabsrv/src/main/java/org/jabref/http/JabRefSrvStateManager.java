@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -78,8 +79,9 @@ public class JabRefSrvStateManager extends AbstractSrvStateManager {
     /// under the new context's uid. The old uid stays in the registry — a small
     /// leak proportional to the number of edits the server sees in a session.
     private void refreshStaleLibraries() {
-        for (int i = 0; i < openDatabases.size(); i++) {
-            BibDatabaseContext current = openDatabases.get(i);
+        ListIterator<BibDatabaseContext> it = openDatabases.listIterator();
+        while (it.hasNext()) {
+            BibDatabaseContext current = it.next();
             Optional<Path> pathOpt = current.getDatabasePath();
             if (pathOpt.isEmpty()) {
                 continue;
@@ -93,7 +95,7 @@ public class JabRefSrvStateManager extends AbstractSrvStateManager {
                 }
                 Optional<BibDatabaseContext> reparsed = parseLibrary(path);
                 if (reparsed.isPresent()) {
-                    openDatabases.set(i, reparsed.get());
+                    it.set(reparsed.get());
                     registerSearchContext(reparsed.get());
                 }
             } catch (IOException e) {
