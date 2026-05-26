@@ -110,12 +110,21 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         return fixSpaces(matcher.replaceAll(URL_TAG));
     }
 
+    /// Extracts the first DOI found in {@code input}, stores its canonical form in {@link #doi},
+    /// and returns {@code input} with the matched DOI (including any leading {@code doi:} or
+    /// {@code https://doi.org/} prefix) replaced by {@link #DOI_TAG} so the remaining rules do
+    /// not re-parse it as a URL or title.
+    ///
+    /// Called before {@link #findUrls} so a {@code doi.org} link is recorded as a DOI rather
+    /// than being swallowed by the generic URL rule.
+    ///
+    /// @param input raw citation text
+    /// @return the input with the DOI replaced by {@link #DOI_TAG}, or the original input if
+    ///         no DOI was found
     private String findDoi(String input) {
         return DOI.findInText(input)
                   .map(parsed -> {
                       doi = parsed.asString();
-                      // Strip the matched DOI (and any URL/"doi:" prefix) using DOI's own
-                      // matcher so the remaining rules don't re-parse it as a URL or title.
                       return fixSpaces(DOI.replaceInText(input, DOI_TAG));
                   })
                   .orElse(input);
