@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -33,28 +34,30 @@ public class DOI implements Identifier {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DOI.class);
 
+    private static final String DOI_GROUP = "doi";
+
     // Regex
     // (see http://www.doi.org/doi_handbook/2_Numbering.html)
     private static final String DOI_EXP = "(?:urn:)?"       // optional urn
             + "(?:doi:)?"                                   // optional doi
-            + "("                                           // begin group \1
+            + "(?<" + DOI_GROUP + ">"                       // begin named group
             + "10"                                          // directory indicator
             + "(?:\\.[0-9]+)+"                              // registrant codes
             + "[/:%]"                                       // divider
             + "(?:.+)"                                      // suffix alphanumeric string
-            + ")";                                          // end group \1
+            + ")";                                          // end named group
     private static final String FIND_DOI_EXP = "(?:urn:)?"  // optional urn
             + "(?:doi:)?"                                   // optional doi
-            + "("                                           // begin group \1
+            + "(?<" + DOI_GROUP + ">"                       // begin named group
             + "10"                                          // directory indicator
             + "(?:\\.[0-9]+)+"                              // registrant codes
             + "[/:]"                                        // divider
             + "(?:[^\\s,]+[^,;(\\.\\s)])"                   // suffix alphanumeric without " "/"," and not ending on "."/","/";"
-            + ")";                                          // end group \1
+            + ")";                                          // end named group
 
     // Regex (Short DOI)
-    private static final String SHORT_DOI_SHORTCUT = "^\\s*(?:https?://)?(?:www\\.)?(?:doi\\.org/)([a-z0-9]{4,10})\\s*$"; // eg https://doi.org/bfrhmx
-    private static final String IN_TEXT_SHORT_DOI_SHORTCUT = "(?:https?://)?(?:www\\.)?(?:doi\\.org/)([a-z0-9]{4,10})"; // eg https://doi.org/bfrhmx somewhere in the text
+    private static final String SHORT_DOI_SHORTCUT = "^\\s*(?:https?://)?(?:www\\.)?(?:doi\\.org/)(?<" + DOI_GROUP + ">[a-z0-9]{4,10})\\s*$"; // eg https://doi.org/bfrhmx
+    private static final String IN_TEXT_SHORT_DOI_SHORTCUT = "(?:https?://)?(?:www\\.)?(?:doi\\.org/)(?<" + DOI_GROUP + ">[a-z0-9]{4,10})"; // eg https://doi.org/bfrhmx somewhere in the text
     private static final String SHORT_DOI_EXP_PREFIX = "^(?:"   // can begin with...
             + "\\s*(?:https?://)?(?:www\\.)?"                   // optional url parts "http(s)://"+"www."
             + "[a-zA-Z\\.]*doi[a-zA-Z\\.]*"                     //  eg "dx.doi." or "doi.acm." or "doi." if with url, must include "doi", otherwise too ambiguous
@@ -63,22 +66,22 @@ public class DOI implements Identifier {
             + "(?:[\\s/]?(?:(?:urn:)|(?:doi:)|(?:urn:doi:)))"   // "doi:10/12ab" or " urn:10/12ab" or "/urn:doi:/10/12ab" ...
             + "|(?:\\s?/?)"                                     // or "/10/12ab" or " /10/12ab" or "10/12ab" or " 10/12ab"
             + ")"                                               // end "any one of these"
-            + "("                                               // begin group \1
+            + "(?<" + DOI_GROUP + ">"                           // begin named group
             + "10"                                              // directory indicator
             + "[/%:]"                                           // divider
             + "[a-zA-Z0-9]{3,}"                                 // at least 3 characters
-            + ")"                                               // end group \1
+            + ")"                                               // end named group
             + "\\s*$";                                          // must be the end
     private static final String FIND_SHORT_DOI_EXP = "(?:"          // begin "any one of these" (but not none of those!)
             + "(?:(?:www\\.)?doi\\.org/)"                           // either doi.org
             + "|"                                                   // or any of the following with doi.org or not...
             + "(?:(?:doi.org/)?(?:(?:urn:)|(?:doi:)|(?:urn:doi:)))" // "doi:10/12ab" or " urn:10/12ab" or "/urn:doi:/10/12ab" or "doi.org/doi:10/12ab"...
             + ")"                                                   // end "any one of these"
-            + "("                                                   // begin group \1
+            + "(?<" + DOI_GROUP + ">"                               // begin named group
             + "10"                                                  // directory indicator
             + "[/%:]"                                               // divider
             + "[a-zA-Z0-9]{3,}"                                     // at least 3 characters
-            + ")";                                                  // end group  \1
+            + ")";                                                  // end named group
 
     private static final String HTTP_EXP = "https?://[^\\s]+?" + DOI_EXP;
     private static final String SHORT_DOI_HTTP_EXP = "https?://[^\\s]+?" + SHORT_DOI_EXP;
@@ -124,19 +127,18 @@ public class DOI implements Identifier {
         // Extract DOI/Short DOI
         Matcher matcher = EXACT_DOI_PATT.matcher(trimmedDoi);
         if (matcher.find()) {
-            // match only group \1
-            this.doi = matcher.group(1);
+            this.doi = matcher.group(DOI_GROUP);
         } else {
             // Short DOI
             Matcher shortDoiMatcher = EXACT_SHORT_DOI_PATT.matcher(trimmedDoi);
             if (shortDoiMatcher.find()) {
-                this.doi = shortDoiMatcher.group(1);
+                this.doi = shortDoiMatcher.group(DOI_GROUP);
                 isShortDoi = true;
             } else {
                 // Shortcut DOI without the "10/" as in "doi.org/d8dn"
                 Matcher shortcutDoiMatcher = EXACT_SHORT_DOI_SHORTCUT.matcher(trimmedDoi);
                 if (shortcutDoiMatcher.find()) {
-                    this.doi = "10/" + shortcutDoiMatcher.group(1);
+                    this.doi = "10/" + shortcutDoiMatcher.group(DOI_GROUP);
                     isShortDoi = true;
                 } else {
                     throw new IllegalArgumentException(trimmedDoi + " is not a valid DOI/Short DOI.");
@@ -221,19 +223,21 @@ public class DOI implements Identifier {
     private static Optional<DoiTextMatch> findInTextInternal(String text) {
         // Each pattern is tried independently; the earliest match in the text wins so
         // callers like {@link #replaceInText} strip the first DOI rather than whichever
-        // regex happened to be tried last.
+        // regex happened to be tried last. The shortcut form (e.g. "doi.org/bfrhmx") is
+        // re-prefixed with "10/" so the {@link DOI} constructor accepts it directly via
+        // EXACT_SHORT_DOI_PATT instead of having to re-derive the URL form.
         return Stream.of(
-                             firstMatch(FIND_DOI_PATT, text, 1),
-                             firstMatch(FIND_SHORT_DOI_PATT, text, 1),
-                             firstMatch(FIND_SHORT_DOI_SHORTCUT, text, 0))
+                             firstMatch(FIND_DOI_PATT, text, m -> m.group(DOI_GROUP)),
+                             firstMatch(FIND_SHORT_DOI_PATT, text, m -> m.group(DOI_GROUP)),
+                             firstMatch(FIND_SHORT_DOI_SHORTCUT, text, m -> "10/" + m.group(DOI_GROUP)))
                      .flatMap(Optional::stream)
                      .min(Comparator.comparingInt(DoiTextMatch::start));
     }
 
-    private static Optional<DoiTextMatch> firstMatch(Pattern pattern, String text, int doiGroup) {
+    private static Optional<DoiTextMatch> firstMatch(Pattern pattern, String text, Function<Matcher, String> doiExtractor) {
         Matcher matcher = pattern.matcher(text);
         if (matcher.find()) {
-            return Optional.of(new DoiTextMatch(matcher.group(doiGroup), matcher.start(), matcher.end()));
+            return Optional.of(new DoiTextMatch(doiExtractor.apply(matcher), matcher.start(), matcher.end()));
         }
         return Optional.empty();
     }
