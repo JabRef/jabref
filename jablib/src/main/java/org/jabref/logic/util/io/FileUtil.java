@@ -173,15 +173,19 @@ public class FileUtil {
         String nameWithoutExtension = getBaseName(fileName);
 
         nameWithoutExtension = FileNameCleaner.cleanFileName(nameWithoutExtension);
+        final String cleanedName = nameWithoutExtension;
 
-        if (nameWithoutExtension.length() > MAXIMUM_FILE_NAME_LENGTH) {
-            Optional<String> extension = getFileExtension(fileName);
+        Optional<String> extension = getFileExtension(fileName);
+        String fullCleanedName = extension.map(s -> cleanedName + "." + s).orElse(cleanedName);
+        // Fix: check FULL filename length (name + extension), not just name alone
+        if (fullCleanedName.length() > MAXIMUM_FILE_NAME_LENGTH) {
+
             String shortName = nameWithoutExtension.substring(0, MAXIMUM_FILE_NAME_LENGTH - extension.map(s -> s.length() + 1).orElse(0));
-            LOGGER.info("Truncated the too long filename '{}' ({}} characters) to '{}'.", fileName, fileName.length(), shortName);
+            LOGGER.info("Truncated the too long filename '{}' ({} characters) to '{}'.", fileName, fileName.length(), shortName);
             return extension.map(s -> shortName + "." + s).orElse(shortName);
         }
 
-        return fileName;
+        return fullCleanedName;
     }
 
     /// Adds an extension to the given file name. The original extension is not replaced. That means, "demo.bib", ".sav"
