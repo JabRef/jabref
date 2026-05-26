@@ -11,6 +11,10 @@
           {
             "type": "command",
             "command": "python .claude/hooks/git-rebase-guard.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/pr-policy-tag-guard.py"
           }
         ]
       }
