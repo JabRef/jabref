@@ -1,6 +1,7 @@
 package org.jabref.logic;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -15,6 +16,7 @@ import org.jabref.logic.util.Directories;
 import org.jabref.model.metadata.UserHostInfo;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// Preferences for the linked files
 @NullMarked
@@ -23,7 +25,7 @@ public class FilePreferences {
     public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] {"[bibtexkey]", "[bibtexkey] - [title]"};
 
     private final SimpleObjectProperty<UserHostInfo> userAndHost = new SimpleObjectProperty<>();
-    private final ObjectProperty<Path> mainFileDirectory = new SimpleObjectProperty<>();
+    private final ObjectProperty<@Nullable Path> mainFileDirectory = new SimpleObjectProperty<>();
     private final BooleanProperty storeFilesRelativeToBibFile = new SimpleBooleanProperty();
     private final BooleanProperty autoRenameFilesOnChange = new SimpleBooleanProperty();
     private final StringProperty fileNamePattern = new SimpleStringProperty();
@@ -143,15 +145,15 @@ public class FilePreferences {
         return userAndHost.getValue().getUserHostString();
     }
 
-    public Path getMainFileDirectory() {
-        return mainFileDirectory.get();
+    public Optional<Path> getMainFileDirectory() {
+        return Optional.ofNullable(mainFileDirectory.get());
     }
 
-    public ObjectProperty<Path> mainFileDirectoryProperty() {
+    public ObjectProperty<@Nullable Path> mainFileDirectoryProperty() {
         return mainFileDirectory;
     }
 
-    public void setMainFileDirectory(Path mainFileDirectory) {
+    public void setMainFileDirectory(@Nullable Path mainFileDirectory) {
         this.mainFileDirectory.set(mainFileDirectory);
     }
 

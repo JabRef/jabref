@@ -84,7 +84,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         // External files preferences / Attached files preferences / File preferences
-        mainFileDirectoryProperty.setValue(filePreferences.getMainFileDirectory().toString());
+        mainFileDirectoryProperty.setValue(filePreferences.getMainFileDirectory().orElse(Path.of("")).toString());
         useMainFileDirectoryProperty.setValue(!filePreferences.shouldStoreFilesRelativeToBibFile());
         useBibLocationAsPrimaryProperty.setValue(filePreferences.shouldStoreFilesRelativeToBibFile());
         fulltextIndex.setValue(filePreferences.shouldFulltextIndexLinkedFiles());
@@ -115,7 +115,11 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         // External files preferences / Attached files preferences / File preferences
-        filePreferences.setMainFileDirectory(Path.of(mainFileDirectoryProperty.getValue()));
+        if (mainFileDirectoryProperty.getValue().isEmpty()) {
+            filePreferences.setMainFileDirectory(null);
+        } else {
+            filePreferences.setMainFileDirectory(Path.of(mainFileDirectoryProperty.getValue()));
+        }
         filePreferences.setStoreFilesRelativeToBibFile(useBibLocationAsPrimaryProperty.getValue());
         filePreferences.setAutoRenameFilesOnChange(autoRenameFilesOnChangeProperty.getValue());
         filePreferences.setFileNamePattern(fileNamePatternProperty.getValue());

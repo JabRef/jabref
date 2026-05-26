@@ -21,7 +21,9 @@ public class MainFileDirectoryDialogViewModel extends AbstractViewModel {
         this.filePreferences = preferences.getFilePreferences();
         this.dialogService = dialogService;
 
-        pathProperty.set(filePreferences.getMainFileDirectory().toString());
+        pathProperty.set(filePreferences.getMainFileDirectory()
+                                        .map(Path::toString)
+                                        .orElse(""));
     }
 
     public StringProperty pathProperty() {

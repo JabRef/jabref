@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
@@ -122,7 +123,7 @@ class BibDatabaseContextTest {
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
         Path userDirJabRef = Directories.getUserDirectory();
 
-        when(fileDirPrefs.getMainFileDirectory()).thenReturn(userDirJabRef);
+        when(fileDirPrefs.getMainFileDirectory()).thenReturn(Optional.of(userDirJabRef));
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(Path.of("biblio.bib"));
         assertEquals(List.of(userDirJabRef), database.getFileDirectories(fileDirPrefs));
