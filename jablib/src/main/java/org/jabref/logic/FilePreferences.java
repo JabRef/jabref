@@ -382,7 +382,7 @@ public class FilePreferences {
     }
 
     public FilePreferences withMainFileDirectory(Path lastUsedDirectory) {
-        this.workingDirectory.set(lastUsedDirectory);
+        this.mainFileDirectory.set(lastUsedDirectory);
         return this;
     }
 
