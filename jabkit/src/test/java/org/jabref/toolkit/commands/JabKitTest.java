@@ -62,6 +62,22 @@ class JabKitTest extends AbstractJabKitTest {
     }
 
     @Test
+    void checkConsistencyGitHubActionsFormat() {
+        Path testBib = getClassResourceAsPath("origin.bib");
+        String testBibFile = testBib.toAbsolutePath().toString();
+
+        List<String> args = List.of("check", "consistency", testBibFile, "--output-format", "github-actions", "--porcelain");
+
+        int executionResult = executeToLog(args.toArray(String[]::new));
+
+        // origin.bib has a single entry type, so no consistency findings are produced; the
+        // run is still expected to succeed and not emit any annotations.
+        String output = getStandardOutput();
+        assertEquals("", output);
+        assertEquals(0, executionResult);
+    }
+
+    @Test
     void checkConsistencyFailsWithoutInputFile() {
         int executionResult = executeToLog("check", "consistency");
 
