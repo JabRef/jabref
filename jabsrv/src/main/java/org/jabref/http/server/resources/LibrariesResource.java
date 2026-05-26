@@ -12,7 +12,6 @@ import org.jabref.http.dto.LibraryQueryResponse;
 import org.jabref.http.dto.LibraryQueryResult;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -99,7 +98,7 @@ public class LibrariesResource {
         return matches;
     }
 
-    /// Delegate to whichever [SearchContext] the state manager provides. In GUI
+    /// Delegate to whichever [org.jabref.logic.search.SearchContext] the state manager provides. In GUI
     /// mode this is the live orchestrator that may use the Postgres backend; in
     /// stand-alone mode this is a fresh in-memory context.
     private List<BibEntry> runSearch(BibDatabaseContext context, SearchQuery query) {
