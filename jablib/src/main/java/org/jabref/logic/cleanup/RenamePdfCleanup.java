@@ -2,8 +2,8 @@ package org.jabref.logic.cleanup;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -13,6 +13,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.util.OptionalUtil;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -35,6 +36,12 @@ public class RenamePdfCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry, Consumer<Runnable> mutationScheduler) {
+        // File I/O must run on the background thread; bypass the scheduler entirely.
+        return cleanup(entry);
+    }
+
+    @Override
+    public List<FieldChange> cleanup(BibEntry entry) {
         List<LinkedFile> files = entry.getFiles();
 
         boolean changed = false;
@@ -57,16 +64,10 @@ public class RenamePdfCleanup implements CleanupJob {
         }
 
         if (changed) {
-            List<FieldChange> changes = new ArrayList<>();
-            mutationScheduler.accept(() -> entry.setFiles(files).ifPresent(changes::add));
-            return changes;
+            Optional<FieldChange> changes = entry.setFiles(files);
+            return OptionalUtil.toList(changes);
         }
 
         return List.of();
-    }
-
-    @Override
-    public List<FieldChange> cleanup(BibEntry entry) {
-        return cleanup(entry, Runnable::run);
     }
 }
