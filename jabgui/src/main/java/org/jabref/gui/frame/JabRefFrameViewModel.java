@@ -51,8 +51,6 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.groups.ExplicitGroup;
-import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -277,8 +275,7 @@ public class JabRefFrameViewModel {
     }
 
     /// Assigns the imported entries to the group named {@code groupName}, creating it as a
-    /// top-level group if it does not exist yet. Group names are unique within a library,
-    /// so the name identifies the group anywhere in the tree.
+    /// top-level group if it does not exist yet.
     ///
     /// TODO: if an existing group is not assignable (e.g. a search or automatic group),
     ///       the assignment silently does nothing - no error is reported to the caller.
@@ -288,15 +285,8 @@ public class JabRefFrameViewModel {
             databaseContext.getMetaData().setGroups(newRoot);
             return newRoot;
         });
-        GroupTreeNode target = root.iterateOverTree()
-                                   .filter(node -> node != root)
-                                   .filter(node -> groupName.equals(node.getName()))
-                                   .findFirst()
-                                   .orElseGet(() -> root.addSubgroup(new ExplicitGroup(
-                                           groupName,
-                                           GroupHierarchyType.INDEPENDENT,
-                                           preferences.getBibEntryPreferences().getKeywordSeparator())));
-        target.addEntriesToGroup(entries);
+        root.findOrCreateExplicitGroup(groupName, preferences.getBibEntryPreferences().getKeywordSeparator())
+            .addEntriesToGroup(entries);
     }
 
     private void checkForBibInUpperDir() {
