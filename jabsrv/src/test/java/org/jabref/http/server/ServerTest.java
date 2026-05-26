@@ -107,7 +107,7 @@ public abstract class ServerTest extends JerseyTest {
 
     /// Restarts the Jersey test container so the state manager is rebuilt with the new
     /// files. Necessary because the state manager snapshots the file list at
-    /// `configure()` time (see [#parseFilesToServe()]).
+    /// `configure()` time (see [#filesToServe]).
     protected void setAvailableLibraries(EnumSet<TestBibFile> files) {
         try {
             tearDown();
