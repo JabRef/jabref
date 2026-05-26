@@ -396,12 +396,9 @@ class FileUtilTest {
         String longerFilename = Stream.generate(() -> String.valueOf('1')).limit(260).collect(Collectors.joining());
         assertEquals(longestValidFilename, FileUtil.getValidFileName(longerFilename));
     }
-    
+
     @Test
     void validFilenameShouldBeTruncatedWhenNameAloneFitsButNamePlusExtensionExceeds255() {
-        // name = 252 chars, extension = ".pdf" (4 chars), total = 256 chars
-        // OLD buggy code: 252 > 255? NO → returns 256-char name (BUG!)
-        // NEW fixed code: 256 > 255? YES → truncates to 255 (FIX!)
         String longerThanLimitWithExtension = Stream.generate(() -> String.valueOf('1'))
                                                     .limit(252)
                                                     .collect(Collectors.joining()) + ".pdf";
@@ -409,8 +406,8 @@ class FileUtilTest {
                                          .limit(251)
                                          .collect(Collectors.joining()) + ".pdf";
 
-        assertEquals(255, expectedTruncated.length());       // confirm expected is exactly 255
-        assertEquals(256, longerThanLimitWithExtension.length()); // confirm input is over limit
+        assertEquals(255, expectedTruncated.length());
+        assertEquals(256, longerThanLimitWithExtension.length());
         assertEquals(expectedTruncated, FileUtil.getValidFileName(longerThanLimitWithExtension));
     }
 

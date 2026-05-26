@@ -463,7 +463,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         });
     }
 
-    /// @implNote Similar method {@link org.jabref.gui.linkedfile.RedownloadMissingFilesAction #redownloadMissing}
+    /// @implNote Similar method {@link org.jabref.gui.linkedfile.RedownloadMissingFilesAction#redownloadMissing}
     public void redownload() {
         LOGGER.info("Redownloading file from {}", linkedFile.getSourceUrl());
         if (linkedFile.getSourceUrl().isEmpty() || !LinkedFile.isOnlineLink(linkedFile.getSourceUrl())) {
