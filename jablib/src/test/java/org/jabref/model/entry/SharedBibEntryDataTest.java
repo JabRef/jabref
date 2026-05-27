@@ -39,6 +39,7 @@ class SharedBibEntryDataTest {
         SharedBibEntryData data1 = new SharedBibEntryData();
         SharedBibEntryData data2 = new SharedBibEntryData();
 
+        assertEquals(data1, data2);
         assertEquals(data1.hashCode(), data2.hashCode());
     }
 }
