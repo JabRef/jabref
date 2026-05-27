@@ -68,10 +68,14 @@ public class GenericCsvExportFormatTest {
         List<String> lines = Files.readAllLines(path);
         assertEquals(2, lines.size());
         assertEquals(
-                "\"Citation Key\",\"Author\",\"Title\",\"Year\",\"Journal\",\"Booktitle\",\"Publisher\",\"Volume\",\"Number\",\"Pages\",\"Month\",\"Edition\",\"Address\",\"Editor\",\"Series\",\"Note\",\"HowPublished\",\"Organization\",\"Institution\",\"School\",\"Chapter\",\"Annote\",\"DOI\",\"URL\",\"Keywords\",\"Abstract\",\"ISBN\",\"ISSN\"",
+                """
+                "Citation Key","Author","Title","Year","Journal","Booktitle","Publisher","Volume","Number","Pages","Month","Edition","Address","Editor","Series","Note","HowPublished","Organization","Institution","School","Chapter","Annote","DOI","URL","Keywords","Abstract","ISBN","ISSN"\
+                """,
                 lines.getFirst());
         assertEquals(
-                "\"Doe2023\",\"Doe, John\",\"Test Article\",\"2023\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
+                """
+                "Doe2023","Doe, John","Test Article","2023","","","","","","","","","","","","","","","","","","","","","","","",""\
+                """,
                 lines.get(1));
     }
 
@@ -109,7 +113,9 @@ public class GenericCsvExportFormatTest {
         List<String> lines = Files.readAllLines(path);
         assertEquals(2, lines.size());
         assertEquals(
-                "\"Doe2023\",\"\",\"Title with \"\"quotes\"\" inside\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
+                """
+                "Doe2023","","Title with ""quotes"" inside","","","","","","","","","","","","","","","","","","","","","","","","",""\
+                """,
                 lines.get(1));
     }
 }
