@@ -331,8 +331,8 @@ public class BibDatabase {
     }
 
     /// Returns the string with the given id.
-    public BibtexString getString(String id) {
-        return bibtexStrings.get(id);
+    public Optional<BibtexString> getString(String id) {
+        return Optional.ofNullable(bibtexStrings.get(id));
     }
 
     /// Returns the string with the given name/label
@@ -658,8 +658,8 @@ public class BibDatabase {
         return -1;
     }
 
-    public BibEntry getEntryById(String id) {
-        return entriesId.get(id);
+    public Optional<BibEntry> getEntryById(String id) {
+        return Optional.ofNullable(entriesId.get(id));
     }
 
     @Override

@@ -19,6 +19,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The `jabkit` subcommands now accept the input file as a positional argument (e.g. `jabkit check integrity references.bib`); the `--input` option remains available as an alias. [#15759](https://github.com/JabRef/jabref/pull/15759)
 - We grouped the `jabkit` consistency and integrity checks under a new `check` command (`jabkit check consistency`, `jabkit check integrity`). [#15759](https://github.com/JabRef/jabref/pull/15759)
 - The `jabkit check consistency` command now supports the `errorformat` output format (`file:line:column: message`), which is the default output format for both `check` subcommands. [#15759](https://github.com/JabRef/jabref/pull/15759)
+- The `jabkit check` subcommands now support a `github-actions` output format that emits findings as [GitHub Actions workflow commands](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#setting-an-error-message), so findings show up as annotations on pull requests. [#15789](https://github.com/JabRef/jabref/pull/15789)
 - The `jabkit check` command now runs both the consistency and integrity checks when given an input file without a subcommand (e.g. `jabkit check references.bib`). [#15759](https://github.com/JabRef/jabref/pull/15759)
 - We added OCR feature using OCRmyPDF to extract text from scanned PDFs and create searchable PDFs including the extracted text. [#15712](https://github.com/JabRef/jabref/pull/15712)
 
@@ -33,8 +34,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - EndNote and Refer importers now respect the citation key preferences for unwanted characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
 - We fixed the Hayagriva YAML exporter to correctly nest DOI, ISBN, and ISSN under `serial-number` as required by the Hayagriva file format specification. [#15713](https://github.com/JabRef/jabref/issues/15713)
 - We fixed an issue where newly added entries could not be found in search. [#15719](https://github.com/JabRef/jabref/issues/15719)
+- We fixed a performance issue with the duplicate resolving when copying and pasting many entries [#15780](https://github.com/JabRef/jabref/pull/15780)
 - We fixed an issue where the duplicate finder progress counter displayed incorrect values, not reflecting the actual number of duplicate pairs reviewed by the user. [#11848](https://github.com/JabRef/jabref/issues/11848)
 - We fixed an issue where non latin caseless author names being parsed as nameprefix instead of familyname. [#15813](https://github.com/JabRef/jabref/issues/15813)
+- We fixed an issue where `Quality-> Cleanup -> Rename PDF` together with `Moved linked files to file directory` would lead to an exception [#15833](https://github.com/JabRef/jabref/issues/15833)
 
 ### Removed
 
