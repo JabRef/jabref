@@ -25,6 +25,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class Pseudonymization {
 
+    private static final String GROUP_PREFIX = "group-";
     private final Character keywordSeparator;
 
     public Pseudonymization(Character keywordSeparator) {
@@ -105,7 +106,7 @@ public class Pseudonymization {
             String originalName = keyword.toString();
             String pseudoName = groupNameMapping.get(originalName);
             if (pseudoName == null) {
-                pseudoName = "group-" + (groupNameMapping.size() + 1);
+                pseudoName = GROUP_PREFIX + (groupNameMapping.size() + 1);
                 groupNameMapping.put(originalName, pseudoName);
                 valueMapping.put(pseudoName, originalName);
             }
@@ -123,7 +124,7 @@ public class Pseudonymization {
                                                          int counter) {
         AbstractGroup originalGroup = node.getGroup();
         String originalName = originalGroup.getName();
-        String pseudoName = "group-" + counter;
+        String pseudoName = GROUP_PREFIX + counter;
         counter++;
         valueMapping.put(pseudoName, originalName);
         groupNameMapping.put(originalName, pseudoName);

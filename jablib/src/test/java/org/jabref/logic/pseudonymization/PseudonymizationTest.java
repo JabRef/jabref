@@ -119,8 +119,10 @@ class PseudonymizationTest {
         );
         root.addChild(child);
         context.getMetaData().setGroups(root);
+
         Pseudonymization.Result res =
                 new Pseudonymization(',').pseudonymizeLibrary(context);
+
         GroupTreeNode pseudonymizedRoot =
                 res.bibDatabaseContext().getMetaData().getGroups().orElseThrow();
         assertEquals("group-1", pseudonymizedRoot.getGroup().getName());
