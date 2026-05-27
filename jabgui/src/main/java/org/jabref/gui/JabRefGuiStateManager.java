@@ -1,7 +1,9 @@
 package org.jabref.gui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -21,14 +23,14 @@ import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.util.Pair;
 
-import org.jabref.gui.ai.components.aichat.AiChatWindow;
+import org.jabref.gui.ai.chat.AiGroupChatWindow;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.walkthrough.Walkthrough;
+import org.jabref.http.AbstractSrvStateManager;
 import org.jabref.logic.command.CommandSelectionTab;
-import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
@@ -39,7 +41,7 @@ import org.jabref.model.search.query.SearchQuery;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.PreboundBinding;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +57,7 @@ import org.slf4j.LoggerFactory;
 /// - dialog window sizes/positions
 /// - opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})
 ///
-public class JabRefGuiStateManager implements StateManager {
+public class JabRefGuiStateManager extends AbstractSrvStateManager implements StateManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiStateManager.class);
     private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
@@ -64,7 +66,6 @@ public class JabRefGuiStateManager implements StateManager {
     private final OptionalObjectProperty<LibraryTab> activeTab = OptionalObjectProperty.empty();
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<String, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
-    private final ObservableMap<String, IndexManager> indexManagers = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final OptionalObjectProperty<SearchQuery> activeGlobalSearchQuery = OptionalObjectProperty.empty();
     private final StringProperty searchQueryProperty = new SimpleStringProperty();
@@ -78,7 +79,7 @@ public class JabRefGuiStateManager implements StateManager {
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
-    private final List<AiChatWindow> aiChatWindows = new ArrayList<>();
+    private final Map<BibDatabaseContext, Map<String, AiGroupChatWindow>> groupAiChatWindows = new HashMap<>();
     private final BooleanProperty editorShowing = new SimpleBooleanProperty(false);
     private final OptionalObjectProperty<Walkthrough> activeWalkthrough = OptionalObjectProperty.empty();
     private final BooleanProperty canGoBack = new SimpleBooleanProperty(false);
@@ -135,7 +136,8 @@ public class JabRefGuiStateManager implements StateManager {
     }
 
     @Override
-    public void setSelectedGroups(BibDatabaseContext context, @NonNull List<GroupTreeNode> newSelectedGroups) {
+    @NullMarked
+    public void setSelectedGroups(BibDatabaseContext context, List<GroupTreeNode> newSelectedGroups) {
         selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).setAll(newSelectedGroups);
     }
 
@@ -147,16 +149,6 @@ public class JabRefGuiStateManager implements StateManager {
     @Override
     public void clearSelectedGroups(BibDatabaseContext context) {
         selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).clear();
-    }
-
-    @Override
-    public void setIndexManager(BibDatabaseContext database, IndexManager indexManager) {
-        indexManagers.put(database.getUid(), indexManager);
-    }
-
-    @Override
-    public Optional<IndexManager> getIndexManager(BibDatabaseContext database) {
-        return Optional.ofNullable(indexManagers.get(database.getUid()));
     }
 
     @Override
@@ -259,8 +251,26 @@ public class JabRefGuiStateManager implements StateManager {
     }
 
     @Override
-    public List<AiChatWindow> getAiChatWindows() {
-        return aiChatWindows;
+    public Optional<AiGroupChatWindow> getAiChatWindowForGroup(BibDatabaseContext context, String groupName) {
+        return Optional.ofNullable(groupAiChatWindows.get(context))
+                       .flatMap(innerMap -> Optional.ofNullable(innerMap.get(groupName)));
+    }
+
+    @Override
+    public void setAiChatWindowForGroup(BibDatabaseContext context, String groupName, AiGroupChatWindow aiGroupChatWindow) {
+        groupAiChatWindows.computeIfAbsent(context, k -> new HashMap<>())
+                          .put(groupName, aiGroupChatWindow);
+    }
+
+    @Override
+    public void removeAiChatWindowForGroup(BibDatabaseContext context, String groupName) {
+        Map<String, AiGroupChatWindow> innerMap = groupAiChatWindows.get(context);
+        if (innerMap != null) {
+            innerMap.remove(groupName);
+            if (innerMap.isEmpty()) {
+                groupAiChatWindows.remove(context);
+            }
+        }
     }
 
     @Override

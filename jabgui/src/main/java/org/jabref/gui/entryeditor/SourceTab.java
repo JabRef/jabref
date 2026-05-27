@@ -323,7 +323,7 @@ public class SourceTab extends EntryEditorTab {
         newEntry.getCitationKey()
                 .ifPresentOrElse(
                         outOfFocusEntry::setCitationKey,
-                        outOfFocusEntry::clearCiteKey);
+                        outOfFocusEntry::clearCitationKey);
 
         // First, remove fields that the user has removed.
         for (Map.Entry<Field, String> field : outOfFocusEntry.getFieldMap().entrySet()) {

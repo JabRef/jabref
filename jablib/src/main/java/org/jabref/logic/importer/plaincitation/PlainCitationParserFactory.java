@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.plaincitation;
 
-import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.chatting.ChatModel;
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.pdf.RuleBasedBibliographyPdfImporter;
@@ -14,7 +15,8 @@ public class PlainCitationParserFactory {
                                                              CitationKeyPatternPreferences citationKeyPatternPreferences,
                                                              GrobidPreferences grobidPreferences,
                                                              ImportFormatPreferences importFormatPreferences,
-                                                             AiService aiService) {
+                                                             AiPreferences aiPreferences,
+                                                             ChatModel chatModel) {
         return switch (parserChoice) {
             case PlainCitationParserChoice.RULE_BASED_GENERAL ->
                     new RuleBasedPlainCitationParser();
@@ -23,7 +25,7 @@ public class PlainCitationParserFactory {
             case PlainCitationParserChoice.GROBID ->
                     new GrobidPlainCitationParser(grobidPreferences, importFormatPreferences);
             case PlainCitationParserChoice.LLM ->
-                    new LlmPlainCitationParser(aiService.getTemplatesService(), importFormatPreferences, aiService.getChatLanguageModel());
+                    new LlmPlainCitationParser(importFormatPreferences, aiPreferences.getCitationParsingSystemMessageTemplate(), chatModel);
         };
     }
 }

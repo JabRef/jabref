@@ -2,11 +2,13 @@
 
 //DESCRIPTION jabsrv - serve BibTeX files using JabRef
 
-//JAVA 25+
+//JAVA 25
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
+// mavenlocal is listed first so a locally built jablib (./gradlew :jablib:publishToMavenLocal)
+// takes precedence over the published 6.0-SNAPSHOT - needed when testing unreleased jablib changes.
 // raw is for https://github.com/unicode-org/icu/pull/2127
-//REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
+//REPOS mavenlocal,mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 // see  https://github.com/gradlex-org/extra-java-module-info/issues/237 why we include e-adr here
@@ -60,8 +62,11 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GlobalExceptionMapper.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonFactory.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonMessageBodyReader.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonMessageBodyWriter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LinkedPdfFileDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabrefMediaType.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/AbstractSrvStateManager.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabRefSrvStateManager.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/SrvStateManager.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWQueryParams.java
@@ -97,6 +102,15 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ServerUtils.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
+
+// new jablib sources not yet in the 6.0-SNAPSHOT artifact
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/LibrarySearcher.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/NoOpSearchBackend.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/SearchBackend.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/SearchContext.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/inmemory/BibEntryMatchVisitor.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/inmemory/InMemoryLibrarySearcher.java
+//SOURCES ../jablib/src/main/java/org/jabref/logic/search/inmemory/InMemorySearchBackend.java
 
 //FILES tinylog.properties=../jabsrv-cli/src/main/resources/tinylog.properties
 

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.StackPane?>
+<?import org.jabref.gui.ai.AiPrivacyNoticeView?>
+<?import org.jabref.gui.ai.chat.AiChatView?>
+<fx:root
+        type="StackPane"
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.jabref.gui.ai.chat.AiEntryChatView">
+
+    <AiPrivacyNoticeView
+            fx:id="privacyNotice"/>
+
+    <AiChatView
+            fx:id="aiChatView"/>
+
+</fx:root>
