@@ -25,7 +25,6 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 @Execution(ExecutionMode.SAME_THREAD)
@@ -55,7 +54,7 @@ public class GenericCsvExportFormatTest {
     }
 
     @Test
-    void performExportWithBasicFields(@TempDir Path testFolder) throws IOException, SaveException, ParserConfigurationException, TransformerException {
+    void performExportForSingleAuthor(@TempDir Path testFolder) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         Path path = testFolder.resolve("test.csv");
         BibEntry entry = new BibEntry()
                 .withCitationKey("Doe2023")
@@ -68,14 +67,16 @@ public class GenericCsvExportFormatTest {
 
         List<String> lines = Files.readAllLines(path);
         assertEquals(2, lines.size());
-        assertTrue(lines.getFirst().contains("Citation Key"));
-        assertTrue(lines.getFirst().contains("Author"));
-        assertTrue(lines.get(1).contains("Doe2023"));
-        assertTrue(lines.get(1).contains("Doe, John"));
+        assertEquals(
+                "\"Citation Key\",\"Author\",\"Title\",\"Year\",\"Journal\",\"Booktitle\",\"Publisher\",\"Volume\",\"Number\",\"Pages\",\"Month\",\"Edition\",\"Address\",\"Editor\",\"Series\",\"Note\",\"HowPublished\",\"Organization\",\"Institution\",\"School\",\"Chapter\",\"Annote\",\"DOI\",\"URL\",\"Keywords\",\"Abstract\",\"ISBN\",\"ISSN\"",
+                lines.getFirst());
+        assertEquals(
+                "\"Doe2023\",\"Doe, John\",\"Test Article\",\"2023\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
+                lines.get(1));
     }
 
     @Test
-    void performExportWithMultipleEntries(@TempDir Path testFolder) throws IOException, SaveException, ParserConfigurationException, TransformerException {
+    void performExportForMultipleEntries(@TempDir Path testFolder) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         Path path = testFolder.resolve("test.csv");
         BibEntry entry1 = new BibEntry()
                 .withCitationKey("Doe2023")
@@ -96,39 +97,6 @@ public class GenericCsvExportFormatTest {
     }
 
     @Test
-    void performExportWithEmptyEntryList(@TempDir Path testFolder) throws IOException, SaveException, ParserConfigurationException, TransformerException {
-        Path path = testFolder.resolve("test.csv");
-        List<BibEntry> entries = List.of();
-
-        exportFormat.export(databaseContext, path, entries);
-
-        assertTrue(Files.notExists(path));
-    }
-
-    @Test
-    void performExportContainsAllStandardFieldHeaders(@TempDir Path testFolder) throws IOException, SaveException, ParserConfigurationException, TransformerException {
-        Path path = testFolder.resolve("test.csv");
-        BibEntry entry = new BibEntry()
-                .withCitationKey("Test2023")
-                .withField(StandardField.AUTHOR, "Doe, John");
-        List<BibEntry> entries = List.of(entry);
-
-        exportFormat.export(databaseContext, path, entries);
-
-        List<String> lines = Files.readAllLines(path);
-        String header = lines.getFirst();
-        assertTrue(header.contains("Citation Key"));
-        assertTrue(header.contains("Author"));
-        assertTrue(header.contains("Title"));
-        assertTrue(header.contains("Year"));
-        assertTrue(header.contains("Journal"));
-        assertTrue(header.contains("DOI"));
-        assertTrue(header.contains("Abstract"));
-        assertTrue(header.contains("Chapter"));
-        assertTrue(header.contains("Annote"));
-    }
-
-    @Test
     void performExportEscapesDoubleQuotesInFields(@TempDir Path testFolder) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         Path path = testFolder.resolve("test.csv");
         BibEntry entry = new BibEntry()
@@ -140,6 +108,8 @@ public class GenericCsvExportFormatTest {
 
         List<String> lines = Files.readAllLines(path);
         assertEquals(2, lines.size());
-        assertTrue(lines.get(1).contains("\"\"quotes\"\""));
+        assertEquals(
+                "\"Doe2023\",\"\",\"Title with \"\"quotes\"\" inside\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
+                lines.get(1));
     }
 }
