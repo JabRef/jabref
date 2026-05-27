@@ -68,10 +68,18 @@ public class JabRefSrvStateManager extends AbstractSrvStateManager {
         }
     }
 
+    /// Returns an unmodifiable snapshot of the open libraries.
+    ///
+    /// Grizzly/Jersey serve requests concurrently and several resources call
+    /// `getOpenDatabases().stream()`. Returning the live [#openDatabases] would
+    /// let a caller iterate the list while another thread enters this method
+    /// and `refreshStaleLibraries` structurally modifies it via the
+    /// `ListIterator#set` in the reparse path. The snapshot is taken under the
+    /// monitor so iteration after the call is race-free.
     @Override
     public synchronized ObservableList<BibDatabaseContext> getOpenDatabases() {
         refreshStaleLibraries();
-        return openDatabases;
+        return FXCollections.unmodifiableObservableList(FXCollections.observableArrayList(openDatabases));
     }
 
     /// Compares each tracked file's current mtime against the snapshot taken at
@@ -142,7 +150,7 @@ public class JabRefSrvStateManager extends AbstractSrvStateManager {
     }
 
     @Override
-    public List<String> getAllDatabasePaths() {
+    public synchronized List<String> getAllDatabasePaths() {
         return openDatabases.stream()
                             .map(BibDatabaseContext::getDatabasePath)
                             .flatMap(Optional::stream)
