@@ -179,7 +179,6 @@ public class FileUtil {
         String fullCleanedName = extension.map(s -> cleanedName + "." + s).orElse(cleanedName);
         // Fix: check FULL filename length (name + extension), not just name alone
         if (fullCleanedName.length() > MAXIMUM_FILE_NAME_LENGTH) {
-
             String shortName = nameWithoutExtension.substring(0, MAXIMUM_FILE_NAME_LENGTH - extension.map(s -> s.length() + 1).orElse(0));
             LOGGER.info("Truncated the too long filename '{}' ({} characters) to '{}'.", fileName, fileName.length(), shortName);
             return extension.map(s -> shortName + "." + s).orElse(shortName);
