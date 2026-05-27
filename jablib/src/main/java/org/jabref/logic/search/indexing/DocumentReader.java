@@ -40,17 +40,17 @@ public final class DocumentReader {
         List<Document> pages = new ArrayList<>();
         try (PDDocument pdfDocument = Loader.loadPDF(resolvedPdfPath.toFile())) {
             int numberOfPages = pdfDocument.getNumberOfPages();
-            LOGGER.debug("Reading file {} content with {} pages", resolvedPdfPath.toAbsolutePath(), numberOfPages);
+            LOGGER.debug("Indexing file '{}' (linked as '{}') with {} pages", resolvedPdfPath.toAbsolutePath(), fileLink, numberOfPages);
             for (int pageNumber = 1; pageNumber <= numberOfPages; pageNumber++) {
                 Document newDocument = new Document();
                 addIdentifiers(newDocument, fileLink);
                 addMetaData(newDocument, resolvedPdfPath, pageNumber);
-                addContentIfNotEmpty(pdfDocument, newDocument, resolvedPdfPath, pageNumber);
+                addContentIfNotEmpty(pdfDocument, newDocument, resolvedPdfPath, fileLink, pageNumber);
 
                 pages.add(newDocument);
             }
         } catch (IOException e) {
-            LOGGER.warn("Could not read {}", resolvedPdfPath.toAbsolutePath(), e);
+            LOGGER.warn("Could not read '{}' (linked as '{}')", resolvedPdfPath.toAbsolutePath(), fileLink, e);
             return pages;
         }
         if (pages.isEmpty()) {
@@ -88,7 +88,7 @@ public final class DocumentReader {
         addStringField(newDocument, PAGE_NUMBER.toString(), String.valueOf(pageNumber));
     }
 
-    private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, Path resolvedPath, int pageNumber) {
+    private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, Path resolvedPath, String fileLink, int pageNumber) {
         PDFTextStripper pdfTextStripper = new PDFTextStripper();
         pdfTextStripper.setLineSeparator("\n");
         pdfTextStripper.setStartPage(pageNumber);
@@ -112,7 +112,7 @@ public final class DocumentReader {
                 newDocument.add(new TextField(ANNOTATIONS.toString(), String.join("\n", annotations), Field.Store.YES));
             }
         } catch (IOException e) {
-            LOGGER.warn("Could not read page {} of  {}", pageNumber, resolvedPath.toAbsolutePath(), e);
+            LOGGER.warn("Could not read page {} of file '{}' (linked as '{}')", pageNumber, resolvedPath.toAbsolutePath(), fileLink, e);
         }
     }
 
