@@ -399,16 +399,17 @@ class FileUtilTest {
 
     @Test
     void validFilenameShouldBeTruncatedWhenNameAloneFitsButNamePlusExtensionExceeds255() {
-        String longerThanLimitWithExtension = Stream.generate(() -> String.valueOf('1'))
-                                                    .limit(252)
-                                                    .collect(Collectors.joining()) + ".pdf";
-        String expectedTruncated = Stream.generate(() -> String.valueOf('1'))
-                                         .limit(251)
-                                         .collect(Collectors.joining()) + ".pdf";
-
+        String longerThanLimitWithExtension = "1".repeat(252) + ".pdf";
+        String expectedTruncated = "1".repeat(251) + ".pdf";
         assertEquals(255, expectedTruncated.length());
         assertEquals(256, longerThanLimitWithExtension.length());
         assertEquals(expectedTruncated, FileUtil.getValidFileName(longerThanLimitWithExtension));
+    }
+
+    @Test
+    void getValidFileNameDoesNotThrowForInvalidPathCharacters() {
+        String result = FileUtil.getValidFileName("a:b.pdf");
+        assertFalse(result.isEmpty());
     }
 
     @Test

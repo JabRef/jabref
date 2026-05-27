@@ -79,11 +79,17 @@ public class FileUtil {
     ///
     /// @return the extension (without leading dot), trimmed and in lowercase.
     public static Optional<String> getFileExtension(@NonNull String fileName) {
-        Path realFileName = Path.of(fileName.trim()).getFileName();
-        if (realFileName == null) {
-            return Optional.empty();
+        String trimmed = fileName.trim();
+        String realFileNameString;
+        try {
+            Path realFileName = Path.of(trimmed).getFileName();
+            if (realFileName == null) {
+                return Optional.empty();
+            }
+            realFileNameString = realFileName.toString();
+        } catch (InvalidPathException e) {
+            realFileNameString = FilenameUtils.getName(trimmed);
         }
-        String realFileNameString = realFileName.toString();
         String extension = FilenameUtils.getExtension(realFileNameString);
         if (StringUtil.isNullOrEmpty(extension)) {
             return Optional.empty();
@@ -179,7 +185,11 @@ public class FileUtil {
         String fullCleanedName = extension.map(s -> cleanedName + "." + s).orElse(cleanedName);
         // Fix: check FULL filename length (name + extension), not just name alone
         if (fullCleanedName.length() > MAXIMUM_FILE_NAME_LENGTH) {
-            String shortName = nameWithoutExtension.substring(0, MAXIMUM_FILE_NAME_LENGTH - extension.map(s -> s.length() + 1).orElse(0));
+            int maxBaseLen = MAXIMUM_FILE_NAME_LENGTH - extension.map(s -> s.length() + 1).orElse(0);
+            if (maxBaseLen <= 0) {
+                return fullCleanedName.substring(0, MAXIMUM_FILE_NAME_LENGTH);
+            }
+            String shortName = nameWithoutExtension.substring(0, maxBaseLen);
             LOGGER.info("Truncated the too long filename '{}' ({} characters) to '{}'.", fileName, fileName.length(), shortName);
             return extension.map(s -> shortName + "." + s).orElse(shortName);
         }
