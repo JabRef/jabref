@@ -79,16 +79,15 @@ public class FileUtil {
     ///
     /// @return the extension (without leading dot), trimmed and in lowercase.
     public static Optional<String> getFileExtension(@NonNull String fileName) {
-        String trimmed = fileName.trim();
         String realFileNameString;
         try {
-            Path realFileName = Path.of(trimmed).getFileName();
+            Path realFileName = Path.of(fileName.trim()).getFileName();
             if (realFileName == null) {
                 return Optional.empty();
             }
             realFileNameString = realFileName.toString();
         } catch (InvalidPathException e) {
-            realFileNameString = FilenameUtils.getName(trimmed);
+            realFileNameString = FilenameUtils.getName(fileName.trim());
         }
         String extension = FilenameUtils.getExtension(realFileNameString);
         if (StringUtil.isNullOrEmpty(extension)) {
@@ -120,7 +119,7 @@ public class FileUtil {
         try {
             path = Path.of(fileName.trim());
         } catch (InvalidPathException e) {
-            return fileName;
+            return FilenameUtils.getBaseName(FilenameUtils.getName(fileName.trim()));
         }
         String realFileName = path.getFileName().toString();
         String baseName = FilenameUtils.getBaseName(realFileName);

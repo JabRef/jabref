@@ -413,6 +413,12 @@ class FileUtilTest {
     }
 
     @Test
+    void getValidFileNameDoesNotDuplicateExtensionForInvalidPath() {
+        String result = FileUtil.getValidFileName("invalid<>path.pdf");
+        assertFalse(result.endsWith(".pdf.pdf"));
+    }
+
+    @Test
     void getLinkedDirNameDefaultFullTitle() {
         String fileDirPattern = "PDF/[year]/[auth]/[citationkey] - [fulltitle]";
         BibEntry entry = new BibEntry();
