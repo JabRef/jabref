@@ -28,6 +28,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import io.github.adr.linked.ADR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,9 +76,9 @@ public class JabRefSrvStateManager extends AbstractSrvStateManager {
 
     /// Compares each tracked file's current mtime against the snapshot taken at
     /// the last parse. If it changed, the library is re-parsed, the context in
-    /// [#openDatabases] is replaced, and a fresh [SearchContext] is registered
-    /// under the new context's uid. The old uid stays in the registry — a small
-    /// leak proportional to the number of edits the server sees in a session.
+    /// [#openDatabases] is replaced, the old [SearchContext] is removed, and a
+    /// fresh one is registered under the new context's uid.
+    @ADR(61)
     private void refreshStaleLibraries() {
         ListIterator<BibDatabaseContext> it = openDatabases.listIterator();
         while (it.hasNext()) {
@@ -93,11 +94,11 @@ public class JabRefSrvStateManager extends AbstractSrvStateManager {
                 if (now.equals(previous)) {
                     continue;
                 }
-                Optional<BibDatabaseContext> reparsed = parseLibrary(path);
-                if (reparsed.isPresent()) {
-                    it.set(reparsed.get());
-                    registerSearchContext(reparsed.get());
-                }
+                parseLibrary(path).ifPresent(updated -> {
+                    removeSearchContext(current);
+                    it.set(updated);
+                    registerSearchContext(updated);
+                });
             } catch (IOException e) {
                 LOGGER.warn("Could not stat library {} for freshness check", path, e);
             }
