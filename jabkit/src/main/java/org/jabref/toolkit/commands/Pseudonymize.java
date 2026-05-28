@@ -62,7 +62,8 @@ class Pseudonymize implements Callable<Integer> {
         }
 
         System.out.println(Localization.lang("Pseudonymizing library '%0'...", fileName));
-        Pseudonymization pseudonymization = new Pseudonymization();
+        Character keywordSeparator = argumentProcessor.cliPreferences.getBibEntryPreferences().getKeywordSeparator();
+        Pseudonymization pseudonymization = new Pseudonymization(keywordSeparator);
         BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
         Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
 

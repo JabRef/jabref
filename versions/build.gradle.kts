@@ -39,7 +39,8 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.1")
 
-    api("com.dlsc.gemsfx:gemsfx:4.0.5")
+    api("com.dlsc.gemsfx:gemsfx:4.1.0")
+    api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
     api("com.fasterxml:aalto-xml:1.4.0")
@@ -138,7 +139,7 @@ dependencies.constraints {
     api("org.libreoffice:libreoffice:26.2.2")
     api("org.libreoffice:unoloader:26.2.2")
     api("org.mockito:mockito-core:5.23.0")
-    api("org.ow2.asm:asm:9.10")
+    api("org.ow2.asm:asm:9.10.1")
     api("org.postgresql:postgresql:42.7.11")
     api("org.slf4j:jul-to-slf4j:2.0.18")
     api("org.slf4j:slf4j-api:2.0.18")
