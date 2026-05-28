@@ -13,6 +13,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityCheckResultCsvWriter;
 import org.jabref.logic.integrity.IntegrityCheckResultErrorFormatWriter;
+import org.jabref.logic.integrity.IntegrityCheckResultGitHubActionsWriter;
 import org.jabref.logic.integrity.IntegrityCheckResultWriter;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -41,7 +42,7 @@ class CheckIntegrity implements Callable<Integer> {
     @Mixin
     private InputOption inputOption = new InputOption();
 
-    @Option(names = {"--output-format"}, description = "Output format: errorformat, txt or csv", defaultValue = Check.FORMAT_ERRORFORMAT)
+    @Option(names = {"--output-format"}, description = "Output format: csv, errorformat, github-actions or txt", defaultValue = Check.FORMAT_ERRORFORMAT)
     private String outputFormat;
 
     // in BibTeX it could be preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex()
@@ -93,6 +94,8 @@ class CheckIntegrity implements Callable<Integer> {
             case Check.FORMAT_ERRORFORMAT,
                  Check.FORMAT_TXT ->
                     checkResultWriter = new IntegrityCheckResultErrorFormatWriter(writer, messages, parserResult, inputFile);
+            case Check.FORMAT_GITHUB_ACTIONS ->
+                    checkResultWriter = new IntegrityCheckResultGitHubActionsWriter(writer, messages, parserResult, inputFile);
             case Check.FORMAT_CSV ->
                     checkResultWriter = new IntegrityCheckResultCsvWriter(writer, messages);
             default -> {

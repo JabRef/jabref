@@ -582,7 +582,7 @@ public class StringUtil {
     }
 
     /// Checks if a CharSequence is not empty (""), not null and not whitespace only.
-    public static boolean isNotBlank(String string) {
+    public static boolean isNotBlank(@Nullable String string) {
         return !isBlank(string);
     }
 
@@ -724,7 +724,7 @@ public class StringUtil {
             sb.append(WRAPPED_LINE_PREFIX);
             sb.append(pair.getKey());
 
-            sb.append(" ".repeat(padding));
+            sb.repeat(" ", padding);
 
             sb.append(STRING_TABLE_DELIMITER);
             sb.append(pair.getValue());

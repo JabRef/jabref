@@ -11,6 +11,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCsvWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultErrorFormatWriter;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultGitHubActionsWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.model.database.BibDatabaseContext;
@@ -35,7 +36,7 @@ class CheckConsistency implements Callable<Integer> {
     @Mixin
     private InputOption inputOption = new InputOption();
 
-    @Option(names = {"--output-format"}, description = "Output format: errorformat, txt or csv", defaultValue = Check.FORMAT_ERRORFORMAT)
+    @Option(names = {"--output-format"}, description = "Output format: csv, errorformat, github-actions or txt", defaultValue = Check.FORMAT_ERRORFORMAT)
     private String outputFormat;
 
     @Override
@@ -84,6 +85,15 @@ class CheckConsistency implements Callable<Integer> {
 
         if (Check.FORMAT_ERRORFORMAT.equalsIgnoreCase(outputFormat)) {
             checkResultWriter = new BibliographyConsistencyCheckResultErrorFormatWriter(
+                    result,
+                    writer,
+                    porcelain,
+                    jabKit.entryTypesManager,
+                    databaseContext.getMode(),
+                    parserResult,
+                    inputFile);
+        } else if (Check.FORMAT_GITHUB_ACTIONS.equalsIgnoreCase(outputFormat)) {
+            checkResultWriter = new BibliographyConsistencyCheckResultGitHubActionsWriter(
                     result,
                     writer,
                     porcelain,
