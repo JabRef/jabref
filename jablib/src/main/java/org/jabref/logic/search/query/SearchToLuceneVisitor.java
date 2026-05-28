@@ -75,12 +75,18 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
 
         // TODO: Here, there is no unescaping of the term (e.g., field\=thing=value does not work as expected)
         String field = ctx.FIELD().getText().toLowerCase(Locale.ROOT);
+
+        int operator = ctx.operator().getStart().getType();
+        if (operator == SearchParser.GT || operator == SearchParser.LT ||
+            operator == SearchParser.GTE || operator == SearchParser.LTE) {
+            return ""; // Comparison operators not applicable to fulltext index
+        }
+
         if (!isValidField(field)) {
             return "";
         }
 
         field = SearchFieldConstants.ANY_FIELD.equals(field) || SearchFieldConstants.ANY_FIELD_ALIAS.equals(field) ? "" : field + ":";
-        int operator = ctx.operator().getStart().getType();
         return buildFieldExpression(field, term, operator, isQuoted);
     }
 

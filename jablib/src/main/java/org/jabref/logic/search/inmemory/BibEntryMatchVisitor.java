@@ -11,7 +11,10 @@ import org.jabref.logic.search.query.SearchFieldConstants;
 import org.jabref.logic.search.query.SearchQueryConversion;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.DateGroup;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
@@ -104,6 +107,12 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
 
         String fieldName = ctx.FIELD().getText().toLowerCase(Locale.ROOT);
         int operator = ctx.operator().getStart().getType();
+
+        if (operator == SearchParser.GT || operator == SearchParser.LT ||
+            operator == SearchParser.GTE || operator == SearchParser.LTE) {
+            return compareFieldValue(fieldName, term, operator);
+        }
+
         OperatorFlags flags = mapOperator(operator);
 
         // field = "" / field != "" — presence/absence
@@ -213,6 +222,66 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
             LOGGER.debug("Invalid regex pattern '{}': {}", pattern, e.getMessage());
             return false;
         }
+    }
+
+    private boolean compareFieldValue(String fieldName, String term, int operator) {
+        Field field = FieldFactory.parseField(fieldName);
+
+        if (field.getProperties().contains(FieldProperty.YEAR)) {
+            try {
+                int termYear = Integer.parseInt(term.strip());
+                return entry.getField(field)
+                            .flatMap(v -> {
+                                try {
+                                    return java.util.Optional.of(Integer.parseInt(v.strip()));
+                                } catch (NumberFormatException e) {
+                                    return java.util.Optional.empty();
+                                }
+                            })
+                            .map(entryYear -> compareInts((int) entryYear, termYear, operator))
+                            .orElse(false);
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+
+        if (field.getProperties().contains(FieldProperty.DATE)) {
+            int dashes = (int) term.chars().filter(c -> c == '-').count();
+            String formatKey = switch (dashes) {
+                case 0 -> "YYYY";
+                case 1 -> "YYYY-MM";
+                default -> "YYYY-MM-DD";
+            };
+            return DateGroup.extractDate(field, entry)
+                            .flatMap(d -> DateGroup.getDateKey(d, formatKey))
+                            .map(entryKey -> compareStrings(entryKey, term, operator))
+                            .orElse(false);
+        }
+
+        return entry.getField(field)
+                    .map(v -> compareStrings(v.strip(), term.strip(), operator))
+                    .orElse(false);
+    }
+
+    private static boolean compareInts(int a, int b, int operator) {
+        return switch (operator) {
+            case SearchParser.GT  -> a > b;
+            case SearchParser.LT  -> a < b;
+            case SearchParser.GTE -> a >= b;
+            case SearchParser.LTE -> a <= b;
+            default -> false;
+        };
+    }
+
+    private static boolean compareStrings(String a, String b, int operator) {
+        int cmp = a.compareTo(b);
+        return switch (operator) {
+            case SearchParser.GT  -> cmp > 0;
+            case SearchParser.LT  -> cmp < 0;
+            case SearchParser.GTE -> cmp >= 0;
+            case SearchParser.LTE -> cmp <= 0;
+            default -> false;
+        };
     }
 
     /// @param matchKind one of [SearchFlags#INEXACT_MATCH], [SearchFlags#EXACT_MATCH], [SearchFlags#REGULAR_EXPRESSION]

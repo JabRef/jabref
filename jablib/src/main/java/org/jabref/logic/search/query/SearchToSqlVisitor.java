@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.PostgreConstants;
@@ -180,6 +182,11 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         String field = ctx.FIELD().getText();
         int operator = ctx.operator().getStart().getType();
 
+        if (operator == SearchParser.GT || operator == SearchParser.LT ||
+            operator == SearchParser.GTE || operator == SearchParser.LTE) {
+            return buildComparisonQuery(field.toLowerCase(Locale.ROOT), term, operator);
+        }
+
         if (operator == SearchParser.EQUAL || operator == SearchParser.CONTAINS) {
             setFlags(searchFlags, INEXACT_MATCH, false, false);
         } else if (operator == SearchParser.CEQUAL) {
@@ -262,6 +269,34 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                        : buildContainsFieldQuery(field, sqlOperator, prefixSuffix, term);
             }
         }
+    }
+
+    private SqlQueryNode buildComparisonQuery(String fieldName, String term, int operator) {
+        String sqlOp = switch (operator) {
+            case SearchParser.GT  -> ">";
+            case SearchParser.LT  -> "<";
+            case SearchParser.GTE -> ">=";
+            case SearchParser.LTE -> "<=";
+            default -> ">=";
+        };
+
+        boolean isYear = FieldFactory.parseField(fieldName).getProperties().contains(FieldProperty.YEAR);
+        String valueExpr = isYear
+                ? "CAST(" + FIELD_VALUE_LITERAL + " AS INTEGER)"
+                : FIELD_VALUE_LITERAL.toString();
+
+        String cte = """
+                cte%d AS (
+                    SELECT %s
+                    FROM %s
+                    WHERE %s = ? AND %s %s ?
+                )
+                """.formatted(cteCounter, ENTRY_ID, mainTableName,
+                              FIELD_NAME, valueExpr, sqlOp);
+
+        SqlQueryNode node = new SqlQueryNode(cte, List.of(fieldName, term));
+        nodes.add(node);
+        return new SqlQueryNode("cte" + cteCounter++);
     }
 
     private SqlQueryNode buildEntryIdQuery(String entryId) {
