@@ -35,11 +35,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.LibraryPreferences;
-import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
-import org.jabref.logic.ai.preferences.AiDefaultExpertSettings;
-import org.jabref.logic.ai.preferences.AiDefaultTemplates;
 import org.jabref.logic.ai.preferences.AiPreferences;
-import org.jabref.logic.ai.preferences.AiProviderDefaultChatModels;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -638,50 +634,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(LAST_EDITED, "");
         // endregion
 
-        // region AI
-        defaults.put(AI_ENABLED, false);
-        defaults.put(AI_AUTO_GENERATE_EMBEDDINGS, false);
-        defaults.put(AI_AUTO_GENERATE_SUMMARIES, false);
-        defaults.put(AI_PROVIDER, AiProvider.OPEN_AI.name());
-        defaults.put(AI_OPEN_AI_CHAT_MODEL, AiProviderDefaultChatModels.getDefaultChatModel(AiProvider.OPEN_AI).getName());
-        defaults.put(AI_MISTRAL_AI_CHAT_MODEL, AiProviderDefaultChatModels.getDefaultChatModel(AiProvider.MISTRAL_AI).getName());
-        defaults.put(AI_GEMINI_CHAT_MODEL, AiProviderDefaultChatModels.getDefaultChatModel(AiProvider.GEMINI).getName());
-        defaults.put(AI_HUGGING_FACE_CHAT_MODEL, AiProviderDefaultChatModels.getDefaultChatModel(AiProvider.HUGGING_FACE).getName());
-        defaults.put(AI_CUSTOMIZE_SETTINGS, false);
-        defaults.put(AI_EMBEDDING_MODEL, AiDefaultExpertSettings.EMBEDDING_MODEL.name());
-        defaults.put(AI_OPEN_AI_API_BASE_URL, AiProvider.OPEN_AI.getApiUrl());
-        defaults.put(AI_MISTRAL_AI_API_BASE_URL, AiProvider.MISTRAL_AI.getApiUrl());
-        defaults.put(AI_GEMINI_API_BASE_URL, AiProvider.GEMINI.getApiUrl());
-        defaults.put(AI_HUGGING_FACE_API_BASE_URL, AiProvider.HUGGING_FACE.getApiUrl());
-        defaults.put(AI_SUMMARIZATOR_KIND, AiDefaultExpertSettings.SUMMARIZATOR_KIND.name());
-        defaults.put(AI_TOKEN_ESTIMATOR_KIND, AiDefaultExpertSettings.TOKEN_ESTIMATOR_KIND.name());
-        defaults.put(AI_TEMPERATURE, AiDefaultExpertSettings.TEMPERATURE);
-        defaults.put(AI_CONTEXT_WINDOW_SIZE,
-                PredefinedChatModelUtil.getContextWindowSize(
-                        AiProvider.valueOf((String) defaults.get(AI_PROVIDER)),
-                        AiProviderDefaultChatModels.getDefaultChatModel(AiProvider.valueOf((String) defaults.get(AI_PROVIDER))).getName()
-                )
-        );
-        defaults.put(AI_DOCUMENT_SPLITTER_KIND, AiDefaultExpertSettings.DOCUMENT_SPLITTER_KIND.name());
-        defaults.put(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, AiDefaultExpertSettings.DOCUMENT_SPLITTER_CHUNK_SIZE);
-        defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, AiDefaultExpertSettings.DOCUMENT_SPLITTER_OVERLAP_SIZE);
-        defaults.put(AI_ANSWER_ENGINE_KIND, AiDefaultExpertSettings.ANSWER_ENGINE_KIND.name());
-        defaults.put(AI_RAG_MAX_RESULTS_COUNT, AiDefaultExpertSettings.RAG_MAX_RESULTS_COUNT);
-        defaults.put(AI_RAG_MIN_SCORE, AiDefaultExpertSettings.RAG_MIN_SCORE);
-
-        // region AI templates
-        defaults.put(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE, AiDefaultTemplates.CHATTING_SYSTEM_MESSAGE_TEMPLATE);
-        defaults.put(AI_CHATTING_USER_MESSAGE_TEMPLATE, AiDefaultTemplates.CHATTING_USER_MESSAGE_TEMPLATE);
-        defaults.put(AI_SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE, AiDefaultTemplates.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE);
-        defaults.put(AI_SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE, AiDefaultTemplates.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE);
-        defaults.put(AI_SUMMARIZATION_FULL_DOCUMENT_SYSTEM_MESSAGE_TEMPLATE, AiDefaultTemplates.SUMMARIZATION_FULL_DOCUMENT_SYSTEM_MESSAGE_TEMPLATE);
-        defaults.put(AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE, AiDefaultTemplates.CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE);
-        defaults.put(AI_MARKDOWN_CHAT_EXPORT_TEMPLATE, AiDefaultTemplates.MARKDOWN_CHAT_EXPORT_TEMPLATE);
-        defaults.put(AI_GENERATE_FOLLOW_UP_QUESTIONS, true);
-        defaults.put(AI_FOLLOW_UP_QUESTIONS_COUNT, 3);
-        defaults.put(AI_FOLLOW_UP_QUESTIONS_TEMPLATE, AiDefaultTemplates.FOLLOW_UP_QUESTIONS_TEMPLATE);
-        // endregion
-
         // WalkThrough
         defaults.put(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED, Boolean.FALSE);
 
@@ -994,6 +946,7 @@ public class JabRefCliPreferences implements CliPreferences {
                                                    .withMainFileDirectory(getDefaultPath())
                                                    .withLastUsedDirectory(getDefaultPath())
         );
+        getAiPreferences().setAll(AiPreferences.getDefault());
     }
 
     /// Imports Preferences from an XML file.
@@ -1020,6 +973,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getRemotePreferences().setAll(getRemotePreferencesFromBackingStore(getRemotePreferences()));
         getCitationKeyPatternPreferences().setAll(getCitationKeyPatternPreferencesFromBackingStore(getCitationKeyPatternPreferences()));
         getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
+        getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
     }
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
@@ -1987,43 +1941,7 @@ public class JabRefCliPreferences implements CliPreferences {
             return aiPreferences;
         }
 
-        boolean aiEnabled = getBoolean(AI_ENABLED);
-
-        aiPreferences = new AiPreferences(
-                aiEnabled,
-                getBoolean(AI_AUTO_GENERATE_EMBEDDINGS),
-                getBoolean(AI_AUTO_GENERATE_SUMMARIES),
-                AiProvider.safeValueOf(get(AI_PROVIDER)),
-                get(AI_OPEN_AI_CHAT_MODEL),
-                get(AI_MISTRAL_AI_CHAT_MODEL),
-                get(AI_GEMINI_CHAT_MODEL),
-                get(AI_HUGGING_FACE_CHAT_MODEL),
-                getBoolean(AI_CUSTOMIZE_SETTINGS),
-                get(AI_OPEN_AI_API_BASE_URL),
-                get(AI_MISTRAL_AI_API_BASE_URL),
-                get(AI_GEMINI_API_BASE_URL),
-                get(AI_HUGGING_FACE_API_BASE_URL),
-                SummarizatorKind.safeValueOf(get(AI_SUMMARIZATOR_KIND)),
-                TokenEstimatorKind.safeValueOf(get(AI_TOKEN_ESTIMATOR_KIND)),
-                PredefinedEmbeddingModel.safeValueOf(get(AI_EMBEDDING_MODEL)),
-                getDouble(AI_TEMPERATURE),
-                getInt(AI_CONTEXT_WINDOW_SIZE),
-                DocumentSplitterKind.safeValueOf(get(AI_DOCUMENT_SPLITTER_KIND)),
-                getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE),
-                getInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE),
-                AnswerEngineKind.safeValueOf(get(AI_ANSWER_ENGINE_KIND)),
-                getInt(AI_RAG_MAX_RESULTS_COUNT),
-                getDouble(AI_RAG_MIN_SCORE),
-                get(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE),
-                get(AI_CHATTING_USER_MESSAGE_TEMPLATE),
-                get(AI_SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE),
-                get(AI_SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE),
-                get(AI_SUMMARIZATION_FULL_DOCUMENT_SYSTEM_MESSAGE_TEMPLATE),
-                get(AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE),
-                get(AI_MARKDOWN_CHAT_EXPORT_TEMPLATE),
-                getBoolean(AI_GENERATE_FOLLOW_UP_QUESTIONS),
-                getInt(AI_FOLLOW_UP_QUESTIONS_COUNT),
-                get(AI_FOLLOW_UP_QUESTIONS_TEMPLATE));
+        aiPreferences = getAiPreferencesFromBackingStore(AiPreferences.getDefault());
 
         EasyBind.listen(aiPreferences.enableAiProperty(), (_, _, newValue) -> putBoolean(AI_ENABLED, newValue));
         EasyBind.listen(aiPreferences.autoGenerateEmbeddingsProperty(), (_, _, newValue) -> putBoolean(AI_AUTO_GENERATE_EMBEDDINGS, newValue));
@@ -2072,6 +1990,45 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(aiPreferences.followUpQuestionsTemplateProperty(), (_, _, newValue) -> put(AI_FOLLOW_UP_QUESTIONS_TEMPLATE, newValue));
 
         return aiPreferences;
+    }
+
+    private AiPreferences getAiPreferencesFromBackingStore(AiPreferences defaults) {
+        return new AiPreferences(
+                getBoolean(AI_ENABLED, defaults.getEnableAi()),
+                getBoolean(AI_AUTO_GENERATE_EMBEDDINGS, defaults.getAutoGenerateEmbeddings()),
+                getBoolean(AI_AUTO_GENERATE_SUMMARIES, defaults.getAutoGenerateSummaries()),
+                AiProvider.safeValueOf(get(AI_PROVIDER, defaults.getAiProvider().name())),
+                get(AI_OPEN_AI_CHAT_MODEL, defaults.getOpenAiChatModel()),
+                get(AI_MISTRAL_AI_CHAT_MODEL, defaults.getMistralAiChatModel()),
+                get(AI_GEMINI_CHAT_MODEL, defaults.getGeminiChatModel()),
+                get(AI_HUGGING_FACE_CHAT_MODEL, defaults.getHuggingFaceChatModel()),
+                getBoolean(AI_CUSTOMIZE_SETTINGS, defaults.getCustomizeExpertSettings()),
+                get(AI_OPEN_AI_API_BASE_URL, defaults.getOpenAiApiBaseUrl()),
+                get(AI_MISTRAL_AI_API_BASE_URL, defaults.getMistralAiApiBaseUrl()),
+                get(AI_GEMINI_API_BASE_URL, defaults.getGeminiApiBaseUrl()),
+                get(AI_HUGGING_FACE_API_BASE_URL, defaults.getHuggingFaceApiBaseUrl()),
+                SummarizatorKind.safeValueOf(get(AI_SUMMARIZATOR_KIND, defaults.getSummarizatorKind().name())),
+                TokenEstimatorKind.safeValueOf(get(AI_TOKEN_ESTIMATOR_KIND, defaults.getTokenEstimatorKind().name())),
+                PredefinedEmbeddingModel.safeValueOf(get(AI_EMBEDDING_MODEL, defaults.embeddingModelProperty().get().name())),
+                getDouble(AI_TEMPERATURE, defaults.temperatureProperty().get()),
+                getInt(AI_CONTEXT_WINDOW_SIZE, defaults.contextWindowSizeProperty().get()),
+                DocumentSplitterKind.safeValueOf(get(AI_DOCUMENT_SPLITTER_KIND, defaults.getDocumentSplitterKind().name())),
+                getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, defaults.documentSplitterChunkSizeProperty().get()),
+                getInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, defaults.documentSplitterOverlapSizeProperty().get()),
+                AnswerEngineKind.safeValueOf(get(AI_ANSWER_ENGINE_KIND, defaults.getAnswerEngineKind().name())),
+                getInt(AI_RAG_MAX_RESULTS_COUNT, defaults.ragMaxResultsCountProperty().get()),
+                getDouble(AI_RAG_MIN_SCORE, defaults.ragMinScoreProperty().get()),
+                get(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE, defaults.getChattingSystemMessageTemplate()),
+                get(AI_CHATTING_USER_MESSAGE_TEMPLATE, defaults.getChattingUserMessageTemplate()),
+                get(AI_SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE, defaults.getSummarizationChunkSystemMessageTemplate()),
+                get(AI_SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE, defaults.getSummarizationCombineSystemMessageTemplate()),
+                get(AI_SUMMARIZATION_FULL_DOCUMENT_SYSTEM_MESSAGE_TEMPLATE, defaults.getSummarizationFullDocumentSystemMessageTemplate()),
+                get(AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE, defaults.getCitationParsingSystemMessageTemplate()),
+                get(AI_MARKDOWN_CHAT_EXPORT_TEMPLATE, defaults.getMarkdownChatExportTemplate()),
+                getBoolean(AI_GENERATE_FOLLOW_UP_QUESTIONS, defaults.getGenerateFollowUpQuestions()),
+                getInt(AI_FOLLOW_UP_QUESTIONS_COUNT, defaults.getFollowUpQuestionsCount()),
+                get(AI_FOLLOW_UP_QUESTIONS_TEMPLATE, defaults.getFollowUpQuestionsTemplate())
+        );
     }
 
     @Override
