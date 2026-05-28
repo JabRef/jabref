@@ -67,6 +67,7 @@ import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.importer.util.MetaDataParser;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
@@ -78,7 +79,6 @@ import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.JStyle;
-import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
@@ -589,27 +589,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(PROTECTED_TERMS_ENABLED_EXTERNAL, "");
         defaults.put(PROTECTED_TERMS_DISABLED_EXTERNAL, "");
 
-        // OpenOffice/LibreOffice
-        if (OS.WINDOWS) {
-            defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_WIN_EXEC_PATH);
-        } else if (OS.OS_X) {
-            defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_OSX_EXEC_PATH);
-        } else { // Linux
-            defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_LINUX_EXEC_PATH);
-        }
-
-        defaults.put(OO_SYNC_WHEN_CITING, Boolean.FALSE);
-        defaults.put(OO_ALWAYS_ADD_CITED_ON_PAGES, Boolean.FALSE);
-        defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);
-        defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
-        defaults.put(OO_EXTERNAL_STYLE_FILES, "");
-        defaults.put(OO_CURRENT_STYLE, CSLStyleLoader.getDefaultStyle().getPath()); // Default CSL Style is IEEE
-        defaults.put(OO_CSL_BIBLIOGRAPHY_TITLE, "References");
-        defaults.put(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, "Heading 2");
-        defaults.put(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, "Text body");
-        defaults.put(OO_EXTERNAL_CSL_STYLES, "");
-        defaults.put(OO_ADD_SPACE_AFTER, Boolean.TRUE);
-
         defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage");
         defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
         defaults.put(FETCHER_CUSTOM_KEY_PERSIST, Boolean.FALSE);
@@ -971,6 +950,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 CitationKeyPatternPreferences.getDefault()
                                              .withKeywordDelimiter(getBibEntryPreferences().keywordSeparatorProperty()));
         getAiPreferences().setAll(AiPreferences.getDefault());
+        getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences())).setAll(
+                OpenOfficePreferences.getDefault());
     }
 
     /// Imports Preferences from an XML file.
@@ -996,6 +977,9 @@ public class JabRefCliPreferences implements CliPreferences {
         getRemotePreferences().setAll(getRemotePreferencesFromBackingStore(getRemotePreferences()));
         getCitationKeyPatternPreferences().setAll(getCitationKeyPatternPreferencesFromBackingStore(getCitationKeyPatternPreferences()));
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
+        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences());
+        getOpenOfficePreferences(repository).setAll(
+                getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
     }
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
@@ -2386,36 +2370,7 @@ public class JabRefCliPreferences implements CliPreferences {
             return openOfficePreferences;
         }
 
-        String currentStylePath = get(OO_CURRENT_STYLE);
-
-        OOStyle currentStyle = CSLStyleLoader.getDefaultStyle(); // Defaults to IEEE CSL Style
-
-        // Reassign currentStyle based on actual last used CSL style or JStyle
-        if (CSLStyleUtils.isCitationStyleFile(currentStylePath)) {
-            currentStyle = CSLStyleUtils.createCitationStyleFromFile(currentStylePath)
-                                        .orElse(CSLStyleLoader.getDefaultStyle());
-        } else {
-            // For now, must be a JStyle. In future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
-            try {
-                currentStyle = new JStyle(currentStylePath, getLayoutFormatterPreferences(), journalAbbreviationRepository);
-            } catch (IOException ex) {
-                LOGGER.warn("Could not create JStyle", ex);
-            }
-        }
-
-        openOfficePreferences = new OpenOfficePreferences(
-                get(OO_EXECUTABLE_PATH),
-                getBoolean(OO_USE_ALL_OPEN_BASES),
-                getBoolean(OO_SYNC_WHEN_CITING),
-                getStringList(OO_EXTERNAL_STYLE_FILES),
-                get(OO_BIBLIOGRAPHY_STYLE_FILE),
-                currentStyle,
-                getBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES),
-                get(OO_CSL_BIBLIOGRAPHY_TITLE),
-                get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT),
-                get(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT),
-                getStringList(OO_EXTERNAL_CSL_STYLES),
-                getBoolean(OO_ADD_SPACE_AFTER));
+        openOfficePreferences = getOpenOfficePreferencesFromBackingStore(OpenOfficePreferences.getDefault(), journalAbbreviationRepository);
 
         EasyBind.listen(openOfficePreferences.executablePathProperty(), (_, _, newValue) -> put(OO_EXECUTABLE_PATH, newValue));
         EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (_, _, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
@@ -2435,6 +2390,38 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(openOfficePreferences.cslBibliographyBodyFormatProperty(), (_, _, newValue) -> put(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, newValue));
 
         return openOfficePreferences;
+    }
+
+    private OpenOfficePreferences getOpenOfficePreferencesFromBackingStore(OpenOfficePreferences defaults, JournalAbbreviationRepository journalAbbreviationRepository) {
+        String currentStylePath = get(OO_CURRENT_STYLE, defaults.getCurrentStyle().getPath());
+        OOStyle currentStyle = defaults.getCurrentStyle();
+
+        // Reassign currentStyle based on actual last used CSL style or JStyle
+        if (CSLStyleUtils.isCitationStyleFile(currentStylePath)) {
+            currentStyle = CSLStyleUtils.createCitationStyleFromFile(currentStylePath)
+                                        .orElse(CSLStyleLoader.getDefaultStyle());
+        } else if (journalAbbreviationRepository != null) {
+            // For now, must be a JStyle. In future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
+            try {
+                currentStyle = new JStyle(currentStylePath, getLayoutFormatterPreferences(), journalAbbreviationRepository);
+            } catch (IOException ex) {
+                LOGGER.warn("Could not create JStyle", ex);
+            }
+        }
+
+        return new OpenOfficePreferences(
+                get(OO_EXECUTABLE_PATH, defaults.getExecutablePath()),
+                getBoolean(OO_USE_ALL_OPEN_BASES, defaults.getUseAllDatabases()),
+                getBoolean(OO_SYNC_WHEN_CITING, defaults.getSyncWhenCiting()),
+                getStringList(OO_EXTERNAL_STYLE_FILES),
+                get(OO_BIBLIOGRAPHY_STYLE_FILE, defaults.getCurrentJStyle()),
+                currentStyle,
+                getBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES, defaults.getAlwaysAddCitedOnPages()),
+                get(OO_CSL_BIBLIOGRAPHY_TITLE, defaults.getCslBibliographyTitle()),
+                get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, defaults.getCslBibliographyHeaderFormat()),
+                get(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, defaults.getCslBibliographyBodyFormat()),
+                getStringList(OO_EXTERNAL_CSL_STYLES),
+                getBoolean(OO_ADD_SPACE_AFTER, defaults.getAddSpaceAfter()));
     }
 
     @Override
