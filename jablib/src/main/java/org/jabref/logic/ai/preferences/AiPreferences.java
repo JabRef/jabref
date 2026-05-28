@@ -1,6 +1,7 @@
 package org.jabref.logic.ai.preferences;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
@@ -19,6 +20,7 @@ import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
+import org.jabref.model.ai.llm.PredefinedChatModel;
 import org.jabref.model.ai.pipeline.AnswerEngineKind;
 import org.jabref.model.ai.pipeline.DocumentSplitterKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
@@ -34,6 +36,15 @@ public class AiPreferences {
 
     private static final String KEYRING_AI_SERVICE = "org.jabref.ai";
     private static final String KEYRING_AI_SERVICE_ACCOUNT = "apiKey";
+
+    private static final AiProvider DEFAULT_AI_PROVIDER = AiProvider.OPEN_AI;
+
+    private static final Map<AiProvider, PredefinedChatModel> DEFAULT_CHAT_MODEL = Map.of(
+            AiProvider.OPEN_AI, PredefinedChatModel.GPT_4O_MINI,
+            AiProvider.MISTRAL_AI, PredefinedChatModel.OPEN_MIXTRAL_8X22B,
+            AiProvider.GEMINI, PredefinedChatModel.GEMINI_1_5_FLASH,
+            AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE
+    );
 
     private final BooleanProperty enableAi;
     private final BooleanProperty autoGenerateEmbeddings;
@@ -78,6 +89,53 @@ public class AiPreferences {
     private final BooleanProperty generateFollowUpQuestions;
     private final IntegerProperty followUpQuestionsCount;
     private final StringProperty followUpQuestionsTemplate;
+
+    private AiPreferences() {
+        this(
+                false,                                                                       // AI disabled
+                false,                                                                       // Auto-generate embeddings
+                false,                                                                       // Auto-generate summaries
+                DEFAULT_AI_PROVIDER,                                                         // AI provider
+
+                DEFAULT_CHAT_MODEL.get(AiProvider.OPEN_AI).getName(),                        // OpenAI chat model
+                DEFAULT_CHAT_MODEL.get(AiProvider.MISTRAL_AI).getName(),                     // Mistral AI chat model
+                DEFAULT_CHAT_MODEL.get(AiProvider.GEMINI).getName(),                         // Gemini chat model
+                DEFAULT_CHAT_MODEL.get(AiProvider.HUGGING_FACE).getName(),                   // HuggingFace chat model
+
+                false,                                                                       // Customize expert settings
+
+                AiProvider.OPEN_AI.getApiUrl(),                                              // OpenAI API base URL
+                AiProvider.MISTRAL_AI.getApiUrl(),                                           // Mistral AI API base URL
+                AiProvider.GEMINI.getApiUrl(),                                               // Gemini API base URL
+                AiProvider.HUGGING_FACE.getApiUrl(),                                         // HuggingFace API base URL
+
+                AiDefaultExpertSettings.SUMMARIZATOR_KIND,                                   // Summarizator kind
+                AiDefaultExpertSettings.TOKEN_ESTIMATOR_KIND,                                // Token estimator kind
+                AiDefaultExpertSettings.EMBEDDING_MODEL,                                     // Embedding model
+                AiDefaultExpertSettings.TEMPERATURE,                                         // Temperature
+                PredefinedChatModelUtil.getContextWindowSize(
+                        DEFAULT_AI_PROVIDER,
+                        DEFAULT_CHAT_MODEL.get(DEFAULT_AI_PROVIDER).getName()),              // Context window size
+                AiDefaultExpertSettings.DOCUMENT_SPLITTER_KIND,                              // Document splitter kind
+                AiDefaultExpertSettings.DOCUMENT_SPLITTER_CHUNK_SIZE,                        // Document splitter chunk size
+                AiDefaultExpertSettings.DOCUMENT_SPLITTER_OVERLAP_SIZE,                      // Document splitter overlap size
+                AiDefaultExpertSettings.ANSWER_ENGINE_KIND,                                  // Answer engine kind
+                AiDefaultExpertSettings.RAG_MAX_RESULTS_COUNT,                               // RAG max results count
+                AiDefaultExpertSettings.RAG_MIN_SCORE,                                       // RAG min score
+
+                AiDefaultTemplates.CHATTING_SYSTEM_MESSAGE_TEMPLATE,                         // Chatting system message template
+                AiDefaultTemplates.CHATTING_USER_MESSAGE_TEMPLATE,                           // Chatting user message template
+                AiDefaultTemplates.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE,              // Summarization chunk system message template
+                AiDefaultTemplates.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE,            // Summarization combine system message template
+                AiDefaultTemplates.SUMMARIZATION_FULL_DOCUMENT_SYSTEM_MESSAGE_TEMPLATE,      // Summarization full document system message template
+                AiDefaultTemplates.CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE,                 // Citation parsing system message template
+                AiDefaultTemplates.MARKDOWN_CHAT_EXPORT_TEMPLATE,                            // Markdown chat export template
+
+                true,                                                                        // Generate follow-up questions
+                3,                                                                           // Follow-up questions count
+                AiDefaultTemplates.FOLLOW_UP_QUESTIONS_TEMPLATE                              // Follow-up questions template
+        );
+    }
 
     public AiPreferences(
             boolean enableAi,
@@ -158,6 +216,52 @@ public class AiPreferences {
         this.generateFollowUpQuestions = new SimpleBooleanProperty(generateFollowUpQuestions);
         this.followUpQuestionsCount = new SimpleIntegerProperty(followUpQuestionsCount);
         this.followUpQuestionsTemplate = new SimpleStringProperty(followUpQuestionsTemplate);
+    }
+
+    public static AiPreferences getDefault() {
+        return new AiPreferences();
+    }
+
+    public void setAll(AiPreferences preferences) {
+        this.enableAi.set(preferences.getEnableAi());
+        this.autoGenerateEmbeddings.set(preferences.getAutoGenerateEmbeddings());
+        this.autoGenerateSummaries.set(preferences.getAutoGenerateSummaries());
+        this.aiProvider.set(preferences.getAiProvider());
+
+        this.openAiChatModel.set(preferences.getOpenAiChatModel());
+        this.mistralAiChatModel.set(preferences.getMistralAiChatModel());
+        this.geminiChatModel.set(preferences.getGeminiChatModel());
+        this.huggingFaceChatModel.set(preferences.getHuggingFaceChatModel());
+
+        this.customizeExpertSettings.set(preferences.getCustomizeExpertSettings());
+
+        this.openAiApiBaseUrl.set(preferences.getOpenAiApiBaseUrl());
+        this.mistralAiApiBaseUrl.set(preferences.getMistralAiApiBaseUrl());
+        this.geminiApiBaseUrl.set(preferences.getGeminiApiBaseUrl());
+        this.huggingFaceApiBaseUrl.set(preferences.getHuggingFaceApiBaseUrl());
+
+        this.summarizatorKind.set(preferences.getSummarizatorKind());
+        this.tokenEstimatorKind.set(preferences.getTokenEstimatorKind());
+        this.embeddingModel.set(preferences.getEmbeddingModel());
+        this.temperature.set(preferences.getTemperature());
+        this.contextWindowSize.set(preferences.getContextWindowSize());
+        this.documentSplitterKind.set(preferences.getDocumentSplitterKind());
+        this.documentSplitterChunkSize.set(preferences.getDocumentSplitterChunkSize());
+        this.documentSplitterOverlapSize.set(preferences.getDocumentSplitterOverlapSize());
+        this.answerEngineKind.set(preferences.getAnswerEngineKind());
+        this.ragMaxResultsCount.set(preferences.getRagMaxResultsCount());
+        this.ragMinScore.set(preferences.getRagMinScore());
+        this.chattingSystemMessageTemplate.set(preferences.getChattingSystemMessageTemplate());
+        this.chattingUserMessageTemplate.set(preferences.getChattingUserMessageTemplate());
+        this.summarizationChunkSystemMessageTemplate.set(preferences.getSummarizationChunkSystemMessageTemplate());
+        this.summarizationCombineSystemMessageTemplate.set(preferences.getSummarizationCombineSystemMessageTemplate());
+        this.summarizationFullDocumentSystemMessageTemplate.set(preferences.getSummarizationFullDocumentSystemMessageTemplate());
+        this.citationParsingSystemMessageTemplate.set(preferences.getCitationParsingSystemMessageTemplate());
+        this.markdownChatExportTemplate.set(preferences.getMarkdownChatExportTemplate());
+        this.generateFollowUpQuestions.set(preferences.getGenerateFollowUpQuestions());
+
+        this.followUpQuestionsCount.set(preferences.getFollowUpQuestionsCount());
+        this.followUpQuestionsTemplate.set(preferences.getFollowUpQuestionsTemplate());
     }
 
     public String getApiKeyForAiProvider(AiProvider aiProvider) {
