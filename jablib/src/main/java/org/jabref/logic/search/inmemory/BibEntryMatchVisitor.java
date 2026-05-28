@@ -230,16 +230,12 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
         if (field.getProperties().contains(FieldProperty.YEAR)) {
             try {
                 int termYear = Integer.parseInt(term.strip());
-                return entry.getField(field)
-                            .flatMap(v -> {
-                                try {
-                                    return java.util.Optional.of(Integer.parseInt(v.strip()));
-                                } catch (NumberFormatException e) {
-                                    return java.util.Optional.empty();
-                                }
-                            })
-                            .map(entryYear -> compareInts((int) entryYear, termYear, operator))
-                            .orElse(false);
+                // extractDate handles the date→year alias: an entry with only "date = 2022-11-05"
+                // is matched by "year >= 2020" because getFieldOrAlias resolves date to year
+                return DateGroup.extractDate(field, entry)
+                                .flatMap(d -> d.getYear())
+                                .map(entryYear -> compareInts(entryYear, termYear, operator))
+                                .orElse(false);
             } catch (NumberFormatException e) {
                 return false;
             }
@@ -247,13 +243,8 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
 
         if (field.getProperties().contains(FieldProperty.DATE)) {
             int dashes = (int) term.chars().filter(c -> c == '-').count();
-            String formatKey = switch (dashes) {
-                case 0 -> "YYYY";
-                case 1 -> "YYYY-MM";
-                default -> "YYYY-MM-DD";
-            };
             return DateGroup.extractDate(field, entry)
-                            .flatMap(d -> DateGroup.getDateKey(d, formatKey))
+                            .map(d -> normalizeDateKey(d, dashes))
                             .map(entryKey -> compareStrings(entryKey, term, operator))
                             .orElse(false);
         }
@@ -261,6 +252,17 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
         return entry.getField(field)
                     .map(v -> compareStrings(v.strip(), term.strip(), operator))
                     .orElse(false);
+    }
+
+    private static String normalizeDateKey(org.jabref.model.entry.Date d, int termDashes) {
+        int year = d.getYear().orElse(0);
+        int month = d.getMonth().map(org.jabref.model.entry.Month::getNumber).orElse(1);
+        int day = d.getDay().orElse(1);
+        return switch (termDashes) {
+            case 0  -> "%04d".formatted(year);
+            case 1  -> "%04d-%02d".formatted(year, month);
+            default -> "%04d-%02d-%02d".formatted(year, month, day);
+        };
     }
 
     private static boolean compareInts(int a, int b, int operator) {
