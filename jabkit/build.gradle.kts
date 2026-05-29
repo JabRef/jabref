@@ -72,5 +72,5 @@ tasks.register<JavaExec>("runJabKitPortableSmokeTest") {
     classpath = sourceSets.main.get().runtimeClasspath
     jvmArgs(application.applicationDefaultJvmArgs)
     workingDir = file("src/test/resources")
-    args("--debug", "check-consistency", "--input=empty.bib")
+    args("--debug", "check", "consistency", "empty.bib")
 }

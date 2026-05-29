@@ -46,6 +46,8 @@ testModuleInfo {
     requires("org.xmlunit")
     requires("org.xmlunit.matchers")
 
+	requires("com.fasterxml.jackson.databind")
+
     requires("com.tngtech.archunit")
     requires("com.tngtech.archunit.junit5.api")
     runtimeOnly("com.tngtech.archunit.junit5.engine")

@@ -33,21 +33,26 @@ import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.push.PushToApplications;
+import org.jabref.logic.search.inmemory.InMemoryLibrarySearcher;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 @AllowedToUseAwt("Requires java.awt.datatransfer.Clipboard")
 @Path("better-bibtex/cayw")
 public class CAYWResource {
@@ -104,7 +109,7 @@ public class CAYWResource {
                                                      .map(this::createCAYWEntry)
                                                      .collect(Collectors.toList());
             initializeGUI();
-            searchResults = openSearchGui(entries);
+            searchResults = openSearchGui(entries, databaseContext);
         }
 
         if (searchResults.isEmpty()) {
@@ -146,31 +151,39 @@ public class CAYWResource {
         return Response.ok(formattedResponse).type(formatter.getMediaType()).build();
     }
 
-    private List<CAYWEntry> openSearchGui(List<CAYWEntry> entries) throws InterruptedException, ExecutionException {
-        /* unused until DatabaseSearcher is fixed
-        PostgreServer postgreServer = new PostgreServer();
-        IndexManager.clearOldSearchIndices();
-        searcher = new DatabaseSearcher(
-                databaseContext,
-                new CurrentThreadTaskExecutor(),
-                preferences,
-                postgreServer);
-          */
+    private List<CAYWEntry> openSearchGui(List<CAYWEntry> entries, BibDatabaseContext databaseContext) throws InterruptedException, ExecutionException {
+        InMemoryLibrarySearcher searcher = new InMemoryLibrarySearcher(databaseContext, preferences.getBibEntryPreferences());
 
         CompletableFuture<List<CAYWEntry>> future = new CompletableFuture<>();
         Platform.runLater(() -> {
             SearchDialog dialog = new SearchDialog();
-            // TODO: Using the DatabaseSearcher directly here results in a lot of exceptions being thrown, so we use an alternative for now until we have a nice way of using the DatabaseSearcher class.
-            //       searchDialog.set(new SearchDialog<>(s -> searcher.getMatches(new SearchQuery(s)), entries));
             List<CAYWEntry> results = dialog.show(
-                    searchQuery ->
-                            entries.stream()
-                                   .filter(caywEntry -> matches(caywEntry, searchQuery)).toList(),
+                    searchText -> filterEntries(entries, searchText, searcher),
                     entries);
             future.complete(results);
         });
 
         return future.get();
+    }
+
+    /// Filter strategy:
+    /// - Empty input → return everything.
+    /// - Valid Search.g4 expression → grammar-based filter via [InMemoryLibrarySearcher].
+    /// - Invalid expression (e.g. user is mid-typing `author=`) → fall back to a plain
+    ///   substring match across the CAYW labels so the list stays useful as the user types.
+    private List<CAYWEntry> filterEntries(List<CAYWEntry> entries, String searchText, InMemoryLibrarySearcher searcher) {
+        if (searchText.isEmpty()) {
+            return entries;
+        }
+        SearchQuery query = new SearchQuery(searchText);
+        if (query.isValid()) {
+            return entries.stream()
+                          .filter(caywEntry -> searcher.matches(caywEntry.bibEntry(), query))
+                          .toList();
+        }
+        return entries.stream()
+                      .filter(caywEntry -> matchesSubstring(caywEntry, searchText))
+                      .toList();
     }
 
     private BibDatabaseContext getBibDatabaseContext(CAYWQueryParams queryParams) throws IOException {
@@ -235,25 +248,40 @@ public class CAYWResource {
 
     private synchronized void initializeGUI() {
         // TODO: Implement a better way to handle the window popup since this is a bit hacky.
-        if (!initialized) {
-            if (!(srvStateManager instanceof JabRefSrvStateManager)) {
-                LOGGER.debug("Running inside JabRef UI, no need to initialize JavaFX for CAYW resource.");
-                initialized = true;
-                return;
-            }
-            LOGGER.debug("Initializing JavaFX for CAYW resource.");
-            CountDownLatch latch = new CountDownLatch(1);
+        if (initialized) {
+            return;
+        }
+        if (!(srvStateManager instanceof JabRefSrvStateManager)) {
+            LOGGER.debug("Running inside JabRef UI, no need to initialize JavaFX for CAYW resource.");
+            initialized = true;
+            return;
+        }
+        LOGGER.debug("Initializing JavaFX for CAYW resource.");
+        CountDownLatch latch = new CountDownLatch(1);
+        try {
             Platform.startup(() -> {
                 Platform.setImplicitExit(false);
-                initialized = true;
                 latch.countDown();
             });
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException("JavaFX initialization interrupted", e);
-            }
+        } catch (IllegalStateException alreadyInitialized) {
+            LOGGER.debug("JavaFX runtime already initialized.", alreadyInitialized);
+            initialized = true;
+            return;
+        } catch (Throwable e) {
+            // Catches NoClassDefFoundError/UnsatisfiedLinkError when the JavaFX runtime is missing or version-mismatched
+            // (e.g., javafx.graphics from an older version paired with a newer javafx.base where javafx.util.FXPermission was removed).
+            LOGGER.error("Could not initialize JavaFX runtime for CAYW resource.", e);
+            throw new WebApplicationException(
+                    Response.status(Response.Status.SERVICE_UNAVAILABLE)
+                            .entity("CAYW unavailable: JavaFX runtime could not be initialized (" + e.getClass().getName() + ": " + e.getMessage() + "). The CAYW endpoint requires a working, version-consistent JavaFX runtime on the module path.")
+                            .build());
+        }
+        try {
+            latch.await();
+            initialized = true;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("JavaFX initialization interrupted", e);
         }
     }
 
@@ -269,10 +297,7 @@ public class CAYWResource {
         return new CAYWEntry(entry, label, shortLabel, description, new CitationProperties());
     }
 
-    private boolean matches(CAYWEntry entry, String searchText) {
-        if (searchText == null || searchText.isEmpty()) {
-            return true;
-        }
+    private boolean matchesSubstring(CAYWEntry entry, String searchText) {
         String lowerSearchText = searchText.toLowerCase();
         return entry.label().toLowerCase().contains(lowerSearchText) ||
                 entry.description().toLowerCase().contains(lowerSearchText) ||

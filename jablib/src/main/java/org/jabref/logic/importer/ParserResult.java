@@ -27,9 +27,10 @@ import org.jspecify.annotations.Nullable;
 public class ParserResult {
     private final Set<BibEntryType> entryTypes;
     private final Multimap<Range, String> warnings;
+
     @NonNull private BibDatabase database;
     private MetaData metaData;
-    private Path file;
+    @Nullable private Path file;
     private boolean invalid;
     private boolean changedOnMigration = false;
 

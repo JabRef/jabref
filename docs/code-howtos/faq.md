@@ -121,13 +121,14 @@ What's strange (mostly an IntelliJ bug): Regardless of CLI or GUI, These changes
   
 ### Fix
 
-For `csl-styles`, `csl-locales`, and `abbrev.jabref.org`:
+For `abbrev.jabref.org`, `csl-styles`, `csl-locales`, and `ltwa`:
 
 ```bash
 git merge origin/main
+git checkout main -- jablib/src/main/abbrv.jabref.org
 git checkout main -- jablib/src/main/resources/csl-styles
 git checkout main -- jablib/src/main/resources/csl-locales
-git checkout main -- jablib/src/main/abbrv.jabref.org
+git checkout main -- jablib/src/main/resources/ltwa
 git commit -m "Fix submodules"
 git push
 ```

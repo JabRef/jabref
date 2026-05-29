@@ -971,8 +971,11 @@ public class BracketedPattern {
         if (lastAuthor.equals(Author.OTHERS)) {
             return "+";
         }
+        // Normalize the family name the same way citation keys are cleaned (e.g., ö -> oe)
+        // before truncating, so that [authN] yields N characters of the final key form.
         String lastName = lastAuthor.getFamilyName()
-                                    .map(CitationKeyGenerator::removeDefaultUnwantedCharacters).orElse("");
+                                    .map(name -> CitationKeyGenerator.removeUnwantedCharacters(name, "-`ʹ:!;?^$"))
+                                    .orElse("");
         return lastName.length() > n ? lastName.substring(0, n) : lastName;
     }
 
