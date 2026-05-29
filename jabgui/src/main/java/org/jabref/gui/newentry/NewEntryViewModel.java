@@ -141,6 +141,9 @@ public class NewEntryViewModel {
                 ValidationMessage.error(Localization.lang("You must specify one (or more) citations.")));
         interpretParsers = new SimpleListProperty<>(FXCollections.observableArrayList());
         interpretParsers.addAll(PlainCitationParserChoice.values());
+        if (!preferences.getAiPreferences().getEnableAi()) {
+            interpretParsers.remove(PlainCitationParserChoice.LLM);
+        }
         interpretParser = new SimpleObjectProperty<>();
         interpretWorker = null;
 

@@ -306,7 +306,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             });
     }
 
-    public void clearAndSelect(BibEntry bibEntry) {
+    public void clearAndSelect(@NonNull BibEntry bibEntry) {
         // check if entries merged from citation relations tab
         if (citationMergeMode) {
             // keep original entry selected and reset citation merge mode
@@ -620,7 +620,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .collect(Collectors.toList());
     }
 
-    private Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {
+    private Optional<BibEntryTableViewModel> findEntry(@NonNull BibEntry entry) {
         return model.getViewModelByIndex(database.getDatabase().indexOf(entry));
     }
 

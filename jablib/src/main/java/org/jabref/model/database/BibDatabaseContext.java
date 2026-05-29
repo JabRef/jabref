@@ -84,7 +84,7 @@ public class BibDatabaseContext {
         this.location = DatabaseLocation.LOCAL;
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path) {
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, @Nullable Path path) {
         this(database, metaData, path, DatabaseLocation.LOCAL);
     }
 
