@@ -8,7 +8,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.LibraryPreferences;
-import org.jabref.logic.ai.AiPreferences;
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.cleanup.CleanupPreferences;

@@ -37,6 +37,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -150,5 +151,27 @@ class CitationsRelationsTabViewModelTest {
 
         assertEquals(Optional.of("Asdf1222,FirstAuthorCitationKey2022,SecondAuthorCitationKey20221"), existingEntry.getField(StandardField.CITES));
         assertEquals(List.of(existingEntry, firstEntryToImport, secondEntryToImport), bibDatabaseContext.getEntries());
+    }
+
+    @Test
+    void importEntriesUpdatesPropertyOnSuccess() {
+        List<CitationRelationItem> citationItems = List.of(
+                new CitationRelationItem(firstEntryToImport, false));
+
+        viewModel.importEntries(citationItems, CitationFetcher.SearchType.CITES, existingEntry);
+
+        BibEntry lastImported = viewModel.lastImportedEntryProperty().get();
+
+        assertNotNull(lastImported);
+        assertEquals(firstEntryToImport.getAuthorTitleYear(), lastImported.getAuthorTitleYear());
+    }
+
+    @Test
+    void importEntriesUpdatesEvenIfCitationKeyIsMissing() {
+        existingEntry.clearCitationKey();
+        List<CitationRelationItem> citationItems = List.of(
+                new CitationRelationItem(firstEntryToImport, false));
+        viewModel.importEntries(citationItems, CitationFetcher.SearchType.CITED_BY, existingEntry);
+        assertEquals(citationItems.getFirst().entry(), viewModel.lastImportedEntryProperty().get());
     }
 }

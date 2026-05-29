@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
@@ -22,7 +23,7 @@ import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "fetch", description = "Fetch entries from a provider.")
-class Fetch implements Runnable {
+class Fetch implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Fetch.class);
 
     record Provider(String name, String query) {
@@ -44,7 +45,7 @@ class Fetch implements Runnable {
     private Path outputFile;
 
     @Override
-    public void run() {
+    public Integer call() {
         Set<SearchBasedFetcher> fetchers = WebFetchers.getSearchBasedFetchers(
                 argumentProcessor.cliPreferences.getImportFormatPreferences(),
                 argumentProcessor.cliPreferences.getImporterPreferences());
@@ -52,8 +53,8 @@ class Fetch implements Runnable {
                                                                .filter(fetcher -> fetcher.getName().equalsIgnoreCase(provider))
                                                                .findFirst();
         if (selectedFetcher.isEmpty()) {
-            System.out.println(Localization.lang("Could not find fetcher '%0'", provider));
-            return;
+            System.err.println(Localization.lang("Could not find fetcher '%0'", provider));
+            return 2;
         }
 
         if (!sharedOptions.porcelain) {
@@ -65,7 +66,7 @@ class Fetch implements Runnable {
             List<BibEntry> matches = selectedFetcher.get().performSearch(query);
             if (matches.isEmpty()) {
                 System.out.println("\r" + Localization.lang("No results found."));
-                return;
+                return 0;
             }
 
             if (!sharedOptions.porcelain) {
@@ -83,6 +84,8 @@ class Fetch implements Runnable {
             }
         } catch (FetcherException e) {
             LOGGER.error("Error while fetching", e);
+            return 2;
         }
+        return 0;
     }
 }

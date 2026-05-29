@@ -53,22 +53,22 @@ class ContextActionTest {
     }
 
     @Test
+    void shouldBeExecutableForRenameToNameWhenOnlyFilenameDiffers() {
+        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
+        when(fileViewModel.isGeneratedPathSameAsOriginal()).thenReturn(true);
+        when(fileViewModel.isGeneratedNameSameAsOriginal()).thenReturn(false);
+
+        ContextAction action = newAction(StandardActions.RENAME_FILE_TO_NAME, fileViewModel);
+
+        assertTrue(action.isExecutable());
+    }
+
+    @Test
     void shouldBeExecutableForDownloadWhenFileIsOnlineLink() {
         LinkedFileViewModel fileViewModel = mockOnlineLinkViewModel("https://host/resource.pdf");
         ContextAction action = newAction(StandardActions.DOWNLOAD_FILE, fileViewModel);
 
         assertTrue(action.isExecutable(), "DOWNLOAD_FILE should be executable for online link");
-    }
-
-    @Test
-    void shouldNotBeExecutableForMoveToFolderWhenGeneratedPathMatchesOriginal() {
-        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
-        when(fileViewModel.isGeneratedPathSameAsOriginal()).thenReturn(true);
-
-        ContextAction action = newAction(StandardActions.MOVE_FILE_TO_FOLDER, fileViewModel);
-
-        assertFalse(action.isExecutable(),
-                "MOVE_FILE_TO_FOLDER should be disabled when generated path equals original");
     }
 
     @Test
@@ -149,26 +149,6 @@ class ContextActionTest {
         action.execute();
 
         verify(fileViewModel).askForNameAndRename();
-    }
-
-    @Test
-    void shouldExecuteMoveToDefaultDirectory() {
-        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
-        ContextAction action = newAction(StandardActions.MOVE_FILE_TO_FOLDER, fileViewModel);
-
-        action.execute();
-
-        verify(fileViewModel).moveToDefaultDirectory();
-    }
-
-    @Test
-    void shouldExecuteMoveToDefaultDirectoryAndRename() {
-        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
-        ContextAction action = newAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, fileViewModel);
-
-        action.execute();
-
-        verify(fileViewModel).moveToDefaultDirectoryAndRename();
     }
 
     @Test

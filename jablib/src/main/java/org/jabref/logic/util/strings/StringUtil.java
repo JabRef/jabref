@@ -193,7 +193,7 @@ public class StringUtil {
         // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
         addWrappedLine(result, CharMatcher.whitespace().trimTrailingFrom(lines[0]), wrapAmount, newline);
         for (int i = 1; i < lines.length; i++) {
-            if (lines[i].trim().isEmpty()) {
+            if (lines[i].isBlank()) {
                 result.append(newline);
                 result.append('\t');
             } else {
@@ -582,7 +582,7 @@ public class StringUtil {
     }
 
     /// Checks if a CharSequence is not empty (""), not null and not whitespace only.
-    public static boolean isNotBlank(String string) {
+    public static boolean isNotBlank(@Nullable String string) {
         return !isBlank(string);
     }
 
@@ -724,7 +724,7 @@ public class StringUtil {
             sb.append(WRAPPED_LINE_PREFIX);
             sb.append(pair.getKey());
 
-            sb.append(" ".repeat(padding));
+            sb.repeat(" ", padding);
 
             sb.append(STRING_TABLE_DELIMITER);
             sb.append(pair.getValue());
@@ -732,5 +732,9 @@ public class StringUtil {
         }
 
         return sb.toString();
+    }
+
+    public static String makeSafe(@Nullable String string) {
+        return Optional.ofNullable(string).orElse("");
     }
 }

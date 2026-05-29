@@ -1,0 +1,11 @@
+A generic CSV export filter that exports all standard BibTeX fields as-is.
+
+The exported file contains a header row with field names, followed by one row
+per entry. All standard fields are included as columns:
+
+  Citation Key, Author, Title, Year, Journal, Booktitle, Publisher, Volume,
+  Number, Pages, Month, Edition, Address, Editor, Series, Note, HowPublished,
+  Organization, Institution, School, DOI, URL, Keywords, Abstract, ISBN, ISSN
+
+This filter is intended as a simple, general-purpose CSV export suitable for
+use in spreadsheet applications such as Microsoft Excel or LibreOffice Calc.

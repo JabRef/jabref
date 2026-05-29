@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,13 +14,17 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.FileDirectories;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,13 +59,21 @@ class ContextMenuFactoryTest {
         filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
 
         when(guiPreferences.getFilePreferences()).thenReturn(filePreferences);
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(Path.of("/main")));
+        when(bibDatabaseContext.getAllFileDirectories(filePreferences))
+                .thenReturn(new FileDirectories(Path.of("/user"), Path.of("/library"), Path.of("/main")));
+        when(bibDatabaseContext.getDatabaseDirectory()).thenReturn(Optional.of(Path.of("/bib")));
 
         factory = new ContextMenuFactory(
                 mock(DialogService.class),
                 guiPreferences,
                 bibDatabaseContext,
                 bibEntry,
-                mock(LinkedFilesEditorViewModel.class)
+                mock(LinkedFilesEditorViewModel.class),
+                mock(TaskExecutor.class),
+                mock(FileUpdateMonitor.class),
+                mock(UndoManager.class),
+                mock(StateManager.class)
         );
     }
 

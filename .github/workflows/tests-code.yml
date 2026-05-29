@@ -41,20 +41,6 @@ jobs:
           name: pr_number
           path: pr_number.txt
 
-  checkstyle:
-    name: Checkstyle
-    # too slow on ubuntu-slim
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v6
-        with:
-          submodules: 'true'
-          show-progress: 'false'
-      - uses: ./.github/actions/setup-gradle
-      - name: Run checkstyle using gradle
-        run: gradle checkstyleMain checkstyleTest checkstyleJmh
-
   dependencyscopes:
     name: Dependency Scopes
     # too slow on ubuntu-slim
@@ -69,36 +55,12 @@ jobs:
       - name: Run checkAllModuleInfo using gradle
         run: gradle checkAllModuleInfo
 
-  openrewrite:
-    name: OpenRewrite
-    # too slow on ubuntu-slim
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v6
-        with:
-          submodules: 'true'
-          show-progress: 'false'
-      - uses: ./.github/actions/setup-gradle
-      - name: Run OpenRewrite
-        run: |
-          gradle --no-configuration-cache :rewriteRun
-      - name: Output diff
-        if: failure()
-        run: |
-          cat /home/runner/work/jabref/jabref/build/reports/rewrite/rewrite.patch
-
   format:
     # ubuntu-slim doesn't offer docker
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: leventeBajczi/intellij-idea-format@master
-        with:
-          file-mask: "*.java"
-          settings-file: ".idea/codeStyles/Project.xml"
-      - name: Undo JBang changes # IntelliJ issue: https://youtrack.jetbrains.com/issue/IDEA-https://youtrack.jetbrains.com/issue/IDEA-384956/Skip-formatting-of-shebang-headers/Skip-formatting-of-shebang-headers
-        run: git checkout HEAD -- jablib-examples/jbang/*.java
+      - uses: ./.github/actions/format-java
       # job should fail in case there are changes
       - name: Check if any files changed
         run: git diff --exit-code
@@ -127,6 +89,43 @@ jobs:
         run: |
           cd jabref
           git diff --exit-code
+
+  checkstyle:
+    name: Checkstyle
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
+    needs: format
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
+      - name: Run checkstyle using gradle
+        run: gradle checkstyleMain checkstyleTest checkstyleJmh
+
+  openrewrite:
+    name: OpenRewrite
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
+    needs: checkstyle
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - uses: ./.github/actions/setup-gradle
+      - name: Run OpenRewrite
+        run: |
+          gradle --no-configuration-cache :rewriteRun
+
+      # Reformat code (because OpenRewrite does different indents)
+      - uses: ./.github/actions/format-java
+
+      - name: Fail if working directory is unclean
+        run: git diff --exit-code
 
   modernizer:
     name: Modernizer
@@ -187,11 +186,11 @@ jobs:
         uses: jbangdev/setup-jbang@main
       - name: Lint CHANGELOG.md
         run: |
-          # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.16.1:bin check CHANGELOG.md | tee heylogs.txt || true
+          # the grep is needed to filter out an error about all h2 containing a version, which is not relevant for us, because we have an "Unreleased" section
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.18.1:bin check --format github-actions CHANGELOG.md | grep -v all-h2-contain-a-version | tee heylogs.txt || true
 
-          # We have two acceptable errors
-          if ! grep -q "1 problem" heylogs.txt; then
+          error_count=$(grep -c '^::error' heylogs.txt || true)
+          if [ "$error_count" -ne 0 ]; then
             {
               echo "heylogs<<EOF"
               cat heylogs.txt
@@ -329,7 +328,8 @@ jobs:
 
   tests-jabkit-smoke:
     name: "JabKit Smoke Test"
-    runs-on: ubuntu-slim
+    # too slow on ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
@@ -388,119 +388,30 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0
           submodules: 'false'
           show-progress: 'false'
-      - name: Detect changed jablib classes
-        id: changed-jablib-files
-        uses: tj-actions/changed-files@v47
-        with:
-          files: |
-            .jbang/*.java
-            jablib/src/main/java/**/*.java
-            jablib-examples/jbang/**/*.java
-          files_ignore: |
-            jablib/src/main/java/**/*-*.java
-
       - uses: ./.github/actions/setup-gradle
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - name: Setup JDK
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-        uses: actions/setup-java@v5
-        with:
-          java-version: '25'
-          distribution: 'corretto'
-          check-latest: true
-
-      # Build all JBang scripts
-      - run: |
-          for f in .jbang/*.java; do
-            echo "Building $f..."
-            jbang build --fresh "$f"
-          done
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - run: |
-          for f in jablib-examples/jbang/*.java; do
-            echo "Building $f..."
-            jbang build --fresh "$f"
-          done
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-
-      # *Launcher.java should support "--help"
-      - run: jbang run .jbang/JabKitLauncher.java --help
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - run: jbang run .jbang/JabLsLauncher.java --help
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
-      - run: jbang run .jbang/JabSrvLauncher.java --help
-        if: steps.changed-jablib-files.outputs.any_changed != 'true'
+      - name: Build JBang scripts and run launchers
+        uses: ./.github/actions/jbang-check
 
   jbang-pr:
     name: JBang (PR)
-    runs-on: ubuntu-slim
-    # does not need publish, because the JBang scripts are modified
+    runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
-    strategy:
-      fail-fast: false
-      matrix:
-        script: [ .jbang/JabKitLauncher.java, .jbang/JabLsLauncher.java, .jbang/JabSrvLauncher.java, jablib-examples/jbang/doi_to_bibtex.java, jablib-examples/jbang/ieee_pdf_references_to_bibtex.java ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v6
         with:
-          submodules: 'false'
+          submodules: 'true'
           show-progress: 'false'
-      - name: Detect changed jablib classes
-        id: changed-jablib-files
-        uses: tj-actions/changed-files@v47
-        with:
-          files: |
-            .jbang/*.java
-            jabkit/src/main/java/**/*.java
-            jablib/src/main/java/**/*.java
-            jablib-examples/jbang/**/*.java
-          files_ignore: |
-            jablib/src/main/java/**/*-*.java
       - uses: ./.github/actions/setup-gradle
-      - name: Setup JDK
-        uses: actions/setup-java@v5
-        with:
-          java-version: '25'
-          distribution: 'corretto'
-          check-latest: true
-      - name: Modify ${{ matrix.script }} to include changed classes
-        shell: bash
-        # We always run, because changes in jabls, jabsrv also could cause JBang to fail
-        run: |
-          # We modify the JBang scripts directly to avoid issues with relative paths
-          for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
-            case "$f" in
-              .jbang/*)
-                # skip scripts
-                continue
-                ;;
-              jablib-examples/*)
-                # skip scripts
-                continue
-                ;;
-              jabkit/*)
-                # only JabKit needs its modified sources if jabkit was modified
-                if [ "${{ matrix.script }}" != ".jbang/JabKitLauncher.java" ]; then
-                  continue
-                fi
-                ;;
-            esac
-            if [[ "${{ matrix.script }}" == .jbang/* ]]; then
-              echo "//SOURCES ../$f" >> "${{ matrix.script }}"
-            else
-              echo "//SOURCES ../../$f" >> "${{ matrix.script }}"
-            fi
-          done
-      - run: cat ${{ matrix.script }}
-      - run: jbang build "${{ matrix.script }}"
-        shell: bash
-      - run: jbang "${{ matrix.script }}" --help
-        if: ${{ contains(matrix.script, 'Launcher.java') }}
-        shell: bash
+      # Publish jablib to the local Maven repository so the JBang scripts pick up
+      # unreleased changes. -PprojVersion=6.0 makes the artifact 6.0-SNAPSHOT
+      # (the default would be 0.1.0-SNAPSHOT, which the scripts do not reference).
+      - name: Publish jablib to the local Maven repository
+        run: ./gradlew -PprojVersion=6.0 :jablib:publishToMavenLocal
+      - name: Build JBang scripts and run launchers
+        uses: ./.github/actions/jbang-check
 
   maven-examples:
     name: Maven examples

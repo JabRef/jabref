@@ -4,6 +4,8 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jabref.logic.util.JabRefBaseDirectoryLocator;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,10 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FileHistoryTest {
     private FileHistory history;
+    private Path baseDir;
 
     @BeforeEach
     void setUp() {
         history = FileHistory.of(List.of());
+        baseDir = JabRefBaseDirectoryLocator.getBaseDirectoryPath();
     }
 
     @Test
@@ -79,9 +83,46 @@ class FileHistoryTest {
         history.newFile(Path.of("file9"));
 
         assertEquals(8, history.size());
-        assertEquals(Path.of("file9"), history.get(0));
+        assertEquals(Path.of("file9"), history.getFirst());
         assertFalse(history.contains(Path.of("file1")));
     }
+
+    @Test
+    void removeItemRemovesAbsoluteWhenRelativeGiven() {
+        Path relative = Path.of("docs/file.pdf");
+        Path absolute = baseDir.resolve(relative).normalize();
+
+        history.newFile(relative);
+        history.newFile(absolute);
+
+        history.removeItem(relative);
+
+        assertFalse(history.contains(relative));
+        assertFalse(history.contains(absolute));
+    }
+
+    @Test
+    void removeItemRemovesRelativeWhenAbsoluteGiven() {
+        Path relative = Path.of("docs/file.pdf");
+        Path absolute = baseDir.resolve(relative).normalize();
+
+        history.newFile(relative);
+        history.newFile(absolute);
+
+        history.removeItem(absolute);
+
+        assertFalse(history.contains(relative));
+        assertFalse(history.contains(absolute));
+    }
+
+    @Test
+    void removeItemHandlesAbsoluteOutsideBaseDir() {
+        Path outside = Path.of("/tmp/somefile.txt");
+
+        history.newFile(outside);
+
+        history.removeItem(outside);
+
+        assertFalse(history.contains(outside));
+    }
 }
-
-

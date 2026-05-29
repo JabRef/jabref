@@ -35,7 +35,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     /// @param group the group underlying this node
     public GroupTreeNode(AbstractGroup group) {
         super(GroupTreeNode.class);
-        setGroup(group, false, false, null);
+        setGroup(group, false, false, List.of());
     }
 
     public static GroupTreeNode fromGroup(AbstractGroup group) {

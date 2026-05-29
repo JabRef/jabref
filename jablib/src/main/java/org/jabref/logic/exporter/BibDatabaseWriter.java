@@ -340,6 +340,7 @@ public class BibDatabaseWriter {
         List<BibtexString> strings = database.getStringKeySet()
                                              .stream()
                                              .map(database::getString)
+                                             .flatMap(Optional::stream)
                                              .sorted(new BibtexStringComparator(true))
                                              .toList();
         // First, make a Map of all entries:
@@ -421,6 +422,11 @@ public class BibDatabaseWriter {
     }
 
     protected void writeEntryTypeDefinition(BibEntryType customType) throws IOException {
+        bibWriter.write(COMMENT_PREFIX + "{");
+        bibWriter.write(MetaDataSerializer.serializeCustomEntryTypesV2(customType));
+        bibWriter.writeLine("}");
+        bibWriter.finishBlock();
+
         bibWriter.write(COMMENT_PREFIX + "{");
         bibWriter.write(MetaDataSerializer.serializeCustomEntryTypes(customType));
         bibWriter.writeLine("}");

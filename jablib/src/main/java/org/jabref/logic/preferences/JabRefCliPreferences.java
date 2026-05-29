@@ -35,9 +35,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.LibraryPreferences;
-import org.jabref.logic.ai.AiDefaultPreferences;
-import org.jabref.logic.ai.AiPreferences;
-import org.jabref.logic.ai.templates.AiTemplate;
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -69,6 +67,7 @@ import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.importer.util.MetaDataParser;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
@@ -80,7 +79,6 @@ import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.JStyle;
-import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
@@ -99,8 +97,12 @@ import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.model.ai.AiProvider;
-import org.jabref.model.ai.EmbeddingModel;
+import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
+import org.jabref.model.ai.llm.AiProvider;
+import org.jabref.model.ai.pipeline.AnswerEngineKind;
+import org.jabref.model.ai.pipeline.DocumentSplitterKind;
+import org.jabref.model.ai.summarization.SummarizatorKind;
+import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.BibEntryType;
@@ -224,6 +226,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
     public static final String SEARCH_REG_EXP = "regExpSearch";
     public static final String SEARCH_FULLTEXT = "fulltextSearch";
+    public static final String SEARCH_USE_POSTGRES = "searchUsePostgres";
     public static final String SEARCH_KEEP_SEARCH_STRING = "keepSearchString";
     public static final String SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP = "keepOnTop";
     public static final String SEARCH_WINDOW_HEIGHT = "searchWindowHeight";
@@ -308,6 +311,8 @@ public class JabRefCliPreferences implements CliPreferences {
     // Prefs node for customized entry types
     public static final String CUSTOMIZED_BIBTEX_TYPES = "customizedBibtexTypes";
     public static final String CUSTOMIZED_BIBLATEX_TYPES = "customizedBiblatexTypes";
+    public static final String CUSTOMIZED_BIBTEX_TYPES_V2 = "customizedBibtexTypesV2";
+    public static final String CUSTOMIZED_BIBLATEX_TYPES_V2 = "customizedBiblatexTypesV2";
     // Version
     public static final String VERSION_IGNORED_UPDATE = "versionIgnoreUpdate";
     public static final String VERSION_CHECK_ENABLED = "versionCheck";
@@ -396,22 +401,24 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_MISTRAL_AI_API_BASE_URL = "aiMistralAiApiBaseUrl";
     private static final String AI_GEMINI_API_BASE_URL = "aiGeminiApiBaseUrl";
     private static final String AI_HUGGING_FACE_API_BASE_URL = "aiHuggingFaceApiBaseUrl";
-    private static final String AI_SYSTEM_MESSAGE = "aiSystemMessage";
+    private static final String AI_SUMMARIZATOR_KIND = "aiSummarizatorKind";
+    private static final String AI_TOKEN_ESTIMATOR_KIND = "aiTokenEstimatorKind";
     private static final String AI_TEMPERATURE = "aiTemperature";
     private static final String AI_CONTEXT_WINDOW_SIZE = "aiMessageWindowSize";
+    private static final String AI_DOCUMENT_SPLITTER_KIND = "aiDocumentSplitterKind";
     private static final String AI_DOCUMENT_SPLITTER_CHUNK_SIZE = "aiDocumentSplitterChunkSize";
     private static final String AI_DOCUMENT_SPLITTER_OVERLAP_SIZE = "aiDocumentSplitterOverlapSize";
+    private static final String AI_ANSWER_ENGINE_KIND = "aiAnswerEngineKind";
     private static final String AI_RAG_MAX_RESULTS_COUNT = "aiRagMaxResultsCount";
     private static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
 
     private static final String AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE = "aiChattingSystemMessageTemplate";
     private static final String AI_CHATTING_USER_MESSAGE_TEMPLATE = "aiChattingUserMessageTemplate";
     private static final String AI_SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE = "aiSummarizationChunkSystemMessageTemplate";
-    private static final String AI_SUMMARIZATION_CHUNK_USER_MESSAGE_TEMPLATE = "aiSummarizationChunkUserMessageTemplate";
     private static final String AI_SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE = "aiSummarizationCombineSystemMessageTemplate";
-    private static final String AI_SUMMARIZATION_COMBINE_USER_MESSAGE_TEMPLATE = "aiSummarizationCombineUserMessageTemplate";
     private static final String AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE = "aiCitationParsingSystemMessageTemplate";
-    private static final String AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE = "aiCitationParsingUserMessageTemplate";
+    private static final String AI_SUMMARIZATION_FULL_DOCUMENT_SYSTEM_MESSAGE_TEMPLATE = "aiSummarizationFullDocumentSystemMessageTemplate";
+    private static final String AI_MARKDOWN_CHAT_EXPORT_TEMPLATE = "aiMarkdownChatExportTemplate";
     // endregion
 
     private static final String LAST_USED_DIRECTORY = "lastUsedDirectory";
@@ -502,15 +509,6 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.warn("Could not import preferences from jabref.xml", e);
         }
 
-        defaults.put(SEARCH_DISPLAY_MODE, Boolean.TRUE);
-        defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
-        defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
-        defaults.put(SEARCH_FULLTEXT, Boolean.FALSE);
-        defaults.put(SEARCH_KEEP_SEARCH_STRING, Boolean.FALSE);
-        defaults.put(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, Boolean.TRUE);
-        defaults.put(SEARCH_WINDOW_HEIGHT, 176.0);
-        defaults.put(SEARCH_WINDOW_WIDTH, 600.0);
-        defaults.put(SEARCH_WINDOW_DIVIDER_POS, 0.5);
         defaults.put(SEARCH_CATALOGS, convertListToString(List.of(
                 ACMPortalFetcher.FETCHER_NAME,
                 SpringerNatureWebFetcher.FETCHER_NAME,
@@ -581,27 +579,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(PROTECTED_TERMS_ENABLED_EXTERNAL, "");
         defaults.put(PROTECTED_TERMS_DISABLED_EXTERNAL, "");
 
-        // OpenOffice/LibreOffice
-        if (OS.WINDOWS) {
-            defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_WIN_EXEC_PATH);
-        } else if (OS.OS_X) {
-            defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_OSX_EXEC_PATH);
-        } else { // Linux
-            defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_LINUX_EXEC_PATH);
-        }
-
-        defaults.put(OO_SYNC_WHEN_CITING, Boolean.FALSE);
-        defaults.put(OO_ALWAYS_ADD_CITED_ON_PAGES, Boolean.FALSE);
-        defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);
-        defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
-        defaults.put(OO_EXTERNAL_STYLE_FILES, "");
-        defaults.put(OO_CURRENT_STYLE, CSLStyleLoader.getDefaultStyle().getPath()); // Default CSL Style is IEEE
-        defaults.put(OO_CSL_BIBLIOGRAPHY_TITLE, "References");
-        defaults.put(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, "Heading 2");
-        defaults.put(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, "Text body");
-        defaults.put(OO_EXTERNAL_CSL_STYLES, "");
-        defaults.put(OO_ADD_SPACE_AFTER, Boolean.TRUE);
-
         defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage");
         defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
         defaults.put(FETCHER_CUSTOM_KEY_PERSIST, Boolean.FALSE);
@@ -656,44 +633,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(RECENT_DATABASES, "");
         defaults.put(LAST_FOCUSED, "");
         defaults.put(LAST_EDITED, "");
-        // endregion
-
-        // region AI
-        defaults.put(AI_ENABLED, AiDefaultPreferences.ENABLE_CHAT);
-        defaults.put(AI_AUTO_GENERATE_EMBEDDINGS, AiDefaultPreferences.AUTO_GENERATE_EMBEDDINGS);
-        defaults.put(AI_AUTO_GENERATE_SUMMARIES, AiDefaultPreferences.AUTO_GENERATE_SUMMARIES);
-        defaults.put(AI_GENERATE_FOLLOW_UP_QUESTIONS, AiDefaultPreferences.GENERATE_FOLLOW_UP_QUESTIONS);
-        defaults.put(AI_FOLLOW_UP_QUESTIONS_COUNT, AiDefaultPreferences.FOLLOW_UP_QUESTIONS_COUNT);
-        defaults.put(AI_FOLLOW_UP_QUESTIONS_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.FOLLOW_UP_QUESTIONS));
-        defaults.put(AI_PROVIDER, AiDefaultPreferences.PROVIDER.name());
-        defaults.put(AI_OPEN_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.OPEN_AI).getName());
-        defaults.put(AI_MISTRAL_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.MISTRAL_AI).getName());
-        defaults.put(AI_GEMINI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.GEMINI).getName());
-        defaults.put(AI_HUGGING_FACE_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.HUGGING_FACE).getName());
-        defaults.put(AI_CUSTOMIZE_SETTINGS, AiDefaultPreferences.CUSTOMIZE_SETTINGS);
-        defaults.put(AI_EMBEDDING_MODEL, AiDefaultPreferences.EMBEDDING_MODEL.name());
-        defaults.put(AI_OPEN_AI_API_BASE_URL, AiProvider.OPEN_AI.getApiUrl());
-        defaults.put(AI_MISTRAL_AI_API_BASE_URL, AiProvider.MISTRAL_AI.getApiUrl());
-        defaults.put(AI_GEMINI_API_BASE_URL, AiProvider.GEMINI.getApiUrl());
-        defaults.put(AI_HUGGING_FACE_API_BASE_URL, AiProvider.HUGGING_FACE.getApiUrl());
-        defaults.put(AI_SYSTEM_MESSAGE, AiDefaultPreferences.SYSTEM_MESSAGE);
-        defaults.put(AI_TEMPERATURE, AiDefaultPreferences.TEMPERATURE);
-        defaults.put(AI_CONTEXT_WINDOW_SIZE, AiDefaultPreferences.getContextWindowSize(AiDefaultPreferences.PROVIDER, AiDefaultPreferences.CHAT_MODELS.get(AiDefaultPreferences.PROVIDER).getName()));
-        defaults.put(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);
-        defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);
-        defaults.put(AI_RAG_MAX_RESULTS_COUNT, AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);
-        defaults.put(AI_RAG_MIN_SCORE, AiDefaultPreferences.RAG_MIN_SCORE);
-        // endregion
-
-        // region AI templates
-        defaults.put(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CHATTING_SYSTEM_MESSAGE));
-        defaults.put(AI_CHATTING_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CHATTING_USER_MESSAGE));
-        defaults.put(AI_SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE));
-        defaults.put(AI_SUMMARIZATION_CHUNK_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE));
-        defaults.put(AI_SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE));
-        defaults.put(AI_SUMMARIZATION_COMBINE_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE));
-        defaults.put(AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE));
-        defaults.put(AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CITATION_PARSING_USER_MESSAGE));
         // endregion
 
         // WalkThrough
@@ -1000,6 +939,10 @@ public class JabRefCliPreferences implements CliPreferences {
         getCitationKeyPatternPreferences().setAll(
                 CitationKeyPatternPreferences.getDefault()
                                              .withKeywordDelimiter(getBibEntryPreferences().keywordSeparatorProperty()));
+        getAiPreferences().setAll(AiPreferences.getDefault());
+        getSearchPreferences().setAll(SearchPreferences.getDefault());
+        getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences())).setAll(
+                OpenOfficePreferences.getDefault());
     }
 
     /// Imports Preferences from an XML file.
@@ -1024,6 +967,11 @@ public class JabRefCliPreferences implements CliPreferences {
         getTimestampPreferences().setAll(getTimestampPreferencesFromBackingStore(getTimestampPreferences()));
         getRemotePreferences().setAll(getRemotePreferencesFromBackingStore(getRemotePreferences()));
         getCitationKeyPatternPreferences().setAll(getCitationKeyPatternPreferencesFromBackingStore(getCitationKeyPatternPreferences()));
+        getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
+        getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
+        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences());
+        getOpenOfficePreferences(repository).setAll(
+                getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
     }
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
@@ -1131,17 +1079,31 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private List<BibEntryType> getBibEntryTypes(BibDatabaseMode bibDatabaseMode) {
-        List<BibEntryType> storedEntryTypes = new ArrayList<>();
-        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
+        Map<String, BibEntryType> storedEntryTypes = new HashMap<>();
+        addEntryTypesFromPreferences(getPrefsNodeForCustomizedEntryTypesV2(bibDatabaseMode), storedEntryTypes, true, "v2");
+        addEntryTypesFromPreferences(getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode), storedEntryTypes, false, "v1");
+        return new ArrayList<>(storedEntryTypes.values());
+    }
+
+    private void addEntryTypesFromPreferences(Preferences prefsNode,
+                                              Map<String, BibEntryType> storedEntryTypes,
+                                              boolean allowOverWrite,
+                                              String versionLabel) {
         try {
             Arrays.stream(prefsNode.keys())
                   .map(key -> prefsNode.get(key, null))
                   .filter(Objects::nonNull)
-                  .forEach(typeString -> MetaDataParser.parseCustomEntryType(typeString).ifPresent(storedEntryTypes::add));
+                  .forEach(typeString -> MetaDataParser.parseCustomEntryType(typeString).ifPresent(entryType -> {
+                      String entryTypeName = entryType.getType().getName();
+                      if (allowOverWrite) {
+                          storedEntryTypes.put(entryTypeName, entryType);
+                      } else {
+                          storedEntryTypes.putIfAbsent(entryTypeName, entryType);
+                      }
+                  }));
         } catch (BackingStoreException e) {
-            LOGGER.info("Parsing customized entry types failed.", e);
+            LOGGER.info("Parsing customized entry types ({}) failed.", versionLabel, e);
         }
-        return storedEntryTypes;
     }
 
     private void clearAllBibEntryTypes() {
@@ -1152,9 +1114,12 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private void clearBibEntryTypes(BibDatabaseMode mode) {
         try {
-            Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
-            prefsNode.clear();
-            prefsNode.flush();
+            Preferences v1Node = getPrefsNodeForCustomizedEntryTypes(mode);
+            v1Node.clear();
+            v1Node.flush();
+            Preferences v2Node = getPrefsNodeForCustomizedEntryTypesV2(mode);
+            v2Node.clear();
+            v2Node.flush();
         } catch (BackingStoreException e) {
             LOGGER.error("Resetting customized entry types failed.", e);
         }
@@ -1168,16 +1133,19 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void storeBibEntryTypes(Collection<BibEntryType> bibEntryTypes, BibDatabaseMode bibDatabaseMode) {
-        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
+        Preferences prefsNodev1 = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
+        Preferences prefsNodev2 = getPrefsNodeForCustomizedEntryTypesV2(bibDatabaseMode);
 
         try {
             // clear old custom types
             clearBibEntryTypes(bibDatabaseMode);
 
             // store current custom types
-            bibEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), MetaDataSerializer.serializeCustomEntryTypes(type)));
+            bibEntryTypes.forEach(type -> prefsNodev1.put(type.getType().getName(), MetaDataSerializer.serializeCustomEntryTypes(type)));
+            bibEntryTypes.forEach(type -> prefsNodev2.put(type.getType().getName(), MetaDataSerializer.serializeCustomEntryTypesV2(type)));
 
-            prefsNode.flush();
+            prefsNodev1.flush();
+            prefsNodev2.flush();
         } catch (BackingStoreException e) {
             LOGGER.info("Updating stored custom entry types failed.", e);
         }
@@ -1190,6 +1158,16 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
+    private static Preferences getPrefsNodeForCustomizedEntryTypesV2(BibDatabaseMode mode) {
+        return mode == BibDatabaseMode.BIBTEX
+               ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES_V2)
+               : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES_V2);
+    }
+
+    //*************************************************************************************************************
+    // Misc
+    //*************************************************************************************************************
+    // region Misc
     // region LibraryPreferences
     @Override
     public LibraryPreferences getLibraryPreferences() {
@@ -1952,7 +1930,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private void storeFileHistory(FileHistory history) {
         putStringList(RECENT_DATABASES, history.stream()
-                                               .map(Path::toAbsolutePath)
                                                .map(Path::toString)
                                                .toList());
     }
@@ -1967,42 +1944,7 @@ public class JabRefCliPreferences implements CliPreferences {
             return aiPreferences;
         }
 
-        boolean aiEnabled = getBoolean(AI_ENABLED);
-
-        aiPreferences = new AiPreferences(
-                aiEnabled,
-                getBoolean(AI_AUTO_GENERATE_EMBEDDINGS),
-                getBoolean(AI_AUTO_GENERATE_SUMMARIES),
-                getBoolean(AI_GENERATE_FOLLOW_UP_QUESTIONS),
-                getInt(AI_FOLLOW_UP_QUESTIONS_COUNT),
-                AiProvider.fromString(get(AI_PROVIDER)),
-                get(AI_OPEN_AI_CHAT_MODEL),
-                get(AI_MISTRAL_AI_CHAT_MODEL),
-                get(AI_GEMINI_CHAT_MODEL),
-                get(AI_HUGGING_FACE_CHAT_MODEL),
-                getBoolean(AI_CUSTOMIZE_SETTINGS),
-                get(AI_OPEN_AI_API_BASE_URL),
-                get(AI_MISTRAL_AI_API_BASE_URL),
-                get(AI_GEMINI_API_BASE_URL),
-                get(AI_HUGGING_FACE_API_BASE_URL),
-                EmbeddingModel.valueOf(get(AI_EMBEDDING_MODEL)),
-                getDouble(AI_TEMPERATURE),
-                getInt(AI_CONTEXT_WINDOW_SIZE),
-                getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE),
-                getInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE),
-                getInt(AI_RAG_MAX_RESULTS_COUNT),
-                getDouble(AI_RAG_MIN_SCORE),
-                Map.of(
-                        AiTemplate.CHATTING_SYSTEM_MESSAGE, get(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE),
-                        AiTemplate.CHATTING_USER_MESSAGE, get(AI_CHATTING_USER_MESSAGE_TEMPLATE),
-                        AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE, get(AI_SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE),
-                        AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE, get(AI_SUMMARIZATION_CHUNK_USER_MESSAGE_TEMPLATE),
-                        AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, get(AI_SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE),
-                        AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, get(AI_SUMMARIZATION_COMBINE_USER_MESSAGE_TEMPLATE),
-                        AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, get(AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE),
-                        AiTemplate.CITATION_PARSING_USER_MESSAGE, get(AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE),
-                        AiTemplate.FOLLOW_UP_QUESTIONS, get(AI_FOLLOW_UP_QUESTIONS_TEMPLATE)
-                ));
+        aiPreferences = getAiPreferencesFromBackingStore(AiPreferences.getDefault());
 
         EasyBind.listen(aiPreferences.enableAiProperty(), (_, _, newValue) -> putBoolean(AI_ENABLED, newValue));
         EasyBind.listen(aiPreferences.autoGenerateEmbeddingsProperty(), (_, _, newValue) -> putBoolean(AI_AUTO_GENERATE_EMBEDDINGS, newValue));
@@ -2024,25 +1966,72 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(aiPreferences.geminiApiBaseUrlProperty(), (_, _, newValue) -> put(AI_GEMINI_API_BASE_URL, newValue));
         EasyBind.listen(aiPreferences.huggingFaceApiBaseUrlProperty(), (_, _, newValue) -> put(AI_HUGGING_FACE_API_BASE_URL, newValue));
 
+        EasyBind.listen(aiPreferences.summarizatorKindProperty(), (_, _, newValue) -> put(AI_SUMMARIZATOR_KIND, newValue.name()));
+        EasyBind.listen(aiPreferences.tokenEstimatorKindProperty(), (_, _, newValue) -> put(AI_TOKEN_ESTIMATOR_KIND, newValue.name()));
         EasyBind.listen(aiPreferences.embeddingModelProperty(), (_, _, newValue) -> put(AI_EMBEDDING_MODEL, newValue.name()));
         EasyBind.listen(aiPreferences.temperatureProperty(), (_, _, newValue) -> putDouble(AI_TEMPERATURE, newValue.doubleValue()));
         EasyBind.listen(aiPreferences.contextWindowSizeProperty(), (_, _, newValue) -> putInt(AI_CONTEXT_WINDOW_SIZE, newValue));
+
+        EasyBind.listen(aiPreferences.documentSplitterKindProperty(), (_, _, newValue) -> put(AI_DOCUMENT_SPLITTER_KIND, newValue.name()));
         EasyBind.listen(aiPreferences.documentSplitterChunkSizeProperty(), (_, _, newValue) -> putInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, newValue));
         EasyBind.listen(aiPreferences.documentSplitterOverlapSizeProperty(), (_, _, newValue) -> putInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, newValue));
+
+        EasyBind.listen(aiPreferences.answerEngineKindProperty(), (_, _, newValue) -> put(AI_ANSWER_ENGINE_KIND, newValue.name()));
         EasyBind.listen(aiPreferences.ragMaxResultsCountProperty(), (_, _, newValue) -> putInt(AI_RAG_MAX_RESULTS_COUNT, newValue));
         EasyBind.listen(aiPreferences.ragMinScoreProperty(), (_, _, newValue) -> putDouble(AI_RAG_MIN_SCORE, newValue.doubleValue()));
 
-        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CHATTING_SYSTEM_MESSAGE), (_, _, newValue) -> put(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE, newValue));
-        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CHATTING_USER_MESSAGE), (_, _, newValue) -> put(AI_CHATTING_USER_MESSAGE_TEMPLATE, newValue));
-        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE), (_, _, newValue) -> put(AI_SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE, newValue));
-        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE), (_, _, newValue) -> put(AI_SUMMARIZATION_CHUNK_USER_MESSAGE_TEMPLATE, newValue));
-        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE), (_, _, newValue) -> put(AI_SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE, newValue));
-        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE), (_, _, newValue) -> put(AI_SUMMARIZATION_COMBINE_USER_MESSAGE_TEMPLATE, newValue));
-        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE), (_, _, newValue) -> put(AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE, newValue));
-        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CITATION_PARSING_USER_MESSAGE), (_, _, newValue) -> put(AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE, newValue));
-        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.FOLLOW_UP_QUESTIONS), (_, _, newValue) -> put(AI_FOLLOW_UP_QUESTIONS_TEMPLATE, newValue));
+        EasyBind.listen(aiPreferences.chattingSystemMessageTemplateProperty(), (_, _, newValue) -> put(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE, newValue));
+        EasyBind.listen(aiPreferences.chattingUserMessageTemplateProperty(), (_, _, newValue) -> put(AI_CHATTING_USER_MESSAGE_TEMPLATE, newValue));
+        EasyBind.listen(aiPreferences.summarizationChunkSystemMessageTemplateProperty(), (_, _, newValue) -> put(AI_SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE, newValue));
+        EasyBind.listen(aiPreferences.summarizationCombineSystemMessageTemplateProperty(), (_, _, newValue) -> put(AI_SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE, newValue));
+        EasyBind.listen(aiPreferences.summarizationFullDocumentSystemMessageTemplateProperty(), (_, _, newValue) -> put(AI_SUMMARIZATION_FULL_DOCUMENT_SYSTEM_MESSAGE_TEMPLATE, newValue));
+        EasyBind.listen(aiPreferences.citationParsingSystemMessageTemplateProperty(), (_, _, newValue) -> put(AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE, newValue));
+        EasyBind.listen(aiPreferences.markdownChatExportTemplateProperty(), (_, _, newValue) -> put(AI_MARKDOWN_CHAT_EXPORT_TEMPLATE, newValue));
+
+        EasyBind.listen(aiPreferences.generateFollowUpQuestionsProperty(), (_, _, newValue) -> putBoolean(AI_GENERATE_FOLLOW_UP_QUESTIONS, newValue));
+        EasyBind.listen(aiPreferences.followUpQuestionsCountProperty(), (_, _, newValue) -> putInt(AI_FOLLOW_UP_QUESTIONS_COUNT, newValue));
+        EasyBind.listen(aiPreferences.followUpQuestionsTemplateProperty(), (_, _, newValue) -> put(AI_FOLLOW_UP_QUESTIONS_TEMPLATE, newValue));
 
         return aiPreferences;
+    }
+
+    private AiPreferences getAiPreferencesFromBackingStore(AiPreferences defaults) {
+        return new AiPreferences(
+                getBoolean(AI_ENABLED, defaults.getEnableAi()),
+                getBoolean(AI_AUTO_GENERATE_EMBEDDINGS, defaults.getAutoGenerateEmbeddings()),
+                getBoolean(AI_AUTO_GENERATE_SUMMARIES, defaults.getAutoGenerateSummaries()),
+                AiProvider.safeValueOf(get(AI_PROVIDER, defaults.getAiProvider().name())),
+                get(AI_OPEN_AI_CHAT_MODEL, defaults.getOpenAiChatModel()),
+                get(AI_MISTRAL_AI_CHAT_MODEL, defaults.getMistralAiChatModel()),
+                get(AI_GEMINI_CHAT_MODEL, defaults.getGeminiChatModel()),
+                get(AI_HUGGING_FACE_CHAT_MODEL, defaults.getHuggingFaceChatModel()),
+                getBoolean(AI_CUSTOMIZE_SETTINGS, defaults.getCustomizeExpertSettings()),
+                get(AI_OPEN_AI_API_BASE_URL, defaults.getOpenAiApiBaseUrl()),
+                get(AI_MISTRAL_AI_API_BASE_URL, defaults.getMistralAiApiBaseUrl()),
+                get(AI_GEMINI_API_BASE_URL, defaults.getGeminiApiBaseUrl()),
+                get(AI_HUGGING_FACE_API_BASE_URL, defaults.getHuggingFaceApiBaseUrl()),
+                SummarizatorKind.safeValueOf(get(AI_SUMMARIZATOR_KIND, defaults.getSummarizatorKind().name())),
+                TokenEstimatorKind.safeValueOf(get(AI_TOKEN_ESTIMATOR_KIND, defaults.getTokenEstimatorKind().name())),
+                PredefinedEmbeddingModel.safeValueOf(get(AI_EMBEDDING_MODEL, defaults.embeddingModelProperty().get().name())),
+                getDouble(AI_TEMPERATURE, defaults.temperatureProperty().get()),
+                getInt(AI_CONTEXT_WINDOW_SIZE, defaults.contextWindowSizeProperty().get()),
+                DocumentSplitterKind.safeValueOf(get(AI_DOCUMENT_SPLITTER_KIND, defaults.getDocumentSplitterKind().name())),
+                getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, defaults.documentSplitterChunkSizeProperty().get()),
+                getInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, defaults.documentSplitterOverlapSizeProperty().get()),
+                AnswerEngineKind.safeValueOf(get(AI_ANSWER_ENGINE_KIND, defaults.getAnswerEngineKind().name())),
+                getInt(AI_RAG_MAX_RESULTS_COUNT, defaults.ragMaxResultsCountProperty().get()),
+                getDouble(AI_RAG_MIN_SCORE, defaults.ragMinScoreProperty().get()),
+                get(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE, defaults.getChattingSystemMessageTemplate()),
+                get(AI_CHATTING_USER_MESSAGE_TEMPLATE, defaults.getChattingUserMessageTemplate()),
+                get(AI_SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE, defaults.getSummarizationChunkSystemMessageTemplate()),
+                get(AI_SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE, defaults.getSummarizationCombineSystemMessageTemplate()),
+                get(AI_SUMMARIZATION_FULL_DOCUMENT_SYSTEM_MESSAGE_TEMPLATE, defaults.getSummarizationFullDocumentSystemMessageTemplate()),
+                get(AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE, defaults.getCitationParsingSystemMessageTemplate()),
+                get(AI_MARKDOWN_CHAT_EXPORT_TEMPLATE, defaults.getMarkdownChatExportTemplate()),
+                getBoolean(AI_GENERATE_FOLLOW_UP_QUESTIONS, defaults.getGenerateFollowUpQuestions()),
+                getInt(AI_FOLLOW_UP_QUESTIONS_COUNT, defaults.getFollowUpQuestionsCount()),
+                get(AI_FOLLOW_UP_QUESTIONS_TEMPLATE, defaults.getFollowUpQuestionsTemplate())
+        );
     }
 
     @Override
@@ -2051,27 +2040,34 @@ public class JabRefCliPreferences implements CliPreferences {
             return searchPreferences;
         }
 
-        searchPreferences = new SearchPreferences(
-                getBoolean(SEARCH_DISPLAY_MODE) ? SearchDisplayMode.FILTER : SearchDisplayMode.FLOAT,
-                getBoolean(SEARCH_REG_EXP),
-                getBoolean(SEARCH_CASE_SENSITIVE),
-                getBoolean(SEARCH_FULLTEXT),
-                getBoolean(SEARCH_KEEP_SEARCH_STRING),
-                getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP),
-                getDouble(SEARCH_WINDOW_HEIGHT),
-                getDouble(SEARCH_WINDOW_WIDTH),
-                getDouble(SEARCH_WINDOW_DIVIDER_POS));
+        searchPreferences = getSearchPreferencesFromBackingStore(SearchPreferences.getDefault());
 
+        EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (_, _, newValue) -> putBoolean(SEARCH_DISPLAY_MODE, newValue == SearchDisplayMode.FILTER));
         searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchFlags>) _ ->
                 putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchFlags.FULLTEXT)));
-        EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (_, _, newValue) -> putBoolean(SEARCH_DISPLAY_MODE, newValue == SearchDisplayMode.FILTER));
+        // Regular expression and case-sensitive search flags should always be set to default values on startup
         EasyBind.listen(searchPreferences.keepSearchStringProperty(), (_, _, newValue) -> putBoolean(SEARCH_KEEP_SEARCH_STRING, newValue));
         EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (_, _, _) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));
         EasyBind.listen(searchPreferences.getSearchWindowHeightProperty(), (_, _, _) -> putDouble(SEARCH_WINDOW_HEIGHT, searchPreferences.getSearchWindowHeight()));
         EasyBind.listen(searchPreferences.getSearchWindowWidthProperty(), (_, _, _) -> putDouble(SEARCH_WINDOW_WIDTH, searchPreferences.getSearchWindowWidth()));
         EasyBind.listen(searchPreferences.getSearchWindowDividerPositionProperty(), (_, _, _) -> putDouble(SEARCH_WINDOW_DIVIDER_POS, searchPreferences.getSearchWindowDividerPosition()));
+        EasyBind.listen(searchPreferences.usePostgresSearchProperty(), (_, _, newValue) -> putBoolean(SEARCH_USE_POSTGRES, newValue));
 
         return searchPreferences;
+    }
+
+    private SearchPreferences getSearchPreferencesFromBackingStore(SearchPreferences defaults) {
+        return new SearchPreferences(
+                getBoolean(SEARCH_DISPLAY_MODE, defaults.getSearchDisplayMode() == SearchDisplayMode.FILTER) ? SearchDisplayMode.FILTER : SearchDisplayMode.FLOAT,
+                getBoolean(SEARCH_REG_EXP, defaults.isRegularExpression()),
+                getBoolean(SEARCH_CASE_SENSITIVE, defaults.isCaseSensitive()),
+                getBoolean(SEARCH_FULLTEXT, defaults.isFulltext()),
+                getBoolean(SEARCH_USE_POSTGRES, defaults.shouldUsePostgresSearch()),
+                getBoolean(SEARCH_KEEP_SEARCH_STRING, defaults.shouldKeepSearchString()),
+                getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, defaults.shouldKeepWindowOnTop()),
+                getDouble(SEARCH_WINDOW_HEIGHT, defaults.getSearchWindowHeight()),
+                getDouble(SEARCH_WINDOW_WIDTH, defaults.getSearchWindowWidth()),
+                getDouble(SEARCH_WINDOW_DIVIDER_POS, defaults.getSearchWindowDividerPosition()));
     }
 
     @Override
@@ -2371,36 +2367,7 @@ public class JabRefCliPreferences implements CliPreferences {
             return openOfficePreferences;
         }
 
-        String currentStylePath = get(OO_CURRENT_STYLE);
-
-        OOStyle currentStyle = CSLStyleLoader.getDefaultStyle(); // Defaults to IEEE CSL Style
-
-        // Reassign currentStyle based on actual last used CSL style or JStyle
-        if (CSLStyleUtils.isCitationStyleFile(currentStylePath)) {
-            currentStyle = CSLStyleUtils.createCitationStyleFromFile(currentStylePath)
-                                        .orElse(CSLStyleLoader.getDefaultStyle());
-        } else {
-            // For now, must be a JStyle. In future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
-            try {
-                currentStyle = new JStyle(currentStylePath, getLayoutFormatterPreferences(), journalAbbreviationRepository);
-            } catch (IOException ex) {
-                LOGGER.warn("Could not create JStyle", ex);
-            }
-        }
-
-        openOfficePreferences = new OpenOfficePreferences(
-                get(OO_EXECUTABLE_PATH),
-                getBoolean(OO_USE_ALL_OPEN_BASES),
-                getBoolean(OO_SYNC_WHEN_CITING),
-                getStringList(OO_EXTERNAL_STYLE_FILES),
-                get(OO_BIBLIOGRAPHY_STYLE_FILE),
-                currentStyle,
-                getBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES),
-                get(OO_CSL_BIBLIOGRAPHY_TITLE),
-                get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT),
-                get(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT),
-                getStringList(OO_EXTERNAL_CSL_STYLES),
-                getBoolean(OO_ADD_SPACE_AFTER));
+        openOfficePreferences = getOpenOfficePreferencesFromBackingStore(OpenOfficePreferences.getDefault(), journalAbbreviationRepository);
 
         EasyBind.listen(openOfficePreferences.executablePathProperty(), (_, _, newValue) -> put(OO_EXECUTABLE_PATH, newValue));
         EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (_, _, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
@@ -2420,6 +2387,38 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(openOfficePreferences.cslBibliographyBodyFormatProperty(), (_, _, newValue) -> put(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, newValue));
 
         return openOfficePreferences;
+    }
+
+    private OpenOfficePreferences getOpenOfficePreferencesFromBackingStore(OpenOfficePreferences defaults, JournalAbbreviationRepository journalAbbreviationRepository) {
+        String currentStylePath = get(OO_CURRENT_STYLE, defaults.getCurrentStyle().getPath());
+        OOStyle currentStyle = defaults.getCurrentStyle();
+
+        // Reassign currentStyle based on actual last used CSL style or JStyle
+        if (CSLStyleUtils.isCitationStyleFile(currentStylePath)) {
+            currentStyle = CSLStyleUtils.createCitationStyleFromFile(currentStylePath)
+                                        .orElse(CSLStyleLoader.getDefaultStyle());
+        } else if (journalAbbreviationRepository != null) {
+            // For now, must be a JStyle. In future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
+            try {
+                currentStyle = new JStyle(currentStylePath, getLayoutFormatterPreferences(), journalAbbreviationRepository);
+            } catch (IOException ex) {
+                LOGGER.warn("Could not create JStyle", ex);
+            }
+        }
+
+        return new OpenOfficePreferences(
+                get(OO_EXECUTABLE_PATH, defaults.getExecutablePath()),
+                getBoolean(OO_USE_ALL_OPEN_BASES, defaults.getUseAllDatabases()),
+                getBoolean(OO_SYNC_WHEN_CITING, defaults.getSyncWhenCiting()),
+                getStringList(OO_EXTERNAL_STYLE_FILES),
+                get(OO_BIBLIOGRAPHY_STYLE_FILE, defaults.getCurrentJStyle()),
+                currentStyle,
+                getBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES, defaults.getAlwaysAddCitedOnPages()),
+                get(OO_CSL_BIBLIOGRAPHY_TITLE, defaults.getCslBibliographyTitle()),
+                get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, defaults.getCslBibliographyHeaderFormat()),
+                get(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, defaults.getCslBibliographyBodyFormat()),
+                getStringList(OO_EXTERNAL_CSL_STYLES),
+                getBoolean(OO_ADD_SPACE_AFTER, defaults.getAddSpaceAfter()));
     }
 
     @Override
