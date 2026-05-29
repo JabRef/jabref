@@ -71,18 +71,20 @@ public class OpenOfficePreferences {
 
     private OpenOfficePreferences() {
         this(
-                OS.WINDOWS ? DEFAULT_WIN_EXEC_PATH : OS.OS_X ? DEFAULT_OSX_EXEC_PATH : DEFAULT_LINUX_EXEC_PATH,
-                true,
-                false,
-                List.of(),
-                JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,
-                CSLStyleLoader.getDefaultStyle(),
-                false,
-                "References",
-                "Heading 2",
-                "Text body",
-                List.of(),
-                true
+                OS.WINDOWS ? DEFAULT_WIN_EXEC_PATH              // executablePath
+                           : OS.OS_X ? DEFAULT_OSX_EXEC_PATH
+                                     : DEFAULT_LINUX_EXEC_PATH,
+                true,                             // useAllDatabases
+                false,                                          // syncWhenCiting
+                List.of(),                                      // externalJStyles
+                JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,     // currentJStyle
+                CSLStyleLoader.getDefaultStyle(),               // currentStyle
+                false,                                          // alwaysAddCitedOnPages
+                "References",                                   // cslBibliographyTitle
+                "Heading 2",                                    // cslBibliographyHeaderFormat
+                "Text body",                                    // cslBibliographyBodyFormat
+                List.of(),                                      // externalCslStyles
+                true                                            // addSpaceAfter
         );
     }
 
