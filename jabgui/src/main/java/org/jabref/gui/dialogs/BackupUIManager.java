@@ -2,16 +2,17 @@ package org.jabref.gui.dialogs;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.ButtonType;
 
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.backup.BackupResolverDialog;
 import org.jabref.gui.collab.DatabaseChange;
@@ -47,7 +48,8 @@ public class BackupUIManager {
                                                                  GuiPreferences preferences,
                                                                  FileUpdateMonitor fileUpdateMonitor,
                                                                  UndoManager undoManager,
-                                                                 StateManager stateManager) {
+                                                                 StateManager stateManager,
+                                                                 LibraryTabContainer tabContainer) {
         Optional<ButtonType> actionOpt = showBackupResolverDialog(
                 dialogService,
                 preferences.getExternalApplicationsPreferences(),
@@ -58,7 +60,7 @@ public class BackupUIManager {
                 BackupManager.restoreBackup(originalPath, preferences.getFilePreferences().getBackupDirectory());
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
+                return showReviewBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager, tabContainer);
             }
             return Optional.empty();
         });
@@ -78,7 +80,8 @@ public class BackupUIManager {
             GuiPreferences preferences,
             FileUpdateMonitor fileUpdateMonitor,
             UndoManager undoManager,
-            StateManager stateManager) {
+            StateManager stateManager,
+            LibraryTabContainer tabContainer) {
         try {
             ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
 
@@ -94,12 +97,27 @@ public class BackupUIManager {
 
             return UiTaskExecutor.runInJavaFXThread(() -> {
                 List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory);
+                // [impl->req~backup.review.focus-correct-tab~1]
+                tabContainer.getLibraryTabs().stream()
+                    .filter(tab -> tab.getBibDatabaseContext()
+                        .getDatabasePath()
+                        .map(p -> p.equals(originalPath))
+                        .orElse(false))
+                    .findFirst()
+                    .ifPresent(tabContainer::showLibraryTab);
                 DatabaseChangesResolverDialog reviewBackupDialog = new DatabaseChangesResolverDialog(
                         changes,
                         originalDatabase, "Review Backup"
                 );
                 Optional<Boolean> allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
-                LibraryTab saveState = stateManager.activeTabProperty().get().get();
+                // [impl->req~backup.review.focus-correct-tab~1]
+                LibraryTab saveState = tabContainer.getLibraryTabs().stream()
+                    .filter(tab -> tab.getBibDatabaseContext()
+                        .getDatabasePath()
+                        .map(p -> p.equals(originalPath))
+                        .orElse(false))
+                    .findFirst()
+                    .orElseGet(() -> stateManager.activeTabProperty().get().get());
                 final NamedCompoundEdit CE = new NamedCompoundEdit(Localization.lang("Merged external changes"));
                 changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(CE));
                 CE.end();
@@ -117,7 +135,7 @@ public class BackupUIManager {
                 }
 
                 // In case not all changes are resolved, start from scratch
-                return showRestoreBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager);
+                return showRestoreBackupDialog(dialogService, originalPath, preferences, fileUpdateMonitor, undoManager, stateManager, tabContainer);
             });
         } catch (IOException e) {
             LOGGER.error("Error while loading backup or current database", e);

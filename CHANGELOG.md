@@ -54,7 +54,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - JabRef keeps the field `review` in BibTeX files. [#15609](https://github.com/JabRef/jabref/pull/15609)
 
 ### Fixed
-
+- We Fixed backup review dialog not focusing the correct library tab and incorrectly marking the wrong tab as modified. [#15846](https://github.com/JabRef/jabref/issues/15846)
 - We fixed an issue where the citation key generator did not show the date for child entries due to orphaned crossref links. [#9071](https://github.com/JabRef/jabref/issues/9071)
 - We fixed an issue with the `Normalize date` save action truncating date ranges. [#8902](https://github.com/JabRef/jabref/issues/8902)
 - We fixed an issue where removed CSL files were not immediately cleared from the UI upon style removal. [#15438](https://github.com/JabRef/jabref/issues/15438)
