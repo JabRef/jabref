@@ -16,8 +16,8 @@
         -jr-icon-background-active: #0001;
         -jr-icon-background-armed: #0002;
 
-        -jr-row-odd-background: derive(#EBEBEB, 90%);
-        -jr-row-even-background: derive(#EBEBEB, 95%);
+        -jr-row-odd-background: -fx-control-inner-background-alt;
+        -jr-row-even-background: -fx-control-inner-background;
 
         -jr-sidepane-background: #DDDDDD;
         -jr-sidepane-header-background: #D5D5D5;
@@ -1176,6 +1176,14 @@ We want to have a look that matches our icons in the tool-bar */
 #documentViewerDialog .document-viewer .page {
     -fx-padding: 0em 0em 1em 0em;
     -fx-background-insets: 0;
+}
+
+/* EntryEditor */
+#entryEditor .editorPane {
+    -fx-hgap: 10;
+    -fx-vgap: 6;
+    -fx-background-color: -fx-control-inner-background;
+    -fx-padding: 5 5 5 15;
 }
 
 #entryEditor Text {

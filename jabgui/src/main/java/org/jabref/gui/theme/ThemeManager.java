@@ -50,6 +50,7 @@ public class ThemeManager {
     public static Map<String, Node> getDownloadIconTitleMap = Map.of(
             Localization.lang("Downloading"), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode()
     );
+    private static final StyleSheet JABREF_BASE_STYLE_SHEET = StyleSheet.create("internal/jabref-base.css").orElseThrow();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
     private final WorkspacePreferences workspacePreferences;
@@ -84,6 +85,9 @@ public class ThemeManager {
         List<String> toAdd = new ArrayList<>(1);
 
         toAdd.add(theme.getStyleSheet().getSceneStylesheet().toExternalForm());
+        if (theme == ThemePreset.JABREF) {
+            toAdd.add(JABREF_BASE_STYLE_SHEET.getSceneStylesheet().toExternalForm());
+        }
         if (customTheme != null) {
             toAdd.add(customTheme.getSceneStylesheet().toExternalForm());
         }
