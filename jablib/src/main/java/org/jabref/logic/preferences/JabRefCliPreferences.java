@@ -509,16 +509,6 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.warn("Could not import preferences from jabref.xml", e);
         }
 
-        defaults.put(SEARCH_DISPLAY_MODE, Boolean.TRUE);
-        defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
-        defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
-        defaults.put(SEARCH_FULLTEXT, Boolean.FALSE);
-        defaults.put(SEARCH_USE_POSTGRES, Boolean.FALSE);
-        defaults.put(SEARCH_KEEP_SEARCH_STRING, Boolean.FALSE);
-        defaults.put(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, Boolean.TRUE);
-        defaults.put(SEARCH_WINDOW_HEIGHT, 176.0);
-        defaults.put(SEARCH_WINDOW_WIDTH, 600.0);
-        defaults.put(SEARCH_WINDOW_DIVIDER_POS, 0.5);
         defaults.put(SEARCH_CATALOGS, convertListToString(List.of(
                 ACMPortalFetcher.FETCHER_NAME,
                 SpringerNatureWebFetcher.FETCHER_NAME,
@@ -950,6 +940,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 CitationKeyPatternPreferences.getDefault()
                                              .withKeywordDelimiter(getBibEntryPreferences().keywordSeparatorProperty()));
         getAiPreferences().setAll(AiPreferences.getDefault());
+        getSearchPreferences().setAll(SearchPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences())).setAll(
                 OpenOfficePreferences.getDefault());
     }
@@ -977,6 +968,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getRemotePreferences().setAll(getRemotePreferencesFromBackingStore(getRemotePreferences()));
         getCitationKeyPatternPreferences().setAll(getCitationKeyPatternPreferencesFromBackingStore(getCitationKeyPatternPreferences()));
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
+        getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences());
         getOpenOfficePreferences(repository).setAll(
                 getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
@@ -2048,21 +2040,12 @@ public class JabRefCliPreferences implements CliPreferences {
             return searchPreferences;
         }
 
-        searchPreferences = new SearchPreferences(
-                getBoolean(SEARCH_DISPLAY_MODE) ? SearchDisplayMode.FILTER : SearchDisplayMode.FLOAT,
-                getBoolean(SEARCH_REG_EXP),
-                getBoolean(SEARCH_CASE_SENSITIVE),
-                getBoolean(SEARCH_FULLTEXT),
-                getBoolean(SEARCH_USE_POSTGRES),
-                getBoolean(SEARCH_KEEP_SEARCH_STRING),
-                getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP),
-                getDouble(SEARCH_WINDOW_HEIGHT),
-                getDouble(SEARCH_WINDOW_WIDTH),
-                getDouble(SEARCH_WINDOW_DIVIDER_POS));
+        searchPreferences = getSearchPreferencesFromBackingStore(SearchPreferences.getDefault());
 
+        EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (_, _, newValue) -> putBoolean(SEARCH_DISPLAY_MODE, newValue == SearchDisplayMode.FILTER));
         searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchFlags>) _ ->
                 putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchFlags.FULLTEXT)));
-        EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (_, _, newValue) -> putBoolean(SEARCH_DISPLAY_MODE, newValue == SearchDisplayMode.FILTER));
+        // Regular expression and case-sensitive search flags should always be set to default values on startup
         EasyBind.listen(searchPreferences.keepSearchStringProperty(), (_, _, newValue) -> putBoolean(SEARCH_KEEP_SEARCH_STRING, newValue));
         EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (_, _, _) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));
         EasyBind.listen(searchPreferences.getSearchWindowHeightProperty(), (_, _, _) -> putDouble(SEARCH_WINDOW_HEIGHT, searchPreferences.getSearchWindowHeight()));
@@ -2071,6 +2054,20 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(searchPreferences.usePostgresSearchProperty(), (_, _, newValue) -> putBoolean(SEARCH_USE_POSTGRES, newValue));
 
         return searchPreferences;
+    }
+
+    private SearchPreferences getSearchPreferencesFromBackingStore(SearchPreferences defaults) {
+        return new SearchPreferences(
+                getBoolean(SEARCH_DISPLAY_MODE, defaults.getSearchDisplayMode() == SearchDisplayMode.FILTER) ? SearchDisplayMode.FILTER : SearchDisplayMode.FLOAT,
+                getBoolean(SEARCH_REG_EXP, defaults.isRegularExpression()),
+                getBoolean(SEARCH_CASE_SENSITIVE, defaults.isCaseSensitive()),
+                getBoolean(SEARCH_FULLTEXT, defaults.isFulltext()),
+                getBoolean(SEARCH_USE_POSTGRES, defaults.shouldUsePostgresSearch()),
+                getBoolean(SEARCH_KEEP_SEARCH_STRING, defaults.shouldKeepSearchString()),
+                getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, defaults.shouldKeepWindowOnTop()),
+                getDouble(SEARCH_WINDOW_HEIGHT, defaults.getSearchWindowHeight()),
+                getDouble(SEARCH_WINDOW_WIDTH, defaults.getSearchWindowWidth()),
+                getDouble(SEARCH_WINDOW_DIVIDER_POS, defaults.getSearchWindowDividerPosition()));
     }
 
     @Override
