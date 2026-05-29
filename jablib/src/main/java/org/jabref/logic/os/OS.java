@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.metadata.UserHostInfo;
 
 import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.Keyring;
@@ -39,7 +40,15 @@ public class OS {
 
     private static final String DEFAULT_EXECUTABLE_EXTENSION = ".exe";
 
-    public static String getHostName() {
+    public static UserHostInfo getUserHostInfo() {
+        return new UserHostInfo(System.getProperty("user.name"), getHostName());
+    }
+
+    public static UserHostInfo getUserHostInfo(String customOwner) {
+        return new UserHostInfo(customOwner, getHostName());
+    }
+
+    private static String getHostName() {
         String hostName;
         // Following code inspired by https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/SystemUtils.html#getHostName--
         // See also https://stackoverflow.com/a/20793241/873282
