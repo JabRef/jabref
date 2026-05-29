@@ -2,6 +2,7 @@ package org.jabref.gui.dialogs;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
