@@ -56,7 +56,7 @@
 //DEPS org.jabref:afterburner.fx:2.0.0
 //DEPS tools.jackson.core:jackson-core:3.1.4
 //DEPS tools.jackson.core:jackson-databind:3.1.4
-//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.1.3
+//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.1.4
 
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
