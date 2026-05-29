@@ -9,7 +9,6 @@ import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.ButtonType;
 
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
@@ -99,7 +98,7 @@ public class BackupUIManager {
             return UiTaskExecutor.runInJavaFXThread(() -> {
                 List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory);
                 // [impl->req~backup.review.focus-correct-tab~1]
-                tabContainer.getLibraryTabs().stream()
+                tabContainer.getLibraryTabs().stream()l̥
                     .filter(tab -> tab.getBibDatabaseContext()
                         .getDatabasePath()
                         .map(p -> p.equals(originalPath))
