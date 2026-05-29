@@ -31,7 +31,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We introduced a leightweight search engine without fulltext search in linked files as default variant. [#15599](https://github.com/JabRef/jabref/pull/15599)
 
 ### Fixed
-
+- We fixed backup review dialog not focusing the correct library tab and incorrectly marking the wrong tab as modified. [#15846](https://github.com/JabRef/jabref/issues/15846)
 - EndNote and Refer importers now respect the citation key preferences for unwanted characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
 - We fixed the Hayagriva YAML exporter to correctly nest DOI, ISBN, and ISSN under `serial-number` as required by the Hayagriva file format specification. [#15713](https://github.com/JabRef/jabref/issues/15713)
 - We fixed an issue where newly added entries could not be found in search. [#15719](https://github.com/JabRef/jabref/issues/15719)
@@ -95,8 +95,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - JabRef keeps the field `review` in BibTeX files. [#15609](https://github.com/JabRef/jabref/pull/15609)
 
 ### Fixed
-- We Fixed backup review dialog not focusing the correct library tab and incorrectly marking the wrong tab as modified. [#15846](https://github.com/JabRef/jabref/issues/15846)
-
 - We fixed an issue in the LibreOffice integration where the user could insert a CSL citation inside an existing one. [#15701](https://github.com/JabRef/jabref/issues/15701)
 - We fixed an issue where multiple entries are not cited as a single citation for CSL in-text. [#15703](https://github.com/JabRef/jabref/issues/15703)
 - We fixed an issue where the citation key generator did not show the date for child entries due to orphaned crossref links. [#9071](https://github.com/JabRef/jabref/issues/9071)
