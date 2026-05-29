@@ -2,6 +2,7 @@ package org.jabref.gui.dialogs;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
@@ -99,9 +100,9 @@ public class BackupUIManager {
                 // [impl->req~backup.review.focus-correct-tab~1]
                 tabContainer.getLibraryTabs().stream()
                             .filter(tab -> tab.getBibDatabaseContext()
-                                                .getDatabasePath()
-                                                .map(p -> p.equals(originalPath))
-                                                .orElse(false))
+                                              .getDatabasePath()
+                                              .map(p -> p.equals(originalPath))
+                                              .orElse(false))
                             .findFirst()
                             .ifPresent(tabContainer::showLibraryTab);
                 DatabaseChangesResolverDialog reviewBackupDialog = new DatabaseChangesResolverDialog(
@@ -111,12 +112,12 @@ public class BackupUIManager {
                 Optional<Boolean> allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 // [impl->req~backup.review.focus-correct-tab~1]
                 LibraryTab saveState = tabContainer.getLibraryTabs().stream()
-                                                    .filter(tab -> tab.getBibDatabaseContext()
-                                                                        .getDatabasePath()
-                                                                        .map(p -> p.equals(originalPath))
-                                                                        .orElse(false))
-                                                    .findFirst()
-                                                    .orElseGet(() -> stateManager.activeTabProperty().get().get());
+                                                   .filter(tab -> tab.getBibDatabaseContext()
+                                                                     .getDatabasePath()
+                                                                     .map(p -> p.equals(originalPath))
+                                                                     .orElse(false))
+                                                   .findFirst()
+                                                   .orElseGet(() -> stateManager.activeTabProperty().get().get());
                 final NamedCompoundEdit CE = new NamedCompoundEdit(Localization.lang("Merged external changes"));
                 changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(CE));
                 CE.end();
