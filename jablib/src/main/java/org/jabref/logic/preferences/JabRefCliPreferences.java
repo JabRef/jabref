@@ -1123,18 +1123,14 @@ public class JabRefCliPreferences implements CliPreferences {
                ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES)
                : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
     }
-    // endregion
 
     private static Preferences getPrefsNodeForCustomizedEntryTypesV2(BibDatabaseMode mode) {
         return mode == BibDatabaseMode.BIBTEX
                ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES_V2)
                : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES_V2);
     }
+    // endregion
 
-    //*************************************************************************************************************
-    // Misc
-    //*************************************************************************************************************
-    // region Misc
     // region LibraryPreferences
     @Override
     public LibraryPreferences getLibraryPreferences() {
