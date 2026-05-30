@@ -33,7 +33,7 @@ erDiagram
     ENTRY ||--o{ FIELD : contains
     ENTRY {
         serial shared_id
-        varchar type "NOT NULL"
+        varchar type "NOT NULL, CHECK (TYPE <> '')"
         int version
     }
     FIELD {

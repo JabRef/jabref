@@ -16,7 +16,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.DatabaseTest;
 
@@ -56,27 +55,15 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void insertingEmptyTypeThrowsException() {
-        // Arrange: create a bad entry
-        BibEntry badEntry = new BibEntry();
-        badEntry.setType(new EntryType() {
-            @Override
-            public String getName() {
-                return "";
-            }
+    void insertingEmptyTypeThrowsConstraintViolation() {
+        SQLException thrown = assertThrows(SQLException.class, () -> {
 
-            @Override
-            public String getDisplayName() {
-                return "Ghost";
-            }
-        });
+            dbmsConnection.getConnection().createStatement().executeUpdate(
+                    "INSERT INTO jabref.\"ENTRY\" (\"SHARED_ID\", \"TYPE\", \"VERSION\") VALUES (9999, '', 1)");
+        }, "Expected the database to throw an SQLException for the empty TYPE constraint.");
 
-        // Act: attempt to insert it (the exception will be caught and logged internally)
-        dbmsProcessor.insertIntoEntryTable(List.of(badEntry));
-
-        // Assert: fetch all entries from the DB and verify it is completely empty
-        List<BibEntry> savedEntries = dbmsProcessor.getSharedEntries();
-        assertTrue(savedEntries.isEmpty(), "Database should have blocked the ghost entry, keeping the table empty.");
+        assertTrue(thrown.getMessage().contains("ENTRY_TYPE_check"),
+                "The exception should mention the ENTRY_TYPE_check constraint violation.");
     }
 
     @Test

@@ -41,7 +41,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
         connection.createStatement().executeUpdate(
                 "CREATE TABLE IF NOT EXISTS " + escape_Table("ENTRY") + " (" +
                         "\"SHARED_ID\" SERIAL PRIMARY KEY, " +
-                        "\"TYPE\" VARCHAR NOT NULL CHECK (\"TYPE\" <> ''), " +
+                        "\"TYPE\" VARCHAR, " +
                         "\"VERSION\" INTEGER DEFAULT 1)");
 
         connection.createStatement().executeUpdate(
@@ -77,8 +77,8 @@ public class PostgreSQLProcessor extends DBMSProcessor {
                 metadata = getSharedMetaData();
             }
 
-            if (VERSION_DB_STRUCT_DEFAULT == 0 || VERSION_DB_STRUCT_DEFAULT == 1) {
-                LOGGER.info("Migrating from VersionDBStructure 1 to 2 (Applying TYPE constraints)");
+            if (VERSION_DB_STRUCT_DEFAULT <= 1) {
+                LOGGER.info("Applying database structure version 2 (enforcing TYPE constraints)");
 
                 connection.createStatement().executeUpdate(
                         "UPDATE " + escape_Table("ENTRY") + " SET \"TYPE\" = 'Unknown' WHERE \"TYPE\" IS NULL OR \"TYPE\" = ''"
