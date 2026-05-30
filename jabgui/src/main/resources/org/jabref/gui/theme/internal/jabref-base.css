@@ -16,8 +16,8 @@
         -jr-icon-background-active: #0001;
         -jr-icon-background-armed: #0002;
 
-        -jr-row-odd-background: derive(#EBEBEB, 90%);
-        -jr-row-even-background: derive(#EBEBEB, 95%);
+        -jr-row-odd-background: -fx-control-inner-background-alt;
+        -jr-row-even-background: -fx-control-inner-background;
 
         -jr-sidepane-background: #DDDDDD;
         -jr-sidepane-header-background: #D5D5D5;
@@ -1178,6 +1178,14 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-insets: 0;
 }
 
+/* EntryEditor */
+#entryEditor .editorPane {
+    -fx-hgap: 10;
+    -fx-vgap: 6;
+    -fx-background-color: -fx-control-inner-background;
+    -fx-padding: 5 5 5 15;
+}
+
 #entryEditor Text {
     -fx-text-fill: -fx-text-base-color;
     -fx-fill: -fx-text-base-color;
@@ -1627,9 +1635,28 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -fx-accent;
 }
 
+/* PreferenceDialog */
+#preferencesDialog #sidepane {
+    -fx-background-color: -jr-sidepane-background;
+}
+
+#preferencesDialog #preferenceTabList {
+    -fx-background-color: transparent;
+}
+
+#preferencesDialog #preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-padding: 8 8 8 8;
+    -fx-background: transparent;
+    -fx-text-fill: -fx-text-base-color;
+}
+
 #preferencesDialog .button-bar > .container {
     -fx-border-width: 1 0 0 0;
     -fx-border-color: -jr-sidepane-background;
+}
+
+#preferencesDialog #preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected {
+    -fx-background: -fx-control-inner-background;
 }
 
 #preferencesDialog > .split-pane > .split-pane-divider {
