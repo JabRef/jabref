@@ -90,7 +90,6 @@ import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
@@ -521,11 +520,6 @@ public class JabRefCliPreferences implements CliPreferences {
             defaults.put(FONT_FAMILY, "SansSerif");
         }
 
-        // SSL
-        defaults.put(SSL_TRUSTSTORE_PATH, Directories
-                .getSslDirectory()
-                .resolve("truststore.jks").toString());
-
         // system locale as default
         defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
 
@@ -904,7 +898,7 @@ public class JabRefCliPreferences implements CliPreferences {
                                                    .withLastUsedDirectory(getDefaultPath())
         );
         getAiPreferences().setAll(AiPreferences.getDefault());
-
+        getSSLPreferences().setAll(SSLPreferences.getDefault());
         getSearchPreferences().setAll(SearchPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences())).setAll(
                 OpenOfficePreferences.getDefault());
@@ -935,6 +929,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getCitationKeyPatternPreferences().setAll(getCitationKeyPatternPreferencesFromBackingStore(getCitationKeyPatternPreferences()));
         getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
+        getSSLPreferences().setAll(getSSLPreferencesFromBackingStore(getSSLPreferences()));
         getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences());
         getOpenOfficePreferences(repository).setAll(
@@ -1351,11 +1346,14 @@ public class JabRefCliPreferences implements CliPreferences {
             return sslPreferences;
         }
 
-        sslPreferences = new SSLPreferences(
-                get(SSL_TRUSTSTORE_PATH)
-        );
+        sslPreferences = getSSLPreferencesFromBackingStore(SSLPreferences.getDefault());
 
         return sslPreferences;
+    }
+
+    private SSLPreferences getSSLPreferencesFromBackingStore(SSLPreferences defaults) {
+        return new SSLPreferences(
+                get(SSL_TRUSTSTORE_PATH, defaults.getTruststorePath()));
     }
     // endregion
 
