@@ -949,6 +949,14 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
+    private Path getDefaultPath() {
+        return Path.of("/");
+    }
+
+    protected Language getLanguage() {
+        return Language.getLanguageFor(get(LANGUAGE));
+    }
+
     // region JournalAbbreviationPreferences
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
@@ -1492,11 +1500,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
-    // InternalPreferences
-    protected Path getDefaultPath() {
-        return Path.of("/");
-    }
-
+    // region InternalPreferences
     @Override
     public InternalPreferences getInternalPreferences() {
         if (internalPreferences != null) {
@@ -1535,11 +1539,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(MEMORY_STICK_MODE, defaults.isMemoryStickMode())
         );
     }
+    // endregion
 
-    protected Language getLanguage() {
-        return Language.getLanguageFor(get(LANGUAGE));
-    }
-
+    // region FieldPreferences
     @Override
     public FieldPreferences getFieldPreferences() {
         if (fieldPreferences != null) {
@@ -1566,8 +1568,9 @@ public class JabRefCliPreferences implements CliPreferences {
                         FieldFactory.serializeFieldsList(defaults.getNonWrappableFields()))))
         );
     }
+    // endregion
 
-    // region Linked files preferences
+    // region (Linked)FilePreferences
     protected boolean moveToTrashSupported() {
         return false;
     }
@@ -1897,8 +1900,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // endregion
 
-    // region other preferences
-
+    // region AiPreferences
     @Override
     public AiPreferences getAiPreferences() {
         if (aiPreferences != null) {
@@ -1994,7 +1996,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(AI_FOLLOW_UP_QUESTIONS_TEMPLATE, defaults.getFollowUpQuestionsTemplate())
         );
     }
+    // endregion
 
+    // region SearchPreferences
     @Override
     public SearchPreferences getSearchPreferences() {
         if (searchPreferences != null) {
@@ -2030,6 +2034,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getDouble(SEARCH_WINDOW_WIDTH, defaults.getSearchWindowWidth()),
                 getDouble(SEARCH_WINDOW_DIVIDER_POS, defaults.getSearchWindowDividerPosition()));
     }
+    // endregion
 
     @Override
     public XmpPreferences getXmpPreferences() {
