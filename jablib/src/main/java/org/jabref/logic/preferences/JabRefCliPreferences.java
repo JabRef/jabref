@@ -546,7 +546,6 @@ public class JabRefCliPreferences implements CliPreferences {
         // Remembers working directory of last import
         defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
 
-        defaults.put(KEYWORD_SEPARATOR, ", ");
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
 
         defaults.put(PROTECTED_TERMS_ENABLED_INTERNAL, convertListToString(ProtectedTermsLoader.getInternalLists()));
@@ -887,6 +886,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getOwnerPreferences().setAll(OwnerPreferences.getDefault());
         getTimestampPreferences().setAll(TimestampPreferences.getDefault());
         getRemotePreferences().setAll(RemotePreferences.getDefault());
+        getBibEntryPreferences().setAll(BibEntryPreferences.getDefault());
         getCitationKeyPatternPreferences().setAll(
                 CitationKeyPatternPreferences.getDefault()
                                              .withKeywordDelimiter(getBibEntryPreferences().keywordSeparatorProperty())
@@ -928,6 +928,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getRemotePreferences().setAll(getRemotePreferencesFromBackingStore(getRemotePreferences()));
         getCitationKeyPatternPreferences().setAll(getCitationKeyPatternPreferencesFromBackingStore(getCitationKeyPatternPreferences()));
         getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
+        getBibEntryPreferences().setAll(getBibEntryPreferencesFromBackingStore(getBibEntryPreferences()));
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
         getSSLPreferences().setAll(getSSLPreferencesFromBackingStore(getSSLPreferences()));
         getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
@@ -1477,13 +1478,17 @@ public class JabRefCliPreferences implements CliPreferences {
             return bibEntryPreferences;
         }
 
-        bibEntryPreferences = new BibEntryPreferences(
-                get(KEYWORD_SEPARATOR).charAt(0)
-        );
+        bibEntryPreferences = getBibEntryPreferencesFromBackingStore(BibEntryPreferences.getDefault());
 
         EasyBind.listen(bibEntryPreferences.keywordSeparatorProperty(), (_, _, newValue) -> put(KEYWORD_SEPARATOR, String.valueOf(newValue)));
 
         return bibEntryPreferences;
+    }
+
+    private BibEntryPreferences getBibEntryPreferencesFromBackingStore(BibEntryPreferences defaults) {
+        return new BibEntryPreferences(
+                get(KEYWORD_SEPARATOR, String.valueOf(defaults.getKeywordSeparator())).charAt(0)
+        );
     }
     // endregion
 
