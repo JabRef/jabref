@@ -20,7 +20,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
     private PostgresSQLNotificationListener listener;
 
     private int VERSION_DB_STRUCT_DEFAULT = -1;
-    private final int CURRENT_VERSION_DB_STRUCT = 1;
+    private final int CURRENT_VERSION_DB_STRUCT = 2;
 
     public PostgreSQLProcessor(DatabaseConnection connection) {
         super(connection);
@@ -32,9 +32,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
     @Override
     public void setUp() throws SQLException {
 
-        if (CURRENT_VERSION_DB_STRUCT == 1 && checkTableAvailability("ENTRY", "FIELD", "METADATA")) {
-            // checkTableAvailability does not distinguish if same table name exists in different schemas
-            // VERSION_DB_STRUCT_DEFAULT must be forced
+        if (CURRENT_VERSION_DB_STRUCT >= 1 && checkTableAvailability("ENTRY", "FIELD", "METADATA")) {
             VERSION_DB_STRUCT_DEFAULT = 0;
         }
 
@@ -45,10 +43,6 @@ public class PostgreSQLProcessor extends DBMSProcessor {
                         "\"SHARED_ID\" SERIAL PRIMARY KEY, " +
                         "\"TYPE\" VARCHAR NOT NULL CHECK (\"TYPE\" <> ''), " +
                         "\"VERSION\" INTEGER DEFAULT 1)");
-
-        connection.createStatement().executeUpdate(
-                "UPDATE " + escape_Table("ENTRY") + " SET \"TYPE\" = 'Unknown' WHERE \"TYPE\" IS NULL OR \"TYPE\" = ''"
-        );
 
         connection.createStatement().executeUpdate(
                 "CREATE TABLE IF NOT EXISTS " + escape_Table("FIELD") + " (" +
@@ -65,7 +59,6 @@ public class PostgreSQLProcessor extends DBMSProcessor {
 
         if (metadata.get(MetaData.VERSION_DB_STRUCT) != null) {
             try {
-                // replace semicolon so we can parse it
                 VERSION_DB_STRUCT_DEFAULT = Integer.parseInt(metadata.get(MetaData.VERSION_DB_STRUCT).replace(";", ""));
             } catch (Exception e) {
                 LOGGER.warn("[VERSION_DB_STRUCT_DEFAULT] not Integer!");
@@ -75,14 +68,29 @@ public class PostgreSQLProcessor extends DBMSProcessor {
         }
 
         if (VERSION_DB_STRUCT_DEFAULT < CURRENT_VERSION_DB_STRUCT) {
-            // We can to migrate from old table in new table
-            if (VERSION_DB_STRUCT_DEFAULT == 0 && CURRENT_VERSION_DB_STRUCT == 1) {
+            if (VERSION_DB_STRUCT_DEFAULT == 0) {
                 LOGGER.info("Migrating from VersionDBStructure == 0");
                 connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("ENTRY") + " SELECT * FROM \"ENTRY\"");
                 connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("FIELD") + " SELECT * FROM \"FIELD\"");
                 connection.createStatement().executeUpdate("INSERT INTO " + escape_Table("METADATA") + " SELECT * FROM \"METADATA\"");
                 connection.createStatement().execute("SELECT setval(\'jabref.\"ENTRY_SHARED_ID_seq\"\', (select max(\"SHARED_ID\") from jabref.\"ENTRY\"))");
                 metadata = getSharedMetaData();
+            }
+
+            if (VERSION_DB_STRUCT_DEFAULT == 0 || VERSION_DB_STRUCT_DEFAULT == 1) {
+                LOGGER.info("Migrating from VersionDBStructure 1 to 2 (Applying TYPE constraints)");
+
+                connection.createStatement().executeUpdate(
+                        "UPDATE " + escape_Table("ENTRY") + " SET \"TYPE\" = 'Unknown' WHERE \"TYPE\" IS NULL OR \"TYPE\" = ''"
+                );
+
+                connection.createStatement().executeUpdate(
+                        "ALTER TABLE " + escape_Table("ENTRY") + " ALTER COLUMN \"TYPE\" SET NOT NULL"
+                );
+
+                connection.createStatement().executeUpdate(
+                        "ALTER TABLE " + escape_Table("ENTRY") + " ADD CONSTRAINT \"ENTRY_TYPE_check\" CHECK (\"TYPE\" <> '')"
+                );
             }
 
             metadata.put(MetaData.VERSION_DB_STRUCT, String.valueOf(CURRENT_VERSION_DB_STRUCT));
