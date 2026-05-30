@@ -20,7 +20,7 @@ val pdfbox = "3.0.7"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.15.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.15.1"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.3.0"))
     api(platform("org.junit:junit-bom:6.1.0"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.1"))
@@ -39,7 +39,8 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.1")
 
-    api("com.dlsc.gemsfx:gemsfx:4.0.5")
+    api("com.dlsc.gemsfx:gemsfx:4.1.0")
+    api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
     api("com.fasterxml:aalto-xml:1.4.0")
@@ -120,7 +121,7 @@ dependencies.constraints {
     api("org.glassfish.hk2:hk2-api:4.0.1")
     api("org.glassfish.hk2:hk2-locator:4.0.1")
     api("org.glassfish.hk2:hk2-utils:4.0.1")
-    api("org.glassfish.jaxb:jaxb-runtime:4.0.8")
+    api("org.glassfish.jaxb:jaxb-runtime:4.0.9")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.1.0.Final")
     api("org.hisp.dhis:json-tree:1.9.4")
@@ -138,7 +139,7 @@ dependencies.constraints {
     api("org.libreoffice:libreoffice:26.2.2")
     api("org.libreoffice:unoloader:26.2.2")
     api("org.mockito:mockito-core:5.23.0")
-    api("org.ow2.asm:asm:9.10")
+    api("org.ow2.asm:asm:9.10.1")
     api("org.postgresql:postgresql:42.7.11")
     api("org.slf4j:jul-to-slf4j:2.0.18")
     api("org.slf4j:slf4j-api:2.0.18")

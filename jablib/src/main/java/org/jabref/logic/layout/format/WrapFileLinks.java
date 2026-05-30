@@ -106,11 +106,11 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
     private final Map<String, String> replacements = new HashMap<>();
     private final List<Path> fileDirectories;
-    private final String mainFileDirectory;
+    private final Path mainFileDirectory;
     private String fileType;
     private List<FormatEntry> format;
 
-    public WrapFileLinks(List<Path> fileDirectories, String mainFileDirectory) {
+    public WrapFileLinks(List<Path> fileDirectories, Path mainFileDirectory) {
         this.fileDirectories = fileDirectories;
         this.mainFileDirectory = mainFileDirectory;
     }
@@ -204,7 +204,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                         case FILE_PATH:
                             List<Path> dirs;
                             if (fileDirectories.isEmpty()) {
-                                dirs = List.of(Path.of(mainFileDirectory));
+                                dirs = List.of(mainFileDirectory);
                             } else {
                                 dirs = fileDirectories;
                             }
