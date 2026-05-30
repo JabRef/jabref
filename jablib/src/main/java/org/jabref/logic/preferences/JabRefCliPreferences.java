@@ -560,10 +560,6 @@ public class JabRefCliPreferences implements CliPreferences {
         // Remembers working directory of last import
         defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
 
-        defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
-        defaults.put(SEND_LANGUAGE_DATA, Boolean.FALSE);
-        defaults.put(SEND_OS_DATA, Boolean.FALSE);
-        defaults.put(SEND_TIMEZONE_DATA, Boolean.FALSE);
         defaults.put(KEYWORD_SEPARATOR, ", ");
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
 
@@ -916,6 +912,7 @@ public class JabRefCliPreferences implements CliPreferences {
                                                    .withLastUsedDirectory(getDefaultPath())
         );
         getAiPreferences().setAll(AiPreferences.getDefault());
+        getMrDlibPreferences().setAll(MrDlibPreferences.getDefault());
         getSearchPreferences().setAll(SearchPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences())).setAll(
                 OpenOfficePreferences.getDefault());
@@ -946,6 +943,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getCitationKeyPatternPreferences().setAll(getCitationKeyPatternPreferencesFromBackingStore(getCitationKeyPatternPreferences()));
         getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
+        getMrDlibPreferences().setAll(getMrDlibPreferencesFromBackingStore(getMrDlibPreferences()));
         getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences());
         getOpenOfficePreferences(repository).setAll(
@@ -2088,11 +2086,7 @@ public class JabRefCliPreferences implements CliPreferences {
             return mrDlibPreferences;
         }
 
-        mrDlibPreferences = new MrDlibPreferences(
-                getBoolean(ACCEPT_RECOMMENDATIONS),
-                getBoolean(SEND_LANGUAGE_DATA),
-                getBoolean(SEND_OS_DATA),
-                getBoolean(SEND_TIMEZONE_DATA));
+        mrDlibPreferences = getMrDlibPreferencesFromBackingStore(MrDlibPreferences.getDefault());
 
         EasyBind.listen(mrDlibPreferences.acceptRecommendationsProperty(), (_, _, newValue) -> putBoolean(ACCEPT_RECOMMENDATIONS, newValue));
         EasyBind.listen(mrDlibPreferences.sendLanguageProperty(), (_, _, newValue) -> putBoolean(SEND_LANGUAGE_DATA, newValue));
@@ -2100,6 +2094,14 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(mrDlibPreferences.sendTimezoneProperty(), (_, _, newValue) -> putBoolean(SEND_TIMEZONE_DATA, newValue));
 
         return mrDlibPreferences;
+    }
+
+    private MrDlibPreferences getMrDlibPreferencesFromBackingStore(MrDlibPreferences defaults) {
+        return new MrDlibPreferences(
+                getBoolean(ACCEPT_RECOMMENDATIONS, defaults.shouldAcceptRecommendations()),
+                getBoolean(SEND_LANGUAGE_DATA, defaults.shouldSendLanguage()),
+                getBoolean(SEND_OS_DATA, defaults.shouldSendOs()),
+                getBoolean(SEND_TIMEZONE_DATA, defaults.shouldSendTimezone()));
     }
 
     @Override
