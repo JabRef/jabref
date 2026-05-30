@@ -47,20 +47,23 @@ import org.slf4j.LoggerFactory;
 /// @see <a href="https://docs.jabref.org/advanced/custom-themes">Custom themes</a> in
 /// the Jabref documentation.
 public class ThemeManager {
-    public static Map<String, Node> getDownloadIconTitleMap = Map.of(
+    public static Map<String, Node> downloadIconTitleMap = Map.of(
             Localization.lang("Downloading"), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode()
     );
-    private static final StyleSheet JABREF_BASE_STYLE_SHEET = StyleSheet.create("internal/jabref-base.css").orElseThrow();
+    public static final StyleSheet JABREF_BASE_STYLE_SHEET = StyleSheet.create("internal/jabref-base.css").orElseThrow();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
+
     private final WorkspacePreferences workspacePreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
+
+    private final FileUpdateListener cssLiveUpdate = this::cssLiveUpdate;
+    private final FileUpdateListener customCssLiveUpdate = this::customCssLiveUpdate;
+
     private ThemePreset theme;
     private ThemeColorScheme colorScheme = ThemeColorScheme.FOLLOW_SYSTEM;
-    private final FileUpdateListener cssLiveUpdate = this::cssLiveUpdate;
     private StyleSheet customTheme;
-    private final FileUpdateListener customCssLiveUpdate = this::customCssLiveUpdate;
 
     public ThemeManager(@NonNull WorkspacePreferences workspacePreferences,
                         @NonNull FileUpdateMonitor fileUpdateMonitor) {
@@ -80,14 +83,11 @@ public class ThemeManager {
     }
 
     /// Installs the CSS on the given scene
-    /// We always add our jabref theme so that our variables are known.
     public void updateCssOnScene(Scene scene) {
-        List<String> toAdd = new ArrayList<>(1);
+        List<String> toAdd = new ArrayList<>(3);
 
         toAdd.add(theme.getStyleSheet().getSceneStylesheet().toExternalForm());
-        if (theme == ThemePreset.JABREF) {
-            toAdd.add(JABREF_BASE_STYLE_SHEET.getSceneStylesheet().toExternalForm());
-        }
+        toAdd.add(JABREF_BASE_STYLE_SHEET.getSceneStylesheet().toExternalForm());
         if (customTheme != null) {
             toAdd.add(customTheme.getSceneStylesheet().toExternalForm());
         }

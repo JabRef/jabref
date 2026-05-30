@@ -5,11 +5,12 @@
 * All hardcoded colors should be carefully removed at one point (extract to a variable) to improve custom theming.
 */
 
-@import "internal/jabref-base.css";
+@import "internal/jabref-base-colors.css";
 
 @media (prefers-color-scheme: light) {
     * {
         -jr-base: #EBEBEB;
+        -jr-background: #F0F0F0;
         -jr-accent: #A3B7E6;
 
         -jr-checked: #50618F;
@@ -17,28 +18,29 @@
         -jr-tooltip-bg: #A3B7E6;
         -jr-tooltip-fg: #000;
 
-        -jr-scrollbar-thumb: derive(#EBEBEB, -35%);
-        -jr-scrollbar-track: derive(#EBEBEB, 85%);
+        -jr-scrollbar-thumb: #999999;
+        -jr-scrollbar-track: #FCFCFC;
 
-        -jr-inner-bg: derive(#EBEBEB, 95%);
+        -jr-inner-bg: #FEFEFE;
         -jr-mid-text-color: #404040;
         -jr-light-text-color: #FFFFFF;
-        -jr-outer-border: derive(#EBEBEB, -5%);
+        -jr-outer-border: #DFDFDF;
     }
 }
 
 @media (prefers-color-scheme: dark) {
     * {
         -jr-base: #141824;
+        -jr-background: #323C5B;
         -jr-accent: #255652;
 
         -jr-checked: #2C9490;
 
         -jr-tooltip-bg: #255652;
-        -jr-tooltip-fg: derive(#E5E7EA, 50%);
+        -jr-tooltip-fg:#EFF1F5;
 
         -jr-scrollbar-thumb: #E5E7EA;
-        -jr-scrollbar-track: derive(#272B38, -90%);
+        -jr-scrollbar-track: #040406;
 
         -jr-inner-bg: #272B38;
         -jr-mid-text-color: #7D8591;
@@ -51,13 +53,13 @@
 .root {
     -fx-base: -jr-base;
 
-    -fx-background: derive(-jr-base, 25%);
+    -fx-background: -jr-background;
     -fx-color: -jr-base;
     -fx-accent: -jr-accent;
 
-    -fx-body-color: derive(-jr-base, 20%);
-    -fx-body-color-bottomup: derive(-jr-base, 20%);
-    -fx-body-color-to-right: derive(-jr-base, 20%);
+    -fx-body-color: derive(-fx-color, 20%);
+    -fx-body-color-bottomup: derive(-fx-color, 20%);
+    -fx-body-color-to-right: derive(-fx-color, 20%);
 
     -fx-control-inner-background: -jr-inner-bg;
     -fx-control-inner-background-alt: derive(-jr-inner-bg, -5%);
@@ -102,95 +104,15 @@
 .choice-box,
 .combo-box-base,
 .combo-box-base:editable > .arrow-button {
-    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-background-color: -fx-background;
     -fx-background-insets: 0;
     -fx-background-radius: 0.25em;
-    -fx-text-fill: -fx-text-base-color;
-}
-
-/* JavaFX Focus */
-.scroll-pane:focused,
-.split-pane:focused,
-.list-view:focused,
-.tree-view:focused,
-.table-view:focused,
-.tree-table-view:focused {
-    -fx-background-color: -fx-control-inner-background;
-    -fx-background-insets: 0;
-    -fx-background-radius: 0;
-}
-
-/* JavaFX Layout container */
-.scroll-pane,
-.scroll-pane > .viewport,
-.split-pane {
-    -fx-background-color: transparent;
-    -fx-background-insets: 0, 0;
-    -fx-padding: 0;
-}
-
-/* JavaFX Dialog */
-.dialog-pane {
-    -fx-font-size: 1em;
-    -fx-background-color: -fx-control-inner-background;
-}
-
-/* JavaFX TextFlow / HyperLink */
-TextFlow > Text {
-    -fx-fill: -fx-text-background-color;
-}
-
-TextFlow > .hyperlink,
-.hyperlink {
-    -fx-padding: 0;
-    -fx-underline: false;
-    -fx-border-style: null;
-    -fx-border-color: null;
-    -fx-text-fill: -jr-theme;
-    -fx-fill: -jr-theme;
-}
-
-TextFlow > .hyperlink:visited,
-.hyperlink:visited {
-    -fx-text-fill: -jr-accent;
-    -fx-fill: -jr-accent;
-}
-
-.TextFlow > .hyperlink:hover,
-.hyperlink:hover {
-    -fx-underline: true;
-}
-
-TextFlow > .tooltip-text-bold {
-    -fx-font-weight: bold;
-}
-
-TextFlow > .tooltip-text-italic {
-    -fx-font-style: italic;
-}
-
-TextFlow > .tooltip-text-monospaced {
-    -fx-font-family: monospace;
-}
-
-/* JavaFX Tooltip */
-.tooltip {
-    -fx-background: -jr-tooltip-bg;
-    -fx-background-color: -fx-background;
-    -fx-opacity: 95%;
-    -fx-text-fill: -jr-tooltip-fg;
-    -fx-font-size: 1em;
-    -fx-show-delay: 300ms;
-    -fx-hide-delay: 300ms;
-}
-
-.tooltip > TextFlow > Text {
-    -fx-font-size: 1em;
 }
 
 /* JavaFX Button */
 .button {
-    -fx-border-color: -fx-outer-border; /* rgba(0, 0, 0, 0.23); */
+    -fx-border-color: -fx-outer-border;
     -fx-border-width: 0.062em;
     -fx-padding: 0.5em 1em 0.5em 1em;
 }
@@ -240,7 +162,7 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-insets: 0;
     -fx-background-radius: 0;
     -fx-text-fill: -fx-text-base-color;
-    -fx-border-color: -fx-outer-border; /* rgba(0, 0, 0, 0.54); */
+    -fx-border-color: -fx-outer-border;
     -fx-border-width: 0.125em;
     -fx-border-radius: 0.062em;
     -fx-padding: 0.1em 0.1em 0.2em 0.2em;
@@ -282,6 +204,88 @@ TextFlow > .tooltip-text-monospaced {
 
 .radio-button:selected > .radio > .dot {
     -fx-background-color: -jr-checked;
+}
+
+/* JavaFX Focus */
+.scroll-pane:focused,
+.split-pane:focused,
+.list-view:focused,
+.tree-view:focused,
+.table-view:focused,
+.tree-table-view:focused {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+/* JavaFX Layout container */
+.scroll-pane,
+.scroll-pane > .viewport,
+.split-pane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+/* JavaFX Dialog */
+.dialog-pane {
+    -fx-font-size: 1em;
+    -fx-background-color: -fx-control-inner-background;
+}
+
+/* JavaFX TextFlow / HyperLink */
+TextFlow > Text {
+    -fx-fill: -fx-text-background-color;
+}
+
+TextFlow > .hyperlink,
+.hyperlink {
+    -fx-padding: 0;
+    -fx-underline: false;
+    -fx-border-style: null;
+    -fx-border-color: null;
+    -fx-text-fill: -jr-theme;
+    -fx-fill: -jr-theme;
+}
+
+TextFlow > .hyperlink:visited,
+.hyperlink:visited {
+    -fx-text-fill: -fx-accent;
+    -fx-fill: -fx-accent;
+}
+
+.TextFlow > .hyperlink:hover,
+.hyperlink:hover {
+    -fx-underline: true;
+}
+
+TextFlow > .tooltip-text-bold {
+    -fx-font-weight: bold;
+}
+
+TextFlow > .tooltip-text-italic {
+    -fx-font-style: italic;
+}
+
+TextFlow > .tooltip-text-monospaced {
+    -fx-font-family: monospace;
+}
+
+/* JavaFX Tooltip */
+.tooltip {
+    -fx-background: -jr-tooltip-bg;
+    -fx-background-color: -fx-background;
+    -fx-opacity: 95%;
+    -fx-font-size: 1em;
+    -fx-font-family: sans-serif;
+    -fx-font-weight: normal;
+    -fx-text-fill: -jr-tooltip-fg;
+    -fx-show-delay: 300ms;
+    -fx-hide-delay: 300ms;
+}
+
+.tooltip > TextFlow > Text {
+    -fx-font-size: 1em;
 }
 
 /* JavaFX ColorPicker */
@@ -512,7 +516,7 @@ TextFlow > .tooltip-text-monospaced {
 .combo-box-base:editable:focused > .text-field,
 .combo-box-base:editable > .text-field:focused,
 .date-picker > .text-field:focused {
-    -fx-background-color: -jr-accent, -fx-control-inner-background;
+    -fx-background-color: -fx-accent, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 0;
 }
@@ -524,7 +528,7 @@ TextFlow > .tooltip-text-monospaced {
 
 .date-picker-popup > * > .spinner > .button > .left-arrow,
 .date-picker-popup > * > .spinner > .button > .right-arrow {
-    -fx-background: -jr-accent;
+    -fx-background: -fx-accent;
     -fx-background-color: -fx-background;
 }
 
@@ -630,8 +634,8 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .text-input:focused {
-    -fx-highlight-fill: derive(-jr-accent, 20%);
-    -fx-background-color: -jr-accent, -fx-control-inner-background;
+    -fx-highlight-fill: derive(-fx-accent, 20%);
+    -fx-background-color: -fx-accent, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
     -fx-highlight-text-fill: -fx-text-inner-color;
 }
@@ -648,7 +652,7 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .text-area:focused .content {
-    -fx-background-color: -jr-accent, -fx-control-inner-background;
+    -fx-background-color: -fx-accent, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 0;
 }
@@ -668,7 +672,7 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .progress-bar > .track {
-    -fx-background-color: -jr-accent;
+    -fx-background-color: -fx-accent;
 }
 
 /* JavaFX Cell Container */

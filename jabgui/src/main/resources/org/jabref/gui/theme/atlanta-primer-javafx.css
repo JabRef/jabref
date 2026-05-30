@@ -1,9 +1,7 @@
 /*
 * Atlanta Primer Stylesheet.
-* Uses the internal JabRef styles, but otherwise mostly unmodified.
+* Light colors slightly adjusted.
 */
-
-@import "internal/jabref-base.css";
 
 @media (prefers-color-scheme: light) {
     * {
