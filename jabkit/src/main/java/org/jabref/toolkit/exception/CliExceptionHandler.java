@@ -2,6 +2,7 @@ package org.jabref.toolkit.exception;
 
 import org.jabref.logic.JabRefException;
 
+import org.jspecify.annotations.NonNull;
 import picocli.CommandLine;
 
 public class CliExceptionHandler implements CommandLine.IExecutionExceptionHandler {
@@ -16,11 +17,11 @@ public class CliExceptionHandler implements CommandLine.IExecutionExceptionHandl
     public int handleExecutionException(Exception ex, CommandLine commandLine, CommandLine.ParseResult parseResult) throws Exception {
         switch (ex) {
             case CliException cliException -> {
-                System.err.println(buildErrorMessage(cliException, true));
+                printErrorMessage(cliException, true);
                 return cliException.getExitCode();
             }
             case JabRefException jabRefException -> {
-                System.err.println(buildErrorMessage(jabRefException, true));
+                printErrorMessage(jabRefException, true);
                 return CommandLine.ExitCode.SOFTWARE;
             }
             default -> {
@@ -29,13 +30,14 @@ public class CliExceptionHandler implements CommandLine.IExecutionExceptionHandl
         }
     }
 
-    public static String buildErrorMessage(Exception exception, boolean withCauseIfPresent) {
-        Throwable cause = exception.getCause();
-        if (withCauseIfPresent && cause != null) {
-            return exception.getLocalizedMessage()
-                    + " (" + cause.getClass().getSimpleName() + ": " + cause.getLocalizedMessage() + ")";
-        } else {
-            return exception.getLocalizedMessage();
-        }
+    private static void printErrorMessage(Exception ex, boolean withCauseIfPresent) {
+        String errorMessage = (withCauseIfPresent && ex.getCause() != null)
+                              ? ex.getLocalizedMessage() + buildCauseSuffix(ex.getCause())
+                              : ex.getLocalizedMessage();
+        System.err.println(errorMessage);
+    }
+
+    private static @NonNull String buildCauseSuffix(Throwable cause) {
+        return " (" + cause.getClass().getSimpleName() + ": " + cause.getLocalizedMessage() + ")";
     }
 }
