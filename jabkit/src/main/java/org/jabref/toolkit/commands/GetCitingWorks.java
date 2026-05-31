@@ -64,6 +64,8 @@ class GetCitingWorks implements Callable<Integer> {
 
     @Override
     public Integer call() throws ExportException, FetcherException {
+        // TODO: validateJSR380(); - i.e. no output-format without output-file
+        // TODO: e.g. format needs output; format must be valid
         initFields();
 
         CitationFetcher citationFetcher = citationFetcherFactory.getCitationFetcher(citationFetcherType);

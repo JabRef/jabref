@@ -60,7 +60,7 @@ public class ExportService {
     private Exporter createBibtexExporter() {
         return new Exporter("bibtex", "BibTex", StandardFileType.BIBTEX_DB) {
             @Override
-            public void export(@NonNull BibDatabaseContext databaseContext, Path file, @NonNull List<BibEntry> entries) throws IOException, TransformerException, ParserConfigurationException, SaveException {
+            public void export(@NonNull BibDatabaseContext databaseContext, Path file, @NonNull List<BibEntry> entries) throws IOException {
                 internalSaveDatabaseContext(databaseContext, file);
             }
         };
@@ -177,12 +177,6 @@ public class ExportService {
 
         if (!porcelain) {
             System.out.println(Localization.lang("Exporting '%0'.", outputFile));
-        }
-
-        if ("bibtex".equalsIgnoreCase(format)) {
-            // TODO marked for removal
-            saveDatabase(parserResult.getDatabase(), outputFile);
-            return;
         }
 
         Path path = parserResult.getPath().get().toAbsolutePath();

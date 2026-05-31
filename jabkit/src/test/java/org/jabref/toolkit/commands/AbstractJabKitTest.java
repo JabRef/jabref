@@ -141,7 +141,7 @@ public abstract class AbstractJabKitTest {
     ///
     /// @param resourceName the resource name
     /// @return the class resource as path
-    Path getClassResourceAsPath(String resourceName) {
+    protected Path getClassResourceAsPath(String resourceName) {
         try {
             return Path.of(Objects.requireNonNull(this.getClass().getResource(resourceName), "Could not find resource: " + resourceName).toURI())
                        .toAbsolutePath();
@@ -150,7 +150,7 @@ public abstract class AbstractJabKitTest {
         }
     }
 
-    static void assertFileExists(Path file) throws IOException {
+    protected static void assertFileExists(Path file) throws IOException {
         String listedFiles = Files.list(file.getParent())
                                   .map(path -> "'" + path.getFileName().toString() + "'")
                                   .collect(Collectors.joining(", "));
@@ -158,7 +158,7 @@ public abstract class AbstractJabKitTest {
         assertTrue(Files.exists(file), "file  '" + file.getFileName().toString() + "' doesn't exist, but found " + listedFiles);
     }
 
-    static void assertFileDoesntExist(Path file) throws IOException {
+    protected static void assertFileDoesntExist(Path file) {
         assertFalse(Files.exists(file), "file '" + file.getFileName().toString() + "' shouldn't exist, but does");
     }
 }
