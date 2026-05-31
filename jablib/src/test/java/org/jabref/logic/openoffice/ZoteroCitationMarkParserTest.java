@@ -56,11 +56,11 @@ class ZoteroCitationMarkParserTest {
             }
             """;
 
-    String ZoteroCitation = "ZOTERO_ITEM CSL_CITATION " + JOURNAL_ARTICLE_CSL_JSON + " test1234";
+    String zoteroCitation = "ZOTERO_ITEM CSL_CITATION " + JOURNAL_ARTICLE_CSL_JSON + " test1234";
 
     @Test
     void parseJournalArticle() {
-        List<BibEntry> entries = ZoteroCitationMarkParser.parse(ZoteroCitation);
+        List<BibEntry> entries = ZoteroCitationMarkParser.parse(zoteroCitation);
         BibEntry entry = entries.getFirst();
 
         assertEquals(StandardEntryType.Article, entry.getType());
@@ -70,7 +70,7 @@ class ZoteroCitationMarkParserTest {
     @ParameterizedTest
     @MethodSource
     void parseJournalArticleField(StandardField field, String expectedValue) {
-        List<BibEntry> entries = ZoteroCitationMarkParser.parse(ZoteroCitation);
+        List<BibEntry> entries = ZoteroCitationMarkParser.parse(zoteroCitation);
         BibEntry entry = entries.getFirst();
 
         assertEquals(Optional.of(expectedValue), entry.getField(field));
