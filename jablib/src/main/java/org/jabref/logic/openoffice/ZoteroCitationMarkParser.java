@@ -164,7 +164,7 @@ public class ZoteroCitationMarkParser {
     }
 
     private static void setField(BibEntry entry, StandardField field, String value) {
-        if (value == null || StringUtil.isBlank(value)) {
+        if (StringUtil.isBlank(value)) {
             return;
         }
 
