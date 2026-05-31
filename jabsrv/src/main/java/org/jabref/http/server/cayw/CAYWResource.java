@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,10 +43,13 @@ import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -58,6 +62,11 @@ import org.slf4j.LoggerFactory;
 public class CAYWResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(CAYWResource.class);
     private static final String CHOCOLATEBIB_PATH = "/Chocolate.bib";
+    private static final String CONTENT_SECURITY_POLICY = "Content-Security-Policy";
+    private static final String CAYW_CONTENT_SECURITY_POLICY = "default-src 'none'; frame-ancestors 'none'; base-uri 'none'";
+    private static final String X_CONTENT_TYPE_OPTIONS = "X-Content-Type-Options";
+    private static final String NO_SNIFF = "nosniff";
+    private static final String INVALID_LIBRARY_PATH_ERROR = "The 'librarypath' parameter must reference a currently served library file.";
     private static boolean initialized = false;
     private static Pattern ALLOWED_COMMAND = Pattern.compile("[a-zA-Z*]+");
 
@@ -74,6 +83,7 @@ public class CAYWResource {
     private SrvStateManager srvStateManager;
 
     @GET
+    @Produces({MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON})
     public Response getCitation(
             @BeanParam CAYWQueryParams queryParams
     ) throws IOException, ExecutionException, InterruptedException {
@@ -148,7 +158,11 @@ public class CAYWResource {
                               .ifPresent(application -> application.pushEntries(searchResults.stream().map(CAYWEntry::bibEntry).toList()));
         }
 
-        return Response.ok(formattedResponse).type(formatter.getMediaType()).build();
+        return Response.ok(formattedResponse)
+                       .type(formatter.getMediaType())
+                       .header(X_CONTENT_TYPE_OPTIONS, NO_SNIFF)
+                       .header(CONTENT_SECURITY_POLICY, CAYW_CONTENT_SECURITY_POLICY)
+                       .build();
     }
 
     private List<CAYWEntry> openSearchGui(List<CAYWEntry> entries, BibDatabaseContext databaseContext) throws InterruptedException, ExecutionException {
@@ -199,7 +213,11 @@ public class CAYWResource {
 
         if (libraryPath.isPresent()) {
             assert !"demo".equalsIgnoreCase(libraryPath.get());
-            InputStream inputStream = getDatabaseStreamFromPath(java.nio.file.Path.of(libraryPath.get()));
+            java.nio.file.Path requestedLibraryPath = normalizeLibraryPath(libraryPath.get());
+            if (!isServedLibraryPath(requestedLibraryPath)) {
+                throw new BadRequestException(INVALID_LIBRARY_PATH_ERROR);
+            }
+            InputStream inputStream = getDatabaseStreamFromPath(requestedLibraryPath);
             return getDatabaseContextFromStream(inputStream);
         }
 
@@ -208,6 +226,33 @@ public class CAYWResource {
         }
 
         return getDatabaseContextFromStream(getLatestDatabaseStream());
+    }
+
+    private java.nio.file.Path normalizeLibraryPath(String libraryPath) {
+        try {
+            return java.nio.file.Path.of(libraryPath).toAbsolutePath().normalize();
+        } catch (InvalidPathException exception) {
+            throw new BadRequestException(INVALID_LIBRARY_PATH_ERROR, exception);
+        }
+    }
+
+    private boolean isServedLibraryPath(java.nio.file.Path requestedLibraryPath) {
+        return getServedLibraryPaths().stream().anyMatch(requestedLibraryPath::equals);
+    }
+
+    private List<java.nio.file.Path> getServedLibraryPaths() {
+        List<java.nio.file.Path> servedLibraries = filesToServe.getFilesToServe().stream()
+                                                               .map(path -> path.toAbsolutePath().normalize())
+                                                 .toList();
+        if (!servedLibraries.isEmpty()) {
+            return servedLibraries;
+        }
+
+        return srvStateManager.getOpenDatabases().stream()
+                              .map(BibDatabaseContext::getDatabasePath)
+                              .flatMap(Optional::stream)
+                              .map(path -> path.toAbsolutePath().normalize())
+                              .toList();
     }
 
     private InputStream getLatestDatabaseStream() throws IOException {

@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.ServerTest;
+import org.jabref.http.server.TestBibFile;
 import org.jabref.model.entry.BibEntry;
 
 import jakarta.ws.rs.core.Application;
@@ -59,6 +60,8 @@ class CAYWResourceTest extends ServerTest {
         assertEquals(200, response.getStatus());
         assertEquals("\\autocite{Author2023test}", response.readEntity(String.class));
         assertEquals("text/plain", response.getHeaderString("Content-Type"));
+        assertEquals("nosniff", response.getHeaderString("X-Content-Type-Options"));
+        assertEquals("default-src 'none'; frame-ancestors 'none'; base-uri 'none'", response.getHeaderString("Content-Security-Policy"));
     }
 
     @Test
@@ -73,5 +76,30 @@ class CAYWResourceTest extends ServerTest {
 
         assertEquals(400, response.getStatus());
         assertEquals("The 'command' parameter contains invalid characters. Only letters (A–Z, a–z) and '*' are allowed.", response.readEntity(String.class));
+    }
+
+    @Test
+    void servedLibraryPathIsAccepted() {
+        Response response = target("/better-bibtex/cayw")
+                .queryParam("format", "biblatex")
+                .queryParam("selected", "1")
+                .queryParam("librarypath", TestBibFile.GENERAL_SERVER_TEST.path.toString())
+                .request()
+                .get();
+
+        assertEquals(200, response.getStatus());
+        assertEquals("\\autocite{Author2023test}", response.readEntity(String.class));
+    }
+
+    @Test
+    void unknownLibraryPathReturnsBadRequest() {
+        Response response = target("/better-bibtex/cayw")
+                .queryParam("format", "biblatex")
+                .queryParam("selected", "1")
+                .queryParam("librarypath", "/tmp/not-served-library.bib")
+                .request()
+                .get();
+
+        assertEquals(400, response.getStatus());
     }
 }
