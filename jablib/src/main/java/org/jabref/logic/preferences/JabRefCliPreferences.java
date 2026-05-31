@@ -58,7 +58,6 @@ import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
-import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.fetcher.Scopus;
 import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
 import org.jabref.logic.importer.fetcher.WileyFetcher;
@@ -91,7 +90,6 @@ import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
@@ -276,12 +274,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
-
-    public static final String ACCEPT_RECOMMENDATIONS = "acceptRecommendations";
-
-    public static final String SEND_LANGUAGE_DATA = "sendLanguageData";
-    public static final String SEND_OS_DATA = "sendOSData";
-    public static final String SEND_TIMEZONE_DATA = "sendTimezoneData";
 
     /// The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for
     /// OO/LO installation, used to detect location on Win/macOS when using manual
@@ -470,7 +462,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private ImporterPreferences importerPreferences;
     private GrobidPreferences grobidPreferences;
     private ProtectedTermsPreferences protectedTermsPreferences;
-    private MrDlibPreferences mrDlibPreferences;
     private FilePreferences filePreferences;
     private RemotePreferences remotePreferences;
     private ProxyPreferences proxyPreferences;
@@ -529,11 +520,6 @@ public class JabRefCliPreferences implements CliPreferences {
             defaults.put(FONT_FAMILY, "SansSerif");
         }
 
-        // SSL
-        defaults.put(SSL_TRUSTSTORE_PATH, Directories
-                .getSslDirectory()
-                .resolve("truststore.jks").toString());
-
         // system locale as default
         defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
 
@@ -560,11 +546,6 @@ public class JabRefCliPreferences implements CliPreferences {
         // Remembers working directory of last import
         defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
 
-        defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
-        defaults.put(SEND_LANGUAGE_DATA, Boolean.FALSE);
-        defaults.put(SEND_OS_DATA, Boolean.FALSE);
-        defaults.put(SEND_TIMEZONE_DATA, Boolean.FALSE);
-        defaults.put(KEYWORD_SEPARATOR, ", ");
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
 
         defaults.put(PROTECTED_TERMS_ENABLED_INTERNAL, convertListToString(ProtectedTermsLoader.getInternalLists()));
@@ -766,7 +747,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void clearTruststoreFromCustomCertificates() {
-        TrustStoreManager trustStoreManager = new TrustStoreManager(Path.of(defaults.get(SSL_TRUSTSTORE_PATH).toString()));
+        TrustStoreManager trustStoreManager = new TrustStoreManager(SSLPreferences.getDefault().getTruststorePath());
         trustStoreManager.clearCustomCertificates();
     }
 
@@ -905,6 +886,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getOwnerPreferences().setAll(OwnerPreferences.getDefault());
         getTimestampPreferences().setAll(TimestampPreferences.getDefault());
         getRemotePreferences().setAll(RemotePreferences.getDefault());
+        getBibEntryPreferences().setAll(BibEntryPreferences.getDefault());
         getCitationKeyPatternPreferences().setAll(
                 CitationKeyPatternPreferences.getDefault()
                                              .withKeywordDelimiter(getBibEntryPreferences().keywordSeparatorProperty())
@@ -916,6 +898,7 @@ public class JabRefCliPreferences implements CliPreferences {
                                                    .withLastUsedDirectory(getDefaultPath())
         );
         getAiPreferences().setAll(AiPreferences.getDefault());
+        getSSLPreferences().setAll(SSLPreferences.getDefault());
         getSearchPreferences().setAll(SearchPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences())).setAll(
                 OpenOfficePreferences.getDefault());
@@ -945,7 +928,9 @@ public class JabRefCliPreferences implements CliPreferences {
         getRemotePreferences().setAll(getRemotePreferencesFromBackingStore(getRemotePreferences()));
         getCitationKeyPatternPreferences().setAll(getCitationKeyPatternPreferencesFromBackingStore(getCitationKeyPatternPreferences()));
         getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
+        getBibEntryPreferences().setAll(getBibEntryPreferencesFromBackingStore(getBibEntryPreferences()));
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
+        getSSLPreferences().setAll(getSSLPreferencesFromBackingStore(getSSLPreferences()));
         getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences());
         getOpenOfficePreferences(repository).setAll(
@@ -962,6 +947,14 @@ public class JabRefCliPreferences implements CliPreferences {
                     Localization.lang("Could not import preferences"),
                     ex);
         }
+    }
+
+    protected Path getDefaultPath() {
+        return Path.of("/");
+    }
+
+    protected Language getLanguage() {
+        return Language.getLanguageFor(get(LANGUAGE));
     }
 
     // region JournalAbbreviationPreferences
@@ -1134,18 +1127,14 @@ public class JabRefCliPreferences implements CliPreferences {
                ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES)
                : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
     }
-    // endregion
 
     private static Preferences getPrefsNodeForCustomizedEntryTypesV2(BibDatabaseMode mode) {
         return mode == BibDatabaseMode.BIBTEX
                ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES_V2)
                : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES_V2);
     }
+    // endregion
 
-    //*************************************************************************************************************
-    // Misc
-    //*************************************************************************************************************
-    // region Misc
     // region LibraryPreferences
     @Override
     public LibraryPreferences getLibraryPreferences() {
@@ -1366,11 +1355,14 @@ public class JabRefCliPreferences implements CliPreferences {
             return sslPreferences;
         }
 
-        sslPreferences = new SSLPreferences(
-                get(SSL_TRUSTSTORE_PATH)
-        );
+        sslPreferences = getSSLPreferencesFromBackingStore(SSLPreferences.getDefault());
 
         return sslPreferences;
+    }
+
+    private SSLPreferences getSSLPreferencesFromBackingStore(SSLPreferences defaults) {
+        return new SSLPreferences(
+                Path.of(get(SSL_TRUSTSTORE_PATH, defaults.getTruststorePath().toString())));
     }
     // endregion
 
@@ -1494,21 +1486,21 @@ public class JabRefCliPreferences implements CliPreferences {
             return bibEntryPreferences;
         }
 
-        bibEntryPreferences = new BibEntryPreferences(
-                get(KEYWORD_SEPARATOR).charAt(0)
-        );
+        bibEntryPreferences = getBibEntryPreferencesFromBackingStore(BibEntryPreferences.getDefault());
 
         EasyBind.listen(bibEntryPreferences.keywordSeparatorProperty(), (_, _, newValue) -> put(KEYWORD_SEPARATOR, String.valueOf(newValue)));
 
         return bibEntryPreferences;
     }
+
+    private BibEntryPreferences getBibEntryPreferencesFromBackingStore(BibEntryPreferences defaults) {
+        return new BibEntryPreferences(
+                get(KEYWORD_SEPARATOR, String.valueOf(defaults.getKeywordSeparator())).charAt(0)
+        );
+    }
     // endregion
 
-    // InternalPreferences
-    protected Path getDefaultPath() {
-        return Path.of("/");
-    }
-
+    // region InternalPreferences
     @Override
     public InternalPreferences getInternalPreferences() {
         if (internalPreferences != null) {
@@ -1547,11 +1539,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(MEMORY_STICK_MODE, defaults.isMemoryStickMode())
         );
     }
+    // endregion
 
-    protected Language getLanguage() {
-        return Language.getLanguageFor(get(LANGUAGE));
-    }
-
+    // region FieldPreferences
     @Override
     public FieldPreferences getFieldPreferences() {
         if (fieldPreferences != null) {
@@ -1578,8 +1568,9 @@ public class JabRefCliPreferences implements CliPreferences {
                         FieldFactory.serializeFieldsList(defaults.getNonWrappableFields()))))
         );
     }
+    // endregion
 
-    // region Linked files preferences
+    // region (Linked)FilePreferences
     protected boolean moveToTrashSupported() {
         return false;
     }
@@ -1909,8 +1900,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // endregion
 
-    // region other preferences
-
+    // region AiPreferences
     @Override
     public AiPreferences getAiPreferences() {
         if (aiPreferences != null) {
@@ -2006,7 +1996,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(AI_FOLLOW_UP_QUESTIONS_TEMPLATE, defaults.getFollowUpQuestionsTemplate())
         );
     }
+    // endregion
 
+    // region SearchPreferences
     @Override
     public SearchPreferences getSearchPreferences() {
         if (searchPreferences != null) {
@@ -2042,6 +2034,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getDouble(SEARCH_WINDOW_WIDTH, defaults.getSearchWindowWidth()),
                 getDouble(SEARCH_WINDOW_DIVIDER_POS, defaults.getSearchWindowDividerPosition()));
     }
+    // endregion
 
     @Override
     public XmpPreferences getXmpPreferences() {
@@ -2080,26 +2073,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 putStringList(NAME_FORMATTER_VALUE, nameFormatterPreferences.getNameFormatterValue()));
 
         return nameFormatterPreferences;
-    }
-
-    @Override
-    public MrDlibPreferences getMrDlibPreferences() {
-        if (mrDlibPreferences != null) {
-            return mrDlibPreferences;
-        }
-
-        mrDlibPreferences = new MrDlibPreferences(
-                getBoolean(ACCEPT_RECOMMENDATIONS),
-                getBoolean(SEND_LANGUAGE_DATA),
-                getBoolean(SEND_OS_DATA),
-                getBoolean(SEND_TIMEZONE_DATA));
-
-        EasyBind.listen(mrDlibPreferences.acceptRecommendationsProperty(), (_, _, newValue) -> putBoolean(ACCEPT_RECOMMENDATIONS, newValue));
-        EasyBind.listen(mrDlibPreferences.sendLanguageProperty(), (_, _, newValue) -> putBoolean(SEND_LANGUAGE_DATA, newValue));
-        EasyBind.listen(mrDlibPreferences.sendOsProperty(), (_, _, newValue) -> putBoolean(SEND_OS_DATA, newValue));
-        EasyBind.listen(mrDlibPreferences.sendTimezoneProperty(), (_, _, newValue) -> putBoolean(SEND_TIMEZONE_DATA, newValue));
-
-        return mrDlibPreferences;
     }
 
     @Override
