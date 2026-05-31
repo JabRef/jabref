@@ -68,7 +68,13 @@ import static java.util.function.Predicate.not;
 ///
 /// Example:
 ///
-///     Some commment={fieldValue},otherFieldName ={otherFieldValue}
+/// ```bibtex
+/// Some comment
+/// @misc{key,
+///   fieldName = {fieldValue},
+///   otherFieldName = {otherFieldValue}
+/// }
+/// ```
 ///
 /// Then,
 ///
