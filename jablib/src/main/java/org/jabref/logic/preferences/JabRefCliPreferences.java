@@ -747,7 +747,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void clearTruststoreFromCustomCertificates() {
-        TrustStoreManager trustStoreManager = new TrustStoreManager(Path.of(defaults.get(SSL_TRUSTSTORE_PATH).toString()));
+        TrustStoreManager trustStoreManager = new TrustStoreManager(SSLPreferences.getDefault().getTruststorePath());
         trustStoreManager.clearCustomCertificates();
     }
 
@@ -1362,7 +1362,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private SSLPreferences getSSLPreferencesFromBackingStore(SSLPreferences defaults) {
         return new SSLPreferences(
-                get(SSL_TRUSTSTORE_PATH, defaults.getTruststorePath()));
+                Path.of(get(SSL_TRUSTSTORE_PATH, defaults.getTruststorePath().toString())));
     }
     // endregion
 

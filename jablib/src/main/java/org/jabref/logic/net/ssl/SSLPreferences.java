@@ -1,21 +1,23 @@
 package org.jabref.logic.net.ssl;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import java.nio.file.Path;
+
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.logic.util.Directories;
 
 public class SSLPreferences {
-    private final StringProperty truststorePath;
+    private final ObjectProperty<Path> truststorePath;
 
     private SSLPreferences() {
         this(
-                Directories.getSslDirectory().resolve("truststore.jks").toString()  // Truststore path
+                Directories.getSslDirectory().resolve("truststore.jks")  // Truststore path
         );
     }        // SSL
 
-    public SSLPreferences(String truststorePath) {
-        this.truststorePath = new SimpleStringProperty(truststorePath);
+    public SSLPreferences(Path truststorePath) {
+        this.truststorePath = new SimpleObjectProperty<>(truststorePath);
     }
 
     public static SSLPreferences getDefault() {
@@ -26,7 +28,7 @@ public class SSLPreferences {
         this.truststorePath.set(preferences.getTruststorePath());
     }
 
-    public String getTruststorePath() {
+    public Path getTruststorePath() {
         return truststorePath.getValue();
     }
 }
