@@ -949,7 +949,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
-    private Path getDefaultPath() {
+    protected Path getDefaultPath() {
         return Path.of("/");
     }
 
