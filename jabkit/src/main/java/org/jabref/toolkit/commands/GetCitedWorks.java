@@ -25,9 +25,9 @@ class GetCitedWorks implements Callable<Integer> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GetCitedWorks.class);
 
-    CitationFetcherFactory citationFetcherFactory;
+    protected CitationFetcherFactory citationFetcherFactory;
 
-    ExportService exportService;
+    protected ExportService exportService;
 
     @CommandLine.ParentCommand
     private JabKit argumentProcessor;
@@ -74,10 +74,10 @@ class GetCitedWorks implements Callable<Integer> {
 
         List<BibEntry> entries = citationFetcher.getReferences(new BibEntry().withField(StandardField.DOI, doi));
 
-        if (outputFile != null && outputFormat != null) {
-            exportService.exportEntriesToFile(entries, outputFile, outputFormat);
-        } else {
+        if (outputFile == null) {
             exportService.printBibEntriesToStdOut(entries);
+        } else {
+            exportService.exportEntriesToFile(entries, outputFile, outputFormat);
         }
         return CommandLine.ExitCode.OK;
     }
