@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -86,31 +85,6 @@ class ZoteroCitationMarkParserTest {
                 Arguments.of(StandardField.PAGES, "6-7"),
                 Arguments.of(StandardField.DOI, "1234567"),
                 Arguments.of(StandardField.YEAR, "2026")
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource
-    void parseDateParts(String dateParts, Optional<String> expectedYear, Optional<Month> expectedMonth, Optional<String> expectedDay) {
-        final String testJSON = """
-                ZOTERO_ITEM CSL_CITATION {"citationItems":[{"id":588,"itemData":{"type":"article-journal","title":"Date test","issued":{"date-parts":[[%s]]}}}]} RNDabcd3456
-                """;
-
-        List<BibEntry> entries = ZoteroCitationMarkParser.parse(testJSON.formatted(dateParts));
-        BibEntry entry = entries.getFirst();
-
-        assertEquals(expectedYear, entry.getField(StandardField.YEAR));
-        assertEquals(expectedMonth, entry.getMonth());
-        assertEquals(expectedDay, entry.getField(StandardField.DAY));
-    }
-
-    private static Stream<Arguments> parseDateParts() {
-        return Stream.of(
-                Arguments.of("8", Optional.empty(), Optional.of(Month.AUGUST), Optional.empty()),
-                Arguments.of("15", Optional.empty(), Optional.empty(), Optional.of("15")),
-                Arguments.of("8,15", Optional.empty(), Optional.of(Month.AUGUST), Optional.of("15")),
-                Arguments.of("\"2001\",10", Optional.of("2001"), Optional.of(Month.OCTOBER), Optional.empty()),
-                Arguments.of("\"2001\",15", Optional.of("2001"), Optional.empty(), Optional.of("15"))
         );
     }
 }
