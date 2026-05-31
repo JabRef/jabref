@@ -1,6 +1,6 @@
 package org.jabref.toolkit.exception;
 
-/// An ExportServiceException signals an error when exporting to a different format or the underlying filesystem or terminal.
+/// An ImportServiceException signals an error when importing a Database from a file.
 public class ImportServiceException extends CliException {
     public ImportServiceException(String message, String localizedMessage, int exitCode) {
         super(message, localizedMessage, exitCode);

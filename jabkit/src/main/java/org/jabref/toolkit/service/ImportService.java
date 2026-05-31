@@ -89,7 +89,8 @@ public class ImportService {
             return result;
         } catch (ImportException ex) {
             throw new ImportServiceException("Unable to open file '" + inputFile + "'.",
-                    Localization.lang("Unable to open file '%0'.", inputFile), ex, CommandLine.ExitCode.USAGE);
+                    Localization.lang("Unable to open file '%0'.", inputFile), ex,
+                    CommandLine.ExitCode.USAGE);
         }
     }
 
