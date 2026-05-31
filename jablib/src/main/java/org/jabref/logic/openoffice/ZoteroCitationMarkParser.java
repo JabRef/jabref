@@ -110,8 +110,15 @@ public class ZoteroCitationMarkParser {
         }
 
         List<String> dateParts = issuedData.dateParts.getFirst();
+        if ((dateParts == null) || dateParts.isEmpty()) {
+            return;
+        }
 
         String firstDatePart = dateParts.getFirst();
+        if (StringUtil.isBlank(firstDatePart)) {
+            return;
+        }
+
         if (firstDatePart.length() == 4) {
             setDateWithYear(entry, firstDatePart, dateParts);
         } else {
@@ -127,7 +134,14 @@ public class ZoteroCitationMarkParser {
 
         if (dateParts.size() == 2) {
             String secondDatePart = dateParts.get(1);
-            int secondNumber = Integer.parseInt(secondDatePart);
+            int secondNumber;
+            try {
+                secondNumber = Integer.parseInt(secondDatePart);
+            } catch (NumberFormatException e) {
+                LOGGER.debug("Could not parse Zotero date part {}", secondDatePart, e);
+                return;
+            }
+
             if (secondNumber <= 12) {
                 // y-m
                 Date.parse(Optional.of(year), Optional.of(secondDatePart), Optional.empty()).ifPresent(entry::withDate);
@@ -146,7 +160,14 @@ public class ZoteroCitationMarkParser {
 
     private static void setDateWithoutYear(BibEntry entry, List<String> dateParts) {
         String firstDatePart = dateParts.getFirst();
-        int firstNumber = Integer.parseInt(firstDatePart);
+        int firstNumber;
+        try {
+            firstNumber = Integer.parseInt(firstDatePart);
+        } catch (NumberFormatException e) {
+            LOGGER.debug("Could not parse Zotero date part {}", firstDatePart, e);
+            return;
+        }
+
         if (dateParts.size() == 1) {
             if (firstNumber <= 12) {
                 // month
