@@ -78,7 +78,6 @@ public class ZoteroCitationMarkParser {
         setDate(entry, itemData.issued);
         setField(entry, StandardField.TITLE, itemData.title);
         setField(entry, StandardField.JOURNALTITLE, itemData.containerTitle);
-        setField(entry, StandardField.JOURNAL, itemData.containerTitle);
         setField(entry, StandardField.VOLUME, itemData.volume);
         setField(entry, StandardField.NUMBER, itemData.issue);
         setField(entry, StandardField.PAGES, itemData.page);
