@@ -118,64 +118,6 @@ public class ZoteroCitationMarkParser {
         Date.parse(dateString).ifPresent(entry::withDate);
     }
 
-    private static void setDateWithYear(BibEntry entry, String year, List<String> dateParts) {
-        if (dateParts.size() == 1) {
-            Date.parse(Optional.of(year), Optional.empty(), Optional.empty()).ifPresent(entry::withDate);
-            return;
-        }
-
-        if (dateParts.size() == 2) {
-            String secondDatePart = dateParts.get(1);
-            int secondNumber;
-            try {
-                secondNumber = Integer.parseInt(secondDatePart);
-            } catch (NumberFormatException e) {
-                LOGGER.debug("Could not parse Zotero date part {}", secondDatePart, e);
-                return;
-            }
-
-            if (secondNumber <= 12) {
-                // y-m
-                Date.parse(Optional.of(year), Optional.of(secondDatePart), Optional.empty()).ifPresent(entry::withDate);
-            } else {
-                // TODO: Support y-d format for Date.parse()
-                // y-d
-                entry.withField(StandardField.YEAR, year);
-                entry.withField(StandardField.DAY, secondDatePart);
-            }
-            return;
-        }
-
-        // y-m-d
-        Date.parse(Optional.of(year), Optional.of(dateParts.get(1)), Optional.of(dateParts.get(2))).ifPresent(entry::withDate);
-    }
-
-    private static void setDateWithoutYear(BibEntry entry, List<String> dateParts) {
-        String firstDatePart = dateParts.getFirst();
-        int firstNumber;
-        try {
-            firstNumber = Integer.parseInt(firstDatePart);
-        } catch (NumberFormatException e) {
-            LOGGER.debug("Could not parse Zotero date part {}", firstDatePart, e);
-            return;
-        }
-
-        if (dateParts.size() == 1) {
-            if (firstNumber <= 12) {
-                // month
-                entry.withField(StandardField.MONTH, firstDatePart);
-            } else {
-                // day
-                entry.withField(StandardField.DAY, firstDatePart);
-            }
-            return;
-        }
-
-        // m-d
-        entry.withField(StandardField.MONTH, firstDatePart);
-        entry.withField(StandardField.DAY, dateParts.get(1));
-    }
-
     private static void setField(BibEntry entry, StandardField field, String value) {
         if (StringUtil.isBlank(value)) {
             return;
