@@ -113,8 +113,8 @@ public class ExportService {
         try {
             internalSaveDatabaseContext(bibDatabaseContext, outputFile);
         } catch (IOException ex) {
-            throw new ExportServiceException("Unable to write to stdout",
-                    Localization.lang("Unable to write to %0.", "stdout"),
+            throw new ExportServiceException("Unable to write to " + outputFile,
+                    Localization.lang("Unable to write to %0.", outputFile),
                     ex, CommandLine.ExitCode.SOFTWARE);
         }
     }
