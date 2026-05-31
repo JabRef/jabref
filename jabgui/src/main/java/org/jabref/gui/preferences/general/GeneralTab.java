@@ -65,6 +65,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private Button autosaveLocalLibrariesHelp;
     @FXML private CheckBox createBackup;
     @FXML private TextField backupDirectory;
+    @FXML private CheckBox usePostgresSearch;
     @FXML private CheckBox remoteServer;
     @FXML private TextField remotePort;
     @FXML private CheckBox enableHttpServer;
@@ -159,6 +160,8 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         createBackup.selectedProperty().bindBidirectional(viewModel.createBackupProperty());
         backupDirectory.textProperty().bindBidirectional(viewModel.backupDirectoryProperty());
         backupDirectory.disableProperty().bind(viewModel.createBackupProperty().not());
+
+        usePostgresSearch.selectedProperty().bindBidirectional(viewModel.usePostgresSearchProperty());
 
         Platform.runLater(() -> {
             validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);

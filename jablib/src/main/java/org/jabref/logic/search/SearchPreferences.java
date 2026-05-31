@@ -19,6 +19,7 @@ import com.google.common.annotations.VisibleForTesting;
 public class SearchPreferences {
 
     private final ObservableSet<SearchFlags> searchFlags;
+    private final BooleanProperty usePostgresSearch;
     private final BooleanProperty keepWindowOnTop;
     private final DoubleProperty searchWindowHeight;
     private final DoubleProperty searchWindowWidth;
@@ -26,16 +27,32 @@ public class SearchPreferences {
     private final BooleanProperty keepSearchString;
     private final ObjectProperty<SearchDisplayMode> searchDisplayMode;
 
+    private SearchPreferences() {
+        this(
+                SearchDisplayMode.FILTER,  // Search display mode
+                false,                     // Regular expression
+                false,                     // Case sensitive
+                false,                     // Fulltext
+                false,                     // Use postgres search
+                false,                     // Keep search string
+                true,                      // Keep window on top
+                176.0,                     // Search window height
+                600.0,                     // Search window width
+                0.5                        // Search window divider position
+        );
+    }
+
     public SearchPreferences(SearchDisplayMode searchDisplayMode,
                              boolean isRegularExpression,
                              boolean isCaseSensitive,
                              boolean isFulltext,
+                             boolean usePostgresSearch,
                              boolean keepSearchString,
                              boolean keepWindowOnTop,
                              double searchWindowHeight,
                              double searchWindowWidth,
                              double searchWindowDividerPosition) {
-        this(searchDisplayMode, EnumSet.noneOf(SearchFlags.class), keepSearchString, keepWindowOnTop, searchWindowHeight, searchWindowWidth, searchWindowDividerPosition);
+        this(searchDisplayMode, EnumSet.noneOf(SearchFlags.class), usePostgresSearch, keepSearchString, keepWindowOnTop, searchWindowHeight, searchWindowWidth, searchWindowDividerPosition);
         if (isRegularExpression) {
             searchFlags.add(SearchFlags.REGULAR_EXPRESSION);
         }
@@ -48,15 +65,34 @@ public class SearchPreferences {
     }
 
     @VisibleForTesting
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags, boolean keepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition) {
+    public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags, boolean usePostgresSearch, boolean keepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition) {
         this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
         this.searchFlags = FXCollections.observableSet(searchFlags);
 
+        this.usePostgresSearch = new SimpleBooleanProperty(usePostgresSearch);
         this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
         this.searchWindowHeight = new SimpleDoubleProperty(searchWindowHeight);
         this.searchWindowWidth = new SimpleDoubleProperty(searchWindowWidth);
         this.searchWindowDividerPosition = new SimpleDoubleProperty(searchWindowDividerPosition);
         this.keepSearchString = new SimpleBooleanProperty(keepSearchString);
+    }
+
+    public static SearchPreferences getDefault() {
+        return new SearchPreferences();
+    }
+
+    public void setAll(SearchPreferences preferences) {
+        this.searchDisplayMode.set(preferences.getSearchDisplayMode());
+        this.searchFlags.clear();
+        setSearchFlag(SearchFlags.REGULAR_EXPRESSION, preferences.isRegularExpression());
+        setSearchFlag(SearchFlags.CASE_SENSITIVE, preferences.isCaseSensitive());
+        setSearchFlag(SearchFlags.FULLTEXT, preferences.isFulltext());
+        this.usePostgresSearch.set(preferences.shouldUsePostgresSearch());
+        this.keepSearchString.set(preferences.shouldKeepSearchString());
+        this.keepWindowOnTop.set(preferences.shouldKeepWindowOnTop());
+        this.searchWindowHeight.set(preferences.getSearchWindowHeight());
+        this.searchWindowWidth.set(preferences.getSearchWindowWidth());
+        this.searchWindowDividerPosition.set(preferences.getSearchWindowDividerPosition());
     }
 
     public EnumSet<SearchFlags> getSearchFlags() {
@@ -161,5 +197,17 @@ public class SearchPreferences {
 
     public void setKeepSearchString(boolean keepSearchString) {
         this.keepSearchString.set(keepSearchString);
+    }
+
+    public boolean shouldUsePostgresSearch() {
+        return usePostgresSearch.get();
+    }
+
+    public BooleanProperty usePostgresSearchProperty() {
+        return usePostgresSearch;
+    }
+
+    public void setUsePostgresSearch(boolean usePostgresSearch) {
+        this.usePostgresSearch.set(usePostgresSearch);
     }
 }

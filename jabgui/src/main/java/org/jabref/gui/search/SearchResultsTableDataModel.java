@@ -48,7 +48,7 @@ public class SearchResultsTableDataModel {
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
 
-        EasyBind.listen(stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH), (observable, oldValue, newValue) -> updateSearchMatches(newValue));
+        EasyBind.listen(stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH), (_, _, newValue) -> updateSearchMatches(newValue));
         stateManager.searchResultSize(SearchType.GLOBAL_SEARCH).bind(Bindings.size(entriesFiltered));
     }
 
@@ -66,7 +66,7 @@ public class SearchResultsTableDataModel {
             if (query.isPresent()) {
                 SearchResults searchResults = new SearchResults();
                 for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
-                    stateManager.getIndexManager(context).ifPresent(indexManager -> searchResults.mergeSearchResults(indexManager.search(query.get())));
+                    searchResults.mergeSearchResults(stateManager.getSearchContext(context).search(query.get()));
                 }
                 for (BibEntryTableViewModel entry : entriesViewModel) {
                     entry.hasFullTextResultsProperty().set(searchResults.hasFulltextResults(entry.getEntry()));

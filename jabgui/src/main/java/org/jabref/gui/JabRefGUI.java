@@ -50,8 +50,8 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
-import org.jabref.logic.search.IndexManager;
-import org.jabref.logic.search.PostgreServer;
+import org.jabref.logic.search.sqlbased.IndexManager;
+import org.jabref.logic.search.sqlbased.PostgreServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -231,7 +231,6 @@ public class JabRefGUI extends Application {
         JabRefGUI.aiService = new AiService(
                 preferences.getAiPreferences(),
                 preferences.getFilePreferences(),
-                preferences.getCitationKeyPatternPreferences(),
                 dialogService,
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
@@ -244,7 +243,8 @@ public class JabRefGUI extends Application {
                 preferences.getEntryEditorPreferences().citationCountFetcherTypeProperty(),
                 preferences.getCitationKeyPatternPreferences(),
                 preferences.getGrobidPreferences(),
-                JabRefGUI.aiService,
+                preferences.getAiPreferences(),
+                aiService.getCurrentChatModel(),
                 entryTypesManager,
                 dialogService
         );

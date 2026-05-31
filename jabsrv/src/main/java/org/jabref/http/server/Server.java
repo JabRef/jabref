@@ -1,9 +1,11 @@
 package org.jabref.http.server;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import javax.net.ssl.SSLContext;
 
@@ -11,6 +13,8 @@ import org.jabref.http.JabRefSrvStateManager;
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
+import org.jabref.http.dto.GsonMessageBodyReader;
+import org.jabref.http.dto.GsonMessageBodyWriter;
 import org.jabref.http.server.cayw.CAYWResource;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.command.CommandResource;
@@ -22,8 +26,11 @@ import org.jabref.http.server.resources.MapResource;
 import org.jabref.http.server.resources.RootResource;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.UiMessageHandler;
+import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import net.harawata.appdirs.AppDirsFactory;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -66,7 +73,9 @@ public class Server {
         FilesToServe filesToServe = new FilesToServe();
         filesToServe.setFilesToServe(filesToServeList);
 
-        SrvStateManager srvStateManager = new JabRefSrvStateManager();
+        SrvStateManager srvStateManager = new JabRefSrvStateManager(
+                preferences.getBibEntryPreferences(),
+                parseLibraries(filesToServeList));
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
@@ -86,6 +95,26 @@ public class Server {
         }));
 
         return httpServer;
+    }
+
+    /// Parses every library to serve once, up front. The stand-alone server has a fixed
+    /// set of libraries, so there is no reason to re-parse them on every request.
+    private List<BibDatabaseContext> parseLibraries(List<Path> files) {
+        BibtexImporter importer = new BibtexImporter(preferences.getImportFormatPreferences(), new DummyFileUpdateMonitor());
+        return files.stream()
+                    .map(file -> parseLibrary(importer, file))
+                    .flatMap(Optional::stream)
+                    .toList();
+    }
+
+    /// Parses a single library. A library that fails to parse is logged and skipped.
+    private static Optional<BibDatabaseContext> parseLibrary(BibtexImporter importer, Path file) {
+        try {
+            return Optional.of(importer.importDatabase(file).getDatabaseContext());
+        } catch (IOException e) {
+            LOGGER.error("Could not parse library {}", file, e);
+            return Optional.empty();
+        }
     }
 
     /// Entry point for the GUI
@@ -132,6 +161,8 @@ public class Server {
         // Supporting classes
         resourceConfig.register(CORSFilter.class);
         resourceConfig.register(GlobalExceptionMapper.class);
+        resourceConfig.register(GsonMessageBodyReader.class);
+        resourceConfig.register(GsonMessageBodyWriter.class);
 
         LOGGER.debug("Starting HTTP server...");
 
