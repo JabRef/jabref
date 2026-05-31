@@ -561,16 +561,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(LAST_USED_EXPORT, "");
 
-        defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
-
-        defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
         defaults.put(CLEANUP_JOBS, convertListToString(getDefaultCleanupJobs().stream().map(Enum::name).toList()));
         defaults.put(CLEANUP_FIELD_FORMATTERS_ENABLED, Boolean.FALSE);
         defaults.put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanupActions.getMetaDataString(FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS, OS.NEWLINE));
-
-        String defaultExpression = "**/.*[citationkey].*\\\\.[extension]";
-        defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
-        defaults.put(AUTOLINK_USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
 
         // Since some of the preference settings themselves use localized strings, we cannot set the language after
         // the initialization of the preferences in main
@@ -889,7 +882,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getBibEntryPreferences().setAll(BibEntryPreferences.getDefault());
         getCitationKeyPatternPreferences().setAll(
                 CitationKeyPatternPreferences.getDefault()
-                                             .withKeywordDelimiter(getBibEntryPreferences().keywordSeparatorProperty())
+                                             .withKeywordSeparator(getBibEntryPreferences().keywordSeparatorProperty())
         );
         getFilePreferences().setAll(FilePreferences.getDefault()
                                                    .withUserHostInfo(getInternalPreferences().getUserAndHostInfoProperty())
@@ -898,6 +891,9 @@ public class JabRefCliPreferences implements CliPreferences {
                                                    .withLastUsedDirectory(getDefaultPath())
         );
         getAiPreferences().setAll(AiPreferences.getDefault());
+        getAutoLinkPreferences().setAll(
+                AutoLinkPreferences.getDefault()
+                                   .withKeywordSeparator(getBibEntryPreferences().keywordSeparatorProperty()));
         getSSLPreferences().setAll(SSLPreferences.getDefault());
         getSearchPreferences().setAll(SearchPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences())).setAll(
@@ -930,6 +926,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
         getBibEntryPreferences().setAll(getBibEntryPreferencesFromBackingStore(getBibEntryPreferences()));
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
+        getAutoLinkPreferences().setAll(getAutoLinkPreferencesFromBackingStore(getAutoLinkPreferences()));
         getSSLPreferences().setAll(getSSLPreferencesFromBackingStore(getSSLPreferences()));
         getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences());
@@ -1633,17 +1630,14 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
+    // region AutoLinkPreferences
     @Override
     public AutoLinkPreferences getAutoLinkPreferences() {
         if (autoLinkPreferences != null) {
             return autoLinkPreferences;
         }
 
-        autoLinkPreferences = new AutoLinkPreferences(
-                getAutoLinkKeyDependency(),
-                get(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
-                getBoolean(ASK_AUTO_NAMING_PDFS_AGAIN),
-                bibEntryPreferences.keywordSeparatorProperty());
+        autoLinkPreferences = getAutoLinkPreferencesFromBackingStore(AutoLinkPreferences.getDefault());
 
         EasyBind.listen(autoLinkPreferences.citationKeyDependencyProperty(), (_, _, newValue) -> {
             // Starts bibtex only omitted, as it is not being saved
@@ -1658,16 +1652,23 @@ public class JabRefCliPreferences implements CliPreferences {
         return autoLinkPreferences;
     }
 
-    private AutoLinkPreferences.CitationKeyDependency getAutoLinkKeyDependency() {
-        AutoLinkPreferences.CitationKeyDependency citationKeyDependency =
-                AutoLinkPreferences.CitationKeyDependency.START; // default
-        if (getBoolean(AUTOLINK_EXACT_KEY_ONLY)) {
-            citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.EXACT;
-        } else if (getBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
-            citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.REGEX;
-        }
-        return citationKeyDependency;
+    private AutoLinkPreferences getAutoLinkPreferencesFromBackingStore(AutoLinkPreferences defaults) {
+        return new AutoLinkPreferences(
+                getAutoLinkKeyDependency(defaults.getCitationKeyDependency()),
+                get(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaults.getRegularExpression()),
+                getBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, defaults.shouldAskAutoNamingPdfs()),
+                bibEntryPreferences.keywordSeparatorProperty());
     }
+
+    private AutoLinkPreferences.CitationKeyDependency getAutoLinkKeyDependency(AutoLinkPreferences.CitationKeyDependency defaultDependency) {
+        if (getBoolean(AUTOLINK_EXACT_KEY_ONLY, defaultDependency == AutoLinkPreferences.CitationKeyDependency.EXACT)) {
+            return AutoLinkPreferences.CitationKeyDependency.EXACT;
+        } else if (getBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, defaultDependency == AutoLinkPreferences.CitationKeyDependency.REGEX)) {
+            return AutoLinkPreferences.CitationKeyDependency.REGEX;
+        }
+        return AutoLinkPreferences.CitationKeyDependency.START;
+    }
+    // endregion
 
     // region Import/Export preferences
 

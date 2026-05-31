@@ -30,7 +30,7 @@ public class CitationKeyPatternPreferences {
 
     private static final GlobalCitationKeyPatterns DEFAULT_CITATION_KEY_PATTERN = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
 
-    private static final SimpleObjectProperty<Character> DEFAULT_KEYWORD_DELIMITER = new SimpleObjectProperty<>(',');
+    private static final SimpleObjectProperty<Character> DEFAULT_KEYWORD_SEPARATOR = new SimpleObjectProperty<>(',');
 
     private final BooleanProperty shouldTransliterateFieldsForCitationKey;
     private final BooleanProperty shouldAvoidOverwriteCiteKey;
@@ -41,9 +41,9 @@ public class CitationKeyPatternPreferences {
     private final StringProperty keyPatternReplacement;
     private final StringProperty unwantedCharacters;
     private final ObjectProperty<GlobalCitationKeyPatterns> keyPatterns;
-    private final SimpleObjectProperty<Character> keywordDelimiter;
+    private final SimpleObjectProperty<Character> keywordSeparator;
 
-    /// @param keywordDelimiter should always be BibEntryProperties#keyWordDelimiterProperty
+    /// @param keywordSeparator should always be BibEntryProperties#keyWordDelimiterProperty
     public CitationKeyPatternPreferences(boolean shouldTransliterateFieldsForCitationKey,
                                          boolean shouldAvoidOverwriteCiteKey,
                                          boolean shouldWarnBeforeOverwriteCiteKey,
@@ -53,7 +53,7 @@ public class CitationKeyPatternPreferences {
                                          String keyPatternReplacement,
                                          String unwantedCharacters,
                                          GlobalCitationKeyPatterns keyPatterns,
-                                         ReadOnlyObjectProperty<Character> keywordDelimiter) {
+                                         ReadOnlyObjectProperty<Character> keywordSeparator) {
 
         this.shouldTransliterateFieldsForCitationKey = new SimpleBooleanProperty(shouldTransliterateFieldsForCitationKey);
         this.shouldAvoidOverwriteCiteKey = new SimpleBooleanProperty(shouldAvoidOverwriteCiteKey);
@@ -65,8 +65,8 @@ public class CitationKeyPatternPreferences {
         this.unwantedCharacters = new SimpleStringProperty(unwantedCharacters);
         this.keyPatterns = new SimpleObjectProperty<>(keyPatterns);
 
-        this.keywordDelimiter = new SimpleObjectProperty<>();
-        this.keywordDelimiter.bind(keywordDelimiter);
+        this.keywordSeparator = new SimpleObjectProperty<>();
+        this.keywordSeparator.bind(keywordSeparator);
     }
 
     private CitationKeyPatternPreferences() {
@@ -83,7 +83,7 @@ public class CitationKeyPatternPreferences {
                 new SimpleObjectProperty<>()  // keywordDelimiter
         );
 
-        this.keywordDelimiter.bind(DEFAULT_KEYWORD_DELIMITER);
+        this.keywordSeparator.bind(DEFAULT_KEYWORD_SEPARATOR);
     }
 
     public static CitationKeyPatternPreferences getDefault() {
@@ -211,19 +211,15 @@ public class CitationKeyPatternPreferences {
         this.keyPatterns.set(keyPatterns);
     }
 
-    public Character getKeywordDelimiter() {
-        return keywordDelimiter.get();
+    public Character getKeywordSeparator() {
+        return keywordSeparator.get();
     }
 
-    public CitationKeyPatternPreferences withKeywordDelimiter(ReadOnlyObjectProperty<Character> newDelimiter) {
-        if (this.keywordDelimiter.isBound()) {
-            this.keywordDelimiter.unbind();
-        }
-
+    public CitationKeyPatternPreferences withKeywordSeparator(ReadOnlyObjectProperty<Character> newDelimiter) {
         if (newDelimiter == null) {
-            this.keywordDelimiter.bind(DEFAULT_KEYWORD_DELIMITER);
+            this.keywordSeparator.bind(DEFAULT_KEYWORD_SEPARATOR);
         } else {
-            this.keywordDelimiter.bind(newDelimiter);
+            this.keywordSeparator.bind(newDelimiter);
         }
 
         return this;
