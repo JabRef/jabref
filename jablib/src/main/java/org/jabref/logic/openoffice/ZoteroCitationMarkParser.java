@@ -2,6 +2,7 @@ package org.jabref.logic.openoffice;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.jabref.logic.util.strings.StringUtil;
@@ -44,7 +45,7 @@ public class ZoteroCitationMarkParser {
             }
 
             return entries;
-        } catch (JsonParseException e) {
+        } catch (JsonParseException | NumberFormatException | NoSuchElementException e) {
             LOGGER.debug("Could not parse Zotero citation mark {}", referenceMarkName, e);
             return List.of();
         }
