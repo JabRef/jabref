@@ -5,7 +5,7 @@ status: proposed
 date: 2026-05-31
 ---
 
-# Introduce JabKit services
+# Separate JabKit Commands and Services
 
 ## Context and Problem Statement
 
@@ -31,7 +31,7 @@ Chosen option: "Introduce shared JabKit services to separate Commands and logic"
 
 * Good, because import/export behavior is kept consistent and reusable.
 * Good, because changes to adapt to new creation or processing are made in one place.
-* Good, because the service layer can be tested without picocli, like typical java classes
+* Good, because the service layer can be tested without picocli, like typical java classes.
 * Bad, because command execution adds a service layer indirection.
 
 ### Confirmation
