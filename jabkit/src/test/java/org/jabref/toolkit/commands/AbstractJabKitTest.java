@@ -10,8 +10,11 @@ import java.util.EnumSet;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -50,9 +53,23 @@ public abstract class AbstractJabKitTest {
         when(preferences.getExportPreferences()).thenReturn(exportPreferences);
         when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        // The deep-stub mock returns nulls for citation-key generation, which the integrity
+        // check and the database writers rely on; provide a real preferences object instead.
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(new CitationKeyPatternPreferences(
+                false,
+                false,
+                false,
+                false,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                "",
+                "",
+                CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS,
+                GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
+                new SimpleObjectProperty<>(',')));
         when(preferences.getSearchPreferences()).thenReturn(new SearchPreferences(
                 SearchDisplayMode.FILTER,
                 EnumSet.noneOf(SearchFlags.class),
+                false,
                 false,
                 false,
                 0,

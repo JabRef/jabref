@@ -25,19 +25,21 @@ class LibraryResourceTest extends ServerTest {
     @Test
     void getJson() {
         assertEquals("""
-                @Misc{Author2023test,
-                  author = {Demo Author},
-                  title  = {Demo Title},
-                  year   = {2023},
-                }
+                        @Misc{Author2023test,
+                          author = {Demo Author},
+                          title  = {Demo Title},
+                          year   = {2023},
+                        }
 
-                @Comment{jabref-meta: databaseType:bibtex;}
-                """, target("/libraries/" + TestBibFile.GENERAL_SERVER_TEST.id).request(JabrefMediaType.BIBTEX).get(String.class));
+                        @Comment{jabref-meta: databaseType:bibtex;}
+                        """,
+                target("/libraries/" + TestBibFile.GENERAL_SERVER_TEST.id).request(JabrefMediaType.BIBTEX).get(String.class));
     }
 
     @Test
     void getClsItemJson() {
         assertEquals("""
-                [{"id":"Author2023test","type":"article","author":[{"family":"Author","given":"Demo"}],"event-date":{"date-parts":[[2023]]},"issued":{"date-parts":[[2023]]},"title":"Demo Title"}]""", target("/libraries/" + TestBibFile.GENERAL_SERVER_TEST.id).request(JabrefMediaType.JSON_CSL_ITEM).get(String.class));
+                        [{"id":"Author2023test","type":"article","author":[{"family":"Author","given":"Demo"}],"event-date":{"date-parts":[[2023]]},"issued":{"date-parts":[[2023]]},"title":"Demo Title"}]""",
+                target("/libraries/" + TestBibFile.GENERAL_SERVER_TEST.id).request(JabrefMediaType.JSON_CSL_ITEM).get(String.class));
     }
 }

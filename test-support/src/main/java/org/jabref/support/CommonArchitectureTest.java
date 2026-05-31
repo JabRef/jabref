@@ -78,6 +78,14 @@ public class CommonArchitectureTest {
     }
 
     @ArchTest
+    public void doNotUseGuavaCache(JavaClasses classes) {
+        ArchRuleDefinition.noClasses()
+                          .should().dependOnClassesThat().resideInAPackage("com.google.common.cache..")
+                          .because("Caffeine (com.github.benmanes.caffeine.cache) should be used for caching")
+                          .check(classes);
+    }
+
+    @ArchTest
     public void doNotUseJavaAWT(JavaClasses classes) {
         ArchRuleDefinition.noClasses().that().areNotAnnotatedWith(AllowedToUseAwt.class)
                           .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVA_AWT)
@@ -136,7 +144,7 @@ public class CommonArchitectureTest {
     public void restrictUsagesInLogic(JavaClasses classes) {
         ArchRuleDefinition.noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
                           .and().areNotAnnotatedWith(AllowedToUseSwing.class)
-                          .and().areNotAssignableFrom("org.jabref.logic.search.DatabaseSearcherWithBibFilesTest")
+                          .and().areNotAssignableFrom("org.jabref.logic.search.sqlbased.SqlBasedLibrarySearcherWithBibFilesTest")
                           .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
                           .check(classes);
     }
@@ -194,7 +202,7 @@ public class CommonArchitectureTest {
                                   "javax.annotation..",
                                   "org.eclipse.jgit.annotations",
                                   "org.jetbrains.annotations..")
-                          .because("JSpecify annotations should be used")
+                          .because("JSpecify or Guava's @VisisbleForTesting annotations should be used")
                           .check(classes);
     }
 }

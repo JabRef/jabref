@@ -310,6 +310,7 @@ public class BibDatabaseWriter {
         List<BibtexString> strings = database.getStringKeySet()
                                              .stream()
                                              .map(database::getString)
+                                             .flatMap(Optional::stream)
                                              .sorted(new BibtexStringComparator(true))
                                              .toList();
         // First, make a Map of all entries:

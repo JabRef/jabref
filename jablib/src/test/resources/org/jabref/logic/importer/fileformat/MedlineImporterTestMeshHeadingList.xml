@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PubmedArticleSet>
+    <PubmedArticle>
+        <MedlineCitation Owner="NLM" Status="MEDLINE">
+            <PMID Version="1">12345678</PMID>
+            <Article PubModel="Print">
+                <Journal>
+                    <ISSN IssnType="Print">0000-0000</ISSN>
+                    <JournalIssue CitedMedium="Print">
+                        <Volume>1</Volume>
+                        <PubDate><Year>2024</Year></PubDate>
+                    </JournalIssue>
+                    <Title>Test Journal</Title>
+                </Journal>
+                <ArticleTitle>Test article for MeSH heading parsing.</ArticleTitle>
+                <Language>eng</Language>
+            </Article>
+            <MeshHeadingList>
+                <MeshHeading>
+                    <DescriptorName UI="D006801" MajorTopicYN="N">Humans</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D012984" MajorTopicYN="Y">Software</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D007674" MajorTopicYN="Y">Kidney Diseases</DescriptorName>
+                    <QualifierName UI="Q000175" MajorTopicYN="N">diagnosis</QualifierName>
+                    <QualifierName UI="Q000453" MajorTopicYN="N">epidemiology</QualifierName>
+                    <QualifierName UI="Q000628" MajorTopicYN="N">therapy</QualifierName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D008962" MajorTopicYN="N">Models, Theoretical</DescriptorName>
+                    <QualifierName UI="Q000379" MajorTopicYN="Y">methods</QualifierName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D000001" MajorTopicYN="Y">Sample Heading</DescriptorName>
+                    <QualifierName UI="Q000001" MajorTopicYN="Y">analysis</QualifierName>
+                </MeshHeading>
+            </MeshHeadingList>
+        </MedlineCitation>
+        <PubmedData>
+            <PublicationStatus>ppublish</PublicationStatus>
+            <ArticleIdList>
+                <ArticleId IdType="pubmed">12345678</ArticleId>
+            </ArticleIdList>
+        </PubmedData>
+    </PubmedArticle>
+</PubmedArticleSet>

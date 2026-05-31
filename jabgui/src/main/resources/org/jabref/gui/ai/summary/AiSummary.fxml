@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.StackPane?>
+<?import org.jabref.gui.ai.AiPrivacyNoticeView?>
+<?import org.jabref.gui.ai.statuspane.UniversalStatusPaneView?>
+<?import org.jabref.gui.ai.summary.AiSummaryShowingView?>
+<fx:root
+        type="StackPane"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.jabref.gui.ai.summary.AiSummaryView">
+
+    <AiPrivacyNoticeView
+            fx:id="privacyNotice"/>
+
+    <UniversalStatusPaneView
+            fx:id="processingPane"
+            title="%Processing..."
+            showSpinner="true"
+            showButton1="true"
+            button1Text="%Cancel"
+            onButton1Click="#cancel"/>
+
+    <UniversalStatusPaneView
+            fx:id="errorPane"
+            title="%Unable to generate summary"
+            description="%Got error while processing the file:"
+            showTextArea="true"
+            showButton1="true"
+            button1Text="%Regenerate"
+            onButton1Click="#regenerate"
+            showButton2="true"
+            button2Text="%Regenerate with custom parameters"
+            onButton2Click="#regenerateCustom"/>
+
+    <UniversalStatusPaneView
+            fx:id="cancelledPane"
+            title="%Unable to generate summary"
+            description="%The operation was cancelled."
+            showButton1="true"
+            button1Text="%Regenerate"
+            onButton1Click="#regenerate"
+            showButton2="true"
+            button2Text="%Cancel"
+            onButton2Click="#regenerateCustom"/>
+
+    <UniversalStatusPaneView
+            fx:id="noFilesPane"
+            title="%Unable to generate summary"
+            description="%Please attach at least one PDF file to enable summarization of PDF file(s)."/>
+
+    <UniversalStatusPaneView
+            fx:id="noSupportedFileTypesPane"
+            title="%Unable to generate summary"
+            description="%Only PDF files are supported."/>
+
+    <AiSummaryShowingView
+            fx:id="summaryShowing"
+            onRegenerate="#regenerate"
+            onRegenerateCustom="#regenerateCustom"/>
+
+</fx:root>

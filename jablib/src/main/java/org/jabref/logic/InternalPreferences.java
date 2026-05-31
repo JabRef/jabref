@@ -6,9 +6,8 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.model.metadata.UserHostInfo;
 
@@ -17,19 +16,41 @@ public class InternalPreferences {
     private final ObjectProperty<Version> ignoredVersion;
     private final BooleanProperty versionCheckEnabled;
     private final ObjectProperty<Path> lastPreferencesExportPath;
-    private final StringProperty userAndHost;
+    private final ObjectProperty<UserHostInfo> userHostInfo;
     private final BooleanProperty memoryStickMode;
+
+    private InternalPreferences() {
+        this(
+                Version.parse(""),                                     // No ignored version
+                true,                                                  // Version check enabled
+                Path.of(System.getProperty("user.home")),              // Preferences export path
+                OS.getUserHostInfo(System.getProperty("user.name")),   // User and host
+                false                                                  // Memory stick mode
+        );
+    }
 
     public InternalPreferences(Version ignoredVersion,
                                boolean versionCheck,
                                Path exportPath,
-                               String userAndHost,
+                               UserHostInfo userHostInfo,
                                boolean memoryStickMode) {
         this.ignoredVersion = new SimpleObjectProperty<>(ignoredVersion);
         this.versionCheckEnabled = new SimpleBooleanProperty(versionCheck);
         this.lastPreferencesExportPath = new SimpleObjectProperty<>(exportPath);
-        this.userAndHost = new SimpleStringProperty(userAndHost);
+        this.userHostInfo = new SimpleObjectProperty<>(userHostInfo);
         this.memoryStickMode = new SimpleBooleanProperty(memoryStickMode);
+    }
+
+    public static InternalPreferences getDefault() {
+        return new InternalPreferences();
+    }
+
+    public void setAll(InternalPreferences preferences) {
+        this.ignoredVersion.set(preferences.getIgnoredVersion());
+        this.versionCheckEnabled.set(preferences.isVersionCheckEnabled());
+        this.lastPreferencesExportPath.set(preferences.getLastPreferencesExportPath());
+        this.userHostInfo.set(preferences.getUserHostInfo());
+        this.memoryStickMode.set(preferences.isMemoryStickMode());
     }
 
     public Version getIgnoredVersion() {
@@ -68,26 +89,16 @@ public class InternalPreferences {
         this.lastPreferencesExportPath.set(lastPreferencesExportPath);
     }
 
-    public String getUserAndHost() {
-        return userAndHost.get();
-    }
-
-    public StringProperty getUserAndHostProperty() {
-        return userAndHost;
-    }
-
-    /// Returns the user and host information as a UserHostInfo object.
-    ///
-    /// @return the user and host information
     public UserHostInfo getUserHostInfo() {
-        return UserHostInfo.parse(getUserAndHost());
+        return userHostInfo.get();
     }
 
-    /// Sets the user and host information from a UserHostInfo object.
-    ///
-    /// @param userHostInfo the user and host information
+    public ObjectProperty<UserHostInfo> getUserAndHostInfoProperty() {
+        return userHostInfo;
+    }
+
     public void setUserHostInfo(UserHostInfo userHostInfo) {
-        userAndHost.set(userHostInfo.getUserHostString());
+        this.userHostInfo.set(userHostInfo);
     }
 
     public boolean isMemoryStickMode() {

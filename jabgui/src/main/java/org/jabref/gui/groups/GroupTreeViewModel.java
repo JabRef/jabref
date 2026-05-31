@@ -19,20 +19,25 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.stage.WindowEvent;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.ai.components.aichat.AiChatWindow;
+import org.jabref.gui.ai.chat.AiGroupChatWindow;
 import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.ingestion.tasks.generateembeddingsforseveral.GenerateEmbeddingsForSeveralTaskRequest;
+import org.jabref.logic.ai.summarization.tasks.GenerateSummaryTaskRequest;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.query.GroupNameFilterVisitor;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.ai.identifiers.FullBibEntry;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -49,7 +54,6 @@ import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 
 import com.tobiasdiez.easybind.EasyBind;
-import dev.langchain4j.data.message.ChatMessage;
 import org.jspecify.annotations.NonNull;
 
 public class GroupTreeViewModel extends AbstractViewModel {
@@ -431,48 +435,36 @@ public class GroupTreeViewModel extends AbstractViewModel {
     public void chatWithGroup(GroupNodeViewModel group) {
         assert currentDatabase.isPresent();
 
-        StringProperty groupNameProperty = group.getGroupNode().getGroup().nameProperty();
+        BibDatabaseContext context = currentDatabase.get();
+        String groupName = group.getGroupNode().getGroup().getName();
 
-        // We localize the name here, because it is used as the title of the window.
-        // See documentation for {@link AiChatGuardedComponent#name}.
-        StringProperty nameProperty = new SimpleStringProperty(Localization.lang("Group %0", groupNameProperty.get()));
-        groupNameProperty.addListener((obs, oldValue, newValue) -> nameProperty.setValue(Localization.lang("Group %0", groupNameProperty.get())));
-
-        ObservableList<ChatMessage> chatHistory = aiService.getChatHistoryService().getChatHistoryForGroup(currentDatabase.get(), group.getGroupNode());
-        ObservableList<BibEntry> bibEntries = FXCollections.observableArrayList(group.getGroupNode().findMatches(currentDatabase.get().getDatabase()));
-
-        openAiChat(nameProperty, chatHistory, currentDatabase.get(), bibEntries);
-    }
-
-    private void openAiChat(StringProperty name, ObservableList<ChatMessage> chatHistory, BibDatabaseContext bibDatabaseContext, ObservableList<BibEntry> entries) {
-        Optional<AiChatWindow> existingWindow = stateManager.getAiChatWindows().stream().filter(window -> window.getChatName().equals(name.get())).findFirst();
+        Optional<AiGroupChatWindow> existingWindow = stateManager.getAiChatWindowForGroup(context, groupName);
 
         if (existingWindow.isPresent()) {
-            existingWindow.get().requestFocus();
-        } else {
-            AiChatWindow aiChatWindow = new AiChatWindow(
-                    entryTypesManager,
-                    preferences.getAiPreferences(),
-                    fieldPreferences,
-                    preferences.getExternalApplicationsPreferences(),
-                    aiService,
-                    dialogService,
-                    adaptVisibleTabs,
-                    taskExecutor
-            );
-
-            aiChatWindow.setOnCloseRequest(event ->
-                    stateManager.getAiChatWindows().remove(aiChatWindow)
-            );
-
-            stateManager.getAiChatWindows().add(aiChatWindow);
-            dialogService.showCustomWindow(aiChatWindow);
-            aiChatWindow.setChat(name, chatHistory, bibDatabaseContext, entries);
-            aiChatWindow.requestFocus();
+            BaseDialog.bringToFront(existingWindow.get());
+            return;
         }
+
+        AiGroupChatWindow aiChatWindow = new AiGroupChatWindow();
+        aiChatWindow.databaseContextProperty().set(context);
+        aiChatWindow.groupNodeProperty().set(group);
+
+        aiChatWindow.getDialogPane().getScene().getWindow().addEventHandler(
+                WindowEvent.WINDOW_CLOSE_REQUEST,
+                _ -> stateManager.removeAiChatWindowForGroup(context, groupName)
+        );
+
+        stateManager.setAiChatWindowForGroup(context, groupName, aiChatWindow);
+
+        dialogService.showCustomDialogModal(aiChatWindow);
+        BaseDialog.bringToFront(aiChatWindow);
     }
 
     public void generateEmbeddings(GroupNodeViewModel groupNode) {
+        if (!preferences.getAiPreferences().getEnableAi() || !preferences.getAiPreferences().getAutoGenerateEmbeddings()) {
+            return;
+        }
+
         assert currentDatabase.isPresent();
 
         AbstractGroup group = groupNode.getGroupNode().getGroup();
@@ -486,16 +478,27 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 .flatMap(entry -> entry.getFiles().stream())
                 .toList();
 
-        aiService.getIngestionService().ingest(
-                group.nameProperty(),
-                linkedFiles,
-                currentDatabase.get()
-        );
+        aiService.getIngestionTaskAggregator()
+                 .start(new GenerateEmbeddingsForSeveralTaskRequest(
+                         preferences.getFilePreferences(),
+                         aiService.getIngestedDocumentsRepository(),
+                         aiService.getEmbeddingsStore(),
+                         aiService.getCurrentEmbeddingModel(),
+                         aiService.getCurrentDocumentSplitter(),
+                         currentDatabase.get(),
+                         group.nameProperty(),
+                         linkedFiles,
+                         taskExecutor
+                 ));
 
         dialogService.notify(Localization.lang("Ingestion started for group \"%0\".", group.getName()));
     }
 
     public void generateSummaries(GroupNodeViewModel groupNode) {
+        if (!preferences.getAiPreferences().getEnableAi() || !preferences.getAiPreferences().getAutoGenerateSummaries()) {
+            return;
+        }
+
         assert currentDatabase.isPresent();
 
         AbstractGroup group = groupNode.getGroupNode().getGroup();
@@ -508,10 +511,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 .filter(group::isMatch)
                 .toList();
 
-        aiService.getSummariesService().summarize(
-                group.nameProperty(),
-                entries,
-                currentDatabase.get()
+        entries.forEach(entry ->
+                aiService.getSummarizationTaskAggregator().start(
+                        new GenerateSummaryTaskRequest(
+                                preferences.getFilePreferences(),
+                                aiService.getCurrentChatModel(),
+                                aiService.getCurrentSummarizator(),
+                                new FullBibEntry(currentDatabase.get(), entry),
+                                false
+                        )
+                )
         );
 
         dialogService.notify(Localization.lang("Summarization started for group \"%0\".", group.getName()));

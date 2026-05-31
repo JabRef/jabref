@@ -87,12 +87,12 @@ public class SearchQueryVisitor extends SearchBaseVisitor<BaseQueryNode> {
 
         // Pseudo-fields
         field = switch (field) {
-            case "key" ->
+            case SearchFieldConstants.KEY ->
                     InternalField.KEY_FIELD.getName();
-            case "anykeyword" ->
+            case SearchFieldConstants.ANY_KEYWORD ->
                     StandardField.KEYWORDS.getName();
-            case "anyfield" ->
-                    "any";
+            case SearchFieldConstants.ANY_FIELD_ALIAS ->
+                    SearchFieldConstants.ANY_FIELD;
             default ->
                     field;
         };
@@ -104,7 +104,7 @@ public class SearchQueryVisitor extends SearchBaseVisitor<BaseQueryNode> {
             }
         }
 
-        if ("any".equals(field)) {
+        if (SearchFieldConstants.ANY_FIELD.equals(field)) {
             return new SearchQueryNode(Optional.empty(), term);
         }
 

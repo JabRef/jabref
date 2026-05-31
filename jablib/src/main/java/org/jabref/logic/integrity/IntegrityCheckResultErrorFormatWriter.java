@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 
 public class IntegrityCheckResultErrorFormatWriter extends IntegrityCheckResultWriter {
 
@@ -18,14 +20,23 @@ public class IntegrityCheckResultErrorFormatWriter extends IntegrityCheckResultW
         this.inputFile = inputFile;
     }
 
+    // [impl->req~jabkit.cli.check-errorformat-output~1]
     @Override
     public void writeFindings() throws IOException {
         for (IntegrityMessage message : messages) {
-            ParserResult.Range fieldRange = parserResult.getFieldRange(message.entry(), message.field());
-            writer.append("%s:%d:%d: %s\n".formatted(
+            // Entry-level findings (e.g. on the citation key itself) carry only the citation key;
+            // field-level findings additionally carry the field name.
+            String location = message.entry().getCitationKey().orElse(message.entry().getAuthorTitleYear(5));
+            Field field = message.field();
+            ParserResult.Range fieldRange = parserResult.getFieldRange(message.entry(), field);
+            if (field != InternalField.KEY_FIELD) {
+                location += ":" + field.getName();
+            }
+            writer.append("%s:%d:%d:%s: %s\n".formatted(
                     inputFile,
                     fieldRange.startLine(),
                     fieldRange.startColumn(),
+                    location,
                     message.message()));
         }
     }

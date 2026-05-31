@@ -1,5 +1,9 @@
 package org.jabref.toolkit.commands;
 
+import java.util.concurrent.Callable;
+
+import org.jabref.logic.l10n.Localization;
+
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.ParentCommand;
@@ -11,7 +15,7 @@ import static picocli.CommandLine.ParentCommand;
                 // RemoveEmbedded.class
                 // RemovePrivateFields.class
         })
-class Pdf implements Runnable {
+class Pdf implements Callable<Integer> {
     @ParentCommand
     protected JabKit argumentProcessor;
 
@@ -19,7 +23,8 @@ class Pdf implements Runnable {
     private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
     @Override
-    public void run() {
-        System.out.println("Specify a subcommand (write-xmp, update).");
+    public Integer call() {
+        System.err.println(Localization.lang("Specify a subcommand (write-xmp, update)."));
+        return 2;
     }
 }
