@@ -114,16 +114,8 @@ public class ZoteroCitationMarkParser {
             return;
         }
 
-        String firstDatePart = dateParts.getFirst();
-        if (StringUtil.isBlank(firstDatePart)) {
-            return;
-        }
-
-        if (firstDatePart.length() == 4) {
-            setDateWithYear(entry, firstDatePart, dateParts);
-        } else {
-            setDateWithoutYear(entry, dateParts);
-        }
+        String dateString = String.join("-", dateParts);
+        Date.parse(dateString).ifPresent(entry::withDate);
     }
 
     private static void setDateWithYear(BibEntry entry, String year, List<String> dateParts) {
