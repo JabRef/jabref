@@ -10,11 +10,31 @@ public class MrDlibPreferences {
     private final BooleanProperty sendOs;
     private final BooleanProperty sendTimezone;
 
+    private MrDlibPreferences() {
+        this(
+                false, // Accept recommendations
+                false, // Send language
+                false, // Send OS
+                false  // Send timezone
+        );
+    }
+
     public MrDlibPreferences(boolean acceptRecommendations, boolean shouldSendLanguage, boolean shouldSendOs, boolean shouldSendTimezone) {
         this.acceptRecommendations = new SimpleBooleanProperty(acceptRecommendations);
         this.sendLanguage = new SimpleBooleanProperty(shouldSendLanguage);
         this.sendOs = new SimpleBooleanProperty(shouldSendOs);
         this.sendTimezone = new SimpleBooleanProperty(shouldSendTimezone);
+    }
+
+    public static MrDlibPreferences getDefault() {
+        return new MrDlibPreferences();
+    }
+
+    public void setAll(MrDlibPreferences preferences) {
+        this.acceptRecommendations.set(preferences.shouldAcceptRecommendations());
+        this.sendLanguage.set(preferences.shouldSendLanguage());
+        this.sendOs.set(preferences.shouldSendOs());
+        this.sendTimezone.set(preferences.shouldSendTimezone());
     }
 
     public boolean shouldAcceptRecommendations() {

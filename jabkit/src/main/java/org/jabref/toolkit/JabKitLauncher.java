@@ -213,6 +213,6 @@ public class JabKitLauncher {
     }
 
     private static void configureSSL(SSLPreferences sslPreferences) {
-        TrustStoreManager.createTruststoreFileIfNotExist(Path.of(sslPreferences.getTruststorePath()));
+        TrustStoreManager.createTruststoreFileIfNotExist(sslPreferences.getTruststorePath());
     }
 }
