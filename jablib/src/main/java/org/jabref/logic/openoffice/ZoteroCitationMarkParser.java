@@ -101,9 +101,6 @@ public class ZoteroCitationMarkParser {
         return Optional.of(AuthorList.of(authors).getAsLastFirstNamesWithAnd(false));
     }
 
-    ///  Zotero supports 6 types of date format:
-    ///  y-m-d, y-d, y-m, m-d, m, d
-    ///  If the number is less or equal than 12, Zotero thinks it is month, otherwise day.
     private static void setDate(BibEntry entry, ZoteroCitationData.IssuedData issuedData) {
         if (issuedData.dateParts.isEmpty()) {
             return;
