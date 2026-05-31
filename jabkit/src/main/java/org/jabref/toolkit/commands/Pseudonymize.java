@@ -3,7 +3,6 @@ package org.jabref.toolkit.commands;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import org.jabref.logic.importer.ParserResult;
@@ -13,7 +12,8 @@ import org.jabref.logic.pseudonymization.PseudonymizationResultCsvWriter;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.toolkit.converter.CygWinPathConverter;
-import org.jabref.toolkit.exception.ExportException;
+import org.jabref.toolkit.exception.ExportServiceException;
+import org.jabref.toolkit.exception.ImportServiceException;
 import org.jabref.toolkit.service.ExportService;
 import org.jabref.toolkit.service.ImportService;
 
@@ -50,35 +50,27 @@ class Pseudonymize implements Callable<Integer> {
     private boolean force;
 
     @Override
-    public Integer call() {
+    public Integer call() throws ImportServiceException, ExportServiceException {
         Path inputPath = inputOption.getInputFile();
         String fileName = FileUtil.getBaseName(inputPath);
         Path pseudoBibPath = resolveOutputPath(outputFile, inputPath, fileName + PSEUDO_SUFFIX + BIB_EXTENSION);
         Path pseudoKeyPath = resolveOutputPath(keyFile, inputPath, fileName + PSEUDO_SUFFIX + CSV_EXTENSION);
 
-        Optional<ParserResult> parserResult = ImportService.importBibTexFile(inputPath, argumentProcessor.cliPreferences, sharedOptions.porcelain);
-        if (parserResult.isEmpty()) {
-            return 2;
-        }
+        ParserResult parserResult = ImportService.importBibTexFile(inputPath, argumentProcessor.cliPreferences, sharedOptions.porcelain);
 
         System.out.println(Localization.lang("Pseudonymizing library '%0'...", fileName));
         Character keywordSeparator = argumentProcessor.cliPreferences.getBibEntryPreferences().getKeywordSeparator();
         Pseudonymization pseudonymization = new Pseudonymization(keywordSeparator);
-        BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
+        BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
         Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
 
         if (!fileOverwriteCheck(pseudoBibPath)) {
             return 2;
         }
 
-        try {
-            ExportService.create(argumentProcessor.cliPreferences).saveDatabaseContext(
-                    result.bibDatabaseContext(),
-                    pseudoBibPath);
-        } catch (ExportException ex) {
-            // TODO this just informs the user, maybe to lax?
-            System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
-        }
+        ExportService.create(argumentProcessor.cliPreferences).saveDatabaseContext(
+                result.bibDatabaseContext(),
+                pseudoBibPath);
 
         if (!fileOverwriteCheck(pseudoKeyPath)) {
             return 2;

@@ -10,7 +10,7 @@ import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.toolkit.converter.CitationFetcherTypeConverter;
-import org.jabref.toolkit.exception.ExportException;
+import org.jabref.toolkit.exception.ExportServiceException;
 import org.jabref.toolkit.service.CitationFetcherFactory;
 import org.jabref.toolkit.service.ExportService;
 
@@ -65,7 +65,7 @@ class GetCitedWorks implements Callable<Integer> {
     }
 
     @Override
-    public Integer call() throws ExportException, FetcherException {
+    public Integer call() throws ExportServiceException, FetcherException {
         // TODO: validateJSR380(); - i.e. no output-format without output-file
         // TODO: e.g. format needs output; format must be valid
         initFields();

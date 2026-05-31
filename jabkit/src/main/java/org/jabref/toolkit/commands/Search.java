@@ -2,7 +2,6 @@ package org.jabref.toolkit.commands;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import org.jabref.logic.importer.ParserResult;
@@ -14,13 +13,13 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.toolkit.converter.CygWinPathConverter;
-import org.jabref.toolkit.exception.ExportException;
+import org.jabref.toolkit.exception.ExportServiceException;
+import org.jabref.toolkit.exception.ImportServiceException;
 import org.jabref.toolkit.service.ExportService;
 import org.jabref.toolkit.service.ImportService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import picocli.CommandLine;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
@@ -50,18 +49,15 @@ class Search implements Callable<Integer> {
     private String outputFormat = "bibtex";
 
     @Override
-    public Integer call() {
+    public Integer call() throws ImportServiceException, ExportServiceException {
         Path inputFile = inputOption.getInputFile();
 
-        Optional<ParserResult> parserResult = ImportService.importBibTexFile(inputFile, argumentProcessor.cliPreferences, sharedOptions.porcelain);
-        if (parserResult.isEmpty()) {
-            return 2;
-        }
+        ParserResult parserResult = ImportService.importBibTexFile(inputFile, argumentProcessor.cliPreferences, sharedOptions.porcelain);
 
         SearchPreferences searchPreferences = argumentProcessor.cliPreferences.getSearchPreferences();
         SearchQuery searchQuery = new SearchQuery(query, searchPreferences.getSearchFlags());
 
-        BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
+        BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
         LibrarySearcher searcher = new InMemoryLibrarySearcher(databaseContext, argumentProcessor.cliPreferences.getBibEntryPreferences());
         List<BibEntry> matches = searcher.getMatches(searchQuery);
 
@@ -71,22 +67,10 @@ class Search implements Callable<Integer> {
         }
 
         if ("bibtex".equals(outputFormat)) {
-            try {
-                ExportService.create(argumentProcessor.cliPreferences).saveBibEntries(matches, outputFile);
-            } catch (ExportException ex) {
-                // TODO this just informs the user, maybe to lax?
-                System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
-                return 1;
-            }
+            ExportService.create(argumentProcessor.cliPreferences).saveBibEntries(matches, outputFile);
             LOGGER.debug("Finished export");
         } else {
-            try {
-                ExportService.create(argumentProcessor.cliPreferences).exportBibDatabaseContextToFile(databaseContext, matches, outputFile, outputFormat);
-                return CommandLine.ExitCode.OK;
-            } catch (ExportException ex) {
-                System.err.println(ex.getLocalizedMessage() + " (" + (ex.getCause() == null ? "" : ex.getCause().getLocalizedMessage()) + ")");
-                return ex.getExitCode();
-            }
+            ExportService.create(argumentProcessor.cliPreferences).exportBibDatabaseContextToFile(databaseContext, matches, outputFile, outputFormat);
         }
         return 0;
     }

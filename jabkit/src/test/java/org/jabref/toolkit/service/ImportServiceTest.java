@@ -1,7 +1,6 @@
 package org.jabref.toolkit.service;
 
 import java.nio.file.Path;
-import java.util.Optional;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabase;
@@ -15,26 +14,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ImportServiceTest extends AbstractJabKitTest {
 
     @Test
-    void importBibtexFile() {
+    void importBibtexFile() throws Exception {
         Path source = getClassResourceAsPath("origin.bib").toAbsolutePath();
-        Optional<ParserResult> parserResult = ImportService.importBibTexFile(source, preferences, true);
+        ParserResult parserResult = ImportService.importBibTexFile(source, preferences, true);
 
-        BibDatabase database = parserResult.get().getDatabase();
+        BibDatabase database = parserResult.getDatabase();
         assertTrue(database.getEntries().size() > 1);
-        database.getEntries().forEach(entry -> {
-            assertTrue(entry.getField(StandardField.TITLE).isPresent());
-        });
+        database.getEntries().forEach(entry -> assertTrue(entry.getField(StandardField.TITLE).isPresent()));
     }
 
     @Test
-    void importFileWithAutoDetection() {
+    void importFileWithAutoDetection() throws Exception {
         Path source = getClassResourceAsPath("origin.bib").toAbsolutePath();
-        Optional<ParserResult> parserResult = ImportService.importFile(source, "*", preferences, true);
+        ParserResult parserResult = ImportService.importFile(source, "*", preferences, true);
 
-        BibDatabase database = parserResult.get().getDatabase();
+        BibDatabase database = parserResult.getDatabase();
         assertTrue(database.getEntries().size() > 1);
-        database.getEntries().forEach(entry -> {
-            assertTrue(entry.getField(StandardField.TITLE).isPresent());
-        });
+        database.getEntries().forEach(entry -> assertTrue(entry.getField(StandardField.TITLE).isPresent()));
     }
 }

@@ -33,7 +33,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.toolkit.exception.ExportException;
+import org.jabref.toolkit.exception.ExportServiceException;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
@@ -76,17 +76,17 @@ public class ExportService {
                      .toList();
     }
 
-    public void printBibEntriesToStdOut(List<BibEntry> entries) throws ExportException {
+    public void printBibEntriesToStdOut(List<BibEntry> entries) throws ExportServiceException {
         printDatabaseContextToStdOut(new BibDatabaseContext(new BibDatabase(entries)));
     }
 
-    public void printDatabaseContextToStdOut(BibDatabaseContext bibDatabaseContext) throws ExportException {
+    public void printDatabaseContextToStdOut(BibDatabaseContext bibDatabaseContext) throws ExportServiceException {
         try (OutputStreamWriter writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
             generateCitationKeys(bibDatabaseContext, cliPreferences.getCitationKeyPatternPreferences());
             BibDatabaseWriter bibWriter = new BibDatabaseWriter(writer, bibDatabaseContext, cliPreferences);
             bibWriter.writeDatabase(bibDatabaseContext);
         } catch (IOException ex) {
-            throw new ExportException("Unable to write to stdout",
+            throw new ExportServiceException("Unable to write to stdout",
                     Localization.lang("Unable to write to %0.", "stdout"),
                     ex, CommandLine.ExitCode.SOFTWARE);
         }
@@ -94,26 +94,26 @@ public class ExportService {
 
     public void saveBibEntries(
             List<BibEntry> matches,
-            Path outputFile) throws ExportException {
+            Path outputFile) throws ExportServiceException {
 
         saveDatabase(new BibDatabase(matches), outputFile);
     }
 
     public void saveDatabase(
             BibDatabase newBase,
-            Path outputFile) throws ExportException {
+            Path outputFile) throws ExportServiceException {
 
         saveDatabaseContext(new BibDatabaseContext(newBase), outputFile);
     }
 
     public void saveDatabaseContext(
             BibDatabaseContext bibDatabaseContext,
-            Path outputFile) throws ExportException {
+            Path outputFile) throws ExportServiceException {
 
         try {
             internalSaveDatabaseContext(bibDatabaseContext, outputFile);
         } catch (IOException ex) {
-            throw new ExportException("Unable to write to stdout",
+            throw new ExportServiceException("Unable to write to stdout",
                     Localization.lang("Unable to write to %0.", "stdout"),
                     ex, CommandLine.ExitCode.SOFTWARE);
         }
@@ -149,7 +149,7 @@ public class ExportService {
 
     public void exportEntriesToFile(
             List<BibEntry> entries,
-            Path outputFile, String outputFormat) throws ExportException {
+            Path outputFile, String outputFormat) throws ExportServiceException {
 
         exportBibDatabaseContextToFile(
                 new BibDatabaseContext(new BibDatabase(entries)),
@@ -163,7 +163,7 @@ public class ExportService {
             BibDatabaseContext databaseContext,
             List<BibEntry> matches,
             Path outputFile,
-            String outputFormat) throws ExportException {
+            String outputFormat) throws ExportServiceException {
 
         Exporter exporter = getExporterByName(outputFormat);
         tryExportWithExporter(exporter, outputFile, databaseContext, matches, List.of());
@@ -173,7 +173,7 @@ public class ExportService {
             @NonNull ParserResult parserResult,
             @NonNull Path outputFile,
             String format,
-            boolean porcelain) throws ExportException {
+            boolean porcelain) throws ExportServiceException {
 
         if (!porcelain) {
             System.out.println(Localization.lang("Exporting '%0'.", outputFile));
@@ -195,26 +195,26 @@ public class ExportService {
             Exporter exporter, @NonNull Path outputFile,
             BibDatabaseContext databaseContext,
             List<BibEntry> entries,
-            List<Path> fileDirForDatabase) throws ExportException {
+            List<Path> fileDirForDatabase) throws ExportServiceException {
 
         try {
             JournalAbbreviationRepository abbreviationRepository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
             System.out.println(Localization.lang("Exporting %0", outputFile.toAbsolutePath().toString()));
             exporter.export(databaseContext, outputFile, entries, fileDirForDatabase, abbreviationRepository);
         } catch (IOException | SaveException | ParserConfigurationException | TransformerException ex) {
-            throw new ExportException("Failed to export file.",
+            throw new ExportServiceException("Failed to export file.",
                     Localization.lang("Failed to export file."),
                     ex, CommandLine.ExitCode.SOFTWARE);
         }
     }
 
-    private Exporter getExporterByName(String exporterId) throws ExportException {
+    private Exporter getExporterByName(String exporterId) throws ExportServiceException {
         return exporterFactory.getExporterByName(exporterId)
                               .or(() -> bibtexExporter.getId().equalsIgnoreCase(exporterId) ?
                                         Optional.of(bibtexExporter) :
                                         Optional.empty())
                               .orElseThrow(
-                                      () -> new ExportException("Unknown export format '" + exporterId + "'.",
+                                      () -> new ExportServiceException("Unknown export format '" + exporterId + "'.",
                                               Localization.lang("Unknown export format '%0'.", exporterId),
                                               CommandLine.ExitCode.USAGE));
     }

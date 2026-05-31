@@ -3,7 +3,6 @@ package org.jabref.toolkit.service;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 
 import javafx.util.Pair;
 
@@ -16,19 +15,16 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.toolkit.exception.ImportServiceException;
 
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
 public class ImportService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportService.class);
-
-    /// Outcome of [#importBibtexLibrary]. On success, [#parserResult()] is non-null. On failure, it
-    /// is `null` and [#exitCode()] holds the error code the command should return.
-    public record ImportOutcome(@Nullable ParserResult parserResult, int exitCode) {
-    }
 
     public static List<Pair<String, String>> getAvailableImportFormats(CliPreferences preferences) {
         ImportFormatReader importFormatReader = new ImportFormatReader(
@@ -43,10 +39,20 @@ public class ImportService {
                 .toList();
     }
 
-    public static Optional<ParserResult> importFile(Path file,
-                                                    String importFormat,
-                                                    CliPreferences cliPreferences,
-                                                    boolean porcelain) {
+    public static @NonNull ParserResult importBibTexFile(
+            Path inputFile,
+            CliPreferences cliPreferences,
+            boolean porcelain) throws ImportServiceException {
+
+        return importFile(inputFile, "bibtex", cliPreferences, porcelain);
+    }
+
+    public static @NonNull ParserResult importFile(
+            Path inputFile,
+            String importFormat,
+            CliPreferences cliPreferences,
+            boolean porcelain) throws ImportServiceException {
+
         try {
             ImportFormatReader importFormatReader = new ImportFormatReader(
                     cliPreferences.getImporterPreferences(),
@@ -55,51 +61,43 @@ public class ImportService {
                     new DummyFileUpdateMonitor()
             );
 
+            ParserResult result;
             if (!"*".equals(importFormat)) {
                 if (!porcelain) {
-                    System.out.println(Localization.lang("Importing %0", file));
+                    System.out.println(Localization.lang("Importing %0", inputFile));
                 }
-                ParserResult result = importFormatReader.importFromFile(importFormat, file);
-                return Optional.of(result);
+                result = importFormatReader.importFromFile(importFormat, inputFile);
             } else {
                 // * means "guess the format":
                 if (!porcelain) {
-                    System.out.println(Localization.lang("Importing file %0 as unknown format", file));
+                    System.out.println(Localization.lang("Importing file %0 as unknown format", inputFile));
                 }
 
-                ImportFormatReader.ImportResult importResult = importFormatReader.importWithAutoDetection(file);
+                ImportFormatReader.ImportResult importResult = importFormatReader.importWithAutoDetection(inputFile);
 
                 if (!porcelain) {
                     System.out.println(Localization.lang("Format used: %0", importResult.format()));
                 }
-                return Optional.of(importResult.parserResult());
+                result = importResult.parserResult();
             }
-        } catch (ImportException ex) {
-            LOGGER.error("Error opening file '{}'", file, ex);
-            return Optional.empty();
-        }
-    }
 
-    /// Imports `inputFile` as a BibTeX library and validates it. On failure, an error message is
-    /// printed and the returned [ImportOutcome] carries a `null` parser result plus the exit code.
-    public static ImportOutcome importBibtexLibrary(Path inputFile, CliPreferences cliPreferences, boolean porcelain) {
-        Optional<ParserResult> parserResult = importFile(inputFile, "bibtex", cliPreferences, porcelain);
-        if (parserResult.isEmpty()) {
-            System.err.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return new ImportOutcome(null, 2);
+            if (result.isInvalid()) {
+                throw new ImportServiceException("Input file '" + inputFile + "' is invalid and could not be parsed.",
+                        Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile),
+                        CommandLine.ExitCode.USAGE);
+            }
+            return result;
+        } catch (ImportException ex) {
+            throw new ImportServiceException("Unable to open file '" + inputFile + "'.",
+                    Localization.lang("Unable to open file '%0'.", inputFile), ex, CommandLine.ExitCode.USAGE);
         }
-        if (parserResult.get().isInvalid()) {
-            System.err.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
-            return new ImportOutcome(null, 2);
-        }
-        return new ImportOutcome(parserResult.get(), 0);
     }
 
     /// Reads URIs as input
-    public static Optional<ParserResult> importFile(String importArguments,
-                                                    String importFormat,
-                                                    CliPreferences cliPreferences,
-                                                    boolean porcelain) {
+    public static ParserResult importFile(String importArguments,
+                                          String importFormat,
+                                          CliPreferences cliPreferences,
+                                          boolean porcelain) throws ImportServiceException {
         LOGGER.debug("Importing file {}", importArguments);
         String[] data = importArguments.split(",");
 
@@ -110,8 +108,9 @@ public class ImportService {
             try {
                 file = new URLDownload(address).toTemporaryFile();
             } catch (FetcherException | MalformedURLException e) {
-                System.err.println(Localization.lang("Problem downloading from %0: %1", address, e.getLocalizedMessage()));
-                return Optional.empty();
+                throw new ImportServiceException("Problem downloading from " + address + ": " + e.getLocalizedMessage(),
+                        Localization.lang("Problem downloading from %0: %1", address, e.getLocalizedMessage()),
+                        CommandLine.ExitCode.SOFTWARE);
             }
         } else {
             if (OS.WINDOWS) {
@@ -121,31 +120,10 @@ public class ImportService {
             }
         }
 
-        Optional<ParserResult> importResult = importFile(file, importFormat, cliPreferences, porcelain);
-        importResult.ifPresent(result -> {
-            if (result.hasWarnings()) {
-                System.out.println(result.getErrorMessage());
-            }
-        });
-        return importResult;
-    }
-
-    public static Optional<ParserResult> importBibTexFile(Path inputPath, CliPreferences cliPreferences, boolean porcelain) {
-        Optional<ParserResult> parserResult = importFile(
-                inputPath,
-                "bibtex",
-                cliPreferences,
-                porcelain);
-
-        if (parserResult.isEmpty()) {
-            System.err.println(Localization.lang("Unable to open file '%0'.", inputPath));
-            return Optional.empty();
+        ParserResult result = importFile(file, importFormat, cliPreferences, porcelain);
+        if (result.hasWarnings()) {
+            System.out.println(result.getErrorMessage());
         }
-
-        if (parserResult.get().isInvalid()) {
-            System.err.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputPath));
-            return Optional.empty();
-        }
-        return parserResult;
+        return result;
     }
 }

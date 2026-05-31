@@ -2,7 +2,6 @@ package org.jabref.toolkit.commands;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -15,9 +14,12 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.toolkit.exception.ExportException;
+import org.jabref.toolkit.exception.ExportServiceException;
+import org.jabref.toolkit.exception.ImportServiceException;
 import org.jabref.toolkit.service.ExportService;
 import org.jabref.toolkit.service.ImportService;
+
+import picocli.CommandLine;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
@@ -46,17 +48,12 @@ class GenerateBibFromAux implements Callable<Integer> {
     private String fieldFormatters;
 
     @Override
-    public Integer call() {
+    public Integer call() throws ImportServiceException, ExportServiceException {
         Path inputFile = inputOption.getInputFile();
-        Optional<ParserResult> pr = ImportService.importFile(
+        ParserResult pr = ImportService.importBibTexFile(
                 inputFile,
-                "bibtex",
                 argumentProcessor.cliPreferences,
                 sharedOptions.porcelain);
-        if (pr.isEmpty()) {
-            System.err.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return 2;
-        }
 
         if (!Files.exists(auxFile)) {
             System.err.println(Localization.lang("Unable to open file '%0'.", auxFile));
@@ -67,7 +64,7 @@ class GenerateBibFromAux implements Callable<Integer> {
             System.out.println(Localization.lang("Creating excerpt of from '%0' with '%1'.", inputFile, auxFile.toAbsolutePath()));
         }
 
-        AuxParser auxParser = new DefaultAuxParser(pr.get().getDatabase());
+        AuxParser auxParser = new DefaultAuxParser(pr.getDatabase());
         AuxParserResult result = auxParser.parse(auxFile);
 
         if (!sharedOptions.porcelain) {
@@ -77,7 +74,7 @@ class GenerateBibFromAux implements Callable<Integer> {
         BibDatabase subDatabase = result.getGeneratedBibDatabase();
         if (subDatabase == null || !subDatabase.hasEntries()) {
             System.out.println(Localization.lang("No library generated."));
-            return 0;
+            return CommandLine.ExitCode.OK;
         }
 
         FieldFormatterCleanupMapper.applyFormatters(fieldFormatters, subDatabase.getEntries());
@@ -86,22 +83,12 @@ class GenerateBibFromAux implements Callable<Integer> {
             System.out.println(subDatabase.getEntries().stream()
                                           .map(BibEntry::toString)
                                           .collect(Collectors.joining("\n\n")));
-            return 0;
         } else {
-            try {
-                ExportService.create(argumentProcessor.cliPreferences).saveDatabase(
-                        subDatabase,
-                        outputFile);
-            } catch (ExportException ex) {
-                // TODO this just informs the user, maybe to lax?
-                System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
-                return 1;
+            ExportService.create(argumentProcessor.cliPreferences).saveDatabase(subDatabase, outputFile);
+            if (!sharedOptions.porcelain) {
+                System.out.println(Localization.lang("Created library with '%0' entries.", subDatabase.getEntryCount()));
             }
         }
-
-        if (!sharedOptions.porcelain) {
-            System.out.println(Localization.lang("Created library with '%0' entries.", subDatabase.getEntryCount()));
-        }
-        return 0;
+        return CommandLine.ExitCode.OK;
     }
 }

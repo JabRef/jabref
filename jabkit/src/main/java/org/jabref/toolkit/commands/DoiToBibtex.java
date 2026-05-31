@@ -10,7 +10,7 @@ import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.toolkit.exception.ExportException;
+import org.jabref.toolkit.exception.ExportServiceException;
 import org.jabref.toolkit.service.ExportService;
 
 import org.slf4j.Logger;
@@ -34,48 +34,42 @@ class DoiToBibtex implements Callable<Integer> {
     private String[] dois;
 
     @Override
-    public Integer call() {
-        try {
-            CrossRef fetcher = new CrossRef();
-            List<BibEntry> entries = new ArrayList<>(dois.length);
+    public Integer call() throws ExportServiceException {
+        CrossRef fetcher = new CrossRef();
+        List<BibEntry> entries = new ArrayList<>(dois.length);
 
-            for (String doiString : dois) {
-                Optional<DOI> doiParsed = DOI.parse(doiString);
-                if (doiParsed.isEmpty()) {
-                    LOGGER.warn("Skipped DOI {}, because it is not a valid DOI string", doiString);
-                    System.err.println(Localization.lang("DOI %0 is invalid", doiString));
-                    System.err.println();
-                    continue;
-                }
-                Optional<BibEntry> entry;
-                try {
-                    entry = fetcher.performSearchById(doiParsed.get().asString());
-                } catch (FetcherException e) {
-                    LOGGER.error("Could not fetch BibTeX based on DOI", e);
-                    System.err.print(Localization.lang("No data was found for the identifier"));
-                    System.err.println(" - " + doiString);
-                    System.err.println(e.getLocalizedMessage());
-                    System.err.println();
-                    continue;
-                }
-
-                if (entry.isEmpty()) {
-                    LOGGER.error("Could not fetch BibTeX based on DOI - entry is empty");
-                    System.err.print(Localization.lang("No data was found for the identifier"));
-                    System.err.println(" - " + doiString);
-                    System.err.println();
-                    continue;
-                }
-
-                entries.add(entry.get());
+        for (String doiString : dois) {
+            Optional<DOI> doiParsed = DOI.parse(doiString);
+            if (doiParsed.isEmpty()) {
+                LOGGER.warn("Skipped DOI {}, because it is not a valid DOI string", doiString);
+                System.err.println(Localization.lang("DOI %0 is invalid", doiString));
+                System.err.println();
+                continue;
+            }
+            Optional<BibEntry> entry;
+            try {
+                entry = fetcher.performSearchById(doiParsed.get().asString());
+            } catch (FetcherException e) {
+                LOGGER.error("Could not fetch BibTeX based on DOI", e);
+                System.err.print(Localization.lang("No data was found for the identifier"));
+                System.err.println(" - " + doiString);
+                System.err.println(e.getLocalizedMessage());
+                System.err.println();
+                continue;
             }
 
-            ExportService.create(argumentProcessor.cliPreferences).printBibEntriesToStdOut(entries);
-            return CommandLine.ExitCode.OK;
-        } catch (ExportException ex) {
-            LoggerFactory.getLogger(GenerateCitationKeys.class).error("Could not write BibTeX", ex);
-            System.err.println(Localization.lang("Unable to write to %0.", "stdout"));
-            return CommandLine.ExitCode.SOFTWARE;
+            if (entry.isEmpty()) {
+                LOGGER.error("Could not fetch BibTeX based on DOI - entry is empty");
+                System.err.print(Localization.lang("No data was found for the identifier"));
+                System.err.println(" - " + doiString);
+                System.err.println();
+                continue;
+            }
+
+            entries.add(entry.get());
         }
+
+        ExportService.create(argumentProcessor.cliPreferences).printBibEntriesToStdOut(entries);
+        return CommandLine.ExitCode.OK;
     }
 }

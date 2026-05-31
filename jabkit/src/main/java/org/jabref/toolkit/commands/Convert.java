@@ -1,14 +1,14 @@
 package org.jabref.toolkit.commands;
 
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.toolkit.converter.CygWinPathConverter;
-import org.jabref.toolkit.exception.ExportException;
+import org.jabref.toolkit.exception.ExportServiceException;
+import org.jabref.toolkit.exception.ImportServiceException;
 import org.jabref.toolkit.service.ExportService;
 import org.jabref.toolkit.service.ImportService;
 
@@ -44,38 +44,23 @@ class Convert implements Callable<Integer> {
     private String fieldFormatters;
 
     @Override
-    public Integer call() {
+    public Integer call() throws ImportServiceException, ExportServiceException {
         Path inputFile = inputOption.getInputFile();
-        Optional<ParserResult> parserResult = ImportService.importFile(inputFile, inputFormat, jabKit.cliPreferences, sharedOptions.porcelain);
-        if (parserResult.isEmpty()) {
-            System.err.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return 2;
-        }
+        ParserResult parserResult = ImportService.importFile(inputFile, inputFormat, jabKit.cliPreferences, sharedOptions.porcelain);
 
-        if (parserResult.get().isInvalid()) {
-            System.err.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
-            return 2;
-        }
-
-        FieldFormatterCleanupMapper.applyFormatters(fieldFormatters, parserResult.get().getDatabase().getEntries());
+        FieldFormatterCleanupMapper.applyFormatters(fieldFormatters, parserResult.getDatabase().getEntries());
 
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Converting '%0' to '%1'.", inputFile, outputFormat));
         }
 
         if (outputFile == null) {
-            System.out.println(parserResult.get().getDatabase());
+            System.out.println(parserResult.getDatabase());
             return 0;
         }
 
-        try {
-            ExportService.create(jabKit.cliPreferences)
-                                .exportParserResultToFile(parserResult.get(), outputFile, outputFormat, sharedOptions.porcelain);
-            return CommandLine.ExitCode.OK;
-        } catch (ExportException ex) {
-            // TODO this just informs the user, maybe to lax?
-            System.err.println(ex.getLocalizedMessage() + " (" + (ex.getCause() == null ? "" : ex.getCause().getLocalizedMessage()) + ")");
-            return ex.getExitCode();
-        }
+        ExportService.create(jabKit.cliPreferences)
+                     .exportParserResultToFile(parserResult, outputFile, outputFormat, sharedOptions.porcelain);
+        return CommandLine.ExitCode.OK;
     }
 }

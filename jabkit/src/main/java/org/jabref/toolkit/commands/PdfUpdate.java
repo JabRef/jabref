@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -24,6 +23,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.toolkit.exception.ImportServiceException;
 import org.jabref.toolkit.service.ImportService;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -61,34 +61,25 @@ class PdfUpdate implements Callable<Integer> {
     private boolean updateLinkedFiles;
 
     @Override
-    public Integer call() {
+    public Integer call() throws ImportServiceException {
         if (!formats.contains("xmp") && !formats.contains("bibtex-attachment")) {
             System.err.println(Localization.lang("The format option must contain either 'xmp' or 'bibtex-attachment'."));
             return 2;
         }
 
         Path inputFile = inputOption.getInputFile();
-        Optional<ParserResult> parserResult = ImportService.importFile(
+        ParserResult parserResult = ImportService.importFile(
                 inputFile,
                 inputFormat,
                 pdf.argumentProcessor.cliPreferences,
                 sharedOptions.porcelain);
-        if (parserResult.isEmpty()) {
-            System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return 2;
-        }
-
-        if (parserResult.get().isInvalid()) {
-            System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
-            return 2;
-        }
 
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Updating PDF metadata."));
             System.out.flush();
         }
 
-        writeMetadataToPdf(List.of(parserResult.get()),
+        writeMetadataToPdf(List.of(parserResult),
                 List.of(inputFile),
                 citationKeys,
                 pdf.argumentProcessor.cliPreferences.getXmpPreferences(),
