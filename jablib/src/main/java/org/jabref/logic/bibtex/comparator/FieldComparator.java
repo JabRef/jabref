@@ -70,14 +70,11 @@ public class FieldComparator implements Comparator<BibEntry> {
         }
     }
 
-    private String getFieldValue(BibEntry entry) {
-        for (Field aField : fields.getFields()) {
-            Optional<String> o = entry.getFieldOrAliasLatexFree(aField);
-            if (o.isPresent()) {
-                return o.get();
-            }
-        }
-        return null;
+    private Optional<String> getFieldValue(BibEntry entry) {
+        return fields.getFields().stream()
+                     .map(entry::getFieldOrAliasLatexFree)
+                     .flatMap(Optional::stream)
+                     .findFirst();
     }
 
     @Override
@@ -90,8 +87,8 @@ public class FieldComparator implements Comparator<BibEntry> {
             f1 = e1.getType().getDisplayName();
             f2 = e2.getType().getDisplayName();
         } else {
-            f1 = getFieldValue(e1);
-            f2 = getFieldValue(e2);
+            f1 = getFieldValue(e1).orElse(null);
+            f2 = getFieldValue(e2).orElse(null);
         }
 
         // Catch all cases involving null:
