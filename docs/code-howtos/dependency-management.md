@@ -76,15 +76,18 @@ If an issue in this area occurs after modifying dependency versions, you will se
 ```
 
 In these cases, first determine if adding the new 3rd party module is really needed/intended.
-If yes, there are two levels of patching that can be performed:
+If yes, there are three levels of patching that can be performed:
 
-1. Add missing (or modify existing) `module-info.class`:
+1. Add missing mappint to `modules.properties`:
+   In case the module is a real java module, but not loaded by gradle, you need it to put the mapping into `gradle/modules.properties`.
+   Furthermore, if it is a module available on Maven Central, file a pull request against [java-module-dependencies/.../modules.properties](https://github.com/gradlex-org/java-module-dependencies/blob/main/src/main/resources/org/gradlex/javamodule/dependencies/modules.properties)
+2. Add missing (or modify existing) `module-info.class`:
    This is done through the `org.gradlex.extra-java-module-info` plugin.
    Often it is sufficient to add a simple entry for the affected library. For example, to address the error
    above, you can add `module("javax.inject:javax.inject", "javax.inject")` to the `extraJavaModuleInfo` block.
    For more details, refer to the
    [org.gradlex.extra-java-module-info plugin documentation](https://github.com/gradlex-org/extra-java-module-info).
-2. Adjust metadata (POM file) of dependency:
+3. Adjust metadata (POM file) of dependency:
    This is required to solve more severe issues with the metadata of a library using the Gradle concept of
    _Component Metadata Rules_. For a convenient definition of such rules, we use the `patch` notation provided by the
    `org.gradlex.jvm-dependency-conflict-resolution` plugin.
