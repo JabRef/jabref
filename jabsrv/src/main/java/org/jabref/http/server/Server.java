@@ -16,6 +16,7 @@ import org.jabref.http.dto.GsonMessageBodyWriter;
 import org.jabref.http.server.cayw.CAYWResource;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.command.CommandResource;
+import org.jabref.http.server.resources.CitationsResource;
 import org.jabref.http.server.resources.EntriesResource;
 import org.jabref.http.server.resources.EntryResource;
 import org.jabref.http.server.resources.GroupsResource;
@@ -23,6 +24,7 @@ import org.jabref.http.server.resources.LibrariesResource;
 import org.jabref.http.server.resources.LibraryResource;
 import org.jabref.http.server.resources.MapResource;
 import org.jabref.http.server.resources.RootResource;
+import org.jabref.http.server.services.CitationCacheService;
 import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
@@ -106,8 +108,9 @@ public class Server {
     }
 
     private HttpServer startServer(ServiceLocator serviceLocator, URI uri) {
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, new FormatterService());
         ServiceLocatorUtilities.addOneConstant(serviceLocator, preferences, "preferences", CliPreferences.class);
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, new CitationCacheService());
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, new FormatterService());
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
 
         // see https://stackoverflow.com/a/33794265/873282
@@ -117,12 +120,13 @@ public class Server {
 
         // RESTish resources
         resourceConfig.register(RootResource.class);
-        resourceConfig.register(LibrariesResource.class);
-        resourceConfig.register(LibraryResource.class);
-        resourceConfig.register(MapResource.class);
+        resourceConfig.register(CitationsResource.class);
         resourceConfig.register(EntriesResource.class);
         resourceConfig.register(EntryResource.class);
         resourceConfig.register(GroupsResource.class);
+        resourceConfig.register(LibrariesResource.class);
+        resourceConfig.register(LibraryResource.class);
+        resourceConfig.register(MapResource.class);
 
         // Other resources
         resourceConfig.register(CommandResource.class);

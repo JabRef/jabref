@@ -12,6 +12,7 @@ module org.jabref.jabsrv {
     opens org.jabref.http.dto to com.google.gson, org.glassfish.hk2.locator, org.glassfish.hk2.utilities;
     opens org.jabref.http.server.command to com.google.gson, org.glassfish.hk2.locator, org.glassfish.hk2.utilities, tools.jackson.databind;
     exports org.jabref.http.server.services;
+    opens org.jabref.http.server.services to org.glassfish.hk2.locator, org.glassfish.hk2.utilities;
     exports org.jabref.http;
     opens org.jabref.http.server.resources to org.glassfish.hk2.locator, org.glassfish.hk2.utilities;
     exports org.jabref.http.server.resources;
@@ -30,6 +31,11 @@ module org.jabref.jabsrv {
     requires java.logging;
 
     requires com.google.common;
+
+    // region: caching
+    requires com.github.benmanes.caffeine;
+    requires cuid;
+    // endregion
 
     requires transitive com.google.gson;
     requires tools.jackson.core;
