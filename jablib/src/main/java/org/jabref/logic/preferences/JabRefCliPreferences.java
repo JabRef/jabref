@@ -2048,6 +2048,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
+    // region XmpPreferences
     @Override
     public XmpPreferences getXmpPreferences() {
         if (xmpPreferences != null) {
@@ -2068,7 +2069,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return xmpPreferences;
     }
+    // endregion
 
+    // region NameFormatterPreferences
     @Override
     public NameFormatterPreferences getNameFormatterPreferences() {
         if (nameFormatterPreferences != null) {
@@ -2086,7 +2089,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return nameFormatterPreferences;
     }
+    // endregion
 
+    // region ProtectedTermsPreferences
     @Override
     public ProtectedTermsPreferences getProtectedTermsPreferences() {
         if (protectedTermsPreferences != null) {
@@ -2111,6 +2116,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return protectedTermsPreferences;
     }
+    // endregion
 
     @Override
     public ImporterPreferences getImporterPreferences() {
