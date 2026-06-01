@@ -126,6 +126,9 @@ jobs:
 
       - name: Fail if working directory is unclean
         run: .github/format-diff-annotations.sh
+        env:
+          ANNOTATION_TITLE: OpenRewrite
+          ANNOTATION_MESSAGE_PREFIX: "Uncommitted changes after OpenRewrite; run `gradle :rewriteRun`, reformat, and commit the result for"
 
   modernizer:
     name: Modernizer
