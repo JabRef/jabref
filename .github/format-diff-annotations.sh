@@ -17,7 +17,17 @@ if [ -z "$diff" ]; then
 fi
 
 printf '%s\n' "$diff" | gawk '
-  /^\+\+\+ b\// { file = substr($0, 7); next }
+  # Mirror org.jabref.logic.util.GitHubActionsEscape#property: escape %, CR, LF,
+  # then additionally : and , (critical for Windows paths like C:\foo\bar.bib).
+  function escape_property(value) {
+    gsub(/%/,  "%25", value)
+    gsub(/\r/, "%0D", value)
+    gsub(/\n/, "%0A", value)
+    gsub(/:/,  "%3A", value)
+    gsub(/,/,  "%2C", value)
+    return value
+  }
+  /^\+\+\+ b\// { file = escape_property(substr($0, 7)); next }
   /^@@ / {
     # @@ -oldStart,oldCount +newStart,newCount @@
     match($2, /^-([0-9]+)(,([0-9]+))?/, m)
