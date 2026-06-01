@@ -53,6 +53,7 @@ jobs:
         continue-on-error: true
         with:
           name: pr_number
+          path: ${{ runner.temp }}/pr-artifacts
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
 
@@ -60,11 +61,23 @@ jobs:
         if: ${{ github.event_name != 'workflow_dispatch' }}
         id: read-pr_number
         run: |
-          touch pr_number.txt
-          PR_NUMBER=$(cat pr_number.txt)
+          ARTIFACT_FILE="${{ runner.temp }}/pr-artifacts/pr_number.txt"
+          if [ ! -f "$ARTIFACT_FILE" ]; then
+            echo "No pr_number.txt found in downloaded artifact"
+            echo "pr_number=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          PR_NUMBER="$(tr -d '[:space:]' < "$ARTIFACT_FILE")"
+          if ! echo "$PR_NUMBER" | grep -Eq '^[0-9]+$'; then
+            echo "Invalid PR number in artifact"
+            echo "pr_number=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           echo "Read PR number $PR_NUMBER"
-          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-          echo "PR #" >> $GITHUB_STEP_SUMMARY
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "PR #$PR_NUMBER" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Checkout
         # required for gh tool and .github/ghprcomment.yml
