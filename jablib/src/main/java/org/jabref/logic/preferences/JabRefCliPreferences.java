@@ -527,9 +527,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(NEWLINE, System.lineSeparator());
 
-        defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
-        defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
-
         defaults.put(EXPORT_WORKING_DIRECTORY, USER_HOME);
         defaults.put(LAST_USED_DIRECTORY, getDefaultPath().toString());
 
@@ -879,6 +876,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getSSLPreferences().setAll(SSLPreferences.getDefault());
         getSearchPreferences().setAll(SearchPreferences.getDefault());
         getLastFilesOpenedPreferences().setAll(LastFilesOpenedPreferences.getDefault());
+        getXmpPreferences().setAll(XmpPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences())).setAll(
                 OpenOfficePreferences.getDefault());
     }
@@ -915,6 +913,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getSSLPreferences().setAll(getSSLPreferencesFromBackingStore(getSSLPreferences()));
         getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
         getLastFilesOpenedPreferences().setAll(getLastFilesOpenedPreferencesFromBackingStore(getLastFilesOpenedPreferences()));
+        getXmpPreferences().setAll(getXmpPreferencesFromBackingStore(getXmpPreferences()));
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences());
         getOpenOfficePreferences(repository).setAll(
                 getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
@@ -2055,10 +2054,7 @@ public class JabRefCliPreferences implements CliPreferences {
             return xmpPreferences;
         }
 
-        xmpPreferences = new XmpPreferences(
-                getBoolean(USE_XMP_PRIVACY_FILTER),
-                getStringList(XMP_PRIVACY_FILTERS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
-                getBibEntryPreferences().keywordSeparatorProperty());
+        xmpPreferences = getXmpPreferencesFromBackingStore(XmpPreferences.getDefault());
 
         EasyBind.listen(xmpPreferences.useXmpPrivacyFilterProperty(),
                 (_, _, newValue) -> putBoolean(USE_XMP_PRIVACY_FILTER, newValue));
@@ -2068,6 +2064,17 @@ public class JabRefCliPreferences implements CliPreferences {
                                                                  .collect(Collectors.toList())));
 
         return xmpPreferences;
+    }
+
+    private XmpPreferences getXmpPreferencesFromBackingStore(XmpPreferences defaults) {
+        return new XmpPreferences(
+                getBoolean(USE_XMP_PRIVACY_FILTER, defaults.shouldUseXmpPrivacyFilter()),
+                convertStringToList(get(XMP_PRIVACY_FILTERS,
+                        convertListToString(defaults.getXmpPrivacyFilter().stream().map(Field::getName).toList())))
+                        .stream()
+                        .map(FieldFactory::parseField)
+                        .collect(Collectors.toSet()),
+                getBibEntryPreferences().keywordSeparatorProperty());
     }
     // endregion
 
