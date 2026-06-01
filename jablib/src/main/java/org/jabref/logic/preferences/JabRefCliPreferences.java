@@ -1811,8 +1811,13 @@ public class JabRefCliPreferences implements CliPreferences {
 
         cleanupPreferences = getCleanupPreferencesFromBackingStore(CleanupPreferences.getDefault());
 
-        cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) _ ->
-                putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList())));
+        cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) _ -> {
+            if (cleanupPreferences.getActiveJobs().isEmpty()) {
+                remove(CLEANUP_JOBS);
+            } else {
+                putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList()));
+            }
+        });
 
         EasyBind.listen(cleanupPreferences.fieldFormatterCleanupsProperty(), (_, _, newValue) -> {
             putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, newValue.isEnabled());
@@ -1825,9 +1830,10 @@ public class JabRefCliPreferences implements CliPreferences {
     private CleanupPreferences getCleanupPreferencesFromBackingStore(CleanupPreferences defaults) {
         EnumSet<CleanupPreferences.CleanupStep> activeJobs;
         if (hasKey(CLEANUP_JOBS)) {
-            activeJobs = EnumSet.copyOf(getStringList(CLEANUP_JOBS).stream()
-                                                                   .map(CleanupPreferences.CleanupStep::valueOf)
-                                                                   .collect(Collectors.toSet()));
+            Set<CleanupPreferences.CleanupStep> parsed = getStringList(CLEANUP_JOBS).stream()
+                                                                                    .map(CleanupPreferences.CleanupStep::valueOf)
+                                                                                    .collect(Collectors.toSet());
+            activeJobs = parsed.isEmpty() ? EnumSet.noneOf(CleanupPreferences.CleanupStep.class) : EnumSet.copyOf(parsed);
         } else {
             activeJobs = EnumSet.copyOf(defaults.getActiveJobs());
         }

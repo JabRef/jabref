@@ -64,10 +64,6 @@ public class CleanupPreferences {
     }
 
     public EnumSet<CleanupStep> getActiveJobs() {
-        if (activeJobs.isEmpty()) {
-            return EnumSet.noneOf(CleanupStep.class);
-        }
-
         return EnumSet.copyOf(activeJobs);
     }
 
