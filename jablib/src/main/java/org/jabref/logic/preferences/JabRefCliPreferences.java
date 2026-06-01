@@ -557,12 +557,6 @@ public class JabRefCliPreferences implements CliPreferences {
         // will never be translated.
         Localization.setLanguage(getLanguage());
 
-        // region last files opened
-        defaults.put(RECENT_DATABASES, "");
-        defaults.put(LAST_FOCUSED, "");
-        defaults.put(LAST_EDITED, "");
-        // endregion
-
         // WalkThrough
         defaults.put(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED, Boolean.FALSE);
 
@@ -884,6 +878,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getExportPreferences().setAll(ExportPreferences.getDefault());
         getSSLPreferences().setAll(SSLPreferences.getDefault());
         getSearchPreferences().setAll(SearchPreferences.getDefault());
+        getLastFilesOpenedPreferences().setAll(LastFilesOpenedPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences())).setAll(
                 OpenOfficePreferences.getDefault());
     }
@@ -919,6 +914,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getExportPreferences().setAll(getExportPreferencesFromBackingStore(getExportPreferences()));
         getSSLPreferences().setAll(getSSLPreferencesFromBackingStore(getSSLPreferences()));
         getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
+        getLastFilesOpenedPreferences().setAll(getLastFilesOpenedPreferencesFromBackingStore(getLastFilesOpenedPreferences()));
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences());
         getOpenOfficePreferences(repository).setAll(
                 getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
@@ -1831,8 +1827,8 @@ public class JabRefCliPreferences implements CliPreferences {
         EnumSet<CleanupPreferences.CleanupStep> activeJobs;
         if (hasKey(CLEANUP_JOBS)) {
             activeJobs = EnumSet.copyOf(getStringList(CLEANUP_JOBS).stream()
-                                                                    .map(CleanupPreferences.CleanupStep::valueOf)
-                                                                    .collect(Collectors.toSet()));
+                                                                   .map(CleanupPreferences.CleanupStep::valueOf)
+                                                                   .collect(Collectors.toSet()));
         } else {
             activeJobs = EnumSet.copyOf(defaults.getActiveJobs());
         }
@@ -1859,12 +1855,7 @@ public class JabRefCliPreferences implements CliPreferences {
             return lastFilesOpenedPreferences;
         }
 
-        lastFilesOpenedPreferences = new LastFilesOpenedPreferences(
-                getStringList(LAST_EDITED).stream()
-                                          .map(Path::of)
-                                          .toList(),
-                Path.of(get(LAST_FOCUSED)),
-                getFileHistory());
+        lastFilesOpenedPreferences = getLastFilesOpenedPreferencesFromBackingStore(LastFilesOpenedPreferences.getDefault());
 
         lastFilesOpenedPreferences.getLastFilesOpened().addListener((ListChangeListener<Path>) change -> {
             if (change.getList().isEmpty()) {
@@ -1888,10 +1879,30 @@ public class JabRefCliPreferences implements CliPreferences {
         return lastFilesOpenedPreferences;
     }
 
-    private FileHistory getFileHistory() {
-        return FileHistory.of(getStringList(RECENT_DATABASES).stream()
-                                                             .map(Path::of)
-                                                             .toList());
+    private LastFilesOpenedPreferences getLastFilesOpenedPreferencesFromBackingStore(LastFilesOpenedPreferences defaults) {
+        List<Path> lastFilesOpened;
+        if (hasKey(LAST_EDITED)) {
+            lastFilesOpened = convertStringToList(get(LAST_EDITED, "")).stream()
+                                                                       .map(Path::of)
+                                                                       .toList();
+        } else {
+            lastFilesOpened = defaults.getLastFilesOpened();
+        }
+
+        return new LastFilesOpenedPreferences(
+                lastFilesOpened,
+                Path.of(get(LAST_FOCUSED, defaults.getLastFocusedFile().toString())),
+                getFileHistory(defaults.getFileHistory()));
+    }
+
+    private FileHistory getFileHistory(FileHistory defaults) {
+        if (hasKey(RECENT_DATABASES)) {
+            return FileHistory.of(convertStringToList(get(RECENT_DATABASES)).stream()
+                                                                            .map(Path::of)
+                                                                            .toList());
+        } else {
+            return defaults;
+        }
     }
 
     private void storeFileHistory(FileHistory history) {

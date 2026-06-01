@@ -20,10 +20,28 @@ public class LastFilesOpenedPreferences {
     // observable list last files opened in the file menu
     private final FileHistory fileHistory;
 
+    private LastFilesOpenedPreferences() {
+        this(
+                List.of(),               // No last files opened on startup
+                Path.of(""),             // No last focused file
+                FileHistory.of(List.of()) // Empty file history
+        );
+    }
+
     public LastFilesOpenedPreferences(List<Path> lastFilesOpened, Path lastFocusedFile, FileHistory fileHistory) {
         this.lastFilesOpened = FXCollections.observableArrayList(lastFilesOpened);
         this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
         this.fileHistory = fileHistory;
+    }
+
+    public static LastFilesOpenedPreferences getDefault() {
+        return new LastFilesOpenedPreferences();
+    }
+
+    public void setAll(LastFilesOpenedPreferences other) {
+        setLastFilesOpened(List.copyOf(other.getLastFilesOpened()));
+        setLastFocusedFile(other.getLastFocusedFile());
+        fileHistory.setAll(other.getFileHistory());
     }
 
     public ObservableList<Path> getLastFilesOpened() {
