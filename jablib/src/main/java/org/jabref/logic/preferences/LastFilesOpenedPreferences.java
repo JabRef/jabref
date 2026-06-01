@@ -10,6 +10,8 @@ import javafx.collections.ObservableList;
 
 import org.jabref.logic.util.io.FileHistory;
 
+import org.jspecify.annotations.Nullable;
+
 public class LastFilesOpenedPreferences {
 
     // the last libraries that were open when jabref closes and should be reopened on startup
@@ -22,13 +24,15 @@ public class LastFilesOpenedPreferences {
 
     private LastFilesOpenedPreferences() {
         this(
-                List.of(),               // No last files opened on startup
-                Path.of(""),             // No last focused file
+                List.of(),                // No last files opened on startup
+                null,                     // No last focused file
                 FileHistory.of(List.of()) // Empty file history
         );
     }
 
-    public LastFilesOpenedPreferences(List<Path> lastFilesOpened, Path lastFocusedFile, FileHistory fileHistory) {
+    public LastFilesOpenedPreferences(List<Path> lastFilesOpened,
+                                      @Nullable Path lastFocusedFile,
+                                      FileHistory fileHistory) {
         this.lastFilesOpened = FXCollections.observableArrayList(lastFilesOpened);
         this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
         this.fileHistory = fileHistory;

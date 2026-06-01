@@ -1867,7 +1867,7 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         });
         EasyBind.listen(lastFilesOpenedPreferences.lastFocusedFileProperty(), (_, _, newValue) -> {
-            if (newValue != null) {
+            if (newValue != null && !newValue.toString().isBlank()) {
                 put(LAST_FOCUSED, newValue.toAbsolutePath().toString());
             } else {
                 remove(LAST_FOCUSED);
@@ -1888,9 +1888,19 @@ public class JabRefCliPreferences implements CliPreferences {
             lastFilesOpened = defaults.getLastFilesOpened();
         }
 
+        Path lastFocused = null;
+        if (hasKey(LAST_FOCUSED)) {
+            String stored = get(LAST_FOCUSED);
+            if (!stored.isBlank()) {
+                lastFocused = Path.of(stored);
+            }
+        } else {
+            lastFocused = defaults.getLastFocusedFile();
+        }
+
         return new LastFilesOpenedPreferences(
                 lastFilesOpened,
-                Path.of(get(LAST_FOCUSED, defaults.getLastFocusedFile().toString())),
+                lastFocused,
                 getFileHistory(defaults.getFileHistory()));
     }
 
