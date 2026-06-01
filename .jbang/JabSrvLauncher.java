@@ -2,11 +2,13 @@
 
 //DESCRIPTION jabsrv - serve BibTeX files using JabRef
 
-//JAVA 25+
+//JAVA 25
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
+// mavenlocal is listed first so a locally built jablib (./gradlew :jablib:publishToMavenLocal)
+// takes precedence over the published 6.0-SNAPSHOT - needed when testing unreleased jablib changes.
 // raw is for https://github.com/unicode-org/icu/pull/2127
-//REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
+//REPOS mavenlocal,mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,raw=https://raw.githubusercontent.com/JabRef/jabref/refs/heads/main/jablib/lib/
 
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
 // see  https://github.com/gradlex-org/extra-java-module-info/issues/237 why we include e-adr here
@@ -24,7 +26,7 @@
 //DEPS info.picocli:picocli:4.7.7
 
 // from jabsrv
-//DEPS com.fasterxml.jackson.core:jackson-annotations:2.21
+//DEPS com.fasterxml.jackson.core:jackson-annotations:2.22
 //DEPS com.github.ben-manes.caffeine:caffeine:3.2.4
 //DEPS com.google.guava:guava:33.6.0-jre
 //DEPS com.konghq:unirest-modules-gson:4.10.0
@@ -52,9 +54,9 @@
 //DEPS org.glassfish.jersey.inject:jersey-hk2:4.0.2
 //DEPS org.hibernate.validator:hibernate-validator:9.1.0.Final
 //DEPS org.jabref:afterburner.fx:2.0.0
-//DEPS tools.jackson.core:jackson-core:3.1.3
-//DEPS tools.jackson.core:jackson-databind:3.1.3
-//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.1.3
+//DEPS tools.jackson.core:jackson-core:3.1.4
+//DEPS tools.jackson.core:jackson-databind:3.1.4
+//DEPS tools.jackson.dataformat:jackson-dataformat-yaml:3.1.4
 
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java

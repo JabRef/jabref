@@ -202,7 +202,7 @@ public class CommonArchitectureTest {
                                   "javax.annotation..",
                                   "org.eclipse.jgit.annotations",
                                   "org.jetbrains.annotations..")
-                          .because("JSpecify annotations should be used")
+                          .because("JSpecify or Guava's @VisisbleForTesting annotations should be used")
                           .check(classes);
     }
 }

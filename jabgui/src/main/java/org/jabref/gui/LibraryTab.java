@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -126,6 +127,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final NavigationHistory navigationHistory = new NavigationHistory();
     private final BooleanProperty canGoBackProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty canGoForwardProperty = new SimpleBooleanProperty(false);
+
     private boolean backOrForwardNavigationActionTriggered = false;
 
     private BibDatabaseContext bibDatabaseContext;
@@ -164,10 +166,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
+    private final AiService aiService;
+
     private ImportHandler importHandler;
     private SearchContext searchContext;
-
-    private final AiService aiService;
 
     private Runnable autoCompleterChangedListener;
 
@@ -259,7 +261,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         autoRenameFileOnEntryChange = new AutoRenameFileOnEntryChange(bibDatabaseContext, preferences.getFilePreferences());
         coarseChangeFilter.registerListener(autoRenameFileOnEntryChange);
 
-        aiService.setupDatabase(bibDatabaseContext);
+        aiService.setupDatabase(bibDatabaseContext, isDummyContext);
 
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
@@ -340,9 +342,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void createSearchContext() {
-        java.util.function.Supplier<SearchBackend> sqlFactory = () ->
+        Supplier<SearchBackend> sqlFactory = () ->
                 new SqlSearchBackend(new IndexManager(bibDatabaseContext, taskExecutor, preferences, Injector.instantiateModelOrService(PostgreServer.class)));
-        java.util.function.Supplier<SearchBackend> inMemoryFactory = () ->
+        Supplier<SearchBackend> inMemoryFactory = () ->
                 new InMemorySearchBackend(bibDatabaseContext, preferences.getBibEntryPreferences());
         searchContext = new SearchContext(
                 preferences.getSearchPreferences().usePostgresSearchProperty(),
@@ -370,15 +372,15 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private void setDatabaseContext(@NonNull BibDatabaseContext bibDatabaseContext) {
         TabPane tabPane = this.getTabPane();
+        boolean isSelectedTab = false;
 
         if (tabPane == null) {
             LOGGER.debug("User interrupted loading. Not showing any library.");
             return;
         }
-        if (tabPane.getSelectionModel().selectedItemProperty().get().equals(this)) {
-            LOGGER.debug("This case should not happen.");
-            stateManager.setActiveDatabase(bibDatabaseContext);
-            stateManager.activeTabProperty().set(Optional.of(this));
+        Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+        if (selectedTab == this) {
+            isSelectedTab = true;
         }
 
         // Remove existing dummy BibDatabaseContext and add correct BibDatabaseContext from ParserResult to trigger changes in the openDatabases list in the stateManager
@@ -390,6 +392,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         stateManager.getOpenDatabases().add(bibDatabaseContext);
 
         initializeComponentsAndListeners(false);
+
+        if (isSelectedTab) {
+            stateManager.setActiveDatabase(bibDatabaseContext);
+            stateManager.activeTabProperty().set(Optional.of(this));
+        }
+
         installAutosaveManagerAndBackupManager();
     }
 
@@ -571,13 +579,13 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return searchAutoCompleter;
     }
 
-    public void showAndEdit(BibEntry entry) {
+    public void showAndEdit(@NonNull BibEntry entry) {
         this.clearAndSelect(entry);
         stateManager.getEditorShowing().setValue(true);
     }
 
     /// This method selects the given entry, and scrolls it into view in the table. If an entryEditor is shown, it is given focus afterwards.
-    public void clearAndSelect(final BibEntry bibEntry) {
+    public void clearAndSelect(@NonNull BibEntry bibEntry) {
         mainTable.clearAndSelect(bibEntry);
     }
 

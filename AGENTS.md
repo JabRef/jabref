@@ -228,6 +228,10 @@ Both comments must not be added.
 #### Localization
 
 - Fix localization before committing. See `docs/code-howtos/localization.md`
+- The `LocalizationConsistencyTest` failure output is actionable — follow it literally instead of guessing:
+  - `findMissingLocalizationKeys` failing → its output lists ready-to-paste `key=value` lines to **add** to `jablib/src/main/resources/l10n/JabRef_en.properties`. Place each near semantically related keys; reuse an existing similar key when one exists.
+  - `findObsoleteLocalizationKeys` failing → its output lists keys to **remove** from `JabRef_en.properties` (after confirming each is truly unused).
+  - Only edit `JabRef_en.properties`. Translated `JabRef_<lang>.properties` files are maintained by translators via Crowdin — never hand-edit them.
 - JabRef is a multilingual program, When you write any user-facing text, it should be localized.
 
    To do this in Java code, call `Localization.lang` method, like this:
@@ -433,13 +437,28 @@ See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.m
 
 ## Git & PR Etiquette
 
-When creating commits:
+### Syncing with upstream
+
+- **Never** use `git rebase`, `git pull --rebase` / `-r` / `--rebase-merges`, or any force-push (`--force`, `--force-with-lease`, `--force-if-includes`, `-f`, or `+`-prefixed refspecs). Rebasing rewrites commit SHAs already pushed and breaks review threads pinned to commits; force-push would then be required to publish the rewritten history.
+- **Preferred** sync via explicit fetch + merge:
+
+  ```bash
+  git fetch upstream --prune
+  git merge upstream/main
+  ```
+
+- Plain `git pull` is acceptable for updating the branch as long as your local config does not set `pull.rebase=true` (the enforcement hook blocks the explicit rebase variants regardless).
+- Resolve conflicts inside the merge commit. Do not squash or reorder existing commits.
+
+### Commits
 
 - One logical change per commit
 - Clear, technical commit messages
 - Do not reference issues in commits
 - Avoid force-pushes
 - No generated artifacts unless required
+
+### Pull requests
 
 PR title:
 

@@ -33,6 +33,7 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.copyfiles.CopyLinkedFilesAction;
@@ -56,6 +57,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -88,6 +90,10 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     private TaskExecutor taskExecutor;
     @Inject
     private UndoManager undoManager;
+    @Inject
+    private FileUpdateMonitor fileUpdateMonitor;
+    @Inject
+    private StateManager stateManager;
 
     private LinkedFilesEditorViewModel viewModel;
 
@@ -131,7 +137,11 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 preferences,
                 databaseContext,
                 bibEntry,
-                viewModel
+                viewModel,
+                taskExecutor,
+                fileUpdateMonitor,
+                undoManager,
+                stateManager
         );
 
         new ViewModelListCellFactory<LinkedFileViewModel>()

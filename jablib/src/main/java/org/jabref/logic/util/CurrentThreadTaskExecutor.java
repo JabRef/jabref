@@ -29,7 +29,7 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
         try {
             final V result = task.call();
             Consumer<V> onSuccess = task.getOnSuccess();
-            if (onSuccess != null) {
+            if (onSuccess != null && !task.isCancelled()) {
                 onSuccess.accept(result);
             }
             return CompletableFuture.completedFuture(result);
