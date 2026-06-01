@@ -5,7 +5,7 @@ import java.util.List;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-/// Request body for `POST /libraries/query`.
+/// Request body for `POST /libraries:query`.
 ///
 /// `queries` is an ordered list of raw Search.g4 expressions. Each query is run
 /// independently against all open libraries; the position of a query is preserved

@@ -20,6 +20,7 @@ import org.jabref.http.server.resources.CitationsResource;
 import org.jabref.http.server.resources.EntriesResource;
 import org.jabref.http.server.resources.EntryResource;
 import org.jabref.http.server.resources.GroupsResource;
+import org.jabref.http.server.resources.LibrariesQueryResource;
 import org.jabref.http.server.resources.LibrariesResource;
 import org.jabref.http.server.resources.LibraryResource;
 import org.jabref.http.server.resources.MapResource;
@@ -125,6 +126,7 @@ public class Server {
         resourceConfig.register(EntryResource.class);
         resourceConfig.register(GroupsResource.class);
         resourceConfig.register(LibrariesResource.class);
+        resourceConfig.register(LibrariesQueryResource.class);
         resourceConfig.register(LibraryResource.class);
         resourceConfig.register(MapResource.class);
 

@@ -1,6 +1,6 @@
 package org.jabref.http.server;
 
-import org.jabref.http.server.resources.LibrariesResource;
+import org.jabref.http.server.resources.LibrariesQueryResource;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Application;
@@ -14,7 +14,7 @@ class LibrariesQueryResourceTest extends ServerTest {
 
     @Override
     protected Application configure() {
-        ResourceConfig resourceConfig = new ResourceConfig(LibrariesResource.class);
+        ResourceConfig resourceConfig = new ResourceConfig(LibrariesQueryResource.class);
         addGuiBridgeToResourceConfig(resourceConfig);
         addGsonToResourceConfig(resourceConfig);
         addPreferencesToResourceConfig(resourceConfig);
@@ -27,7 +27,7 @@ class LibrariesQueryResourceTest extends ServerTest {
         // [utest->req~jabsrv.query.search~1]
         String body = """
                 {"queries": ["author = \\"Test Author\\""]}""";
-        String result = target("/libraries/query")
+        String result = target("/libraries:query")
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(body), String.class);
         String expected = """
@@ -56,7 +56,7 @@ class LibrariesQueryResourceTest extends ServerTest {
         // [utest->req~jabsrv.query.search~1]
         String body = """
                 {"queries": ["title = \\"Test DOI Entry\\"", "title = \\"Demo Title\\""]}""";
-        String result = target("/libraries/query")
+        String result = target("/libraries:query")
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(body), String.class);
         String expected = """
@@ -90,7 +90,7 @@ class LibrariesQueryResourceTest extends ServerTest {
         // [utest->req~jabsrv.query.search~1]
         String body = """
                 {"queries": ["author = \\"Nobody\\""]}""";
-        String result = target("/libraries/query")
+        String result = target("/libraries:query")
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(body), String.class);
         String expected = """
@@ -107,7 +107,7 @@ class LibrariesQueryResourceTest extends ServerTest {
 
     @Test
     void emptyRequestReturnsEmptyResults() {
-        String result = target("/libraries/query")
+        String result = target("/libraries:query")
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json("{}"), String.class);
         assertEquals("""

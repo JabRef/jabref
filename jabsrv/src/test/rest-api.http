@@ -15,7 +15,7 @@ Accept: application/json
 
 ### Query entries by DOI across all open libraries
 
-POST http://localhost:23119/libraries/query
+POST http://localhost:23119/libraries:query
 Content-Type: application/json
 
 {
@@ -24,7 +24,7 @@ Content-Type: application/json
 
 ### Query entries by DOI and URL across all open libraries
 
-POST http://localhost:23119/libraries/query
+POST http://localhost:23119/libraries:query
 Content-Type: application/json
 
 {

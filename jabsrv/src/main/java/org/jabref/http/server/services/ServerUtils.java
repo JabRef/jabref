@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
 
 import org.jabref.http.SrvStateManager;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -19,6 +21,17 @@ import jakarta.ws.rs.NotFoundException;
 import org.jspecify.annotations.NonNull;
 
 public class ServerUtils {
+
+    /// Returns ids of all libraries the state manager currently considers
+    /// open. Used by every resource that operates across the open
+    /// collection (libraries listing, batch query, ...).
+    public static List<String> openLibraryIds(SrvStateManager srvStateManager) {
+        return srvStateManager.getOpenDatabases().stream()
+                              .map(BibDatabaseContext::getDatabasePath)
+                              .flatMap(Optional::stream)
+                              .map(path -> path.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(path))
+                              .toList();
+    }
 
     /// Returns the on-disk path of the library with the given id, looking it up in the
     /// state manager's open databases (the same source as [#getBibDatabaseContext]).
