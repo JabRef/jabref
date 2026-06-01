@@ -46,7 +46,7 @@ public class ExportPreferences {
         this.lastExportExtension = new SimpleStringProperty(lastExportExtension);
         this.exportWorkingDirectory = new SimpleObjectProperty<>(exportWorkingDirectory);
         this.exportSaveOrder = new SimpleObjectProperty<>(exportSaveOrder);
-        this.customExporters = FXCollections.observableList(customExporters);
+        this.customExporters = FXCollections.observableArrayList(customExporters);
     }
 
     public static ExportPreferences getDefault() {
