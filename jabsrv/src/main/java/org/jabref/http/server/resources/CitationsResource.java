@@ -25,11 +25,11 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-import com.google.gson.Gson;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -63,9 +63,6 @@ public class CitationsResource {
     SrvStateManager srvStateManager;
 
     @Inject
-    Gson gson;
-
-    @Inject
     @Nullable
     UiMessageHandler uiMessageHandler;
 
@@ -76,6 +73,12 @@ public class CitationsResource {
     }
 
     public record LookupResponse(List<LookupMatch> matches, String parserCacheKey, String parsedEntryType) {
+    }
+
+    public record AlreadyExistsResponse(String status, String entryId) {
+        public AlreadyExistsResponse(String entryId) {
+            this("already-exists", entryId);
+        }
     }
 
     @POST
@@ -110,7 +113,7 @@ public class CitationsResource {
     @Path("{parserCacheKey}")
     public Response addFromCache(@PathParam("id") String id,
                                  @PathParam("parserCacheKey") String parserCacheKey,
-                                 @QueryParam("group") @Nullable String group) throws IOException {
+                                 @QueryParam("group") @Nullable String group) {
         if (uiMessageHandler == null) {
             throw new BadRequestException("Only possible in GUI mode.");
         }
@@ -128,13 +131,51 @@ public class CitationsResource {
         }
 
         BibEntry parsed = cached.get().parsed();
+
+        // Defense-in-depth duplicate check: even when SumatraPDF's local
+        // pushed-set is cold (cleared session, different machine), the
+        // server refuses to append a second copy of an already-present
+        // citation. Returns 200 with `{"status":"already-exists"}` instead
+        // of 201 so the client can show a "Citation is already in library"
+        // notification without treating it as a hard error.
+        BibDatabaseContext context = srvStateManager.getActiveDatabase()
+                .orElseThrow(() -> new BadRequestException("No active library"));
+        BibDatabaseMode mode = context.getMode();
+        DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
+        return duplicateCheck.containsDuplicate(context.getDatabase(), parsed, mode)
+                .map(existingEntry -> alreadyExistsResponse(parserCacheKey, existingEntry))
+                .orElseGet(() -> appendParsedAndRespond(parsed, group, parserCacheKey));
+    }
+
+    /// Returns a 200 OK `{"status":"already-exists","entryId":"…"}` body and
+    /// evicts the cache token so a retry can't double-add the entry.
+    private Response alreadyExistsResponse(String parserCacheKey, BibEntry existingEntry) {
+        citationCacheService.invalidate(parserCacheKey);
+        // Prefer the existing entry's citation key; fall back to a short
+        // author/title/year preview when the key is missing or empty.
+        String entryId = existingEntry.getCitationKey()
+                                      .filter(k -> !k.isBlank())
+                                      .orElseGet(() -> existingEntry.getAuthorTitleYear(20));
+        return Response.ok(new AlreadyExistsResponse(entryId))
+                       .type(MediaType.APPLICATION_JSON)
+                       .build();
+    }
+
+    /// Writes the parsed entry as BibTeX, forwards it to the UI for append,
+    /// evicts the cache token, and returns 201 Created.
+    private Response appendParsedAndRespond(BibEntry parsed, @Nullable String group, String parserCacheKey) {
         StringWriter rawEntry = new StringWriter();
         BibWriter bibWriter = new BibWriter(rawEntry, "\n");
         BibEntryWriter entryWriter = new BibEntryWriter(
                 new FieldWriter(preferences.getFieldPreferences()),
                 new BibEntryTypesManager());
-        entryWriter.write(parsed, bibWriter, BibDatabaseMode.BIBTEX);
+        try {
+            entryWriter.write(parsed, bibWriter, BibDatabaseMode.BIBTEX);
+        } catch (IOException e) {
+            throw new InternalServerErrorException("Failed to serialise BibEntry", e);
+        }
 
+        // uiMessageHandler is null-checked at the top of addFromCache; safe here.
         uiMessageHandler.handleUiCommands(List.of(group == null
                                                   ? new UiCommand.AppendBibTeXToCurrentLibrary(rawEntry.toString())
                                                   : new UiCommand.AppendBibTeXToCurrentLibrary(rawEntry.toString(), group)));
