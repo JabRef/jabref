@@ -1,0 +1,231 @@
+package org.jabref.logic.importer.fetcher;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
+
+import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/// Vendor-neutral fulltext fetcher that delegates PDF retrieval to a
+/// locally-running browser-extension companion. The companion uses the
+/// user's already-authenticated browser session to obtain a PDF that
+/// JabRef cannot reach directly (paywall, anti-bot, 418, institutional
+/// SSO).
+///
+/// At fetch time this class:
+///   1. reads the entry's DOI (and URL, if any),
+///   2. enumerates providers from the well-known discovery directory,
+///   3. races all enabled providers in parallel,
+///   4. returns the first `200` response's local file path as a `file://`
+///      URL, so JabRef's existing attach pipeline performs the
+///      move-and-rename step.
+///
+/// Other responses (404, 503, network errors, timeouts) are treated as a
+/// soft miss — there is no retry and no polling. See
+/// `docs/requirements/browser-extension-fulltext.md` for the wire spec.
+///
+/// [impl->req~bxf.fetch~1]
+/// [impl->req~bxf.sync-hold~1]
+/// [impl->req~bxf.auth-bearer~1]
+@NullMarked
+public class BrowserExtensionFulltextFetcher implements FulltextFetcher {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BrowserExtensionFulltextFetcher.class);
+    private static final Gson GSON = new Gson();
+    private static final Duration DEFAULT_SOCKET_TIMEOUT = Duration.ofMinutes(5);
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(5);
+
+    private final Supplier<List<BrowserExtensionProvider>> providerSupplier;
+    private final Duration socketTimeout;
+
+    public BrowserExtensionFulltextFetcher() {
+        this(BrowserExtensionProviderDiscovery::discover, DEFAULT_SOCKET_TIMEOUT);
+    }
+
+    /// Test-visible constructor. Allows injecting a provider list (for unit
+    /// tests against an embedded HTTP server) and a short socket timeout.
+    BrowserExtensionFulltextFetcher(Supplier<List<BrowserExtensionProvider>> providerSupplier,
+                                    Duration socketTimeout) {
+        this.providerSupplier = providerSupplier;
+        this.socketTimeout = socketTimeout;
+    }
+
+    @Override
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException {
+        Optional<String> doi = entry.getField(StandardField.DOI).filter(s -> !StringUtil.isBlank(s));
+        Optional<String> url = entry.getField(StandardField.URL).filter(s -> !StringUtil.isBlank(s));
+        if (doi.isEmpty() && url.isEmpty()) {
+            return Optional.empty();
+        }
+
+        List<BrowserExtensionProvider> providers = providerSupplier.get();
+        if (providers.isEmpty()) {
+            return Optional.empty();
+        }
+
+        String requestBody = buildRequestBody(doi.orElse(null), url.orElse(null));
+
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            return raceProviders(providers, requestBody, executor);
+        }
+    }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.PUBLISHER;
+    }
+
+    private Optional<URL> raceProviders(List<BrowserExtensionProvider> providers,
+                                        String requestBody,
+                                        ExecutorService executor) {
+        CompletableFuture<Optional<URL>> winner = new CompletableFuture<>();
+
+        @SuppressWarnings("unchecked")
+        CompletableFuture<Void>[] tasks = providers.stream()
+                .map(provider -> CompletableFuture.runAsync(() -> {
+                    Optional<URL> outcome = tryProvider(provider, requestBody, executor);
+                    if (outcome.isPresent()) {
+                        winner.complete(outcome);
+                    }
+                }, executor))
+                .toArray(CompletableFuture[]::new);
+
+        CompletableFuture.allOf(tasks).whenComplete((unused, throwable) ->
+                winner.complete(Optional.empty()));
+
+        try {
+            return winner.get(socketTimeout.toMillis(), TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return Optional.empty();
+        } catch (TimeoutException e) {
+            LOGGER.debug("Browser-extension fulltext race timed out after {}", socketTimeout);
+            return Optional.empty();
+        } catch (ExecutionException e) {
+            LOGGER.debug("Browser-extension fulltext race failed", e);
+            return Optional.empty();
+        }
+    }
+
+    /// [impl->req~bxf.fetch-errors~1]
+    private Optional<URL> tryProvider(BrowserExtensionProvider provider,
+                                      String requestBody,
+                                      ExecutorService executor) {
+        @Nullable String token = readToken(provider);
+        if (token == null) {
+            return Optional.empty();
+        }
+
+        URI endpoint = URI.create("http://127.0.0.1:" + provider.port() + "/v1/fulltext");
+        HttpRequest request = HttpRequest.newBuilder(endpoint)
+                .timeout(socketTimeout)
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
+                .build();
+
+        try (HttpClient client = HttpClient.newBuilder()
+                .connectTimeout(CONNECT_TIMEOUT)
+                .executor(executor)
+                .build()) {
+            HttpResponse<String> response = client.send(request, BodyHandlers.ofString(StandardCharsets.UTF_8));
+            if (response.statusCode() != 200) {
+                LOGGER.debug("Provider {} returned HTTP {}: {}", provider.name(), response.statusCode(), response.body());
+                return Optional.empty();
+            }
+            return parseSuccessResponse(provider, response.body());
+        } catch (IOException e) {
+            LOGGER.debug("Provider {} unreachable or returned malformed response", provider.name(), e);
+            return Optional.empty();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return Optional.empty();
+        }
+    }
+
+    private Optional<URL> parseSuccessResponse(BrowserExtensionProvider provider, String body) {
+        FulltextResponse parsed;
+        try {
+            parsed = GSON.fromJson(body, FulltextResponse.class);
+        } catch (JsonSyntaxException e) {
+            LOGGER.debug("Provider {} returned malformed JSON: {}", provider.name(), body, e);
+            return Optional.empty();
+        }
+        if (parsed == null || StringUtil.isBlank(parsed.path())) {
+            LOGGER.debug("Provider {} returned 200 without a path field: {}", provider.name(), body);
+            return Optional.empty();
+        }
+        Path filePath = Path.of(parsed.path());
+        if (!Files.isReadable(filePath)) {
+            LOGGER.debug("Provider {} returned a path that is not readable: {}", provider.name(), parsed.path());
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(filePath.toUri().toURL());
+        } catch (MalformedURLException e) {
+            LOGGER.debug("Provider {} returned an unrepresentable file path: {}", provider.name(), parsed.path(), e);
+            return Optional.empty();
+        }
+    }
+
+    private static @Nullable String readToken(BrowserExtensionProvider provider) {
+        try {
+            String token = Files.readString(provider.tokenFile(), StandardCharsets.UTF_8).strip();
+            if (StringUtil.isBlank(token)) {
+                LOGGER.debug("Token file for provider {} is empty: {}", provider.name(), provider.tokenFile());
+                return null;
+            }
+            return token;
+        } catch (IOException e) {
+            LOGGER.debug("Could not read token file for provider {}: {}", provider.name(), provider.tokenFile(), e);
+            return null;
+        }
+    }
+
+    private static String buildRequestBody(@Nullable String doi, @Nullable String url) {
+        return GSON.toJson(new FulltextRequest(doi, url));
+    }
+
+    /// Wire-format request body, serialised by Gson. Nulls are omitted by
+    /// Gson's default serialisation.
+    private record FulltextRequest(@Nullable String doi, @Nullable String url) {
+    }
+
+    /// Wire-format success response body. Fields not relevant to the
+    /// fetcher (such as `sourceUrl`) are present for forward compatibility
+    /// but ignored.
+    private record FulltextResponse(
+            @Nullable String id,
+            @Nullable String path,
+            @Nullable String sourceUrl) {
+    }
+}

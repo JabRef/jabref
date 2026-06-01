@@ -52,6 +52,10 @@ testModuleInfo {
     requires("com.tngtech.archunit.junit5.api")
     runtimeOnly("com.tngtech.archunit.junit5.engine")
 
+    requires("mockwebserver3")
+    requires("okhttp3")
+    requires("okio")
+
     // Highly recommended builder generator - https://github.com/skinny85/jilt (used for tests only)
     requiresStatic("jilt")
     annotationProcessor("jilt")
