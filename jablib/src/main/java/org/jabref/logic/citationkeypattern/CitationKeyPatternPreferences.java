@@ -43,7 +43,7 @@ public class CitationKeyPatternPreferences {
     private final ObjectProperty<GlobalCitationKeyPatterns> keyPatterns;
     private final SimpleObjectProperty<Character> keywordSeparator;
 
-    /// @param keywordSeparator should always be BibEntryProperties#keyWordDelimiterProperty
+    /// @param keywordSeparator should always be org.jabref.model.entry.BibEntryPreferences#keywordSeparator
     public CitationKeyPatternPreferences(boolean shouldTransliterateFieldsForCitationKey,
                                          boolean shouldAvoidOverwriteCiteKey,
                                          boolean shouldWarnBeforeOverwriteCiteKey,
