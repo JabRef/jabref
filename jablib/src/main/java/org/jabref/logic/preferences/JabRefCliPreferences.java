@@ -107,8 +107,6 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrder;
@@ -527,14 +525,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(EXPORT_IN_ORIGINAL_ORDER, Boolean.TRUE);
         defaults.put(EXPORT_IN_SPECIFIED_ORDER, Boolean.FALSE);
 
-        // export order: if EXPORT_IN_SPECIFIED_ORDER, then use following criteria
-        defaults.put(EXPORT_PRIMARY_SORT_FIELD, InternalField.KEY_FIELD.getName());
-        defaults.put(EXPORT_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(EXPORT_SECONDARY_SORT_FIELD, StandardField.AUTHOR.getName());
-        defaults.put(EXPORT_SECONDARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(EXPORT_TERTIARY_SORT_FIELD, StandardField.TITLE.getName());
-        defaults.put(EXPORT_TERTIARY_SORT_DESCENDING, Boolean.FALSE);
-
         defaults.put(NEWLINE, System.lineSeparator());
 
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
@@ -894,6 +884,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getAutoLinkPreferences().setAll(
                 AutoLinkPreferences.getDefault()
                                    .withKeywordSeparator(getBibEntryPreferences().keywordSeparatorProperty()));
+        getExportPreferences().setAll(ExportPreferences.getDefault());
         getSSLPreferences().setAll(SSLPreferences.getDefault());
         getSearchPreferences().setAll(SearchPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences())).setAll(
@@ -927,6 +918,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getBibEntryPreferences().setAll(getBibEntryPreferencesFromBackingStore(getBibEntryPreferences()));
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
         getAutoLinkPreferences().setAll(getAutoLinkPreferencesFromBackingStore(getAutoLinkPreferences()));
+        getExportPreferences().setAll(getExportPreferencesFromBackingStore(getExportPreferences()));
         getSSLPreferences().setAll(getSSLPreferencesFromBackingStore(getSSLPreferences()));
         getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences());
@@ -1670,19 +1662,14 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
-    // region Import/Export preferences
-
+    // region ExportPreferences
     @Override
     public ExportPreferences getExportPreferences() {
         if (exportPreferences != null) {
             return exportPreferences;
         }
 
-        exportPreferences = new ExportPreferences(
-                get(LAST_USED_EXPORT),
-                Path.of(get(EXPORT_WORKING_DIRECTORY)),
-                getExportSaveOrder(),
-                getCustomExportFormats());
+        exportPreferences = getExportPreferencesFromBackingStore(ExportPreferences.getDefault());
 
         EasyBind.listen(exportPreferences.lastExportExtensionProperty(), (_, _, newValue) -> put(LAST_USED_EXPORT, newValue));
         EasyBind.listen(exportPreferences.exportWorkingDirectoryProperty(), (_, _, newValue) -> put(EXPORT_WORKING_DIRECTORY, newValue.toString()));
@@ -1692,21 +1679,43 @@ public class JabRefCliPreferences implements CliPreferences {
         return exportPreferences;
     }
 
-    protected SaveOrder getExportSaveOrder() {
+    private ExportPreferences getExportPreferencesFromBackingStore(ExportPreferences defaults) {
+        return new ExportPreferences(
+                get(LAST_USED_EXPORT, defaults.getLastExportExtension()),
+                Path.of(get(EXPORT_WORKING_DIRECTORY, defaults.getExportWorkingDirectory().toString())),
+                getExportSaveOrder(defaults.getExportSaveOrder()),
+                getCustomExportFormats(defaults.getCustomExporters()));
+    }
+
+    protected SaveOrder getExportSaveOrder(SaveOrder defaults) {
+        List<SaveOrder.SortCriterion> defaultCriteria = defaults.getSortCriteria();
         List<SaveOrder.SortCriterion> sortCriteria = new ArrayList<>();
 
-        if (!"".equals(get(EXPORT_PRIMARY_SORT_FIELD))) {
-            sortCriteria.add(new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_PRIMARY_SORT_FIELD)), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)));
+        String defaultPrimaryField = defaultCriteria.size() >= 1 ? defaultCriteria.get(0).field().getName() : "";
+        boolean defaultPrimaryDesc = defaultCriteria.size() >= 1 && defaultCriteria.get(0).descending();
+        String primaryField = get(EXPORT_PRIMARY_SORT_FIELD, defaultPrimaryField);
+        if (!"".equals(primaryField)) {
+            sortCriteria.add(new SaveOrder.SortCriterion(FieldFactory.parseField(primaryField), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING, defaultPrimaryDesc)));
         }
-        if (!"".equals(get(EXPORT_SECONDARY_SORT_FIELD))) {
-            sortCriteria.add(new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_SECONDARY_SORT_FIELD)), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)));
+
+        String defaultSecondaryField = defaultCriteria.size() >= 2 ? defaultCriteria.get(1).field().getName() : "";
+        boolean defaultSecondaryDesc = defaultCriteria.size() >= 2 && defaultCriteria.get(1).descending();
+        String secondaryField = get(EXPORT_SECONDARY_SORT_FIELD, defaultSecondaryField);
+        if (!"".equals(secondaryField)) {
+            sortCriteria.add(new SaveOrder.SortCriterion(FieldFactory.parseField(secondaryField), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING, defaultSecondaryDesc)));
         }
-        if (!"".equals(get(EXPORT_TERTIARY_SORT_FIELD))) {
-            sortCriteria.add(new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING)));
+
+        String defaultTertiaryField = defaultCriteria.size() >= 3 ? defaultCriteria.get(2).field().getName() : "";
+        boolean defaultTertiaryDesc = defaultCriteria.size() >= 3 && defaultCriteria.get(2).descending();
+        String tertiaryField = get(EXPORT_TERTIARY_SORT_FIELD, defaultTertiaryField);
+        if (!"".equals(tertiaryField)) {
+            sortCriteria.add(new SaveOrder.SortCriterion(FieldFactory.parseField(tertiaryField), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING, defaultTertiaryDesc)));
         }
 
         return new SaveOrder(
-                SaveOrder.OrderType.fromBooleans(getBoolean(EXPORT_IN_SPECIFIED_ORDER), getBoolean(EXPORT_IN_ORIGINAL_ORDER)),
+                SaveOrder.OrderType.fromBooleans(
+                        getBoolean(EXPORT_IN_SPECIFIED_ORDER, defaults.getOrderType() == SaveOrder.OrderType.SPECIFIED),
+                        getBoolean(EXPORT_IN_ORIGINAL_ORDER, defaults.getOrderType() == SaveOrder.OrderType.ORIGINAL)),
                 sortCriteria
         );
     }
@@ -1717,22 +1726,22 @@ public class JabRefCliPreferences implements CliPreferences {
 
         long saveOrderCount = saveOrder.getSortCriteria().size();
         if (saveOrderCount >= 1) {
-            put(EXPORT_PRIMARY_SORT_FIELD, saveOrder.getSortCriteria().getFirst().field.getName());
-            putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, saveOrder.getSortCriteria().getFirst().descending);
+            put(EXPORT_PRIMARY_SORT_FIELD, saveOrder.getSortCriteria().get(0).field().getName());
+            putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(0).descending());
         } else {
             put(EXPORT_PRIMARY_SORT_FIELD, "");
             putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, false);
         }
         if (saveOrderCount >= 2) {
-            put(EXPORT_SECONDARY_SORT_FIELD, saveOrder.getSortCriteria().get(1).field.getName());
-            putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(1).descending);
+            put(EXPORT_SECONDARY_SORT_FIELD, saveOrder.getSortCriteria().get(1).field().getName());
+            putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(1).descending());
         } else {
             put(EXPORT_SECONDARY_SORT_FIELD, "");
             putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, false);
         }
         if (saveOrderCount >= 3) {
-            put(EXPORT_TERTIARY_SORT_FIELD, saveOrder.getSortCriteria().get(2).field.getName());
-            putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(2).descending);
+            put(EXPORT_TERTIARY_SORT_FIELD, saveOrder.getSortCriteria().get(2).field().getName());
+            putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(2).descending());
         } else {
             put(EXPORT_TERTIARY_SORT_FIELD, "");
             putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, false);
@@ -1742,7 +1751,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     @Override
     public SelfContainedSaveConfiguration getSelfContainedExportConfiguration() {
-        SaveOrder exportSaveOrder = getExportSaveOrder();
+        SaveOrder exportSaveOrder = getExportSaveOrder(ExportPreferences.getDefault().getExportSaveOrder());
         SelfContainedSaveOrder saveOrder = switch (exportSaveOrder.getOrderType()) {
             case TABLE -> {
                 LOGGER.warn("Table sort order requested, but JabRef is in CLI mode. Falling back to default save order");
@@ -1759,23 +1768,28 @@ public class JabRefCliPreferences implements CliPreferences {
                 .shouldAlwaysReformatOnSave());
     }
 
-    private List<TemplateExporter> getCustomExportFormats() {
+    private List<TemplateExporter> getCustomExportFormats(List<TemplateExporter> defaults) {
         LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences();
         SelfContainedSaveConfiguration saveConfiguration = getSelfContainedExportConfiguration();
-        List<TemplateExporter> formats = new ArrayList<>();
+        List<TemplateExporter> formatters = new ArrayList<>();
 
-        for (String toImport : getSeries(CUSTOM_EXPORT_FORMAT)) {
-            List<String> formatData = convertStringToList(toImport);
-            TemplateExporter format = new TemplateExporter(
+        List<String> rawFormats = getSeries(CUSTOM_EXPORT_FORMAT);
+        if (rawFormats.isEmpty()) {
+            return defaults;
+        }
+
+        for (String format : rawFormats) {
+            List<String> formatData = convertStringToList(format);
+            TemplateExporter exporter = new TemplateExporter(
                     formatData.get(EXPORTER_NAME_INDEX),
                     formatData.get(EXPORTER_FILENAME_INDEX),
                     formatData.get(EXPORTER_EXTENSION_INDEX),
                     layoutPreferences,
                     saveConfiguration.getSelfContainedSaveOrder());
-            format.setCustomExport(true);
-            formats.add(format);
+            exporter.setCustomExport(true);
+            formatters.add(exporter);
         }
-        return formats;
+        return formatters;
     }
 
     private void storeCustomExportFormats(List<TemplateExporter> exporters) {
@@ -1793,6 +1807,7 @@ public class JabRefCliPreferences implements CliPreferences {
             purgeSeries(CUSTOM_EXPORT_FORMAT, exporters.size());
         }
     }
+    // endregion
 
     // region Cleanup preferences
 
