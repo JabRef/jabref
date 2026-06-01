@@ -1691,7 +1691,8 @@ public class JabRefCliPreferences implements CliPreferences {
         List<SaveOrder.SortCriterion> defaultCriteria = defaults.getSortCriteria();
         List<SaveOrder.SortCriterion> sortCriteria = new ArrayList<>();
 
-        String defaultPrimaryField = !defaultCriteria.isEmpty() ? defaultCriteria.getFirst().field().getName() : "";
+        // OpenRewrite requires strange rewritings, ideally should follow the pattern for SECONDARY and TERTIARY
+        String defaultPrimaryField = defaultCriteria.isEmpty() ? "" : defaultCriteria.getFirst().field().getName();
         boolean defaultPrimaryDesc = !defaultCriteria.isEmpty() && defaultCriteria.getFirst().descending();
         String primaryField = get(EXPORT_PRIMARY_SORT_FIELD, defaultPrimaryField);
         if (!"".equals(primaryField)) {
