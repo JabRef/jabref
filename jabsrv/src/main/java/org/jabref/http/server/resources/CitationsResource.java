@@ -2,6 +2,7 @@ package org.jabref.http.server.resources;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,10 +70,19 @@ public class CitationsResource {
     @Inject
     CitationCacheService citationCacheService;
 
-    public record LookupMatch(String entryId) {
+    public record LookupMatch(String libraryId, String entryId, boolean inActiveLibrary) {
     }
 
-    public record LookupResponse(List<LookupMatch> matches, String parserCacheKey, String parsedEntryType) {
+    /// matchScope is derived from `matches`:
+    ///   "active" — at least one match is in the currently-active library
+    ///              (the library Ctrl+J would add to — so duplicate);
+    ///   "other"  — match(es) exist only in *other* open libraries
+    ///              (related, but Ctrl+J would still add to the active one);
+    ///   "none"   — no match in any open library.
+    /// Clients use this to colour the hover badge without having to walk the
+    /// matches array themselves (mint vs olive vs grey).
+    public record LookupResponse(List<LookupMatch> matches, String matchScope,
+                                 String parserCacheKey, String parsedEntryType) {
     }
 
     public record AlreadyExistsResponse(String status, String entryId) {
@@ -97,16 +107,39 @@ public class CitationsResource {
         BibEntry parsed = parsePlainCitation(choice, citationText)
                 .orElseThrow(() -> new BadRequestException("Could not parse a bibliography entry from the given text."));
 
-        BibDatabaseContext context = srvStateManager.getActiveDatabase()
+        // Cross-library lookup: walk every open library so we can tell the
+        // client whether the citation is in the *active* library (Ctrl+J
+        // would create a duplicate → mint) vs an *other* open library (still
+        // worth surfacing — the user may want to switch libraries or copy
+        // across → olive, AnchorHub's related-match colour).
+        BibDatabaseContext activeContext = srvStateManager.getActiveDatabase()
                 .orElseThrow(() -> new BadRequestException("No active library"));
-        BibDatabaseMode mode = context.getMode();
         DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
-        List<LookupMatch> matches = duplicateCheck.containsDuplicate(context.getDatabase(), parsed, mode)
-                                                  .map(existing -> List.of(new LookupMatch(existing.getCitationKey().orElse(""))))
-                                                  .orElse(List.of());
+        List<LookupMatch> matches = new ArrayList<>();
+        for (BibDatabaseContext ctx : srvStateManager.getOpenDatabases()) {
+            boolean isActive = ctx == activeContext;
+            duplicateCheck.containsDuplicate(ctx.getDatabase(), parsed, ctx.getMode())
+                          .ifPresent(existing -> matches.add(new LookupMatch(
+                                  libraryIdFor(ctx),
+                                  existing.getCitationKey().orElse(""),
+                                  isActive)));
+        }
+        String matchScope = matches.stream().anyMatch(LookupMatch::inActiveLibrary) ? "active"
+                          : !matches.isEmpty() ? "other"
+                          : "none";
 
         String cacheKey = citationCacheService.put(parsed, citationText);
-        return new LookupResponse(matches, cacheKey, parsed.getType().getName());
+        return new LookupResponse(matches, matchScope, cacheKey, parsed.getType().getName());
+    }
+
+    /// Stable-ish library identifier for response bodies. Saved libraries use
+    /// the absolute path; unsaved libraries fall back to an in-process id
+    /// derived from the BibDatabaseContext so the client at least sees they
+    /// are distinct.
+    private static String libraryIdFor(BibDatabaseContext ctx) {
+        return ctx.getDatabasePath()
+                  .map(p -> p.toAbsolutePath().toString())
+                  .orElseGet(() -> "unsaved-" + Integer.toHexString(System.identityHashCode(ctx)));
     }
 
     @POST
