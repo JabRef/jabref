@@ -1691,8 +1691,8 @@ public class JabRefCliPreferences implements CliPreferences {
         List<SaveOrder.SortCriterion> defaultCriteria = defaults.getSortCriteria();
         List<SaveOrder.SortCriterion> sortCriteria = new ArrayList<>();
 
-        String defaultPrimaryField = defaultCriteria.size() >= 1 ? defaultCriteria.get(0).field().getName() : "";
-        boolean defaultPrimaryDesc = defaultCriteria.size() >= 1 && defaultCriteria.get(0).descending();
+        String defaultPrimaryField = !defaultCriteria.isEmpty() ? defaultCriteria.getFirst().field().getName() : "";
+        boolean defaultPrimaryDesc = !defaultCriteria.isEmpty() && defaultCriteria.getFirst().descending();
         String primaryField = get(EXPORT_PRIMARY_SORT_FIELD, defaultPrimaryField);
         if (!"".equals(primaryField)) {
             sortCriteria.add(new SaveOrder.SortCriterion(FieldFactory.parseField(primaryField), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING, defaultPrimaryDesc)));
@@ -1726,8 +1726,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
         long saveOrderCount = saveOrder.getSortCriteria().size();
         if (saveOrderCount >= 1) {
-            put(EXPORT_PRIMARY_SORT_FIELD, saveOrder.getSortCriteria().get(0).field().getName());
-            putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(0).descending());
+            put(EXPORT_PRIMARY_SORT_FIELD, saveOrder.getSortCriteria().getFirst().field().getName());
+            putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, saveOrder.getSortCriteria().getFirst().descending());
         } else {
             put(EXPORT_PRIMARY_SORT_FIELD, "");
             putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, false);
