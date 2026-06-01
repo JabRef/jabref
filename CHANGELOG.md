@@ -34,7 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - EndNote and Refer importers now respect the citation key preferences for unwanted characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
-- We hardened CAYW browser extension communication by validating custom `librarypath` access and adding an allow/disallow confirmation dialog for opening local files. [#15295](https://github.com/JabRef/jabref/issues/15295)
+- We hardened CAYW browser endpoint communication by validating custom `librarypath` access and adding an allow/disallow confirmation dialog for opening local files. [#15295](https://github.com/JabRef/jabref/issues/15295)
 - We fixed the Hayagriva YAML exporter to correctly nest DOI, ISBN, and ISSN under `serial-number` as required by the Hayagriva file format specification. [#15713](https://github.com/JabRef/jabref/issues/15713)
 - We fixed an issue where newly added entries could not be found in search. [#15719](https://github.com/JabRef/jabref/issues/15719)
 - We fixed a performance issue with the duplicate resolving when copying and pasting many entries [#15780](https://github.com/JabRef/jabref/pull/15780)

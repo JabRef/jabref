@@ -254,10 +254,6 @@ public class CAYWResource {
     }
 
     private boolean isLibraryPathAccessAllowed(Path requestedLibraryPath) {
-        if (srvStateManager instanceof JabRefSrvStateManager) {
-            return true;
-        }
-
         if (allowAllLibraryPaths || TRUSTED_LIBRARY_PATHS.contains(requestedLibraryPath)) {
             return true;
         }
