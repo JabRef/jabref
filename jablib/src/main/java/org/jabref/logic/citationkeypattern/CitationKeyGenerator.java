@@ -236,7 +236,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     /// @param entry the {@link BibEntry} that a citation key is generated for
     /// @return a cleaned citation key for the given {@link BibEntry}
     private Function<String, String> expandBracketContent(BibEntry entry) {
-        Character keywordDelimiter = citationKeyPatternPreferences.getKeywordDelimiter();
+        Character keywordDelimiter = citationKeyPatternPreferences.getKeywordSeparator();
 
         return (String bracket) -> {
             String expandedPattern;
