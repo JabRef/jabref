@@ -3,7 +3,7 @@ parent: Code Howtos
 ---
 # Dependency management
 
-The structrue and dependency management in the JabRef project uses the
+The structure and dependency management in the JabRef project uses the
 [Java Module System (JPMS)](https://www.oracle.com/corporate/features/understanding-java-9-modules.html)
 as the primary system for defining _modules_ and their _dependencies_. For a smooth integration of JPMS and Gradle's
 dependency management, the `org.gradlex.java-module-dependencies` plugin, and the additional notations it provides, are
@@ -55,8 +55,7 @@ If you use a 3rd party module like `tools.jackson.databind`, a version for that 
 be selected. For this, the `versions/build.gradle.kts`
 defines a so-called _Gradle platform_ (also called BOM) that contains the versions of all 3rd party
 modules used. If you want to upgrade the version of a module, do this here. If you need to use a new 3rd party module
-in a `src/main/java/module-info.java` file, you need to
-add the version here.
+in a `src/main/java/module-info.java` file, you need to add the version here.
 (If the new module is not completely JPMS compatible, you may also need to add or modify
 [patching rules](#patching-3rd-party-modules)).
 
