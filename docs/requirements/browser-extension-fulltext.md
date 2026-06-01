@@ -11,6 +11,55 @@ The requirement identifiers use the `bxf` (browser-extension-fulltext) prefix an
 
 This file is the **canonical copy**. Verbatim copies live alongside provider implementations to support cross-repo tracing. Edits must land in this file first; provider repositories sync afterwards.
 
+## Happy-path flow
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant J as JabRef
+    participant F as BrowserExtensionFulltextFetcher
+    participant D as Discovery dir<br/>(filesystem)
+    participant H as Provider HTTP server<br/>(loopback)
+    participant E as Browser extension
+    participant T as Browser tab
+    participant P as Publisher site
+
+    User->>J: Get fulltext for entry
+    J->>F: findFullText(entry)
+    F->>D: list *.json
+    D-->>F: providers + tokenFile paths
+    F->>D: read each tokenFile
+    D-->>F: bearer tokens
+
+    par race providers
+        F->>H: POST /v1/fulltext<br/>{doi, url}<br/>Authorization: Bearer ...
+    end
+
+    H->>H: resolve DOI -> publisher URL<br/>pick adapter (publisher / generic)
+    H->>E: fetchFulltext (native messaging)<br/>{requestId, url, contentScriptName}
+    E->>E: enqueue (global cap 3, per-host cap 1)
+    E->>T: tabs.create({url, active: false})
+    T->>P: GET publisher URL (with cookies)
+    P-->>T: rendered page
+    E->>T: scripting.executeScript(adapter)
+    T-->>E: PDF URL
+    E->>P: downloads.download(pdfUrl)
+    P-->>E: PDF bytes -> downloads/anchorhub/&lt;id&gt;.pdf
+    E->>T: tabs.remove
+    E-->>H: {requestId, id, path, sourceUrl}
+    H-->>F: 200 {id, path, sourceUrl}
+
+    F-->>J: Optional&lt;URL&gt; (file:// path)
+    J->>J: copy/move into library dir,<br/>rename per pattern
+    J-->>User: PDF linked to entry
+```
+
+Notes:
+
+- The race step fans out one HTTP request per discovered provider. The first `200` wins; losing requests are cancelled by closing their TCP connections (see [`req~bxf.cancellation~1`](#cancellation-via-connection-close)).
+- Adapter selection (publisher-specific vs generic fallback) and the per-publisher concurrency cap both live on the provider side; JabRef does not know which publisher adapters a provider supports.
+- The provider returns a local file path; JabRef wraps it as a `file://` URL so its existing attach pipeline copies the PDF into the library's file directory and renames it per the configured pattern.
+
 ## Discovery directory
 `req~bxf.discovery-dir~1`
 
