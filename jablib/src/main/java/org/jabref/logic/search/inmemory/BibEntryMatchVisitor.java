@@ -1,6 +1,7 @@
 package org.jabref.logic.search.inmemory;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -243,26 +244,37 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
 
         if (field.getProperties().contains(FieldProperty.DATE)) {
             int dashes = (int) term.chars().filter(c -> c == '-').count();
+            LocalDate termDate = parseTermDate(term.strip(), dashes);
+            if (termDate == null) {
+                return false;
+            }
             return DateGroup.extractDate(field, entry)
-                            .map(d -> normalizeDateKey(d, dashes))
-                            .map(entryKey -> compareStrings(entryKey, term, operator))
+                            .map(BibEntryMatchVisitor::toLocalDate)
+                            .map(entryDate -> compareInts(entryDate.compareTo(termDate), 0, operator))
                             .orElse(false);
         }
 
-        return entry.getField(field)
-                    .map(v -> compareStrings(v.strip(), term.strip(), operator))
-                    .orElse(false);
+        return false;
     }
 
-    private static String normalizeDateKey(org.jabref.model.entry.Date d, int termDashes) {
-        int year = d.getYear().orElse(0);
-        int month = d.getMonth().map(org.jabref.model.entry.Month::getNumber).orElse(1);
-        int day = d.getDay().orElse(1);
-        return switch (termDashes) {
-            case 0  -> "%04d".formatted(year);
-            case 1  -> "%04d-%02d".formatted(year, month);
-            default -> "%04d-%02d-%02d".formatted(year, month, day);
-        };
+    private static LocalDate parseTermDate(String term, int dashes) {
+        try {
+            String[] parts = term.split("-");
+            return switch (dashes) {
+                case 0 -> LocalDate.of(Integer.parseInt(parts[0]), 1, 1);
+                case 1 -> LocalDate.of(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), 1);
+                default -> LocalDate.parse(term);
+            };
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static LocalDate toLocalDate(org.jabref.model.entry.Date d) {
+        return LocalDate.of(
+                d.getYear().orElse(0),
+                d.getMonth().map(org.jabref.model.entry.Month::getNumber).orElse(1),
+                d.getDay().orElse(1));
     }
 
     private static boolean compareInts(int a, int b, int operator) {
@@ -275,18 +287,7 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
         };
     }
 
-    private static boolean compareStrings(String a, String b, int operator) {
-        int cmp = a.compareTo(b);
-        return switch (operator) {
-            case SearchParser.GT  -> cmp > 0;
-            case SearchParser.LT  -> cmp < 0;
-            case SearchParser.GTE -> cmp >= 0;
-            case SearchParser.LTE -> cmp <= 0;
-            default -> false;
-        };
-    }
-
-    /// @param matchKind one of [SearchFlags#INEXACT_MATCH], [SearchFlags#EXACT_MATCH], [SearchFlags#REGULAR_EXPRESSION]
+/// @param matchKind one of [SearchFlags#INEXACT_MATCH], [SearchFlags#EXACT_MATCH], [SearchFlags#REGULAR_EXPRESSION]
     private record OperatorFlags(SearchFlags matchKind, boolean caseSensitive, boolean negation) {
     }
 
