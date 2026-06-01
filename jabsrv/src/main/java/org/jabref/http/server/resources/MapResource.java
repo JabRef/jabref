@@ -24,13 +24,12 @@ public class MapResource {
     @Inject
     SrvStateManager srvStateManager;
 
-    /// At http://localhost:23119/libraries/{id}/map <br><br>
+    /// At <http://localhost:23119/libraries/{id}/map>
     ///
-    /// Looks for the .jmp file in the directory of the given library ({id}.bib file).
+    /// Looks for the `.jmp` file in the directory of the given library (`{id}.bib` file).
     ///
     /// @param id The given library
-    /// @return A JSON String containing the mindmap data. If no {id}.jmp file was found, returns the standard mindmap
-    /// @throws IOException
+    /// @return A JSON String containing the mindmap data. If no `{id}.jmp` file was found, returns the standard mindmap
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String getJabMapJson(@PathParam("id") String id) throws IOException {
