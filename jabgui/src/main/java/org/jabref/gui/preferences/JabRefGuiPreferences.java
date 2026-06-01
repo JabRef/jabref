@@ -47,6 +47,7 @@ import org.jabref.gui.theme.Theme;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
@@ -1219,7 +1220,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     @Override
     public SelfContainedSaveConfiguration getSelfContainedExportConfiguration() {
-        SaveOrder exportSaveOrder = getExportSaveOrder();
+        SaveOrder exportSaveOrder = getExportSaveOrder(ExportPreferences.getDefault().getExportSaveOrder());
         SelfContainedSaveOrder saveOrder = switch (exportSaveOrder.getOrderType()) {
             case TABLE ->
                     this.getSelfContainedTableSaveOrder();
