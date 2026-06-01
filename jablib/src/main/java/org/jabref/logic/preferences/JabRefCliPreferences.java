@@ -1748,7 +1748,6 @@ public class JabRefCliPreferences implements CliPreferences {
             putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, false);
         }
     }
-    // endregion
 
     @Override
     public SelfContainedSaveConfiguration getSelfContainedExportConfiguration() {
@@ -1810,8 +1809,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
-    // region Cleanup preferences
-
+    // region CleanupPreferences
     @Override
     public CleanupPreferences getCleanupPreferences() {
         if (cleanupPreferences != null) {
@@ -1863,11 +1861,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 CleanupPreferences.CleanupStep.UNABBREVIATE));
         return activeJobs;
     }
-
     // endregion
 
-    // region last files opened
-
+    // region LastFilesOpenedPreferences
     @Override
     public LastFilesOpenedPreferences getLastFilesOpenedPreferences() {
         if (lastFilesOpenedPreferences != null) {
@@ -1914,7 +1910,6 @@ public class JabRefCliPreferences implements CliPreferences {
                                                .map(Path::toString)
                                                .toList());
     }
-
     // endregion
 
     // region AiPreferences
