@@ -551,10 +551,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(LAST_USED_EXPORT, "");
 
-        defaults.put(CLEANUP_JOBS, convertListToString(getDefaultCleanupJobs().stream().map(Enum::name).toList()));
-        defaults.put(CLEANUP_FIELD_FORMATTERS_ENABLED, Boolean.FALSE);
-        defaults.put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanupActions.getMetaDataString(FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS, OS.NEWLINE));
-
         // Since some of the preference settings themselves use localized strings, we cannot set the language after
         // the initialization of the preferences in main
         // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
@@ -881,6 +877,7 @@ public class JabRefCliPreferences implements CliPreferences {
                                                    .withLastUsedDirectory(getDefaultPath())
         );
         getAiPreferences().setAll(AiPreferences.getDefault());
+        getCleanupPreferences().setAll(CleanupPreferences.getDefault());
         getAutoLinkPreferences().setAll(
                 AutoLinkPreferences.getDefault()
                                    .withKeywordSeparator(getBibEntryPreferences().keywordSeparatorProperty()));
@@ -917,6 +914,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
         getBibEntryPreferences().setAll(getBibEntryPreferencesFromBackingStore(getBibEntryPreferences()));
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
+        getCleanupPreferences().setAll(getCleanupPreferencesFromBackingStore(getCleanupPreferences()));
         getAutoLinkPreferences().setAll(getAutoLinkPreferencesFromBackingStore(getAutoLinkPreferences()));
         getExportPreferences().setAll(getExportPreferencesFromBackingStore(getExportPreferences()));
         getSSLPreferences().setAll(getSSLPreferencesFromBackingStore(getSSLPreferences()));
@@ -1816,13 +1814,7 @@ public class JabRefCliPreferences implements CliPreferences {
             return cleanupPreferences;
         }
 
-        cleanupPreferences = new CleanupPreferences(
-                EnumSet.copyOf(getStringList(CLEANUP_JOBS).stream()
-                                                          .map(CleanupPreferences.CleanupStep::valueOf)
-                                                          .collect(Collectors.toSet())),
-                new FieldFormatterCleanupActions(getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanupMapper.parseActions(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))
-                ));
+        cleanupPreferences = getCleanupPreferencesFromBackingStore(CleanupPreferences.getDefault());
 
         cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) _ ->
                 putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList())));
@@ -1835,31 +1827,28 @@ public class JabRefCliPreferences implements CliPreferences {
         return cleanupPreferences;
     }
 
-    @Override
-    public CleanupPreferences getDefaultCleanupPreset() {
-        return new CleanupPreferences(
-                getDefaultCleanupJobs(),
-                new FieldFormatterCleanupActions(
-                        (Boolean) defaults.get(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanupMapper.parseActions((String) defaults.get(CLEANUP_FIELD_FORMATTERS))
-                ));
-    }
+    private CleanupPreferences getCleanupPreferencesFromBackingStore(CleanupPreferences defaults) {
+        EnumSet<CleanupPreferences.CleanupStep> activeJobs;
+        if (hasKey(CLEANUP_JOBS)) {
+            activeJobs = EnumSet.copyOf(getStringList(CLEANUP_JOBS).stream()
+                                                                    .map(CleanupPreferences.CleanupStep::valueOf)
+                                                                    .collect(Collectors.toSet()));
+        } else {
+            activeJobs = EnumSet.copyOf(defaults.getActiveJobs());
+        }
 
-    private static EnumSet<CleanupPreferences.CleanupStep> getDefaultCleanupJobs() {
-        EnumSet<CleanupPreferences.CleanupStep> activeJobs = EnumSet.allOf(CleanupPreferences.CleanupStep.class);
-        activeJobs.removeAll(EnumSet.of(
-                CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
-                CleanupPreferences.CleanupStep.MOVE_PDF,
-                CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
-                CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX,
-                CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX,
-                CleanupPreferences.CleanupStep.CONVERT_MSC_CODES,
-                CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT,
-                CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS,
-                CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE,
-                CleanupPreferences.CleanupStep.ABBREVIATE_LTWA,
-                CleanupPreferences.CleanupStep.UNABBREVIATE));
-        return activeJobs;
+        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(
+                getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, defaults.getFieldFormatterCleanups().isEnabled()),
+                FieldFormatterCleanupMapper.parseActions(
+                        StringUtil.unifyLineBreaks(get(
+                                        CLEANUP_FIELD_FORMATTERS,
+                                        FieldFormatterCleanupActions.getMetaDataString(defaults.getFieldFormatterCleanups()
+                                                                                               .getConfiguredActions(),
+                                                OS.NEWLINE)),
+                                ""))
+        );
+
+        return new CleanupPreferences(activeJobs, actions);
     }
     // endregion
 
