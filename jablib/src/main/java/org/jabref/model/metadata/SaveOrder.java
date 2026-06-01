@@ -115,23 +115,23 @@ public class SaveOrder {
 
     public record
     SortCriterion(Field field, boolean descending) {
-            /// Given field sorted ascending
-            public SortCriterion(Field field) {
-                this(field, false);
-            }
+        /// Given field sorted ascending
+        public SortCriterion(Field field) {
+            this(field, false);
+        }
 
-            /// @param field      The field
-            /// @param descending Must be a boolean value as string, e.g. "true", "false"
-            public SortCriterion(Field field, String descending) {
-                this(field, Boolean.parseBoolean(descending));
-            }
+        /// @param field      The field
+        /// @param descending Must be a boolean value as string, e.g. "true", "false"
+        public SortCriterion(Field field, String descending) {
+            this(field, Boolean.parseBoolean(descending));
+        }
 
         @Override
-            public @NonNull String toString() {
-                return "SortCriterion{" + "field='" + field + '\'' +
-                        ", descending=" + descending +
-                        '}';
-            }
+        public @NonNull String toString() {
+            return "SortCriterion{" + "field='" + field + '\'' +
+                    ", descending=" + descending +
+                    '}';
+        }
     }
 
     public enum OrderType {
