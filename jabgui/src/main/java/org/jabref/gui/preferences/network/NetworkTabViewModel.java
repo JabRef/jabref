@@ -123,7 +123,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a password"))));
 
-        this.trustStoreManager = new TrustStoreManager(Path.of(preferences.getSSLPreferences().getTruststorePath()));
+        this.trustStoreManager = new TrustStoreManager(preferences.getSSLPreferences().getTruststorePath());
     }
 
     @Override
