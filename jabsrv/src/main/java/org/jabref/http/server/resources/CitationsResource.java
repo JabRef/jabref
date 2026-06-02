@@ -125,8 +125,8 @@ public class CitationsResource {
                                   isActive)));
         }
         String matchScope = matches.stream().anyMatch(LookupMatch::inActiveLibrary) ? "active"
-                                                                                    : !matches.isEmpty() ? "other"
-                                                                                                         : "none";
+                                                                                    : matches.isEmpty() ? "none"
+                                                                                                         : "other";
 
         String cacheKey = citationCacheService.put(parsed, citationText);
         return new LookupResponse(matches, matchScope, cacheKey, parsed.getType().getName());
