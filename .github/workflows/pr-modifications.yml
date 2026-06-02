@@ -9,6 +9,8 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
+  actions: write
+  contents: read
   pull-requests: write
 
 jobs:
@@ -117,4 +119,3 @@ jobs:
         with:
           name: pr_number
           path: pr_number.txt
-
