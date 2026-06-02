@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.undo.UndoManager;
@@ -25,22 +26,8 @@ import org.slf4j.LoggerFactory;
 public class KeywordsEditor extends TagsEditor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeywordsEditor.class);
-    private static final MscCodeRepository MSC_CODES = initializeRepository();
-
-    private static MscCodeRepository initializeRepository() {
-        URL resourceUrl = KeywordsEditor.class.getClassLoader().getResource("MSC_2020.csv");
-        if (resourceUrl == null) {
-            LOGGER.error("Resource not found: MSC_2020.csv");
-            return new MscCodeRepository();
-        }
-
-        try {
-            return MscCodeUtils.loadMscCodeRepositoryFromCsv(resourceUrl).orElseGet(MscCodeRepository::new);
-        } catch (MscCodeLoadingException e) {
-            LOGGER.error("Error loading MSC codes", e);
-            return new MscCodeRepository();
-        }
-    }
+    private final CliPreferences preferences;
+    private MscCodeRepository mscCodes;
 
     private final KeywordsEditorViewModel viewModel;
 
@@ -50,6 +37,7 @@ public class KeywordsEditor extends TagsEditor {
                           CliPreferences preferences) {
 
         super(field, suggestionProvider, fieldCheckers, Injector.instantiateModelOrService(UndoManager.class));
+        this.preferences = preferences;
 
         this.viewModel = new KeywordsEditorViewModel(
                 field,
@@ -95,8 +83,12 @@ public class KeywordsEditor extends TagsEditor {
 
     @Override
     protected void customizeTag(Label tagLabel, Keyword keyword) {
-        MSC_CODES.getDescription(tagLabel.getText())
-                 .ifPresent(mscClassification -> tagLabel.setTooltip(new Tooltip(mscClassification)));
+        if (!preferences.shouldEnableMscKeywordDescriptions()) {
+            return;
+        }
+
+        getMscCodes().flatMap(repository -> repository.getDescription(tagLabel.getText()))
+                     .ifPresent(mscClassification -> tagLabel.setTooltip(new Tooltip(mscClassification)));
     }
 
     public KeywordsEditorViewModel getViewModel() {
@@ -106,5 +98,25 @@ public class KeywordsEditor extends TagsEditor {
     @Override
     public void bindToEntry(BibEntry entry) {
         viewModel.bindToEntry(entry);
+    }
+
+    private Optional<MscCodeRepository> getMscCodes() {
+        if (mscCodes != null) {
+            return Optional.of(mscCodes);
+        }
+
+        URL resourceUrl = KeywordsEditor.class.getClassLoader().getResource("MSC_2020.csv");
+        if (resourceUrl == null) {
+            LOGGER.error("Resource not found: MSC_2020.csv");
+            return Optional.empty();
+        }
+
+        try {
+            mscCodes = MscCodeUtils.loadMscCodeRepositoryFromCsv(resourceUrl).orElseGet(MscCodeRepository::new);
+            return Optional.of(mscCodes);
+        } catch (MscCodeLoadingException e) {
+            LOGGER.error("Error loading MSC codes", e);
+            return Optional.empty();
+        }
     }
 }

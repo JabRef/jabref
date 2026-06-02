@@ -70,7 +70,7 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
     @VisibleForTesting
     Optional<String> extractOpenAlexId(String url) {
         try {
-            URL u = new URL(url);
+            URL u = URLUtil.create(url);
 
             if (!"openalex.org".equalsIgnoreCase(u.getHost())) {
                 return Optional.empty();

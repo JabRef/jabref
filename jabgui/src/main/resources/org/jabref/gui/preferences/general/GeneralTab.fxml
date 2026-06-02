@@ -117,6 +117,7 @@
             <Insets top="-8.0"/>
         </padding>
     </HBox>
+    <CheckBox fx:id="enableMscKeywordDescriptions" text="%Enable MSC keyword descriptions"/>
 
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <CheckBox fx:id="createBackup" text="%Create backup"/>

@@ -70,6 +70,10 @@ public interface CliPreferences {
 
     CleanupPreferences getDefaultCleanupPreset();
 
+    boolean shouldEnableMscKeywordDescriptions();
+
+    void setEnableMscKeywordDescriptions(boolean enabled);
+
     LibraryPreferences getLibraryPreferences();
 
     DOIPreferences getDOIPreferences();

@@ -29,6 +29,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseMode;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -44,6 +45,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @Inject private UiMessageHandler uiMessageHandler;
     @Inject private RemoteListenerServerManager remoteListenerServerManager;
     @Inject private StateManager stateManager;
+    @Inject private TaskExecutor taskExecutor;
 
     @FXML private SearchableComboBox<Language> language;
     @FXML private ComboBox<ThemeTypes> theme;
@@ -62,6 +64,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private ComboBox<BibDatabaseMode> biblatexMode;
     @FXML private CheckBox alwaysReformatBib;
     @FXML private CheckBox autosaveLocalLibraries;
+    @FXML private CheckBox enableMscKeywordDescriptions;
     @FXML private Button autosaveLocalLibrariesHelp;
     @FXML private CheckBox createBackup;
     @FXML private TextField backupDirectory;
@@ -106,7 +109,8 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
                 languageServerController,
                 uiMessageHandler,
                 remoteListenerServerManager,
-                stateManager);
+                stateManager,
+                taskExecutor);
 
         new ViewModelListCellFactory<Language>()
                 .withText(Language::getDisplayName)
@@ -153,6 +157,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
+        enableMscKeywordDescriptions.selectedProperty().bindBidirectional(viewModel.enableMscKeywordDescriptionsProperty());
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService, preferences.getExternalApplicationsPreferences()), autosaveLocalLibrariesHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService, preferences.getExternalApplicationsPreferences()), remoteHelp);

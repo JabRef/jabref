@@ -1,67 +1,55 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
+import java.nio.file.Path;
 
 import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
+import org.jabref.logic.msc.MscCodeLoader;
 import org.jabref.logic.msc.MscCodeRepository;
 import org.jabref.logic.preferences.JabRefCliPreferences;
-import org.jabref.logic.shared.exception.MscCodeLoadingException;
+import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.MscCodeUtils;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 
 import com.airhacks.afterburner.injection.Injector;
+import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatter {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConvertMSCCodesFormatter.class);
-    private static final MscCodeRepository MSC_CODES;
-    private static boolean conversionPossible;
+    private static final Object MSC_CODES_LOCK = new Object();
+    private static @Nullable volatile MscCodeRepository mscCodes;
 
-    static {
-        MSC_CODES = initializeRepository();
+    private @Nullable JabRefCliPreferences cliPreferences;
+
+    public ConvertMSCCodesFormatter() {
+        this.cliPreferences = null;
     }
 
-    private static MscCodeRepository initializeRepository() {
-        URL resourceUrl = ConvertMSCCodesFormatter.class.getClassLoader().getResource("MSC_2020.csv");
-        if (resourceUrl == null) {
-            LOGGER.error("Resource not found: MSC_2020.csv");
-            conversionPossible = false;
-            return new MscCodeRepository();
-        }
-
-        try {
-            MscCodeRepository repository = MscCodeUtils.loadMscCodeRepositoryFromCsv(resourceUrl).orElseGet(MscCodeRepository::new);
-            conversionPossible = !repository.getAllLoaded().isEmpty();
-            return repository;
-        } catch (MscCodeLoadingException e) {
-            LOGGER.error("Error loading MSC codes", e);
-            conversionPossible = false;
-            return new MscCodeRepository();
-        }
+    ConvertMSCCodesFormatter(JabRefCliPreferences cliPreferences) {
+        this.cliPreferences = cliPreferences;
     }
 
     @NonNull
     @Override
     public String format(@NonNull String text) {
-        if (text.isEmpty() || !conversionPossible) {
+        JabRefCliPreferences preferences = getCliPreferences();
+        if (text.isEmpty() || !preferences.shouldEnableMscKeywordDescriptions()) {
             return text;
         }
 
-        // Using Injector to avoid widespread refactoring for constructor injection.
-        // Class that calls formatters (FieldFormatterCleanupActions.java) has many usages that would need updates.
-        JabRefCliPreferences cliPreferences = Injector.instantiateModelOrService(JabRefCliPreferences.class);
-
         // get preferences for BibEntry
-        BibEntryPreferences bibPreferences = cliPreferences.getBibEntryPreferences();
+        BibEntryPreferences bibPreferences = preferences.getBibEntryPreferences();
         Character dlim = bibPreferences.getKeywordSeparator();
 
         // create KeywordList to tokenize
@@ -73,7 +61,9 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
             // non-code keyword is present leave as-is
             Keyword item = list.next();
             String code = item.toString().trim(); // remove whitespace
-            String convertedText = MSC_CODES.getDescription(code).orElse(code);
+            String convertedText = getMscCodes()
+                    .flatMap(repository -> repository.getDescription(code))
+                    .orElse(code);
 
             modifiedList.add(new Keyword(convertedText));
         }
@@ -99,5 +89,39 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
     @Override
     public String getExampleInput() {
         return "06E30";
+    }
+
+    private JabRefCliPreferences getCliPreferences() {
+        if (cliPreferences != null) {
+            return cliPreferences;
+        }
+        return Injector.instantiateModelOrService(JabRefCliPreferences.class);
+    }
+
+    private static Optional<MscCodeRepository> getMscCodes() {
+        if (mscCodes != null) {
+            return Optional.of(mscCodes);
+        }
+
+        synchronized (MSC_CODES_LOCK) {
+            if (mscCodes != null) {
+                return Optional.of(mscCodes);
+            }
+
+            mscCodes = loadMscCodes();
+            return Optional.ofNullable(mscCodes);
+        }
+    }
+
+    private static MscCodeRepository loadMscCodes() {
+        Path mscMvFile = Directories.getMscDirectory().resolve(MscCodeLoader.MSC_FILE_NAME);
+        return MscCodeUtils.loadMscCodeRepositoryFromMvStore(mscMvFile).orElseGet(MscCodeRepository::new);
+    }
+
+    @VisibleForTesting
+    public static void setMscCodes(MscCodeRepository repository) {
+        synchronized (MSC_CODES_LOCK) {
+            mscCodes = repository;
+        }
     }
 }

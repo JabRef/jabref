@@ -2,6 +2,7 @@ package org.jabref.logic.util;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.logic.msc.MscCodeLoader;
@@ -31,5 +32,17 @@ public class MscCodeUtils {
             LOGGER.error("Error loading MSC codes from CSV URL", e);
             throw new MscCodeLoadingException("Failed to load MSC codes from CSV URL", e);
         }
+    }
+
+    @NonNull
+    public static Optional<MscCodeRepository> loadMscCodeRepositoryFromMvStore(Path mvStoreFile) {
+        try {
+            if (MscCodeLoader.isMvStoreAvailableWithData(mvStoreFile)) {
+                return Optional.of(new MscCodeRepository(mvStoreFile));
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error loading MSC codes from MVStore", e);
+        }
+        return Optional.empty();
     }
 }

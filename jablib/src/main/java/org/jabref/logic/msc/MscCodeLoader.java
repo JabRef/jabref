@@ -1,13 +1,18 @@
 package org.jabref.logic.msc;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.net.URLDownload;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -18,6 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class MscCodeLoader {
+    public static final String MSC_FILE_NAME = "msc_codes.mv";
+    public static final String MSC_CSV_URL = "https://msc2020.org/MSC_2020.csv";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MscCodeLoader.class);
     private static final String MSC_CODES_MAP_NAME = "MscCodes";
     private static final CSVFormat MSC_CSV_FORMAT = CSVFormat.DEFAULT.builder()
@@ -34,31 +42,27 @@ public final class MscCodeLoader {
 
     public static List<MscCodeEntry> readMscCodesFromCsvFile(Path file) throws IOException {
         LOGGER.debug("Reading MSC codes from file {}", file);
-
-        List<MscCodeEntry> entries = new ArrayList<>();
-        try (CSVParser csvParser = CSVParser.parse(Files.newBufferedReader(file, StandardCharsets.ISO_8859_1), MSC_CSV_FORMAT)) {
-            for (CSVRecord csvRecord : csvParser) {
-                String code = csvRecord.size() > 0 ? csvRecord.get(0) : "";
-                if (code.isBlank()) {
-                    continue;
-                }
-
-                String text = csvRecord.size() > 1 ? csvRecord.get(1) : "";
-                String description = csvRecord.size() > 2 ? csvRecord.get(2) : "";
-                entries.add(new MscCodeEntry(code, text, description));
-            }
+        try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.ISO_8859_1)) {
+            List<MscCodeEntry> entries = readMscCodes(reader);
+            LOGGER.debug("Loaded {} MSC codes from {}", entries.size(), file);
+            return entries;
         }
-
-        LOGGER.debug("Loaded {} MSC codes from {}", entries.size(), file);
-        return entries;
     }
 
     public static List<MscCodeEntry> readMscCodesFromCsvUrl(URL resourceUrl) throws IOException {
         LOGGER.debug("Reading MSC codes from URL {}", resourceUrl);
+        try (InputStreamReader reader = new InputStreamReader(new URLDownload(resourceUrl).asInputStream(), StandardCharsets.ISO_8859_1)) {
+            List<MscCodeEntry> entries = readMscCodes(reader);
+            LOGGER.debug("Loaded {} MSC codes from {}", entries.size(), resourceUrl);
+            return entries;
+        } catch (FetcherException e) {
+            throw new IOException(e);
+        }
+    }
 
+    private static List<MscCodeEntry> readMscCodes(Reader reader) throws IOException {
         List<MscCodeEntry> entries = new ArrayList<>();
-        try (InputStreamReader reader = new InputStreamReader(resourceUrl.openStream(), StandardCharsets.ISO_8859_1);
-             CSVParser csvParser = CSVParser.parse(reader, MSC_CSV_FORMAT)) {
+        try (CSVParser csvParser = CSVParser.parse(reader, MSC_CSV_FORMAT)) {
             for (CSVRecord csvRecord : csvParser) {
                 String code = csvRecord.size() > 0 ? csvRecord.get(0) : "";
                 if (code.isBlank()) {
@@ -70,22 +74,29 @@ public final class MscCodeLoader {
                 entries.add(new MscCodeEntry(code, text, description));
             }
         }
-
-        LOGGER.debug("Loaded {} MSC codes from {}", entries.size(), resourceUrl);
         return entries;
     }
 
     public static void convertCsvToMvStore(Path csvFile, Path mvStoreFile) throws IOException {
         LOGGER.debug("Converting MSC codes from {} to {}", csvFile, mvStoreFile);
+        ensureParentDirectoryExists(mvStoreFile);
+        storeInMvStore(readMscCodesFromCsvFile(csvFile), mvStoreFile);
+    }
 
-        Path parent = mvStoreFile.getParent();
+    public static void downloadAndConvert(URL csvUrl, Path mvStoreFile) throws IOException {
+        LOGGER.debug("Downloading MSC codes from {} and converting to {}", csvUrl, mvStoreFile);
+        ensureParentDirectoryExists(mvStoreFile);
+        storeInMvStore(readMscCodesFromCsvUrl(csvUrl), mvStoreFile);
+    }
+
+    private static void ensureParentDirectoryExists(Path file) throws IOException {
+        Path parent = file.getParent();
         if (parent != null) {
             Files.createDirectories(parent);
         }
-        Files.deleteIfExists(mvStoreFile);
+    }
 
-        List<MscCodeEntry> entries = readMscCodesFromCsvFile(csvFile);
-
+    private static void storeInMvStore(List<MscCodeEntry> entries, Path mvStoreFile) {
         try (MVStore store = new MVStore.Builder()
                 .fileName(mvStoreFile.toAbsolutePath().toString())
                 .compressHigh()
@@ -95,6 +106,19 @@ public final class MscCodeLoader {
                 codesMap.put(entry.code(), entry);
             }
             LOGGER.debug("Stored {} MSC codes in {}", codesMap.size(), mvStoreFile);
+        }
+    }
+
+    public static boolean isMvStoreAvailableWithData(Path mvStoreFile) {
+        if (!Files.exists(mvStoreFile)) {
+            return false;
+        }
+        try (MVStore store = new MVStore.Builder().readOnly().fileName(mvStoreFile.toAbsolutePath().toString()).open()) {
+            MVMap<String, MscCodeEntry> codesMap = store.openMap(MSC_CODES_MAP_NAME);
+            return !codesMap.isEmpty();
+        } catch (Exception e) {
+            LOGGER.debug("MSC codes MVStore not available or broken: {}", mvStoreFile);
+            return false;
         }
     }
 }
