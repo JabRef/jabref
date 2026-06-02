@@ -35,11 +35,11 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferencesDialogView;
 import org.jabref.gui.preferences.preview.PreviewTab;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.logic.util.ObservablesHelper;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -102,11 +102,14 @@ public class PreviewPanel extends VBox implements PreviewControls {
                 .withText(PreviewLayout::getDisplayName)
                 .install(previewLayoutComboBox);
         previewLayoutComboBox.setItems(previewPreferences.getLayoutCycle());
+        previewLayoutComboBox.setValue(previewPreferences.getSelectedPreviewLayout());
 
-        ObservablesHelper.bindBidirectional(
+        BindingsHelper.bindBidirectional(
                 previewPreferences.layoutCyclePositionProperty(),
                 previewLayoutComboBox.valueProperty(),
-                position -> previewPreferences.getLayoutCycle().get(position.intValue()),
+                position -> { // An expanded form of a lambda (with {} and a return statement) has to be used. Otherwise, it would mark the call as "ambiguous".
+                    return previewPreferences.getLayoutCycle().get(position.intValue());
+                },
                 layout -> previewPreferences.getLayoutCycle().indexOf(layout)
         );
 
