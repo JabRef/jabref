@@ -117,7 +117,7 @@ public final class MscCodeLoader {
             MVMap<String, MscCodeEntry> codesMap = store.openMap(MSC_CODES_MAP_NAME);
             return !codesMap.isEmpty();
         } catch (Exception e) {
-            LOGGER.debug("MSC codes MVStore not available or broken: {}", mvStoreFile);
+            LOGGER.debug("MSC codes MVStore not available or broken: {}", mvStoreFile, e);
             return false;
         }
     }
