@@ -8,19 +8,24 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class MscCodeLoader {
     public static final String MSC_FILE_NAME = "msc_codes.mv";
     public static final String MSC_CSV_URL = "https://msc2020.org/MSC_2020.csv";
@@ -68,7 +73,7 @@ public final class MscCodeLoader {
                                     String description = csvRecord.size() > 2 ? csvRecord.get(2) : "";
                                     return new MscCodeEntry(code, text, description);
                                 })
-                                .filter(entry -> !entry.code().isBlank())
+                                .filter(entry -> !StringUtil.isBlank(entry.code()))
                                 .toList();
         }
     }
@@ -93,15 +98,31 @@ public final class MscCodeLoader {
     }
 
     private static void storeInMvStore(List<MscCodeEntry> entries, Path mvStoreFile) {
-        try (MVStore store = new MVStore.Builder()
-                .fileName(mvStoreFile.toAbsolutePath().toString())
-                .compressHigh()
-                .open()) {
-            MVMap<String, MscCodeEntry> codesMap = store.openMap(MSC_CODES_MAP_NAME);
-            for (MscCodeEntry entry : entries) {
-                codesMap.put(entry.code(), entry);
+        @Nullable Path tempFile = null;
+        try {
+            tempFile = Files.createTempFile(mvStoreFile.getParent(), "msc", ".mv");
+            try (MVStore store = new MVStore.Builder()
+                    .fileName(tempFile.toAbsolutePath().toString())
+                    .compressHigh()
+                    .open()) {
+                MVMap<String, MscCodeEntry> codesMap = store.openMap(MSC_CODES_MAP_NAME);
+                codesMap.clear();
+                for (MscCodeEntry entry : entries) {
+                    codesMap.put(entry.code(), entry);
+                }
+                store.commit();
             }
-            LOGGER.debug("Stored {} MSC codes in {}", codesMap.size(), mvStoreFile);
+            Files.move(tempFile, mvStoreFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            LOGGER.debug("Stored {} MSC codes in {}", entries.size(), mvStoreFile);
+        } catch (IOException e) {
+            LOGGER.error("Error writing MSC codes to MVStore: {}", mvStoreFile, e);
+            if (tempFile != null) {
+                try {
+                    Files.deleteIfExists(tempFile);
+                } catch (IOException ex) {
+                    LOGGER.error("Could not delete temporary file: {}", tempFile, ex);
+                }
+            }
         }
     }
 

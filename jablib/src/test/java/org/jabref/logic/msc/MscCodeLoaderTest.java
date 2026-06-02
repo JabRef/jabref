@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MscCodeLoaderTest {
 
@@ -67,5 +68,31 @@ class MscCodeLoaderTest {
         MscCodeRepository repository = MscCodeUtils.loadMscCodeRepositoryFromCsv(csvFile.toUri().toURL()).get();
 
         assertEquals("Applications of boundary value problems involving ordinary differential equations", repository.getDescription("34B60").get());
+    }
+
+    @Test
+    void convertCsvToMvStoreRemovesStaleEntries() throws IOException {
+        Path csvFile1 = tempDir.resolve("MSC_1.csv");
+        Files.writeString(csvFile1, """
+                code\ttext\tdescription
+                "11-XX"\t"Number theory"\t"Number theory"
+                "12-XX"\t"Field theory and polynomials"\t"Field theory and polynomials"
+                """, StandardCharsets.ISO_8859_1);
+        Path mvStoreFile = tempDir.resolve("msc-list.mv");
+
+        MscCodeLoader.convertCsvToMvStore(csvFile1, mvStoreFile);
+
+        Path csvFile2 = tempDir.resolve("MSC_2.csv");
+        Files.writeString(csvFile2, """
+                code\ttext\tdescription
+                "11-XX"\t"Number theory updated"\t"Number theory updated"
+                """, StandardCharsets.ISO_8859_1);
+
+        MscCodeLoader.convertCsvToMvStore(csvFile2, mvStoreFile);
+
+        MscCodeRepository repository = new MscCodeRepository(mvStoreFile);
+        assertEquals("Number theory updated", repository.getDescription("11-XX").get());
+        // This should fail currently because 12-XX is still there
+        assertTrue(repository.getDescription("12-XX").isEmpty(), "Stale entry 12-XX should be removed");
     }
 }
