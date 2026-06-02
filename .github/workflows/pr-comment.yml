@@ -68,8 +68,21 @@ jobs:
             exit 0
           fi
 
-          PR_NUMBER="$(tr -d '[:space:]' < "$ARTIFACT_FILE")"
-          if ! echo "$PR_NUMBER" | grep -Eq '^[0-9]+$'; then
+          if ! IFS= read -r PR_NUMBER < "$ARTIFACT_FILE"; then
+            echo "Invalid PR number in artifact"
+            echo "pr_number=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          PR_NUMBER="${PR_NUMBER%$'\r'}"
+
+          if sed -n '2,$p' "$ARTIFACT_FILE" | grep -q '^'; then
+            echo "Invalid PR number in artifact"
+            echo "pr_number=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if ! [[ "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
             echo "Invalid PR number in artifact"
             echo "pr_number=" >> "$GITHUB_OUTPUT"
             exit 0
