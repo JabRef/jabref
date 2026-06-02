@@ -52,8 +52,18 @@ printf '%s\n' "$diff" | gawk '
   # at, so it is anchored on the new-side range instead. Context lines padded
   # around each hunk are skipped, so the range matches the actual edit rather
   # than the whole `@@` hunk.
+  # git quotes paths containing unusual characters (e.g. spaces) in the diff
+  # headers: --- "a/config/Eclipse Code Style.epf". Strip the surrounding quote
+  # and undo the C-style backslash escaping git applies inside it.
+  function unquote(s) {
+    sub(/"$/, "", s)        # trailing quote
+    gsub(/\\"/, "\"", s)    # \" -> "
+    gsub(/\\\\/, "\\", s)   # \\ -> \
+    return s
+  }
   function flush(  s, e) {
     if (!inRun) return
+    if (file == "") { inRun = 0; hasOld = 0; hasNew = 0; return }
     if (hasOld) { s = oldStartLine; e = oldEndLine }
     else        { s = newStartLine; e = newEndLine }
     if (e < s) e = s
@@ -61,13 +71,16 @@ printf '%s\n' "$diff" | gawk '
     printf "::error file=%s,line=%s,endLine=%s,title=%s::%s in file %s, lines %s-%s.\n", file, s, e, title, messagePrefix, escape_data(fileRaw), s, e
     inRun = 0; hasOld = 0; hasNew = 0
   }
-  /^diff --git / { flush(); inHunk = 0; next }
+  # Reset the path so an unrecognized header can't reuse the previous file's name.
+  /^diff --git / { flush(); inHunk = 0; file = ""; fileRaw = ""; next }
   # Old-file header. For deletions the new-file header is "+++ /dev/null", so the
   # old side ("--- a/...") is the only place the path appears. Annotations are
   # anchored on old-side line numbers anyway, so this is the right path to point at.
+  /^--- "a\// { flush(); inHunk = 0; fileRaw = unquote(substr($0, 8)); file = escape_property(fileRaw); next }
   /^--- a\//     { flush(); inHunk = 0; fileRaw = substr($0, 7); file = escape_property(fileRaw); next }
   /^--- /        { next }          # "--- /dev/null" (new file); path comes from "+++ b/"
   /^index /      { next }
+  /^\+\+\+ "b\// { flush(); inHunk = 0; fileRaw = unquote(substr($0, 8)); file = escape_property(fileRaw); next }
   /^\+\+\+ b\//  { flush(); inHunk = 0; fileRaw = substr($0, 7); file = escape_property(fileRaw); next }
   /^@@ / {
     # @@ -oldStart,oldCount +newStart,newCount @@
