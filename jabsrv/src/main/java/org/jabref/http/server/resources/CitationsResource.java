@@ -113,7 +113,7 @@ public class CitationsResource {
         // worth surfacing — the user may want to switch libraries or copy
         // across → olive, AnchorHub's related-match colour).
         BibDatabaseContext activeContext = srvStateManager.getActiveDatabase()
-                .orElseThrow(() -> new BadRequestException("No active library"));
+                                                          .orElseThrow(() -> new BadRequestException("No active library"));
         DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         List<LookupMatch> matches = new ArrayList<>();
         for (BibDatabaseContext ctx : srvStateManager.getOpenDatabases()) {
@@ -125,8 +125,8 @@ public class CitationsResource {
                                   isActive)));
         }
         String matchScope = matches.stream().anyMatch(LookupMatch::inActiveLibrary) ? "active"
-                          : !matches.isEmpty() ? "other"
-                          : "none";
+                                                                                    : !matches.isEmpty() ? "other"
+                                                                                                         : "none";
 
         String cacheKey = citationCacheService.put(parsed, citationText);
         return new LookupResponse(matches, matchScope, cacheKey, parsed.getType().getName());
@@ -160,7 +160,7 @@ public class CitationsResource {
             // its TTL expired. 410 Gone tells the client to re-do the lookup
             // and pay the parser cost again.
             throw new ClientErrorException("Cached citation expired or unknown — re-run /citations/lookup",
-                                           Response.Status.GONE);
+                    Response.Status.GONE);
         }
 
         BibEntry parsed = cached.get().parsed();
@@ -172,12 +172,12 @@ public class CitationsResource {
         // of 201 so the client can show a "Citation is already in library"
         // notification without treating it as a hard error.
         BibDatabaseContext context = srvStateManager.getActiveDatabase()
-                .orElseThrow(() -> new BadRequestException("No active library"));
+                                                    .orElseThrow(() -> new BadRequestException("No active library"));
         BibDatabaseMode mode = context.getMode();
         DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         return duplicateCheck.containsDuplicate(context.getDatabase(), parsed, mode)
-                .map(existingEntry -> alreadyExistsResponse(parserCacheKey, existingEntry))
-                .orElseGet(() -> appendParsedAndRespond(parsed, group, parserCacheKey));
+                             .map(existingEntry -> alreadyExistsResponse(parserCacheKey, existingEntry))
+                             .orElseGet(() -> appendParsedAndRespond(parsed, group, parserCacheKey));
     }
 
     /// Returns a 200 OK `{"status":"already-exists","entryId":"…"}` body and
