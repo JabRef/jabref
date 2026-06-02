@@ -80,24 +80,19 @@ Accept: text/html
 GET http://localhost:23119/libraries/demo/entries/Corti_2009
 Accept: text/plain
 
-## From here: C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib is required
+### Get BibTeX of Chocolate.bib
 
-### Get BibTeX of C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib
-
-GET http://localhost:23119/libraries/Chocolate.bib-6a732609
+GET http://localhost:23119/libraries/demo
 Accept: application/x-bibtex
 
-### Get JSON of C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib
+### Get JSON of Chocolate.bib
 
-GET http://localhost:23119/libraries/Chocolate.bib-6a732609
+GET http://localhost:23119/libraries/demo
 Accept: application/json
 
-### Get CSL JSON of C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib
+### Get CSL JSON of Chocolate.bib
 
-// if you have checked out the JabRef code at c:\git-repositories\jabref, then this
-// will show the contents of your first opened library using CSL JSON
-
-GET http://localhost:23119/libraries/Chocolate.bib-6a732609
+GET http://localhost:23119/libraries/demo
 Accept: application/x-bibtex-library-csl+json
 
 ## Error cases

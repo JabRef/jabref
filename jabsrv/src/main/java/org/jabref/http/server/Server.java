@@ -1,8 +1,11 @@
 package org.jabref.http.server;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
@@ -29,6 +32,7 @@ import org.jabref.http.server.services.CitationCacheService;
 import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.database.BibDatabase;
 
 import net.harawata.appdirs.AppDirsFactory;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -53,15 +57,22 @@ public class Server {
     }
 
     /// Entry point for the CLI
-    public HttpServer run(List<Path> files, URI uri) {
+    public HttpServer run(List<Path> files, URI uri) throws IOException {
         List<Path> filesToServeList;
         if (files.isEmpty()) {
-            LOGGER.debug("No library available to serve, serving the demo library...");
-            // Server.class.getResource("...") is always null here, thus trying relative path
-            // Path bibPath = Path.of(Server.class.getResource("http-server-demo.bib").toURI());
-            Path bibPath = Path.of("src/main/resources/org/jabref/http/server/http-server-demo.bib").toAbsolutePath();
-            LOGGER.debug("Location of demo library: {}", bibPath);
-            filesToServeList = List.of(bibPath);
+            LOGGER.debug("No library available to serve, serving the demo library (Chocolate.bib)...");
+            // Chocolate.bib lives at the resources root of jablib (a dependency of jabsrv), thus it is reachable on the classpath.
+            // JabRefSrvStateManager requires a filesystem Path, so the classpath resource is copied to a temporary file.
+            try (InputStream demo = BibDatabase.class.getResourceAsStream("/Chocolate.bib")) {
+                if (demo == null) {
+                    throw new IOException("Demo library Chocolate.bib not found on classpath");
+                }
+                Path bibPath = Files.createTempFile("jabsrv-demo-", ".bib");
+                bibPath.toFile().deleteOnExit();
+                Files.copy(demo, bibPath, StandardCopyOption.REPLACE_EXISTING);
+                LOGGER.debug("Location of demo library: {}", bibPath);
+                filesToServeList = List.of(bibPath);
+            }
         } else {
             filesToServeList = files;
         }
