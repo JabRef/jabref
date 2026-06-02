@@ -1,6 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import java.net.URL;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -11,23 +10,17 @@ import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
-import org.jabref.logic.msc.MscCodeRepository;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.shared.exception.MscCodeLoadingException;
 import org.jabref.logic.util.MscCodeUtils;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.injection.Injector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class KeywordsEditor extends TagsEditor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(KeywordsEditor.class);
     private final CliPreferences preferences;
-    private MscCodeRepository mscCodes;
 
     private final KeywordsEditorViewModel viewModel;
 
@@ -87,7 +80,7 @@ public class KeywordsEditor extends TagsEditor {
             return;
         }
 
-        getMscCodes().flatMap(repository -> repository.getDescription(tagLabel.getText()))
+        MscCodeUtils.getMscCodeRepository().flatMap(repository -> repository.getDescription(tagLabel.getText()))
                      .ifPresent(mscClassification -> tagLabel.setTooltip(new Tooltip(mscClassification)));
     }
 
@@ -98,25 +91,5 @@ public class KeywordsEditor extends TagsEditor {
     @Override
     public void bindToEntry(BibEntry entry) {
         viewModel.bindToEntry(entry);
-    }
-
-    private Optional<MscCodeRepository> getMscCodes() {
-        if (mscCodes != null) {
-            return Optional.of(mscCodes);
-        }
-
-        URL resourceUrl = KeywordsEditor.class.getClassLoader().getResource("MSC_2020.csv");
-        if (resourceUrl == null) {
-            LOGGER.error("Resource not found: MSC_2020.csv");
-            return Optional.empty();
-        }
-
-        try {
-            mscCodes = MscCodeUtils.loadMscCodeRepositoryFromCsv(resourceUrl).orElseGet(MscCodeRepository::new);
-            return Optional.of(mscCodes);
-        } catch (MscCodeLoadingException e) {
-            LOGGER.error("Error loading MSC codes", e);
-            return Optional.empty();
-        }
     }
 }

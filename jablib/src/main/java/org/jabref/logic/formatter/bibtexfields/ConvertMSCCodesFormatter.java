@@ -4,15 +4,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.nio.file.Path;
 
 import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
-import org.jabref.logic.msc.MscCodeLoader;
 import org.jabref.logic.msc.MscCodeRepository;
 import org.jabref.logic.preferences.JabRefCliPreferences;
-import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.MscCodeUtils;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.Keyword;
@@ -22,13 +19,8 @@ import com.airhacks.afterburner.injection.Injector;
 import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConvertMSCCodesFormatter.class);
-    private static final Object MSC_CODES_LOCK = new Object();
-    private static @Nullable volatile MscCodeRepository mscCodes;
 
     private @Nullable JabRefCliPreferences cliPreferences;
 
@@ -61,7 +53,7 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
             // non-code keyword is present leave as-is
             Keyword item = list.next();
             String code = item.toString().trim(); // remove whitespace
-            String convertedText = getMscCodes()
+            String convertedText = MscCodeUtils.getMscCodeRepository()
                     .flatMap(repository -> repository.getDescription(code))
                     .orElse(code);
 
@@ -98,30 +90,8 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
         return Injector.instantiateModelOrService(JabRefCliPreferences.class);
     }
 
-    private static Optional<MscCodeRepository> getMscCodes() {
-        if (mscCodes != null) {
-            return Optional.of(mscCodes);
-        }
-
-        synchronized (MSC_CODES_LOCK) {
-            if (mscCodes != null) {
-                return Optional.of(mscCodes);
-            }
-
-            mscCodes = loadMscCodes();
-            return Optional.ofNullable(mscCodes);
-        }
-    }
-
-    private static MscCodeRepository loadMscCodes() {
-        Path mscMvFile = Directories.getMscDirectory().resolve(MscCodeLoader.MSC_FILE_NAME);
-        return MscCodeUtils.loadMscCodeRepositoryFromMvStore(mscMvFile).orElseGet(MscCodeRepository::new);
-    }
-
     @VisibleForTesting
     public static void setMscCodes(MscCodeRepository repository) {
-        synchronized (MSC_CODES_LOCK) {
-            mscCodes = repository;
-        }
+        MscCodeUtils.setMscCodeRepository(repository);
     }
 }
