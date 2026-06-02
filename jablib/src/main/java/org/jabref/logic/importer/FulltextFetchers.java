@@ -36,7 +36,7 @@ public class FulltextFetchers {
     // to complete; the browser-extension companion fetcher in particular
     // may open a tab, navigate through a SeamlessAccess redirect, and
     // download the PDF, which can easily exceed the older 10 s cap.
-    private static final int FETCHER_TIMEOUT = 60;
+    private static final int FETCHER_TIMEOUT = 120;
 
     private final Set<FulltextFetcher> fetchers;
 
