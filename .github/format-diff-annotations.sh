@@ -58,17 +58,17 @@ printf '%s\n' "$diff" | gawk '
     else        { s = newStartLine; e = newEndLine }
     if (e < s) e = s
     if (s < 1) s = 1
-    printf "::error file=%s,line=%s,endLine=%s,title=%s::%s lines %s-%s.\n", file, s, e, title, messagePrefix, s, e
+    printf "::error file=%s,line=%s,endLine=%s,title=%s::%s in file %s, lines %s-%s.\n", file, s, e, title, messagePrefix, escape_data(fileRaw), s, e
     inRun = 0; hasOld = 0; hasNew = 0
   }
   /^diff --git / { flush(); inHunk = 0; next }
   # Old-file header. For deletions the new-file header is "+++ /dev/null", so the
   # old side ("--- a/...") is the only place the path appears. Annotations are
   # anchored on old-side line numbers anyway, so this is the right path to point at.
-  /^--- a\//     { flush(); inHunk = 0; file = escape_property(substr($0, 7)); next }
+  /^--- a\//     { flush(); inHunk = 0; fileRaw = substr($0, 7); file = escape_property(fileRaw); next }
   /^--- /        { next }          # "--- /dev/null" (new file); path comes from "+++ b/"
   /^index /      { next }
-  /^\+\+\+ b\//  { flush(); inHunk = 0; file = escape_property(substr($0, 7)); next }
+  /^\+\+\+ b\//  { flush(); inHunk = 0; fileRaw = substr($0, 7); file = escape_property(fileRaw); next }
   /^@@ / {
     # @@ -oldStart,oldCount +newStart,newCount @@
     flush()
