@@ -43,7 +43,7 @@ module org.jabref.jabsrv {
     requires transitive com.fasterxml.jackson.annotation;
 
     requires static jakarta.annotation;
-    requires jakarta.inject;
+    requires transitive jakarta.inject;
 
     requires static io.github.eadr;
 
