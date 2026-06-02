@@ -6,6 +6,7 @@ import org.jabref.logic.msc.MscCodeEntry;
 import org.jabref.logic.msc.MscCodeRepository;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

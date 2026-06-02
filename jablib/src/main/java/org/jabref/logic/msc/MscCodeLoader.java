@@ -8,15 +8,14 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.net.URLDownload;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
@@ -61,20 +60,17 @@ public final class MscCodeLoader {
     }
 
     private static List<MscCodeEntry> readMscCodes(Reader reader) throws IOException {
-        List<MscCodeEntry> entries = new ArrayList<>();
-        try (CSVParser csvParser = CSVParser.parse(reader, MSC_CSV_FORMAT)) {
-            for (CSVRecord csvRecord : csvParser) {
-                String code = csvRecord.size() > 0 ? csvRecord.get(0) : "";
-                if (code.isBlank()) {
-                    continue;
-                }
-
-                String text = csvRecord.size() > 1 ? csvRecord.get(1) : "";
-                String description = csvRecord.size() > 2 ? csvRecord.get(2) : "";
-                entries.add(new MscCodeEntry(code, text, description));
-            }
+        try (CSVParser csvParser = MSC_CSV_FORMAT.parse(reader)) {
+            return StreamSupport.stream(csvParser.spliterator(), false)
+                                .map(csvRecord -> {
+                                    String code = csvRecord.size() > 0 ? csvRecord.get(0) : "";
+                                    String text = csvRecord.size() > 1 ? csvRecord.get(1) : "";
+                                    String description = csvRecord.size() > 2 ? csvRecord.get(2) : "";
+                                    return new MscCodeEntry(code, text, description);
+                                })
+                                .filter(entry -> !entry.code().isBlank())
+                                .toList();
         }
-        return entries;
     }
 
     public static void convertCsvToMvStore(Path csvFile, Path mvStoreFile) throws IOException {

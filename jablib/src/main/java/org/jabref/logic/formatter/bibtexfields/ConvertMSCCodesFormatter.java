@@ -1,9 +1,6 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
@@ -46,19 +43,15 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
 
         // create KeywordList to tokenize
         KeywordList keyList = KeywordList.parse(text, dlim);
-        Iterator<Keyword> list = keyList.iterator();
-        List<Keyword> modifiedList = new ArrayList<>();
-        while (list.hasNext()) {
-            // check if key in map and add value to result string
-            // non-code keyword is present leave as-is
-            Keyword item = list.next();
-            String code = item.toString().trim(); // remove whitespace
-            String convertedText = MscCodeUtils.getMscCodeRepository()
-                    .flatMap(repository -> repository.getDescription(code))
-                    .orElse(code);
-
-            modifiedList.add(new Keyword(convertedText));
-        }
+        List<Keyword> modifiedList = keyList.stream()
+                .map(item -> {
+                    String code = item.toString().trim();
+                    String convertedText = MscCodeUtils.getMscCodeRepository()
+                            .flatMap(repository -> repository.getDescription(code))
+                            .orElse(code);
+                    return new Keyword(convertedText);
+                })
+                .toList();
 
         return KeywordList.serialize(modifiedList, dlim);
     }

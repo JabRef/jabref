@@ -9,6 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.jabref.logic.msc.MscCodeLoader;
 import org.jabref.logic.msc.MscCodeRepository;
 import org.jabref.logic.shared.exception.MscCodeLoadingException;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
