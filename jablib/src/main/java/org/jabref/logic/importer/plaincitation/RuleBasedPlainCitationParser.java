@@ -195,7 +195,7 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
         }
         int nonDigitParts = 0;
         for (String part : lastParts) {
-            if (part.matches(".*\\d.*")) {
+            if (containsDigit(part)) {
                 break;
             }
             nonDigitParts++;
@@ -210,5 +210,12 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
             isArticle = false;
         }
         return fixSpaces(input);
+    }
+
+    /// Checks whether {@code input} contains at least one digit. Used instead of a
+    /// {@code ".*\\d.*"} regex on user-provided text: a direct scan is linear time and
+    /// not susceptible to regex backtracking on adversarial input.
+    private static boolean containsDigit(String input) {
+        return input.codePoints().anyMatch(Character::isDigit);
     }
 }
