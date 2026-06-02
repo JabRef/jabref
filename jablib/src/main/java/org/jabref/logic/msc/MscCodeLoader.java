@@ -1,6 +1,8 @@
 package org.jabref.logic.msc;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,7 +26,8 @@ public final class MscCodeLoader {
                                                                      .setQuote('"')
                                                                      .setTrim(true)
                                                                      .setHeader()
-                                                                     .setSkipHeaderRecord(true).get();
+                                                                     .setSkipHeaderRecord(true)
+                                                                     .build();
 
     private MscCodeLoader() {
     }
@@ -33,7 +36,7 @@ public final class MscCodeLoader {
         LOGGER.debug("Reading MSC codes from file {}", file);
 
         List<MscCodeEntry> entries = new ArrayList<>();
-        try (CSVParser csvParser = CSVParser.parse((Files.newBufferedReader(file, StandardCharsets.ISO_8859_1)), MSC_CSV_FORMAT)) {
+        try (CSVParser csvParser = CSVParser.parse(Files.newBufferedReader(file, StandardCharsets.ISO_8859_1), MSC_CSV_FORMAT)) {
             for (CSVRecord csvRecord : csvParser) {
                 String code = csvRecord.size() > 0 ? csvRecord.get(0) : "";
                 if (code.isBlank()) {
@@ -47,6 +50,28 @@ public final class MscCodeLoader {
         }
 
         LOGGER.debug("Loaded {} MSC codes from {}", entries.size(), file);
+        return entries;
+    }
+
+    public static List<MscCodeEntry> readMscCodesFromCsvUrl(URL resourceUrl) throws IOException {
+        LOGGER.debug("Reading MSC codes from URL {}", resourceUrl);
+
+        List<MscCodeEntry> entries = new ArrayList<>();
+        try (InputStreamReader reader = new InputStreamReader(resourceUrl.openStream(), StandardCharsets.ISO_8859_1);
+             CSVParser csvParser = CSVParser.parse(reader, MSC_CSV_FORMAT)) {
+            for (CSVRecord csvRecord : csvParser) {
+                String code = csvRecord.size() > 0 ? csvRecord.get(0) : "";
+                if (code.isBlank()) {
+                    continue;
+                }
+
+                String text = csvRecord.size() > 1 ? csvRecord.get(1) : "";
+                String description = csvRecord.size() > 2 ? csvRecord.get(2) : "";
+                entries.add(new MscCodeEntry(code, text, description));
+            }
+        }
+
+        LOGGER.debug("Loaded {} MSC codes from {}", entries.size(), resourceUrl);
         return entries;
     }
 

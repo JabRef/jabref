@@ -8,6 +8,7 @@ import java.util.List;
 import org.jabref.logic.formatter.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
+import org.jabref.logic.msc.MscCodeRepository;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.shared.exception.MscCodeLoadingException;
 import org.jabref.logic.util.MscCodeUtils;
@@ -16,43 +17,35 @@ import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 
 import com.airhacks.afterburner.injection.Injector;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatter {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConvertMSCCodesFormatter.class);
-    private static final BiMap<String, String> MSCMAP;
+    private static final MscCodeRepository MSC_CODES;
     private static boolean conversionPossible;
 
     static {
-        MSCMAP = initializeMap();
+        MSC_CODES = initializeRepository();
     }
 
-    private static HashBiMap<String, String> initializeMap() {
-        HashBiMap<String, String> tempMap = HashBiMap.create();
-
-        URL resourceUrl = ConvertMSCCodesFormatter.class.getClassLoader().getResource("msc_codes.json");
-
-        // Check for valid mapping of msc codes
+    private static MscCodeRepository initializeRepository() {
+        URL resourceUrl = ConvertMSCCodesFormatter.class.getClassLoader().getResource("MSC_2020.csv");
         if (resourceUrl == null) {
-            LOGGER.error("Resource not found: msc_codes.json");
+            LOGGER.error("Resource not found: MSC_2020.csv");
             conversionPossible = false;
-            return tempMap;
-        } else {
-            try {
-                tempMap = MscCodeUtils.loadMscCodesFromJson(resourceUrl).get();
-                if (!tempMap.isEmpty()) {
-                    conversionPossible = true;
-                    return tempMap;
-                }
-            } catch (MscCodeLoadingException e) {
-                LOGGER.error("Error loading MSC codes:", e);
-                conversionPossible = false;
-            }
-            return tempMap;
+            return new MscCodeRepository();
+        }
+
+        try {
+            MscCodeRepository repository = MscCodeUtils.loadMscCodeRepositoryFromCsv(resourceUrl).orElseGet(MscCodeRepository::new);
+            conversionPossible = !repository.getAllLoaded().isEmpty();
+            return repository;
+        } catch (MscCodeLoadingException e) {
+            LOGGER.error("Error loading MSC codes", e);
+            conversionPossible = false;
+            return new MscCodeRepository();
         }
     }
 
@@ -80,7 +73,7 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
             // non-code keyword is present leave as-is
             Keyword item = list.next();
             String code = item.toString().trim(); // remove whitespace
-            String convertedText = MSCMAP.getOrDefault(code, code);
+            String convertedText = MSC_CODES.getDescription(code).orElse(code);
 
             modifiedList.add(new Keyword(convertedText));
         }

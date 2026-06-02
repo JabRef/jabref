@@ -3,6 +3,7 @@ package org.jabref.logic.msc;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -18,7 +19,11 @@ public class MscCodeRepository {
     public MscCodeRepository() {
     }
 
-    public MscCodeRepository(Path mscListFile) {
+    public MscCodeRepository(Collection<MscCodeEntry> entries) {
+        entries.forEach(entry -> mscCodes.put(entry.code(), entry));
+    }
+
+    public MscCodeRepository(Path mscListFile) throws IOException {
         try (MVStore store = new MVStore.Builder().readOnly().fileName(mscListFile.toAbsolutePath().toString()).open()) {
             MVMap<String, MscCodeEntry> mvMscCodes = store.openMap(MSC_CODES_MAP_NAME);
             mscCodes.putAll(mvMscCodes);
@@ -34,6 +39,6 @@ public class MscCodeRepository {
     }
 
     public Collection<MscCodeEntry> getAllLoaded() {
-        return mscCodes.values();
+        return List.copyOf(mscCodes.values());
     }
 }

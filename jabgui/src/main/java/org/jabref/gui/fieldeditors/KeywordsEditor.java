@@ -1,7 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
 import java.net.URL;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.undo.UndoManager;
@@ -11,6 +10,7 @@ import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.msc.MscCodeRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.exception.MscCodeLoadingException;
 import org.jabref.logic.util.MscCodeUtils;
@@ -19,35 +19,26 @@ import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.injection.Injector;
-import com.google.common.collect.HashBiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class KeywordsEditor extends TagsEditor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeywordsEditor.class);
-    private static HashBiMap<String, String> mscmap;
+    private static final MscCodeRepository MSC_CODES = initializeRepository();
 
-    static {
-        URL resourceUrl = KeywordsEditor.class.getClassLoader().getResource("msc_codes.json");
-
+    private static MscCodeRepository initializeRepository() {
+        URL resourceUrl = KeywordsEditor.class.getClassLoader().getResource("MSC_2020.csv");
         if (resourceUrl == null) {
-            LOGGER.error("Resource not found: msc_codes.json");
-            mscmap = HashBiMap.create();
+            LOGGER.error("Resource not found: MSC_2020.csv");
+            return new MscCodeRepository();
         }
 
         try {
-            Optional<HashBiMap<String, String>> optionalMscCodes = MscCodeUtils.loadMscCodesFromJson(resourceUrl);
-
-            if (optionalMscCodes.isPresent()) {
-                mscmap = optionalMscCodes.get();
-            } else {
-                LOGGER.warn("Resource not found msc_codes.json");
-                mscmap = HashBiMap.create();
-            }
+            return MscCodeUtils.loadMscCodeRepositoryFromCsv(resourceUrl).orElseGet(MscCodeRepository::new);
         } catch (MscCodeLoadingException e) {
             LOGGER.error("Error loading MSC codes", e);
-            mscmap = HashBiMap.create();
+            return new MscCodeRepository();
         }
     }
 
@@ -104,11 +95,8 @@ public class KeywordsEditor extends TagsEditor {
 
     @Override
     protected void customizeTag(Label tagLabel, Keyword keyword) {
-        if (mscmap.containsKey(tagLabel.getText())) {
-            String mscClassification = mscmap.get(tagLabel.getText());
-            Tooltip tooltip = new Tooltip(mscClassification);
-            tagLabel.setTooltip(tooltip);
-        }
+        MSC_CODES.getDescription(tagLabel.getText())
+                 .ifPresent(mscClassification -> tagLabel.setTooltip(new Tooltip(mscClassification)));
     }
 
     public KeywordsEditorViewModel getViewModel() {
