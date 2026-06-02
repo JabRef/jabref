@@ -97,6 +97,8 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/FocusCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/OpenLibrariesCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/SelectEntriesCommand.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/CitationsResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibrariesQueryResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibrariesResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibraryResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/EntriesResource.java
@@ -104,11 +106,13 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/GroupsResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/MapResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/RootResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/CitationCacheService.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ServerUtils.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
 
 // new jablib sources not yet in the 6.0-SNAPSHOT artifact
+//SOURCES ../jablib/src/main/java/org/jabref/logic/importer/plaincitation/PlainCitationParserFactory.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/UiCommand.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/LibrarySearcher.java
 //SOURCES ../jablib/src/main/java/org/jabref/logic/search/NoOpSearchBackend.java
