@@ -35,6 +35,7 @@ import org.jabref.gui.linkedfile.AttachFileFromURLAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.bibtex.FileFieldWriter;
+import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -268,6 +269,16 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     private void addFromURLAndDownload(URL url, Map<String, String> headers) {
+        // Some fetchers (browser-extension companion, local cache) return a
+        // file:// URL pointing at a PDF already on disk. There is nothing to
+        // download — attach the file directly, move it into the configured
+        // file directory, and rename it per the file-naming pattern (the
+        // same fate a successful HTTP download would have via
+        // DownloadLinkedFileAction).
+        if ("file".equalsIgnoreCase(url.getProtocol())) {
+            attachLocalFile(url);
+            return;
+        }
         LinkedFileViewModel onlineFile = new LinkedFileViewModel(
                 new LinkedFile(url, ""),
                 entry,
@@ -277,6 +288,50 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 preferences);
         files.add(onlineFile);
         onlineFile.download(true, headers);
+    }
+
+    private void attachLocalFile(URL url) {
+        Path sourcePath;
+        try {
+            sourcePath = Path.of(url.toURI());
+        } catch (java.net.URISyntaxException | IllegalArgumentException e) {
+            LOGGER.warn("Could not interpret fetcher-returned file URL {}", url, e);
+            dialogService.notify(Localization.lang("No full text document found"));
+            return;
+        }
+
+        // The PDF external-file type is always present in JabRef's built-in
+        // type list; ifPresent keeps the contract explicit without an
+        // `orElse` fallback that would never fire.
+        ExternalFileTypes.getExternalFileTypeByExt("pdf",
+                                                  preferences.getExternalApplicationsPreferences())
+                         .ifPresent(externalFileType ->
+                                 attachLocalPdf(sourcePath, externalFileType));
+    }
+
+    private void attachLocalPdf(Path sourcePath, ExternalFileType externalFileType) {
+        LinkedFile linkedFile = new LinkedFile("", sourcePath, externalFileType.getName());
+
+        LinkedFileHandler handler = new LinkedFileHandler(
+                linkedFile, entry, databaseContext, preferences.getFilePreferences());
+        try {
+            // shouldMove=true, shouldRenameToFilenamePattern=true — same
+            // behaviour as a drag-drop onto the main table.
+            handler.copyOrMoveToDefaultDirectory(true, true);
+        } catch (IOException e) {
+            LOGGER.warn("Could not move fetcher-returned file {} into the library directory",
+                    sourcePath, e);
+            // Keep the original path; the user can move/rename it manually.
+        }
+
+        LinkedFileViewModel localFile = new LinkedFileViewModel(
+                linkedFile,
+                entry,
+                databaseContext,
+                taskExecutor,
+                dialogService,
+                preferences);
+        files.add(localFile);
     }
 
     public void deleteFile(LinkedFileViewModel file) {
