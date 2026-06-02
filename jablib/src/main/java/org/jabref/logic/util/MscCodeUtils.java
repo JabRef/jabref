@@ -54,18 +54,21 @@ public class MscCodeUtils {
 
     @NonNull
     public static Optional<MscCodeRepository> getMscCodeRepository() {
-        if (mscCodes == null) {
+        MscCodeRepository localCodes = mscCodes;
+        if (localCodes == null) {
             MSC_CODES_LOCK.lock();
             try {
-                if (mscCodes == null) {
+                localCodes = mscCodes;
+                if (localCodes == null) {
                     Path mscMvFile = Directories.getMscDirectory().resolve(MscCodeLoader.MSC_FILE_NAME);
-                    mscCodes = loadMscCodeRepositoryFromMvStore(mscMvFile).orElseGet(MscCodeRepository::new);
+                    localCodes = loadMscCodeRepositoryFromMvStore(mscMvFile).orElseGet(MscCodeRepository::new);
+                    mscCodes = localCodes;
                 }
             } finally {
                 MSC_CODES_LOCK.unlock();
             }
         }
-        return Optional.of(mscCodes);
+        return Optional.of(localCodes);
     }
 
     public static void setMscCodeRepository(MscCodeRepository repository) {
