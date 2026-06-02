@@ -2,6 +2,9 @@ package org.jabref.logic.importer;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +40,30 @@ public class FulltextFetchers {
     private final Set<FulltextFetcher> fetchers;
 
     private final BiPredicate<String, Map<String, String>> isPDF = (url, headers) -> {
+        // Local file:// URLs (returned e.g. by a browser-extension companion
+        // fetcher that already wrote the PDF to disk) cannot go through
+        // URLDownload, which is HTTP-oriented. Verify the file is actually a
+        // PDF by reading the magic bytes.
+        if (url.startsWith("file:")) {
+            try {
+                Path path = Paths.get(java.net.URI.create(url));
+                if (!Files.isReadable(path)) {
+                    return false;
+                }
+                try (java.io.InputStream in = Files.newInputStream(path)) {
+                    byte[] magic = in.readNBytes(5);
+                    return magic.length == 5
+                            && magic[0] == '%'
+                            && magic[1] == 'P'
+                            && magic[2] == 'D'
+                            && magic[3] == 'F'
+                            && magic[4] == '-';
+                }
+            } catch (IllegalArgumentException | IOException e) {
+                LOGGER.debug("Could not verify PDF magic bytes for {}", url, e);
+                return false;
+            }
+        }
         try {
             URLDownload download = new URLDownload(url);
             headers.forEach(download::addHeader);
