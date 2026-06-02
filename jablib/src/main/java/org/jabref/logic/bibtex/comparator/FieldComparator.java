@@ -37,7 +37,7 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     public FieldComparator(SaveOrder.SortCriterion sortCriterion) {
-        this(new OrFields(sortCriterion.field), sortCriterion.descending);
+        this(new OrFields(sortCriterion.field()), sortCriterion.descending());
     }
 
     public FieldComparator(OrFields fields, boolean descending) {
