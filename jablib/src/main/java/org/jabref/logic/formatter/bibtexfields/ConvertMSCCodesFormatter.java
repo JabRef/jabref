@@ -44,14 +44,14 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
         // create KeywordList to tokenize
         KeywordList keyList = KeywordList.parse(text, dlim);
         List<Keyword> modifiedList = keyList.stream()
-                .map(item -> {
-                    String code = item.toString().trim();
-                    String convertedText = MscCodeUtils.getMscCodeRepository()
-                            .flatMap(repository -> repository.getDescription(code))
-                            .orElse(code);
-                    return new Keyword(convertedText);
-                })
-                .toList();
+                                            .map(item -> {
+                                                String code = item.toString().trim();
+                                                String convertedText = MscCodeUtils.getMscCodeRepository()
+                                                                                   .flatMap(repository -> repository.getDescription(code))
+                                                                                   .orElse(code);
+                                                return new Keyword(convertedText);
+                                            })
+                                            .toList();
 
         return KeywordList.serialize(modifiedList, dlim);
     }

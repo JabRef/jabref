@@ -1,6 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.undo.UndoManager;
@@ -81,7 +80,7 @@ public class KeywordsEditor extends TagsEditor {
         }
 
         MscCodeUtils.getMscCodeRepository().flatMap(repository -> repository.getDescription(tagLabel.getText()))
-                     .ifPresent(mscClassification -> tagLabel.setTooltip(new Tooltip(mscClassification)));
+                    .ifPresent(mscClassification -> tagLabel.setTooltip(new Tooltip(mscClassification)));
     }
 
     public KeywordsEditorViewModel getViewModel() {

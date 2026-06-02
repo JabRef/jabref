@@ -2,7 +2,6 @@ package org.jabref.gui.preferences.general;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -590,9 +589,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         dialogService.notify(Localization.lang("Downloading MSC codes..."));
 
         BackgroundTask.wrap(() -> {
-            MscCodeLoader.downloadAndConvert(URLUtil.create(MscCodeLoader.MSC_CSV_URL), mscMvFile);
-            return null;
-        })
+                          MscCodeLoader.downloadAndConvert(URLUtil.create(MscCodeLoader.MSC_CSV_URL), mscMvFile);
+                          return null;
+                      })
                       .onSuccess(v -> dialogService.notify(Localization.lang("MSC codes downloaded successfully.")))
                       .onFailure(e -> {
                           LOGGER.error("Error downloading MSC codes", e);
