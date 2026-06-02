@@ -78,7 +78,7 @@ If an issue in this area occurs after modifying dependency versions, you will se
 In these cases, first determine if adding the new 3rd party module is really needed/intended.
 If yes, there are three levels of patching that can be performed:
 
-1. Add missing mappint to `modules.properties`:
+1. Add missing mapping to `modules.properties`:
    In case the module is a real java module, but not loaded by gradle, you need it to put the mapping into `gradle/modules.properties`.
    Furthermore, if it is a module available on Maven Central, file a pull request against [java-module-dependencies/.../modules.properties](https://github.com/gradlex-org/java-module-dependencies/blob/main/src/main/resources/org/gradlex/javamodule/dependencies/modules.properties)
 2. Add missing (or modify existing) `module-info.class`:
