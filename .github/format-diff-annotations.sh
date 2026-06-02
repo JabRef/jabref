@@ -71,7 +71,7 @@ printf '%s\n' "$diff" | gawk '
     printf "::error file=%s,line=%s,endLine=%s,title=%s::%s in file %s, lines %s-%s.\n", file, s, e, title, messagePrefix, escape_data(fileRaw), s, e
     inRun = 0; hasOld = 0; hasNew = 0
   }
-  # Reset the path so an unrecognized header can't reuse the previous file's name.
+  # Reset the path so an unrecognized header cannot reuse the prior file name.
   /^diff --git / { flush(); inHunk = 0; file = ""; fileRaw = ""; next }
   # Old-file header. For deletions the new-file header is "+++ /dev/null", so the
   # old side ("--- a/...") is the only place the path appears. Annotations are
