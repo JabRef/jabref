@@ -21,7 +21,6 @@ import org.apache.commons.csv.CSVParser;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,18 +38,9 @@ public final class MscCodeLoader {
                                                                      .setTrim(true)
                                                                      .setHeader()
                                                                      .setSkipHeaderRecord(true)
-                                                                     .build();
+                                                                     .get();
 
     private MscCodeLoader() {
-    }
-
-    public static List<MscCodeEntry> readMscCodesFromCsvFile(Path file) throws IOException {
-        LOGGER.debug("Reading MSC codes from file {}", file);
-        try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.ISO_8859_1)) {
-            List<MscCodeEntry> entries = readMscCodes(reader);
-            LOGGER.debug("Loaded {} MSC codes from {}", entries.size(), file);
-            return entries;
-        }
     }
 
     public static List<MscCodeEntry> readMscCodesFromCsvUrl(URL resourceUrl) throws IOException {
@@ -81,7 +71,9 @@ public final class MscCodeLoader {
     public static void convertCsvToMvStore(Path csvFile, Path mvStoreFile) throws IOException {
         LOGGER.debug("Converting MSC codes from {} to {}", csvFile, mvStoreFile);
         ensureParentDirectoryExists(mvStoreFile);
-        storeInMvStore(readMscCodesFromCsvFile(csvFile), mvStoreFile);
+        try (BufferedReader reader = Files.newBufferedReader(csvFile, StandardCharsets.ISO_8859_1)) {
+            storeInMvStore(readMscCodes(reader), mvStoreFile);
+        }
     }
 
     public static void downloadAndConvert(URL csvUrl, Path mvStoreFile) throws IOException {
@@ -98,7 +90,7 @@ public final class MscCodeLoader {
     }
 
     private static void storeInMvStore(List<MscCodeEntry> entries, Path mvStoreFile) {
-        @Nullable Path tempFile = null;
+        Path tempFile = null;
         try {
             tempFile = Files.createTempFile(mvStoreFile.getParent(), "msc", ".mv");
             try (MVStore store = new MVStore.Builder()
