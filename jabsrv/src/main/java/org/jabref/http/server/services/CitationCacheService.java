@@ -33,9 +33,9 @@ public class CitationCacheService {
     }
 
     private final Cache<String, CachedCitation> cache = Caffeine.newBuilder()
-            .maximumSize(MAX_ENTRIES)
-            .expireAfterWrite(TTL)
-            .build();
+                                                                .maximumSize(MAX_ENTRIES)
+                                                                .expireAfterWrite(TTL)
+                                                                .build();
 
     /// Stores a parsed citation and returns the token the client should send
     /// back to the add endpoint.
