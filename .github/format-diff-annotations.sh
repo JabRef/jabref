@@ -45,24 +45,48 @@ printf '%s\n' "$diff" | gawk '
     title = escape_property(ENVIRON["ANNOTATION_TITLE"])
     messagePrefix = escape_data(ENVIRON["ANNOTATION_MESSAGE_PREFIX"])
   }
-  /^\+\+\+ b\// { file = escape_property(substr($0, 7)); next }
+  # Emit one annotation per contiguous run of changed lines, anchored on the
+  # old-side line numbers. The old side is the committed file the developer
+  # has to fix, so those are the line numbers worth pointing at. Context lines
+  # padded around each hunk are skipped, so the range matches the actual edit
+  # rather than the whole `@@` hunk.
+  function flush(  s, e) {
+    if (!inRun) return
+    s = runStart; e = runEnd
+    if (e < s) e = s
+    if (s < 1) s = 1
+    printf "::error file=%s,line=%s,endLine=%s,title=%s::%s lines %s-%s.\n", file, s, e, title, messagePrefix, s, e
+    inRun = 0
+  }
+  /^diff --git / { flush(); inHunk = 0; next }
+  /^--- /        { next }          # old-file header
+  /^index /      { next }
+  /^\+\+\+ b\//  { flush(); inHunk = 0; file = escape_property(substr($0, 7)); next }
   /^@@ / {
     # @@ -oldStart,oldCount +newStart,newCount @@
-    match($2, /^-([0-9]+)(,([0-9]+))?/, o)
-    match($3, /^\+([0-9]+)(,([0-9]+))?/, n)
-    oldStart = o[1]; oldCount = (o[3] == "" ? 1 : o[3])
-    newStart = n[1]; newCount = (n[3] == "" ? 1 : n[3])
-    if (oldCount > 0) {                       # there are old lines -> anchor on them
-      start = oldStart
-      end = oldStart + oldCount - 1
-    } else {                                  # pure addition / new file -> anchor on new lines
-      start = newStart
-      end = newStart + newCount - 1
-    }
-    if (start < 1) start = 1
-    if (end < start) end = start
-    printf "::error file=%s,line=%s,endLine=%s,title=%s::%s lines %s-%s.\n", file, start, end, title, messagePrefix, start, end
+    flush()
+    match($2, /^-([0-9]+)/, o)
+    oldLine = o[1]
+    inHunk = 1
+    next
   }
+  {
+    if (!inHunk) next
+    c = substr($0, 1, 1)
+    if (c == "-") {                           # removed/changed committed line
+      if (!inRun) { inRun = 1; runStart = oldLine }
+      runEnd = oldLine
+      oldLine++
+    } else if (c == "+") {                    # added line: does not consume an old line
+      if (!inRun) { inRun = 1; runStart = oldLine; runEnd = oldLine }
+    } else if (c == "\\") {                   # "\ No newline at end of file"
+      # ignore
+    } else {                                  # context line -> ends the current run
+      flush()
+      oldLine++
+    }
+  }
+  END { flush() }
 '
 
 # Make the job fail despite the successful annotations above.
