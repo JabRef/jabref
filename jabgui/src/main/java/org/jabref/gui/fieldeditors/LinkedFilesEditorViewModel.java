@@ -324,14 +324,12 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
             // Keep the original path; the user can move/rename it manually.
         }
 
-        LinkedFileViewModel localFile = new LinkedFileViewModel(
-                linkedFile,
-                entry,
-                databaseContext,
-                taskExecutor,
-                dialogService,
-                preferences);
-        files.add(localFile);
+        // Write through to the entry's FILE field. The bidirectional binding
+        // installed in the constructor pulls the new file into the editor's
+        // observable list (via parseToFileViewModel), so the LinkedFilesEditor
+        // UI refreshes without us having to construct a LinkedFileViewModel
+        // ourselves.
+        entry.addFile(linkedFile);
     }
 
     public void deleteFile(LinkedFileViewModel file) {
