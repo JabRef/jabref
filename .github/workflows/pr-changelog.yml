@@ -10,7 +10,8 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  pull-requests: write
+  contents: read
+  pull-requests: read
 
 jobs:
   changelog_modification_consistency:
@@ -77,4 +78,3 @@ jobs:
         with:
           name: pr_number
           path: pr_number.txt
-
