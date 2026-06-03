@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Emits GitHub Actions error annotations (with line ranges) for every hunk in the
-# current `git diff`, then exits non-zero if the working directory is dirty.
+# Emits GitHub Actions error annotations (with line ranges) for every changed hunk
+# (staged, unstaged, or untracked), then exits non-zero if any change is present.
 #
 # Used by the CI jobs that rewrite files (formatter, OpenRewrite) and then check
 # that the working tree is clean. Each remaining hunk becomes an
@@ -19,7 +19,15 @@ set -euo pipefail
 export ANNOTATION_TITLE="${ANNOTATION_TITLE:-Formatting}"
 export ANNOTATION_MESSAGE_PREFIX="${ANNOTATION_MESSAGE_PREFIX:-Wrongly formatted. Run the formatter (see CONTRIBUTING.md) to fix}"
 
-diff="$(git diff)"
+# Record untracked files as intent-to-add so they show up as additions in
+# `git diff HEAD` below. CI runs in an ephemeral checkout, so mutating the index
+# is safe. Without this, plain `git diff` would miss both staged changes and
+# untracked files, letting CI report "clean" while uncommitted work remains.
+git add --intent-to-add --all
+
+# `git diff HEAD` reports staged and unstaged changes (plus the untracked files
+# just marked intent-to-add) relative to the last commit.
+diff="$(git diff HEAD)"
 
 if [ -z "$diff" ]; then
   echo "Working tree clean"

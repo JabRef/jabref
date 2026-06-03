@@ -1,8 +1,9 @@
 name: Check formatting
 description: >-
-  Fail if the working tree has uncommitted changes, emitting GitHub Actions
-  annotations for every changed hunk. On failure, also print the diff to the
-  log and upload it as a patch artifact (apply locally with `git apply format.patch`).
+  Fail if the working tree has uncommitted changes (staged, unstaged, or
+  untracked), emitting GitHub Actions annotations for every changed hunk. On
+  failure, also print the diff to the log and upload it as a patch artifact
+  (apply locally with `git apply format.patch`).
 
 inputs:
   working-directory:
@@ -34,7 +35,7 @@ runs:
     - name: Output formatting diff
       if: failure()
       shell: bash
-      run: git -C "${{ inputs.working-directory }}" diff | tee "${{ inputs.working-directory }}/format.patch"
+      run: git -C "${{ inputs.working-directory }}" diff HEAD | tee "${{ inputs.working-directory }}/format.patch"
     - name: Upload formatting patch
       if: failure()
       uses: actions/upload-artifact@v4
