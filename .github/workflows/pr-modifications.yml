@@ -9,9 +9,8 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  actions: write
   contents: read
-  pull-requests: write
+  pull-requests: read
 
 jobs:
   # This ensures that no git merge conflict markers (<<<, ...) are contained

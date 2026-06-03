@@ -6,7 +6,6 @@ on:
     types: [ opened, reopened, edited ]
 
 permissions:
-  actions: write
   contents: read
   pull-requests: read
 
