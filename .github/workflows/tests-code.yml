@@ -116,7 +116,10 @@ jobs:
         with:
           submodules: 'true'
           show-progress: 'false'
+      # OpenRewrite does not yet support JDK 26, see https://github.com/openrewrite/rewrite/issues/7554
       - uses: ./.github/actions/setup-gradle
+        with:
+          javaVersion: '25'
       - name: Run OpenRewrite
         run: |
           gradle --no-configuration-cache :rewriteRun
