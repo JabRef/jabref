@@ -62,18 +62,9 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/format-java
       # job should fail in case there are changes
-      - name: Check if any files changed
-        run: .github/format-diff-annotations.sh
-      # On failure, surface the formatting diff so it can be applied locally (git apply format.patch)
-      - name: Output formatting diff
-        if: failure()
-        run: git diff | tee format.patch
-      - name: Upload formatting patch
-        if: failure()
-        uses: actions/upload-artifact@v4
+      - uses: ./.github/actions/check-formatting
         with:
-          name: formatting-fix-patch
-          path: format.patch
+          artifact-name: formatting-fix-patch
 
   format-javadoc:
     # too slow on ubuntu-slim
@@ -95,20 +86,10 @@ jobs:
       - run: |
           cd Convert2MarkdownJavadoc
           java Convert2MarkdownJavadoc.java ../jabref
-      - name: Check if any files changed
-        run: |
-          cd jabref
-          .github/format-diff-annotations.sh
-      # On failure, surface the formatting diff so it can be applied locally (git apply format.patch)
-      - name: Output formatting diff
-        if: failure()
-        run: git -C jabref diff | tee format.patch
-      - name: Upload formatting patch
-        if: failure()
-        uses: actions/upload-artifact@v4
+      - uses: ./jabref/.github/actions/check-formatting
         with:
-          name: javadoc-fix-patch
-          path: format.patch
+          working-directory: jabref
+          artifact-name: javadoc-fix-patch
 
   checkstyle:
     name: Checkstyle
@@ -145,20 +126,11 @@ jobs:
       - uses: ./.github/actions/format-java
 
       - name: Fail if working directory is unclean
-        run: .github/format-diff-annotations.sh
-        env:
-          ANNOTATION_TITLE: OpenRewrite
-          ANNOTATION_MESSAGE_PREFIX: "Uncommitted changes after OpenRewrite; run `gradle :rewriteRun`, reformat, and commit the result for"
-      # On failure, surface the OpenRewrite diff so it can be applied locally (git apply format.patch)
-      - name: Output OpenRewrite diff
-        if: failure()
-        run: git diff | tee format.patch
-      - name: Upload OpenRewrite patch
-        if: failure()
-        uses: actions/upload-artifact@v4
+        uses: ./.github/actions/check-formatting
         with:
-          name: openrewrite-fix-patch
-          path: format.patch
+          artifact-name: openrewrite-fix-patch
+          annotation-title: OpenRewrite
+          annotation-message-prefix: "Uncommitted changes after OpenRewrite; run `gradle :rewriteRun`, reformat, and commit the result for"
 
   modernizer:
     name: Modernizer
