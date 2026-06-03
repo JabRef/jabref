@@ -79,7 +79,7 @@ public class KeywordsEditor extends TagsEditor {
             return;
         }
 
-        MscCodeUtils.getMscCodeRepository().flatMap(repository -> repository.getDescription(tagLabel.getText()))
+        MscCodeUtils.getMscCodeRepository().flatMap(repository -> repository.getText(tagLabel.getText()))
                     .ifPresent(mscClassification -> tagLabel.setTooltip(new Tooltip(mscClassification)));
     }
 
