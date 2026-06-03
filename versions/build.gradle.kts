@@ -21,11 +21,11 @@ val pdfbox = "3.0.7"
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
     api(platform("dev.langchain4j:langchain4j-bom:1.15.1"))
-    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.3.0"))
+    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.4.0"))
     api(platform("org.junit:junit-bom:6.1.0"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.1"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
-    api(platform("tools.jackson:jackson-bom:3.1.3"))
+    api(platform("tools.jackson:jackson-bom:3.1.4"))
 }
 
 dependencies.constraints {
@@ -48,8 +48,8 @@ dependencies.constraints {
     api("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta:1.0.0")
     api("com.github.ben-manes.caffeine:caffeine:3.2.4")
     api("com.github.javakeyring:java-keyring:1.0.4")
-    api("com.github.javaparser:javaparser-core:3.28.1")
-    api("com.github.javaparser:javaparser-symbol-solver-core:3.28.1")
+    api("com.github.javaparser:javaparser-core:3.28.2")
+    api("com.github.javaparser:javaparser-symbol-solver-core:3.28.2")
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.github.tomtung:latex2unicode_2.13:0.3.2")
     api("com.google.errorprone:error_prone_core:2.48.0")
@@ -90,10 +90,10 @@ dependencies.constraints {
     api("jakarta.inject:jakarta.inject-api:2.0.1")
     api("jakarta.validation:jakarta.validation-api:3.1.1")
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
-    api("net.bytebuddy:byte-buddy:1.18.8")
+    api("net.bytebuddy:byte-buddy:1.18.9")
     api("net.harawata:appdirs:1.5.0")
-    api("net.java.dev.jna:jna-jpms:5.18.1")
-    api("net.java.dev.jna:jna-platform:5.18.1")
+    api("net.java.dev.jna:jna-jpms:5.19.0")
+    api("net.java.dev.jna:jna-platform:5.19.0")
     api("net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:4.3.0")
     api("net.ltgt.nullaway:nullaway:2.3.0")
     api("org.antlr:antlr4-runtime:4.13.2")
@@ -148,8 +148,8 @@ dependencies.constraints {
     api("org.tinylog:slf4j-tinylog:2.7.0")
     api("org.tinylog:tinylog-api:2.7.0")
     api("org.tinylog:tinylog-impl:2.7.0")
-    api("org.xmlunit:xmlunit-core:2.11.0")
-    api("org.xmlunit:xmlunit-matchers:2.11.0")
+    api("org.xmlunit:xmlunit-core:2.12.0")
+    api("org.xmlunit:xmlunit-matchers:2.12.0")
     api("org.yaml:snakeyaml:2.6")
     api("tech.units:indriya:2.2.4")
 }
