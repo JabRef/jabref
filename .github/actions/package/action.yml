@@ -35,8 +35,6 @@ inputs:
   subdir:
     required: true
 
-  gradleCommand:
-    required: true
   secretsPresent:
     required: true
 
@@ -55,7 +53,7 @@ runs:
   steps:
     - name: jpackage ${{ inputs.component }}
       shell: bash
-      run: ${{ inputs.gradleCommand }} -i :${{ inputs.component }}:jpackage
+      run: gradle -i :${{ inputs.component }}:jpackage
       env:
         VERSION: ${{ inputs.AssemblySemVer }}
         VERSION_INFO: ${{ inputs.InformationalVersion }}
