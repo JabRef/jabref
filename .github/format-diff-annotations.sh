@@ -10,7 +10,8 @@
 # formatting issues or OpenRewrite changes:
 #   ANNOTATION_TITLE           annotation title          (default: "Formatting")
 #   ANNOTATION_MESSAGE_PREFIX  message before the range  (default: formatter hint)
-# The text " lines <start>-<end>." is appended to the message prefix.
+# The range is appended to the message prefix: " line <n>." for a single line, or
+# " lines <start>-<end>." for a multi-line range.
 #
 # Usage: run from the directory that contains the git working tree to check.
 set -euo pipefail
