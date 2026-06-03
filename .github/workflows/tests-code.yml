@@ -62,9 +62,8 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/format-java
       # job should fail in case there are changes
-      - uses: ./.github/actions/check-formatting
-        with:
-          artifact-name: formatting-fix-patch
+      - name: Check if any files changed
+        run: .github/format-diff-annotations.sh
 
   format-javadoc:
     # too slow on ubuntu-slim
@@ -86,10 +85,10 @@ jobs:
       - run: |
           cd Convert2MarkdownJavadoc
           java Convert2MarkdownJavadoc.java ../jabref
-      - uses: ./jabref/.github/actions/check-formatting
-        with:
-          working-directory: jabref
-          artifact-name: javadoc-fix-patch
+      - name: Check if any files changed
+        run: |
+          cd jabref
+          .github/format-diff-annotations.sh
 
   checkstyle:
     name: Checkstyle
@@ -126,11 +125,10 @@ jobs:
       - uses: ./.github/actions/format-java
 
       - name: Fail if working directory is unclean
-        uses: ./.github/actions/check-formatting
-        with:
-          artifact-name: openrewrite-fix-patch
-          annotation-title: OpenRewrite
-          annotation-message-prefix: "Uncommitted changes after OpenRewrite; run `gradle :rewriteRun`, reformat, and commit the result for"
+        run: .github/format-diff-annotations.sh
+        env:
+          ANNOTATION_TITLE: OpenRewrite
+          ANNOTATION_MESSAGE_PREFIX: "Uncommitted changes after OpenRewrite; run `gradle :rewriteRun`, reformat, and commit the result for"
 
   modernizer:
     name: Modernizer

@@ -61,16 +61,14 @@ printf '%s\n' "$diff" | gawk '
     gsub(/\\\\/, "\\", s)   # \\ -> \
     return s
   }
-  function flush(  s, e, range) {
+  function flush(  s, e) {
     if (!inRun) return
     if (file == "") { inRun = 0; hasOld = 0; hasNew = 0; return }
     if (hasOld) { s = oldStartLine; e = oldEndLine }
     else        { s = newStartLine; e = newEndLine }
     if (e < s) e = s
     if (s < 1) s = 1
-    if (s == e) range = "line " s
-    else        range = "lines " s "-" e
-    printf "::error file=%s,line=%s,endLine=%s,title=%s::%s in file %s, %s.\n", file, s, e, title, messagePrefix, escape_data(fileRaw), range
+    printf "::error file=%s,line=%s,endLine=%s,title=%s::%s in file %s, lines %s-%s.\n", file, s, e, title, messagePrefix, escape_data(fileRaw), s, e
     inRun = 0; hasOld = 0; hasNew = 0
   }
   # Reset the path so an unrecognized header cannot reuse the prior file name.
