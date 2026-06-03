@@ -21,6 +21,8 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.control.SpinnerValueFactory;
 
+import com.tobiasdiez.easybind.EasyBind;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.WorkspacePreferences;
@@ -139,6 +141,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableLanguageServerProperty = new SimpleBooleanProperty();
     private final StringProperty languageServerPortProperty = new SimpleStringProperty("");
     private final TrustStoreManager trustStoreManager;
+    private boolean mscKeywordDescriptionsInitialized;
 
     public GeneralTabViewModel(DialogService dialogService,
                                GuiPreferences preferences,
@@ -161,6 +164,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.remoteListenerServerManager = remoteListenerServerManager;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
+        EasyBind.subscribe(enableMscKeywordDescriptionsProperty, this::onMscKeywordDescriptionsChanged);
 
         fontSizeValidator = new FunctionBasedValidator<>(
                 fontSizeProperty,
@@ -274,6 +278,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         enableLanguageServerProperty.setValue(remotePreferences.shouldEnableLanguageServer());
         languageServerPortProperty.setValue(String.valueOf(remotePreferences.getLanguageServerPort()));
+
+        mscKeywordDescriptionsInitialized = true;
     }
 
     @Override
@@ -316,12 +322,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         libraryPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
         libraryPreferences.setAutoSave(autosaveLocalLibraries.getValue());
-
-        boolean mscEnabled = enableMscKeywordDescriptionsProperty.getValue();
-        if (mscEnabled && !preferences.shouldEnableMscKeywordDescriptions()) {
-            downloadMscCodes();
-        }
-        preferences.setEnableMscKeywordDescriptions(mscEnabled);
+        preferences.setEnableMscKeywordDescriptions(enableMscKeywordDescriptionsProperty.getValue());
 
         filePreferences.setCreateBackup(createBackupProperty.getValue());
         filePreferences.setBackupDirectory(Path.of(backupDirectoryProperty.getValue()));
@@ -580,6 +581,30 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         }
     }
 
+    private void onMscKeywordDescriptionsChanged(Boolean newValue) {
+        if (!mscKeywordDescriptionsInitialized) {
+            return;
+        }
+
+        if (Boolean.TRUE.equals(newValue)) {
+            boolean accepted = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("License agreement for MSC codes"),
+                    Localization.lang("The MSC codes are provided under the Creative Commons Attribution-ShareAlike-NonCommercial 4.0 International License.")
+                            + "\n\n"
+                            + Localization.lang("By enabling this feature, you agree to the terms of this license.")
+                            + "\n"
+                            + "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+                    Localization.lang("Accept"),
+                    Localization.lang("Decline"));
+
+            if (accepted) {
+                downloadMscCodes();
+            } else {
+                enableMscKeywordDescriptionsProperty.setValue(false);
+            }
+        }
+    }
+
     private void downloadMscCodes() {
         Path mscMvFile = Directories.getMscDirectory().resolve(MscCodeLoader.MSC_FILE_NAME);
         if (MscCodeLoader.isMvStoreAvailableWithData(mscMvFile)) {
@@ -592,7 +617,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                           MscCodeLoader.downloadAndConvert(URLUtil.create(MscCodeLoader.MSC_CSV_URL), mscMvFile);
                           return null;
                       })
-                      .onSuccess(v -> dialogService.notify(Localization.lang("MSC codes downloaded successfully.")))
+                      .onSuccess(_ -> dialogService.notify(Localization.lang("MSC codes downloaded successfully.")))
                       .onFailure(e -> {
                           LOGGER.error("Error downloading MSC codes", e);
                           dialogService.showErrorDialogAndWait(Localization.lang("Error downloading MSC codes"), e);

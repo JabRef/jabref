@@ -19,13 +19,13 @@ import org.jspecify.annotations.Nullable;
 
 public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatter {
 
-    private @Nullable JabRefCliPreferences cliPreferences;
+    private final @Nullable JabRefCliPreferences cliPreferences;
 
     public ConvertMSCCodesFormatter() {
         this.cliPreferences = null;
     }
 
-    ConvertMSCCodesFormatter(JabRefCliPreferences cliPreferences) {
+    ConvertMSCCodesFormatter(@Nullable JabRefCliPreferences cliPreferences) {
         this.cliPreferences = cliPreferences;
     }
 
@@ -47,7 +47,7 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
                                             .map(item -> {
                                                 String code = item.toString().trim();
                                                 String convertedText = MscCodeUtils.getMscCodeRepository()
-                                                                                   .flatMap(repository -> repository.getDescription(code))
+                                                                                   .flatMap(repository -> repository.getText(code))
                                                                                    .orElse(code);
                                                 return new Keyword(convertedText);
                                             })

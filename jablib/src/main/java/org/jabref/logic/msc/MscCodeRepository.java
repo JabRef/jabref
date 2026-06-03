@@ -34,6 +34,10 @@ public class MscCodeRepository {
         return Optional.ofNullable(mscCodes.get(code));
     }
 
+    public Optional<String> getText(String code) {
+        return get(code).map(MscCodeEntry::text);
+    }
+
     public Optional<String> getDescription(String code) {
         return get(code).map(MscCodeEntry::description);
     }

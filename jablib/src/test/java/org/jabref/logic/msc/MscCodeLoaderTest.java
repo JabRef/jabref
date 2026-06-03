@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.jabref.logic.util.MscCodeUtils;
 
@@ -32,10 +33,9 @@ class MscCodeLoaderTest {
 
         MscCodeRepository repository = new MscCodeRepository(mvStoreFile);
 
-        assertEquals(
-                "Applications of boundary value problems involving ordinary differential equations",
-                repository.getDescription("34B60").get());
-        assertEquals("None of the above, but in this section", repository.getDescription("53C99").get());
+        assertEquals(Optional.of("Applications of boundary value problems involving ordinary differential equations"),
+                repository.getText("34B60"));
+        assertEquals(Optional.of("None of the above, but in this section"), repository.getDescription("53C99"));
     }
 
     @Test
@@ -48,7 +48,7 @@ class MscCodeLoaderTest {
 
         MscCodeRepository repository = MscCodeUtils.loadMscCodeRepositoryFromCsv(csvFile.toUri().toURL()).get();
 
-        assertEquals("Applications of boundary value problems involving ordinary differential equations", repository.getDescription("34B60").get());
+        assertEquals(Optional.of("Applications of boundary value problems involving ordinary differential equations"), repository.getDescription("34B60"));
     }
 
     @Test

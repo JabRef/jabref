@@ -46,7 +46,6 @@ public class ConvertMSCCodesFormatterTest {
     "90B40": "Search theory",
     */
 
-
     @Test
     void convertSingleMSCCode() {
         assertEquals("Applications of boundary value problems involving ordinary differential equations",
@@ -56,7 +55,7 @@ public class ConvertMSCCodesFormatterTest {
     @Test
     void convertMultipleMSCCodes() {
         assertEquals(
-                "53C99 None of the above, but in this section,Biopropulsion in water and in air,Search theory",
+                "Global differential geometry,Biopropulsion in water and in air,Search theory",
                 formatter.format("53C99,76Z10,90B40"));
     }
 
