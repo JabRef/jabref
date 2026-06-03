@@ -53,7 +53,10 @@ jobs:
         run: chmod +x jabkit/build/native/nativeCompile/jabkit
 
       - name: Install clitest
-        run: brew install clitest
+        run: |
+          curl -sOL https://raw.githubusercontent.com/aureliojargas/clitest/master/clitest
+          chmod +x clitest
+          sudo mv clitest /usr/bin
 
       - name: Run JabKit native smoke tests
         run: cd jabkit && clitest src/nativeTest/clitest/jabkit.md
