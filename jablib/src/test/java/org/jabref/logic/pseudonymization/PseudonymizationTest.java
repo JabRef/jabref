@@ -21,6 +21,10 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -66,31 +70,80 @@ class PseudonymizationTest {
 
     @Test
     void pseudonymizeTwoEntries() {
-        BibEntry first = new BibEntry("first")
+        BibEntry first = new BibEntry()
+                .withCitationKey("first")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
-        BibEntry second = new BibEntry("second")
+        BibEntry second = new BibEntry()
+                .withCitationKey("second")
                 .withField(StandardField.AUTHOR, "Author Two")
                 .withField(StandardField.PAGES, "some pages");
 
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(List.of(first, second)));
 
-        Pseudonymization pseudonymization = new Pseudonymization();
+        Pseudonymization pseudonymization = new Pseudonymization(',');
         Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
 
-        BibEntry firstPseudo = new BibEntry("citationkey-1")
+        BibEntry firstPseudo = new BibEntry()
+                .withCitationKey("citationkey-1")
                 .withField(StandardField.AUTHOR, "author-1")
                 .withField(StandardField.PAGES, "pages-1");
-        BibEntry secondPseudo = new BibEntry("citationkey-2")
+        BibEntry secondPseudo = new BibEntry()
+                .withCitationKey("citationkey-2")
                 .withField(StandardField.AUTHOR, "author-2")
                 .withField(StandardField.PAGES, "pages-1");
         BibDatabaseContext bibDatabaseContextExpected = new BibDatabaseContext(new BibDatabase(List.of(firstPseudo, secondPseudo)));
         bibDatabaseContextExpected.setMode(BibDatabaseMode.BIBLATEX);
         Pseudonymization.Result expected = new Pseudonymization.Result(
                 bibDatabaseContextExpected,
-                Map.of("author-1", "Author One", "author-2", "Author Two", "pages-1", "some pages", "citationkey-1", "first", "citationkey-2", "second"));
+                Map.of("author-1", "Author One",
+                        "author-2", "Author Two",
+                        "pages-1", "some pages",
+                        "citationkey-1", "first",
+                        "citationkey-2", "second"));
 
         assertEquals(expected, result);
+    }
+
+    @Test
+    void shouldPseudonymizeGroupTree() {
+        BibEntry entry = new BibEntry()
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Test Author");
+        BibDatabase db = new BibDatabase();
+        db.insertEntry(entry);
+        BibDatabaseContext context = new BibDatabaseContext(db);
+        GroupTreeNode root = GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
+        GroupTreeNode child = GroupTreeNode.fromGroup(
+                new ExplicitGroup("Research", GroupHierarchyType.INDEPENDENT, ',')
+        );
+        root.addChild(child);
+        context.getMetaData().setGroups(root);
+
+        Pseudonymization.Result res =
+                new Pseudonymization(',').pseudonymizeLibrary(context);
+
+        GroupTreeNode pseudonymizedRoot =
+                res.bibDatabaseContext().getMetaData().getGroups().orElseThrow();
+        assertEquals("group-1", pseudonymizedRoot.getGroup().getName());
+        assertEquals("group-2",
+                pseudonymizedRoot.getChildren().getFirst().getGroup().getName());
+    }
+
+    @Test
+    void shouldPseudonymizeUnmappedGroups() {
+        BibEntry entry = new BibEntry()
+                .withCitationKey("test")
+                .withField(StandardField.AUTHOR, "Test Author")
+                .withField(StandardField.GROUPS, "not-in-tree");
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+
+        Pseudonymization.Result result = new Pseudonymization(',').pseudonymizeLibrary(context);
+
+        BibEntry pseudoEntry = result.bibDatabaseContext().getEntries().getFirst();
+        String pseudoGroups = pseudoEntry.getField(StandardField.GROUPS).orElse("");
+        assertTrue(pseudoGroups.startsWith("group-"));
+        assertTrue(result.valueMapping().containsValue("not-in-tree"));
     }
 
     @Test
@@ -98,7 +151,7 @@ class PseudonymizationTest {
         Path path = Path.of(PseudonymizationTest.class.getResource("Chocolate.bib").toURI());
         BibDatabaseContext databaseContext = importer.importDatabase(path).getDatabaseContext();
 
-        Pseudonymization pseudonymization = new Pseudonymization();
+        Pseudonymization pseudonymization = new Pseudonymization(',');
         Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
         databaseWriter.writeDatabase(result.bibDatabaseContext());
 
@@ -117,7 +170,7 @@ class PseudonymizationTest {
 
         BibDatabaseContext databaseContext = importer.importDatabase(path).getDatabaseContext();
 
-        Pseudonymization pseudonymization = new Pseudonymization();
+        Pseudonymization pseudonymization = new Pseudonymization(',');
         Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
         databaseWriter.writeDatabase(result.bibDatabaseContext());
 

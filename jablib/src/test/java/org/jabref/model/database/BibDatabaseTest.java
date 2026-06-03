@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -162,7 +161,7 @@ class BibDatabaseTest {
     void stringIsNotModifiedAfterInsertion() {
         database.addString(bibtexString);
 
-        assertEquals(bibtexString, database.getString(bibtexString.getId()));
+        assertEquals(Optional.of(bibtexString), database.getString(bibtexString.getId()));
     }
 
     @Test
@@ -212,10 +211,10 @@ class BibDatabaseTest {
     @Test
     void databaseReturnsNullForRemovedString() {
         database.addString(bibtexString);
-        assertEquals(bibtexString, database.getString(bibtexString.getId()));
+        assertEquals(Optional.of(bibtexString), database.getString(bibtexString.getId()));
 
         database.removeString(bibtexString.getId());
-        assertNull(database.getString(bibtexString.getId()));
+        assertTrue(database.getString(bibtexString.getId()).isEmpty());
     }
 
     @Test

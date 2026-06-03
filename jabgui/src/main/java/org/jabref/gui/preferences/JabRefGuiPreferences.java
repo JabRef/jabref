@@ -47,9 +47,11 @@ import org.jabref.gui.theme.Theme;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
+import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -179,6 +181,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String GROUP_VIEW_FILTER = "groupFilter";
     private static final String GROUP_VIEW_INVERT = "groupInvert";
     private static final String DEFAULT_HIERARCHICAL_CONTEXT = "defaultHierarchicalContext";
+    private static final String GROUP_SHOW_AI_CHAT = "groupShowAiChat";
     // endregion
 
     // region specialFieldsPreferences
@@ -229,6 +232,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String CITATION_COUNT_FETCHER_TYPE = "citationCountFetcherType";
     // endregion
 
+    // region MrDlibPreferences
+    private static final String MRDLIB_ACCEPT_RECOMMENDATIONS = "acceptRecommendations";
+    private static final String MRDLIB_SEND_LANGUAGE_DATA = "sendLanguageData";
+    private static final String MRDLIB_SEND_OS_DATA = "sendOSData";
+    private static final String MRDLIB_SEND_TIMEZONE_DATA = "sendTimezoneData";
+    // endregion
+
     private static JabRefGuiPreferences singleton;
 
     private EntryEditorPreferences entryEditorPreferences;
@@ -250,6 +260,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private CopyToPreferences copyToPreferences;
     private NewEntryPreferences newEntryPreferences;
     private DonationPreferences donationPreferences;
+    private MrDlibPreferences mrDlibPreferences;
 
     /// @deprecated Never ever add a call to this method. There should be only one caller.
     /// All other usages should get the preferences passed (or injected).
@@ -287,6 +298,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getLayoutFormatterPreferences(),
                 Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                 Injector.instantiateModelOrService(BibEntryTypesManager.class)));
+        getMrDlibPreferences().setAll(MrDlibPreferences.getDefault());
     }
 
     @Override
@@ -312,6 +324,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getSidePanePreferences().setAll(getSidePanePreferencesFromBackingStore(getSidePanePreferences()));
         getNameDisplayPreferences().setAll(getNameDisplayPreferencesFromBackingStore(getNameDisplayPreferences()));
         getPreviewPreferences().setAll(getPreviewPreferencesFromBackingStore(getPreviewPreferences()));
+        getMrDlibPreferences().setAll(getMrDlibPreferencesFromBackingStore(getMrDlibPreferences()));
     }
 
     // region CopyToPreferences
@@ -767,6 +780,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(groupsPreferences.autoAssignGroupProperty(), (_, _, newValue) -> putBoolean(AUTO_ASSIGN_GROUP, newValue));
         EasyBind.listen(groupsPreferences.displayGroupCountProperty(), (_, _, newValue) -> putBoolean(DISPLAY_GROUP_COUNT, newValue));
         EasyBind.listen(groupsPreferences.defaultHierarchicalContextProperty(), (_, _, newValue) -> put(DEFAULT_HIERARCHICAL_CONTEXT, newValue.name()));
+        EasyBind.listen(groupsPreferences.showAiChatButtonProperty(), (_, _, newValue) -> putBoolean(GROUP_SHOW_AI_CHAT, newValue));
 
         return groupsPreferences;
     }
@@ -780,7 +794,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(DISPLAY_GROUP_COUNT, defaults.shouldDisplayGroupCount()),
                 GroupHierarchyType.valueOf(
                         get(DEFAULT_HIERARCHICAL_CONTEXT, defaults.getDefaultHierarchicalContext().name())
-                )
+                ),
+                getBoolean(GROUP_SHOW_AI_CHAT, defaults.showAiChatButton())
         );
     }
     // endregion
@@ -1177,9 +1192,35 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
     // endregion
 
+    // region MrDlibPreferences
+    @Override
+    public MrDlibPreferences getMrDlibPreferences() {
+        if (mrDlibPreferences != null) {
+            return mrDlibPreferences;
+        }
+
+        mrDlibPreferences = getMrDlibPreferencesFromBackingStore(MrDlibPreferences.getDefault());
+
+        EasyBind.listen(mrDlibPreferences.acceptRecommendationsProperty(), (_, _, newValue) -> putBoolean(MRDLIB_ACCEPT_RECOMMENDATIONS, newValue));
+        EasyBind.listen(mrDlibPreferences.sendLanguageProperty(), (_, _, newValue) -> putBoolean(MRDLIB_SEND_LANGUAGE_DATA, newValue));
+        EasyBind.listen(mrDlibPreferences.sendOsProperty(), (_, _, newValue) -> putBoolean(MRDLIB_SEND_OS_DATA, newValue));
+        EasyBind.listen(mrDlibPreferences.sendTimezoneProperty(), (_, _, newValue) -> putBoolean(MRDLIB_SEND_TIMEZONE_DATA, newValue));
+
+        return mrDlibPreferences;
+    }
+
+    private MrDlibPreferences getMrDlibPreferencesFromBackingStore(MrDlibPreferences defaults) {
+        return new MrDlibPreferences(
+                getBoolean(MRDLIB_ACCEPT_RECOMMENDATIONS, defaults.shouldAcceptRecommendations()),
+                getBoolean(MRDLIB_SEND_LANGUAGE_DATA, defaults.shouldSendLanguage()),
+                getBoolean(MRDLIB_SEND_OS_DATA, defaults.shouldSendOs()),
+                getBoolean(MRDLIB_SEND_TIMEZONE_DATA, defaults.shouldSendTimezone()));
+    }
+    // endregion
+
     @Override
     public SelfContainedSaveConfiguration getSelfContainedExportConfiguration() {
-        SaveOrder exportSaveOrder = getExportSaveOrder();
+        SaveOrder exportSaveOrder = getExportSaveOrder(ExportPreferences.getDefault().getExportSaveOrder());
         SelfContainedSaveOrder saveOrder = switch (exportSaveOrder.getOrderType()) {
             case TABLE ->
                     this.getSelfContainedTableSaveOrder();
