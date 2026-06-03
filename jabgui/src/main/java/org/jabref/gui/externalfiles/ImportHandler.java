@@ -211,9 +211,28 @@ public class ImportHandler {
                             }
                             addResultToList(file, success, message);
                         } else {
-                            BibEntry emptyEntryWithLink = createEmptyEntryWithLink(file);
-                            entriesToAdd.add(emptyEntryWithLink);
-                            addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with file link."));
+                            try {
+                                ImportFormatReader importFormatReader = new ImportFormatReader(
+                                        preferences.getImporterPreferences(),
+                                        preferences.getImportFormatPreferences(),
+                                        preferences.getCitationKeyPatternPreferences(),
+                                        fileUpdateMonitor
+                                );
+                                ImportResult importResult = importFormatReader.importWithAutoDetection(file);
+                                List<BibEntry> importedEntries = importResult.parserResult().getDatabase().getEntries();
+                                if (!importedEntries.isEmpty()) {
+                                    entriesToAdd.addAll(importedEntries);
+                                    addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
+                                } else {
+                                    BibEntry emptyEntryWithLink = createEmptyEntryWithLink(file);
+                                    entriesToAdd.add(emptyEntryWithLink);
+                                    addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with file link."));
+                                }
+                            } catch (ImportException e) {
+                                BibEntry emptyEntryWithLink = createEmptyEntryWithLink(file);
+                                entriesToAdd.add(emptyEntryWithLink);
+                                addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with file link."));
+                            }
                         }
                     } catch (IOException ex) {
                         LOGGER.error("Error importing", ex);
