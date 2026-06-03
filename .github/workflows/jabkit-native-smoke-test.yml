@@ -1,0 +1,58 @@
+name: JabKit Native Smoke Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-native:
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+
+      - uses: ./.github/actions/setup-gradle
+        with:
+          distribution: graalvm
+
+      - name: Build JabKit native binary
+        run: ./gradlew :jabkit:nativeCompile
+
+      - name: Upload JabKit native binary
+        uses: actions/upload-artifact@v7
+        with:
+          name: jabkit-native-macos-silicon
+          path: jabkit/build/native/nativeCompile/jabkit
+          retention-days: 1
+
+  smoke-test:
+    needs: build-native
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+
+      - name: Download JabKit native binary
+        uses: actions/download-artifact@v8
+        with:
+          name: jabkit-native-macos-silicon
+          path: jabkit/build/native/nativeCompile/
+
+      - name: Make binary executable
+        run: chmod +x jabkit/build/native/nativeCompile/jabkit
+
+      - name: Install clitest
+        run: brew install clitest
+
+      - name: Run JabKit native smoke tests
+        run: cd jabkit && clitest src/nativeTest/clitest/jabkit.md
