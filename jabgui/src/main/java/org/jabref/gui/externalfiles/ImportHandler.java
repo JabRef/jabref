@@ -143,6 +143,12 @@ public class ImportHandler {
             public List<ImportFilesResultItemViewModel> call() {
                 counter = 1;
                 CompoundEdit compoundEdit = new CompoundEdit();
+                ImportFormatReader importFormatReader = new ImportFormatReader(
+                        preferences.getImporterPreferences(),
+                        preferences.getImportFormatPreferences(),
+                        preferences.getCitationKeyPatternPreferences(),
+                        fileUpdateMonitor
+                );
                 for (final Path file : files) {
                     final List<BibEntry> entriesToAdd = new ArrayList<>();
 
@@ -212,25 +218,18 @@ public class ImportHandler {
                             addResultToList(file, success, message);
                         } else {
                             try {
-                                ImportFormatReader importFormatReader = new ImportFormatReader(
-                                        preferences.getImporterPreferences(),
-                                        preferences.getImportFormatPreferences(),
-                                        preferences.getCitationKeyPatternPreferences(),
-                                        fileUpdateMonitor
-                                );
                                 ImportResult importResult = importFormatReader.importWithAutoDetection(file);
                                 List<BibEntry> importedEntries = importResult.parserResult().getDatabase().getEntries();
                                 if (!importedEntries.isEmpty()) {
                                     entriesToAdd.addAll(importedEntries);
                                     addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
                                 } else {
-                                    BibEntry emptyEntryWithLink = createEmptyEntryWithLink(file);
-                                    entriesToAdd.add(emptyEntryWithLink);
+                                    entriesToAdd.add(createEmptyEntryWithLink(file));
                                     addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with file link."));
                                 }
                             } catch (ImportException e) {
-                                BibEntry emptyEntryWithLink = createEmptyEntryWithLink(file);
-                                entriesToAdd.add(emptyEntryWithLink);
+                                LOGGER.debug("Could not import file {} using auto-detection", file, e);
+                                entriesToAdd.add(createEmptyEntryWithLink(file));
                                 addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with file link."));
                             }
                         }
