@@ -3,9 +3,9 @@ package org.jabref.gui.preferences.general;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.WorkspacePreferences;
+import org.jabref.gui.edit.CopyToPreferences;
 import org.jabref.gui.preferences.DonationPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.edit.CopyToPreferences;
 import org.jabref.gui.theme.Theme;
 import org.jabref.http.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
@@ -19,6 +19,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.util.TaskExecutor;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,13 +34,12 @@ import static org.mockito.Mockito.when;
 class GeneralTabViewModelTest {
 
     private DialogService dialogService;
-    private GuiPreferences preferences;
     private GeneralTabViewModel viewModel;
 
     @BeforeEach
     void setUp() {
         dialogService = mock(DialogService.class);
-        preferences = mock(GuiPreferences.class);
+        GuiPreferences preferences = mock(GuiPreferences.class);
         when(preferences.getWorkspacePreferences()).thenReturn(new WorkspacePreferences(Language.ENGLISH, false, 12, Theme.system(), false, true, true, true, true, java.util.List.of()));
         when(preferences.getLibraryPreferences()).thenReturn(LibraryPreferences.getDefault());
         when(preferences.getFilePreferences()).thenReturn(FilePreferences.getDefault());
