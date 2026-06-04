@@ -530,6 +530,15 @@
         },
         {
           "name": "inputOption"
+        },
+        {
+          "name": "outputFile"
+        },
+        {
+          "name": "keyFile"
+        },
+        {
+          "name": "force"
         }
       ],
       "methods": [
