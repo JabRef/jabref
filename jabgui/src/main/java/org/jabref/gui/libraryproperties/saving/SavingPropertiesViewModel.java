@@ -13,7 +13,6 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
-import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.model.database.BibDatabaseContext;
@@ -51,11 +50,13 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
     private final BibDatabaseContext databaseContext;
     private final MetaData initialMetaData;
     private final SaveOrder saveOrder;
+    private final FieldFormatterCleanupActions defaultSaveActions;
 
-    public SavingPropertiesViewModel(BibDatabaseContext databaseContext) {
+    public SavingPropertiesViewModel(BibDatabaseContext databaseContext, FieldFormatterCleanupActions defaultSaveActions) {
         this.databaseContext = databaseContext;
         this.initialMetaData = databaseContext.getMetaData();
         this.saveOrder = initialMetaData.getSaveOrder().orElse(UI_DEFAULT_SAVE_ORDER);
+        this.defaultSaveActions = defaultSaveActions;
     }
 
     @Override
@@ -94,9 +95,8 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
             cleanupsDisableProperty.setValue(!value.isEnabled());
             cleanupsProperty.setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
         }, () -> {
-            CleanupPreferences defaultPreset = CleanupPreferences.getDefault();
-            cleanupsDisableProperty.setValue(!defaultPreset.getFieldFormatterCleanups().isEnabled());
-            cleanupsProperty.setValue(FXCollections.observableArrayList(defaultPreset.getFieldFormatterCleanups().getConfiguredActions()));
+            cleanupsDisableProperty.setValue(!defaultSaveActions.isEnabled());
+            cleanupsProperty.setValue(FXCollections.observableArrayList(defaultSaveActions.getConfiguredActions()));
         });
     }
 
