@@ -178,6 +178,15 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputFile"
+        },
+        {
+          "name": "outputFormat"
+        },
+        {
+          "name": "allowIntegerEdition"
         }
       ],
       "methods": [

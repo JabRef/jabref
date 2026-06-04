@@ -106,6 +106,9 @@
       "glob": "csl-styles/ieee.csl"
     },
     {
+      "glob": "uk/ac/ed/ph/snuggletex/**"
+    },
+    {
       "glob": "l10n/JabRef.properties"
     },
     {
@@ -157,6 +160,9 @@
   "bundles": [
     {
       "name": "l10n/JabRef"
+    },
+    {
+      "name": "uk/ac/ed/ph/snuggletex/core-error-messages"
     }
   ]
 }
