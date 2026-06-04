@@ -71,7 +71,7 @@ runs:
     - name: Smoke test ${{ inputs.component }}
       shell: bash
       run: |
-        ${{ inputs.gradleCommand }} :${{ inputs.component }}:run --args="--help"
+        gradle -i :${{ inputs.component }}:run --args="--help"
       env:
         VERSION: ${{ inputs.AssemblySemVer }}
         VERSION_INFO: ${{ inputs.InformationalVersion }}
@@ -129,7 +129,7 @@ runs:
     - name: ShadowJar ${{ inputs.component }}
       if: ${{ (inputs.os == 'ubuntu-22.04') }}
       shell: bash
-      run: ${{ inputs.gradleCommand }} :${{ inputs.component }}:shadowJar
+      run: gradle -i :${{ inputs.component }}:shadowJar
       env:
         VERSION: ${{ inputs.AssemblySemVer }}
         VERSION_INFO: ${{ inputs.InformationalVersion }}
