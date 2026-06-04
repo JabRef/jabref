@@ -8,3 +8,5 @@ $ "$JABKIT" check integrity --input=src/test/resources/org/jabref/toolkit/comman
 1
 $ grep -c "capital letters are not masked using curly brackets" build/tmp/integrity.out
 1
+$ "$JABKIT" convert --input=src/test/resources/org/jabref/toolkit/commands/origin.bib --input-format=bibtex 2>/dev/null | grep "to 'bibtex'"
+Converting 'src/test/resources/org/jabref/toolkit/commands/origin.bib' to 'bibtex'.

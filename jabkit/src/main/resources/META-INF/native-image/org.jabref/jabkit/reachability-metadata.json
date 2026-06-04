@@ -244,6 +244,18 @@
         },
         {
           "name": "inputOption"
+        },
+        {
+          "name": "inputFormat"
+        },
+        {
+          "name": "outputFile"
+        },
+        {
+          "name": "outputFormat"
+        },
+        {
+          "name": "fieldFormatters"
         }
       ],
       "methods": [
