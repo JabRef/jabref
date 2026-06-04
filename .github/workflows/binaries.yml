@@ -361,7 +361,6 @@ jobs:
               {
                 "os": "ubuntu-22.04",
                 "displayName": "linux-amd64",
-                "gradleCommand": "gradle",
                 "archivePortable": "tar -c -C jabgui/build/packages/ubuntu-22.04 JabRef | pigz --rsyncable > jabgui/build/packages/ubuntu-22.04/JabRef-portable_linux.tar.gz && rm -R jabgui/build/packages/ubuntu-22.04/JabRef",
                 "archivePortableJabKit": "tar -c -C jabkit/build/packages/ubuntu-22.04 jabkit | pigz --rsyncable > jabkit/build/packages/ubuntu-22.04/jabkit-portable_linux.tar.gz && rm -R jabkit/build/packages/ubuntu-22.04/jabkit",
                 "archivePortableJabLS": "tar -c -C jabls-cli/build/packages/ubuntu-22.04 jabls | pigz --rsyncable > jabls-cli/build/packages/ubuntu-22.04/jabls-portable_linux.tar.gz && rm -R jabls-cli/build/packages/ubuntu-22.04/jabls",
@@ -371,7 +370,6 @@ jobs:
               {
                 "os": "ubuntu-22.04-arm",
                 "displayName": "linux-arm",
-                "gradleCommand": "gradle",
                 "archivePortable": "tar -c -C jabgui/build/packages/ubuntu-22.04-arm JabRef | pigz --rsyncable > jabgui/build/packages/ubuntu-22.04-arm/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/build/packages/ubuntu-22.04-arm/JabRef",
                 "archivePortableJabKit": "tar -c -C jabkit/build/packages/ubuntu-22.04-arm jabkit | pigz --rsyncable > jabkit/build/packages/ubuntu-22.04-arm/jabkit-portable_linux_arm64.tar.gz && rm -R jabkit/build/packages/ubuntu-22.04-arm/jabkit",
                 "archivePortableJabLS": "tar -c -C jabls-cli/build/packages/ubuntu-22.04-arm jabls | pigz --rsyncable > jabls-cli/build/packages/ubuntu-22.04-arm/jabls-portable_linux_arm64.tar.gz && rm -R jabls-cli/build/packages/ubuntu-22.04-arm/jabls",
@@ -381,7 +379,6 @@ jobs:
               {
                 "os": "windows-latest",
                 "displayName": "windows-amd64",
-                "gradleCommand": "gradle",
                 "archivePortable": "7z a -r jabgui/build/packages/windows-latest/JabRef-portable_windows.zip ./jabgui/build/packages/windows-latest/JabRef && rm -R jabgui/build/packages/windows-latest/JabRef",
                 "archivePortableJabKit": "7z a -r jabkit/build/packages/windows-latest/jabkit-portable_windows.zip ./jabkit/build/packages/windows-latest/jabkit && rm -R jabkit/build/packages/windows-latest/jabkit",
                 "archivePortableJabLS": "7z a -r jabls-cli/build/packages/windows-latest/jabls-portable_windows.zip ./jabls-cli/build/packages/windows-latest/jabls && rm -R jabls-cli/build/packages/windows-latest/jabls",
@@ -391,7 +388,6 @@ jobs:
               {
                 "os": "macos-15-intel",
                 "displayName": "macOS-intel",
-                "gradleCommand": "gradle",
                 "archivePortable": "7z a -r jabgui/build/packages/macos-15-intel/JabRef-portable_macos-intel.zip ./jabgui/build/packages/macos-15-intel/JabRef.app && rm -R jabgui/build/packages/macos-15-intel/JabRef.app",
                 "archivePortableJabKit": "7z a -r jabkit/build/packages/macos-15-intel/jabkit-portable_macos-intel.zip ./jabkit/build/packages/macos-15-intel/jabkit.app && rm -R jabkit/build/packages/macos-15-intel/jabkit.app",
                 "archivePortableJabLS": "7z a -r jabls-cli/build/packages/macos-15-intel/jabls-portable_macos-intel.zip ./jabls-cli/build/packages/macos-15-intel/jabls.app && rm -R jabls-cli/build/packages/macos-15-intel/jabls.app",
@@ -401,7 +397,6 @@ jobs:
               {
                 "os": "macos-15",
                 "displayName": "macOS-silicon",
-                "gradleCommand": "gradle",
                 "archivePortable": "7z a -r jabgui/build/packages/macos-15/JabRef-portable_macos-silicon.zip ./jabgui/build/packages/macos-15/JabRef.app && rm -R jabgui/build/packages/macos-15/JabRef.app",
                 "archivePortableJabKit": "7z a -r jabkit/build/packages/macos-15/jabkit-portable_macos-silicon.zip ./jabkit/build/packages/macos-15/jabkit.app && rm -R jabkit/build/packages/macos-15/jabkit.app",
                 "archivePortableJabLS": "7z a -r jabls-cli/build/packages/macos-15/jabls-portable_macos-silicon.zip ./jabls-cli/build/packages/macos-15/jabls.app && rm -R jabls-cli/build/packages/macos-15/jabls.app",
@@ -574,7 +569,7 @@ jobs:
         id: jablib-jar
         # wait: gitversion
         # background: true
-        run: ${{ matrix.gradleCommand }} :jablib:jar
+        run: gradle :jablib:jar
         env:
           VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
           VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
@@ -597,14 +592,14 @@ jobs:
       - name: jabls jar
         # background: true
         id: jabls-jar
-        run: ${{ matrix.gradleCommand }} :jabls:jar
+        run: gradle :jabls:jar
         env:
           VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
           VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
       - name: jabsrv jar
         # background: true
         id: jabsrv-jar
-        run: ${{ matrix.gradleCommand }} :jabsrv:jar
+        run: gradle :jabsrv:jar
         env:
           VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
           VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
@@ -657,7 +652,6 @@ jobs:
         id: jabls-cli
         # background: true
         with:
-          gradleCommand: ${{ matrix.gradleCommand }}
           component: jabls-cli
           componentShort: jabls
           branchName: ${{ needs.pre-build.outputs.branch }}
@@ -683,7 +677,6 @@ jobs:
         name: Package JabRef HTTP Server
         # background: true
         with:
-          gradleCommand: ${{ matrix.gradleCommand }}
           component: jabsrv-cli
           componentShort: jabsrv
           branchName: ${{ needs.pre-build.outputs.branch }}
@@ -710,7 +703,6 @@ jobs:
         id: jabgui
         # background: true
         with:
-          gradleCommand: ${{ matrix.gradleCommand }}
           component: jabgui
           componentShort: jabgui
           branchName: ${{ needs.pre-build.outputs.branch }}
@@ -736,7 +728,6 @@ jobs:
         name: Package JabKit
         # background: true
         with:
-          gradleCommand: ${{ matrix.gradleCommand }}
           component: jabkit
           componentShort: jabkit
           branchName: ${{ needs.pre-build.outputs.branch }}
