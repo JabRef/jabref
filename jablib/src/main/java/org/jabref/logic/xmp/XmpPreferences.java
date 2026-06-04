@@ -29,9 +29,9 @@ public class XmpPreferences {
 
     private XmpPreferences() {
         this(
-                false,            // Don't use XMP privacy filter
+                false,                                     // Don't use XMP privacy filter
                 new HashSet<>(DEFAULT_XMP_PRIVACY_FILTER), // Default XMP privacy filter fields (mutable copy)
-                new SimpleObjectProperty<>(',')                  // Default keyword separator
+                new SimpleObjectProperty<>(',')            // Default keyword separator
         );
     }
 
