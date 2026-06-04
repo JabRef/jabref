@@ -244,6 +244,42 @@
                             wrapText="true"/>
                 </VBox>
             </Tab>
+
+            <Tab fx:id="tabEnterUrl"
+                 text="%Enter URL"
+                 closable="false">
+                <VBox spacing="10.0">
+                    <padding>
+                        <Insets top="10.0"/>
+                    </padding>
+                    <HBox alignment="CENTER_LEFT"
+                          spacing="10.0">
+                        <Label text="%URL"/>
+                        <TextField
+                                fx:id="urlText"
+                                prefHeight="30.0"
+                                HBox.hgrow="ALWAYS">
+                            <tooltip>
+                                <Tooltip
+                                        fx:id="urlTextTooltip"
+                                        text="%Specify the source URL to look up."/>
+                            </tooltip>
+                        </TextField>
+                    </HBox>
+                    <VBox spacing="5.0">
+                        <padding>
+                            <Insets top="5.0"/>
+                        </padding>
+                        <Label fx:id="urlErrorInvalidText"
+                               text="%You must provide a URL.">
+                            <font>
+                                <Font name="System Italic"
+                                      size="13.0"/>
+                            </font>
+                        </Label>
+                    </VBox>
+                </VBox>
+            </Tab>
         </TabPane>
     </content>
     <ButtonType

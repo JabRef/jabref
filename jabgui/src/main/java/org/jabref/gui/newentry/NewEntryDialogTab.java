@@ -5,4 +5,5 @@ public enum NewEntryDialogTab {
     ENTER_IDENTIFIER,
     INTERPRET_CITATIONS,
     SPECIFY_BIBTEX,
+    ENTER_URL,
 }

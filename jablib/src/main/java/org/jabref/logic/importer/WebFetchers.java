@@ -27,6 +27,7 @@ import org.jabref.logic.importer.fetcher.DiVA;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.importer.fetcher.EuropePmcFetcher;
+import org.jabref.logic.importer.fetcher.GenericUrlBasedFetcher;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.INSPIREFetcher;
@@ -301,6 +302,14 @@ public class WebFetchers {
                 new SpringerNatureWebFetcher(importerPreferences),
                 new UnpaywallFetcher(importerPreferences),
                 new WileyFetcher(importerPreferences)
+        );
+
+        return fetchers;
+    }
+
+    public static Set<UrlBasedFetcher> getURLBasedFetchers() {
+        Set<UrlBasedFetcher> fetchers = Set.of(
+                new GenericUrlBasedFetcher()
         );
 
         return fetchers;
