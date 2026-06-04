@@ -330,6 +330,42 @@
         },
         {
           "name": "inputOption"
+        },
+        {
+          "name": "outputFile"
+        },
+        {
+          "name": "pattern"
+        },
+        {
+          "name": "transliterate"
+        },
+        {
+          "name": "warnBeforeOverwrite"
+        },
+        {
+          "name": "keySuffix"
+        },
+        {
+          "name": "keyPatternRegex"
+        },
+        {
+          "name": "keyPatternReplacement"
+        },
+        {
+          "name": "unwantedCharacters"
+        },
+        {
+          "name": "keywordDelimiter"
+        },
+        {
+          "name": "avoidOverwrite"
+        },
+        {
+          "name": "generateBeforeSaving"
+        },
+        {
+          "name": "keyPatterns"
         }
       ],
       "methods": [
