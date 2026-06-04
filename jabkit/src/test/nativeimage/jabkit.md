@@ -8,3 +8,5 @@ $ "$JABKIT" check integrity --input=src/test/resources/org/jabref/toolkit/comman
 1
 $ grep -c "capital letters are not masked using curly brackets" build/tmp/integrity.out
 1
+$ "$JABKIT" preferences export /tmp/jabkit-prefs-smoke.xml 2>/dev/null; echo $?
+0

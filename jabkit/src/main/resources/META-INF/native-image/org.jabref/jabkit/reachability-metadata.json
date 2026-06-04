@@ -476,6 +476,9 @@
       "fields": [
         {
           "name": "parent"
+        },
+        {
+          "name": "outputFile"
         }
       ],
       "methods": [
@@ -490,6 +493,9 @@
       "fields": [
         {
           "name": "parent"
+        },
+        {
+          "name": "inputFile"
         }
       ],
       "methods": [
