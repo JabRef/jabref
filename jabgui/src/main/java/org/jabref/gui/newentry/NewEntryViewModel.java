@@ -613,27 +613,28 @@ public class NewEntryViewModel {
         urlWorker.setOnSucceeded(_ -> {
             final Optional<List<BibEntry>> result = urlWorker.getValue();
 
-            if (result.isEmpty()) {
-                dialogService.showWarningDialogAndWait(
-                        Localization.lang("Invalid result"),
-                        Localization.lang(
-                                "An unknown error has occurred."));
-                LOGGER.error("An invalid result was returned when fetching URL entries");
-                executing.set(false);
-                return;
-            }
+            result.ifPresentOrElse(
+                entries -> {
+                    final ImportHandler handler = new ImportHandler(
+                            libraryTab.getBibDatabaseContext(),
+                            preferences,
+                            fileUpdateMonitor,
+                            libraryTab.getUndoManager(),
+                            stateManager,
+                            dialogService,
+                            taskExecutor);
+                    handler.importEntriesWithDuplicateCheck(null, entries);
 
-            final ImportHandler handler = new ImportHandler(
-                    libraryTab.getBibDatabaseContext(),
-                    preferences,
-                    fileUpdateMonitor,
-                    libraryTab.getUndoManager(),
-                    stateManager,
-                    dialogService,
-                    taskExecutor);
-            handler.importEntriesWithDuplicateCheck(null, result.get());
-
-            executedSuccessfully.set(true);
+                    executedSuccessfully.set(true);
+                },
+                () -> {
+                    dialogService.showWarningDialogAndWait(
+                            Localization.lang("Invalid result"),
+                            Localization.lang(
+                                    "An unknown error has occurred."));
+                    LOGGER.error("An invalid result was returned when fetching URL entries");
+                }
+            );
             executing.set(false);
         });
 
