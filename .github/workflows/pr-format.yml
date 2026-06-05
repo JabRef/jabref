@@ -6,7 +6,8 @@ on:
     types: [ opened, reopened, edited ]
 
 permissions:
-  pull-requests: write
+  contents: read
+  pull-requests: read
 
 jobs:
   check_title_format:
