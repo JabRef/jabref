@@ -563,7 +563,7 @@ public class NewEntryViewModel {
         taskExecutor.execute(bibtexWorker);
     }
 
-    private class WorkerEnterUrl extends Task<Optional<List<BibEntry>>> {
+    private class WorkerLookupUrl extends Task<Optional<List<BibEntry>>> {
         @Override
         protected Optional<List<BibEntry>> call() throws FetcherException {
             String url = urlText.getValue();
@@ -576,11 +576,11 @@ public class NewEntryViewModel {
         }
     }
 
-    public void executeEnterUrl() {
+    public void executeLookupUrl() {
         executing.setValue(true);
 
         cancel();
-        urlWorker = new WorkerEnterUrl();
+        urlWorker = new WorkerLookupUrl();
 
         urlWorker.setOnFailed(_ -> {
             final Throwable exception = urlWorker.getException();

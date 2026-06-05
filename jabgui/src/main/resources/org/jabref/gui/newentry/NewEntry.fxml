@@ -245,7 +245,7 @@
                 </VBox>
             </Tab>
 
-            <Tab fx:id="tabEnterUrl"
+            <Tab fx:id="tabLookupUrl"
                  text="%Enter URL"
                  closable="false">
                 <VBox spacing="10.0">
@@ -260,9 +260,7 @@
                                 prefHeight="30.0"
                                 HBox.hgrow="ALWAYS">
                             <tooltip>
-                                <Tooltip
-                                        fx:id="urlTextTooltip"
-                                        text="%Specify the source URL to look up."/>
+                                <Tooltip text="%Specify the source URL to look up."/>
                             </tooltip>
                         </TextField>
                     </HBox>

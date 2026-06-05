@@ -104,7 +104,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML private Tab tabLookupIdentifier;
     @FXML private Tab tabInterpretCitations;
     @FXML private Tab tabSpecifyBibtex;
-    @FXML private Tab tabEnterUrl;
+    @FXML private Tab tabLookupUrl;
 
     @FXML private TitledPane entryRecommendedTitle;
     @FXML private TilePane entryRecommended;
@@ -210,9 +210,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 tabs.getSelectionModel().select(tabSpecifyBibtex);
                 switchSpecifyBibtex();
                 break;
-            case NewEntryDialogTab.ENTER_URL:
-                tabs.getSelectionModel().select(tabEnterUrl);
-                switchEnterUrl();
+            case NewEntryDialogTab.LOOKUP_URL:
+                tabs.getSelectionModel().select(tabLookupUrl);
+                switchLookupUrl();
                 break;
         }
 
@@ -220,7 +220,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         tabLookupIdentifier.setOnSelectionChanged(_ -> switchLookupIdentifier());
         tabInterpretCitations.setOnSelectionChanged(_ -> switchInterpretCitations());
         tabSpecifyBibtex.setOnSelectionChanged(_ -> switchSpecifyBibtex());
-        tabEnterUrl.setOnSelectionChanged(_ -> switchEnterUrl());
+        tabLookupUrl.setOnSelectionChanged(_ -> switchLookupUrl());
     }
 
     @FXML
@@ -243,7 +243,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         initializeLookupIdentifier();
         initializeInterpretCitations();
         initializeSpecifyBibTeX();
-        initializeEnterUrl();
+        initializeLookupUrl();
     }
 
     private void initializeAddEntry() {
@@ -410,7 +410,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
     }
 
-    private void initializeEnterUrl() {
+    private void initializeLookupUrl() {
         urlText.setPromptText(Localization.lang("Enter the reference URL to search for."));
         urlText.textProperty().bindBidirectional(viewModel.urlTextProperty());
 
@@ -493,14 +493,13 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     @FXML
-    private void switchEnterUrl() {
-        // TODO
-        if (!tabEnterUrl.isSelected()) {
+    private void switchLookupUrl() {
+        if (!tabLookupUrl.isSelected()) {
             return;
         }
 
-        currentApproach = NewEntryDialogTab.ENTER_URL;
-        newEntryPreferences.setLatestApproach(NewEntryDialogTab.ENTER_URL);
+        currentApproach = NewEntryDialogTab.LOOKUP_URL;
+        newEntryPreferences.setLatestApproach(NewEntryDialogTab.LOOKUP_URL);
 
         if (urlText != null) {
             Platform.runLater(() -> urlText.requestFocus());
@@ -547,10 +546,10 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 viewModel.executeSpecifyBibtex();
                 switchSpecifyBibtex();
                 break;
-            case NewEntryDialogTab.ENTER_URL:
+            case NewEntryDialogTab.LOOKUP_URL:
                 generateButton.setText(Localization.lang("Searching..."));
-                viewModel.executeEnterUrl();
-                switchEnterUrl();
+                viewModel.executeLookupUrl();
+                switchLookupUrl();
                 break;
         }
     }
