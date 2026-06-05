@@ -28,6 +28,7 @@ Which mapping should JabRef use to convert between entry types and Zotero's item
 Chosen option: Use Better BibTeX's mapping in converter, because it provides both mapping directions, from entry type to item type and item type to entry type. When it comes to types that Better BibTeX does not support, we use JabRef's natural BibTeX/BibLaTeX mapping or Zotero's natural mapping.
 
 ### Consequences
+
 * Good, because Better BibTeX supports mapping for both BibTeX and BibLaTeX entry types.
 * Good, because Better BibTeX supports more entry types than citeproc-java.
 * Good, because Better BibTeX provides mapping for both entry type to item type and item type to entry type.
