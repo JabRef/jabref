@@ -52,14 +52,14 @@ Converter can be found via [this link](https://github.com/michel-kraemer/citepro
 
 ### Use JabRef's natural BibTeX/BibLaTeX mapping
 
-JabRef's internal behavior to map item type to entry type 
+JabRef's internal behavior to map item type to entry type
 
 * Good, because the mapping follows JabRef's internal behavior.
 * Good, because no new dependency is needed.
 * Bad, because we have limited control on the mapping
 * Bad, because it converts multiple item type to `misc`, which loses much information.
 
-### Use Zotero's natural mapping 
+### Use Zotero's natural mapping
 
 Zotero's internal behavior to map entry type to item type
 
