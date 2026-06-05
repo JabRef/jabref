@@ -614,26 +614,26 @@ public class NewEntryViewModel {
             final Optional<List<BibEntry>> result = urlWorker.getValue();
 
             result.ifPresentOrElse(
-                entries -> {
-                    final ImportHandler handler = new ImportHandler(
-                            libraryTab.getBibDatabaseContext(),
-                            preferences,
-                            fileUpdateMonitor,
-                            libraryTab.getUndoManager(),
-                            stateManager,
-                            dialogService,
-                            taskExecutor);
-                    handler.importEntriesWithDuplicateCheck(null, entries);
+                    entries -> {
+                        final ImportHandler handler = new ImportHandler(
+                                libraryTab.getBibDatabaseContext(),
+                                preferences,
+                                fileUpdateMonitor,
+                                libraryTab.getUndoManager(),
+                                stateManager,
+                                dialogService,
+                                taskExecutor);
+                        handler.importEntriesWithDuplicateCheck(null, entries);
 
-                    executedSuccessfully.set(true);
-                },
-                () -> {
-                    dialogService.showWarningDialogAndWait(
-                            Localization.lang("Invalid result"),
-                            Localization.lang(
-                                    "An unknown error has occurred."));
-                    LOGGER.error("An invalid result was returned when fetching URL entries");
-                }
+                        executedSuccessfully.set(true);
+                    },
+                    () -> {
+                        dialogService.showWarningDialogAndWait(
+                                Localization.lang("Invalid result"),
+                                Localization.lang(
+                                        "An unknown error has occurred."));
+                        LOGGER.error("An invalid result was returned when fetching URL entries");
+                    }
             );
             executing.set(false);
         });
