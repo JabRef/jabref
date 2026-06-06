@@ -34,7 +34,7 @@ Chosen option: Use Better BibTeX's mapping in converter, because it provides bot
 * Good, because Better BibTeX provides mapping for both entry type to item type and item type to entry type.
 * Good, because Better BibTeX is designed specifically for Zotero and BibTeX and BibLaTeX interoperability.
 * Good, because the repository is actively maintained.
-* Bad, because Better BibTeX does not support all entry types.
+* Bad, because Better BibTeX does not support all JabRef's entry types.
 * Bad, because Better BibTeX contains many-to-one mappings when converting entry type to item type, which may lose information.
 * Bad, because we need to track Better BibTeX's updates, or import it as a dependency.
 
@@ -80,6 +80,6 @@ Zotero's internal behavior to map entry type to item type
 * Good, because Better BibTeX provides mapping for both entry type to item type and item type to entry type.
 * Good, because Better BibTeX is designed specifically for Zotero and BibTeX and BibLaTeX interoperability.
 * Good, because the repository is actively maintained.
-* Bad, because Better BibTeX does not support all entry types.
+* Bad, because Better BibTeX does not support all JabRef's entry types.
 * Bad, because Better BibTeX contains many-to-one mappings when converting entry type to item type, which may lose information.
 * Bad, because JabRef needs to track Better BibTeX's updates, or import it as a submodule.
