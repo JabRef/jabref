@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Emits GitHub Actions error annotations (with line ranges) for every hunk in the
-# current `git diff`, then exits non-zero if the working directory is dirty.
+# Emits GitHub Actions error annotations (with line ranges) for every changed hunk
+# (staged, unstaged, or untracked), then exits non-zero if any change is present.
 #
 # Used by the CI jobs that rewrite files (formatter, OpenRewrite) and then check
 # that the working tree is clean. Each remaining hunk becomes an
@@ -10,7 +10,8 @@
 # formatting issues or OpenRewrite changes:
 #   ANNOTATION_TITLE           annotation title          (default: "Formatting")
 #   ANNOTATION_MESSAGE_PREFIX  message before the range  (default: formatter hint)
-# The text " lines <start>-<end>." is appended to the message prefix.
+# The range is appended to the message prefix: " line <n>." for a single line, or
+# " lines <start>-<end>." for a multi-line range.
 #
 # Usage: run from the directory that contains the git working tree to check.
 set -euo pipefail
@@ -18,7 +19,15 @@ set -euo pipefail
 export ANNOTATION_TITLE="${ANNOTATION_TITLE:-Formatting}"
 export ANNOTATION_MESSAGE_PREFIX="${ANNOTATION_MESSAGE_PREFIX:-Wrongly formatted. Run the formatter (see CONTRIBUTING.md) to fix}"
 
-diff="$(git diff)"
+# Record untracked files as intent-to-add so they show up as additions in
+# `git diff HEAD` below. CI runs in an ephemeral checkout, so mutating the index
+# is safe. Without this, plain `git diff` would miss both staged changes and
+# untracked files, letting CI report "clean" while uncommitted work remains.
+git add --intent-to-add --all
+
+# `git diff HEAD` reports staged and unstaged changes (plus the untracked files
+# just marked intent-to-add) relative to the last commit.
+diff="$(git diff HEAD)"
 
 if [ -z "$diff" ]; then
   echo "Working tree clean"
@@ -61,14 +70,16 @@ printf '%s\n' "$diff" | gawk '
     gsub(/\\\\/, "\\", s)   # \\ -> \
     return s
   }
-  function flush(  s, e) {
+  function flush(  s, e, range) {
     if (!inRun) return
     if (file == "") { inRun = 0; hasOld = 0; hasNew = 0; return }
     if (hasOld) { s = oldStartLine; e = oldEndLine }
     else        { s = newStartLine; e = newEndLine }
     if (e < s) e = s
     if (s < 1) s = 1
-    printf "::error file=%s,line=%s,endLine=%s,title=%s::%s in file %s, lines %s-%s.\n", file, s, e, title, messagePrefix, escape_data(fileRaw), s, e
+    if (s == e) range = "line " s
+    else        range = "lines " s "-" e
+    printf "::error file=%s,line=%s,endLine=%s,title=%s::%s in file %s, %s.\n", file, s, e, title, messagePrefix, escape_data(fileRaw), range
     inRun = 0; hasOld = 0; hasNew = 0
   }
   # Reset the path so an unrecognized header cannot reuse the prior file name.

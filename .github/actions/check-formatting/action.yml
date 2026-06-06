@@ -1,0 +1,44 @@
+name: Check formatting
+description: >-
+  Fail if the working tree has uncommitted changes (staged, unstaged, or
+  untracked), emitting GitHub Actions annotations for every changed hunk. On
+  failure, also print the diff to the log and upload it as a patch artifact
+  (apply locally with `git apply format.patch`).
+
+inputs:
+  working-directory:
+    description: Directory containing the git working tree to check
+    required: false
+    default: "."
+  artifact-name:
+    description: Name of the uploaded patch artifact (must be unique within a workflow run)
+    required: true
+  annotation-title:
+    description: Title shown on each annotation
+    required: false
+    default: Formatting
+  annotation-message-prefix:
+    description: Message shown before the line range on each annotation
+    required: false
+    default: "Wrongly formatted. Run the formatter (see CONTRIBUTING.md) to fix"
+
+runs:
+  using: composite
+  steps:
+    - name: Check if any files changed
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        ANNOTATION_TITLE: ${{ inputs.annotation-title }}
+        ANNOTATION_MESSAGE_PREFIX: ${{ inputs.annotation-message-prefix }}
+      run: .github/format-diff-annotations.sh
+    - name: Output formatting diff
+      if: failure()
+      shell: bash
+      run: git -C "${{ inputs.working-directory }}" diff HEAD | tee "${{ inputs.working-directory }}/format.patch"
+    - name: Upload formatting patch
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.working-directory }}/format.patch
