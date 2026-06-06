@@ -2122,7 +2122,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getCustomImportFormats(defaults.getCustomImporters()),
                 getFetcherKeys(defaults.getApiKeys()),
                 getBoolean(FETCHER_CUSTOM_KEY_PERSIST, defaults.shouldPersistCustomKeys()),
-                getStringList(IMPORTER_CATALOGS),
+                hasKey(IMPORTER_CATALOGS) ? getStringList(IMPORTER_CATALOGS) : defaults.getCatalogs(),
                 getDefaultPlainCitationParser(defaults.getDefaultPlainCitationParser()),
                 getInt(IMPORTER_CITATIONS_RELATIONS_STORE_TTL, defaults.getCitationsRelationsStoreTTL()),
                 Map.of()
@@ -2130,7 +2130,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private Set<CustomImporter> getCustomImportFormats(Set<CustomImporter> defaults) {
-        if (!hasKey(IMPORTER_CUSTOM_FORMAT)) {
+        if (!hasKey(IMPORTER_CUSTOM_FORMAT + "0")) {
             return defaults;
         }
 
