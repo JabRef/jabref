@@ -539,12 +539,12 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             lastFocusedField = null;
             Platform.runLater(() -> {
                 setFocusToField(fieldToRestore);
-                Platform.runLater(() -> Platform.runLater(() -> {
+                Platform.runLater(() -> {
                     Node focused = getScene().getFocusOwner();
                     if (focused instanceof TextInputControl textInput) {
                         textInput.end();
                     }
-                }));
+                });
             });
         }
     }
