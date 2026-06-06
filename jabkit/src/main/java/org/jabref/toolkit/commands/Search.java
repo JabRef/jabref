@@ -68,7 +68,7 @@ class Search implements Callable<Integer> {
 
         ExportService exportService = ExportService.create(argumentProcessor.cliPreferences);
         if (outputFile != null) {
-            exportService.exportBibDatabaseContextToFile(databaseContext, matches, outputFile, outputFormat);
+            exportService.exportEntriesToFile(matches, outputFile, outputFormat);
             LOGGER.debug("Finished export");
         } else {
             exportService.printBibEntriesToStdOut(matches);
