@@ -10,6 +10,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.toolkit.exception.CliExceptionHandler;
 import org.jabref.toolkit.service.CitationFetcherFactory;
 import org.jabref.toolkit.service.ExportService;
+import org.jabref.toolkit.util.CapturingCommandLine;
 import org.jabref.toolkit.util.CommandFactory;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -44,9 +45,9 @@ class GetCitedWorksTest extends AbstractJabKitTest {
 
         JabKit jabKit = new JabKit(preferences, entryTypesManager);
         CommandFactory factory = new CommandFactory(sut);
-        this.commandLine = new CommandLine(jabKit, factory);
-        // TODO: redirect stdout/stderr for capturing and clean unit test output
-        commandLine.setExecutionExceptionHandler(new CliExceptionHandler(commandLine.getExecutionExceptionHandler()));
+        this.commandLine = new CapturingCommandLine(jabKit, factory);
+        commandLine.setExecutionExceptionHandler(
+                new CliExceptionHandler(commandLine.getExecutionExceptionHandler()));
 
         citationFetcher = mock(CitationFetcher.class);
         when(mockFetcherFactory.getCitationFetcher(any())).thenReturn(citationFetcher);
@@ -65,7 +66,7 @@ class GetCitedWorksTest extends AbstractJabKitTest {
         ArgumentCaptor<List<BibEntry>> captor = ArgumentCaptor.captor();
         doNothing().when(mockExportService).printBibEntriesToStdOut(captor.capture());
 
-        int exitCode = commandLine.execute("get-cited-works", "10.3390/su131810256");
+        int exitCode = commandLine.executeToLog("get-cited-works", "10.3390/su131810256");
 
         assertEquals(CommandLine.ExitCode.OK, exitCode);
         List<BibEntry> exported = captor.getValue();
@@ -87,7 +88,7 @@ class GetCitedWorksTest extends AbstractJabKitTest {
         ArgumentCaptor<String> format = ArgumentCaptor.captor();
         doNothing().when(mockExportService).exportEntriesToFile(entries.capture(), file.capture(), format.capture());
 
-        int exitCode = commandLine.execute(
+        int exitCode = commandLine.executeToLog(
                 "get-cited-works", "10.3390/su131810256",
                 "--output", "out.file",
                 "--output-format", "Klingon"
@@ -105,7 +106,7 @@ class GetCitedWorksTest extends AbstractJabKitTest {
         List<BibEntry> citedWorks = List.of();
         when(citationFetcher.getReferences(any())).thenReturn(citedWorks);
 
-        int exitCode = commandLine.execute("get-cited-works", "10.1000/2045-climate101");
+        int exitCode = commandLine.executeToLog("get-cited-works", "10.1000/2045-climate101");
 
         assertEquals(CommandLine.ExitCode.OK, exitCode);
     }
@@ -115,7 +116,7 @@ class GetCitedWorksTest extends AbstractJabKitTest {
         when(citationFetcher.getReferences(any())).thenThrow(
                 new FetcherException("Fetcher: Failed to fetch (negative test)"));
 
-        int exitCode = commandLine.execute("get-cited-works", "10.1000/2026valid01");
+        int exitCode = commandLine.executeToLog("get-cited-works", "10.1000/2026valid01");
 
         assertEquals(CommandLine.ExitCode.SOFTWARE, exitCode);
     }
