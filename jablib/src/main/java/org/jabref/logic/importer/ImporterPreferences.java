@@ -121,8 +121,8 @@ public class ImporterPreferences {
         this.importWorkingDirectory.set(preferences.getImportWorkingDirectory());
         this.warnAboutDuplicatesOnImport.set(preferences.shouldWarnAboutDuplicatesOnImport());
         setCustomImporters(preferences.getCustomImporters());
+        this.persistCustomKeys.set(preferences.shouldPersistCustomKeys()); // Before getApiKeys to avoid stale keys in keyring
         setApiKeys(preferences.getApiKeys());
-        this.persistCustomKeys.set(preferences.shouldPersistCustomKeys());
         this.catalogs.setAll(preferences.getCatalogs());
         this.defaultPlainCitationParser.set(preferences.getDefaultPlainCitationParser());
         this.citationsRelationsStoreTTL.set(preferences.getCitationsRelationsStoreTTL());
