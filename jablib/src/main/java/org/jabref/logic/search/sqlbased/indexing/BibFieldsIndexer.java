@@ -167,7 +167,7 @@ public class BibFieldsIndexer {
         int count = entries.size();
         if (count > 1) {
             task.showToUser(true);
-            task.setTitle(Localization.lang("Indexing bib fields for %0", libraryName));
+            task.setTitle(Localization.lang("Indexing fields for %0", libraryName));
         }
         long startTime = System.currentTimeMillis();
         LOGGER.debug("Adding {} entries to index", count);
