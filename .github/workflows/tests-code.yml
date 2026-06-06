@@ -62,8 +62,9 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/format-java
       # job should fail in case there are changes
-      - name: Check if any files changed
-        run: git diff --exit-code
+      - uses: ./.github/actions/check-formatting
+        with:
+          artifact-name: formatting-fix-patch
 
   format-javadoc:
     # too slow on ubuntu-slim
@@ -85,10 +86,10 @@ jobs:
       - run: |
           cd Convert2MarkdownJavadoc
           java Convert2MarkdownJavadoc.java ../jabref
-      - name: Check if any files changed
-        run: |
-          cd jabref
-          git diff --exit-code
+      - uses: ./jabref/.github/actions/check-formatting
+        with:
+          working-directory: jabref
+          artifact-name: javadoc-fix-patch
 
   checkstyle:
     name: Checkstyle
@@ -125,7 +126,11 @@ jobs:
       - uses: ./.github/actions/format-java
 
       - name: Fail if working directory is unclean
-        run: git diff --exit-code
+        uses: ./.github/actions/check-formatting
+        with:
+          artifact-name: openrewrite-fix-patch
+          annotation-title: OpenRewrite
+          annotation-message-prefix: "Uncommitted changes after OpenRewrite; run `gradle :rewriteRun`, reformat, and commit the result for"
 
   modernizer:
     name: Modernizer
@@ -186,12 +191,11 @@ jobs:
         uses: jbangdev/setup-jbang@main
       - name: Lint CHANGELOG.md
         run: |
-          # run heylogs verification with GitHub Actions annotations
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.18.0:bin check --format github-actions CHANGELOG.md | tee heylogs.txt || true
+          # the grep is needed to filter out an error about all h2 containing a version, which is not relevant for us, because we have an "Unreleased" section
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.18.1:bin check --format github-actions CHANGELOG.md | grep -v all-h2-contain-a-version | tee heylogs.txt || true
 
-          # We have one acceptable error
           error_count=$(grep -c '^::error' heylogs.txt || true)
-          if [ "$error_count" -ne 1 ]; then
+          if [ "$error_count" -ne 0 ]; then
             {
               echo "heylogs<<EOF"
               cat heylogs.txt

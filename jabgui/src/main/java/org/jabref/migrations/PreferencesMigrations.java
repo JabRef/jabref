@@ -557,7 +557,7 @@ public class PreferencesMigrations {
                 for (int i = 0; i < names.size(); i++) {
                     keyring.setPassword("org.jabref.customapikeys", names.get(i), new Password(
                             keys.get(i),
-                            preferences.getInternalPreferences().getUserAndHost())
+                            preferences.getInternalPreferences().getUserHostInfo().getUserHostString())
                             .encrypt());
                 }
                 preferences.deleteKey(V5_9_FETCHER_CUSTOM_KEYS);

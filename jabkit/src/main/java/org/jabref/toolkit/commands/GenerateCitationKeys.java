@@ -130,7 +130,7 @@ class GenerateCitationKeys implements Callable<Integer> {
                 keyPatternReplacement != null ? keyPatternReplacement : existingPreferences.getKeyPatternReplacement(),
                 unwantedCharacters != null ? unwantedCharacters : existingPreferences.getUnwantedCharacters(),
                 getKeyPatterns(keyPatterns, existingPreferences.getKeyPatterns()),
-                new SimpleObjectProperty<>(keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordDelimiter())
+                new SimpleObjectProperty<>(keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordSeparator())
         );
         return new CitationKeyGenerator(databaseContext, preferencesToUse);
     }

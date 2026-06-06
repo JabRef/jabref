@@ -106,6 +106,7 @@ class ReferenceMarkTest {
         return Stream.of(
                 Arguments.of("JABREF_Smith2000 CID_12345 uniqueId1 NORMAL", true),
                 Arguments.of("JABREF_John2026 CID_7 uniqueId8 IN_TEXT", true),
+                Arguments.of("ZOTERO_ITEM CSL_CITATION {\"citationItems\":[]} testZotero1234", true),
                 Arguments.of("JR_cite0_1_key1", false),
                 Arguments.of("Unrelated citations", false)
         );

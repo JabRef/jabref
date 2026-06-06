@@ -19,7 +19,7 @@ plugins {
     id("dev.jbang") version "0.4.0"
 
     id("net.ltgt.errorprone") version "5.1.0"
-    id("net.ltgt.nullaway") version "3.0.0"
+    id("net.ltgt.nullaway") version "3.1.0"
 }
 
 testModuleInfo {
