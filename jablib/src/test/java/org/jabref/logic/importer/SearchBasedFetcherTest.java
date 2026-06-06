@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SearchBasedFetcherTest {
@@ -95,6 +96,13 @@ class SearchBasedFetcherTest {
         // DOI fails ANTLR parsing, so it becomes a raw SearchQueryNode
         SearchQueryNode searchNode = assertInstanceOf(SearchQueryNode.class, fetcher.getLastQueryNode());
         assertEquals("10.1109/5.771073", searchNode.term());
+    }
+
+    @Test
+    void unmigatedFetcherThrowsOnRawQuery() {
+        StubSearchBasedFetcher fetcher = new StubSearchBasedFetcher();
+        assertThrows(UnsupportedOperationException.class,
+                () -> fetcher.performRawSearchQuery("quantum"));
     }
 }
 
