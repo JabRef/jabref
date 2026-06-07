@@ -14,7 +14,6 @@ import org.jabref.toolkit.exception.ExportServiceException;
 import org.jabref.toolkit.service.CitationFetcherFactory;
 import org.jabref.toolkit.service.ExportService;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -58,7 +57,6 @@ class GetCitedWorks implements Callable<Integer> {
     @CommandLine.Parameters(description = "DOI to check")
     private String doi;
 
-    @VisibleForTesting
     void initFields() {
         citationFetcherFactory = CitationFetcherFactory.create(argumentProcessor.cliPreferences);
         exportService = ExportService.create(argumentProcessor.cliPreferences);
