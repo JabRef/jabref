@@ -24,7 +24,7 @@ Which mapping should JabRef use to convert between entry types and Zotero's item
 
 ## Decision Outcome
 
-Chosen option: Use Better BibTeX's mapping in converter, because it provides both mapping directions, from BibTeX/BibLaTeX entry type to Zotero item type and CSL/Zotero item type to entry type. 
+Chosen option: Use Better BibTeX's mapping in converter, because it provides both mapping directions, from BibTeX/BibLaTeX entry type to Zotero item type and CSL/Zotero item type to entry type.
 
 ### Consequences
 
@@ -52,6 +52,7 @@ Converter can be found via [BibTeXConverter#toType](https://github.com/michel-kr
 * Bad, because the repository is not actively maintained.
 
 ### Use Zotero's import/export mapping
+
 Zotero provides mappings from Zotero item type to BibTeX/BibLaTeX entry type. However, Zotero's reference mark uses CSL JSON, whose item types and field names differ from the ones in Zotero item type. Zotero does not provide a direct mapping from CSL item type to BibTeX/BibLaTeX entry type, so we first need to map CSL item types back to Zotero item types, then apply Zotero’s BibTeX/BibLaTeX export mapping.
 
 1. Converter from Zotero item type to BibLaTeX entry type can be found via [BibLaTeX.js](https://github.com/zotero/translators/blob/cfc69de47e1e1fb88122cbbba6c30f56d6ed63fe/BibLaTeX.js#L135-L170)
