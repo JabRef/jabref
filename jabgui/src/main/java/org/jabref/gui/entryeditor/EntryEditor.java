@@ -400,6 +400,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 fileMonitor,
                 preferences,
                 taskExecutor,
+                themeManager,
                 bibEntryTypesManager,
                 searchCitationsRelationsService
         ));
