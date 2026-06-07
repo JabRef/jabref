@@ -60,8 +60,7 @@ class Check implements Callable<Integer> {
 
     private int checkIntegrity() {
         try {
-            CheckIntegrity.execute(inputFile, outputFormat, true, sharedOptions.porcelain, jabKit);
-            return CommandLine.ExitCode.OK;
+            return CheckIntegrity.execute(inputFile, outputFormat, true, sharedOptions.porcelain, jabKit);
         } catch (ImportServiceException e) {
             System.err.println(e.getLocalizedMessage());
             return e.getExitCode();
@@ -70,8 +69,7 @@ class Check implements Callable<Integer> {
 
     private int checkConsistency() {
         try {
-            CheckConsistency.execute(inputFile, outputFormat, sharedOptions.porcelain, jabKit);
-            return CommandLine.ExitCode.OK;
+            return CheckConsistency.execute(inputFile, outputFormat, sharedOptions.porcelain, jabKit);
         } catch (ImportServiceException e) {
             System.err.println(e.getLocalizedMessage());
             return e.getExitCode();
