@@ -51,13 +51,13 @@ public class ExportService {
     private final Exporter bibtexExporter;
     private final BibEntryTypesManager entryTypesManager;
 
-    private final boolean porcelaine;
+    private final boolean porcelain;
 
-    public ExportService(CliPreferences cliPreferences, boolean porcelaine) {
+    public ExportService(CliPreferences cliPreferences, boolean porcelain) {
         this.cliPreferences = cliPreferences;
         entryTypesManager = cliPreferences.getCustomEntryTypesRepository();
         exporterFactory = ExporterFactory.create(cliPreferences);
-        this.porcelaine = porcelaine;
+        this.porcelain = porcelain;
         bibtexExporter = createBibtexExporter();
     }
 
@@ -70,8 +70,8 @@ public class ExportService {
         };
     }
 
-    public static ExportService create(CliPreferences cliPreferences, boolean porcelaine) {
-        return new ExportService(cliPreferences, porcelaine);
+    public static ExportService create(CliPreferences cliPreferences, boolean porcelain) {
+        return new ExportService(cliPreferences, porcelain);
     }
 
     public List<Pair<String, String>> getAvailableExportFormats() {
@@ -235,7 +235,7 @@ public class ExportService {
     }
 
     private void printOut(String s) {
-        if (!this.porcelaine) {
+        if (!this.porcelain) {
             System.out.println(s);
         }
     }

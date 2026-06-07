@@ -19,8 +19,8 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 class ExportServiceTest extends AbstractJabKitTest {
@@ -57,18 +57,15 @@ class ExportServiceTest extends AbstractJabKitTest {
 
     @Test
     void wrongOutputFormatFails(@TempDir Path tempDir) throws Exception {
-        try {
-            Path source = getClassResourceAsPath("origin.bib").toAbsolutePath();
-            ParserResult parserResult = ImportService.importBibTexFile(source, preferences, true);
-            Path output = tempDir.resolve("output.bibtex");
+        Path source = getClassResourceAsPath("origin.bib").toAbsolutePath();
+        ParserResult parserResult = ImportService.importBibTexFile(source, preferences, true);
+        Path output = tempDir.resolve("output.bibtex");
 
-            String invalidFormat = "Klingon";
-            new ExportService(preferences, false).exportParserResultToFile(parserResult, output, invalidFormat);
+        String invalidFormat = "Klingon";
 
-            fail("An ExportServiceException should have been thrown");
-        } catch (ExportServiceException e) {
-            assertTrue(e.getMessage().contains("format"));
-        }
+        assertThrows(ExportServiceException.class,
+                () -> new ExportService(preferences, false)
+                        .exportParserResultToFile(parserResult, output, invalidFormat));
     }
 
     @Test

@@ -7,8 +7,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.toolkit.converter.CygWinPathConverter;
 import org.jabref.toolkit.exception.ImportServiceException;
 
-import picocli.CommandLine;
-
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
