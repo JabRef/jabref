@@ -98,7 +98,7 @@ class GenerateCitationKeys implements Callable<Integer> {
             keyGenerator.generateAndSetKey(entry);
         }
 
-        ExportService exportService = ExportService.create(parentCommand.getParent().cliPreferences);
+        ExportService exportService = ExportService.create(parentCommand.getParent().cliPreferences, sharedOptions.porcelain);
         if (outputFile != null) {
             exportService.saveDatabase(parserResult.getDatabase(), outputFile);
         } else {

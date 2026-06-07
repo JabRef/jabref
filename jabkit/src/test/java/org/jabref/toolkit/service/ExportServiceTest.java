@@ -39,7 +39,7 @@ class ExportServiceTest extends AbstractJabKitTest {
         ParserResult parserResult = ImportService.importBibTexFile(source, preferences, true);
         Path output = tempDir.resolve("output." + format);
 
-        new ExportService(preferences).exportParserResultToFile(parserResult, output, format, true);
+        new ExportService(preferences, false).exportParserResultToFile(parserResult, output, format);
 
         assertFileExists(output);
     }
@@ -50,7 +50,7 @@ class ExportServiceTest extends AbstractJabKitTest {
         ParserResult parserResult = ImportService.importBibTexFile(source, preferences, true);
         Path output = tempDir.resolve("output.bibtex");
 
-        new ExportService(preferences).exportParserResultToFile(parserResult, output, "bibtex", true);
+        new ExportService(preferences, false).exportParserResultToFile(parserResult, output, "bibtex");
 
         assertTrue(Files.readString(output).contains("Darwin1888"));
     }
@@ -63,7 +63,7 @@ class ExportServiceTest extends AbstractJabKitTest {
             Path output = tempDir.resolve("output.bibtex");
 
             String invalidFormat = "Klingon";
-            new ExportService(preferences).exportParserResultToFile(parserResult, output, invalidFormat, true);
+            new ExportService(preferences, false).exportParserResultToFile(parserResult, output, invalidFormat);
 
             fail("An ExportServiceException should have been thrown");
         } catch (ExportServiceException e) {
@@ -81,7 +81,7 @@ class ExportServiceTest extends AbstractJabKitTest {
         ExportPreferences exportPreferences = new ExportPreferences(".html", tempDir, saveOrder, List.of());
         when(preferences.getExportPreferences()).thenReturn(exportPreferences);
 
-        new ExportService(preferences).exportParserResultToFile(parserResult, outputHtml, "tablerefsabsbib", true);
+        new ExportService(preferences, false).exportParserResultToFile(parserResult, outputHtml, "tablerefsabsbib");
 
         assertFileExists(outputHtml);
     }

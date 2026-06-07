@@ -66,7 +66,7 @@ class Search implements Callable<Integer> {
             return 0;
         }
 
-        ExportService exportService = ExportService.create(argumentProcessor.cliPreferences);
+        ExportService exportService = ExportService.create(argumentProcessor.cliPreferences, sharedOptions.porcelain);
         if (outputFile != null) {
             exportService.exportEntriesToFile(matches, outputFile, outputFormat);
             LOGGER.debug("Finished export");

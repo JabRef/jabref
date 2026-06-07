@@ -59,7 +59,7 @@ class GetCitedWorks implements Callable<Integer> {
 
     void initFields() {
         citationFetcherFactory = CitationFetcherFactory.create(argumentProcessor.cliPreferences);
-        exportService = ExportService.create(argumentProcessor.cliPreferences);
+        exportService = ExportService.create(argumentProcessor.cliPreferences, sharedOptions.porcelain);
     }
 
     @Override

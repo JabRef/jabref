@@ -59,8 +59,8 @@ class Convert implements Callable<Integer> {
             return 0;
         }
 
-        ExportService.create(jabKit.cliPreferences)
-                     .exportParserResultToFile(parserResult, outputFile, outputFormat, sharedOptions.porcelain);
+        ExportService.create(jabKit.cliPreferences, sharedOptions.porcelain)
+                     .exportParserResultToFile(parserResult, outputFile, outputFormat);
         return CommandLine.ExitCode.OK;
     }
 }

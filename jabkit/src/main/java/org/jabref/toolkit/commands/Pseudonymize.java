@@ -68,7 +68,7 @@ class Pseudonymize implements Callable<Integer> {
             return 2;
         }
 
-        ExportService.create(argumentProcessor.cliPreferences).saveDatabaseContext(
+        ExportService.create(argumentProcessor.cliPreferences, sharedOptions.porcelain).saveDatabaseContext(
                 result.bibDatabaseContext(),
                 pseudoBibPath);
 

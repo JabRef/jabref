@@ -84,7 +84,7 @@ class GenerateBibFromAux implements Callable<Integer> {
                                           .map(BibEntry::toString)
                                           .collect(Collectors.joining("\n\n")));
         } else {
-            ExportService.create(argumentProcessor.cliPreferences).saveDatabase(subDatabase, outputFile);
+            ExportService.create(argumentProcessor.cliPreferences, sharedOptions.porcelain).saveDatabase(subDatabase, outputFile);
             if (!sharedOptions.porcelain) {
                 System.out.println(Localization.lang("Created library with '%0' entries.", subDatabase.getEntryCount()));
             }

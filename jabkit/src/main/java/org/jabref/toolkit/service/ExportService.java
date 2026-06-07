@@ -51,10 +51,13 @@ public class ExportService {
     private final Exporter bibtexExporter;
     private final BibEntryTypesManager entryTypesManager;
 
-    public ExportService(CliPreferences cliPreferences) {
+    private final boolean porcelaine;
+
+    public ExportService(CliPreferences cliPreferences, boolean porcelaine) {
         this.cliPreferences = cliPreferences;
         entryTypesManager = cliPreferences.getCustomEntryTypesRepository();
         exporterFactory = ExporterFactory.create(cliPreferences);
+        this.porcelaine = porcelaine;
         bibtexExporter = createBibtexExporter();
     }
 
@@ -67,8 +70,8 @@ public class ExportService {
         };
     }
 
-    public static ExportService create(CliPreferences cliPreferences) {
-        return new ExportService(cliPreferences);
+    public static ExportService create(CliPreferences cliPreferences, boolean porcelaine) {
+        return new ExportService(cliPreferences, porcelaine);
     }
 
     public List<Pair<String, String>> getAvailableExportFormats() {
@@ -125,7 +128,7 @@ public class ExportService {
             Path outputFile) throws IOException {
 
         if (!FileUtil.isBibFile(outputFile)) {
-            System.err.println(Localization.lang("Invalid output file type provided."));
+            printOut(Localization.lang("Invalid output file type provided."));
         }
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(outputFile, StandardCharsets.UTF_8)) {
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
@@ -141,10 +144,10 @@ public class ExportService {
 
             // Show just a warning message if encoding did not work for all characters:
             if (fileWriter.hasEncodingProblems()) {
-                System.err.println(Localization.lang("Warning") + ": "
-                        + Localization.lang("UTF-8 could not be used to encode the following characters: %0", fileWriter.getEncodingProblems()));
+                printErr(Localization.lang("UTF-8 could not be used to encode the following characters: %0",
+                        fileWriter.getEncodingProblems()));
             }
-            System.out.println(Localization.lang("Saved %0.", outputFile));
+            printOut(Localization.lang("Saved %0.", outputFile));
         }
     }
 
@@ -173,12 +176,7 @@ public class ExportService {
     public void exportParserResultToFile(
             ParserResult parserResult,
             Path outputFile,
-            String format,
-            boolean porcelain) throws ExportServiceException {
-
-        if (!porcelain) {
-            System.out.println(Localization.lang("Exporting '%0'.", outputFile));
-        }
+            String format) throws ExportServiceException {
 
         Optional<Path> path = parserResult.getPath().map(Path::toAbsolutePath);
         BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
@@ -192,7 +190,7 @@ public class ExportService {
         tryExportWithExporter(exporter, outputFile, databaseContext, entries, fileDirForDatabase);
     }
 
-    private static void tryExportWithExporter(
+    private void tryExportWithExporter(
             Exporter exporter,
             Path outputFile,
             BibDatabaseContext databaseContext,
@@ -201,7 +199,7 @@ public class ExportService {
 
         try {
             JournalAbbreviationRepository abbreviationRepository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
-            System.out.println(Localization.lang("Exporting %0", outputFile.toAbsolutePath().toString()));
+            printOut(Localization.lang("Exporting %0", outputFile.toAbsolutePath().toString()));
             exporter.export(databaseContext, outputFile, entries, fileDirForDatabase, abbreviationRepository);
         } catch (IOException | SaveException | ParserConfigurationException | TransformerException ex) {
             throw new ExportServiceException("Failed to export file.",
@@ -234,5 +232,16 @@ public class ExportService {
                 keyGenerator.generateAndSetKey(entry);
             }
         }
+    }
+
+    private void printOut(String s) {
+        if (!this.porcelaine) {
+            System.out.println(s);
+        }
+    }
+
+    private void printErr(String s) {
+        // We print actual errors independent of porcelain flag
+        System.err.println(s);
     }
 }
