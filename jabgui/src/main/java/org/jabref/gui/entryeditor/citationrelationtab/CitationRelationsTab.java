@@ -12,12 +12,10 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Worker;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -62,10 +60,10 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.maintable.MainTableTooltip;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableInsertEntries;
@@ -128,8 +126,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final ProgressIndicator progressIndicator;
     private final GridPane sciteResultsPane;
     private final EntryEditorPreferences entryEditorPreferences;
-    private final Tooltip previewTooltip;
-    private final PreviewViewer previewViewer;
+    private final MainTableTooltip previewTooltip;
     private ComboBox<CitationFetcherType> fetcherCombo;
 
     private boolean shouldClearSelectionOnDrop = false;
@@ -177,15 +174,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
 
-        this.previewTooltip = new Tooltip();
-        this.previewViewer = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
-        this.previewViewer.resizeForTooltipContent();
-        this.previewTooltip.setGraphic(previewViewer);
-        this.previewViewer.getEngine().getLoadWorker().stateProperty().addListener((_, _, newState) -> {
-            if (newState == Worker.State.SUCCEEDED) {
-                Platform.runLater(this.previewTooltip::sizeToScene);
-            }
-        });
+        this.previewTooltip = new MainTableTooltip(dialogService, preferences, themeManager, taskExecutor);
     }
 
     private void setSciteResultsPane() {
@@ -592,9 +581,9 @@ public class CitationRelationsTab extends EntryEditorTab {
                     hContainer.getStyleClass().add("entry-container");
 
                     hContainer.setOnMouseEntered(_ -> {
-                        previewViewer.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
-                        previewViewer.setDatabaseContext(stateManager.getActiveDatabase().orElse(new BibDatabaseContext()));
-                        previewViewer.setEntry(entry.entry());
+                        stateManager.getActiveDatabase().ifPresent(databaseContext -> {
+                            previewTooltip.createPreviewTooltip(databaseContext, entry.entry());
+                        });
                     });
                     Tooltip.install(hContainer, previewTooltip);
 
