@@ -182,7 +182,7 @@ public class ExportService {
 
         Optional<Path> path = parserResult.getPath().map(Path::toAbsolutePath);
         BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
-        databaseContext.setDatabasePath(path.orElse(null));
+        path.ifPresent(databaseContext::setDatabasePath);
         List<Path> fileDirForDatabase = databaseContext
                 .getFileDirectories(cliPreferences.getFilePreferences());
 
