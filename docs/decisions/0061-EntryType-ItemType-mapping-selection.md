@@ -19,24 +19,24 @@ Which mapping should JabRef use to convert between entry types and Zotero's item
 ## Considered Options
 
 1. Use citeproc-java's mapping
-2. Use JabRef's natural BibTeX/BibLaTeX mapping
-3. Use Zotero's natural mapping
-4. Use Better BibTeX's mapping
+2. Use Zotero's import/export mapping
+3. Use Better BibTeX's mapping
 
 ## Decision Outcome
 
-Chosen option: Use Better BibTeX's mapping in converter, because it provides both mapping directions, from entry type to item type and item type to entry type. When it comes to types that Better BibTeX does not support, we use JabRef's natural BibTeX/BibLaTeX mapping or Zotero's natural mapping.
+Chosen option: Use Better BibTeX's mapping in converter, because it provides both mapping directions, from BibTeX/BibLaTeX entry type to Zotero item type and CSL/Zotero item type to entry type. 
 
 ### Consequences
 
+* Good, because Better BibTeX provides mapping directly from CSL item type to BibTeX/BibLaTeX entry type.
+* Good, because Better BibTeX provides mapping between Zotero item type and BibTeX/BibLaTeX entry type.
 * Good, because Better BibTeX supports mapping for both BibTeX and BibLaTeX entry types.
 * Good, because Better BibTeX supports more entry types than citeproc-java.
-* Good, because Better BibTeX provides mapping for both entry type to item type and item type to entry type.
 * Good, because Better BibTeX is designed specifically for Zotero and BibTeX and BibLaTeX interoperability.
 * Good, because the repository is actively maintained.
 * Bad, because Better BibTeX does not support all JabRef's entry types.
-* Bad, because Better BibTeX contains many-to-one mappings when converting entry type to item type, which may lose information.
-* Bad, because we need to track Better BibTeX's updates, or import it as a dependency.
+* Bad, because Better BibTeX contains many-to-one mappings when converting BibTeX/BibLaTeX entry type to Zotero item type, which may lose information.
+* Bad, because JabRef needs to track Better BibTeX's updates, or import it as a submodule.
 
 ## Pros and Cons of the Options
 
@@ -51,20 +51,14 @@ Converter can be found via [BibTeXConverter#toType](https://github.com/michel-kr
 * Bad, because citeproc-java converts unsupported entry type to "journal-article"
 * Bad, because the repository is not actively maintained.
 
-### Use JabRef's natural BibTeX/BibLaTeX mapping
+### Use Zotero's import/export mapping
+Zotero provides mappings from Zotero item type to BibTeX/BibLaTeX entry type. However, Zotero's reference mark uses CSL JSON, whose item types and field names differ from the ones in Zotero item type. Zotero does not provide a direct mapping from CSL item type to BibTeX/BibLaTeX entry type, so we first need to map CSL item types back to Zotero item types, then apply Zotero’s BibTeX/BibLaTeX export mapping.
 
-JabRef's internal behavior to map item type to entry type
-
-* Good, because the mapping follows JabRef's internal behavior.
-* Good, because no new dependency is needed.
-* Bad, because we have limited control on the mapping
-* Bad, because it converts multiple item type to `misc`, which loses much information.
-
-### Use Zotero's natural mapping
-
-Zotero's internal behavior to map entry type to item type
+1. Converter from Zotero item type to BibLaTeX entry type can be found via [BibLaTeX.js](https://github.com/zotero/translators/blob/cfc69de47e1e1fb88122cbbba6c30f56d6ed63fe/BibLaTeX.js#L135-L170)
+2. Converter between Zotero item type to BibTeX entry type can be found via [BibTeX.js](https://github.com/zotero/translators/blob/cfc69de47e1e1fb88122cbbba6c30f56d6ed63fe/BibTeX.js#L219-L270)
 
 * Good, because the mapping follows Zotero's internal behavior.
+* Bad, because Zotero does not provide mapping directly from CSL item type to BibLaTeX/BibTeX entry type.
 * Bad, because some entry types are not supported by Zotero.
 * Bad, because we have limited control on the mapping.
 * Bad, because round-trip conversion may cause mismatch (electronic -> web page -> online)
@@ -72,14 +66,15 @@ Zotero's internal behavior to map entry type to item type
 ### Use Better BibTeX's mapping
 
 1. Converter from entry type to item type can be found via [bibtex.ts](https://github.com/retorquere/zotero-better-bibtex/blob/7b7237e60aad44c47656484cd5eaa40201882449/translators/bibtex/bibtex.ts#L632-L679).
-2. Converter from item type to BibTeX entry type can be found via [bibtex.ts](https://github.com/retorquere/zotero-better-bibtex/blob/7b7237e60aad44c47656484cd5eaa40201882449/translators/bibtex/bibtex.ts#L56-L131).
-3. Converter from item type to BibLaTeX entry type can be found via [biblatex.ts](https://github.com/retorquere/zotero-better-bibtex/blob/7b7237e60aad44c47656484cd5eaa40201882449/translators/bibtex/biblatex.ts#L47-L127).
+2. Converter from CSL/Zotero item type to BibTeX entry type can be found via [bibtex.ts](https://github.com/retorquere/zotero-better-bibtex/blob/7b7237e60aad44c47656484cd5eaa40201882449/translators/bibtex/bibtex.ts#L56-L131).
+3. Converter from CSL/Zotero item type to BibLaTeX entry type can be found via [biblatex.ts](https://github.com/retorquere/zotero-better-bibtex/blob/7b7237e60aad44c47656484cd5eaa40201882449/translators/bibtex/biblatex.ts#L47-L127).
 
+* Good, because Better BibTeX provides mapping directly from CSL item type to BibTeX/BibLaTeX entry type.
+* Good, because Better BibTeX provides mapping between Zotero item type and BibTeX/BibLaTeX entry type.
 * Good, because Better BibTeX supports mapping for both BibTeX and BibLaTeX entry types.
 * Good, because Better BibTeX supports more entry types than citeproc-java.
-* Good, because Better BibTeX provides mapping for both entry type to item type and item type to entry type.
 * Good, because Better BibTeX is designed specifically for Zotero and BibTeX and BibLaTeX interoperability.
 * Good, because the repository is actively maintained.
 * Bad, because Better BibTeX does not support all JabRef's entry types.
-* Bad, because Better BibTeX contains many-to-one mappings when converting entry type to item type, which may lose information.
+* Bad, because Better BibTeX contains many-to-one mappings when converting BibTeX/BibLaTeX entry type to Zotero item type, which may lose information.
 * Bad, because JabRef needs to track Better BibTeX's updates, or import it as a submodule.
