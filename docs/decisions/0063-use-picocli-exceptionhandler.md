@@ -1,8 +1,6 @@
 ---
 nav_order: 0063
 parent: Decision Records
-status: proposed
-date: 2026-05-31
 ---
 
 # Use picocli ExceptionHandler for JabKit Error Handling

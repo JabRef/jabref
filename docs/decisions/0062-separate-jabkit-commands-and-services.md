@@ -1,8 +1,6 @@
 ---
 nav_order: 0062
 parent: Decision Records
-status: proposed
-date: 2026-05-31
 ---
 
 # Separate JabKit Commands and Services
