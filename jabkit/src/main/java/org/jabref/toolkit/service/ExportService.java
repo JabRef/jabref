@@ -65,7 +65,7 @@ public class ExportService {
         return new Exporter("bibtex", "BibTex", StandardFileType.BIBTEX_DB) {
             @Override
             public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws IOException {
-                 internalSaveDatabaseContext(new BibDatabaseContext(new BibDatabase(entries)), file);
+                internalSaveDatabaseContext(new BibDatabaseContext(new BibDatabase(entries)), file);
             }
         };
     }
@@ -199,7 +199,7 @@ public class ExportService {
 
         try {
             JournalAbbreviationRepository abbreviationRepository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
-            printOut(Localization.lang("Exporting %0", outputFile.toAbsolutePath().toString()));
+            printOut(Localization.lang("Exporting '%0'.", outputFile.toAbsolutePath().toString()));
             exporter.export(databaseContext, outputFile, entries, fileDirForDatabase, abbreviationRepository);
         } catch (IOException | SaveException | ParserConfigurationException | TransformerException ex) {
             throw new ExportServiceException("Failed to export file.",
