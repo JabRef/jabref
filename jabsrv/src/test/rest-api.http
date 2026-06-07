@@ -34,7 +34,7 @@ Content-Type: application/json
   "queries": ["doi = \"10.1161/circulationaha.108.827022\"", "title = \"chocolate\""]
 }
 
-## demo cases
+### demo cases
 
 // JabRef ships with "Chocolate.bib", which is "magically" served when asking for "demo"
 
