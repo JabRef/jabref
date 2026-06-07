@@ -2,7 +2,7 @@ plugins {
     id("org.jabref.gradle.module")
     id("org.jabref.gradle.feature.shadowjar")
     id("application")
-    id("org.graalvm.buildtools.native") version "0.11.1"
+    id("org.jabref.gradle.feature.nativecompile")
 }
 
 group = "org.jabref.jabkit"
@@ -81,12 +81,6 @@ graalvmNative {
         named("main") {
             imageName.set("jabkit")
             mainClass.set("org.jabref.toolkit.JabKitLauncher")
-            buildArgs.addAll(
-                "--no-fallback",
-                "-H:+ReportExceptionStackTraces",
-                "-H:IncludeLocales=en",
-                "-H:+EnableAllSecurityServices"
-            )
         }
     }
 }
