@@ -36,11 +36,3 @@ Chosen option: "Introduce a custom picocli IExecutionExceptionHandler and handle
 ### Confirmation
 
 Commands rarely catch exceptions or check for valid return values. Exceptions are thrown as `CliException` and subclasses (or `JabRefException`) from the service and helper classes but not handled in the command.
-
-## Pros and Cons of the Options
-
-### Let the commands be responsible for communicating errors and manage exit codes
-
-* Good, because it does not require framework knowledge and is plain java.
-* Bad, because it's hard to track which cases are handled and which are not (or somewhere else).
-* Bad, because it duplicates a lot of error handling and risks divergent behavior.
