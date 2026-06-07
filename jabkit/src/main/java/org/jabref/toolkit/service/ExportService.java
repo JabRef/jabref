@@ -36,11 +36,12 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.toolkit.exception.ExportServiceException;
 
 import com.airhacks.afterburner.injection.Injector;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
+@NullMarked
 public class ExportService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportService.class);
@@ -60,7 +61,7 @@ public class ExportService {
     private Exporter createBibtexExporter() {
         return new Exporter("bibtex", "BibTex", StandardFileType.BIBTEX_DB) {
             @Override
-            public void export(@NonNull BibDatabaseContext databaseContext, Path file, @NonNull List<BibEntry> entries) throws IOException {
+            public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws IOException {
                 internalSaveDatabaseContext(databaseContext, file);
             }
         };
@@ -170,8 +171,8 @@ public class ExportService {
     }
 
     public void exportParserResultToFile(
-            @NonNull ParserResult parserResult,
-            @NonNull Path outputFile,
+            ParserResult parserResult,
+            Path outputFile,
             String format,
             boolean porcelain) throws ExportServiceException {
 
@@ -179,9 +180,9 @@ public class ExportService {
             System.out.println(Localization.lang("Exporting '%0'.", outputFile));
         }
 
-        Path path = parserResult.getPath().get().toAbsolutePath();
+        Optional<Path> path = parserResult.getPath().map(Path::toAbsolutePath);
         BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
-        databaseContext.setDatabasePath(path);
+        databaseContext.setDatabasePath(path.orElse(null));
         List<Path> fileDirForDatabase = databaseContext
                 .getFileDirectories(cliPreferences.getFilePreferences());
 
@@ -192,7 +193,8 @@ public class ExportService {
     }
 
     private static void tryExportWithExporter(
-            Exporter exporter, @NonNull Path outputFile,
+            Exporter exporter,
+            Path outputFile,
             BibDatabaseContext databaseContext,
             List<BibEntry> entries,
             List<Path> fileDirForDatabase) throws ExportServiceException {
@@ -210,9 +212,9 @@ public class ExportService {
 
     private Exporter getExporterByName(String exporterId) throws ExportServiceException {
         return exporterFactory.getExporterByName(exporterId)
-                              .or(() -> bibtexExporter.getId().equalsIgnoreCase(exporterId) ?
-                                        Optional.of(bibtexExporter) :
-                                        Optional.empty())
+                              .or(() -> bibtexExporter.getId().equalsIgnoreCase(exporterId)
+                                        ? Optional.of(bibtexExporter)
+                                        : Optional.empty())
                               .orElseThrow(
                                       () -> new ExportServiceException("Unknown export format '" + exporterId + "'.",
                                               Localization.lang("Unknown export format '%0'.", exporterId),

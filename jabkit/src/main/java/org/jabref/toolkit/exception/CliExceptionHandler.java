@@ -2,9 +2,10 @@ package org.jabref.toolkit.exception;
 
 import org.jabref.logic.JabRefException;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import picocli.CommandLine;
 
+@NullMarked
 public class CliExceptionHandler implements CommandLine.IExecutionExceptionHandler {
 
     private final CommandLine.IExecutionExceptionHandler delegate;
@@ -37,7 +38,7 @@ public class CliExceptionHandler implements CommandLine.IExecutionExceptionHandl
         System.err.println(errorMessage);
     }
 
-    private static @NonNull String buildCauseSuffix(Throwable cause) {
+    private static String buildCauseSuffix(Throwable cause) {
         return " (" + cause.getClass().getSimpleName() + ": " + cause.getLocalizedMessage() + ")";
     }
 }

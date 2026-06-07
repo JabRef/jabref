@@ -6,8 +6,9 @@ import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
 import org.jabref.logic.preferences.CliPreferences;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class CitationFetcherFactory {
 
     private final CliPreferences cliPreferences;
@@ -20,7 +21,7 @@ public class CitationFetcherFactory {
         return new CitationFetcherFactory(cliPreferences);
     }
 
-    public @NonNull CitationFetcher getCitationFetcher(CitationFetcherType citationFetcherType) {
+    public CitationFetcher getCitationFetcher(CitationFetcherType citationFetcherType) {
         ChatModel chatModel = ChatModelFactory.create(cliPreferences.getAiPreferences());
         return CitationFetcherType.getCitationFetcher(
                 citationFetcherType,

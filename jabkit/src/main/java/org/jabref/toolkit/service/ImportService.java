@@ -17,11 +17,12 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.toolkit.exception.ImportServiceException;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
+@NullMarked
 public class ImportService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportService.class);
@@ -39,7 +40,7 @@ public class ImportService {
                 .toList();
     }
 
-    public static @NonNull ParserResult importBibTexFile(
+    public static ParserResult importBibTexFile(
             Path inputFile,
             CliPreferences cliPreferences,
             boolean porcelain) throws ImportServiceException {
@@ -47,7 +48,7 @@ public class ImportService {
         return importFile(inputFile, "bibtex", cliPreferences, porcelain);
     }
 
-    public static @NonNull ParserResult importFile(
+    public static ParserResult importFile(
             Path inputFile,
             String importFormat,
             CliPreferences cliPreferences,
