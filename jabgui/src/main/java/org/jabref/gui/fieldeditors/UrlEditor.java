@@ -48,6 +48,7 @@ public class UrlEditor extends HBox implements FieldEditorFX {
 
         this.viewModel = new UrlEditorViewModel(field, suggestionProvider, dialogService, preferences, fieldCheckers, undoManager);
 
+        textField.setId(field.getName());
         establishBinding(textField, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
 
         Supplier<List<MenuItem>> contextMenuSupplier = EditorMenus.getCleanupUrlMenu(textField);
