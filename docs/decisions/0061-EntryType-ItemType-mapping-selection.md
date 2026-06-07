@@ -42,7 +42,7 @@ Chosen option: Use Better BibTeX's mapping in converter, because it provides bot
 
 ### Use citeproc-java's mapping
 
-Converter can be found via [this link](https://github.com/michel-kraemer/citeproc-java/blob/09d31a49090e06e6ab062016012b593897b3cb26/citeproc-java/src/main/java/de/undercouch/citeproc/BibTeX/BibTeXConverter.java#L420-L462)
+Converter can be found via [BibTeXConverter#toType](https://github.com/michel-kraemer/citeproc-java/blob/09d31a49090e06e6ab062016012b593897b3cb26/citeproc-java/src/main/java/de/undercouch/citeproc/bibtex/BibTeXConverter.java#L420-L461)
 
 * Good, because citeproc-java provides an existing converter, reducing the amount of time to customize mapping.
 * Good, because citeproc-java is already a JabRef's submodule, no new dependency is needed
@@ -71,9 +71,9 @@ Zotero's internal behavior to map entry type to item type
 
 ### Use Better BibTeX's mapping
 
-1. Converter from entry type to item type can be found via [this link](https://github.com/retorquere/zotero-better-bibtex/blob/7b7237e60aad44c47656484cd5eaa40201882449/translators/bibtex/bibtex.ts#L632-L679).
-2. Converter from item type to BibTeX entry type can be found via [this link](https://github.com/retorquere/zotero-better-bibtex/blob/7b7237e60aad44c47656484cd5eaa40201882449/translators/bibtex/bibtex.ts#L56-L131).
-3. Converter from item type to BibLaTeX entry type can be found via [this link](https://github.com/retorquere/zotero-better-bibtex/blob/7b7237e60aad44c47656484cd5eaa40201882449/translators/bibtex/biblatex.ts#L47-L127).
+1. Converter from entry type to item type can be found via [bibtex.ts](https://github.com/retorquere/zotero-better-bibtex/blob/7b7237e60aad44c47656484cd5eaa40201882449/translators/bibtex/bibtex.ts#L632-L679).
+2. Converter from item type to BibTeX entry type can be found via [bibtex.ts](https://github.com/retorquere/zotero-better-bibtex/blob/7b7237e60aad44c47656484cd5eaa40201882449/translators/bibtex/bibtex.ts#L56-L131).
+3. Converter from item type to BibLaTeX entry type can be found via [biblatex.ts](https://github.com/retorquere/zotero-better-bibtex/blob/7b7237e60aad44c47656484cd5eaa40201882449/translators/bibtex/biblatex.ts#L47-L127).
 
 * Good, because Better BibTeX supports mapping for both BibTeX and BibLaTeX entry types.
 * Good, because Better BibTeX supports more entry types than citeproc-java.
