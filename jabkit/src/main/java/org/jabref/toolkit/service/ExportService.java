@@ -124,7 +124,7 @@ public class ExportService {
             Path outputFile) throws IOException {
 
         if (!FileUtil.isBibFile(outputFile)) {
-            System.err.println(Localization.lang("Invalid output file type provided. (wrong extension)"));
+            System.err.println(Localization.lang("Invalid output file type provided."));
         }
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(outputFile, StandardCharsets.UTF_8)) {
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
