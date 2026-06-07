@@ -13,23 +13,25 @@ GET http://localhost:23119
 GET http://localhost:23119/libraries
 Accept: application/json
 
-### Query entries by DOI across all open libraries
+### Query entries across all open libraries (single query)
+
+// Each query is a Search.g4 expression. The DOI below is present in the bundled demo (Chocolate.bib),
+// so this returns a match when the server is started without a library file.
 
 POST http://localhost:23119/libraries:query
 Content-Type: application/json
 
 {
-  "dois": ["10.1000/xyz123"]
+  "queries": ["doi = \"10.1161/circulationaha.108.827022\""]
 }
 
-### Query entries by DOI and URL across all open libraries
+### Query entries across all open libraries (multiple queries, results returned in input order)
 
 POST http://localhost:23119/libraries:query
 Content-Type: application/json
 
 {
-  "dois": ["10.1000/xyz123"],
-  "urls": ["https://example.com/paper"]
+  "queries": ["doi = \"10.1161/circulationaha.108.827022\"", "title = \"chocolate\""]
 }
 
 ## demo cases

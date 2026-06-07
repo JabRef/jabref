@@ -6,7 +6,7 @@ parent: Requirements
 ## Cross-library search
 `req~jabsrv.query.search~1`
 
-The HTTP server exposes `POST /libraries/query` accepting `{ "queries": ["…"] }`, where each query is a Search.g4 expression.
+The HTTP server exposes `POST /libraries:query` accepting `{ "queries": ["…"] }`, where each query is a Search.g4 expression.
 Each query is run independently against all open libraries and returns the matching entries.
 
 Results are returned in the same order as the input queries, so a caller matching a list of references can align the n-th query with the n-th reference.
