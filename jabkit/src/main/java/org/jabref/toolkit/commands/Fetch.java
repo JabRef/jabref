@@ -55,9 +55,9 @@ class Fetch implements Callable<Integer> {
                                                      .filter(fetcher -> fetcher.getName().equalsIgnoreCase(provider))
                                                      .findFirst()
                                                      .orElseThrow(() -> new CliException(
-                                                                       "Could not find fetcher '" + provider + "'",
-                                                                       Localization.lang("Could not find fetcher '%0'", provider),
-                                                                       CommandLine.ExitCode.USAGE));
+                                                             "Could not find fetcher '" + provider + "'",
+                                                             Localization.lang("Could not find fetcher '%0'", provider),
+                                                             CommandLine.ExitCode.USAGE));
 
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Running query '%0' with fetcher '%1'.", query, provider));
