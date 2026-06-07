@@ -30,7 +30,6 @@ jobs:
         with:
           name: jabkit-native-macos-silicon
           path: jabkit/build/native/nativeCompile/jabkit
-          retention-days: 1
 
   smoke-test:
     needs: build-native
@@ -53,10 +52,13 @@ jobs:
         run: chmod +x jabkit/build/native/nativeCompile/jabkit
 
       - name: Install clitest
-        run: |
-          curl -sOL https://raw.githubusercontent.com/aureliojargas/clitest/master/clitest
-          chmod +x clitest
-          sudo mv clitest /usr/bin
+        uses: ethanjli/cached-download-action@v0.1.4
+        with:
+          url: https://raw.githubusercontent.com/aureliojargas/clitest/master/clitest
+          destination: /tmp/clitest
+
+      - name: Make clitest executable
+        run: chmod +x /tmp/clitest
 
       - name: Run JabKit native smoke tests
-        run: cd jabkit && clitest src/nativeTest/clitest/jabkit.md
+        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit.md
