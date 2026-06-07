@@ -65,7 +65,7 @@ public class ExportService {
         return new Exporter("bibtex", "BibTex", StandardFileType.BIBTEX_DB) {
             @Override
             public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws IOException {
-                internalSaveDatabaseContext(databaseContext, file);
+                 internalSaveDatabaseContext(new BibDatabaseContext(new BibDatabase(entries)), file);
             }
         };
     }
