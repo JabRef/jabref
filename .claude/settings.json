@@ -15,6 +15,10 @@
           {
             "type": "command",
             "command": "python .claude/hooks/pr-policy-tag-guard.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/commit-msg-heredoc-guard.py"
           }
         ]
       }
