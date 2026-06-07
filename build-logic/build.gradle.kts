@@ -19,4 +19,5 @@ dependencies {
     implementation("org.gradlex:java-module-testing:1.8.1")
     implementation("org.gradlex:jvm-dependency-conflict-resolution:2.5")
     implementation("org.gradle.toolchains:foojay-resolver:1.0.0")
+    implementation("org.graalvm.buildtools:native-gradle-plugin:0.11.1")
 }
