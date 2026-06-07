@@ -51,14 +51,14 @@ class Check implements Callable<Integer> {
             return 2;
         }
 
-        int consistencyExit = handleConsistencyCheck();
-        int integrityExit = handleIntegrityCheck();
+        int consistencyExit = checkConsistency();
+        int integrityExit = checkIntegrity();
 
         // Report the worst exit code: 0 = clean, 1 = findings, 2/3 = error.
         return Math.max(consistencyExit, integrityExit);
     }
 
-    private int handleIntegrityCheck() {
+    private int checkIntegrity() {
         try {
             CheckIntegrity.execute(inputFile, outputFormat, true, sharedOptions.porcelain, jabKit);
             return CommandLine.ExitCode.OK;
@@ -68,7 +68,7 @@ class Check implements Callable<Integer> {
         }
     }
 
-    private int handleConsistencyCheck() {
+    private int checkConsistency() {
         try {
             CheckConsistency.execute(inputFile, outputFormat, sharedOptions.porcelain, jabKit);
             return CommandLine.ExitCode.OK;
