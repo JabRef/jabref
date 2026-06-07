@@ -3,9 +3,9 @@ package org.jabref.toolkit.commands;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
-import com.google.common.io.Files;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -21,14 +21,14 @@ public class PseudonymizeTest extends AbstractJabKitTest {
         commandLine.execute("pseudonymize", "--input=" + origin, "--output=" + output, "--key=" + key);
         assertFileExists(output);
         assertFileExists(key);
-        assertFalse(Files.readLines(output.toFile(), Charset.defaultCharset()).stream().anyMatch((s) -> s.contains("Newton1999")));
+        assertFalse(Files.readAllLines(output, Charset.defaultCharset()).stream().anyMatch((s) -> s.contains("Newton1999")));
     }
 
     @Test
     public void automaticFileCreation(@TempDir Path tempDir) throws IOException {
         Path origin = getClassResourceAsPath("origin.bib");
         Path copy = tempDir.resolve("origin.bib");
-        Files.copy(origin.toFile(), copy.toFile());
+        Files.copy(origin, copy);
         commandLine.execute("pseudonymize", "--input=" + copy);
         Path output = tempDir.resolve("origin.pseudo.bib");
         Path key = tempDir.resolve("origin.pseudo.csv");
@@ -41,11 +41,11 @@ public class PseudonymizeTest extends AbstractJabKitTest {
         Path origin = getClassResourceAsPath("origin.bib").toAbsolutePath();
         Path output = tempDir.resolve("new.pseudo.bib");
         Path key = tempDir.resolve("new.pseudo.csv");
-        Files.write("some".getBytes(StandardCharsets.UTF_8), output.toFile());
+        Files.write(output, "some".getBytes(StandardCharsets.UTF_8));
         commandLine.execute("pseudonymize", "-f", "--input=" + origin, "--output=" + output, "--key=" + key);
         assertFileExists(output);
         assertFileExists(key);
-        assertTrue(Files.readLines(output.toFile(), Charset.defaultCharset()).size() > 1);
+        assertTrue(Files.readAllLines(output, Charset.defaultCharset()).size() > 1);
     }
 
     @Test
@@ -53,10 +53,10 @@ public class PseudonymizeTest extends AbstractJabKitTest {
         Path origin = getClassResourceAsPath("origin.bib").toAbsolutePath();
         Path output = tempDir.resolve("new.pseudo.bib");
         Path key = tempDir.resolve("new.pseudo.csv");
-        Files.write("some".getBytes(StandardCharsets.UTF_8), key.toFile());
+        Files.write(key, "some".getBytes(StandardCharsets.UTF_8));
         commandLine.execute("pseudonymize", "--input=" + origin, "--output=" + output, "--key=" + key);
         assertFileExists(output);
         assertFileExists(key);
-        assertFalse(Files.readLines(key.toFile(), Charset.defaultCharset()).size() > 1);
+        assertFalse(Files.readAllLines(key, Charset.defaultCharset()).size() > 1);
     }
 }

@@ -15,7 +15,6 @@ testModuleInfo {
     requires("org.junit.jupiter.api")
     requires("org.junit.jupiter.params")
     requires("org.mockito")
-    requires("com.google.common")
 }
 
 tasks.withType<Test>().configureEach {
