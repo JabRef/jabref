@@ -1,6 +1,7 @@
 package org.jabref.model.database.event;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEvent;
@@ -13,7 +14,7 @@ public class EntriesAddedEvent extends EntriesEvent {
 
     // firstEntry used by listeners that used to listen to AllInsertsFinishedEvent
     // final?
-    private final BibEntry firstEntry;
+    @Nullable private final BibEntry firstEntry;
 
     /// @param bibEntries `List` of `BibEntry` objects which are being added.
     /// @param location   Location affected by this event
@@ -26,7 +27,7 @@ public class EntriesAddedEvent extends EntriesEvent {
         }
     }
 
-    public @Nullable BibEntry getFirstEntry() {
-        return this.firstEntry;
+    public Optional<BibEntry> getFirstEntry() {
+        return Optional.ofNullable(firstEntry);
     }
 }

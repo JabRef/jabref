@@ -1,6 +1,7 @@
 package org.jabref.model.event;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
@@ -8,18 +9,19 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryChangedEvent;
 
 import com.google.common.eventbus.Subscribe;
+import org.jspecify.annotations.Nullable;
 
 public class EventListenerTest {
 
     private List<BibEntry> addedEntries;
-    private BibEntry firstInsertedEntry;
+    @Nullable private BibEntry firstInsertedEntry;
     private List<BibEntry> removedEntries;
     private BibEntry changedEntry;
 
     @Subscribe
     public void listen(EntriesAddedEvent event) {
         this.addedEntries = event.getBibEntries();
-        this.firstInsertedEntry = event.getFirstEntry();
+        this.firstInsertedEntry = event.getFirstEntry().orElse(null);
     }
 
     @Subscribe
@@ -36,8 +38,8 @@ public class EventListenerTest {
         return addedEntries;
     }
 
-    public BibEntry getFirstInsertedEntry() {
-        return firstInsertedEntry;
+    public Optional<BibEntry> getFirstInsertedEntry() {
+        return Optional.ofNullable(firstInsertedEntry);
     }
 
     public List<BibEntry> getRemovedEntries() {
