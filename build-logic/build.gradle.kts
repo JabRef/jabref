@@ -13,11 +13,11 @@ dependencies {
     implementation("com.github.andygoossens:gradle-modernizer-plugin:1.13.0")
     implementation("com.gradleup.shadow:shadow-gradle-plugin:9.4.1")
     implementation("de.undercouch.download:de.undercouch.download.gradle.plugin:5.7.0")
+    implementation("org.graalvm.buildtools:native-gradle-plugin:0.11.1")
     implementation("org.gradlex:extra-java-module-info:1.14")
     implementation("org.gradlex:java-module-dependencies:1.12.1")
     implementation("org.gradlex:java-module-packaging:1.2.1")
     implementation("org.gradlex:java-module-testing:1.8.1")
     implementation("org.gradlex:jvm-dependency-conflict-resolution:2.5")
     implementation("org.gradle.toolchains:foojay-resolver:1.0.0")
-    implementation("org.graalvm.buildtools:native-gradle-plugin:0.11.1")
 }

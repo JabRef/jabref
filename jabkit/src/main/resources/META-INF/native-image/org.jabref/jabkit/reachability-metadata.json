@@ -627,12 +627,6 @@
       "glob": "META-INF/services/org.tinylog.writers.Writer"
     },
     {
-      "glob": "tinylog-dev.properties"
-    },
-    {
-      "glob": "tinylog-test.properties"
-    },
-    {
       "glob": "tinylog.properties"
     },
     {
