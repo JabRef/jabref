@@ -7,6 +7,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.ProgressCounter;
 
+import org.jspecify.annotations.Nullable;
+
 /// An extension to the [BackgroundTask] that stores the result (or exception) of the task inside.
 ///
 /// Useful for the Ai features with task aggregators ([org.jabref.logic.ai.ingestion.IngestionTaskAggregator], [org.jabref.logic.ai.summarization.SummarizationTaskAggregator]),
@@ -35,7 +37,8 @@ public abstract class TrackedBackgroundTask<V> extends BackgroundTask<V> {
         progressCounter.listenToAllProperties(this::updateProgress);
     }
 
-    public V call() throws Exception {
+    /// Returns null if canceled.
+    public @Nullable V call() throws Exception {
         try {
             status.set(Status.PROCESSING);
 
