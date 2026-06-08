@@ -296,7 +296,7 @@ class CSLFormatUtilsTest {
 
                 Arguments.of(
                         "(Smith, Jones and Williams, 2016)",
-                        STYLE_LIST.stream().filter(e -> "De Montfort University (author-date/Harvard)".equals(e.getTitle())).findAny().get()
+                        STYLE_LIST.stream().filter(e -> "Cite Them Right 12th edition (author-date/Harvard)".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
