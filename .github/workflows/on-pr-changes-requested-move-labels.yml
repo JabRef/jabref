@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-slim
     permissions:
       actions: read
-      issues: write
+      pull-requests: write
     steps:
       - name: Download artifact from triggering run
         uses: actions/download-artifact@v8
