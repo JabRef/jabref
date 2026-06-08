@@ -23,7 +23,8 @@ public final class MetadataChange extends DatabaseChange {
         // group change is handled by GroupChange, so we set the groups root to the original value
         // to prevent any inconsistency
         metaDataDiff.getGroupDifferences()
-                    .ifPresent(groupDiff -> databaseContext.getMetaData().setGroups(groupDiff.getOriginalGroupRoot()));
+                    .filter(groupDiff -> groupDiff.getOriginalGroupRoot().isPresent())
+                    .ifPresent(groupDiff -> databaseContext.getMetaData().setGroups(groupDiff.getOriginalGroupRoot().get()));
     }
 
     public MetaDataDiff getMetaDataDiff() {

@@ -1,5 +1,7 @@
 package org.jabref.gui.collab.groupchange;
 
+import java.util.Optional;
+
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.groups.GroupTreeNodeViewModel;
@@ -17,14 +19,13 @@ public final class GroupChange extends DatabaseChange {
     public GroupChange(GroupDiff groupDiff, BibDatabaseContext databaseContext, DatabaseChangeResolverFactory databaseChangeResolverFactory) {
         super(databaseContext, databaseChangeResolverFactory);
         this.groupDiff = groupDiff;
-        setChangeName(groupDiff.getOriginalGroupRoot() == null ? Localization.lang("Removed all groups") : Localization
-                .lang("Modified groups tree"));
+        setChangeName(groupDiff.getOriginalGroupRoot().isEmpty() ? Localization.lang("Removed all groups") : Localization
+                                                                                                             .lang("Modified groups tree"));
     }
 
     @Override
     public void applyChange(NamedCompoundEdit undoEdit) {
-        GroupTreeNode oldRoot = groupDiff.getOriginalGroupRoot();
-        GroupTreeNode newRoot = groupDiff.getNewGroupRoot();
+        Optional<GroupTreeNode> newRoot = groupDiff.getNewGroupRoot();
 
         GroupTreeNode root = databaseContext.getMetaData().getGroups().orElseGet(() -> {
             GroupTreeNode groupTreeNode = new GroupTreeNode(GroupsFactory.createAllEntriesGroup());
@@ -36,13 +37,13 @@ public final class GroupChange extends DatabaseChange {
                 new GroupTreeNodeViewModel(databaseContext.getMetaData().getGroups().orElse(null)),
                 new GroupTreeNodeViewModel(root), Localization.lang("Modified groups"));
         root.removeAllChildren();
-        if (newRoot == null) {
+        if (newRoot.isEmpty()) {
             // I think setting root to null is not possible
             root.setGroup(GroupsFactory.createAllEntriesGroup(), false, false, null);
         } else {
             // change root group, even though it'll be AllEntries anyway
-            root.setGroup(newRoot.getGroup(), false, false, null);
-            for (GroupTreeNode child : newRoot.getChildren()) {
+            root.setGroup(newRoot.get().getGroup(), false, false, null);
+            for (GroupTreeNode child : newRoot.get().getChildren()) {
                 child.copySubtree().moveTo(root);
             }
         }

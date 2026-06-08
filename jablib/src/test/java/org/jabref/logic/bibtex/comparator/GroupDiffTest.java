@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -56,8 +57,9 @@ class GroupDiffTest {
 
         Optional<GroupDiff> groupDiff = GroupDiff.compare(originalMetaData, newMetaData);
 
-        Optional<GroupDiff> expectedGroupDiff = Optional.of(new GroupDiff(originalMetaData.getGroups().get(), newMetaData.getGroups().get()));
+        Optional<GroupDiff> expectedGroupDiff = Optional.of(new GroupDiff(originalMetaData.getGroups().orElse(null), newMetaData.getGroups().orElse(null)));
 
+        assertTrue(groupDiff.isPresent());
         assertEquals(expectedGroupDiff.get().getNewGroupRoot(), groupDiff.get().getNewGroupRoot());
         assertEquals(expectedGroupDiff.get().getOriginalGroupRoot(), groupDiff.get().getOriginalGroupRoot());
     }

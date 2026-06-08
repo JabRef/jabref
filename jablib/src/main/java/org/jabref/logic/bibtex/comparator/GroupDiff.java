@@ -5,11 +5,13 @@ import java.util.Optional;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 
-public class GroupDiff {
-    private final GroupTreeNode originalGroupRoot;
-    private final GroupTreeNode newGroupRoot;
+import org.jspecify.annotations.Nullable;
 
-    GroupDiff(GroupTreeNode originalGroupRoot, GroupTreeNode newGroupRoot) {
+public class GroupDiff {
+    @Nullable private final GroupTreeNode originalGroupRoot;
+    @Nullable private final GroupTreeNode newGroupRoot;
+
+    GroupDiff(@Nullable GroupTreeNode originalGroupRoot, @Nullable GroupTreeNode newGroupRoot) {
         this.originalGroupRoot = originalGroupRoot;
         this.newGroupRoot = newGroupRoot;
     }
@@ -27,11 +29,11 @@ public class GroupDiff {
         }
     }
 
-    public GroupTreeNode getOriginalGroupRoot() {
-        return originalGroupRoot;
+    public Optional<GroupTreeNode> getOriginalGroupRoot() {
+        return Optional.ofNullable(originalGroupRoot);
     }
 
-    public GroupTreeNode getNewGroupRoot() {
-        return newGroupRoot;
+    public Optional<GroupTreeNode> getNewGroupRoot() {
+        return Optional.ofNullable(newGroupRoot);
     }
 }

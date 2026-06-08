@@ -9,7 +9,7 @@ public final class GroupChangeDetailsView extends DatabaseChangeDetailsView {
 
     public GroupChangeDetailsView(GroupChange groupChange) {
         String labelValue;
-        if (groupChange.getGroupDiff().getNewGroupRoot() == null) {
+        if (groupChange.getGroupDiff().getNewGroupRoot().isEmpty()) {
             labelValue = groupChange.getName() + '.';
         } else {
             labelValue = Localization.lang("%0. Accepting the change replaces the complete groups tree with the externally modified groups tree.", groupChange.getName());
