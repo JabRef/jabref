@@ -203,25 +203,28 @@ runs:
       if: failure() && (inputs.os == 'windows-latest')
       shell: pwsh
       run: |
-        $tempDir = Get-ChildItem "$env:TEMP\jdk.jpackage*" | Select-Object -First 1 -ExpandProperty FullName
+        $tempDir = Get-ChildItem "$env:TEMP\jdk.jpackage*" -Directory | Select-Object -First 1 -ExpandProperty FullName
+        Write-Host "tempDir: $tempDir"
         $config = "$tempDir\config"
         $wixobj = "$tempDir\wixobj"
+        Write-Host "config: $config"
+        Write-Host "wixobj: $wixobj"
         light.exe -nologo -spdb `
-          -ext WixUtilExtension `
-          -ext WixUIExtension `
-          -b $config `
-          -sice:ICE27 `
-          -loc "$config\MsiInstallerStrings_de.wxl" `
-          -loc "$config\MsiInstallerStrings_en.wxl" `
-          -loc "$config\MsiInstallerStrings_ja.wxl" `
-          -loc "$config\MsiInstallerStrings_zh_CN.wxl" `
-          -cultures:en-us `
-          "$wixobj\main.wixobj" `
-          "$wixobj\bundle.wixobj" `
-          "$wixobj\ui.wixobj" `
-          "$wixobj\InstallDirNotEmptyDlg.wixobj" `
-          "$wixobj\os-condition.wixobj" `
-          -out "$wixobj\a.msi"
+        -ext WixUtilExtension `
+        -ext WixUIExtension `
+        -b $config `
+        -sice:ICE27 `
+        -loc "$config\MsiInstallerStrings_de.wxl" `
+        -loc "$config\MsiInstallerStrings_en.wxl" `
+        -loc "$config\MsiInstallerStrings_ja.wxl" `
+        -loc "$config\MsiInstallerStrings_zh_CN.wxl" `
+        -cultures:en-us `
+        "$wixobj\main.wixobj" `
+        "$wixobj\bundle.wixobj" `
+        "$wixobj\ui.wixobj" `
+        "$wixobj\InstallDirNotEmptyDlg.wixobj" `
+        "$wixobj\os-condition.wixobj" `
+        -out "$wixobj\a.msi"
     - name: Upload WiX temp dir
       if: failure() && (inputs.os == 'windows-latest')
       uses: actions/upload-artifact@v4
