@@ -227,7 +227,7 @@ public class PreferencesMigrations {
     private static void migrateFileImportPattern(String oldStylePattern,
                                                  String newStylePattern,
                                                  JabRefCliPreferences prefs) {
-        String preferenceFileNamePattern = prefs.get(V4_0_IMPORT_FILENAME_PATTERN, null);
+        String preferenceFileNamePattern = prefs.get(V4_0_IMPORT_FILENAME_PATTERN);
 
         if (oldStylePattern.equals(preferenceFileNamePattern)) {
             // Upgrade the old-style File Name pattern to new one:
