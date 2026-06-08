@@ -178,13 +178,12 @@ public class JabRefFrameViewModel {
                       .forEach(command -> openDatabaseAction.get().openFiles(command.toImport()));
 
             uiCommands.stream()
-                      .filter(UiCommand.AppendFilesToCurrentLibrary.class::isInstance)
-                      .map(UiCommand.AppendFilesToCurrentLibrary.class::cast)
-                      .map(UiCommand.AppendFilesToCurrentLibrary::toAppend)
-                      .filter(Objects::nonNull)
-                      .findAny().ifPresent(toAppend -> {
-                          LOGGER.debug("Append to current library {} requested", toAppend);
-                          waitForLoadingFinished(() -> appendToCurrentLibrary(toAppend));
+                      .filter(UiCommand.AppendFilesToLibrary.class::isInstance)
+                      .map(UiCommand.AppendFilesToLibrary.class::cast)
+                      .findAny().ifPresent(command -> {
+                          LOGGER.debug("Append to library {} requested", command.toAppend());
+                          selectLibraryTab(command.library());
+                          waitForLoadingFinished(() -> appendToCurrentLibrary(command.toAppend()));
                       });
 
             uiCommands.stream()
@@ -201,13 +200,15 @@ public class JabRefFrameViewModel {
                       .map(UiCommand.AppendFileOrUrlToCurrentLibrary.class::cast)
                       .findAny().ifPresent(importFile -> importFromFileAndOpen(importFile.location()));
 
-            uiCommands.stream().filter(UiCommand.AppendBibTeXToCurrentLibrary.class::isInstance)
-                      .map(UiCommand.AppendBibTeXToCurrentLibrary.class::cast)
-                      .findAny().ifPresent(importBibTex ->
-                              importBibtexStringAndOpen(
-                                      importBibTex.bibtex(),
-                                      // importBibtexStringAndOpen accepts null targetGroup to indicate "no group assignment"
-                                      importBibTex.targetGroup().orElse(null)));
+            uiCommands.stream().filter(UiCommand.AppendBibTeXToLibrary.class::isInstance)
+                      .map(UiCommand.AppendBibTeXToLibrary.class::cast)
+                      .findAny().ifPresent(importBibTex -> {
+                          selectLibraryTab(importBibTex.library());
+                          importBibtexStringAndOpen(
+                                  importBibTex.bibtex(),
+                                  // importBibtexStringAndOpen accepts null targetGroup to indicate "no group assignment"
+                                  importBibTex.targetGroup().orElse(null));
+                      });
         }
 
         // Handle jumpToEntry
@@ -252,6 +253,23 @@ public class JabRefFrameViewModel {
                       .onSuccess(result -> result.ifPresent(this::addParserResult))
                       .onFailure(t -> LOGGER.error("Unable to import file {} ", location, t))
                       .executeWith(taskExecutor);
+    }
+
+    /// Selects the already-open tab whose library lives at {@code library} so that the
+    /// subsequent append targets it instead of the previously active tab. An empty Optional
+    /// leaves the current tab unchanged; an unknown/closed path logs a warning and also keeps
+    /// the current tab (the server side already rejects unknown ids with 404, so this is only a
+    /// defensive fallback).
+    private void selectLibraryTab(Optional<Path> library) {
+        library.map(path -> path.toAbsolutePath().normalize()).ifPresent(normalized ->
+                tabContainer.getLibraryTabs().stream()
+                            .filter(tab -> tab.getBibDatabaseContext().getDatabasePath()
+                                              .map(path -> path.toAbsolutePath().normalize().equals(normalized))
+                                              .orElse(false))
+                            .findFirst()
+                            .ifPresentOrElse(
+                                    tabContainer::showLibraryTab,
+                                    () -> LOGGER.warn("Requested library {} is not open; appending to the current tab instead", normalized)));
     }
 
     private void directImportEntries(ParserResult parserResult, @Nullable String targetGroup) {

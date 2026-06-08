@@ -12,6 +12,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added the ability to view citation previews rendered using the selected style on hover in the "Citations" tab. [#15914](https://github.com/JabRef/jabref/pull/15914)
+- We extended the HTTP server with library query, groups listing, and group-assignment on import. [#15599](https://github.com/JabRef/jabref/pull/15599)
+- The HTTP import endpoint (`POST /libraries/{id}/entries`) now accepts any open library id, switching JabRef to that library before importing, instead of only the currently active one.
 - We added support for selecting answer engines and summarization algorithms, allowing users to change the underlying AI behavior. [#15688](https://github.com/JabRef/jabref/pull/15688)
 - The citation key generator also normalizes super and subscript characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
 - We added automatic source groups to SLR results and fixed group merging to preserve all source groups. [#12542](https://github.com/JabRef/jabref/issues/12542)
