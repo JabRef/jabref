@@ -62,6 +62,7 @@ runs:
         BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
         IEEEAPIKey: ${{ inputs.ieeeApiKey }}
         SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
+        JAVA_TOOL_OPTIONS: "-Djpackage.debug=true"
     - name: Validate Signature
       if: ${{ inputs.secretsPresent == 'true' && inputs.os == 'macos-latest' && inputs.component == 'jabgui' }}
       shell: bash
