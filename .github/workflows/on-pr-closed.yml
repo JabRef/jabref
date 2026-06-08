@@ -61,6 +61,11 @@ jobs:
               pr = context.payload.pull_request;
             }
 
+            if (!pr?.number || !pr?.user?.login) {
+              core.setFailed('Missing pull request data.');
+              return;
+            }
+
             core.setOutput("pr_number", String(pr.number));
             core.setOutput("pr_url", pr.html_url ?? "");
             core.setOutput("pr_body", pr.body ?? "");
@@ -111,11 +116,31 @@ jobs:
       - name: Remove assignee
         env:
           ISSUE_NUMBER: ${{ needs.determine_issue_number.outputs.issue_number }}
+          PR_NUMBER: ${{ needs.collect_parameters.outputs.pr_number }}
           PR_USER: ${{ needs.collect_parameters.outputs.pr_user }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           set -x
+
+          case "$ISSUE_NUMBER" in
+            ''|*[!0-9]*)
+              echo "Invalid issue number: $ISSUE_NUMBER" >&2
+              exit 1
+              ;;
+          esac
+
+          case "$PR_NUMBER" in
+            ''|*[!0-9]*)
+              echo "Invalid pull request number: $PR_NUMBER" >&2
+              exit 1
+              ;;
+          esac
+
+          if [[ ! "$PR_USER" =~ ^[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?$ ]]; then
+            echo "Invalid GitHub username: $PR_USER" >&2
+            exit 1
+          fi
 
           # "brute force" remove assignee - it might happen that the contributor was unassinged, but the PR closed later; therefore we need " || true" to ignore any error
           gh issue edit "$ISSUE_NUMBER" --remove-assignee "$PR_USER" || true
@@ -129,6 +154,13 @@ jobs:
           ISSUE_NUMBER: ${{ needs.determine_issue_number.outputs.issue_number }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          case "$ISSUE_NUMBER" in
+            ''|*[!0-9]*)
+              echo "Invalid issue number: $ISSUE_NUMBER" >&2
+              exit 1
+              ;;
+          esac
+
           issue=$(gh issue view "$ISSUE_NUMBER" --json assignees)
           count=$(echo "$issue" | jq '.assignees | length')
           if [ "$count" -gt 0 ]; then
@@ -175,6 +207,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Commenting on PR..."
+          case "$PR_NUMBER" in
+            ''|*[!0-9]*)
+              echo "Invalid pull request number: $PR_NUMBER" >&2
+              exit 1
+              ;;
+          esac
+
+          case "$ISSUE_NUMBER" in
+            ''|*[!0-9]*)
+              echo "Invalid issue number: $ISSUE_NUMBER" >&2
+              exit 1
+              ;;
+          esac
+
           gh issue comment "$PR_NUMBER" -b "This pull requests was closed without merging. You have been unassigned from the respective issue #$ISSUE_NUMBER. In case you closed the PR for yourself, you can re-open it. Please also check [After submission of a pull request](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#after-submission-of-a-pull-request) in [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md)."
   comment_on_resolved_issue:
     name: Comment on resolved issue
