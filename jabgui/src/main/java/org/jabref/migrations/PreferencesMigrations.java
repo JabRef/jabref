@@ -204,7 +204,7 @@ public class PreferencesMigrations {
 
     /// Migrate Import File Name and Directory name Patterns from versions <=4.0 to new BracketedPatterns
     static void upgradeImportFileAndDirePatterns(JabRefCliPreferences prefs) {
-        if (prefs.get(V4_0_IMPORT_FILENAME_PATTERN, null) != null) {
+        if (prefs.hasKey(V4_0_IMPORT_FILENAME_PATTERN)) {
             String[] oldStylePatterns = new String[] {
                     "\\bibtexkey",
                     "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
