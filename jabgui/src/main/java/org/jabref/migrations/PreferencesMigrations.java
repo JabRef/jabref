@@ -41,6 +41,8 @@ import org.slf4j.LoggerFactory;
 
 public class PreferencesMigrations {
 
+    public static final String V4_0_IMPORT_FILENAME_PATTERN = "importFileNamePattern";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesMigrations.class);
 
     private PreferencesMigrations() {
@@ -52,9 +54,8 @@ public class PreferencesMigrations {
 
         upgradePrefsToOrgJabRef(mainPrefsNode);
         upgradeSortOrder(preferences);
-        upgradeFaultyEncodingStrings(preferences);
         upgradeLabelPatternToCitationKeyPattern(preferences, mainPrefsNode);
-        upgradeImportFileAndDirePatterns(preferences, mainPrefsNode);
+        upgradeImportFileAndDirePatterns(preferences);
         upgradeStoredBibEntryTypes(preferences, mainPrefsNode, preferences.getCustomEntryTypesRepository());
         upgradeKeyBindingsToJavaFX(preferences);
         addCrossRefRelatedFieldsForAutoComplete(preferences);
@@ -191,27 +192,6 @@ public class PreferencesMigrations {
         }
     }
 
-    /// Migrate Import File Name and Directory name Patterns from versions <=4.0 to new BracketedPatterns
-    private static void migrateFileImportPattern(String oldStylePattern, String newStylePattern,
-                                                 JabRefCliPreferences prefs, Preferences mainPrefsNode) {
-        String preferenceFileNamePattern = mainPrefsNode.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, null);
-
-        if (oldStylePattern.equals(preferenceFileNamePattern)) {
-            // Upgrade the old-style File Name pattern to new one:
-            mainPrefsNode.put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
-            LOGGER.info("migrated old style {} value \"{}\" to new value \"{}\" in the preference file", JabRefCliPreferences.IMPORT_FILENAMEPATTERN, oldStylePattern, newStylePattern);
-
-            if (prefs.hasKey(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)) {
-                // Update also the key in the current application settings, if necessary:
-                String fileNamePattern = prefs.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN);
-                if (oldStylePattern.equals(fileNamePattern)) {
-                    prefs.put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
-                    LOGGER.info("migrated old style {} value \"{}\" to new value \"{}\" in the running application", JabRefCliPreferences.IMPORT_FILENAMEPATTERN, oldStylePattern, newStylePattern);
-                }
-            }
-        }
-    }
-
     static void upgradeResolveBibTeXStringsFields(JabRefCliPreferences prefs) {
         String oldPrefsValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon";
         String currentPrefs = prefs.get(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS);
@@ -222,10 +202,9 @@ public class PreferencesMigrations {
         }
     }
 
-    static void upgradeImportFileAndDirePatterns(JabRefCliPreferences prefs, Preferences mainPrefsNode) {
-        // Migrate Import patterns
-        // Check for prefs node for Version <= 4.0
-        if (mainPrefsNode.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, null) != null) {
+    /// Migrate Import File Name and Directory name Patterns from versions <=4.0 to new BracketedPatterns
+    static void upgradeImportFileAndDirePatterns(JabRefCliPreferences prefs) {
+        if (prefs.get(V4_0_IMPORT_FILENAME_PATTERN, null) != null) {
             String[] oldStylePatterns = new String[] {
                     "\\bibtexkey",
                     "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
@@ -235,14 +214,32 @@ public class PreferencesMigrations {
             String[] oldDisplayStylePattern = new String[] {"bibtexkey", "bibtexkey - title"};
 
             for (int i = 0; i < oldStylePatterns.length; i++) {
-                migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
+                migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs);
             }
             for (int i = 0; i < oldDisplayStylePattern.length; i++) {
-                migrateFileImportPattern(oldDisplayStylePattern[i], newStylePatterns[i], prefs, mainPrefsNode);
+                migrateFileImportPattern(oldDisplayStylePattern[i], newStylePatterns[i], prefs);
             }
         }
-        // Directory preferences are not yet migrated, since it is not quote clear how to parse and reinterpret
-        // the user defined old-style patterns, and the default pattern is "".
+        // Directory preferences are not yet migrated, since it is not quite clear how to parse and reinterpret
+        // the user-defined old-style patterns, and the default pattern is "".
+    }
+
+    private static void migrateFileImportPattern(String oldStylePattern,
+                                                 String newStylePattern,
+                                                 JabRefCliPreferences prefs) {
+        String preferenceFileNamePattern = prefs.get(V4_0_IMPORT_FILENAME_PATTERN, null);
+
+        if (oldStylePattern.equals(preferenceFileNamePattern)) {
+            // Upgrade the old-style File Name pattern to new one:
+            prefs.put(V4_0_IMPORT_FILENAME_PATTERN, newStylePattern);
+            LOGGER.info("migrated old style {} value \"{}\" to new value \"{}\" in the preference file", V4_0_IMPORT_FILENAME_PATTERN, oldStylePattern, newStylePattern);
+
+            // Update also the key in the current application settings, if necessary:
+            if (oldStylePattern.equals(prefs.getFilePreferences().getFileNamePattern())) {
+                prefs.getFilePreferences().setFileNamePattern(newStylePattern);
+                LOGGER.info("migrated old style {} value \"{}\" to new value \"{}\" in the running application", V4_0_IMPORT_FILENAME_PATTERN, oldStylePattern, newStylePattern);
+            }
+        }
     }
 
     private static void upgradeKeyBindingsToJavaFX(JabRefCliPreferences prefs) {

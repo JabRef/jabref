@@ -138,24 +138,23 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String LIBRARY_ADD_IMPORTED_ENTRIES_GROUP_NAME = "addImportedEntriesGroupName";
     // endregion
 
-    public static final String EXPORT_IN_ORIGINAL_ORDER = "exportInOriginalOrder";
-    public static final String EXPORT_IN_SPECIFIED_ORDER = "exportInSpecifiedOrder";
-
+    // region ExportPreferences
+    public static final String LAST_USED_EXPORT = "lastUsedExport";
+    public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
     public static final String EXPORT_PRIMARY_SORT_FIELD = "exportPriSort";
     public static final String EXPORT_PRIMARY_SORT_DESCENDING = "exportPriDescending";
     public static final String EXPORT_SECONDARY_SORT_FIELD = "exportSecSort";
     public static final String EXPORT_SECONDARY_SORT_DESCENDING = "exportSecDescending";
     public static final String EXPORT_TERTIARY_SORT_FIELD = "exportTerSort";
     public static final String EXPORT_TERTIARY_SORT_DESCENDING = "exportTerDescending";
+    public static final String EXPORT_IN_ORIGINAL_ORDER = "exportInOriginalOrder";
+    public static final String EXPORT_IN_SPECIFIED_ORDER = "exportInSpecifiedOrder";
+    // endregion
 
+    // region XmpPreferences
+    public static final String XMP_USE_PRIVACY_FILTER = "useXmpPrivacyFilter";
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
-    public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
-
-    public static final String LAST_USED_EXPORT = "lastUsedExport";
-    public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
-    public static final String WORKING_DIRECTORY = "workingDirectory";
-    public static final String BACKUP_DIRECTORY = "backupDirectory";
-    public static final String CREATE_BACKUP = "createBackup";
+    // endregion
 
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
 
@@ -199,8 +198,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
 
-    public static final String MAIN_FILE_DIRECTORY = "fileDirectory";
-
     public static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
     public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
     public static final String SEARCH_REG_EXP = "regExpSearch";
@@ -214,13 +211,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String GROBID_ENABLED = "grobidEnabled";
     public static final String GROBID_PREFERENCE = "grobidPreference";
     public static final String GROBID_URL = "grobidURL";
-
-    public static final String CONFIRM_LINKED_FILE_DELETE = "confirmLinkedFileDelete";
-    public static final String TRASH_INSTEAD_OF_DELETE = "trashInsteadOfDelete";
-
-    public static final String ADJUST_FILE_LINKS_ON_TRANSFER = "adjustFileLinksOnTransfer";
-    public static final String COPY_LINKED_FILES_ON_TRANSFER = "copyLinkedFilesOnTransfer";
-    public static final String MOVE_LINKED_FILES_ON_TRANSFER = "moveLinkedFilesOnTransfer";
 
     // region CitationKeyPreferences
     public static final String CITATION_KEY_TRANSLITERATE_FIELDS = "transliterateFields";
@@ -240,15 +230,10 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String AUTOLINK_USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
     // bibLocAsPrimaryDir is a misleading antique variable name, we keep it for reason of compatibility
 
-    public static final String STORE_RELATIVE_TO_BIB = "bibLocAsPrimaryDir";
-
     public static final String ASK_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP_JOBS = "CleanUpJobs";
     public static final String CLEANUP_FIELD_FORMATTERS_ENABLED = "CleanUpFormattersEnabled";
     public static final String CLEANUP_FIELD_FORMATTERS = "CleanUpFormatters";
-    public static final String AUTO_RENAME_FILES_ON_CHANGE = "autoRenameFilesOnChange";
-    public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
-    public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
 
@@ -288,6 +273,31 @@ public class JabRefCliPreferences implements CliPreferences {
     // String delimiter
     public static final Character STRINGLIST_DELIMITER = ';';
 
+    // region (Linked)FilePreferences
+    private static final String FILES_MAIN_DIRECTORY = "fileDirectory";
+    private static final String FILES_STORE_RELATIVE_TO_BIB = "bibLocAsPrimaryDir";
+    private static final String FILES_AUTO_RENAME_ON_CHANGE = "autoRenameFilesOnChange";
+    private static final String FILES_IMPORT_NAMEPATTERN = "importFileNamePattern";
+    private static final String FILES_IMPORT_DIRPATTERN = "importFileDirPattern";
+    private static final String FILES_DOWNLOAD_LINKED = "downloadLinkedFiles";
+    private static final String FILES_FULLTEXT_INDEX = "fulltextIndexLinkedFiles";
+    private static final String FILES_WORKING_DIRECTORY = "workingDirectory";
+
+    // FixMe: Missplaced
+    private static final String BACKUP_ENABLED = "createBackup";
+    private static final String BACKUP_DIRECTORY = "backupDirectory";
+
+    private static final String FILES_CONFIRM_DELETE_LINKED = "confirmLinkedFileDelete";
+    private static final String FILES_TRASH_INSTEAD_OF_DELETE = "trashInsteadOfDelete";
+    private static final String FILES_ADJUST_FILE_LINKS_ON_TRANSFER = "adjustFileLinksOnTransfer";
+    private static final String FILES_COPY_LINKED_FILES_ON_TRANSFER = "copyLinkedFilesOnTransfer";
+    private static final String FILES_MOVE_LINKED_FILES_ON_TRANSFER = "moveLinkedFilesOnTransfer";
+    private static final String FILES_KEEP_DOWNLOAD_URL = "keepDownloadUrl";
+    private static final String FILES_LAST_USED_DIRECTORY = "lastUsedDirectory";
+    private static final String FILES_OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY = "openFileExplorerInFileDirectory";
+    private static final String FILES_OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY = "openFileExplorerInLastUsedDirectory";
+    // endregion
+
     // region last files opened
     private static final String LAST_EDITED = "lastEdited";
     private static final String LAST_FOCUSED = "lastFocused";
@@ -319,9 +329,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // Dialog states
     private static final String PREFS_EXPORT_PATH = "prefsExportPath";
-    private static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
-    private static final String FULLTEXT_INDEX_LINKED_FILES = "fulltextIndexLinkedFiles";
-    private static final String KEEP_DOWNLOAD_URL = "keepDownloadUrl";
 
     // Indexes for Strings within stored custom export entries
     private static final int EXPORTER_NAME_INDEX = 0;
@@ -375,11 +382,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_SUMMARIZATION_FULL_DOCUMENT_SYSTEM_MESSAGE_TEMPLATE = "aiSummarizationFullDocumentSystemMessageTemplate";
     private static final String AI_MARKDOWN_CHAT_EXPORT_TEMPLATE = "aiMarkdownChatExportTemplate";
     // endregion
-
-    private static final String LAST_USED_DIRECTORY = "lastUsedDirectory";
-
-    private static final String OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY = "openFileExplorerInFileDirectory";
-    private static final String OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY = "openFileExplorerInLastUsedDirectory";
 
     // region Push to application preferences
     private static final String PUSH_TO_APPLICATION = "pushToApplication";
@@ -1491,25 +1493,25 @@ public class JabRefCliPreferences implements CliPreferences {
 
         filePreferences = getFilePreferencesFromBackingStore(FilePreferences.getDefault());
 
-        EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (_, _, newValue) -> put(MAIN_FILE_DIRECTORY, newValue != null ? newValue.toString() : ""));
-        EasyBind.listen(filePreferences.storeFilesRelativeToBibFileProperty(), (_, _, newValue) -> putBoolean(STORE_RELATIVE_TO_BIB, newValue));
-        EasyBind.listen(filePreferences.autoRenameFilesOnChangeProperty(), (_, _, newValue) -> putBoolean(AUTO_RENAME_FILES_ON_CHANGE, newValue));
-        EasyBind.listen(filePreferences.fileNamePatternProperty(), (_, _, newValue) -> put(IMPORT_FILENAMEPATTERN, newValue));
-        EasyBind.listen(filePreferences.fileDirectoryPatternProperty(), (_, _, newValue) -> put(IMPORT_FILEDIRPATTERN, newValue));
-        EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (_, _, newValue) -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
-        EasyBind.listen(filePreferences.fulltextIndexLinkedFilesProperty(), (_, _, newValue) -> putBoolean(FULLTEXT_INDEX_LINKED_FILES, newValue));
-        EasyBind.listen(filePreferences.workingDirectoryProperty(), (_, _, newValue) -> put(WORKING_DIRECTORY, newValue.toString()));
-        EasyBind.listen(filePreferences.createBackupProperty(), (_, _, newValue) -> putBoolean(CREATE_BACKUP, newValue));
+        EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (_, _, newValue) -> put(FILES_MAIN_DIRECTORY, newValue != null ? newValue.toString() : ""));
+        EasyBind.listen(filePreferences.storeFilesRelativeToBibFileProperty(), (_, _, newValue) -> putBoolean(FILES_STORE_RELATIVE_TO_BIB, newValue));
+        EasyBind.listen(filePreferences.autoRenameFilesOnChangeProperty(), (_, _, newValue) -> putBoolean(FILES_AUTO_RENAME_ON_CHANGE, newValue));
+        EasyBind.listen(filePreferences.fileNamePatternProperty(), (_, _, newValue) -> put(FILES_IMPORT_NAMEPATTERN, newValue));
+        EasyBind.listen(filePreferences.fileDirectoryPatternProperty(), (_, _, newValue) -> put(FILES_IMPORT_DIRPATTERN, newValue));
+        EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (_, _, newValue) -> putBoolean(FILES_DOWNLOAD_LINKED, newValue));
+        EasyBind.listen(filePreferences.fulltextIndexLinkedFilesProperty(), (_, _, newValue) -> putBoolean(FILES_FULLTEXT_INDEX, newValue));
+        EasyBind.listen(filePreferences.workingDirectoryProperty(), (_, _, newValue) -> put(FILES_WORKING_DIRECTORY, newValue.toString()));
+        EasyBind.listen(filePreferences.createBackupProperty(), (_, _, newValue) -> putBoolean(BACKUP_ENABLED, newValue));
         EasyBind.listen(filePreferences.backupDirectoryProperty(), (_, _, newValue) -> put(BACKUP_DIRECTORY, newValue.toString()));
-        EasyBind.listen(filePreferences.confirmDeleteLinkedFileProperty(), (_, _, newValue) -> putBoolean(CONFIRM_LINKED_FILE_DELETE, newValue));
-        EasyBind.listen(filePreferences.moveToTrashProperty(), (_, _, newValue) -> putBoolean(TRASH_INSTEAD_OF_DELETE, newValue));
-        EasyBind.listen(filePreferences.adjustFileLinksOnTransferProperty(), (_, _, newValue) -> putBoolean(ADJUST_FILE_LINKS_ON_TRANSFER, newValue));
-        EasyBind.listen(filePreferences.copyLinkedFilesOnTransferProperty(), (_, _, newValue) -> putBoolean(COPY_LINKED_FILES_ON_TRANSFER, newValue));
-        EasyBind.listen(filePreferences.moveLinkedFilesOnTransferPropertyProperty(), (_, _, newValue) -> putBoolean(MOVE_LINKED_FILES_ON_TRANSFER, newValue));
-        EasyBind.listen(filePreferences.shouldKeepDownloadUrlProperty(), (_, _, newValue) -> putBoolean(KEEP_DOWNLOAD_URL, newValue));
-        EasyBind.listen(filePreferences.lastUsedDirectoryProperty(), (_, _, newValue) -> put(LAST_USED_DIRECTORY, newValue.toString()));
-        EasyBind.listen(filePreferences.openFileExplorerInFileDirectoryProperty(), (_, _, newValue) -> putBoolean(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, newValue));
-        EasyBind.listen(filePreferences.openFileExplorerInLastUsedDirectoryProperty(), (_, _, newValue) -> putBoolean(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, newValue));
+        EasyBind.listen(filePreferences.confirmDeleteLinkedFileProperty(), (_, _, newValue) -> putBoolean(FILES_CONFIRM_DELETE_LINKED, newValue));
+        EasyBind.listen(filePreferences.moveToTrashProperty(), (_, _, newValue) -> putBoolean(FILES_TRASH_INSTEAD_OF_DELETE, newValue));
+        EasyBind.listen(filePreferences.adjustFileLinksOnTransferProperty(), (_, _, newValue) -> putBoolean(FILES_ADJUST_FILE_LINKS_ON_TRANSFER, newValue));
+        EasyBind.listen(filePreferences.copyLinkedFilesOnTransferProperty(), (_, _, newValue) -> putBoolean(FILES_COPY_LINKED_FILES_ON_TRANSFER, newValue));
+        EasyBind.listen(filePreferences.moveLinkedFilesOnTransferPropertyProperty(), (_, _, newValue) -> putBoolean(FILES_MOVE_LINKED_FILES_ON_TRANSFER, newValue));
+        EasyBind.listen(filePreferences.shouldKeepDownloadUrlProperty(), (_, _, newValue) -> putBoolean(FILES_KEEP_DOWNLOAD_URL, newValue));
+        EasyBind.listen(filePreferences.lastUsedDirectoryProperty(), (_, _, newValue) -> put(FILES_LAST_USED_DIRECTORY, newValue.toString()));
+        EasyBind.listen(filePreferences.openFileExplorerInFileDirectoryProperty(), (_, _, newValue) -> putBoolean(FILES_OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, newValue));
+        EasyBind.listen(filePreferences.openFileExplorerInLastUsedDirectoryProperty(), (_, _, newValue) -> putBoolean(FILES_OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, newValue));
 
         return filePreferences;
     }
@@ -1517,27 +1519,27 @@ public class JabRefCliPreferences implements CliPreferences {
     private FilePreferences getFilePreferencesFromBackingStore(FilePreferences defaults) {
         return new FilePreferences(
                 getInternalPreferences().getUserAndHostInfoProperty(),
-                getPath(MAIN_FILE_DIRECTORY, defaults.mainFileDirectoryProperty().get()),
-                getBoolean(STORE_RELATIVE_TO_BIB, defaults.shouldStoreFilesRelativeToBibFile()),
-                getBoolean(AUTO_RENAME_FILES_ON_CHANGE, defaults.shouldAutoRenameFilesOnChange()),
-                get(IMPORT_FILENAMEPATTERN, defaults.getFileNamePattern()),
-                get(IMPORT_FILEDIRPATTERN, defaults.getFileDirectoryPattern()),
-                getBoolean(DOWNLOAD_LINKED_FILES, defaults.shouldDownloadLinkedFiles()),
-                getBoolean(FULLTEXT_INDEX_LINKED_FILES, defaults.shouldFulltextIndexLinkedFiles()),
-                Path.of(get(WORKING_DIRECTORY, defaults.getWorkingDirectory().toString())),
-                getBoolean(CREATE_BACKUP, defaults.shouldCreateBackup()),
+                getPath(FILES_MAIN_DIRECTORY, defaults.mainFileDirectoryProperty().get()),
+                getBoolean(FILES_STORE_RELATIVE_TO_BIB, defaults.shouldStoreFilesRelativeToBibFile()),
+                getBoolean(FILES_AUTO_RENAME_ON_CHANGE, defaults.shouldAutoRenameFilesOnChange()),
+                get(FILES_IMPORT_NAMEPATTERN, defaults.getFileNamePattern()),
+                get(FILES_IMPORT_DIRPATTERN, defaults.getFileDirectoryPattern()),
+                getBoolean(FILES_DOWNLOAD_LINKED, defaults.shouldDownloadLinkedFiles()),
+                getBoolean(FILES_FULLTEXT_INDEX, defaults.shouldFulltextIndexLinkedFiles()),
+                Path.of(get(FILES_WORKING_DIRECTORY, defaults.getWorkingDirectory().toString())),
+                getBoolean(BACKUP_ENABLED, defaults.shouldCreateBackup()),
                 // We choose the data directory, because a ".bak" file should survive cache cleanups
                 getPath(BACKUP_DIRECTORY, defaults.getBackupDirectory()),
-                getBoolean(CONFIRM_LINKED_FILE_DELETE, defaults.confirmDeleteLinkedFile()),
+                getBoolean(FILES_CONFIRM_DELETE_LINKED, defaults.confirmDeleteLinkedFile()),
                 // We make use of the fallback, because we need AWT being initialized, which is not the case at the constructor JabRefPreferences()
-                getBoolean(TRASH_INSTEAD_OF_DELETE, moveToTrashSupported()),
-                getBoolean(ADJUST_FILE_LINKS_ON_TRANSFER, defaults.shouldAdjustFileLinksOnTransfer()),
-                getBoolean(COPY_LINKED_FILES_ON_TRANSFER, defaults.shouldCopyLinkedFilesOnTransfer()),
-                getBoolean(MOVE_LINKED_FILES_ON_TRANSFER, defaults.shouldMoveLinkedFilesOnTransfer()),
-                getBoolean(KEEP_DOWNLOAD_URL, defaults.shouldKeepDownloadUrl()),
-                getPath(LAST_USED_DIRECTORY, defaults.getLastUsedDirectory()),
-                getBoolean(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, defaults.shouldOpenFileExplorerInFileDirectory()),
-                getBoolean(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, defaults.shouldOpenFileExplorerInLastUsedDirectory()));
+                getBoolean(FILES_TRASH_INSTEAD_OF_DELETE, moveToTrashSupported()),
+                getBoolean(FILES_ADJUST_FILE_LINKS_ON_TRANSFER, defaults.shouldAdjustFileLinksOnTransfer()),
+                getBoolean(FILES_COPY_LINKED_FILES_ON_TRANSFER, defaults.shouldCopyLinkedFilesOnTransfer()),
+                getBoolean(FILES_MOVE_LINKED_FILES_ON_TRANSFER, defaults.shouldMoveLinkedFilesOnTransfer()),
+                getBoolean(FILES_KEEP_DOWNLOAD_URL, defaults.shouldKeepDownloadUrl()),
+                getPath(FILES_LAST_USED_DIRECTORY, defaults.getLastUsedDirectory()),
+                getBoolean(FILES_OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, defaults.shouldOpenFileExplorerInFileDirectory()),
+                getBoolean(FILES_OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, defaults.shouldOpenFileExplorerInLastUsedDirectory()));
     }
 
     protected boolean moveToTrashSupported() {
@@ -2003,7 +2005,7 @@ public class JabRefCliPreferences implements CliPreferences {
         xmpPreferences = getXmpPreferencesFromBackingStore(XmpPreferences.getDefault());
 
         EasyBind.listen(xmpPreferences.useXmpPrivacyFilterProperty(),
-                (_, _, newValue) -> putBoolean(USE_XMP_PRIVACY_FILTER, newValue));
+                (_, _, newValue) -> putBoolean(XMP_USE_PRIVACY_FILTER, newValue));
         xmpPreferences.getXmpPrivacyFilter().addListener((SetChangeListener<Field>) _ ->
                 putStringList(XMP_PRIVACY_FILTERS, xmpPreferences.getXmpPrivacyFilter().stream()
                                                                  .map(Field::getName)
@@ -2014,7 +2016,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private XmpPreferences getXmpPreferencesFromBackingStore(XmpPreferences defaults) {
         return new XmpPreferences(
-                getBoolean(USE_XMP_PRIVACY_FILTER, defaults.shouldUseXmpPrivacyFilter()),
+                getBoolean(XMP_USE_PRIVACY_FILTER, defaults.shouldUseXmpPrivacyFilter()),
                 convertStringToList(get(XMP_PRIVACY_FILTERS,
                         convertListToString(defaults.getXmpPrivacyFilter().stream().map(Field::getName).toList())))
                         .stream()
