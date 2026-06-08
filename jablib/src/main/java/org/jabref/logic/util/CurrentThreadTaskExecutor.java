@@ -22,10 +22,9 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
     /// javafx.concurrent.Task.TaskCallable#call()}, but adapted to run sequentially.
     @Override
     public <V> Future<V> execute(BackgroundTask<V> task) {
-        Runnable onRunning = task.getOnRunning();
-        if (onRunning != null) {
-            onRunning.run();
-        }
+        task.getOnRunning()
+            .ifPresent(Runnable::run);
+
         try {
             final V result = task.call();
             Consumer<V> onSuccess = task.getOnSuccess();

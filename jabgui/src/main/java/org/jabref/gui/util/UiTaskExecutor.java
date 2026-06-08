@@ -189,10 +189,11 @@ public class UiTaskExecutor implements TaskExecutor {
                 return task.call();
             }
         };
-        Runnable onRunning = task.getOnRunning();
-        if (onRunning != null) {
-            javaTask.setOnRunning(_ -> onRunning.run());
-        }
+
+        task.getOnRunning()
+            .ifPresent(onRunning ->
+                    javaTask.setOnRunning(_ -> onRunning.run()));
+
         Consumer<V> onSuccess = task.getOnSuccess();
         javaTask.setOnSucceeded(_ -> {
             // Set to 100% completed on completion

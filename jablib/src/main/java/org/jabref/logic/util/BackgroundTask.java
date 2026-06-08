@@ -1,5 +1,6 @@
 package org.jabref.logic.util;
 
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -17,6 +18,7 @@ import javafx.beans.property.StringProperty;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,10 +47,11 @@ public abstract class BackgroundTask<V> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackgroundTask.class);
 
-    private Runnable onRunning;
-    private Consumer<V> onSuccess;
-    private Consumer<Exception> onException;
-    private Runnable onFinished;
+    @Nullable private Runnable onRunning;
+    @Nullable private Consumer<V> onSuccess;
+    @Nullable private Consumer<Exception> onException;
+    @Nullable private Runnable onFinished;
+
     private final BooleanProperty isCancelled = new SimpleBooleanProperty(false);
     private final BooleanProperty mayInterruptIfRunning = new SimpleBooleanProperty(true);
     private final ObjectProperty<BackgroundProgress> progress = new SimpleObjectProperty<>(new BackgroundProgress(0, 0));
@@ -81,7 +84,7 @@ public abstract class BackgroundTask<V> {
         };
     }
 
-    private static <T> Consumer<T> chain(Runnable first, Consumer<T> second) {
+    private static <T> Consumer<T> chain(@Nullable Runnable first, @Nullable Consumer<T> second) {
         if (first != null) {
             if (second != null) {
                 return result -> {
@@ -189,8 +192,8 @@ public abstract class BackgroundTask<V> {
 
     public abstract V call() throws Exception;
 
-    public Runnable getOnRunning() {
-        return onRunning;
+    public Optional<Runnable> getOnRunning() {
+        return Optional.ofNullable(onRunning);
     }
 
     public Consumer<V> getOnSuccess() {
