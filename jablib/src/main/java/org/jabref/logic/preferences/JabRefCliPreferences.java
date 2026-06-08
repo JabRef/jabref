@@ -507,9 +507,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(NEWLINE, System.lineSeparator());
 
-        defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
-        defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
-
         defaults.put(EXPORT_WORKING_DIRECTORY, USER_HOME);
         defaults.put(LAST_USED_DIRECTORY, getDefaultPath().toString());
 
@@ -522,21 +519,11 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(LAST_USED_EXPORT, "");
 
-        defaults.put(CLEANUP_JOBS, convertListToString(getDefaultCleanupJobs().stream().map(Enum::name).toList()));
-        defaults.put(CLEANUP_FIELD_FORMATTERS_ENABLED, Boolean.FALSE);
-        defaults.put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanupActions.getMetaDataString(FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS, OS.NEWLINE));
-
         // Since some of the preference settings themselves use localized strings, we cannot set the language after
         // the initialization of the preferences in main
         // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
         // will never be translated.
         Localization.setLanguage(getLanguage());
-
-        // region last files opened
-        defaults.put(RECENT_DATABASES, "");
-        defaults.put(LAST_FOCUSED, "");
-        defaults.put(LAST_EDITED, "");
-        // endregion
 
         // WalkThrough
         defaults.put(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED, Boolean.FALSE);
@@ -852,6 +839,7 @@ public class JabRefCliPreferences implements CliPreferences {
                                                    .withLastUsedDirectory(getDefaultPath())
         );
         getAiPreferences().setAll(AiPreferences.getDefault());
+        getCleanupPreferences().setAll(CleanupPreferences.getDefault());
         getImporterPreferences().setAll(ImporterPreferences.getDefault());
         getAutoLinkPreferences().setAll(
                 AutoLinkPreferences.getDefault()
@@ -859,6 +847,8 @@ public class JabRefCliPreferences implements CliPreferences {
         getExportPreferences().setAll(ExportPreferences.getDefault());
         getSSLPreferences().setAll(SSLPreferences.getDefault());
         getSearchPreferences().setAll(SearchPreferences.getDefault());
+        getLastFilesOpenedPreferences().setAll(LastFilesOpenedPreferences.getDefault());
+        getXmpPreferences().setAll(XmpPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences())).setAll(
                 OpenOfficePreferences.getDefault());
     }
@@ -889,11 +879,14 @@ public class JabRefCliPreferences implements CliPreferences {
         getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
         getBibEntryPreferences().setAll(getBibEntryPreferencesFromBackingStore(getBibEntryPreferences()));
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
+        getCleanupPreferences().setAll(getCleanupPreferencesFromBackingStore(getCleanupPreferences()));
         getImporterPreferences().setAll(getImporterPreferencesFromBackingStore(getImporterPreferences()));
         getAutoLinkPreferences().setAll(getAutoLinkPreferencesFromBackingStore(getAutoLinkPreferences()));
         getExportPreferences().setAll(getExportPreferencesFromBackingStore(getExportPreferences()));
         getSSLPreferences().setAll(getSSLPreferencesFromBackingStore(getSSLPreferences()));
         getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
+        getLastFilesOpenedPreferences().setAll(getLastFilesOpenedPreferencesFromBackingStore(getLastFilesOpenedPreferences()));
+        getXmpPreferences().setAll(getXmpPreferencesFromBackingStore(getXmpPreferences()));
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences());
         getOpenOfficePreferences(repository).setAll(
                 getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
@@ -1721,7 +1714,6 @@ public class JabRefCliPreferences implements CliPreferences {
             putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, false);
         }
     }
-    // endregion
 
     @Override
     public SelfContainedSaveConfiguration getSelfContainedExportConfiguration() {
@@ -1783,24 +1775,22 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
-    // region Cleanup preferences
-
+    // region CleanupPreferences
     @Override
     public CleanupPreferences getCleanupPreferences() {
         if (cleanupPreferences != null) {
             return cleanupPreferences;
         }
 
-        cleanupPreferences = new CleanupPreferences(
-                EnumSet.copyOf(getStringList(CLEANUP_JOBS).stream()
-                                                          .map(CleanupPreferences.CleanupStep::valueOf)
-                                                          .collect(Collectors.toSet())),
-                new FieldFormatterCleanupActions(getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanupMapper.parseActions(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))
-                ));
+        cleanupPreferences = getCleanupPreferencesFromBackingStore(CleanupPreferences.getDefault());
 
-        cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) _ ->
-                putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList())));
+        cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) _ -> {
+            if (cleanupPreferences.getActiveJobs().isEmpty()) {
+                remove(CLEANUP_JOBS);
+            } else {
+                putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList()));
+            }
+        });
 
         EasyBind.listen(cleanupPreferences.fieldFormatterCleanupsProperty(), (_, _, newValue) -> {
             putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, newValue.isEnabled());
@@ -1810,49 +1800,40 @@ public class JabRefCliPreferences implements CliPreferences {
         return cleanupPreferences;
     }
 
-    @Override
-    public CleanupPreferences getDefaultCleanupPreset() {
-        return new CleanupPreferences(
-                getDefaultCleanupJobs(),
-                new FieldFormatterCleanupActions(
-                        (Boolean) defaults.get(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanupMapper.parseActions((String) defaults.get(CLEANUP_FIELD_FORMATTERS))
-                ));
-    }
+    private CleanupPreferences getCleanupPreferencesFromBackingStore(CleanupPreferences defaults) {
+        EnumSet<CleanupPreferences.CleanupStep> activeJobs;
+        if (hasKey(CLEANUP_JOBS)) {
+            Set<CleanupPreferences.CleanupStep> parsed = getStringList(CLEANUP_JOBS).stream()
+                                                                                    .map(CleanupPreferences.CleanupStep::valueOf)
+                                                                                    .collect(Collectors.toSet());
+            activeJobs = parsed.isEmpty() ? EnumSet.noneOf(CleanupPreferences.CleanupStep.class) : EnumSet.copyOf(parsed);
+        } else {
+            activeJobs = EnumSet.copyOf(defaults.getActiveJobs());
+        }
 
-    private static EnumSet<CleanupPreferences.CleanupStep> getDefaultCleanupJobs() {
-        EnumSet<CleanupPreferences.CleanupStep> activeJobs = EnumSet.allOf(CleanupPreferences.CleanupStep.class);
-        activeJobs.removeAll(EnumSet.of(
-                CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
-                CleanupPreferences.CleanupStep.MOVE_PDF,
-                CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
-                CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX,
-                CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX,
-                CleanupPreferences.CleanupStep.CONVERT_MSC_CODES,
-                CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT,
-                CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS,
-                CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE,
-                CleanupPreferences.CleanupStep.ABBREVIATE_LTWA,
-                CleanupPreferences.CleanupStep.UNABBREVIATE));
-        return activeJobs;
-    }
+        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(
+                getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, defaults.getFieldFormatterCleanups().isEnabled()),
+                FieldFormatterCleanupMapper.parseActions(
+                        StringUtil.unifyLineBreaks(get(
+                                        CLEANUP_FIELD_FORMATTERS,
+                                        FieldFormatterCleanupActions.getMetaDataString(defaults.getFieldFormatterCleanups()
+                                                                                               .getConfiguredActions(),
+                                                OS.NEWLINE)),
+                                ""))
+        );
 
+        return new CleanupPreferences(activeJobs, actions);
+    }
     // endregion
 
-    // region last files opened
-
+    // region LastFilesOpenedPreferences
     @Override
     public LastFilesOpenedPreferences getLastFilesOpenedPreferences() {
         if (lastFilesOpenedPreferences != null) {
             return lastFilesOpenedPreferences;
         }
 
-        lastFilesOpenedPreferences = new LastFilesOpenedPreferences(
-                getStringList(LAST_EDITED).stream()
-                                          .map(Path::of)
-                                          .toList(),
-                Path.of(get(LAST_FOCUSED)),
-                getFileHistory());
+        lastFilesOpenedPreferences = getLastFilesOpenedPreferencesFromBackingStore(LastFilesOpenedPreferences.getDefault());
 
         lastFilesOpenedPreferences.getLastFilesOpened().addListener((ListChangeListener<Path>) change -> {
             if (change.getList().isEmpty()) {
@@ -1865,7 +1846,7 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         });
         EasyBind.listen(lastFilesOpenedPreferences.lastFocusedFileProperty(), (_, _, newValue) -> {
-            if (newValue != null) {
+            if (newValue != null && !newValue.toString().isBlank()) {
                 put(LAST_FOCUSED, newValue.toAbsolutePath().toString());
             } else {
                 remove(LAST_FOCUSED);
@@ -1876,10 +1857,40 @@ public class JabRefCliPreferences implements CliPreferences {
         return lastFilesOpenedPreferences;
     }
 
-    private FileHistory getFileHistory() {
-        return FileHistory.of(getStringList(RECENT_DATABASES).stream()
-                                                             .map(Path::of)
-                                                             .toList());
+    private LastFilesOpenedPreferences getLastFilesOpenedPreferencesFromBackingStore(LastFilesOpenedPreferences defaults) {
+        List<Path> lastFilesOpened;
+        if (hasKey(LAST_EDITED)) {
+            lastFilesOpened = convertStringToList(get(LAST_EDITED, "")).stream()
+                                                                       .map(Path::of)
+                                                                       .toList();
+        } else {
+            lastFilesOpened = defaults.getLastFilesOpened();
+        }
+
+        Path lastFocused = null;
+        if (hasKey(LAST_FOCUSED)) {
+            String stored = get(LAST_FOCUSED);
+            if (!stored.isBlank()) {
+                lastFocused = Path.of(stored);
+            }
+        } else {
+            lastFocused = defaults.getLastFocusedFile();
+        }
+
+        return new LastFilesOpenedPreferences(
+                lastFilesOpened,
+                lastFocused,
+                getFileHistory(defaults.getFileHistory()));
+    }
+
+    private FileHistory getFileHistory(FileHistory defaults) {
+        if (hasKey(RECENT_DATABASES)) {
+            return FileHistory.of(convertStringToList(get(RECENT_DATABASES)).stream()
+                                                                            .map(Path::of)
+                                                                            .toList());
+        } else {
+            return defaults;
+        }
     }
 
     private void storeFileHistory(FileHistory history) {
@@ -1887,7 +1898,6 @@ public class JabRefCliPreferences implements CliPreferences {
                                                .map(Path::toString)
                                                .toList());
     }
-
     // endregion
 
     // region AiPreferences
@@ -2026,16 +2036,14 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
+    // region XmpPreferences
     @Override
     public XmpPreferences getXmpPreferences() {
         if (xmpPreferences != null) {
             return xmpPreferences;
         }
 
-        xmpPreferences = new XmpPreferences(
-                getBoolean(USE_XMP_PRIVACY_FILTER),
-                getStringList(XMP_PRIVACY_FILTERS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
-                getBibEntryPreferences().keywordSeparatorProperty());
+        xmpPreferences = getXmpPreferencesFromBackingStore(XmpPreferences.getDefault());
 
         EasyBind.listen(xmpPreferences.useXmpPrivacyFilterProperty(),
                 (_, _, newValue) -> putBoolean(USE_XMP_PRIVACY_FILTER, newValue));
@@ -2047,6 +2055,19 @@ public class JabRefCliPreferences implements CliPreferences {
         return xmpPreferences;
     }
 
+    private XmpPreferences getXmpPreferencesFromBackingStore(XmpPreferences defaults) {
+        return new XmpPreferences(
+                getBoolean(USE_XMP_PRIVACY_FILTER, defaults.shouldUseXmpPrivacyFilter()),
+                convertStringToList(get(XMP_PRIVACY_FILTERS,
+                        convertListToString(defaults.getXmpPrivacyFilter().stream().map(Field::getName).toList())))
+                        .stream()
+                        .map(FieldFactory::parseField)
+                        .collect(Collectors.toSet()),
+                getBibEntryPreferences().keywordSeparatorProperty());
+    }
+    // endregion
+
+    // region NameFormatterPreferences
     @Override
     public NameFormatterPreferences getNameFormatterPreferences() {
         if (nameFormatterPreferences != null) {
@@ -2064,7 +2085,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return nameFormatterPreferences;
     }
+    // endregion
 
+    // region ProtectedTermsPreferences
     @Override
     public ProtectedTermsPreferences getProtectedTermsPreferences() {
         if (protectedTermsPreferences != null) {
@@ -2089,6 +2112,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return protectedTermsPreferences;
     }
+    // endregion
 
     // region ImporterPreferences
     @Override
