@@ -96,7 +96,7 @@ class XmpMetadataCleanupTest {
         LinkedFile linkedFile = new LinkedFile("Test PDF", pdfFile, "PDF");
         olly2018.addFile(linkedFile);
         when(databaseContext.getFileDirectories(any(FilePreferences.class)))
-                .thenReturn(Collections.singletonList(tempDir));
+                .thenReturn(List.of(tempDir));
 
         List<FieldChange> changes = cleanupJob.cleanup(olly2018);
         List<FieldChange> expectedChanges = List.of(new FieldChange(
@@ -121,10 +121,9 @@ class XmpMetadataCleanupTest {
         assertEquals(List.of(), xmpReader.readRawXmp(pdfFile));
 
         LinkedFile linkedFile = new LinkedFile("Test PDF", pdfFile, "PDF");
-        BibEntry bibEntry = new BibEntry().withFiles(Collections.singletonList(linkedFile));
+        BibEntry bibEntry = new BibEntry().withFiles(List.of(linkedFile));
 
         List<FieldChange> changes = cleanupJob.cleanup(bibEntry);
         assertEquals(List.of(), changes);
     }
 }
-
