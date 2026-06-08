@@ -10,6 +10,7 @@ import org.jabref.logic.util.io.BackupFileUtil;
 public enum TestBibFile {
     GENERAL_SERVER_TEST("src/test/resources/org/jabref/http/server/general-server-test.bib"),
     GROUPS_SERVER_TEST("src/test/resources/org/jabref/http/server/groups-server-test.bib"),
+    XSS_SERVER_TEST("src/test/resources/org/jabref/http/server/xss-server-test.bib"),
     CHOCOLATE_BIB("../jablib/src/main/resources/Chocolate.bib");
 
     public final Path path;

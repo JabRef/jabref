@@ -26,8 +26,9 @@ jobs:
     runs-on: ubuntu-slim
     permissions:
       actions: read
-      contents: write
-      pull-requests: write
+      contents: read
+      issues: write
+      pull-requests: read
     timeout-minutes: 10
     steps:
       - name: Show GitHub context

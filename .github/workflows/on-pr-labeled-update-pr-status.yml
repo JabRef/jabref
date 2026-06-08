@@ -10,8 +10,8 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-slim
     permissions:
-      actions: write
-      contents: write
+      actions: read
+      issues: read
       pull-requests: write
     steps:
       - name: Download artifact from triggering run

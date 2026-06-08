@@ -53,15 +53,6 @@ import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImporterPreferences;
-import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
-import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
-import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
-import org.jabref.logic.importer.fetcher.DBLPFetcher;
-import org.jabref.logic.importer.fetcher.IEEE;
-import org.jabref.logic.importer.fetcher.Scopus;
-import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
-import org.jabref.logic.importer.fetcher.WileyFetcher;
-import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.util.GrobidPreferences;
@@ -89,7 +80,6 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
-import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
@@ -164,7 +154,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
     public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
 
-    public static final String IMPORT_WORKING_DIRECTORY = "importWorkingDirectory";
     public static final String LAST_USED_EXPORT = "lastUsedExport";
     public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
     public static final String WORKING_DIRECTORY = "workingDirectory";
@@ -213,7 +202,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES = "duplicateResolverDecisionResult";
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
-    public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
 
     public static final String MAIN_FILE_DIRECTORY = "fileDirectory";
 
@@ -227,11 +215,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String SEARCH_WINDOW_HEIGHT = "searchWindowHeight";
     public static final String SEARCH_WINDOW_WIDTH = "searchWindowWidth";
     public static final String SEARCH_WINDOW_DIVIDER_POS = "searchWindowDividerPos";
-    public static final String SEARCH_CATALOGS = "searchCatalogs";
-    public static final String DEFAULT_PLAIN_CITATION_PARSER = "defaultPlainCitationParser";
-    public static final String CITATIONS_RELATIONS_STORE_TTL = "citationsRelationsStoreTTL";
-    public static final String IMPORTERS_ENABLED = "importersEnabled";
-    public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
     public static final String GROBID_ENABLED = "grobidEnabled";
     public static final String GROBID_PREFERENCE = "grobidPreference";
     public static final String GROBID_URL = "grobidURL";
@@ -309,8 +292,6 @@ public class JabRefCliPreferences implements CliPreferences {
     // String delimiter
     public static final Character STRINGLIST_DELIMITER = ';';
 
-    protected static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
-
     // Helper string
     protected static final String USER_HOME = System.getProperty("user.home");
 
@@ -332,11 +313,6 @@ public class JabRefCliPreferences implements CliPreferences {
     // PROXY_PASSWORD = "proxyPassword" handled by KeyRing
     private static final String PROXY_PERSIST_PASSWORD = "persistPassword";
     // endregion
-
-    // Web search
-    private static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
-    private static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
-    private static final String FETCHER_CUSTOM_KEY_PERSIST = "fetcherCustomKeyPersist";
 
     // SSL
     private static final String SSL_TRUSTSTORE_PATH = "truststorePath";
@@ -436,6 +412,20 @@ public class JabRefCliPreferences implements CliPreferences {
     );
     // endregion
 
+    // region ImporterPreferences
+    private static final String IMPORTER_ENABLED = "importersEnabled";
+    private static final String IMPORTER_GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
+    private static final String IMPORTER_WORKING_DIRECTORY = "importWorkingDirectory";
+    private static final String IMPORTER_WARN_ABOUT_DUPLICATES = "warnAboutDuplicatesInInspection";
+    private static final String IMPORTER_CUSTOM_FORMAT = "customImportFormat";
+    private static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
+    private static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
+    private static final String FETCHER_CUSTOM_KEY_PERSIST = "fetcherCustomKeyPersist";
+    private static final String IMPORTER_CATALOGS = "searchCatalogs";
+    private static final String IMPORTER_DEFAULT_PLAIN_CITATION_PARSER = "defaultPlainCitationParser";
+    private static final String IMPORTER_CITATIONS_RELATIONS_STORE_TTL = "citationsRelationsStoreTTL";
+    // endregion
+
     // region Git
     private static final String GITHUB_PAT_KEY = "githubPersonalAccessToken";
     private static final String GITHUB_USERNAME_KEY = "githubUsername";
@@ -495,16 +485,6 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.warn("Could not import preferences from jabref.xml", e);
         }
 
-        defaults.put(SEARCH_CATALOGS, convertListToString(List.of(
-                ACMPortalFetcher.FETCHER_NAME,
-                SpringerNatureWebFetcher.FETCHER_NAME,
-                DBLPFetcher.FETCHER_NAME,
-                IEEE.FETCHER_NAME)));
-        defaults.put(DEFAULT_PLAIN_CITATION_PARSER, PlainCitationParserChoice.RULE_BASED_GENERAL.name());
-        defaults.put(IMPORTERS_ENABLED, Boolean.TRUE);
-        defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
-        defaults.put(CITATIONS_RELATIONS_STORE_TTL, 30);
-
         // region Grobid
         defaults.put(GROBID_ENABLED, Boolean.FALSE);
         defaults.put(GROBID_PREFERENCE, Boolean.FALSE);
@@ -527,14 +507,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(NEWLINE, System.lineSeparator());
 
-        defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
-        defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
-
         defaults.put(EXPORT_WORKING_DIRECTORY, USER_HOME);
         defaults.put(LAST_USED_DIRECTORY, getDefaultPath().toString());
-
-        // Remembers working directory of last import
-        defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
 
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
 
@@ -543,29 +517,13 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(PROTECTED_TERMS_ENABLED_EXTERNAL, "");
         defaults.put(PROTECTED_TERMS_DISABLED_EXTERNAL, "");
 
-        defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage");
-        defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
-        defaults.put(FETCHER_CUSTOM_KEY_PERSIST, Boolean.FALSE);
-
-        defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
-
         defaults.put(LAST_USED_EXPORT, "");
-
-        defaults.put(CLEANUP_JOBS, convertListToString(getDefaultCleanupJobs().stream().map(Enum::name).toList()));
-        defaults.put(CLEANUP_FIELD_FORMATTERS_ENABLED, Boolean.FALSE);
-        defaults.put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanupActions.getMetaDataString(FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS, OS.NEWLINE));
 
         // Since some of the preference settings themselves use localized strings, we cannot set the language after
         // the initialization of the preferences in main
         // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
         // will never be translated.
         Localization.setLanguage(getLanguage());
-
-        // region last files opened
-        defaults.put(RECENT_DATABASES, "");
-        defaults.put(LAST_FOCUSED, "");
-        defaults.put(LAST_EDITED, "");
-        // endregion
 
         // WalkThrough
         defaults.put(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED, Boolean.FALSE);
@@ -881,12 +839,16 @@ public class JabRefCliPreferences implements CliPreferences {
                                                    .withLastUsedDirectory(getDefaultPath())
         );
         getAiPreferences().setAll(AiPreferences.getDefault());
+        getCleanupPreferences().setAll(CleanupPreferences.getDefault());
+        getImporterPreferences().setAll(ImporterPreferences.getDefault());
         getAutoLinkPreferences().setAll(
                 AutoLinkPreferences.getDefault()
                                    .withKeywordSeparator(getBibEntryPreferences().keywordSeparatorProperty()));
         getExportPreferences().setAll(ExportPreferences.getDefault());
         getSSLPreferences().setAll(SSLPreferences.getDefault());
         getSearchPreferences().setAll(SearchPreferences.getDefault());
+        getLastFilesOpenedPreferences().setAll(LastFilesOpenedPreferences.getDefault());
+        getXmpPreferences().setAll(XmpPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences())).setAll(
                 OpenOfficePreferences.getDefault());
     }
@@ -917,10 +879,14 @@ public class JabRefCliPreferences implements CliPreferences {
         getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
         getBibEntryPreferences().setAll(getBibEntryPreferencesFromBackingStore(getBibEntryPreferences()));
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
+        getCleanupPreferences().setAll(getCleanupPreferencesFromBackingStore(getCleanupPreferences()));
+        getImporterPreferences().setAll(getImporterPreferencesFromBackingStore(getImporterPreferences()));
         getAutoLinkPreferences().setAll(getAutoLinkPreferencesFromBackingStore(getAutoLinkPreferences()));
         getExportPreferences().setAll(getExportPreferencesFromBackingStore(getExportPreferences()));
         getSSLPreferences().setAll(getSSLPreferencesFromBackingStore(getSSLPreferences()));
         getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
+        getLastFilesOpenedPreferences().setAll(getLastFilesOpenedPreferencesFromBackingStore(getLastFilesOpenedPreferences()));
+        getXmpPreferences().setAll(getXmpPreferencesFromBackingStore(getXmpPreferences()));
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences());
         getOpenOfficePreferences(repository).setAll(
                 getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
@@ -1748,7 +1714,6 @@ public class JabRefCliPreferences implements CliPreferences {
             putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, false);
         }
     }
-    // endregion
 
     @Override
     public SelfContainedSaveConfiguration getSelfContainedExportConfiguration() {
@@ -1810,24 +1775,22 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
-    // region Cleanup preferences
-
+    // region CleanupPreferences
     @Override
     public CleanupPreferences getCleanupPreferences() {
         if (cleanupPreferences != null) {
             return cleanupPreferences;
         }
 
-        cleanupPreferences = new CleanupPreferences(
-                EnumSet.copyOf(getStringList(CLEANUP_JOBS).stream()
-                                                          .map(CleanupPreferences.CleanupStep::valueOf)
-                                                          .collect(Collectors.toSet())),
-                new FieldFormatterCleanupActions(getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanupMapper.parseActions(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))
-                ));
+        cleanupPreferences = getCleanupPreferencesFromBackingStore(CleanupPreferences.getDefault());
 
-        cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) _ ->
-                putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList())));
+        cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) _ -> {
+            if (cleanupPreferences.getActiveJobs().isEmpty()) {
+                remove(CLEANUP_JOBS);
+            } else {
+                putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList()));
+            }
+        });
 
         EasyBind.listen(cleanupPreferences.fieldFormatterCleanupsProperty(), (_, _, newValue) -> {
             putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, newValue.isEnabled());
@@ -1837,49 +1800,40 @@ public class JabRefCliPreferences implements CliPreferences {
         return cleanupPreferences;
     }
 
-    @Override
-    public CleanupPreferences getDefaultCleanupPreset() {
-        return new CleanupPreferences(
-                getDefaultCleanupJobs(),
-                new FieldFormatterCleanupActions(
-                        (Boolean) defaults.get(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanupMapper.parseActions((String) defaults.get(CLEANUP_FIELD_FORMATTERS))
-                ));
-    }
+    private CleanupPreferences getCleanupPreferencesFromBackingStore(CleanupPreferences defaults) {
+        EnumSet<CleanupPreferences.CleanupStep> activeJobs;
+        if (hasKey(CLEANUP_JOBS)) {
+            Set<CleanupPreferences.CleanupStep> parsed = getStringList(CLEANUP_JOBS).stream()
+                                                                                    .map(CleanupPreferences.CleanupStep::valueOf)
+                                                                                    .collect(Collectors.toSet());
+            activeJobs = parsed.isEmpty() ? EnumSet.noneOf(CleanupPreferences.CleanupStep.class) : EnumSet.copyOf(parsed);
+        } else {
+            activeJobs = EnumSet.copyOf(defaults.getActiveJobs());
+        }
 
-    private static EnumSet<CleanupPreferences.CleanupStep> getDefaultCleanupJobs() {
-        EnumSet<CleanupPreferences.CleanupStep> activeJobs = EnumSet.allOf(CleanupPreferences.CleanupStep.class);
-        activeJobs.removeAll(EnumSet.of(
-                CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
-                CleanupPreferences.CleanupStep.MOVE_PDF,
-                CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
-                CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX,
-                CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX,
-                CleanupPreferences.CleanupStep.CONVERT_MSC_CODES,
-                CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT,
-                CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS,
-                CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE,
-                CleanupPreferences.CleanupStep.ABBREVIATE_LTWA,
-                CleanupPreferences.CleanupStep.UNABBREVIATE));
-        return activeJobs;
-    }
+        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(
+                getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, defaults.getFieldFormatterCleanups().isEnabled()),
+                FieldFormatterCleanupMapper.parseActions(
+                        StringUtil.unifyLineBreaks(get(
+                                        CLEANUP_FIELD_FORMATTERS,
+                                        FieldFormatterCleanupActions.getMetaDataString(defaults.getFieldFormatterCleanups()
+                                                                                               .getConfiguredActions(),
+                                                OS.NEWLINE)),
+                                ""))
+        );
 
+        return new CleanupPreferences(activeJobs, actions);
+    }
     // endregion
 
-    // region last files opened
-
+    // region LastFilesOpenedPreferences
     @Override
     public LastFilesOpenedPreferences getLastFilesOpenedPreferences() {
         if (lastFilesOpenedPreferences != null) {
             return lastFilesOpenedPreferences;
         }
 
-        lastFilesOpenedPreferences = new LastFilesOpenedPreferences(
-                getStringList(LAST_EDITED).stream()
-                                          .map(Path::of)
-                                          .toList(),
-                Path.of(get(LAST_FOCUSED)),
-                getFileHistory());
+        lastFilesOpenedPreferences = getLastFilesOpenedPreferencesFromBackingStore(LastFilesOpenedPreferences.getDefault());
 
         lastFilesOpenedPreferences.getLastFilesOpened().addListener((ListChangeListener<Path>) change -> {
             if (change.getList().isEmpty()) {
@@ -1892,7 +1846,7 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         });
         EasyBind.listen(lastFilesOpenedPreferences.lastFocusedFileProperty(), (_, _, newValue) -> {
-            if (newValue != null) {
+            if (newValue != null && !newValue.toString().isBlank()) {
                 put(LAST_FOCUSED, newValue.toAbsolutePath().toString());
             } else {
                 remove(LAST_FOCUSED);
@@ -1903,10 +1857,40 @@ public class JabRefCliPreferences implements CliPreferences {
         return lastFilesOpenedPreferences;
     }
 
-    private FileHistory getFileHistory() {
-        return FileHistory.of(getStringList(RECENT_DATABASES).stream()
-                                                             .map(Path::of)
-                                                             .toList());
+    private LastFilesOpenedPreferences getLastFilesOpenedPreferencesFromBackingStore(LastFilesOpenedPreferences defaults) {
+        List<Path> lastFilesOpened;
+        if (hasKey(LAST_EDITED)) {
+            lastFilesOpened = convertStringToList(get(LAST_EDITED, "")).stream()
+                                                                       .map(Path::of)
+                                                                       .toList();
+        } else {
+            lastFilesOpened = defaults.getLastFilesOpened();
+        }
+
+        Path lastFocused = null;
+        if (hasKey(LAST_FOCUSED)) {
+            String stored = get(LAST_FOCUSED);
+            if (!stored.isBlank()) {
+                lastFocused = Path.of(stored);
+            }
+        } else {
+            lastFocused = defaults.getLastFocusedFile();
+        }
+
+        return new LastFilesOpenedPreferences(
+                lastFilesOpened,
+                lastFocused,
+                getFileHistory(defaults.getFileHistory()));
+    }
+
+    private FileHistory getFileHistory(FileHistory defaults) {
+        if (hasKey(RECENT_DATABASES)) {
+            return FileHistory.of(convertStringToList(get(RECENT_DATABASES)).stream()
+                                                                            .map(Path::of)
+                                                                            .toList());
+        } else {
+            return defaults;
+        }
     }
 
     private void storeFileHistory(FileHistory history) {
@@ -1914,7 +1898,6 @@ public class JabRefCliPreferences implements CliPreferences {
                                                .map(Path::toString)
                                                .toList());
     }
-
     // endregion
 
     // region AiPreferences
@@ -2053,16 +2036,14 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
+    // region XmpPreferences
     @Override
     public XmpPreferences getXmpPreferences() {
         if (xmpPreferences != null) {
             return xmpPreferences;
         }
 
-        xmpPreferences = new XmpPreferences(
-                getBoolean(USE_XMP_PRIVACY_FILTER),
-                getStringList(XMP_PRIVACY_FILTERS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
-                getBibEntryPreferences().keywordSeparatorProperty());
+        xmpPreferences = getXmpPreferencesFromBackingStore(XmpPreferences.getDefault());
 
         EasyBind.listen(xmpPreferences.useXmpPrivacyFilterProperty(),
                 (_, _, newValue) -> putBoolean(USE_XMP_PRIVACY_FILTER, newValue));
@@ -2074,6 +2055,19 @@ public class JabRefCliPreferences implements CliPreferences {
         return xmpPreferences;
     }
 
+    private XmpPreferences getXmpPreferencesFromBackingStore(XmpPreferences defaults) {
+        return new XmpPreferences(
+                getBoolean(USE_XMP_PRIVACY_FILTER, defaults.shouldUseXmpPrivacyFilter()),
+                convertStringToList(get(XMP_PRIVACY_FILTERS,
+                        convertListToString(defaults.getXmpPrivacyFilter().stream().map(Field::getName).toList())))
+                        .stream()
+                        .map(FieldFactory::parseField)
+                        .collect(Collectors.toSet()),
+                getBibEntryPreferences().keywordSeparatorProperty());
+    }
+    // endregion
+
+    // region NameFormatterPreferences
     @Override
     public NameFormatterPreferences getNameFormatterPreferences() {
         if (nameFormatterPreferences != null) {
@@ -2091,7 +2085,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return nameFormatterPreferences;
     }
+    // endregion
 
+    // region ProtectedTermsPreferences
     @Override
     public ProtectedTermsPreferences getProtectedTermsPreferences() {
         if (protectedTermsPreferences != null) {
@@ -2116,53 +2112,55 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return protectedTermsPreferences;
     }
+    // endregion
 
+    // region ImporterPreferences
     @Override
     public ImporterPreferences getImporterPreferences() {
         if (importerPreferences != null) {
             return importerPreferences;
         }
 
-        PlainCitationParserChoice defaultPlainCitationParser;
-        try {
-            defaultPlainCitationParser = PlainCitationParserChoice.valueOf(get(DEFAULT_PLAIN_CITATION_PARSER));
-        } catch (IllegalArgumentException ex) {
-            defaultPlainCitationParser = PlainCitationParserChoice.RULE_BASED_GENERAL;
-        }
+        importerPreferences = getImporterPreferencesFromBackingStore(ImporterPreferences.getDefault());
 
-        importerPreferences = new ImporterPreferences(
-                getBoolean(IMPORTERS_ENABLED),
-                getBoolean(GENERATE_KEY_ON_IMPORT),
-                Path.of(get(IMPORT_WORKING_DIRECTORY)),
-                getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
-                getCustomImportFormats(),
-                getFetcherKeys(),
-                getDefaultFetcherKeys(),
-                getBoolean(FETCHER_CUSTOM_KEY_PERSIST),
-                getStringList(SEARCH_CATALOGS),
-                defaultPlainCitationParser,
-                getInt(CITATIONS_RELATIONS_STORE_TTL),
-                Map.of()
-        );
-
-        EasyBind.listen(importerPreferences.importerEnabledProperty(), (_, _, newValue) -> putBoolean(IMPORTERS_ENABLED, newValue));
-        EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (_, _, newValue) -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
-        EasyBind.listen(importerPreferences.importWorkingDirectoryProperty(), (_, _, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
-        EasyBind.listen(importerPreferences.warnAboutDuplicatesOnImportProperty(), (_, _, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
+        EasyBind.listen(importerPreferences.importerEnabledProperty(), (_, _, newValue) -> putBoolean(IMPORTER_ENABLED, newValue));
+        EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (_, _, newValue) -> putBoolean(IMPORTER_GENERATE_KEY_ON_IMPORT, newValue));
+        EasyBind.listen(importerPreferences.importWorkingDirectoryProperty(), (_, _, newValue) -> put(IMPORTER_WORKING_DIRECTORY, newValue.toString()));
+        EasyBind.listen(importerPreferences.warnAboutDuplicatesOnImportProperty(), (_, _, newValue) -> putBoolean(IMPORTER_WARN_ABOUT_DUPLICATES, newValue));
         EasyBind.listen(importerPreferences.persistCustomKeysProperty(), (_, _, newValue) -> putBoolean(FETCHER_CUSTOM_KEY_PERSIST, newValue));
-        importerPreferences.getApiKeys().addListener((InvalidationListener) _ -> storeFetcherKeys(importerPreferences.getApiKeys()));
+        importerPreferences.getApiKeys().addListener((InvalidationListener) _ -> storeFetcherKeys(importerPreferences));
         importerPreferences.getCustomImporters().addListener((InvalidationListener) _ -> storeCustomImportFormats(importerPreferences.getCustomImporters()));
-        importerPreferences.getCatalogs().addListener((InvalidationListener) _ -> putStringList(SEARCH_CATALOGS, importerPreferences.getCatalogs()));
-        EasyBind.listen(importerPreferences.defaultPlainCitationParserProperty(), (_, _, newValue) -> put(DEFAULT_PLAIN_CITATION_PARSER, newValue.name()));
-        EasyBind.listen(importerPreferences.citationsRelationsStoreTTLProperty(), (_, _, newValue) -> put(CITATIONS_RELATIONS_STORE_TTL, newValue.toString()));
+        importerPreferences.getCatalogs().addListener((InvalidationListener) _ -> putStringList(IMPORTER_CATALOGS, importerPreferences.getCatalogs()));
+        EasyBind.listen(importerPreferences.defaultPlainCitationParserProperty(), (_, _, newValue) -> put(IMPORTER_DEFAULT_PLAIN_CITATION_PARSER, newValue.name()));
+        EasyBind.listen(importerPreferences.citationsRelationsStoreTTLProperty(), (_, _, newValue) -> put(IMPORTER_CITATIONS_RELATIONS_STORE_TTL, newValue.toString()));
 
         return importerPreferences;
     }
 
-    private Set<CustomImporter> getCustomImportFormats() {
+    private ImporterPreferences getImporterPreferencesFromBackingStore(ImporterPreferences defaults) {
+        return new ImporterPreferences(
+                getBoolean(IMPORTER_ENABLED, defaults.areImporterEnabled()),
+                getBoolean(IMPORTER_GENERATE_KEY_ON_IMPORT, defaults.shouldGenerateNewKeyOnImport()),
+                Path.of(get(IMPORTER_WORKING_DIRECTORY, defaults.getImportWorkingDirectory().toString())),
+                getBoolean(IMPORTER_WARN_ABOUT_DUPLICATES, defaults.shouldWarnAboutDuplicatesOnImport()),
+                getCustomImportFormats(defaults.getCustomImporters()),
+                getFetcherKeys(defaults.getApiKeys()),
+                getBoolean(FETCHER_CUSTOM_KEY_PERSIST, defaults.shouldPersistCustomKeys()),
+                hasKey(IMPORTER_CATALOGS) ? getStringList(IMPORTER_CATALOGS) : defaults.getCatalogs(),
+                getDefaultPlainCitationParser(defaults.getDefaultPlainCitationParser()),
+                getInt(IMPORTER_CITATIONS_RELATIONS_STORE_TTL, defaults.getCitationsRelationsStoreTTL()),
+                Map.of()
+        );
+    }
+
+    private Set<CustomImporter> getCustomImportFormats(Set<CustomImporter> defaults) {
+        if (!hasKey(IMPORTER_CUSTOM_FORMAT + "0")) {
+            return defaults;
+        }
+
         Set<CustomImporter> importers = new TreeSet<>();
 
-        for (String toImport : getSeries(CUSTOM_IMPORT_FORMAT)) {
+        for (String toImport : getSeries(IMPORTER_CUSTOM_FORMAT)) {
             List<String> importerString = convertStringToList(toImport);
             try {
                 if (importerString.size() == 2) {
@@ -2181,19 +2179,28 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void storeCustomImportFormats(Set<CustomImporter> importers) {
-        purgeSeries(CUSTOM_IMPORT_FORMAT, 0);
+        purgeSeries(IMPORTER_CUSTOM_FORMAT, 0);
         CustomImporter[] importersArray = importers.toArray(new CustomImporter[0]);
         for (int i = 0; i < importersArray.length; i++) {
-            putStringList(CUSTOM_IMPORT_FORMAT + i, importersArray[i].getAsStringList());
+            putStringList(IMPORTER_CUSTOM_FORMAT + i, importersArray[i].getAsStringList());
         }
     }
 
-    private Set<FetcherApiKey> getFetcherKeys() {
+    private Set<FetcherApiKey> getFetcherKeys(Set<FetcherApiKey> defaults) {
+        if (!hasKey(FETCHER_CUSTOM_KEY_NAMES) || !hasKey(FETCHER_CUSTOM_KEY_USES)) {
+            return defaults;
+        }
+
         Set<FetcherApiKey> fetcherApiKeys = new HashSet<>();
 
         List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
         List<String> uses = getStringList(FETCHER_CUSTOM_KEY_USES);
         List<String> keys = getFetcherKeysFromKeyring(names);
+
+        if (names.size() != uses.size() || names.size() != keys.size()) {
+            LOGGER.warn("Could not load fetcher keys from preferences. Will ignore.");
+            return defaults;
+        }
 
         for (int i = 0; i < names.size(); i++) {
             fetcherApiKeys.add(new FetcherApiKey(
@@ -2228,33 +2235,12 @@ public class JabRefCliPreferences implements CliPreferences {
         return keys;
     }
 
-    private Map<String, String> getDefaultFetcherKeys() {
-        // We do not want to have a dependency on afterburner.fx (because of huge JavaFX dependency tree). Therefore, we do not use following line, but instantiate "BuildInfo" directly.
-        // BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
-        // if (buildInfo == null) {
-        //     LOGGER.warn("Could not instantiate BuildInfo.");
-        //     return Map.of();
-        // }
-        BuildInfo buildInfo = new BuildInfo();
-
-        Map<String, String> keys = new HashMap<>();
-        keys.put(AstrophysicsDataSystem.FETCHER_NAME, buildInfo.astrophysicsDataSystemAPIKey);
-        keys.put(BiodiversityLibrary.FETCHER_NAME, buildInfo.biodiversityHeritageApiKey);
-        keys.put(Scopus.FETCHER_NAME, buildInfo.scopusApiKey);
-        keys.put(SemanticScholarCitationFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
-        // SpringerLink uses the same key and fetcher name as SpringerFetcher
-        keys.put(SpringerNatureWebFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
-        keys.put(WileyFetcher.FETCHER_NAME, buildInfo.wileyTdmApiKey);
-
-        return keys;
-    }
-
-    private void storeFetcherKeys(Set<FetcherApiKey> fetcherApiKeys) {
+    private void storeFetcherKeys(ImporterPreferences defaults) {
         List<String> names = new ArrayList<>();
         List<String> uses = new ArrayList<>();
         List<String> keys = new ArrayList<>();
 
-        for (FetcherApiKey apiKey : fetcherApiKeys) {
+        for (FetcherApiKey apiKey : defaults.getApiKeys()) {
             names.add(apiKey.getName());
             uses.add(String.valueOf(apiKey.shouldUse()));
             keys.add(apiKey.getKey());
@@ -2263,7 +2249,7 @@ public class JabRefCliPreferences implements CliPreferences {
         putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
         putStringList(FETCHER_CUSTOM_KEY_USES, uses);
 
-        if (getBoolean(FETCHER_CUSTOM_KEY_PERSIST)) {
+        if (defaults.shouldPersistCustomKeys()) {
             storeFetcherKeysToKeyring(names, keys);
         } else {
             clearCustomFetcherKeys();
@@ -2305,6 +2291,15 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.error("Unable to open key store");
         }
     }
+
+    private PlainCitationParserChoice getDefaultPlainCitationParser(PlainCitationParserChoice defaultPlainCitationParser) {
+        try {
+            return PlainCitationParserChoice.valueOf(get(IMPORTER_DEFAULT_PLAIN_CITATION_PARSER, defaultPlainCitationParser.name()));
+        } catch (IllegalArgumentException ex) {
+            return defaultPlainCitationParser;
+        }
+    }
+    // endregion
 
     @Override
     public GrobidPreferences getGrobidPreferences() {
