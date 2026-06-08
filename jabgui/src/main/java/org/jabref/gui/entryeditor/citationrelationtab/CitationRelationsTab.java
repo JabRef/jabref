@@ -580,6 +580,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     hContainer.getChildren().addAll(entryNode, separator, vContainer);
                     hContainer.getStyleClass().add("entry-container");
 
+                    // [impl->req~entry-editor.citations.hover-preview~1]
                     hContainer.setOnMouseEntered(_ -> {
                         stateManager.getActiveDatabase().ifPresent(databaseContext -> {
                             previewTooltip.createPreviewTooltip(databaseContext, entry.entry());
