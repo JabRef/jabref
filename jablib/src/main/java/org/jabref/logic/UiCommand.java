@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public sealed interface UiCommand {
@@ -40,15 +41,15 @@ public sealed interface UiCommand {
             this(Optional.empty(), bibtex, Optional.empty());
         }
 
-        public AppendBibTeXToLibrary(String bibtex, String targetGroup) {
+        public AppendBibTeXToLibrary(String bibtex, @Nullable String targetGroup) {
             this(Optional.empty(), bibtex, toGroup(targetGroup));
         }
 
-        public AppendBibTeXToLibrary(Optional<Path> library, String bibtex, String targetGroup) {
+        public AppendBibTeXToLibrary(Optional<Path> library, String bibtex, @Nullable String targetGroup) {
             this(library, bibtex, toGroup(targetGroup));
         }
 
-        private static Optional<String> toGroup(String targetGroup) {
+        private static Optional<String> toGroup(@Nullable String targetGroup) {
             return targetGroup == null || targetGroup.isBlank() ? Optional.empty() : Optional.of(targetGroup);
         }
     }
