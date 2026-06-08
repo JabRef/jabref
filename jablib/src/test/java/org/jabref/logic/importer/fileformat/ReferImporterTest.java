@@ -46,7 +46,7 @@ public class ReferImporterTest {
 
     @Test
     void getDescription() {
-        assertEquals("Import for the Refer/BibIX file.", referImporter.getDescription());
+        assertEquals("Importer for the Refer/BibIX file.", referImporter.getDescription());
     }
 
     @Test
