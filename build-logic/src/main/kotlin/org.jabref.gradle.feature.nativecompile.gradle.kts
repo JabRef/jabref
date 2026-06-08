@@ -9,7 +9,7 @@ graalvmNative {
                 "--no-fallback",
                 "-H:+ReportExceptionStackTraces",
                 "-H:IncludeLocales=en",
-                "-H:+EnableAllSecurityServices"
+                "--enable-all-security-services"
             )
         }
     }
