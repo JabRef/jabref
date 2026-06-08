@@ -482,13 +482,8 @@ public class JabRefCliPreferences implements CliPreferences {
         // system locale as default
         defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
 
-        // export order
-        defaults.put(EXPORT_IN_ORIGINAL_ORDER, Boolean.TRUE);
-        defaults.put(EXPORT_IN_SPECIFIED_ORDER, Boolean.FALSE);
-
         defaults.put(NEWLINE, System.lineSeparator());
 
-        defaults.put(EXPORT_WORKING_DIRECTORY, USER_HOME);
         defaults.put(LAST_USED_DIRECTORY, getDefaultPath().toString());
 
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
