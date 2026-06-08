@@ -38,7 +38,6 @@ import org.jabref.http.server.cayw.format.CAYWFormatter;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
 import org.jabref.http.server.cayw.gui.SearchDialog;
-import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.l10n.Localization;
@@ -88,9 +87,6 @@ public class CAYWResource {
 
     @Inject
     private FormatterService formatterService;
-
-    @Inject
-    private FilesToServe filesToServe;
 
     @Inject
     private SrvStateManager srvStateManager;
@@ -216,12 +212,12 @@ public class CAYWResource {
     private BibDatabaseContext getBibDatabaseContext(CAYWQueryParams queryParams) throws IOException {
         Optional<String> libraryId = queryParams.getLibraryId();
         if (libraryId.isPresent()) {
-            return ServerUtils.getBibDatabaseContext(libraryId.get(), filesToServe, srvStateManager, preferences.getImportFormatPreferences());
+            return ServerUtils.getBibDatabaseContext(libraryId.get(), srvStateManager, preferences.getImportFormatPreferences());
         }
 
         Optional<String> libraryPath = queryParams.getLibraryPath();
         if (libraryPath.isPresent() && "demo".equals(libraryPath.get())) {
-            return ServerUtils.getBibDatabaseContext("demo", filesToServe, srvStateManager, preferences.getImportFormatPreferences());
+            return ServerUtils.getBibDatabaseContext("demo", srvStateManager, preferences.getImportFormatPreferences());
         }
 
         if (libraryPath.isPresent()) {
@@ -328,13 +324,6 @@ public class CAYWResource {
     }
 
     private List<Path> getServedLibraryPaths() {
-        List<Path> servedLibraries = Optional.ofNullable(filesToServe.getFilesToServe()).orElse(List.of()).stream()
-                                             .map(path -> path.toAbsolutePath().normalize())
-                                             .toList();
-        if (!servedLibraries.isEmpty()) {
-            return servedLibraries;
-        }
-
         return srvStateManager.getOpenDatabases().stream()
                               .map(BibDatabaseContext::getDatabasePath)
                               .flatMap(Optional::stream)

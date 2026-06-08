@@ -105,11 +105,8 @@ public class PreviewPreferences {
         if (layoutCycle.isEmpty()) {
             this.layoutCyclePosition.setValue(0);
         } else {
-            int previewCyclePosition = position;
-            while (previewCyclePosition < 0) {
-                previewCyclePosition += layoutCycle.size();
-            }
-            this.layoutCyclePosition.setValue(previewCyclePosition % layoutCycle.size());
+            int newPosition = Math.floorMod(position, layoutCycle.size());
+            this.layoutCyclePosition.setValue(newPosition);
         }
     }
 

@@ -284,7 +284,7 @@ tasks.test {
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
     testLogging {
-        showStandardStreams = true
+        showStandardStreams = false
     }
 }
 
