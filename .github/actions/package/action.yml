@@ -199,3 +199,10 @@ runs:
           -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' \
           build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }}* \
           jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/jbundle/
+    - name: Upload WiX temp dir
+      if: failure() && (inputs.os == 'windows-latest')
+      uses: actions/upload-artifact@v4
+      with:
+        name: wix-temp
+        path: C:\Users\runneradmin\AppData\Local\Temp\jdk.jpackage*\
+        if-no-files-found: warn
