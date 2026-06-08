@@ -324,13 +324,6 @@ public class CAYWResource {
     }
 
     private List<Path> getServedLibraryPaths() {
-        List<Path> servedLibraries = Optional.ofNullable(filesToServe.getFilesToServe()).orElse(List.of()).stream()
-                                             .map(path -> path.toAbsolutePath().normalize())
-                                             .toList();
-        if (!servedLibraries.isEmpty()) {
-            return servedLibraries;
-        }
-
         return srvStateManager.getOpenDatabases().stream()
                               .map(BibDatabaseContext::getDatabasePath)
                               .flatMap(Optional::stream)
