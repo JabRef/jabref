@@ -197,8 +197,8 @@ class CSLFormatUtilsTest {
 
                 // Small-caps
                 Arguments.of(
-                        "<smallcaps>Smith</smallcaps>, <smallcaps>B.</smallcaps>, <smallcaps>Jones</smallcaps>, <smallcaps>B.</smallcaps> and <smallcaps>Williams</smallcaps>, <smallcaps>J.</smallcaps> (2016) Title of the test entry <smallcaps>Taylor</smallcaps>, <smallcaps>P.</smallcaps> (ed.). <i>BibTeX Journal</i>, 34(3), pp. 45–67.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Cite Them Right 12th edition (author-date/Harvard)".equals(e.getTitle())).findAny().get()
+                        "<smallcaps>Smith, Jones, Williams</smallcaps> 2016: <smallcaps>B. Smith, B. Jones, J. Williams</smallcaps>, «Title of the test entry,» in <i>BibTeX Journal</i> 34, 3 <https://github.com/JabRef>, 2016, pp. 45–67.<p></p>",
+                        STYLE_LIST.stream().filter(e -> "Archeologia Classica (Italiano)".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Non-breaking spaces
