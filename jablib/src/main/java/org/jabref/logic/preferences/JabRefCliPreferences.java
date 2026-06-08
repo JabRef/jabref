@@ -3,7 +3,6 @@ package org.jabref.logic.preferences;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -162,7 +161,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
 
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
-    public static final String DEFAULT_ENCODING = "defaultEncoding";
 
     // region DOIPreferences
     public static final String DOI_BASE_URI = "baseDOIURI";
@@ -485,8 +483,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(NEWLINE, System.lineSeparator());
 
         defaults.put(LAST_USED_DIRECTORY, getDefaultPath().toString());
-
-        defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
 
         defaults.put(LAST_USED_EXPORT, "");
 

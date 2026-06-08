@@ -2,7 +2,6 @@ package org.jabref.migrations;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -105,41 +104,6 @@ public class PreferencesMigrations {
             Preferences childNode = from.node(child);
             Preferences newChildNode = to.node(child);
             copyPrefsRecursively(childNode, newChildNode);
-        }
-    }
-
-    /// Added from Jabref 2.11 beta 4 onwards to fix wrong encoding names
-    private static void upgradeFaultyEncodingStrings(JabRefCliPreferences prefs) {
-        String defaultEncoding = prefs.get(JabRefCliPreferences.DEFAULT_ENCODING);
-        if (defaultEncoding == null) {
-            return;
-        }
-
-        Map<String, String> encodingMap = new HashMap<>();
-        encodingMap.put("UTF8", "UTF-8");
-        encodingMap.put("Cp1250", "CP1250");
-        encodingMap.put("Cp1251", "CP1251");
-        encodingMap.put("Cp1252", "CP1252");
-        encodingMap.put("Cp1253", "CP1253");
-        encodingMap.put("Cp1254", "CP1254");
-        encodingMap.put("Cp1257", "CP1257");
-        encodingMap.put("ISO8859_1", "ISO8859-1");
-        encodingMap.put("ISO8859_2", "ISO8859-2");
-        encodingMap.put("ISO8859_3", "ISO8859-3");
-        encodingMap.put("ISO8859_4", "ISO8859-4");
-        encodingMap.put("ISO8859_5", "ISO8859-5");
-        encodingMap.put("ISO8859_6", "ISO8859-6");
-        encodingMap.put("ISO8859_7", "ISO8859-7");
-        encodingMap.put("ISO8859_8", "ISO8859-8");
-        encodingMap.put("ISO8859_9", "ISO8859-9");
-        encodingMap.put("ISO8859_13", "ISO8859-13");
-        encodingMap.put("ISO8859_15", "ISO8859-15");
-        encodingMap.put("KOI8_R", "KOI8-R");
-        encodingMap.put("Big5_HKSCS", "Big5-HKSCS");
-        encodingMap.put("EUC_JP", "EUC-JP");
-
-        if (encodingMap.containsKey(defaultEncoding)) {
-            prefs.put(JabRefCliPreferences.DEFAULT_ENCODING, encodingMap.get(defaultEncoding));
         }
     }
 
