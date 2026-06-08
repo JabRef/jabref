@@ -476,9 +476,6 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.warn("Could not import preferences from jabref.xml", e);
         }
 
-        // system locale as default
-        defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
-
         // Since some of the preference settings themselves use localized strings, we cannot set the language after
         // the initialization of the preferences in main
         // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
@@ -872,7 +869,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     protected Language getLanguage() {
-        return Language.getLanguageFor(get(LANGUAGE));
+        return Language.getLanguageFor(get(LANGUAGE, Locale.getDefault().getLanguage()));
     }
 
     // region JournalAbbreviationPreferences
@@ -1190,7 +1187,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
-    // region Proxy Preferences
+    // region ProxyPreferences
     @Override
     public ProxyPreferences getProxyPreferences() {
         if (proxyPreferences != null) {
@@ -1489,10 +1486,6 @@ public class JabRefCliPreferences implements CliPreferences {
     // endregion
 
     // region (Linked)FilePreferences
-    protected boolean moveToTrashSupported() {
-        return false;
-    }
-
     @Override
     public FilePreferences getFilePreferences() {
         if (filePreferences != null) {
@@ -1548,6 +1541,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 getPath(LAST_USED_DIRECTORY, defaults.getLastUsedDirectory()),
                 getBoolean(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, defaults.shouldOpenFileExplorerInFileDirectory()),
                 getBoolean(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, defaults.shouldOpenFileExplorerInLastUsedDirectory()));
+    }
+
+    protected boolean moveToTrashSupported() {
+        return false;
     }
     // endregion
 
@@ -2296,6 +2293,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
+    // region OpenOfficePreferences
     @Override
     public OpenOfficePreferences getOpenOfficePreferences(JournalAbbreviationRepository journalAbbreviationRepository) {
         if (openOfficePreferences != null) {
@@ -2355,6 +2353,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getStringList(OO_EXTERNAL_CSL_STYLES),
                 getBoolean(OO_ADD_SPACE_AFTER, defaults.getAddSpaceAfter()));
     }
+    // endregion
 
     @Override
     public GitPreferences getGitPreferences() {
