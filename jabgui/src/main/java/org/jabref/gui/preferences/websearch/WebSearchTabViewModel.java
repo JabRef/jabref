@@ -254,6 +254,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                                                      .map(fetcherViewModel -> new FetcherApiKey(fetcherViewModel.getName(), fetcherViewModel.shouldUseCustomApiKey(), fetcherViewModel.getApiKey()))
                                                      .toList();
 
+        // Must be set before keys are set
         importerPreferences.setPersistCustomKeys(apikeyPersistProperty.get());
         importerPreferences.getApiKeys().clear();
         if (apikeyPersistAvailableProperty.get()) {
