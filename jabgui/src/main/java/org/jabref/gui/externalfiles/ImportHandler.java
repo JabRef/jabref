@@ -87,6 +87,7 @@ public class ImportHandler {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final ExternalFilesEntryLinker fileLinker;
     private final ExternalFilesContentImporter contentImporter;
+    private final ImportFormatReader importFormatReader;
     private final UndoManager undoManager;
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -125,6 +126,11 @@ public class ImportHandler {
 
         this.fileLinker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), filePreferences, dialogService, stateManager);
         this.contentImporter = new ExternalFilesContentImporter(preferences.getImportFormatPreferences());
+        this.importFormatReader = new ImportFormatReader(
+                preferences.getImporterPreferences(),
+                preferences.getImportFormatPreferences(),
+                preferences.getCitationKeyPatternPreferences(),
+                fileupdateMonitor);
         this.undoManager = undoManager;
     }
 
@@ -211,9 +217,21 @@ public class ImportHandler {
                             }
                             addResultToList(file, success, message);
                         } else {
-                            BibEntry emptyEntryWithLink = createEmptyEntryWithLink(file);
-                            entriesToAdd.add(emptyEntryWithLink);
-                            addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with file link."));
+                            try {
+                                ImportResult importResult = ImportHandler.this.importFormatReader.importWithAutoDetection(file);
+                                List<BibEntry> importedEntries = importResult.parserResult().getDatabase().getEntries();
+                                if (importedEntries.isEmpty()) {
+                                    entriesToAdd.add(createEmptyEntryWithLink(file));
+                                    addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with file link."));
+                                } else {
+                                    entriesToAdd.addAll(importedEntries);
+                                    addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
+                                }
+                            } catch (ImportException e) {
+                                LOGGER.warn("Could not import file {} using auto-detection", file, e);
+                                entriesToAdd.add(createEmptyEntryWithLink(file));
+                                addResultToList(file, false, Localization.lang("Could not auto-detect file format. An empty entry was created with file link."));
+                            }
                         }
                     } catch (IOException ex) {
                         LOGGER.error("Error importing", ex);
