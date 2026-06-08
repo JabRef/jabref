@@ -1,10 +1,6 @@
 /*
 * Base JabRef styling for specific UIs and style classes.
-* =====
-* For the Future:
-* All '-jr-xxx' variables should be carefully reconsidered to decouple themes from it.
-* Instead, the '-fx-xxx' variables should be used so that all JavaFX styles play nice with it.
-* This make it much easier to plugin in any other CSS.
+* Will always be loaded by JabRef no matter which theme is selected.
 */
 
 @import "jabref-base-colors.css";
@@ -201,7 +197,8 @@
 .icon-buttonNoSpaceTop,
 .icon-button {
     -fx-border-width: 0;
-    -fx-background: -jr-icon-background;
+    -fx-background: transparent;
+    -fx-background-color: transparent;
     -fx-padding: 0.5em;
 }
 
@@ -209,16 +206,19 @@
 .icon-buttonNoSpaceTop:hover,
 .icon-button:hover {
     -fx-background: -jr-icon-background-active;
+    -fx-background-color: -jr-icon-background-active;
 }
 
 .icon-buttonNoSpaceBottom:armed,
 .icon-buttonNoSpaceTop:armed,
 .icon-button:armed {
     -fx-background: -jr-icon-background-armed;
+    -fx-background-color: -jr-icon-background-armed;
 }
 
 .icon-button:selected {
     -fx-background: -jr-icon-background-active;
+    -fx-background-color: -jr-icon-background-active;
     -fx-text-fill: white;
     -fx-fill: white;
 }
@@ -278,7 +278,6 @@
 }
 
 .sidePaneComponentHeader {
-    -fx-background-color: -jr-sidepane-header-background;
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
     -fx-pref-height: 3em;
 }
@@ -1314,12 +1313,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 #groupTree:focused,
 #groupTree:filled:selected {
-    -fx-background-color: -jr-sidepane-background;
     -fx-table-cell-border-color: transparent;
-}
-
-#groupTree, .tree-table-row-cell {
-    -fx-background-color: -jr-sidepane-background;
 }
 
 #groupTree .tree-table-cell {
@@ -1430,13 +1424,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-translate-x: -0.4em;
 }
 
-#groupFilterBar {
-    -fx-background-color: -jr-search-background;
-    -fx-border-color: -jr-separator;
-    -fx-border-width: 1 0 0 0;
-    -fx-padding: 0em 1em 0em 1em;
-}
-
 #groupFilterBar .glyph-icon {
     -fx-font-size: 2em;
 }
@@ -1499,10 +1486,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* ParseLatexResult */
 
-#referenceListView {
-    -fx-background-color: -jr-sidepane-background;
-}
-
 #parseLatexResultDialog > .split-pane > .split-pane-divider {
     -fx-padding: 0 4 0 4;
     -fx-background-color: transparent;
@@ -1510,7 +1493,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 #parseLatexResultDialog .button-bar > .container {
     -fx-border-width: 1 0 0 0;
-    -fx-border-color: -jr-sidepane-background;
 }
 
 #parseLatexResultDialog .parse-latex-reference-text {
@@ -1521,12 +1503,10 @@ We want to have a look that matches our icons in the tool-bar */
 
 #preferencesDialog #preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell {
     -fx-padding: 8;
-    -fx-background: -jr-sidepane-background;
 }
 
 #preferencesDialog .button-bar > .container {
     -fx-border-width: 1 0 0 0;
-    -fx-border-color: -jr-sidepane-background;
 }
 
 #preferencesDialog #preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected {

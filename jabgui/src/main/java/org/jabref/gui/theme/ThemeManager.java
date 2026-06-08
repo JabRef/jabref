@@ -87,10 +87,10 @@ public class ThemeManager {
         List<String> toAdd = new ArrayList<>(3);
 
         toAdd.add(theme.getStyleSheet().getSceneStylesheet().toExternalForm());
-        toAdd.add(JABREF_BASE_STYLE_SHEET.getSceneStylesheet().toExternalForm());
         if (customTheme != null) {
             toAdd.add(customTheme.getSceneStylesheet().toExternalForm());
         }
+        toAdd.add(JABREF_BASE_STYLE_SHEET.getSceneStylesheet().toExternalForm());
 
         scene.getStylesheets().setAll(toAdd);
     }

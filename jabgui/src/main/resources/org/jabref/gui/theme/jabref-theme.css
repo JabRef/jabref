@@ -131,12 +131,12 @@
 }
 
 .button:default:hover {
-    -fx-background-color: derive(-fx-default-button, -10%);
+    -fx-background-color: -fx-default-button;
 }
 
 .button:default:focused,
 .button:default:pressed {
-    -fx-background-color: derive(-fx-default-button, -20%);
+    -fx-background-color: -fx-default-button;
 }
 
 /* JavaFX ToggleButton */
@@ -243,7 +243,7 @@ TextFlow > .hyperlink,
     -fx-padding: 0;
     -fx-underline: false;
     -fx-border-style: null;
-    -fx-border-color: null;
+    -fx-border-color: transparent;
     -fx-text-fill: -jr-theme;
     -fx-fill: -jr-theme;
 }
@@ -293,7 +293,7 @@ TextFlow > .tooltip-text-monospaced {
 .color-picker:hover,
 .color-picker:focused,
 .color-picker {
-    -fx-background-color: transparent, transparent, transparent, transparent;
+    -fx-background-color: transparent;
     -fx-background-radius: 0;
     -fx-background-insets: 0;
     -fx-effect: null;
@@ -317,7 +317,7 @@ TextFlow > .tooltip-text-monospaced {
 .progress-indicator {
     -fx-progress-color: -jr-theme;
     -fx-border-width: 0;
-    -fx-background-color: -jr-icon-background;
+    -fx-background-color: transparent;
 }
 
 .progress-indicator:hover {
@@ -461,7 +461,7 @@ TextFlow > .tooltip-text-monospaced {
 
 /* JavaFX SplitPane */
 .split-pane > .split-pane-divider {
-    -fx-background-color: -jr-sidepane-background;
+    -fx-background-color: -jr-separator;
     -fx-padding: 0 .5 0 .5;
 }
 
@@ -469,7 +469,7 @@ TextFlow > .tooltip-text-monospaced {
 .combo-box-base {
     -fx-background-color: -fx-outer-border, -fx-control-inner-background;
     -fx-background-insets: 0, 1;
-    -fx-background-radius: 0, 0;
+    -fx-background-radius: 0;
 }
 
 .combo-box > .list-cell {
@@ -489,21 +489,19 @@ TextFlow > .tooltip-text-monospaced {
 
 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
     -fx-padding: 4 0 4 5;
-    /* No alternate highlighting */
     -fx-background: -fx-control-inner-background;
+    -fx-background-color: -fx-control-inner-background;
 }
 
 .combo-box-popup > .list-view > .placeholder > .label {
     -fx-text-fill: -fx-text-base-color;
 }
 
-.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
-    -fx-background: -fx-selection-bar;
-}
-
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover,
 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
     -fx-background: -fx-selection-bar;
+    -fx-background-color: -fx-selection-bar;
 }
 
 .combo-box-base:editable > .text-field,
@@ -529,7 +527,7 @@ TextFlow > .tooltip-text-monospaced {
 .date-picker-popup > * > .spinner > .button > .left-arrow,
 .date-picker-popup > * > .spinner > .button > .right-arrow {
     -fx-background: -fx-accent;
-    -fx-background-color: -fx-background;
+    -fx-background-color: -fx-accent;
 }
 
 /* JavaFX Accordion / TitledPane */
@@ -582,13 +580,13 @@ TextFlow > .tooltip-text-monospaced {
 
 .scroll-bar .thumb:hover,
 .scroll-bar .thumb:pressed {
-    -fx-background-color: derive(-jr-scrollbar-thumb, -30%);
+    -fx-background-color: -jr-scrollbar-thumb;
 }
 
 /* Hide increment and decrement buttons */
 .scroll-bar > .increment-button,
 .scroll-bar > .decrement-button {
-    -fx-background-color: null;
+    -fx-background-color: transparent;
     -fx-background-radius: 0;
     -fx-background-insets: 0;
     -fx-padding: 0;
@@ -599,7 +597,7 @@ TextFlow > .tooltip-text-monospaced {
 .scroll-bar:horizontal > .increment-button > .increment-arrow,
 .scroll-bar:vertical > .decrement-button > .decrement-arrow,
 .scroll-bar:vertical > .increment-button > .increment-arrow {
-    -fx-background-color: null;
+    -fx-background-color: transparent;
     -fx-background-radius: 0;
     -fx-background-insets: 0;
     -fx-shape: null;
@@ -634,7 +632,7 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .text-input:focused {
-    -fx-highlight-fill: derive(-fx-accent, 20%);
+    -fx-highlight-fill: -fx-accent;
     -fx-background-color: -fx-accent, -fx-control-inner-background;
     -fx-background-insets: 0, 2;
     -fx-highlight-text-fill: -fx-text-inner-color;

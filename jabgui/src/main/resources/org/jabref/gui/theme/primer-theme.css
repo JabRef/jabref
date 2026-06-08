@@ -1,6 +1,11 @@
 /*
-* Atlanta Primer Stylesheet.
-* Light colors slightly adjusted.
+* Primer Stylesheet.
+*
+* Customizations:
+* - Light colors slightly adjusted
+* - TabPane Style fixed (padding)
+* - removed hardcoded font size
+* - removed custom AtlantaFX classes (to make this stylesheet smaller and avoid accidental styles)
 */
 
 @media (prefers-color-scheme: light) {
@@ -241,12 +246,6 @@
     -fx-background-color: transparent;
 }
 
-.ikonli-font-icon {
-    -fx-icon-color: -color-fg-default;
-    -fx-fill: -color-fg-default;
-    -fx-icon-size: 18px;
-}
-
 .mnemonic-underline {
     -fx-stroke: transparent;
 }
@@ -373,51 +372,6 @@ Text {
     -fx-border-color: -color-fg-default;
     -fx-border-width: 0 0 1 0;
     -fx-border-style: dashed;
-}
-
-.ikonli-font-icon.text-on-emphasis {
-    -fx-fill: -color-fg-emphasis;
-    -fx-icon-color: -color-fg-emphasis;
-}
-
-.ikonli-font-icon.accent {
-    -fx-fill: -color-accent-emphasis;
-    -fx-icon-color: -color-accent-emphasis;
-}
-
-.ikonli-font-icon.success {
-    -fx-fill: -color-success-emphasis;
-    -fx-icon-color: -color-success-emphasis;
-}
-
-.ikonli-font-icon.warning {
-    -fx-fill: -color-warning-emphasis;
-    -fx-icon-color: -color-warning-emphasis;
-}
-
-.ikonli-font-icon.danger {
-    -fx-fill: -color-danger-emphasis;
-    -fx-icon-color: -color-danger-emphasis;
-}
-
-.ikonli-font-icon:accent {
-    -fx-fill: -color-accent-emphasis;
-    -fx-icon-color: -color-accent-emphasis;
-}
-
-.ikonli-font-icon:success {
-    -fx-fill: -color-success-emphasis;
-    -fx-icon-color: -color-success-emphasis;
-}
-
-.ikonli-font-icon:warning {
-    -fx-fill: -color-warning-emphasis;
-    -fx-icon-color: -color-warning-emphasis;
-}
-
-.ikonli-font-icon:danger {
-    -fx-fill: -color-danger-emphasis;
-    -fx-icon-color: -color-danger-emphasis;
 }
 
 .bg-default {
@@ -579,10 +533,6 @@ Text {
     -fx-alignment: CENTER;
     -fx-padding: 8px 12px 8px 12px;
 }
-.button .font-icon, .button .ikonli-font-icon {
-    -fx-icon-color: -color-button-fg;
-    -fx-fill: -color-button-fg;
-}
 .button:disabled {
     -fx-opacity: 0.4;
     -fx-effect: none;
@@ -632,25 +582,13 @@ Text {
 .button:hover:focused {
     -fx-background-color: -color-button-border-focused, -color-button-bg-hover;
 }
-.button:hover .font-icon, .button:hover .ikonli-font-icon {
-    -fx-icon-color: -color-button-fg-hover;
-    -fx-fill: -color-button-fg-hover;
-}
 .button:focused {
     -fx-background-color: -color-button-border-focused, -color-button-bg-focused;
     -fx-text-fill: -color-button-fg-focused;
 }
-.button:focused .font-icon, .button:focused .ikonli-font-icon {
-    -fx-icon-color: -color-button-fg-focused;
-    -fx-fill: -color-button-fg-focused;
-}
 .button:armed, .button:focused:armed {
     -fx-background-color: -color-button-border-pressed, -color-button-bg-pressed;
     -fx-text-fill: -color-button-fg-pressed;
-}
-.button:armed .font-icon, .button:armed .ikonli-font-icon, .button:focused:armed .font-icon, .button:focused:armed .ikonli-font-icon {
-    -fx-icon-color: -color-button-fg-pressed;
-    -fx-fill: -color-button-fg-pressed;
 }
 .button.button-outlined {
     -color-button-bg: -color-bg-default;
@@ -1497,12 +1435,6 @@ Text {
 .combo-box-base:disabled {
     -fx-opacity: 0.4;
 }
-.combo-box-base:success, .combo-box-base:success:focused {
-    -fx-background-color: -color-success-emphasis, -color-bg-default;
-}
-.combo-box-base:danger, .combo-box-base:danger:focused {
-    -fx-background-color: -color-danger-emphasis, -color-bg-default;
-}
 .combo-box-base:focused {
     -fx-background-color: -color-accent-emphasis, -color-bg-default;
 }
@@ -1539,12 +1471,6 @@ Text {
     -fx-background-insets: 0, 1px 0 1px 1px;
     -fx-background-radius: 4px 0 0 4px, 3px 0 0 3px;
 }
-.combo-box-base:success > .arrow-button > .arrow {
-    -fx-background-color: -color-success-fg;
-}
-.combo-box-base:danger > .arrow-button > .arrow {
-    -fx-background-color: -color-danger-fg;
-}
 .combo-box-base.alt-icon > .arrow-button > .arrow {
     -fx-shape: "M12 5.83L15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9 12 5.83zm0 12.34L8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15 12 18.17z";
     -fx-scale-shape: false;
@@ -1555,12 +1481,6 @@ Text {
     -fx-text-fill: -color-fg-default;
     -fx-padding: 8px 12px 8px 12px;
     -fx-graphic-text-gap: 6px;
-}
-.combo-box:success > .list-cell {
-    -fx-text-fill: -color-success-fg;
-}
-.combo-box:danger > .list-cell {
-    -fx-text-fill: -color-danger-fg;
 }
 .combo-box.small > .list-cell {
     -fx-padding: 5.7142857143px 8.5714285714px 5.7142857143px 8.5714285714px;
@@ -1595,25 +1515,13 @@ Text {
     -fx-graphic-text-gap: 6px;
     -fx-text-fill: -color-fg-default;
 }
-.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell .font-icon, .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell .ikonli-font-icon {
-    -fx-icon-color: -color-fg-default;
-    -fx-fill: -color-fg-default;
-}
 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
     -fx-background-color: -color-base-7;
     -fx-text-fill: -color-fg-default;
 }
-.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover .font-icon, .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover .ikonli-font-icon {
-    -fx-icon-color: -color-fg-default;
-    -fx-fill: -color-fg-default;
-}
 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected, .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
     -fx-background-color: -color-base-6;
     -fx-text-fill: -color-fg-default;
-}
-.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected .font-icon, .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected .ikonli-font-icon, .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover .font-icon, .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover .ikonli-font-icon {
-    -fx-icon-color: -color-fg-default;
-    -fx-fill: -color-fg-default;
 }
 .combo-box-popup > .list-view > .placeholder > .label {
     -fx-text-fill: -color-fg-muted;
@@ -1630,12 +1538,6 @@ Text {
 }
 .choice-box:disabled {
     -fx-opacity: 0.4;
-}
-.choice-box:success, .choice-box:success:focused {
-    -fx-background-color: -color-success-emphasis, -color-bg-default;
-}
-.choice-box:danger, .choice-box:danger:focused {
-    -fx-background-color: -color-danger-emphasis, -color-bg-default;
 }
 .choice-box:focused {
     -fx-background-color: -color-accent-emphasis, -color-bg-default;
@@ -1668,18 +1570,6 @@ Text {
     -fx-shape: "M7 10l5 5 5-5z";
     -fx-scale-shape: false;
     -fx-background-color: -color-fg-muted;
-}
-.choice-box:success > .label {
-    -fx-text-fill: -color-success-fg;
-}
-.choice-box:success > .open-button > .arrow {
-    -fx-background-color: -color-success-fg;
-}
-.choice-box:danger > .label {
-    -fx-text-fill: -color-danger-fg;
-}
-.choice-box:danger > .open-button > .arrow {
-    -fx-background-color: -color-danger-fg;
 }
 .choice-box:disabled > .label {
     -fx-opacity: 1;
@@ -1715,14 +1605,6 @@ Text {
 }
 .custom-text-field:left-node-visible:right-node-visible {
     -fx-padding: 8px 0 8px 0;
-}
-.custom-text-field:success .font-icon, .custom-text-field:success .ikonli-font-icon {
-    -fx-icon-color: -color-success-fg;
-    -fx-fill: -color-success-fg;
-}
-.custom-text-field:danger .font-icon, .custom-text-field:danger .ikonli-font-icon {
-    -fx-icon-color: -color-danger-fg;
-    -fx-fill: -color-danger-fg;
 }
 
 .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
@@ -2490,25 +2372,6 @@ Text {
 .dialog-pane:no-header > * > .graphic-container {
     -fx-padding: 1em 1em 0 1em;
 }
-.dialog-pane.information > .header-panel {
-    -fx-background-color: -color-accent-fg, -color-bg-subtle;
-}
-.dialog-pane.information > .header-panel > .label {
-    -fx-text-fill: -color-fg-default;
-}
-.dialog-pane.warning > .header-panel {
-    -fx-background-color: -color-warning-fg, -color-bg-subtle;
-}
-.dialog-pane.warning > .header-panel > .label {
-    -fx-text-fill: -color-fg-default;
-}
-.dialog-pane.error > .header-panel {
-    -fx-background-color: -color-danger-fg, -color-bg-subtle;
-}
-.dialog-pane.error > .header-panel > .label {
-    -fx-text-fill: -color-fg-default;
-}
-
 .alert.information.dialog-pane {
     -fx-graphic: url("data:image/png;base64,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");
 }
@@ -2565,94 +2428,6 @@ Text {
     -fx-stroke: none;
 }
 
-.color-picker.html-editor-foreground {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Text-Color.png");
-}
-
-.color-picker.html-editor-background {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Background-Color.png");
-}
-
-.html-editor-cut {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Cut.png");
-}
-
-.html-editor-copy {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Copy.png");
-}
-
-.html-editor-paste {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Paste.png");
-}
-
-.html-editor-align-left {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Left.png");
-}
-
-.html-editor-align-center {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Center.png");
-}
-
-.html-editor-align-right {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Right.png");
-}
-
-.html-editor-align-justify {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Justify.png");
-}
-
-.html-editor-outdent {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Outdent.png");
-}
-
-.html-editor-outdent:dir(rtl) {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Outdent-rtl.png");
-}
-
-.html-editor-indent {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Indent.png");
-}
-
-.html-editor-indent:dir(rtl) {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Indent-rtl.png");
-}
-
-.html-editor-bullets {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Bullets.png");
-}
-
-.html-editor-bullets:dir(rtl) {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Bullets-rtl.png");
-}
-
-.html-editor-numbers {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Numbered.png");
-}
-
-.html-editor-numbers:dir(rtl) {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Numbered-rtl.png");
-}
-
-.html-editor-bold {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Bold.png");
-}
-
-.html-editor-italic {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Italic.png");
-}
-
-.html-editor-underline {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Underline.png");
-}
-
-.html-editor-strike {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Strikethrough.png");
-}
-
-.html-editor-hr {
-    -fx-graphic: url("/com/sun/javafx/scene/control/skin/modena/HTMLEditor-Break.png");
-}
-
 .hyperlink {
     -color-link-fg: -color-accent-fg;
     -color-link-fg-visited: -color-fg-default;
@@ -2698,84 +2473,6 @@ Text {
 .label.right-pill {
     -fx-background-radius: 0 4px 4px 0, 0 3px 3px 0;
 }
-.label.accent {
-    -fx-text-fill: -color-accent-fg;
-}
-.label.accent .font-icon, .label.accent .ikonli-font-icon {
-    -fx-icon-color: -color-accent-fg;
-    -fx-fill: -color-accent-fg;
-}
-.label.success {
-    -fx-text-fill: -color-success-fg;
-}
-.label.success .font-icon, .label.success .ikonli-font-icon {
-    -fx-icon-color: -color-success-fg;
-    -fx-fill: -color-success-fg;
-}
-.label.warning {
-    -fx-text-fill: -color-warning-fg;
-}
-.label.warning .font-icon, .label.warning .ikonli-font-icon {
-    -fx-icon-color: -color-warning-fg;
-    -fx-fill: -color-warning-fg;
-}
-.label.danger {
-    -fx-text-fill: -color-danger-fg;
-}
-.label.danger .font-icon, .label.danger .ikonli-font-icon {
-    -fx-icon-color: -color-danger-fg;
-    -fx-fill: -color-danger-fg;
-}
-.label.text-muted {
-    -fx-text-fill: -color-fg-muted;
-}
-.label.text-muted .font-icon, .label.text-muted .ikonli-font-icon {
-    -fx-icon-color: -color-fg-muted;
-    -fx-fill: -color-fg-muted;
-}
-.label.text-subtle {
-    -fx-text-fill: -color-fg-subtle;
-}
-.label.text-subtle .font-icon, .label.text-subtle .ikonli-font-icon {
-    -fx-icon-color: -color-fg-subtle;
-    -fx-fill: -color-fg-subtle;
-}
-.label.text-on-emphasis {
-    -fx-text-fill: -color-fg-emphasis;
-}
-.label.text-on-emphasis .font-icon, .label.text-on-emphasis .ikonli-font-icon {
-    -fx-icon-color: -color-fg-emphasis;
-    -fx-fill: -color-fg-emphasis;
-}
-.label:accent {
-    -fx-text-fill: -color-accent-emphasis;
-}
-.label:accent .font-icon, .label:accent .ikonli-font-icon {
-    -fx-icon-color: -color-accent-fg;
-    -fx-fill: -color-accent-fg;
-}
-.label:success {
-    -fx-text-fill: -color-success-emphasis;
-}
-.label:success .font-icon, .label:success .ikonli-font-icon {
-    -fx-icon-color: -color-success-fg;
-    -fx-fill: -color-success-fg;
-}
-.label:warning {
-    -fx-text-fill: -color-warning-emphasis;
-}
-.label:warning .font-icon, .label:warning .ikonli-font-icon {
-    -fx-icon-color: -color-warning-fg;
-    -fx-fill: -color-warning-fg;
-}
-.label:danger {
-    -fx-text-fill: -color-danger-emphasis;
-}
-.label:danger .font-icon, .label:danger .ikonli-font-icon {
-    -fx-icon-color: -color-danger-fg;
-    -fx-fill: -color-danger-fg;
-}
-
 .menu-bar {
     -fx-background-color: -color-border-muted, -color-bg-subtle;
     -fx-background-insets: 0 0 0 0, 0 0 1 0;
@@ -2856,10 +2553,6 @@ Text {
 }
 .menu-item:focused > .right-container > .arrow {
     -fx-background-color: -color-fg-default;
-}
-.menu-item:focused .font-icon, .menu-item:focused .ikonli-font-icon {
-    -fx-icon-color: -color-fg-default;
-    -fx-fill: -color-fg-default;
 }
 .menu-item:disabled {
     -fx-opacity: 0.4;
@@ -2952,12 +2645,6 @@ Text {
     -fx-alignment: CENTER;
     -fx-padding: 0;
     -fx-alignment: CENTER_LEFT;
-}
-.menu-button .font-icon, .menu-button .ikonli-font-icon,
-.split-menu-button .font-icon,
-.split-menu-button .ikonli-font-icon {
-    -fx-icon-color: -color-button-fg;
-    -fx-fill: -color-button-fg;
 }
 .menu-button:disabled,
 .split-menu-button:disabled {
@@ -3055,12 +2742,6 @@ Text {
 .split-menu-button:hover > .arrow-button > .arrow {
     -fx-background-color: -color-button-fg-hover;
 }
-.menu-button:hover .font-icon, .menu-button:hover .ikonli-font-icon,
-.split-menu-button:hover .font-icon,
-.split-menu-button:hover .ikonli-font-icon {
-    -fx-icon-color: -color-button-fg-hover;
-    -fx-fill: -color-button-fg-hover;
-}
 .menu-button:focused,
 .split-menu-button:focused {
     -fx-background-color: -color-button-border-focused, -color-button-bg-focused;
@@ -3072,12 +2753,6 @@ Text {
 .menu-button:focused > .arrow-button > .arrow,
 .split-menu-button:focused > .arrow-button > .arrow {
     -fx-background-color: -color-button-fg-focused;
-}
-.menu-button:focused .font-icon, .menu-button:focused .ikonli-font-icon,
-.split-menu-button:focused .font-icon,
-.split-menu-button:focused .ikonli-font-icon {
-    -fx-icon-color: -color-button-fg-focused;
-    -fx-fill: -color-button-fg-focused;
 }
 .menu-button:armed, .menu-button:focused:armed,
 .split-menu-button:armed,
@@ -3094,120 +2769,6 @@ Text {
 .split-menu-button:armed > .arrow-button > .arrow,
 .split-menu-button:focused:armed > .arrow-button > .arrow {
     -fx-background-color: -color-button-fg-pressed;
-}
-.menu-button:armed .font-icon, .menu-button:armed .ikonli-font-icon, .menu-button:focused:armed .font-icon, .menu-button:focused:armed .ikonli-font-icon,
-.split-menu-button:armed .font-icon,
-.split-menu-button:armed .ikonli-font-icon,
-.split-menu-button:focused:armed .font-icon,
-.split-menu-button:focused:armed .ikonli-font-icon {
-    -fx-icon-color: -color-button-fg-pressed;
-    -fx-fill: -color-button-fg-pressed;
-}
-.menu-button.button-outlined,
-.split-menu-button.button-outlined {
-    -color-button-bg: -color-bg-default;
-    -color-button-fg: -color-fg-default;
-    -color-button-bg-hover: -color-base-6;
-    -color-button-fg-hover: -color-button-fg;
-}
-.menu-button.accent,
-.split-menu-button.accent {
-    -color-button-bg: -color-accent-emphasis;
-    -color-button-fg: -color-fg-emphasis;
-    -color-button-border: -color-accent-emphasis;
-    -color-button-bg-hover: -color-accent-emphasis;
-    -color-button-fg-hover: -color-fg-emphasis;
-    -color-button-border-hover: -color-accent-emphasis;
-    -color-button-bg-focused: -color-accent-6;
-    -color-button-fg-focused: -color-fg-emphasis;
-    -color-button-border-focused: -color-accent-emphasis;
-    -color-button-bg-pressed: -color-accent-emphasis;
-    -color-button-fg-pressed: -color-fg-emphasis;
-    -color-button-border-pressed: transparent;
-}
-.menu-button.accent.button-outlined,
-.split-menu-button.accent.button-outlined {
-    -color-button-bg: -color-bg-default;
-    -color-button-fg: -color-accent-fg;
-    -color-button-bg-hover: -color-accent-emphasis;
-    -color-button-fg-hover: -color-fg-emphasis;
-}
-.menu-button.accent.flat,
-.split-menu-button.accent.flat {
-    -color-button-fg: -color-accent-fg;
-    -color-button-bg-hover: -color-accent-subtle;
-}
-.menu-button.accent .menu-item .font-icon, .menu-button.accent .menu-item .ikonli-font-icon,
-.split-menu-button.accent .menu-item .font-icon,
-.split-menu-button.accent .menu-item .ikonli-font-icon {
-    -fx-icon-color: -color-fg-default;
-    -fx-fill: -color-fg-default;
-}
-.menu-button.success,
-.split-menu-button.success {
-    -color-button-bg: -color-success-emphasis;
-    -color-button-fg: -color-fg-emphasis;
-    -color-button-border: -color-success-emphasis;
-    -color-button-bg-hover: -color-success-emphasis;
-    -color-button-fg-hover: -color-fg-emphasis;
-    -color-button-border-hover: -color-success-emphasis;
-    -color-button-bg-focused: -color-success-6;
-    -color-button-fg-focused: -color-fg-emphasis;
-    -color-button-border-focused: -color-success-emphasis;
-    -color-button-bg-pressed: -color-success-emphasis;
-    -color-button-fg-pressed: -color-fg-emphasis;
-    -color-button-border-pressed: transparent;
-}
-.menu-button.success.button-outlined,
-.split-menu-button.success.button-outlined {
-    -color-button-bg: -color-bg-default;
-    -color-button-fg: -color-success-fg;
-    -color-button-bg-hover: -color-success-emphasis;
-    -color-button-fg-hover: -color-fg-emphasis;
-}
-.menu-button.success.flat,
-.split-menu-button.success.flat {
-    -color-button-fg: -color-success-fg;
-    -color-button-bg-hover: -color-success-subtle;
-}
-.menu-button.success .menu-item .font-icon, .menu-button.success .menu-item .ikonli-font-icon,
-.split-menu-button.success .menu-item .font-icon,
-.split-menu-button.success .menu-item .ikonli-font-icon {
-    -fx-icon-color: -color-fg-default;
-    -fx-fill: -color-fg-default;
-}
-.menu-button.danger,
-.split-menu-button.danger {
-    -color-button-bg: -color-danger-emphasis;
-    -color-button-fg: -color-fg-emphasis;
-    -color-button-border: -color-danger-emphasis;
-    -color-button-bg-hover: -color-danger-emphasis;
-    -color-button-fg-hover: -color-fg-emphasis;
-    -color-button-border-hover: -color-danger-emphasis;
-    -color-button-bg-focused: -color-danger-6;
-    -color-button-fg-focused: -color-fg-emphasis;
-    -color-button-border-focused: -color-danger-emphasis;
-    -color-button-bg-pressed: -color-danger-emphasis;
-    -color-button-fg-pressed: -color-fg-emphasis;
-    -color-button-border-pressed: transparent;
-}
-.menu-button.danger.button-outlined,
-.split-menu-button.danger.button-outlined {
-    -color-button-bg: -color-bg-default;
-    -color-button-fg: -color-danger-fg;
-    -color-button-bg-hover: -color-danger-emphasis;
-    -color-button-fg-hover: -color-fg-emphasis;
-}
-.menu-button.danger.flat,
-.split-menu-button.danger.flat {
-    -color-button-fg: -color-danger-fg;
-    -color-button-bg-hover: -color-danger-subtle;
-}
-.menu-button.danger .menu-item .font-icon, .menu-button.danger .menu-item .ikonli-font-icon,
-.split-menu-button.danger .menu-item .font-icon,
-.split-menu-button.danger .menu-item .ikonli-font-icon {
-    -fx-icon-color: -color-fg-default;
-    -fx-fill: -color-fg-default;
 }
 .menu-button.flat,
 .split-menu-button.flat {
@@ -3333,11 +2894,6 @@ Text {
 .message.tile-base > .container > .header > .description Text:disabled {
     -fx-opacity: 0.4;
 }
-.message.tile-base > .container .font-icon, .message.tile-base > .container .ikonli-font-icon {
-    -fx-icon-color: -color-message-fg-primary;
-    -fx-fill: -color-message-fg-primary;
-    -fx-icon-size: 24px;
-}
 .message.tile-base:hover:interactive > .container {
     -fx-background-color: -color-message-bg;
     -fx-border-color: -color-message-border-interactive;
@@ -3429,9 +2985,6 @@ Text {
     -fx-padding: 1em 1em 0 1em;
     -fx-spacing: 0.75em;
 }
-.notification > .container > .header > .graphic .font-icon, .notification > .container > .header > .graphic .ikonli-font-icon {
-    -fx-icon-size: 24px;
-}
 .notification > .container > .header > .message Text {
     -fx-fill: -color-notify-fg;
 }
@@ -3480,55 +3033,6 @@ Text {
 .notification > .container > .button-bar {
     -fx-padding: 0 1em 0 1em;
 }
-.notification.accent {
-    -color-notify-border-intent: -color-accent-emphasis;
-}
-.notification.accent > .container {
-    -fx-background-color: -color-notify-border, -color-notify-bg, -color-notify-border-intent -color-notify-bg -color-notify-bg -color-notify-bg, -color-notify-bg;
-    -fx-background-insets: 0, 1, 1, 1 1 1 6px;
-    -fx-background-radius: 4px;
-}
-.notification.accent > .container > .header > .graphic .font-icon, .notification.accent > .container > .header > .graphic .ikonli-font-icon {
-    -fx-fill: -color-accent-emphasis;
-    -fx-icon-color: -color-accent-emphasis;
-}
-.notification.success {
-    -color-notify-border-intent: -color-success-emphasis;
-}
-.notification.success > .container {
-    -fx-background-color: -color-notify-border, -color-notify-bg, -color-notify-border-intent -color-notify-bg -color-notify-bg -color-notify-bg, -color-notify-bg;
-    -fx-background-insets: 0, 1, 1, 1 1 1 6px;
-    -fx-background-radius: 4px;
-}
-.notification.success > .container > .header > .graphic .font-icon, .notification.success > .container > .header > .graphic .ikonli-font-icon {
-    -fx-fill: -color-success-emphasis;
-    -fx-icon-color: -color-success-emphasis;
-}
-.notification.warning {
-    -color-notify-border-intent: -color-warning-emphasis;
-}
-.notification.warning > .container {
-    -fx-background-color: -color-notify-border, -color-notify-bg, -color-notify-border-intent -color-notify-bg -color-notify-bg -color-notify-bg, -color-notify-bg;
-    -fx-background-insets: 0, 1, 1, 1 1 1 6px;
-    -fx-background-radius: 4px;
-}
-.notification.warning > .container > .header > .graphic .font-icon, .notification.warning > .container > .header > .graphic .ikonli-font-icon {
-    -fx-fill: -color-warning-emphasis;
-    -fx-icon-color: -color-warning-emphasis;
-}
-.notification.danger {
-    -color-notify-border-intent: -color-danger-emphasis;
-}
-.notification.danger > .container {
-    -fx-background-color: -color-notify-border, -color-notify-bg, -color-notify-border-intent -color-notify-bg -color-notify-bg -color-notify-bg, -color-notify-bg;
-    -fx-background-insets: 0, 1, 1, 1 1 1 6px;
-    -fx-background-radius: 4px;
-}
-.notification.danger > .container > .header > .graphic .font-icon, .notification.danger > .container > .header > .graphic .ikonli-font-icon {
-    -fx-fill: -color-danger-emphasis;
-    -fx-icon-color: -color-danger-emphasis;
-}
-
 .pagination {
     -fx-padding: 0;
     -fx-arrow-button-gap: 4;
@@ -3875,23 +3379,11 @@ Text {
     -fx-text-fill: -color-segment-fg;
     -fx-padding: 8px 12px 8px 12px;
 }
-.segmented-control > .root-container > .labels > .toggle-label .font-icon, .segmented-control > .root-container > .labels > .toggle-label .ikonli-font-icon {
-    -fx-icon-color: -color-segment-fg;
-    -fx-fill: -color-segment-fg;
-}
 .segmented-control > .root-container > .labels > .toggle-label:hover {
     -fx-text-fill: -color-segment-fg-hover;
 }
-.segmented-control > .root-container > .labels > .toggle-label:hover .font-icon, .segmented-control > .root-container > .labels > .toggle-label:hover .ikonli-font-icon {
-    -fx-icon-color: -color-segment-fg-hover;
-    -fx-fill: -color-segment-fg-hover;
-}
 .segmented-control > .root-container > .labels > .toggle-label:selected {
     -fx-text-fill: -color-segment-fg-selected;
-}
-.segmented-control > .root-container > .labels > .toggle-label:selected .font-icon, .segmented-control > .root-container > .labels > .toggle-label:selected .ikonli-font-icon {
-    -fx-icon-color: -color-segment-fg-selected;
-    -fx-fill: -color-segment-fg-selected;
 }
 .segmented-control:disabled {
     -fx-opacity: 0.4;
@@ -4626,18 +4118,7 @@ Text {
 .text-input:disabled > .scroll-pane {
     -fx-opacity: 1;
 }
-.text-input:success {
-    -color-input-bg: -color-bg-default;
-    -color-input-fg: -color-success-fg;
-    -color-input-border: -color-success-emphasis;
-    -color-input-border-focused: -color-success-emphasis;
-}
-.text-input:danger {
-    -color-input-bg: -color-bg-default;
-    -color-input-fg: -color-danger-fg;
-    -color-input-border: -color-danger-emphasis;
-    -color-input-border-focused: -color-danger-emphasis;
-}
+
 .text-input:readonly {
     -fx-background-color: -color-input-border, -color-input-bg-readonly;
 }
@@ -4701,19 +4182,6 @@ Text {
 
 .password-field {
     -fx-text-fill: -color-fg-muted;
-}
-
-.combo-box-base:success > .text-field {
-    -color-input-bg: -color-bg-default;
-    -color-input-fg: -color-success-fg;
-    -color-input-border: -color-success-emphasis;
-    -color-input-border-focused: -color-success-emphasis;
-}
-.combo-box-base:danger > .text-field {
-    -color-input-bg: -color-bg-default;
-    -color-input-fg: -color-danger-fg;
-    -color-input-border: -color-danger-emphasis;
-    -color-input-border-focused: -color-danger-emphasis;
 }
 
 .tile-base > .container {
@@ -4852,10 +4320,6 @@ Text {
     -color-button-fg-selected: -color-fg-emphasis;
     -fx-padding: 8px 12px 8px 12px;
 }
-.toggle-button .font-icon, .toggle-button .ikonli-font-icon {
-    -fx-icon-color: -color-button-fg;
-    -fx-fill: -color-button-fg;
-}
 .toggle-button:disabled {
     -fx-opacity: 0.4;
     -fx-effect: none;
@@ -4901,10 +4365,6 @@ Text {
     -fx-background-color: -color-accent-emphasis, -color-button-bg-selected;
     -fx-text-fill: -color-button-fg-selected;
     -fx-background-insets: 0;
-}
-.toggle-button:selected .font-icon, .toggle-button:selected .ikonli-font-icon, .toggle-button:selected:focused .font-icon, .toggle-button:selected:focused .ikonli-font-icon {
-    -fx-fill: -color-button-fg-selected;
-    -fx-icon-color: -color-button-fg-selected;
 }
 .toggle-button:show-mnemonics:selected > .mnemonic-underline {
     -fx-stroke: -color-button-fg-selected;
@@ -4970,18 +4430,6 @@ Text {
 }
 .toggle-switch:selected > .thumb-area {
     -fx-background-color: -color-accent-emphasis, -color-accent-emphasis;
-}
-.toggle-switch:selected:success > .thumb {
-    -fx-background-color: -color-success-emphasis, -color-fg-emphasis;
-}
-.toggle-switch:selected:success > .thumb-area {
-    -fx-background-color: -color-success-emphasis, -color-success-emphasis;
-}
-.toggle-switch:selected:danger > .thumb {
-    -fx-background-color: -color-danger-emphasis, -color-fg-emphasis;
-}
-.toggle-switch:selected:danger > .thumb-area {
-    -fx-background-color: -color-danger-emphasis, -color-danger-emphasis;
 }
 .toggle-switch:right > .label-container > .label {
     -fx-padding: 2px 0 2px 6px;
@@ -5084,9 +4532,10 @@ Text {
     -fx-background-insets: 0, 1px;
     -fx-background-radius: 4px, 3px;
     -fx-text-fill: -color-fg-default;
-    -fx-font-size: 14px;
+    -fx-font-family: sans-serif;
     -fx-font-weight: normal;
     -fx-padding: 8px 12px 8px 12px;
     -fx-opacity: 0.85;
-    -fx-effect: dropshadow(three-pass-box, -color-shadow-default, 8px, 0.6, 0, 2);
+    -fx-show-delay: 300ms;
+    -fx-hide-delay: 300ms;
 }

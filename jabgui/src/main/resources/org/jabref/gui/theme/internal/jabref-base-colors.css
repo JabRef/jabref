@@ -1,5 +1,12 @@
 /*
 * JabRef base colors.
+* Will always be loaded by JabRef no matter which theme is selected.
+* ===========
+* Work for the Future:
+* All '-jr-xxx' variables should be carefully reconsidered to decouple themes from it.
+* Instead, the '-fx-xxx' variables should be used so that all JavaFX styles play nice with it.
+* This make it much easier to plug-in in any other CSS theme.
+* We should only keep the colors like -jr-green.
 */
 
 @media (prefers-color-scheme: light) {
@@ -11,8 +18,6 @@
         -jr-icon-background-active: #0001;
         -jr-icon-background-armed: #0002;
 
-        -jr-sidepane-background: #DDDDDD;
-        -jr-sidepane-header-background: #D5D5D5;
         -jr-background-alt: #F0F0F0;
         -jr-search-background: #FBFBFB;
 
@@ -47,8 +52,6 @@
         -jr-icon-background-active: #FFF1;
         -jr-icon-background-armed: #FFF2;
 
-        -jr-sidepane-background: #212330;
-        -jr-sidepane-header-background: #151924;
         -jr-background-alt: #151924;
         -jr-search-background: #2C2E3B;
 
@@ -76,9 +79,6 @@
 
 /* JabRef variables and colors */
 .root {
-    /* Generic colors */
-    -jr-icon-background: transparent;
-
     -jr-white: #ffffff;
     -jr-gray-1: #dddddd;
     -jr-gray-2: #808080;

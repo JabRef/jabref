@@ -4,7 +4,7 @@ import org.jabref.logic.l10n.Localization;
 
 public enum ThemePreset {
     JABREF(Localization.lang("JabRef Theme"), "jabref-theme.css"),
-    ATLANTA_PRIMER(Localization.lang("Atlanta Primer"), "atlanta-primer-javafx.css");
+    PRIMER(Localization.lang("Primer Theme"), "primer-theme.css");
 
     private final String themeName;
     private final String css;
