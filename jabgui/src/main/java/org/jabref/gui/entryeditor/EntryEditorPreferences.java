@@ -63,6 +63,7 @@ public class EntryEditorPreferences {
     private final ObjectProperty<CitationCountFetcherType> citationCountFetcherType;
     private final BooleanProperty shouldShowSciteTab;
     private final BooleanProperty showUserCommentsFields;
+    private final BooleanProperty shouldEnableMscKeywordDescriptions;
     private final DoubleProperty previewWidthDividerPosition;
 
     private EntryEditorPreferences() {
@@ -82,6 +83,7 @@ public class EntryEditorPreferences {
                 CitationFetcherType.SEMANTIC_SCHOLAR, // Citation Fetcher Type
                 CitationCountFetcherType.SEMANTIC_SCHOLAR, // Citation Count Fetcher Type
                 true,                                 // Show tab 'Citation information'
+                false,                                // Enable MSC codes as Keyword
                 true,                                 // Show user comments field
                 0.5                                   // Preview Width Divider Position
         );
@@ -102,6 +104,7 @@ public class EntryEditorPreferences {
                                   CitationFetcherType citationFetcherType,
                                   CitationCountFetcherType citationCountFetcherType,
                                   boolean showSciteTab,
+                                  boolean shouldEnableMscKeywordDescriptions,
                                   boolean showUserCommentsFields,
                                   double previewWidthDividerPosition) {
 
@@ -120,6 +123,7 @@ public class EntryEditorPreferences {
         this.citationFetcherType = new SimpleObjectProperty<>(citationFetcherType);
         this.citationCountFetcherType = new SimpleObjectProperty<>(citationCountFetcherType);
         this.shouldShowSciteTab = new SimpleBooleanProperty(showSciteTab);
+        this.shouldEnableMscKeywordDescriptions = new SimpleBooleanProperty(shouldEnableMscKeywordDescriptions);
         this.showUserCommentsFields = new SimpleBooleanProperty(showUserCommentsFields);
         this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
     }
@@ -174,6 +178,7 @@ public class EntryEditorPreferences {
         this.citationFetcherType.set(preferences.getCitationFetcherType());
         this.citationCountFetcherType.set(preferences.getCitationCountFetcherType());
         this.shouldShowSciteTab.set(preferences.shouldShowSciteTab());
+        this.shouldEnableMscKeywordDescriptions.set(preferences.shouldEnableMscKeywordDescriptions());
         this.showUserCommentsFields.set(preferences.shouldShowUserCommentsFields());
         this.previewWidthDividerPosition.set(preferences.getPreviewWidthDividerPosition());
     }
@@ -356,6 +361,18 @@ public class EntryEditorPreferences {
 
     public void setShouldShowSciteTab(boolean shouldShowSciteTab) {
         this.shouldShowSciteTab.set(shouldShowSciteTab);
+    }
+
+    public boolean shouldEnableMscKeywordDescriptions() {
+        return this.shouldEnableMscKeywordDescriptions.get();
+    }
+
+    public BooleanProperty shouldEnableMscKeywordDescriptionsProperty() {
+        return this.shouldEnableMscKeywordDescriptions;
+    }
+
+    public void setShouldEnableMscKeywordDescriptions(boolean shouldEnableMscKeywordDescriptions) {
+        this.shouldEnableMscKeywordDescriptions.set(shouldEnableMscKeywordDescriptions);
     }
 
     public boolean shouldShowUserCommentsFields() {

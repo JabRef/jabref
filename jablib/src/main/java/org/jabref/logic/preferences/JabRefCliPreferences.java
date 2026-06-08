@@ -267,7 +267,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String CLEANUP_JOBS = "CleanUpJobs";
     public static final String CLEANUP_FIELD_FORMATTERS_ENABLED = "CleanUpFormattersEnabled";
     public static final String CLEANUP_FIELD_FORMATTERS = "CleanUpFormatters";
-    public static final String ENABLE_MSC_KEYWORD_DESCRIPTIONS = "enableMscKeywordDescriptions";
     public static final String AUTO_RENAME_FILES_ON_CHANGE = "autoRenameFilesOnChange";
     public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
     public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
@@ -1846,16 +1845,6 @@ public class JabRefCliPreferences implements CliPreferences {
                         (Boolean) defaults.get(CLEANUP_FIELD_FORMATTERS_ENABLED),
                         FieldFormatterCleanupMapper.parseActions((String) defaults.get(CLEANUP_FIELD_FORMATTERS))
                 ));
-    }
-
-    @Override
-    public boolean shouldEnableMscKeywordDescriptions() {
-        return getBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, false);
-    }
-
-    @Override
-    public void setEnableMscKeywordDescriptions(boolean enabled) {
-        putBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, enabled);
     }
 
     private static EnumSet<CleanupPreferences.CleanupStep> getDefaultCleanupJobs() {
