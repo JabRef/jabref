@@ -824,6 +824,7 @@ public class JabRefCliPreferences implements CliPreferences {
                                                    .withLastUsedDirectory(getDefaultPath())
         );
         getAiPreferences().setAll(AiPreferences.getDefault());
+        getNameFormatterPreferences().setAll(NameFormatterPreferences.getDefault());
         getCleanupPreferences().setAll(CleanupPreferences.getDefault());
         getImporterPreferences().setAll(ImporterPreferences.getDefault());
         getAutoLinkPreferences().setAll(
@@ -864,6 +865,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
         getBibEntryPreferences().setAll(getBibEntryPreferencesFromBackingStore(getBibEntryPreferences()));
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
+        getNameFormatterPreferences().setAll(getNameFormatterPreferencesFromBackingStore(getNameFormatterPreferences()));
         getCleanupPreferences().setAll(getCleanupPreferencesFromBackingStore(getCleanupPreferences()));
         getImporterPreferences().setAll(getImporterPreferencesFromBackingStore(getImporterPreferences()));
         getAutoLinkPreferences().setAll(getAutoLinkPreferencesFromBackingStore(getAutoLinkPreferences()));
@@ -2059,9 +2061,7 @@ public class JabRefCliPreferences implements CliPreferences {
             return nameFormatterPreferences;
         }
 
-        nameFormatterPreferences = new NameFormatterPreferences(
-                getStringList(NAME_FORMATER_KEY),
-                getStringList(NAME_FORMATTER_VALUE));
+        nameFormatterPreferences = getNameFormatterPreferencesFromBackingStore(NameFormatterPreferences.getDefault());
 
         nameFormatterPreferences.getNameFormatterKey().addListener((InvalidationListener) _ ->
                 putStringList(NAME_FORMATER_KEY, nameFormatterPreferences.getNameFormatterKey()));
@@ -2069,6 +2069,12 @@ public class JabRefCliPreferences implements CliPreferences {
                 putStringList(NAME_FORMATTER_VALUE, nameFormatterPreferences.getNameFormatterValue()));
 
         return nameFormatterPreferences;
+    }
+
+    private NameFormatterPreferences getNameFormatterPreferencesFromBackingStore(NameFormatterPreferences defaults) {
+        return new NameFormatterPreferences(
+                convertStringToList(get(NAME_FORMATER_KEY, convertListToString(defaults.getNameFormatterKey()))),
+                convertStringToList(get(NAME_FORMATTER_VALUE, convertListToString(defaults.getNameFormatterValue()))));
     }
     // endregion
 
