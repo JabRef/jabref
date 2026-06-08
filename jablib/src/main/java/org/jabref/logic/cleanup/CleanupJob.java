@@ -1,6 +1,7 @@
 package org.jabref.logic.cleanup;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -24,6 +25,7 @@ public interface CleanupJob {
     default List<FieldChange> cleanup(BibEntry entry, Consumer<Runnable> mutationScheduler) {
         AtomicReference<List<FieldChange>> result = new AtomicReference<>(List.of());
         mutationScheduler.accept(() -> result.set(cleanup(entry)));
-        return result.get();
+        // Checking for null to suppress the null-away warning, even though the result.get() would never be null.
+        return Optional.ofNullable(result.get()).orElse(List.of());
     }
 }
