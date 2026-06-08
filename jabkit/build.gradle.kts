@@ -2,7 +2,6 @@ plugins {
     id("org.jabref.gradle.module")
     id("org.jabref.gradle.feature.shadowjar")
     id("application")
-    id("org.jabref.gradle.feature.nativecompile")
 }
 
 group = "org.jabref.jabkit"
@@ -74,13 +73,4 @@ tasks.register<JavaExec>("runJabKitPortableSmokeTest") {
     jvmArgs(application.applicationDefaultJvmArgs)
     workingDir = file("src/test/resources")
     args("--debug", "check", "consistency", "empty.bib")
-}
-
-graalvmNative {
-    binaries {
-        named("main") {
-            imageName.set("jabkit")
-            mainClass.set("org.jabref.toolkit.JabKitLauncher")
-        }
-    }
 }
