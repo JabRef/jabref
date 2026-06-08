@@ -479,12 +479,6 @@ public class JabRefCliPreferences implements CliPreferences {
             LOGGER.warn("Could not import preferences from jabref.xml", e);
         }
 
-        // region Grobid
-        defaults.put(GROBID_ENABLED, Boolean.FALSE);
-        defaults.put(GROBID_PREFERENCE, Boolean.FALSE);
-        defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
-        // endregion
-
         // system locale as default
         defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
 
@@ -830,6 +824,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getLastFilesOpenedPreferences().setAll(LastFilesOpenedPreferences.getDefault());
         getXmpPreferences().setAll(XmpPreferences.getDefault());
         getProtectedTermsPreferences().setAll(ProtectedTermsPreferences.getDefault());
+        getGrobidPreferences().setAll(GrobidPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences())).setAll(
                 OpenOfficePreferences.getDefault());
     }
@@ -870,6 +865,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getLastFilesOpenedPreferences().setAll(getLastFilesOpenedPreferencesFromBackingStore(getLastFilesOpenedPreferences()));
         getXmpPreferences().setAll(getXmpPreferencesFromBackingStore(getXmpPreferences()));
         getProtectedTermsPreferences().setAll(getProtectedTermsPreferencesFromBackingStore(getProtectedTermsPreferences()));
+        getGrobidPreferences().setAll(getGrobidPreferencesFromBackingStore(getGrobidPreferences()));
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences());
         getOpenOfficePreferences(repository).setAll(
                 getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
@@ -2292,16 +2288,14 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
+    // region GrobidPreferences
     @Override
     public GrobidPreferences getGrobidPreferences() {
         if (grobidPreferences != null) {
             return grobidPreferences;
         }
 
-        grobidPreferences = new GrobidPreferences(
-                getBoolean(GROBID_ENABLED),
-                getBoolean(GROBID_PREFERENCE),
-                get(GROBID_URL));
+        grobidPreferences = getGrobidPreferencesFromBackingStore(GrobidPreferences.getDefault());
 
         EasyBind.listen(grobidPreferences.grobidEnabledProperty(), (_, _, newValue) -> putBoolean(GROBID_ENABLED, newValue));
         EasyBind.listen(grobidPreferences.grobidUseAskedProperty(), (_, _, newValue) -> putBoolean(GROBID_PREFERENCE, newValue));
@@ -2309,6 +2303,14 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return grobidPreferences;
     }
+
+    private GrobidPreferences getGrobidPreferencesFromBackingStore(GrobidPreferences defaults) {
+        return new GrobidPreferences(
+                getBoolean(GROBID_ENABLED, defaults.isGrobidEnabled()),
+                getBoolean(GROBID_PREFERENCE, defaults.isGrobidUseAsked()),
+                get(GROBID_URL, defaults.getGrobidURL()));
+    }
+    // endregion
 
     @Override
     public OpenOfficePreferences getOpenOfficePreferences(JournalAbbreviationRepository journalAbbreviationRepository) {

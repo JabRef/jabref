@@ -7,16 +7,13 @@ import javafx.collections.ObservableList;
 
 public class NameFormatterPreferences {
 
-    private static final List<String> DEFAULT_NAME_FORMATTER_KEY = List.of();   // No default name formatter keys
-    private static final List<String> DEFAULT_NAME_FORMATTER_VALUE = List.of(); // No default name formatter values
-
     private final ObservableList<String> nameFormatterKey;
     private final ObservableList<String> nameFormatterValue;
 
     private NameFormatterPreferences() {
         this(
-                DEFAULT_NAME_FORMATTER_KEY,   // Name formatter keys
-                DEFAULT_NAME_FORMATTER_VALUE  // Name formatter values
+                List.of(), // Name formatter keys
+                List.of()  // Name formatter values
         );
     }
 
