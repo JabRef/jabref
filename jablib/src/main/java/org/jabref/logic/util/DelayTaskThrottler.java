@@ -6,6 +6,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,7 @@ public class DelayTaskThrottler {
 
     private int delay;
 
-    private ScheduledFuture<?> scheduledTask;
+    @Nullable private ScheduledFuture<?> scheduledTask;
 
     /// @param delay delay in milliseconds
     public DelayTaskThrottler(int delay) {
