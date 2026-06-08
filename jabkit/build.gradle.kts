@@ -1,8 +1,8 @@
 plugins {
     id("org.jabref.gradle.module")
     id("org.jabref.gradle.feature.shadowjar")
-    id("application")
     id("org.jabref.gradle.feature.nativecompile")
+    id("application")
 }
 
 group = "org.jabref.jabkit"
