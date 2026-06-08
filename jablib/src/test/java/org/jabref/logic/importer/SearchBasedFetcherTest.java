@@ -99,7 +99,7 @@ class SearchBasedFetcherTest {
     }
 
     @Test
-    void unmigatedFetcherThrowsOnRawQuery() {
+    void unmigratedFetcherThrowsOnRawQuery() {
         StubSearchBasedFetcher fetcher = new StubSearchBasedFetcher();
         assertThrows(UnsupportedOperationException.class,
                 () -> fetcher.performRawSearchQuery("quantum"));
