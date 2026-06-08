@@ -1,7 +1,6 @@
 package org.jabref.logic.ai.preferences;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
@@ -38,13 +37,6 @@ public class AiPreferences {
     private static final String KEYRING_AI_SERVICE_ACCOUNT = "apiKey";
 
     private static final AiProvider DEFAULT_AI_PROVIDER = AiProvider.OPEN_AI;
-
-    private static final Map<AiProvider, PredefinedChatModel> DEFAULT_CHAT_MODEL = Map.of(
-            AiProvider.OPEN_AI, PredefinedChatModel.GPT_4O_MINI,
-            AiProvider.MISTRAL_AI, PredefinedChatModel.OPEN_MIXTRAL_8X22B,
-            AiProvider.GEMINI, PredefinedChatModel.GEMINI_1_5_FLASH,
-            AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE
-    );
 
     private final BooleanProperty enableAi;
     private final BooleanProperty autoGenerateEmbeddings;
@@ -92,15 +84,15 @@ public class AiPreferences {
 
     private AiPreferences() {
         this(
-                false,                                                                       // AI disabled
+                false,                                                               // AI disabled
                 false,                                                                       // Auto-generate embeddings
                 false,                                                                       // Auto-generate summaries
                 DEFAULT_AI_PROVIDER,                                                         // AI provider
 
-                DEFAULT_CHAT_MODEL.get(AiProvider.OPEN_AI).getName(),                        // OpenAI chat model
-                DEFAULT_CHAT_MODEL.get(AiProvider.MISTRAL_AI).getName(),                     // Mistral AI chat model
-                DEFAULT_CHAT_MODEL.get(AiProvider.GEMINI).getName(),                         // Gemini chat model
-                DEFAULT_CHAT_MODEL.get(AiProvider.HUGGING_FACE).getName(),                   // HuggingFace chat model
+                getDefaultChatModelForProvider(AiProvider.OPEN_AI).getName(),                // OpenAI chat model
+                getDefaultChatModelForProvider(AiProvider.MISTRAL_AI).getName(),             // Mistral AI chat model
+                getDefaultChatModelForProvider(AiProvider.GEMINI).getName(),                 // Gemini chat model
+                getDefaultChatModelForProvider(AiProvider.HUGGING_FACE).getName(),           // HuggingFace chat model
 
                 false,                                                                       // Customize expert settings
 
@@ -115,7 +107,7 @@ public class AiPreferences {
                 AiDefaultExpertSettings.TEMPERATURE,                                         // Temperature
                 PredefinedChatModelUtil.getContextWindowSize(
                         DEFAULT_AI_PROVIDER,
-                        DEFAULT_CHAT_MODEL.get(DEFAULT_AI_PROVIDER).getName()),              // Context window size
+                        getDefaultChatModelForProvider(DEFAULT_AI_PROVIDER).getName()),      // Context window size
                 AiDefaultExpertSettings.DOCUMENT_SPLITTER_KIND,                              // Document splitter kind
                 AiDefaultExpertSettings.DOCUMENT_SPLITTER_CHUNK_SIZE,                        // Document splitter chunk size
                 AiDefaultExpertSettings.DOCUMENT_SPLITTER_OVERLAP_SIZE,                      // Document splitter overlap size
@@ -635,6 +627,7 @@ public class AiPreferences {
     }
 
     public List<Property<?>> getChatProperties() {
+        // noinspection unchecked
         return (List<Property<?>>) Stream.of(
                 List.of(enableAi, aiProvider, customizeExpertSettings, temperature, contextWindowSize, tokenEstimatorKind),
                 getChatModelNamesProperties(),
@@ -818,5 +811,18 @@ public class AiPreferences {
 
     public void setFollowUpQuestionsTemplate(String followUpQuestionsTemplate) {
         this.followUpQuestionsTemplate.set(followUpQuestionsTemplate);
+    }
+
+    private static PredefinedChatModel getDefaultChatModelForProvider(AiProvider aiProvider) {
+        return switch (aiProvider) {
+            case OPEN_AI ->
+                    PredefinedChatModel.GPT_4O_MINI;
+            case MISTRAL_AI ->
+                    PredefinedChatModel.OPEN_MIXTRAL_8X22B;
+            case GEMINI ->
+                    PredefinedChatModel.GEMINI_1_5_FLASH;
+            case HUGGING_FACE ->
+                    PredefinedChatModel.BLANK_HUGGING_FACE;
+        };
     }
 }
