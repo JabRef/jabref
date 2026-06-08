@@ -45,7 +45,7 @@ class CSLFormatUtilsTest {
                 .orElseThrow(() -> new NoSuchElementException("Missing citation style: " + title));
     }
 
-    /// Test to check transformation of raw, unsupported HTML into OO-ready HTML.
+    /// Test to check the transformation of raw, unsupported HTML into OO-ready HTML.
     @ParameterizedTest
     @MethodSource
     void ooHTMLTransformFromRawHTML(String expected, String rawHtml) {
@@ -167,88 +167,88 @@ class CSLFormatUtilsTest {
                 // Non-numeric, parentheses, commas, full stops, slashes, hyphens, colons, italics
                 Arguments.of(
                         "Smith, B., Jones, B., & Williams, J. (2016). Title of the test entry. <i>BibTeX Journal</i>, <i>34</i>(3), 45–67. https://doi.org/10.1001/bla.blubb<p></p>",
-                        STYLE_LIST.stream().filter(e -> "APA Style 7th edition".equals(e.getTitle())).findAny().get()
+                        getStyle("APA Style 7th edition")
                 ),
 
                 // Numeric type "[1]", brackets, newlines
                 Arguments.of(
                         "[1] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016, doi: 10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "IEEE Reference Guide version 11.29.2023".equals(e.getTitle())).findAny().get()
+                        getStyle("IEEE Reference Guide version 11.29.2023")
                 ),
 
                 // Numeric type "1."
                 Arguments.of(
                         "1. Smith, B., Jones, B., Williams, J.: Title of the test entry. BibTeX Journal. 34, 45–67 (2016). https://doi.org/10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Springer - Lecture Notes in Computer Science".equals(e.getTitle())).findAny().get()
+                        getStyle("Springer - Lecture Notes in Computer Science")
                 ),
 
                 Arguments.of(
                         "Smith, Bill, Bob Jones, and Jeff Williams. 2016. “Title of the Test Entry.” <i>BibTeX Journal</i> 34 (3): 45–67. https://doi.org/10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle())).findAny().get()
+                        getStyle("Chicago Manual of Style 17th edition (author-date)")
                 ),
 
                 // Semicolons
                 Arguments.of(
                         "1. Smith B, Jones B, Williams J. Title of the test entry. Taylor P, editor. BibTeX Journal. 2016 Jul;34(3):45–67. doi:10.1001/bla.blubb<p></p>",
-                        STYLE_LIST.stream().filter(e -> "NLM/Vancouver: Citing Medicine 2nd edition (citation-sequence)".equals(e.getTitle())).findAny().get()
+                        getStyle("NLM/Vancouver: Citing Medicine 2nd edition (citation-sequence)")
                 ),
 
                 Arguments.of(
                         "1. Smith, B., Jones, B. & Williams, J. Title of the test entry. <i>BibTeX Journal</i> <b>34</b>, 45–67 (2016).<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Nature".equals(e.getTitle())).findAny().get()
+                        getStyle("Nature")
                 ),
 
                 Arguments.of(
                         "1. Smith B, Jones B, Williams J. Title of the test entry. Taylor P, ed. <i>BibTeX Journal</i>. 2016;34(3):45-67. doi:10.1001/bla.blubb<p></p>",
-                        STYLE_LIST.stream().filter(e -> "AMA Manual of Style 11th edition".equals(e.getTitle())).findAny().get()
+                        getStyle("AMA Manual of Style 11th edition")
                 ),
 
                 // Small-caps
                 Arguments.of(
                         "<smallcaps>Smith, Jones, Williams</smallcaps> 2016: <smallcaps>B. Smith, B. Jones, J. Williams</smallcaps>, «Title of the test entry,» in <i>BibTeX Journal</i> 34, 3 <https://github.com/JabRef>, 2016, pp. 45–67.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Archeologia Classica (Italiano)".equals(e.getTitle())).findAny().get()
+                        getStyle("Archeologia Classica (Italiano)")
                 ),
 
                 // Non-breaking spaces
                 Arguments.of(
                         "Smith, Bill, Bob Jones, & Jeff Williams, “Title of the test entry,” <i>BibTeX Journal</i>, 2016, vol. 34, no. 3, pp. 45–67.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Histoire & Mesure (Français)".equals(e.getTitle())).findAny().get()
+                        getStyle("Histoire & Mesure (Français)")
                 ),
 
                 // Numeric with a full stop - "1."
                 Arguments.of(
                         "1. Smith, B., Jones, B. and Williams, J. 2016. Title of the test entry. <i>BibTeX Journal</i>. <b>34</b>: 45–67.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().get()
+                        getStyle("The Journal of Veterinary Medical Science")
                 ),
 
                 // Bold text, bold numeric with a full stop - "<BOLD>1."
                 Arguments.of(
                         "<b>1</b>. <b>Smith  B, Jones  B, Williams  J</b>. Title of the test entry. <i>BibTeX Journal</i> 2016 ; 34 : 45–67.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle())).findAny().get()
+                        getStyle("Acta Orthopædica Belgica")
                 ),
 
                 // Naked numeric - "1"
                 Arguments.of(
                         "1 Smith Bill, Jones Bob, Williams Jeff. Title of the test entry. <i>BibTeX Journal</i> 2016;<b>34</b>(3):45–67. Doi: 10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().get()
+                        getStyle("Acta Anaesthesiologica Taiwanica")
                 ),
 
                 // Numeric in parentheses - "(1)"
                 Arguments.of(
                         "(1) Smith, B.; Jones, B.; Williams, J. Title of the Test Entry. <i>BibTeX Journal</i> <b>2016</b>, <i>34</i> (3), 45–67. https://doi.org/10.1001/bla.blubb.<p></p>",
-                        STYLE_LIST.stream().filter(e -> "ACS Guide 2022 revision".equals(e.getTitle())).findAny().get()
+                        getStyle("ACS Guide 2022 revision")
                 ),
 
                 // Numeric with right parenthesis - "1)"
                 Arguments.of(
                         "1) Smith B., Jones B., Williams J., <i>BibTeX Journal</i>, <b>34</b>, 45–67 (2016).<p></p>",
-                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle())).findAny().get()
+                        getStyle("Chemical and Pharmaceutical Bulletin")
                 ),
 
                 // Numeric in superscript - "<SUPERSCRIPT>1"
                 Arguments.of(
                         "<sup>1</sup> B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal <b>34</b>(3), 45–67 (2016).<p></p>",
-                        STYLE_LIST.stream().filter(e -> "AIP Style Manual 4th edition".equals(e.getTitle())).findAny().get()
+                        getStyle("AIP Style Manual 4th edition")
                 )
         );
     }
@@ -269,84 +269,84 @@ class CSLFormatUtilsTest {
         return Stream.of(
                 Arguments.of(
                         "(Smith et al., 2016)",
-                        STYLE_LIST.stream().filter(e -> "APA Style 7th edition".equals(e.getTitle())).findAny().get()
+                        getStyle("APA Style 7th edition")
                 ),
 
                 Arguments.of(
                         "[1]",
-                        STYLE_LIST.stream().filter(e -> "IEEE Reference Guide version 11.29.2023".equals(e.getTitle())).findAny().get()
+                        getStyle("IEEE Reference Guide version 11.29.2023")
                 ),
 
                 Arguments.of(
                         "[1]",
-                        STYLE_LIST.stream().filter(e -> "Springer - Lecture Notes in Computer Science".equals(e.getTitle())).findAny().get()
+                        getStyle("Springer - Lecture Notes in Computer Science")
                 ),
 
                 Arguments.of(
                         "(Smith, Jones, and Williams 2016)",
-                        STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle())).findAny().get()
+                        getStyle("Chicago Manual of Style 17th edition (author-date)")
                 ),
 
                 Arguments.of(
                         "(1)",
-                        STYLE_LIST.stream().filter(e -> "NLM/Vancouver: Citing Medicine 2nd edition (citation-sequence)".equals(e.getTitle())).findAny().get()
+                        getStyle("NLM/Vancouver: Citing Medicine 2nd edition (citation-sequence)")
                 ),
 
                 Arguments.of(
                         "<sup>1</sup>",
-                        STYLE_LIST.stream().filter(e -> "Nature".equals(e.getTitle())).findAny().get()
+                        getStyle("Nature")
                 ),
 
                 Arguments.of(
                         "<sup>1</sup>",
-                        STYLE_LIST.stream().filter(e -> "AMA Manual of Style 11th edition".equals(e.getTitle())).findAny().get()
+                        getStyle("AMA Manual of Style 11th edition")
                 ),
 
                 Arguments.of(
                         "(Smith, Jones and Williams, 2016)",
-                        STYLE_LIST.stream().filter(e -> "Cite Them Right 12th edition (author-date/Harvard)".equals(e.getTitle())).findAny().get()
+                        getStyle("Cite Them Right 12th edition (author-date/Harvard)")
                 ),
 
                 Arguments.of(
                         "Smith, B., B. Jones, and J. Williams, 2016.",
-                        STYLE_LIST.stream().filter(e -> "Histoire & Mesure (Français)".equals(e.getTitle())).findAny().get()
+                        getStyle("Histoire & Mesure (Français)")
                 ),
 
                 Arguments.of(
                         "[1]",
-                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().get()
+                        getStyle("The Journal of Veterinary Medical Science")
                 ),
 
                 Arguments.of(
                         "(<i>1</i>)",
-                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle())).findAny().get()
+                        getStyle("Acta Orthopædica Belgica")
                 ),
 
                 Arguments.of(
                         "<sup>1</sup>",
-                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().get()
+                        getStyle("Acta Anaesthesiologica Taiwanica")
                 ),
 
                 Arguments.of(
                         "<sup>1</sup>",
-                        STYLE_LIST.stream().filter(e -> "ACS Guide 2022 revision".equals(e.getTitle())).findAny().get()
+                        getStyle("ACS Guide 2022 revision")
                 ),
 
                 // Note: not sure if the right parenthesis outside the superscript is correct, but that's how citeproc-java generates it in raw form as well.
                 Arguments.of(
                         "<sup>1</sup>)",
-                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle())).findAny().get()
+                        getStyle("Chemical and Pharmaceutical Bulletin")
                 ),
 
                 Arguments.of(
                         "<sup>1</sup>",
-                        STYLE_LIST.stream().filter(e -> "AIP Style Manual 4th edition".equals(e.getTitle())).findAny().get()
+                        getStyle("AIP Style Manual 4th edition")
                 ),
 
                 // Non-bibliographic style (citation-format="note")
                 Arguments.of(
                         "B. Smith, B. Jones and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i> 34, no. 3 (July 2016): 45–67.",
-                        STYLE_LIST.stream().filter(e -> "The Journal of Clinical Ethics".equals(e.getTitle())).findAny().get()
+                        getStyle("The Journal of Clinical Ethics")
                 )
         );
     }
