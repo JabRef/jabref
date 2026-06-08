@@ -95,6 +95,8 @@
 
     -fx-focused-text-base-color: -jr-light-text-color;
     -fx-focused-mark-color: -jr-light-text-color;
+
+    -fx-background-color: -fx-background;
 }
 
 /* JavaFX Button-like */
@@ -204,18 +206,6 @@
 
 .radio-button:selected > .radio > .dot {
     -fx-background-color: -jr-checked;
-}
-
-/* JavaFX Focus */
-.scroll-pane:focused,
-.split-pane:focused,
-.list-view:focused,
-.tree-view:focused,
-.table-view:focused,
-.tree-table-view:focused {
-    -fx-background-color: -fx-control-inner-background;
-    -fx-background-insets: 0;
-    -fx-background-radius: 0;
 }
 
 /* JavaFX Layout container */
