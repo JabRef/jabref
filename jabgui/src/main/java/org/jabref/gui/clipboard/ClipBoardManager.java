@@ -175,7 +175,7 @@ public class ClipBoardManager {
         StringBuilder builder = new StringBuilder();
         if (!stringConstants.isEmpty()) {
             stringConstants.forEach(strConst -> {
-                builder.append(strConst.getParsedSerialization() == null ? "" : strConst.getParsedSerialization());
+                builder.append(strConst.getParsedSerialization().orElse(""));
                 builder.append(OS.NEWLINE);
             });
             builder.append(OS.NEWLINE);

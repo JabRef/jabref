@@ -2,6 +2,7 @@ package org.jabref.gui;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.collections.FXCollections;
@@ -102,7 +103,7 @@ class ClipBoardManagerTest extends ApplicationTest {
                 .withChanged(true);
 
         BibtexString bibtexString = mock(BibtexString.class);
-        when(bibtexString.getParsedSerialization()).thenReturn("@String{grl = \"Geophys. Res. Lett.\"}");
+        when(bibtexString.getParsedSerialization()).thenReturn(Optional.of("@String{grl = \"Geophys. Res. Lett.\"}"));
 
         AtomicReference<String> actual = new AtomicReference<>();
         interact(Unchecked.runnable(() -> {

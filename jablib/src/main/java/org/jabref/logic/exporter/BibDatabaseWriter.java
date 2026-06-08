@@ -362,7 +362,7 @@ public class BibDatabaseWriter {
         // If the string has not been modified, write it back as it was
         if (!saveConfiguration.shouldReformatFile() && !bibtexString.hasChanged()) {
             LOGGER.debug("Writing parsed serialization {}.", bibtexString.getParsedSerialization());
-            bibWriter.write(bibtexString.getParsedSerialization());
+            bibWriter.write(bibtexString.getParsedSerialization().orElse(null));
             return;
         }
 

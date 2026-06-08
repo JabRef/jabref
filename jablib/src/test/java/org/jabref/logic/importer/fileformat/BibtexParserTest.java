@@ -792,7 +792,7 @@ class BibtexParserTest {
         BibtexString parsedString = result.getDatabase().getStringValues().iterator().next();
 
         assertEquals(1, result.getDatabase().getStringCount());
-        assertEquals(string, parsedString.getParsedSerialization());
+        assertEquals(Optional.of(string), parsedString.getParsedSerialization());
     }
 
     @Test

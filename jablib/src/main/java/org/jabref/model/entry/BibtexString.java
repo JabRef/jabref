@@ -2,6 +2,9 @@ package org.jabref.model.entry;
 
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
+
+import org.jspecify.annotations.Nullable;
 
 /// This class models a BibTex String ("@String")
 public class BibtexString implements Cloneable {
@@ -72,7 +75,7 @@ public class BibtexString implements Cloneable {
     private String content;
     private String id;
     private Type type;
-    private String parsedSerialization;
+    @Nullable private String parsedSerialization;
     private boolean hasChanged;
 
     /// Default constructor. Use this if in doubt.
@@ -90,7 +93,7 @@ public class BibtexString implements Cloneable {
     /// Do not use if not working with reading BibTeX files (or similar actions).     *
     ///
     /// @param parsedSerialization The serialization read during parsing
-    public BibtexString(String name, String content, String parsedSerialization) {
+    public BibtexString(String name, String content, @Nullable String parsedSerialization) {
         this(name, content);
         this.parsedSerialization = parsedSerialization;
         hasChanged = false;
@@ -132,8 +135,8 @@ public class BibtexString implements Cloneable {
         return type;
     }
 
-    public String getParsedSerialization() {
-        return parsedSerialization;
+    public Optional<String> getParsedSerialization() {
+        return Optional.ofNullable(parsedSerialization);
     }
 
     public boolean hasChanged() {
@@ -147,8 +150,7 @@ public class BibtexString implements Cloneable {
         if (parsedSerialization != null) {
             try {
                 // get the text before the string
-                String prolog = parsedSerialization.substring(0, parsedSerialization.indexOf('@'));
-                return prolog;
+                return parsedSerialization.substring(0, parsedSerialization.indexOf('@'));
             } catch (StringIndexOutOfBoundsException ignore) {
                 // if this occurs a broken parsed serialization has been set, so just do nothing
             }
