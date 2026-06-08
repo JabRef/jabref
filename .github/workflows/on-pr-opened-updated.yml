@@ -17,9 +17,9 @@ jobs:
     name: Conflicts with target branch
     runs-on: ubuntu-slim
     permissions:
-      actions: write
       contents: read
-      pull-requests: write
+      issues: write
+      pull-requests: read
     steps:
       - uses: actions/checkout@v6
         with:
