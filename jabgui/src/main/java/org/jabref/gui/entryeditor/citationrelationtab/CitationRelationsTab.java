@@ -60,9 +60,11 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.maintable.MainTableTooltip;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
@@ -124,6 +126,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final ProgressIndicator progressIndicator;
     private final GridPane sciteResultsPane;
     private final EntryEditorPreferences entryEditorPreferences;
+    private final MainTableTooltip previewTooltip;
     private ComboBox<CitationFetcherType> fetcherCombo;
 
     private boolean shouldClearSelectionOnDrop = false;
@@ -134,6 +137,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 FileUpdateMonitor fileUpdateMonitor,
                                 GuiPreferences preferences,
                                 TaskExecutor taskExecutor,
+                                ThemeManager themeManager,
                                 BibEntryTypesManager bibEntryTypesManager,
                                 SearchCitationsRelationsService searchCitationsRelationsService) {
         this.dialogService = dialogService;
@@ -169,6 +173,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         setSciteResultsPane();
 
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
+
+        this.previewTooltip = new MainTableTooltip(dialogService, preferences, themeManager, taskExecutor);
     }
 
     private void setSciteResultsPane() {
@@ -573,6 +579,14 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                     hContainer.getChildren().addAll(entryNode, separator, vContainer);
                     hContainer.getStyleClass().add("entry-container");
+
+                    // [impl->req~entry-editor.citations.hover-preview~1]
+                    hContainer.setOnMouseEntered(_ -> {
+                        stateManager.getActiveDatabase().ifPresent(databaseContext -> {
+                            previewTooltip.createPreviewTooltip(databaseContext, entry.entry());
+                        });
+                    });
+                    Tooltip.install(hContainer, previewTooltip);
 
                     return hContainer;
                 })

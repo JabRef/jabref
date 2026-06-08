@@ -19,6 +19,7 @@ concurrency:
 
 permissions:
   actions: write
+  contents: read
 
 jobs:
   build:

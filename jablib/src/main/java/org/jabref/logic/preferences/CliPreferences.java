@@ -17,7 +17,6 @@ import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
-import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -69,8 +68,6 @@ public interface CliPreferences {
 
     CleanupPreferences getCleanupPreferences();
 
-    CleanupPreferences getDefaultCleanupPreset();
-
     LibraryPreferences getLibraryPreferences();
 
     DOIPreferences getDOIPreferences();
@@ -100,8 +97,6 @@ public interface CliPreferences {
     NameFormatterPreferences getNameFormatterPreferences();
 
     SearchPreferences getSearchPreferences();
-
-    MrDlibPreferences getMrDlibPreferences();
 
     ProtectedTermsPreferences getProtectedTermsPreferences();
 

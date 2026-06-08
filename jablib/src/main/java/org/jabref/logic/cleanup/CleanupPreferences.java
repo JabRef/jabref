@@ -1,7 +1,7 @@
 package org.jabref.logic.cleanup;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 
 import javafx.beans.property.ObjectProperty;
@@ -10,11 +10,38 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
 public class CleanupPreferences {
+
+    private static final EnumSet<CleanupStep> DEFAULT_ACTIVE_JOBS = EnumSet.of(
+            CleanupStep.CLEAN_UP_DOI,
+            CleanupStep.CLEANUP_EPRINT,
+            CleanupStep.CLEAN_UP_URL,
+            CleanupStep.CLEAN_UP_ISSN,
+            CleanupStep.MAKE_PATHS_RELATIVE,
+            CleanupStep.RENAME_PDF,
+            CleanupStep.FIX_FILE_LINKS,
+            CleanupStep.CLEAN_UP_DELETED_LINKED_FILES,
+            CleanupStep.REMOVE_XMP_METADATA,
+            CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE,
+            CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE,
+            CleanupStep.DO_NOT_CONVERT_TIMESTAMP);
+
+    private static final FieldFormatterCleanupActions DEFAULT_FIELD_FORMATTER_CLEANUPS =
+            new FieldFormatterCleanupActions(false, FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS);
+
     private final ObservableSet<CleanupStep> activeJobs;
     private final ObjectProperty<FieldFormatterCleanupActions> fieldFormatterCleanups;
 
-    public CleanupPreferences(EnumSet<CleanupStep> activeJobs) {
-        this(activeJobs, new FieldFormatterCleanupActions(false, new ArrayList<>()));
+    private CleanupPreferences() {
+        this(
+                EnumSet.copyOf(DEFAULT_ACTIVE_JOBS),  // copy to prevent mutation of static field
+                DEFAULT_FIELD_FORMATTER_CLEANUPS      // Default field formatter cleanups (disabled)
+        );
+    }
+
+    public CleanupPreferences(Set<CleanupStep> activeJobs) {
+        this(
+                EnumSet.copyOf(activeJobs),
+                new FieldFormatterCleanupActions(false, FieldFormatterCleanupActions.DEFAULT_SAVE_ACTIONS));
     }
 
     public CleanupPreferences(CleanupStep activeJob) {
@@ -25,17 +52,22 @@ public class CleanupPreferences {
         this(EnumSet.noneOf(CleanupStep.class), formatterCleanups);
     }
 
-    public CleanupPreferences(EnumSet<CleanupStep> activeJobs, FieldFormatterCleanupActions formatterCleanups) {
-        this.activeJobs = FXCollections.observableSet(activeJobs);
+    public CleanupPreferences(Set<CleanupStep> activeJobs, FieldFormatterCleanupActions formatterCleanups) {
+        this.activeJobs = FXCollections.observableSet(new HashSet<>(activeJobs));
         this.fieldFormatterCleanups = new SimpleObjectProperty<>(formatterCleanups);
     }
 
-    public EnumSet<CleanupStep> getActiveJobs() {
-        if (activeJobs.isEmpty()) {
-            return EnumSet.noneOf(CleanupStep.class);
-        }
+    public static CleanupPreferences getDefault() {
+        return new CleanupPreferences();
+    }
 
-        return EnumSet.copyOf(activeJobs);
+    public void setAll(CleanupPreferences other) {
+        setActiveJobs(other.getActiveJobs());
+        setFieldFormatterCleanups(other.getFieldFormatterCleanups());
+    }
+
+    public Set<CleanupStep> getActiveJobs() {
+        return activeJobs;
     }
 
     public ObservableSet<CleanupStep> getObservableActiveJobs() {

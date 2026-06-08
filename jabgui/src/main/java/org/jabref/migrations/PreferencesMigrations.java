@@ -534,7 +534,7 @@ public class PreferencesMigrations {
             prefs.put(V6_0_CLEANUP_JOBS, String.join(";", activeJobs));
         }
 
-        List<String> formatterCleanups = List.of(StringUtil.unifyLineBreaks(prefs.get(V5_8_CLEANUP_FIELD_FORMATTERS), "\n")
+        List<String> formatterCleanups = List.of(StringUtil.unifyLineBreaks(prefs.get(V5_8_CLEANUP_FIELD_FORMATTERS, ""), "\n")
                                                            .split("\n"));
         if (formatterCleanups.size() >= 2
                 && (FieldFormatterCleanupActions.ENABLED.equals(formatterCleanups.getFirst())
@@ -559,7 +559,7 @@ public class PreferencesMigrations {
                 for (int i = 0; i < names.size(); i++) {
                     keyring.setPassword("org.jabref.customapikeys", names.get(i), new Password(
                             keys.get(i),
-                            preferences.getInternalPreferences().getUserAndHost())
+                            preferences.getInternalPreferences().getUserHostInfo().getUserHostString())
                             .encrypt());
                 }
                 preferences.deleteKey(V5_9_FETCHER_CUSTOM_KEYS);

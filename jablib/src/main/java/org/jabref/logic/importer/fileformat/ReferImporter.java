@@ -58,7 +58,7 @@ public class ReferImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Import for the Refer/BibIX file.");
+        return Localization.lang("Importer for the Refer/BibIX file.");
     }
 
     @Override

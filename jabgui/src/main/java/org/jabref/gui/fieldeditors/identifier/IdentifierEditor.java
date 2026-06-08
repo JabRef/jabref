@@ -79,6 +79,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
+        textField.setId(field.getName());
         textField.textProperty().bindBidirectional(viewModel.textProperty());
 
         fetchInformationByIdentifierButton.setTooltip(
