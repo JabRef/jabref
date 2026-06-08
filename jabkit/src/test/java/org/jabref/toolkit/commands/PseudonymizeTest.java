@@ -39,7 +39,7 @@ public class PseudonymizeTest extends AbstractJabKitTest {
         Path origin = getClassResourceAsPath("origin.bib").toAbsolutePath();
         Path output = tempDir.resolve("new.pseudo.bib");
         Path key = tempDir.resolve("new.pseudo.csv");
-        Files.writeString(output,"some");
+        Files.writeString(output, "some");
         commandLine.execute("pseudonymize", "-f", "--input=" + origin, "--output=" + output, "--key=" + key);
         assertFileExists(output);
         assertFileExists(key);
