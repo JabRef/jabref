@@ -2,7 +2,6 @@ package org.jabref.logic.cleanup;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 import javax.xml.transform.TransformerException;
