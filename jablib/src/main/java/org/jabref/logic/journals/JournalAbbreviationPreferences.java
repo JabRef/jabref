@@ -7,6 +7,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+// TODO:  rename this preferences to AbbrevationPreferensc and move the shouldEnableMscKeywordDescriptions here
+// Use that preferences than in the Formatter
 public class JournalAbbreviationPreferences {
 
     private final ObservableList<String> externalJournalLists;

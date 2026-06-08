@@ -32,7 +32,7 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
     @NonNull
     @Override
     public String format(@NonNull String text) {
-        JabRefCliPreferences preferences = getCliPreferences();
+        JabRefCliPreferences preferences = getCliPreferences().en;
         if (text.isEmpty() || !preferences.shouldEnableMscKeywordDescriptions()) {
             return text;
         }
