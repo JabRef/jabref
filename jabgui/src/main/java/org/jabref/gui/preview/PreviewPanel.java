@@ -178,7 +178,7 @@ public class PreviewPanel extends VBox implements PreviewControls {
         MenuItem nextPreviewLayout = new MenuItem(Localization.lang("Next preview layout"));
         keyBindingRepository.getKeyCombination(KeyBinding.NEXT_PREVIEW_LAYOUT).ifPresent(nextPreviewLayout::setAccelerator);
         nextPreviewLayout.setOnAction(_ -> this.nextPreviewStyle());
-        MenuItem goToPreferences = new MenuItem(Localization.lang("Go to preview preferences..."));
+        MenuItem goToPreferences = new MenuItem(Localization.lang("Open preview preferences..."));
         goToPreferences.setOnAction(_ -> dialogService.showCustomDialogAndWait(new PreferencesDialogView(PreviewTab.class)));
 
         ContextMenu menu = new ContextMenu();
