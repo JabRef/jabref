@@ -199,29 +199,6 @@ runs:
           -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' \
           build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }}* \
           jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/jbundle/
-    - name: Run light.exe with verbose output
-      if: failure() && (inputs.os == 'windows-latest')
-      shell: pwsh
-      run: |
-        $tempDir = Get-ChildItem "$env:TEMP\jdk.jpackage*" | Select-Object -First 1 -ExpandProperty FullName
-        $config = "$tempDir\config"
-        $wixobj = "$tempDir\wixobj"
-        light.exe -nologo -spdb `
-          -ext WixUtilExtension `
-          -ext WixUIExtension `
-          -b $config `
-          -sice:ICE27 `
-          -loc "$config\MsiInstallerStrings_de.wxl" `
-          -loc "$config\MsiInstallerStrings_en.wxl" `
-          -loc "$config\MsiInstallerStrings_ja.wxl" `
-          -loc "$config\MsiInstallerStrings_zh_CN.wxl" `
-          -cultures:en-us `
-          "$wixobj\main.wixobj" `
-          "$wixobj\bundle.wixobj" `
-          "$wixobj\ui.wixobj" `
-          "$wixobj\InstallDirNotEmptyDlg.wixobj" `
-          "$wixobj\os-condition.wixobj" `
-          -out "$wixobj\a.msi"
     - name: Upload WiX temp dir
       if: failure() && (inputs.os == 'windows-latest')
       uses: actions/upload-artifact@v4
