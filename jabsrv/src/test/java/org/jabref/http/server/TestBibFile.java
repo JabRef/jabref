@@ -9,6 +9,7 @@ import org.jabref.logic.util.io.BackupFileUtil;
 /// We cannot use a string constant as the path changes from OS to OS. Therefore, we need to dynamically create the expected result.
 public enum TestBibFile {
     GENERAL_SERVER_TEST("src/test/resources/org/jabref/http/server/general-server-test.bib"),
+    GROUPS_SERVER_TEST("src/test/resources/org/jabref/http/server/groups-server-test.bib"),
     XSS_SERVER_TEST("src/test/resources/org/jabref/http/server/xss-server-test.bib"),
     CHOCOLATE_BIB("../jablib/src/main/resources/Chocolate.bib");
 
