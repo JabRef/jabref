@@ -20,6 +20,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
+import com.google.common.html.HtmlEscapers;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
@@ -124,16 +125,22 @@ public class EntryResource {
         String releaseDate = entry.getField(StandardField.DATE).orElse("(N/A)");
 
         // the only difference to the plain text version of this method is the format of the output:
-        String preview =
-                "<strong>Author:</strong> " + author + "<br>" +
-                        "<strong>Title:</strong> " + title + "<br>" +
-                        "<strong>Journal:</strong> " + journal + "<br>" +
-                        "<strong>Volume:</strong> " + volume + "<br>" +
-                        "<strong>Number:</strong> " + number + "<br>" +
-                        "<strong>Pages:</strong> " + pages + "<br>" +
-                        "<strong>Released on:</strong> " + releaseDate;
-
-        return preview;
+        return """
+                <strong>Author:</strong> %s<br>
+                <strong>Title:</strong> %s<br>
+                <strong>Journal:</strong> %s<br>
+                <strong>Volume:</strong> %s<br>
+                <strong>Number:</strong> %s<br>
+                <strong>Pages:</strong> %s<br>
+                <strong>Released on:</strong> %s"""
+                .formatted(
+                        HtmlEscapers.htmlEscaper().escape(author),
+                        HtmlEscapers.htmlEscaper().escape(title),
+                        HtmlEscapers.htmlEscaper().escape(journal),
+                        HtmlEscapers.htmlEscaper().escape(volume),
+                        HtmlEscapers.htmlEscaper().escape(number),
+                        HtmlEscapers.htmlEscaper().escape(pages),
+                        HtmlEscapers.htmlEscaper().escape(releaseDate));
     }
 
     @POST

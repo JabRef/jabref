@@ -68,8 +68,6 @@ public interface CliPreferences {
 
     CleanupPreferences getCleanupPreferences();
 
-    CleanupPreferences getDefaultCleanupPreset();
-
     LibraryPreferences getLibraryPreferences();
 
     DOIPreferences getDOIPreferences();

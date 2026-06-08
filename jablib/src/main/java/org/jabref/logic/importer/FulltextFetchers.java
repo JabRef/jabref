@@ -34,8 +34,12 @@ import org.slf4j.LoggerFactory;
 public class FulltextFetchers {
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextFetchers.class);
 
-    // Timeout in seconds
-    private static final int FETCHER_TIMEOUT = 10;
+    // Timeout in seconds. Set generously so fetchers that bounce through
+    // an institutional SSO chain or a slow publisher CDN have a chance
+    // to complete; the browser-extension companion fetcher in particular
+    // may open a tab, navigate through a SeamlessAccess redirect, and
+    // download the PDF, which can easily exceed the older 10 s cap.
+    private static final int FETCHER_TIMEOUT = 120;
 
     private final Set<FulltextFetcher> fetchers;
 
