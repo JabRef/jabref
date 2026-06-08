@@ -137,11 +137,11 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     private void setAnimations() {
         ObjectProperty<Color> flashingColor = new SimpleObjectProperty<>(Color.TRANSPARENT);
-        StringProperty flashingColorStringProperty = ColorUtil.createFlashingColorStringProperty(flashingColor);
 
-        searchBox.styleProperty().bind(
-                new SimpleStringProperty("-fx-control-inner-background: ").concat(flashingColorStringProperty).concat(";")
-        );
+        flashingColor.addListener((observer, oldValue, newValue) -> {
+            String fxColor = ColorUtil.toRGBCode(newValue);
+            searchBox.setStyle("-fx-control-inner-background: " + fxColor + ";");
+        });
         invalidateSearch = new Timeline(
                 new KeyFrame(Duration.seconds(0), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR)),
                 new KeyFrame(Duration.seconds(0.25), new KeyValue(flashingColor, Color.RED, Interpolator.LINEAR)),

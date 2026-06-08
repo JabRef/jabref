@@ -16,6 +16,8 @@ import javax.swing.undo.UndoManager;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.css.PseudoClass;
@@ -90,6 +92,10 @@ public class GroupTreeView extends BorderPane {
     private static final PseudoClass PSEUDOCLASS_ALLSELECTED = PseudoClass.getPseudoClass("all-selected");
     private static final PseudoClass PSEUDOCLASS_ROOTELEMENT = PseudoClass.getPseudoClass("root");
     private static final PseudoClass PSEUDOCLASS_SUBELEMENT = PseudoClass.getPseudoClass("sub"); // > 1 deep
+    private static final PseudoClass PSEUDOCLASS_HITS_SMALL = PseudoClass.getPseudoClass("hits-small");
+    private static final PseudoClass PSEUDOCLASS_HITS_MEDIUM = PseudoClass.getPseudoClass("hits-medium");
+    private static final PseudoClass PSEUDOCLASS_HITS_LARGE = PseudoClass.getPseudoClass("hits-large");
+    private static final PseudoClass PSEUDOCLASS_HITS_XLARGE = PseudoClass.getPseudoClass("hits-xlarge");
 
     private static final double NUMBER_COL_WIDTH = 60D;
     private static final double EXPANSION_COL_WIDTH = 20D;
@@ -392,21 +398,16 @@ public class GroupTreeView extends BorderPane {
                 });
         text.getStyleClass().setAll("text");
 
-        text.styleProperty().bind(Bindings.createStringBinding(() -> {
-            double reducedFontSize;
-            double font_size = preferences.getWorkspacePreferences().getMainFontSize();
-            // For each breaking point, the font size is reduced 0.20 em to fix issue 8797
-            if (font_size > 26.0) {
-                reducedFontSize = 0.25;
-            } else if (font_size > 22.0) {
-                reducedFontSize = 0.35;
-            } else if (font_size > 18.0) {
-                reducedFontSize = 0.55;
-            } else {
-                reducedFontSize = 0.75;
-            }
-            return "-fx-font-size: %fem;".formatted(reducedFontSize);
-        }, preferences.getWorkspacePreferences().mainFontSizeProperty()));
+        IntegerProperty mainFontSize = preferences.getWorkspacePreferences().mainFontSizeProperty();
+        BooleanBinding smallFont = mainFontSize.lessThanOrEqualTo(18);
+        BooleanBinding mediumFont = mainFontSize.greaterThan(18).and(mainFontSize.lessThanOrEqualTo(22));
+        BooleanBinding largeFont = mainFontSize.greaterThan(22).and(mainFontSize.lessThanOrEqualTo(26));
+        BooleanBinding xlargeFont = mainFontSize.greaterThan(26);
+
+        BindingsHelper.includePseudoClassWhen(node, PSEUDOCLASS_HITS_SMALL, smallFont);
+        BindingsHelper.includePseudoClassWhen(node, PSEUDOCLASS_HITS_MEDIUM, mediumFont);
+        BindingsHelper.includePseudoClassWhen(node, PSEUDOCLASS_HITS_LARGE, largeFont);
+        BindingsHelper.includePseudoClassWhen(node, PSEUDOCLASS_HITS_XLARGE, xlargeFont);
 
         node.getChildren().add(text);
         node.setMaxWidth(Control.USE_PREF_SIZE);

@@ -1372,6 +1372,22 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-radius: 0.7em;
 }
 
+#groupTree .numberColumn > .hits:hits-small {
+    -fx-font-size: 0.75em;
+}
+
+#groupTree .numberColumn > .hits:hits-medium {
+    -fx-font-size: 0.55em;
+}
+
+#groupTree .numberColumn > .hits:hits-large {
+    -fx-font-size: 0.35em;
+}
+
+#groupTree .numberColumn > .hits:hits-xlarge {
+    -fx-font-size: 0.25em;
+}
+
 #groupTree .numberColumn > .hits .text {
     -fx-fill: -jr-group-hits-fg;
 }

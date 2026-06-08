@@ -96,11 +96,10 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
         });
 
         ObjectProperty<Color> flashingColor = new SimpleObjectProperty<>(Color.TRANSPARENT);
-        StringProperty flashingColorStringProperty = ColorUtil.createFlashingColorStringProperty(flashingColor);
-
-        searchBox.styleProperty().bind(
-                new SimpleStringProperty("-fx-control-inner-background: ").concat(flashingColorStringProperty).concat(";")
-        );
+        flashingColor.addListener((observer, oldValue, newValue) -> {
+            String fxColor = ColorUtil.toRGBCode(newValue);
+            searchBox.setStyle("-fx-control-inner-background: " + fxColor + ";");
+        });
 
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
