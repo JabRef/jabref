@@ -71,7 +71,6 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.push.PushApplications;
@@ -500,11 +499,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
 
-        defaults.put(PROTECTED_TERMS_ENABLED_INTERNAL, convertListToString(ProtectedTermsLoader.getInternalLists()));
-        defaults.put(PROTECTED_TERMS_DISABLED_INTERNAL, "");
-        defaults.put(PROTECTED_TERMS_ENABLED_EXTERNAL, "");
-        defaults.put(PROTECTED_TERMS_DISABLED_EXTERNAL, "");
-
         defaults.put(LAST_USED_EXPORT, "");
 
         // Since some of the preference settings themselves use localized strings, we cannot set the language after
@@ -835,6 +829,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getSearchPreferences().setAll(SearchPreferences.getDefault());
         getLastFilesOpenedPreferences().setAll(LastFilesOpenedPreferences.getDefault());
         getXmpPreferences().setAll(XmpPreferences.getDefault());
+        getProtectedTermsPreferences().setAll(ProtectedTermsPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences())).setAll(
                 OpenOfficePreferences.getDefault());
     }
@@ -874,6 +869,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
         getLastFilesOpenedPreferences().setAll(getLastFilesOpenedPreferencesFromBackingStore(getLastFilesOpenedPreferences()));
         getXmpPreferences().setAll(getXmpPreferencesFromBackingStore(getXmpPreferences()));
+        getProtectedTermsPreferences().setAll(getProtectedTermsPreferencesFromBackingStore(getProtectedTermsPreferences()));
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences());
         getOpenOfficePreferences(repository).setAll(
                 getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
@@ -2085,12 +2081,7 @@ public class JabRefCliPreferences implements CliPreferences {
             return protectedTermsPreferences;
         }
 
-        protectedTermsPreferences = new ProtectedTermsPreferences(
-                getStringList(PROTECTED_TERMS_ENABLED_INTERNAL),
-                getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL),
-                getStringList(PROTECTED_TERMS_DISABLED_INTERNAL),
-                getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL)
-        );
+        protectedTermsPreferences = getProtectedTermsPreferencesFromBackingStore(ProtectedTermsPreferences.getDefault());
 
         protectedTermsPreferences.getEnabledExternalTermLists().addListener((InvalidationListener) _ ->
                 putStringList(PROTECTED_TERMS_ENABLED_EXTERNAL, protectedTermsPreferences.getEnabledExternalTermLists()));
@@ -2102,6 +2093,15 @@ public class JabRefCliPreferences implements CliPreferences {
                 putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, protectedTermsPreferences.getDisabledInternalTermLists()));
 
         return protectedTermsPreferences;
+    }
+
+    private ProtectedTermsPreferences getProtectedTermsPreferencesFromBackingStore(ProtectedTermsPreferences defaults) {
+        return new ProtectedTermsPreferences(
+                convertStringToList(get(PROTECTED_TERMS_ENABLED_INTERNAL, convertListToString(defaults.getEnabledInternalTermLists()))),
+                convertStringToList(get(PROTECTED_TERMS_ENABLED_EXTERNAL, convertListToString(defaults.getEnabledExternalTermLists()))),
+                convertStringToList(get(PROTECTED_TERMS_DISABLED_INTERNAL, convertListToString(defaults.getDisabledInternalTermLists()))),
+                convertStringToList(get(PROTECTED_TERMS_DISABLED_EXTERNAL, convertListToString(defaults.getDisabledExternalTermLists())))
+        );
     }
     // endregion
 
