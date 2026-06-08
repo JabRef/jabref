@@ -295,9 +295,6 @@ public class JabRefCliPreferences implements CliPreferences {
     // Helper string
     protected static final String USER_HOME = System.getProperty("user.home");
 
-    // UI
-    private static final String FONT_FAMILY = "fontFamily";
-
     // region last files opened
     private static final String LAST_EDITED = "lastEdited";
     private static final String LAST_FOCUSED = "lastFocused";
@@ -390,8 +387,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private static final String OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY = "openFileExplorerInFileDirectory";
     private static final String OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY = "openFileExplorerInLastUsedDirectory";
-
-    private static final String MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED = "mainFileDirectoryWalkthroughCompleted";
 
     // region Push to application preferences
     private static final String PUSH_TO_APPLICATION = "pushToApplication";
@@ -491,13 +486,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(GROBID_URL, "http://grobid.jabref.org:8070");
         // endregion
 
-        if (OS.OS_X) {
-            defaults.put(FONT_FAMILY, "SansSerif");
-        } else {
-            // Linux
-            defaults.put(FONT_FAMILY, "SansSerif");
-        }
-
         // system locale as default
         defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
 
@@ -524,9 +512,6 @@ public class JabRefCliPreferences implements CliPreferences {
         // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
         // will never be translated.
         Localization.setLanguage(getLanguage());
-
-        // WalkThrough
-        defaults.put(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED, Boolean.FALSE);
 
         // region Git preferences
         defaults.put(GITHUB_PAT_KEY, "");
