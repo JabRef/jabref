@@ -1,7 +1,7 @@
 package org.jabref.logic.openoffice.oocsltext;
 
-import java.util.NoSuchElementException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationstyle.CSLStyleLoader;
@@ -40,9 +40,9 @@ class CSLFormatUtilsTest {
 
     private static CitationStyle getStyle(String title) {
         return STYLE_LIST.stream()
-                .filter(style -> title.equals(style.getTitle()))
-                .findAny()
-                .orElseThrow(() -> new NoSuchElementException("Missing citation style: " + title));
+                         .filter(style -> title.equals(style.getTitle()))
+                         .findAny()
+                         .orElseThrow(() -> new NoSuchElementException("Missing citation style: " + title));
     }
 
     /// Test to check the transformation of raw, unsupported HTML into OO-ready HTML.
