@@ -147,7 +147,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String EXPORT_SECONDARY_SORT_DESCENDING = "exportSecDescending";
     public static final String EXPORT_TERTIARY_SORT_FIELD = "exportTerSort";
     public static final String EXPORT_TERTIARY_SORT_DESCENDING = "exportTerDescending";
-    public static final String NEWLINE = "newline";
 
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
     public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
@@ -479,12 +478,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // system locale as default
         defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
-
-        defaults.put(NEWLINE, System.lineSeparator());
-
-        defaults.put(LAST_USED_DIRECTORY, getDefaultPath().toString());
-
-        defaults.put(LAST_USED_EXPORT, "");
 
         // Since some of the preference settings themselves use localized strings, we cannot set the language after
         // the initialization of the preferences in main
