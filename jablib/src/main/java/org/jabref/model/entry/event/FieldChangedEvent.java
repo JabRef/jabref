@@ -1,6 +1,7 @@
 package org.jabref.model.entry.event;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
@@ -12,8 +13,8 @@ import org.jspecify.annotations.Nullable;
 public class FieldChangedEvent extends EntryChangedEvent {
 
     private final Field field;
-    private final String newValue;
-    private final String oldValue;
+    @Nullable private final String newValue;
+    @Nullable private final String oldValue;
     private int majorCharacterChange = 0;
 
     /// @param bibEntry Affected BibEntry object
@@ -21,7 +22,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
     /// @param oldValue old field value
     /// @param newValue new field value
     /// @param location Location affected by this event
-    public FieldChangedEvent(BibEntry bibEntry, Field field, String newValue, String oldValue,
+    public FieldChangedEvent(BibEntry bibEntry, Field field, @Nullable String newValue, @Nullable String oldValue,
                              EntriesEventSource location) {
         super(bibEntry, location);
         this.field = field;
@@ -33,7 +34,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
     /// @param bibEntry Affected BibEntry object
     /// @param field    Name of field which has been changed
     /// @param newValue new field value
-    public FieldChangedEvent(BibEntry bibEntry, Field field, String newValue, String oldValue) {
+    public FieldChangedEvent(BibEntry bibEntry, Field field, @Nullable String newValue, @Nullable String oldValue) {
         super(bibEntry);
         this.field = field;
         this.newValue = newValue;
@@ -73,12 +74,12 @@ public class FieldChangedEvent extends EntryChangedEvent {
         return field;
     }
 
-    public String getNewValue() {
-        return newValue;
+    public Optional<String> getNewValue() {
+        return Optional.ofNullable(newValue);
     }
 
-    public String getOldValue() {
-        return oldValue;
+    public Optional<String> getOldValue() {
+        return Optional.ofNullable(oldValue);
     }
 
     public int getMajorCharacterChange() {

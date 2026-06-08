@@ -6,6 +6,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.lucene.search.SearcherManager;
+import org.jspecify.annotations.Nullable;
 
 public interface LuceneIndexer {
     void updateOnStart(BackgroundTask<?> task);
@@ -14,7 +15,7 @@ public interface LuceneIndexer {
 
     void removeFromIndex(Collection<BibEntry> entries, BackgroundTask<?> task);
 
-    void updateEntry(BibEntry entry, String oldValue, String newValue, BackgroundTask<?> task);
+    void updateEntry(BibEntry entry, @Nullable String oldValue, @Nullable String newValue, BackgroundTask<?> task);
 
     void removeAllFromIndex();
 

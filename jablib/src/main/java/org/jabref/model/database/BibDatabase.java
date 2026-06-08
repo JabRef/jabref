@@ -294,11 +294,11 @@ public class BibDatabase {
         String id = string.getId();
 
         if (hasStringByName(string.getName())) {
-            throw new KeyCollisionException("A string with that label already exists", id);
+            throw new KeyCollisionException("A string with that label already exists");
         }
 
         if (bibtexStrings.containsKey(id)) {
-            throw new KeyCollisionException("Duplicate BibTeX string id.", id);
+            throw new KeyCollisionException("Duplicate BibTeX string id.");
         }
 
         bibtexStrings.put(id, string);
@@ -552,12 +552,12 @@ public class BibDatabase {
 
         if (isLinkedField) {
             BibEntry entry = event.getBibEntry();
-            String oldValue = event.getOldValue();
-            String newValue = event.getNewValue();
+            Optional<String> oldValue = event.getOldValue();
+            Optional<String> newValue = event.getNewValue();
 
             // split the old multiple key string into individual keys and remove the entry from all old keys
-            if (!StringUtil.isBlank(oldValue)) {
-                for (String rawKey : oldValue.split(",")) {
+            if (oldValue.isPresent() && !StringUtil.isBlank(oldValue.get())) {
+                for (String rawKey : oldValue.get().split(",")) {
                     if (!StringUtil.isBlank(rawKey)) {
                         String oldKey = rawKey.trim();
                         Set<BibEntry> referenceEntries = citationIndex.get(oldKey);
@@ -574,8 +574,8 @@ public class BibDatabase {
             }
 
             // split the new multiple key string into individual keys and add the entry to all new keys
-            if (!StringUtil.isBlank(newValue)) {
-                for (String rawKey : newValue.split(",")) {
+            if (newValue.isPresent() && !StringUtil.isBlank(newValue.get())) {
+                for (String rawKey : newValue.get().split(",")) {
                     if (!StringUtil.isBlank(rawKey)) {
                         String newKey = rawKey.trim();
                         citationIndex.computeIfAbsent(newKey, k -> ConcurrentHashMap.newKeySet()).add(entry);
@@ -599,7 +599,7 @@ public class BibDatabase {
         return Optional.ofNullable(this.sharedDatabaseID);
     }
 
-    public void setSharedDatabaseID(String sharedDatabaseID) {
+    public void setSharedDatabaseID(@Nullable String sharedDatabaseID) {
         this.sharedDatabaseID = sharedDatabaseID;
     }
 

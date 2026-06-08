@@ -43,6 +43,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -203,7 +204,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     }
 
     @Override
-    public void updateEntry(BibEntry entry, String oldValue, String newValue, BackgroundTask<?> task) {
+    public void updateEntry(BibEntry entry, @Nullable String oldValue, @Nullable String newValue, BackgroundTask<?> task) {
         Set<LinkedFile> oldFiles = new HashSet<>(FileFieldParser.parse(oldValue));
         Set<LinkedFile> newFiles = new HashSet<>(FileFieldParser.parse(newValue));
 

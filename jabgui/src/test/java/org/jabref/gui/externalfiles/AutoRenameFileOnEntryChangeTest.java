@@ -76,12 +76,12 @@ class AutoRenameFileOnEntryChangeTest {
             @Subscribe
             public void listen(FieldChangedEvent event) {
                 if (event.getField().equals(StandardField.AUTHOR)) {
-                    String author = event.getNewValue();
+                    String author = event.getNewValue().orElse("");
                     String year = entry.getField(StandardField.YEAR).orElse("");
                     entry.setCitationKey(author + year);
                 } else if (event.getField().equals(StandardField.YEAR)) {
                     String author = entry.getField(StandardField.AUTHOR).orElse("");
-                    String year = event.getNewValue();
+                    String year = event.getNewValue().orElse("");
                     entry.setCitationKey(author + year);
                 }
             }

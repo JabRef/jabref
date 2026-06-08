@@ -42,6 +42,7 @@ import org.jabref.model.search.event.IndexStartedEvent;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchResults;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,7 @@ public class IndexManager {
     private final ConcurrentHashMap<String, FileDelta> pendingFileValuesByEntry = new ConcurrentHashMap<>();
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
-    private record FileDelta(String oldValue, String newValue) {
+    private record FileDelta(@Nullable String oldValue, @Nullable String newValue) {
     }
 
     private record PendingFieldUpdates(BibEntry entry, Set<Field> fields) {
@@ -181,9 +182,9 @@ public class IndexManager {
         String entryId = entry.getId();
         Field field = event.getField();
 
-        /// Accumulate which fields need updating for this entry
-        /// Use `entryId` because hashCode of `entry` changes when fields are updated.
-        /// Instead, `entryId` is stable.
+        // Accumulate which fields need updating for this entry
+        // Use `entryId` because hashCode of `entry` changes when fields are updated.
+        // Instead, `entryId` is stable.
         pendingFieldsByEntry.compute(entryId, (_, pendingUpdates) -> {
             if (pendingUpdates == null) {
                 Set<Field> fields = ConcurrentHashMap.newKeySet();
@@ -195,15 +196,15 @@ public class IndexManager {
             return new PendingFieldUpdates(entry, pendingUpdates.fields());
         });
 
-        /// FILE field updates rely on oldValue/newValue diffing in linkedFilesIndexer
-        /// Intermediate events dropped by the throttler would corrupt the baseline,
-        /// so we preserve the first oldValue seen and always update to the latest newValue
+        // FILE field updates rely on oldValue/newValue diffing in linkedFilesIndexer
+        // Intermediate events dropped by the throttler would corrupt the baseline,
+        // so we preserve the first oldValue seen and always update to the latest newValue
         if (field.equals(StandardField.FILE)) {
             pendingFileValuesByEntry.compute(entryId, (_, existing) -> {
                 if (existing == null) {
-                    return new FileDelta(event.getOldValue(), event.getNewValue());
+                    return new FileDelta(event.getOldValue().orElse(null), event.getNewValue().orElse(null));
                 } else {
-                    return new FileDelta(existing.oldValue(), event.getNewValue());
+                    return new FileDelta(existing.oldValue(), event.getNewValue().orElse(null));
                 }
             });
         }
@@ -219,7 +220,7 @@ public class IndexManager {
                 return;
             }
 
-            /// Snapshot and clear pending state atomically
+            // Snapshot and clear pending state atomically
             pendingFieldsByEntry.forEach((pendingEntryId, updates) -> {
                 if (pendingFieldsByEntry.remove(pendingEntryId, updates)) {
                     BibEntry pendingEntry = updates.entry();

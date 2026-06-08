@@ -13,19 +13,20 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.Range;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FileFieldParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileFieldParser.class);
 
-    private final String value;
+    @Nullable private final String value;
 
     private StringBuilder charactersOfCurrentElement;
 
     private boolean windowsPath;
 
-    private FileFieldParser(String value) {
+    private FileFieldParser(@Nullable String value) {
         if (value == null) {
             this.value = null;
         } else {
@@ -45,7 +46,7 @@ public class FileFieldParser {
     /// - some characters might be escaped
     /// - Windows absolute paths might be included without escaping
     ///
-    public static List<LinkedFile> parse(String value) {
+    public static List<LinkedFile> parse(@Nullable String value) {
         // We need state to have a more clean code. Thus, we instantiate the class and then return the result
         FileFieldParser fileFieldParser = new FileFieldParser(value);
         return fileFieldParser.parse().stream().map(LinkedFilePosition::linkedFile).collect(Collectors.toList());

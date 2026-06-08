@@ -27,8 +27,8 @@ public class KeyChangeListener {
     @Subscribe
     public void listen(FieldChangedEvent event) {
         if (event.getField().equals(InternalField.KEY_FIELD)) {
-            String newKey = event.getNewValue();
-            String oldKey = event.getOldValue();
+            String newKey = event.getNewValue().orElse(null);
+            String oldKey = event.getOldValue().orElse(null);
             updateEntryLinks(newKey, oldKey);
         }
     }
@@ -42,7 +42,7 @@ public class KeyChangeListener {
         }
     }
 
-    private void updateEntryLinks(String newKey, @Nullable String oldKey) {
+    private void updateEntryLinks(@Nullable String newKey, @Nullable String oldKey) {
         Set<BibEntry> affectedEntries = database.getEntriesForCitationKey(oldKey);
         for (BibEntry entry : affectedEntries) {
             entry.getFields(field -> field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK))
@@ -58,7 +58,7 @@ public class KeyChangeListener {
         }
     }
 
-    private void replaceKeyInMultiplesKeyField(String newKey, String oldKey, BibEntry entry, Field field, String fieldContent) {
+    private void replaceKeyInMultiplesKeyField(@Nullable String newKey, @Nullable String oldKey, BibEntry entry, Field field, String fieldContent) {
         List<String> keys = new ArrayList<>(Arrays.asList(fieldContent.split(",")));
         int index = keys.indexOf(oldKey);
         if (index != -1) {
@@ -71,7 +71,7 @@ public class KeyChangeListener {
         }
     }
 
-    private void replaceSingleKeyInField(String newKey, String oldKey, BibEntry entry, Field field, String fieldContent) {
+    private void replaceSingleKeyInField(@Nullable String newKey, @Nullable String oldKey, BibEntry entry, Field field, String fieldContent) {
         if (fieldContent.equals(oldKey)) {
             if (newKey == null) {
                 entry.clearField(field);

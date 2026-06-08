@@ -12,6 +12,7 @@ import org.jabref.model.entry.BibEntry;
 import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,7 @@ public class ReadOnlyLinkedFilesIndexer implements LuceneIndexer {
     }
 
     @Override
-    public void updateEntry(BibEntry entry, String oldValue, String newValue, BackgroundTask<?> task) {
+    public void updateEntry(BibEntry entry, @Nullable String oldValue, @Nullable String newValue, BackgroundTask<?> task) {
     }
 
     @Override
