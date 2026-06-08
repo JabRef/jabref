@@ -42,7 +42,6 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Search.java
 
 //FILES tinylog.properties=../jabkit/src/main/resources/tinylog.properties
-//FILES module.info=../jabkit/src/main/java/module-info.java
 
 // This is the main class - directly called by JBang
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/JabKitLauncher.java
