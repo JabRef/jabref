@@ -140,7 +140,7 @@ public class DeleteFileAction extends SimpleCommand {
         warning.setGlyphSize(24.0);
         Label header = new Label(description, warning);
         header.setWrapText(true);
-        
+
         ListView<LinkedFileViewModel> filesToDeleteList = new ListView<>(FXCollections.observableArrayList(filesToDelete));
         new ViewModelListCellFactory<LinkedFileViewModel>()
                 .withText(item -> item.getFile().getLink())
