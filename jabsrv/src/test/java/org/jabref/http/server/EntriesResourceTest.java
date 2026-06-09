@@ -1,6 +1,5 @@
 package org.jabref.http.server;
 
-import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.http.server.resources.EntriesResource;
