@@ -90,6 +90,6 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        return loadRepository(new AbbreviationPreferences(List.of(), true));
+        return loadRepository(new AbbreviationPreferences(List.of(), true, false));
     }
 }

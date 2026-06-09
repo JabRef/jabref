@@ -13,23 +13,28 @@ public class AbbreviationPreferences {
 
     private final ObservableList<String> externalJournalLists;
     private final BooleanProperty useFJournalField;
+    private final BooleanProperty shouldEnableMscKeywordDescriptions;
 
     public AbbreviationPreferences(List<String> externalJournalLists,
-                                   boolean useFJournalField) {
+                                   boolean useFJournalField,
+                                   boolean shouldEnableMscKeywordDescriptions) {
         this.externalJournalLists = FXCollections.observableArrayList(externalJournalLists);
         this.useFJournalField = new SimpleBooleanProperty(useFJournalField);
+        this.shouldEnableMscKeywordDescriptions = new SimpleBooleanProperty(shouldEnableMscKeywordDescriptions);
     }
 
     private AbbreviationPreferences() {
         this(
                 List.of(), // externalJournalLists
-                true       // useFJournalField
+                true,       // useFJournalField
+                false       // shouldEnableMscKeywordDescriptions
         );
     }
 
     public void setAll(AbbreviationPreferences preferences) {
         this.externalJournalLists.setAll(preferences.externalJournalLists);
         this.useFJournalField.set(preferences.shouldUseFJournalField());
+        this.shouldEnableMscKeywordDescriptions.set(preferences.shouldEnableMscKeywordDescriptions());
     }
 
     public static AbbreviationPreferences getDefault() {
@@ -55,5 +60,17 @@ public class AbbreviationPreferences {
 
     public void setUseFJournalField(boolean useFJournalField) {
         this.useFJournalField.set(useFJournalField);
+    }
+
+    public final boolean shouldEnableMscKeywordDescriptions() {
+        return shouldEnableMscKeywordDescriptions.get();
+    }
+
+    public final void setShouldEnableMscKeywordDescriptions(boolean value) {
+        this.shouldEnableMscKeywordDescriptions.set(value);
+    }
+
+    public final BooleanProperty shouldEnableMscKeywordDescriptionsProperty() {
+        return shouldEnableMscKeywordDescriptions;
     }
 }

@@ -49,7 +49,7 @@ public interface CliPreferences {
 
     BibEntryPreferences getBibEntryPreferences();
 
-    AbbreviationPreferences getJournalAbbreviationPreferences();
+    AbbreviationPreferences getAbbreviationPreferences();
 
     FilePreferences getFilePreferences();
 
