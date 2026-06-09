@@ -67,7 +67,7 @@ public interface NodeResolver {
                     }
                     Node graphic = button.getGraphic();
                     return (graphic instanceof JabRefIconView jabRefIconView) && jabRefIconView.getGlyph() == glyph ||
-                            (graphic instanceof FontIcon fontIcon) && fontIcon.getIconCode() == glyph.getIkon();
+                            (graphic instanceof FontIcon fontIcon) && glyph.isIkonBacked() && fontIcon.getIconCode() == glyph.getIkon();
                 })
                 .findFirst();
     }

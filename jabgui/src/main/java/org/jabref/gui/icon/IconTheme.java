@@ -364,8 +364,13 @@ public class IconTheme {
         ABSOLUTE_PATH(MaterialDesignF.FAMILY_TREE),
         GIT_SYNC(MaterialDesignG.GIT),
         RELATIVE_PATH(MaterialDesignF.FILE_TREE_OUTLINE),
-        SHORTEN_DOI(MaterialDesignA.ARROW_COLLAPSE_HORIZONTAL);
+        SHORTEN_DOI(MaterialDesignA.ARROW_COLLAPSE_HORIZONTAL),
+        // Example SVG-backed icon (a star, 24x24 viewport) sourced via the svgnode library instead of an Ikonli font.
+        EXAMPLE_SVG_STAR("M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z");
 
+        /// Backing icon. Usually Ikonli-backed ({@link InternalMaterialDesignIcon}), but may be SVG-backed
+        /// ({@link SvgIcon}) for glyphs only available as SVG. {@link #getGraphicNode()} works for both;
+        /// {@link #getIkon()} is meaningful only for the Ikonli subset (guard with {@link #isIkonBacked()}).
         private final JabRefIcon icon;
 
         JabRefIcons(Ikon... icons) {
@@ -376,9 +381,24 @@ public class IconTheme {
             icon = new InternalMaterialDesignIcon(color, icons);
         }
 
-        @Override
+        /// Builds an SVG-backed icon from a raw SVG path string (24x24 viewport), via the svgnode library.
+        JabRefIcons(String svgPath) {
+            icon = new SvgIcon(name(), svgPath);
+        }
+
+        /// Whether this icon is backed by an Ikonli font and therefore exposes a usable {@link Ikon}.
+        /// SVG-backed icons return {@code false}.
+        public boolean isIkonBacked() {
+            return icon instanceof InternalMaterialDesignIcon;
+        }
+
+        /// @throws UnsupportedOperationException if this icon is SVG-backed rather than Ikonli-backed.
+        ///         Callers that may encounter SVG icons must check {@link #isIkonBacked()} first.
         public Ikon getIkon() {
-            return icon.getIkon();
+            if (icon instanceof InternalMaterialDesignIcon materialDesignIcon) {
+                return materialDesignIcon.getIkon();
+            }
+            throw new UnsupportedOperationException(name() + " is SVG-backed and has no Ikon");
         }
 
         @Override

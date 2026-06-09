@@ -48,6 +48,8 @@ open module org.jabref {
             with org.jabref.gui.icon.JabrefIconProvider;
 
     requires reactfx;
+
+    requires tools.maran.svgnode;
     // endregion
 
     // region: Logging

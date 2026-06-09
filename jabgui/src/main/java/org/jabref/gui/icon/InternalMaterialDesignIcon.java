@@ -71,7 +71,6 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
         return this.unicode;
     }
 
-    @Override
     public Ikon getIkon() {
         return icons.getFirst();
     }
