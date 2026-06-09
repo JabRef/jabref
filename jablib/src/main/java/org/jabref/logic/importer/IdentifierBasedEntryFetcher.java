@@ -45,8 +45,23 @@ public class IdentifierBasedEntryFetcher {
     }
 
     public Optional<BibEntry> fetchByField(List<BibEntry> candidates, Field field) {
-        return findIdentifier(candidates, field)
-                .flatMap(identifier -> fetchByFieldAndIdentifier.apply(field, normalizeIdentifier(field, identifier)));
+        for (BibEntry candidate : candidates) {
+            Optional<String> normalizedIdentifier = candidate.getField(field)
+                                                            .map(String::trim)
+                                                            .filter(identifier -> !identifier.isBlank())
+                                                            .flatMap(identifier -> normalizeIdentifier(field, identifier));
+
+            if (normalizedIdentifier.isEmpty()) {
+                continue;
+            }
+
+            Optional<BibEntry> fetchedEntry = fetchByFieldAndIdentifier.apply(field, normalizedIdentifier.get());
+            if (fetchedEntry.isPresent()) {
+                return fetchedEntry;
+            }
+        }
+
+        return Optional.empty();
     }
 
     public Map<Field, BibEntry> fetchByFields(List<BibEntry> candidates, List<Field> fields) {
@@ -59,27 +74,17 @@ public class IdentifierBasedEntryFetcher {
         return fetchedEntries;
     }
 
-    private Optional<String> findIdentifier(List<BibEntry> candidates, Field field) {
-        for (BibEntry candidate : candidates) {
-            Optional<String> identifier = candidate.getField(field);
-            if (identifier.isPresent()) {
-                return identifier;
-            }
-        }
-
-        return Optional.empty();
-    }
-
-    static String normalizeIdentifier(Field field, String identifier) {
+    static Optional<String> normalizeIdentifier(Field field, String identifier) {
         String trimmedIdentifier = identifier.trim();
 
         if (field == StandardField.DOI) {
+            // Some PDF metadata stores DOI values as info URIs such as `info:doi/10...`
+            // so the prefix is stripped before passing the remaining value to JabRef's DOI parser.
             String cleanedIdentifier = trimmedIdentifier.replaceFirst("(?i)^info:doi[:/]", "");
             return DOI.parse(cleanedIdentifier)
-                      .map(DOI::asString)
-                      .orElse(cleanedIdentifier);
+                      .map(DOI::asString);
         }
 
-        return trimmedIdentifier;
+        return Optional.of(trimmedIdentifier);
     }
 }

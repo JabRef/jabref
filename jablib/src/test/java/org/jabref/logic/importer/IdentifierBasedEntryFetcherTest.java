@@ -8,13 +8,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@FetcherTest
 class IdentifierBasedEntryFetcherTest {
 
     @Test
@@ -31,7 +32,7 @@ class IdentifierBasedEntryFetcherTest {
 
         Optional<BibEntry> result = fetcher.fetchByField(List.of(candidate), StandardField.DOI);
 
-        assertTrue(result.isPresent());
+        assertEquals(Optional.of(fetchedEntry), result);
         assertEquals("10.1145/3651640.3651646", fetchedIdentifier.get());
     }
 
@@ -41,7 +42,7 @@ class IdentifierBasedEntryFetcherTest {
 
         Optional<BibEntry> result = fetcher.fetchByField(List.of(new BibEntry()), StandardField.DOI);
 
-        assertFalse(result.isPresent());
+        assertEquals(Optional.empty(), result);
     }
 
     @Test
@@ -55,8 +56,10 @@ class IdentifierBasedEntryFetcherTest {
         Map<Field, BibEntry> fetchedEntries = fetcher.fetchByFields(List.of(candidate), List.of(StandardField.DOI, StandardField.ISBN, StandardField.ISSN));
 
         assertEquals(2, fetchedEntries.size());
-        assertTrue(fetchedEntries.containsKey(StandardField.DOI));
-        assertTrue(fetchedEntries.containsKey(StandardField.ISBN));
+        assertEquals(Optional.of("doi:10.1145/3651640.3651646"), Optional.ofNullable(fetchedEntries.get(StandardField.DOI))
+                                                                                .flatMap(entry -> entry.getField(StandardField.TITLE)));
+        assertEquals(Optional.of("isbn:9780134685991"), Optional.ofNullable(fetchedEntries.get(StandardField.ISBN))
+                                                                               .flatMap(entry -> entry.getField(StandardField.TITLE)));
         assertFalse(fetchedEntries.containsKey(StandardField.ISSN));
     }
 }
