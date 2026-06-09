@@ -141,7 +141,7 @@ public class DeleteFileAction extends SimpleCommand {
         Label header = new Label(description, warning);
         header.setWrapText(true);
         header.getStyleClass().add("dialog-header");
-
+        
         ListView<LinkedFileViewModel> filesToDeleteList = new ListView<>(FXCollections.observableArrayList(filesToDelete));
         new ViewModelListCellFactory<LinkedFileViewModel>()
                 .withText(item -> item.getFile().getLink())
