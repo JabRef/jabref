@@ -8,7 +8,7 @@ import javafx.scene.paint.Color;
 /// {@link JabRefIcon} backed by an SVG path, rendered as a {@link JabRefSvgNode} via the
 /// <a href="https://github.com/Maran23/svgnode">svgnode</a> library. The SVG-backed counterpart to
 /// {@link IkonliIcon}; use it for glyphs only available as SVG rather than as an Ikonli font glyph.
-public class SvgIcon implements JabRefIcon {
+public final class SvgIcon implements JabRefIcon {
 
     private static final int DEFAULT_SIZE = 24;
 

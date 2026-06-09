@@ -22,7 +22,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 /// {@link JabRefIcon} backed by an <a href="https://kordamp.org/ikonli/">Ikonli</a> font glyph, rendered as a
 /// {@link FontIcon}. The font-backed counterpart to {@link SvgIcon}; unlike SVG icons it exposes its underlying
 /// {@link Ikon} via {@link #getIkon()}. Immutable: {@link #withColor} and {@link #withSize} return copies.
-public class IkonliIcon implements JabRefIcon {
+public final class IkonliIcon implements JabRefIcon {
 
     /// All {@link Ikon} values discovered via the {@link IkonProvider} service loader, used by {@link #findIcon}.
     /// Lazily populated on first lookup.
