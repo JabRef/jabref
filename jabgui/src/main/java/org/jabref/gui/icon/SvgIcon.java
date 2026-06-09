@@ -5,8 +5,6 @@ import java.util.Optional;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 
-import tools.maran.svgnode.SvgNode;
-
 /// {@link JabRefIcon} backed by an SVG path via the <a href="https://github.com/Maran23/svgnode">svgnode</a>
 /// library, instead of an Ikonli font glyph. Use as a source for toolbar buttons and other graphics where
 /// the icon is only available as SVG.
@@ -36,9 +34,10 @@ public class SvgIcon implements JabRefIcon {
 
     @Override
     public Node getGraphicNode() {
-        SvgNode node = new SvgNode(svgPath, size);
-        node.getStyleClass().add("glyph-icon");
-        color.ifPresent(node::setSvgColor);
+        JabRefSvgNode node = new JabRefSvgNode(svgPath, size);
+        // Explicit color (via withColor/disabled) is a user-origin value, so it wins over theme CSS. When absent,
+        // the node's `glyph-icon`/`ikonli-font-icon` classes let theme `-fx-icon-color` rules drive the color.
+        color.ifPresent(node::setIconColor);
         return node;
     }
 
