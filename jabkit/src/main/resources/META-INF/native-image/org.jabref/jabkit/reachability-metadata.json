@@ -1,0 +1,641 @@
+{
+  "reflection": [
+    {
+      "type": "com.sun.crypto.provider.AESCipher$General",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.ARCFOURCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.ChaCha20Cipher$ChaCha20Poly1305",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.DESCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.DESedeCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.GaloisCounterMode$AESGCM",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Boolean",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "getBoolean",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Object"
+    },
+    {
+      "type": "java.lang.ProcessHandle",
+      "methods": [
+        {
+          "name": "current",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.nio.file.Path"
+    },
+    {
+      "type": "java.nio.file.Paths"
+    },
+    {
+      "type": "java.security.AlgorithmParametersSpi"
+    },
+    {
+      "type": "java.security.KeyStoreSpi"
+    },
+    {
+      "type": "java.sql.Connection"
+    },
+    {
+      "type": "java.sql.Driver"
+    },
+    {
+      "type": "java.sql.DriverManager"
+    },
+    {
+      "type": "java.sql.Time"
+    },
+    {
+      "type": "java.sql.Timestamp"
+    },
+    {
+      "type": "java.time.Duration"
+    },
+    {
+      "type": "java.time.Instant"
+    },
+    {
+      "type": "java.time.LocalDate"
+    },
+    {
+      "type": "java.time.LocalDateTime"
+    },
+    {
+      "type": "java.time.LocalTime"
+    },
+    {
+      "type": "java.time.MonthDay"
+    },
+    {
+      "type": "java.time.OffsetDateTime"
+    },
+    {
+      "type": "java.time.OffsetTime"
+    },
+    {
+      "type": "java.time.Period"
+    },
+    {
+      "type": "java.time.Year"
+    },
+    {
+      "type": "java.time.YearMonth"
+    },
+    {
+      "type": "java.time.ZoneId"
+    },
+    {
+      "type": "java.time.ZoneOffset"
+    },
+    {
+      "type": "java.time.ZonedDateTime"
+    },
+    {
+      "type": "org.jabref.toolkit.commands.CheckConsistency",
+      "fields": [
+        {
+          "name": "jabKit"
+        },
+        {
+          "name": "sharedOptions"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.CheckIntegrity",
+      "fields": [
+        {
+          "name": "jabKit"
+        },
+        {
+          "name": "sharedOptions"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.CitationKeys",
+      "fields": [
+        {
+          "name": "parentCommand"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.Convert",
+      "fields": [
+        {
+          "name": "jabKit"
+        },
+        {
+          "name": "sharedOptions"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.DoiToBibtex",
+      "fields": [
+        {
+          "name": "argumentProcessor"
+        },
+        {
+          "name": "sharedOptions"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.Fetch",
+      "fields": [
+        {
+          "name": "argumentProcessor"
+        },
+        {
+          "name": "sharedOptions"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.GenerateBibFromAux",
+      "fields": [
+        {
+          "name": "argumentProcessor"
+        },
+        {
+          "name": "sharedOptions"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.GenerateCitationKeys",
+      "fields": [
+        {
+          "name": "parentCommand"
+        },
+        {
+          "name": "sharedOptions"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.GetCitedWorks",
+      "fields": [
+        {
+          "name": "argumentProcessor"
+        },
+        {
+          "name": "sharedOptions"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.GetCitingWorks",
+      "fields": [
+        {
+          "name": "argumentProcessor"
+        },
+        {
+          "name": "sharedOptions"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.JabKit",
+      "fields": [
+        {
+          "name": "sharedOptions"
+        },
+        {
+          "name": "versionInfoRequested"
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.JabKit$SharedOptions",
+      "fields": [
+        {
+          "name": "debug"
+        },
+        {
+          "name": "porcelain"
+        },
+        {
+          "name": "usageHelpRequested"
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.Pdf",
+      "fields": [
+        {
+          "name": "argumentProcessor"
+        },
+        {
+          "name": "sharedOptions"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.PdfUpdate",
+      "fields": [
+        {
+          "name": "pdf"
+        },
+        {
+          "name": "sharedOptions"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.Preferences",
+      "fields": [
+        {
+          "name": "argumentProcessor"
+        },
+        {
+          "name": "sharedOptions"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.Preferences$PreferencesExport",
+      "fields": [
+        {
+          "name": "parent"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.Preferences$PreferencesImport",
+      "fields": [
+        {
+          "name": "parent"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.Preferences$PreferencesReset",
+      "fields": [
+        {
+          "name": "parent"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.Pseudonymize",
+      "fields": [
+        {
+          "name": "argumentProcessor"
+        },
+        {
+          "name": "sharedOptions"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.Search",
+      "fields": [
+        {
+          "name": "argumentProcessor"
+        },
+        {
+          "name": "sharedOptions"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.converter.CitationFetcherTypeConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.converter.CygWinPathConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.converter.KeySuffixConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.tinylog.configuration.PropertiesConfigurationLoader",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.tinylog.core.TinylogLoggingProvider",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.tinylog.policies.StartupPolicy",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "org.tinylog.slf4j.TinylogSlf4jServiceProvider"
+    },
+    {
+      "type": "org.tinylog.throwable.StripThrowableFilter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "org.tinylog.writers.ConsoleWriter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.util.Map"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "org.tinylog.writers.RollingFileWriter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.util.Map"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "picocli.CommandLine$AutoHelpMixin"
+    },
+    {
+      "type": "sun.management.VMManagementImpl",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "compTimeMonitoringSupport"
+        },
+        {
+          "name": "currentThreadCpuTimeSupport"
+        },
+        {
+          "name": "objectMonitorUsageSupport"
+        },
+        {
+          "name": "otherThreadCpuTimeSupport"
+        },
+        {
+          "name": "remoteDiagnosticCommandsSupport"
+        },
+        {
+          "name": "synchronizerUsageSupport"
+        },
+        {
+          "name": "threadAllocatedMemorySupport"
+        },
+        {
+          "name": "threadContentionMonitoringSupport"
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "glob": "META-INF/services/java.net.spi.InetAddressResolverProvider"
+    },
+    {
+      "glob": "META-INF/services/java.net.spi.URLStreamHandlerProvider"
+    },
+    {
+      "glob": "META-INF/services/java.nio.charset.spi.CharsetProvider"
+    },
+    {
+      "glob": "META-INF/services/java.time.zone.ZoneRulesProvider"
+    },
+    {
+      "glob": "META-INF/services/java.util.prefs.PreferencesFactory"
+    },
+    {
+      "glob": "META-INF/services/org.slf4j.spi.SLF4JServiceProvider"
+    },
+    {
+      "glob": "META-INF/services/org.tinylog.configuration.ConfigurationLoader"
+    },
+    {
+      "glob": "META-INF/services/org.tinylog.policies.Policy"
+    },
+    {
+      "glob": "META-INF/services/org.tinylog.provider.LoggingProvider"
+    },
+    {
+      "glob": "META-INF/services/org.tinylog.throwable.ThrowableFilter"
+    },
+    {
+      "glob": "META-INF/services/org.tinylog.writers.Writer"
+    },
+    {
+      "glob": "tinylog.properties"
+    },
+    {
+      "module": "java.base",
+      "glob": "jdk/internal/icu/impl/data/*/nfc.nrm"
+    },
+    {
+      "module": "java.base",
+      "glob": "sun/text/resources/LineBreakIteratorData"
+    }
+  ]
+}
