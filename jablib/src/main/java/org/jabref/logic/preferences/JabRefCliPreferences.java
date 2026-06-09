@@ -57,7 +57,7 @@ import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
@@ -453,7 +453,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private XmpPreferences xmpPreferences;
     private CleanupPreferences cleanupPreferences;
     private CitationKeyPatternPreferences citationKeyPatternPreferences;
-    private JournalAbbreviationPreferences journalAbbreviationPreferences;
+    private AbbreviationPreferences abbreviationPreferences;
     private FieldPreferences fieldPreferences;
     private AiPreferences aiPreferences;
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
@@ -774,7 +774,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getFieldPreferences().setAll(FieldPreferences.getDefault());
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
         getPushToApplicationPreferences().setAll(PushToApplicationPreferences.getDefault());
-        getJournalAbbreviationPreferences().setAll(JournalAbbreviationPreferences.getDefault());
+        getJournalAbbreviationPreferences().setAll(AbbreviationPreferences.getDefault());
         getLibraryPreferences().setAll(LibraryPreferences.getDefault());
         getDOIPreferences().setAll(DOIPreferences.getDefault());
         getOwnerPreferences().setAll(OwnerPreferences.getDefault());
@@ -873,23 +873,23 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // region JournalAbbreviationPreferences
     @Override
-    public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        if (journalAbbreviationPreferences != null) {
-            return journalAbbreviationPreferences;
+    public AbbreviationPreferences getJournalAbbreviationPreferences() {
+        if (abbreviationPreferences != null) {
+            return abbreviationPreferences;
         }
 
-        journalAbbreviationPreferences = getJournalAbbreviationPreferencesFromBackingStore(JournalAbbreviationPreferences.getDefault());
+        abbreviationPreferences = getJournalAbbreviationPreferencesFromBackingStore(AbbreviationPreferences.getDefault());
 
-        journalAbbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) _ ->
-                putStringList(EXTERNAL_JOURNAL_LISTS, journalAbbreviationPreferences.getExternalJournalLists()));
-        EasyBind.listen(journalAbbreviationPreferences.useFJournalFieldProperty(),
+        abbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) _ ->
+                putStringList(EXTERNAL_JOURNAL_LISTS, abbreviationPreferences.getExternalJournalLists()));
+        EasyBind.listen(abbreviationPreferences.useFJournalFieldProperty(),
                 (_, _, newValue) -> putBoolean(USE_AMS_FJOURNAL, newValue));
 
-        return journalAbbreviationPreferences;
+        return abbreviationPreferences;
     }
 
-    private JournalAbbreviationPreferences getJournalAbbreviationPreferencesFromBackingStore(JournalAbbreviationPreferences defaults) {
-        return new JournalAbbreviationPreferences(
+    private AbbreviationPreferences getJournalAbbreviationPreferencesFromBackingStore(AbbreviationPreferences defaults) {
+        return new AbbreviationPreferences(
                 convertStringToList(get(EXTERNAL_JOURNAL_LISTS, convertListToString(defaults.getExternalJournalLists()))),
                 getBoolean(USE_AMS_FJOURNAL, defaults.useFJournalFieldProperty().get()));
     }

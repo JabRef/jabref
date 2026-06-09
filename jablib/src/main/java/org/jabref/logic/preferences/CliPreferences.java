@@ -18,7 +18,7 @@ import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.util.GrobidPreferences;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
@@ -49,7 +49,7 @@ public interface CliPreferences {
 
     BibEntryPreferences getBibEntryPreferences();
 
-    JournalAbbreviationPreferences getJournalAbbreviationPreferences();
+    AbbreviationPreferences getJournalAbbreviationPreferences();
 
     FilePreferences getFilePreferences();
 
