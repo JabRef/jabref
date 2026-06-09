@@ -2,6 +2,7 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.List;
 
+import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.msc.MscCodeEntry;
 import org.jabref.logic.msc.MscCodeRepository;
 import org.jabref.logic.preferences.JabRefCliPreferences;
@@ -17,12 +18,15 @@ import static org.mockito.Mockito.when;
 public class ConvertMSCCodesFormatterTest {
 
     private JabRefCliPreferences cliPreferences;
+    private AbbreviationPreferences abbreviationPreferences;
     private ConvertMSCCodesFormatter formatter;
 
     @BeforeEach
     void setup() {
         cliPreferences = mock(JabRefCliPreferences.class);
-        when(cliPreferences.getAbbreviationPreferences().shouldEnableMscKeywordDescriptions()).thenReturn(true);
+        abbreviationPreferences = mock(AbbreviationPreferences.class);
+        when(cliPreferences.getAbbreviationPreferences()).thenReturn(abbreviationPreferences);
+        when(abbreviationPreferences.shouldEnableMscKeywordDescriptions()).thenReturn(true);
         when(cliPreferences.getBibEntryPreferences()).thenReturn(BibEntryPreferences.getDefault());
         formatter = new ConvertMSCCodesFormatter(cliPreferences);
 
