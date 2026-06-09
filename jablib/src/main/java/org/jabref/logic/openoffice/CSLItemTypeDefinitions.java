@@ -200,6 +200,7 @@ class CSLItemTypeDefinitions {
     static Map<String, StandardField> getFieldMappings(String cslItemType) {
         Map<String, StandardField> fieldMappings = new HashMap<>(COMMON_FIELDS);
         fieldMappings.putAll(FIELD_MAPPING.getOrDefault(cslItemType, Map.of()));
+
         return fieldMappings;
     }
 
