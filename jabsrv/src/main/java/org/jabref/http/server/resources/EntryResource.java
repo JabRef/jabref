@@ -103,10 +103,16 @@ public class EntryResource {
         List<BibEntry> entriesByCitationKey = getDatabaseContext(id).getDatabase().getEntriesByCitationKey(entryId);
         if (entriesByCitationKey.isEmpty()) {
             // This response is served as text/html, so escape the user-controlled path
-            // parameters before reflecting them into the message (XSS).
-            throw new NotFoundException("Entry with citation key '"
+            // parameters before reflecting them into the message (XSS). The message is
+            // attached as the text/html entity so it survives GlobalExceptionMapper, which
+            // forwards WebApplicationException.getResponse() verbatim.
+            String message = "Entry with citation key '"
                     + HtmlEscapers.htmlEscaper().escape(entryId) + "' not found in library "
-                    + HtmlEscapers.htmlEscaper().escape(id));
+                    + HtmlEscapers.htmlEscaper().escape(id);
+            throw new NotFoundException(Response.status(Response.Status.NOT_FOUND)
+                    .type(MediaType.TEXT_HTML + ";charset=UTF-8")
+                    .entity(message)
+                    .build());
         }
         if (entriesByCitationKey.size() > 1) {
             LOGGER.warn("Multiple entries found with citation key '{}'. Using the first one.", entryId);
