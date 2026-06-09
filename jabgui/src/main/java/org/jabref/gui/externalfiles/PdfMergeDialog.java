@@ -24,8 +24,12 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldTextMapper;
 
 import com.google.common.base.Suppliers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PdfMergeDialog {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PdfMergeDialog.class);
 
     /// Constructs a merge dialog for a PDF file. This dialog calls various {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}s, collects the results, and lets the user choose between them.
     ///
@@ -99,6 +103,7 @@ public class PdfMergeDialog {
                               }
                           }
                       })
+                      .onFailure(exception -> LOGGER.debug("Identifier enrichment failed.", exception))
                       .executeWith(taskExecutor);
     }
 
