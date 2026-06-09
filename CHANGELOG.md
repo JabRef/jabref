@@ -11,19 +11,21 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a preview style selection bar which shows the current preview style and allows to select a specific style without cycling through all of them. [#15820](https://github.com/JabRef/jabref/pull/15820)
 - We added the ability to view citation previews rendered using the selected style on hover in the "Citations" tab. [#15914](https://github.com/JabRef/jabref/pull/15914)
 - We added support for selecting answer engines and summarization algorithms, allowing users to change the underlying AI behavior. [#15688](https://github.com/JabRef/jabref/pull/15688)
 - The citation key generator also normalizes super and subscript characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
 - We added automatic source groups to SLR results and fixed group merging to preserve all source groups. [#12542](https://github.com/JabRef/jabref/issues/12542)
 - We enabled usage of relative or absolute file paths depending on your file directory settings. [#3590](https://github.com/JabRef/jabref/issues/3590)
 - We added the ability to import and focus an entry from the Citation tab by double click. [#15460](https://github.com/JabRef/jabref/issues/15460)
+- We extended the HTTP server with library query, groups listing, and group-assignment on import. [#15599](https://github.com/JabRef/jabref/pull/15599)
 - The `jabkit` subcommands now accept the input file as a positional argument (e.g. `jabkit check integrity references.bib`); the `--input` option remains available as an alias. [#15759](https://github.com/JabRef/jabref/pull/15759)
 - We grouped the `jabkit` consistency and integrity checks under a new `check` command (`jabkit check consistency`, `jabkit check integrity`). [#15759](https://github.com/JabRef/jabref/pull/15759)
 - The `jabkit check consistency` command now supports the `errorformat` output format (`file:line:column: message`), which is the default output format for both `check` subcommands. [#15759](https://github.com/JabRef/jabref/pull/15759)
 - The `jabkit check` subcommands now support a `github-actions` output format that emits findings as [GitHub Actions workflow commands](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#setting-an-error-message), so findings show up as annotations on pull requests. [#15789](https://github.com/JabRef/jabref/pull/15789)
 - The `jabkit check` command now runs both the consistency and integrity checks when given an input file without a subcommand (e.g. `jabkit check references.bib`). [#15759](https://github.com/JabRef/jabref/pull/15759)
 - We added OCR feature using OCRmyPDF to extract text from scanned PDFs and create searchable PDFs including the extracted text. [#15712](https://github.com/JabRef/jabref/pull/15712)
-- We Added generic CSV export filter that exports all standard BibTeX fields [#15711](https://github.com/JabRef/jabref/issues/15711)
+- We added generic CSV export filter that exports all standard BibTeX fields [#15711](https://github.com/JabRef/jabref/issues/15711)
 
 ### Changed
 
