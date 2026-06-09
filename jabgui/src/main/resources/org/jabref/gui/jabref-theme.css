@@ -73,7 +73,7 @@
 
 .bordered {
     -fx-border-width: 1;
-    -fx-border-color: black;
+    -fx-border-color: -fx-outer-border;
 }
 
 .background-transparent {
