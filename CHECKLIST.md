@@ -27,7 +27,7 @@ code until all points are fulfilled. Do not skip any point.
 
 ## Documentation
 
-- [ ] `CHANGELOG.md` entry added if the change is visible to the user (end-user wording, no extra blank lines).
+- [ ] `CHANGELOG.md` entry added if the change is visible to the user (end-user wording, no extra blank lines). Use `TODO` as the issue/PR reference placeholder when the PR number is not yet known — never a fake number.
 - [ ] Requirement added to `docs/requirements/<area>.md` if the change is a new feature or significant bug fix (skip for refactors, minor fixes, and internal changes).
 - [ ] Developer documentation under `docs/` updated if behavior or architecture changed.
 
@@ -37,3 +37,4 @@ code until all points are fulfilled. Do not skip any point.
 - [ ] All checklist items kept and marked `[x]`, `[ ]`, or `[/]`.
 - [ ] All HTML comments removed from the PR body.
 - [ ] PR created with `gh pr create --body-file <file>` (not `--body`).
+- [ ] If CHANGELOG.md used a `TODO` placeholder, it was replaced with the real PR-number link after PR creation, then committed and pushed.
