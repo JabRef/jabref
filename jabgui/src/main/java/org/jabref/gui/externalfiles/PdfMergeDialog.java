@@ -59,13 +59,13 @@ public class PdfMergeDialog {
 
     private static void finishDialog(MultiMergeEntriesView dialog, Path filePath, GuiPreferences preferences, TaskExecutor taskExecutor) {
         Supplier<BibEntry> verbatimSupplier = memoize(
-            wrapImporterToSupplier(new PdfVerbatimBibtexImporter(preferences.getImportFormatPreferences()), filePath));
+                wrapImporterToSupplier(new PdfVerbatimBibtexImporter(preferences.getImportFormatPreferences()), filePath));
         Supplier<BibEntry> embeddedSupplier = memoize(
-            wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
+                wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
         Supplier<BibEntry> xmpSupplier = memoize(
-            wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
+                wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
         Supplier<BibEntry> contentSupplier = memoize(
-            wrapImporterToSupplier(new PdfContentImporter(), filePath));
+                wrapImporterToSupplier(new PdfContentImporter(), filePath));
 
         dialog.addSource(Localization.lang("Verbatim"), verbatimSupplier);
         dialog.addSource(Localization.lang("Embedded"), embeddedSupplier);

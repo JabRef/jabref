@@ -47,9 +47,9 @@ public class IdentifierBasedEntryFetcher {
     public Optional<BibEntry> fetchByField(List<BibEntry> candidates, Field field) {
         for (BibEntry candidate : candidates) {
             Optional<String> normalizedIdentifier = candidate.getField(field)
-                                                            .map(String::trim)
-                                                            .filter(identifier -> !identifier.isBlank())
-                                                            .flatMap(identifier -> normalizeIdentifier(field, identifier));
+                                                             .map(String::trim)
+                                                             .filter(identifier -> !identifier.isBlank())
+                                                             .flatMap(identifier -> normalizeIdentifier(field, identifier));
 
             if (normalizedIdentifier.isEmpty()) {
                 continue;

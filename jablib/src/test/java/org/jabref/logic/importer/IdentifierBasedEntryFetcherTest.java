@@ -57,9 +57,9 @@ class IdentifierBasedEntryFetcherTest {
 
         assertEquals(2, fetchedEntries.size());
         assertEquals(Optional.of("doi:10.1145/3651640.3651646"), Optional.ofNullable(fetchedEntries.get(StandardField.DOI))
-                                                                                .flatMap(entry -> entry.getField(StandardField.TITLE)));
+                                                                         .flatMap(entry -> entry.getField(StandardField.TITLE)));
         assertEquals(Optional.of("isbn:9780134685991"), Optional.ofNullable(fetchedEntries.get(StandardField.ISBN))
-                                                                               .flatMap(entry -> entry.getField(StandardField.TITLE)));
+                                                                .flatMap(entry -> entry.getField(StandardField.TITLE)));
         assertFalse(fetchedEntries.containsKey(StandardField.ISSN));
     }
 }
