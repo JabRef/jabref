@@ -13,6 +13,7 @@ code until all points are fulfilled. Do not skip any point.
 - [ ] No commented-out code left behind.
 - [ ] User-facing text is localized (`Localization.lang` in Java, `%` prefix in FXML).
 - [ ] New `BibEntry` objects created with withers (`withField`, not `setField`).
+- [ ] User-controlled data (request params, entry fields, file contents) is HTML-escaped before being written into any `text/html` response — including exception/error messages, not just the success body (XSS).
 - [ ] Tests added or updated for changed behavior in `org.jabref.model` / `org.jabref.logic`.
 
 ## Verification commands
