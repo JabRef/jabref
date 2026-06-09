@@ -13,199 +13,186 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 class CSLItemTypeDefinitions {
     private static final Map<String, EntryType> ITEM_TYPES = Map.ofEntries(
+            // preprint
+            Map.entry("article", StandardEntryType.Online),
+            // Journal Article
             Map.entry("article-journal", StandardEntryType.Article),
+            // Magazine Article
             Map.entry("article-magazine", StandardEntryType.Article),
+            // Newspaper Article
             Map.entry("article-newspaper", StandardEntryType.Article),
+            // Bill
             Map.entry("bill", BiblatexApaEntryType.Legislation),
+            // Book
             Map.entry("book", StandardEntryType.Book),
+            // Podcast, TV Broadcast, Radio Broadcast
             Map.entry("broadcast", StandardEntryType.Misc),
+            // Book Section
             Map.entry("chapter", StandardEntryType.InCollection),
-            Map.entry("data", StandardEntryType.Dataset),
+            // Dataset
             Map.entry("dataset", StandardEntryType.Dataset),
+            // document, attachment, note
+            Map.entry("document", StandardEntryType.InReference),
+            // Dictionary Entry
             Map.entry("entry-dictionary", StandardEntryType.InReference),
+            // Encyclopedia Article
             Map.entry("entry-encyclopedia", StandardEntryType.InReference),
-            Map.entry("figure", BiblatexNonStandardEntryType.Image),
+            // Artwork
             Map.entry("graphic", BiblatexNonStandardEntryType.Image),
+            // Hearing
             Map.entry("hearing", BiblatexApaEntryType.Jurisdiction),
-            Map.entry("instantMessage", StandardEntryType.Misc),
+            // Interview
             Map.entry("interview", StandardEntryType.Misc),
+            // Case
             Map.entry("legal_case", BiblatexApaEntryType.Jurisdiction),
+            // Statute
             Map.entry("legislation", BiblatexApaEntryType.Legislation),
+            // Manuscript
             Map.entry("manuscript", StandardEntryType.Unpublished),
+            // Map
             Map.entry("map", StandardEntryType.Misc),
+            // Film, Video Recording
             Map.entry("motion_picture", BiblatexNonStandardEntryType.Movie),
-            Map.entry("musical_score", BiblatexNonStandardEntryType.Audio),
-            Map.entry("pamphlet", StandardEntryType.Booklet),
+            // Conference Paper
             Map.entry("paper-conference", StandardEntryType.InProceedings),
+            // Patent
             Map.entry("patent", IEEETranEntryType.Patent),
+            // Letter, Email, Instant Message
             Map.entry("personal_communication", BiblatexNonStandardEntryType.Letter),
+            // Forum Post
+            Map.entry("post", StandardEntryType.Online),
+            // Blog Post
             Map.entry("post-weblog", StandardEntryType.Online),
+            // Report
             Map.entry("report", StandardEntryType.Report),
-            Map.entry("review", BiblatexNonStandardEntryType.Review),
-            Map.entry("review-book", BiblatexNonStandardEntryType.Review),
+            // Computer Program
+            Map.entry("software", StandardEntryType.Report),
+            // Audio Recording
             Map.entry("song", BiblatexNonStandardEntryType.Music),
+            // Presentation
             Map.entry("speech", StandardEntryType.Misc),
+            // Standard
+            Map.entry("standard", StandardEntryType.Misc),
+            // Thesis
             Map.entry("thesis", StandardEntryType.Thesis),
-            Map.entry("treaty", BiblatexApaEntryType.Legal),
+            // Web Page
             Map.entry("webpage", StandardEntryType.Online)
     );
 
     private static final Map<String, StandardField> COMMON_FIELDS = Map.ofEntries(
-            field("title", StandardField.TITLE),
-            field("DOI", StandardField.DOI),
-            field("URL", StandardField.URL)
+            withField("title", StandardField.TITLE),
+            withField("DOI", StandardField.DOI)
     );
 
     private static final Map<String, Map<String, StandardField>> FIELD_MAPPING = Map.ofEntries(
             override("article-journal", Map.ofEntries(
-                    field("container-title", StandardField.JOURNALTITLE),
-                    field("issue", StandardField.NUMBER),
-                    field("page", StandardField.PAGES),
-                    field("volume", StandardField.VOLUME))),
+                    withField("container-title", StandardField.JOURNALTITLE),
+                    withField("issue", StandardField.NUMBER),
+                    withField("page", StandardField.PAGES),
+                    withField("volume", StandardField.VOLUME))),
             override("article-magazine", Map.ofEntries(
-                    field("container-title", StandardField.JOURNALTITLE),
-                    field("issue", StandardField.NUMBER),
-                    field("page", StandardField.PAGES),
-                    field("volume", StandardField.VOLUME))),
+                    withField("container-title", StandardField.JOURNALTITLE),
+                    withField("issue", StandardField.NUMBER),
+                    withField("page", StandardField.PAGES),
+                    withField("volume", StandardField.VOLUME))),
             override("article-newspaper", Map.ofEntries(
-                    field("container-title", StandardField.JOURNALTITLE),
-                    field("issue", StandardField.NUMBER),
-                    field("page", StandardField.PAGES),
-                    field("volume", StandardField.VOLUME))),
-            override("book", Map.ofEntries(
-                    field("collection-title", StandardField.SERIES),
-                    field("edition", StandardField.EDITION),
-                    field("ISBN", StandardField.ISBN),
-                    field("publisher", StandardField.PUBLISHER),
-                    field("publisher-place", StandardField.LOCATION),
-                    field("volume", StandardField.VOLUME))),
-            override("chapter", Map.ofEntries(
-                    field("collection-title", StandardField.SERIES),
-                    field("container-title", StandardField.BOOKTITLE),
-                    field("edition", StandardField.EDITION),
-                    field("ISBN", StandardField.ISBN),
-                    field("page", StandardField.PAGES),
-                    field("publisher", StandardField.PUBLISHER),
-                    field("publisher-place", StandardField.LOCATION),
-                    field("volume", StandardField.VOLUME))),
-            override("entry-dictionary", Map.ofEntries(
-                    field("collection-title", StandardField.SERIES),
-                    field("container-title", StandardField.BOOKTITLE),
-                    field("edition", StandardField.EDITION),
-                    field("ISBN", StandardField.ISBN),
-                    field("page", StandardField.PAGES),
-                    field("publisher", StandardField.PUBLISHER),
-                    field("publisher-place", StandardField.LOCATION),
-                    field("volume", StandardField.VOLUME))),
-            override("entry-encyclopedia", Map.ofEntries(
-                    field("collection-title", StandardField.SERIES),
-                    field("container-title", StandardField.BOOKTITLE),
-                    field("edition", StandardField.EDITION),
-                    field("ISBN", StandardField.ISBN),
-                    field("page", StandardField.PAGES),
-                    field("publisher", StandardField.PUBLISHER),
-                    field("publisher-place", StandardField.LOCATION),
-                    field("volume", StandardField.VOLUME))),
-            override("paper-conference", Map.ofEntries(
-                    field("collection-title", StandardField.SERIES),
-                    field("container-title", StandardField.BOOKTITLE),
-                    field("event-place", StandardField.LOCATION),
-                    field("event-title", StandardField.EVENTTITLE),
-                    field("ISBN", StandardField.ISBN),
-                    field("page", StandardField.PAGES),
-                    field("publisher", StandardField.PUBLISHER))),
-            override("post-weblog", Map.ofEntries(
-                    field("publisher", StandardField.ORGANIZATION))),
-            override("webpage", Map.ofEntries(
-                    field("publisher", StandardField.ORGANIZATION))),
-            override("report", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("issue", StandardField.NUMBER),
-                    field("page", StandardField.PAGES),
-                    field("publisher", StandardField.INSTITUTION),
-                    field("publisher-place", StandardField.LOCATION))),
-            override("thesis", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.INSTITUTION),
-                    field("publisher-place", StandardField.LOCATION))),
-            override("patent", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("number", StandardField.NUMBER))),
+                    withField("container-title", StandardField.JOURNALTITLE),
+                    withField("issue", StandardField.NUMBER),
+                    withField("page", StandardField.PAGES),
+                    withField("volume", StandardField.VOLUME))),
             override("bill", Map.ofEntries(
-                    field("number", StandardField.NUMBER),
-                    field("publisher", StandardField.ORGANIZATION),
-                    field("publisher-place", StandardField.LOCATION))),
-            override("hearing", Map.ofEntries(
-                    field("number", StandardField.NUMBER),
-                    field("publisher", StandardField.ORGANIZATION),
-                    field("publisher-place", StandardField.LOCATION))),
-            override("legal_case", Map.ofEntries(
-                    field("number", StandardField.NUMBER),
-                    field("publisher", StandardField.ORGANIZATION),
-                    field("publisher-place", StandardField.LOCATION))),
-            override("legislation", Map.ofEntries(
-                    field("number", StandardField.NUMBER),
-                    field("publisher", StandardField.ORGANIZATION),
-                    field("publisher-place", StandardField.LOCATION))),
-            override("treaty", Map.ofEntries(
-                    field("number", StandardField.NUMBER),
-                    field("publisher", StandardField.ORGANIZATION),
-                    field("publisher-place", StandardField.LOCATION))),
+                    withField("page", StandardField.PAGES))),
+            override("book", Map.ofEntries(
+                    withField("collection-title", StandardField.SERIES),
+                    withField("edition", StandardField.EDITION),
+                    withField("ISBN", StandardField.ISBN),
+                    withField("publisher", StandardField.PUBLISHER),
+                    withField("publisher-place", StandardField.LOCATION),
+                    withField("volume", StandardField.VOLUME))),
             override("broadcast", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.ORGANIZATION))),
-            override("data", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.ORGANIZATION))),
+                    withField("publisher-place", StandardField.LOCATION),
+                    withField("publisher", StandardField.PUBLISHER))),
+            override("chapter", Map.ofEntries(
+                    withField("collection-title", StandardField.SERIES),
+                    withField("container-title", StandardField.JOURNALTITLE),
+                    withField("edition", StandardField.EDITION),
+                    withField("page", StandardField.PAGES),
+                    withField("publisher", StandardField.PUBLISHER),
+                    withField("publisher-place", StandardField.LOCATION),
+                    withField("volume", StandardField.VOLUME))),
             override("dataset", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.ORGANIZATION))),
-            override("figure", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.ORGANIZATION))),
+                    withField("publisher-place", StandardField.LOCATION),
+                    withField("publisher", StandardField.PUBLISHER))),
+            override("entry-dictionary", Map.ofEntries(
+                    withField("publisher-place", StandardField.LOCATION),
+                    withField("publisher", StandardField.PUBLISHER))),
+            override("entry-encyclopedia", Map.ofEntries(
+                    withField("publisher-place", StandardField.LOCATION),
+                    withField("publisher", StandardField.PUBLISHER))),
             override("graphic", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.ORGANIZATION))),
+                    withField("publisher-place", StandardField.LOCATION),
+                    withField("publisher", StandardField.PUBLISHER))),
+            override("hearing", Map.ofEntries(
+                    withField("publisher-place", StandardField.LOCATION),
+                    withField("publisher", StandardField.PUBLISHER))),
             override("instantMessage", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.ORGANIZATION))),
+                    withField("publisher-place", StandardField.LOCATION),
+                    withField("publisher", StandardField.PUBLISHER))),
             override("interview", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.ORGANIZATION))),
+                    withField("publisher-place", StandardField.LOCATION),
+                    withField("publisher", StandardField.PUBLISHER))),
+            override("legal_case", Map.ofEntries(
+                    withField("publisher-place", StandardField.LOCATION),
+                    withField("publisher", StandardField.PUBLISHER))),
+            override("legislation", Map.ofEntries(
+                    withField("publisher-place", StandardField.LOCATION),
+                    withField("publisher", StandardField.PUBLISHER))),
             override("manuscript", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.ORGANIZATION))),
+                    withField("publisher-place", StandardField.LOCATION),
+                    withField("publisher", StandardField.PUBLISHER))),
             override("map", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.ORGANIZATION))),
+                    withField("publisher-place", StandardField.LOCATION),
+                    withField("publisher", StandardField.PUBLISHER))),
             override("motion_picture", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.ORGANIZATION))),
+                    withField("publisher-place", StandardField.LOCATION),
+                    withField("publisher", StandardField.PUBLISHER))),
             override("musical_score", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.ORGANIZATION))),
-            override("pamphlet", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.ORGANIZATION))),
+                    withField("publisher-place", StandardField.LOCATION),
+                    withField("publisher", StandardField.PUBLISHER))),
+            override("paper-conference", Map.ofEntries(
+                    withField("collection-title", StandardField.SERIES),
+                    withField("container-title", StandardField.JOURNALTITLE),
+                    withField("volume", StandardField.VOLUME),
+                    withField("event-place", StandardField.LOCATION),
+                    withField("page", StandardField.PAGES),
+                    withField("publisher", StandardField.PUBLISHER))),
+            override("patent", Map.ofEntries(
+                    withField("number", StandardField.NUMBER))),
             override("personal_communication", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.ORGANIZATION))),
-            override("review", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.ORGANIZATION))),
-            override("review-book", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.ORGANIZATION))),
+                    withField("event-place", StandardField.LOCATION))),
+            override("post-weblog", Map.ofEntries(
+                    withField("publisher", StandardField.ORGANIZATION))),
+            override("report", Map.ofEntries(
+                    withField("page", StandardField.PAGES),
+                    withField("number", StandardField.NUMBER),
+                    withField("publisher", StandardField.INSTITUTION),
+                    withField("publisher-place", StandardField.LOCATION))),
             override("song", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.ORGANIZATION))),
+                    withField("event-place", StandardField.LOCATION),
+                    withField("publisher", StandardField.ORGANIZATION))),
             override("speech", Map.ofEntries(
-                    field("genre", StandardField.TYPE),
-                    field("publisher", StandardField.ORGANIZATION)))
+                    withField("event-place", StandardField.LOCATION),
+                    withField("publisher", StandardField.ORGANIZATION))),
+            override("thesis", Map.ofEntries(
+                    withField("publisher", StandardField.INSTITUTION),
+                    withField("publisher-place", StandardField.LOCATION))),
+            override("webpage", Map.ofEntries(
+                    withField("container-title", StandardField.JOURNALTITLE),
+                    withField("URL", StandardField.URL)))
     );
 
     static Optional<EntryType> getEntryType(String zoteroItemType) {
-        return Optional.of(ITEM_TYPES.get(zoteroItemType));
+        return Optional.ofNullable(ITEM_TYPES.get(zoteroItemType));
     }
 
     static Map<String, StandardField> getFieldMappings(String zoteroItemType) {
@@ -214,7 +201,7 @@ class CSLItemTypeDefinitions {
         return fieldMappings;
     }
 
-    private static Map.Entry<String, StandardField> field(String cslField, StandardField field) {
+    private static Map.Entry<String, StandardField> withField(String cslField, StandardField field) {
         return Map.entry(cslField, field);
     }
 
