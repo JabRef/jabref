@@ -260,7 +260,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         enableLanguageServerProperty.setValue(remotePreferences.shouldEnableLanguageServer());
         languageServerPortProperty.setValue(String.valueOf(remotePreferences.getLanguageServerPort()));
-
     }
 
     @Override

@@ -16,11 +16,11 @@ import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
-import org.jabref.logic.msc.MscCodeLoader;
+import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.msc.MscCodeLoader;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.TaskExecutor;
@@ -272,9 +272,9 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         dialogService.notify(Localization.lang("Downloading MSC codes..."));
 
         BackgroundTask.wrap(() -> {
-                              MscCodeLoader.downloadAndConvert(URLUtil.create(MscCodeLoader.MSC_CSV_URL), mscMvFile);
-                              return null;
-                          })
+                          MscCodeLoader.downloadAndConvert(URLUtil.create(MscCodeLoader.MSC_CSV_URL), mscMvFile);
+                          return null;
+                      })
                       .onSuccess(_ -> dialogService.notify(Localization.lang("MSC codes downloaded successfully.")))
                       .onFailure(e -> {
                           LOGGER.error("Error downloading MSC codes", e);
