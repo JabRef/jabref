@@ -48,11 +48,6 @@
                         <JabRefIconView glyph="ADD_NOBOX"/>
                     </graphic>
                 </Button>
-                <Button text="SVG glyph" GridPane.columnIndex="7" GridPane.rowIndex="1">
-                    <graphic>
-                        <JabRefIconView glyph="EXAMPLE_SVG_STAR" style="-fx-icon-color: #2d9d4f;"/>
-                    </graphic>
-                </Button>
                 <Button fx:id="normalButtonHover" text="Hover" GridPane.columnIndex="1" GridPane.rowIndex="1">
                     <graphic>
                         <JabRefIconView glyph="ADD_NOBOX"/>
@@ -389,6 +384,7 @@
                                                visited="true"/>
                                     <Separator prefWidth="200.0"/>
                                     <ColorPicker/>
+                                    <JabRefIconView glyph="EXAMPLE_SVG_STAR" style="-fx-icon-color: #2d9d4f;"/>
                                 </children>
                             </VBox>
                             <Separator orientation="VERTICAL" prefHeight="200.0"/>

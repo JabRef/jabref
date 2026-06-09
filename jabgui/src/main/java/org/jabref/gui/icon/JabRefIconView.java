@@ -22,16 +22,14 @@ import javafx.scene.text.Font;
 import org.jabref.gui.icon.IconTheme.JabRefIcons;
 
 import com.tobiasdiez.easybind.EasyBind;
-import org.kordamp.ikonli.javafx.FontIcon;
-import tools.maran.svgnode.SvgNode;
 
 /// View for a {@link JabRefIcons} usable in FXML (e.g. {@code <JabRefIconView glyph="REFRESH"/>}).
 ///
-/// Hosts the backing node produced by {@link JabRefIcons#getGraphicNode()} instead of being a {@link FontIcon}
-/// itself, so it renders both Ikonli-font-backed glyphs (as a {@link FontIcon}) and SVG-backed glyphs
-/// (see {@link SvgIcon}, rendered as an {@link SvgNode}).
+/// Hosts the backing node produced by {@link JabRefIcons#getGraphicNode()} instead of being a {@code FontIcon}
+/// itself, so it renders both Ikonli-font-backed glyphs (as a {@code FontIcon}) and SVG-backed glyphs
+/// (see {@link SvgIcon}, rendered as a {@link JabRefSvgNode}).
 ///
-/// Theme coloring is handled by the hosted child itself (a {@link FontIcon} or {@link JabRefSvgNode}, both of
+/// Theme coloring is handled by the hosted child itself (a {@code FontIcon} or {@link JabRefSvgNode}, both of
 /// which carry the icon style classes), so this view stays unclassed to avoid double-theming. The styleable
 /// {@code -fx-icon-color} here is an explicit override knob — e.g. an inline {@code style="-fx-icon-color: ..."}
 /// in FXML — and, when set, is forwarded to an SVG child as a user-origin color (overriding theme CSS).
@@ -90,16 +88,10 @@ public class JabRefIconView extends Group {
         EasyBind.subscribe(iconColor, _ -> applyColor());
     }
 
-    /// Rebuilds the hosted node from the current glyph and applies the current size to whichever
-    /// backing node type ({@link FontIcon} or {@link SvgNode}) it is.
+    /// Rebuilds the hosted node from the current glyph, sized to the current glyph size. The icon applies the size
+    /// to its own backing node type (font or SVG), so this view stays agnostic to which one it is.
     private void updateGraphic() {
-        int size = glyphSize.get().intValue();
-        Node node = glyph.get().getGraphicNode();
-        switch (node) {
-            case FontIcon fontIcon -> fontIcon.setIconSize(size);
-            case SvgNode svgNode -> svgNode.setSize(size);
-            default -> { }
-        }
+        Node node = glyph.get().withSize(glyphSize.get().intValue()).getGraphicNode();
         getChildren().setAll(node);
         applyColor();
     }

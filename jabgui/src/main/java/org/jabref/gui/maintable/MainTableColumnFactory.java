@@ -23,6 +23,7 @@ import javafx.scene.text.Text;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.IkonliIcon;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.maintable.columns.ContentSelectorColumn;
 import org.jabref.gui.maintable.columns.FieldColumn;
@@ -254,7 +255,7 @@ public class MainTableColumnFactory {
     private Node createGroupIconRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
         List<JabRefIcon> groupIcons = matchedGroups.stream()
                                                    .filter(abstractGroup -> abstractGroup.getIconName().isPresent())
-                                                   .flatMap(group -> IconTheme.findIcon(group.getIconName().get(), group.getColor().map(Color::valueOf).orElse(IconTheme.getDefaultGroupColor())).stream()
+                                                   .flatMap(group -> IkonliIcon.findIcon(group.getIconName().get(), group.getColor().map(Color::valueOf).orElse(IconTheme.getDefaultGroupColor())).stream()
                                                    )
                                                    .toList();
         if (!groupIcons.isEmpty()) {

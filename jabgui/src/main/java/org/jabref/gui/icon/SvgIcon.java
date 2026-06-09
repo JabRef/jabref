@@ -5,9 +5,9 @@ import java.util.Optional;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 
-/// {@link JabRefIcon} backed by an SVG path via the <a href="https://github.com/Maran23/svgnode">svgnode</a>
-/// library, instead of an Ikonli font glyph. Use as a source for toolbar buttons and other graphics where
-/// the icon is only available as SVG.
+/// {@link JabRefIcon} backed by an SVG path, rendered as a {@link JabRefSvgNode} via the
+/// <a href="https://github.com/Maran23/svgnode">svgnode</a> library. The SVG-backed counterpart to
+/// {@link IkonliIcon}; use it for glyphs only available as SVG rather than as an Ikonli font glyph.
 public class SvgIcon implements JabRefIcon {
 
     private static final int DEFAULT_SIZE = 24;
@@ -52,7 +52,12 @@ public class SvgIcon implements JabRefIcon {
     }
 
     @Override
+    public JabRefIcon withSize(int size) {
+        return new SvgIcon(name, svgPath, size, color);
+    }
+
+    @Override
     public JabRefIcon disabled() {
-        return new SvgIcon(name, svgPath, size, Optional.of(IconTheme.DEFAULT_DISABLED_COLOR));
+        return withColor(IconTheme.DEFAULT_DISABLED_COLOR);
     }
 }

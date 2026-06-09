@@ -22,7 +22,6 @@ import com.sun.javafx.scene.NodeHelper;
 import com.sun.javafx.scene.control.LabeledText;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 /// Resolves nodes from a Scene
 @FunctionalInterface
@@ -67,7 +66,7 @@ public interface NodeResolver {
                     }
                     Node graphic = button.getGraphic();
                     return (graphic instanceof JabRefIconView jabRefIconView) && jabRefIconView.getGlyph() == glyph ||
-                            (graphic instanceof FontIcon fontIcon) && glyph.isIkonBacked() && fontIcon.getIconCode() == glyph.getIkon();
+                            glyph.matches(graphic);
                 })
                 .findFirst();
     }

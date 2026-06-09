@@ -7,14 +7,9 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.ServiceLoader;
-import java.util.Set;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -26,7 +21,6 @@ import org.jabref.architecture.AllowedToUseClassGetResource;
 
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.Ikon;
-import org.kordamp.ikonli.IkonProvider;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignB;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
@@ -51,8 +45,6 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.util.EnumSet.allOf;
-
 @AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 public class IconTheme {
 
@@ -61,30 +53,13 @@ public class IconTheme {
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
     private static final Logger LOGGER = LoggerFactory.getLogger(IconTheme.class);
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
-    private static final Set<Ikon> ICON_NAMES = new HashSet<>();
 
     public static Color getDefaultGroupColor() {
         return Color.web("#8a8a8a");
     }
 
-    public static Optional<JabRefIcon> findIcon(String code, Color color) {
-        if (ICON_NAMES.isEmpty()) {
-            loadAllIkons();
-        }
-        return ICON_NAMES.stream().filter(icon -> icon.toString().equals(code.toUpperCase(Locale.ENGLISH)))
-                         .map(internalMat -> new InternalMaterialDesignIcon(internalMat).withColor(color)).findFirst();
-    }
-
     public static Image getJabRefImage() {
         return getImageFX("jabrefIcon48");
-    }
-
-    private static void loadAllIkons() {
-        ServiceLoader<IkonProvider> providers = ServiceLoader.load(IkonProvider.class);
-
-        for (IkonProvider provider : providers) {
-            ICON_NAMES.addAll(allOf(provider.getIkon()));
-        }
     }
 
     /*
@@ -368,17 +343,16 @@ public class IconTheme {
         // Example SVG-backed icon (a star, 24x24 viewport) sourced via the svgnode library instead of an Ikonli font.
         EXAMPLE_SVG_STAR("M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z");
 
-        /// Backing icon. Usually Ikonli-backed ({@link InternalMaterialDesignIcon}), but may be SVG-backed
-        /// ({@link SvgIcon}) for glyphs only available as SVG. {@link #getGraphicNode()} works for both;
-        /// {@link #getIkon()} is meaningful only for the Ikonli subset (guard with {@link #isIkonBacked()}).
+        /// Backing icon: an {@link IkonliIcon} for Ikonli-font glyphs (the common case) or an {@link SvgIcon} for
+        /// glyphs only available as SVG. {@link #getGraphicNode()} works for both.
         private final JabRefIcon icon;
 
         JabRefIcons(Ikon... icons) {
-            icon = new InternalMaterialDesignIcon(icons);
+            icon = new IkonliIcon(icons);
         }
 
         JabRefIcons(Color color, Ikon... icons) {
-            icon = new InternalMaterialDesignIcon(color, icons);
+            icon = new IkonliIcon(color, icons);
         }
 
         /// Builds an SVG-backed icon from a raw SVG path string (24x24 viewport), via the svgnode library.
@@ -386,24 +360,19 @@ public class IconTheme {
             icon = new SvgIcon(name(), svgPath);
         }
 
-        /// Whether this icon is backed by an Ikonli font and therefore exposes a usable {@link Ikon}.
-        /// SVG-backed icons return {@code false}.
-        public boolean isIkonBacked() {
-            return icon instanceof InternalMaterialDesignIcon;
-        }
-
-        /// @throws UnsupportedOperationException if this icon is SVG-backed rather than Ikonli-backed.
-        ///         Callers that may encounter SVG icons must check {@link #isIkonBacked()} first.
-        public Ikon getIkon() {
-            if (icon instanceof InternalMaterialDesignIcon materialDesignIcon) {
-                return materialDesignIcon.getIkon();
-            }
-            throw new UnsupportedOperationException(name() + " is SVG-backed and has no Ikon");
+        @Override
+        public boolean matches(Node graphicNode) {
+            return icon.matches(graphicNode);
         }
 
         @Override
         public Node getGraphicNode() {
             return icon.getGraphicNode();
+        }
+
+        @Override
+        public JabRefIcon withSize(int size) {
+            return icon.withSize(size);
         }
 
         public Button asButton() {
