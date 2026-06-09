@@ -159,7 +159,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     private Text createPageLink(LinkedFile linkedFile, int pageNumber, String searchExpression) {
         Text pageLink = new Text(Localization.lang("On page %0", pageNumber) + System.lineSeparator() + System.lineSeparator());
-        pageLink.getStyleClass().add("bold-italic");
+        pageLink.getStyleClass().addAll("bold", "italic");
 
         pageLink.setOnMouseClicked(event -> {
             if (MouseButton.PRIMARY == event.getButton()) {

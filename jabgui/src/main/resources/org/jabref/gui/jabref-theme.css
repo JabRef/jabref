@@ -2429,3 +2429,10 @@ journalInfo .grid-cell-b {
     -fx-background-insets: 0, 0;
     -fx-padding: 0;
 }
+.italic {
+    -fx-font-style: italic;
+}
+.dialog-header {
+    -fx-padding: 10px;
+    -fx-background-color: -fx-background;
+}
