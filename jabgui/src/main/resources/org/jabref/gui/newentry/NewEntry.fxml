@@ -115,7 +115,7 @@
                                     StackPane.alignment="CENTER_RIGHT"
                                     text="%Jump to entry"
                                     visible="false"
-                                    style="-fx-padding: 0 15 0 0;"/>
+                                    styleClass="padding-left-medium"/>
                         </StackPane>
                     </HBox>
                     <VBox spacing="5.0">
