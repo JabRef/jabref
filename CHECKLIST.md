@@ -27,7 +27,7 @@ code until all points are fulfilled. Do not skip any point.
 
 ## Documentation
 
-- [ ] `CHANGELOG.md` entry added if the change is visible to the user (end-user wording, no extra blank lines). Use `TODO` as the issue/PR reference placeholder when the PR number is not yet known — never a fake number.
+- [ ] `CHANGELOG.md` entry added if the change is visible to the user (end-user wording, no extra blank lines). Use `TODO` as the issue/PR reference placeholder when no issue is known and the PR is not yet created — never a fake number.
 - [ ] Searched [jabref/issues](https://github.com/JabRef/jabref/issues) and [jabref-koppor/issues](https://github.com/JabRef/jabref-koppor/issues) for a related issue; linked only on a confident match, otherwise kept `TODO` (no `closes`/`fixes` for merely-similar issues).
 - [ ] Requirement added to `docs/requirements/<area>.md` if the change is a new feature or significant bug fix (skip for refactors, minor fixes, and internal changes).
 - [ ] Developer documentation under `docs/` updated if behavior or architecture changed.

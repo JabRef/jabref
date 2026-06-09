@@ -482,7 +482,7 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 - Add a CHANGELOG.md entry only if the change is visible to the user.
 - The CHANGELOG.md entry should be for end users (and not programmers).
 - Do not add extra blank lines in CHANGELOG.md
-- When the PR number is not yet known, use `TODO` as the issue/PR reference placeholder — never invent a fake number.
+- When no issue is known and the PR is not yet created, use `TODO` as the issue/PR reference placeholder — never invent a fake number.
 - Before using `TODO`, search <https://github.com/JabRef/jabref/issues> and <https://github.com/JabRef/jabref-koppor/issues> for a matching issue. Link it only on a confident match; otherwise list candidates for human review and keep `TODO`. Never use `closes`/`fixes` keywords for a merely-similar issue.
 - User documentation is available in a separate repository <https://github.com/JabRef/user-documentation>.
 - No AI-disclosure comments inside source code
