@@ -102,7 +102,11 @@ public class EntryResource {
     public String getHTMLRepresentation(@PathParam("id") String id, @PathParam("entryId") String entryId) throws IOException {
         List<BibEntry> entriesByCitationKey = getDatabaseContext(id).getDatabase().getEntriesByCitationKey(entryId);
         if (entriesByCitationKey.isEmpty()) {
-            throw new NotFoundException("Entry with citation key '" + entryId + "' not found in library " + id);
+            // This response is served as text/html, so escape the user-controlled path
+            // parameters before reflecting them into the message (XSS).
+            throw new NotFoundException("Entry with citation key '"
+                    + HtmlEscapers.htmlEscaper().escape(entryId) + "' not found in library "
+                    + HtmlEscapers.htmlEscaper().escape(id));
         }
         if (entriesByCitationKey.size() > 1) {
             LOGGER.warn("Multiple entries found with citation key '{}'. Using the first one.", entryId);
