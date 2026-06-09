@@ -203,11 +203,11 @@ class CSLItemTypeDefinitions {
         return fieldMappings;
     }
 
-    private static Map.Entry<String, StandardField> cslFieldToBibField(String cslField, StandardField field) {
-        return Map.entry(cslField, field);
+    private static Map.Entry<String, StandardField> cslFieldToBibField(String cslField, StandardField bibField) {
+        return Map.entry(cslField, bibField);
     }
 
-    private static Map.Entry<String, Map<String, StandardField>> cslTypeToBibType(String cslType, Map<String, StandardField> fields) {
-        return Map.entry(cslType, fields);
+    private static Map.Entry<String, Map<String, StandardField>> cslTypeToBibType(String cslType, Map<String, StandardField> bibTypeWithFields) {
+        return Map.entry(cslType, bibTypeWithFields);
     }
 }
