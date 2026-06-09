@@ -899,3 +899,26 @@ TextFlow > .tooltip-text-monospaced {
 .web-view {
     -fx-page-fill: -jr-light-text-color;
 }
+/* Utility style classes */
+.bold {
+    -fx-font-weight: bold;
+}
+
+.italic {
+    -fx-font-style: italic;
+}
+
+.small-text {
+    -fx-font-size: 0.75em;
+}
+
+.bold-italic {
+    -fx-font-weight: bold;
+    -fx-font-style: italic;
+}
+.linked-files-info {
+    -fx-padding: 0.5em 0 0.5em 0;
+}
+.welcome-scroll-pane {
+    -fx-background-color: transparent;
+}
