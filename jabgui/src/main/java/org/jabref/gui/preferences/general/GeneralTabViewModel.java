@@ -37,38 +37,27 @@ import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.UiMessageHandler;
-import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.msc.MscCodeLoader;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.search.SearchPreferences;
-import org.jabref.logic.util.BackgroundTask;
-import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.logic.util.TaskExecutor;
-import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseMode;
 
-import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     protected static SpinnerValueFactory<Integer> fontSizeValueFactory =
             new SpinnerValueFactory.IntegerSpinnerValueFactory(9, Integer.MAX_VALUE);
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GeneralTabViewModel.class);
 
     private final ReadOnlyListProperty<Language> languagesListProperty =
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Language.getSorted()));
@@ -105,7 +94,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
-    private final BooleanProperty enableMscKeywordDescriptionsProperty = new SimpleBooleanProperty();
 
     private final BooleanProperty createBackupProperty = new SimpleBooleanProperty();
     private final StringProperty backupDirectoryProperty = new SimpleStringProperty("");
@@ -119,13 +107,11 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final FilePreferences filePreferences;
     private final SearchPreferences searchPreferences;
     private final RemotePreferences remotePreferences;
-    private final AbbreviationPreferences abbbreviationPreferences;
     private final HttpServerManager httpServerManager;
     private final LanguageServerController languageServerController;
     private final UiMessageHandler uiMessageHandler;
     private final RemoteListenerServerManager remoteListenerServerManager;
     private final StateManager stateManager;
-    private final TaskExecutor taskExecutor;
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
@@ -142,7 +128,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableLanguageServerProperty = new SimpleBooleanProperty();
     private final StringProperty languageServerPortProperty = new SimpleStringProperty("");
     private final TrustStoreManager trustStoreManager;
-    private boolean mscKeywordDescriptionsInitialized;
 
     public GeneralTabViewModel(DialogService dialogService,
                                GuiPreferences preferences,
@@ -150,8 +135,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                                LanguageServerController languageServerController,
                                UiMessageHandler uiMessageHandler,
                                RemoteListenerServerManager remoteListenerServerManager,
-                               StateManager stateManager,
-                               TaskExecutor taskExecutor) {
+                               StateManager stateManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.workspacePreferences = preferences.getWorkspacePreferences();
@@ -159,14 +143,11 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.filePreferences = preferences.getFilePreferences();
         this.searchPreferences = preferences.getSearchPreferences();
         this.remotePreferences = preferences.getRemotePreferences();
-        this.abbbreviationPreferences = preferences.getAbbreviationPreferences();
         this.httpServerManager = httpServerManager;
         this.languageServerController = languageServerController;
         this.uiMessageHandler = uiMessageHandler;
         this.remoteListenerServerManager = remoteListenerServerManager;
         this.stateManager = stateManager;
-        this.taskExecutor = taskExecutor;
-        EasyBind.subscribe(enableMscKeywordDescriptionsProperty, this::onMscKeywordDescriptionsChanged);
 
         fontSizeValidator = new FunctionBasedValidator<>(
                 fontSizeProperty,
@@ -265,7 +246,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         alwaysReformatBibProperty.setValue(libraryPreferences.shouldAlwaysReformatOnSave());
         autosaveLocalLibraries.setValue(libraryPreferences.shouldAutoSave());
-        enableMscKeywordDescriptionsProperty.setValue(abbbreviationPreferences.shouldEnableMscKeywordDescriptions());
 
         createBackupProperty.setValue(filePreferences.shouldCreateBackup());
         backupDirectoryProperty.setValue(filePreferences.getBackupDirectory().toString());
@@ -281,7 +261,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         enableLanguageServerProperty.setValue(remotePreferences.shouldEnableLanguageServer());
         languageServerPortProperty.setValue(String.valueOf(remotePreferences.getLanguageServerPort()));
 
-        mscKeywordDescriptionsInitialized = true;
     }
 
     @Override
@@ -324,7 +303,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         libraryPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
         libraryPreferences.setAutoSave(autosaveLocalLibraries.getValue());
-        abbbreviationPreferences.setShouldEnableMscKeywordDescriptions(enableMscKeywordDescriptionsProperty.getValue());
 
         filePreferences.setCreateBackup(createBackupProperty.getValue());
         filePreferences.setBackupDirectory(Path.of(backupDirectoryProperty.getValue()));
@@ -523,10 +501,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return autosaveLocalLibraries;
     }
 
-    public BooleanProperty enableMscKeywordDescriptionsProperty() {
-        return enableMscKeywordDescriptionsProperty;
-    }
-
     public BooleanProperty createBackupProperty() {
         return this.createBackupProperty;
     }
@@ -581,50 +555,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
         }
-    }
-
-    private void onMscKeywordDescriptionsChanged(Boolean newValue) {
-        if (!mscKeywordDescriptionsInitialized) {
-            return;
-        }
-
-        if (Boolean.TRUE.equals(newValue)) {
-            boolean accepted = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("License agreement for MSC codes"),
-                    Localization.lang("The MSC codes are provided under the Creative Commons Attribution-ShareAlike-NonCommercial 4.0 International License.")
-                            + "\n\n"
-                            + Localization.lang("By enabling this feature, you agree to the terms of this license.")
-                            + "\n"
-                            + "https://creativecommons.org/licenses/by-nc-sa/4.0/",
-                    Localization.lang("Accept"),
-                    Localization.lang("Decline"));
-
-            if (accepted) {
-                downloadMscCodes();
-            } else {
-                enableMscKeywordDescriptionsProperty.setValue(false);
-            }
-        }
-    }
-
-    private void downloadMscCodes() {
-        Path mscMvFile = Directories.getMscDirectory().resolve(MscCodeLoader.MSC_FILE_NAME);
-        if (MscCodeLoader.isMvStoreAvailableWithData(mscMvFile)) {
-            return;
-        }
-
-        dialogService.notify(Localization.lang("Downloading MSC codes..."));
-
-        BackgroundTask.wrap(() -> {
-                          MscCodeLoader.downloadAndConvert(URLUtil.create(MscCodeLoader.MSC_CSV_URL), mscMvFile);
-                          return null;
-                      })
-                      .onSuccess(_ -> dialogService.notify(Localization.lang("MSC codes downloaded successfully.")))
-                      .onFailure(e -> {
-                          LOGGER.error("Error downloading MSC codes", e);
-                          dialogService.showErrorDialogAndWait(Localization.lang("Error downloading MSC codes"), e);
-                      })
-                      .executeWith(taskExecutor);
     }
 
     private Optional<Integer> getPortAsInt(String value) {

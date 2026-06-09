@@ -16,13 +16,25 @@ import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
+import org.jabref.logic.msc.MscCodeLoader;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.Directories;
+import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
+import com.tobiasdiez.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class EntryEditorTabViewModel implements PreferenceTabViewModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntryEditorTabViewModel.class);
 
     private final BooleanProperty openOnNewEntryProperty = new SimpleBooleanProperty();
     private final BooleanProperty defaultSourceProperty = new SimpleBooleanProperty();
@@ -37,6 +49,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty journalPopupProperty = new SimpleBooleanProperty();
     private final BooleanProperty autoLinkEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableSciteTabProperty = new SimpleBooleanProperty();
+    private final BooleanProperty enableMscKeywordDescriptionsProperty = new SimpleBooleanProperty();
 
     private final BooleanProperty showUserCommentsProperty = new SimpleBooleanProperty();
     private final ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty = new SimpleObjectProperty<>();
@@ -47,12 +60,18 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final GuiPreferences preferences;
     private final EntryEditorPreferences entryEditorPreferences;
     private final MrDlibPreferences mrDlibPreferences;
+    private final AbbreviationPreferences abbreviationPreferences;
+    private final TaskExecutor taskExecutor;
+    private boolean mscKeywordDescriptionsInitialized;
 
-    public EntryEditorTabViewModel(DialogService dialogService, GuiPreferences preferences) {
+    public EntryEditorTabViewModel(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
         this.mrDlibPreferences = preferences.getMrDlibPreferences();
+        this.abbreviationPreferences = preferences.getAbbreviationPreferences();
+        this.taskExecutor = taskExecutor;
+        EasyBind.subscribe(enableMscKeywordDescriptionsProperty, this::onMscKeywordDescriptionsChanged);
     }
 
     @Override
@@ -73,10 +92,12 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         journalPopupProperty.setValue(entryEditorPreferences.shouldEnableJournalPopup() == EntryEditorPreferences.JournalPopupEnabled.ENABLED);
         autoLinkEnabledProperty.setValue(entryEditorPreferences.autoLinkFilesEnabled());
         enableSciteTabProperty.setValue(entryEditorPreferences.shouldShowSciteTab());
+        enableMscKeywordDescriptionsProperty.setValue(abbreviationPreferences.shouldEnableMscKeywordDescriptions());
         showUserCommentsProperty.setValue(entryEditorPreferences.shouldShowUserCommentsFields());
         citationCountFetcherTypeProperty.setValue(entryEditorPreferences.getCitationCountFetcherType());
 
         setFields(entryEditorPreferences.getEntryEditorTabs());
+        mscKeywordDescriptionsInitialized = true;
     }
 
     public void resetToDefaults() {
@@ -115,6 +136,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         // entryEditorPreferences.setDividerPosition();
         entryEditorPreferences.setAutoLinkFilesEnabled(autoLinkEnabledProperty.getValue());
         entryEditorPreferences.setShouldShowSciteTab(enableSciteTabProperty.getValue());
+        abbreviationPreferences.setShouldEnableMscKeywordDescriptions(enableMscKeywordDescriptionsProperty.getValue());
         entryEditorPreferences.setShowUserCommentsFields(showUserCommentsProperty.getValue());
         entryEditorPreferences.setCitationCountFetcherType(citationCountFetcherTypeProperty.getValue());
 
@@ -205,11 +227,59 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         return enableSciteTabProperty;
     }
 
+    public BooleanProperty enableMscKeywordDescriptionsProperty() {
+        return enableMscKeywordDescriptionsProperty;
+    }
+
     public BooleanProperty showUserCommentsProperty() {
         return this.showUserCommentsProperty;
     }
 
     public ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty() {
         return citationCountFetcherTypeProperty;
+    }
+
+    private void onMscKeywordDescriptionsChanged(Boolean newValue) {
+        if (!mscKeywordDescriptionsInitialized) {
+            return;
+        }
+
+        if (Boolean.TRUE.equals(newValue)) {
+            boolean accepted = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("License agreement for MSC codes"),
+                    Localization.lang("The MSC codes are provided under the Creative Commons Attribution-ShareAlike-NonCommercial 4.0 International License.")
+                            + "\n\n"
+                            + Localization.lang("By enabling this feature, you agree to the terms of this license.")
+                            + "\n"
+                            + "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+                    Localization.lang("Accept"),
+                    Localization.lang("Decline"));
+
+            if (accepted) {
+                downloadMscCodes();
+            } else {
+                enableMscKeywordDescriptionsProperty.setValue(false);
+            }
+        }
+    }
+
+    private void downloadMscCodes() {
+        var mscMvFile = Directories.getMscDirectory().resolve(MscCodeLoader.MSC_FILE_NAME);
+        if (MscCodeLoader.isMvStoreAvailableWithData(mscMvFile)) {
+            return;
+        }
+
+        dialogService.notify(Localization.lang("Downloading MSC codes..."));
+
+        BackgroundTask.wrap(() -> {
+                              MscCodeLoader.downloadAndConvert(URLUtil.create(MscCodeLoader.MSC_CSV_URL), mscMvFile);
+                              return null;
+                          })
+                      .onSuccess(_ -> dialogService.notify(Localization.lang("MSC codes downloaded successfully.")))
+                      .onFailure(e -> {
+                          LOGGER.error("Error downloading MSC codes", e);
+                          dialogService.showErrorDialogAndWait(Localization.lang("Error downloading MSC codes"), e);
+                      })
+                      .executeWith(taskExecutor);
     }
 }
