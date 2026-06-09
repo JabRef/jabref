@@ -183,10 +183,10 @@ class CSLItemTypeDefinitions {
                     cslFieldToBibField("number", StandardField.NUMBER),
                     cslFieldToBibField("publisher", StandardField.INSTITUTION),
                     cslFieldToBibField("publisher-place", StandardField.LOCATION))),
-            cslTypeToBibType("song", Map.ofEntries(
+            cslTypeToBibType("software", Map.ofEntries(
                     cslFieldToBibField("event-place", StandardField.LOCATION),
                     cslFieldToBibField("publisher", StandardField.ORGANIZATION))),
-            cslTypeToBibType("software", Map.ofEntries(
+            cslTypeToBibType("song", Map.ofEntries(
                     cslFieldToBibField("event-place", StandardField.LOCATION),
                     cslFieldToBibField("publisher", StandardField.ORGANIZATION))),
             cslTypeToBibType("speech", Map.ofEntries(
