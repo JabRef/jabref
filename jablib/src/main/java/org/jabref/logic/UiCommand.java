@@ -34,7 +34,7 @@ public sealed interface UiCommand {
 
     /// "Twin" to [#AppendFilesToLibrary]. Accepts BibTeX as text instead stored in a file.
     ///
-    /// @param library the target library; an empty Optional means the currently active library.
+    /// @param library     the target library; an empty Optional means the currently active library.
     /// @param targetGroup name of a group the imported entries are additionally assigned to. If the group does not exist, it is created as a top-level group. An empty Optional means no group assignment.
     record AppendBibTeXToLibrary(Optional<Path> library, String bibtex, Optional<String> targetGroup) implements UiCommand {
         public AppendBibTeXToLibrary(String bibtex) {
