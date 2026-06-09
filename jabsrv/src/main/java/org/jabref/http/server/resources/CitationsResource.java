@@ -98,18 +98,94 @@ public class CitationsResource {
         // The target library is the one Ctrl+J would add to: "current" -> active
         // library, any other id -> that open library (404 if unknown/closed).
         BibDatabaseContext targetContext = resolveTargetContext(id);
+        return doLookup(citationText, targetContext,
+                        srvStateManager.getOpenDatabases(),
+                        new DuplicateCheck(new BibEntryTypesManager()));
+    }
 
-        BibEntry parsed = ServerUtils.parsePlainCitation(preferences, citationText)
-                                     .orElseThrow(() -> new BadRequestException("Could not parse a bibliography entry from the given text."));
+    /// Wrapper for the batched lookup payload. Plain `List<String>` would work
+    /// too, but a named record makes the JSON self-describing and leaves room
+    /// to add per-request options (e.g. include-snippets) without breaking the
+    /// schema.
+    public record BatchLookupRequest(List<String> citations) {
+    }
+
+    /// Aligned-by-index with the request: `results[i]` corresponds to
+    /// `citations[i]`. Blank input slots yield an empty `LookupResponse`
+    /// (matches=[], matchScope="none") rather than failing the whole batch.
+    public record BatchLookupResponse(List<LookupResponse> results) {
+    }
+
+    /// Batched variant of [#lookup] for the SumatraPDF page-scan flow: when
+    /// the reader lands on a new page we extract every citation link's
+    /// extracted bibliography text in one shot, fire one POST, and paint the
+    /// returned per-citation `matchScope` as in-PDF dots. Single round-trip
+    /// + JabRef-side [CitationCacheService#getByText] hits mean repeat
+    /// scans of the same page are O(1) per citation with no LLM cost.
+    @POST
+    @Path("lookup:batch")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public BatchLookupResponse lookupBatch(@PathParam("id") String id, BatchLookupRequest request) throws FetcherException {
+        if (request == null || request.citations() == null || request.citations().isEmpty()) {
+            throw new BadRequestException("Citations list must not be empty.");
+        }
+        BibDatabaseContext targetContext = resolveTargetContext(id);
+        // Resolve once and reuse across every citation in the batch: the
+        // open-database list and DuplicateCheck are independent of the
+        // individual citation text, so re-creating per iteration would burn
+        // CPU for no benefit.
+        List<BibDatabaseContext> openDatabases = srvStateManager.getOpenDatabases();
+        DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
+
+        List<LookupResponse> results = new ArrayList<>(request.citations().size());
+        for (String citationText : request.citations()) {
+            if (StringUtil.isBlank(citationText)) {
+                // Empty slot — return a "none" response so client indexing
+                // stays aligned. Skipping would shift downstream results.
+                results.add(new LookupResponse(List.of(), "none", null, null));
+                continue;
+            }
+            try {
+                results.add(doLookup(citationText, targetContext, openDatabases, duplicateCheck));
+            } catch (FetcherException e) {
+                // One citation failing to parse shouldn't fail the batch.
+                // Surface as an empty response so the client paints "no match"
+                // (= gray ring) for that slot; the others still resolve.
+                results.add(new LookupResponse(List.of(), "none", null, null));
+            }
+        }
+        return new BatchLookupResponse(results);
+    }
+
+    /// Shared body of single + batched lookup. Resolves the citation text to
+    /// a `BibEntry` (via the text-hash cache when possible, else the
+    /// LLM/fetcher), walks every open library for duplicates, mints a fresh
+    /// token for the add-from-cache flow, and assembles the response.
+    private LookupResponse doLookup(String citationText,
+                                    BibDatabaseContext targetContext,
+                                    List<BibDatabaseContext> openDatabases,
+                                    DuplicateCheck duplicateCheck) throws FetcherException {
+        // Text cache first: lets a re-scan of the same PDF page (or two
+        // distinct PDFs that cite the same paper) reuse the prior parse and
+        // skip the LLM call entirely.
+        Optional<CitationCacheService.CachedCitation> cachedByText = citationCacheService.getByText(citationText);
+        BibEntry parsed;
+        if (cachedByText.isPresent()) {
+            parsed = cachedByText.get().parsed();
+        } else {
+            parsed = ServerUtils.parsePlainCitation(preferences, citationText)
+                    .orElseThrow(() -> new BadRequestException("Could not parse a bibliography entry from the given text."));
+            citationCacheService.putByText(parsed, citationText);
+        }
 
         // Cross-library lookup: walk every open library so we can tell the
         // client whether the citation is in the *target* library (Ctrl+J
         // would create a duplicate → mint) vs an *other* open library (still
         // worth surfacing — the user may want to switch libraries or copy
         // across → olive, AnchorHub's related-match colour).
-        DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         List<LookupMatch> matches = new ArrayList<>();
-        for (BibDatabaseContext ctx : srvStateManager.getOpenDatabases()) {
+        for (BibDatabaseContext ctx : openDatabases) {
             boolean isActive = ctx == targetContext;
             duplicateCheck.containsDuplicate(ctx.getDatabase(), parsed, ctx.getMode())
                           .ifPresent(existing -> matches.add(new LookupMatch(
