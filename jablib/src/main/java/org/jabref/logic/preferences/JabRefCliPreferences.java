@@ -886,7 +886,7 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(abbreviationPreferences.useFJournalFieldProperty(),
                 (_, _, newValue) -> putBoolean(USE_AMS_FJOURNAL, newValue));
 
-        EasyBind.listen(abbreviationPreferences.useFJournalFieldProperty(),
+        EasyBind.listen(abbreviationPreferences.shouldEnableMscKeywordDescriptionsProperty(),
                 (_, _, newValue) -> putBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, newValue));
 
         return abbreviationPreferences;

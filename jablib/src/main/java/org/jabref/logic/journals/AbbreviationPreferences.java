@@ -7,8 +7,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-// TODO:  rename this preferences to AbbrevationPreferensc and move the shouldEnableMscKeywordDescriptions here
-// Use that preferences than in the Formatter
 public class AbbreviationPreferences {
 
     private final ObservableList<String> externalJournalLists;
@@ -27,7 +25,7 @@ public class AbbreviationPreferences {
         this(
                 List.of(), // externalJournalLists
                 true,       // useFJournalField
-                false       // shouldEnableMscKeywordDescriptions
+                false       // Enable MSC codes as Keyword
         );
     }
 
@@ -62,15 +60,15 @@ public class AbbreviationPreferences {
         this.useFJournalField.set(useFJournalField);
     }
 
-    public final boolean shouldEnableMscKeywordDescriptions() {
+    public boolean shouldEnableMscKeywordDescriptions() {
         return shouldEnableMscKeywordDescriptions.get();
     }
 
-    public final void setShouldEnableMscKeywordDescriptions(boolean value) {
+    public void setShouldEnableMscKeywordDescriptions(boolean value) {
         this.shouldEnableMscKeywordDescriptions.set(value);
     }
 
-    public final BooleanProperty shouldEnableMscKeywordDescriptionsProperty() {
+    public BooleanProperty shouldEnableMscKeywordDescriptionsProperty() {
         return shouldEnableMscKeywordDescriptions;
     }
 }

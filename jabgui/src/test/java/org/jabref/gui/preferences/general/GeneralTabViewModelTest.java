@@ -48,7 +48,6 @@ class GeneralTabViewModelTest {
         when(preferences.getCopyToPreferences()).thenReturn(CopyToPreferences.getDefault());
         when(preferences.getDonationPreferences()).thenReturn(DonationPreferences.getDefault());
         when(preferences.getSSLPreferences()).thenReturn(SSLPreferences.getDefault());
-        when(preferences.shouldEnableMscKeywordDescriptions()).thenReturn(false);
 
         viewModel = new GeneralTabViewModel(
                 dialogService,

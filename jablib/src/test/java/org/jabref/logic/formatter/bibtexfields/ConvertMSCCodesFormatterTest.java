@@ -22,7 +22,7 @@ public class ConvertMSCCodesFormatterTest {
     @BeforeEach
     void setup() {
         cliPreferences = mock(JabRefCliPreferences.class);
-        when(cliPreferences.shouldEnableMscKeywordDescriptions()).thenReturn(true);
+        when(cliPreferences.getAbbreviationPreferences().shouldEnableMscKeywordDescriptions()).thenReturn(true);
         when(cliPreferences.getBibEntryPreferences()).thenReturn(BibEntryPreferences.getDefault());
         formatter = new ConvertMSCCodesFormatter(cliPreferences);
 
@@ -75,7 +75,7 @@ public class ConvertMSCCodesFormatterTest {
 
     @Test
     void disabledFeatureLeavesKeywordsUntouched() {
-        when(cliPreferences.shouldEnableMscKeywordDescriptions()).thenReturn(false);
+        when(cliPreferences.getAbbreviationPreferences().shouldEnableMscKeywordDescriptions()).thenReturn(false);
 
         assertEquals("34B60,90B40", formatter.format("34B60,90B40"));
     }

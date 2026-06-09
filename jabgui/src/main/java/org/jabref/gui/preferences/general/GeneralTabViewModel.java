@@ -37,6 +37,7 @@ import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.UiMessageHandler;
+import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.msc.MscCodeLoader;
@@ -118,6 +119,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final FilePreferences filePreferences;
     private final SearchPreferences searchPreferences;
     private final RemotePreferences remotePreferences;
+    private final AbbreviationPreferences abbbreviationPreferences;
     private final HttpServerManager httpServerManager;
     private final LanguageServerController languageServerController;
     private final UiMessageHandler uiMessageHandler;
@@ -157,6 +159,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.filePreferences = preferences.getFilePreferences();
         this.searchPreferences = preferences.getSearchPreferences();
         this.remotePreferences = preferences.getRemotePreferences();
+        this.abbbreviationPreferences = preferences.getAbbreviationPreferences();
         this.httpServerManager = httpServerManager;
         this.languageServerController = languageServerController;
         this.uiMessageHandler = uiMessageHandler;
@@ -262,7 +265,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         alwaysReformatBibProperty.setValue(libraryPreferences.shouldAlwaysReformatOnSave());
         autosaveLocalLibraries.setValue(libraryPreferences.shouldAutoSave());
-        enableMscKeywordDescriptionsProperty.setValue(preferences.shouldEnableMscKeywordDescriptions());
+        enableMscKeywordDescriptionsProperty.setValue(abbbreviationPreferences.shouldEnableMscKeywordDescriptions());
 
         createBackupProperty.setValue(filePreferences.shouldCreateBackup());
         backupDirectoryProperty.setValue(filePreferences.getBackupDirectory().toString());
@@ -321,7 +324,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         libraryPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
         libraryPreferences.setAutoSave(autosaveLocalLibraries.getValue());
-        preferences.setEnableMscKeywordDescriptions(enableMscKeywordDescriptionsProperty.getValue());
+        abbbreviationPreferences.setShouldEnableMscKeywordDescriptions(enableMscKeywordDescriptionsProperty.getValue());
 
         filePreferences.setCreateBackup(createBackupProperty.getValue());
         filePreferences.setBackupDirectory(Path.of(backupDirectoryProperty.getValue()));
