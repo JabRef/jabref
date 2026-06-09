@@ -193,13 +193,13 @@ class CSLItemTypeDefinitions {
                     cslFieldToBibField("URL", StandardField.URL)))
     );
 
-    static Optional<EntryType> getEntryType(String zoteroItemType) {
-        return Optional.ofNullable(ITEM_TYPES.get(zoteroItemType));
+    static Optional<EntryType> getEntryType(String cslItemType) {
+        return Optional.ofNullable(ITEM_TYPES.get(cslItemType));
     }
 
-    static Map<String, StandardField> getFieldMappings(String zoteroItemType) {
+    static Map<String, StandardField> getFieldMappings(String cslItemType) {
         Map<String, StandardField> fieldMappings = new HashMap<>(COMMON_FIELDS);
-        fieldMappings.putAll(FIELD_MAPPING.getOrDefault(zoteroItemType, Map.of()));
+        fieldMappings.putAll(FIELD_MAPPING.getOrDefault(cslItemType, Map.of()));
         return fieldMappings;
     }
 
