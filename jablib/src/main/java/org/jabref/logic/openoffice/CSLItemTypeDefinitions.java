@@ -12,6 +12,8 @@ import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
 class CSLItemTypeDefinitions {
+    /// CSL item type <-> Zotero item type mapping can be found via [zotero-schema/schema.json](https://github.com/zotero/zotero-schema/blob/62e983a2e575fe9b9a3677ad7c9772080b67a1e4/schema.json#L3219-L3324)
+    /// CSL item type <-> BibLaTeX entry type can be found via [zotero-better-bibtex/biblatex.ts](https://github.com/retorquere/zotero-better-bibtex/blob/master/translators/bibtex/biblatex.ts)
     private static final Map<String, EntryType> ITEM_TYPES = Map.ofEntries(
             // preprint
             Map.entry("article", StandardEntryType.Online),
@@ -80,115 +82,115 @@ class CSLItemTypeDefinitions {
     );
 
     private static final Map<String, StandardField> COMMON_FIELDS = Map.ofEntries(
-            withField("title", StandardField.TITLE),
-            withField("DOI", StandardField.DOI)
+            cslFieldToBibField("title", StandardField.TITLE),
+            cslFieldToBibField("DOI", StandardField.DOI)
     );
 
     private static final Map<String, Map<String, StandardField>> FIELD_MAPPING = Map.ofEntries(
-            override("article-journal", Map.ofEntries(
-                    withField("container-title", StandardField.JOURNALTITLE),
-                    withField("issue", StandardField.NUMBER),
-                    withField("page", StandardField.PAGES),
-                    withField("volume", StandardField.VOLUME))),
-            override("article-magazine", Map.ofEntries(
-                    withField("container-title", StandardField.JOURNALTITLE),
-                    withField("issue", StandardField.NUMBER),
-                    withField("page", StandardField.PAGES),
-                    withField("volume", StandardField.VOLUME))),
-            override("article-newspaper", Map.ofEntries(
-                    withField("container-title", StandardField.JOURNALTITLE),
-                    withField("issue", StandardField.NUMBER),
-                    withField("page", StandardField.PAGES),
-                    withField("volume", StandardField.VOLUME))),
-            override("bill", Map.ofEntries(
-                    withField("page", StandardField.PAGES))),
-            override("book", Map.ofEntries(
-                    withField("collection-title", StandardField.SERIES),
-                    withField("edition", StandardField.EDITION),
-                    withField("ISBN", StandardField.ISBN),
-                    withField("publisher", StandardField.PUBLISHER),
-                    withField("publisher-place", StandardField.LOCATION),
-                    withField("volume", StandardField.VOLUME))),
-            override("broadcast", Map.ofEntries(
-                    withField("publisher-place", StandardField.LOCATION),
-                    withField("publisher", StandardField.PUBLISHER))),
-            override("chapter", Map.ofEntries(
-                    withField("collection-title", StandardField.SERIES),
-                    withField("container-title", StandardField.JOURNALTITLE),
-                    withField("edition", StandardField.EDITION),
-                    withField("page", StandardField.PAGES),
-                    withField("publisher", StandardField.PUBLISHER),
-                    withField("publisher-place", StandardField.LOCATION),
-                    withField("volume", StandardField.VOLUME))),
-            override("dataset", Map.ofEntries(
-                    withField("publisher-place", StandardField.LOCATION),
-                    withField("publisher", StandardField.PUBLISHER))),
-            override("entry-dictionary", Map.ofEntries(
-                    withField("publisher-place", StandardField.LOCATION),
-                    withField("publisher", StandardField.PUBLISHER))),
-            override("entry-encyclopedia", Map.ofEntries(
-                    withField("publisher-place", StandardField.LOCATION),
-                    withField("publisher", StandardField.PUBLISHER))),
-            override("graphic", Map.ofEntries(
-                    withField("publisher-place", StandardField.LOCATION),
-                    withField("publisher", StandardField.PUBLISHER))),
-            override("hearing", Map.ofEntries(
-                    withField("publisher-place", StandardField.LOCATION),
-                    withField("publisher", StandardField.PUBLISHER))),
-            override("instantMessage", Map.ofEntries(
-                    withField("publisher-place", StandardField.LOCATION),
-                    withField("publisher", StandardField.PUBLISHER))),
-            override("interview", Map.ofEntries(
-                    withField("publisher-place", StandardField.LOCATION),
-                    withField("publisher", StandardField.PUBLISHER))),
-            override("legal_case", Map.ofEntries(
-                    withField("publisher-place", StandardField.LOCATION),
-                    withField("publisher", StandardField.PUBLISHER))),
-            override("legislation", Map.ofEntries(
-                    withField("publisher-place", StandardField.LOCATION),
-                    withField("publisher", StandardField.PUBLISHER))),
-            override("manuscript", Map.ofEntries(
-                    withField("publisher-place", StandardField.LOCATION),
-                    withField("publisher", StandardField.PUBLISHER))),
-            override("map", Map.ofEntries(
-                    withField("publisher-place", StandardField.LOCATION),
-                    withField("publisher", StandardField.PUBLISHER))),
-            override("motion_picture", Map.ofEntries(
-                    withField("publisher-place", StandardField.LOCATION),
-                    withField("publisher", StandardField.PUBLISHER))),
-            override("musical_score", Map.ofEntries(
-                    withField("publisher-place", StandardField.LOCATION),
-                    withField("publisher", StandardField.PUBLISHER))),
-            override("paper-conference", Map.ofEntries(
-                    withField("collection-title", StandardField.SERIES),
-                    withField("container-title", StandardField.JOURNALTITLE),
-                    withField("volume", StandardField.VOLUME),
-                    withField("event-place", StandardField.LOCATION),
-                    withField("page", StandardField.PAGES),
-                    withField("publisher", StandardField.PUBLISHER))),
-            override("patent", Map.ofEntries(
-                    withField("number", StandardField.NUMBER))),
-            override("personal_communication", Map.ofEntries(
-                    withField("event-place", StandardField.LOCATION))),
-            override("post-weblog", Map.ofEntries(
-                    withField("publisher", StandardField.ORGANIZATION))),
-            override("report", Map.ofEntries(
-                    withField("page", StandardField.PAGES),
-                    withField("number", StandardField.NUMBER),
-                    withField("publisher", StandardField.INSTITUTION),
-                    withField("publisher-place", StandardField.LOCATION))),
-            override("song", Map.ofEntries(
-                    withField("event-place", StandardField.LOCATION),
-                    withField("publisher", StandardField.ORGANIZATION))),
-            override("speech", Map.ofEntries(
-                    withField("event-place", StandardField.LOCATION),
-                    withField("publisher", StandardField.ORGANIZATION))),
-            override("thesis", Map.ofEntries(
-                    withField("publisher", StandardField.INSTITUTION),
-                    withField("publisher-place", StandardField.LOCATION))),
-            override("webpage", Map.ofEntries(
-                    withField("container-title", StandardField.JOURNALTITLE),
-                    withField("URL", StandardField.URL)))
+            cslTypeToBibType("article-journal", Map.ofEntries(
+                    cslFieldToBibField("container-title", StandardField.JOURNALTITLE),
+                    cslFieldToBibField("issue", StandardField.NUMBER),
+                    cslFieldToBibField("page", StandardField.PAGES),
+                    cslFieldToBibField("volume", StandardField.VOLUME))),
+            cslTypeToBibType("article-magazine", Map.ofEntries(
+                    cslFieldToBibField("container-title", StandardField.JOURNALTITLE),
+                    cslFieldToBibField("issue", StandardField.NUMBER),
+                    cslFieldToBibField("page", StandardField.PAGES),
+                    cslFieldToBibField("volume", StandardField.VOLUME))),
+            cslTypeToBibType("article-newspaper", Map.ofEntries(
+                    cslFieldToBibField("container-title", StandardField.JOURNALTITLE),
+                    cslFieldToBibField("issue", StandardField.NUMBER),
+                    cslFieldToBibField("page", StandardField.PAGES),
+                    cslFieldToBibField("volume", StandardField.VOLUME))),
+            cslTypeToBibType("bill", Map.ofEntries(
+                    cslFieldToBibField("page", StandardField.PAGES))),
+            cslTypeToBibType("book", Map.ofEntries(
+                    cslFieldToBibField("collection-title", StandardField.SERIES),
+                    cslFieldToBibField("edition", StandardField.EDITION),
+                    cslFieldToBibField("ISBN", StandardField.ISBN),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER),
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
+                    cslFieldToBibField("volume", StandardField.VOLUME))),
+            cslTypeToBibType("broadcast", Map.ofEntries(
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+            cslTypeToBibType("chapter", Map.ofEntries(
+                    cslFieldToBibField("collection-title", StandardField.SERIES),
+                    cslFieldToBibField("container-title", StandardField.JOURNALTITLE),
+                    cslFieldToBibField("edition", StandardField.EDITION),
+                    cslFieldToBibField("page", StandardField.PAGES),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER),
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
+                    cslFieldToBibField("volume", StandardField.VOLUME))),
+            cslTypeToBibType("dataset", Map.ofEntries(
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+            cslTypeToBibType("entry-dictionary", Map.ofEntries(
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+            cslTypeToBibType("entry-encyclopedia", Map.ofEntries(
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+            cslTypeToBibType("graphic", Map.ofEntries(
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+            cslTypeToBibType("hearing", Map.ofEntries(
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+            cslTypeToBibType("instantMessage", Map.ofEntries(
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+            cslTypeToBibType("interview", Map.ofEntries(
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+            cslTypeToBibType("legal_case", Map.ofEntries(
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+            cslTypeToBibType("legislation", Map.ofEntries(
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+            cslTypeToBibType("manuscript", Map.ofEntries(
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+            cslTypeToBibType("map", Map.ofEntries(
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+            cslTypeToBibType("motion_picture", Map.ofEntries(
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+            cslTypeToBibType("musical_score", Map.ofEntries(
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+            cslTypeToBibType("paper-conference", Map.ofEntries(
+                    cslFieldToBibField("collection-title", StandardField.SERIES),
+                    cslFieldToBibField("container-title", StandardField.JOURNALTITLE),
+                    cslFieldToBibField("volume", StandardField.VOLUME),
+                    cslFieldToBibField("event-place", StandardField.LOCATION),
+                    cslFieldToBibField("page", StandardField.PAGES),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+            cslTypeToBibType("patent", Map.ofEntries(
+                    cslFieldToBibField("number", StandardField.NUMBER))),
+            cslTypeToBibType("personal_communication", Map.ofEntries(
+                    cslFieldToBibField("event-place", StandardField.LOCATION))),
+            cslTypeToBibType("post-weblog", Map.ofEntries(
+                    cslFieldToBibField("publisher", StandardField.ORGANIZATION))),
+            cslTypeToBibType("report", Map.ofEntries(
+                    cslFieldToBibField("page", StandardField.PAGES),
+                    cslFieldToBibField("number", StandardField.NUMBER),
+                    cslFieldToBibField("publisher", StandardField.INSTITUTION),
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION))),
+            cslTypeToBibType("song", Map.ofEntries(
+                    cslFieldToBibField("event-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher", StandardField.ORGANIZATION))),
+            cslTypeToBibType("speech", Map.ofEntries(
+                    cslFieldToBibField("event-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher", StandardField.ORGANIZATION))),
+            cslTypeToBibType("thesis", Map.ofEntries(
+                    cslFieldToBibField("publisher", StandardField.INSTITUTION),
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION))),
+            cslTypeToBibType("webpage", Map.ofEntries(
+                    cslFieldToBibField("container-title", StandardField.JOURNALTITLE),
+                    cslFieldToBibField("URL", StandardField.URL)))
     );
 
     static Optional<EntryType> getEntryType(String zoteroItemType) {
@@ -201,11 +203,11 @@ class CSLItemTypeDefinitions {
         return fieldMappings;
     }
 
-    private static Map.Entry<String, StandardField> withField(String cslField, StandardField field) {
+    private static Map.Entry<String, StandardField> cslFieldToBibField(String cslField, StandardField field) {
         return Map.entry(cslField, field);
     }
 
-    private static Map.Entry<String, Map<String, StandardField>> override(String cslType, Map<String, StandardField> fields) {
+    private static Map.Entry<String, Map<String, StandardField>> cslTypeToBibType(String cslType, Map<String, StandardField> fields) {
         return Map.entry(cslType, fields);
     }
 }
