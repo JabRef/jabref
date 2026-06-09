@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.chatting.ChatModel;
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.importer.FetcherException;
@@ -28,13 +29,13 @@ public class AllCitationFetcher implements CitationFetcher {
     private final List<CitationFetcher> fetchers;
     private final char keywordSeparator;
 
-    public AllCitationFetcher(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences, CitationKeyPatternPreferences citationKeyPatternPreferences, GrobidPreferences grobidPreferences, AiService aiService) {
+    public AllCitationFetcher(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences, CitationKeyPatternPreferences citationKeyPatternPreferences, GrobidPreferences grobidPreferences, AiPreferences aiPreferences, ChatModel chatModel) {
         List<CitationFetcher> providers = new ArrayList<>();
         for (CitationFetcherType type : CitationFetcherType.values()) {
             if (type == CitationFetcherType.ALL) {
                 continue;
             }
-            providers.add(CitationFetcherType.getCitationFetcher(type, importerPreferences, importFormatPreferences, citationKeyPatternPreferences, grobidPreferences, aiService));
+            providers.add(CitationFetcherType.getCitationFetcher(type, importerPreferences, importFormatPreferences, citationKeyPatternPreferences, grobidPreferences, aiPreferences, chatModel));
         }
         this.fetchers = List.copyOf(providers);
         this.keywordSeparator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator();

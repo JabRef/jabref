@@ -14,6 +14,7 @@ import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.importer.AuthorListParser;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// This is an immutable class representing information of either <CODE>author</CODE> or <CODE>editor</CODE> field in bibtex record.
 ///
@@ -119,8 +120,9 @@ import org.jspecify.annotations.NonNull;
 public class AuthorList implements Iterable<Author> {
 
     private static final Map<String, AuthorList> AUTHOR_CACHE = Collections.synchronizedMap(new WeakHashMap<>());
+
     private final List<Author> authors;
-    private AuthorList latexFreeAuthors;
+    @Nullable private AuthorList latexFreeAuthors;
 
     /// Creates a new list of authors.
     ///
@@ -141,7 +143,7 @@ public class AuthorList implements Iterable<Author> {
     }
 
     public static Collector<Author, ?, AuthorList> collect() {
-        return Collectors.collectingAndThen(Collectors.toUnmodifiableList(), AuthorList::new);
+        return Collectors.collectingAndThen(Collectors.toList(), AuthorList::new);
     }
 
     private static String andCoordinatedConjunction(List<Author> authors, Function<Author, String> style, boolean oxfordComma) {

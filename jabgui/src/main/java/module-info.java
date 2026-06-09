@@ -168,7 +168,7 @@ open module org.jabref {
     // uses org.eclipse.jgit.transport.SshSessionFactory;
     // uses org.eclipse.jgit.lib.Signer;
 
-    requires transitive org.jspecify;
+    requires org.jspecify;
 
     // region: other libraries (alphabetically)
     // requires cuid;

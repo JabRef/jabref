@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.model.study.Study;
-import org.jabref.model.study.StudyDatabase;
+import org.jabref.model.study.StudyCatalog;
 import org.jabref.model.study.StudyQuery;
 
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ class SearchRxivExporterTest {
                 "Test Study",
                 List.of("What is AI?"),
                 List.of(new StudyQuery("artificial intelligence AND health")),
-                List.of(new StudyDatabase("IEEE", true)));
+                List.of(new StudyCatalog("IEEE", true)));
     }
 
     @Test
@@ -69,8 +69,8 @@ class SearchRxivExporterTest {
                 "Test Study",
                 List.of("What is AI?"),
                 List.of(new StudyQuery("machine learning")),
-                List.of(new StudyDatabase("IEEE", true),
-                        new StudyDatabase("ACM", true)));
+                List.of(new StudyCatalog("IEEE", true),
+                        new StudyCatalog("ACM", true)));
 
         exporter.export(study, tempDir);
 
@@ -91,7 +91,7 @@ class SearchRxivExporterTest {
                 "Test Study",
                 List.of("What is AI?"),
                 List.of(new StudyQuery(query)),
-                List.of(new StudyDatabase(database, true)));
+                List.of(new StudyCatalog(database, true)));
 
         exporter.export(study, tempDir);
 

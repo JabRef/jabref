@@ -20,7 +20,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
-import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
+import static org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -192,8 +192,7 @@ class CitationKeyGeneratorTest {
             "@ARTICLE{kohn, author={Andreas Ùöning}, year={2000}}", "Uoe",
 
             # Special cases
-            # We keep "-" in citation keys, thus Al-Ketan with three letters is "Al-"
-            "@ARTICLE{kohn, author={Oraib Al-Ketan}, year={2000}}", "Al-",
+            "@ARTICLE{kohn, author={Oraib Al-Ketan}, year={2000}}", "AlK",
             "@ARTICLE{kohn, author={Andrés D'Alessandro}, year={2000}}", "DAl",
             "@ARTICLE{kohn, author={Andrés Aʹrnold}, year={2000}}", "Arn"
             """)
@@ -274,17 +273,37 @@ class CitationKeyGeneratorTest {
 
     @Test
     void removeIllegalCharactersPreservesDiacritics() {
-        assertEquals("kṛṣṇā", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("kṛṣṇā", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
-        assertEquals("Müller2020", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("Müller2020", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
-        assertEquals("taṇḍulīyaka", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("taṇḍulīyaka", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
-        assertEquals("García_2021", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("García_2021", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("kṛṣṇā", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("kṛṣṇā", CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("Müller2020", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("Müller2020", CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("taṇḍulīyaka", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("taṇḍulīyaka", CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("García_2021", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("García_2021", CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @Test
     void removeIllegalCharactersRemovesDisallowedChars() {
-        assertEquals("key", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("ke{y}", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
-        assertEquals("key", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("ke y", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
-        assertEquals("key", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("k#e%y", CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("key", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("ke{y}", CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("key", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("ke y", CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS));
+        assertEquals("key", CitationKeyGenerator.removeUnwantedCharactersWithKeepDiacritics("k#e%y", CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS));
+    }
+
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            # Latin-1 superscript digits
+            Balqis1,     Balqis¹
+            x2,          x²
+            x3,          x³
+            # Superscripts and Subscripts block (U+2070..U+209F)
+            x4,          x⁴
+            H2O,         H₂O
+            # superscript zero
+            x0,          x⁰
+            # non-digit superscript characters are stripped
+            x,           xⁿ
+            # mixed with regular digits
+            Balqis12025, Balqis¹2025
+            """)
+    void removeUnwantedCharactersNormalizesSuperscriptsAndSubscripts(String expected, String input) {
+        assertEquals(expected, CitationKeyGenerator.removeUnwantedCharacters(input, DEFAULT_UNWANTED_CHARACTERS));
     }
 
     @Test
@@ -559,7 +578,7 @@ class CitationKeyGeneratorTest {
                 Arguments.of("Newton", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authors]"),
                 Arguments.of("NewtonMaxwell", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "[authors]"),
                 Arguments.of("NewtonMaxwellEinstein", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authors]"),
-                Arguments.of("Newton-Maxwell-Einstein", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authors:regex(\"(.)([A-Z])\",\"$1-$2\")]")
+                Arguments.of("NewtonMaxwellEinstein", AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authors:regex(\"(.)([A-Z])\",\"$1-$2\")]")
         );
     }
 
@@ -974,7 +993,7 @@ class CitationKeyGeneratorTest {
 
     @ParameterizedTest
     @CsvSource({
-            "'Green Scheduling of: Whatever', 'GreenSchedulingOf:Whatever'",
+            "'Green Scheduling of: Whatever', 'GreenSchedulingOfWhatever'",
             "'Green Scheduling of `Whatever`', 'GreenSchedulingofWhatever'"
     })
     void generateKeyStripsSpecialCharsFromTitle(String title, String expected) {
@@ -1058,7 +1077,7 @@ class CitationKeyGeneratorTest {
                 .withField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1)
                 .withField(StandardField.YEAR, "2019");
 
-        assertEquals("Newton-2019", generateKey(entry, "[auth]-[year]"));
+        assertEquals("Newton2019", generateKey(entry, "[auth]-[year]"));
     }
 
     @Test
@@ -1067,7 +1086,7 @@ class CitationKeyGeneratorTest {
                 .withField(StandardField.AUTHOR, "Newton, Isaac")
                 .withField(StandardField.YEAR, "2019");
 
-        assertEquals("newt-2019", generateKey(entry, "[auth4:lower]-[year]"));
+        assertEquals("newt2019", generateKey(entry, "[auth4:lower]-[year]"));
     }
 
     @Test

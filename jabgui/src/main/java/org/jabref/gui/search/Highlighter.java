@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.search.query.SearchQueryConversion;
+import org.jabref.logic.search.sqlbased.PostgreServer;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchQueryNode;

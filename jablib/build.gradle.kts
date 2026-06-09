@@ -19,7 +19,7 @@ plugins {
     id("dev.jbang") version "0.4.0"
 
     id("net.ltgt.errorprone") version "5.1.0"
-    id("net.ltgt.nullaway") version "3.0.0"
+    id("net.ltgt.nullaway") version "3.1.0"
 }
 
 testModuleInfo {
@@ -45,6 +45,8 @@ testModuleInfo {
 
     requires("org.xmlunit")
     requires("org.xmlunit.matchers")
+
+	requires("com.fasterxml.jackson.databind")
 
     requires("com.tngtech.archunit")
     requires("com.tngtech.archunit.junit5.api")
@@ -278,7 +280,7 @@ tasks.test {
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
     testLogging {
-        showStandardStreams = true
+        showStandardStreams = false
     }
 }
 
