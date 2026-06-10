@@ -16,6 +16,7 @@ import java.util.Set;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.FileUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +56,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     /// The file to which writes are redirected to.
     private final Path temporaryFile;
 
-    private FileLock temporaryFileLock;
+    @Nullable private FileLock temporaryFileLock;
 
     /// A backup of the target file (if it exists), created when the stream is closed
     private final Path backupFile;
@@ -122,7 +123,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     /// Overridden because of cleanup actions in case of an error
     @Override
-    public void write(byte b[], int off, int len) throws IOException {
+    public void write(byte[] b, int off, int len) throws IOException {
         try {
             out.write(b, off, len);
         } catch (IOException exception) {
