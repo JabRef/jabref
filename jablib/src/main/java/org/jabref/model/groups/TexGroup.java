@@ -17,6 +17,7 @@ import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,11 +27,12 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(TexGroup.class);
 
     private final Path filePath;
-    private Set<String> keysUsedInAux;
     private final FileUpdateMonitor fileMonitor;
     private final AuxParser auxParser;
     private final MetaData metaData;
     private final String user;
+
+    @Nullable private Set<String> keysUsedInAux;
 
     TexGroup(String name,
              GroupHierarchyType context,
