@@ -49,7 +49,7 @@ public final class IkonliIcon implements JabRefIcon {
     }
 
     private IkonliIcon(List<Ikon> icons, Optional<Color> color, Optional<Integer> size) {
-        this.icons = icons;
+        this.icons = List.copyOf(icons);
         this.color = color;
         this.size = size;
     }
