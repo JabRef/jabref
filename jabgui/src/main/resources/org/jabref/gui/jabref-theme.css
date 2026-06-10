@@ -2436,3 +2436,18 @@ journalInfo .grid-cell-b {
     -fx-padding: 10px;
     -fx-background-color: -fx-background;
 }
+.small-text {
+    -fx-font-size: 0.75em;
+}
+
+.delete-file-dialog-header {
+    -fx-padding: 10px;
+}
+
+.linked-files-info {
+    -fx-padding: 0.5em 0 0.5em 0;
+}
+
+.welcome-scroll-pane {
+    -fx-background-color: transparent;
+}
