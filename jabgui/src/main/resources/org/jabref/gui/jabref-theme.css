@@ -657,6 +657,18 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0;
 }
 
+.padding-medium {
+    -fx-padding: 1em;
+}
+
+.padding-left-medium {
+    -fx-padding: 0em 0em 0em 1em;
+}
+
+.padding-large {
+    -fx-padding: 20 30 20 30;
+}
+
 .align-center-right {
     -fx-alignment: CENTER-RIGHT;
 }

@@ -41,7 +41,7 @@
     <TabPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
              AnchorPane.topAnchor="0.0">
         <Tab text="Buttons">
-            <GridPane hgap="32" style="-fx-padding: 20 30 20 30;" vgap="16">
+            <GridPane hgap="32" styleClass="padding-large" vgap="16">
                 <Label GridPane.columnIndex="0" GridPane.columnSpan="6" GridPane.rowIndex="0">Normal buttons:</Label>
                 <Button text="Normal" GridPane.columnIndex="0" GridPane.rowIndex="1">
                     <graphic>
@@ -182,9 +182,9 @@
             </GridPane>
         </Tab>
         <Tab text="Switches">
-            <VBox spacing="10" style="-fx-padding: 1em">
+            <VBox spacing="10" styleClass="padding-medium">
                 <Label text="Checkboxes"/>
-                <VBox spacing="15" style="-fx-padding: 0em 0em 0em 1em">
+                <VBox spacing="15" styleClass="padding-left-medium">
                     <CheckBox text="Unchecked"/>
                     <CheckBox selected="true" text="Checked"/>
                     <CheckBox disable="true" text="Unchecked disabled"/>
@@ -195,7 +195,7 @@
                         <Insets top="20.0"/>
                     </VBox.margin>
                 </Label>
-                <VBox spacing="15" style="-fx-padding: 0em 0em 0em 1em">
+                <VBox spacing="15" styleClass="padding-left-medium">
                     <RadioButton text="Unchecked"/>
                     <RadioButton selected="true" text="Checked"/>
                     <RadioButton disable="true" text="Unchecked disabled"/>
