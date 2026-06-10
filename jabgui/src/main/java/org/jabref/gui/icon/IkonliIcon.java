@@ -8,7 +8,6 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
@@ -20,8 +19,8 @@ import org.kordamp.ikonli.IkonProvider;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 /// {@link JabRefIcon} backed by an <a href="https://kordamp.org/ikonli/">Ikonli</a> font glyph, rendered as a
-/// {@link FontIcon}. The font-backed counterpart to {@link SvgIcon}; unlike SVG icons it exposes its underlying
-/// {@link Ikon} via {@link #getIkon()}. Immutable: {@link #withColor} and {@link #withSize} return copies.
+/// {@link FontIcon}. The font-backed counterpart to {@link SvgIcon}. Immutable: {@link #withColor} and
+/// {@link #withSize} return copies.
 public final class IkonliIcon implements JabRefIcon {
 
     /// All {@link Ikon} values discovered via the {@link IkonProvider} service loader, used by {@link #findIcon}.
@@ -31,7 +30,6 @@ public final class IkonliIcon implements JabRefIcon {
     private final List<Ikon> icons;
     private final Optional<Color> color;
     private final Optional<Integer> size;
-    private final String unicode;
 
     public IkonliIcon(Ikon... icons) {
         this(Arrays.asList(icons), Optional.empty(), Optional.empty());
@@ -53,7 +51,6 @@ public final class IkonliIcon implements JabRefIcon {
         this.icons = icons;
         this.color = color;
         this.size = size;
-        this.unicode = icons.stream().map(Ikon::getCode).map(String::valueOf).collect(Collectors.joining());
     }
 
     /// Finds the Ikonli icon whose name matches {@code code} (case-insensitive), tinted with {@code color}.
@@ -111,13 +108,5 @@ public final class IkonliIcon implements JabRefIcon {
     @Override
     public String name() {
         return icons.getFirst().toString();
-    }
-
-    public String getCode() {
-        return this.unicode;
-    }
-
-    public Ikon getIkon() {
-        return icons.getFirst();
     }
 }

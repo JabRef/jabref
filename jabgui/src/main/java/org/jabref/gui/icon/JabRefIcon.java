@@ -5,8 +5,7 @@ import javafx.scene.paint.Color;
 
 /// Library-agnostic icon contract, with two parallel implementations: {@link IkonliIcon} (backed by an Ikonli
 /// font glyph) and {@link SvgIcon} (backed by an SVG path). The {@link IconTheme.JabRefIcons} enum is a third
-/// implementation that delegates to one of those two per glyph. Ikonli-specific access ({@code getIkon()}) lives
-/// only on {@link IkonliIcon}, not here, so non-Ikonli sources can implement this interface.
+/// implementation that delegates to one of those two per glyph.
 public sealed interface JabRefIcon permits IconTheme.JabRefIcons, IkonliIcon, SvgIcon {
 
     Node getGraphicNode();
