@@ -35,7 +35,7 @@ public class KeywordsEditor extends TagsEditor {
                 field,
                 suggestionProvider,
                 fieldCheckers,
-                preferences,
+                preferences.getBibEntryPreferences(),
                 undoManager);
 
         setupTagsField(

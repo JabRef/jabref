@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.entryeditor;
 
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -264,7 +265,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     }
 
     private void downloadMscCodes() {
-        var mscMvFile = Directories.getMscDirectory().resolve(MscCodeLoader.MSC_FILE_NAME);
+        Path mscMvFile = Directories.getMscDirectory().resolve(MscCodeLoader.MSC_FILE_NAME);
         if (MscCodeLoader.isMvStoreAvailableWithData(mscMvFile)) {
             return;
         }
