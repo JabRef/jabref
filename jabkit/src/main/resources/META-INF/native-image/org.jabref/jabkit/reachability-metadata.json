@@ -174,7 +174,7 @@
       "type": "org.jabref.toolkit.commands.CheckConsistency",
       "fields": [
         {
-          "name": "jabKit"
+          "name": "check"
         },
         {
           "name": "sharedOptions"
@@ -197,7 +197,7 @@
       "type": "org.jabref.toolkit.commands.CheckIntegrity",
       "fields": [
         {
-          "name": "jabKit"
+          "name": "check"
         },
         {
           "name": "sharedOptions"
@@ -241,6 +241,9 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
         }
       ],
       "methods": [
@@ -292,6 +295,9 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
         }
       ],
       "methods": [
@@ -309,6 +315,9 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
         }
       ],
       "methods": [
@@ -433,6 +442,9 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
         }
       ],
       "methods": [
@@ -509,6 +521,9 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
         }
       ],
       "methods": [
@@ -526,6 +541,9 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
         }
       ],
       "methods": [
