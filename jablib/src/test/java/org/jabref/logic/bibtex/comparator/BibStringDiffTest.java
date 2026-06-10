@@ -36,22 +36,21 @@ class BibStringDiffTest {
 
     @Test
     void equalTest() {
-        BibStringDiff other = new BibStringDiff(diff.getOriginalString(), diff.getNewString());
+        BibStringDiff other = new BibStringDiff(diff.getOriginalString().orElse(null), diff.getNewString().orElse(null));
         assertEquals(diff, other);
         assertEquals(diff.hashCode(), other.hashCode());
     }
 
     @Test
     void notEqualTest() {
-        BibStringDiff other = new BibStringDiff(diff.getNewString(), diff.getOriginalString());
+        BibStringDiff other = new BibStringDiff(diff.getNewString().orElse(null), diff.getOriginalString().orElse(null));
         assertNotEquals(diff, other);
         assertNotEquals(diff.hashCode(), other.hashCode());
     }
 
     @Test
     void identicalObjectsAreEqual() {
-        BibStringDiff other = diff;
-        assertEquals(other, diff);
+        assertEquals(diff, diff);
     }
 
     @Test

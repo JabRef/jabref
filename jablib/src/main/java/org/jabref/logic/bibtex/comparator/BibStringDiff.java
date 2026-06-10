@@ -11,12 +11,14 @@ import java.util.Set;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibtexString;
 
+import org.jspecify.annotations.Nullable;
+
 public class BibStringDiff {
 
-    private final BibtexString originalString;
-    private final BibtexString newString;
+    @Nullable private final BibtexString originalString;
+    @Nullable private final BibtexString newString;
 
-    BibStringDiff(BibtexString originalString, BibtexString newString) {
+    BibStringDiff(@Nullable BibtexString originalString, @Nullable BibtexString newString) {
         this.originalString = originalString;
         this.newString = newString;
     }
@@ -80,12 +82,12 @@ public class BibStringDiff {
         return differences;
     }
 
-    public BibtexString getOriginalString() {
-        return originalString;
+    public Optional<BibtexString> getOriginalString() {
+        return Optional.ofNullable(originalString);
     }
 
-    public BibtexString getNewString() {
-        return newString;
+    public Optional<BibtexString> getNewString() {
+        return Optional.ofNullable(newString);
     }
 
     @Override
