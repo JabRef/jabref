@@ -8,6 +8,4 @@ parent: Requirements
 
 Workflows that run in `pull_request_target` context must not write attacker-controlled pull request content to `GITHUB_OUTPUT` with a fixed delimiter, and must not pass untrusted PR metadata into privileged shell commands without validation and quoting.
 
-Needs: impl
-
 <!-- markdownlint-disable-file MD022 -->
