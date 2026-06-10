@@ -33,8 +33,6 @@ class CSLItemTypeDefinitions {
             Map.entry("chapter", StandardEntryType.InCollection),
             // Dataset
             Map.entry("dataset", StandardEntryType.Dataset),
-            // document, attachment, note
-            Map.entry("document", StandardEntryType.InReference),
             // Dictionary Entry
             Map.entry("entry-dictionary", StandardEntryType.InReference),
             // Encyclopedia Article
@@ -81,67 +79,103 @@ class CSLItemTypeDefinitions {
             Map.entry("webpage", StandardEntryType.Online)
     );
 
+    /// Fields that each entry contains
+    /// `Author` and `Date` are processed in `ZoteroCitationMarkParser`
     private static final Map<String, StandardField> COMMON_FIELDS = Map.ofEntries(
             cslFieldToBibField("title", StandardField.TITLE),
-            cslFieldToBibField("DOI", StandardField.DOI)
+            cslFieldToBibField("DOI", StandardField.DOI),
+            cslFieldToBibField("note", StandardField.NOTE)
     );
 
     private static final Map<String, Map<String, StandardField>> CSL2BIB_FIELDS = Map.ofEntries(
             cslTypeToBibType("article", Map.ofEntries(
                     cslFieldToBibField("container-title", StandardField.JOURNALTITLE),
-                    cslFieldToBibField("issue", StandardField.NUMBER),
+                    cslFieldToBibField("issue", StandardField.ISSUE),
                     cslFieldToBibField("page", StandardField.PAGES),
+                    cslFieldToBibField("ISSN", StandardField.ISSN),
                     cslFieldToBibField("volume", StandardField.VOLUME))),
+
             cslTypeToBibType("article-journal", Map.ofEntries(
                     cslFieldToBibField("container-title", StandardField.JOURNALTITLE),
-                    cslFieldToBibField("issue", StandardField.NUMBER),
+                    cslFieldToBibField("issue", StandardField.ISSUE),
                     cslFieldToBibField("page", StandardField.PAGES),
+                    cslFieldToBibField("ISSN", StandardField.ISSN),
                     cslFieldToBibField("volume", StandardField.VOLUME))),
+
             cslTypeToBibType("article-magazine", Map.ofEntries(
                     cslFieldToBibField("container-title", StandardField.JOURNALTITLE),
-                    cslFieldToBibField("issue", StandardField.NUMBER),
+                    cslFieldToBibField("issue", StandardField.ISSUE),
                     cslFieldToBibField("page", StandardField.PAGES),
+                    cslFieldToBibField("ISSN", StandardField.ISSN),
                     cslFieldToBibField("volume", StandardField.VOLUME))),
+
             cslTypeToBibType("article-newspaper", Map.ofEntries(
                     cslFieldToBibField("container-title", StandardField.JOURNALTITLE),
-                    cslFieldToBibField("issue", StandardField.NUMBER),
+                    cslFieldToBibField("issue", StandardField.ISSUE),
                     cslFieldToBibField("page", StandardField.PAGES),
+                    cslFieldToBibField("ISSN", StandardField.ISSN),
                     cslFieldToBibField("volume", StandardField.VOLUME))),
+
             cslTypeToBibType("bill", Map.ofEntries(
+                    cslFieldToBibField("volume", StandardField.VOLUME),
                     cslFieldToBibField("page", StandardField.PAGES))),
+
             cslTypeToBibType("book", Map.ofEntries(
-                    cslFieldToBibField("collection-title", StandardField.SERIES),
                     cslFieldToBibField("edition", StandardField.EDITION),
-                    cslFieldToBibField("ISBN", StandardField.ISBN),
-                    cslFieldToBibField("publisher", StandardField.PUBLISHER),
+                    cslFieldToBibField("volume", StandardField.VOLUME),
+                    cslFieldToBibField("collection-title", StandardField.SERIES),
                     cslFieldToBibField("publisher-place", StandardField.LOCATION),
-                    cslFieldToBibField("volume", StandardField.VOLUME))),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER),
+                    cslFieldToBibField("page", StandardField.PAGES),
+                    cslFieldToBibField("ISBN", StandardField.ISBN),
+                    cslFieldToBibField("URL", StandardField.URL),
+                    cslFieldToBibField("ISSN", StandardField.ISSN))),
+
             cslTypeToBibType("broadcast", Map.ofEntries(
                     cslFieldToBibField("publisher-place", StandardField.LOCATION),
                     cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+            // author -> creator
+
             cslTypeToBibType("chapter", Map.ofEntries(
-                    cslFieldToBibField("collection-title", StandardField.SERIES),
-                    cslFieldToBibField("container-title", StandardField.JOURNALTITLE),
+                    cslFieldToBibField("container-title", StandardField.BOOKTITLE),
                     cslFieldToBibField("edition", StandardField.EDITION),
-                    cslFieldToBibField("page", StandardField.PAGES),
-                    cslFieldToBibField("publisher", StandardField.PUBLISHER),
+                    cslFieldToBibField("volume", StandardField.VOLUME),
+                    cslFieldToBibField("collection-title", StandardField.SERIES),
                     cslFieldToBibField("publisher-place", StandardField.LOCATION),
-                    cslFieldToBibField("volume", StandardField.VOLUME))),
+                    cslFieldToBibField("ISBN", StandardField.ISBN),
+                    cslFieldToBibField("ISSN", StandardField.ISSN),
+                    cslFieldToBibField("URL", StandardField.URL),
+                    cslFieldToBibField("page", StandardField.PAGES),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+
             cslTypeToBibType("dataset", Map.ofEntries(
                     cslFieldToBibField("publisher-place", StandardField.LOCATION),
                     cslFieldToBibField("publisher", StandardField.PUBLISHER))),
-            cslTypeToBibType("document", Map.ofEntries(
-                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
-                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+
             cslTypeToBibType("entry-dictionary", Map.ofEntries(
+                    cslFieldToBibField("collection-title", StandardField.SERIES),
+                    cslFieldToBibField("volume", StandardField.VOLUME),
+                    cslFieldToBibField("edition", StandardField.EDITION),
+                    cslFieldToBibField("URL", StandardField.URL),
                     cslFieldToBibField("publisher-place", StandardField.LOCATION),
-                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER),
+                    cslFieldToBibField("page", StandardField.PAGES),
+                    cslFieldToBibField("ISBN", StandardField.ISBN))),
+
             cslTypeToBibType("entry-encyclopedia", Map.ofEntries(
+                    cslFieldToBibField("collection-title", StandardField.SERIES),
+                    cslFieldToBibField("volume", StandardField.VOLUME),
+                    cslFieldToBibField("edition", StandardField.EDITION),
+                    cslFieldToBibField("URL", StandardField.URL),
                     cslFieldToBibField("publisher-place", StandardField.LOCATION),
-                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER),
+                    cslFieldToBibField("page", StandardField.PAGES),
+                    cslFieldToBibField("ISBN", StandardField.ISBN))),
+
             cslTypeToBibType("graphic", Map.ofEntries(
                     cslFieldToBibField("publisher-place", StandardField.LOCATION),
                     cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+
             cslTypeToBibType("hearing", Map.ofEntries(
                     cslFieldToBibField("publisher-place", StandardField.LOCATION),
                     cslFieldToBibField("publisher", StandardField.PUBLISHER))),
