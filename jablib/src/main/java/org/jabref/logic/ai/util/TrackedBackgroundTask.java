@@ -38,6 +38,7 @@ public abstract class TrackedBackgroundTask<V> extends BackgroundTask<V> {
     }
 
     /// Returns null if canceled.
+    @Override
     public @Nullable V call() throws Exception {
         try {
             status.set(Status.PROCESSING);

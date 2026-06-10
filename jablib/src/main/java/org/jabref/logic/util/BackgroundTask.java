@@ -84,7 +84,7 @@ public abstract class BackgroundTask<V> {
         };
     }
 
-    private static <T> Consumer<T> chain(@Nullable Runnable first, @Nullable Consumer<T> second) {
+    private static <T> Consumer<T> chain(@Nullable Runnable first, Consumer<T> second) {
         if (first != null) {
             if (second != null) {
                 return result -> {
@@ -92,7 +92,7 @@ public abstract class BackgroundTask<V> {
                     second.accept(result);
                 };
             } else {
-                return result -> first.run();
+                return _ -> first.run();
             }
         } else {
             return second;

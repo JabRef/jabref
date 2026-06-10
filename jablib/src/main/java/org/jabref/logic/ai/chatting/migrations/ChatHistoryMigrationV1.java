@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.jabref.logic.ai.chatting.repositories.ChatHistoryRepository;
@@ -30,6 +31,7 @@ import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.h2.mvstore.WriteBuffer;
 import org.h2.mvstore.type.BasicDataType;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,10 +90,10 @@ public final class ChatHistoryMigrationV1 {
 
         String libraryId = bibDatabaseContext.getMetaData().getAiLibraryId().get();
 
-        Path oldFilePath = Directories.getAiFilesDirectory()
-                                      .getParent()
-                                      .resolve("1")
-                                      .resolve(OLD_CHAT_HISTORY_FILE_NAME);
+        Path oldFilePath = Objects.requireNonNull(Directories.getAiFilesDirectory()
+                                                             .getParent())
+                                  .resolve("1")
+                                  .resolve(OLD_CHAT_HISTORY_FILE_NAME);
 
         migrate(oldFilePath, libraryId, bibDatabaseContext, repository, notificationService);
     }
@@ -263,7 +265,7 @@ public final class ChatHistoryMigrationV1 {
 
     /// Deserializes old ChatHistoryRecord bytes using a remapping ObjectInputStream.
     /// Remaps the deleted inner class name to the current {@link ChatHistoryRecord}.
-    private static ChatHistoryRecord deserializeOldRecord(byte[] data) {
+    private static @Nullable ChatHistoryRecord deserializeOldRecord(byte[] data) {
         try (ClassRemappingObjectInputStream ois = new ClassRemappingObjectInputStream(
                 new java.io.ByteArrayInputStream(data))) {
             Object obj = ois.readObject();

@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.ai.summarization.repositories.SummariesRepository;
@@ -83,10 +84,10 @@ public final class SummariesMigrationV1 {
         String libraryId = bibDatabaseContext.getMetaData().getAiLibraryId().get();
         Path bibDatabasePath = bibDatabaseContext.getDatabasePath().get();
 
-        Path oldFilePath = Directories.getAiFilesDirectory()
-                                      .getParent()  // Go from ai/2/ to ai/
-                                      .resolve("1")  // Go to ai/1/
-                                      .resolve(OLD_SUMMARIES_FILE_NAME);
+        Path oldFilePath = Objects.requireNonNull(Directories.getAiFilesDirectory()
+                                                             .getParent())  // Go from ai/2/ to ai/
+                                  .resolve("1")  // Go to ai/1/
+                                  .resolve(OLD_SUMMARIES_FILE_NAME);
 
         migrate(oldFilePath, libraryId, bibDatabasePath, repository, notificationService);
     }

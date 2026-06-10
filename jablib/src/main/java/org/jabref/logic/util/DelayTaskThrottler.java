@@ -1,6 +1,6 @@
 package org.jabref.logic.util;
 
-import java.util.concurrent.Callable;
+import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -34,7 +34,7 @@ public class DelayTaskThrottler {
         this.executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
     }
 
-    public ScheduledFuture<?> schedule(Runnable command) {
+    public Optional<ScheduledFuture<?>> schedule(Runnable command) {
         if (scheduledTask != null) {
             cancel();
         }
@@ -43,19 +43,7 @@ public class DelayTaskThrottler {
         } catch (RejectedExecutionException e) {
             LOGGER.debug("Rejecting while another process is already running.");
         }
-        return scheduledTask;
-    }
-
-    public <T> ScheduledFuture<?> scheduleTask(Callable<?> command) {
-        if (scheduledTask != null) {
-            cancel();
-        }
-        try {
-            scheduledTask = executor.schedule(command, delay, TimeUnit.MILLISECONDS);
-        } catch (RejectedExecutionException e) {
-            LOGGER.debug("Rejecting while another process is already running.");
-        }
-        return scheduledTask;
+        return Optional.ofNullable(scheduledTask);
     }
 
     /// Execute scheduled Runnable early

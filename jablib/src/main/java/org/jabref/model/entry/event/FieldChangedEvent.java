@@ -57,7 +57,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
 
     private int computeMajorCharacterChange(@Nullable String oldValue, @Nullable String newValue) {
         // Objects.equals first checks '=='
-        if (Objects.equals(oldValue, newValue)) {
+        if ((oldValue == null && newValue == null) || Objects.equals(oldValue, newValue)) {
             return 0;
         } else if (oldValue == null) {
             return newValue.length();
