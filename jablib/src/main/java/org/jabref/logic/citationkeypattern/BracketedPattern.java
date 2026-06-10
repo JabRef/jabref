@@ -125,7 +125,11 @@ public class BracketedPattern {
         }
     }
 
-    private final String pattern;
+    @Nullable private final String pattern;
+
+    public BracketedPattern() {
+        this.pattern = null;
+    }
 
     public BracketedPattern(String pattern) {
         this.pattern = pattern;

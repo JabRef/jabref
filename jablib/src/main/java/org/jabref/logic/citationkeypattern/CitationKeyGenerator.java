@@ -18,6 +18,7 @@ import org.jabref.model.entry.types.EntryType;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,7 +159,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     /// @param key    the new key
     /// @param oldKey the old key
     /// @return a key, if needed, with an appended letter
-    private String appendLettersToKey(String key, String oldKey) {
+    private String appendLettersToKey(String key, @Nullable String oldKey) {
         long occurrences = database.getNumberOfCitationKeyOccurrences(key);
 
         if ((occurrences > 0) && Objects.equals(oldKey, key)) {
