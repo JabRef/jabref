@@ -361,8 +361,11 @@ public class BibDatabaseWriter {
     protected void writeString(BibtexString bibtexString, int maxKeyLength) throws IOException {
         // If the string has not been modified, write it back as it was
         if (!saveConfiguration.shouldReformatFile() && !bibtexString.hasChanged()) {
-            LOGGER.debug("Writing parsed serialization {}.", bibtexString.getParsedSerialization());
-            bibWriter.write(bibtexString.getParsedSerialization().orElse(null));
+            Optional<String> serialization = bibtexString.getParsedSerialization();
+            if (serialization.isPresent()) {
+                LOGGER.debug("Writing parsed serialization {}.", bibtexString.getParsedSerialization());
+                bibWriter.write(serialization.get());
+            }
             return;
         }
 
