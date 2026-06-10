@@ -137,12 +137,9 @@ public class JabKitLauncher {
             );
 
             String footerText = "";
-            // Skip format footers for check-consistency since formats are already documented in option description
-            if (!"check-consistency".equals(subCommand.getCommandSpec().name())) {
-                footerText += hasOptions.get("input") ? inputFooter : "";
-                footerText += hasOptions.get("output") ? outputFooter : "";
-                footerText += hasOptions.get("export") ? exportFooter : "";
-            }
+            footerText += hasOptions.get("input") ? inputFooter : "";
+            footerText += hasOptions.get("output") ? outputFooter : "";
+            footerText += hasOptions.get("export") ? exportFooter : "";
             subCommand.getCommandSpec().usageMessage().footer(footerText);
         });
 
@@ -216,6 +213,6 @@ public class JabKitLauncher {
     }
 
     private static void configureSSL(SSLPreferences sslPreferences) {
-        TrustStoreManager.createTruststoreFileIfNotExist(Path.of(sslPreferences.getTruststorePath()));
+        TrustStoreManager.createTruststoreFileIfNotExist(sslPreferences.getTruststorePath());
     }
 }

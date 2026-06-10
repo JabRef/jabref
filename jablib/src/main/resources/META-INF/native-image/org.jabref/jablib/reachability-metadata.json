@@ -109,7 +109,7 @@
       "glob": "uk/ac/ed/ph/snuggletex/**"
     },
     {
-      "glob": "l10n/JabRef.properties"
+      "glob": "l10n/JabRef_en.properties"
     },
     {
       "glob": "msc_codes.json"
@@ -137,10 +137,6 @@
     {
       "module": "org.jabref.jablib",
       "glob": "journals/ltwa-list.mv"
-    },
-    {
-      "module": "org.jabref.jablib",
-      "glob": "l10n/JabRef.properties"
     },
     {
       "module": "org.jabref.jablib",

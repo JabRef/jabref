@@ -1,8 +1,8 @@
 plugins {
     id("org.jabref.gradle.module")
     id("org.jabref.gradle.feature.shadowjar")
+    id("org.jabref.gradle.feature.nativecompile")
     id("application")
-    id("org.graalvm.buildtools.native") version "0.11.1"
 }
 
 group = "org.jabref.jabkit"
@@ -16,7 +16,6 @@ testModuleInfo {
     requires("org.junit.jupiter.api")
     requires("org.junit.jupiter.params")
     requires("org.mockito")
-    requires("com.google.common")
 }
 
 tasks.withType<Test>().configureEach {
@@ -73,7 +72,7 @@ tasks.register<JavaExec>("runJabKitPortableSmokeTest") {
     classpath = sourceSets.main.get().runtimeClasspath
     jvmArgs(application.applicationDefaultJvmArgs)
     workingDir = file("src/test/resources")
-    args("--debug", "check-consistency", "--input=empty.bib")
+    args("--debug", "check", "consistency", "empty.bib")
 }
 
 graalvmNative {
@@ -81,12 +80,6 @@ graalvmNative {
         named("main") {
             imageName.set("jabkit")
             mainClass.set("org.jabref.toolkit.JabKitLauncher")
-            buildArgs.addAll(
-                "--no-fallback",
-                "-H:+ReportExceptionStackTraces",
-                "-H:IncludeLocales=en",
-                "-H:+EnableAllSecurityServices"
-            )
         }
     }
 }

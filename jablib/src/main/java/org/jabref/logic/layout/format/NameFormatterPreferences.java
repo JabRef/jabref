@@ -10,9 +10,25 @@ public class NameFormatterPreferences {
     private final ObservableList<String> nameFormatterKey;
     private final ObservableList<String> nameFormatterValue;
 
+    private NameFormatterPreferences() {
+        this(
+                List.of(), // Name formatter keys
+                List.of()  // Name formatter values
+        );
+    }
+
     public NameFormatterPreferences(List<String> nameFormatterKey, List<String> nameFormatterValue) {
         this.nameFormatterKey = FXCollections.observableArrayList(nameFormatterKey);
         this.nameFormatterValue = FXCollections.observableArrayList(nameFormatterValue);
+    }
+
+    public static NameFormatterPreferences getDefault() {
+        return new NameFormatterPreferences();
+    }
+
+    public void setAll(NameFormatterPreferences preferences) {
+        this.nameFormatterKey.setAll(preferences.getNameFormatterKey());
+        this.nameFormatterValue.setAll(preferences.getNameFormatterValue());
     }
 
     public ObservableList<String> getNameFormatterKey() {

@@ -1,0 +1,29 @@
+version: "2.0.0"
+authors:
+  - Donna Tartt
+  - Virginia Woolf
+title: TestStudyName
+research-questions:
+  - Question1
+  - Question2
+queries:
+  - query: Quantum
+    catalog-specific:
+      IEEEXplore: "(Document Title:Quantum)"
+      ACM Portal: "[Title: Quantum]"
+  - query: Cloud Computing
+  - query: '"Software Engineering"'
+catalogs:
+  - name: Springer
+    enabled: true
+    reason: Primary source
+  - name: ArXiv
+    enabled: true
+    reason: ""
+  - name: Medline/PubMed
+    enabled: true
+    reason: ""
+  - name: IEEEXplore
+    enabled: false
+    reason: ""
+

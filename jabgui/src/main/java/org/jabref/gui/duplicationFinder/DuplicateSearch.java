@@ -123,8 +123,6 @@ public class DuplicateSearch extends SimpleCommand {
         DuplicateSearchResult result = new DuplicateSearchResult();
 
         while (!libraryAnalyzed.get() || !duplicates.isEmpty()) {
-            duplicateProgress.set(duplicateProgress.getValue() + 1);
-
             List<BibEntry> dups;
             try {
                 // poll with timeout in case the library is not analyzed completely, but contains no more duplicates
@@ -152,6 +150,8 @@ public class DuplicateSearch extends SimpleCommand {
 
                 DuplicateResolverType resolverType = askAboutExact ? DuplicateResolverType.DUPLICATE_SEARCH_WITH_EXACT : DuplicateResolverType.DUPLICATE_SEARCH;
 
+                // Increment only when a pair is actually shown to the user
+                duplicateProgress.set(duplicateProgress.getValue() + 1);
                 UiTaskExecutor.runAndWaitInJavaFXThread(() -> askResolveStrategy(result, first, second, resolverType));
             }
         }
@@ -162,7 +162,7 @@ public class DuplicateSearch extends SimpleCommand {
     private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
         DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, stateManager, dialogService, preferences);
 
-        dialog.titleProperty().bind(Bindings.concat(dialog.getTitle()).concat(" (").concat(duplicateProgress.getValue()).concat("/").concat(duplicateTotal).concat(")"));
+        dialog.titleProperty().bind(Bindings.concat(dialog.getTitle()).concat(" (").concat(duplicateProgress).concat("/").concat(duplicateTotal).concat(")"));
 
         DuplicateResolverResult resolverResult;
 

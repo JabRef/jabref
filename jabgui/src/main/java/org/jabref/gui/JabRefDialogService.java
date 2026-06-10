@@ -35,15 +35,16 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.BaseWindow;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -541,11 +542,22 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public void showCustomWindow(BaseWindow window) {
-        if (window.getOwner() == null) {
-            window.initOwner(mainWindow);
+    public void showCustomDialogModal(BaseDialog<?> dialog) {
+        if (dialog.getOwner() == null) {
+            dialog.initOwner(mainWindow);
         }
-        window.show();
+
+        dialog.initModality(Modality.NONE);
+
+        // Using answer: <https://stackoverflow.com/a/36262208>.
+        Window dialogWindow = dialog.getDialogPane().getScene().getWindow();
+        // Using `addEventHandler` in case someone already used `setOnCloseRequest`.
+        dialogWindow.addEventHandler(
+                WindowEvent.WINDOW_CLOSE_REQUEST,
+                _ -> dialogWindow.hide()
+        );
+
+        dialog.show();
     }
 
     private String getContentByCode(int statusCode) {

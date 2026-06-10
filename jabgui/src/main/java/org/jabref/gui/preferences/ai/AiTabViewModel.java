@@ -1,9 +1,7 @@
 package org.jabref.gui.preferences.ai;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
@@ -21,28 +19,25 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
-import org.jabref.logic.ai.AiDefaultPreferences;
-import org.jabref.logic.ai.AiPreferences;
-import org.jabref.logic.ai.models.AiModelService;
-import org.jabref.logic.ai.models.FetchAiModelsBackgroundTask;
-import org.jabref.logic.ai.templates.AiTemplate;
+import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
+import org.jabref.logic.ai.preferences.AiDefaultExpertSettings;
+import org.jabref.logic.ai.preferences.AiDefaultTemplates;
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.LocalizedNumbers;
-import org.jabref.logic.util.OptionalObjectProperty;
-import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.LocalizedNumbersUtils;
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.model.ai.AiProvider;
-import org.jabref.model.ai.EmbeddingModel;
+import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
+import org.jabref.model.ai.llm.AiProvider;
+import org.jabref.model.ai.pipeline.AnswerEngineKind;
+import org.jabref.model.ai.summarization.SummarizatorKind;
+import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
-@NullMarked
 public class AiTabViewModel implements PreferenceTabViewModel {
     protected static SpinnerValueFactory<Integer> followUpQuestionsCountValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 5, 3);
 
@@ -53,8 +48,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty disableAutoGenerateEmbeddings = new SimpleBooleanProperty();
     private final BooleanProperty autoGenerateSummaries = new SimpleBooleanProperty();
     private final BooleanProperty disableAutoGenerateSummaries = new SimpleBooleanProperty();
-    private final BooleanProperty generateFollowUpQuestions = new SimpleBooleanProperty();
-    private final IntegerProperty followUpQuestionsCount = new SimpleIntegerProperty();
 
     private final ListProperty<AiProvider> aiProvidersList =
             new SimpleListProperty<>(FXCollections.observableArrayList(AiProvider.values()));
@@ -79,9 +72,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty customizeExpertSettings = new SimpleBooleanProperty();
 
-    private final ListProperty<EmbeddingModel> embeddingModelsList =
-            new SimpleListProperty<>(FXCollections.observableArrayList(EmbeddingModel.values()));
-    private final ObjectProperty<EmbeddingModel> selectedEmbeddingModel = new SimpleObjectProperty<>();
+    private final ListProperty<PredefinedEmbeddingModel> embeddingModelsList =
+            new SimpleListProperty<>(FXCollections.observableArrayList(PredefinedEmbeddingModel.values()));
+    private final ObjectProperty<PredefinedEmbeddingModel> selectedEmbeddingModel = new SimpleObjectProperty<>();
 
     private final StringProperty currentApiBaseUrl = new SimpleStringProperty();
     private final BooleanProperty disableApiBaseUrl = new SimpleBooleanProperty(true); // {@link HuggingFaceChatModel} and {@link GoogleAiGeminiChatModel} doesn't support setting API base URL
@@ -91,19 +84,29 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final StringProperty geminiApiBaseUrl = new SimpleStringProperty();
     private final StringProperty huggingFaceApiBaseUrl = new SimpleStringProperty();
 
-    private final Map<AiTemplate, StringProperty> templateSources = Map.of(
-            AiTemplate.CHATTING_SYSTEM_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.CHATTING_USER_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.CITATION_PARSING_USER_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.FOLLOW_UP_QUESTIONS, new SimpleStringProperty()
-    );
+    private final StringProperty chattingSystemMessageTemplate = new SimpleStringProperty();
+    private final StringProperty chattingUserMessageTemplate = new SimpleStringProperty();
+    private final StringProperty summarizationChunkSystemMessageTemplate = new SimpleStringProperty();
+    private final StringProperty summarizationCombineSystemMessageTemplate = new SimpleStringProperty();
+    private final StringProperty citationParsingSystemMessageTemplate = new SimpleStringProperty();
+    private final StringProperty summarizationFullDocumentSystemMessageTemplate = new SimpleStringProperty();
+    private final StringProperty markdownChatExportTemplate = new SimpleStringProperty();
+    private final StringProperty followUpQuestionsTemplate = new SimpleStringProperty();
 
-    private final OptionalObjectProperty<AiTemplate> selectedTemplate = OptionalObjectProperty.empty();
+    private final BooleanProperty generateFollowUpQuestions = new SimpleBooleanProperty();
+    private final IntegerProperty followUpQuestionsCount = new SimpleIntegerProperty();
+
+    private final ListProperty<AnswerEngineKind> answerEnginesList =
+            new SimpleListProperty<>(FXCollections.observableArrayList(AnswerEngineKind.values()));
+    private final ObjectProperty<AnswerEngineKind> answerEngineProperty = new SimpleObjectProperty<>();
+
+    private final ListProperty<SummarizatorKind> summarizationAlgorithmsList =
+            new SimpleListProperty<>(FXCollections.observableArrayList(SummarizatorKind.values()));
+    private final ObjectProperty<SummarizatorKind> summarizationAlgorithmProperty = new SimpleObjectProperty<>();
+
+    private final ObjectProperty<TokenEstimatorKind> tokenEstimationAlgorithmProperty = new SimpleObjectProperty<>();
+    private final ListProperty<TokenEstimatorKind> tokenEstimationAlgorithmsProperty =
+            new SimpleListProperty<>(FXCollections.observableArrayList(TokenEstimatorKind.values()));
 
     private final StringProperty temperature = new SimpleStringProperty();
     private final IntegerProperty contextWindowSize = new SimpleIntegerProperty();
@@ -116,8 +119,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty disableExpertSettings = new SimpleBooleanProperty(true);
 
     private final AiPreferences aiPreferences;
-    private final AiModelService aiModelService;
-    private final TaskExecutor taskExecutor;
 
     private final Validator apiKeyValidator;
     private final Validator chatModelValidator;
@@ -132,12 +133,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final Validator ragMinScoreTypeValidator;
     private final Validator ragMinScoreRangeValidator;
 
-    public AiTabViewModel(CliPreferences preferences, TaskExecutor taskExecutor) {
+    public AiTabViewModel(CliPreferences preferences) {
         this.oldLocale = Locale.getDefault();
 
         this.aiPreferences = preferences.getAiPreferences();
-        this.aiModelService = new AiModelService();
-        this.taskExecutor = taskExecutor;
 
         this.enableAi.addListener((_, _, newValue) -> {
             disableBasicSettings.set(!newValue);
@@ -149,7 +148,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         );
 
         this.selectedAiProvider.addListener((_, oldValue, newValue) -> {
-            List<String> models = AiDefaultPreferences.getAvailableModels(newValue);
+            List<String> models = PredefinedChatModelUtil.getAvailableModels(newValue);
 
             disableApiBaseUrl.set(newValue == AiProvider.HUGGING_FACE || newValue == AiProvider.GEMINI);
 
@@ -224,7 +223,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                         huggingFaceChatModel.set(newValue);
             }
 
-            contextWindowSize.set(AiDefaultPreferences.getContextWindowSize(selectedAiProvider.get(), newValue));
+            contextWindowSize.set(PredefinedChatModelUtil.getContextWindowSize(selectedAiProvider.get(), newValue));
         });
 
         this.currentApiKey.addListener((_, _, newValue) -> {
@@ -275,13 +274,13 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         this.temperatureTypeValidator = new FunctionBasedValidator<>(
                 temperature,
-                temp -> LocalizedNumbers.stringToDouble(temp).isPresent(),
+                temp -> LocalizedNumbersUtils.stringToDouble(temp).isPresent(),
                 ValidationMessage.error(Localization.lang("Temperature must be a number")));
 
         // Source: https://platform.openai.com/docs/api-reference/chat/create#chat-create-temperature
         this.temperatureRangeValidator = new FunctionBasedValidator<>(
                 temperature,
-                temp -> LocalizedNumbers.stringToDouble(temp).map(t -> t >= 0 && t <= 2).orElse(false),
+                temp -> LocalizedNumbersUtils.stringToDouble(temp).map(t -> t >= 0 && t <= 2).orElse(false),
                 ValidationMessage.error(Localization.lang("Temperature must be between 0 and 2")));
 
         this.contextWindowSizeValidator = new FunctionBasedValidator<>(
@@ -306,12 +305,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         this.ragMinScoreTypeValidator = new FunctionBasedValidator<>(
                 ragMinScore,
-                minScore -> LocalizedNumbers.stringToDouble(minScore).isPresent(),
+                minScore -> LocalizedNumbersUtils.stringToDouble(minScore).isPresent(),
                 ValidationMessage.error(Localization.lang("RAG minimum score must be a number")));
 
         this.ragMinScoreRangeValidator = new FunctionBasedValidator<>(
                 ragMinScore,
-                minScore -> LocalizedNumbers.stringToDouble(minScore).map(s -> s > 0 && s < 1).orElse(false),
+                minScore -> LocalizedNumbersUtils.stringToDouble(minScore).map(s -> s > 0 && s < 1).orElse(false),
                 ValidationMessage.error(Localization.lang("RAG minimum score must be greater than 0 and less than 1")));
     }
 
@@ -335,8 +334,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         enableAi.setValue(aiPreferences.getEnableAi());
         autoGenerateSummaries.setValue(aiPreferences.getAutoGenerateSummaries());
         autoGenerateEmbeddings.setValue(aiPreferences.getAutoGenerateEmbeddings());
-        generateFollowUpQuestions.setValue(aiPreferences.getGenerateFollowUpQuestions());
-        followUpQuestionsCount.setValue(aiPreferences.getFollowUpQuestionsCount());
 
         selectedAiProvider.setValue(aiPreferences.getAiProvider());
 
@@ -344,15 +341,28 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         selectedEmbeddingModel.setValue(aiPreferences.getEmbeddingModel());
 
-        Arrays.stream(AiTemplate.values()).forEach(template ->
-                templateSources.get(template).set(aiPreferences.getTemplate(template)));
+        chattingSystemMessageTemplate.set(aiPreferences.getChattingSystemMessageTemplate());
+        chattingUserMessageTemplate.set(aiPreferences.getChattingUserMessageTemplate());
+        summarizationChunkSystemMessageTemplate.set(aiPreferences.getSummarizationChunkSystemMessageTemplate());
+        summarizationCombineSystemMessageTemplate.set(aiPreferences.getSummarizationCombineSystemMessageTemplate());
+        citationParsingSystemMessageTemplate.set(aiPreferences.getCitationParsingSystemMessageTemplate());
+        summarizationFullDocumentSystemMessageTemplate.set(aiPreferences.getSummarizationFullDocumentSystemMessageTemplate());
+        markdownChatExportTemplate.set(aiPreferences.getMarkdownChatExportTemplate());
 
-        temperature.setValue(LocalizedNumbers.doubleToString(aiPreferences.getTemperature()));
+        generateFollowUpQuestions.set(aiPreferences.getGenerateFollowUpQuestions());
+        followUpQuestionsCount.set(aiPreferences.getFollowUpQuestionsCount());
+        followUpQuestionsTemplate.set(aiPreferences.getFollowUpQuestionsTemplate());
+
+        answerEngineProperty.set(aiPreferences.getAnswerEngineKind());
+        summarizationAlgorithmProperty.setValue(aiPreferences.getSummarizatorKind());
+        tokenEstimationAlgorithmProperty.setValue(aiPreferences.getTokenEstimatorKind());
+
+        temperature.setValue(LocalizedNumbersUtils.doubleToString(aiPreferences.getTemperature()));
         contextWindowSize.setValue(aiPreferences.getContextWindowSize());
         documentSplitterChunkSize.setValue(aiPreferences.getDocumentSplitterChunkSize());
         documentSplitterOverlapSize.setValue(aiPreferences.getDocumentSplitterOverlapSize());
         ragMaxResultsCount.setValue(aiPreferences.getRagMaxResultsCount());
-        ragMinScore.setValue(LocalizedNumbers.doubleToString(aiPreferences.getRagMinScore()));
+        ragMinScore.setValue(LocalizedNumbersUtils.doubleToString(aiPreferences.getRagMinScore()));
     }
 
     @Override
@@ -360,8 +370,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setEnableAi(enableAi.get());
         aiPreferences.setAutoGenerateEmbeddings(autoGenerateEmbeddings.get());
         aiPreferences.setAutoGenerateSummaries(autoGenerateSummaries.get());
-        aiPreferences.setGenerateFollowUpQuestions(generateFollowUpQuestions.get());
-        aiPreferences.setFollowUpQuestionsCount(followUpQuestionsCount.get());
 
         aiPreferences.setAiProvider(selectedAiProvider.get());
 
@@ -374,8 +382,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.storeAiApiKeyInKeyring(AiProvider.MISTRAL_AI, mistralAiApiKey.get() == null ? "" : mistralAiApiKey.get());
         aiPreferences.storeAiApiKeyInKeyring(AiProvider.GEMINI, geminiAiApiKey.get() == null ? "" : geminiAiApiKey.get());
         aiPreferences.storeAiApiKeyInKeyring(AiProvider.HUGGING_FACE, huggingFaceApiKey.get() == null ? "" : huggingFaceApiKey.get());
-        // We notify in all cases without a real check if something was changed
-        aiPreferences.apiKeyUpdated();
 
         aiPreferences.setCustomizeExpertSettings(customizeExpertSettings.get());
 
@@ -386,90 +392,95 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setGeminiApiBaseUrl(geminiApiBaseUrl.get() == null ? "" : geminiApiBaseUrl.get());
         aiPreferences.setHuggingFaceApiBaseUrl(huggingFaceApiBaseUrl.get() == null ? "" : huggingFaceApiBaseUrl.get());
 
-        Arrays.stream(AiTemplate.values()).forEach(template ->
-                aiPreferences.setTemplate(template, templateSources.get(template).get()));
+        aiPreferences.setChattingSystemMessageTemplate(chattingSystemMessageTemplate.get());
+        aiPreferences.setChattingUserMessageTemplate(chattingUserMessageTemplate.get());
+        aiPreferences.setSummarizationChunkSystemMessageTemplate(summarizationChunkSystemMessageTemplate.get());
+        aiPreferences.setSummarizationCombineSystemMessageTemplate(summarizationCombineSystemMessageTemplate.get());
+        aiPreferences.setCitationParsingSystemMessageTemplate(citationParsingSystemMessageTemplate.get());
+        aiPreferences.setSummarizationFullDocumentSystemMessageTemplate(summarizationFullDocumentSystemMessageTemplate.get());
+        aiPreferences.setMarkdownChatExportTemplate(markdownChatExportTemplate.get());
+
+        aiPreferences.setGenerateFollowUpQuestions(generateFollowUpQuestions.get());
+        aiPreferences.setFollowUpQuestionsCount(followUpQuestionsCount.get());
+        aiPreferences.setFollowUpQuestionsTemplate(followUpQuestionsTemplate.get());
+
+        aiPreferences.setAnswerEngineKind(answerEngineProperty.get());
+        aiPreferences.setSummarizatorKind(summarizationAlgorithmProperty.get());
+        aiPreferences.setTokenEstimatorKind(tokenEstimationAlgorithmProperty.get());
 
         // We already check the correctness of temperature and RAG minimum score in validators, so we don't need to check it here.
-        aiPreferences.setTemperature(LocalizedNumbers.stringToDouble(oldLocale, temperature.get()).get());
+        aiPreferences.setTemperature(LocalizedNumbersUtils.stringToDouble(oldLocale, temperature.get()).get());
         aiPreferences.setContextWindowSize(contextWindowSize.get());
         aiPreferences.setDocumentSplitterChunkSize(documentSplitterChunkSize.get());
         aiPreferences.setDocumentSplitterOverlapSize(documentSplitterOverlapSize.get());
         aiPreferences.setRagMaxResultsCount(ragMaxResultsCount.get());
-        aiPreferences.setRagMinScore(LocalizedNumbers.stringToDouble(oldLocale, ragMinScore.get()).get());
+        aiPreferences.setRagMinScore(LocalizedNumbersUtils.stringToDouble(oldLocale, ragMinScore.get()).get());
     }
 
     public void resetExpertSettings() {
         String resetApiBaseUrl = selectedAiProvider.get().getApiUrl();
         currentApiBaseUrl.set(resetApiBaseUrl);
 
-        contextWindowSize.set(AiDefaultPreferences.getContextWindowSize(selectedAiProvider.get(), currentChatModel.get()));
+        contextWindowSize.set(PredefinedChatModelUtil.getContextWindowSize(selectedAiProvider.get(), currentChatModel.get()));
 
-        temperature.set(LocalizedNumbers.doubleToString(AiDefaultPreferences.TEMPERATURE));
-        documentSplitterChunkSize.set(AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);
-        documentSplitterOverlapSize.set(AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);
-        ragMaxResultsCount.set(AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);
-        ragMinScore.set(LocalizedNumbers.doubleToString(AiDefaultPreferences.RAG_MIN_SCORE));
-        followUpQuestionsCount.set(AiDefaultPreferences.FOLLOW_UP_QUESTIONS_COUNT);
+        answerEngineProperty.set(AiDefaultExpertSettings.ANSWER_ENGINE_KIND);
+        summarizationAlgorithmProperty.set(AiDefaultExpertSettings.SUMMARIZATOR_KIND);
+        tokenEstimationAlgorithmProperty.set(AiDefaultExpertSettings.TOKEN_ESTIMATOR_KIND);
+
+        summarizationAlgorithmProperty.set(AiDefaultExpertSettings.SUMMARIZATOR_KIND);
+        tokenEstimationAlgorithmProperty.set(AiDefaultExpertSettings.TOKEN_ESTIMATOR_KIND);
+        temperature.set(LocalizedNumbersUtils.doubleToString(AiDefaultExpertSettings.TEMPERATURE));
+        documentSplitterChunkSize.set(AiDefaultExpertSettings.DOCUMENT_SPLITTER_CHUNK_SIZE);
+        documentSplitterOverlapSize.set(AiDefaultExpertSettings.DOCUMENT_SPLITTER_OVERLAP_SIZE);
+        ragMaxResultsCount.set(AiDefaultExpertSettings.RAG_MAX_RESULTS_COUNT);
+        ragMinScore.set(LocalizedNumbersUtils.doubleToString(AiDefaultExpertSettings.RAG_MIN_SCORE));
     }
 
     public void resetTemplates() {
-        Arrays.stream(AiTemplate.values()).forEach(template ->
-                templateSources.get(template).set(AiDefaultPreferences.TEMPLATES.get(template)));
+        resetChattingSystemMessageTemplate();
+        resetChattingUserMessageTemplate();
+        resetSummarizationChunkSystemMessageTemplate();
+        resetSummarizationCombineSystemMessageTemplate();
+        resetCitationParsingSystemMessageTemplate();
+        resetSummarizationFullDocumentSystemMessageTemplate();
+        resetMarkdownChatExportTemplate();
+        resetFollowUpQuestionsTemplate();
     }
 
-    public void resetCurrentTemplate() {
-        selectedTemplateProperty().get().ifPresent(template -> {
-            String defaultTemplate = AiDefaultPreferences.TEMPLATES.get(template);
-            templateSources.get(template).set(defaultTemplate);
-        });
+    public void resetChattingSystemMessageTemplate() {
+        chattingSystemMessageTemplate.set(AiDefaultTemplates.CHATTING_SYSTEM_MESSAGE_TEMPLATE);
     }
 
-    /// Fetches available models for the currently selected AI provider.
-    /// Attempts to fetch models dynamically from the API, falling back to hardcoded models if fetch fails.
-    /// This method runs asynchronously using a BackgroundTask and updates the chatModelsList when complete.
-    public void refreshAvailableModels() {
-        AiProvider provider = selectedAiProvider.get();
-        if (provider == null) {
-            return;
-        }
-
-        String apiKey = currentApiKey.get();
-
-        // Get API base URL, defaulting to provider's default URL if not customized
-        String apiBaseUrl;
-        if (customizeExpertSettings.get()) {
-            String customUrl = currentApiBaseUrl.get();
-            apiBaseUrl = (customUrl != null && !customUrl.isBlank()) ? customUrl : provider.getApiUrl();
-        } else {
-            apiBaseUrl = provider.getApiUrl();
-        }
-
-        List<String> staticModels = aiModelService.getStaticModels(provider);
-        chatModelsList.setAll(staticModels);
-
-        FetchAiModelsBackgroundTask fetchTask = getAiModelsBackgroundTask(provider, apiBaseUrl, apiKey);
-
-        fetchTask.executeWith(taskExecutor);
+    public void resetChattingUserMessageTemplate() {
+        chattingUserMessageTemplate.set(AiDefaultTemplates.CHATTING_USER_MESSAGE_TEMPLATE);
     }
 
-    private FetchAiModelsBackgroundTask getAiModelsBackgroundTask(AiProvider provider, String apiBaseUrl, @Nullable String apiKey) {
-        FetchAiModelsBackgroundTask fetchTask = new FetchAiModelsBackgroundTask(
-                aiModelService,
-                provider,
-                apiBaseUrl,
-                apiKey
-        );
+    public void resetSummarizationChunkSystemMessageTemplate() {
+        summarizationChunkSystemMessageTemplate.set(AiDefaultTemplates.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE);
+    }
 
-        fetchTask.onSuccess(dynamicModels -> {
-            if (!dynamicModels.isEmpty()) {
-                String currentModel = currentChatModel.get();
-                chatModelsList.setAll(dynamicModels);
-                if (currentModel != null && !currentModel.isBlank()) {
-                    currentChatModel.set(currentModel);
-                }
-            }
-        });
-        return fetchTask;
+    public void resetSummarizationCombineSystemMessageTemplate() {
+        summarizationCombineSystemMessageTemplate.set(AiDefaultTemplates.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE);
+    }
+
+    public void resetSummarizationFullDocumentSystemMessageTemplate() {
+        summarizationFullDocumentSystemMessageTemplate.set(AiDefaultTemplates.SUMMARIZATION_FULL_DOCUMENT_SYSTEM_MESSAGE_TEMPLATE);
+    }
+
+    public void resetCitationParsingSystemMessageTemplate() {
+        citationParsingSystemMessageTemplate.set(AiDefaultTemplates.CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE);
+    }
+
+    public void resetMarkdownChatExportTemplate() {
+        markdownChatExportTemplate.set(AiDefaultTemplates.MARKDOWN_CHAT_EXPORT_TEMPLATE);
+    }
+
+    public StringProperty markdownChatExportTemplateProperty() {
+        return markdownChatExportTemplate;
+    }
+
+    public void resetFollowUpQuestionsTemplate() {
+        followUpQuestionsTemplate.set(AiDefaultTemplates.FOLLOW_UP_QUESTIONS_TEMPLATE);
     }
 
     @Override
@@ -531,18 +542,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return disableAutoGenerateSummaries;
     }
 
-    public BooleanProperty generateFollowUpQuestions() {
-        return generateFollowUpQuestions;
-    }
-
-    public IntegerProperty followUpQuestionsCountProperty() {
-        return followUpQuestionsCount;
-    }
-
-    public StringProperty followUpQuestionsTemplateProperty() {
-        return aiPreferences.templateProperty(AiTemplate.FOLLOW_UP_QUESTIONS);
-    }
-
     public ReadOnlyListProperty<AiProvider> aiProvidersProperty() {
         return aiProvidersList;
     }
@@ -567,11 +566,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return customizeExpertSettings;
     }
 
-    public ReadOnlyListProperty<EmbeddingModel> embeddingModelsProperty() {
+    public ReadOnlyListProperty<PredefinedEmbeddingModel> embeddingModelsProperty() {
         return embeddingModelsList;
     }
 
-    public ObjectProperty<EmbeddingModel> selectedEmbeddingModelProperty() {
+    public ObjectProperty<PredefinedEmbeddingModel> selectedEmbeddingModelProperty() {
         return selectedEmbeddingModel;
     }
 
@@ -583,12 +582,52 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return disableApiBaseUrl;
     }
 
-    public Map<AiTemplate, StringProperty> getTemplateSources() {
-        return templateSources;
+    public StringProperty chattingSystemMessageTemplateProperty() {
+        return chattingSystemMessageTemplate;
     }
 
-    public OptionalObjectProperty<AiTemplate> selectedTemplateProperty() {
-        return selectedTemplate;
+    public StringProperty chattingUserMessageTemplateProperty() {
+        return chattingUserMessageTemplate;
+    }
+
+    public StringProperty summarizationChunkSystemMessageTemplateProperty() {
+        return summarizationChunkSystemMessageTemplate;
+    }
+
+    public StringProperty summarizationCombineSystemMessageTemplateProperty() {
+        return summarizationCombineSystemMessageTemplate;
+    }
+
+    public StringProperty summarizationFullDocumentSystemMessageTemplateProperty() {
+        return summarizationFullDocumentSystemMessageTemplate;
+    }
+
+    public StringProperty citationParsingSystemMessageTemplateProperty() {
+        return citationParsingSystemMessageTemplate;
+    }
+
+    public ListProperty<AnswerEngineKind> answerEngineKindsProperty() {
+        return answerEnginesList;
+    }
+
+    public ObjectProperty<AnswerEngineKind> answerEngineProperty() {
+        return answerEngineProperty;
+    }
+
+    public ListProperty<SummarizatorKind> summarizationAlgorithmsProperty() {
+        return summarizationAlgorithmsList;
+    }
+
+    public ObjectProperty<SummarizatorKind> summarizationAlgorithmProperty() {
+        return summarizationAlgorithmProperty;
+    }
+
+    public ListProperty<TokenEstimatorKind> tokenEstimationAlgorithmsProperty() {
+        return tokenEstimationAlgorithmsProperty;
+    }
+
+    public ObjectProperty<TokenEstimatorKind> tokenEstimationAlgorithmProperty() {
+        return tokenEstimationAlgorithmProperty;
     }
 
     public StringProperty temperatureProperty() {
@@ -669,5 +708,17 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public ValidationStatus getRagMinScoreRangeValidationStatus() {
         return ragMinScoreRangeValidator.getValidationStatus();
+    }
+
+    public BooleanProperty generateFollowUpQuestionsProperty() {
+        return generateFollowUpQuestions;
+    }
+
+    public IntegerProperty followUpQuestionsCountProperty() {
+        return followUpQuestionsCount;
+    }
+
+    public StringProperty followUpQuestionsTemplateProperty() {
+        return followUpQuestionsTemplate;
     }
 }

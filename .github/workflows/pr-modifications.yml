@@ -9,7 +9,8 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  pull-requests: write
+  contents: read
+  pull-requests: read
 
 jobs:
   # This ensures that no git merge conflict markers (<<<, ...) are contained
@@ -117,4 +118,3 @@ jobs:
         with:
           name: pr_number
           path: pr_number.txt
-
