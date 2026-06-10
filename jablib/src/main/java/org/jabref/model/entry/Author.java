@@ -8,7 +8,9 @@ import org.jabref.logic.formatter.bibtexfields.RemoveWordEnclosingAndOuterEnclos
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 
-/// This is an immutable class that keeps information regarding single author. It is just a container for the information, with very simple methods to access it.
+import org.jspecify.annotations.Nullable;
+
+/// This is an immutable class that keeps information regarding a single author. It is just a container for the information, with very simple methods to access it.
 ///
 /// Current usage: only methods `getLastOnly`, `getFirstLast`, and `getLastFirst` are used; all other methods are provided for completeness.
 @AllowedToUseLogic("because it needs to use formatter")
@@ -21,14 +23,15 @@ public class Author {
 
     public static final RemoveWordEnclosingAndOuterEnclosingBracesFormatter FORMATTER = new RemoveWordEnclosingAndOuterEnclosingBracesFormatter();
 
-    private final String givenName;
-    private final String givenNameAbbreviated;
-    private final String namePrefix;
-    private final String familyName;
-    private final String nameSuffix;
+    @Nullable private final String givenName;
+    @Nullable private final String givenNameAbbreviated;
+    @Nullable private final String namePrefix;
+    @Nullable private final String familyName;
+    @Nullable private final String nameSuffix;
+
     private Author latexFreeAuthor;
 
-    /// Creates the Author object. If any part of the name is absent, <CODE>null</CODE> must be passed; otherwise other methods may return erroneous results.
+    /// Creates the Author object. If any part of the name is absent, `null` must be passed; otherwise other methods may return erroneous results.
     ///
     /// In case only the last part is passed, enclosing braces are
     ///
@@ -37,7 +40,13 @@ public class Author {
     /// @param namePrefix           the von part of the author's name (may consist of several tokens, like "de la" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
     /// @param familyName           the last name of the author (may consist of several tokens, like "Vall{\'e}e Poussin" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
     /// @param nameSuffix           the junior part of the author's name (may consist of several tokens, like "Jr. III" in "Smith, Jr. III, John")
-    public Author(String givenName, String givenNameAbbreviated, String namePrefix, String familyName, String nameSuffix) {
+    public Author(
+            @Nullable String givenName,
+            @Nullable String givenNameAbbreviated,
+            @Nullable String namePrefix,
+            @Nullable String familyName,
+            @Nullable String nameSuffix
+    ) {
         boolean keepBracesAtLastPart = StringUtil.isBlank(givenName) && StringUtil.isBlank(givenNameAbbreviated) && StringUtil.isBlank(namePrefix) && !StringUtil.isBlank(familyName) && StringUtil.isBlank(nameSuffix);
 
         if (!StringUtil.isBlank(givenName)) {

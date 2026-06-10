@@ -127,10 +127,6 @@ public class BracketedPattern {
 
     private final String pattern;
 
-    public BracketedPattern() {
-        this.pattern = null;
-    }
-
     public BracketedPattern(String pattern) {
         this.pattern = pattern;
     }
@@ -149,7 +145,7 @@ public class BracketedPattern {
     /// @param bibentry The bibentry to expand.
     /// @param database The database to use for string-lookups and cross-refs. May be null.
     /// @return The expanded pattern. The empty string is returned, if it could not be expanded.
-    public String expand(@NonNull BibEntry bibentry, BibDatabase database) {
+    public String expand(@NonNull BibEntry bibentry, @Nullable BibDatabase database) {
         Character keywordDelimiter = ';';
         return expand(bibentry, keywordDelimiter, database);
     }
@@ -160,7 +156,7 @@ public class BracketedPattern {
     /// @param keywordDelimiter The keyword delimiter to use.
     /// @param database         The database to use for string-lookups and cross-refs. May be null.
     /// @return The expanded pattern. The empty string is returned, if it could not be expanded.
-    public String expand(@NonNull BibEntry bibentry, Character keywordDelimiter, BibDatabase database) {
+    public String expand(@NonNull BibEntry bibentry, Character keywordDelimiter, @Nullable BibDatabase database) {
         return expandBrackets(this.pattern, keywordDelimiter, bibentry, database);
     }
 
@@ -171,7 +167,7 @@ public class BracketedPattern {
     /// @param entry            The bibEntry to use for expansion
     /// @param database         The database for field resolving. May be null.
     /// @return The expanded pattern. Not null.
-    public static String expandBrackets(@NonNull String pattern, Character keywordDelimiter, @NonNull BibEntry entry, BibDatabase database) {
+    public static String expandBrackets(@NonNull String pattern, Character keywordDelimiter, @NonNull BibEntry entry, @Nullable BibDatabase database) {
         return expandBrackets(pattern, expandBracketContent(keywordDelimiter, entry, database));
     }
 
@@ -182,7 +178,7 @@ public class BracketedPattern {
     /// @param entry            The {@link BibEntry} to use for expansion
     /// @param database         The {@link BibDatabase} for field resolving. May be null.
     /// @return a function accepting a bracketed expression and returning the result of expanding it
-    public static Function<String, String> expandBracketContent(Character keywordDelimiter, BibEntry entry, BibDatabase database) {
+    public static Function<String, String> expandBracketContent(Character keywordDelimiter, BibEntry entry, @Nullable BibDatabase database) {
         return (String bracket) -> {
             List<String> fieldParts = parseFieldAndModifiers(bracket);
             // check whether there is a modifier on the end such as
@@ -296,7 +292,7 @@ public class BracketedPattern {
     /// @param keywordDelimiter The de
     /// @param database         The database to use for field resolving. May be null.
     /// @return String containing the evaluation result. Empty string if the pattern cannot be resolved.
-    public static String getFieldValue(BibEntry entry, String pattern, Character keywordDelimiter, BibDatabase database) {
+    public static String getFieldValue(BibEntry entry, String pattern, Character keywordDelimiter, @Nullable BibDatabase database) {
         try {
             if (pattern.startsWith("auth") || pattern.startsWith("pureauth")) {
                 // result the author
