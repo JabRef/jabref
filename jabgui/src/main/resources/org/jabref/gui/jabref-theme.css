@@ -76,17 +76,12 @@
     -fx-border-color: -fx-outer-border;
 }
 
-.background-transparent {
+.bg-transparent {
     -fx-background-color: transparent;
 }
 
-.padding-right-medium {
+.padding-right-15 {
     -fx-padding: 0 15 0 0;
-}
-
-.error-label {
-    -fx-text-fill: -jr-error;
-    -fx-font-weight: bold;
 }
 
 .merge-header-cell {

@@ -59,7 +59,7 @@
                 </ListScrollPane>
 
                 <Pane fx:id="transparentPane"
-                      styleClass="background-transparent"/>
+                      styleClass="bg-transparent"/>
 
                 <ProgressIndicator
                         fx:id="loadingIndicator"
