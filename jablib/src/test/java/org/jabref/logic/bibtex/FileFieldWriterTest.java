@@ -17,22 +17,22 @@ class FileFieldWriterTest {
 
     @Test
     void quoteStandard() {
-        assertEquals("a", FileFieldWriter.quote("a"));
+        assertEquals("a", FileFieldWriter.quote("a").orElse(null));
     }
 
     @Test
     void quoteAllCharacters() {
-        assertEquals("a\\:\\;\\\\", FileFieldWriter.quote("a:;\\"));
+        assertEquals("a\\:\\;\\\\", FileFieldWriter.quote("a:;\\").orElse(null));
     }
 
     @Test
     void quoteEmpty() {
-        assertEquals("", FileFieldWriter.quote(""));
+        assertEquals("", FileFieldWriter.quote("").orElse(null));
     }
 
     @Test
     void quoteNull() {
-        assertNull(FileFieldWriter.quote(null));
+        assertNull(FileFieldWriter.quote(null).orElse(null));
     }
 
     private static Stream<Arguments> getEncodingTestData() {

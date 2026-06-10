@@ -2,14 +2,18 @@ package org.jabref.logic.bibtex;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.LinkedFile;
 
-public class FileFieldWriter {
+import org.jspecify.annotations.Nullable;
+
+public final class FileFieldWriter {
 
     private FileFieldWriter() {
+        throw new UnsupportedOperationException("cannot instantiate a utility class");
     }
 
     public static String getStringRepresentation(List<LinkedFile> fields) {
@@ -49,12 +53,13 @@ public class FileFieldWriter {
     private static String encodeStringArray(String[] entry) {
         return Arrays.stream(entry)
                      .map(FileFieldWriter::quote)
+                     .flatMap(Optional::stream)
                      .collect(Collectors.joining(":"));
     }
 
-    public static String quote(String s) {
+    public static Optional<String> quote(@Nullable String s) {
         if (s == null) {
-            return null;
+            return Optional.empty();
         }
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
@@ -64,6 +69,6 @@ public class FileFieldWriter {
             }
             sb.append(c);
         }
-        return sb.toString();
+        return Optional.of(sb.toString());
     }
 }
