@@ -67,6 +67,29 @@
     -fx-font-weight: bold;
 }
 
+.italic {
+    -fx-font-style: italic;
+}
+
+.bold-italic {
+    -fx-font-style: italic;
+    -fx-font-weight: bold;
+}
+
+.small-bold {
+    -fx-font-size: 0.75em;
+    -fx-font-weight: bold;
+}
+
+.cursor-hand {
+    -fx-cursor: hand;
+}
+
+.dialog-header {
+    -fx-padding: 10px;
+    -fx-background-color: -fx-background;
+}
+
 .merge-header-cell {
     -fx-border-color: -fx-outer-border;
     -fx-background-color: -jr-row-odd-background;
