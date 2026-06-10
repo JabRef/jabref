@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.model.FieldChange;
@@ -26,6 +27,8 @@ final class FileFieldCleanupUpdater {
 
         AtomicReference<Optional<FieldChange>> change = new AtomicReference<>(Optional.empty());
         mutationScheduler.accept(() -> change.set(entry.setField(StandardField.FILE, newValue)));
-        return change.get().map(List::of).orElseGet(List::of);
+        return Optional.ofNullable(change.get())
+                       .flatMap(Function.identity()) // Equivalent to `flatten`, unwraps optional in optional.
+                       .map(List::of).orElseGet(List::of);
     }
 }

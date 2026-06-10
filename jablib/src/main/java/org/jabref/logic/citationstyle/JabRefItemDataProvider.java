@@ -29,6 +29,7 @@ import de.undercouch.citeproc.helper.json.StringJsonBuilderFactory;
 import org.jbibtex.BibTeXEntry;
 import org.jbibtex.DigitStringValue;
 import org.jbibtex.Key;
+import org.jspecify.annotations.Nullable;
 
 /// Custom {@link ItemDataProvider} that allows to set the data so that we don't have to instantiate a new CSL object
 /// every time.
@@ -40,7 +41,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
 
     private final List<BibEntry> data = new ArrayList<>();
 
-    private BibDatabaseContext bibDatabaseContext;
+    @Nullable private BibDatabaseContext bibDatabaseContext;
     private BibEntryTypesManager entryTypesManager;
     private PagesChecker pagesChecker;
 
@@ -48,7 +49,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
         stringJsonBuilderFactory = new StringJsonBuilderFactory();
     }
 
-    /// Converts the {@link BibEntry} into {@link CSLItemData}.
+    /// Converts the [BibEntry] into [CSLItemData].
     ///
     /// <br>
     /// <table>
@@ -186,7 +187,7 @@ public class JabRefItemDataProvider implements ItemDataProvider {
     }
 
     @Override
-    public CSLItemData retrieveItem(String id) {
+    public @Nullable CSLItemData retrieveItem(String id) {
         return data.stream()
                    .filter(entry -> entry.getCitationKey().orElse("").equals(id))
                    .map(entry -> bibEntryToCSLItemData(entry, bibDatabaseContext, entryTypesManager))
