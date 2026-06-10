@@ -114,10 +114,6 @@ public class JabRefIconView extends Group {
         return CSS_META_DATA;
     }
 
-    public IconTheme.JabRefIcons getDefaultGlyph() {
-        return IconTheme.JabRefIcons.ERROR;
-    }
-
     public IconTheme.JabRefIcons getGlyph() {
         return glyph.get();
     }
