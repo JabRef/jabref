@@ -52,7 +52,7 @@ dependencies.constraints {
     api("com.github.javaparser:javaparser-symbol-solver-core:3.28.2")
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.github.tomtung:latex2unicode_2.13:0.3.2")
-    api("com.google.errorprone:error_prone_core:2.48.0")
+    api("com.google.errorprone:error_prone_core:2.50.0")
     api("com.google.guava:guava:33.6.0-jre")
     api("com.googlecode.plist:dd-plist:1.29")
     api("com.h2database:h2-mvstore:2.4.240")
@@ -115,7 +115,7 @@ dependencies.constraints {
     api("org.apache.velocity:velocity-engine-core:2.4.1")
     api("org.bouncycastle:bcprov-jdk18on:1.84")
     api("org.controlsfx:controlsfx:11.2.3")
-    api("org.eclipse.jgit:org.eclipse.jgit:7.6.0.202603022253-r")
+    api("org.eclipse.jgit:org.eclipse.jgit:7.7.0.202606012155-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
     api("org.fxmisc.richtext:richtextfx:0.11.7")
     api("org.glassfish.hk2:hk2-api:4.0.1")
