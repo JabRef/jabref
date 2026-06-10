@@ -12,6 +12,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,10 +42,11 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
             "</font>__NEWLINE__";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TextBasedPreviewLayout.class);
-    private Layout layout;
+
+    @Nullable private Layout layout;
     private String text;
-    private LayoutFormatterPreferences layoutFormatterPreferences;
-    private JournalAbbreviationRepository abbreviationRepository;
+    @Nullable private LayoutFormatterPreferences layoutFormatterPreferences;
+    @Nullable private JournalAbbreviationRepository abbreviationRepository;
 
     public TextBasedPreviewLayout(String text,
                                   @NonNull LayoutFormatterPreferences layoutFormatterPreferences,
