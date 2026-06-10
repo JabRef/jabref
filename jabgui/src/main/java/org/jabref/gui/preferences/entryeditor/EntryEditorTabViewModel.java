@@ -102,7 +102,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetToDefaults() {
-        setFields(preferences.getEntryEditorPreferences().getDefaultEntryEditorTabs());
+        setFields(EntryEditorPreferences.getDefaultEntryEditorTabs());
     }
 
     private void setFields(Map<String, Set<Field>> tabNamesAndFields) {
