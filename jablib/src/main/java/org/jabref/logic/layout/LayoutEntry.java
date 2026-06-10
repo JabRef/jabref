@@ -92,13 +92,14 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.UnknownField;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class LayoutEntry {
     private static final Logger LOGGER = LoggerFactory.getLogger(LayoutEntry.class);
 
-    private List<LayoutFormatter> option;
+    @Nullable private List<LayoutFormatter> option;
     // Formatter to be run after other formatters:
     private LayoutFormatter postFormatter;
 
@@ -163,6 +164,7 @@ class LayoutEntry {
                 case LayoutHelper.IS_FIELD_END:
                 case LayoutHelper.IS_GROUP_END:
                     if (blockStart.equals(parsedEntry.s)) {
+                        assert blockEntries != null;
                         blockEntries.add(parsedEntry);
                         int groupType = parsedEntry.i == LayoutHelper.IS_GROUP_END ? LayoutHelper.IS_GROUP_START :
                                         LayoutHelper.IS_FIELD_START;
@@ -199,10 +201,10 @@ class LayoutEntry {
         this.postFormatter = formatter;
     }
 
-    public String doLayout(BibEntry bibEntry, BibDatabase database) {
+    public Optional<String> doLayout(BibEntry bibEntry, BibDatabase database) {
         switch (type) {
             case LayoutHelper.IS_LAYOUT_TEXT:
-                return text;
+                return Optional.of(text);
             case LayoutHelper.IS_SIMPLE_COMMAND:
                 String value = bibEntry.getResolvedFieldOrAlias(FieldFactory.parseField(text), database).orElse("");
 
@@ -210,19 +212,19 @@ class LayoutEntry {
                 if (postFormatter != null) {
                     value = postFormatter.format(value);
                 }
-                return value;
+                return Optional.of(value);
             case LayoutHelper.IS_FIELD_START:
             case LayoutHelper.IS_GROUP_START:
                 return handleFieldOrGroupStart(bibEntry, database);
             case LayoutHelper.IS_OPTION_FIELD:
-                return handleOptionField(bibEntry, database);
+                return Optional.of(handleOptionField(bibEntry, database));
             case LayoutHelper.IS_ENCODING_NAME:
                 // Printing the encoding name is not supported in entry layouts, only
                 // in begin/end layouts. This prevents breakage if some users depend
                 // on a field called "encoding". We simply return this field instead:
-                return bibEntry.getResolvedFieldOrAlias(new UnknownField("encoding"), database).orElse(null);
+                return bibEntry.getResolvedFieldOrAlias(new UnknownField("encoding"), database);
             default:
-                return "";
+                return Optional.of("");
         }
     }
 
@@ -264,7 +266,7 @@ class LayoutEntry {
         return fieldEntry;
     }
 
-    private String handleFieldOrGroupStart(BibEntry bibtex, BibDatabase database) {
+    private Optional<String> handleFieldOrGroupStart(BibEntry bibtex, BibDatabase database) {
         Optional<String> field;
         boolean negated = false;
         if (type == LayoutHelper.IS_GROUP_START) {
@@ -295,7 +297,7 @@ class LayoutEntry {
 
         if ((field.isPresent() == negated) || ((type == LayoutHelper.IS_GROUP_START)
                 && field.get().equalsIgnoreCase(LayoutHelper.getCurrentGroup()))) {
-            return null;
+            return Optional.empty();
         } else {
             if (type == LayoutHelper.IS_GROUP_START) {
                 LayoutHelper.setCurrentGroup(field.get());
@@ -305,11 +307,11 @@ class LayoutEntry {
             boolean previousSkipped = false;
 
             for (int i = 0; i < layoutEntries.size(); i++) {
-                fieldText = layoutEntries.get(i).doLayout(bibtex, database);
+                fieldText = layoutEntries.get(i).doLayout(bibtex, database).orElse(null);
 
                 if (fieldText == null) {
                     if ((i + 1) < layoutEntries.size()) {
-                        if (layoutEntries.get(i + 1).doLayout(bibtex, database).isBlank()) {
+                        if (layoutEntries.get(i + 1).doLayout(bibtex, database).orElse("").isBlank()) {
                             i++;
                             previousSkipped = true;
                             continue;
@@ -337,7 +339,7 @@ class LayoutEntry {
                 previousSkipped = false;
             }
 
-            return sb.toString();
+            return Optional.of(sb.toString());
         }
     }
 
