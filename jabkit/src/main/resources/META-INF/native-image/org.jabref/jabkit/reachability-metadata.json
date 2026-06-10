@@ -148,7 +148,7 @@
       "type": "java.time.ZonedDateTime"
     },
     {
-      "type": "org.jabref.toolkit.commands.CheckConsistency",
+      "type": "org.jabref.toolkit.commands.Check",
       "fields": [
         {
           "name": "jabKit"
@@ -171,6 +171,29 @@
       ]
     },
     {
+      "type": "org.jabref.toolkit.commands.CheckConsistency",
+      "fields": [
+        {
+          "name": "jabKit"
+        },
+        {
+          "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
+        },
+        {
+          "name": "outputFormat"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "org.jabref.toolkit.commands.CheckIntegrity",
       "fields": [
         {
@@ -180,7 +203,7 @@
           "name": "sharedOptions"
         },
         {
-          "name": "inputFile"
+          "name": "inputOption"
         },
         {
           "name": "outputFormat"
@@ -320,6 +343,37 @@
         },
         {
           "name": "sharedOptions"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.InputOption",
+      "fields": [
+        {
+          "name": "inputSource"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.InputOption$InputSource",
+      "fields": [
+        {
+          "name": "positionalInput"
+        },
+        {
+          "name": "optionInput"
         }
       ],
       "methods": [
