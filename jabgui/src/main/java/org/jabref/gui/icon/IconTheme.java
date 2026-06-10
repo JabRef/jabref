@@ -54,6 +54,9 @@ public class IconTheme {
     private static final Logger LOGGER = LoggerFactory.getLogger(IconTheme.class);
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
 
+    private IconTheme() {
+    }
+
     public static Color getDefaultGroupColor() {
         return Color.web("#8a8a8a");
     }
