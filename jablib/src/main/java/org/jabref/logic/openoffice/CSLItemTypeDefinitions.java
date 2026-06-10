@@ -14,7 +14,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 class CSLItemTypeDefinitions {
     /// CSL item type <-> Zotero item type mapping can be found via [zotero-schema/schema.json](https://github.com/zotero/zotero-schema/blob/62e983a2e575fe9b9a3677ad7c9772080b67a1e4/schema.json#L3219-L3324)
     /// CSL item type <-> BibLaTeX entry type can be found via [zotero-better-bibtex/biblatex.ts](https://github.com/retorquere/zotero-better-bibtex/blob/master/translators/bibtex/biblatex.ts)
-    private static final Map<String, EntryType> ITEM_TYPES = Map.ofEntries(
+    private static final Map<String, EntryType> CSL2BIB_TYPES = Map.ofEntries(
             // preprint
             Map.entry("article", StandardEntryType.Online),
             // Journal Article
@@ -86,7 +86,7 @@ class CSLItemTypeDefinitions {
             cslFieldToBibField("DOI", StandardField.DOI)
     );
 
-    private static final Map<String, Map<String, StandardField>> FIELD_MAPPING = Map.ofEntries(
+    private static final Map<String, Map<String, StandardField>> CSL2BIB_FIELDS = Map.ofEntries(
             cslTypeToBibType("article", Map.ofEntries(
                     cslFieldToBibField("container-title", StandardField.JOURNALTITLE),
                     cslFieldToBibField("issue", StandardField.NUMBER),
@@ -204,12 +204,12 @@ class CSLItemTypeDefinitions {
     );
 
     static Optional<EntryType> getEntryType(String cslItemType) {
-        return Optional.ofNullable(ITEM_TYPES.get(cslItemType));
+        return Optional.ofNullable(CSL2BIB_TYPES.get(cslItemType));
     }
 
     static Map<String, StandardField> getFieldMappings(String cslItemType) {
         Map<String, StandardField> fieldMappings = new HashMap<>(COMMON_FIELDS);
-        fieldMappings.putAll(FIELD_MAPPING.getOrDefault(cslItemType, Map.of()));
+        fieldMappings.putAll(CSL2BIB_FIELDS.getOrDefault(cslItemType, Map.of()));
 
         return fieldMappings;
     }
