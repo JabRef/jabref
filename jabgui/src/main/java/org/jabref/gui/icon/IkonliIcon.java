@@ -10,6 +10,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 import javafx.scene.Node;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.util.ColorUtil;
@@ -73,7 +74,20 @@ public final class IkonliIcon implements JabRefIcon {
 
     @Override
     public Node getGraphicNode() {
-        FontIcon fontIcon = FontIcon.of(icons.getFirst());
+        if (icons.size() == 1) {
+            return buildFontIcon(icons.getFirst());
+        }
+        // Multi-glyph icon (e.g. the RANK1..RANK5 star rows): render one FontIcon per glyph side by side, so all
+        // stars show instead of only the first.
+        HBox row = new HBox();
+        for (Ikon ikon : icons) {
+            row.getChildren().add(buildFontIcon(ikon));
+        }
+        return row;
+    }
+
+    private FontIcon buildFontIcon(Ikon ikon) {
+        FontIcon fontIcon = FontIcon.of(ikon);
         fontIcon.getStyleClass().add("glyph-icon");
         size.ifPresent(fontIcon::setIconSize);
 
