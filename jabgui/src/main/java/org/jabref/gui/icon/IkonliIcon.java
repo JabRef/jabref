@@ -24,10 +24,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 /// {@link #withSize} return copies.
 public final class IkonliIcon implements JabRefIcon {
 
-    /// All {@link Ikon} values discovered via the {@link IkonProvider} service loader, used by {@link #findIcon}.
-    /// Lazily populated on first lookup.
-    private static final Set<Ikon> ALL_IKONS = new HashSet<>();
-
     private final List<Ikon> icons;
     private final Optional<Color> color;
     private final Optional<Integer> size;
@@ -56,19 +52,24 @@ public final class IkonliIcon implements JabRefIcon {
 
     /// Finds the Ikonli icon whose name matches {@code code} (case-insensitive), tinted with {@code color}.
     public static Optional<JabRefIcon> findIcon(String code, Color color) {
-        if (ALL_IKONS.isEmpty()) {
-            loadAllIkons();
-        }
-        return ALL_IKONS.stream()
-                        .filter(ikon -> ikon.toString().equals(code.toUpperCase(Locale.ENGLISH)))
-                        .<JabRefIcon>map(ikon -> new IkonliIcon(ikon).withColor(color))
-                        .findFirst();
+        return IkonliIcons.ALL.stream()
+                              .filter(ikon -> ikon.toString().equals(code.toUpperCase(Locale.ENGLISH)))
+                              .map(ikon -> new IkonliIcon(ikon).withColor(color))
+                              .findFirst();
     }
 
-    private static void loadAllIkons() {
-        ServiceLoader<IkonProvider> providers = ServiceLoader.load(IkonProvider.class);
-        for (IkonProvider provider : providers) {
-            ALL_IKONS.addAll(EnumSet.allOf(provider.getIkon()));
+    /// Holds every {@link Ikon} discovered via the {@link IkonProvider} service loader, used by {@link #findIcon}.
+    /// Initialization-on-demand holder: the JVM populates {@link #ALL} exactly once, on first access, with no
+    /// explicit locking.
+    private static final class IkonliIcons {
+        private static final Set<Ikon> ALL = load();
+
+        private static Set<Ikon> load() {
+            Set<Ikon> all = new HashSet<>();
+            for (IkonProvider provider : ServiceLoader.load(IkonProvider.class)) {
+                all.addAll(EnumSet.allOf(provider.getIkon()));
+            }
+            return Set.copyOf(all);
         }
     }
 
