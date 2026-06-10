@@ -175,7 +175,7 @@ public class BibEntry {
         return setField(StandardField.LANGUAGEID, parsedLangid.getJabRefFormat());
     }
 
-    public Optional<String> getResolvedFieldOrAlias(OrFields fields, BibDatabase database) {
+    public Optional<String> getResolvedFieldOrAlias(OrFields fields, @Nullable BibDatabase database) {
         for (Field field : fields.getFields()) {
             Optional<String> value = getResolvedFieldOrAlias(field, database);
             if (value.isPresent()) {
@@ -655,7 +655,7 @@ public class BibEntry {
     /// @param fields   An array of field names to be checked.
     /// @param database The database in which to look up crossref'd entries, if any. This argument can be null, meaning that no attempt will be made to follow crossrefs.
     /// @return true if all fields are set or could be resolved, false otherwise.
-    public boolean allFieldsPresent(Collection<OrFields> fields, BibDatabase database) {
+    public boolean allFieldsPresent(Collection<OrFields> fields, @Nullable BibDatabase database) {
         return fields.stream().allMatch(field -> this.getResolvedFieldOrAlias(field, database).isPresent());
     }
 

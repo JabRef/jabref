@@ -2,8 +2,6 @@ package org.jabref.logic.bibtex;
 
 import java.util.Optional;
 
-import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
@@ -16,19 +14,11 @@ import org.jspecify.annotations.Nullable;
 public class TypedBibEntry {
 
     private final BibEntry entry;
-    private final Optional<BibDatabase> database;
-    private final BibDatabaseMode mode;
+    @Nullable private final BibDatabaseMode mode;
 
     public TypedBibEntry(@NonNull BibEntry entry, @Nullable BibDatabaseMode mode) {
         this.entry = entry;
-        this.database = Optional.empty();
         this.mode = mode;
-    }
-
-    public TypedBibEntry(@NonNull BibEntry entry, @NonNull BibDatabaseContext databaseContext) {
-        this.entry = entry;
-        this.database = Optional.of(databaseContext.getDatabase());
-        this.mode = databaseContext.getMode();
     }
 
     /// Checks the fields of the entry whether all required fields are set.
@@ -36,12 +26,10 @@ public class TypedBibEntry {
     ///
     /// @return true if all required fields are set, false otherwise
     public boolean hasAllRequiredFields(BibEntryTypesManager entryTypesManager) {
-        Optional<BibEntryType> type = entryTypesManager.enrich(entry.getType(), this.mode);
-        if (type.isPresent()) {
-            return entry.allFieldsPresent(type.get().getRequiredFields(), database.orElse(null));
-        } else {
-            return true;
-        }
+        Optional<BibEntryType> type = entryTypesManager.enrich(entry.getType(), mode);
+        return type.map(bibEntryType ->
+                           entry.allFieldsPresent(bibEntryType.getRequiredFields(), null))
+                   .orElse(true);
     }
 
     /// Gets the display name for the type of the entry.
