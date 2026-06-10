@@ -15,6 +15,8 @@ import javafx.scene.paint.Color;
 
 import org.jabref.gui.util.ColorUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.IkonProvider;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -22,29 +24,30 @@ import org.kordamp.ikonli.javafx.FontIcon;
 /// {@link JabRefIcon} backed by an <a href="https://kordamp.org/ikonli/">Ikonli</a> font glyph, rendered as a
 /// {@link FontIcon}. The font-backed counterpart to {@link SvgIcon}. Immutable: {@link #withColor} and
 /// {@link #withSize} return copies.
+@NullMarked
 public final class IkonliIcon implements JabRefIcon {
 
     private final List<Ikon> icons;
-    private final Optional<Color> color;
-    private final Optional<Integer> size;
+    private final @Nullable Color color;
+    private final @Nullable Integer size;
 
     public IkonliIcon(Ikon... icons) {
-        this(Arrays.asList(icons), Optional.empty(), Optional.empty());
+        this(Arrays.asList(icons), null, null);
     }
 
     public IkonliIcon(List<Ikon> icons) {
-        this(icons, Optional.empty(), Optional.empty());
+        this(icons, null, null);
     }
 
     public IkonliIcon(Color color, Ikon... icons) {
-        this(Arrays.asList(icons), Optional.of(color), Optional.empty());
+        this(Arrays.asList(icons), color, null);
     }
 
     IkonliIcon(Color color, List<Ikon> icons) {
-        this(icons, Optional.of(color), Optional.empty());
+        this(icons, color, null);
     }
 
-    private IkonliIcon(List<Ikon> icons, Optional<Color> color, Optional<Integer> size) {
+    private IkonliIcon(List<Ikon> icons, @Nullable Color color, @Nullable Integer size) {
         this.icons = List.copyOf(icons);
         this.color = color;
         this.size = size;
@@ -90,12 +93,16 @@ public final class IkonliIcon implements JabRefIcon {
     private FontIcon buildFontIcon(Ikon ikon) {
         FontIcon fontIcon = FontIcon.of(ikon);
         fontIcon.getStyleClass().add("glyph-icon");
-        size.ifPresent(fontIcon::setIconSize);
+        if (size != null) {
+            fontIcon.setIconSize(size);
+        }
 
         // Override the default color from the css files
-        color.ifPresent(color -> fontIcon.setStyle(fontIcon.getStyle() +
-                "-fx-fill: %s;".formatted(ColorUtil.toRGBCode(color)) +
-                "-fx-icon-color: %s;".formatted(ColorUtil.toRGBCode(color))));
+        if (color != null) {
+            fontIcon.setStyle(fontIcon.getStyle() +
+                    "-fx-fill: %s;".formatted(ColorUtil.toRGBCode(color)) +
+                    "-fx-icon-color: %s;".formatted(ColorUtil.toRGBCode(color)));
+        }
 
         return fontIcon;
     }
@@ -107,12 +114,12 @@ public final class IkonliIcon implements JabRefIcon {
 
     @Override
     public JabRefIcon withColor(Color color) {
-        return new IkonliIcon(icons, Optional.of(color), size);
+        return new IkonliIcon(icons, color, size);
     }
 
     @Override
     public JabRefIcon withSize(int size) {
-        return new IkonliIcon(icons, color, Optional.of(size));
+        return new IkonliIcon(icons, color, size);
     }
 
     @Override
