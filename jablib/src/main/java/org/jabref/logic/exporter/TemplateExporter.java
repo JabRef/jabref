@@ -82,7 +82,7 @@ public class TemplateExporter extends Exporter {
     public TemplateExporter(String displayName,
                             String consoleName,
                             String lfFileName,
-                            String directory,
+                            @Nullable String directory,
                             FileType extension,
                             LayoutFormatterPreferences layoutPreferences,
                             SelfContainedSaveOrder saveOrder) {
