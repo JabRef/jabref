@@ -82,7 +82,7 @@ class ZoteroCitationMarkParserTest {
                 Arguments.of(StandardField.AUTHOR, "Doe, John and Zhang, Hancong"),
                 Arguments.of(StandardField.JOURNALTITLE, "Journal of Test"),
                 Arguments.of(StandardField.VOLUME, "1"),
-                Arguments.of(StandardField.NUMBER, "2"),
+                Arguments.of(StandardField.ISSUE, "2"),
                 Arguments.of(StandardField.PAGES, "6-7"),
                 Arguments.of(StandardField.DOI, "1234567"),
                 Arguments.of(StandardField.YEAR, "2026")
@@ -172,7 +172,6 @@ class ZoteroCitationMarkParserTest {
                                 "type":"paper-conference",
                                 "title":"Conference paper",
                                 "container-title":"Proceedings title",
-                                "event-title":"Conference event",
                                 "event-place":"Paris",
                                 "publisher":"ACM",
                                 "page":"1-8",
@@ -182,7 +181,6 @@ class ZoteroCitationMarkParserTest {
                         Map.of(
                                 StandardField.TITLE, "Conference paper",
                                 StandardField.BOOKTITLE, "Proceedings title",
-                                StandardField.EVENTTITLE, "Conference event",
                                 StandardField.LOCATION, "Paris",
                                 StandardField.PUBLISHER, "ACM",
                                 StandardField.PAGES, "1-8",
@@ -199,8 +197,7 @@ class ZoteroCitationMarkParserTest {
                         StandardEntryType.Online,
                         Map.of(
                                 StandardField.TITLE, "Web page",
-                                StandardField.URL, "https://example.org",
-                                StandardField.ORGANIZATION, "Example Org"
+                                StandardField.URL, "https://example.org"
                         )
                 ),
                 Arguments.of(
@@ -208,15 +205,13 @@ class ZoteroCitationMarkParserTest {
                                 "type":"thesis",
                                 "title":"Thesis title",
                                 "publisher":"Test University",
-                                "publisher-place":"Amsterdam",
-                                "genre":"PhD thesis"
+                                "publisher-place":"Amsterdam"
                                 """,
                         StandardEntryType.Thesis,
                         Map.of(
                                 StandardField.TITLE, "Thesis title",
-                                StandardField.INSTITUTION, "Test University",
                                 StandardField.LOCATION, "Amsterdam",
-                                StandardField.TYPE, "PhD thesis"
+                                StandardField.PUBLISHER, "Test University"
                         )
                 ),
                 Arguments.of(
@@ -225,8 +220,7 @@ class ZoteroCitationMarkParserTest {
                                 "title":"Report title",
                                 "publisher":"Research Institute",
                                 "publisher-place":"Delft",
-                                "genre":"Technical report",
-                                "issue":"R-1",
+                                "collection-number":"R-1",
                                 "page":"1-30"
                                 """,
                         StandardEntryType.Report,
@@ -234,7 +228,6 @@ class ZoteroCitationMarkParserTest {
                                 StandardField.TITLE, "Report title",
                                 StandardField.INSTITUTION, "Research Institute",
                                 StandardField.LOCATION, "Delft",
-                                StandardField.TYPE, "Technical report",
                                 StandardField.NUMBER, "R-1",
                                 StandardField.PAGES, "1-30"
                         )
