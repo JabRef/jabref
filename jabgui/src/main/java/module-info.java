@@ -1,3 +1,5 @@
+import org.jabref.gui.icon.JabRefIconProvider;
+
 open module org.jabref {
     requires org.jabref.jablib;
     requires org.jabref.jabls;
@@ -45,7 +47,7 @@ open module org.jabref {
     provides org.kordamp.ikonli.IkonHandler
             with org.jabref.gui.icon.JabRefIkonHandler;
     provides org.kordamp.ikonli.IkonProvider
-            with org.jabref.gui.icon.JabrefIconProvider;
+            with JabRefIconProvider;
 
     requires reactfx;
 

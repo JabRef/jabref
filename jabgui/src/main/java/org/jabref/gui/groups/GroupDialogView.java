@@ -35,7 +35,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabrefIconProvider;
+import org.jabref.gui.icon.JabRefIconProvider;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -288,7 +288,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         FilteredList<Ikon> filteredList = new FilteredList<>(ikonList);
 
         for (IkonProvider provider : ServiceLoader.load(IkonProvider.class.getModule().getLayer(), IkonProvider.class)) {
-            if (provider.getClass() != JabrefIconProvider.class) {
+            if (provider.getClass() != JabRefIconProvider.class) {
                 ikonList.addAll(EnumSet.allOf(provider.getIkon()));
             }
         }
