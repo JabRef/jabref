@@ -77,7 +77,7 @@ class CheckIntegrity implements Callable<Integer> {
                 databaseContext,
                 jabKit.cliPreferences.getFilePreferences(),
                 jabKit.cliPreferences.getCitationKeyPatternPreferences(),
-                JournalAbbreviationLoader.loadRepository(jabKit.cliPreferences.getJournalAbbreviationPreferences()),
+                JournalAbbreviationLoader.loadRepository(jabKit.cliPreferences.getAbbreviationPreferences()),
                 allowIntegerEdition
         );
 
