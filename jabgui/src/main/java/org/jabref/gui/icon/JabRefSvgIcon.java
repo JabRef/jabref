@@ -16,9 +16,10 @@ import javafx.scene.paint.Paint;
 
 import tools.maran.svgnode.SvgNode;
 
-/// {@link SvgNode} that follows the same theme CSS as Ikonli font icons, so SVG icons need no special styling.
+/// Renders an SVG path as an icon that follows the same theme CSS as Ikonli font icons, so SVG icons need no
+/// special styling. The SVG-backed counterpart to a {@link org.kordamp.ikonli.javafx.FontIcon}.
 ///
-/// Bridges three CSS properties (which font icons already honor) onto the SVG node:
+/// Bridges three CSS properties (which font icons already honor) onto this node:
 /// - {@code -fx-icon-color} → {@link #setSvgColor(Paint)}
 /// - {@code -fx-icon-size} (absolute, e.g. {@code .action-icon}) → {@link #setSize(double)}
 /// - {@code -fx-font-size} (em, e.g. {@code .mainToolbar} at {@code 1.7em}) → {@link #setSize(double)}, resolved
@@ -27,43 +28,43 @@ import tools.maran.svgnode.SvgNode;
 /// Tagged with the {@code glyph-icon} and {@code ikonli-font-icon} style classes so existing selectors match it.
 /// Works whether used bare (via {@link JabRefIcon#getGraphicNode()}, as in the toolbar/menus) or inside a
 /// {@link JabRefIconView}. {@code -fx-icon-size}, when present, takes precedence over {@code -fx-font-size}.
-public class JabRefSvgNode extends SvgNode {
+public class JabRefSvgIcon extends SvgNode {
 
-    private static final CssMetaData<JabRefSvgNode, Paint> ICON_COLOR =
+    private static final CssMetaData<JabRefSvgIcon, Paint> ICON_COLOR =
             new CssMetaData<>("-fx-icon-color", PaintConverter.getInstance()) {
                 @Override
-                public boolean isSettable(JabRefSvgNode node) {
+                public boolean isSettable(JabRefSvgIcon node) {
                     return !node.iconColor.isBound();
                 }
 
                 @Override
-                public StyleableProperty<Paint> getStyleableProperty(JabRefSvgNode node) {
+                public StyleableProperty<Paint> getStyleableProperty(JabRefSvgIcon node) {
                     return node.iconColor;
                 }
             };
 
-    private static final CssMetaData<JabRefSvgNode, Number> ICON_SIZE =
+    private static final CssMetaData<JabRefSvgIcon, Number> ICON_SIZE =
             new CssMetaData<>("-fx-icon-size", SizeConverter.getInstance()) {
                 @Override
-                public boolean isSettable(JabRefSvgNode node) {
+                public boolean isSettable(JabRefSvgIcon node) {
                     return !node.iconSize.isBound();
                 }
 
                 @Override
-                public StyleableProperty<Number> getStyleableProperty(JabRefSvgNode node) {
+                public StyleableProperty<Number> getStyleableProperty(JabRefSvgIcon node) {
                     return node.iconSize;
                 }
             };
 
-    private static final CssMetaData<JabRefSvgNode, Number> FONT_SIZE =
+    private static final CssMetaData<JabRefSvgIcon, Number> FONT_SIZE =
             new CssMetaData<>("-fx-font-size", SizeConverter.getInstance()) {
                 @Override
-                public boolean isSettable(JabRefSvgNode node) {
+                public boolean isSettable(JabRefSvgIcon node) {
                     return !node.fontSize.isBound();
                 }
 
                 @Override
-                public StyleableProperty<Number> getStyleableProperty(JabRefSvgNode node) {
+                public StyleableProperty<Number> getStyleableProperty(JabRefSvgIcon node) {
                     return node.fontSize;
                 }
             };
@@ -105,7 +106,7 @@ public class JabRefSvgNode extends SvgNode {
                 }
             };
 
-    public JabRefSvgNode(String path, double size) {
+    public JabRefSvgIcon(String path, double size) {
         super(path, size);
         getStyleClass().addAll("glyph-icon", "ikonli-font-icon");
     }

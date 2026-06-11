@@ -16,9 +16,9 @@ import com.tobiasdiez.easybind.EasyBind;
 ///
 /// Hosts the backing node produced by {@link JabRefIcons#getGraphicNode()} instead of being a {@code FontIcon}
 /// itself, so it renders both Ikonli-font-backed glyphs (as a {@code FontIcon}) and SVG-backed glyphs
-/// (see {@link SvgIcon}, rendered as a {@link JabRefSvgNode}).
+/// (see {@link SvgIcon}, rendered as a {@link JabRefSvgIcon}).
 ///
-/// Theme coloring is handled by the hosted child itself (a {@code FontIcon} or {@link JabRefSvgNode}, both of
+/// Theme coloring is handled by the hosted child itself (a {@code FontIcon} or {@link JabRefSvgIcon}, both of
 /// which carry the icon style classes), so this view stays unclassed to avoid double-theming. The styleable
 /// {@code -fx-icon-color} here is an explicit override knob — e.g. an inline {@code style="-fx-icon-color: ..."}
 /// in FXML — and, when set, is forwarded to an SVG child as a user-origin color (overriding theme CSS).
