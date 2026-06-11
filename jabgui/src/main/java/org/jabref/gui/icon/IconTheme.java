@@ -56,11 +56,11 @@ public class IconTheme {
             "jabrefIcon64",
             "jabrefIcon128");
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(IconTheme.class);
+
     private static final String ICON_PATH_PREFIX = "/images/external/";
     private static final String DEFAULT_ICON_PATH = ICON_PATH_PREFIX + "red.png";
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(IconTheme.class.getResource("/images/Icons.properties"));
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(IconTheme.class);
 
     private IconTheme() {
     }
@@ -86,7 +86,6 @@ public class IconTheme {
         try (InputStream in = url.openStream()) {
             properties.load(in);
         } catch (IOException e) {
-            assert LOGGER != null;
             LOGGER.warn("Unable to read default icon theme.", e);
         }
 
