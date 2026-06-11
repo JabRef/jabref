@@ -5,7 +5,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
@@ -98,7 +97,6 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
         EasyBind.subscribe(textProperty(), label::replaceText);
         label.setAutoHeight(true);
         label.setWrapText(true);
-        label.getStyleClass().add("cursor-hand");
 
         // Workarounds
         preventTextSelectionViaMouseEvents();
@@ -124,7 +122,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
 
         HBox.setHgrow(labelBox, Priority.ALWAYS);
         labelBox.setPadding(new Insets(8));
-        labelBox.setCursor(Cursor.HAND);
+        labelBox.getStyleClass().add("cursor-hand");
     }
 
     private Button createCopyButton() {
