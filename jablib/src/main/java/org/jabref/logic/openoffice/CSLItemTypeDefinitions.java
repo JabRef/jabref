@@ -16,7 +16,7 @@ class CSLItemTypeDefinitions {
     /// CSL item type <-> BibLaTeX entry type can be found via [zotero-better-bibtex/biblatex.ts](https://github.com/retorquere/zotero-better-bibtex/blob/master/translators/bibtex/biblatex.ts)
     private static final Map<String, EntryType> CSL2BIB_TYPES = Map.ofEntries(
             // preprint
-            Map.entry("article", StandardEntryType.Online),
+            Map.entry("article", StandardEntryType.Article),
             // Journal Article
             Map.entry("article-journal", StandardEntryType.Article),
             // Magazine Article
@@ -235,7 +235,6 @@ class CSLItemTypeDefinitions {
 
             cslTypeToBibType("personal_communication", Map.ofEntries(
                     cslFieldToBibField("URL", StandardField.URL),
-                    cslFieldToBibField("event-place", StandardField.LOCATION),
                     cslFieldToBibField("event-place", StandardField.LOCATION))),
 
             cslTypeToBibType("post", Map.ofEntries(
