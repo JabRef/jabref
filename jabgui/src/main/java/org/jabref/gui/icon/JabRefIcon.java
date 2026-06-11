@@ -13,9 +13,7 @@ public sealed interface JabRefIcon permits IconTheme.JabRefIcons, IkonliIcon, Sv
     /// Whether {@code graphicNode} (built elsewhere, e.g. set as a control's graphic) is a rendering of this icon.
     /// Used to locate a control by the icon shown on it. Only implementations that can identify their own backing
     /// node type return {@code true}; the default is {@code false}.
-    default boolean matches(Node graphicNode) {
-        return false;
-    }
+    boolean matches(Node graphicNode);
 
     String name();
 

@@ -46,6 +46,11 @@ public final class SvgIcon implements JabRefIcon {
     }
 
     @Override
+    public boolean matches(Node graphicNode) {
+        return (graphicNode instanceof JabRefSvgNode svgNode) && svgNode.getPath().equals(svgPath);
+    }
+
+    @Override
     public String name() {
         return name;
     }
