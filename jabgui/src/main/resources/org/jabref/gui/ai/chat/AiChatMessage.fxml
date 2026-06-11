@@ -19,7 +19,7 @@
     <VBox fx:id="bubble"
           styleClass="chat-bubble">
         <Label fx:id="sourceLabel"
-               style="-fx-font-weight: bold;"/>
+               styleClass="bold"/>
 
         <StackPane
                 fx:id="markdownContentPane"/>
