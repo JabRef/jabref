@@ -65,8 +65,6 @@ class CSLItemTypeDefinitions {
             Map.entry("post-weblog", StandardEntryType.Online),
             // Report
             Map.entry("report", StandardEntryType.Report),
-            // Computer Program
-            Map.entry("software", StandardEntryType.Report),
             // Audio Recording
             Map.entry("song", BiblatexNonStandardEntryType.Music),
             // Presentation
@@ -173,68 +171,117 @@ class CSLItemTypeDefinitions {
                     cslFieldToBibField("ISBN", StandardField.ISBN))),
 
             cslTypeToBibType("graphic", Map.ofEntries(
-                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
+                    cslFieldToBibField("URL", StandardField.URL),
+                    cslFieldToBibField("event-place", StandardField.LOCATION),
                     cslFieldToBibField("publisher", StandardField.PUBLISHER))),
 
             cslTypeToBibType("hearing", Map.ofEntries(
-                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
-                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+                    cslFieldToBibField("event-place", StandardField.LOCATION),
+                    cslFieldToBibField("URL", StandardField.URL),
+                    // Not sure
+                    cslFieldToBibField("section", StandardField.ORGANIZATION),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER),
+                    cslFieldToBibField("page", StandardField.PAGES))),
+
             cslTypeToBibType("interview", Map.ofEntries(
+                    cslFieldToBibField("URL", StandardField.URL),
                     cslFieldToBibField("publisher-place", StandardField.LOCATION),
                     cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+
             cslTypeToBibType("legal_case", Map.ofEntries(
-                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
-                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+                    cslFieldToBibField("URL", StandardField.URL),
+                    cslFieldToBibField("volume", StandardField.VOLUME),
+                    cslFieldToBibField("page", StandardField.PAGES))),
+
             cslTypeToBibType("legislation", Map.ofEntries(
-                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
-                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+                    cslFieldToBibField("volume", StandardField.VOLUME),
+                    cslFieldToBibField("pages", StandardField.PAGES),
+                    cslFieldToBibField("URL", StandardField.URL))),
+
             cslTypeToBibType("manuscript", Map.ofEntries(
+                    cslFieldToBibField("URL", StandardField.URL),
                     cslFieldToBibField("publisher-place", StandardField.LOCATION),
                     cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+
             cslTypeToBibType("map", Map.ofEntries(
+                    cslFieldToBibField("edition", StandardField.EDITION),
+                    cslFieldToBibField("ISBN", StandardField.ISBN),
+                    cslFieldToBibField("URL", StandardField.URL),
                     cslFieldToBibField("publisher-place", StandardField.LOCATION),
                     cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+
             cslTypeToBibType("motion_picture", Map.ofEntries(
+                    cslFieldToBibField("URL", StandardField.URL),
                     cslFieldToBibField("publisher-place", StandardField.LOCATION),
                     cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+            // Author - > director
+
             cslTypeToBibType("paper-conference", Map.ofEntries(
                     cslFieldToBibField("collection-title", StandardField.SERIES),
-                    cslFieldToBibField("container-title", StandardField.JOURNALTITLE),
+                    cslFieldToBibField("container-title", StandardField.BOOKTITLE),
                     cslFieldToBibField("volume", StandardField.VOLUME),
-                    cslFieldToBibField("event-place", StandardField.LOCATION),
+                    cslFieldToBibField("publish-place", StandardField.LOCATION),
                     cslFieldToBibField("page", StandardField.PAGES),
+                    cslFieldToBibField("ISBN", StandardField.ISBN),
+                    cslFieldToBibField("ISSN", StandardField.ISSN),
+                    cslFieldToBibField("URL", StandardField.URL),
                     cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+
             cslTypeToBibType("patent", Map.ofEntries(
-                    cslFieldToBibField("number", StandardField.NUMBER))),
+                    cslFieldToBibField("page", StandardField.PAGES),
+                    cslFieldToBibField("URL", StandardField.URL),
+                    cslFieldToBibField("number", StandardField.NUMBER),
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION))),
+
             cslTypeToBibType("personal_communication", Map.ofEntries(
+                    cslFieldToBibField("URL", StandardField.URL),
+                    cslFieldToBibField("event-place", StandardField.LOCATION),
                     cslFieldToBibField("event-place", StandardField.LOCATION))),
+
             cslTypeToBibType("post", Map.ofEntries(
-                    cslFieldToBibField("publisher", StandardField.ORGANIZATION))),
+                    cslFieldToBibField("URL", StandardField.URL),
+                    cslFieldToBibField("container-title", StandardField.BOOKTITLE))),
+            // accessed, issued
+
             cslTypeToBibType("post-weblog", Map.ofEntries(
-                    cslFieldToBibField("publisher", StandardField.ORGANIZATION))),
+                    cslFieldToBibField("URL", StandardField.URL),
+                    cslFieldToBibField("container-title", StandardField.BOOKTITLE))),
+            // accessed, issued
+
             cslTypeToBibType("report", Map.ofEntries(
                     cslFieldToBibField("page", StandardField.PAGES),
-                    cslFieldToBibField("number", StandardField.NUMBER),
+                    cslFieldToBibField("collection-number", StandardField.NUMBER),
+                    cslFieldToBibField("ISBN", StandardField.ISBN),
                     cslFieldToBibField("publisher", StandardField.INSTITUTION),
                     cslFieldToBibField("publisher-place", StandardField.LOCATION))),
-            cslTypeToBibType("software", Map.ofEntries(
-                    cslFieldToBibField("event-place", StandardField.LOCATION),
-                    cslFieldToBibField("publisher", StandardField.ORGANIZATION))),
+
             cslTypeToBibType("song", Map.ofEntries(
+                    cslFieldToBibField("volume", StandardField.VOLUME),
+                    cslFieldToBibField("ISBN", StandardField.ISBN),
                     cslFieldToBibField("event-place", StandardField.LOCATION),
-                    cslFieldToBibField("publisher", StandardField.ORGANIZATION))),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER))),
+
             cslTypeToBibType("speech", Map.ofEntries(
-                    cslFieldToBibField("event-place", StandardField.LOCATION),
-                    cslFieldToBibField("publisher", StandardField.ORGANIZATION))),
+                    cslFieldToBibField("collection-title", StandardField.SERIES),
+                    cslFieldToBibField("URL", StandardField.URL),
+                    cslFieldToBibField("event-place", StandardField.LOCATION))),
+
             cslTypeToBibType("standard", Map.ofEntries(
-                    cslFieldToBibField("event-place", StandardField.LOCATION),
-                    cslFieldToBibField("publisher", StandardField.ORGANIZATION))),
+                    cslFieldToBibField("publish-place", StandardField.LOCATION),
+                    cslFieldToBibField("URL", StandardField.URL))),
+
             cslTypeToBibType("thesis", Map.ofEntries(
-                    cslFieldToBibField("publisher", StandardField.INSTITUTION),
+                    cslFieldToBibField("collection-title", StandardField.SERIES),
+                    cslFieldToBibField("ISBN", StandardField.ISBN),
+                    cslFieldToBibField("URL", StandardField.URL),
+                    cslFieldToBibField("ISSN", StandardField.ISSN),
+                    cslFieldToBibField("publisher", StandardField.PUBLISHER),
                     cslFieldToBibField("publisher-place", StandardField.LOCATION))),
+
             cslTypeToBibType("webpage", Map.ofEntries(
-                    cslFieldToBibField("container-title", StandardField.JOURNALTITLE),
-                    cslFieldToBibField("URL", StandardField.URL)))
+                    cslFieldToBibField("URL", StandardField.URL),
+                    cslFieldToBibField("container-title", StandardField.BOOKTITLE)))
+            // Accessed, issued
     );
 
     static Optional<EntryType> getEntryType(String cslItemType) {
