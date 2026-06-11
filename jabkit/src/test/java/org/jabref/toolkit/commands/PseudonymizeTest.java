@@ -1,8 +1,6 @@
 package org.jabref.toolkit.commands;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -21,7 +19,7 @@ public class PseudonymizeTest extends AbstractJabKitTest {
         commandLine.execute("pseudonymize", "--input=" + origin, "--output=" + output, "--key=" + key);
         assertFileExists(output);
         assertFileExists(key);
-        assertFalse(Files.readAllLines(output, Charset.defaultCharset()).stream().anyMatch((s) -> s.contains("Newton1999")));
+        assertFalse(Files.readAllLines(output).stream().anyMatch((s) -> s.contains("Newton1999")));
     }
 
     @Test
@@ -41,11 +39,11 @@ public class PseudonymizeTest extends AbstractJabKitTest {
         Path origin = getClassResourceAsPath("origin.bib").toAbsolutePath();
         Path output = tempDir.resolve("new.pseudo.bib");
         Path key = tempDir.resolve("new.pseudo.csv");
-        Files.write(output, "some".getBytes(StandardCharsets.UTF_8));
+        Files.writeString(output, "some");
         commandLine.execute("pseudonymize", "-f", "--input=" + origin, "--output=" + output, "--key=" + key);
         assertFileExists(output);
         assertFileExists(key);
-        assertTrue(Files.readAllLines(output, Charset.defaultCharset()).size() > 1);
+        assertTrue(Files.readAllLines(output).size() > 1);
     }
 
     @Test
@@ -53,10 +51,10 @@ public class PseudonymizeTest extends AbstractJabKitTest {
         Path origin = getClassResourceAsPath("origin.bib").toAbsolutePath();
         Path output = tempDir.resolve("new.pseudo.bib");
         Path key = tempDir.resolve("new.pseudo.csv");
-        Files.write(key, "some".getBytes(StandardCharsets.UTF_8));
+        Files.writeString(key, "some");
         commandLine.execute("pseudonymize", "--input=" + origin, "--output=" + output, "--key=" + key);
         assertFileExists(output);
         assertFileExists(key);
-        assertFalse(Files.readAllLines(key, Charset.defaultCharset()).size() > 1);
+        assertFalse(Files.readAllLines(key).size() > 1);
     }
 }

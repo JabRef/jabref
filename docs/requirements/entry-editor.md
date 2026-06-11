@@ -12,4 +12,11 @@ When users search or select a group not containing the entry shown in the Entry 
 
 Needs: impl
 
+## Citations tab should show citation preview on hover
+`req~entry-editor.citations.hover-preview~1`
+
+When the user hovers over a citation entry inside the Entry Editor's "Citations" tab, a tooltip containing the entry preview rendered in the current selected style should be displayed.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
