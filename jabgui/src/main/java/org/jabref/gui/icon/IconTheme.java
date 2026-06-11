@@ -1,14 +1,13 @@
 package org.jabref.gui.icon;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 
 import javafx.scene.Node;
 import javafx.scene.image.Image;
@@ -78,30 +77,21 @@ public class IconTheme {
         return Objects.requireNonNull(IconTheme.class.getResource(path), "Path must not be null for key " + name);
     }
 
-    /// Read a typical java property url into a Map. Currently, doesn't support escaping
-    /// of the '=' character - it simply looks for the first '=' to determine where the key ends.
-    /// Both the key and the value is trimmed for whitespace at the ends.
+    /// Reads file mapping icon keys to image file names, prefixing each value with {@link #ICON_PATH_PREFIX}.
     ///
     /// @param url The URL to read information from.
     /// @return A Map containing all key-value pairs found.
     private static Map<String, String> readIconThemeFile(@NonNull URL url) {
-        Map<String, String> result = new HashMap<>();
-
-        try (BufferedReader in = new BufferedReader(
-                new InputStreamReader(url.openStream(), StandardCharsets.ISO_8859_1))) {
-            String line;
-            while ((line = in.readLine()) != null) {
-                if (!line.contains("=")) {
-                    continue;
-                }
-
-                int index = line.indexOf('=');
-                String key = line.substring(0, index).trim();
-                String value = ICON_PATH_PREFIX + line.substring(index + 1).trim();
-                result.put(key, value);
-            }
+        Properties properties = new Properties();
+        try (InputStream in = url.openStream()) {
+            properties.load(in);
         } catch (IOException e) {
             LOGGER.warn("Unable to read default icon theme.", e);
+        }
+
+        Map<String, String> result = new HashMap<>();
+        for (String key : properties.stringPropertyNames()) {
+            result.put(key, ICON_PATH_PREFIX + properties.getProperty(key));
         }
         return result;
     }
