@@ -80,7 +80,7 @@ public class UnpaywallFetcher implements SearchBasedFetcher, CustomizableKeyFetc
     @Override
     public boolean isValidKey(String apiKey) {
         try {
-            URL testUrl = new URL(getUrl("10.47397/tb/44-3/tb138kopp-jabref", apiKey));
+            URL testUrl = URLUtil.create(getUrl("10.47397/tb/44-3/tb138kopp-jabref", apiKey));
             HttpURLConnection connection = (HttpURLConnection) testUrl.openConnection();
             int statusCode = connection.getResponseCode();
             return (statusCode >= 200) && (statusCode < 300);

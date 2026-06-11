@@ -182,7 +182,7 @@
         <HBox>
             <Region HBox.hgrow="ALWAYS"/>
             <Label text="%The size of the embedding model could be smaller than written in the list."
-                   style="-fx-font-style: italic;"/>
+                   styleClass="italic"/>
         </HBox>
 
         <Spacer/>
