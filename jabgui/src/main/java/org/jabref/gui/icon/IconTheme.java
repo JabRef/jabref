@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
@@ -376,20 +374,6 @@ public class IconTheme {
         @Override
         public JabRefIcon withSize(int size) {
             return icon.withSize(size);
-        }
-
-        public Button asButton() {
-            Button button = new Button();
-            button.setGraphic(getGraphicNode());
-            button.getStyleClass().add("icon-button");
-            return button;
-        }
-
-        public ToggleButton asToggleButton() {
-            ToggleButton button = new ToggleButton();
-            button.setGraphic(getGraphicNode());
-            button.getStyleClass().add("icon-button");
-            return button;
         }
 
         @Override
