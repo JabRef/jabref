@@ -65,7 +65,7 @@ public class IconTheme {
     private IconTheme() {
     }
 
-    public static Image getJabRefImage() {
+    public static Image getJabRefIcon() {
         return new Image(getIconUrl("jabrefIcon48").toString());
     }
 
@@ -86,6 +86,7 @@ public class IconTheme {
         try (InputStream in = url.openStream()) {
             properties.load(in);
         } catch (IOException e) {
+            assert LOGGER != null;
             LOGGER.warn("Unable to read default icon theme.", e);
         }
 
@@ -96,7 +97,7 @@ public class IconTheme {
         return result;
     }
 
-    public static List<Image> getLogoSetFX() {
+    public static List<Image> getLogoSet() {
         return LOGO_SET.stream()
                        .map(name -> new Image(getIconUrl(name).toString()))
                        .toList();
@@ -312,12 +313,11 @@ public class IconTheme {
         ABSOLUTE_PATH(MaterialDesignF.FAMILY_TREE),
         GIT_SYNC(MaterialDesignG.GIT),
         RELATIVE_PATH(MaterialDesignF.FILE_TREE_OUTLINE),
-        SHORTEN_DOI(MaterialDesignA.ARROW_COLLAPSE_HORIZONTAL),
-        // Example SVG-backed icon (a star, 24x24 viewport) sourced via the svgnode library instead of an Ikonli font.
-        EXAMPLE_SVG_STAR("M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z");
+        SHORTEN_DOI(MaterialDesignA.ARROW_COLLAPSE_HORIZONTAL);
 
-        /// Backing icon: an {@link IkonliIcon} for Ikonli-font glyphs (the common case) or an {@link SvgIcon} for
-        /// glyphs only available as SVG. {@link #getGraphicNode()} works for both.
+        // Example SVG-backed icon (a star, 24x24 viewport) sourced via the svgnode for testing purposes.
+        // EXAMPLE_SVG_STAR("M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z");
+
         private final JabRefIcon icon;
 
         JabRefIcons(Ikon... icons) {
@@ -328,7 +328,6 @@ public class IconTheme {
             icon = new IkonliIcon(color, icons);
         }
 
-        /// Builds an SVG-backed icon from a raw SVG path string (24x24 viewport), via the svgnode library.
         JabRefIcons(String svgPath) {
             icon = new SvgIcon(name(), svgPath);
         }

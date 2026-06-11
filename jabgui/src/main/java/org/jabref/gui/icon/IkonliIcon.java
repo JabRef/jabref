@@ -61,9 +61,8 @@ public final class IkonliIcon implements JabRefIcon {
                               .findFirst();
     }
 
-    /// Holds every {@link Ikon} discovered via the {@link IkonProvider} service loader, used by {@link #findIcon}.
-    /// Initialization-on-demand holder: the JVM populates {@link #ALL} exactly once, on first access, with no
-    /// explicit locking.
+    /// Holds every {@link Ikon} discovered via the {@link IkonProvider} service loader. Initialization on first
+    /// access guaranteed by JVM.
     private static final class IkonliIcons {
         private static final Set<Ikon> ALL = load();
 
