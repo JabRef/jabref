@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,39 +46,31 @@ import org.slf4j.LoggerFactory;
 public class IconTheme {
 
     public static final Color DEFAULT_DISABLED_COLOR = Color.web("#c8c8c8");
+    public static final Color DEFAULT_GROUP_COLOR = Color.web("#8a8a8a");
     public static final Color SELECTED_COLOR = Color.web("#50618F");
-    private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
+    private static final List<String> LOGO_SET = List.of(
+            "jabrefIcon16",
+            "jabrefIcon20",
+            "jabrefIcon32",
+            "jabrefIcon40",
+            "jabrefIcon48",
+            "jabrefIcon64",
+            "jabrefIcon128");
+
+    private static final String ICON_PATH_PREFIX = "/images/external/";
+    private static final String DEFAULT_ICON_PATH = ICON_PATH_PREFIX + "red.png";
+    private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(IconTheme.class.getResource("/images/Icons.properties"));
+
     private static final Logger LOGGER = LoggerFactory.getLogger(IconTheme.class);
-    private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
 
     private IconTheme() {
     }
 
-    public static Color getDefaultGroupColor() {
-        return Color.web("#8a8a8a");
-    }
-
     public static Image getJabRefImage() {
-        return getImageFX("jabrefIcon48");
+        return new Image(getIconUrl("jabrefIcon48").toString());
     }
 
-    /*
-     * Constructs an {@link Image} for the image representing the given function, in the resource
-     * file listing images.
-     *
-     * @param name The name of the icon, such as "open", "save", "saveAs" etc.
-     * @return The {@link Image} for the function.
-     */
-    private static Image getImageFX(String name) {
-        return new Image(getIconUrl(name).toString());
-    }
-
-    /// Looks up the URL for the image representing the given function, in the resource
-    /// file listing images.
-    ///
-    /// @param name The name of the icon, such as "open", "save", "saveAs" etc.
-    /// @return The URL to the actual image to use.
-    public static URL getIconUrl(@NonNull String name) {
+    private static URL getIconUrl(@NonNull String name) {
         if (!KEY_TO_ICON.containsKey(name)) {
             LOGGER.warn("Could not find icon url by name {}, so falling back on default icon {}", name, DEFAULT_ICON_PATH);
         }
@@ -91,11 +82,9 @@ public class IconTheme {
     /// of the '=' character - it simply looks for the first '=' to determine where the key ends.
     /// Both the key and the value is trimmed for whitespace at the ends.
     ///
-    /// @param url    The URL to read information from.
-    /// @param prefix A String to prefix to all values read. Can represent e.g. the directory where icon files are to be found.
+    /// @param url The URL to read information from.
     /// @return A Map containing all key-value pairs found.
-    // FIXME: prefix can be removed?!
-    private static Map<String, String> readIconThemeFile(@NonNull URL url, @NonNull String prefix) {
+    private static Map<String, String> readIconThemeFile(@NonNull URL url) {
         Map<String, String> result = new HashMap<>();
 
         try (BufferedReader in = new BufferedReader(
@@ -108,7 +97,7 @@ public class IconTheme {
 
                 int index = line.indexOf('=');
                 String key = line.substring(0, index).trim();
-                String value = prefix + line.substring(index + 1).trim();
+                String value = ICON_PATH_PREFIX + line.substring(index + 1).trim();
                 result.put(key, value);
             }
         } catch (IOException e) {
@@ -118,16 +107,9 @@ public class IconTheme {
     }
 
     public static List<Image> getLogoSetFX() {
-        List<Image> jabrefLogos = new ArrayList<>();
-        jabrefLogos.add(new Image(getIconUrl("jabrefIcon16").toString()));
-        jabrefLogos.add(new Image(getIconUrl("jabrefIcon20").toString()));
-        jabrefLogos.add(new Image(getIconUrl("jabrefIcon32").toString()));
-        jabrefLogos.add(new Image(getIconUrl("jabrefIcon40").toString()));
-        jabrefLogos.add(new Image(getIconUrl("jabrefIcon48").toString()));
-        jabrefLogos.add(new Image(getIconUrl("jabrefIcon64").toString()));
-        jabrefLogos.add(new Image(getIconUrl("jabrefIcon128").toString()));
-
-        return jabrefLogos;
+        return LOGO_SET.stream()
+                       .map(name -> new Image(getIconUrl(name).toString()))
+                       .toList();
     }
 
     public enum JabRefIcons implements JabRefIcon {

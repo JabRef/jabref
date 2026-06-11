@@ -262,7 +262,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 return;
             }
             if (parentNode == null) {
-                viewModel.colorFieldProperty().setValue(IconTheme.getDefaultGroupColor());
+                viewModel.colorFieldProperty().setValue(IconTheme.DEFAULT_GROUP_COLOR);
                 return;
             }
             List<Color> colorsOfSiblings = parentNode.getChildren().stream()
