@@ -22,6 +22,9 @@ class ZoteroCitationData {
         @SerializedName("collection-title")
         String collectionTitle = "";
 
+        @SerializedName("collection-number")
+        String collectionNumber = "";
+
         @SerializedName("DOI")
         String doi = "";
 
@@ -68,8 +71,10 @@ class ZoteroCitationData {
                 case "edition" ->
                         edition;
                 case "event-place",
-                     "publish-place" ->
+                     "publisher-place" ->
                         Location;
+                case "collection-number" ->
+                        collectionNumber;
                 case "ISBN" ->
                         isbn;
                 case "ISSN" ->
