@@ -195,7 +195,7 @@ class CSLItemTypeDefinitions {
 
             cslTypeToBibType("legislation", Map.ofEntries(
                     cslFieldToBibField("volume", StandardField.VOLUME),
-                    cslFieldToBibField("pages", StandardField.PAGES),
+                    cslFieldToBibField("page", StandardField.PAGES),
                     cslFieldToBibField("URL", StandardField.URL))),
 
             cslTypeToBibType("manuscript", Map.ofEntries(
