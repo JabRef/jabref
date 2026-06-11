@@ -69,6 +69,12 @@ public class IconTheme {
         return new Image(getIconUrl("jabrefIcon48").toString());
     }
 
+    public static List<Image> getLogoSet() {
+        return LOGO_SET.stream()
+                       .map(name -> new Image(getIconUrl(name).toString()))
+                       .toList();
+    }
+
     private static URL getIconUrl(@NonNull String name) {
         if (!KEY_TO_ICON.containsKey(name)) {
             LOGGER.warn("Could not find icon url by name {}, so falling back on default icon {}", name, DEFAULT_ICON_PATH);
@@ -94,12 +100,6 @@ public class IconTheme {
             result.put(key, ICON_PATH_PREFIX + properties.getProperty(key));
         }
         return result;
-    }
-
-    public static List<Image> getLogoSet() {
-        return LOGO_SET.stream()
-                       .map(name -> new Image(getIconUrl(name).toString()))
-                       .toList();
     }
 
     public enum JabRefIcons implements JabRefIcon {
@@ -312,10 +312,10 @@ public class IconTheme {
         ABSOLUTE_PATH(MaterialDesignF.FAMILY_TREE),
         GIT_SYNC(MaterialDesignG.GIT),
         RELATIVE_PATH(MaterialDesignF.FILE_TREE_OUTLINE),
-        SHORTEN_DOI(MaterialDesignA.ARROW_COLLAPSE_HORIZONTAL);
+        SHORTEN_DOI(MaterialDesignA.ARROW_COLLAPSE_HORIZONTAL),
 
         // Example SVG-backed icon (a star, 24x24 viewport) sourced via the svgnode for testing purposes.
-        // EXAMPLE_SVG_STAR("M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z");
+        EXAMPLE_SVG_STAR("M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z");
 
         private final JabRefIcon icon;
 

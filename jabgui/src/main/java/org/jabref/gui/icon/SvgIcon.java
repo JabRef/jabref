@@ -6,9 +6,6 @@ import javafx.scene.paint.Color;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-/// {@link JabRefIcon} backed by an SVG path, rendered as a {@link JabRefSvgNode} via the
-/// <a href="https://github.com/Maran23/svgnode">svgnode</a> library. The SVG-backed counterpart to
-/// {@link IkonliIcon}; use it for glyphs only available as SVG rather than as an Ikonli font glyph.
 @NullMarked
 public final class SvgIcon implements JabRefIcon {
 
@@ -21,10 +18,6 @@ public final class SvgIcon implements JabRefIcon {
 
     public SvgIcon(String name, String svgPath) {
         this(name, svgPath, DEFAULT_SIZE, null);
-    }
-
-    public SvgIcon(String name, String svgPath, int size) {
-        this(name, svgPath, size, null);
     }
 
     private SvgIcon(String name, String svgPath, int size, @Nullable Color color) {

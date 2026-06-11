@@ -1,22 +1,11 @@
 package org.jabref.gui.icon;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.css.CssMetaData;
-import javafx.css.SimpleStyleableObjectProperty;
 import javafx.css.Size;
 import javafx.css.SizeUnits;
-import javafx.css.Styleable;
-import javafx.css.StyleableObjectProperty;
-import javafx.css.StyleableProperty;
-import javafx.css.converter.PaintConverter;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 
 import org.jabref.gui.icon.IconTheme.JabRefIcons;
@@ -34,31 +23,6 @@ import com.tobiasdiez.easybind.EasyBind;
 /// {@code -fx-icon-color} here is an explicit override knob — e.g. an inline {@code style="-fx-icon-color: ..."}
 /// in FXML — and, when set, is forwarded to an SVG child as a user-origin color (overriding theme CSS).
 public class JabRefIconView extends Group {
-
-    private static final CssMetaData<JabRefIconView, Paint> ICON_COLOR =
-            new CssMetaData<>("-fx-icon-color", PaintConverter.getInstance()) {
-                @Override
-                public boolean isSettable(JabRefIconView node) {
-                    return !node.iconColor.isBound();
-                }
-
-                @Override
-                public StyleableProperty<Paint> getStyleableProperty(JabRefIconView node) {
-                    return node.iconColor;
-                }
-            };
-
-    private static final List<CssMetaData<? extends Styleable, ?>> CSS_META_DATA;
-
-    static {
-        List<CssMetaData<? extends Styleable, ?>> metaData = new ArrayList<>(Group.getClassCssMetaData());
-        metaData.add(ICON_COLOR);
-        CSS_META_DATA = Collections.unmodifiableList(metaData);
-    }
-
-    /// CSS-styleable color, fed by {@code -fx-icon-color} rules. Forwarded to SVG children.
-    private final StyleableObjectProperty<Paint> iconColor =
-            new SimpleStyleableObjectProperty<>(ICON_COLOR, this, "iconColor");
 
     /// This property is only needed to get proper IDE support in FXML files
     /// (e.g. validation that parameter passed to "icon" is indeed of type {@link IconTheme.JabRefIcons}).
@@ -85,7 +49,6 @@ public class JabRefIconView extends Group {
     private void initialize() {
         EasyBind.subscribe(glyph, _ -> updateGraphic());
         EasyBind.subscribe(glyphSize, _ -> updateGraphic());
-        EasyBind.subscribe(iconColor, _ -> applyColor());
     }
 
     /// Rebuilds the hosted node from the current glyph, sized to the current glyph size. The icon applies the size
@@ -93,25 +56,6 @@ public class JabRefIconView extends Group {
     private void updateGraphic() {
         Node node = glyph.get().withSize(glyphSize.get().intValue()).getGraphicNode();
         getChildren().setAll(node);
-        applyColor();
-    }
-
-    /// Forwards an explicit {@link #iconColor} override to an SVG child as a user-origin color. When unset
-    /// (the common case) the child colors itself from theme CSS, so it is left untouched.
-    private void applyColor() {
-        Paint color = iconColor.get();
-        if ((color != null) && !getChildren().isEmpty() && (getChildren().getFirst() instanceof JabRefSvgNode svgNode)) {
-            svgNode.setIconColor(color);
-        }
-    }
-
-    public static List<CssMetaData<? extends Styleable, ?>> getClassCssMetaData() {
-        return CSS_META_DATA;
-    }
-
-    @Override
-    public List<CssMetaData<? extends Styleable, ?>> getCssMetaData() {
-        return CSS_META_DATA;
     }
 
     public IconTheme.JabRefIcons getGlyph() {
