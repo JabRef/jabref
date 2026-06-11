@@ -220,7 +220,7 @@ class CSLItemTypeDefinitions {
                     cslFieldToBibField("collection-title", StandardField.SERIES),
                     cslFieldToBibField("container-title", StandardField.BOOKTITLE),
                     cslFieldToBibField("volume", StandardField.VOLUME),
-                    cslFieldToBibField("publish-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
                     cslFieldToBibField("page", StandardField.PAGES),
                     cslFieldToBibField("ISBN", StandardField.ISBN),
                     cslFieldToBibField("ISSN", StandardField.ISSN),
@@ -267,7 +267,7 @@ class CSLItemTypeDefinitions {
                     cslFieldToBibField("event-place", StandardField.LOCATION))),
 
             cslTypeToBibType("standard", Map.ofEntries(
-                    cslFieldToBibField("publish-place", StandardField.LOCATION),
+                    cslFieldToBibField("publisher-place", StandardField.LOCATION),
                     cslFieldToBibField("URL", StandardField.URL))),
 
             cslTypeToBibType("thesis", Map.ofEntries(
