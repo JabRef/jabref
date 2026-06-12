@@ -303,6 +303,14 @@ public class AiPreferences {
         return aiFeaturesEnabledInitially.get();
     }
 
+    public BooleanProperty aiFeaturesEnabledCurrentlyProperty() {
+        return aiFeaturesEnabledCurrently;
+    }
+
+    public boolean getAiFeaturesEnabledCurrently() {
+        return aiFeaturesEnabledCurrently.get();
+    }
+
     public void setAiFeaturesEnabledCurrently(boolean aiFeaturesEnabledCurrently) {
         this.aiFeaturesEnabledCurrently.set(aiFeaturesEnabledCurrently);
     }
