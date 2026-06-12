@@ -37,7 +37,7 @@ public class AiEntryChatViewModel extends AbstractViewModel {
     }
 
     private void setupBindings() {
-        enabled.bind(aiPreferences.aiFeaturesEnabledCurrentlyProperty());
+        enabled.bind(aiPreferences.aiFeaturesEnabledProperty());
     }
 
     private void setupListeners() {

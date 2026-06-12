@@ -149,13 +149,13 @@ public class AiChatViewModel extends AbstractViewModel {
                 aiPreferences.getDocumentSplitterProperties()
         ));
 
-        BooleanBinding isAiTurnedOff = aiPreferences.aiFeaturesEnabledCurrentlyProperty().not();
+        BooleanBinding isAiTurnedOff = aiPreferences.aiFeaturesEnabledProperty().not();
         BooleanBinding isWaiting = generateRagResponseTask.isNotNull();
         BooleanBinding hasNoFiles = Bindings.createBooleanBinding(() ->
                         entries.get() == null ||
                                 entries.isEmpty() ||
                                 entries.stream().flatMap(identifier -> identifier.entry().getFiles().stream()).findAny().isEmpty(),
-                entries, aiPreferences.aiFeaturesEnabledCurrentlyProperty()
+                entries, aiPreferences.aiFeaturesEnabledProperty()
         );
 
         BooleanBinding isError = Bindings.createBooleanBinding(() -> {
@@ -202,7 +202,7 @@ public class AiChatViewModel extends AbstractViewModel {
     }
 
     private void changeEmbeddingTasks() {
-        if (!aiPreferences.getAiFeaturesEnabledCurrently() || entries.isEmpty()) {
+        if (!aiPreferences.getAiFeaturesEnabled() || entries.isEmpty()) {
             return;
         }
 

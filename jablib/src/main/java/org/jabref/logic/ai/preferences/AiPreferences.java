@@ -226,7 +226,7 @@ public class AiPreferences {
     }
 
     public void setAll(AiPreferences preferences) {
-        this.aiFeaturesEnabledCurrently.set(preferences.getAiFeaturesEnabledCurrently());
+        this.aiFeaturesEnabledCurrently.set(preferences.getAiFeaturesEnabled());
         this.autoGenerateEmbeddings.set(preferences.getAutoGenerateEmbeddings());
         this.autoGenerateSummaries.set(preferences.getAutoGenerateSummaries());
         this.aiProvider.set(preferences.getAiProvider());
@@ -295,12 +295,12 @@ public class AiPreferences {
         }
     }
 
-    public BooleanProperty aiFeaturesEnabledCurrentlyProperty() {
-        return aiFeaturesEnabledCurrently;
+    public ReadOnlyBooleanProperty aiFeaturesEnabledProperty() {
+        return aiFeaturesEnabledInitially;
     }
 
-    public boolean getAiFeaturesEnabledCurrently() {
-        return aiFeaturesEnabledCurrently.get();
+    public boolean getAiFeaturesEnabled() {
+        return aiFeaturesEnabledInitially.get();
     }
 
     public void setAiFeaturesEnabledCurrently(boolean aiFeaturesEnabledCurrently) {

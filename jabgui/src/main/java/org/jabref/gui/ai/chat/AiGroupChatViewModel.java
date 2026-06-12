@@ -37,7 +37,7 @@ public class AiGroupChatViewModel extends AbstractViewModel {
         this.aiPreferences = aiPreferences;
         this.chatHistoryCache = aiService.getChatHistoryCache();
 
-        enabled.bind(aiPreferences.aiFeaturesEnabledCurrentlyProperty());
+        enabled.bind(aiPreferences.aiFeaturesEnabledProperty());
 
         BindingsHelper.listen(this::loadGroupChat, groupNode, databaseContext);
     }
