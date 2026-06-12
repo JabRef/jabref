@@ -136,7 +136,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     private Text createFileLink(LinkedFile linkedFile) {
         Text fileLinkText = new Text(Localization.lang("Found match in %0", linkedFile.getLink()) + System.lineSeparator() + System.lineSeparator());
-        fileLinkText.setStyle("-fx-font-weight: bold;");
+        fileLinkText.getStyleClass().add("bold");
 
         ContextMenu fileContextMenu = getFileContextMenu(linkedFile);
         BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
