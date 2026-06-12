@@ -71,6 +71,20 @@
     -fx-font-style: italic;
 }
 
+.bold-italic {
+    -fx-font-weight: bold;
+    -fx-font-style: italic;
+}
+
+.cursor-hand {
+    -fx-cursor: hand;
+}
+
+.marking-label {
+    -fx-font-size: 0.75em;
+    -fx-font-weight: bold;
+}
+
 .bordered {
     -fx-border-width: 1;
     -fx-border-color: -fx-outer-border;
