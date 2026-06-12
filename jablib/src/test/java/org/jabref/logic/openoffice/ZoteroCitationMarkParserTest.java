@@ -18,6 +18,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ZoteroCitationMarkParserTest {
 
+    private record CSLTestCase(
+            String itemData,
+            StandardEntryType entryType,
+            Map<StandardField, String> fields) {
+    }
+
     private static final String JOURNAL_ARTICLE_CSL_JSON = """
             {
               "citationItems": [
@@ -91,21 +97,21 @@ class ZoteroCitationMarkParserTest {
 
     @ParameterizedTest
     @MethodSource
-    void parseCSLJSON(String itemData, StandardEntryType expectedEntryType, Map<StandardField, String> expectedFields) {
+    void parseCSLJSON(CSLTestCase testCase) {
         List<BibEntry> entries = ZoteroCitationMarkParser.parse("""
                 ZOTERO_ITEM CSL_CITATION {"citationItems":[{"id":600,"itemData":{%s}}]} test1234
-                """.formatted(itemData));
+                """.formatted(testCase.itemData()));
         BibEntry entry = entries.getFirst();
 
-        assertEquals(expectedEntryType, entry.getType());
-        for (Map.Entry<StandardField, String> expectedField : expectedFields.entrySet()) {
+        assertEquals(testCase.entryType(), entry.getType());
+        for (Map.Entry<StandardField, String> expectedField : testCase.fields().entrySet()) {
             assertEquals(Optional.of(expectedField.getValue()), entry.getField(expectedField.getKey()));
         }
     }
 
-    private static Stream<Arguments> parseCSLJSON() {
+    private static Stream<CSLTestCase> parseCSLJSON() {
         return Stream.of(
-                Arguments.of(
+                new CSLTestCase(
                         """
                                 "type":"article-magazine",
                                 "title":"Magazine article"
@@ -115,7 +121,7 @@ class ZoteroCitationMarkParserTest {
                                 StandardField.TITLE, "Magazine article"
                         )
                 ),
-                Arguments.of(
+                new CSLTestCase(
                         """
                                 "type":"article-newspaper",
                                 "title":"Newspaper article"
@@ -125,7 +131,7 @@ class ZoteroCitationMarkParserTest {
                                 StandardField.TITLE, "Newspaper article"
                         )
                 ),
-                Arguments.of(
+                new CSLTestCase(
                         """
                                 "type":"book",
                                 "title":"Book title",
@@ -147,7 +153,7 @@ class ZoteroCitationMarkParserTest {
                                 StandardField.VOLUME, "4"
                         )
                 ),
-                Arguments.of(
+                new CSLTestCase(
                         """
                                 "type":"chapter",
                                 "title":"Chapter title",
@@ -167,7 +173,7 @@ class ZoteroCitationMarkParserTest {
                                 StandardField.ISBN, "978-4-56"
                         )
                 ),
-                Arguments.of(
+                new CSLTestCase(
                         """
                                 "type":"paper-conference",
                                 "title":"Conference paper",
@@ -187,7 +193,7 @@ class ZoteroCitationMarkParserTest {
                                 StandardField.ISBN, "978-7-89"
                         )
                 ),
-                Arguments.of(
+                new CSLTestCase(
                         """
                                 "type":"webpage",
                                 "title":"Web page",
@@ -200,7 +206,7 @@ class ZoteroCitationMarkParserTest {
                                 StandardField.URL, "https://example.org"
                         )
                 ),
-                Arguments.of(
+                new CSLTestCase(
                         """
                                 "type":"thesis",
                                 "title":"Thesis title",
@@ -214,7 +220,7 @@ class ZoteroCitationMarkParserTest {
                                 StandardField.PUBLISHER, "Test University"
                         )
                 ),
-                Arguments.of(
+                new CSLTestCase(
                         """
                                 "type":"report",
                                 "title":"Report title",
