@@ -148,13 +148,42 @@
       "type": "java.time.ZonedDateTime"
     },
     {
-      "type": "org.jabref.toolkit.commands.CheckConsistency",
+      "type": "org.jabref.toolkit.commands.Check",
       "fields": [
         {
           "name": "jabKit"
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputFile"
+        },
+        {
+          "name": "outputFormat"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.CheckConsistency",
+      "fields": [
+        {
+          "name": "check"
+        },
+        {
+          "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
+        },
+        {
+          "name": "outputFormat"
         }
       ],
       "methods": [
@@ -168,10 +197,19 @@
       "type": "org.jabref.toolkit.commands.CheckIntegrity",
       "fields": [
         {
-          "name": "jabKit"
+          "name": "check"
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
+        },
+        {
+          "name": "outputFormat"
+        },
+        {
+          "name": "allowIntegerEdition"
         }
       ],
       "methods": [
@@ -203,6 +241,9 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
         }
       ],
       "methods": [
@@ -254,6 +295,9 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
         }
       ],
       "methods": [
@@ -271,6 +315,9 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
         }
       ],
       "methods": [
@@ -305,6 +352,37 @@
         },
         {
           "name": "sharedOptions"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.InputOption",
+      "fields": [
+        {
+          "name": "inputSource"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.InputOption$InputSource",
+      "fields": [
+        {
+          "name": "positionalInput"
+        },
+        {
+          "name": "optionInput"
         }
       ],
       "methods": [
@@ -364,6 +442,9 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
         }
       ],
       "methods": [
@@ -440,6 +521,9 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
         }
       ],
       "methods": [
@@ -457,6 +541,9 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
         }
       ],
       "methods": [
