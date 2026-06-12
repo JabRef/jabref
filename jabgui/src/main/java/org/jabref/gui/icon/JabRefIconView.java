@@ -50,6 +50,12 @@ public class JabRefIconView extends Group {
 
     private static final List<CssMetaData<? extends Styleable, ?>> CSS_META_DATA;
 
+    static {
+        List<CssMetaData<? extends Styleable, ?>> metaData = new ArrayList<>(Group.getClassCssMetaData());
+        metaData.add(ICON_COLOR);
+        CSS_META_DATA = Collections.unmodifiableList(metaData);
+    }
+
     /// CSS-styleable color, fed by {@code -fx-icon-color} rules (e.g. an inline {@code style="-fx-icon-color: ..."}).
     /// Forwarded to an SVG child as a user-origin color.
     private final StyleableObjectProperty<Paint> iconColor =
@@ -70,11 +76,6 @@ public class JabRefIconView extends Group {
         Size size = new Size(1.0, SizeUnits.EM);
         this.glyph = new SimpleObjectProperty<>(icon);
         this.glyphSize = new SimpleObjectProperty<>((int) size.pixels(Font.getDefault()));
-
-        List<CssMetaData<? extends Styleable, ?>> metaData = new ArrayList<>(Group.getClassCssMetaData());
-        metaData.add(ICON_COLOR);
-        CSS_META_DATA = Collections.unmodifiableList(metaData);
-
         initialize();
     }
 
