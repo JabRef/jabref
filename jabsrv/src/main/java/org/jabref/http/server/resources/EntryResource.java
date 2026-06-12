@@ -44,7 +44,7 @@ public class EntryResource {
     @Inject
     SrvStateManager srvStateManager;
 
-    /// At http://localhost:23119/libraries/{id}/entries/{entryId} <br><br>
+    /// At [http://localhost:23119/libraries/){id}/entries/{entryId}](http://localhost:23119/libraries/){id}/entries/{entryId} <br><br>
     ///
     /// Combines attributes of a given BibEntry into a basic entry preview for as plain text.
     ///
@@ -76,16 +76,14 @@ public class EntryResource {
         String releaseDate = entry.getField(StandardField.DATE).orElse("(N/A)");
 
         // the only difference to the HTML version of this method is the format of the output:
-        String preview =
-                "Author: " + author
-                        + "\nTitle: " + title
-                        + "\nJournal: " + journal
-                        + "\nVolume: " + volume
-                        + "\nNumber: " + number
-                        + "\nPages: " + pages
-                        + "\nReleased on: " + releaseDate;
 
-        return preview;
+        return "Author: " + author
+                + "\nTitle: " + title
+                + "\nJournal: " + journal
+                + "\nVolume: " + volume
+                + "\nNumber: " + number
+                + "\nPages: " + pages
+                + "\nReleased on: " + releaseDate;
     }
 
     /// At http://localhost:23119/libraries/{id}/entries/{entryId} <br><br>
@@ -95,7 +93,6 @@ public class EntryResource {
     /// @param id      The name of the library
     /// @param entryId The CitationKey of the BibEntry
     /// @return a basic entry preview as HTML text
-    /// @throws IOException
     @GET
     @Path("entries/{entryId}")
     @Produces(MediaType.TEXT_HTML + ";charset=UTF-8")
