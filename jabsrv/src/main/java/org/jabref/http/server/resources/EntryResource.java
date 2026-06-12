@@ -110,9 +110,9 @@ public class EntryResource {
                     + HtmlEscapers.htmlEscaper().escape(entryId) + "' not found in library "
                     + HtmlEscapers.htmlEscaper().escape(id);
             throw new NotFoundException(Response.status(Response.Status.NOT_FOUND)
-                    .type(MediaType.TEXT_HTML + ";charset=UTF-8")
-                    .entity(message)
-                    .build());
+                                                .type(MediaType.TEXT_HTML + ";charset=UTF-8")
+                                                .entity(message)
+                                                .build());
         }
         if (entriesByCitationKey.size() > 1) {
             LOGGER.warn("Multiple entries found with citation key '{}'. Using the first one.", entryId);
