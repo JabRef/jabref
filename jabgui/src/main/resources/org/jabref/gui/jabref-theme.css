@@ -121,6 +121,10 @@
     -fx-fill: -fx-text-base-color;
 }
 
+.linked-file-padding {
+    -fx-padding: 0.5em 0 0.5em 0;
+}
+
 .walkthrough-spotlight {
     -fx-fill: rgba(34, 47, 62, 0.75);
 }
