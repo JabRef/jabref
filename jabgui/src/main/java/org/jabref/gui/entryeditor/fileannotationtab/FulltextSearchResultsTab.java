@@ -117,7 +117,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                                 }
                                 if (!searchResult.getAnnotationsResultStringsHtml().isEmpty()) {
                                     Text annotationsText = new Text(System.lineSeparator() + Localization.lang("Found matches in annotations:") + System.lineSeparator() + System.lineSeparator());
-                                    annotationsText.setStyle("-fx-font-style: italic;");
+                                    annotationsText.getStyleClass().add("italic");
                                     content.getChildren().add(annotationsText);
 
                                     for (String resultTextHtml : searchResult.getAnnotationsResultStringsHtml()) {
@@ -159,7 +159,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     private Text createPageLink(LinkedFile linkedFile, int pageNumber, String searchExpression) {
         Text pageLink = new Text(Localization.lang("On page %0", pageNumber) + System.lineSeparator() + System.lineSeparator());
-        pageLink.setStyle("-fx-font-style: italic; -fx-font-weight: bold;");
+        pageLink.getStyleClass().addAll("italic", "bold");
 
         pageLink.setOnMouseClicked(event -> {
             if (MouseButton.PRIMARY == event.getButton()) {
