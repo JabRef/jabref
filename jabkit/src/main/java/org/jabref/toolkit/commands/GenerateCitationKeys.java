@@ -2,7 +2,6 @@ package org.jabref.toolkit.commands;
 
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import javafx.beans.property.SimpleObjectProperty;
@@ -18,9 +17,14 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.toolkit.converter.KeySuffixConverter;
+import org.jabref.toolkit.exception.ExportServiceException;
+import org.jabref.toolkit.exception.ImportServiceException;
+import org.jabref.toolkit.service.ExportService;
+import org.jabref.toolkit.service.ImportService;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import picocli.CommandLine;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
@@ -76,25 +80,14 @@ class GenerateCitationKeys implements Callable<Integer> {
     private Map<String, String> keyPatterns;
 
     @Override
-    public Integer call() {
+    public Integer call() throws ImportServiceException, ExportServiceException {
         Path inputFile = inputOption.getInputFile();
-        Optional<ParserResult> parserResult = JabKit.importFile(
+        ParserResult parserResult = ImportService.importBibTexFile(
                 inputFile,
-                "bibtex",
                 parentCommand.getParent().cliPreferences,
                 sharedOptions.porcelain);
 
-        if (parserResult.isEmpty()) {
-            System.err.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return 2;
-        }
-
-        if (parserResult.get().isInvalid()) {
-            System.err.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
-            return 2;
-        }
-
-        BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
+        BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
 
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Regenerating citation keys according to metadata."));
@@ -105,16 +98,13 @@ class GenerateCitationKeys implements Callable<Integer> {
             keyGenerator.generateAndSetKey(entry);
         }
 
+        ExportService exportService = ExportService.create(parentCommand.getParent().cliPreferences, sharedOptions.porcelain);
         if (outputFile != null) {
-            JabKit.saveDatabase(
-                    parentCommand.getParent().cliPreferences,
-                    parentCommand.getParent().entryTypesManager,
-                    parserResult.get().getDatabase(),
-                    outputFile);
-            return 0;
+            exportService.saveDatabase(parserResult.getDatabase(), outputFile);
         } else {
-            return JabKit.outputDatabaseContext(parentCommand.getParent().cliPreferences, parserResult.get().getDatabaseContext());
+            exportService.printDatabaseContextToStdOut(parserResult.getDatabaseContext());
         }
+        return CommandLine.ExitCode.OK;
     }
 
     private @NonNull CitationKeyGenerator getCitationKeyGenerator(BibDatabaseContext databaseContext) {

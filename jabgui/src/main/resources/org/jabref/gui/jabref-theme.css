@@ -67,6 +67,23 @@
     -fx-font-weight: bold;
 }
 
+.italic {
+    -fx-font-style: italic;
+}
+
+.bordered {
+    -fx-border-width: 1;
+    -fx-border-color: -fx-outer-border;
+}
+
+.bg-transparent {
+    -fx-background-color: transparent;
+}
+
+.padding-right-15 {
+    -fx-padding: 0 15 0 0;
+}
+
 .merge-header-cell {
     -fx-border-color: -fx-outer-border;
     -fx-background-color: -jr-row-odd-background;
