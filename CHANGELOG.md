@@ -330,7 +330,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We introduced a settings parameter to manage citations' relations local storage time-to-live with a default value set to 30 days. [#11189](https://github.com/JabRef/jabref/issues/11189)
 - We distribute arm64 images for Linux. [#10842](https://github.com/JabRef/jabref/issues/10842)
 - When adding an entry to a library, a warning is displayed if said entry already exists in an active library. [#13261](https://github.com/JabRef/jabref/issues/13261)
-- We added the field `monthfiled` to the default list of fields to resolve BibTeX-Strings for. [#13375](https://github.com/JabRef/jabref/issues/13375)
+- We added the field `monthfiled` to the default list of fields to resolve BibTeX-Strings. [#13375](https://github.com/JabRef/jabref/issues/13375)
 - We added a new ID based fetcher for [EuropePMC](https://europepmc.org/). [#13389](https://github.com/JabRef/jabref/pull/13389)
 - We added quick settings for welcome tab. [#12664](https://github.com/JabRef/jabref/issues/12664)
 - We added pagination support for the web search entries dialog, improving navigation for large search results. [#5507](https://github.com/JabRef/jabref/issues/5507)
@@ -1759,7 +1759,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where entries with the entry type Misc from an imported aux file would not be saved correctly to the bib file on disk. [#6405](https://github.com/JabRef/jabref/issues/6405)
 - We fixed an issue where percent sign ('%') was not formatted properly by the HTML formatter. [#6753](https://github.com/JabRef/jabref/issues/6753)
 - We fixed an issue with the [SAO/NASA Astrophysics Data System](https://docs.jabref.org/collect/add-entry-using-an-id#sao-nasa-a-ds) fetcher where `\textbackslash` appeared at the end of the abstract.
-- We fixed an issue with the Science Direct fetcher where PDFs could not be downloaded. Fixes. [#5860](https://github.com/JabRef/jabref/issues/5860)
+- We fixed an issue with the Science Direct fetcher where PDFs could not be downloaded. [#5860](https://github.com/JabRef/jabref/issues/5860)
 - We fixed an issue with the Library of Congress importer.
 - We fixed the [link to the external libraries listing](https://github.com/JabRef/jabref/blob/master/external-libraries.md) in the about dialog
 - We fixed an issue regarding pasting on Linux. [#6293](https://github.com/JabRef/jabref/issues/6293)
