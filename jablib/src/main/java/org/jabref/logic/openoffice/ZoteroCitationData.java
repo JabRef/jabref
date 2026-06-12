@@ -45,7 +45,7 @@ class ZoteroCitationData {
         String publisher = "";
 
         @SerializedName(value = "publisher-place", alternate = "event-place")
-        String Location = "";
+        String location = "";
 
         String title = "";
 
@@ -72,7 +72,7 @@ class ZoteroCitationData {
                         edition;
                 case "event-place",
                      "publisher-place" ->
-                        Location;
+                        location;
                 case "collection-number" ->
                         collectionNumber;
                 case "ISBN" ->
