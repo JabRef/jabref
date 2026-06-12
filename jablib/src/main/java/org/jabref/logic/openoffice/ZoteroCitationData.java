@@ -54,9 +54,11 @@ class ZoteroCitationData {
         @SerializedName("URL")
         String url = "";
 
-        List<AuthorData> author = List.of();
+        String note = "";
 
-        List<AuthorData> editor = List.of();
+        String section = "";
+
+        List<AuthorData> author = List.of();
 
         IssuedData issued = new IssuedData();
 
@@ -93,6 +95,10 @@ class ZoteroCitationData {
                         url;
                 case "volume" ->
                         volume;
+                case "note" ->
+                        note;
+                case "section" ->
+                        section;
                 default ->
                         "";
             };
