@@ -461,7 +461,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     public void generateEmbeddings(GroupNodeViewModel groupNode) {
-        if (!preferences.getAiPreferences().getEnableAi() || !preferences.getAiPreferences().getAutoGenerateEmbeddings()) {
+        if (!preferences.getAiPreferences().getAiFeaturesEnabledCurrently() || !preferences.getAiPreferences().getAutoGenerateEmbeddings()) {
             return;
         }
 
@@ -495,7 +495,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     public void generateSummaries(GroupNodeViewModel groupNode) {
-        if (!preferences.getAiPreferences().getEnableAi() || !preferences.getAiPreferences().getAutoGenerateSummaries()) {
+        if (!preferences.getAiPreferences().getAiFeaturesEnabledCurrently() || !preferences.getAiPreferences().getAutoGenerateSummaries()) {
             return;
         }
 

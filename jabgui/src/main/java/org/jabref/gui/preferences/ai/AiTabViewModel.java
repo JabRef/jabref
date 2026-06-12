@@ -331,7 +331,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         geminiChatModel.setValue(aiPreferences.getGeminiChatModel());
         huggingFaceChatModel.setValue(aiPreferences.getHuggingFaceChatModel());
 
-        enableAi.setValue(aiPreferences.getEnableAi());
+        enableAi.setValue(aiPreferences.getAiFeaturesEnabledCurrently());
         autoGenerateSummaries.setValue(aiPreferences.getAutoGenerateSummaries());
         autoGenerateEmbeddings.setValue(aiPreferences.getAutoGenerateEmbeddings());
 
@@ -367,7 +367,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        aiPreferences.setEnableAi(enableAi.get());
+        aiPreferences.setAiFeaturesEnabledCurrently(enableAi.get());
         aiPreferences.setAutoGenerateEmbeddings(autoGenerateEmbeddings.get());
         aiPreferences.setAutoGenerateSummaries(autoGenerateSummaries.get());
 

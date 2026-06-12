@@ -91,7 +91,7 @@ public class AiSummaryViewModel extends AbstractViewModel {
                 State.READY,
 
                 Map.entry(State.AI_TURNED_OFF,
-                        aiPreferences.enableAiProperty().not()
+                        aiPreferences.aiFeaturesEnabledCurrentlyProperty().not()
                 ),
 
                 Map.entry(State.NO_FILES,

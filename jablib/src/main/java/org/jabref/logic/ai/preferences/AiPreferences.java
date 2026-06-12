@@ -46,7 +46,7 @@ public class AiPreferences {
             AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE
     );
 
-    private final BooleanProperty enableAi;
+    private final BooleanProperty aiFeaturesEnabledCurrently;
     private final BooleanProperty autoGenerateEmbeddings;
     private final BooleanProperty autoGenerateSummaries;
 
@@ -138,7 +138,7 @@ public class AiPreferences {
     }
 
     public AiPreferences(
-            boolean enableAi,
+            boolean aiFeaturesEnabledCurrently,
             boolean autoGenerateEmbeddings,
             boolean autoGenerateSummaries,
             AiProvider aiProvider,
@@ -173,7 +173,7 @@ public class AiPreferences {
             int followUpQuestionsCount,
             String followUpQuestionsTemplate
     ) {
-        this.enableAi = new SimpleBooleanProperty(enableAi);
+        this.aiFeaturesEnabledCurrently = new SimpleBooleanProperty(aiFeaturesEnabledCurrently);
         this.autoGenerateEmbeddings = new SimpleBooleanProperty(autoGenerateEmbeddings);
         this.autoGenerateSummaries = new SimpleBooleanProperty(autoGenerateSummaries);
 
@@ -223,7 +223,7 @@ public class AiPreferences {
     }
 
     public void setAll(AiPreferences preferences) {
-        this.enableAi.set(preferences.getEnableAi());
+        this.aiFeaturesEnabledCurrently.set(preferences.getAiFeaturesEnabledCurrently());
         this.autoGenerateEmbeddings.set(preferences.getAutoGenerateEmbeddings());
         this.autoGenerateSummaries.set(preferences.getAutoGenerateSummaries());
         this.aiProvider.set(preferences.getAiProvider());
@@ -292,16 +292,16 @@ public class AiPreferences {
         }
     }
 
-    public BooleanProperty enableAiProperty() {
-        return enableAi;
+    public BooleanProperty aiFeaturesEnabledCurrentlyProperty() {
+        return aiFeaturesEnabledCurrently;
     }
 
-    public boolean getEnableAi() {
-        return enableAi.get();
+    public boolean getAiFeaturesEnabledCurrently() {
+        return aiFeaturesEnabledCurrently.get();
     }
 
-    public void setEnableAi(boolean enableAi) {
-        this.enableAi.set(enableAi);
+    public void setAiFeaturesEnabledCurrently(boolean aiFeaturesEnabledCurrently) {
+        this.aiFeaturesEnabledCurrently.set(aiFeaturesEnabledCurrently);
     }
 
     public BooleanProperty autoGenerateEmbeddingsProperty() {
@@ -636,7 +636,7 @@ public class AiPreferences {
 
     public List<Property<?>> getChatProperties() {
         return (List<Property<?>>) Stream.of(
-                List.of(enableAi, aiProvider, customizeExpertSettings, temperature, contextWindowSize, tokenEstimatorKind),
+                List.of(aiFeaturesEnabledCurrently, aiProvider, customizeExpertSettings, temperature, contextWindowSize, tokenEstimatorKind),
                 getChatModelNamesProperties(),
                 getApiBaseUrlsProperties()
         ).flatMap(List::stream).toList();
@@ -644,14 +644,14 @@ public class AiPreferences {
 
     public List<? extends Property<?>> getSummarizatorProperties() {
         return Stream.of(
-                List.of(enableAi, customizeExpertSettings, summarizatorKind),
+                List.of(aiFeaturesEnabledCurrently, customizeExpertSettings, summarizatorKind),
                 List.of(summarizationChunkSystemMessageTemplate, summarizationCombineSystemMessageTemplate, summarizationFullDocumentSystemMessageTemplate)
         ).flatMap(List::stream).toList();
     }
 
     public List<? extends Property<?>> getAnswerEngineProperties() {
         return List.of(
-                enableAi,
+                aiFeaturesEnabledCurrently,
                 embeddingModel,
                 customizeExpertSettings,
                 answerEngineKind,
@@ -662,7 +662,7 @@ public class AiPreferences {
 
     public List<? extends Property<?>> getDocumentSplitterProperties() {
         return List.of(
-                enableAi,
+                aiFeaturesEnabledCurrently,
                 customizeExpertSettings,
                 documentSplitterKind,
                 documentSplitterChunkSize,

@@ -1873,7 +1873,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         aiPreferences = getAiPreferencesFromBackingStore(AiPreferences.getDefault());
 
-        EasyBind.listen(aiPreferences.enableAiProperty(), (_, _, newValue) -> putBoolean(AI_ENABLED, newValue));
+        EasyBind.listen(aiPreferences.aiFeaturesEnabledCurrentlyProperty(), (_, _, newValue) -> putBoolean(AI_ENABLED, newValue));
         EasyBind.listen(aiPreferences.autoGenerateEmbeddingsProperty(), (_, _, newValue) -> putBoolean(AI_AUTO_GENERATE_EMBEDDINGS, newValue));
         EasyBind.listen(aiPreferences.autoGenerateSummariesProperty(), (_, _, newValue) -> putBoolean(AI_AUTO_GENERATE_SUMMARIES, newValue));
         EasyBind.listen(aiPreferences.generateFollowUpQuestionsProperty(), (_, _, newValue) -> putBoolean(AI_GENERATE_FOLLOW_UP_QUESTIONS, newValue));
@@ -1924,7 +1924,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private AiPreferences getAiPreferencesFromBackingStore(AiPreferences defaults) {
         return new AiPreferences(
-                getBoolean(AI_ENABLED, defaults.getEnableAi()),
+                getBoolean(AI_ENABLED, defaults.getAiFeaturesEnabledCurrently()),
                 getBoolean(AI_AUTO_GENERATE_EMBEDDINGS, defaults.getAutoGenerateEmbeddings()),
                 getBoolean(AI_AUTO_GENERATE_SUMMARIES, defaults.getAutoGenerateSummaries()),
                 AiProvider.safeValueOf(get(AI_PROVIDER, defaults.getAiProvider().name())),
