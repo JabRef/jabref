@@ -8,7 +8,7 @@ $ "$JABKIT" check integrity --input=src/test/resources/org/jabref/toolkit/comman
 1
 $ grep -c "capital letters are not masked using curly brackets" build/tmp/integrity.out
 1
-$ "$JABKIT" preferences export --porcelain /tmp/jabkit-prefs-smoke.xml 2>/dev/null; echo $?
+$ "$JABKIT" preferences export /tmp/jabkit-prefs-smoke.xml 2>/dev/null; echo $?
 0
 $ "$JABKIT" pseudonymize --porcelain --input=src/test/resources/org/jabref/toolkit/commands/origin.bib --output=/tmp/origin.pseudo.bib --key=/tmp/origin.pseudo.csv 2>/dev/null | grep "Pseudonymizing library"
 Pseudonymizing library 'origin'...
