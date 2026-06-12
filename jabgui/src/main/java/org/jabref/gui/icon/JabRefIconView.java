@@ -16,10 +16,12 @@ import javafx.css.StyleableProperty;
 import javafx.css.converter.PaintConverter;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 
 import org.jabref.gui.icon.IconTheme.JabRefIcons;
+import org.jabref.gui.util.ColorUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -97,12 +99,14 @@ public class JabRefIconView extends Group {
         applyColor();
     }
 
-    /// Forwards an explicit {@link #iconColor} override to an SVG child as a user-origin color. When unset
-    /// (the common case) the child colors itself from theme CSS, so it is left untouched.
+    /// Forwards an explicit {@link #iconColor} override to an SVG child. Applied as an inline style (INLINE origin)
+    /// rather than a programmatic set, so it beats the author `.glyph-icon { -fx-icon-color }` theme rule the child
+    /// also matches. When unset (the common case) the child colors itself from theme CSS, so it is left untouched.
     private void applyColor() {
         Paint color = iconColor.get();
-        if ((color != null) && !getChildren().isEmpty() && (getChildren().getFirst() instanceof JabRefSvgIcon svgIcon)) {
-            svgIcon.setIconColor(color);
+        if ((color instanceof Color iconColorValue) && !getChildren().isEmpty()
+                && (getChildren().getFirst() instanceof JabRefSvgIcon svgIcon)) {
+            svgIcon.setStyle("-fx-icon-color: %s;".formatted(ColorUtil.toRGBCode(iconColorValue)));
         }
     }
 
