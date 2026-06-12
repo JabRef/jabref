@@ -9,6 +9,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -46,6 +47,7 @@ public class AiPreferences {
             AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE
     );
 
+    private final ReadOnlyBooleanProperty aiFeaturesEnabledInitially;
     private final BooleanProperty aiFeaturesEnabledCurrently;
     private final BooleanProperty autoGenerateEmbeddings;
     private final BooleanProperty autoGenerateSummaries;
@@ -173,6 +175,7 @@ public class AiPreferences {
             int followUpQuestionsCount,
             String followUpQuestionsTemplate
     ) {
+        this.aiFeaturesEnabledInitially = new SimpleBooleanProperty(aiFeaturesEnabledCurrently);
         this.aiFeaturesEnabledCurrently = new SimpleBooleanProperty(aiFeaturesEnabledCurrently);
         this.autoGenerateEmbeddings = new SimpleBooleanProperty(autoGenerateEmbeddings);
         this.autoGenerateSummaries = new SimpleBooleanProperty(autoGenerateSummaries);
