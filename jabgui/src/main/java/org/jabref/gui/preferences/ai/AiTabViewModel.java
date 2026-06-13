@@ -370,6 +370,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        // [impl->req~ai.general.enabling.restart~1]
         if (enableAi.get() != aiPreferences.getAiFeaturesEnabledCurrently()) {
             restartWarnings.add(Localization.lang("AI features turned on/off."));
         }

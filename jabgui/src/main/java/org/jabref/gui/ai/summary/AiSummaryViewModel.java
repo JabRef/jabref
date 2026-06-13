@@ -39,6 +39,7 @@ import org.jspecify.annotations.Nullable;
 public class AiSummaryViewModel extends AbstractViewModel {
     public enum State {
         AI_TURNED_OFF,
+        RESTART_NEEDED,
         NO_FILES,
         NO_SUPPORTED_FILE_TYPES,
         PROCESSING,
@@ -92,6 +93,10 @@ public class AiSummaryViewModel extends AbstractViewModel {
 
                 Map.entry(State.AI_TURNED_OFF,
                         aiPreferences.aiFeaturesEnabledProperty().not()
+                ),
+
+                Map.entry(State.RESTART_NEEDED,
+                        aiPreferences.restardNeededBinding()
                 ),
 
                 Map.entry(State.NO_FILES,

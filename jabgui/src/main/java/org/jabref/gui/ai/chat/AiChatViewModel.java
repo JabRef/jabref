@@ -60,6 +60,7 @@ import org.slf4j.LoggerFactory;
 public class AiChatViewModel extends AbstractViewModel {
     public enum State {
         AI_TURNED_OFF,
+        RESTART_NEEDED,
         NO_FILES,
         IDLE,
         WAITING_FOR_MESSAGE,
@@ -149,7 +150,7 @@ public class AiChatViewModel extends AbstractViewModel {
                 aiPreferences.getDocumentSplitterProperties()
         ));
 
-        BooleanBinding isAiTurnedOff = aiPreferences.aiFeaturesEnabledProperty().not();
+        BooleanBinding isAiTurnedOff = aiPreferences.aiFeaturesEnabledCurrentlyProperty().not();
         BooleanBinding isWaiting = generateRagResponseTask.isNotNull();
         BooleanBinding hasNoFiles = Bindings.createBooleanBinding(() ->
                         entries.get() == null ||
@@ -170,6 +171,7 @@ public class AiChatViewModel extends AbstractViewModel {
                 State.IDLE,
 
                 Map.entry(State.AI_TURNED_OFF, isAiTurnedOff),
+                Map.entry(State.RESTART_NEEDED, aiPreferences.restardNeededBinding()),
                 Map.entry(State.WAITING_FOR_MESSAGE, isWaiting),
                 Map.entry(State.NO_FILES, hasNoFiles),
                 Map.entry(State.ERROR, isError)

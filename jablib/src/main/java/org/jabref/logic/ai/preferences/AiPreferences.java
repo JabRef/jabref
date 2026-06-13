@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -32,6 +33,12 @@ import com.github.javakeyring.PasswordAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/// AI preferences.
+///
+/// Quick note about [#aiFeaturesEnabledInitially] and [#aiFeaturesEnabledCurrently]:
+/// As per `req~ai.general.enabling.restart~1`, when enabled property is changed, a restart required. This implies that
+/// AI processes should start and work only if they were initially enabled. So whenever you want to guard some code from
+/// executing only if AI is enabled, please use [#aiFeaturesEnabledInitially] via [#getAiFeaturesEnabled()]`.
 public class AiPreferences {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiPreferences.class);
 
@@ -47,7 +54,7 @@ public class AiPreferences {
             AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE
     );
 
-    private final ReadOnlyBooleanProperty aiFeaturesEnabledInitially;
+    private final BooleanProperty aiFeaturesEnabledInitially;
     private final BooleanProperty aiFeaturesEnabledCurrently;
     private final BooleanProperty autoGenerateEmbeddings;
     private final BooleanProperty autoGenerateSummaries;
@@ -219,6 +226,20 @@ public class AiPreferences {
         this.generateFollowUpQuestions = new SimpleBooleanProperty(generateFollowUpQuestions);
         this.followUpQuestionsCount = new SimpleIntegerProperty(followUpQuestionsCount);
         this.followUpQuestionsTemplate = new SimpleStringProperty(followUpQuestionsTemplate);
+
+        // This listener is needed for the following scenario:
+        // 1. AI features initially enabled.
+        // 2. User turns of AI features.
+        // 3. User sees the privacy noticy pane, and again enables AI features.
+        //
+        // If there was no such listener as written below, AI features would continue to work, however, Between steps 2
+        // and 3 the user could work a lot in JabRef and open many libraries, but AI didn't track them.
+        // As a result, it is better to set [#aiFeaturesEnabledInitially] to just `false`.
+        this.aiFeaturesEnabledCurrently.addListener((_, _, newValue) -> {
+            if (!newValue) {
+                this.aiFeaturesEnabledInitially.set(false);
+            }
+        });
     }
 
     public static AiPreferences getDefault() {
@@ -293,6 +314,11 @@ public class AiPreferences {
         } catch (Exception e) {
             LOGGER.warn("JabRef could not open keyring for storing {} API token", aiProvider.name(), e);
         }
+    }
+
+    public BooleanBinding restardNeededBinding() {
+        return (aiFeaturesEnabledProperty().not().and(aiFeaturesEnabledCurrentlyProperty()))
+                .or(aiFeaturesEnabledProperty().and(aiFeaturesEnabledCurrentlyProperty().not()));
     }
 
     public ReadOnlyBooleanProperty aiFeaturesEnabledProperty() {
