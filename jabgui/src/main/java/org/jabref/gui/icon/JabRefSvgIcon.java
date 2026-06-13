@@ -17,7 +17,7 @@ import javafx.scene.paint.Paint;
 import tools.maran.svgnode.SvgNode;
 
 /// Renders an SVG path as an icon that follows the same theme CSS as Ikonli font icons, so SVG icons need no
-/// special styling. The SVG-backed counterpart to a {@link org.kordamp.ikonli.javafx.FontIcon}.
+/// special styling.
 ///
 /// Bridges three CSS properties (which font icons already honor) onto this node:
 /// - {@code -fx-icon-color} → {@link #setSvgColor(Paint)}
