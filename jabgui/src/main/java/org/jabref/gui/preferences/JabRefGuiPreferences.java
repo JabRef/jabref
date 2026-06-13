@@ -358,18 +358,20 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(entryEditorPreferences.entryEditorTabs(), (_, _, newValue) -> storeEntryEditorTabs(newValue));
         // defaultEntryEditorTabs are read-only
         EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (_, _, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowRecommendationsTabProperty(), (_, _, newValue) -> putBoolean(SHOW_RECOMMENDATIONS, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowAiSummaryTabProperty(), (_, _, newValue) -> putBoolean(SHOW_AI_SUMMARY, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowAiChatTabProperty(), (_, _, newValue) -> putBoolean(SHOW_AI_CHAT, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowLatexCitationsTabProperty(), (_, _, newValue) -> putBoolean(SHOW_LATEX_CITATIONS, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowFileAnnotationsTabProperty(), (_, _, newValue) -> putBoolean(SMART_FILE_ANNOTATIONS, newValue));
+        EasyBind.listen(entryEditorPreferences.staticTabListProperty(), (_, _, newValue) -> {
+            putBoolean(SHOW_RECOMMENDATIONS, newValue.contains(EntryEditorPreferences.StaticTab.RELATED_ARTICLES));
+            putBoolean(SHOW_AI_SUMMARY, newValue.contains(EntryEditorPreferences.StaticTab.AI_SUMMARY));
+            putBoolean(SHOW_AI_CHAT, newValue.contains(EntryEditorPreferences.StaticTab.AI_CHAT));
+            putBoolean(SHOW_LATEX_CITATIONS, newValue.contains(EntryEditorPreferences.StaticTab.LATEX_CITATIONS));
+            putBoolean(SMART_FILE_ANNOTATIONS, newValue.contains(EntryEditorPreferences.StaticTab.FILE_ANNOTATIONS));
+            putBoolean(SHOW_SCITE_TAB, newValue.contains(EntryEditorPreferences.StaticTab.CITATION_INFORMATION));
+            putBoolean(SHOW_USER_COMMENTS_FIELDS, newValue.contains(EntryEditorPreferences.StaticTab.USER_COMMENTS));
+        });
         EasyBind.listen(entryEditorPreferences.showSourceTabByDefaultProperty(), (_, _, newValue) -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
         EasyBind.listen(entryEditorPreferences.enableValidationProperty(), (_, _, newValue) -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
         EasyBind.listen(entryEditorPreferences.allowIntegerEditionBibtexProperty(), (_, _, newValue) -> putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, newValue));
         EasyBind.listen(entryEditorPreferences.autoLinkEnabledProperty(), (_, _, newValue) -> putBoolean(AUTOLINK_FILES_ENABLED, newValue));
         EasyBind.listen(entryEditorPreferences.enableJournalPopupProperty(), (_, _, newValue) -> put(JOURNAL_POPUP, newValue.toString()));
-        EasyBind.listen(entryEditorPreferences.shouldShowLSciteTabProperty(), (_, _, newValue) -> putBoolean(SHOW_SCITE_TAB, newValue));
-        EasyBind.listen(entryEditorPreferences.showUserCommentsFieldsProperty(), (_, _, newValue) -> putBoolean(SHOW_USER_COMMENTS_FIELDS, newValue));
         EasyBind.listen(entryEditorPreferences.previewWidthDividerPositionProperty(), (_, _, newValue) -> putDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, newValue.doubleValue()));
         EasyBind.listen(entryEditorPreferences.citationFetcherTypeProperty(), (_, _, newValue) -> put(CITATION_FETCHER_TYPE, newValue.name()));
         EasyBind.listen(entryEditorPreferences.citationCountFetcherTypeProperty(), (_, _, newValue) -> put(CITATION_COUNT_FETCHER_TYPE, newValue.name()));
@@ -380,11 +382,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return new EntryEditorPreferences(
                 getEntryEditorTabs(),
                 getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),
-                getBoolean(SHOW_RECOMMENDATIONS, defaults.shouldShowRecommendationsTab()),
-                getBoolean(SHOW_AI_SUMMARY, defaults.shouldShowAiSummaryTab()),
-                getBoolean(SHOW_AI_CHAT, defaults.shouldShowAiChatTab()),
-                getBoolean(SHOW_LATEX_CITATIONS, defaults.shouldShowLatexCitationsTab()),
-                getBoolean(SMART_FILE_ANNOTATIONS, defaults.shouldShowFileAnnotationsTab()),
+                EntryEditorPreferences.staticTabsFromBoolean(
+                        getBoolean(SHOW_RECOMMENDATIONS, defaults.shouldShowRecommendationsTab()),
+                        getBoolean(SHOW_AI_SUMMARY, defaults.shouldShowAiSummaryTab()),
+                        getBoolean(SHOW_AI_CHAT, defaults.shouldShowAiChatTab()),
+                        getBoolean(SHOW_LATEX_CITATIONS, defaults.shouldShowLatexCitationsTab()),
+                        getBoolean(SMART_FILE_ANNOTATIONS, defaults.shouldShowFileAnnotationsTab()),
+                        getBoolean(SHOW_SCITE_TAB, defaults.shouldShowSciteTab()),
+                        getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields())),
                 getBoolean(DEFAULT_SHOW_SOURCE, defaults.showSourceTabByDefault()),
                 getBoolean(VALIDATE_IN_ENTRY_EDITOR, defaults.shouldEnableValidation()),
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaults.shouldAllowIntegerEditionBibtex()),
@@ -392,8 +397,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP, defaults.shouldEnableJournalPopup().name())),
                 CitationFetcherType.valueOf(get(CITATION_FETCHER_TYPE, defaults.getCitationFetcherType().name())),
                 CitationCountFetcherType.valueOf(get(CITATION_COUNT_FETCHER_TYPE, defaults.getCitationCountFetcherType().name())),
-                getBoolean(SHOW_SCITE_TAB, defaults.shouldShowSciteTab()),
-                getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields()),
                 getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewWidthDividerPosition())
         );
     }

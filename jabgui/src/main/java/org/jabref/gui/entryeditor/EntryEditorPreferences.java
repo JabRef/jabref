@@ -13,10 +13,12 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.MapProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleMapProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
@@ -47,13 +49,19 @@ public class EntryEditorPreferences {
         }
     }
 
+    public enum StaticTab {
+        RELATED_ARTICLES,
+        AI_SUMMARY,
+        AI_CHAT,
+        FILE_ANNOTATIONS,
+        LATEX_CITATIONS,
+        CITATION_INFORMATION,
+        USER_COMMENTS
+    }
+
     private final MapProperty<String, Set<Field>> entryEditorTabList;
+    private final SetProperty<StaticTab> staticTabList;
     private final BooleanProperty shouldOpenOnNewEntry;
-    private final BooleanProperty shouldShowRecommendationsTab;
-    private final BooleanProperty shouldShowAiSummaryTab;
-    private final BooleanProperty shouldShowAiChatTab;
-    private final BooleanProperty shouldShowLatexCitationsTab;
-    private final BooleanProperty shouldShowFileAnnotationsTab;
     private final BooleanProperty showSourceTabByDefault;
     private final BooleanProperty enableValidation;
     private final BooleanProperty allowIntegerEditionBibtex;
@@ -61,39 +69,27 @@ public class EntryEditorPreferences {
     private final ObjectProperty<JournalPopupEnabled> enablementStatus;
     private final ObjectProperty<CitationFetcherType> citationFetcherType;
     private final ObjectProperty<CitationCountFetcherType> citationCountFetcherType;
-    private final BooleanProperty shouldShowSciteTab;
-    private final BooleanProperty showUserCommentsFields;
     private final DoubleProperty previewWidthDividerPosition;
 
     private EntryEditorPreferences() {
         this(
-                getDefaultEntryEditorTabs(),          // Default Entry Editor Tabs
-                true,                                 // Open editor when a new entry is created
-                true,                                 // Show tab 'Related articles'
-                true,                                 // Show tab 'AI Summary'
-                true,                                 // Show tab 'AI Chat'
-                true,                                 // Show tab 'LaTeX citations'
-                true,                                 // Show tab 'File annotations' only if its contains highlights or comments
-                false,                                // Show BibTeX source by default
-                true,                                 // Show validation messages
-                true,                                 // Allow integers in 'edition' filed in BibTeX mode
-                true,                                 // Automatically search and show unlinked files in the entry editor
-                JournalPopupEnabled.DISABLED,         // Fetch journal information online to show
-                CitationFetcherType.SEMANTIC_SCHOLAR, // Citation Fetcher Type
-                CitationCountFetcherType.SEMANTIC_SCHOLAR, // Citation Count Fetcher Type
-                true,                                 // Show tab 'Citation information'
-                true,                                 // Show user comments field
-                0.5                                   // Preview Width Divider Position
+                getDefaultEntryEditorTabs(),
+                true,
+                getDefaultStaticTabs(),
+                false,
+                true,
+                true,
+                true,
+                JournalPopupEnabled.DISABLED,
+                CitationFetcherType.SEMANTIC_SCHOLAR,
+                CitationCountFetcherType.SEMANTIC_SCHOLAR,
+                0.5
         );
     }
 
     public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList,
                                   boolean shouldOpenOnNewEntry,
-                                  boolean shouldShowRecommendationsTab,
-                                  boolean shouldShowAiSummaryTab,
-                                  boolean shouldShowAiChatTab,
-                                  boolean shouldShowLatexCitationsTab,
-                                  boolean shouldShowFileAnnotationsTab,
+                                  Set<StaticTab> staticTabs,
                                   boolean showSourceTabByDefault,
                                   boolean enableValidation,
                                   boolean allowIntegerEditionBibtex,
@@ -101,17 +97,11 @@ public class EntryEditorPreferences {
                                   JournalPopupEnabled journalPopupEnabled,
                                   CitationFetcherType citationFetcherType,
                                   CitationCountFetcherType citationCountFetcherType,
-                                  boolean showSciteTab,
-                                  boolean showUserCommentsFields,
                                   double previewWidthDividerPosition) {
 
         this.entryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(entryEditorTabList));
+        this.staticTabList = new SimpleSetProperty<>(FXCollections.observableSet(staticTabs));
         this.shouldOpenOnNewEntry = new SimpleBooleanProperty(shouldOpenOnNewEntry);
-        this.shouldShowRecommendationsTab = new SimpleBooleanProperty(shouldShowRecommendationsTab);
-        this.shouldShowAiSummaryTab = new SimpleBooleanProperty(shouldShowAiSummaryTab);
-        this.shouldShowAiChatTab = new SimpleBooleanProperty(shouldShowAiChatTab);
-        this.shouldShowLatexCitationsTab = new SimpleBooleanProperty(shouldShowLatexCitationsTab);
-        this.shouldShowFileAnnotationsTab = new SimpleBooleanProperty(shouldShowFileAnnotationsTab);
         this.showSourceTabByDefault = new SimpleBooleanProperty(showSourceTabByDefault);
         this.enableValidation = new SimpleBooleanProperty(enableValidation);
         this.allowIntegerEditionBibtex = new SimpleBooleanProperty(allowIntegerEditionBibtex);
@@ -119,9 +109,71 @@ public class EntryEditorPreferences {
         this.enablementStatus = new SimpleObjectProperty<>(journalPopupEnabled);
         this.citationFetcherType = new SimpleObjectProperty<>(citationFetcherType);
         this.citationCountFetcherType = new SimpleObjectProperty<>(citationCountFetcherType);
-        this.shouldShowSciteTab = new SimpleBooleanProperty(showSciteTab);
-        this.showUserCommentsFields = new SimpleBooleanProperty(showUserCommentsFields);
         this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
+    }
+
+    public static Set<StaticTab> getDefaultStaticTabs() {
+        return EnumSet.allOf(StaticTab.class);
+    }
+
+    public SetProperty<StaticTab> staticTabListProperty() {
+        return staticTabList;
+    }
+
+    public boolean shouldShowStaticTab(StaticTab tab) {
+        return staticTabList.contains(tab);
+    }
+
+    public void setShowStaticTab(StaticTab tab, boolean show) {
+        Set<StaticTab> current = staticTabList.get();
+        Set<StaticTab> updated = current.isEmpty() ? EnumSet.noneOf(StaticTab.class) : EnumSet.copyOf(current);
+        if (show) {
+            updated.add(tab);
+        } else {
+            updated.remove(tab);
+        }
+        staticTabList.set(FXCollections.observableSet(updated));
+    }
+
+    public Set<StaticTab> getStaticTabs() {
+        return staticTabList.get();
+    }
+
+    public void setStaticTabs(Set<StaticTab> tabs) {
+        staticTabList.set(FXCollections.observableSet(tabs));
+    }
+
+    public static Set<StaticTab> staticTabsFromBoolean(
+            boolean showRelatedArticles,
+            boolean showAISummary,
+            boolean showAIChat,
+            boolean showLaTeXCitations,
+            boolean showFileAnnotations,
+            boolean showCitationInformation,
+            boolean showUserComments) {
+        Set<StaticTab> tabs = EnumSet.noneOf(StaticTab.class);
+        if (showRelatedArticles) {
+            tabs.add(StaticTab.RELATED_ARTICLES);
+        }
+        if (showAISummary) {
+            tabs.add(StaticTab.AI_SUMMARY);
+        }
+        if (showAIChat) {
+            tabs.add(StaticTab.AI_CHAT);
+        }
+        if (showLaTeXCitations) {
+            tabs.add(StaticTab.LATEX_CITATIONS);
+        }
+        if (showFileAnnotations) {
+            tabs.add(StaticTab.FILE_ANNOTATIONS);
+        }
+        if (showCitationInformation) {
+            tabs.add(StaticTab.CITATION_INFORMATION);
+        }
+        if (showUserComments) {
+            tabs.add(StaticTab.USER_COMMENTS);
+        }
+        return tabs;
     }
 
     public static SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
@@ -161,11 +213,7 @@ public class EntryEditorPreferences {
     public void setAll(EntryEditorPreferences preferences) {
         this.entryEditorTabList.set(preferences.entryEditorTabs());
         this.shouldOpenOnNewEntry.set(preferences.shouldOpenOnNewEntry());
-        this.shouldShowRecommendationsTab.set(preferences.shouldShowRecommendationsTab());
-        this.shouldShowAiSummaryTab.set(preferences.shouldShowAiSummaryTab());
-        this.shouldShowAiChatTab.set(preferences.shouldShowAiChatTab());
-        this.shouldShowLatexCitationsTab.set(preferences.shouldShowLatexCitationsTab());
-        this.shouldShowFileAnnotationsTab.set(preferences.shouldShowFileAnnotationsTab());
+        this.staticTabList.set(FXCollections.observableSet(preferences.getStaticTabs()));
         this.showSourceTabByDefault.set(preferences.showSourceTabByDefault());
         this.enableValidation.set(preferences.shouldEnableValidation());
         this.allowIntegerEditionBibtex.set(preferences.shouldAllowIntegerEditionBibtex());
@@ -173,8 +221,6 @@ public class EntryEditorPreferences {
         this.enablementStatus.set(preferences.shouldEnableJournalPopup());
         this.citationFetcherType.set(preferences.getCitationFetcherType());
         this.citationCountFetcherType.set(preferences.getCitationCountFetcherType());
-        this.shouldShowSciteTab.set(preferences.shouldShowSciteTab());
-        this.showUserCommentsFields.set(preferences.shouldShowUserCommentsFields());
         this.previewWidthDividerPosition.set(preferences.getPreviewWidthDividerPosition());
     }
 
@@ -203,63 +249,43 @@ public class EntryEditorPreferences {
     }
 
     public boolean shouldShowRecommendationsTab() {
-        return shouldShowRecommendationsTab.get();
+        return shouldShowStaticTab(StaticTab.RELATED_ARTICLES);
     }
 
-    public BooleanProperty shouldShowRecommendationsTabProperty() {
-        return shouldShowRecommendationsTab;
-    }
-
-    public void setShouldShowRecommendationsTab(boolean shouldShowRecommendationsTab) {
-        this.shouldShowRecommendationsTab.set(shouldShowRecommendationsTab);
+    public void setShouldShowRecommendationsTab(boolean show) {
+        setShowStaticTab(StaticTab.RELATED_ARTICLES, show);
     }
 
     public boolean shouldShowAiSummaryTab() {
-        return shouldShowAiSummaryTab.get();
+        return shouldShowStaticTab(StaticTab.AI_SUMMARY);
     }
 
-    public BooleanProperty shouldShowAiSummaryTabProperty() {
-        return shouldShowAiSummaryTab;
-    }
-
-    public void setShouldShowAiSummaryTab(boolean shouldShowAiSummaryTab) {
-        this.shouldShowAiSummaryTab.set(shouldShowAiSummaryTab);
+    public void setShouldShowAiSummaryTab(boolean show) {
+        setShowStaticTab(StaticTab.AI_SUMMARY, show);
     }
 
     public boolean shouldShowAiChatTab() {
-        return shouldShowAiChatTab.get();
+        return shouldShowStaticTab(StaticTab.AI_CHAT);
     }
 
-    public BooleanProperty shouldShowAiChatTabProperty() {
-        return shouldShowAiChatTab;
-    }
-
-    public void setShouldShowAiChatTab(boolean shouldShowAiChatTab) {
-        this.shouldShowAiChatTab.set(shouldShowAiChatTab);
+    public void setShouldShowAiChatTab(boolean show) {
+        setShowStaticTab(StaticTab.AI_CHAT, show);
     }
 
     public boolean shouldShowLatexCitationsTab() {
-        return shouldShowLatexCitationsTab.get();
+        return shouldShowStaticTab(StaticTab.LATEX_CITATIONS);
     }
 
-    public BooleanProperty shouldShowLatexCitationsTabProperty() {
-        return shouldShowLatexCitationsTab;
-    }
-
-    public void setShouldShowLatexCitationsTab(boolean shouldShowLatexCitationsTab) {
-        this.shouldShowLatexCitationsTab.set(shouldShowLatexCitationsTab);
+    public void setShouldShowLatexCitationsTab(boolean show) {
+        setShowStaticTab(StaticTab.LATEX_CITATIONS, show);
     }
 
     public boolean shouldShowFileAnnotationsTab() {
-        return shouldShowFileAnnotationsTab.get();
+        return shouldShowStaticTab(StaticTab.FILE_ANNOTATIONS);
     }
 
-    public BooleanProperty shouldShowFileAnnotationsTabProperty() {
-        return shouldShowFileAnnotationsTab;
-    }
-
-    public void setShouldShowFileAnnotationsTab(boolean shouldShowFileAnnotationsTab) {
-        this.shouldShowFileAnnotationsTab.set(shouldShowFileAnnotationsTab);
+    public void setShouldShowFileAnnotationsTab(boolean show) {
+        setShowStaticTab(StaticTab.FILE_ANNOTATIONS, show);
     }
 
     public boolean showSourceTabByDefault() {
@@ -347,27 +373,19 @@ public class EntryEditorPreferences {
     }
 
     public boolean shouldShowSciteTab() {
-        return this.shouldShowSciteTab.get();
+        return shouldShowStaticTab(StaticTab.CITATION_INFORMATION);
     }
 
-    public BooleanProperty shouldShowLSciteTabProperty() {
-        return this.shouldShowSciteTab;
-    }
-
-    public void setShouldShowSciteTab(boolean shouldShowSciteTab) {
-        this.shouldShowSciteTab.set(shouldShowSciteTab);
+    public void setShouldShowSciteTab(boolean show) {
+        setShowStaticTab(StaticTab.CITATION_INFORMATION, show);
     }
 
     public boolean shouldShowUserCommentsFields() {
-        return showUserCommentsFields.get();
+        return shouldShowStaticTab(StaticTab.USER_COMMENTS);
     }
 
-    public BooleanProperty showUserCommentsFieldsProperty() {
-        return showUserCommentsFields;
-    }
-
-    public void setShowUserCommentsFields(boolean showUserCommentsFields) {
-        this.showUserCommentsFields.set(showUserCommentsFields);
+    public void setShowUserCommentsFields(boolean show) {
+        setShowStaticTab(StaticTab.USER_COMMENTS, show);
     }
 
     public void setPreviewWidthDividerPosition(double previewWidthDividerPosition) {
