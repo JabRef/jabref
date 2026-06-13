@@ -103,9 +103,17 @@ Accept: application/x-bibtex-library-csl+json
 
 GET http://localhost:23119/libraries/notfound
 
+### GET HTML entry preview for unknown citation key (404; key is HTML-escaped in the message)
+
+// The citation key below is `<script>alert(1)</script>` URL-encoded. The 404 body is served
+// as text/html, so the key is HTML-escaped (`&lt;script&gt;...`) and not reflected as raw markup.
+
+GET http://localhost:23119/libraries/demo/entries/%3Cscript%3Ealert(1)%3C%2Fscript%3E/entries/%3Cscript%3Ealert(1)%3C%2Fscript%3E
+Accept: text/html
+
 ## Creation
 
-JabRef offers `current` for the currently selected tab
+// JabRef offers `current` for the currently selected tab
 
 ### Add BibTeX to current library
 

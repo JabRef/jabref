@@ -1,10 +1,10 @@
 $ JABKIT=build/native/nativeCompile/jabkit
 $ "$JABKIT" --help 2>/dev/null | grep "^Usage:"
 Usage: jabkit [-dhpv] [COMMAND]
-$ "$JABKIT" check consistency --input=src/test/resources/org/jabref/toolkit/commands/origin.bib 2>/dev/null | grep -E "^Consistency check completed"
-Consistency check completed
+$ "$JABKIT" check consistency --porcelain --input=src/test/resources/org/jabref/toolkit/commands/origin.bib 2>/dev/null; echo $?
+0
 $ mkdir -p build/tmp
-$ "$JABKIT" check integrity --input=src/test/resources/org/jabref/toolkit/commands/origin.bib > build/tmp/integrity.out 2>/dev/null; echo $?
+$ "$JABKIT" check integrity --porcelain --input=src/test/resources/org/jabref/toolkit/commands/origin.bib > build/tmp/integrity.out 2>/dev/null; echo $?
 1
 $ grep -c "capital letters are not masked using curly brackets" build/tmp/integrity.out
 1
@@ -12,3 +12,9 @@ $ "$JABKIT" preferences export /tmp/jabkit-prefs-smoke.xml 2>/dev/null; echo $?
 0
 $ "$JABKIT" pseudonymize --porcelain --input=src/test/resources/org/jabref/toolkit/commands/origin.bib --output=/tmp/origin.pseudo.bib --key=/tmp/origin.pseudo.csv 2>/dev/null | grep "Pseudonymizing library"
 Pseudonymizing library 'origin'...
+$ "$JABKIT" convert --porcelain --input=src/test/resources/org/jabref/toolkit/commands/origin.bib --input-format=bibtex --output=build/tmp/convert.bib 2>/dev/null; echo $?
+0
+$ grep -c "@Book{" build/tmp/convert.bib
+3
+$ "$JABKIT" citationkeys generate --porcelain --input=src/test/resources/org/jabref/toolkit/commands/origin.bib 2>/dev/null | grep -c "@Book{"
+3
