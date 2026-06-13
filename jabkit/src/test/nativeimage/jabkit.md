@@ -8,10 +8,12 @@ $ "$JABKIT" check integrity --porcelain --input=src/test/resources/org/jabref/to
 1
 $ grep -c "capital letters are not masked using curly brackets" build/tmp/integrity.out
 1
-$ "$JABKIT" preferences export /tmp/jabkit-prefs-smoke.xml 2>/dev/null; echo $?
+$ "$JABKIT" preferences export build/tmp/jabkit-prefs-smoke.xml 2>/dev/null; echo $?
 0
-$ "$JABKIT" pseudonymize --porcelain --input=src/test/resources/org/jabref/toolkit/commands/origin.bib --output=/tmp/origin.pseudo.bib --key=/tmp/origin.pseudo.csv 2>/dev/null | grep "Pseudonymizing library"
-Pseudonymizing library 'origin'...
+$ "$JABKIT" pseudonymize --porcelain --force --input=src/test/resources/org/jabref/toolkit/commands/origin.bib --output=build/tmp/origin.pseudo.bib --key=build/tmp/origin.pseudo.csv > build/tmp/pseudonymize.out 2>/dev/null; echo $?
+0
+$ grep -c "Pseudonymizing library" build/tmp/pseudonymize.out
+1
 $ "$JABKIT" convert --porcelain --input=src/test/resources/org/jabref/toolkit/commands/origin.bib --input-format=bibtex --output=build/tmp/convert.bib 2>/dev/null; echo $?
 0
 $ grep -c "@Book{" build/tmp/convert.bib
