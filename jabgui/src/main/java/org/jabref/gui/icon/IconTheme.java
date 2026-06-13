@@ -15,7 +15,7 @@ import javafx.scene.paint.Color;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignB;
@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
+@NullMarked
 public class IconTheme {
 
     public static final Color DEFAULT_DISABLED_COLOR = Color.web("#c8c8c8");
@@ -75,7 +76,7 @@ public class IconTheme {
                        .toList();
     }
 
-    private static URL getIconUrl(@NonNull String name) {
+    private static URL getIconUrl(String name) {
         if (!KEY_TO_ICON.containsKey(name)) {
             LOGGER.warn("Could not find icon url by name {}, so falling back on default icon {}", name, DEFAULT_ICON_PATH);
         }
@@ -87,7 +88,7 @@ public class IconTheme {
     ///
     /// @param url The URL to read information from.
     /// @return A Map containing all key-value pairs found.
-    private static Map<String, String> readIconThemeFile(@NonNull URL url) {
+    private static Map<String, String> readIconThemeFile(URL url) {
         Properties properties = new Properties();
         try (InputStream in = url.openStream()) {
             properties.load(in);

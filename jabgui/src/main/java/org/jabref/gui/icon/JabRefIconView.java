@@ -24,6 +24,7 @@ import org.jabref.gui.icon.IconTheme.JabRefIcons;
 import org.jabref.gui.util.ColorUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
+import org.jspecify.annotations.NullMarked;
 
 /// View for a {@link JabRefIcons} usable in FXML (e.g. {@code <JabRefIconView glyph="REFRESH"/>}).
 ///
@@ -35,6 +36,7 @@ import com.tobiasdiez.easybind.EasyBind;
 /// which carry the icon style classes), so this view stays unclassed to avoid double-theming. The styleable
 /// {@code -fx-icon-color} here is an explicit override knob — e.g. an inline {@code style="-fx-icon-color: ..."}
 /// in FXML — and, when set, is forwarded to an SVG child as a user-origin color (overriding theme CSS).
+@NullMarked
 public class JabRefIconView extends Group {
 
     private static final CssMetaData<JabRefIconView, Paint> ICON_COLOR =
