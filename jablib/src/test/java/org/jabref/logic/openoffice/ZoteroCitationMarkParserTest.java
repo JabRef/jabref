@@ -1,6 +1,7 @@
 package org.jabref.logic.openoffice;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -16,6 +17,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ZoteroCitationMarkParserTest {
+
+    private record CSLTestCase(
+            String itemData,
+            StandardEntryType entryType,
+            Map<StandardField, String> fields) {
+    }
 
     private static final String JOURNAL_ARTICLE_CSL_JSON = """
             {
@@ -81,10 +88,156 @@ class ZoteroCitationMarkParserTest {
                 Arguments.of(StandardField.AUTHOR, "Doe, John and Zhang, Hancong"),
                 Arguments.of(StandardField.JOURNALTITLE, "Journal of Test"),
                 Arguments.of(StandardField.VOLUME, "1"),
-                Arguments.of(StandardField.NUMBER, "2"),
+                Arguments.of(StandardField.ISSUE, "2"),
                 Arguments.of(StandardField.PAGES, "6-7"),
                 Arguments.of(StandardField.DOI, "1234567"),
                 Arguments.of(StandardField.YEAR, "2026")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void parseCSLJSON(CSLTestCase testCase) {
+        List<BibEntry> entries = ZoteroCitationMarkParser.parse("""
+                ZOTERO_ITEM CSL_CITATION {"citationItems":[{"id":600,"itemData":{%s}}]} test1234
+                """.formatted(testCase.itemData()));
+        BibEntry entry = entries.getFirst();
+
+        assertEquals(testCase.entryType(), entry.getType());
+        for (Map.Entry<StandardField, String> expectedField : testCase.fields().entrySet()) {
+            assertEquals(Optional.of(expectedField.getValue()), entry.getField(expectedField.getKey()));
+        }
+    }
+
+    private static Stream<CSLTestCase> parseCSLJSON() {
+        return Stream.of(
+                new CSLTestCase(
+                        """
+                                "type":"article-magazine",
+                                "title":"Magazine article"
+                                """,
+                        StandardEntryType.Article,
+                        Map.of(
+                                StandardField.TITLE, "Magazine article"
+                        )
+                ),
+                new CSLTestCase(
+                        """
+                                "type":"article-newspaper",
+                                "title":"Newspaper article"
+                                """,
+                        StandardEntryType.Article,
+                        Map.of(
+                                StandardField.TITLE, "Newspaper article"
+                        )
+                ),
+                new CSLTestCase(
+                        """
+                                "type":"book",
+                                "title":"Book title",
+                                "publisher":"Book Press",
+                                "publisher-place":"Berlin",
+                                "ISBN":"978-1-23",
+                                "edition":"2",
+                                "collection-title":"Book series",
+                                "volume":"4"
+                                """,
+                        StandardEntryType.Book,
+                        Map.of(
+                                StandardField.TITLE, "Book title",
+                                StandardField.PUBLISHER, "Book Press",
+                                StandardField.LOCATION, "Berlin",
+                                StandardField.ISBN, "978-1-23",
+                                StandardField.EDITION, "2",
+                                StandardField.SERIES, "Book series",
+                                StandardField.VOLUME, "4"
+                        )
+                ),
+                new CSLTestCase(
+                        """
+                                "type":"chapter",
+                                "title":"Chapter title",
+                                "container-title":"Edited book",
+                                "publisher":"Chapter Press",
+                                "publisher-place":"London",
+                                "page":"10-20",
+                                "ISBN":"978-4-56"
+                                """,
+                        StandardEntryType.InCollection,
+                        Map.of(
+                                StandardField.TITLE, "Chapter title",
+                                StandardField.BOOKTITLE, "Edited book",
+                                StandardField.PUBLISHER, "Chapter Press",
+                                StandardField.LOCATION, "London",
+                                StandardField.PAGES, "10-20",
+                                StandardField.ISBN, "978-4-56"
+                        )
+                ),
+                new CSLTestCase(
+                        """
+                                "type":"paper-conference",
+                                "title":"Conference paper",
+                                "container-title":"Proceedings title",
+                                "event-place":"Paris",
+                                "publisher":"ACM",
+                                "page":"1-8",
+                                "ISBN":"978-7-89"
+                                """,
+                        StandardEntryType.InProceedings,
+                        Map.of(
+                                StandardField.TITLE, "Conference paper",
+                                StandardField.BOOKTITLE, "Proceedings title",
+                                StandardField.LOCATION, "Paris",
+                                StandardField.PUBLISHER, "ACM",
+                                StandardField.PAGES, "1-8",
+                                StandardField.ISBN, "978-7-89"
+                        )
+                ),
+                new CSLTestCase(
+                        """
+                                "type":"webpage",
+                                "title":"Web page",
+                                "URL":"https://example.org",
+                                "publisher":"Example Org"
+                                """,
+                        StandardEntryType.Online,
+                        Map.of(
+                                StandardField.TITLE, "Web page",
+                                StandardField.URL, "https://example.org"
+                        )
+                ),
+                new CSLTestCase(
+                        """
+                                "type":"thesis",
+                                "title":"Thesis title",
+                                "publisher":"Test University",
+                                "publisher-place":"Amsterdam"
+                                """,
+                        StandardEntryType.Thesis,
+                        Map.of(
+                                StandardField.TITLE, "Thesis title",
+                                StandardField.LOCATION, "Amsterdam",
+                                StandardField.PUBLISHER, "Test University"
+                        )
+                ),
+                new CSLTestCase(
+                        """
+                                "type":"report",
+                                "title":"Report title",
+                                "publisher":"Research Institute",
+                                "publisher-place":"Delft",
+                                "collection-number":"R-1",
+                                "page":"1-30"
+                                """,
+                        StandardEntryType.Report,
+                        Map.of(
+                                StandardField.TITLE, "Report title",
+                                StandardField.INSTITUTION, "Research Institute",
+                                StandardField.LOCATION, "Delft",
+                                StandardField.NUMBER, "R-1",
+                                StandardField.PAGES, "1-30"
+                        )
+                )
         );
     }
 }
