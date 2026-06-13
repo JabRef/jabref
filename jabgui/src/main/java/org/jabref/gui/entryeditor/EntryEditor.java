@@ -206,8 +206,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                     }
                 });
 
-        EasyBind.listen(preferences.getEntryEditorPreferences().shouldShowRecommendationsTabProperty(),
-                (_, _, newValue) -> {
+        EasyBind.listen(preferences.getEntryEditorPreferences().staticTabListProperty(),
+                (_, _, _) -> {
                     if (currentlyEditedEntry != null) {
                         adaptVisibleTabs();
                     }
