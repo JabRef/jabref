@@ -40,9 +40,9 @@ public class GitPreferences {
 
     public void setAll(GitPreferences preferences) {
         this.username.set(preferences.getUsername());
-        this.pat.set(preferences.getPat());
         this.repositoryUrl.set(preferences.getRepositoryUrl());
         this.rememberPat.set(preferences.getPersistPat());
+        this.pat.set(preferences.getPat());
     }
 
     public void setUsername(String username) {
