@@ -1,0 +1,164 @@
+{
+  "reflection": [
+    {
+      "type": "com.github.javakeyring.internal.osx.ModernOsxKeychainBackend",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.util.ArrayList",
+      "serializable": true
+    },
+    {
+      "type": "java.util.CollSer",
+      "serializable": true
+    },
+    {
+      "type": "org.h2.mvstore.MVStore$TxCounter"
+    },
+    {
+      "type": "org.h2.mvstore.Page"
+    },
+    {
+      "type": "org.h2.store.fs.async.FilePathAsync"
+    },
+    {
+      "type": "org.h2.store.fs.mem.FilePathMem"
+    },
+    {
+      "type": "org.h2.store.fs.mem.FilePathMemLZF"
+    },
+    {
+      "type": "org.h2.store.fs.niomapped.FilePathNioMapped"
+    },
+    {
+      "type": "org.h2.store.fs.niomem.FilePathNioMem"
+    },
+    {
+      "type": "org.h2.store.fs.niomem.FilePathNioMemLZF"
+    },
+    {
+      "type": "org.h2.store.fs.retry.FilePathRetryOnInterrupt"
+    },
+    {
+      "type": "org.h2.store.fs.split.FilePathSplit"
+    },
+    {
+      "type": "org.h2.store.fs.zip.FilePathZip"
+    },
+    {
+      "type": "org.jabref.logic.journals.Abbreviation",
+      "serializable": true
+    },
+    {
+      "type": "org.jabref.logic.journals.ltwa.LtwaEntry",
+      "serializable": true
+    },
+    {
+      "type": "sun.text.resources.cldr.FormatData"
+    },
+    {
+      "type": "sun.text.resources.cldr.FormatData_en"
+    },
+    {
+      "type": "sun.text.resources.cldr.FormatData_en_US"
+    },
+    {
+      "type": "sun.util.resources.cldr.CalendarData"
+    },
+    {
+      "type": "tools.jackson.databind.deser.Deserializers[]"
+    },
+    {
+      "type": "tools.jackson.databind.deser.KeyDeserializers[]"
+    },
+    {
+      "type": "tools.jackson.databind.deser.ValueInstantiators[]"
+    },
+    {
+      "type": "tools.jackson.databind.ser.Serializers[]"
+    }
+  ],
+  "resources": [
+    {
+      "glob": "csl-styles/ieee.csl"
+    },
+    {
+      "glob": "uk/ac/ed/ph/snuggletex/**"
+    },
+    {
+      "glob": "l10n/JabRef_en.properties"
+    },
+    {
+      "glob": "msc_codes.json"
+    },
+    {
+      "glob": "protectedterms/computer_science.terms"
+    },
+    {
+      "glob": "protectedterms/countries_territories.terms"
+    },
+    {
+      "glob": "protectedterms/electrical_engineering.terms"
+    },
+    {
+      "glob": "protectedterms/months_weekdays.terms"
+    },
+    {
+      "module": "org.jabref.jablib",
+      "glob": "build.properties"
+    },
+    {
+      "module": "org.jabref.jablib",
+      "glob": "journals/journal-list.mv"
+    },
+    {
+      "module": "org.jabref.jablib",
+      "glob": "journals/ltwa-list.mv"
+    },
+    {
+      "module": "org.jabref.jablib",
+      "glob": "l10n/JabRef_en.properties"
+    },
+    {
+      "glob": "META-INF/services/javax.xml.parsers.DocumentBuilderFactory"
+    },
+    {
+      "glob": "META-INF/services/javax.xml.transform.TransformerFactory"
+    },
+    {
+      "module": "jkeychain",
+      "glob": "osxkeychain.so"
+    }
+  ],
+  "bundles": [
+    {
+      "name": "l10n/JabRef"
+    },
+    {
+      "name": "uk/ac/ed/ph/snuggletex/core-error-messages"
+    }
+  ]
+}

@@ -40,6 +40,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
@@ -59,9 +60,11 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.maintable.MainTableTooltip;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
@@ -123,6 +126,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final ProgressIndicator progressIndicator;
     private final GridPane sciteResultsPane;
     private final EntryEditorPreferences entryEditorPreferences;
+    private final MainTableTooltip previewTooltip;
     private ComboBox<CitationFetcherType> fetcherCombo;
 
     private boolean shouldClearSelectionOnDrop = false;
@@ -133,6 +137,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 FileUpdateMonitor fileUpdateMonitor,
                                 GuiPreferences preferences,
                                 TaskExecutor taskExecutor,
+                                ThemeManager themeManager,
                                 BibEntryTypesManager bibEntryTypesManager,
                                 SearchCitationsRelationsService searchCitationsRelationsService) {
         this.dialogService = dialogService;
@@ -157,11 +162,19 @@ public class CitationRelationsTab extends EntryEditorTab {
                 taskExecutor
         );
 
+        EasyBind.subscribe(citationsRelationsTabViewModel.lastImportedEntryProperty(), entry -> {
+            if (entry != null) { // on load, the entry is null
+                stateManager.activeTabProperty().get().ifPresent(tab -> tab.showAndEdit(entry));
+            }
+        });
+
         this.progressIndicator = new ProgressIndicator();
         this.sciteResultsPane = new GridPane();
         setSciteResultsPane();
 
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
+
+        this.previewTooltip = new MainTableTooltip(dialogService, preferences, themeManager, taskExecutor);
     }
 
     private void setSciteResultsPane() {
@@ -205,7 +218,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         VBox vBox = new VBox();
         vBox.getChildren().add(progressIndicator);
-        vBox.setStyle("-fx-alignment: center;");
+        vBox.getStyleClass().add("align-center");
 
         sciteResultsPane.add(vBox, 0, 0);
 
@@ -225,7 +238,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         vBox.getChildren().add(progressIndicator);
         vBox.getChildren().add(label);
         vBox.setSpacing(2d);
-        vBox.setStyle("-fx-alignment: center;");
+        vBox.getStyleClass().add("align-center");
 
         sciteResultsPane.add(vBox, 0, 0);
 
@@ -247,7 +260,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         hBox.getChildren().add(label);
         hBox.getChildren().add(link);
         hBox.setSpacing(2d);
-        hBox.setStyle("-fx-alignment: center;");
+        hBox.getStyleClass().add("align-center");
 
         sciteResultsPane.add(hBox, 0, 0);
 
@@ -485,8 +498,8 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         // Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citingVBox, citedByVBox);
-        styleFetchedListView(citedByListView);
-        styleFetchedListView(citingListView);
+        styleFetchedListView(citedByListView, citedByComponents);
+        styleFetchedListView(citingListView, citingComponents);
 
         // switch to the tab will not trigger refresh from the remote
         searchForRelations(citingComponents, citedByComponents, false);
@@ -495,10 +508,11 @@ public class CitationRelationsTab extends EntryEditorTab {
         return container;
     }
 
-    /// Styles a given CheckListView to display BibEntries either with a hyperlink or an add button
+    /// Styles a given CheckListView to display BibEntries either with a hyperlink or an add button.
+    /// Also adds the handling of mouse clicks.
     ///
     /// @param listView CheckListView to style
-    private void styleFetchedListView(CheckListView<CitationRelationItem> listView) {
+    private void styleFetchedListView(CheckListView<CitationRelationItem> listView, CitationComponents citationComponents) {
         PseudoClass entrySelected = PseudoClass.getPseudoClass("selected");
         new ViewModelListCellFactory<CitationRelationItem>()
                 .withGraphic(entry -> {
@@ -518,11 +532,6 @@ public class CitationRelationsTab extends EntryEditorTab {
                         jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in library")));
                         jumpTo.getStyleClass().add("addEntryButton");
                         jumpTo.setOnMouseClicked(_ -> jumpToEntry(entry));
-                        hContainer.setOnMouseClicked(event -> {
-                            if (event.getClickCount() == 2) {
-                                jumpToEntry(entry);
-                            }
-                        });
                         vContainer.getChildren().add(jumpTo);
 
                         Button compareButton = IconTheme.JabRefIcons.MERGE_ENTRIES.asButton();
@@ -571,19 +580,46 @@ public class CitationRelationsTab extends EntryEditorTab {
                     hContainer.getChildren().addAll(entryNode, separator, vContainer);
                     hContainer.getStyleClass().add("entry-container");
 
+                    // [impl->req~entry-editor.citations.hover-preview~1]
+                    hContainer.setOnMouseEntered(_ -> {
+                        stateManager.getActiveDatabase().ifPresent(databaseContext -> {
+                            previewTooltip.createPreviewTooltip(databaseContext, entry.entry());
+                        });
+                    });
+                    Tooltip.install(hContainer, previewTooltip);
+
                     return hContainer;
                 })
-                .withOnMouseClickedEvent((citationRelationItem, _) -> {
-                    if (!citationRelationItem.isLocal()) {
-                        listView.getCheckModel().toggleCheckState(citationRelationItem);
-                    }
-                })
+                .withOnMouseClickedEvent((item, event) -> handleItemClick(item, event, listView, citationComponents))
                 .setOnDragDetected((item, event) -> handleDragDetected(listView, item, event))
                 .setOnDragDone((_, event) -> handleDragDone(listView, event))
                 .withPseudoClass(entrySelected, listView::getItemBooleanProperty)
                 .install(listView);
 
         listView.setSelectionModel(new NoSelectionModel<>());
+    }
+
+    private void handleItemClick(CitationRelationItem item,
+                                 MouseEvent event,
+                                 CheckListView<CitationRelationItem> listView,
+                                 CitationComponents citationComponents) {
+        if (event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
+            event.consume();
+            listView.getCheckModel().check(item);
+
+            if (item.isLocal()) {
+                // Jump if item is already in the library
+                jumpToEntry(item);
+            } else {
+                // Entry not in library -> import it
+                importEntries(List.of(item), citationComponents.searchType(), currentEntry);
+            }
+            return;
+        }
+        if (!item.isLocal()) {
+            // standard behavior with one click
+            listView.getCheckModel().toggleCheckState(item);
+        }
     }
 
     private void handleDragDetected(CheckListView<CitationRelationItem> listView, CitationRelationItem item, MouseEvent event) {
@@ -630,7 +666,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldPreferences fieldPreferences, BibEntryTypesManager entryTypesManager) throws IOException {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
-        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
+        FieldWriter fieldWriter = new FieldWriter(fieldPreferences);
         new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, type);
         return writer.toString();
     }
@@ -668,7 +704,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     /// @param label       label to style
     /// @param tooltipText tooltip text
     private void styleLabel(Label label, String tooltipText) {
-        label.setStyle("-fx-padding: 5px");
+        label.getStyleClass().add("padding-5px");
         label.setAlignment(Pos.CENTER);
         label.setTooltip(new Tooltip(tooltipText));
         label.setMaxWidth(Double.MAX_VALUE);
@@ -814,7 +850,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         hBox.getChildren().add(label);
         hBox.getChildren().add(link);
         hBox.setSpacing(2d);
-        hBox.setStyle("-fx-alignment: center;");
+        hBox.getStyleClass().add("align-center");
         hBox.setFillHeight(true);
 
         citationComponents.listView().getItems().clear();
@@ -943,9 +979,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         if (citedByTask != null) {
             citedByTask.cancel(false);
         }
-
         citationsRelationsTabViewModel.importEntries(entriesToImport, searchType, existingEntry);
-
         dialogService.notify(Localization.lang("%0 entry(s) imported", entriesToImport.size()));
     }
 

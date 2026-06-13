@@ -37,6 +37,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     @FXML private CheckBox autoLinkFilesEnabled;
     @FXML private CheckBox enableSciteTab;
     @FXML private ComboBox<CitationCountFetcherType> citationCountFetcherCombo;
+    @FXML private CheckBox enableMscKeywordDescriptions;
     @FXML private CheckBox showUserCommentsField;
 
     @FXML private Button generalFieldsHelp;
@@ -54,7 +55,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     }
 
     public void initialize() {
-        this.viewModel = new EntryEditorTabViewModel(dialogService, preferences);
+        this.viewModel = new EntryEditorTabViewModel(dialogService, preferences, taskExecutor);
 
         openOnNewEntry.selectedProperty().bindBidirectional(viewModel.openOnNewEntryProperty());
         defaultSource.selectedProperty().bindBidirectional(viewModel.defaultSourceProperty());
@@ -74,6 +75,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
                 .withText(CitationCountFetcherType::getName)
                 .install(citationCountFetcherCombo);
         citationCountFetcherCombo.valueProperty().bindBidirectional(viewModel.citationCountFetcherTypeProperty());
+        enableMscKeywordDescriptions.selectedProperty().bindBidirectional(viewModel.enableMscKeywordDescriptionsProperty());
         showUserCommentsField.selectedProperty().bindBidirectional(viewModel.showUserCommentsProperty());
 
         fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsProperty());

@@ -87,7 +87,21 @@ public class UiTaskExecutor implements TaskExecutor {
         }
     }
 
+    /// Runs the runnable later. This will guarantee that it runs on the FX UI Thread.
+    ///
+    /// @param runnable runnable BackgroundTask to run
     public static void runInJavaFXThread(Runnable runnable) {
+        Platform.runLater(runnable);
+    }
+
+    /// Runs the runnable now, when we are already on the FX UI Thread, or later if we are not.
+    ///
+    /// @param runnable runnable BackgroundTask to run
+    public static void runNowOrInJavaFXThread(Runnable runnable) {
+        if (Platform.isFxApplicationThread()) {
+            runnable.run();
+            return;
+        }
         Platform.runLater(runnable);
     }
 
@@ -184,7 +198,7 @@ public class UiTaskExecutor implements TaskExecutor {
             // Set to 100% completed on completion
             task.updateProgress(1, 1);
 
-            if (onSuccess != null) {
+            if (onSuccess != null && !javaTask.isCancelled()) {
                 onSuccess.accept(javaTask.getValue());
             }
         });

@@ -125,7 +125,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private void configurePreviewView(ThemeManager themeManager) {
         previewView.setContextMenuEnabled(false);
         previewView.getEngine().setJavaScriptEnabled(true);
-        themeManager.installCss(previewView.getEngine());
+        themeManager.installCssOnWebEngine(previewView.getEngine());
 
         previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newValue) -> {
             if (newValue != Worker.State.SUCCEEDED) {
@@ -211,8 +211,23 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         BibEntry currentEntry = entry;
 
         BackgroundTask.wrap(() -> layout.generatePreview(currentEntry, databaseContext))
-                      .onSuccess(this::setPreviewText)
+                      .onSuccess(previewText -> {
+                          setPreviewText(previewText);
+                          if (preferences.getPreviewPreferences().shouldDownloadCovers()) {
+                              downloadCoverAndRefresh(currentEntry, previewText);
+                          }
+                      })
                       .onFailure(e -> setPreviewText(formatError(currentEntry, e)))
+                      .executeWith(taskExecutor);
+    }
+
+    private void downloadCoverAndRefresh(BibEntry entry, String previewText) {
+        BackgroundTask.wrap(() -> bookCoverFetcher.downloadCoversForEntry(entry))
+                      .onSuccess((ignored) -> {
+                          if (entry.equals(this.entry)) {
+                              setPreviewText(previewText);
+                          }
+                      })
                       .executeWith(taskExecutor);
     }
 

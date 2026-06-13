@@ -172,7 +172,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
             } else {
                 setFlags(searchFlags, INEXACT_MATCH, isCaseSensitive, false);
             }
-            return getFieldQueryNode("any", term, searchFlags);
+            return getFieldQueryNode(SearchFieldConstants.ANY_FIELD, term, searchFlags);
         }
 
         // fielded expression
@@ -229,19 +229,19 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
         // Pseudo-fields
         field = switch (field) {
-            case "key" ->
+            case SearchFieldConstants.KEY ->
                     InternalField.KEY_FIELD.getName();
-            case "anykeyword" ->
+            case SearchFieldConstants.ANY_KEYWORD ->
                     StandardField.KEYWORDS.getName();
-            case "anyfield" ->
-                    "any";
+            case SearchFieldConstants.ANY_FIELD_ALIAS ->
+                    SearchFieldConstants.ANY_FIELD;
             default ->
                     field;
         };
 
         if (ENTRY_ID.toString().equals(field)) {
             return buildEntryIdQuery(term);
-        } else if ("any".equals(field)) {
+        } else if (SearchFieldConstants.ANY_FIELD.equals(field)) {
             if (searchFlags.contains(EXACT_MATCH)) {
                 return searchFlags.contains(NEGATION)
                        ? buildExactNegationAnyFieldQuery(sqlOperator, term)

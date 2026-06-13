@@ -44,4 +44,12 @@ public class MainTableTooltip extends Tooltip {
         }
         return this;
     }
+
+    public Tooltip createPreviewTooltip(BibDatabaseContext databaseContext, BibEntry entry) {
+        preview.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
+        preview.setDatabaseContext(databaseContext);
+        preview.setEntry(entry);
+        setGraphic(preview);
+        return this;
+    }
 }

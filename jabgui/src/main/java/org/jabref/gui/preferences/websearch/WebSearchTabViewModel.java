@@ -96,12 +96,14 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     }
 
     private void setupPlainCitationParsers() {
+        // [pp->feat~ai.citation-parsing~1]
         if (!refAiEnabled.get()) {
             plainCitationParsers.remove(PlainCitationParserChoice.LLM);
         }
 
         refAiEnabled.addListener((_, _, newValue) -> {
             if (newValue) {
+                // [impl->feat~ai.citation-parsing~1]
                 plainCitationParsers.add(PlainCitationParserChoice.LLM);
             } else {
                 PlainCitationParserChoice oldChoice = defaultPlainCitationParser.get();
@@ -148,12 +150,12 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         warnAboutDuplicatesOnImportProperty.setValue(importerPreferences.shouldWarnAboutDuplicatesOnImport());
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
         shouldKeepDownloadUrl.setValue(filePreferences.shouldKeepDownloadUrl());
-        addImportedEntries.setValue(libraryPreferences.isAddImportedEntriesEnabled());
+        addImportedEntries.setValue(libraryPreferences.shouldAddImportedEntries());
         addImportedEntriesGroupName.setValue(libraryPreferences.getAddImportedEntriesGroupName());
         defaultPlainCitationParser.setValue(importerPreferences.getDefaultPlainCitationParser());
         citationsRelationStoreTTL.setValue(importerPreferences.getCitationsRelationsStoreTTL());
 
-        useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
+        useCustomDOIProperty.setValue(doiPreferences.shouldUseCustom());
         useCustomDOINameProperty.setValue(doiPreferences.getDefaultBaseURI());
 
         grobidEnabledProperty.setValue(grobidPreferences.isGrobidEnabled());
@@ -227,7 +229,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
         filePreferences.setKeepDownloadUrl(shouldKeepDownloadUrl.getValue());
         libraryPreferences.setAddImportedEntries(addImportedEntries.getValue());
-        if (addImportedEntriesGroupName.getValue().trim().isEmpty()) {
+        if (addImportedEntriesGroupName.getValue().isBlank()) {
             libraryPreferences.setAddImportedEntriesGroupName(Localization.lang("Imported entries"));
         } else {
             libraryPreferences.setAddImportedEntriesGroupName(addImportedEntriesGroupName.getValue().trim());
@@ -252,6 +254,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                                                      .map(fetcherViewModel -> new FetcherApiKey(fetcherViewModel.getName(), fetcherViewModel.shouldUseCustomApiKey(), fetcherViewModel.getApiKey()))
                                                      .toList();
 
+        // Must be set before keys are set
         importerPreferences.setPersistCustomKeys(apikeyPersistProperty.get());
         importerPreferences.getApiKeys().clear();
         if (apikeyPersistAvailableProperty.get()) {

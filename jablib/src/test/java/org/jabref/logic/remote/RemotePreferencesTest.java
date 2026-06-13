@@ -13,59 +13,59 @@ class RemotePreferencesTest {
 
     @BeforeEach
     void setUp() {
-        preferences = new RemotePreferences(1000, true, 3000, false, false, 2087, true);
+        preferences = new RemotePreferences(true, 1000, false, 3000, false, 2087, true);
     }
 
     @Test
     void getPort() {
-        assertEquals(1000, preferences.getPort());
+        assertEquals(1000, preferences.getRemoteServerPort());
     }
 
     @Test
     void getHttpPort() {
-        assertEquals(3000, preferences.getHttpPort());
+        assertEquals(3000, preferences.getHttpServerPort());
     }
 
     @Test
     void setPort() {
-        preferences.setPort(2000);
-        assertEquals(2000, preferences.getPort());
+        preferences.setRemoteServerPort(2000);
+        assertEquals(2000, preferences.getRemoteServerPort());
     }
 
     @Test
     void setHttpPort() {
-        preferences.setHttpPort(4000);
-        assertEquals(4000, preferences.getHttpPort());
+        preferences.setHttpServerPort(4000);
+        assertEquals(4000, preferences.getHttpServerPort());
     }
 
     @Test
-    void useRemoteServer() {
-        assertTrue(preferences.useRemoteServer());
+    void shouldEnableRemoteServer() {
+        assertTrue(preferences.shouldEnableRemoteServer());
     }
 
     @Test
-    void setUseRemoteServer() {
-        preferences.setUseRemoteServer(false);
-        assertFalse(preferences.useRemoteServer());
+    void setShouldEnableRemoteServer() {
+        preferences.setEnableRemoteServer(false);
+        assertFalse(preferences.shouldEnableRemoteServer());
     }
 
     @Test
-    void isDifferentPortTrue() {
-        assertTrue(preferences.isDifferentPort(2000));
+    void isDifferentRemoteServerPortTrue() {
+        assertTrue(preferences.isDifferentRemoteServerPort(2000));
     }
 
     @Test
-    void isDifferentHttpPortTrue() {
-        assertTrue(preferences.isDifferentHttpPort(4000));
+    void isDifferentHttpServerPortTrue() {
+        assertTrue(preferences.isDifferentHttpServerPort(4000));
     }
 
     @Test
-    void isDifferentPortFalse() {
-        assertFalse(preferences.isDifferentPort(1000));
+    void isDifferentRemoteServerPortFalse() {
+        assertFalse(preferences.isDifferentRemoteServerPort(1000));
     }
 
     @Test
-    void isDifferentHttpPortFalse() {
-        assertFalse(preferences.isDifferentHttpPort(3000));
+    void isDifferentHttpServerPortFalse() {
+        assertFalse(preferences.isDifferentHttpServerPort(3000));
     }
 }

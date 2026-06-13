@@ -16,19 +16,32 @@ public class AutoLinkPreferences {
         REGEX // Filenames matching a regular expression pattern
     }
 
+    private static final SimpleObjectProperty<Character> DEFAULT_KEYWORD_SEPARATOR = new SimpleObjectProperty<>(',');
+
     private final ObjectProperty<CitationKeyDependency> citationKeyDependency;
     private final StringProperty regularExpression;
     private final BooleanProperty askAutoNamingPdfs;
-    private final ReadOnlyObjectProperty<Character> keywordSeparator;
+    private final SimpleObjectProperty<Character> keywordSeparator;
+
+    private AutoLinkPreferences() {
+        this(
+                CitationKeyDependency.START,            // Citation key dependency
+                "**/.*[citationkey].*\\\\.[extension]", // Regular expression
+                true,                                   // Ask auto naming PDFs
+                DEFAULT_KEYWORD_SEPARATOR               // Keyword separator
+        );
+    }
 
     public AutoLinkPreferences(CitationKeyDependency citationKeyDependency,
                                String regularExpression,
                                boolean askAutoNamingPdfs,
-                               ObjectProperty<Character> keywordSeparatorProperty) {
+                               ReadOnlyObjectProperty<Character> keywordSeparatorProperty) {
         this.citationKeyDependency = new SimpleObjectProperty<>(citationKeyDependency);
         this.regularExpression = new SimpleStringProperty(regularExpression);
         this.askAutoNamingPdfs = new SimpleBooleanProperty(askAutoNamingPdfs);
-        this.keywordSeparator = keywordSeparatorProperty;
+
+        this.keywordSeparator = new SimpleObjectProperty<>();
+        this.keywordSeparator.bind(keywordSeparatorProperty);
     }
 
     /// For testing purpose
@@ -40,6 +53,16 @@ public class AutoLinkPreferences {
         this.regularExpression = new SimpleStringProperty(regularExpression);
         this.askAutoNamingPdfs = new SimpleBooleanProperty(askAutoNamingPdfs);
         this.keywordSeparator = new SimpleObjectProperty<>(keywordSeparator);
+    }
+
+    public static AutoLinkPreferences getDefault() {
+        return new AutoLinkPreferences();
+    }
+
+    public void setAll(AutoLinkPreferences preferences) {
+        this.citationKeyDependency.set(preferences.getCitationKeyDependency());
+        this.regularExpression.set(preferences.getRegularExpression());
+        this.askAutoNamingPdfs.set(preferences.shouldAskAutoNamingPdfs());
     }
 
     public CitationKeyDependency getCitationKeyDependency() {
@@ -80,5 +103,15 @@ public class AutoLinkPreferences {
 
     public Character getKeywordSeparator() {
         return keywordSeparator.getValue();
+    }
+
+    public AutoLinkPreferences withKeywordSeparator(ReadOnlyObjectProperty<Character> newSeparator) {
+        if (newSeparator == null) {
+            this.keywordSeparator.bind(DEFAULT_KEYWORD_SEPARATOR);
+        } else {
+            this.keywordSeparator.bind(newSeparator);
+        }
+
+        return this;
     }
 }

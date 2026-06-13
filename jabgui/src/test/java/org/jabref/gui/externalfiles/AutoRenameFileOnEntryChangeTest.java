@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javafx.beans.property.SimpleObjectProperty;
+
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -24,7 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
+import static org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -54,8 +56,7 @@ class AutoRenameFileOnEntryChangeTest {
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 keyPattern,
-                "",
-                ',');
+                new SimpleObjectProperty<>(','));
 
         when(guiPreferences.getCitationKeyPatternPreferences()).thenReturn(patternPreferences);
         when(guiPreferences.getFilePreferences()).thenReturn(filePreferences);

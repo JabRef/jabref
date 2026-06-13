@@ -91,8 +91,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private final DialogService dialogService;
     @Inject private StateManager stateManager;
     @Inject private TaskExecutor taskExecutor;
-    @Inject private AiService aiService;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private AiService aiService;
 
     private final ControlsFxVisualizer visualizer;
 
@@ -216,7 +216,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
     @FXML
     public void initialize() {
-        viewModel = new NewEntryViewModel(preferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, aiService, fileUpdateMonitor);
+        viewModel = new NewEntryViewModel(preferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, fileUpdateMonitor, aiService);
 
         getDialogPane().disableProperty().bind(viewModel.executingProperty());
 
@@ -370,6 +370,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void initializeInterpretCitations() {
+        // [impl->req~textinput.clipboard.autofocus~1]
         interpretText.textProperty().bindBidirectional(viewModel.interpretTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {
@@ -443,6 +444,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         currentApproach = NewEntryDialogTab.INTERPRET_CITATIONS;
         newEntryPreferences.setLatestApproach(NewEntryDialogTab.INTERPRET_CITATIONS);
 
+        // [impl->req~textinput.clipboard.autofocus~1]
         if (interpretText != null) {
             Platform.runLater(() -> interpretText.requestFocus());
         }

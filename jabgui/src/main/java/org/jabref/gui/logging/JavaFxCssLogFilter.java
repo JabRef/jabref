@@ -10,7 +10,7 @@ import java.util.logging.LogRecord;
 ///
 /// We only filter java.util.logging WARN records whose message indicates a CSS lookup/conversion
 /// problem and that originate from processing a stylesheet (either JavaFX's modena.bss or
-/// JabRef's Base.css). All other log records are passed through unmodified.
+/// JabRef's Theme CSS). All other log records are passed through unmodified.
 public class JavaFxCssLogFilter implements Filter {
 
     @Override
@@ -37,9 +37,9 @@ public class JavaFxCssLogFilter implements Filter {
             return true;
         }
 
-        // Restrict to JavaFX default theme (modena.bss) or JabRef's own Base.css
+        // Restrict to JavaFX default theme (modena.bss) or JabRef's own theme CSS
         final boolean isJavaFxTheme = msg.contains("modena.bss") || msg.contains("javafx-controls");
-        final boolean isJabRefBaseCss = msg.contains("/org/jabref/gui/base.css");
+        final boolean isJabRefBaseCss = msg.contains("/org/jabref/gui/jabref-theme.css");
         if (!(isJavaFxTheme || isJabRefBaseCss)) {
             return true;
         }

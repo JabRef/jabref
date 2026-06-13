@@ -10,12 +10,14 @@ import org.tinylog.Logger;
 
 //DESCRIPTION Opens the given PDF file, parses the references and outputs BibTeX
 
-//JAVA 25+
+//JAVA 25
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 //FILES tinylog.properties=tinylog.properties
 
 //REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/
 //DEPS org.jabref:jablib:6.0-SNAPSHOT
+// see  https://github.com/gradlex-org/extra-java-module-info/issues/237 why we include e-adr here
+//DEPS io.github.adr:e-adr:2.0.0
 // JabRef relies on PR https://github.com/unicode-org/icu/pull/2127; for experiments the release version is OK.
 //DEPS com.ibm.icu:icu4j:78.1
 //DEPS com.fasterxml.jackson.core:jackson-annotations:2.20

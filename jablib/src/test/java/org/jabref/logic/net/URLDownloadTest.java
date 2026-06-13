@@ -65,10 +65,10 @@ class URLDownloadTest {
 
     @Test
     void downloadToTemporaryFileKeepsName() throws MalformedURLException, FetcherException {
-        URLDownload google = new URLDownload(URLUtil.create("https://github.com/JabRef/jabref/blob/main/LICENSE"));
+        URLDownload robots = new URLDownload(URLUtil.create("https://httpbin.org/robots.txt"));
 
-        String path = google.toTemporaryFile().toString();
-        assertTrue(path.contains("LICENSE"), path);
+        String path = robots.toTemporaryFile().toString();
+        assertTrue(path.contains("robots"), path);
     }
 
     @Test
@@ -121,13 +121,13 @@ class URLDownloadTest {
 
     @Test
     void test503ErrorThrowsFetcherServerException() throws MalformedURLException {
-        URLDownload urlDownload = new URLDownload(URLUtil.create("http://httpstat.us/503"));
+        URLDownload urlDownload = new URLDownload(URLUtil.create("https://gethttpstatus.com/503"));
         assertThrows(FetcherServerException.class, urlDownload::asString);
     }
 
     @Test
     void test429ErrorThrowsFetcherClientException() throws MalformedURLException {
-        URLDownload urlDownload = new URLDownload(URLUtil.create("http://httpstat.us/429"));
+        URLDownload urlDownload = new URLDownload(URLUtil.create("https://gethttpstatus.com/429"));
         assertThrows(FetcherClientException.class, urlDownload::asString);
     }
 }

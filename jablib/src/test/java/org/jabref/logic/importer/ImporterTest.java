@@ -3,6 +3,7 @@ package org.jabref.logic.importer;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.CitaviXmlImporter;
@@ -33,6 +34,8 @@ import static org.mockito.Mockito.when;
 @ResourceLock("Localization.lang")
 public class ImporterTest {
 
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s");
+
     @ParameterizedTest
     @MethodSource("instancesToTest")
     void getFormatterNameDoesNotReturnNull(Importer format) {
@@ -54,8 +57,7 @@ public class ImporterTest {
     @ParameterizedTest
     @MethodSource("instancesToTest")
     void getIdDoesNotContainWhitespace(Importer format) {
-        Pattern whitespacePattern = Pattern.compile("\\s");
-        assertFalse(whitespacePattern.matcher(format.getId()).find());
+        assertFalse(WHITESPACE_PATTERN.matcher(format.getId()).find());
     }
 
     @ParameterizedTest
@@ -67,6 +69,8 @@ public class ImporterTest {
     public static Stream<Importer> instancesToTest() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        CitationKeyPatternPreferences citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class);
+        when(citationKeyPatternPreferences.getUnwantedCharacters()).thenReturn(CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS);
         return Stream.of(
                 // all classes implementing {@link Importer}
                 // sorted alphabetically
@@ -74,7 +78,7 @@ public class ImporterTest {
                 new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()),
                 new CitaviXmlImporter(),
                 new CopacImporter(),
-                new EndnoteImporter(),
+                new EndnoteImporter(citationKeyPatternPreferences),
                 new InspecImporter(),
                 new IsiImporter(),
                 new MedlineImporter(),

@@ -27,7 +27,7 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.logic.search.PostgreServer;
+import org.jabref.logic.search.sqlbased.PostgreServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.strings.StringUtil;
@@ -35,6 +35,9 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.toolkit.commands.JabKit;
+import org.jabref.toolkit.exception.CliExceptionHandler;
+import org.jabref.toolkit.service.ExportService;
+import org.jabref.toolkit.service.ImportService;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -78,11 +81,13 @@ public class JabKitLauncher {
 
             JabKit jabKit = new JabKit(preferences, entryTypesManager);
             CommandLine commandLine = new CommandLine(jabKit);
+            commandLine.setExecutionExceptionHandler(new CliExceptionHandler(commandLine.getExecutionExceptionHandler()));
+            // [impl->req~jabkit.cli.banner-shown~1]
             String usageHeader = BuildInfo.JABREF_BANNER.formatted(buildInfo.version) + "\n" + JABKIT_BRAND;
             commandLine.getCommandSpec().usageMessage().header(usageHeader);
             applyUsageFooters(commandLine,
-                    JabKit.getAvailableImportFormats(preferences),
-                    JabKit.getAvailableExportFormats(preferences),
+                    ImportService.getAvailableImportFormats(preferences),
+                    ExportService.create(preferences, true).getAvailableExportFormats(),
                     WebFetchers.getSearchBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
 
             // Show help when no arguments are given. Placed after header and footer setup
@@ -95,7 +100,7 @@ public class JabKitLauncher {
             // Heavy initialization only needed when actually executing a command
             PostgreServer postgreServer = new PostgreServer();
             Injector.setModelOrService(PostgreServer.class, postgreServer);
-            Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences(), postgreServer.getDataSource()));
+            Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getAbbreviationPreferences(), postgreServer.getDataSource()));
             Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
 
             configureProxy(preferences.getProxyPreferences());
@@ -139,12 +144,9 @@ public class JabKitLauncher {
             );
 
             String footerText = "";
-            // Skip format footers for check-consistency since formats are already documented in option description
-            if (!"check-consistency".equals(subCommand.getCommandSpec().name())) {
-                footerText += hasOptions.get("input") ? inputFooter : "";
-                footerText += hasOptions.get("output") ? outputFooter : "";
-                footerText += hasOptions.get("export") ? exportFooter : "";
-            }
+            footerText += hasOptions.get("input") ? inputFooter : "";
+            footerText += hasOptions.get("output") ? outputFooter : "";
+            footerText += hasOptions.get("export") ? exportFooter : "";
             subCommand.getCommandSpec().usageMessage().footer(footerText);
         });
 
@@ -218,6 +220,6 @@ public class JabKitLauncher {
     }
 
     private static void configureSSL(SSLPreferences sslPreferences) {
-        TrustStoreManager.createTruststoreFileIfNotExist(Path.of(sslPreferences.getTruststorePath()));
+        TrustStoreManager.createTruststoreFileIfNotExist(sslPreferences.getTruststorePath());
     }
 }

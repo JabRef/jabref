@@ -65,7 +65,7 @@ public class ConstantsItemModel {
     private static ValidationMessage validateLabel(String input) {
         if (input == null) {
             return ValidationMessage.error("May not be null");
-        } else if (input.trim().isEmpty()) {
+        } else if (input.isBlank()) {
             return ValidationMessage.error(Localization.lang("Please enter the string's label"));
         } else if (IS_NUMBER.matcher(input).matches()) {
             return ValidationMessage.error(Localization.lang("The label of the string cannot be a number."));
@@ -81,7 +81,7 @@ public class ConstantsItemModel {
     private static ValidationMessage validateContent(String input) {
         if (input == null) {
             return ValidationMessage.error(Localization.lang("Must not be empty!"));
-        } else if (input.trim().isEmpty()) {
+        } else if (input.isBlank()) {
             return ValidationMessage.error(Localization.lang("Must not be empty!"));
         } else {
             return null; // everything is ok

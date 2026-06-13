@@ -50,7 +50,7 @@ public class LspLauncher extends Thread {
     }
 
     public LspLauncher(RemoteMessageHandler messageHandler, CliPreferences cliPreferences, DataSource dataSource, int port) {
-        this(messageHandler, cliPreferences, JournalAbbreviationLoader.loadRepository(cliPreferences.getJournalAbbreviationPreferences(), dataSource), cliPreferences.getCustomEntryTypesRepository(), port);
+        this(messageHandler, cliPreferences, JournalAbbreviationLoader.loadRepository(cliPreferences.getAbbreviationPreferences(), dataSource), cliPreferences.getCustomEntryTypesRepository(), port);
     }
 
     public LspLauncher(JabRefCliPreferences instance, DataSource dataSource, Integer port) {

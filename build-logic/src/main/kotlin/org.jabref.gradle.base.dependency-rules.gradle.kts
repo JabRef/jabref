@@ -98,6 +98,11 @@ jvmDependencyConflicts.patch {
         addRuntimeOnlyDependency("com.knuddels:jtokkit")
     }
     module("org.jabref:afterburner.fx") {
+        // POM pins javafx-* to 20; strip and re-add without version so :versions platform resolves them to current
+        removeDependency("org.openjfx:javafx-controls")
+        removeDependency("org.openjfx:javafx-fxml")
+        removeDependency("org.openjfx:javafx-swing")
+        removeDependency("org.openjfx:javafx-web")
         // metadata decared these as runtime only, but they are 'requires transitive' in module-info
         addApiDependency("org.openjfx:javafx-fxml")
         addApiDependency("org.openjfx:javafx-controls")
@@ -472,9 +477,7 @@ extraJavaModuleInfo {
         preserveExisting()
         exports("com.sun.javafx.scene")
         opens("com.sun.javafx.application", "org.testfx")
-        opens("com.sun.javafx.tk.quantum", "com.pixelduke.fxthemes")
         opens("javafx.scene", "org.controlsfx.controls")
-        opens("javafx.stage", "com.pixelduke.fxthemes")
     }
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {

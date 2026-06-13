@@ -16,11 +16,11 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.PostgreServer;
+import org.jabref.logic.search.sqlbased.PostgreServer;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -52,11 +52,11 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
-    private final JournalAbbreviationPreferences abbreviationsPreferences;
+    private final AbbreviationPreferences abbreviationsPreferences;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private boolean shouldWriteLists;
 
-    public JournalAbbreviationsTabViewModel(JournalAbbreviationPreferences abbreviationsPreferences,
+    public JournalAbbreviationsTabViewModel(AbbreviationPreferences abbreviationsPreferences,
                                             @NonNull DialogService dialogService,
                                             @NonNull TaskExecutor taskExecutor,
                                             @NonNull JournalAbbreviationRepository journalAbbreviationRepository) {
@@ -111,6 +111,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         createFileObjects();
         selectLastJournalFile();
         addBuiltInList();
+
+        useFJournal.set(abbreviationsPreferences.shouldUseFJournalField());
     }
 
     /// Read all saved file paths and read their abbreviations.
@@ -237,11 +239,11 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     }
 
     private void setCurrentAbbreviationNameAndAbbreviationIfValid(Abbreviation abbreviationObject) {
-        if (abbreviationObject.getName().trim().isEmpty()) {
+        if (abbreviationObject.getName().isBlank()) {
             dialogService.showErrorDialogAndWait(Localization.lang("Name cannot be empty"));
             return;
         }
-        if (abbreviationObject.getAbbreviation().trim().isEmpty()) {
+        if (abbreviationObject.getAbbreviation().isBlank()) {
             dialogService.showErrorDialogAndWait(Localization.lang("Abbreviation cannot be empty"));
             return;
         }
@@ -316,7 +318,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                         shouldWriteLists = false;
                     }
                 })
-                .onSuccess(success -> {
+                .onSuccess(_ -> {
                     PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
                     Injector.setModelOrService(
                             JournalAbbreviationRepository.class,

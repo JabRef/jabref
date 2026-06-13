@@ -3,7 +3,7 @@ package org.jabref.logic.ai.models;
 import java.util.List;
 
 import org.jabref.logic.net.URLDownload;
-import org.jabref.model.ai.AiProvider;
+import org.jabref.model.ai.llm.AiProvider;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,11 +40,6 @@ class OpenAiCompatibleModelProviderTest {
     @Test
     void supportsMistralAi() {
         assertTrue(provider.supports(AiProvider.MISTRAL_AI));
-    }
-
-    @Test
-    void supportsGpt4All() {
-        assertTrue(provider.supports(AiProvider.GPT4ALL));
     }
 
     @Test
@@ -117,17 +112,6 @@ class OpenAiCompatibleModelProviderTest {
     }
 
     @Test
-    void fetchModelsHandlesGpt4AllProvider() {
-        // Test with blank API key for GPT4ALL
-        List<String> models = provider.fetchModels(
-                AiProvider.GPT4ALL,
-                "http://localhost:4891",
-                ""
-        );
-        assertTrue(models.isEmpty());
-    }
-
-    @Test
     void supportsMethodReturnsFalseForUnsupportedProviders() {
         // Test all unsupported providers
         assertFalse(provider.supports(AiProvider.HUGGING_FACE),
@@ -143,14 +127,12 @@ class OpenAiCompatibleModelProviderTest {
                 "Should support OPEN_AI");
         assertTrue(provider.supports(AiProvider.MISTRAL_AI),
                 "Should support MISTRAL_AI");
-        assertTrue(provider.supports(AiProvider.GPT4ALL),
-                "Should support GPT4ALL");
     }
 
     @Test
     void fetchModelsWithNullApiKeyForDifferentProviders() {
         // Test that all supported providers handle null API key correctly
-        for (AiProvider provider : List.of(AiProvider.OPEN_AI, AiProvider.MISTRAL_AI, AiProvider.GPT4ALL)) {
+        for (AiProvider provider : List.of(AiProvider.OPEN_AI, AiProvider.MISTRAL_AI)) {
             List<String> models = this.provider.fetchModels(provider, "https://example.com", null);
             assertTrue(models.isEmpty(),
                     "Provider " + provider + " should return empty list for null API key");
@@ -160,7 +142,7 @@ class OpenAiCompatibleModelProviderTest {
     @Test
     void fetchModelsWithBlankApiKeyForDifferentProviders() {
         // Test that all supported providers handle blank API key correctly
-        for (AiProvider provider : List.of(AiProvider.OPEN_AI, AiProvider.MISTRAL_AI, AiProvider.GPT4ALL)) {
+        for (AiProvider provider : List.of(AiProvider.OPEN_AI, AiProvider.MISTRAL_AI)) {
             List<String> models = this.provider.fetchModels(provider, "https://example.com", "   ");
             assertTrue(models.isEmpty(),
                     "Provider " + provider + " should return empty list for blank API key");

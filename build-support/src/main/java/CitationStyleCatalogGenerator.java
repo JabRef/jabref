@@ -2,9 +2,9 @@
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //DEPS org.jspecify:jspecify:1.0.0
-//DEPS org.slf4j:slf4j-api:2.0.17
-//DEPS org.slf4j:slf4j-simple:2.0.17
-//DEPS tools.jackson.core:jackson-databind:3.1.1
+//DEPS org.slf4j:slf4j-api:2.0.18
+//DEPS org.slf4j:slf4j-simple:2.0.18
+//DEPS tools.jackson.core:jackson-databind:3.2.0
 
 //SOURCES ../../../../jablib/src/main/java/org/jabref/architecture/AllowedToUseClassGetResource.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/citationstyle/CSLStyleUtils.java

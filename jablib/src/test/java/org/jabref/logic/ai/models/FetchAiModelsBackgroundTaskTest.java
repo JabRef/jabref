@@ -2,7 +2,7 @@ package org.jabref.logic.ai.models;
 
 import java.util.List;
 
-import org.jabref.model.ai.AiProvider;
+import org.jabref.model.ai.llm.AiProvider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,27 +87,6 @@ class FetchAiModelsBackgroundTaskTest {
                 AiProvider.MISTRAL_AI,
                 "https://api.mistral.ai",
                 "mistral-key"
-        );
-
-        List<String> result = task.call();
-
-        assertEquals(expectedModels, result);
-    }
-
-    @Test
-    void taskHandlesGpt4AllProvider() {
-        List<String> expectedModels = List.of("llama-3", "mistral");
-        when(mockAiModelService.fetchModelsSynchronously(
-                eq(AiProvider.GPT4ALL),
-                any(String.class),
-                any(String.class)
-        )).thenReturn(expectedModels);
-
-        FetchAiModelsBackgroundTask task = new FetchAiModelsBackgroundTask(
-                mockAiModelService,
-                AiProvider.GPT4ALL,
-                "http://localhost:4891",
-                ""
         );
 
         List<String> result = task.call();

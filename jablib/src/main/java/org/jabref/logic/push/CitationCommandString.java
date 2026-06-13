@@ -1,5 +1,7 @@
 package org.jabref.logic.push;
 
+import java.util.regex.Pattern;
+
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +10,13 @@ public record CitationCommandString(@NonNull String prefix, @NonNull String deli
     public static final String CITE_KEY1 = "key1";
     public static final String CITE_KEY2 = "key2";
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationCommandString.class);
+    private static final Pattern ALLOWED_PREFIX = Pattern.compile("[a-zA-Z\\\\*]+\\{?");
+
+    public CitationCommandString {
+        if (!ALLOWED_PREFIX.matcher(prefix).matches()) {
+            LOGGER.warn("Invalid prefix: {}", prefix);
+        }
+    }
 
     @Override
     public @NonNull String toString() {

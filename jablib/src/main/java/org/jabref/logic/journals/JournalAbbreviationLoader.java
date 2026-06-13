@@ -40,7 +40,7 @@ public class JournalAbbreviationLoader {
         return parser.getAbbreviations();
     }
 
-    public static JournalAbbreviationRepository loadRepository(JournalAbbreviationPreferences journalAbbreviationPreferences,
+    public static JournalAbbreviationRepository loadRepository(AbbreviationPreferences abbreviationPreferences,
                                                                DataSource dataSource) {
         JournalAbbreviationRepository repository;
 
@@ -56,7 +56,7 @@ public class JournalAbbreviationLoader {
         }
 
         // Read external lists
-        List<String> lists = journalAbbreviationPreferences.getExternalJournalLists();
+        List<String> lists = abbreviationPreferences.getExternalJournalLists();
         if (lists != null && !lists.isEmpty()) {
             // reversing ensures that the latest lists overwrites the former one
             Collections.reverse(lists);
@@ -118,6 +118,6 @@ public class JournalAbbreviationLoader {
 
     /// Loads the built-in repository using the given data source. Used for testing.
     public static JournalAbbreviationRepository loadBuiltInRepository(DataSource dataSource) {
-        return loadRepository(new JournalAbbreviationPreferences(List.of(), true), dataSource);
+        return loadRepository(new AbbreviationPreferences(List.of(), true, false), dataSource);
     }
 }

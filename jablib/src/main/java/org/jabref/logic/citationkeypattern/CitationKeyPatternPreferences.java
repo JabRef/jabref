@@ -18,18 +18,32 @@ public class CitationKeyPatternPreferences {
         SECOND_WITH_B   // CiteKey, CiteKeyB, CiteKeyC ...
     }
 
-    private final BooleanProperty shouldTransliterateFieldsForCitationKey = new SimpleBooleanProperty();
-    private final BooleanProperty shouldAvoidOverwriteCiteKey = new SimpleBooleanProperty();
-    private final BooleanProperty shouldWarnBeforeOverwriteCiteKey = new SimpleBooleanProperty();
-    private final BooleanProperty shouldGenerateCiteKeysBeforeSaving = new SimpleBooleanProperty();
-    private final ObjectProperty<KeySuffix> keySuffix = new SimpleObjectProperty<>();
-    private final StringProperty keyPatternRegex = new SimpleStringProperty();
-    private final StringProperty keyPatternReplacement = new SimpleStringProperty();
-    private final StringProperty unwantedCharacters = new SimpleStringProperty();
-    private final ObjectProperty<GlobalCitationKeyPatterns> keyPatterns = new SimpleObjectProperty<>();
-    private final String defaultPattern;
-    private final ReadOnlyObjectProperty<Character> keywordDelimiter;
+    /// List of unwanted characters. These will be removed at the end.
+    /// Note that `+` is a wanted character to indicate "et al." in authorsAlpha.
+    /// Example: `ABC+`. See `org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()` for examples.
+    ///
+    /// Should never be used directly - use [CitationKeyPatternPreferences#getUnwantedCharacters()] instead, which respects the user's preferences
+    ///
+    /// See also #DISALLOWED_CHARACTERS
+    @VisibleForTesting
+    public static final String DEFAULT_UNWANTED_CHARACTERS = "-`ʹ:!;?^$";
 
+    private static final GlobalCitationKeyPatterns DEFAULT_CITATION_KEY_PATTERN = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
+
+    private static final SimpleObjectProperty<Character> DEFAULT_KEYWORD_SEPARATOR = new SimpleObjectProperty<>(',');
+
+    private final BooleanProperty shouldTransliterateFieldsForCitationKey;
+    private final BooleanProperty shouldAvoidOverwriteCiteKey;
+    private final BooleanProperty shouldWarnBeforeOverwriteCiteKey;
+    private final BooleanProperty shouldGenerateCiteKeysBeforeSaving;
+    private final ObjectProperty<KeySuffix> keySuffix;
+    private final StringProperty keyPatternRegex;
+    private final StringProperty keyPatternReplacement;
+    private final StringProperty unwantedCharacters;
+    private final ObjectProperty<GlobalCitationKeyPatterns> keyPatterns;
+    private final SimpleObjectProperty<Character> keywordSeparator;
+
+    /// @param keywordSeparator should always be org.jabref.model.entry.BibEntryPreferences#keywordSeparator
     public CitationKeyPatternPreferences(boolean shouldTransliterateFieldsForCitationKey,
                                          boolean shouldAvoidOverwriteCiteKey,
                                          boolean shouldWarnBeforeOverwriteCiteKey,
@@ -39,47 +53,54 @@ public class CitationKeyPatternPreferences {
                                          String keyPatternReplacement,
                                          String unwantedCharacters,
                                          GlobalCitationKeyPatterns keyPatterns,
-                                         String defaultPattern,
-                                         ReadOnlyObjectProperty<Character> keywordDelimiter) {
+                                         ReadOnlyObjectProperty<Character> keywordSeparator) {
 
-        this.shouldTransliterateFieldsForCitationKey.set(shouldTransliterateFieldsForCitationKey);
-        this.shouldAvoidOverwriteCiteKey.set(shouldAvoidOverwriteCiteKey);
-        this.shouldWarnBeforeOverwriteCiteKey.set(shouldWarnBeforeOverwriteCiteKey);
-        this.shouldGenerateCiteKeysBeforeSaving.set(shouldGenerateCiteKeysBeforeSaving);
-        this.keySuffix.set(keySuffix);
-        this.keyPatternRegex.set(keyPatternRegex);
-        this.keyPatternReplacement.set(keyPatternReplacement);
-        this.unwantedCharacters.set(unwantedCharacters);
-        this.keyPatterns.set(keyPatterns);
+        this.shouldTransliterateFieldsForCitationKey = new SimpleBooleanProperty(shouldTransliterateFieldsForCitationKey);
+        this.shouldAvoidOverwriteCiteKey = new SimpleBooleanProperty(shouldAvoidOverwriteCiteKey);
+        this.shouldWarnBeforeOverwriteCiteKey = new SimpleBooleanProperty(shouldWarnBeforeOverwriteCiteKey);
+        this.shouldGenerateCiteKeysBeforeSaving = new SimpleBooleanProperty(shouldGenerateCiteKeysBeforeSaving);
+        this.keySuffix = new SimpleObjectProperty<>(keySuffix);
+        this.keyPatternRegex = new SimpleStringProperty(keyPatternRegex);
+        this.keyPatternReplacement = new SimpleStringProperty(keyPatternReplacement);
+        this.unwantedCharacters = new SimpleStringProperty(unwantedCharacters);
+        this.keyPatterns = new SimpleObjectProperty<>(keyPatterns);
 
-        this.defaultPattern = defaultPattern;
-        this.keywordDelimiter = keywordDelimiter;
+        this.keywordSeparator = new SimpleObjectProperty<>();
+        this.keywordSeparator.bind(keywordSeparator);
     }
 
-    @VisibleForTesting
-    public CitationKeyPatternPreferences(boolean shouldTransliterateFieldsForCitationKey,
-                                         boolean shouldAvoidOverwriteCiteKey,
-                                         boolean shouldWarnBeforeOverwriteCiteKey,
-                                         boolean shouldGenerateCiteKeysBeforeSaving,
-                                         KeySuffix keySuffix,
-                                         String keyPatternRegex,
-                                         String keyPatternReplacement,
-                                         String unwantedCharacters,
-                                         GlobalCitationKeyPatterns keyPatterns,
-                                         String defaultPattern,
-                                         Character keywordDelimiter) {
+    private CitationKeyPatternPreferences() {
+        this(
+                false,                        // shouldTransliterateFieldsForCitationKey
+                false,                        // shouldAvoidOverwriteCiteKey
+                true,                         // shouldWarnBeforeOverwriteCiteKey
+                false,                        // shouldGenerateCiteKeysBeforeSaving
+                KeySuffix.SECOND_WITH_A,
+                "",                           // keyPatternRegex
+                "",                           // keyPatternReplacement
+                DEFAULT_UNWANTED_CHARACTERS,
+                DEFAULT_CITATION_KEY_PATTERN,
+                new SimpleObjectProperty<>()  // keywordDelimiter
+        );
 
-        this(shouldTransliterateFieldsForCitationKey,
-                shouldAvoidOverwriteCiteKey,
-                shouldWarnBeforeOverwriteCiteKey,
-                shouldGenerateCiteKeysBeforeSaving,
-                keySuffix,
-                keyPatternRegex,
-                keyPatternReplacement,
-                unwantedCharacters,
-                keyPatterns,
-                defaultPattern,
-                new SimpleObjectProperty<>(keywordDelimiter));
+        this.keywordSeparator.bind(DEFAULT_KEYWORD_SEPARATOR);
+    }
+
+    public static CitationKeyPatternPreferences getDefault() {
+        return new CitationKeyPatternPreferences();
+    }
+
+    public void setAll(CitationKeyPatternPreferences preferences) {
+        this.shouldTransliterateFieldsForCitationKey.set(preferences.shouldTransliterateFieldsForCitationKey.get());
+        this.shouldAvoidOverwriteCiteKey.set(preferences.shouldAvoidOverwriteCiteKey.get());
+        this.shouldWarnBeforeOverwriteCiteKey.set(preferences.shouldWarnBeforeOverwriteCiteKey.get());
+        this.shouldGenerateCiteKeysBeforeSaving.set(preferences.shouldGenerateCiteKeysBeforeSaving.get());
+        this.keySuffix.set(preferences.keySuffix.get());
+        this.keyPatternRegex.set(preferences.keyPatternRegex.get());
+        this.keyPatternReplacement.set(preferences.keyPatternReplacement.get());
+        this.unwantedCharacters.set(preferences.unwantedCharacters.get());
+        this.keyPatterns.set(preferences.keyPatterns.get());
+        // keywordDelimiter is always bound to BibEntryPreferences#keywordDelimiter
     }
 
     public boolean shouldTransliterateFieldsForCitationKey() {
@@ -190,11 +211,17 @@ public class CitationKeyPatternPreferences {
         this.keyPatterns.set(keyPatterns);
     }
 
-    public String getDefaultPattern() {
-        return defaultPattern;
+    public Character getKeywordSeparator() {
+        return keywordSeparator.get();
     }
 
-    public Character getKeywordDelimiter() {
-        return keywordDelimiter.get();
+    public CitationKeyPatternPreferences withKeywordSeparator(ReadOnlyObjectProperty<Character> newDelimiter) {
+        if (newDelimiter == null) {
+            this.keywordSeparator.bind(DEFAULT_KEYWORD_SEPARATOR);
+        } else {
+            this.keywordSeparator.bind(newDelimiter);
+        }
+
+        return this;
     }
 }

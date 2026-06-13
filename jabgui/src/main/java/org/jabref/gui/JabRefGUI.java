@@ -50,8 +50,8 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
-import org.jabref.logic.search.IndexManager;
-import org.jabref.logic.search.PostgreServer;
+import org.jabref.logic.search.sqlbased.IndexManager;
+import org.jabref.logic.search.sqlbased.PostgreServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -178,7 +178,7 @@ public class JabRefGUI extends Application {
 
         BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
         PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
-        journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences(), postgreServer.getDataSource());
+        journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getAbbreviationPreferences(), postgreServer.getDataSource());
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
         Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);
         Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
@@ -232,7 +232,6 @@ public class JabRefGUI extends Application {
         JabRefGUI.aiService = new AiService(
                 preferences.getAiPreferences(),
                 preferences.getFilePreferences(),
-                preferences.getCitationKeyPatternPreferences(),
                 dialogService,
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
@@ -245,7 +244,8 @@ public class JabRefGUI extends Application {
                 preferences.getEntryEditorPreferences().citationCountFetcherTypeProperty(),
                 preferences.getCitationKeyPatternPreferences(),
                 preferences.getGrobidPreferences(),
-                JabRefGUI.aiService,
+                preferences.getAiPreferences(),
+                aiService.getCurrentChatModel(),
                 entryTypesManager,
                 dialogService
         );
@@ -329,7 +329,7 @@ public class JabRefGUI extends Application {
         Scene scene = new Scene(powerpane);
 
         LOGGER.debug("installing CSS");
-        themeManager.installCssImmediately(scene);
+        themeManager.installCssOnScene(scene);
 
         LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -458,16 +458,16 @@ public class JabRefGUI extends Application {
     public void startBackgroundTasks() {
         RemotePreferences remotePreferences = preferences.getRemotePreferences();
         CLIMessageHandler cliMessageHandler = new CLIMessageHandler(mainFrame, preferences);
-        if (remotePreferences.useRemoteServer()) {
+        if (remotePreferences.shouldEnableRemoteServer()) {
             remoteListenerServerManager.openAndStart(
                     cliMessageHandler,
-                    remotePreferences.getPort());
+                    remotePreferences.getRemoteServerPort());
         }
 
-        if (remotePreferences.enableHttpServer()) {
+        if (remotePreferences.shouldEnableHttpServer()) {
             httpServerManager.start(preferences, stateManager, mainFrame, remotePreferences.getHttpServerUri());
         }
-        if (remotePreferences.enableLanguageServer()) {
+        if (remotePreferences.shouldEnableLanguageServer()) {
             languageServerController.start(cliMessageHandler, remotePreferences.getLanguageServerPort());
         }
     }
