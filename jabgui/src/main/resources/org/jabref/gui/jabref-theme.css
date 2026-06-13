@@ -125,6 +125,11 @@
     -fx-fill: -fx-text-base-color;
 }
 
+.file-annotation-marking {
+    -fx-font-size: 0.75em;
+    -fx-font-weight: bold;
+}
+
 .linked-file-padding {
     -fx-padding: 0.5em 0 0.5em 0;
 }
