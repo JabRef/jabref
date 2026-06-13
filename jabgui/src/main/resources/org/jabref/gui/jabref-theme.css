@@ -125,6 +125,11 @@
     -fx-fill: -fx-text-base-color;
 }
 
+.delete-file-dialog-header {
+    -fx-padding: 10px;
+    -fx-background-color: -fx-background;
+}
+
 .file-annotation-marking {
     -fx-font-size: 0.75em;
     -fx-font-weight: bold;
