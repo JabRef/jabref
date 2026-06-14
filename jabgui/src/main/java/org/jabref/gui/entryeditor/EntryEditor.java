@@ -206,7 +206,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                     }
                 });
 
-        preferences.getEntryEditorPreferences().getStaticTabs().addListener((InvalidationListener) _ -> {
+        preferences.getEntryEditorPreferences().getTabConfigs().addListener((InvalidationListener) _ -> {
             if (currentlyEditedEntry != null) {
                 adaptVisibleTabs();
             }

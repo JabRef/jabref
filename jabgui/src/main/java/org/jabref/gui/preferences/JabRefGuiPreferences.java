@@ -24,6 +24,7 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.edit.CopyToPreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.entryeditor.EntryEditorTabConfig;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -355,17 +356,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         }
         entryEditorPreferences = getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences.getDefault());
 
-        entryEditorPreferences.getEntryEditorTabs().addListener((InvalidationListener) _ -> storeEntryEditorTabs(entryEditorPreferences.getEntryEditorTabs()));
+        entryEditorPreferences.getTabConfigs().addListener((InvalidationListener) _ -> storeTabConfigs(entryEditorPreferences.getTabConfigs()));
         EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (_, _, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
-        entryEditorPreferences.getStaticTabs().addListener((InvalidationListener) _ -> {
-            putBoolean(SHOW_RECOMMENDATIONS, entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.RELATED_ARTICLES));
-            putBoolean(SHOW_AI_SUMMARY, entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.AI_SUMMARY));
-            putBoolean(SHOW_AI_CHAT, entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.AI_CHAT));
-            putBoolean(SHOW_LATEX_CITATIONS, entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.LATEX_CITATIONS));
-            putBoolean(SMART_FILE_ANNOTATIONS, entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.FILE_ANNOTATIONS));
-            putBoolean(SHOW_SCITE_TAB, entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.CITATION_INFORMATION));
-            putBoolean(SHOW_USER_COMMENTS_FIELDS, entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.USER_COMMENTS));
-        });
         EasyBind.listen(entryEditorPreferences.showSourceTabByDefaultProperty(), (_, _, newValue) -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
         EasyBind.listen(entryEditorPreferences.enableValidationProperty(), (_, _, newValue) -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
         EasyBind.listen(entryEditorPreferences.allowIntegerEditionBibtexProperty(), (_, _, newValue) -> putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, newValue));
@@ -418,26 +410,41 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return tabs;
     }
 
-    /// Stores the defined tabs and corresponding fields in the preferences.
-    ///
-    /// @param customTabs a map of tab names and the corresponding set of fields to be displayed in
-    private void storeEntryEditorTabs(Map<String, Set<Field>> customTabs) {
-        String[] names = customTabs.keySet().toArray(String[]::new);
-        String[] fields = customTabs.values().stream()
-                                    .map(set -> set.stream()
+    private void storeTabConfigs(List<EntryEditorTabConfig> configs) {
+        List<EntryEditorTabConfig.FieldSet> fieldSetTabs = configs.stream()
+                                                                  .filter(EntryEditorTabConfig.FieldSet.class::isInstance)
+                                                                  .map(EntryEditorTabConfig.FieldSet.class::cast)
+                                                                  .toList();
+
+        for (int i = 0; i < fieldSetTabs.size(); i++) {
+            put(CUSTOM_TAB_NAME + i, fieldSetTabs.get(i).name());
+            put(CUSTOM_TAB_FIELDS + i, fieldSetTabs.get(i).fields().stream()
                                                    .map(Field::getName)
-                                                   .collect(Collectors.joining(STRINGLIST_DELIMITER.toString())))
-                                    .toArray(String[]::new);
-
-        for (int i = 0; i < customTabs.size(); i++) {
-            put(CUSTOM_TAB_NAME + i, names[i]);
-            put(CUSTOM_TAB_FIELDS + i, fields[i]);
+                                                   .collect(Collectors.joining(STRINGLIST_DELIMITER.toString())));
         }
+        purgeSeries(CUSTOM_TAB_NAME, fieldSetTabs.size());
+        purgeSeries(CUSTOM_TAB_FIELDS, fieldSetTabs.size());
 
-        purgeSeries(CUSTOM_TAB_NAME, customTabs.size());
-        purgeSeries(CUSTOM_TAB_FIELDS, customTabs.size());
-
-        getEntryEditorTabs();
+        for (EntryEditorTabConfig config : configs) {
+            if (config instanceof EntryEditorTabConfig.Feature feature) {
+                switch (feature.type()) {
+                    case RELATED_ARTICLES ->
+                            putBoolean(SHOW_RECOMMENDATIONS, feature.visible());
+                    case AI_SUMMARY ->
+                            putBoolean(SHOW_AI_SUMMARY, feature.visible());
+                    case AI_CHAT ->
+                            putBoolean(SHOW_AI_CHAT, feature.visible());
+                    case LATEX_CITATIONS ->
+                            putBoolean(SHOW_LATEX_CITATIONS, feature.visible());
+                    case FILE_ANNOTATIONS ->
+                            putBoolean(SMART_FILE_ANNOTATIONS, feature.visible());
+                    case CITATION_INFORMATION ->
+                            putBoolean(SHOW_SCITE_TAB, feature.visible());
+                    case USER_COMMENTS ->
+                            putBoolean(SHOW_USER_COMMENTS_FIELDS, feature.visible());
+                }
+            }
+        }
     }
     // endregion
 

@@ -3,6 +3,7 @@ package org.jabref.migrations;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -588,7 +589,11 @@ public class PreferencesMigrations {
     /// The tab "Comments" is hard coded using {@link org.jabref.gui.entryeditor.CommentsTab} since v5.10 (and thus hard-wired in {@link org.jabref.gui.entryeditor.EntryEditor#createTabs()}.
     /// Thus, the configuration ih the preferences is obsolete
     static void removeCommentsFromCustomEditorTabs(GuiPreferences preferences) {
-        preferences.getEntryEditorPreferences().getEntryEditorTabs().remove("Comments");
+        EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
+        Map<String, Set<Field>> tabs = new LinkedHashMap<>(entryEditorPreferences.getEntryEditorTabs());
+        if (tabs.remove("Comments") != null) {
+            entryEditorPreferences.setEntryEditorTabList(tabs);
+        }
     }
 
     /// upgrade the old theme css names of the theme to the new theme properties
