@@ -5,8 +5,9 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -14,59 +15,59 @@
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.preferences.entryeditor.EntryEditorTab">
+
     <Label styleClass="titleHeader" text="%Entry editor"/>
-    <fx:define>
-        <ToggleGroup fx:id="nameFormat"/>
-        <ToggleGroup fx:id="firstNames"/>
-    </fx:define>
 
     <CheckBox fx:id="openOnNewEntry" text="%Open editor when a new entry is created"/>
-    <CheckBox
-            fx:id="autoLinkFilesEnabled"
-            text="%Automatically search and show unlinked files in the entry editor"/>
-
+    <CheckBox fx:id="autoLinkFilesEnabled"
+              text="%Automatically search and show unlinked files in the entry editor"/>
     <CheckBox fx:id="enableValidation" text="%Show validation messages"/>
-    <CheckBox fx:id="allowIntegerEdition" text="%Allow integers in 'edition' field in BibTeX mode"/>
+    <CheckBox fx:id="allowIntegerEdition"
+              text="%Allow integers in 'edition' field in BibTeX mode"/>
     <CheckBox fx:id="journalPopupEnabled" text="%Fetch journal information online to show"/>
     <CheckBox fx:id="enableMscKeywordDescriptions" text="%Enable MSC keyword descriptions"/>
-    <CheckBox fx:id="showUserCommentsField" text="%Show user comments field"/>
-    <CheckBox fx:id="enableSciteTab" text="%Show tab 'Citation information'"/>
-    <HBox spacing="10.0" disable="${!enableSciteTab.selected}">
-        <padding>
-            <Insets left="20.0"/>
-        </padding>
+    <CheckBox fx:id="defaultSource" text="%Show BibTeX source by default"/>
+    <CheckBox fx:id="acceptRecommendations" text="%Accept recommendations from Mr. DLib"/>
+
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
         <Label text="%Citation count fetcher:"/>
         <ComboBox fx:id="citationCountFetcherCombo"/>
     </HBox>
-    <CheckBox fx:id="enableRelatedArticlesTab" text="%Show tab 'Related articles'"/>
-    <CheckBox fx:id="acceptRecommendations" text="%Accept recommendations from Mr. DLib"
-              disable="${!enableRelatedArticlesTab.selected}">
-        <padding>
-            <Insets left="20.0"/>
-        </padding>
-    </CheckBox>
-    <CheckBox fx:id="defaultSource" text="%Show BibTeX source by default"/>
-    <CheckBox fx:id="enableLatexCitationsTab" text="%Show tab 'LaTeX citations'"/>
-    <CheckBox fx:id="smartFileAnnotationsTab" text="%Show tab 'File annotations' only if it contains highlights or comments"/>
-    <CheckBox fx:id="enableAiSummaryTab" text="%Show tab 'AI Summary'"/>
-    <CheckBox fx:id="enableAiChatTab" text="%Show tab 'AI Chat'"/>
 
-    <Label styleClass="sectionHeader" text="%Custom editor tabs"/>
-    <HBox>
-        <Label text="%Create custom fields for each BibTeX entry"/>
-        <HBox HBox.hgrow="ALWAYS"/>
-        <Button fx:id="generalFieldsHelp"/>
-        <Button prefHeight="20.0" prefWidth="20.0" styleClass="icon-button,narrow" onAction="#resetToDefaults">
-            <graphic>
-                <JabRefIconView glyph="REFRESH"/>
-            </graphic>
-            <tooltip>
-                <Tooltip text="%Reset to default"/>
-            </tooltip>
-        </Button>
-    </HBox>
+    <Label styleClass="sectionHeader" text="%Editor tabs"/>
 
-    <TextArea fx:id="fieldsTextArea" minHeight="200.0"/>
+    <SplitPane dividerPositions="0.33" VBox.vgrow="ALWAYS">
 
-    <Label text="%Format: Tab:field;field;... (e.g. General:url;pdf;note...)"/>
+        <!-- Left: ordered list of all tabs; feature tabs have a visibility checkbox -->
+        <VBox spacing="5.0" minWidth="180.0" SplitPane.resizableWithParent="false">
+            <ListView fx:id="tabConfigsList" VBox.vgrow="ALWAYS"/>
+            <HBox spacing="5.0">
+                <Button fx:id="addTabButton" onAction="#addFieldSetTab" styleClass="icon-button">
+                    <graphic><JabRefIconView glyph="ADD"/></graphic>
+                    <tooltip><Tooltip text="%Add custom tab"/></tooltip>
+                </Button>
+                <Button fx:id="removeTabButton" onAction="#removeFieldSetTab" styleClass="icon-button">
+                    <graphic><JabRefIconView glyph="REMOVE"/></graphic>
+                    <tooltip><Tooltip text="%Remove selected tab"/></tooltip>
+                </Button>
+                <HBox HBox.hgrow="ALWAYS"/>
+                <Button fx:id="generalFieldsHelp" styleClass="icon-button"/>
+                <Button fx:id="resetTabsButton" onAction="#resetToDefaults" styleClass="icon-button">
+                    <graphic><JabRefIconView glyph="REFRESH"/></graphic>
+                    <tooltip><Tooltip text="%Reset to default tabs"/></tooltip>
+                </Button>
+            </HBox>
+        </VBox>
+
+        <!-- Right: name + fields editor, visible only when a field-set tab is selected -->
+        <VBox fx:id="tabEditorPanel" spacing="8.0">
+            <padding><Insets left="10.0" top="5.0"/></padding>
+            <Label fx:id="tabNameLabel" text="%Tab name"/>
+            <TextField fx:id="tabNameField"/>
+            <Label fx:id="tabFieldsLabel" text="%Fields"/>
+            <!-- TagsField<Field> added programmatically in EntryEditorTab.initialize() -->
+        </VBox>
+
+    </SplitPane>
+
 </fx:root>
