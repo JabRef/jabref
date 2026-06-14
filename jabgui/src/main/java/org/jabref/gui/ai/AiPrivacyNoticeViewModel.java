@@ -64,8 +64,8 @@ public class AiPrivacyNoticeViewModel extends AbstractViewModel {
     }
 
     public void privacyDisagree() {
-        entryEditorPreferences.setShouldShowAiChatTab(false);
-        entryEditorPreferences.setShouldShowAiSummaryTab(false);
+        entryEditorPreferences.setStaticTabVisible(EntryEditorPreferences.StaticTab.AI_CHAT, false);
+        entryEditorPreferences.setStaticTabVisible(EntryEditorPreferences.StaticTab.AI_SUMMARY, false);
         groupsPreferences.setShowAiChatButton(false);
         aiPreferences.setEnableAi(false);
     }

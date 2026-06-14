@@ -355,17 +355,16 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         }
         entryEditorPreferences = getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences.getDefault());
 
-        EasyBind.listen(entryEditorPreferences.entryEditorTabs(), (_, _, newValue) -> storeEntryEditorTabs(newValue));
-        // defaultEntryEditorTabs are read-only
+        entryEditorPreferences.getEntryEditorTabs().addListener((InvalidationListener) _ -> storeEntryEditorTabs(entryEditorPreferences.getEntryEditorTabs()));
         EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (_, _, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
-        EasyBind.listen(entryEditorPreferences.staticTabListProperty(), (_, _, newValue) -> {
-            putBoolean(SHOW_RECOMMENDATIONS, newValue.contains(EntryEditorPreferences.StaticTab.RELATED_ARTICLES));
-            putBoolean(SHOW_AI_SUMMARY, newValue.contains(EntryEditorPreferences.StaticTab.AI_SUMMARY));
-            putBoolean(SHOW_AI_CHAT, newValue.contains(EntryEditorPreferences.StaticTab.AI_CHAT));
-            putBoolean(SHOW_LATEX_CITATIONS, newValue.contains(EntryEditorPreferences.StaticTab.LATEX_CITATIONS));
-            putBoolean(SMART_FILE_ANNOTATIONS, newValue.contains(EntryEditorPreferences.StaticTab.FILE_ANNOTATIONS));
-            putBoolean(SHOW_SCITE_TAB, newValue.contains(EntryEditorPreferences.StaticTab.CITATION_INFORMATION));
-            putBoolean(SHOW_USER_COMMENTS_FIELDS, newValue.contains(EntryEditorPreferences.StaticTab.USER_COMMENTS));
+        entryEditorPreferences.getStaticTabs().addListener((InvalidationListener) _ -> {
+            putBoolean(SHOW_RECOMMENDATIONS, entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.RELATED_ARTICLES));
+            putBoolean(SHOW_AI_SUMMARY, entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.AI_SUMMARY));
+            putBoolean(SHOW_AI_CHAT, entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.AI_CHAT));
+            putBoolean(SHOW_LATEX_CITATIONS, entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.LATEX_CITATIONS));
+            putBoolean(SMART_FILE_ANNOTATIONS, entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.FILE_ANNOTATIONS));
+            putBoolean(SHOW_SCITE_TAB, entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.CITATION_INFORMATION));
+            putBoolean(SHOW_USER_COMMENTS_FIELDS, entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.USER_COMMENTS));
         });
         EasyBind.listen(entryEditorPreferences.showSourceTabByDefaultProperty(), (_, _, newValue) -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
         EasyBind.listen(entryEditorPreferences.enableValidationProperty(), (_, _, newValue) -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
@@ -383,13 +382,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getEntryEditorTabs(),
                 getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),
                 EntryEditorPreferences.staticTabsFromBoolean(
-                        getBoolean(SHOW_RECOMMENDATIONS, defaults.shouldShowRecommendationsTab()),
-                        getBoolean(SHOW_AI_SUMMARY, defaults.shouldShowAiSummaryTab()),
-                        getBoolean(SHOW_AI_CHAT, defaults.shouldShowAiChatTab()),
-                        getBoolean(SHOW_LATEX_CITATIONS, defaults.shouldShowLatexCitationsTab()),
-                        getBoolean(SMART_FILE_ANNOTATIONS, defaults.shouldShowFileAnnotationsTab()),
-                        getBoolean(SHOW_SCITE_TAB, defaults.shouldShowSciteTab()),
-                        getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields())),
+                        getBoolean(SHOW_RECOMMENDATIONS, defaults.isStaticTabVisible(EntryEditorPreferences.StaticTab.RELATED_ARTICLES)),
+                        getBoolean(SHOW_AI_SUMMARY, defaults.isStaticTabVisible(EntryEditorPreferences.StaticTab.AI_SUMMARY)),
+                        getBoolean(SHOW_AI_CHAT, defaults.isStaticTabVisible(EntryEditorPreferences.StaticTab.AI_CHAT)),
+                        getBoolean(SHOW_LATEX_CITATIONS, defaults.isStaticTabVisible(EntryEditorPreferences.StaticTab.LATEX_CITATIONS)),
+                        getBoolean(SMART_FILE_ANNOTATIONS, defaults.isStaticTabVisible(EntryEditorPreferences.StaticTab.FILE_ANNOTATIONS)),
+                        getBoolean(SHOW_SCITE_TAB, defaults.isStaticTabVisible(EntryEditorPreferences.StaticTab.CITATION_INFORMATION)),
+                        getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.isStaticTabVisible(EntryEditorPreferences.StaticTab.USER_COMMENTS))),
                 getBoolean(DEFAULT_SHOW_SOURCE, defaults.showSourceTabByDefault()),
                 getBoolean(VALIDATE_IN_ENTRY_EDITOR, defaults.shouldEnableValidation()),
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaults.shouldAllowIntegerEditionBibtex()),

@@ -15,6 +15,7 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.fetcher.CrossRef;
@@ -138,7 +139,7 @@ public class CitationsRelationsTabViewModel {
     }
 
     public boolean shouldShow() {
-        return preferences.getEntryEditorPreferences().shouldShowSciteTab();
+        return preferences.getEntryEditorPreferences().isStaticTabVisible(EntryEditorPreferences.StaticTab.CITATION_INFORMATION);
     }
 
     public void bindToEntry(@Nullable BibEntry entry) {

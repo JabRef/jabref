@@ -32,7 +32,7 @@ public class FileAnnotationTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        if (!entryEditorPreferences.shouldShowFileAnnotationsTab()) {
+        if (!entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.FILE_ANNOTATIONS)) {
             return entry.getField(StandardField.FILE).isPresent();
         }
 

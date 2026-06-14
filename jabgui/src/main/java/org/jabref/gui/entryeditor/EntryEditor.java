@@ -206,12 +206,11 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                     }
                 });
 
-        EasyBind.listen(preferences.getEntryEditorPreferences().staticTabListProperty(),
-                (_, _, _) -> {
-                    if (currentlyEditedEntry != null) {
-                        adaptVisibleTabs();
-                    }
-                });
+        preferences.getEntryEditorPreferences().getStaticTabs().addListener((InvalidationListener) _ -> {
+            if (currentlyEditedEntry != null) {
+                adaptVisibleTabs();
+            }
+        });
     }
 
     private void setupDragAndDrop() {

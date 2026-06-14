@@ -236,8 +236,8 @@ public class RelatedArticlesTab extends EntryEditorTab {
             setContent(getRelatedArticlesPane(entry));
         });
 
-        hideTab.setOnAction(event -> {
-            preferences.getEntryEditorPreferences().setShouldShowRecommendationsTab(false);
+        hideTab.setOnAction(_ -> {
+            preferences.getEntryEditorPreferences().setStaticTabVisible(EntryEditorPreferences.StaticTab.RELATED_ARTICLES, false);
         });
 
         hbox.getChildren().addAll(button, hideTab);
@@ -250,7 +250,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     @Override
     public boolean shouldShow(BibEntry entry) {
         EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
-        return entryEditorPreferences.shouldShowRecommendationsTab();
+        return entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.RELATED_ARTICLES);
     }
 
     @Override
