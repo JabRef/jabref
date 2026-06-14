@@ -33,7 +33,7 @@ public class AiSummaryTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        return preferences.getEntryEditorPreferences().shouldShowAiSummaryTab();
+        return preferences.getEntryEditorPreferences().isStaticTabVisible(EntryEditorPreferences.StaticTab.AI_SUMMARY);
     }
 
     /// @implNote Method similar to {@link AiChatTab#bindToEntry(BibEntry)}

@@ -81,7 +81,7 @@ class CommentsTabTest {
         when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
         when(ownerPreferences.getDefaultOwner()).thenReturn(ownerName);
         when(preferences.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);
-        when(entryEditorPreferences.shouldShowUserCommentsFields()).thenReturn(true);
+        when(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.USER_COMMENTS)).thenReturn(true);
         when(databaseContext.getMode()).thenReturn(BibDatabaseMode.BIBLATEX);
         BibEntryType entryTypeMock = mock(BibEntryType.class);
         when(entryTypesManager.enrich(any(), any())).thenReturn(Optional.of(entryTypeMock));
@@ -100,7 +100,7 @@ class CommentsTabTest {
     @Test
     void emptyCommentShownIfGloballyEnabled() {
         final UserSpecificCommentField ownerComment = new UserSpecificCommentField(ownerName);
-        when(entryEditorPreferences.shouldShowUserCommentsFields()).thenReturn(true);
+        when(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.USER_COMMENTS)).thenReturn(true);
 
         BibEntry entry = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.COMMENT, "Standard comment text");
@@ -112,7 +112,7 @@ class CommentsTabTest {
 
     @Test
     void emptyCommentFieldNotShownIfGloballyDisabled() {
-        when(entryEditorPreferences.shouldShowUserCommentsFields()).thenReturn(false);
+        when(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.USER_COMMENTS)).thenReturn(false);
 
         BibEntry entry = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.COMMENT, "Standard comment text");
@@ -126,7 +126,7 @@ class CommentsTabTest {
     @ValueSource(booleans = {true, false})
     void commentFieldShownIfContainsText(boolean shouldShowUserCommentsFields) {
         final UserSpecificCommentField ownerComment = new UserSpecificCommentField(ownerName);
-        when(entryEditorPreferences.shouldShowUserCommentsFields()).thenReturn(shouldShowUserCommentsFields);
+        when(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.USER_COMMENTS)).thenReturn(shouldShowUserCommentsFields);
 
         BibEntry entry = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.COMMENT, "Standard comment text")

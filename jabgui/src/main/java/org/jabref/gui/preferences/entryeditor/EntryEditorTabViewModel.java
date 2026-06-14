@@ -82,19 +82,19 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
         openOnNewEntryProperty.setValue(entryEditorPreferences.shouldOpenOnNewEntry());
         defaultSourceProperty.setValue(entryEditorPreferences.showSourceTabByDefault());
-        enableRelatedArticlesTabProperty.setValue(entryEditorPreferences.shouldShowRecommendationsTab());
-        enableAiSummaryTabProperty.setValue(entryEditorPreferences.shouldShowAiSummaryTab());
-        enableAiChatTabProperty.setValue(entryEditorPreferences.shouldShowAiChatTab());
+        enableRelatedArticlesTabProperty.setValue(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.RELATED_ARTICLES));
+        enableAiSummaryTabProperty.setValue(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.AI_SUMMARY));
+        enableAiChatTabProperty.setValue(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.AI_CHAT));
         acceptRecommendationsProperty.setValue(mrDlibPreferences.shouldAcceptRecommendations());
-        enableLatexCitationsTabProperty.setValue(entryEditorPreferences.shouldShowLatexCitationsTab());
-        smartFileAnnotationsTabProperty.setValue(entryEditorPreferences.shouldShowFileAnnotationsTab());
+        enableLatexCitationsTabProperty.setValue(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.LATEX_CITATIONS));
+        smartFileAnnotationsTabProperty.setValue(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.FILE_ANNOTATIONS));
         enableValidationProperty.setValue(entryEditorPreferences.shouldEnableValidation());
         allowIntegerEditionProperty.setValue(entryEditorPreferences.shouldAllowIntegerEditionBibtex());
         journalPopupProperty.setValue(entryEditorPreferences.shouldEnableJournalPopup() == EntryEditorPreferences.JournalPopupEnabled.ENABLED);
         autoLinkEnabledProperty.setValue(entryEditorPreferences.autoLinkFilesEnabled());
-        enableSciteTabProperty.setValue(entryEditorPreferences.shouldShowSciteTab());
+        enableSciteTabProperty.setValue(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.CITATION_INFORMATION));
         enableMscKeywordDescriptionsProperty.setValue(abbreviationPreferences.shouldEnableMscKeywordDescriptions());
-        showUserCommentsProperty.setValue(entryEditorPreferences.shouldShowUserCommentsFields());
+        showUserCommentsProperty.setValue(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.USER_COMMENTS));
         citationCountFetcherTypeProperty.setValue(entryEditorPreferences.getCitationCountFetcherType());
 
         setFields(entryEditorPreferences.getEntryEditorTabs());
@@ -122,12 +122,12 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         // entryEditorPreferences.setEntryEditorTabList();
         entryEditorPreferences.setShouldOpenOnNewEntry(openOnNewEntryProperty.getValue());
-        entryEditorPreferences.setShouldShowRecommendationsTab(enableRelatedArticlesTabProperty.getValue());
-        entryEditorPreferences.setShouldShowAiSummaryTab(enableAiSummaryTabProperty.getValue());
-        entryEditorPreferences.setShouldShowAiChatTab(enableAiChatTabProperty.getValue());
+        entryEditorPreferences.setStaticTabVisible(EntryEditorPreferences.StaticTab.RELATED_ARTICLES, enableRelatedArticlesTabProperty.getValue());
+        entryEditorPreferences.setStaticTabVisible(EntryEditorPreferences.StaticTab.AI_SUMMARY, enableAiSummaryTabProperty.getValue());
+        entryEditorPreferences.setStaticTabVisible(EntryEditorPreferences.StaticTab.AI_CHAT, enableAiChatTabProperty.getValue());
         mrDlibPreferences.setAcceptRecommendations(acceptRecommendationsProperty.getValue());
-        entryEditorPreferences.setShouldShowLatexCitationsTab(enableLatexCitationsTabProperty.getValue());
-        entryEditorPreferences.setShouldShowFileAnnotationsTab(smartFileAnnotationsTabProperty.getValue());
+        entryEditorPreferences.setStaticTabVisible(EntryEditorPreferences.StaticTab.LATEX_CITATIONS, enableLatexCitationsTabProperty.getValue());
+        entryEditorPreferences.setStaticTabVisible(EntryEditorPreferences.StaticTab.FILE_ANNOTATIONS, smartFileAnnotationsTabProperty.getValue());
         entryEditorPreferences.setShowSourceTabByDefault(defaultSourceProperty.getValue());
         entryEditorPreferences.setEnableValidation(enableValidationProperty.getValue());
         entryEditorPreferences.setAllowIntegerEditionBibtex(allowIntegerEditionProperty.getValue());
@@ -136,9 +136,9 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
                                                      : EntryEditorPreferences.JournalPopupEnabled.DISABLED);
         // entryEditorPreferences.setDividerPosition();
         entryEditorPreferences.setAutoLinkFilesEnabled(autoLinkEnabledProperty.getValue());
-        entryEditorPreferences.setShouldShowSciteTab(enableSciteTabProperty.getValue());
+        entryEditorPreferences.setStaticTabVisible(EntryEditorPreferences.StaticTab.CITATION_INFORMATION, enableSciteTabProperty.getValue());
         abbreviationPreferences.setShouldEnableMscKeywordDescriptions(enableMscKeywordDescriptionsProperty.getValue());
-        entryEditorPreferences.setShowUserCommentsFields(showUserCommentsProperty.getValue());
+        entryEditorPreferences.setStaticTabVisible(EntryEditorPreferences.StaticTab.USER_COMMENTS, showUserCommentsProperty.getValue());
         entryEditorPreferences.setCitationCountFetcherType(citationCountFetcherTypeProperty.getValue());
 
         Map<String, Set<Field>> customTabsMap = new LinkedHashMap<>();

@@ -74,7 +74,7 @@ public class CommentsTab extends FieldsEditorTab {
         comments.add(StandardField.COMMENT);
 
         // Only show the user-specific comment field if it's enabled and should be visible
-        if (entryEditorPreferences.shouldShowUserCommentsFields() && shouldShowHideButton) {
+        if (entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.USER_COMMENTS) && shouldShowHideButton) {
             comments.add(userSpecificCommentField);
         }
 
@@ -129,7 +129,7 @@ public class CommentsTab extends FieldsEditorTab {
             editor.setEditable(shouldBeEnabled);
         }
 
-        if (entryEditorPreferences.shouldShowUserCommentsFields()) {
+        if (entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.USER_COMMENTS)) {
             // Show "Hide" button only if user-specific comment field is empty
             if (!entry.hasField(userSpecificCommentField)) {
                 if (shouldShowHideButton) {
