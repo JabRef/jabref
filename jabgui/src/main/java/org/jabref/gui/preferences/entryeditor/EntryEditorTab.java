@@ -1,8 +1,10 @@
 package org.jabref.gui.preferences.entryeditor;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -183,7 +185,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
                 suggestions.stream()
                            .filter(f -> f.getName().toLowerCase().startsWith(
                                    request.getUserText().toLowerCase()))
-                           .toList());
+                           .collect(Collectors.toCollection(ArrayList::new)));
         tagsField.setMatcher((field, searchText) ->
                 field.getName().toLowerCase().startsWith(searchText.toLowerCase()));
         tagsField.setComparator(Comparator.comparing(Field::getName));
