@@ -395,6 +395,18 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "outputFile"
+        },
+        {
+          "name": "outputFormat"
+        },
+        {
+          "name": "citationFetcherType"
+        },
+        {
+          "name": "doi"
         }
       ],
       "methods": [
@@ -412,6 +424,18 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "outputFile"
+        },
+        {
+          "name": "outputFormat"
+        },
+        {
+          "name": "citationFetcherType"
+        },
+        {
+          "name": "doi"
         }
       ],
       "methods": [
