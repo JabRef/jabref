@@ -273,6 +273,9 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "dois"
         }
       ],
       "methods": [
@@ -290,6 +293,15 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "provider"
+        },
+        {
+          "name": "query"
+        },
+        {
+          "name": "outputFile"
         }
       ],
       "methods": [
