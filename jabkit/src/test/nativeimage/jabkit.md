@@ -32,7 +32,11 @@ $ grep -i -c "10.47397/tb/44-3/tb138kopp-jabref" build/tmp/fetch-crossref.out
 1
 $ "$JABKIT" get-cited-works --porcelain 10.1016/j.jksuci.2024.102118 > build/tmp/get-cited-works.out 2>/dev/null; echo $?
 0
+$ grep -q "^@" build/tmp/get-cited-works.out; echo $?
+0
 $ "$JABKIT" get-citing-works --porcelain 10.1016/j.jksuci.2024.102118 > build/tmp/get-citing-works.out 2>/dev/null; echo $?
+0
+$ grep -q "^@" build/tmp/get-citing-works.out; echo $?
 0
 $ "$JABKIT" generate-bib-from-aux --porcelain --aux=src/test/resources/org/jabref/toolkit/commands/paper.aux --input=src/test/resources/org/jabref/toolkit/commands/origin.bib --output=build/tmp/generated.bib; echo $?
 0
