@@ -1,9 +1,13 @@
 package org.jabref.gui.preferences.entryeditor;
 
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -11,12 +15,14 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.entryeditor.EntryEditorTabConfig;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
-import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.journals.AbbreviationPreferences;
@@ -27,7 +33,8 @@ import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
@@ -39,26 +46,41 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty openOnNewEntryProperty = new SimpleBooleanProperty();
     private final BooleanProperty defaultSourceProperty = new SimpleBooleanProperty();
-    private final BooleanProperty enableRelatedArticlesTabProperty = new SimpleBooleanProperty();
-    private final BooleanProperty enableAiSummaryTabProperty = new SimpleBooleanProperty();
-    private final BooleanProperty enableAiChatTabProperty = new SimpleBooleanProperty();
     private final BooleanProperty acceptRecommendationsProperty = new SimpleBooleanProperty();
-    private final BooleanProperty enableLatexCitationsTabProperty = new SimpleBooleanProperty();
-    private final BooleanProperty smartFileAnnotationsTabProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableValidationProperty = new SimpleBooleanProperty();
     private final BooleanProperty allowIntegerEditionProperty = new SimpleBooleanProperty();
     private final BooleanProperty journalPopupProperty = new SimpleBooleanProperty();
     private final BooleanProperty autoLinkEnabledProperty = new SimpleBooleanProperty();
-    private final BooleanProperty enableSciteTabProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableMscKeywordDescriptionsProperty = new SimpleBooleanProperty();
-
-    private final BooleanProperty showUserCommentsProperty = new SimpleBooleanProperty();
     private final ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty = new SimpleObjectProperty<>();
 
-    private final StringProperty fieldsProperty = new SimpleStringProperty();
+    /// Working copy of tab configurations — not the live preferences list.
+    /// Written to preferences only in {@link #storeSettings()}.
+    private final ObservableList<EntryEditorTabConfig> tabConfigs = FXCollections.observableArrayList();
+
+    /// The tab currently selected in the list view. Drives {@link #selectedTabName} and
+    /// {@link #selectedTabFields}. Updated by the view via {@code EasyBind.subscribe} on the
+    /// list's {@code selectedItemProperty}. Changing it commits the previous FieldSet edit first.
+    private final ObjectProperty<EntryEditorTabConfig> selectedTab = new SimpleObjectProperty<>();
+
+    /// Staging property for the name of the currently selected field-set tab.
+    /// Not written to {@link #tabConfigs} until selection changes or {@link #storeSettings()} is called.
+    private final StringProperty selectedTabName = new SimpleStringProperty("");
+
+    /// Staging list for the fields of the currently selected field-set tab.
+    private final ObservableList<Field> selectedTabFields = FXCollections.observableArrayList();
+
+    private final BooleanProperty fieldSetTabSelected = new SimpleBooleanProperty(false);
+    private final BooleanProperty canRemoveSelectedTab = new SimpleBooleanProperty(false);
+
+    /// All known fields, sorted by name, provided as suggestions in the fields editor.
+    private final List<Field> allKnownFields = Stream.<Field>concat(
+                                                             java.util.Arrays.stream(StandardField.values()),
+                                                             java.util.Arrays.stream(SpecialField.values()))
+                                                     .sorted(Comparator.comparing(Field::getName))
+                                                     .toList();
 
     private final DialogService dialogService;
-    private final GuiPreferences preferences;
     private final EntryEditorPreferences entryEditorPreferences;
     private final MrDlibPreferences mrDlibPreferences;
     private final AbbreviationPreferences abbreviationPreferences;
@@ -67,109 +89,170 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public EntryEditorTabViewModel(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
-        this.preferences = preferences;
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
         this.mrDlibPreferences = preferences.getMrDlibPreferences();
         this.abbreviationPreferences = preferences.getAbbreviationPreferences();
         this.taskExecutor = taskExecutor;
+
+        selectedTab.addListener((_, oldItem, newItem) -> {
+            commitCurrentEdit(oldItem);
+            loadSelection(newItem);
+        });
+
         EasyBind.subscribe(enableMscKeywordDescriptionsProperty, this::onMscKeywordDescriptionsChanged);
+    }
+
+    /// Commits any pending name/fields edit for {@code oldItem} back into {@link #tabConfigs}.
+    private void commitCurrentEdit(EntryEditorTabConfig oldItem) {
+        if (!(oldItem instanceof EntryEditorTabConfig.FieldSet oldFieldSet)) {
+            return;
+        }
+        int index = tabConfigs.indexOf(oldItem);
+        if (index < 0) {
+            return;
+        }
+        tabConfigs.set(index, new EntryEditorTabConfig.FieldSet(
+                selectedTabName.get(), new LinkedHashSet<>(selectedTabFields), oldFieldSet.visible()));
+    }
+
+    private void loadSelection(EntryEditorTabConfig newItem) {
+        if (newItem instanceof EntryEditorTabConfig.FieldSet fieldSet) {
+            selectedTabName.set(fieldSet.name());
+            selectedTabFields.setAll(fieldSet.fields());
+            fieldSetTabSelected.set(true);
+            canRemoveSelectedTab.set(true);
+        } else {
+            selectedTabName.set("");
+            selectedTabFields.clear();
+            fieldSetTabSelected.set(false);
+            canRemoveSelectedTab.set(false);
+        }
     }
 
     @Override
     public void setValues() {
-        // ToDo: Include CustomizeGeneralFieldsDialog in PreferencesDialog
-        //       Therefore yet unused: entryEditorPreferences.getEntryEditorTabList();
+        tabConfigs.setAll(entryEditorPreferences.getTabConfigs());
+        selectedTab.set(null);
 
         openOnNewEntryProperty.setValue(entryEditorPreferences.shouldOpenOnNewEntry());
         defaultSourceProperty.setValue(entryEditorPreferences.showSourceTabByDefault());
-        enableRelatedArticlesTabProperty.setValue(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.RELATED_ARTICLES));
-        enableAiSummaryTabProperty.setValue(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.AI_SUMMARY));
-        enableAiChatTabProperty.setValue(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.AI_CHAT));
         acceptRecommendationsProperty.setValue(mrDlibPreferences.shouldAcceptRecommendations());
-        enableLatexCitationsTabProperty.setValue(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.LATEX_CITATIONS));
-        smartFileAnnotationsTabProperty.setValue(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.FILE_ANNOTATIONS));
         enableValidationProperty.setValue(entryEditorPreferences.shouldEnableValidation());
         allowIntegerEditionProperty.setValue(entryEditorPreferences.shouldAllowIntegerEditionBibtex());
         journalPopupProperty.setValue(entryEditorPreferences.shouldEnableJournalPopup() == EntryEditorPreferences.JournalPopupEnabled.ENABLED);
         autoLinkEnabledProperty.setValue(entryEditorPreferences.autoLinkFilesEnabled());
-        enableSciteTabProperty.setValue(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.CITATION_INFORMATION));
         enableMscKeywordDescriptionsProperty.setValue(abbreviationPreferences.shouldEnableMscKeywordDescriptions());
-        showUserCommentsProperty.setValue(entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.USER_COMMENTS));
         citationCountFetcherTypeProperty.setValue(entryEditorPreferences.getCitationCountFetcherType());
-
-        setFields(entryEditorPreferences.getEntryEditorTabs());
         mscKeywordDescriptionsInitialized = true;
     }
 
     public void resetToDefaults() {
-        setFields(EntryEditorPreferences.getDefaultEntryEditorTabs());
+        tabConfigs.removeIf(config -> config instanceof EntryEditorTabConfig.FieldSet);
+        List<EntryEditorTabConfig> defaultFieldSets = EntryEditorPreferences.getDefaultEntryEditorTabs()
+                                                                            .entrySet().stream()
+                                                                            .<EntryEditorTabConfig>map(e -> new EntryEditorTabConfig.FieldSet(e.getKey(), e.getValue(), true))
+                                                                            .toList();
+        tabConfigs.addAll(0, defaultFieldSets);
+        // selectedTab is cleared automatically when the ListView loses the old selected item
     }
 
-    private void setFields(Map<String, Set<Field>> tabNamesAndFields) {
-        StringBuilder sb = new StringBuilder();
-
-        // Fill with customized vars
-        for (Map.Entry<String, Set<Field>> tab : tabNamesAndFields.entrySet()) {
-            sb.append(tab.getKey());
-            sb.append(':');
-            sb.append(FieldFactory.serializeFieldsList(tab.getValue()));
-            sb.append('\n');
+    public void addFieldSetTab() {
+        int insertIndex = 0;
+        for (int i = 0; i < tabConfigs.size(); i++) {
+            if (tabConfigs.get(i) instanceof EntryEditorTabConfig.FieldSet) {
+                insertIndex = i + 1;
+            }
         }
-        fieldsProperty.set(sb.toString());
+        EntryEditorTabConfig newTab = new EntryEditorTabConfig.FieldSet(
+                Localization.lang("New Tab"), Set.of(), true);
+        tabConfigs.add(insertIndex, newTab);
+        selectedTab.set(newTab); // commits old, loads new empty state; view mirrors via EasyBind
+    }
+
+    public void removeSelectedFieldSetTab() {
+        if (selectedTab.get() instanceof EntryEditorTabConfig.FieldSet toRemove) {
+            tabConfigs.remove(toRemove);
+            // ListView auto-updates selection; view listener propagates it back to selectedTab
+        }
+    }
+
+    /// Toggles the visibility of a feature tab. Called by the cell's checkbox.
+    public void toggleFeatureTabVisibility(EntryEditorTabConfig config) {
+        int index = tabConfigs.indexOf(config);
+        if (index >= 0 && config instanceof EntryEditorTabConfig.Feature feature) {
+            tabConfigs.set(index, new EntryEditorTabConfig.Feature(feature.type(), !feature.visible()));
+        }
     }
 
     @Override
     public void storeSettings() {
-        // entryEditorPreferences.setEntryEditorTabList();
         entryEditorPreferences.setShouldOpenOnNewEntry(openOnNewEntryProperty.getValue());
-        entryEditorPreferences.setStaticTabVisible(EntryEditorPreferences.StaticTab.RELATED_ARTICLES, enableRelatedArticlesTabProperty.getValue());
-        entryEditorPreferences.setStaticTabVisible(EntryEditorPreferences.StaticTab.AI_SUMMARY, enableAiSummaryTabProperty.getValue());
-        entryEditorPreferences.setStaticTabVisible(EntryEditorPreferences.StaticTab.AI_CHAT, enableAiChatTabProperty.getValue());
-        mrDlibPreferences.setAcceptRecommendations(acceptRecommendationsProperty.getValue());
-        entryEditorPreferences.setStaticTabVisible(EntryEditorPreferences.StaticTab.LATEX_CITATIONS, enableLatexCitationsTabProperty.getValue());
-        entryEditorPreferences.setStaticTabVisible(EntryEditorPreferences.StaticTab.FILE_ANNOTATIONS, smartFileAnnotationsTabProperty.getValue());
         entryEditorPreferences.setShowSourceTabByDefault(defaultSourceProperty.getValue());
         entryEditorPreferences.setEnableValidation(enableValidationProperty.getValue());
         entryEditorPreferences.setAllowIntegerEditionBibtex(allowIntegerEditionProperty.getValue());
         entryEditorPreferences.setEnableJournalPopup(journalPopupProperty.getValue()
                                                      ? EntryEditorPreferences.JournalPopupEnabled.ENABLED
                                                      : EntryEditorPreferences.JournalPopupEnabled.DISABLED);
-        // entryEditorPreferences.setDividerPosition();
         entryEditorPreferences.setAutoLinkFilesEnabled(autoLinkEnabledProperty.getValue());
-        entryEditorPreferences.setStaticTabVisible(EntryEditorPreferences.StaticTab.CITATION_INFORMATION, enableSciteTabProperty.getValue());
-        abbreviationPreferences.setShouldEnableMscKeywordDescriptions(enableMscKeywordDescriptionsProperty.getValue());
-        entryEditorPreferences.setStaticTabVisible(EntryEditorPreferences.StaticTab.USER_COMMENTS, showUserCommentsProperty.getValue());
+        mrDlibPreferences.setAcceptRecommendations(acceptRecommendationsProperty.getValue());
         entryEditorPreferences.setCitationCountFetcherType(citationCountFetcherTypeProperty.getValue());
+        abbreviationPreferences.setShouldEnableMscKeywordDescriptions(enableMscKeywordDescriptionsProperty.getValue());
 
-        Map<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
-        String[] lines = fieldsProperty.get().split("\n");
-
-        for (String line : lines) {
-            String[] parts = line.split(":");
-            if (parts.length != 2) {
-                dialogService.showInformationDialogAndWait(
-                        Localization.lang("Error"),
-                        Localization.lang("Each line must be of the following form: 'tab:field1;field2;...;fieldN'."));
-                return;
+        // Write feature-tab visibility from working copy
+        for (EntryEditorTabConfig config : tabConfigs) {
+            if (config instanceof EntryEditorTabConfig.Feature feature) {
+                entryEditorPreferences.setStaticTabVisible(feature.type(), feature.visible());
             }
-
-            // Use literal string of unwanted characters specified below as opposed to exporting characters
-            // from preferences because the list of allowable characters in this particular differs
-            // i.e. ';' character is allowed in this window, but it's on the list of unwanted chars in preferences
-            String unwantedChars = "#{}()~,^&-\"'`ʹ\\";
-            String testString = CitationKeyGenerator.cleanKey(parts[1], unwantedChars);
-            if (!testString.equals(parts[1])) {
-                dialogService.showInformationDialogAndWait(
-                        Localization.lang("Error"),
-                        Localization.lang("Field names are not allowed to contain white spaces or certain characters (%0).",
-                                "# { } ( ) ~ , ^ & - \" ' ` ʹ \\"));
-                return;
-            }
-
-            customTabsMap.put(parts[0], FieldFactory.parseFieldList(parts[1]));
         }
 
-        entryEditorPreferences.setEntryEditorTabList(customTabsMap);
+        // Write field-set tabs. The currently selected FieldSet may have pending edits that have
+        // not yet been committed to tabConfigs (they only commit on navigation). Read them directly
+        // from the staging properties so nothing is lost when the user clicks Apply without switching tabs.
+        EntryEditorTabConfig pendingItem = selectedTab.get();
+        int pendingIndex = (pendingItem instanceof EntryEditorTabConfig.FieldSet)
+                           ? tabConfigs.indexOf(pendingItem) : -1;
+
+        Map<String, Set<Field>> fieldSetMap = new LinkedHashMap<>();
+        for (int i = 0; i < tabConfigs.size(); i++) {
+            if (tabConfigs.get(i) instanceof EntryEditorTabConfig.FieldSet fieldSet) {
+                if (i == pendingIndex) {
+                    fieldSetMap.put(selectedTabName.get(), new LinkedHashSet<>(selectedTabFields));
+                } else {
+                    fieldSetMap.put(fieldSet.name(), fieldSet.fields());
+                }
+            }
+        }
+        entryEditorPreferences.setEntryEditorTabList(fieldSetMap);
+    }
+
+    // region Properties
+
+    public ObservableList<EntryEditorTabConfig> getTabConfigs() {
+        return tabConfigs;
+    }
+
+    public ObjectProperty<EntryEditorTabConfig> selectedTabProperty() {
+        return selectedTab;
+    }
+
+    public StringProperty selectedTabNameProperty() {
+        return selectedTabName;
+    }
+
+    public ObservableList<Field> getSelectedTabFields() {
+        return selectedTabFields;
+    }
+
+    public List<Field> getAllKnownFields() {
+        return allKnownFields;
+    }
+
+    public BooleanProperty fieldSetTabSelectedProperty() {
+        return fieldSetTabSelected;
+    }
+
+    public BooleanProperty canRemoveSelectedTabProperty() {
+        return canRemoveSelectedTab;
     }
 
     public BooleanProperty openOnNewEntryProperty() {
@@ -180,28 +263,8 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         return defaultSourceProperty;
     }
 
-    public BooleanProperty enableRelatedArticlesTabProperty() {
-        return enableRelatedArticlesTabProperty;
-    }
-
-    public BooleanProperty enableAiSummaryTabProperty() {
-        return enableAiSummaryTabProperty;
-    }
-
-    public BooleanProperty enableAiChatTabProperty() {
-        return enableAiChatTabProperty;
-    }
-
     public BooleanProperty acceptRecommendationsProperty() {
         return acceptRecommendationsProperty;
-    }
-
-    public BooleanProperty enableLatexCitationsTabProperty() {
-        return enableLatexCitationsTabProperty;
-    }
-
-    public BooleanProperty smartFileAnnotationsTabProperty() {
-        return smartFileAnnotationsTabProperty;
     }
 
     public BooleanProperty enableValidationProperty() {
@@ -209,36 +272,26 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     }
 
     public BooleanProperty allowIntegerEditionProperty() {
-        return this.allowIntegerEditionProperty;
+        return allowIntegerEditionProperty;
     }
 
     public BooleanProperty journalPopupProperty() {
         return journalPopupProperty;
     }
 
-    public StringProperty fieldsProperty() {
-        return fieldsProperty;
-    }
-
     public BooleanProperty autoLinkFilesEnabledProperty() {
         return autoLinkEnabledProperty;
-    }
-
-    public BooleanProperty enableSciteTabProperty() {
-        return enableSciteTabProperty;
     }
 
     public BooleanProperty enableMscKeywordDescriptionsProperty() {
         return enableMscKeywordDescriptionsProperty;
     }
 
-    public BooleanProperty showUserCommentsProperty() {
-        return this.showUserCommentsProperty;
-    }
-
     public ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty() {
         return citationCountFetcherTypeProperty;
     }
+
+    // endregion
 
     private void onMscKeywordDescriptionsChanged(Boolean newValue) {
         if (!mscKeywordDescriptionsInitialized) {

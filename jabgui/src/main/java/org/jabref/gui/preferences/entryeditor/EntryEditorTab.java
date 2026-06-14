@@ -1,47 +1,69 @@
 package org.jabref.gui.preferences.entryeditor;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.entryeditor.EntryEditorTabConfig;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.dlsc.gemsfx.TagsField;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox openOnNewEntry;
     @FXML private CheckBox defaultSource;
-    @FXML private CheckBox enableRelatedArticlesTab;
-    @FXML private CheckBox enableAiSummaryTab;
-    @FXML private CheckBox enableAiChatTab;
     @FXML private CheckBox acceptRecommendations;
-    @FXML private CheckBox enableLatexCitationsTab;
-    @FXML private CheckBox smartFileAnnotationsTab;
     @FXML private CheckBox enableValidation;
     @FXML private CheckBox allowIntegerEdition;
     @FXML private CheckBox journalPopupEnabled;
     @FXML private CheckBox autoLinkFilesEnabled;
-    @FXML private CheckBox enableSciteTab;
-    @FXML private ComboBox<CitationCountFetcherType> citationCountFetcherCombo;
     @FXML private CheckBox enableMscKeywordDescriptions;
-    @FXML private CheckBox showUserCommentsField;
+    @FXML private ComboBox<CitationCountFetcherType> citationCountFetcherCombo;
 
+    @FXML private ListView<EntryEditorTabConfig> tabConfigsList;
+    @FXML private Button addTabButton;
+    @FXML private Button removeTabButton;
+    @FXML private Button resetTabsButton;
     @FXML private Button generalFieldsHelp;
-    @FXML private TextArea fieldsTextArea;
+
+    @FXML private VBox tabEditorPanel;
+    @FXML private Label tabNameLabel;
+    @FXML private TextField tabNameField;
+    @FXML private Label tabFieldsLabel;
+
+    private boolean syncingFields = false;
 
     public EntryEditorTab() {
         ViewLoader.view(this)
@@ -59,33 +81,198 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
 
         openOnNewEntry.selectedProperty().bindBidirectional(viewModel.openOnNewEntryProperty());
         defaultSource.selectedProperty().bindBidirectional(viewModel.defaultSourceProperty());
-        enableRelatedArticlesTab.selectedProperty().bindBidirectional(viewModel.enableRelatedArticlesTabProperty());
-        enableAiSummaryTab.selectedProperty().bindBidirectional(viewModel.enableAiSummaryTabProperty());
-        enableAiChatTab.selectedProperty().bindBidirectional(viewModel.enableAiChatTabProperty());
         acceptRecommendations.selectedProperty().bindBidirectional(viewModel.acceptRecommendationsProperty());
-        enableLatexCitationsTab.selectedProperty().bindBidirectional(viewModel.enableLatexCitationsTabProperty());
-        smartFileAnnotationsTab.selectedProperty().bindBidirectional(viewModel.smartFileAnnotationsTabProperty());
         enableValidation.selectedProperty().bindBidirectional(viewModel.enableValidationProperty());
         allowIntegerEdition.selectedProperty().bindBidirectional(viewModel.allowIntegerEditionProperty());
         journalPopupEnabled.selectedProperty().bindBidirectional(viewModel.journalPopupProperty());
         autoLinkFilesEnabled.selectedProperty().bindBidirectional(viewModel.autoLinkFilesEnabledProperty());
-        enableSciteTab.selectedProperty().bindBidirectional(viewModel.enableSciteTabProperty());
+        enableMscKeywordDescriptions.selectedProperty().bindBidirectional(viewModel.enableMscKeywordDescriptionsProperty());
+
         citationCountFetcherCombo.setItems(FXCollections.observableList(List.of(CitationCountFetcherType.values())));
         new ViewModelListCellFactory<CitationCountFetcherType>()
                 .withText(CitationCountFetcherType::getName)
                 .install(citationCountFetcherCombo);
         citationCountFetcherCombo.valueProperty().bindBidirectional(viewModel.citationCountFetcherTypeProperty());
-        enableMscKeywordDescriptions.selectedProperty().bindBidirectional(viewModel.enableMscKeywordDescriptionsProperty());
-        showUserCommentsField.selectedProperty().bindBidirectional(viewModel.showUserCommentsProperty());
 
-        fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsProperty());
+        setupTabList();
+        setupTabEditor();
 
         ActionFactory actionFactory = new ActionFactory();
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.GENERAL_FIELDS, dialogService, preferences.getExternalApplicationsPreferences()), generalFieldsHelp);
+        actionFactory.configureIconButton(
+                StandardActions.HELP,
+                new HelpAction(HelpFile.GENERAL_FIELDS, dialogService, preferences.getExternalApplicationsPreferences()),
+                generalFieldsHelp);
+    }
+
+    private void setupTabList() {
+        tabConfigsList.setItems(viewModel.getTabConfigs());
+        tabConfigsList.setCellFactory(_ -> new TabConfigCell());
+
+        // Sync list selection → viewModel
+        EasyBind.subscribe(tabConfigsList.getSelectionModel().selectedItemProperty(), newItem -> {
+            if (!Objects.equals(newItem, viewModel.selectedTabProperty().get())) {
+                viewModel.selectedTabProperty().set(newItem);
+            }
+        });
+
+        // Sync viewModel → list selection (e.g. after addFieldSetTab)
+        EasyBind.subscribe(viewModel.selectedTabProperty(), newItem -> {
+            if (!Objects.equals(newItem, tabConfigsList.getSelectionModel().getSelectedItem())) {
+                tabConfigsList.getSelectionModel().select(newItem);
+            }
+        });
+
+        removeTabButton.disableProperty().bind(viewModel.canRemoveSelectedTabProperty().not());
+    }
+
+    private void setupTabEditor() {
+        // Right panel visibility tied to field-set selection
+        tabNameLabel.visibleProperty().bind(viewModel.fieldSetTabSelectedProperty());
+        tabNameLabel.managedProperty().bind(viewModel.fieldSetTabSelectedProperty());
+        tabNameField.visibleProperty().bind(viewModel.fieldSetTabSelectedProperty());
+        tabNameField.managedProperty().bind(viewModel.fieldSetTabSelectedProperty());
+        tabFieldsLabel.visibleProperty().bind(viewModel.fieldSetTabSelectedProperty());
+        tabFieldsLabel.managedProperty().bind(viewModel.fieldSetTabSelectedProperty());
+
+        tabNameField.textProperty().bindBidirectional(viewModel.selectedTabNameProperty());
+
+        TagsField<Field> tabFieldsTagsField = buildFieldTagsField();
+        tabFieldsTagsField.visibleProperty().bind(viewModel.fieldSetTabSelectedProperty());
+        tabFieldsTagsField.managedProperty().bind(viewModel.fieldSetTabSelectedProperty());
+        VBox.setVgrow(tabFieldsTagsField, Priority.ALWAYS);
+        tabEditorPanel.getChildren().add(tabFieldsTagsField);
+
+        // Bidirectional sync: viewModel staging ↔ TagsField display.
+        // JavaFX has no bindContentBidirectional for lists; use guarded listeners.
+        viewModel.getSelectedTabFields().addListener((ListChangeListener<Field>) _ -> {
+            if (!syncingFields) {
+                syncingFields = true;
+                tabFieldsTagsField.getTags().setAll(viewModel.getSelectedTabFields());
+                syncingFields = false;
+            }
+        });
+        tabFieldsTagsField.getTags().addListener((ListChangeListener<Field>) _ -> {
+            if (!syncingFields) {
+                syncingFields = true;
+                viewModel.getSelectedTabFields().setAll(tabFieldsTagsField.getTags());
+                syncingFields = false;
+            }
+        });
+    }
+
+    private TagsField<Field> buildFieldTagsField() {
+        TagsField<Field> tagsField = new TagsField<>();
+
+        StringConverter<Field> converter = new StringConverter<>() {
+            @Override
+            public String toString(Field field) {
+                return field != null ? field.getName() : "";
+            }
+
+            @Override
+            public Field fromString(String name) {
+                return FieldFactory.parseField(name);
+            }
+        };
+
+        List<Field> suggestions = viewModel.getAllKnownFields();
+
+        tagsField.setConverter(converter);
+        tagsField.setCellFactory(new ViewModelListCellFactory<Field>().withText(Field::getName));
+        tagsField.setSuggestionProvider(request ->
+                suggestions.stream()
+                           .filter(f -> f.getName().toLowerCase().startsWith(
+                                   request.getUserText().toLowerCase()))
+                           .toList());
+        tagsField.setMatcher((field, searchText) ->
+                field.getName().toLowerCase().startsWith(searchText.toLowerCase()));
+        tagsField.setComparator(Comparator.comparing(Field::getName));
+        tagsField.setNewItemProducer(converter::fromString);
+        tagsField.setTagViewFactory(field -> buildFieldTag(field, tagsField));
+        tagsField.setShowSearchIcon(false);
+
+        return tagsField;
+    }
+
+    private Node buildFieldTag(Field field, TagsField<Field> tagsField) {
+        Label label = new Label(field.getName());
+        label.setGraphic(IconTheme.JabRefIcons.REMOVE_TAGS.getGraphicNode());
+        label.setContentDisplay(ContentDisplay.RIGHT);
+        label.getGraphic().setOnMouseClicked(_ -> tagsField.removeTags(field));
+        return label;
+    }
+
+    private static String featureTabDisplayName(EntryEditorPreferences.StaticTab type) {
+        return switch (type) {
+            case RELATED_ARTICLES -> Localization.lang("Related articles");
+            case AI_SUMMARY -> Localization.lang("AI Summary");
+            case AI_CHAT -> Localization.lang("AI Chat");
+            case FILE_ANNOTATIONS -> Localization.lang("File annotations");
+            case LATEX_CITATIONS -> Localization.lang("LaTeX citations");
+            case CITATION_INFORMATION -> Localization.lang("Citation information");
+            case USER_COMMENTS -> Localization.lang("User comments");
+        };
+    }
+
+    @FXML
+    void addFieldSetTab() {
+        viewModel.addFieldSetTab();
+    }
+
+    @FXML
+    void removeFieldSetTab() {
+        viewModel.removeSelectedFieldSetTab();
     }
 
     @FXML
     void resetToDefaults() {
         viewModel.resetToDefaults();
     }
+
+    // region Cell
+
+    private class TabConfigCell extends ListCell<EntryEditorTabConfig> {
+
+        private final CheckBox checkBox = new CheckBox();
+        private final Label nameLabel = new Label();
+        private final HBox container = new HBox(6, checkBox, nameLabel);
+
+        private boolean updatingCell = false;
+
+        TabConfigCell() {
+            checkBox.selectedProperty().addListener((_, _, selected) -> {
+                if (updatingCell) {
+                    return;
+                }
+                viewModel.toggleFeatureTabVisibility(getItem());
+            });
+        }
+
+        @Override
+        protected void updateItem(EntryEditorTabConfig config, boolean empty) {
+            super.updateItem(config, empty);
+            if (empty || config == null) {
+                setGraphic(null);
+                return;
+            }
+            updatingCell = true;
+            switch (config) {
+                case EntryEditorTabConfig.Feature feature -> {
+                    checkBox.setVisible(true);
+                    checkBox.setManaged(true);
+                    checkBox.setSelected(feature.visible());
+                    nameLabel.setText(featureTabDisplayName(feature.type()));
+                }
+                case EntryEditorTabConfig.FieldSet fieldSet -> {
+                    checkBox.setVisible(false);
+                    checkBox.setManaged(false);
+                    nameLabel.setText(fieldSet.name());
+                }
+            }
+            updatingCell = false;
+            setGraphic(container);
+        }
+    }
+
+    // endregion
 }
