@@ -321,7 +321,16 @@
           "name": "sharedOptions"
         },
         {
+          "name": "auxFile"
+        },
+        {
           "name": "inputOption"
+        },
+        {
+          "name": "outputFile"
+        },
+        {
+          "name": "fieldFormatters"
         }
       ],
       "methods": [
