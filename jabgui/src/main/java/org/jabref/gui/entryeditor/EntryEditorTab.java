@@ -52,7 +52,7 @@ public abstract class EntryEditorTab extends Tab {
     public void notifyAboutFocus(BibEntry entry) {
         currentEntry.set(entry);
         if (!entry.equals(boundEntry) || !entry.getType().equals(boundEntryType)) {
-            // TODO: Shouldn't "bindToEntry" called when changing the entry?
+            // bindToEntry is intentionally lazy: content rebuilds only on focus, not on every entry push to currentEntryProperty().
             LOGGER.trace("Tab got focus with different entry (or entry type) {}", entry);
             LOGGER.trace("Different entry: {}", !entry.equals(boundEntry));
             LOGGER.trace("Different entry type: {}", !entry.getType().equals(boundEntryType));
