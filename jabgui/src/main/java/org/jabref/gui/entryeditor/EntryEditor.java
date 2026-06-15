@@ -133,7 +133,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                   .root(this)
                   .load();
 
-        this.viewModel = new EntryEditorViewModel(stateManager);
+        this.viewModel = new EntryEditorViewModel(stateManager, preferences.getEntryEditorPreferences());
 
         this.fileLinker = new ExternalFilesEntryLinker(
                 preferences.getExternalApplicationsPreferences(),
@@ -220,7 +220,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                     }
                 });
 
-        preferences.getEntryEditorPreferences().getTabConfigs().addListener((InvalidationListener) _ -> {
+        viewModel.getTabModels().addListener((InvalidationListener) _ -> {
             if (viewModel.getCurrentlyEditedEntry() != null) {
                 adaptVisibleTabs();
             }
