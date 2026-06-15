@@ -232,12 +232,14 @@ public class AiPreferences {
         this.followUpQuestionsTemplate = new SimpleStringProperty(followUpQuestionsTemplate);
 
         // This listener is needed for the following scenario:
-        // 1. AI features initially enabled.
-        // 2. User turns of AI features.
-        // 3. User sees the privacy noticy pane, and again enables AI features.
         //
-        // If there was no such listener as written below, AI features would continue to work, however, Between steps 2
-        // and 3 the user could work a lot in JabRef and open many libraries, but AI didn't track them.
+        // 1. AI features initially are enabled.
+        // 2. User turns off AI features.
+        // 3. User sees the privacy notice pane, and again enables AI features.
+        //
+        // If there was no such listener as written below, AI features would continue to work,
+        // however, between steps 2 and 3, the user could change a lot in the running JabRef
+        // instance, such as opening many libraries, which then wouldn't get tracked by the AI.
         // As a result, it is better to set [#aiFeaturesEnabledInitially] to just `false`.
         this.aiFeaturesEnabledCurrently.addListener((_, _, newValue) -> {
             if (!newValue) {
