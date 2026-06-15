@@ -1,6 +1,7 @@
 package org.jabref.logic.openoffice.frontend;
 
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.openoffice.backend.Backend52;
 import org.jabref.model.openoffice.util.OOResult;
 
 import com.sun.star.text.XTextDocument;
