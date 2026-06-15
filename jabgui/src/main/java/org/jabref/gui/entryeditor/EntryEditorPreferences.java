@@ -55,9 +55,9 @@ public class EntryEditorPreferences {
         USER_COMMENTS
     }
 
-    /// Ordered list of all configurable tabs. {@link EntryEditorTabConfig.FieldSet} entries
-    /// always precede {@link EntryEditorTabConfig.Feature} entries.
-    private final ObservableList<EntryEditorTabConfig> tabConfigs;
+    /// Ordered list of all configurable tabs. {@link EntryEditorTabModel.FieldSet} entries
+    /// always precede {@link EntryEditorTabModel.Feature} entries.
+    private final ObservableList<EntryEditorTabModel> tabConfigs;
 
     private final BooleanProperty shouldOpenOnNewEntry;
     private final BooleanProperty showSourceTabByDefault;
@@ -96,7 +96,7 @@ public class EntryEditorPreferences {
                                   CitationFetcherType citationFetcherType,
                                   CitationCountFetcherType citationCountFetcherType,
                                   double previewWidthDividerPosition) {
-        this.tabConfigs = FXCollections.observableList(createEntryEditorTabConfigs(entryEditorTabList, staticTabs));
+        this.tabConfigs = FXCollections.observableList(createEntryEditorTabModels(entryEditorTabList, staticTabs));
         this.shouldOpenOnNewEntry = new SimpleBooleanProperty(shouldOpenOnNewEntry);
         this.showSourceTabByDefault = new SimpleBooleanProperty(showSourceTabByDefault);
         this.enableValidation = new SimpleBooleanProperty(enableValidation);
@@ -108,26 +108,26 @@ public class EntryEditorPreferences {
         this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
     }
 
-    private static List<EntryEditorTabConfig> createEntryEditorTabConfigs(Map<String, Set<Field>> entryEditorTabList,
+    private static List<EntryEditorTabModel> createEntryEditorTabModels(Map<String, Set<Field>> entryEditorTabList,
                                                                           Set<StaticTab> staticTabs) {
-        List<EntryEditorTabConfig> configs = new ArrayList<>();
+        List<EntryEditorTabModel> configs = new ArrayList<>();
 
         entryEditorTabList.forEach((name, fields) ->
-                configs.add(new EntryEditorTabConfig.FieldSet(name, fields, true)));
+                configs.add(new EntryEditorTabModel.FieldSet(name, fields, true)));
 
         for (StaticTab tab : StaticTab.values()) {
-            configs.add(new EntryEditorTabConfig.Feature(tab, staticTabs.contains(tab)));
+            configs.add(new EntryEditorTabModel.Feature(tab, staticTabs.contains(tab)));
         }
         return configs;
     }
 
-    public ObservableList<EntryEditorTabConfig> getTabConfigs() {
+    public ObservableList<EntryEditorTabModel> getTabConfigs() {
         return tabConfigs;
     }
 
     public boolean isStaticTabVisible(StaticTab tab) {
-        for (EntryEditorTabConfig config : tabConfigs) {
-            if (config instanceof EntryEditorTabConfig.Feature(
+        for (EntryEditorTabModel config : tabConfigs) {
+            if (config instanceof EntryEditorTabModel.Feature(
                     StaticTab type,
                     boolean visible
             ) && type == tab) {
@@ -139,8 +139,8 @@ public class EntryEditorPreferences {
 
     public void setStaticTabVisible(StaticTab tab, boolean show) {
         for (int i = 0; i < tabConfigs.size(); i++) {
-            if (tabConfigs.get(i) instanceof EntryEditorTabConfig.Feature feature && feature.type() == tab) {
-                tabConfigs.set(i, new EntryEditorTabConfig.Feature(tab, show));
+            if (tabConfigs.get(i) instanceof EntryEditorTabModel.Feature feature && feature.type() == tab) {
+                tabConfigs.set(i, new EntryEditorTabModel.Feature(tab, show));
                 return;
             }
         }
@@ -150,8 +150,8 @@ public class EntryEditorPreferences {
     /// in the preferences; use {@link #setEntryEditorTabList} to persist modifications.
     public Map<String, Set<Field>> getEntryEditorTabs() {
         SequencedMap<String, Set<Field>> map = new LinkedHashMap<>();
-        for (EntryEditorTabConfig config : tabConfigs) {
-            if (config instanceof EntryEditorTabConfig.FieldSet fieldSet) {
+        for (EntryEditorTabModel config : tabConfigs) {
+            if (config instanceof EntryEditorTabModel.FieldSet fieldSet) {
                 map.put(fieldSet.name(), fieldSet.fields());
             }
         }
@@ -159,11 +159,11 @@ public class EntryEditorPreferences {
     }
 
     public void setEntryEditorTabList(Map<String, Set<Field>> tabs) {
-        List<EntryEditorTabConfig> newFieldSet = tabs.entrySet().stream()
-                                                     .<EntryEditorTabConfig>map(e ->
-                                                             new EntryEditorTabConfig.FieldSet(e.getKey(), e.getValue(), true))
+        List<EntryEditorTabModel> newFieldSet = tabs.entrySet().stream()
+                                                     .<EntryEditorTabModel>map(e ->
+                                                             new EntryEditorTabModel.FieldSet(e.getKey(), e.getValue(), true))
                                                      .toList();
-        tabConfigs.removeIf(config -> config instanceof EntryEditorTabConfig.FieldSet);
+        tabConfigs.removeIf(config -> config instanceof EntryEditorTabModel.FieldSet);
         tabConfigs.addAll(0, newFieldSet);
     }
 

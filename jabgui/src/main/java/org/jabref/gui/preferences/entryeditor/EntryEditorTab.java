@@ -26,7 +26,7 @@ import javafx.util.StringConverter;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
-import org.jabref.gui.entryeditor.EntryEditorTabConfig;
+import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
@@ -54,7 +54,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     @FXML private CheckBox enableMscKeywordDescriptions;
     @FXML private ComboBox<CitationCountFetcherType> citationCountFetcherCombo;
 
-    @FXML private ListView<EntryEditorTabConfig> tabConfigsList;
+    @FXML private ListView<EntryEditorTabModel> tabConfigsList;
     @FXML private Button addTabButton;
     @FXML private Button removeTabButton;
     @FXML private Button resetTabsButton;
@@ -233,7 +233,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
 
     // region Cell
 
-    private class TabConfigCell extends ListCell<EntryEditorTabConfig> {
+    private class TabConfigCell extends ListCell<EntryEditorTabModel> {
 
         private final CheckBox checkBox = new CheckBox();
         private final Label nameLabel = new Label();
@@ -251,7 +251,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         }
 
         @Override
-        protected void updateItem(EntryEditorTabConfig config, boolean empty) {
+        protected void updateItem(EntryEditorTabModel config, boolean empty) {
             super.updateItem(config, empty);
             if (empty || config == null) {
                 setGraphic(null);
@@ -259,13 +259,13 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
             }
             updatingCell = true;
             switch (config) {
-                case EntryEditorTabConfig.Feature feature -> {
+                case EntryEditorTabModel.Feature feature -> {
                     checkBox.setVisible(true);
                     checkBox.setManaged(true);
                     checkBox.setSelected(feature.visible());
                     nameLabel.setText(featureTabDisplayName(feature.type()));
                 }
-                case EntryEditorTabConfig.FieldSet fieldSet -> {
+                case EntryEditorTabModel.FieldSet fieldSet -> {
                     checkBox.setVisible(false);
                     checkBox.setManaged(false);
                     nameLabel.setText(fieldSet.name());
