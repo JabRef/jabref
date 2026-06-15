@@ -24,7 +24,7 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.edit.CopyToPreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
-import org.jabref.gui.entryeditor.EntryEditorTabConfig;
+import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -410,10 +410,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return tabs;
     }
 
-    private void storeTabConfigs(List<EntryEditorTabConfig> configs) {
-        List<EntryEditorTabConfig.FieldSet> fieldSetTabs = configs.stream()
-                                                                  .filter(EntryEditorTabConfig.FieldSet.class::isInstance)
-                                                                  .map(EntryEditorTabConfig.FieldSet.class::cast)
+    private void storeTabConfigs(List<EntryEditorTabModel> configs) {
+        List<EntryEditorTabModel.FieldSet> fieldSetTabs = configs.stream()
+                                                                  .filter(EntryEditorTabModel.FieldSet.class::isInstance)
+                                                                  .map(EntryEditorTabModel.FieldSet.class::cast)
                                                                   .toList();
 
         for (int i = 0; i < fieldSetTabs.size(); i++) {
@@ -425,8 +425,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         purgeSeries(CUSTOM_TAB_NAME, fieldSetTabs.size());
         purgeSeries(CUSTOM_TAB_FIELDS, fieldSetTabs.size());
 
-        for (EntryEditorTabConfig config : configs) {
-            if (config instanceof EntryEditorTabConfig.Feature feature) {
+        for (EntryEditorTabModel config : configs) {
+            if (config instanceof EntryEditorTabModel.Feature feature) {
                 switch (feature.type()) {
                     case RELATED_ARTICLES ->
                             putBoolean(SHOW_RECOMMENDATIONS, feature.visible());
