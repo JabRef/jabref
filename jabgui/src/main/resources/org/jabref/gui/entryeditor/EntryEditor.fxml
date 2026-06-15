@@ -55,7 +55,7 @@
                     <JabRefIconView glyph="CLEANUP_ENTRIES"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="%Cleanup entry"/>
+                    <Tooltip text="%Clean up entry"/>
                 </tooltip>
             </Button>
             <Button fx:id="fetcherButton" styleClass="icon-button,narrow">

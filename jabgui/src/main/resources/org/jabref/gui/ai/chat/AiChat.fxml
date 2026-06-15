@@ -49,7 +49,7 @@
                         fitToWidth="true"
                         fitToHeight="true"
                         spacing="10"
-                        style="-fx-border-width: 1; -fx-border-color: black">
+                        styleClass="bordered">
                     <contentPadding>
                         <Insets top="10"
                                 right="10"
@@ -59,7 +59,7 @@
                 </ListScrollPane>
 
                 <Pane fx:id="transparentPane"
-                      style="-fx-background-color: transparent;"/>
+                      styleClass="bg-transparent"/>
 
                 <ProgressIndicator
                         fx:id="loadingIndicator"

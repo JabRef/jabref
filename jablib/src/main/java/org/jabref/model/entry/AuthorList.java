@@ -143,7 +143,7 @@ public class AuthorList implements Iterable<Author> {
     }
 
     public static Collector<Author, ?, AuthorList> collect() {
-        return Collectors.collectingAndThen(Collectors.toUnmodifiableList(), AuthorList::new);
+        return Collectors.collectingAndThen(Collectors.toList(), AuthorList::new);
     }
 
     private static String andCoordinatedConjunction(List<Author> authors, Function<Author, String> style, boolean oxfordComma) {

@@ -13,6 +13,7 @@ code until all points are fulfilled. Do not skip any point.
 - [ ] No commented-out code left behind.
 - [ ] User-facing text is localized (`Localization.lang` in Java, `%` prefix in FXML).
 - [ ] New `BibEntry` objects created with withers (`withField`, not `setField`).
+- [ ] User-controlled data (request params, entry fields, file contents) is HTML-escaped before being written into any `text/html` response — including exception/error messages, not just the success body (XSS).
 - [ ] Tests added or updated for changed behavior in `org.jabref.model` / `org.jabref.logic`.
 
 ## Verification commands
@@ -27,7 +28,8 @@ code until all points are fulfilled. Do not skip any point.
 
 ## Documentation
 
-- [ ] `CHANGELOG.md` entry added if the change is visible to the user (end-user wording, no extra blank lines).
+- [ ] `CHANGELOG.md` entry added if the change is visible to the user (end-user wording, no extra blank lines). Use `TODO` as the issue/PR reference placeholder when no issue is known and the PR is not yet created — never a fake number.
+- [ ] Searched [jabref/issues](https://github.com/JabRef/jabref/issues) and [jabref-koppor/issues](https://github.com/JabRef/jabref-koppor/issues) for a related issue; linked only on a confident match, otherwise kept `TODO` (no `closes`/`fixes` for merely-similar issues).
 - [ ] Requirement added to `docs/requirements/<area>.md` if the change is a new feature or significant bug fix (skip for refactors, minor fixes, and internal changes).
 - [ ] Developer documentation under `docs/` updated if behavior or architecture changed.
 
@@ -37,3 +39,4 @@ code until all points are fulfilled. Do not skip any point.
 - [ ] All checklist items kept and marked `[x]`, `[ ]`, or `[/]`.
 - [ ] All HTML comments removed from the PR body.
 - [ ] PR created with `gh pr create --body-file <file>` (not `--body`).
+- [ ] If CHANGELOG.md used a `TODO` placeholder, it was replaced with the real PR-number link after PR creation, then committed and pushed.

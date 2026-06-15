@@ -153,6 +153,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.ai.chatting.exporters;
     exports org.jabref.logic.ai.summarization.exporters;
     exports org.jabref.logic.ai.summarization.util;
+    exports org.jabref.logic.msc;
     // endregion
 
     requires java.base;
