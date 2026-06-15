@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 ///
 /// This class loads abbreviations from a CSV file and stores them into a MV file ({@link #readAbbreviationsFromCsvFile(Path)}
-/// It can also create an {@link JournalAbbreviationRepository} based on an MV file ({@link #loadRepository(JournalAbbreviationPreferences)}.
+/// It can also create an {@link JournalAbbreviationRepository} based on an MV file ({@link #loadRepository(AbbreviationPreferences)}.
 ///
 ///
 /// Abbreviations are available at <a href="https://github.com/JabRef/abbrv.jabref.org/">https://github.com/JabRef/abbrv.jabref.org/</a>.
@@ -32,7 +32,7 @@ public class JournalAbbreviationLoader {
         return parser.getAbbreviations();
     }
 
-    public static JournalAbbreviationRepository loadRepository(JournalAbbreviationPreferences journalAbbreviationPreferences) {
+    public static JournalAbbreviationRepository loadRepository(AbbreviationPreferences abbreviationPreferences) {
         JournalAbbreviationRepository repository;
 
         // Initialize with built-in list
@@ -55,7 +55,7 @@ public class JournalAbbreviationLoader {
         }
 
         // Read external lists
-        List<String> lists = journalAbbreviationPreferences.getExternalJournalLists();
+        List<String> lists = abbreviationPreferences.getExternalJournalLists();
         // might produce NPE in tests
         if (lists != null && !lists.isEmpty()) {
             // reversing ensures that the latest lists overwrites the former one
@@ -90,6 +90,6 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        return loadRepository(new JournalAbbreviationPreferences(List.of(), true));
+        return loadRepository(new AbbreviationPreferences(List.of(), true, false));
     }
 }

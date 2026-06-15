@@ -1,0 +1,241 @@
+package org.jabref.http.server.resources;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.jabref.http.SrvStateManager;
+import org.jabref.http.server.services.CitationCacheService;
+import org.jabref.logic.UiCommand;
+import org.jabref.logic.UiMessageHandler;
+import org.jabref.logic.ai.chatting.ChatModel;
+import org.jabref.logic.ai.chatting.util.ChatModelFactory;
+import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.database.DuplicateCheck;
+import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
+import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import org.jspecify.annotations.Nullable;
+
+/// Cached plain-citation lookup + later add.
+///
+/// Two endpoints designed for the hover-then-Ctrl+J SumatraPDF flow (the LLM
+/// parser is expensive; we don't want to pay twice for "is it already in the
+/// library?" and "add it"):
+///
+/// 1. `POST /libraries/{id}/citations/lookup` — parse plain citation text,
+///    run [DuplicateCheck] against the active library, stash the parsed
+///    [BibEntry] in [CitationCacheService], return matches plus the cache
+///    token.
+/// 2. `POST /libraries/{id}/citations/{parserCacheKey}` — look up the cached
+///    parsed entry by token, append it to the current library, evict the
+///    token. Returns 410 Gone when the token expired so the client can fall
+///    back to `POST /libraries/current/entries` and pay for the parse again.
+@Path("libraries/{id}/citations")
+public class CitationsResource {
+
+    @Inject
+    CliPreferences preferences;
+
+    @Inject
+    SrvStateManager srvStateManager;
+
+    @Inject
+    @Nullable
+    UiMessageHandler uiMessageHandler;
+
+    @Inject
+    CitationCacheService citationCacheService;
+
+    public record LookupMatch(String libraryId, String entryId, boolean inActiveLibrary) {
+    }
+
+    /// matchScope is derived from `matches`:
+    ///   "active" — at least one match is in the currently-active library
+    ///              (the library Ctrl+J would add to — so duplicate);
+    ///   "other"  — match(es) exist only in *other* open libraries
+    ///              (related, but Ctrl+J would still add to the active one);
+    ///   "none"   — no match in any open library.
+    /// Clients use this to colour the hover badge without having to walk the
+    /// matches array themselves (mint vs olive vs grey).
+    public record LookupResponse(List<LookupMatch> matches, String matchScope,
+                                 String parserCacheKey, String parsedEntryType) {
+    }
+
+    public record AlreadyExistsResponse(String status, String entryId) {
+        public AlreadyExistsResponse(String entryId) {
+            this("already-exists", entryId);
+        }
+    }
+
+    @POST
+    @Path("lookup")
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
+    public LookupResponse lookup(@PathParam("id") String id, String citationText) throws FetcherException {
+        if (!"current".equals(id)) {
+            throw new BadRequestException("Only currently selected library possible");
+        }
+        if (StringUtil.isBlank(citationText)) {
+            throw new BadRequestException("Citation text must not be empty.");
+        }
+
+        PlainCitationParserChoice choice = preferences.getImporterPreferences().getDefaultPlainCitationParser();
+        BibEntry parsed = parsePlainCitation(choice, citationText)
+                .orElseThrow(() -> new BadRequestException("Could not parse a bibliography entry from the given text."));
+
+        // Cross-library lookup: walk every open library so we can tell the
+        // client whether the citation is in the *active* library (Ctrl+J
+        // would create a duplicate → mint) vs an *other* open library (still
+        // worth surfacing — the user may want to switch libraries or copy
+        // across → olive, AnchorHub's related-match colour).
+        BibDatabaseContext activeContext = srvStateManager.getActiveDatabase()
+                                                          .orElseThrow(() -> new BadRequestException("No active library"));
+        DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
+        List<LookupMatch> matches = new ArrayList<>();
+        for (BibDatabaseContext ctx : srvStateManager.getOpenDatabases()) {
+            boolean isActive = ctx == activeContext;
+            duplicateCheck.containsDuplicate(ctx.getDatabase(), parsed, ctx.getMode())
+                          .ifPresent(existing -> matches.add(new LookupMatch(
+                                  libraryIdFor(ctx),
+                                  existing.getCitationKey().orElse(""),
+                                  isActive)));
+        }
+        String matchScope = matches.stream()
+                                   .anyMatch(LookupMatch::inActiveLibrary) ? "active"
+                                                                           : matches.isEmpty() ? "none" : "other";
+
+        String cacheKey = citationCacheService.put(parsed, citationText);
+        return new LookupResponse(matches, matchScope, cacheKey, parsed.getType().getName());
+    }
+
+    /// Stable-ish library identifier for response bodies. Saved libraries use
+    /// the absolute path; unsaved libraries fall back to an in-process id
+    /// derived from the BibDatabaseContext so the client at least sees they
+    /// are distinct.
+    private static String libraryIdFor(BibDatabaseContext ctx) {
+        return ctx.getDatabasePath()
+                  .map(p -> p.toAbsolutePath().toString())
+                  .orElseGet(() -> "unsaved-" + Integer.toHexString(System.identityHashCode(ctx)));
+    }
+
+    @POST
+    @Path("{parserCacheKey}")
+    public Response addFromCache(@PathParam("id") String id,
+                                 @PathParam("parserCacheKey") String parserCacheKey,
+                                 @QueryParam("group") @Nullable String group) {
+        if (uiMessageHandler == null) {
+            throw new BadRequestException("Only possible in GUI mode.");
+        }
+        if (!"current".equals(id)) {
+            throw new BadRequestException("Only currently selected library possible");
+        }
+
+        Optional<CitationCacheService.CachedCitation> cached = citationCacheService.get(parserCacheKey);
+        if (cached.isEmpty()) {
+            // Distinct from 404: the token was never issued OR (more commonly)
+            // its TTL expired. 410 Gone tells the client to re-do the lookup
+            // and pay the parser cost again.
+            throw new ClientErrorException("Cached citation expired or unknown — re-run /citations/lookup",
+                    Response.Status.GONE);
+        }
+
+        BibEntry parsed = cached.get().parsed();
+
+        // Defense-in-depth duplicate check: even when SumatraPDF's local
+        // pushed-set is cold (cleared session, different machine), the
+        // server refuses to append a second copy of an already-present
+        // citation. Returns 200 with `{"status":"already-exists"}` instead
+        // of 201 so the client can show a "Citation is already in library"
+        // notification without treating it as a hard error.
+        BibDatabaseContext context = srvStateManager.getActiveDatabase()
+                                                    .orElseThrow(() -> new BadRequestException("No active library"));
+        BibDatabaseMode mode = context.getMode();
+        DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
+        return duplicateCheck.containsDuplicate(context.getDatabase(), parsed, mode)
+                             .map(existingEntry -> alreadyExistsResponse(parserCacheKey, existingEntry))
+                             .orElseGet(() -> appendParsedAndRespond(parsed, group, parserCacheKey));
+    }
+
+    /// Returns a 200 OK `{"status":"already-exists","entryId":"…"}` body and
+    /// evicts the cache token so a retry can't double-add the entry.
+    private Response alreadyExistsResponse(String parserCacheKey, BibEntry existingEntry) {
+        citationCacheService.invalidate(parserCacheKey);
+        // Prefer the existing entry's citation key; fall back to a short
+        // author/title/year preview when the key is missing or empty.
+        String entryId = existingEntry.getCitationKey()
+                                      .filter(k -> !k.isBlank())
+                                      .orElseGet(() -> existingEntry.getAuthorTitleYear(20));
+        return Response.ok(new AlreadyExistsResponse(entryId))
+                       .type(MediaType.APPLICATION_JSON)
+                       .build();
+    }
+
+    /// Writes the parsed entry as BibTeX, forwards it to the UI for append,
+    /// evicts the cache token, and returns 201 Created.
+    private Response appendParsedAndRespond(BibEntry parsed, @Nullable String group, String parserCacheKey) {
+        StringWriter rawEntry = new StringWriter();
+        BibWriter bibWriter = new BibWriter(rawEntry, "\n");
+        BibEntryWriter entryWriter = new BibEntryWriter(
+                new FieldWriter(preferences.getFieldPreferences()),
+                new BibEntryTypesManager());
+        try {
+            entryWriter.write(parsed, bibWriter, BibDatabaseMode.BIBTEX);
+        } catch (IOException e) {
+            throw new InternalServerErrorException("Failed to serialise BibEntry", e);
+        }
+
+        // uiMessageHandler is null-checked at the top of addFromCache; safe here.
+        uiMessageHandler.handleUiCommands(List.of(group == null
+                                                  ? new UiCommand.AppendBibTeXToCurrentLibrary(rawEntry.toString())
+                                                  : new UiCommand.AppendBibTeXToCurrentLibrary(rawEntry.toString(), group)));
+
+        // Evict so the same token can't add a second copy. The client
+        // already has confirmation it landed; re-tries fall through to
+        // the 410 branch above and trigger a fresh lookup.
+        citationCacheService.invalidate(parserCacheKey);
+        return Response.status(Response.Status.CREATED).build();
+    }
+
+    /// Mirrors `EntriesResource.parsePlainCitation` — kept in sync by hand for
+    /// now; pulling it into a shared helper is a follow-up refactor.
+    private Optional<BibEntry> parsePlainCitation(PlainCitationParserChoice choice, String citationText) throws FetcherException {
+        if (choice == PlainCitationParserChoice.LLM) {
+            try (ChatModel chatModel = ChatModelFactory.create(preferences.getAiPreferences())) {
+                return PlainCitationParserFactory.getLlmPlainCitationParser(
+                                                         preferences.getImportFormatPreferences(),
+                                                         preferences.getAiPreferences(),
+                                                         chatModel)
+                                                 .parsePlainCitation(citationText);
+            }
+        }
+        return PlainCitationParserFactory.getPlainCitationParser(
+                choice,
+                preferences.getCitationKeyPatternPreferences(),
+                preferences.getGrobidPreferences(),
+                preferences.getImportFormatPreferences()).parsePlainCitation(citationText);
+    }
+}

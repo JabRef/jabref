@@ -75,6 +75,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -82,6 +83,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import jakarta.inject.Inject;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// GUI component that allows editing of the fields of a BibEntry (i.e. the one that shows up, when you double click on
 /// an entry in the table)
@@ -104,6 +106,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     private BibEntry currentlyEditedEntry;
 
     private SourceTab sourceTab;
+
+    private @Nullable Field lastFocusedField;
 
     @FXML private TabPane tabbed;
 
@@ -301,10 +305,12 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                         event.consume();
                         break;
                     case ENTRY_EDITOR_NEXT_ENTRY:
+                        captureFocusedField();
                         tabSupplier.get().selectNextEntry();
                         event.consume();
                         break;
                     case ENTRY_EDITOR_PREVIOUS_ENTRY:
+                        captureFocusedField();
                         tabSupplier.get().selectPreviousEntry();
                         event.consume();
                         break;
@@ -330,6 +336,13 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 }
             }
         });
+    }
+
+    private void captureFocusedField() {
+        Node focusedNode = getScene().getFocusOwner();
+        if (focusedNode instanceof TextInputControl textInput && textInput.getId() != null) {
+            lastFocusedField = FieldFactory.parseField(textInput.getId());
+        }
     }
 
     public void selectFieldDialog() {
@@ -404,6 +417,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 fileMonitor,
                 preferences,
                 taskExecutor,
+                themeManager,
                 bibEntryTypesManager,
                 searchCitationsRelationsService
         ));
@@ -497,6 +511,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     public void setCurrentlyEditedEntry(@NonNull BibEntry currentlyEditedEntry) {
         if (Objects.equals(this.currentlyEditedEntry, currentlyEditedEntry)) {
+            lastFocusedField = null;
             return;
         }
 
@@ -535,6 +550,20 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         EntryEditorTab selectedTab = getSelectedTab();
         if (selectedTab != null) {
             Platform.runLater(() -> selectedTab.notifyAboutFocus(currentlyEditedEntry));
+        }
+
+        if (lastFocusedField != null) {
+            Field fieldToRestore = lastFocusedField;
+            lastFocusedField = null;
+            Platform.runLater(() -> {
+                setFocusToField(fieldToRestore);
+                Platform.runLater(() -> {
+                    Node focused = getScene().getFocusOwner();
+                    if (focused instanceof TextInputControl textInput) {
+                        textInput.end();
+                    }
+                });
+            });
         }
     }
 

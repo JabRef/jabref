@@ -183,7 +183,7 @@ public class ImportHandler {
                                 files.size(),
                                 targetBibDatabaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse(Localization.lang("untitled")),
                                 counter));
-                        updateMessage(Localization.lang("Processing %0", FileUtil.shortenFileName(file.getFileName().toString(), 68)));
+                        updateMessage(Localization.lang("Processing \"%0\"...", FileUtil.shortenFileName(file.getFileName().toString(), 68)));
                         updateProgress(counter, files.size());
                         showToUser(true);
                     });

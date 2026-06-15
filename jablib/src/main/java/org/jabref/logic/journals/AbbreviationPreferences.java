@@ -7,31 +7,36 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class JournalAbbreviationPreferences {
+public class AbbreviationPreferences {
 
     private final ObservableList<String> externalJournalLists;
     private final BooleanProperty useFJournalField;
+    private final BooleanProperty shouldEnableMscKeywordDescriptions;
 
-    public JournalAbbreviationPreferences(List<String> externalJournalLists,
-                                          boolean useFJournalField) {
+    public AbbreviationPreferences(List<String> externalJournalLists,
+                                   boolean useFJournalField,
+                                   boolean shouldEnableMscKeywordDescriptions) {
         this.externalJournalLists = FXCollections.observableArrayList(externalJournalLists);
         this.useFJournalField = new SimpleBooleanProperty(useFJournalField);
+        this.shouldEnableMscKeywordDescriptions = new SimpleBooleanProperty(shouldEnableMscKeywordDescriptions);
     }
 
-    private JournalAbbreviationPreferences() {
+    private AbbreviationPreferences() {
         this(
                 List.of(), // externalJournalLists
-                true       // useFJournalField
+                true,       // useFJournalField
+                false       // Enable MSC codes as Keyword
         );
     }
 
-    public void setAll(JournalAbbreviationPreferences preferences) {
+    public void setAll(AbbreviationPreferences preferences) {
         this.externalJournalLists.setAll(preferences.externalJournalLists);
         this.useFJournalField.set(preferences.shouldUseFJournalField());
+        this.shouldEnableMscKeywordDescriptions.set(preferences.shouldEnableMscKeywordDescriptions());
     }
 
-    public static JournalAbbreviationPreferences getDefault() {
-        return new JournalAbbreviationPreferences();
+    public static AbbreviationPreferences getDefault() {
+        return new AbbreviationPreferences();
     }
 
     public ObservableList<String> getExternalJournalLists() {
@@ -53,5 +58,17 @@ public class JournalAbbreviationPreferences {
 
     public void setUseFJournalField(boolean useFJournalField) {
         this.useFJournalField.set(useFJournalField);
+    }
+
+    public boolean shouldEnableMscKeywordDescriptions() {
+        return shouldEnableMscKeywordDescriptions.get();
+    }
+
+    public void setShouldEnableMscKeywordDescriptions(boolean value) {
+        this.shouldEnableMscKeywordDescriptions.set(value);
+    }
+
+    public BooleanProperty shouldEnableMscKeywordDescriptionsProperty() {
+        return shouldEnableMscKeywordDescriptions;
     }
 }
