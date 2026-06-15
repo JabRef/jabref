@@ -187,7 +187,7 @@ public class ImportHandler {
 
                             if (pdfEntriesInFile.isEmpty()) {
                                 entriesToAdd.add(createEmptyEntryWithLink(file));
-                                addResultToList(file, false, Localization.lang("No BibTeX was found. An empty entry was created with file link."));
+                                addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with a file link."));
                             } else {
                                 generateKeys(pdfEntriesInFile);
                                 pdfEntriesInFile.forEach(entry -> {
