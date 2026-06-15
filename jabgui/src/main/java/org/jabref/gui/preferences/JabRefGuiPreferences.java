@@ -374,13 +374,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getEntryEditorTabs(),
                 getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),
                 EntryEditorPreferences.staticTabsFromBoolean(
-                        getBoolean(SHOW_RECOMMENDATIONS, defaults.isStaticTabVisible(EntryEditorPreferences.StaticTab.RELATED_ARTICLES)),
-                        getBoolean(SHOW_AI_SUMMARY, defaults.isStaticTabVisible(EntryEditorPreferences.StaticTab.AI_SUMMARY)),
-                        getBoolean(SHOW_AI_CHAT, defaults.isStaticTabVisible(EntryEditorPreferences.StaticTab.AI_CHAT)),
-                        getBoolean(SHOW_LATEX_CITATIONS, defaults.isStaticTabVisible(EntryEditorPreferences.StaticTab.LATEX_CITATIONS)),
-                        getBoolean(SMART_FILE_ANNOTATIONS, defaults.isStaticTabVisible(EntryEditorPreferences.StaticTab.FILE_ANNOTATIONS)),
-                        getBoolean(SHOW_SCITE_TAB, defaults.isStaticTabVisible(EntryEditorPreferences.StaticTab.CITATION_INFORMATION)),
-                        getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.isStaticTabVisible(EntryEditorPreferences.StaticTab.USER_COMMENTS))),
+                        getBoolean(SHOW_RECOMMENDATIONS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.RELATED_ARTICLES)),
+                        getBoolean(SHOW_AI_SUMMARY, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.AI_SUMMARY)),
+                        getBoolean(SHOW_AI_CHAT, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.AI_CHAT)),
+                        getBoolean(SHOW_LATEX_CITATIONS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.LATEX_CITATIONS)),
+                        getBoolean(SMART_FILE_ANNOTATIONS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.FILE_ANNOTATIONS)),
+                        getBoolean(SHOW_SCITE_TAB, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.CITATION_INFORMATION)),
+                        getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.USER_COMMENTS))),
                 getBoolean(DEFAULT_SHOW_SOURCE, defaults.showSourceTabByDefault()),
                 getBoolean(VALIDATE_IN_ENTRY_EDITOR, defaults.shouldEnableValidation()),
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaults.shouldAllowIntegerEditionBibtex()),
@@ -412,9 +412,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     private void storeTabConfigs(List<EntryEditorTabModel> configs) {
         List<EntryEditorTabModel.FieldSet> fieldSetTabs = configs.stream()
-                                                                  .filter(EntryEditorTabModel.FieldSet.class::isInstance)
-                                                                  .map(EntryEditorTabModel.FieldSet.class::cast)
-                                                                  .toList();
+                                                                 .filter(EntryEditorTabModel.FieldSet.class::isInstance)
+                                                                 .map(EntryEditorTabModel.FieldSet.class::cast)
+                                                                 .toList();
 
         for (int i = 0; i < fieldSetTabs.size(); i++) {
             put(CUSTOM_TAB_NAME + i, fieldSetTabs.get(i).name());
@@ -426,22 +426,25 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         purgeSeries(CUSTOM_TAB_FIELDS, fieldSetTabs.size());
 
         for (EntryEditorTabModel config : configs) {
-            if (config instanceof EntryEditorTabModel.Feature feature) {
-                switch (feature.type()) {
+            if (config instanceof EntryEditorTabModel.Feature(
+                    EntryEditorTabModel.StaticTab type,
+                    boolean visible
+            )) {
+                switch (type) {
                     case RELATED_ARTICLES ->
-                            putBoolean(SHOW_RECOMMENDATIONS, feature.visible());
+                            putBoolean(SHOW_RECOMMENDATIONS, visible);
                     case AI_SUMMARY ->
-                            putBoolean(SHOW_AI_SUMMARY, feature.visible());
+                            putBoolean(SHOW_AI_SUMMARY, visible);
                     case AI_CHAT ->
-                            putBoolean(SHOW_AI_CHAT, feature.visible());
+                            putBoolean(SHOW_AI_CHAT, visible);
                     case LATEX_CITATIONS ->
-                            putBoolean(SHOW_LATEX_CITATIONS, feature.visible());
+                            putBoolean(SHOW_LATEX_CITATIONS, visible);
                     case FILE_ANNOTATIONS ->
-                            putBoolean(SMART_FILE_ANNOTATIONS, feature.visible());
+                            putBoolean(SMART_FILE_ANNOTATIONS, visible);
                     case CITATION_INFORMATION ->
-                            putBoolean(SHOW_SCITE_TAB, feature.visible());
+                            putBoolean(SHOW_SCITE_TAB, visible);
                     case USER_COMMENTS ->
-                            putBoolean(SHOW_USER_COMMENTS_FIELDS, feature.visible());
+                            putBoolean(SHOW_USER_COMMENTS_FIELDS, visible);
                 }
             }
         }

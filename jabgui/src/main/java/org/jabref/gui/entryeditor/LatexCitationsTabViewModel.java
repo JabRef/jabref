@@ -191,7 +191,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     }
 
     public boolean shouldShow() {
-        return preferences.getEntryEditorPreferences().isStaticTabVisible(EntryEditorPreferences.StaticTab.LATEX_CITATIONS);
+        return preferences.getEntryEditorPreferences().isStaticTabVisible(EntryEditorTabModel.StaticTab.LATEX_CITATIONS);
     }
 
     private class CitationsAlterationListener implements FileAlterationListener {

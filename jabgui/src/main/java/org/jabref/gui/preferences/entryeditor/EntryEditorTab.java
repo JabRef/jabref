@@ -25,7 +25,6 @@ import javafx.util.StringConverter;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
@@ -204,15 +203,22 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         return label;
     }
 
-    private static String featureTabDisplayName(EntryEditorPreferences.StaticTab type) {
+    private static String featureTabDisplayName(EntryEditorTabModel.StaticTab type) {
         return switch (type) {
-            case RELATED_ARTICLES -> Localization.lang("Related articles");
-            case AI_SUMMARY -> Localization.lang("AI Summary");
-            case AI_CHAT -> Localization.lang("AI Chat");
-            case FILE_ANNOTATIONS -> Localization.lang("File annotations");
-            case LATEX_CITATIONS -> Localization.lang("LaTeX citations");
-            case CITATION_INFORMATION -> Localization.lang("Citation information");
-            case USER_COMMENTS -> Localization.lang("User comments");
+            case RELATED_ARTICLES ->
+                    Localization.lang("Related articles");
+            case AI_SUMMARY ->
+                    Localization.lang("AI Summary");
+            case AI_CHAT ->
+                    Localization.lang("AI Chat");
+            case FILE_ANNOTATIONS ->
+                    Localization.lang("File annotations");
+            case LATEX_CITATIONS ->
+                    Localization.lang("LaTeX citations");
+            case CITATION_INFORMATION ->
+                    Localization.lang("Citation information");
+            case USER_COMMENTS ->
+                    Localization.lang("User comments");
         };
     }
 

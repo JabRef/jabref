@@ -13,11 +13,21 @@ public sealed interface EntryEditorTabModel
 
     boolean visible();
 
+    enum StaticTab {
+        RELATED_ARTICLES,
+        AI_SUMMARY,
+        AI_CHAT,
+        FILE_ANNOTATIONS,
+        LATEX_CITATIONS,
+        CITATION_INFORMATION,
+        USER_COMMENTS
+    }
+
     record FieldSet(String name, Set<Field> fields, boolean visible)
             implements EntryEditorTabModel {
     }
 
-    record Feature(EntryEditorPreferences.StaticTab type, boolean visible)
+    record Feature(StaticTab type, boolean visible)
             implements EntryEditorTabModel {
     }
 }
