@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.auxparser.AuxParser;
-import org.jabref.logic.auxparser.AuxParserResult;
+import org.jabref.logic.util.LazyValue;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
@@ -16,17 +16,14 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jspecify.annotations.NullMarked;
 
 @AllowedToUseLogic("because it needs access to aux parser")
+@NullMarked
 public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TexGroup.class);
-
     private final Path filePath;
-    private Set<String> keysUsedInAux;
+    private final LazyValue<Set<String>> keysUsedInAux;
     private final FileUpdateMonitor fileMonitor;
     private final AuxParser auxParser;
     private final MetaData metaData;
@@ -34,17 +31,20 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     TexGroup(String name,
              GroupHierarchyType context,
-             @NonNull Path filePath,
+             Path filePath,
              AuxParser auxParser,
              FileUpdateMonitor fileMonitor,
              MetaData metaData,
              String user) {
         super(name, context);
+
         this.metaData = metaData;
         this.user = user;
         this.filePath = expandPath(filePath);
         this.auxParser = auxParser;
         this.fileMonitor = fileMonitor;
+
+        this.keysUsedInAux = new LazyValue<>(() -> auxParser.parse(filePath).getUniqueKeys());
     }
 
     public static TexGroup create(String name,
@@ -75,12 +75,9 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     @Override
     public boolean contains(BibEntry entry) {
-        if (keysUsedInAux == null) {
-            AuxParserResult auxResult = auxParser.parse(filePath);
-            keysUsedInAux = auxResult.getUniqueKeys();
-        }
-
-        return entry.getCitationKey().map(keysUsedInAux::contains).orElse(false);
+        return entry.getCitationKey()
+                    .map(keysUsedInAux.get()::contains)
+                    .orElse(false);
     }
 
     @Override
@@ -130,7 +127,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     @Override
     public void fileUpdated() {
         // Reset previous parse result
-        keysUsedInAux = null;
+        keysUsedInAux.invalidate();
         metaData.groupsBinding().invalidate();
     }
 
