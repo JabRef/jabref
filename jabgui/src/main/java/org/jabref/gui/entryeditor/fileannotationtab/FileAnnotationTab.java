@@ -48,22 +48,10 @@ public class FileAnnotationTab extends EntryEditorTab {
 
     private boolean computeShouldShow() {
         BibEntry entry = getCurrentEntry();
-        if (entry == null) {
+        if (entry == null || !entryEditorPreferences.isStaticTabVisible(EntryEditorTabModel.StaticTab.FILE_ANNOTATIONS)) {
             return false;
         }
-
-        if (!entryEditorPreferences.isStaticTabVisible(EntryEditorTabModel.StaticTab.FILE_ANNOTATIONS)) {
-            return entry.getField(StandardField.FILE).isPresent();
-        }
-
-        return entry.getField(StandardField.FILE).isPresent()
-                && stateManager.activeTabProperty().get()
-                               .map(tab -> tab.getAnnotationCache()
-                                              .getFromCache(entry)
-                                              .values()
-                                              .stream()
-                                              .anyMatch(list -> !list.isEmpty()))
-                               .orElse(false);
+        return entry.getField(StandardField.FILE).isPresent();
     }
 
     @Override

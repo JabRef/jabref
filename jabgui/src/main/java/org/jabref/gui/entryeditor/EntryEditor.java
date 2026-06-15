@@ -11,7 +11,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.Node;
@@ -123,6 +122,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     @Inject private SearchCitationsRelationsService searchCitationsRelationsService;
 
     private final List<EntryEditorTab> allPossibleTabs = new ArrayList<>();
+    private final List<Subscription> shouldShowSubscriptions = new ArrayList<>();
 
     public EntryEditor(Supplier<LibraryTab> tabSupplier, UndoAction undoAction, RedoAction redoAction) {
         this.tabSupplier = tabSupplier;
@@ -173,6 +173,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             if (tab.isPresent()) {
                 tabbed.getTabs().clear();
 
+                shouldShowSubscriptions.forEach(Subscription::unsubscribe);
+                shouldShowSubscriptions.clear();
                 this.allPossibleTabs.clear();
                 this.allPossibleTabs.addAll(tabFactory.createTabs(this));
                 this.sourceTab = allPossibleTabs.stream()
@@ -181,8 +183,12 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                                                 .findFirst()
                                                 .orElse(null);
 
-                adaptVisibleTabs();
+                allPossibleTabs.forEach(t ->
+                        shouldShowSubscriptions.add(EasyBind.subscribe(t.shouldShow(), _ -> syncTabPane())));
+                syncTabPane();
             } else {
+                shouldShowSubscriptions.forEach(Subscription::unsubscribe);
+                shouldShowSubscriptions.clear();
                 this.allPossibleTabs.clear();
                 close();
             }
@@ -209,7 +215,6 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         EasyBind.listen(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(),
                 (_, _, newValue) -> {
                     if (viewModel.getCurrentlyEditedEntry() != null) {
-                        adaptVisibleTabs();
                         Tab tab = tabbed.getSelectionModel().selectedItemProperty().get();
                         if (newValue && tab instanceof FieldsEditorTab fieldsEditorTab) {
                             fieldsEditorTab.removePreviewPanelFromThisTab();
@@ -219,12 +224,6 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                         }
                     }
                 });
-
-        viewModel.getTabModels().addListener((InvalidationListener) _ -> {
-            if (viewModel.getCurrentlyEditedEntry() != null) {
-                adaptVisibleTabs();
-            }
-        });
     }
 
     private void setupDragAndDrop() {
@@ -385,34 +384,29 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     @Override
     public void adaptVisibleTabs() {
-        // We need to find out, which tabs will be shown (and which not anymore) and remove and re-add the appropriate tabs
-        // to the editor. We cannot to simply remove all and re-add the complete list of visible tabs, because
-        // the tabs give an ugly animation the looks like all tabs are shifting in from the right. In other words:
-        // This hack is required since tabbed.getTabs().setAll(visibleTabs) changes the order of the tabs in the editor
-
         BibEntry entry = viewModel.getCurrentlyEditedEntry();
-        if (entry == null) {
+        if (entry != null) {
+            allPossibleTabs.forEach(tab -> tab.currentEntryProperty().set(entry));
+        }
+        syncTabPane();
+    }
+
+    /// Diffs {@link #allPossibleTabs} against the current {@link #tabbed} contents and adds/removes tabs to match
+    /// the tabs whose {@link EntryEditorTab#shouldShow()} is {@code true}, preserving order without a full replace
+    /// (a full replace causes an ugly shift-in animation for all tabs).
+    private void syncTabPane() {
+        if (viewModel.getCurrentlyEditedEntry() == null) {
             tabbed.getTabs().clear();
             return;
         }
 
-        // Keep every tab's current entry in sync so their shouldShow() observables reflect this entry
-        allPossibleTabs.forEach(tab -> tab.currentEntryProperty().set(entry));
-
-        // First, remove tabs that we do not want to show
         List<EntryEditorTab> toBeRemoved = allPossibleTabs.stream().filter(tab -> !tab.shouldShow().getValue()).toList();
         tabbed.getTabs().removeAll(toBeRemoved);
 
-        // Next add all the visible tabs (if not already present) at the right position
         List<Tab> visibleTabs = allPossibleTabs.stream().filter(tab -> tab.shouldShow().getValue()).collect(Collectors.toList());
         for (int i = 0; i < visibleTabs.size(); i++) {
             Tab toBeAdded = visibleTabs.get(i);
-            Tab shown = null;
-
-            if (i < tabbed.getTabs().size()) {
-                shown = tabbed.getTabs().get(i);
-            }
-
+            Tab shown = i < tabbed.getTabs().size() ? tabbed.getTabs().get(i) : null;
             if (!toBeAdded.equals(shown)) {
                 tabbed.getTabs().add(i, toBeAdded);
             }
@@ -432,20 +426,19 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     }
 
     private void onEntryChanged(@NonNull BibEntry entry) {
+        allPossibleTabs.forEach(tab -> tab.currentEntryProperty().set(entry));
+
         if (typeSubscription != null) {
             typeSubscription.unsubscribe();
         }
 
         typeSubscription = EasyBind.subscribe(entry.typeProperty(), _ -> {
             typeLabel.setText(new TypedBibEntry(entry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
-            adaptVisibleTabs();
             setupToolBar();
             getSelectedTab().notifyAboutFocus(entry);
         });
 
         typeLabel.setText(new TypedBibEntry(entry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
-
-        adaptVisibleTabs();
 
         setupToolBar();
 
