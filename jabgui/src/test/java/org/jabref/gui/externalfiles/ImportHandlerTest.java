@@ -1,5 +1,6 @@
 package org.jabref.gui.externalfiles;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -16,8 +17,10 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImportFormatReader.ImportResult;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -126,6 +129,35 @@ class ImportHandlerTest {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Clear Author");
         BibEntry cleanedEntry = importHandler.cleanUpEntry(entry);
         assertEquals(new BibEntry().withField(StandardField.AUTHOR, "Clear Author"), cleanedEntry);
+    }
+
+    @Test
+    void createAutoDetectionImportOutcomeReturnsWarningResultForParsedFileWithWarnings() {
+        BibEntry importedEntry = new BibEntry(StandardEntryType.Article).withCitationKey("Warning2026");
+        ParserResult parserResult = new ParserResult(List.of(importedEntry));
+        parserResult.addWarning("Warning text");
+
+        ImportResult importResult = new ImportResult("RIS", parserResult);
+
+        ImportHandler.AutoDetectionImportOutcome outcome = importHandler.createAutoDetectionImportOutcome(Path.of("sample.ris"), importResult);
+
+        assertFalse(outcome.success());
+        assertEquals(List.of(importedEntry), outcome.entriesToAdd());
+        assertEquals("File was imported as RIS, but warnings were reported: Warning text", outcome.message());
+    }
+
+    @Test
+    void createAutoDetectionImportOutcomeReturnsEmptyEntryAndWarningMessageWhenNoEntriesWereParsed() {
+        ParserResult parserResult = new ParserResult();
+        parserResult.addWarning("Warning text");
+
+        ImportResult importResult = new ImportResult("RIS", parserResult);
+
+        ImportHandler.AutoDetectionImportOutcome outcome = importHandler.createAutoDetectionImportOutcome(Path.of("sample.ris"), importResult);
+
+        assertFalse(outcome.success());
+        assertEquals(1, outcome.entriesToAdd().size());
+        assertEquals("No importable data was found in RIS. An empty entry was created with file link. Warning text", outcome.message());
     }
 
     @Test
