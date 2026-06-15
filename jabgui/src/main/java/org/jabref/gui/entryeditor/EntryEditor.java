@@ -4,12 +4,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -39,9 +35,6 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
 import org.jabref.gui.cleanup.CleanupSingleAction;
-import org.jabref.gui.entryeditor.citationrelationtab.CitationRelationsTab;
-import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
-import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
@@ -96,6 +89,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     private final Supplier<LibraryTab> tabSupplier;
     private final ExternalFilesEntryLinker fileLinker;
     private final PreviewPanel previewPanel;
+    private final EntryEditorTabFactory tabFactory;
     private final UndoAction undoAction;
     private final RedoAction redoAction;
 
@@ -155,6 +149,24 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 taskExecutor,
                 stateManager);
 
+        this.tabFactory = new EntryEditorTabFactory(
+                previewPanel,
+                undoAction,
+                redoAction,
+                buildInfo,
+                dialogService,
+                taskExecutor,
+                preferences,
+                stateManager,
+                themeManager,
+                fileMonitor,
+                directoryMonitor,
+                undoManager,
+                bibEntryTypesManager,
+                journalAbbreviationRepository,
+                keyBindingRepository,
+                searchCitationsRelationsService);
+
         setupKeyBindings();
 
         EasyBind.subscribe(stateManager.activeTabProperty(), tab -> {
@@ -162,7 +174,12 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 tabbed.getTabs().clear();
 
                 this.allPossibleTabs.clear();
-                this.allPossibleTabs.addAll(createTabs());
+                this.allPossibleTabs.addAll(tabFactory.createTabs(this));
+                this.sourceTab = allPossibleTabs.stream()
+                                                .filter(SourceTab.class::isInstance)
+                                                .map(SourceTab.class::cast)
+                                                .findFirst()
+                                                .orElse(null);
 
                 adaptVisibleTabs();
             } else {
@@ -364,88 +381,6 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     @FXML
     private void navigateToNextEntry() {
         tabSupplier.get().selectNextEntry();
-    }
-
-    private List<EntryEditorTab> createTabs() {
-        List<EntryEditorTab> tabs = new LinkedList<>();
-
-        tabs.add(new PreviewTab(preferences, stateManager, previewPanel));
-
-        // Required, optional (important+detail), deprecated, and "other" fields
-        tabs.add(new RequiredFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel));
-        tabs.add(new ImportantOptionalFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel));
-        tabs.add(new DetailOptionalFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel));
-        tabs.add(new DeprecatedFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel));
-        tabs.add(new OtherFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel));
-
-        // Comment Tab: Tab for general and user-specific comments
-        tabs.add(new CommentsTab(preferences, undoManager, undoAction, redoAction, journalAbbreviationRepository, stateManager, previewPanel));
-
-        // ToDo: Needs to be recreated on preferences change
-        Map<String, Set<Field>> entryEditorTabList = getAdditionalUserConfiguredTabs();
-        for (Map.Entry<String, Set<Field>> tab : entryEditorTabList.entrySet()) {
-            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), undoManager, undoAction, redoAction, preferences, journalAbbreviationRepository, stateManager, previewPanel));
-        }
-
-        tabs.add(new MathSciNetTab());
-        tabs.add(new FileAnnotationTab(stateManager, preferences));
-        tabs.add(new CitationRelationsTab(
-                dialogService,
-                undoManager,
-                stateManager,
-                fileMonitor,
-                preferences,
-                taskExecutor,
-                themeManager,
-                bibEntryTypesManager,
-                searchCitationsRelationsService
-        ));
-        tabs.add(new RelatedArticlesTab(buildInfo, preferences, dialogService, stateManager, taskExecutor));
-        sourceTab = new SourceTab(
-                undoManager,
-                preferences.getFieldPreferences(),
-                preferences.getImportFormatPreferences(),
-                fileMonitor,
-                dialogService,
-                bibEntryTypesManager,
-                keyBindingRepository,
-                stateManager);
-        tabs.add(sourceTab);
-        tabs.add(new LatexCitationsTab(preferences, dialogService, stateManager, directoryMonitor));
-        tabs.add(new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor, this));
-        tabs.add(new AiSummaryTab(preferences, stateManager));
-        tabs.add(new AiChatTab(preferences, stateManager));
-
-        return tabs;
-    }
-
-    /// The preferences allow to configure tabs to show (e.g.,"General", "Abstract")
-    /// These should be shown. Already hard-coded ones (above and below this code block) should be removed.
-    /// This method does this calculation.
-    ///
-    /// @return Map of tab names and the fields to show in them.
-    private Map<String, Set<Field>> getAdditionalUserConfiguredTabs() {
-        Map<String, Set<Field>> entryEditorTabList = new HashMap<>(preferences.getEntryEditorPreferences().getEntryEditorTabs());
-
-        // Same order as in org.jabref.gui.entryeditor.EntryEditor.createTabs before the call of getAdditionalUserConfiguredTabs
-        entryEditorTabList.remove(PreviewTab.NAME);
-        entryEditorTabList.remove(RequiredFieldsTab.NAME);
-        entryEditorTabList.remove(ImportantOptionalFieldsTab.NAME);
-        entryEditorTabList.remove(DetailOptionalFieldsTab.NAME);
-        entryEditorTabList.remove(DeprecatedFieldsTab.NAME);
-        entryEditorTabList.remove(OtherFieldsTab.NAME);
-        entryEditorTabList.remove(CommentsTab.NAME);
-
-        // Same order as in org.jabref.gui.entryeditor.EntryEditor.createTabs after the call of getAdditionalUserConfiguredTabs
-        entryEditorTabList.remove(MathSciNetTab.NAME);
-        entryEditorTabList.remove(FileAnnotationTab.NAME);
-        entryEditorTabList.remove(CitationRelationsTab.NAME);
-        entryEditorTabList.remove(RelatedArticlesTab.NAME);
-        // SourceTab is not listed, because it has different names for BibTeX and biblatex mode
-        entryEditorTabList.remove(LatexCitationsTab.NAME);
-        entryEditorTabList.remove(FulltextSearchResultsTab.NAME);
-
-        return entryEditorTabList;
     }
 
     @Override
