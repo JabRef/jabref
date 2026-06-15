@@ -2,7 +2,6 @@ package org.jabref.migrations;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +41,8 @@ import org.slf4j.LoggerFactory;
 
 public class PreferencesMigrations {
 
+    public static final String V4_0_IMPORT_FILENAME_PATTERN = "importFileNamePattern";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesMigrations.class);
 
     private PreferencesMigrations() {
@@ -53,9 +54,8 @@ public class PreferencesMigrations {
 
         upgradePrefsToOrgJabRef(mainPrefsNode);
         upgradeSortOrder(preferences);
-        upgradeFaultyEncodingStrings(preferences);
         upgradeLabelPatternToCitationKeyPattern(preferences, mainPrefsNode);
-        upgradeImportFileAndDirePatterns(preferences, mainPrefsNode);
+        upgradeImportFileAndDirePatterns(preferences);
         upgradeStoredBibEntryTypes(preferences, mainPrefsNode, preferences.getCustomEntryTypesRepository());
         upgradeKeyBindingsToJavaFX(preferences);
         addCrossRefRelatedFieldsForAutoComplete(preferences);
@@ -105,41 +105,6 @@ public class PreferencesMigrations {
             Preferences childNode = from.node(child);
             Preferences newChildNode = to.node(child);
             copyPrefsRecursively(childNode, newChildNode);
-        }
-    }
-
-    /// Added from Jabref 2.11 beta 4 onwards to fix wrong encoding names
-    private static void upgradeFaultyEncodingStrings(JabRefCliPreferences prefs) {
-        String defaultEncoding = prefs.get(JabRefCliPreferences.DEFAULT_ENCODING);
-        if (defaultEncoding == null) {
-            return;
-        }
-
-        Map<String, String> encodingMap = new HashMap<>();
-        encodingMap.put("UTF8", "UTF-8");
-        encodingMap.put("Cp1250", "CP1250");
-        encodingMap.put("Cp1251", "CP1251");
-        encodingMap.put("Cp1252", "CP1252");
-        encodingMap.put("Cp1253", "CP1253");
-        encodingMap.put("Cp1254", "CP1254");
-        encodingMap.put("Cp1257", "CP1257");
-        encodingMap.put("ISO8859_1", "ISO8859-1");
-        encodingMap.put("ISO8859_2", "ISO8859-2");
-        encodingMap.put("ISO8859_3", "ISO8859-3");
-        encodingMap.put("ISO8859_4", "ISO8859-4");
-        encodingMap.put("ISO8859_5", "ISO8859-5");
-        encodingMap.put("ISO8859_6", "ISO8859-6");
-        encodingMap.put("ISO8859_7", "ISO8859-7");
-        encodingMap.put("ISO8859_8", "ISO8859-8");
-        encodingMap.put("ISO8859_9", "ISO8859-9");
-        encodingMap.put("ISO8859_13", "ISO8859-13");
-        encodingMap.put("ISO8859_15", "ISO8859-15");
-        encodingMap.put("KOI8_R", "KOI8-R");
-        encodingMap.put("Big5_HKSCS", "Big5-HKSCS");
-        encodingMap.put("EUC_JP", "EUC-JP");
-
-        if (encodingMap.containsKey(defaultEncoding)) {
-            prefs.put(JabRefCliPreferences.DEFAULT_ENCODING, encodingMap.get(defaultEncoding));
         }
     }
 
@@ -227,27 +192,6 @@ public class PreferencesMigrations {
         }
     }
 
-    /// Migrate Import File Name and Directory name Patterns from versions <=4.0 to new BracketedPatterns
-    private static void migrateFileImportPattern(String oldStylePattern, String newStylePattern,
-                                                 JabRefCliPreferences prefs, Preferences mainPrefsNode) {
-        String preferenceFileNamePattern = mainPrefsNode.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, null);
-
-        if (oldStylePattern.equals(preferenceFileNamePattern)) {
-            // Upgrade the old-style File Name pattern to new one:
-            mainPrefsNode.put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
-            LOGGER.info("migrated old style {} value \"{}\" to new value \"{}\" in the preference file", JabRefCliPreferences.IMPORT_FILENAMEPATTERN, oldStylePattern, newStylePattern);
-
-            if (prefs.hasKey(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)) {
-                // Update also the key in the current application settings, if necessary:
-                String fileNamePattern = prefs.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN);
-                if (oldStylePattern.equals(fileNamePattern)) {
-                    prefs.put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
-                    LOGGER.info("migrated old style {} value \"{}\" to new value \"{}\" in the running application", JabRefCliPreferences.IMPORT_FILENAMEPATTERN, oldStylePattern, newStylePattern);
-                }
-            }
-        }
-    }
-
     static void upgradeResolveBibTeXStringsFields(JabRefCliPreferences prefs) {
         String oldPrefsValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon";
         String currentPrefs = prefs.get(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS);
@@ -258,10 +202,9 @@ public class PreferencesMigrations {
         }
     }
 
-    static void upgradeImportFileAndDirePatterns(JabRefCliPreferences prefs, Preferences mainPrefsNode) {
-        // Migrate Import patterns
-        // Check for prefs node for Version <= 4.0
-        if (mainPrefsNode.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, null) != null) {
+    /// Migrate Import File Name and Directory name Patterns from versions <=4.0 to new BracketedPatterns
+    static void upgradeImportFileAndDirePatterns(JabRefCliPreferences prefs) {
+        if (prefs.hasKey(V4_0_IMPORT_FILENAME_PATTERN)) {
             String[] oldStylePatterns = new String[] {
                     "\\bibtexkey",
                     "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
@@ -271,14 +214,32 @@ public class PreferencesMigrations {
             String[] oldDisplayStylePattern = new String[] {"bibtexkey", "bibtexkey - title"};
 
             for (int i = 0; i < oldStylePatterns.length; i++) {
-                migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
+                migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs);
             }
             for (int i = 0; i < oldDisplayStylePattern.length; i++) {
-                migrateFileImportPattern(oldDisplayStylePattern[i], newStylePatterns[i], prefs, mainPrefsNode);
+                migrateFileImportPattern(oldDisplayStylePattern[i], newStylePatterns[i], prefs);
             }
         }
-        // Directory preferences are not yet migrated, since it is not quote clear how to parse and reinterpret
-        // the user defined old-style patterns, and the default pattern is "".
+        // Directory preferences are not yet migrated, since it is not quite clear how to parse and reinterpret
+        // the user-defined old-style patterns, and the default pattern is "".
+    }
+
+    private static void migrateFileImportPattern(String oldStylePattern,
+                                                 String newStylePattern,
+                                                 JabRefCliPreferences prefs) {
+        String preferenceFileNamePattern = prefs.get(V4_0_IMPORT_FILENAME_PATTERN);
+
+        if (oldStylePattern.equals(preferenceFileNamePattern)) {
+            // Upgrade the old-style File Name pattern to new one:
+            prefs.put(V4_0_IMPORT_FILENAME_PATTERN, newStylePattern);
+            LOGGER.info("migrated old style {} value \"{}\" to new value \"{}\" in the preference file", V4_0_IMPORT_FILENAME_PATTERN, oldStylePattern, newStylePattern);
+
+            // Update also the key in the current application settings, if necessary:
+            if (oldStylePattern.equals(prefs.getFilePreferences().getFileNamePattern())) {
+                prefs.getFilePreferences().setFileNamePattern(newStylePattern);
+                LOGGER.info("migrated old style {} value \"{}\" to new value \"{}\" in the running application", V4_0_IMPORT_FILENAME_PATTERN, oldStylePattern, newStylePattern);
+            }
+        }
     }
 
     private static void upgradeKeyBindingsToJavaFX(JabRefCliPreferences prefs) {
@@ -512,13 +473,24 @@ public class PreferencesMigrations {
     /// <tr> <td> CleanUpFormattersEnabled </td> <td> TRUE </td> </tr>
     /// <tr> <td> CleanUpFormatters        </td> <td> `field[formatter,formatter...]\nfield[...]\nfield[...]... `</td> </tr>
     /// </table>
-    private static void upgradeCleanups(JabRefCliPreferences prefs) {
+    static void upgradeCleanups(JabRefCliPreferences prefs) {
         final String V5_8_CLEANUP = "CleanUp";
         final String V6_0_CLEANUP_JOBS = "CleanUpJobs";
+        final String V6_0_CLEANUP_REMOVED_ISSN = "CLEAN_UP_ISSN";
 
         final String V5_8_CLEANUP_FIELD_FORMATTERS = "CleanUpFormatters";
         final String V6_0_CLEANUP_FIELD_FORMATTERS = "CleanUpFormatters";
         final String V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED = "CleanUpFormattersEnabled";
+
+        if (prefs.hasKey(V6_0_CLEANUP_JOBS)) {
+            List<String> cleanupJobs = prefs.getStringList(V6_0_CLEANUP_JOBS);
+            if (cleanupJobs.contains(V6_0_CLEANUP_REMOVED_ISSN)) {
+                prefs.putStringList(V6_0_CLEANUP_JOBS,
+                        cleanupJobs.stream()
+                                   .filter(job -> !V6_0_CLEANUP_REMOVED_ISSN.equals(job))
+                                   .toList());
+            }
+        }
 
         List<String> activeJobs = new ArrayList<>();
         for (CleanupPreferences.CleanupStep action : EnumSet.allOf(CleanupPreferences.CleanupStep.class)) {
