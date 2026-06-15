@@ -5,6 +5,7 @@ import java.util.List;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
@@ -50,6 +51,8 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
     private final GuiPreferences preferences;
 
+    private final ObservableValue<Boolean> shouldShow;
+
     public RelatedArticlesTab(BuildInfo buildInfo,
                               GuiPreferences preferences,
                               DialogService dialogService,
@@ -61,6 +64,10 @@ public class RelatedArticlesTab extends EntryEditorTab {
         this.taskExecutor = taskExecutor;
 
         this.preferences = preferences;
+
+        this.shouldShow = Bindings.createBooleanBinding(
+                () -> preferences.getEntryEditorPreferences().isStaticTabVisible(EntryEditorTabModel.StaticTab.RELATED_ARTICLES),
+                preferences.getEntryEditorPreferences().getTabConfigs());
 
         setText(Localization.lang("Related articles"));
         setTooltip(new Tooltip(Localization.lang("Related articles")));
@@ -248,9 +255,8 @@ public class RelatedArticlesTab extends EntryEditorTab {
     }
 
     @Override
-    public boolean shouldShow(BibEntry entry) {
-        EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
-        return entryEditorPreferences.isStaticTabVisible(EntryEditorTabModel.StaticTab.RELATED_ARTICLES);
+    public ObservableValue<Boolean> shouldShow() {
+        return shouldShow;
     }
 
     @Override

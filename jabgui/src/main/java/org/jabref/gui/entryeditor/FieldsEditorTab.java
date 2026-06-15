@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
@@ -59,6 +60,10 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     private final UndoManager undoManager;
 
     private Collection<Field> fields = new ArrayList<>();
+
+    /// Shown when the current entry (of its type) has at least one field to display in this tab.
+    private final ObservableValue<Boolean> shouldShow =
+            EasyBind.map(currentEntryProperty(), entry -> (entry != null) && !determineFieldsToShow(entry).isEmpty());
 
     @SuppressWarnings("FieldCanBeLocal")
     private Subscription dividerPositionSubscription;
@@ -194,8 +199,8 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     }
 
     @Override
-    public boolean shouldShow(BibEntry entry) {
-        return !determineFieldsToShow(entry).isEmpty();
+    public ObservableValue<Boolean> shouldShow() {
+        return shouldShow;
     }
 
     @Override

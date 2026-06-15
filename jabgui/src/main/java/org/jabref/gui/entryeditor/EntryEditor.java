@@ -461,12 +461,15 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             return;
         }
 
+        // Keep every tab's current entry in sync so their shouldShow() observables reflect this entry
+        allPossibleTabs.forEach(tab -> tab.currentEntryProperty().set(entry));
+
         // First, remove tabs that we do not want to show
-        List<EntryEditorTab> toBeRemoved = allPossibleTabs.stream().filter(tab -> !tab.shouldShow(entry)).toList();
+        List<EntryEditorTab> toBeRemoved = allPossibleTabs.stream().filter(tab -> !tab.shouldShow().getValue()).toList();
         tabbed.getTabs().removeAll(toBeRemoved);
 
         // Next add all the visible tabs (if not already present) at the right position
-        List<Tab> visibleTabs = allPossibleTabs.stream().filter(tab -> tab.shouldShow(entry)).collect(Collectors.toList());
+        List<Tab> visibleTabs = allPossibleTabs.stream().filter(tab -> tab.shouldShow().getValue()).collect(Collectors.toList());
         for (int i = 0; i < visibleTabs.size(); i++) {
             Tab toBeAdded = visibleTabs.get(i);
             Tab shown = null;

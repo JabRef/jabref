@@ -1,5 +1,7 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Parent;
 import javafx.scene.control.Tooltip;
 
@@ -22,17 +24,34 @@ public class FileAnnotationTab extends EntryEditorTab {
     private final StateManager stateManager;
     private final EntryEditorPreferences entryEditorPreferences;
 
+    private final ObservableValue<Boolean> shouldShow;
+
     public FileAnnotationTab(StateManager stateManager,
                              GuiPreferences preferences) {
         this.stateManager = stateManager;
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
+
+        this.shouldShow = Bindings.createBooleanBinding(
+                this::computeShouldShow,
+                currentEntryProperty(),
+                entryEditorPreferences.getTabConfigs(),
+                stateManager.activeTabProperty());
 
         setText(Localization.lang("File annotations"));
         setTooltip(new Tooltip(Localization.lang("Show file annotations")));
     }
 
     @Override
-    public boolean shouldShow(BibEntry entry) {
+    public ObservableValue<Boolean> shouldShow() {
+        return shouldShow;
+    }
+
+    private boolean computeShouldShow() {
+        BibEntry entry = getCurrentEntry();
+        if (entry == null) {
+            return false;
+        }
+
         if (!entryEditorPreferences.isStaticTabVisible(EntryEditorTabModel.StaticTab.FILE_ANNOTATIONS)) {
             return entry.getField(StandardField.FILE).isPresent();
         }
