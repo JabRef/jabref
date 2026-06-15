@@ -45,16 +45,6 @@ public class EntryEditorPreferences {
         }
     }
 
-    public enum StaticTab {
-        RELATED_ARTICLES,
-        AI_SUMMARY,
-        AI_CHAT,
-        FILE_ANNOTATIONS,
-        LATEX_CITATIONS,
-        CITATION_INFORMATION,
-        USER_COMMENTS
-    }
-
     /// Ordered list of all configurable tabs. {@link EntryEditorTabModel.FieldSet} entries
     /// always precede {@link EntryEditorTabModel.Feature} entries.
     private final ObservableList<EntryEditorTabModel> tabConfigs;
@@ -73,7 +63,7 @@ public class EntryEditorPreferences {
         this(
                 getDefaultEntryEditorTabs(),
                 true,
-                EnumSet.allOf(StaticTab.class),
+                EnumSet.allOf(EntryEditorTabModel.StaticTab.class),
                 false,
                 true,
                 true,
@@ -87,7 +77,7 @@ public class EntryEditorPreferences {
 
     public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList,
                                   boolean shouldOpenOnNewEntry,
-                                  Set<StaticTab> staticTabs,
+                                  Set<EntryEditorTabModel.StaticTab> staticTabs,
                                   boolean showSourceTabByDefault,
                                   boolean enableValidation,
                                   boolean allowIntegerEditionBibtex,
@@ -109,13 +99,13 @@ public class EntryEditorPreferences {
     }
 
     private static List<EntryEditorTabModel> createEntryEditorTabModels(Map<String, Set<Field>> entryEditorTabList,
-                                                                          Set<StaticTab> staticTabs) {
+                                                                          Set<EntryEditorTabModel.StaticTab> staticTabs) {
         List<EntryEditorTabModel> configs = new ArrayList<>();
 
         entryEditorTabList.forEach((name, fields) ->
                 configs.add(new EntryEditorTabModel.FieldSet(name, fields, true)));
 
-        for (StaticTab tab : StaticTab.values()) {
+        for (EntryEditorTabModel.StaticTab tab : EntryEditorTabModel.StaticTab.values()) {
             configs.add(new EntryEditorTabModel.Feature(tab, staticTabs.contains(tab)));
         }
         return configs;
@@ -125,10 +115,10 @@ public class EntryEditorPreferences {
         return tabConfigs;
     }
 
-    public boolean isStaticTabVisible(StaticTab tab) {
+    public boolean isStaticTabVisible(EntryEditorTabModel.StaticTab tab) {
         for (EntryEditorTabModel config : tabConfigs) {
             if (config instanceof EntryEditorTabModel.Feature(
-                    StaticTab type,
+                    EntryEditorTabModel.StaticTab type,
                     boolean visible
             ) && type == tab) {
                 return visible;
@@ -137,7 +127,7 @@ public class EntryEditorPreferences {
         return false;
     }
 
-    public void setStaticTabVisible(StaticTab tab, boolean show) {
+    public void setStaticTabVisible(EntryEditorTabModel.StaticTab tab, boolean show) {
         for (int i = 0; i < tabConfigs.size(); i++) {
             if (tabConfigs.get(i) instanceof EntryEditorTabModel.Feature feature && feature.type() == tab) {
                 tabConfigs.set(i, new EntryEditorTabModel.Feature(tab, show));
@@ -167,7 +157,7 @@ public class EntryEditorPreferences {
         tabConfigs.addAll(0, newFieldSet);
     }
 
-    public static Set<StaticTab> staticTabsFromBoolean(
+    public static Set<EntryEditorTabModel.StaticTab> staticTabsFromBoolean(
             boolean showRelatedArticles,
             boolean showAISummary,
             boolean showAIChat,
@@ -175,27 +165,27 @@ public class EntryEditorPreferences {
             boolean showFileAnnotations,
             boolean showCitationInformation,
             boolean showUserComments) {
-        Set<StaticTab> tabs = EnumSet.noneOf(StaticTab.class);
+        Set<EntryEditorTabModel.StaticTab> tabs = EnumSet.noneOf(EntryEditorTabModel.StaticTab.class);
         if (showRelatedArticles) {
-            tabs.add(StaticTab.RELATED_ARTICLES);
+            tabs.add(EntryEditorTabModel.StaticTab.RELATED_ARTICLES);
         }
         if (showAISummary) {
-            tabs.add(StaticTab.AI_SUMMARY);
+            tabs.add(EntryEditorTabModel.StaticTab.AI_SUMMARY);
         }
         if (showAIChat) {
-            tabs.add(StaticTab.AI_CHAT);
+            tabs.add(EntryEditorTabModel.StaticTab.AI_CHAT);
         }
         if (showLaTeXCitations) {
-            tabs.add(StaticTab.LATEX_CITATIONS);
+            tabs.add(EntryEditorTabModel.StaticTab.LATEX_CITATIONS);
         }
         if (showFileAnnotations) {
-            tabs.add(StaticTab.FILE_ANNOTATIONS);
+            tabs.add(EntryEditorTabModel.StaticTab.FILE_ANNOTATIONS);
         }
         if (showCitationInformation) {
-            tabs.add(StaticTab.CITATION_INFORMATION);
+            tabs.add(EntryEditorTabModel.StaticTab.CITATION_INFORMATION);
         }
         if (showUserComments) {
-            tabs.add(StaticTab.USER_COMMENTS);
+            tabs.add(EntryEditorTabModel.StaticTab.USER_COMMENTS);
         }
         return tabs;
     }

@@ -226,7 +226,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         vb.getChildren().addAll(cbTitle, cbVersion, cbLanguage, cbOS, cbTimezone);
         vb.setSpacing(10);
 
-        button.setOnAction(event -> {
+        button.setOnAction(_ -> {
             MrDlibPreferences mrDlibPreferences = preferences.getMrDlibPreferences();
             mrDlibPreferences.setAcceptRecommendations(true);
             mrDlibPreferences.setSendLanguage(cbLanguage.isSelected());
@@ -237,7 +237,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         });
 
         hideTab.setOnAction(_ -> {
-            preferences.getEntryEditorPreferences().setStaticTabVisible(EntryEditorPreferences.StaticTab.RELATED_ARTICLES, false);
+            preferences.getEntryEditorPreferences().setStaticTabVisible(EntryEditorTabModel.StaticTab.RELATED_ARTICLES, false);
         });
 
         hbox.getChildren().addAll(button, hideTab);
@@ -250,7 +250,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
     @Override
     public boolean shouldShow(BibEntry entry) {
         EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
-        return entryEditorPreferences.isStaticTabVisible(EntryEditorPreferences.StaticTab.RELATED_ARTICLES);
+        return entryEditorPreferences.isStaticTabVisible(EntryEditorTabModel.StaticTab.RELATED_ARTICLES);
     }
 
     @Override
