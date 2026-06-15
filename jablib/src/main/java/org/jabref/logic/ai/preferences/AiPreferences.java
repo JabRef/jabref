@@ -316,7 +316,7 @@ public class AiPreferences {
         }
     }
 
-    public BooleanBinding restardNeededBinding() {
+    public BooleanBinding restartNeededBinding() {
         return (aiFeaturesEnabledProperty().not().and(aiFeaturesEnabledCurrentlyProperty()))
                 .or(aiFeaturesEnabledProperty().and(aiFeaturesEnabledCurrentlyProperty().not()));
     }

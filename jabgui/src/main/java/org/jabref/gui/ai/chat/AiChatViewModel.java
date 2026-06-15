@@ -171,7 +171,7 @@ public class AiChatViewModel extends AbstractViewModel {
                 State.IDLE,
 
                 Map.entry(State.AI_TURNED_OFF, isAiTurnedOff),
-                Map.entry(State.RESTART_NEEDED, aiPreferences.restardNeededBinding()),
+                Map.entry(State.RESTART_NEEDED, aiPreferences.restartNeededBinding()),
                 Map.entry(State.WAITING_FOR_MESSAGE, isWaiting),
                 Map.entry(State.NO_FILES, hasNoFiles),
                 Map.entry(State.ERROR, isError)

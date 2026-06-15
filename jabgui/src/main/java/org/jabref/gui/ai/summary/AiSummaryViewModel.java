@@ -96,7 +96,7 @@ public class AiSummaryViewModel extends AbstractViewModel {
                 ),
 
                 Map.entry(State.RESTART_NEEDED,
-                        aiPreferences.restardNeededBinding()
+                        aiPreferences.restartNeededBinding()
                 ),
 
                 Map.entry(State.NO_FILES,
