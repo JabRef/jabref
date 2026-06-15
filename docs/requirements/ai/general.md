@@ -15,3 +15,5 @@ Rationale: AI features are tightly coupled to the library data model and require
 Needs: impl
 
 Covers: `feat~ai.general~1`
+
+<!-- markdownlint-disable-file MD022 -->
