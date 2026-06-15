@@ -148,13 +148,42 @@
       "type": "java.time.ZonedDateTime"
     },
     {
-      "type": "org.jabref.toolkit.commands.CheckConsistency",
+      "type": "org.jabref.toolkit.commands.Check",
       "fields": [
         {
           "name": "jabKit"
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputFile"
+        },
+        {
+          "name": "outputFormat"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.CheckConsistency",
+      "fields": [
+        {
+          "name": "check"
+        },
+        {
+          "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
+        },
+        {
+          "name": "outputFormat"
         }
       ],
       "methods": [
@@ -168,10 +197,19 @@
       "type": "org.jabref.toolkit.commands.CheckIntegrity",
       "fields": [
         {
-          "name": "jabKit"
+          "name": "check"
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
+        },
+        {
+          "name": "outputFormat"
+        },
+        {
+          "name": "allowIntegerEdition"
         }
       ],
       "methods": [
@@ -203,6 +241,21 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
+        },
+        {
+          "name": "inputFormat"
+        },
+        {
+          "name": "outputFile"
+        },
+        {
+          "name": "outputFormat"
+        },
+        {
+          "name": "fieldFormatters"
         }
       ],
       "methods": [
@@ -254,6 +307,9 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
         }
       ],
       "methods": [
@@ -271,6 +327,45 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
+        },
+        {
+          "name": "outputFile"
+        },
+        {
+          "name": "pattern"
+        },
+        {
+          "name": "transliterate"
+        },
+        {
+          "name": "warnBeforeOverwrite"
+        },
+        {
+          "name": "keySuffix"
+        },
+        {
+          "name": "keyPatternRegex"
+        },
+        {
+          "name": "keyPatternReplacement"
+        },
+        {
+          "name": "unwantedCharacters"
+        },
+        {
+          "name": "keywordDelimiter"
+        },
+        {
+          "name": "avoidOverwrite"
+        },
+        {
+          "name": "generateBeforeSaving"
+        },
+        {
+          "name": "keyPatterns"
         }
       ],
       "methods": [
@@ -305,6 +400,37 @@
         },
         {
           "name": "sharedOptions"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.InputOption",
+      "fields": [
+        {
+          "name": "inputSource"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.toolkit.commands.InputOption$InputSource",
+      "fields": [
+        {
+          "name": "positionalInput"
+        },
+        {
+          "name": "optionInput"
         }
       ],
       "methods": [
@@ -364,6 +490,9 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
         }
       ],
       "methods": [
@@ -395,6 +524,9 @@
       "fields": [
         {
           "name": "parent"
+        },
+        {
+          "name": "outputFile"
         }
       ],
       "methods": [
@@ -409,6 +541,9 @@
       "fields": [
         {
           "name": "parent"
+        },
+        {
+          "name": "inputFile"
         }
       ],
       "methods": [
@@ -440,6 +575,18 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
+        },
+        {
+          "name": "outputFile"
+        },
+        {
+          "name": "keyFile"
+        },
+        {
+          "name": "force"
         }
       ],
       "methods": [
@@ -457,6 +604,9 @@
         },
         {
           "name": "sharedOptions"
+        },
+        {
+          "name": "inputOption"
         }
       ],
       "methods": [

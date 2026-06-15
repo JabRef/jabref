@@ -60,7 +60,21 @@ _____
    DISCLOSE every AI tool used to produce this PR, including the exact model.
    Example: "Claude Code (model claude-opus-4-7)", "GitHub Copilot (GPT-4o)".
    Write "none" if no AI tool was used.
+
+   IF AN AI TOOL WAS USED:
+     The AI MUST go through CHECKLIST.md one item at a time, verify each
+     point against the actual change, and paste the completed checklist
+     here as evidence. Wrap it in the <details> block below, replacing the
+     dots in [.] with [x] done / [ ] TODO / [/] not applicable for EVERY
+     item. Do not summarize or drop items — paste them all.
    -->
+
+<details>
+<summary>AI CHECKLIST.md walkthrough</summary>
+
+<!-- AI: paste the full CHECKLIST.md here, every item marked. -->
+
+</details>
 
 ### Checklist
 

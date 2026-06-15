@@ -56,8 +56,8 @@ import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.importer.util.MetaDataParser;
+import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
@@ -317,9 +317,10 @@ public class JabRefCliPreferences implements CliPreferences {
     // SSL
     private static final String SSL_TRUSTSTORE_PATH = "truststorePath";
 
-    // Journal
+    // Abbreviation preferences
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
     private static final String USE_AMS_FJOURNAL = "useAMSFJournal";
+    private static final String ENABLE_MSC_KEYWORD_DESCRIPTIONS = "enableMscKeywordDescriptions";
 
     // Protected terms
     private static final String PROTECTED_TERMS_ENABLED_EXTERNAL = "protectedTermsEnabledExternal";
@@ -453,7 +454,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private XmpPreferences xmpPreferences;
     private CleanupPreferences cleanupPreferences;
     private CitationKeyPatternPreferences citationKeyPatternPreferences;
-    private JournalAbbreviationPreferences journalAbbreviationPreferences;
+    private AbbreviationPreferences abbreviationPreferences;
     private FieldPreferences fieldPreferences;
     private AiPreferences aiPreferences;
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
@@ -480,13 +481,6 @@ public class JabRefCliPreferences implements CliPreferences {
         // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
         // will never be translated.
         Localization.setLanguage(getLanguage());
-
-        // region Git preferences
-        defaults.put(GITHUB_PAT_KEY, "");
-        defaults.put(GITHUB_USERNAME_KEY, "");
-        defaults.put(GITHUB_REMOTE_URL_KEY, "");
-        defaults.put(GITHUB_REMEMBER_PAT_KEY, false);
-        // endregion
     }
 
     /// @deprecated Never ever add a call to this method. There should be only one
@@ -774,7 +768,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getFieldPreferences().setAll(FieldPreferences.getDefault());
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
         getPushToApplicationPreferences().setAll(PushToApplicationPreferences.getDefault());
-        getJournalAbbreviationPreferences().setAll(JournalAbbreviationPreferences.getDefault());
+        getAbbreviationPreferences().setAll(AbbreviationPreferences.getDefault());
         getLibraryPreferences().setAll(LibraryPreferences.getDefault());
         getDOIPreferences().setAll(DOIPreferences.getDefault());
         getOwnerPreferences().setAll(OwnerPreferences.getDefault());
@@ -805,8 +799,9 @@ public class JabRefCliPreferences implements CliPreferences {
         getXmpPreferences().setAll(XmpPreferences.getDefault());
         getProtectedTermsPreferences().setAll(ProtectedTermsPreferences.getDefault());
         getGrobidPreferences().setAll(GrobidPreferences.getDefault());
-        getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences())).setAll(
+        getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences())).setAll(
                 OpenOfficePreferences.getDefault());
+        getGitPreferences().setAll(GitPreferences.getDefault());
     }
 
     /// Imports Preferences from an XML file.
@@ -825,7 +820,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getFieldPreferences().setAll(getFieldPreferencesFromBackingStore(getFieldPreferences()));
         getProxyPreferences().setAll(getProxyPreferencesFromBackingStore(getProxyPreferences()));
         getPushToApplicationPreferences().setAll(getPushToApplicationPreferencesFromBackingStore(getPushToApplicationPreferences()));
-        getJournalAbbreviationPreferences().setAll(getJournalAbbreviationPreferencesFromBackingStore(getJournalAbbreviationPreferences()));
+        getAbbreviationPreferences().setAll(getJournalAbbreviationPreferencesFromBackingStore(getAbbreviationPreferences()));
         getLibraryPreferences().setAll(getLibraryPreferencesFromBackingStore(getLibraryPreferences()));
         getDOIPreferences().setAll(getDoiPreferencesFromBackingStore(getDOIPreferences()));
         getOwnerPreferences().setAll(getOwnerPreferencesFromBackingStore(getOwnerPreferences()));
@@ -846,9 +841,10 @@ public class JabRefCliPreferences implements CliPreferences {
         getXmpPreferences().setAll(getXmpPreferencesFromBackingStore(getXmpPreferences()));
         getProtectedTermsPreferences().setAll(getProtectedTermsPreferencesFromBackingStore(getProtectedTermsPreferences()));
         getGrobidPreferences().setAll(getGrobidPreferencesFromBackingStore(getGrobidPreferences()));
-        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getJournalAbbreviationPreferences());
+        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences());
         getOpenOfficePreferences(repository).setAll(
                 getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
+        getGitPreferences().setAll(getGitPreferencesFromBackingStore(getGitPreferences()));
     }
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
@@ -873,25 +869,29 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // region JournalAbbreviationPreferences
     @Override
-    public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        if (journalAbbreviationPreferences != null) {
-            return journalAbbreviationPreferences;
+    public AbbreviationPreferences getAbbreviationPreferences() {
+        if (abbreviationPreferences != null) {
+            return abbreviationPreferences;
         }
 
-        journalAbbreviationPreferences = getJournalAbbreviationPreferencesFromBackingStore(JournalAbbreviationPreferences.getDefault());
+        abbreviationPreferences = getJournalAbbreviationPreferencesFromBackingStore(AbbreviationPreferences.getDefault());
 
-        journalAbbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) _ ->
-                putStringList(EXTERNAL_JOURNAL_LISTS, journalAbbreviationPreferences.getExternalJournalLists()));
-        EasyBind.listen(journalAbbreviationPreferences.useFJournalFieldProperty(),
+        abbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) _ ->
+                putStringList(EXTERNAL_JOURNAL_LISTS, abbreviationPreferences.getExternalJournalLists()));
+        EasyBind.listen(abbreviationPreferences.useFJournalFieldProperty(),
                 (_, _, newValue) -> putBoolean(USE_AMS_FJOURNAL, newValue));
 
-        return journalAbbreviationPreferences;
+        EasyBind.listen(abbreviationPreferences.shouldEnableMscKeywordDescriptionsProperty(),
+                (_, _, newValue) -> putBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, newValue));
+
+        return abbreviationPreferences;
     }
 
-    private JournalAbbreviationPreferences getJournalAbbreviationPreferencesFromBackingStore(JournalAbbreviationPreferences defaults) {
-        return new JournalAbbreviationPreferences(
+    private AbbreviationPreferences getJournalAbbreviationPreferencesFromBackingStore(AbbreviationPreferences defaults) {
+        return new AbbreviationPreferences(
                 convertStringToList(get(EXTERNAL_JOURNAL_LISTS, convertListToString(defaults.getExternalJournalLists()))),
-                getBoolean(USE_AMS_FJOURNAL, defaults.useFJournalFieldProperty().get()));
+                getBoolean(USE_AMS_FJOURNAL, defaults.useFJournalFieldProperty().get()),
+                getBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaults.shouldEnableMscKeywordDescriptions()));
     }
     // endregion
 
@@ -2355,18 +2355,14 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
+    // region GitPreferences
     @Override
     public GitPreferences getGitPreferences() {
         if (gitPreferences != null) {
             return gitPreferences;
         }
 
-        gitPreferences = new GitPreferences(
-                get(GITHUB_USERNAME_KEY),
-                getGitHubPat(),
-                get(GITHUB_REMOTE_URL_KEY),
-                getBoolean(GITHUB_REMEMBER_PAT_KEY)
-        );
+        gitPreferences = getGitPreferencesFromBackingStore(GitPreferences.getDefault());
 
         EasyBind.listen(gitPreferences.usernameProperty(), (_, _, newVal) -> put(GITHUB_USERNAME_KEY, newVal));
         EasyBind.listen(gitPreferences.patProperty(), (_, _, newVal) -> setGitHubPat(newVal));
@@ -2381,7 +2377,16 @@ public class JabRefCliPreferences implements CliPreferences {
         return gitPreferences;
     }
 
-    // endregion
+    private GitPreferences getGitPreferencesFromBackingStore(GitPreferences defaults) {
+        boolean rememberPat = getBoolean(GITHUB_REMEMBER_PAT_KEY, defaults.getPersistPat());
+
+        return new GitPreferences(
+                get(GITHUB_USERNAME_KEY, defaults.getUsername()),
+                rememberPat ? getGitHubPat().orElse(defaults.getPat()) : defaults.getPat(),
+                get(GITHUB_REMOTE_URL_KEY, defaults.getRepositoryUrl()),
+                rememberPat
+        );
+    }
 
     private static void deleteGitHubPat() {
         try (final Keyring keyring = Keyring.create()) {
@@ -2391,20 +2396,18 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
-    private String getGitHubPat() {
-        if (getBoolean(GITHUB_REMEMBER_PAT_KEY)) {
-            try (final Keyring keyring = Keyring.create()) {
-                return new Password(
-                        keyring.getPassword("org.jabref", "github"),
-                        getInternalPreferences().getUserHostInfo().getUserHostString())
-                        .decrypt();
-            } catch (PasswordAccessException ex) {
-                LOGGER.warn("No GitHub token stored in keyring");
-            } catch (Exception ex) {
-                LOGGER.warn("Could not read GitHub token from keyring", ex);
-            }
+    private Optional<String> getGitHubPat() {
+        try (final Keyring keyring = Keyring.create()) {
+            return Optional.of(new Password(
+                    keyring.getPassword("org.jabref", "github"),
+                    getInternalPreferences().getUserHostInfo().getUserHostString())
+                    .decrypt());
+        } catch (PasswordAccessException ex) {
+            LOGGER.warn("No GitHub token stored in keyring");
+        } catch (Exception ex) {
+            LOGGER.warn("Could not read GitHub token from keyring", ex);
         }
-        return (String) defaults.get(GITHUB_PAT_KEY);
+        return Optional.empty();
     }
 
     private void setGitHubPat(String pat) {
@@ -2423,4 +2426,5 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         }
     }
+    // endregion
 }

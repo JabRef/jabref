@@ -1,30 +1,23 @@
 package org.jabref.toolkit.commands;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import org.jabref.logic.exporter.Exporter;
-import org.jabref.logic.exporter.ExporterFactory;
-import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.LibrarySearcher;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.search.inmemory.InMemoryLibrarySearcher;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.toolkit.converter.CygWinPathConverter;
+import org.jabref.toolkit.exception.ExportServiceException;
+import org.jabref.toolkit.exception.ImportServiceException;
+import org.jabref.toolkit.service.ExportService;
+import org.jabref.toolkit.service.ImportService;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,27 +49,15 @@ class Search implements Callable<Integer> {
     private String outputFormat = "bibtex";
 
     @Override
-    public Integer call() {
+    public Integer call() throws ImportServiceException, ExportServiceException {
         Path inputFile = inputOption.getInputFile();
-        Optional<ParserResult> parserResult = JabKit.importFile(
-                inputFile,
-                "bibtex",
-                argumentProcessor.cliPreferences,
-                sharedOptions.porcelain);
-        if (parserResult.isEmpty()) {
-            System.err.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return 2;
-        }
 
-        if (parserResult.get().isInvalid()) {
-            System.err.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
-            return 2;
-        }
+        ParserResult parserResult = ImportService.importBibTexFile(inputFile, argumentProcessor.cliPreferences, sharedOptions.porcelain);
 
         SearchPreferences searchPreferences = argumentProcessor.cliPreferences.getSearchPreferences();
         SearchQuery searchQuery = new SearchQuery(query, searchPreferences.getSearchFlags());
 
-        BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
+        BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
         LibrarySearcher searcher = new InMemoryLibrarySearcher(databaseContext, argumentProcessor.cliPreferences.getBibEntryPreferences());
         List<BibEntry> matches = searcher.getMatches(searchQuery);
 
@@ -85,37 +66,12 @@ class Search implements Callable<Integer> {
             return 0;
         }
 
-        if ("bibtex".equals(outputFormat)) {
-            JabKit.saveDatabase(
-                    argumentProcessor.cliPreferences,
-                    argumentProcessor.entryTypesManager,
-                    new BibDatabase(matches),
-                    outputFile);
+        ExportService exportService = ExportService.create(argumentProcessor.cliPreferences, sharedOptions.porcelain);
+        if (outputFile != null) {
+            exportService.exportEntriesToFile(matches, outputFile, outputFormat);
             LOGGER.debug("Finished export");
         } else {
-            ExporterFactory exporterFactory = ExporterFactory.create(argumentProcessor.cliPreferences);
-            Optional<Exporter> exporter = exporterFactory.getExporterByName(outputFormat);
-
-            if (exporter.isEmpty()) {
-                System.err.println(Localization.lang("Unknown export format %0", outputFormat));
-                return 2;
-            }
-
-            try {
-                System.out.println(Localization.lang("Exporting %0", outputFile.toAbsolutePath().toString()));
-                exporter.get().export(
-                        databaseContext,
-                        outputFile,
-                        matches,
-                        List.of(),
-                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
-            } catch (IOException
-                     | SaveException
-                     | ParserConfigurationException
-                     | TransformerException ex) {
-                LOGGER.error("Could not export file '{}}'", outputFile.toAbsolutePath(), ex);
-                return 2;
-            }
+            exportService.printBibEntriesToStdOut(matches);
         }
         return 0;
     }

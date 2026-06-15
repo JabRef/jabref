@@ -28,6 +28,7 @@
     <CheckBox fx:id="enableValidation" text="%Show validation messages"/>
     <CheckBox fx:id="allowIntegerEdition" text="%Allow integers in 'edition' field in BibTeX mode"/>
     <CheckBox fx:id="journalPopupEnabled" text="%Fetch journal information online to show"/>
+    <CheckBox fx:id="enableMscKeywordDescriptions" text="%Enable MSC keyword descriptions"/>
     <CheckBox fx:id="showUserCommentsField" text="%Show user comments field"/>
     <CheckBox fx:id="enableSciteTab" text="%Show tab 'Citation information'"/>
     <HBox spacing="10.0" disable="${!enableSciteTab.selected}">
