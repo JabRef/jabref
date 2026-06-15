@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.geometry.VPos;
 import javafx.scene.control.Button;
@@ -42,6 +44,8 @@ public class CommentsTab extends FieldsEditorTab {
     private boolean isFieldCurrentlyVisible;
     private boolean shouldShowHideButton;
 
+    private final ObservableValue<Boolean> shouldShow;
+
     public CommentsTab(GuiPreferences preferences,
                        UndoManager undoManager,
                        UndoAction undoAction,
@@ -64,6 +68,17 @@ public class CommentsTab extends FieldsEditorTab {
         userSpecificCommentField = new UserSpecificCommentField(defaultOwner);
         entryEditorPreferences = preferences.getEntryEditorPreferences();
         shouldShowHideButton = true;
+
+        this.shouldShow = Bindings.createBooleanBinding(
+                () -> getCurrentEntry() != null
+                      && entryEditorPreferences.isStaticTabVisible(EntryEditorTabModel.StaticTab.USER_COMMENTS),
+                currentEntryProperty(),
+                entryEditorPreferences.getTabConfigs());
+    }
+
+    @Override
+    public ObservableValue<Boolean> shouldShow() {
+        return shouldShow;
     }
 
     @Override
