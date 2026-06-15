@@ -54,7 +54,8 @@ public class EditSeparate {
                     if (markRange.isEmpty()) {
                         return OOResult.error(new JabRefException("Could not find mark range for citation group"));
                     }
-                    XTextCursor textCursor = markRange.get().getText().createTextCursorByRange(markRange.get());
+                    XTextRange textRange = markRange.orElseThrow();
+                    XTextCursor textCursor = textRange.getText().createTextCursorByRange(textRange);
 
                     List<Citation> citations = group.citationsInStorageOrder;
                     if (citations.size() <= 1) {
