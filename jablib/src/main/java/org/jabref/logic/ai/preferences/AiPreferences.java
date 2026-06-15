@@ -54,7 +54,11 @@ public class AiPreferences {
             AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE
     );
 
+    /// Controls whether the AI features should start/work in a JabRef session.
+    /// This property is set when JabRef has started, and is not persisted.
     private final BooleanProperty aiFeaturesEnabledInitially;
+    /// Controls whether to show the privacy policy banner and whether to request a restart.
+    /// This property is persisted and controlled by preferences.
     private final BooleanProperty aiFeaturesEnabledCurrently;
     private final BooleanProperty autoGenerateEmbeddings;
     private final BooleanProperty autoGenerateSummaries;
