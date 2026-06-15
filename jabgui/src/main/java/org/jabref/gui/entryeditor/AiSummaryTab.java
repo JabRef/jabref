@@ -1,5 +1,7 @@
 package org.jabref.gui.entryeditor;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.StateManager;
@@ -17,6 +19,8 @@ public class AiSummaryTab extends EntryEditorTab {
 
     private final AiSummaryView aiSummaryView;
 
+    private final ObservableValue<Boolean> shouldShow;
+
     public AiSummaryTab(
             GuiPreferences preferences,
             StateManager stateManager
@@ -26,14 +30,18 @@ public class AiSummaryTab extends EntryEditorTab {
 
         this.aiSummaryView = new AiSummaryView();
 
+        this.shouldShow = Bindings.createBooleanBinding(
+                () -> preferences.getEntryEditorPreferences().isStaticTabVisible(EntryEditorTabModel.StaticTab.AI_SUMMARY),
+                preferences.getEntryEditorPreferences().getTabConfigs());
+
         setText(Localization.lang("AI summary"));
         setTooltip(new Tooltip(Localization.lang("AI-generated summary of attached file(s)")));
         setContent(aiSummaryView);
     }
 
     @Override
-    public boolean shouldShow(BibEntry entry) {
-        return preferences.getEntryEditorPreferences().isStaticTabVisible(EntryEditorTabModel.StaticTab.AI_SUMMARY);
+    public ObservableValue<Boolean> shouldShow() {
+        return shouldShow;
     }
 
     /// @implNote Method similar to {@link AiChatTab#bindToEntry(BibEntry)}

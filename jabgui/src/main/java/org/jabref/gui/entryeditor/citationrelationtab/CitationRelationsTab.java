@@ -14,6 +14,8 @@ import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
@@ -130,6 +132,9 @@ public class CitationRelationsTab extends EntryEditorTab {
     private ComboBox<CitationFetcherType> fetcherCombo;
 
     private boolean shouldClearSelectionOnDrop = false;
+
+    /// The citation relations tab is currently always shown (see TODO in {@link #shouldShow()}).
+    private final ObservableValue<Boolean> shouldShow = new SimpleBooleanProperty(true);
 
     public CitationRelationsTab(DialogService dialogService,
                                 UndoManager undoManager,
@@ -273,7 +278,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     private EventHandler<ActionEvent> doiLookUp() {
         return actionEvent -> {
-            citationsRelationsTabViewModel.lookUpDoi(currentEntry);
+            citationsRelationsTabViewModel.lookUpDoi(getCurrentEntry());
         };
     }
 
@@ -612,7 +617,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 jumpToEntry(item);
             } else {
                 // Entry not in library -> import it
-                importEntries(List.of(item), citationComponents.searchType(), currentEntry);
+                importEntries(List.of(item), citationComponents.searchType(), getCurrentEntry());
             }
             return;
         }
@@ -767,12 +772,11 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     /// Determines if tab should be shown according to preferences
     ///
-    /// @param entry Currently selected BibEntry
     /// @return whether tab should be shown
     @Override
-    public boolean shouldShow(BibEntry entry) {
+    public ObservableValue<Boolean> shouldShow() {
         // TODO: Create a preference and show tab only if preference is enabled
-        return true;
+        return shouldShow;
     }
 
     @Override

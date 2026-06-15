@@ -13,7 +13,9 @@ import javax.swing.undo.UndoManager;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
@@ -80,6 +82,9 @@ public class SourceTab extends EntryEditorTab {
     private Map<Field, Range> fieldPositions;
     private CodeArea codeArea;
     private BibEntry previousEntry;
+
+    /// The source tab is always available, regardless of the current entry.
+    private final ObservableValue<Boolean> shouldShow = new SimpleBooleanProperty(true);
 
     public SourceTab(CountingUndoManager undoManager,
                      FieldPreferences fieldPreferences,
@@ -220,8 +225,8 @@ public class SourceTab extends EntryEditorTab {
         sourceValidator.addRule(validationMessage);
 
         codeArea.focusedProperty().addListener((_, _, onFocus) -> {
-            if (!onFocus && (currentEntry != null)) {
-                storeSource(currentEntry, codeArea.textProperty().getValue());
+            if (!onFocus && (getCurrentEntry() != null)) {
+                storeSource(getCurrentEntry(), codeArea.textProperty().getValue());
             }
         });
         VirtualizedScrollPane<CodeArea> scrollableCodeArea = new VirtualizedScrollPane<>(codeArea);
@@ -229,8 +234,8 @@ public class SourceTab extends EntryEditorTab {
     }
 
     @Override
-    public boolean shouldShow(BibEntry entry) {
-        return true;
+    public ObservableValue<Boolean> shouldShow() {
+        return shouldShow;
     }
 
     private void updateCodeArea() {
@@ -244,7 +249,7 @@ public class SourceTab extends EntryEditorTab {
 
             codeArea.clear();
             try {
-                codeArea.appendText(getSourceString(currentEntry, mode, fieldPreferences));
+                codeArea.appendText(getSourceString(getCurrentEntry(), mode, fieldPreferences));
                 codeArea.setEditable(true);
                 Platform.runLater(this::highlightSearchPattern);
             } catch (IOException ex) {
@@ -379,7 +384,7 @@ public class SourceTab extends EntryEditorTab {
                 case SAVE_LIBRARY,
                      SAVE_ALL,
                      SAVE_LIBRARY_AS ->
-                        storeSource(currentEntry, codeArea.textProperty().getValue());
+                        storeSource(getCurrentEntry(), codeArea.textProperty().getValue());
             }
         });
     }

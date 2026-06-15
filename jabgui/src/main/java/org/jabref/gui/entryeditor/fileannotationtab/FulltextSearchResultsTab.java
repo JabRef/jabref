@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.ContextMenu;
@@ -57,6 +59,8 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private BibEntry entry;
     private DocumentViewerView documentViewerView;
 
+    private final ObservableValue<Boolean> shouldShow;
+
     public FulltextSearchResultsTab(StateManager stateManager,
                                     GuiPreferences preferences,
                                     DialogService dialogService,
@@ -68,6 +72,12 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         this.actionFactory = new ActionFactory();
         this.taskExecutor = taskExecutor;
         this.entryEditor = entryEditor;
+
+        this.shouldShow = Bindings.createBooleanBinding(
+                () -> stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get()
+                                  .map(query -> query.isValid() && query.getSearchFlags().contains(SearchFlags.FULLTEXT))
+                                  .orElse(false),
+                stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH));
 
         content = new TextFlow();
         ScrollPane scrollPane = new ScrollPane(content);
@@ -81,15 +91,13 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     }
 
     @Override
-    public boolean shouldShow(BibEntry entry) {
-        return stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get()
-                           .map(query -> query.isValid() && query.getSearchFlags().contains(SearchFlags.FULLTEXT))
-                           .orElse(false);
+    public ObservableValue<Boolean> shouldShow() {
+        return shouldShow;
     }
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        if (entry == null || !shouldShow(entry)) {
+        if (entry == null || !shouldShow.getValue()) {
             return;
         }
         this.entry = entry;

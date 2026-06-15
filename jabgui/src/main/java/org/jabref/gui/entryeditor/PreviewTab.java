@@ -1,5 +1,6 @@
 package org.jabref.gui.entryeditor;
 
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.SplitPane;
 
 import org.jabref.gui.StateManager;
@@ -7,7 +8,6 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.BibEntry;
 
 public class PreviewTab extends TabWithPreviewPanel {
     public static final String NAME = "Preview";
@@ -15,11 +15,15 @@ public class PreviewTab extends TabWithPreviewPanel {
     private final GuiPreferences preferences;
     private final SplitPane splitPane;
 
+    private final ObservableValue<Boolean> shouldShow;
+
     public PreviewTab(GuiPreferences preferences,
                       StateManager stateManager,
                       PreviewPanel previewPanel) {
         super(stateManager, previewPanel);
         this.preferences = preferences;
+
+        this.shouldShow = preferences.getPreviewPreferences().showPreviewAsExtraTabProperty();
 
         setGraphic(IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW.getGraphicNode());
         setText(Localization.lang("Preview"));
@@ -29,8 +33,8 @@ public class PreviewTab extends TabWithPreviewPanel {
     }
 
     @Override
-    public boolean shouldShow(BibEntry entry) {
-        return preferences.getPreviewPreferences().shouldShowPreviewAsExtraTab();
+    public ObservableValue<Boolean> shouldShow() {
+        return shouldShow;
     }
 
     protected void handleFocus() {
