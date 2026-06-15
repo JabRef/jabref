@@ -1763,7 +1763,8 @@ public class JabRefCliPreferences implements CliPreferences {
         EnumSet<CleanupPreferences.CleanupStep> activeJobs;
         if (hasKey(CLEANUP_JOBS)) {
             Set<CleanupPreferences.CleanupStep> parsed = getStringList(CLEANUP_JOBS).stream()
-                                                                                    .map(CleanupPreferences.CleanupStep::valueOf)
+                                                                                    .map(CleanupPreferences.CleanupStep::safeValueOf)
+                                                                                    .flatMap(Optional::stream)
                                                                                     .collect(Collectors.toSet());
             activeJobs = parsed.isEmpty() ? EnumSet.noneOf(CleanupPreferences.CleanupStep.class) : EnumSet.copyOf(parsed);
         } else {

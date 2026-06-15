@@ -473,13 +473,24 @@ public class PreferencesMigrations {
     /// <tr> <td> CleanUpFormattersEnabled </td> <td> TRUE </td> </tr>
     /// <tr> <td> CleanUpFormatters        </td> <td> `field[formatter,formatter...]\nfield[...]\nfield[...]... `</td> </tr>
     /// </table>
-    private static void upgradeCleanups(JabRefCliPreferences prefs) {
+    static void upgradeCleanups(JabRefCliPreferences prefs) {
         final String V5_8_CLEANUP = "CleanUp";
         final String V6_0_CLEANUP_JOBS = "CleanUpJobs";
+        final String V6_0_CLEANUP_REMOVED_ISSN = "CLEAN_UP_ISSN";
 
         final String V5_8_CLEANUP_FIELD_FORMATTERS = "CleanUpFormatters";
         final String V6_0_CLEANUP_FIELD_FORMATTERS = "CleanUpFormatters";
         final String V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED = "CleanUpFormattersEnabled";
+
+        if (prefs.hasKey(V6_0_CLEANUP_JOBS)) {
+            List<String> cleanupJobs = prefs.getStringList(V6_0_CLEANUP_JOBS);
+            if (cleanupJobs.contains(V6_0_CLEANUP_REMOVED_ISSN)) {
+                prefs.putStringList(V6_0_CLEANUP_JOBS,
+                        cleanupJobs.stream()
+                                   .filter(job -> !V6_0_CLEANUP_REMOVED_ISSN.equals(job))
+                                   .toList());
+            }
+        }
 
         List<String> activeJobs = new ArrayList<>();
         for (CleanupPreferences.CleanupStep action : EnumSet.allOf(CleanupPreferences.CleanupStep.class)) {
