@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
@@ -102,7 +101,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     private Subscription typeSubscription;
 
-    private BibEntry currentlyEditedEntry;
+    private EntryEditorViewModel viewModel;
 
     private SourceTab sourceTab;
 
@@ -140,6 +139,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                   .root(this)
                   .load();
 
+        this.viewModel = new EntryEditorViewModel(stateManager);
+
         this.fileLinker = new ExternalFilesEntryLinker(
                 preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
@@ -175,26 +176,22 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
             EntryEditorTab activeTab = (EntryEditorTab) tab;
             if (activeTab != null) {
-                activeTab.notifyAboutFocus(currentlyEditedEntry);
+                activeTab.notifyAboutFocus(viewModel.getCurrentlyEditedEntry());
                 if (activeTab instanceof FieldsEditorTab fieldsTab) {
                     Platform.runLater(() -> setupNavigationForTab(fieldsTab));
                 }
             }
         });
 
-        stateManager.getSelectedEntries().addListener((InvalidationListener) _ -> {
-            if (stateManager.getSelectedEntries().isEmpty()) {
-                // [impl->req~entry-editor.keep-showing~1]
-                // No change in the entry editor
-                // We allow users to edit the "old" entry
-            } else {
-                setCurrentlyEditedEntry(stateManager.getSelectedEntries().getFirst());
+        EasyBind.listen(viewModel.currentlyEditedEntryProperty(), (_, _, newEntry) -> {
+            if (newEntry != null) {
+                onEntryChanged(newEntry);
             }
         });
 
         EasyBind.listen(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(),
                 (_, _, newValue) -> {
-                    if (currentlyEditedEntry != null) {
+                    if (viewModel.getCurrentlyEditedEntry() != null) {
                         adaptVisibleTabs();
                         Tab tab = tabbed.getSelectionModel().selectedItemProperty().get();
                         if (newValue && tab instanceof FieldsEditorTab fieldsEditorTab) {
@@ -207,7 +204,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 });
 
         preferences.getEntryEditorPreferences().getTabConfigs().addListener((InvalidationListener) _ -> {
-            if (currentlyEditedEntry != null) {
+            if (viewModel.getCurrentlyEditedEntry() != null) {
                 adaptVisibleTabs();
             }
         });
@@ -343,7 +340,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     @FXML
     private void deleteEntry() {
-        tabSupplier.get().deleteEntry(currentlyEditedEntry);
+        tabSupplier.get().deleteEntry(viewModel.getCurrentlyEditedEntry());
     }
 
     @FXML
@@ -458,17 +455,18 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         // the tabs give an ugly animation the looks like all tabs are shifting in from the right. In other words:
         // This hack is required since tabbed.getTabs().setAll(visibleTabs) changes the order of the tabs in the editor
 
-        if (currentlyEditedEntry == null) {
+        BibEntry entry = viewModel.getCurrentlyEditedEntry();
+        if (entry == null) {
             tabbed.getTabs().clear();
             return;
         }
 
         // First, remove tabs that we do not want to show
-        List<EntryEditorTab> toBeRemoved = allPossibleTabs.stream().filter(tab -> !tab.shouldShow(currentlyEditedEntry)).toList();
+        List<EntryEditorTab> toBeRemoved = allPossibleTabs.stream().filter(tab -> !tab.shouldShow(entry)).toList();
         tabbed.getTabs().removeAll(toBeRemoved);
 
         // Next add all the visible tabs (if not already present) at the right position
-        List<Tab> visibleTabs = allPossibleTabs.stream().filter(tab -> tab.shouldShow(currentlyEditedEntry)).collect(Collectors.toList());
+        List<Tab> visibleTabs = allPossibleTabs.stream().filter(tab -> tab.shouldShow(entry)).collect(Collectors.toList());
         for (int i = 0; i < visibleTabs.size(); i++) {
             Tab toBeAdded = visibleTabs.get(i);
             Tab shown = null;
@@ -484,35 +482,30 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     }
 
     public BibEntry getCurrentlyEditedEntry() {
-        return currentlyEditedEntry;
+        return viewModel.getCurrentlyEditedEntry();
     }
 
     public List<EntryEditorTab> getAllPossibleTabs() {
         return allPossibleTabs;
     }
 
-    public void setCurrentlyEditedEntry(@NonNull BibEntry currentlyEditedEntry) {
-        if (Objects.equals(this.currentlyEditedEntry, currentlyEditedEntry)) {
-            lastFocusedField = null;
-            return;
-        }
+    public void setCurrentlyEditedEntry(@NonNull BibEntry entry) {
+        viewModel.currentlyEditedEntryProperty().set(entry);
+    }
 
-        this.currentlyEditedEntry = currentlyEditedEntry;
-
-        // Subscribe to type changes for rebuilding the currently visible tab
+    private void onEntryChanged(@NonNull BibEntry entry) {
         if (typeSubscription != null) {
-            // Remove subscription for old entry if existing
             typeSubscription.unsubscribe();
         }
 
-        typeSubscription = EasyBind.subscribe(this.currentlyEditedEntry.typeProperty(), _ -> {
-            typeLabel.setText(new TypedBibEntry(this.currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
+        typeSubscription = EasyBind.subscribe(entry.typeProperty(), _ -> {
+            typeLabel.setText(new TypedBibEntry(entry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
             adaptVisibleTabs();
             setupToolBar();
-            getSelectedTab().notifyAboutFocus(this.currentlyEditedEntry);
+            getSelectedTab().notifyAboutFocus(entry);
         });
 
-        typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
+        typeLabel.setText(new TypedBibEntry(entry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
 
         adaptVisibleTabs();
 
@@ -531,7 +524,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
         EntryEditorTab selectedTab = getSelectedTab();
         if (selectedTab != null) {
-            Platform.runLater(() -> selectedTab.notifyAboutFocus(currentlyEditedEntry));
+            Platform.runLater(() -> selectedTab.notifyAboutFocus(entry));
         }
 
         if (lastFocusedField != null) {
@@ -554,12 +547,13 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     }
 
     private void setupToolBar() {
+        BibEntry entry = viewModel.getCurrentlyEditedEntry();
         // Update type label
-        TypedBibEntry typedEntry = new TypedBibEntry(currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode());
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, tabSupplier.get().getBibDatabaseContext().getMode());
         typeLabel.setText(typedEntry.getTypeForDisplay());
 
         // Add type change menu
-        ContextMenu typeMenu = new ChangeEntryTypeMenu(List.of(currentlyEditedEntry), tabSupplier.get().getBibDatabaseContext(), undoManager, bibEntryTypesManager).asContextMenu();
+        ContextMenu typeMenu = new ChangeEntryTypeMenu(List.of(entry), tabSupplier.get().getBibDatabaseContext(), undoManager, bibEntryTypesManager).asContextMenu();
         typeLabel.setOnMouseClicked(event -> typeMenu.show(typeLabel, Side.RIGHT, 0, 0));
         typeChangeButton.setOnMouseClicked(event -> typeMenu.show(typeChangeButton, Side.RIGHT, 0, 0));
 
@@ -593,7 +587,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     }
 
     private void fetchAndMerge(EntryBasedFetcher fetcher) {
-        new FetchAndMergeEntry(tabSupplier.get().getBibDatabaseContext(), taskExecutor, preferences, dialogService, undoManager, stateManager).fetchAndMerge(currentlyEditedEntry, fetcher);
+        new FetchAndMergeEntry(tabSupplier.get().getBibDatabaseContext(), taskExecutor, preferences, dialogService, undoManager, stateManager).fetchAndMerge(viewModel.getCurrentlyEditedEntry(), fetcher);
     }
 
     public void selectField(String fieldName) {
