@@ -216,6 +216,9 @@ public class ImportHandler {
                                 message = bibtexParserResult.getErrorMessage();
                             }
                             addResultToList(file, success, message);
+                        } else if (!importFormatReader.hasImporterForFile(file)) {
+                            entriesToAdd.add(createEmptyEntryWithLink(file));
+                            addResultToList(file, false, Localization.lang("Could not auto-detect file format. An empty entry was created with file link."));
                         } else {
                             try {
                                 ImportResult importResult = ImportHandler.this.importFormatReader.importWithAutoDetection(file);
