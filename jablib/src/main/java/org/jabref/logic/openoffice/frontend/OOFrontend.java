@@ -72,6 +72,8 @@ public class OOFrontend {
             return OOResult.ok(new OOFrontend(doc));
         } catch (NoDocumentException | WrappedTargetException e) {
             return OOResult.error(new JabRefException(e.getMessage(), e));
+        } catch (RuntimeException e) {
+            return OOResult.error(new JabRefException(e.getMessage(), e));
         }
     }
 

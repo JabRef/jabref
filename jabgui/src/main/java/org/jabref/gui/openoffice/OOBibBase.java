@@ -886,6 +886,17 @@ public class OOBibBase {
     /// @param fcursor       Used to synchronize document.
     private OOVoidResult<OOError> updateCSLBibliography(List<BibDatabase> databases, CitationStyle citationStyle, XTextDocument doc,
                                                         OOResult<FunctionalTextViewCursor, OOError> fcursor, String errorTitle) {
+        return updateCSLBibliography(dialogService, databases, citationStyle, doc, fcursor, errorTitle, cslCitationOOAdapter, cslUpdateBibliography);
+    }
+
+    static OOVoidResult<OOError> updateCSLBibliography(DialogService dialogService,
+                                                       List<BibDatabase> databases,
+                                                       CitationStyle citationStyle,
+                                                       XTextDocument doc,
+                                                       OOResult<FunctionalTextViewCursor, OOError> fcursor,
+                                                       String errorTitle,
+                                                       CSLCitationOOAdapter cslCitationOOAdapter,
+                                                       CSLUpdateBibliography cslUpdateBibliography) {
         try {
             UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
 
@@ -911,15 +922,21 @@ public class OOBibBase {
             // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
             // MUST always be paired with an unlockControllers() call
             doc.lockControllers();
-
-            cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
-        } catch (CreationException e) {
-            return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));
-        } catch (NoDocumentException | com.sun.star.uno.Exception e) {
-            dialogService.notify(Localization.lang("No document found or LibreOffice insertion failure"));
-            LOGGER.error("Could not update CSL bibliography", e);
+            try {
+                cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+            } catch (CreationException e) {
+                LOGGER.error("Could not update CSL bibliography", e);
+                return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));
+            } catch (NoDocumentException e) {
+                LOGGER.error("Could not update CSL bibliography", e);
+                return OOVoidResult.error(OOError.from(e).setTitle(errorTitle));
+            } catch (com.sun.star.uno.Exception e) {
+                LOGGER.error("Could not update CSL bibliography", e);
+                return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));
+            } finally {
+                doc.unlockControllers();
+            }
         } finally {
-            doc.unlockControllers();
             UnoUndo.leaveUndoContext(doc);
             fcursor.get().restore(doc);
         }
