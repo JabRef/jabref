@@ -35,7 +35,7 @@ public class FileAnnotationTab extends EntryEditorTab implements NamedEntryEdito
         this.shouldShow = Bindings.createBooleanBinding(
                 this::computeShouldShow,
                 currentEntryProperty(),
-                entryEditorPreferences.getTabConfigs(),
+                entryEditorPreferences.getTabModels(),
                 stateManager.activeTabProperty());
 
         setText(Localization.lang("File annotations"));

@@ -55,7 +55,7 @@ public class LatexCitationsTab extends EntryEditorTab implements NamedEntryEdito
 
         this.shouldShow = Bindings.createBooleanBinding(
                 viewModel::shouldShow,
-                preferences.getEntryEditorPreferences().getTabConfigs());
+                preferences.getEntryEditorPreferences().getTabModels());
 
         this.searchPane = new GridPane();
         this.progressIndicator = new ProgressIndicator();
