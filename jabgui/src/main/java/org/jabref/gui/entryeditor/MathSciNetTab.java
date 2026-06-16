@@ -20,8 +20,8 @@ public class MathSciNetTab extends EntryEditorTab implements NamedEntryEditorTab
 
     public static final String NAME = "MathSciNet Review";
 
-    /// Shown only when the current entry carries a MathSciNet (MR number) identifier.
-    private final ObservableValue<Boolean> shouldShow =
+    /// Content available only when the current entry carries a MathSciNet (MR number) identifier.
+    private final ObservableValue<Boolean> contentVisibility =
             EasyBind.map(currentEntryProperty(), entry -> (entry != null) && getMathSciNetId(entry).isPresent());
 
     public MathSciNetTab() {
@@ -58,8 +58,8 @@ public class MathSciNetTab extends EntryEditorTab implements NamedEntryEditorTab
     }
 
     @Override
-    public ObservableValue<Boolean> shouldShow() {
-        return shouldShow;
+    protected ObservableValue<Boolean> contentVisibility() {
+        return contentVisibility;
     }
 
     @Override

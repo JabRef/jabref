@@ -13,9 +13,7 @@ import javax.swing.undo.UndoManager;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
@@ -82,9 +80,6 @@ public class SourceTab extends EntryEditorTab {
     private Map<Field, Range> fieldPositions;
     private CodeArea codeArea;
     private BibEntry previousEntry;
-
-    /// The source tab is always available, regardless of the current entry.
-    private final ObservableValue<Boolean> shouldShow = new SimpleBooleanProperty(true);
 
     public SourceTab(CountingUndoManager undoManager,
                      FieldPreferences fieldPreferences,
@@ -231,11 +226,6 @@ public class SourceTab extends EntryEditorTab {
         });
         VirtualizedScrollPane<CodeArea> scrollableCodeArea = new VirtualizedScrollPane<>(codeArea);
         this.setContent(scrollableCodeArea);
-    }
-
-    @Override
-    public ObservableValue<Boolean> shouldShow() {
-        return shouldShow;
     }
 
     private void updateCodeArea() {

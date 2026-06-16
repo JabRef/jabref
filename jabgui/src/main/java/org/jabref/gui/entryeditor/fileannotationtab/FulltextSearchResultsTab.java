@@ -60,7 +60,8 @@ public class FulltextSearchResultsTab extends EntryEditorTab implements NamedEnt
     private BibEntry entry;
     private DocumentViewerView documentViewerView;
 
-    private final ObservableValue<Boolean> shouldShow;
+    /// Content available only while an active, valid fulltext search query exists.
+    private final ObservableValue<Boolean> contentVisibility;
 
     public FulltextSearchResultsTab(StateManager stateManager,
                                     GuiPreferences preferences,
@@ -74,7 +75,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab implements NamedEnt
         this.taskExecutor = taskExecutor;
         this.entryEditor = entryEditor;
 
-        this.shouldShow = Bindings.createBooleanBinding(
+        this.contentVisibility = Bindings.createBooleanBinding(
                 () -> stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get()
                                   .map(query -> query.isValid() && query.getSearchFlags().contains(SearchFlags.FULLTEXT))
                                   .orElse(false),
@@ -92,13 +93,13 @@ public class FulltextSearchResultsTab extends EntryEditorTab implements NamedEnt
     }
 
     @Override
-    public ObservableValue<Boolean> shouldShow() {
-        return shouldShow;
+    protected ObservableValue<Boolean> contentVisibility() {
+        return contentVisibility;
     }
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        if (entry == null || !shouldShow.getValue()) {
+        if (entry == null || !contentVisibility.getValue()) {
             return;
         }
         this.entry = entry;

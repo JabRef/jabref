@@ -5,7 +5,6 @@ import java.util.List;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
@@ -51,8 +50,6 @@ public class RelatedArticlesTab extends EntryEditorTab implements NamedEntryEdit
 
     private final GuiPreferences preferences;
 
-    private final ObservableValue<Boolean> shouldShow;
-
     public RelatedArticlesTab(BuildInfo buildInfo,
                               GuiPreferences preferences,
                               DialogService dialogService,
@@ -64,10 +61,6 @@ public class RelatedArticlesTab extends EntryEditorTab implements NamedEntryEdit
         this.taskExecutor = taskExecutor;
 
         this.preferences = preferences;
-
-        this.shouldShow = Bindings.createBooleanBinding(
-                () -> preferences.getEntryEditorPreferences().isStaticTabVisible(EntryEditorTabModel.StaticTab.RELATED_ARTICLES),
-                preferences.getEntryEditorPreferences().getTabModels());
 
         setText(Localization.lang("Related articles"));
         setTooltip(new Tooltip(Localization.lang("Related articles")));
@@ -252,11 +245,6 @@ public class RelatedArticlesTab extends EntryEditorTab implements NamedEntryEdit
         root.setContent(vbox);
 
         return root;
-    }
-
-    @Override
-    public ObservableValue<Boolean> shouldShow() {
-        return shouldShow;
     }
 
     @Override

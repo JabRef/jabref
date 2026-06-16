@@ -1,7 +1,5 @@
 package org.jabref.gui.entryeditor;
 
-import javafx.beans.binding.Bindings;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -40,8 +38,6 @@ public class LatexCitationsTab extends EntryEditorTab implements NamedEntryEdito
     private final ProgressIndicator progressIndicator;
     private final CitationsDisplay citationsDisplay;
 
-    private final ObservableValue<Boolean> shouldShow;
-
     public LatexCitationsTab(GuiPreferences preferences,
                              DialogService dialogService,
                              StateManager stateManager,
@@ -52,10 +48,6 @@ public class LatexCitationsTab extends EntryEditorTab implements NamedEntryEdito
                 preferences,
                 dialogService,
                 directoryMonitor);
-
-        this.shouldShow = Bindings.createBooleanBinding(
-                viewModel::shouldShow,
-                preferences.getEntryEditorPreferences().getTabModels());
 
         this.searchPane = new GridPane();
         this.progressIndicator = new ProgressIndicator();
@@ -162,11 +154,6 @@ public class LatexCitationsTab extends EntryEditorTab implements NamedEntryEdito
             LibraryTab libraryTab = stateManager.activeTabProperty().get().get();
             viewModel.bindToEntry(libraryTab, entry);
         }
-    }
-
-    @Override
-    public ObservableValue<Boolean> shouldShow() {
-        return shouldShow;
     }
 
     @Override

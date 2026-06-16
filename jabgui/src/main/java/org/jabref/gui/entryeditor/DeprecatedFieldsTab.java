@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.StateManager;
@@ -31,7 +30,6 @@ public class DeprecatedFieldsTab extends FieldsEditorTab implements NamedEntryEd
 
     public static final String NAME = "Deprecated fields";
     private final BibEntryTypesManager entryTypesManager;
-    private final ObservableValue<Boolean> shouldShow;
 
     public DeprecatedFieldsTab(UndoManager undoManager,
                                UndoAction undoAction,
@@ -52,7 +50,6 @@ public class DeprecatedFieldsTab extends FieldsEditorTab implements NamedEntryEd
                 previewPanel
         );
         this.entryTypesManager = entryTypesManager;
-        this.shouldShow = gateByFieldSet(preferences.getEntryEditorPreferences(), EntryEditorTabModel.BuiltInFieldSet.DEPRECATED_FIELDS);
 
         setText(Localization.lang("Deprecated fields"));
         EasyBind.subscribe(preferences.getWorkspacePreferences().showAdvancedHintsProperty(), advancedHints -> {
@@ -63,11 +60,6 @@ public class DeprecatedFieldsTab extends FieldsEditorTab implements NamedEntryEd
             }
         });
         setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());
-    }
-
-    @Override
-    public ObservableValue<Boolean> shouldShow() {
-        return shouldShow;
     }
 
     @Override

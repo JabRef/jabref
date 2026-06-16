@@ -190,10 +190,6 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         return searchError;
     }
 
-    public boolean shouldShow() {
-        return preferences.getEntryEditorPreferences().isStaticTabVisible(EntryEditorTabModel.StaticTab.LATEX_CITATIONS);
-    }
-
     private class CitationsAlterationListener implements FileAlterationListener {
         @Override
         public void onStart(FileAlterationObserver observer) {

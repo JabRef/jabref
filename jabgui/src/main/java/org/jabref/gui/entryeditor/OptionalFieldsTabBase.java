@@ -6,7 +6,6 @@ import java.util.SequencedSet;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.StateManager;
@@ -27,11 +26,9 @@ import org.jabref.model.entry.field.Field;
 public class OptionalFieldsTabBase extends FieldsEditorTab {
     private final BibEntryTypesManager entryTypesManager;
     private final boolean isImportantOptionalFields;
-    private final ObservableValue<Boolean> shouldShow;
 
     public OptionalFieldsTabBase(String title,
                                  boolean isImportantOptionalFields,
-                                 EntryEditorTabModel.BuiltInFieldSet fieldSet,
                                  UndoManager undoManager,
                                  UndoAction undoAction,
                                  RedoAction redoAction,
@@ -50,15 +47,9 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                 previewPanel);
         this.entryTypesManager = entryTypesManager;
         this.isImportantOptionalFields = isImportantOptionalFields;
-        this.shouldShow = gateByFieldSet(preferences.getEntryEditorPreferences(), fieldSet);
         setText(title);
         setTooltip(new Tooltip(Localization.lang("Show optional fields")));
         setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());
-    }
-
-    @Override
-    public ObservableValue<Boolean> shouldShow() {
-        return shouldShow;
     }
 
     @Override
