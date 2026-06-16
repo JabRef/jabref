@@ -26,7 +26,7 @@ import org.jabref.model.entry.field.Field;
 
 import com.tobiasdiez.easybind.EasyBind;
 
-public class DeprecatedFieldsTab extends FieldsEditorTab {
+public class DeprecatedFieldsTab extends FieldsEditorTab implements NamedEntryEditorTab {
 
     public static final String NAME = "Deprecated fields";
     private final BibEntryTypesManager entryTypesManager;
@@ -73,5 +73,10 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
             // Entry type unknown -> treat all fields as required (thus no optional fields)
             return new LinkedHashSet<>();
         }
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

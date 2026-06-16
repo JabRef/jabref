@@ -9,6 +9,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
+import org.jabref.gui.entryeditor.NamedEntryEditorTab;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
@@ -17,7 +18,7 @@ import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class FileAnnotationTab extends EntryEditorTab {
+public class FileAnnotationTab extends EntryEditorTab implements NamedEntryEditorTab {
 
     public static final String NAME = "File annotations";
 
@@ -65,5 +66,10 @@ public class FileAnnotationTab extends EntryEditorTab {
         } else {
             setContent(null);
         }
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -91,80 +93,80 @@ public class EntryEditorTabFactory {
     public List<EntryEditorTab> createTabs(EntryEditor entryEditor) {
         List<EntryEditorTab> tabs = new LinkedList<>();
 
-        tabs.add(new PreviewTab(preferences, stateManager, previewPanel));
+        // Fixed tabs shown before the user-configured ones
+        List<EntryEditorTab> leadingTabs = List.of(
+                new PreviewTab(preferences, stateManager, previewPanel),
+                // Required, optional (important+detail), deprecated, and "other" fields
+                new RequiredFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel),
+                new ImportantOptionalFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel),
+                new DetailOptionalFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel),
+                new DeprecatedFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel),
+                new OtherFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel),
+                // Comment Tab: Tab for general and user-specific comments
+                new CommentsTab(preferences, undoManager, undoAction, redoAction, journalAbbreviationRepository, stateManager, previewPanel)
+        );
 
-        // Required, optional (important+detail), deprecated, and "other" fields
-        tabs.add(new RequiredFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel));
-        tabs.add(new ImportantOptionalFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel));
-        tabs.add(new DetailOptionalFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel));
-        tabs.add(new DeprecatedFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel));
-        tabs.add(new OtherFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel));
+        // Fixed tabs shown after the user-configured ones
+        List<EntryEditorTab> trailingTabs = List.of(
+                new MathSciNetTab(),
+                new FileAnnotationTab(stateManager, preferences),
+                new CitationRelationsTab(
+                        dialogService,
+                        undoManager,
+                        stateManager,
+                        fileMonitor,
+                        preferences,
+                        taskExecutor,
+                        themeManager,
+                        bibEntryTypesManager,
+                        searchCitationsRelationsService
+                ),
+                new RelatedArticlesTab(buildInfo, preferences, dialogService, stateManager, taskExecutor),
+                // SourceTab is not a NamedEntryEditorTab, because it has different names for BibTeX and biblatex mode
+                new SourceTab(
+                        undoManager,
+                        preferences.getFieldPreferences(),
+                        preferences.getImportFormatPreferences(),
+                        fileMonitor,
+                        dialogService,
+                        bibEntryTypesManager,
+                        keyBindingRepository,
+                        stateManager),
+                new LatexCitationsTab(preferences, dialogService, stateManager, directoryMonitor),
+                new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor, entryEditor),
+                new AiSummaryTab(preferences, stateManager),
+                new AiChatTab(preferences, stateManager)
+        );
 
-        // Comment Tab: Tab for general and user-specific comments
-        tabs.add(new CommentsTab(preferences, undoManager, undoAction, redoAction, journalAbbreviationRepository, stateManager, previewPanel));
+        tabs.addAll(leadingTabs);
 
         // ToDo: Needs to be recreated on preferences change
-        Map<String, Set<Field>> entryEditorTabList = getAdditionalUserConfiguredTabs();
+        Map<String, Set<Field>> entryEditorTabList = getAdditionalUserConfiguredTabs(leadingTabs, trailingTabs);
         for (Map.Entry<String, Set<Field>> tab : entryEditorTabList.entrySet()) {
             tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), undoManager, undoAction, redoAction, preferences, journalAbbreviationRepository, stateManager, previewPanel));
         }
 
-        tabs.add(new MathSciNetTab());
-        tabs.add(new FileAnnotationTab(stateManager, preferences));
-        tabs.add(new CitationRelationsTab(
-                dialogService,
-                undoManager,
-                stateManager,
-                fileMonitor,
-                preferences,
-                taskExecutor,
-                themeManager,
-                bibEntryTypesManager,
-                searchCitationsRelationsService
-        ));
-        tabs.add(new RelatedArticlesTab(buildInfo, preferences, dialogService, stateManager, taskExecutor));
-        tabs.add(new SourceTab(
-                undoManager,
-                preferences.getFieldPreferences(),
-                preferences.getImportFormatPreferences(),
-                fileMonitor,
-                dialogService,
-                bibEntryTypesManager,
-                keyBindingRepository,
-                stateManager));
-        tabs.add(new LatexCitationsTab(preferences, dialogService, stateManager, directoryMonitor));
-        tabs.add(new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor, entryEditor));
-        tabs.add(new AiSummaryTab(preferences, stateManager));
-        tabs.add(new AiChatTab(preferences, stateManager));
+        tabs.addAll(trailingTabs);
 
         return tabs;
     }
 
     /// The preferences allow to configure tabs to show (e.g.,"General", "Abstract")
-    /// These should be shown. Already hard-coded ones (above and below this code block) should be removed.
-    /// This method does this calculation.
+    /// These should be shown. The fixed tabs (passed in) should be removed, since they are
+    /// already covered by built-in tabs. The names of those built-in tabs are derived
+    /// automatically from any {@link NamedEntryEditorTab} among them, so this exclusion
+    /// can never go out of sync with the tabs actually created above.
     ///
     /// @return Map of tab names and the fields to show in them.
-    private Map<String, Set<Field>> getAdditionalUserConfiguredTabs() {
+    private Map<String, Set<Field>> getAdditionalUserConfiguredTabs(List<EntryEditorTab> leadingTabs, List<EntryEditorTab> trailingTabs) {
         Map<String, Set<Field>> entryEditorTabList = new HashMap<>(preferences.getEntryEditorPreferences().getEntryEditorTabs());
 
-        // Same order as in createTabs before the call of getAdditionalUserConfiguredTabs
-        entryEditorTabList.remove(PreviewTab.NAME);
-        entryEditorTabList.remove(RequiredFieldsTab.NAME);
-        entryEditorTabList.remove(ImportantOptionalFieldsTab.NAME);
-        entryEditorTabList.remove(DetailOptionalFieldsTab.NAME);
-        entryEditorTabList.remove(DeprecatedFieldsTab.NAME);
-        entryEditorTabList.remove(OtherFieldsTab.NAME);
-        entryEditorTabList.remove(CommentsTab.NAME);
-
-        // Same order as in createTabs after the call of getAdditionalUserConfiguredTabs
-        entryEditorTabList.remove(MathSciNetTab.NAME);
-        entryEditorTabList.remove(FileAnnotationTab.NAME);
-        entryEditorTabList.remove(CitationRelationsTab.NAME);
-        entryEditorTabList.remove(RelatedArticlesTab.NAME);
-        // SourceTab is not listed, because it has different names for BibTeX and biblatex mode
-        entryEditorTabList.remove(LatexCitationsTab.NAME);
-        entryEditorTabList.remove(FulltextSearchResultsTab.NAME);
+        Set<String> builtInTabNames = Stream.concat(leadingTabs.stream(), trailingTabs.stream())
+                                             .filter(NamedEntryEditorTab.class::isInstance)
+                                             .map(NamedEntryEditorTab.class::cast)
+                                             .map(NamedEntryEditorTab::getName)
+                                             .collect(Collectors.toSet());
+        builtInTabNames.forEach(entryEditorTabList::remove);
 
         return entryEditorTabList;
     }

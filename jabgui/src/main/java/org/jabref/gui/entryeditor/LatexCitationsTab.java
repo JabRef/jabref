@@ -28,7 +28,7 @@ import org.jabref.model.entry.BibEntry;
 
 import com.tobiasdiez.easybind.EasyBind;
 
-public class LatexCitationsTab extends EntryEditorTab {
+public class LatexCitationsTab extends EntryEditorTab implements NamedEntryEditorTab {
 
     public static final String NAME = "LaTeX citations";
 
@@ -167,5 +167,10 @@ public class LatexCitationsTab extends EntryEditorTab {
     @Override
     public ObservableValue<Boolean> shouldShow() {
         return shouldShow;
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

@@ -11,7 +11,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-public class DetailOptionalFieldsTab extends OptionalFieldsTabBase {
+public class DetailOptionalFieldsTab extends OptionalFieldsTabBase implements NamedEntryEditorTab {
 
     public static final String NAME = "Optional fields 2";
 
@@ -35,5 +35,10 @@ public class DetailOptionalFieldsTab extends OptionalFieldsTabBase {
                 stateManager,
                 previewPanel
         );
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 }
