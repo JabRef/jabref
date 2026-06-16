@@ -22,15 +22,15 @@ import org.jspecify.annotations.Nullable;
 /// Handles all focus and keyboard-navigation concerns for {@link EntryEditor}.
 ///
 /// Owns: field-level focus capture/restore across entry changes; tab-to-tab keyboard navigation
-/// (Tab/Shift-Tab wrapping); jump-to-field lookups; and the DOM traversal helpers those depend on.
-class EntryEditorFocusHelper {
+/// (Tab/Shift-Tab wrapping) and jump-to-field lookups. DOM traversal is delegated to {@link EntryEditorFocusTraversal}.
+class EntryEditorFocusUtils {
 
     private final TabPane tabPane;
     private final Node sceneSource;
 
     private @Nullable Field lastFocusedField;
 
-    EntryEditorFocusHelper(TabPane tabPane, Node sceneSource) {
+    EntryEditorFocusUtils(TabPane tabPane, Node sceneSource) {
         this.tabPane = tabPane;
         this.sceneSource = sceneSource;
     }
@@ -130,35 +130,14 @@ class EntryEditorFocusHelper {
     }
 
     boolean isFirstFieldInCurrentTab(Node node) {
-        if (node == null || tabPane.getSelectionModel().getSelectedItem() == null) {
-            return false;
-        }
-
-        Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
-        if (!(selectedTab instanceof FieldsEditorTab currentTab)) {
-            return false;
-        }
-
-        Collection<Field> shownFields = currentTab.getShownFields();
-        if (!shownFields.isEmpty() && node.getId() != null) {
-            Optional<Field> firstField = shownFields.stream().findFirst();
-            boolean matchesFirstFieldId = firstField.map(Field::getName)
-                                                    .map(name -> name.equalsIgnoreCase(node.getId()))
-                                                    .orElse(false);
-            if (matchesFirstFieldId) {
-                return true;
-            }
-        }
-
-        if (currentTab.getContent() instanceof Parent parent) {
-            Parent searchRoot = findEditorGridParent(parent).orElse(parent);
-            return findFirstFocusableNode(searchRoot).map(n -> n == node).orElse(false);
-        }
-
-        return false;
+        return isBoundaryFieldInCurrentTab(node, true);
     }
 
     boolean isLastFieldInCurrentTab(Node node) {
+        return isBoundaryFieldInCurrentTab(node, false);
+    }
+
+    private boolean isBoundaryFieldInCurrentTab(Node node, boolean first) {
         if (node == null || tabPane.getSelectionModel().getSelectedItem() == null) {
             return false;
         }
@@ -170,18 +149,23 @@ class EntryEditorFocusHelper {
 
         Collection<Field> shownFields = currentTab.getShownFields();
         if (!shownFields.isEmpty() && node.getId() != null) {
-            Optional<Field> lastField = shownFields.stream().reduce((first, second) -> second);
-            boolean matchesLastFieldId = lastField.map(Field::getName)
-                                                  .map(name -> name.equalsIgnoreCase(node.getId()))
-                                                  .orElse(false);
-            if (matchesLastFieldId) {
+            Optional<Field> boundaryField = first
+                                            ? shownFields.stream().findFirst()
+                                            : shownFields.stream().reduce((firstField, secondField) -> secondField);
+            boolean matchesBoundaryFieldId = boundaryField.map(Field::getName)
+                                                          .map(name -> name.equalsIgnoreCase(node.getId()))
+                                                          .orElse(false);
+            if (matchesBoundaryFieldId) {
                 return true;
             }
         }
 
         if (currentTab.getContent() instanceof Parent parent) {
-            Parent searchRoot = findEditorGridParent(parent).orElse(parent);
-            return findLastFocusableNode(searchRoot).map(n -> n == node).orElse(false);
+            Parent searchRoot = EntryEditorFocusTraversal.findEditorGridParent(parent).orElse(parent);
+            Optional<Node> boundaryNode = first
+                                          ? EntryEditorFocusTraversal.findFirstFocusableNode(searchRoot)
+                                          : EntryEditorFocusTraversal.findLastFocusableNode(searchRoot);
+            return boundaryNode.map(n -> n == node).orElse(false);
         }
 
         return false;
@@ -216,21 +200,21 @@ class EntryEditorFocusHelper {
         Collection<Field> shownFields = tab.getShownFields();
         if (!shownFields.isEmpty()) {
             Field firstField = shownFields.iterator().next();
-            Optional<TextInputControl> firstTextInput = findTextInputById(parent, firstField.getName());
+            Optional<Node> firstTextInput = EntryEditorFocusTraversal.findFirstTextInputById(parent, firstField.getName());
             if (firstTextInput.isPresent()) {
                 firstTextInput.get().requestFocus();
                 return;
             }
         }
 
-        Optional<TextInputControl> anyTextInput = findAnyTextInput(parent);
+        Optional<Node> anyTextInput = EntryEditorFocusTraversal.findFirstTextInput(parent);
         if (anyTextInput.isPresent()) {
             anyTextInput.get().requestFocus();
             return;
         }
 
-        Parent searchRoot = findEditorGridParent(parent).orElse(parent);
-        findFirstFocusableNode(searchRoot).ifPresent(Node::requestFocus);
+        Parent searchRoot = EntryEditorFocusTraversal.findEditorGridParent(parent).orElse(parent);
+        EntryEditorFocusTraversal.findFirstFocusableNode(searchRoot).ifPresent(Node::requestFocus);
     }
 
     private void focusLastFieldInTab(FieldsEditorTab tab) {
@@ -242,98 +226,15 @@ class EntryEditorFocusHelper {
         Collection<Field> shownFields = tab.getShownFields();
         if (!shownFields.isEmpty()) {
             Optional<Field> lastField = shownFields.stream().reduce((first, second) -> second);
-            Optional<TextInputControl> lastTextInput = findTextInputById(parent, lastField.get().getName());
+            Optional<Node> lastTextInput = EntryEditorFocusTraversal.findFirstTextInputById(parent, lastField.get().getName());
             if (lastTextInput.isPresent()) {
                 lastTextInput.get().requestFocus();
                 return;
             }
         }
 
-        Parent searchRoot = findEditorGridParent(parent).orElse(parent);
-        findLastFocusableNode(searchRoot).ifPresent(Node::requestFocus);
-    }
-
-    // endregion
-
-    // region — DOM traversal helpers (static, no state)
-
-    private static Optional<TextInputControl> findTextInputById(Parent parent, String id) {
-        for (Node child : parent.getChildrenUnmodifiable()) {
-            if (child instanceof TextInputControl textInput && id.equalsIgnoreCase(textInput.getId())) {
-                return Optional.of(textInput);
-            } else if (child instanceof Parent childParent) {
-                Optional<TextInputControl> found = findTextInputById(childParent, id);
-                if (found.isPresent()) {
-                    return found;
-                }
-            }
-        }
-        return Optional.empty();
-    }
-
-    private static Optional<TextInputControl> findAnyTextInput(Parent parent) {
-        for (Node child : parent.getChildrenUnmodifiable()) {
-            if (child instanceof TextInputControl textInput) {
-                return Optional.of(textInput);
-            } else if (child instanceof Parent childParent) {
-                Optional<TextInputControl> found = findAnyTextInput(childParent);
-                if (found.isPresent()) {
-                    return found;
-                }
-            }
-        }
-        return Optional.empty();
-    }
-
-    private static Optional<Node> findFirstFocusableNode(Parent parent) {
-        for (Node child : parent.getChildrenUnmodifiable()) {
-            if (isNodeFocusable(child)) {
-                return Optional.of(child);
-            } else if (child instanceof Parent childParent) {
-                Optional<Node> found = findFirstFocusableNode(childParent);
-                if (found.isPresent()) {
-                    return found;
-                }
-            }
-        }
-        return Optional.empty();
-    }
-
-    private static Optional<Node> findLastFocusableNode(Parent parent) {
-        Optional<Node> last = Optional.empty();
-        for (Node child : parent.getChildrenUnmodifiable()) {
-            if (child instanceof Parent childParent) {
-                Optional<Node> sub = findLastFocusableNode(childParent);
-                if (sub.isPresent()) {
-                    last = sub;
-                }
-            }
-            if (isNodeFocusable(child)) {
-                last = Optional.of(child);
-            }
-        }
-        return last;
-    }
-
-    private static boolean isNodeFocusable(Node node) {
-        return node.isFocusTraversable() && node.isVisible() && !node.isDisabled() && node.isManaged();
-    }
-
-    /// Tries to locate the editor grid (style class {@code "editorPane"}) to avoid including preview
-    /// or other sibling panels when determining focus-order boundaries.
-    private static Optional<Parent> findEditorGridParent(Parent root) {
-        if (root.getStyleClass().contains("editorPane")) {
-            return Optional.of(root);
-        }
-        for (Node child : root.getChildrenUnmodifiable()) {
-            if (child instanceof Parent p) {
-                Optional<Parent> found = findEditorGridParent(p);
-                if (found.isPresent()) {
-                    return found;
-                }
-            }
-        }
-        return Optional.empty();
+        Parent searchRoot = EntryEditorFocusTraversal.findEditorGridParent(parent).orElse(parent);
+        EntryEditorFocusTraversal.findLastFocusableNode(searchRoot).ifPresent(Node::requestFocus);
     }
 
     // endregion
