@@ -131,7 +131,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        tabConfigs.setAll(entryEditorPreferences.getTabConfigs());
+        tabConfigs.setAll(entryEditorPreferences.getTabModels());
         selectedTab.set(null);
 
         openOnNewEntryProperty.setValue(entryEditorPreferences.shouldOpenOnNewEntry());
@@ -149,9 +149,9 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     public void resetToDefaults() {
         tabConfigs.removeIf(config -> config instanceof EntryEditorTabModel.FieldSet);
         List<EntryEditorTabModel> defaultFieldSets = EntryEditorPreferences.getDefaultEntryEditorTabs()
-                                                                            .entrySet().stream()
-                                                                            .<EntryEditorTabModel>map(e -> new EntryEditorTabModel.FieldSet(e.getKey(), e.getValue(), true))
-                                                                            .toList();
+                                                                           .entrySet().stream()
+                                                                           .<EntryEditorTabModel>map(e -> new EntryEditorTabModel.FieldSet(e.getKey(), e.getValue(), true))
+                                                                           .toList();
         tabConfigs.addAll(0, defaultFieldSets);
         // selectedTab is cleared automatically when the ListView loses the old selected item
     }

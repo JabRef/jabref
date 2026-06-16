@@ -47,7 +47,7 @@ public class EntryEditorPreferences {
 
     /// Ordered list of all configurable tabs. {@link EntryEditorTabModel.FieldSet} entries
     /// always precede {@link EntryEditorTabModel.Feature} entries.
-    private final ObservableList<EntryEditorTabModel> tabConfigs;
+    private final ObservableList<EntryEditorTabModel> tabModels;
 
     private final BooleanProperty shouldOpenOnNewEntry;
     private final BooleanProperty showSourceTabByDefault;
@@ -86,7 +86,7 @@ public class EntryEditorPreferences {
                                   CitationFetcherType citationFetcherType,
                                   CitationCountFetcherType citationCountFetcherType,
                                   double previewWidthDividerPosition) {
-        this.tabConfigs = FXCollections.observableList(createEntryEditorTabModels(entryEditorTabList, staticTabs));
+        this.tabModels = FXCollections.observableList(createEntryEditorTabModels(entryEditorTabList, staticTabs));
         this.shouldOpenOnNewEntry = new SimpleBooleanProperty(shouldOpenOnNewEntry);
         this.showSourceTabByDefault = new SimpleBooleanProperty(showSourceTabByDefault);
         this.enableValidation = new SimpleBooleanProperty(enableValidation);
@@ -100,27 +100,27 @@ public class EntryEditorPreferences {
 
     private static List<EntryEditorTabModel> createEntryEditorTabModels(Map<String, Set<Field>> entryEditorTabList,
                                                                         Set<EntryEditorTabModel.StaticTab> staticTabs) {
-        List<EntryEditorTabModel> configs = new ArrayList<>();
+        List<EntryEditorTabModel> tabModels = new ArrayList<>();
 
         entryEditorTabList.forEach((name, fields) ->
-                configs.add(new EntryEditorTabModel.FieldSet(name, fields, true)));
+                tabModels.add(new EntryEditorTabModel.FieldSet(name, fields, true)));
 
         for (EntryEditorTabModel.StaticTab tab : EntryEditorTabModel.StaticTab.values()) {
-            configs.add(new EntryEditorTabModel.Feature(tab, staticTabs.contains(tab)));
+            tabModels.add(new EntryEditorTabModel.Feature(tab, staticTabs.contains(tab)));
         }
-        return configs;
+        return tabModels;
     }
 
-    public ObservableList<EntryEditorTabModel> getTabConfigs() {
-        return tabConfigs;
+    public ObservableList<EntryEditorTabModel> getTabModels() {
+        return tabModels;
     }
 
-    public boolean isStaticTabVisible(EntryEditorTabModel.StaticTab tab) {
-        for (EntryEditorTabModel config : tabConfigs) {
-            if (config instanceof EntryEditorTabModel.Feature(
-                    EntryEditorTabModel.StaticTab type,
+    public boolean isStaticTabVisible(EntryEditorTabModel.StaticTab tabModel) {
+        for (EntryEditorTabModel model : tabModels) {
+            if (model instanceof EntryEditorTabModel.Feature(
+                    EntryEditorTabModel.StaticTab staticTabModel,
                     boolean visible
-            ) && type == tab) {
+            ) && staticTabModel == tabModel) {
                 return visible;
             }
         }
@@ -128,9 +128,9 @@ public class EntryEditorPreferences {
     }
 
     public void setStaticTabVisible(EntryEditorTabModel.StaticTab tab, boolean show) {
-        for (int i = 0; i < tabConfigs.size(); i++) {
-            if (tabConfigs.get(i) instanceof EntryEditorTabModel.Feature feature && feature.type() == tab) {
-                tabConfigs.set(i, new EntryEditorTabModel.Feature(tab, show));
+        for (int i = 0; i < tabModels.size(); i++) {
+            if (tabModels.get(i) instanceof EntryEditorTabModel.Feature feature && feature.type() == tab) {
+                tabModels.set(i, new EntryEditorTabModel.Feature(tab, show));
                 return;
             }
         }
@@ -140,7 +140,7 @@ public class EntryEditorPreferences {
     /// in the preferences; use {@link #setEntryEditorTabList} to persist modifications.
     public Map<String, Set<Field>> getEntryEditorTabs() {
         SequencedMap<String, Set<Field>> map = new LinkedHashMap<>();
-        for (EntryEditorTabModel config : tabConfigs) {
+        for (EntryEditorTabModel config : tabModels) {
             if (config instanceof EntryEditorTabModel.FieldSet fieldSet) {
                 map.put(fieldSet.name(), fieldSet.fields());
             }
@@ -153,61 +153,8 @@ public class EntryEditorPreferences {
                                                     .<EntryEditorTabModel>map(e ->
                                                             new EntryEditorTabModel.FieldSet(e.getKey(), e.getValue(), true))
                                                     .toList();
-        tabConfigs.removeIf(config -> config instanceof EntryEditorTabModel.FieldSet);
-        tabConfigs.addAll(0, newFieldSet);
-    }
-
-    public static Set<EntryEditorTabModel.StaticTab> staticTabsFromBoolean(
-            boolean showRequiredFields,
-            boolean showImportantOptionalFields,
-            boolean showDetailOptionalFields,
-            boolean showDeprecatedFields,
-            boolean showOtherFields,
-            boolean showRelatedArticles,
-            boolean showAISummary,
-            boolean showAIChat,
-            boolean showLaTeXCitations,
-            boolean showFileAnnotations,
-            boolean showCitationInformation,
-            boolean showUserComments) {
-        Set<EntryEditorTabModel.StaticTab> tabs = EnumSet.noneOf(EntryEditorTabModel.StaticTab.class);
-        if (showRequiredFields) {
-            tabs.add(EntryEditorTabModel.StaticTab.REQUIRED_FIELDS);
-        }
-        if (showImportantOptionalFields) {
-            tabs.add(EntryEditorTabModel.StaticTab.IMPORTANT_OPTIONAL_FIELDS);
-        }
-        if (showDetailOptionalFields) {
-            tabs.add(EntryEditorTabModel.StaticTab.DETAIL_OPTIONAL_FIELDS);
-        }
-        if (showDeprecatedFields) {
-            tabs.add(EntryEditorTabModel.StaticTab.DEPRECATED_FIELDS);
-        }
-        if (showOtherFields) {
-            tabs.add(EntryEditorTabModel.StaticTab.OTHER_FIELDS);
-        }
-        if (showRelatedArticles) {
-            tabs.add(EntryEditorTabModel.StaticTab.RELATED_ARTICLES);
-        }
-        if (showAISummary) {
-            tabs.add(EntryEditorTabModel.StaticTab.AI_SUMMARY);
-        }
-        if (showAIChat) {
-            tabs.add(EntryEditorTabModel.StaticTab.AI_CHAT);
-        }
-        if (showLaTeXCitations) {
-            tabs.add(EntryEditorTabModel.StaticTab.LATEX_CITATIONS);
-        }
-        if (showFileAnnotations) {
-            tabs.add(EntryEditorTabModel.StaticTab.FILE_ANNOTATIONS);
-        }
-        if (showCitationInformation) {
-            tabs.add(EntryEditorTabModel.StaticTab.CITATION_INFORMATION);
-        }
-        if (showUserComments) {
-            tabs.add(EntryEditorTabModel.StaticTab.USER_COMMENTS);
-        }
-        return tabs;
+        tabModels.removeIf(config -> config instanceof EntryEditorTabModel.FieldSet);
+        tabModels.addAll(0, newFieldSet);
     }
 
     public static SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
@@ -247,7 +194,7 @@ public class EntryEditorPreferences {
     // endregion
 
     public void setAll(EntryEditorPreferences preferences) {
-        tabConfigs.setAll(preferences.getTabConfigs());
+        tabModels.setAll(preferences.getTabModels());
         this.shouldOpenOnNewEntry.set(preferences.shouldOpenOnNewEntry());
         this.showSourceTabByDefault.set(preferences.showSourceTabByDefault());
         this.enableValidation.set(preferences.shouldEnableValidation());

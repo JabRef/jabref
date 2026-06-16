@@ -72,7 +72,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         return Bindings.createBooleanBinding(
                 () -> shouldShow.getValue() && entryEditorPreferences.isStaticTabVisible(tab),
                 shouldShow,
-                entryEditorPreferences.getTabConfigs());
+                entryEditorPreferences.getTabModels());
     }
 
     @SuppressWarnings("FieldCanBeLocal")

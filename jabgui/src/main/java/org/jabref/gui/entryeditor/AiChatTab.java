@@ -29,7 +29,7 @@ public class AiChatTab extends EntryEditorTab {
 
         this.shouldShow = Bindings.createBooleanBinding(
                 () -> entryEditorPreferences.isStaticTabVisible(EntryEditorTabModel.StaticTab.AI_CHAT),
-                entryEditorPreferences.getTabConfigs());
+                entryEditorPreferences.getTabModels());
 
         setText(Localization.lang("AI chat"));
         setTooltip(new Tooltip(Localization.lang("Chat with AI about content of attached file(s)")));

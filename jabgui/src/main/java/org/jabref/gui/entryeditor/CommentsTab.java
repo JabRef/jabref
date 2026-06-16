@@ -71,9 +71,9 @@ public class CommentsTab extends FieldsEditorTab implements NamedEntryEditorTab 
 
         this.shouldShow = Bindings.createBooleanBinding(
                 () -> getCurrentEntry() != null
-                      && entryEditorPreferences.isStaticTabVisible(EntryEditorTabModel.StaticTab.USER_COMMENTS),
+                        && entryEditorPreferences.isStaticTabVisible(EntryEditorTabModel.StaticTab.USER_COMMENTS),
                 currentEntryProperty(),
-                entryEditorPreferences.getTabConfigs());
+                entryEditorPreferences.getTabModels());
     }
 
     @Override

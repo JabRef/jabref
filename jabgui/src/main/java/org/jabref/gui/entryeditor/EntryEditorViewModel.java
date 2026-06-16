@@ -38,6 +38,6 @@ public class EntryEditorViewModel extends AbstractViewModel {
     }
 
     public ObservableList<EntryEditorTabModel> getTabModels() {
-        return entryEditorPreferences.getTabConfigs();
+        return entryEditorPreferences.getTabModels();
     }
 }

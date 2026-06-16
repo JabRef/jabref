@@ -67,7 +67,7 @@ public class RelatedArticlesTab extends EntryEditorTab implements NamedEntryEdit
 
         this.shouldShow = Bindings.createBooleanBinding(
                 () -> preferences.getEntryEditorPreferences().isStaticTabVisible(EntryEditorTabModel.StaticTab.RELATED_ARTICLES),
-                preferences.getEntryEditorPreferences().getTabConfigs());
+                preferences.getEntryEditorPreferences().getTabModels());
 
         setText(Localization.lang("Related articles"));
         setTooltip(new Tooltip(Localization.lang("Related articles")));

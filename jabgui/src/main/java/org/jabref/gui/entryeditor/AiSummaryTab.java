@@ -32,7 +32,7 @@ public class AiSummaryTab extends EntryEditorTab {
 
         this.shouldShow = Bindings.createBooleanBinding(
                 () -> preferences.getEntryEditorPreferences().isStaticTabVisible(EntryEditorTabModel.StaticTab.AI_SUMMARY),
-                preferences.getEntryEditorPreferences().getTabConfigs());
+                preferences.getEntryEditorPreferences().getTabModels());
 
         setText(Localization.lang("AI summary"));
         setTooltip(new Tooltip(Localization.lang("AI-generated summary of attached file(s)")));

@@ -2,6 +2,7 @@ package org.jabref.gui.preferences;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -334,6 +335,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     // region CopyToPreferences
+
     public CopyToPreferences getCopyToPreferences() {
         if (copyToPreferences != null) {
             return copyToPreferences;
@@ -352,16 +354,17 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(INCLUDE_CROSS_REFERENCES, defaults.getShouldIncludeCrossReferences())
         );
     }
-    // endregion
 
+    // endregion
     // region EntryEditorPreferences
+
     public EntryEditorPreferences getEntryEditorPreferences() {
         if (entryEditorPreferences != null) {
             return entryEditorPreferences;
         }
         entryEditorPreferences = getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences.getDefault());
 
-        entryEditorPreferences.getTabConfigs().addListener((InvalidationListener) _ -> storeTabConfigs(entryEditorPreferences.getTabConfigs()));
+        entryEditorPreferences.getTabModels().addListener((InvalidationListener) _ -> storeTabConfigs(entryEditorPreferences.getTabModels()));
         EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (_, _, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
         EasyBind.listen(entryEditorPreferences.showSourceTabByDefaultProperty(), (_, _, newValue) -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
         EasyBind.listen(entryEditorPreferences.enableValidationProperty(), (_, _, newValue) -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
@@ -378,7 +381,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return new EntryEditorPreferences(
                 getEntryEditorTabs(),
                 getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),
-                EntryEditorPreferences.staticTabsFromBoolean(
+                staticTabsFromBoolean(
                         getBoolean(SHOW_REQUIRED_FIELDS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.REQUIRED_FIELDS)),
                         getBoolean(SHOW_IMPORTANT_OPTIONAL_FIELDS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.IMPORTANT_OPTIONAL_FIELDS)),
                         getBoolean(SHOW_DETAIL_OPTIONAL_FIELDS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.DETAIL_OPTIONAL_FIELDS)),
@@ -400,6 +403,59 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 CitationCountFetcherType.valueOf(get(CITATION_COUNT_FETCHER_TYPE, defaults.getCitationCountFetcherType().name())),
                 getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewWidthDividerPosition())
         );
+    }
+
+    private static Set<EntryEditorTabModel.StaticTab> staticTabsFromBoolean(
+            boolean showRequiredFields,
+            boolean showImportantOptionalFields,
+            boolean showDetailOptionalFields,
+            boolean showDeprecatedFields,
+            boolean showOtherFields,
+            boolean showRelatedArticles,
+            boolean showAISummary,
+            boolean showAIChat,
+            boolean showLaTeXCitations,
+            boolean showFileAnnotations,
+            boolean showCitationInformation,
+            boolean showUserComments) {
+        Set<EntryEditorTabModel.StaticTab> tabs = EnumSet.noneOf(EntryEditorTabModel.StaticTab.class);
+        if (showRequiredFields) {
+            tabs.add(EntryEditorTabModel.StaticTab.REQUIRED_FIELDS);
+        }
+        if (showImportantOptionalFields) {
+            tabs.add(EntryEditorTabModel.StaticTab.IMPORTANT_OPTIONAL_FIELDS);
+        }
+        if (showDetailOptionalFields) {
+            tabs.add(EntryEditorTabModel.StaticTab.DETAIL_OPTIONAL_FIELDS);
+        }
+        if (showDeprecatedFields) {
+            tabs.add(EntryEditorTabModel.StaticTab.DEPRECATED_FIELDS);
+        }
+        if (showOtherFields) {
+            tabs.add(EntryEditorTabModel.StaticTab.OTHER_FIELDS);
+        }
+        if (showRelatedArticles) {
+            tabs.add(EntryEditorTabModel.StaticTab.RELATED_ARTICLES);
+        }
+        if (showAISummary) {
+            tabs.add(EntryEditorTabModel.StaticTab.AI_SUMMARY);
+        }
+        if (showAIChat) {
+            tabs.add(EntryEditorTabModel.StaticTab.AI_CHAT);
+        }
+        if (showLaTeXCitations) {
+            tabs.add(EntryEditorTabModel.StaticTab.LATEX_CITATIONS);
+        }
+        if (showFileAnnotations) {
+            tabs.add(EntryEditorTabModel.StaticTab.FILE_ANNOTATIONS);
+        }
+        if (showCitationInformation) {
+            tabs.add(EntryEditorTabModel.StaticTab.CITATION_INFORMATION);
+        }
+        if (showUserComments) {
+            tabs.add(EntryEditorTabModel.StaticTab.USER_COMMENTS);
+        }
+        return tabs;
     }
 
     /// Get a Map of defined tab names to default tab fields.
