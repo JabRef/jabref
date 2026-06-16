@@ -99,7 +99,7 @@ public class EntryEditorPreferences {
     }
 
     private static List<EntryEditorTabModel> createEntryEditorTabModels(Map<String, Set<Field>> entryEditorTabList,
-                                                                          Set<EntryEditorTabModel.StaticTab> staticTabs) {
+                                                                        Set<EntryEditorTabModel.StaticTab> staticTabs) {
         List<EntryEditorTabModel> configs = new ArrayList<>();
 
         entryEditorTabList.forEach((name, fields) ->
@@ -150,14 +150,19 @@ public class EntryEditorPreferences {
 
     public void setEntryEditorTabList(Map<String, Set<Field>> tabs) {
         List<EntryEditorTabModel> newFieldSet = tabs.entrySet().stream()
-                                                     .<EntryEditorTabModel>map(e ->
-                                                             new EntryEditorTabModel.FieldSet(e.getKey(), e.getValue(), true))
-                                                     .toList();
+                                                    .<EntryEditorTabModel>map(e ->
+                                                            new EntryEditorTabModel.FieldSet(e.getKey(), e.getValue(), true))
+                                                    .toList();
         tabConfigs.removeIf(config -> config instanceof EntryEditorTabModel.FieldSet);
         tabConfigs.addAll(0, newFieldSet);
     }
 
     public static Set<EntryEditorTabModel.StaticTab> staticTabsFromBoolean(
+            boolean showRequiredFields,
+            boolean showImportantOptionalFields,
+            boolean showDetailOptionalFields,
+            boolean showDeprecatedFields,
+            boolean showOtherFields,
             boolean showRelatedArticles,
             boolean showAISummary,
             boolean showAIChat,
@@ -166,6 +171,21 @@ public class EntryEditorPreferences {
             boolean showCitationInformation,
             boolean showUserComments) {
         Set<EntryEditorTabModel.StaticTab> tabs = EnumSet.noneOf(EntryEditorTabModel.StaticTab.class);
+        if (showRequiredFields) {
+            tabs.add(EntryEditorTabModel.StaticTab.REQUIRED_FIELDS);
+        }
+        if (showImportantOptionalFields) {
+            tabs.add(EntryEditorTabModel.StaticTab.IMPORTANT_OPTIONAL_FIELDS);
+        }
+        if (showDetailOptionalFields) {
+            tabs.add(EntryEditorTabModel.StaticTab.DETAIL_OPTIONAL_FIELDS);
+        }
+        if (showDeprecatedFields) {
+            tabs.add(EntryEditorTabModel.StaticTab.DEPRECATED_FIELDS);
+        }
+        if (showOtherFields) {
+            tabs.add(EntryEditorTabModel.StaticTab.OTHER_FIELDS);
+        }
         if (showRelatedArticles) {
             tabs.add(EntryEditorTabModel.StaticTab.RELATED_ARTICLES);
         }

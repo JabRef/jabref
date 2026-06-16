@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.geometry.VPos;
@@ -64,6 +65,15 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     /// Shown when the current entry (of its type) has at least one field to display in this tab.
     private final ObservableValue<Boolean> shouldShow =
             EasyBind.map(currentEntryProperty(), entry -> (entry != null) && !determineFieldsToShow(entry).isEmpty());
+
+    /// Combines {@link #shouldShow} with a {@link EntryEditorTabModel.StaticTab} visibility preference,
+    /// for subclasses backing a tab that the user can turn off entirely (e.g. {@link RequiredFieldsTab}).
+    protected final ObservableValue<Boolean> gateByStaticTab(EntryEditorPreferences entryEditorPreferences, EntryEditorTabModel.StaticTab tab) {
+        return Bindings.createBooleanBinding(
+                () -> shouldShow.getValue() && entryEditorPreferences.isStaticTabVisible(tab),
+                shouldShow,
+                entryEditorPreferences.getTabConfigs());
+    }
 
     @SuppressWarnings("FieldCanBeLocal")
     private Subscription dividerPositionSubscription;

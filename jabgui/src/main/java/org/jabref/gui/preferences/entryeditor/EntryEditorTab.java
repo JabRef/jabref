@@ -205,6 +205,16 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
 
     private static String featureTabDisplayName(EntryEditorTabModel.StaticTab type) {
         return switch (type) {
+            case REQUIRED_FIELDS ->
+                    Localization.lang("Required fields");
+            case IMPORTANT_OPTIONAL_FIELDS ->
+                    Localization.lang("Optional fields");
+            case DETAIL_OPTIONAL_FIELDS ->
+                    Localization.lang("Optional fields 2");
+            case DEPRECATED_FIELDS ->
+                    Localization.lang("Deprecated fields");
+            case OTHER_FIELDS ->
+                    Localization.lang("Other fields");
             case RELATED_ARTICLES ->
                     Localization.lang("Related articles");
             case AI_SUMMARY ->
