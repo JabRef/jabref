@@ -846,10 +846,14 @@ class BibEntryTest {
     }
 
     @Test
-    void getFieldValuesReflexivityHolds() {
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setField(StandardField.AUTHOR, "Turing, Alan");
-        Collection<String> values = entry.getFieldValues();
-        assertEquals(values, values);
+    void getFieldValuesReturnsCollectionWithContentBasedEquals() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Turing, Alan");
+
+        Collection<String> values1 = entry.getFieldValues();
+        Collection<String> values2 = entry.getFieldValues();
+
+        assertEquals(values1, values2);
+        assertEquals(List.of("Turing, Alan"), new ArrayList<>(entry.getFieldValues()));
     }
 }

@@ -379,7 +379,7 @@ public class BibDatabase {
 
         // All entries
         for (BibEntry entry : entries) {
-            for (String fieldContent : entry.getFieldValues()) {
+            for (String fieldContent : entry.getFieldMap().values()) {
                 resolveContent(fieldContent, new HashSet<>(), allUsedIds);
             }
         }
