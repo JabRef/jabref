@@ -14,6 +14,11 @@ public sealed interface EntryEditorTabModel
     boolean visible();
 
     enum StaticTab {
+        REQUIRED_FIELDS,
+        IMPORTANT_OPTIONAL_FIELDS,
+        DETAIL_OPTIONAL_FIELDS,
+        DEPRECATED_FIELDS,
+        OTHER_FIELDS,
         RELATED_ARTICLES,
         AI_SUMMARY,
         AI_CHAT,

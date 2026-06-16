@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.StateManager;
@@ -35,6 +36,7 @@ public class OtherFieldsTab extends FieldsEditorTab implements NamedEntryEditorT
     public static final String NAME = "Other fields";
     private final List<Field> customTabsFieldNames;
     private final BibEntryTypesManager entryTypesManager;
+    private final ObservableValue<Boolean> shouldShow;
 
     public OtherFieldsTab(UndoManager undoManager,
                           UndoAction undoAction,
@@ -58,6 +60,7 @@ public class OtherFieldsTab extends FieldsEditorTab implements NamedEntryEditorT
         this.entryTypesManager = entryTypesManager;
         this.customTabsFieldNames = new ArrayList<>();
         preferences.getEntryEditorPreferences().getEntryEditorTabs().values().forEach(customTabsFieldNames::addAll);
+        this.shouldShow = gateByStaticTab(preferences.getEntryEditorPreferences(), EntryEditorTabModel.StaticTab.OTHER_FIELDS);
 
         setText(Localization.lang("Other fields"));
         setTooltip(new Tooltip(Localization.lang("Show remaining fields")));
@@ -90,6 +93,11 @@ public class OtherFieldsTab extends FieldsEditorTab implements NamedEntryEditorT
             // Entry type unknown -> treat all fields as required (thus no other fields)
             return new LinkedHashSet<>();
         }
+    }
+
+    @Override
+    public ObservableValue<Boolean> shouldShow() {
+        return shouldShow;
     }
 
     @Override

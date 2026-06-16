@@ -216,6 +216,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String CUSTOM_TAB_NAME = "customTabName_";
     private static final String CUSTOM_TAB_FIELDS = "customTabFields_";
     private static final String AUTO_OPEN_FORM = "autoOpenForm";
+    private static final String SHOW_REQUIRED_FIELDS = "showRequiredFields";
+    private static final String SHOW_IMPORTANT_OPTIONAL_FIELDS = "showImportantOptionalFields";
+    private static final String SHOW_DETAIL_OPTIONAL_FIELDS = "showDetailOptionalFields";
+    private static final String SHOW_DEPRECATED_FIELDS = "showDeprecatedFields";
+    private static final String SHOW_OTHER_FIELDS = "showOtherFields";
     private static final String SHOW_RECOMMENDATIONS = "showRecommendations";
     private static final String SHOW_AI_SUMMARY = "showAiSummary";
     private static final String SHOW_AI_CHAT = "showAiChat";
@@ -374,6 +379,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getEntryEditorTabs(),
                 getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),
                 EntryEditorPreferences.staticTabsFromBoolean(
+                        getBoolean(SHOW_REQUIRED_FIELDS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.REQUIRED_FIELDS)),
+                        getBoolean(SHOW_IMPORTANT_OPTIONAL_FIELDS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.IMPORTANT_OPTIONAL_FIELDS)),
+                        getBoolean(SHOW_DETAIL_OPTIONAL_FIELDS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.DETAIL_OPTIONAL_FIELDS)),
+                        getBoolean(SHOW_DEPRECATED_FIELDS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.DEPRECATED_FIELDS)),
+                        getBoolean(SHOW_OTHER_FIELDS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.OTHER_FIELDS)),
                         getBoolean(SHOW_RECOMMENDATIONS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.RELATED_ARTICLES)),
                         getBoolean(SHOW_AI_SUMMARY, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.AI_SUMMARY)),
                         getBoolean(SHOW_AI_CHAT, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.AI_CHAT)),
@@ -431,6 +441,16 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                     boolean visible
             )) {
                 switch (type) {
+                    case REQUIRED_FIELDS ->
+                            putBoolean(SHOW_REQUIRED_FIELDS, visible);
+                    case IMPORTANT_OPTIONAL_FIELDS ->
+                            putBoolean(SHOW_IMPORTANT_OPTIONAL_FIELDS, visible);
+                    case DETAIL_OPTIONAL_FIELDS ->
+                            putBoolean(SHOW_DETAIL_OPTIONAL_FIELDS, visible);
+                    case DEPRECATED_FIELDS ->
+                            putBoolean(SHOW_DEPRECATED_FIELDS, visible);
+                    case OTHER_FIELDS ->
+                            putBoolean(SHOW_OTHER_FIELDS, visible);
                     case RELATED_ARTICLES ->
                             putBoolean(SHOW_RECOMMENDATIONS, visible);
                     case AI_SUMMARY ->
