@@ -322,7 +322,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                     PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
                     Injector.setModelOrService(
                             JournalAbbreviationRepository.class,
-                            JournalAbbreviationLoader.loadRepository(abbreviationsPreferences, postgreServer.getDataSource()));
+                            JournalAbbreviationLoader.loadRepository(abbreviationsPreferences, postgreServer.getConnection()));
                 })
                 .onFailure(exception -> LOGGER.error("Failed to store journal preferences.", exception))
                 .executeWith(taskExecutor);

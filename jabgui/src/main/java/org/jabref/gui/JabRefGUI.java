@@ -178,7 +178,7 @@ public class JabRefGUI extends Application {
 
         BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
         PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
-        journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getAbbreviationPreferences(), postgreServer.getDataSource());
+        journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getAbbreviationPreferences(), postgreServer.getConnection());
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
         Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);
         Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));

@@ -31,7 +31,7 @@ public class ServerCli implements Callable<Void> {
     @Override
     public Void call() throws InterruptedException {
         PostgreServer postgreServer = new PostgreServer();
-        LspLauncher lspLauncher = new LspLauncher(JabRefCliPreferences.getInstance(), postgreServer.getDataSource(), port);
+        LspLauncher lspLauncher = new LspLauncher(JabRefCliPreferences.getInstance(), postgreServer.getConnection(), port);
         lspLauncher.run();
 
         // Keep the server running until user kills the process (e.g., presses Ctrl+C)

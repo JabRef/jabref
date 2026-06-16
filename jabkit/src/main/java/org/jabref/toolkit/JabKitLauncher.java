@@ -100,7 +100,7 @@ public class JabKitLauncher {
             // Heavy initialization only needed when actually executing a command
             PostgreServer postgreServer = new PostgreServer();
             Injector.setModelOrService(PostgreServer.class, postgreServer);
-            Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getAbbreviationPreferences(), postgreServer.getDataSource()));
+            Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getAbbreviationPreferences(), postgreServer.getConnection()));
             Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
 
             configureProxy(preferences.getProxyPreferences());
