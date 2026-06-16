@@ -61,9 +61,8 @@ public class EntryEditorPreferences {
 
     private EntryEditorPreferences() {
         this(
-                getDefaultEntryEditorTabs(),
+                getDefaultTabModels(),
                 true,
-                EnumSet.allOf(EntryEditorTabModel.StaticTab.class),
                 false,
                 true,
                 true,
@@ -75,9 +74,8 @@ public class EntryEditorPreferences {
         );
     }
 
-    public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList,
+    public EntryEditorPreferences(List<EntryEditorTabModel> tabModels,
                                   boolean shouldOpenOnNewEntry,
-                                  Set<EntryEditorTabModel.StaticTab> staticTabs,
                                   boolean showSourceTabByDefault,
                                   boolean enableValidation,
                                   boolean allowIntegerEditionBibtex,
@@ -86,7 +84,7 @@ public class EntryEditorPreferences {
                                   CitationFetcherType citationFetcherType,
                                   CitationCountFetcherType citationCountFetcherType,
                                   double previewWidthDividerPosition) {
-        this.tabModels = FXCollections.observableList(createEntryEditorTabModels(entryEditorTabList, staticTabs));
+        this.tabModels = FXCollections.observableArrayList(tabModels);
         this.shouldOpenOnNewEntry = new SimpleBooleanProperty(shouldOpenOnNewEntry);
         this.showSourceTabByDefault = new SimpleBooleanProperty(showSourceTabByDefault);
         this.enableValidation = new SimpleBooleanProperty(enableValidation);
@@ -98,15 +96,15 @@ public class EntryEditorPreferences {
         this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
     }
 
-    private static List<EntryEditorTabModel> createEntryEditorTabModels(Map<String, Set<Field>> entryEditorTabList,
-                                                                        Set<EntryEditorTabModel.StaticTab> staticTabs) {
+    /// The default tab list: default custom field-set tabs, followed by every static tab enabled.
+    private static List<EntryEditorTabModel> getDefaultTabModels() {
         List<EntryEditorTabModel> tabModels = new ArrayList<>();
 
-        entryEditorTabList.forEach((name, fields) ->
+        getDefaultEntryEditorTabs().forEach((name, fields) ->
                 tabModels.add(new EntryEditorTabModel.FieldSet(name, fields, true)));
 
         for (EntryEditorTabModel.StaticTab tab : EntryEditorTabModel.StaticTab.values()) {
-            tabModels.add(new EntryEditorTabModel.Feature(tab, staticTabs.contains(tab)));
+            tabModels.add(new EntryEditorTabModel.Feature(tab, true));
         }
         return tabModels;
     }
