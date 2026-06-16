@@ -162,12 +162,43 @@ public class EntryEditorTabFactory {
         Map<String, Set<Field>> entryEditorTabList = new HashMap<>(preferences.getEntryEditorPreferences().getEntryEditorTabs());
 
         Set<String> builtInTabNames = Stream.concat(leadingTabs.stream(), trailingTabs.stream())
-                                             .filter(NamedEntryEditorTab.class::isInstance)
-                                             .map(NamedEntryEditorTab.class::cast)
-                                             .map(NamedEntryEditorTab::getName)
-                                             .collect(Collectors.toSet());
+                                            .filter(NamedEntryEditorTab.class::isInstance)
+                                            .map(NamedEntryEditorTab.class::cast)
+                                            .map(NamedEntryEditorTab::getName)
+                                            .collect(Collectors.toSet());
         builtInTabNames.forEach(entryEditorTabList::remove);
 
         return entryEditorTabList;
+    }
+
+    /// Builds the {@link EntryEditorTabModel.Feature} entries for every {@link EntryEditorTabModel.StaticTab},
+    /// in enum declaration order, so callers can append them directly to a tab-models list.
+    public static List<EntryEditorTabModel> fromBoolean(
+            boolean showRequiredFields,
+            boolean showImportantOptionalFields,
+            boolean showDetailOptionalFields,
+            boolean showDeprecatedFields,
+            boolean showOtherFields,
+            boolean showRelatedArticles,
+            boolean showAISummary,
+            boolean showAIChat,
+            boolean showLaTeXCitations,
+            boolean showFileAnnotations,
+            boolean showCitationInformation,
+            boolean showUserComments) {
+        return List.of(
+                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.REQUIRED_FIELDS, showRequiredFields),
+                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.IMPORTANT_OPTIONAL_FIELDS, showImportantOptionalFields),
+                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.DETAIL_OPTIONAL_FIELDS, showDetailOptionalFields),
+                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.DEPRECATED_FIELDS, showDeprecatedFields),
+                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.OTHER_FIELDS, showOtherFields),
+                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.RELATED_ARTICLES, showRelatedArticles),
+                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.AI_SUMMARY, showAISummary),
+                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.AI_CHAT, showAIChat),
+                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.LATEX_CITATIONS, showLaTeXCitations),
+                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.FILE_ANNOTATIONS, showFileAnnotations),
+                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.CITATION_INFORMATION, showCitationInformation),
+                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.USER_COMMENTS, showUserComments)
+        );
     }
 }
