@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.geometry.VPos;
@@ -62,18 +61,9 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
 
     private Collection<Field> fields = new ArrayList<>();
 
-    /// Shown when the current entry (of its type) has at least one field to display in this tab.
-    private final ObservableValue<Boolean> shouldShow =
+    /// Content available when the current entry (of its type) has at least one field to display in this tab.
+    private final ObservableValue<Boolean> contentVisibility =
             EasyBind.map(currentEntryProperty(), entry -> (entry != null) && !determineFieldsToShow(entry).isEmpty());
-
-    /// Combines {@link #shouldShow} with a built-in {@link EntryEditorTabModel.FieldSet} visibility
-    /// preference, for subclasses backing a tab that the user can turn off entirely (e.g. {@link RequiredFieldsTab}).
-    protected final ObservableValue<Boolean> gateByFieldSet(EntryEditorPreferences entryEditorPreferences, EntryEditorTabModel.BuiltInFieldSet fieldSet) {
-        return Bindings.createBooleanBinding(
-                () -> shouldShow.getValue() && entryEditorPreferences.isFieldSetVisible(fieldSet),
-                shouldShow,
-                entryEditorPreferences.getTabModels());
-    }
 
     @SuppressWarnings("FieldCanBeLocal")
     private Subscription dividerPositionSubscription;
@@ -209,8 +199,8 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     }
 
     @Override
-    public ObservableValue<Boolean> shouldShow() {
-        return shouldShow;
+    protected ObservableValue<Boolean> contentVisibility() {
+        return contentVisibility;
     }
 
     @Override

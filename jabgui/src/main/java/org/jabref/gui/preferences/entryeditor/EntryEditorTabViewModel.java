@@ -131,7 +131,11 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        tabConfigs.setAll(entryEditorPreferences.getTabModels());
+        // The Preview tab is configured via the "show preview as a separate tab" preference, not here,
+        // so it is omitted from the configurable tab list (its model visibility bit is unused).
+        tabConfigs.setAll(entryEditorPreferences.getTabModels().stream()
+                                                .filter(model -> !isPreviewFeature(model))
+                                                .toList());
         selectedTab.set(null);
 
         openOnNewEntryProperty.setValue(entryEditorPreferences.shouldOpenOnNewEntry());
@@ -159,10 +163,12 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     /// Index just past a leading {@link EntryEditorTabModel.StaticTab#PREVIEW} feature (1 if present, else 0),
     /// so customized field-set tabs are inserted after the always-present Preview tab instead of before it.
     private int indexAfterLeadingPreview() {
-        return !tabConfigs.isEmpty()
-                && tabConfigs.getFirst() instanceof EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab type, boolean ignored)
-                && type == EntryEditorTabModel.StaticTab.PREVIEW
-                ? 1 : 0;
+        return !tabConfigs.isEmpty() && isPreviewFeature(tabConfigs.getFirst()) ? 1 : 0;
+    }
+
+    private static boolean isPreviewFeature(EntryEditorTabModel model) {
+        return model instanceof EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab type, boolean ignored)
+                && type == EntryEditorTabModel.StaticTab.PREVIEW;
     }
 
     public void addFieldSetTab() {

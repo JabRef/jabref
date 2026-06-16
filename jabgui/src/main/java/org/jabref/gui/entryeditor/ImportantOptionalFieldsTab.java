@@ -26,7 +26,6 @@ public class ImportantOptionalFieldsTab extends OptionalFieldsTabBase implements
         super(
                 Localization.lang("Optional fields"),
                 true,
-                EntryEditorTabModel.BuiltInFieldSet.IMPORTANT_OPTIONAL_FIELDS,
                 undoManager,
                 undoAction,
                 redoAction,

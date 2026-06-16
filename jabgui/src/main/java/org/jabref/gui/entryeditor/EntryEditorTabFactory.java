@@ -4,6 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.citationrelationtab.CitationRelationsTab;
@@ -31,6 +34,9 @@ import org.jabref.model.util.FileUpdateMonitor;
 /// ({@link EntryEditorTabModel}) plus the fixed, always-present tabs into the concrete JavaFX tab views,
 /// keeping tab creation (and the GUI dependencies it needs) out of the view and the view model.
 public class EntryEditorTabFactory {
+
+    /// Visibility gate for tabs that are always enabled (e.g. customized field-set tabs).
+    private static final ObservableValue<Boolean> ALWAYS_ENABLED = new SimpleBooleanProperty(true);
 
     private final PreviewPanel previewPanel;
     private final UndoAction undoAction;
@@ -112,13 +118,33 @@ public class EntryEditorTabFactory {
     ///
     /// @param entryEditor the editor hosting the tabs (needed by {@link FulltextSearchResultsTab})
     public EntryEditorTab createTab(EntryEditorTabModel model, EntryEditor entryEditor) {
-        return switch (model) {
+        EntryEditorTab tab = switch (model) {
             case EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet type, boolean ignored) ->
                     createFieldSetTab(type);
             case EntryEditorTabModel.CustomizedFieldSet(String name, Set<Field> fields, boolean ignored) ->
                     new UserDefinedFieldsTab(name, fields, undoManager, undoAction, redoAction, preferences, journalAbbreviationRepository, stateManager, previewPanel);
             case EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab type, boolean ignored) ->
                     createFeatureTab(type, entryEditor);
+        };
+        tab.setVisibilityGate(visibilityGate(model));
+        return tab;
+    }
+
+    /// The user-controlled visibility for a tab, derived from its model. Customized field-set tabs are
+    /// always enabled (toggled only by adding/removing them); the Preview tab's toggle lives in the
+    /// preview preferences ("show preview as a separate tab"), not in its tab model.
+    private ObservableValue<Boolean> visibilityGate(EntryEditorTabModel model) {
+        EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
+        return switch (model) {
+            case EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet type, boolean ignored) ->
+                    entryEditorPreferences.fieldSetVisibleProperty(type);
+            case EntryEditorTabModel.CustomizedFieldSet ignored ->
+                    ALWAYS_ENABLED;
+            case EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab type, boolean ignored)
+                    when type == EntryEditorTabModel.StaticTab.PREVIEW ->
+                    preferences.getPreviewPreferences().showPreviewAsExtraTabProperty();
+            case EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab type, boolean ignored) ->
+                    entryEditorPreferences.staticTabVisibleProperty(type);
         };
     }
 

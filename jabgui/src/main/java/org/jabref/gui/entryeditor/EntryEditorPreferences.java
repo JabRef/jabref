@@ -9,12 +9,14 @@ import java.util.SequencedMap;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -143,6 +145,18 @@ public class EntryEditorPreferences {
                 return;
             }
         }
+    }
+
+    /// Reactive visibility of a built-in field-set tab, recomputed whenever the tab models change.
+    /// Used by {@link EntryEditorTabFactory} to gate the tab without each tab reaching into preferences.
+    public ObservableValue<Boolean> fieldSetVisibleProperty(EntryEditorTabModel.BuiltInFieldSet fieldSetType) {
+        return Bindings.createBooleanBinding(() -> isFieldSetVisible(fieldSetType), tabModels);
+    }
+
+    /// Reactive visibility of a static (feature) tab, recomputed whenever the tab models change.
+    /// Used by {@link EntryEditorTabFactory} to gate the tab without each tab reaching into preferences.
+    public ObservableValue<Boolean> staticTabVisibleProperty(EntryEditorTabModel.StaticTab tabType) {
+        return Bindings.createBooleanBinding(() -> isStaticTabVisible(tabType), tabModels);
     }
 
     public boolean isStaticTabVisible(EntryEditorTabModel.StaticTab tabModel) {
