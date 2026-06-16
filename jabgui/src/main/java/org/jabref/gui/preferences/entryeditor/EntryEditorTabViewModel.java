@@ -186,7 +186,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
             case EntryEditorTabModel.Feature feature ->
                     tabConfigs.set(index, new EntryEditorTabModel.Feature(feature.type(), !feature.visible()));
             case EntryEditorTabModel.FieldSet fieldSet ->
-                    tabConfigs.set(index, new EntryEditorTabModel.FieldSet(fieldSet.name(), !fieldSet.visible()));
+                    tabConfigs.set(index, new EntryEditorTabModel.FieldSet(fieldSet.type(), !fieldSet.visible()));
             case EntryEditorTabModel.CustomizedFieldSet ignored -> {
                 // Custom tabs are always visible; toggled only by adding/removing them.
             }
@@ -213,7 +213,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
                 case EntryEditorTabModel.Feature feature ->
                         entryEditorPreferences.setStaticTabVisible(feature.type(), feature.visible());
                 case EntryEditorTabModel.FieldSet fieldSet ->
-                        entryEditorPreferences.setFieldSetVisible(fieldSet.name(), fieldSet.visible());
+                        entryEditorPreferences.setFieldSetVisible(fieldSet.type(), fieldSet.visible());
                 case EntryEditorTabModel.CustomizedFieldSet ignored -> {
                     // handled below
                 }

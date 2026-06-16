@@ -8,7 +8,6 @@ import org.jabref.model.entry.field.Field;
 ///
 /// {@link FieldSet}          — built-in tab (e.g. {@link RequiredFieldsTab}) whose fields are computed
 ///                             dynamically from the entry type; only its visibility is configurable.
-///                             Identified by the tab's {@code NAME} constant (see {@link NamedEntryEditorTab}).
 /// {@link CustomizedFieldSet} — user-customizable tab backed by an explicit, named set of fields.
 /// {@link Feature}            — fixed-implementation tab whose only user-facing knob is visibility.
 public sealed interface EntryEditorTabModel
@@ -26,7 +25,15 @@ public sealed interface EntryEditorTabModel
         USER_COMMENTS
     }
 
-    record FieldSet(String name, boolean visible)
+    enum BuiltInFieldSet {
+        REQUIRED_FIELDS,
+        IMPORTANT_OPTIONAL_FIELDS,
+        DETAIL_OPTIONAL_FIELDS,
+        DEPRECATED_FIELDS,
+        OTHER_FIELDS
+    }
+
+    record FieldSet(BuiltInFieldSet type, boolean visible)
             implements EntryEditorTabModel {
     }
 

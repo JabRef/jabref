@@ -60,7 +60,7 @@ public class OtherFieldsTab extends FieldsEditorTab implements NamedEntryEditorT
         this.entryTypesManager = entryTypesManager;
         this.customTabsFieldNames = new ArrayList<>();
         preferences.getEntryEditorPreferences().getEntryEditorTabs().values().forEach(customTabsFieldNames::addAll);
-        this.shouldShow = gateByFieldSetName(preferences.getEntryEditorPreferences(), NAME);
+        this.shouldShow = gateByFieldSet(preferences.getEntryEditorPreferences(), EntryEditorTabModel.BuiltInFieldSet.OTHER_FIELDS);
 
         setText(Localization.lang("Other fields"));
         setTooltip(new Tooltip(Localization.lang("Show remaining fields")));

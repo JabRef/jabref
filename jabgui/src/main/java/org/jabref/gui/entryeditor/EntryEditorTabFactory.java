@@ -201,11 +201,11 @@ public class EntryEditorTabFactory {
             boolean showDeprecatedFields,
             boolean showOtherFields) {
         return List.of(
-                new EntryEditorTabModel.FieldSet(RequiredFieldsTab.NAME, showRequiredFields),
-                new EntryEditorTabModel.FieldSet(ImportantOptionalFieldsTab.NAME, showImportantOptionalFields),
-                new EntryEditorTabModel.FieldSet(DetailOptionalFieldsTab.NAME, showDetailOptionalFields),
-                new EntryEditorTabModel.FieldSet(DeprecatedFieldsTab.NAME, showDeprecatedFields),
-                new EntryEditorTabModel.FieldSet(OtherFieldsTab.NAME, showOtherFields)
+                new EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet.REQUIRED_FIELDS, showRequiredFields),
+                new EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet.IMPORTANT_OPTIONAL_FIELDS, showImportantOptionalFields),
+                new EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet.DETAIL_OPTIONAL_FIELDS, showDetailOptionalFields),
+                new EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet.DEPRECATED_FIELDS, showDeprecatedFields),
+                new EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet.OTHER_FIELDS, showOtherFields)
         );
     }
 }

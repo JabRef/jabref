@@ -52,7 +52,7 @@ public class DeprecatedFieldsTab extends FieldsEditorTab implements NamedEntryEd
                 previewPanel
         );
         this.entryTypesManager = entryTypesManager;
-        this.shouldShow = gateByFieldSetName(preferences.getEntryEditorPreferences(), NAME);
+        this.shouldShow = gateByFieldSet(preferences.getEntryEditorPreferences(), EntryEditorTabModel.BuiltInFieldSet.DEPRECATED_FIELDS);
 
         setText(Localization.lang("Deprecated fields"));
         EasyBind.subscribe(preferences.getWorkspacePreferences().showAdvancedHintsProperty(), advancedHints -> {
