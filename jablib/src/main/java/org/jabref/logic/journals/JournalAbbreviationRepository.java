@@ -15,8 +15,6 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.sql.DataSource;
-
 import org.jabref.logic.journals.ltwa.LtwaRepository;
 import org.jabref.logic.util.strings.StringSimilarity;
 
@@ -66,23 +64,24 @@ public class JournalAbbreviationRepository {
     private static final String GET_ALL_NAMES_SQL = """
             SELECT name FROM journal_abbreviation""";
 
-    private final DataSource dataSource;
+    private final Connection connection;
+    private final Object connectionLock = new Object();
     private final TreeSet<Abbreviation> customAbbreviations = new TreeSet<>();
     private final StringSimilarity similarity = new StringSimilarity();
     private final LtwaRepository ltwaRepository;
 
-    /// Initializes the repository backed by the given Postgres data source.
+    /// Initializes the repository backed by the given Postgres connection.
     ///
-    /// @param dataSource     The Postgres data source containing built-in journal abbreviations.
+    /// @param connection     The Postgres connection containing built-in journal abbreviations.
     /// @param ltwaRepository The LTWA repository to use for LTWA-based abbreviations.
-    public JournalAbbreviationRepository(DataSource dataSource, LtwaRepository ltwaRepository) {
-        this.dataSource = dataSource;
+    public JournalAbbreviationRepository(Connection connection, LtwaRepository ltwaRepository) {
+        this.connection = connection;
         this.ltwaRepository = ltwaRepository;
     }
 
     /// Initializes the repository with demonstration data. Used if no database is available.
     public JournalAbbreviationRepository() {
-        this.dataSource = null;
+        this.connection = null;
         this.ltwaRepository = new LtwaRepository();
         customAbbreviations.add(new Abbreviation("Demonstration", "Demo", "Dem"));
     }
@@ -185,7 +184,7 @@ public class JournalAbbreviationRepository {
     /// Fuzzy matches in the database using Postgres pg_trgm trigram similarity
     /// To prevent wrong matches, fuzzy matching is skipped for single word ASCII inputs
     private Optional<Abbreviation> findFuzzyInDatabase(String input) {
-        if (dataSource == null) {
+        if (connection == null) {
             return Optional.empty();
         }
 
@@ -196,34 +195,35 @@ public class JournalAbbreviationRepository {
             }
         }
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(FIND_FUZZY_SQL)) {
-            ps.setString(1, input);
-            ps.setString(2, input);
-            ps.setDouble(3, FUZZY_SIMILARITY_MIN);
+        synchronized (connectionLock) {
+            try (PreparedStatement ps = connection.prepareStatement(FIND_FUZZY_SQL)) {
+                ps.setString(1, input);
+                ps.setString(2, input);
+                ps.setDouble(3, FUZZY_SIMILARITY_MIN);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                List<Abbreviation> candidates = new ArrayList<>(2);
-                List<Double> similarities = new ArrayList<>(2);
-                while (rs.next()) {
-                    candidates.add(toAbbreviation(rs));
-                    similarities.add(rs.getDouble("sim"));
+                try (ResultSet rs = ps.executeQuery()) {
+                    List<Abbreviation> candidates = new ArrayList<>(2);
+                    List<Double> similarities = new ArrayList<>(2);
+                    while (rs.next()) {
+                        candidates.add(toAbbreviation(rs));
+                        similarities.add(rs.getDouble("sim"));
+                    }
+
+                    if (candidates.isEmpty()) {
+                        return Optional.empty();
+                    }
+
+                    // If top two candidates are too close in similarity, the match is ambiguous
+                    if (candidates.size() > 1
+                            && Math.abs(similarities.getFirst() - similarities.get(1)) < FUZZY_AMBIGUITY_THRESHOLD) {
+                        return Optional.empty();
+                    }
+
+                    return Optional.of(candidates.getFirst());
                 }
-
-                if (candidates.isEmpty()) {
-                    return Optional.empty();
-                }
-
-                // If top two candidates are too close in similarity, the match is ambiguous
-                if (candidates.size() > 1
-                        && Math.abs(similarities.getFirst() - similarities.get(1)) < FUZZY_AMBIGUITY_THRESHOLD) {
-                    return Optional.empty();
-                }
-
-                return Optional.of(candidates.getFirst());
+            } catch (SQLException e) {
+                LOGGER.error("Error during fuzzy search for journal abbreviation", e);
             }
-        } catch (SQLException e) {
-            LOGGER.error("Error during fuzzy search for journal abbreviation", e);
         }
         return Optional.empty();
     }
@@ -297,15 +297,16 @@ public class JournalAbbreviationRepository {
     /// Returns all built in abbreviations from the database, used for UI display in the preferences panel
     public Collection<Abbreviation> getAllLoaded() {
         List<Abbreviation> all = new ArrayList<>();
-        if (dataSource != null) {
-            try (Connection conn = dataSource.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(GET_ALL_SQL);
-                 ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    all.add(toAbbreviation(rs));
+        if (connection != null) {
+            synchronized (connectionLock) {
+                try (PreparedStatement ps = connection.prepareStatement(GET_ALL_SQL);
+                     ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        all.add(toAbbreviation(rs));
+                    }
+                } catch (SQLException e) {
+                    LOGGER.error("Error fetching all journal abbreviations", e);
                 }
-            } catch (SQLException e) {
-                LOGGER.error("Error fetching all journal abbreviations", e);
             }
         }
         return all;
@@ -315,15 +316,16 @@ public class JournalAbbreviationRepository {
     public Set<String> getFullNames() {
         Set<String> names = new HashSet<>();
         customAbbreviations.forEach(abbreviation -> names.add(abbreviation.getName()));
-        if (dataSource != null) {
-            try (Connection conn = dataSource.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(GET_ALL_NAMES_SQL);
-                 ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    names.add(rs.getString("name"));
+        if (connection != null) {
+            synchronized (connectionLock) {
+                try (PreparedStatement ps = connection.prepareStatement(GET_ALL_NAMES_SQL);
+                     ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        names.add(rs.getString("name"));
+                    }
+                } catch (SQLException e) {
+                    LOGGER.error("Error fetching journal full names", e);
                 }
-            } catch (SQLException e) {
-                LOGGER.error("Error fetching journal full names", e);
             }
         }
         return names;
@@ -342,39 +344,41 @@ public class JournalAbbreviationRepository {
     }
 
     private Optional<Abbreviation> queryOne(String sql, String... params) {
-        if (dataSource == null) {
+        if (connection == null) {
             return Optional.empty();
         }
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            for (int i = 0; i < params.length; i++) {
-                ps.setString(i + 1, params[i]);
-            }
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(toAbbreviation(rs));
+        synchronized (connectionLock) {
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                for (int i = 0; i < params.length; i++) {
+                    ps.setString(i + 1, params[i]);
                 }
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return Optional.of(toAbbreviation(rs));
+                    }
+                }
+            } catch (SQLException e) {
+                LOGGER.error("Error querying journal abbreviation", e);
             }
-        } catch (SQLException e) {
-            LOGGER.error("Error querying journal abbreviation", e);
         }
         return Optional.empty();
     }
 
     private boolean queryExists(String sql, String... params) {
-        if (dataSource == null) {
+        if (connection == null) {
             return false;
         }
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            for (int i = 0; i < params.length; i++) {
-                ps.setString(i + 1, params[i]);
+        synchronized (connectionLock) {
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                for (int i = 0; i < params.length; i++) {
+                    ps.setString(i + 1, params[i]);
+                }
+                try (ResultSet rs = ps.executeQuery()) {
+                    return rs.next();
+                }
+            } catch (SQLException e) {
+                LOGGER.error("Error checking journal abbreviation existence", e);
             }
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
-        } catch (SQLException e) {
-            LOGGER.error("Error checking journal abbreviation existence", e);
         }
         return false;
     }

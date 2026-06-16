@@ -14,8 +14,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.jabref.logic.journals.ltwa.LtwaRepository;
 
 import org.slf4j.Logger;
@@ -41,14 +39,19 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadRepository(AbbreviationPreferences abbreviationPreferences,
-                                                               DataSource dataSource) {
+                                                               Connection connection) {
+        if (connection == null) {
+            LOGGER.warn("No Postgres connection available; using demonstration journal repository");
+            return new JournalAbbreviationRepository();
+        }
+        
         JournalAbbreviationRepository repository;
 
         // Initialize built-in abbreviations in Postgres
         try {
-            populateDatabase(dataSource);
+            populateDatabase(connection);
             LtwaRepository ltwaRepository = loadLtwaRepository();
-            repository = new JournalAbbreviationRepository(dataSource, ltwaRepository);
+            repository = new JournalAbbreviationRepository(connection, ltwaRepository);
             LOGGER.debug("Loaded journal abbreviations from Postgres");
         } catch (IOException | SQLException e) {
             LOGGER.error("Error while loading journal abbreviation repository", e);
@@ -75,14 +78,12 @@ public class JournalAbbreviationLoader {
     /// Populates the Postgres database with the built-in journal abbreviation list.
     /// The SQL file is bundled as a resource and contains CREATE TABLE + INSERT statements.
     /// Uses `ON CONFLICT` so it is safe to call multiple times (idempotent).
-    private static void populateDatabase(DataSource dataSource) throws IOException, SQLException {
+    private static void populateDatabase(Connection connection) throws IOException, SQLException {
         // Skip if table already exists — safe for parallel test execution
-        try (Connection conn = dataSource.getConnection()) {
-            try (ResultSet tables = conn.getMetaData().getTables(null, null, "journal_abbreviation", null)) {
-                if (tables.next()) {
-                    LOGGER.debug("Journal abbreviation table already exists, skipping population");
-                    return;
-                }
+        try (ResultSet tables = connection.getMetaData().getTables(null, null, "journal_abbreviation", null)) {
+            if (tables.next()) {
+                LOGGER.debug("Journal abbreviation table already exists, skipping population");
+                return;
             }
         }
         try (InputStream resourceAsStream = JournalAbbreviationLoader.class.getResourceAsStream("/journals/journal-list.sql")) {
@@ -91,8 +92,7 @@ public class JournalAbbreviationLoader {
                 return;
             }
             String sql = new String(resourceAsStream.readAllBytes(), StandardCharsets.UTF_8);
-            try (Connection conn = dataSource.getConnection();
-                 Statement stmt = conn.createStatement()) {
+            try (Statement stmt = connection.createStatement()) {
                 stmt.execute(sql);
             }
             LOGGER.debug("Populated journal abbreviation table from journal-list.sql");
@@ -116,8 +116,8 @@ public class JournalAbbreviationLoader {
         }
     }
 
-    /// Loads the built-in repository using the given data source. Used for testing.
-    public static JournalAbbreviationRepository loadBuiltInRepository(DataSource dataSource) {
-        return loadRepository(new AbbreviationPreferences(List.of(), true, false), dataSource);
+    /// Loads the built-in repository using the given connection. Used for testing.
+    public static JournalAbbreviationRepository loadBuiltInRepository(Connection connection) {
+        return loadRepository(new AbbreviationPreferences(List.of(), true, false), connection);
     }
 }
