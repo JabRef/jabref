@@ -26,7 +26,7 @@ public class DetailOptionalFieldsTab extends OptionalFieldsTabBase implements Na
         super(
                 Localization.lang("Optional fields 2"),
                 false,
-                NAME,
+                EntryEditorTabModel.BuiltInFieldSet.DETAIL_OPTIONAL_FIELDS,
                 undoManager,
                 undoAction,
                 redoAction,

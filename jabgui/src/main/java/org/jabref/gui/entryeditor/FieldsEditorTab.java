@@ -68,9 +68,9 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
 
     /// Combines {@link #shouldShow} with a built-in {@link EntryEditorTabModel.FieldSet} visibility
     /// preference, for subclasses backing a tab that the user can turn off entirely (e.g. {@link RequiredFieldsTab}).
-    protected final ObservableValue<Boolean> gateByFieldSetName(EntryEditorPreferences entryEditorPreferences, String fieldSetName) {
+    protected final ObservableValue<Boolean> gateByFieldSet(EntryEditorPreferences entryEditorPreferences, EntryEditorTabModel.BuiltInFieldSet fieldSet) {
         return Bindings.createBooleanBinding(
-                () -> shouldShow.getValue() && entryEditorPreferences.isFieldSetVisible(fieldSetName),
+                () -> shouldShow.getValue() && entryEditorPreferences.isFieldSetVisible(fieldSet),
                 shouldShow,
                 entryEditorPreferences.getTabModels());
     }

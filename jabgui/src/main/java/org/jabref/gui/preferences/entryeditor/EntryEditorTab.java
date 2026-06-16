@@ -25,12 +25,7 @@ import javafx.util.StringConverter;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.entryeditor.DeprecatedFieldsTab;
-import org.jabref.gui.entryeditor.DetailOptionalFieldsTab;
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
-import org.jabref.gui.entryeditor.ImportantOptionalFieldsTab;
-import org.jabref.gui.entryeditor.OtherFieldsTab;
-import org.jabref.gui.entryeditor.RequiredFieldsTab;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
@@ -227,15 +222,14 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         };
     }
 
-    /// Display name for a built-in {@link EntryEditorTabModel.FieldSet}, matched by its {@code NAME} constant.
-    private static String builtInFieldSetDisplayName(String name) {
-        return switch (name) {
-            case RequiredFieldsTab.NAME -> Localization.lang("Required fields");
-            case ImportantOptionalFieldsTab.NAME -> Localization.lang("Optional fields");
-            case DetailOptionalFieldsTab.NAME -> Localization.lang("Optional fields 2");
-            case DeprecatedFieldsTab.NAME -> Localization.lang("Deprecated fields");
-            case OtherFieldsTab.NAME -> Localization.lang("Other fields");
-            default -> name;
+    /// Display name for a built-in {@link EntryEditorTabModel.FieldSet}.
+    private static String builtInFieldSetDisplayName(EntryEditorTabModel.BuiltInFieldSet type) {
+        return switch (type) {
+            case REQUIRED_FIELDS -> Localization.lang("Required fields");
+            case IMPORTANT_OPTIONAL_FIELDS -> Localization.lang("Optional fields");
+            case DETAIL_OPTIONAL_FIELDS -> Localization.lang("Optional fields 2");
+            case DEPRECATED_FIELDS -> Localization.lang("Deprecated fields");
+            case OTHER_FIELDS -> Localization.lang("Other fields");
         };
     }
 
@@ -292,7 +286,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
                     checkBox.setVisible(true);
                     checkBox.setManaged(true);
                     checkBox.setSelected(fieldSet.visible());
-                    nameLabel.setText(builtInFieldSetDisplayName(fieldSet.name()));
+                    nameLabel.setText(builtInFieldSetDisplayName(fieldSet.type()));
                 }
                 case EntryEditorTabModel.CustomizedFieldSet customizedFieldSet -> {
                     checkBox.setVisible(false);

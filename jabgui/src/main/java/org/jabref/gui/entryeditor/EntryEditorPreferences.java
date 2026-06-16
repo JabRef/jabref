@@ -45,15 +45,6 @@ public class EntryEditorPreferences {
         }
     }
 
-    /// Names of the built-in {@link EntryEditorTabModel.FieldSet} tabs, in display order.
-    private static final List<String> BUILT_IN_FIELD_SET_NAMES = List.of(
-            RequiredFieldsTab.NAME,
-            ImportantOptionalFieldsTab.NAME,
-            DetailOptionalFieldsTab.NAME,
-            DeprecatedFieldsTab.NAME,
-            OtherFieldsTab.NAME
-    );
-
     /// Ordered list of all configurable tabs. {@link EntryEditorTabModel.FieldSet} entries
     /// always precede {@link EntryEditorTabModel.Feature} entries.
     private final ObservableList<EntryEditorTabModel> tabModels;
@@ -113,8 +104,8 @@ public class EntryEditorPreferences {
         getDefaultEntryEditorTabs().forEach((name, fields) ->
                 tabModels.add(new EntryEditorTabModel.CustomizedFieldSet(name, fields, true)));
 
-        for (String builtInFieldSetName : BUILT_IN_FIELD_SET_NAMES) {
-            tabModels.add(new EntryEditorTabModel.FieldSet(builtInFieldSetName, true));
+        for (EntryEditorTabModel.BuiltInFieldSet fieldSet : EntryEditorTabModel.BuiltInFieldSet.values()) {
+            tabModels.add(new EntryEditorTabModel.FieldSet(fieldSet, true));
         }
 
         for (EntryEditorTabModel.StaticTab tab : EntryEditorTabModel.StaticTab.values()) {
@@ -127,22 +118,22 @@ public class EntryEditorPreferences {
         return tabModels;
     }
 
-    public boolean isFieldSetVisible(String fieldSetName) {
+    public boolean isFieldSetVisible(EntryEditorTabModel.BuiltInFieldSet fieldSetType) {
         for (EntryEditorTabModel model : tabModels) {
             if (model instanceof EntryEditorTabModel.FieldSet(
-                    String name,
+                    EntryEditorTabModel.BuiltInFieldSet type,
                     boolean visible
-            ) && name.equals(fieldSetName)) {
+            ) && type == fieldSetType) {
                 return visible;
             }
         }
         return false;
     }
 
-    public void setFieldSetVisible(String fieldSetName, boolean show) {
+    public void setFieldSetVisible(EntryEditorTabModel.BuiltInFieldSet fieldSetType, boolean show) {
         for (int i = 0; i < tabModels.size(); i++) {
-            if (tabModels.get(i) instanceof EntryEditorTabModel.FieldSet fieldSet && fieldSet.name().equals(fieldSetName)) {
-                tabModels.set(i, new EntryEditorTabModel.FieldSet(fieldSetName, show));
+            if (tabModels.get(i) instanceof EntryEditorTabModel.FieldSet fieldSet && fieldSet.type() == fieldSetType) {
+                tabModels.set(i, new EntryEditorTabModel.FieldSet(fieldSetType, show));
                 return;
             }
         }

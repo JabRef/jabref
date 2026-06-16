@@ -31,7 +31,7 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
 
     public OptionalFieldsTabBase(String title,
                                  boolean isImportantOptionalFields,
-                                 String fieldSetName,
+                                 EntryEditorTabModel.BuiltInFieldSet fieldSet,
                                  UndoManager undoManager,
                                  UndoAction undoAction,
                                  RedoAction redoAction,
@@ -50,7 +50,7 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                 previewPanel);
         this.entryTypesManager = entryTypesManager;
         this.isImportantOptionalFields = isImportantOptionalFields;
-        this.shouldShow = gateByFieldSetName(preferences.getEntryEditorPreferences(), fieldSetName);
+        this.shouldShow = gateByFieldSet(preferences.getEntryEditorPreferences(), fieldSet);
         setText(title);
         setTooltip(new Tooltip(Localization.lang("Show optional fields")));
         setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());

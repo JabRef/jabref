@@ -51,7 +51,7 @@ public class RequiredFieldsTab extends FieldsEditorTab implements NamedEntryEdit
                 previewPanel
         );
         this.entryTypesManager = entryTypesManager;
-        this.shouldShow = gateByFieldSetName(preferences.getEntryEditorPreferences(), NAME);
+        this.shouldShow = gateByFieldSet(preferences.getEntryEditorPreferences(), EntryEditorTabModel.BuiltInFieldSet.REQUIRED_FIELDS);
         setText(Localization.lang("Required fields"));
         setTooltip(new Tooltip(Localization.lang("Show required fields")));
         setGraphic(IconTheme.JabRefIcons.REQUIRED.getGraphicNode());
