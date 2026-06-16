@@ -4,21 +4,19 @@ import java.util.Set;
 
 import org.jabref.model.entry.field.Field;
 
-/// Discriminated union of the two kinds of tabs that appear in the entry editor.
+/// Discriminated union of the kinds of tabs that appear in the entry editor.
 ///
-/// {@link FieldSet} — user-customizable tab backed by a named set of fields.
-/// {@link Feature}  — fixed-implementation tab whose only user-facing knob is visibility.
+/// {@link FieldSet}          — built-in tab (e.g. {@link RequiredFieldsTab}) whose fields are computed
+///                             dynamically from the entry type; only its visibility is configurable.
+///                             Identified by the tab's {@code NAME} constant (see {@link NamedEntryEditorTab}).
+/// {@link CustomizedFieldSet} — user-customizable tab backed by an explicit, named set of fields.
+/// {@link Feature}            — fixed-implementation tab whose only user-facing knob is visibility.
 public sealed interface EntryEditorTabModel
-        permits EntryEditorTabModel.FieldSet, EntryEditorTabModel.Feature {
+        permits EntryEditorTabModel.FieldSet, EntryEditorTabModel.CustomizedFieldSet, EntryEditorTabModel.Feature {
 
     boolean visible();
 
     enum StaticTab {
-        REQUIRED_FIELDS,
-        IMPORTANT_OPTIONAL_FIELDS,
-        DETAIL_OPTIONAL_FIELDS,
-        DEPRECATED_FIELDS,
-        OTHER_FIELDS,
         RELATED_ARTICLES,
         AI_SUMMARY,
         AI_CHAT,
@@ -28,7 +26,11 @@ public sealed interface EntryEditorTabModel
         USER_COMMENTS
     }
 
-    record FieldSet(String name, Set<Field> fields, boolean visible)
+    record FieldSet(String name, boolean visible)
+            implements EntryEditorTabModel {
+    }
+
+    record CustomizedFieldSet(String name, Set<Field> fields, boolean visible)
             implements EntryEditorTabModel {
     }
 

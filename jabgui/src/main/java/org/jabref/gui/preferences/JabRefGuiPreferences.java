@@ -23,9 +23,14 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.edit.CopyToPreferences;
+import org.jabref.gui.entryeditor.DeprecatedFieldsTab;
+import org.jabref.gui.entryeditor.DetailOptionalFieldsTab;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabFactory;
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
+import org.jabref.gui.entryeditor.ImportantOptionalFieldsTab;
+import org.jabref.gui.entryeditor.OtherFieldsTab;
+import org.jabref.gui.entryeditor.RequiredFieldsTab;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -408,14 +413,16 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             }
         }
         tabNamesToFields.forEach((name, fields) ->
-                tabModels.add(new EntryEditorTabModel.FieldSet(name, fields, true)));
+                tabModels.add(new EntryEditorTabModel.CustomizedFieldSet(name, fields, true)));
+
+        tabModels.addAll(EntryEditorTabFactory.builtInFieldSetsFromBoolean(
+                getBoolean(SHOW_REQUIRED_FIELDS, defaults.isFieldSetVisible(RequiredFieldsTab.NAME)),
+                getBoolean(SHOW_IMPORTANT_OPTIONAL_FIELDS, defaults.isFieldSetVisible(ImportantOptionalFieldsTab.NAME)),
+                getBoolean(SHOW_DETAIL_OPTIONAL_FIELDS, defaults.isFieldSetVisible(DetailOptionalFieldsTab.NAME)),
+                getBoolean(SHOW_DEPRECATED_FIELDS, defaults.isFieldSetVisible(DeprecatedFieldsTab.NAME)),
+                getBoolean(SHOW_OTHER_FIELDS, defaults.isFieldSetVisible(OtherFieldsTab.NAME))));
 
         tabModels.addAll(EntryEditorTabFactory.fromBoolean(
-                getBoolean(SHOW_REQUIRED_FIELDS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.REQUIRED_FIELDS)),
-                getBoolean(SHOW_IMPORTANT_OPTIONAL_FIELDS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.IMPORTANT_OPTIONAL_FIELDS)),
-                getBoolean(SHOW_DETAIL_OPTIONAL_FIELDS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.DETAIL_OPTIONAL_FIELDS)),
-                getBoolean(SHOW_DEPRECATED_FIELDS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.DEPRECATED_FIELDS)),
-                getBoolean(SHOW_OTHER_FIELDS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.OTHER_FIELDS)),
                 getBoolean(SHOW_RECOMMENDATIONS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.RELATED_ARTICLES)),
                 getBoolean(SHOW_AI_SUMMARY, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.AI_SUMMARY)),
                 getBoolean(SHOW_AI_CHAT, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.AI_CHAT)),
@@ -428,9 +435,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     private void storeTabConfigs(List<EntryEditorTabModel> configs) {
-        List<EntryEditorTabModel.FieldSet> fieldSetTabs = configs.stream()
-                                                                 .filter(EntryEditorTabModel.FieldSet.class::isInstance)
-                                                                 .map(EntryEditorTabModel.FieldSet.class::cast)
+        List<EntryEditorTabModel.CustomizedFieldSet> fieldSetTabs = configs.stream()
+                                                                 .filter(EntryEditorTabModel.CustomizedFieldSet.class::isInstance)
+                                                                 .map(EntryEditorTabModel.CustomizedFieldSet.class::cast)
                                                                  .toList();
 
         for (int i = 0; i < fieldSetTabs.size(); i++) {
@@ -443,21 +450,23 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         purgeSeries(CUSTOM_TAB_FIELDS, fieldSetTabs.size());
 
         for (EntryEditorTabModel config : configs) {
-            if (config instanceof EntryEditorTabModel.Feature(
+            if (config instanceof EntryEditorTabModel.FieldSet(String name, boolean visible)) {
+                String key = switch (name) {
+                    case RequiredFieldsTab.NAME -> SHOW_REQUIRED_FIELDS;
+                    case ImportantOptionalFieldsTab.NAME -> SHOW_IMPORTANT_OPTIONAL_FIELDS;
+                    case DetailOptionalFieldsTab.NAME -> SHOW_DETAIL_OPTIONAL_FIELDS;
+                    case DeprecatedFieldsTab.NAME -> SHOW_DEPRECATED_FIELDS;
+                    case OtherFieldsTab.NAME -> SHOW_OTHER_FIELDS;
+                    default -> null;
+                };
+                if (key != null) {
+                    putBoolean(key, visible);
+                }
+            } else if (config instanceof EntryEditorTabModel.Feature(
                     EntryEditorTabModel.StaticTab type,
                     boolean visible
             )) {
                 switch (type) {
-                    case REQUIRED_FIELDS ->
-                            putBoolean(SHOW_REQUIRED_FIELDS, visible);
-                    case IMPORTANT_OPTIONAL_FIELDS ->
-                            putBoolean(SHOW_IMPORTANT_OPTIONAL_FIELDS, visible);
-                    case DETAIL_OPTIONAL_FIELDS ->
-                            putBoolean(SHOW_DETAIL_OPTIONAL_FIELDS, visible);
-                    case DEPRECATED_FIELDS ->
-                            putBoolean(SHOW_DEPRECATED_FIELDS, visible);
-                    case OTHER_FIELDS ->
-                            putBoolean(SHOW_OTHER_FIELDS, visible);
                     case RELATED_ARTICLES ->
                             putBoolean(SHOW_RECOMMENDATIONS, visible);
                     case AI_SUMMARY ->
