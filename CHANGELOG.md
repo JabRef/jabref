@@ -52,6 +52,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where non latin caseless author names being parsed as nameprefix instead of familyname. [#15813](https://github.com/JabRef/jabref/issues/15813)
 - We fixed an issue where `Quality-> Cleanup -> Rename PDF` together with `Moved linked files to file directory` would lead to an exception. [#15833](https://github.com/JabRef/jabref/issues/15833)
 - We fixed an issue where renaming a linked file with a very long title showed a misleading "file is being used by another process" error instead of renaming successfully. [#14771](https://github.com/JabRef/jabref/issues/14771)
+- We fixed an issue wehre JabRef would trigger `The libray has been changed` while still saving. [#4877](https://github.com/JabRef/jabref/issues/4877)
 
 ### Removed
 
