@@ -219,6 +219,14 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
                     Localization.lang("Citation information");
             case USER_COMMENTS ->
                     Localization.lang("User comments");
+            case PREVIEW ->
+                    Localization.lang("Preview");
+            case MATH_SCI_NET ->
+                    Localization.lang("MathSciNet");
+            case SOURCE ->
+                    Localization.lang("%0 source", "BibTeX");
+            case FULLTEXT_SEARCH_RESULTS ->
+                    Localization.lang("Search results");
         };
     }
 

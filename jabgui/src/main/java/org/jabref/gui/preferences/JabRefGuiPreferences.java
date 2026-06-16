@@ -234,6 +234,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String JOURNAL_POPUP = "journalPopup";
     private static final String SHOW_SCITE_TAB = "showSciteTab";
     private static final String SHOW_USER_COMMENTS_FIELDS = "showUserCommentsFields";
+    private static final String SHOW_PREVIEW_TAB = "showPreviewTab";
+    private static final String SHOW_MATHSCINET_TAB = "showMathSciNetTab";
+    private static final String SHOW_SOURCE_TAB = "showSourceTab";
+    private static final String SHOW_FULLTEXT_SEARCH_TAB = "showFulltextSearchTab";
     private static final String ENTRY_EDITOR_PREVIEW_DIVIDER_POS = "entryEditorPreviewDividerPos";
     private static final String CITATION_FETCHER_TYPE = "citationFetcherType";
     private static final String CITATION_COUNT_FETCHER_TYPE = "citationCountFetcherType";
@@ -397,6 +401,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private List<EntryEditorTabModel> getEntryEditorTabModelsFromBackingStore(EntryEditorPreferences defaults) {
         List<EntryEditorTabModel> tabModels = new ArrayList<>();
 
+        // Always-present leading tab
+        tabModels.add(new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.PREVIEW,
+                getBoolean(SHOW_PREVIEW_TAB, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.PREVIEW))));
+
         Map<String, Set<Field>> tabNamesToFields = new LinkedHashMap<>();
         List<String> tabNames = getSeries(CUSTOM_TAB_NAME);
         List<String> tabFields = getSeries(CUSTOM_TAB_FIELDS);
@@ -425,6 +433,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(SMART_FILE_ANNOTATIONS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.FILE_ANNOTATIONS)),
                 getBoolean(SHOW_SCITE_TAB, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.CITATION_INFORMATION)),
                 getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.USER_COMMENTS))));
+
+        // Always-present trailing tabs
+        tabModels.add(new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.MATH_SCI_NET,
+                getBoolean(SHOW_MATHSCINET_TAB, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.MATH_SCI_NET))));
+        tabModels.add(new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.SOURCE,
+                getBoolean(SHOW_SOURCE_TAB, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.SOURCE))));
+        tabModels.add(new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.FULLTEXT_SEARCH_RESULTS,
+                getBoolean(SHOW_FULLTEXT_SEARCH_TAB, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.FULLTEXT_SEARCH_RESULTS))));
 
         return tabModels;
     }
@@ -480,6 +496,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                             putBoolean(SHOW_SCITE_TAB, visible);
                     case USER_COMMENTS ->
                             putBoolean(SHOW_USER_COMMENTS_FIELDS, visible);
+                    case PREVIEW ->
+                            putBoolean(SHOW_PREVIEW_TAB, visible);
+                    case MATH_SCI_NET ->
+                            putBoolean(SHOW_MATHSCINET_TAB, visible);
+                    case SOURCE ->
+                            putBoolean(SHOW_SOURCE_TAB, visible);
+                    case FULLTEXT_SEARCH_RESULTS ->
+                            putBoolean(SHOW_FULLTEXT_SEARCH_TAB, visible);
                 }
             }
         }

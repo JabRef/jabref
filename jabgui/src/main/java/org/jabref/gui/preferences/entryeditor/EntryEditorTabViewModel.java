@@ -152,12 +152,21 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
                                                                            .entrySet().stream()
                                                                            .<EntryEditorTabModel>map(e -> new EntryEditorTabModel.CustomizedFieldSet(e.getKey(), e.getValue(), true))
                                                                            .toList();
-        tabConfigs.addAll(0, defaultFieldSets);
+        tabConfigs.addAll(indexAfterLeadingPreview(), defaultFieldSets);
         // selectedTab is cleared automatically when the ListView loses the old selected item
     }
 
+    /// Index just past a leading {@link EntryEditorTabModel.StaticTab#PREVIEW} feature (1 if present, else 0),
+    /// so customized field-set tabs are inserted after the always-present Preview tab instead of before it.
+    private int indexAfterLeadingPreview() {
+        return !tabConfigs.isEmpty()
+                && tabConfigs.getFirst() instanceof EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab type, boolean ignored)
+                && type == EntryEditorTabModel.StaticTab.PREVIEW
+                ? 1 : 0;
+    }
+
     public void addFieldSetTab() {
-        int insertIndex = 0;
+        int insertIndex = indexAfterLeadingPreview();
         for (int i = 0; i < tabConfigs.size(); i++) {
             if (tabConfigs.get(i) instanceof EntryEditorTabModel.CustomizedFieldSet) {
                 insertIndex = i + 1;

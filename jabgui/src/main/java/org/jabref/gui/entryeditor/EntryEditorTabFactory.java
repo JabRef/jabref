@@ -95,28 +95,11 @@ public class EntryEditorTabFactory {
     public List<EntryEditorTab> createTabs(EntryEditor entryEditor) {
         List<EntryEditorTab> tabs = new LinkedList<>();
 
-        // Always-present leading tab (no tab model)
-        tabs.add(new PreviewTab(preferences, stateManager, previewPanel));
-
-        // Model-driven tabs: existence and order come from the configured tab models
+        // Existence and order of every tab come from the configured tab models (single source of truth).
         // ToDo: Needs to be recreated on preferences change
         for (EntryEditorTabModel model : preferences.getEntryEditorPreferences().getTabModels()) {
             tabs.add(createTab(model, entryEditor));
         }
-
-        // Always-present trailing tabs (no tab model)
-        tabs.add(new MathSciNetTab());
-        // SourceTab is not a NamedEntryEditorTab, because it has different names for BibTeX and biblatex mode
-        tabs.add(new SourceTab(
-                undoManager,
-                preferences.getFieldPreferences(),
-                preferences.getImportFormatPreferences(),
-                fileMonitor,
-                dialogService,
-                bibEntryTypesManager,
-                keyBindingRepository,
-                stateManager));
-        tabs.add(new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor, entryEditor));
 
         return tabs;
     }
@@ -156,6 +139,8 @@ public class EntryEditorTabFactory {
 
     private EntryEditorTab createFeatureTab(EntryEditorTabModel.StaticTab type, EntryEditor entryEditor) {
         return switch (type) {
+            case PREVIEW ->
+                    new PreviewTab(preferences, stateManager, previewPanel);
             case RELATED_ARTICLES ->
                     new RelatedArticlesTab(buildInfo, preferences, dialogService, stateManager, taskExecutor);
             case AI_SUMMARY ->
@@ -179,6 +164,21 @@ public class EntryEditorTabFactory {
                             searchCitationsRelationsService);
             case USER_COMMENTS ->
                     new CommentsTab(preferences, undoManager, undoAction, redoAction, journalAbbreviationRepository, stateManager, previewPanel);
+            case MATH_SCI_NET ->
+                    new MathSciNetTab();
+            // SourceTab is not a NamedEntryEditorTab, because it has different names for BibTeX and biblatex mode
+            case SOURCE ->
+                    new SourceTab(
+                            undoManager,
+                            preferences.getFieldPreferences(),
+                            preferences.getImportFormatPreferences(),
+                            fileMonitor,
+                            dialogService,
+                            bibEntryTypesManager,
+                            keyBindingRepository,
+                            stateManager);
+            case FULLTEXT_SEARCH_RESULTS ->
+                    new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor, entryEditor);
         };
     }
 
