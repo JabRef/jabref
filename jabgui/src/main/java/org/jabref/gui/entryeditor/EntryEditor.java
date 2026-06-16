@@ -86,11 +86,10 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     private Subscription typeSubscription;
 
-    private EntryEditorViewModel viewModel;
+    private final EntryEditorViewModel viewModel;
+    private final EntryEditorFocusUtils focusUtils;
 
     private SourceTab sourceTab;
-
-    private EntryEditorFocusHelper focusHelper;
 
     @FXML private TabPane tabbed;
 
@@ -159,7 +158,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 keyBindingRepository,
                 searchCitationsRelationsService);
 
-        this.focusHelper = new EntryEditorFocusHelper(tabbed, this);
+        this.focusUtils = new EntryEditorFocusUtils(tabbed, this);
 
         setupKeyBindings();
 
@@ -247,7 +246,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     }
 
     private void setupNavigationForTab(FieldsEditorTab tab) {
-        focusHelper.setupNavigationForTab(tab);
+        focusUtils.setupNavigationForTab(tab);
     }
 
     /// Set up key bindings specific for the entry editor.
@@ -267,12 +266,12 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                         event.consume();
                         break;
                     case ENTRY_EDITOR_NEXT_ENTRY:
-                        focusHelper.captureFocusedField();
+                        focusUtils.captureFocusedField();
                         tabSupplier.get().selectNextEntry();
                         event.consume();
                         break;
                     case ENTRY_EDITOR_PREVIOUS_ENTRY:
-                        focusHelper.captureFocusedField();
+                        focusUtils.captureFocusedField();
                         tabSupplier.get().selectPreviousEntry();
                         event.consume();
                         break;
@@ -418,7 +417,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             Platform.runLater(() -> selectedTab.notifyAboutFocus(entry));
         }
 
-        focusHelper.restoreLastFocusedField();
+        focusUtils.restoreLastFocusedField();
     }
 
     private EntryEditorTab getSelectedTab() {
@@ -470,11 +469,11 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     }
 
     public void selectField(String fieldName) {
-        focusHelper.setFocusToField(FieldFactory.parseField(fieldName));
+        focusUtils.setFocusToField(FieldFactory.parseField(fieldName));
     }
 
     public void setFocusToField(Field field) {
-        focusHelper.setFocusToField(field);
+        focusUtils.setFocusToField(field);
     }
 
     @Override
@@ -486,5 +485,4 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     public void previousPreviewStyle() {
         this.previewPanel.previousPreviewStyle();
     }
-
 }
