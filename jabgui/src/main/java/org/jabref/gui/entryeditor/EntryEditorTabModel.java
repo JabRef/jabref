@@ -16,13 +16,19 @@ public sealed interface EntryEditorTabModel
     boolean visible();
 
     enum StaticTab {
+        // Always-present leading tab (no field configuration; only visibility)
+        PREVIEW,
         RELATED_ARTICLES,
         AI_SUMMARY,
         AI_CHAT,
         FILE_ANNOTATIONS,
         LATEX_CITATIONS,
         CITATION_INFORMATION,
-        USER_COMMENTS
+        USER_COMMENTS,
+        // Always-present trailing tabs
+        MATH_SCI_NET,
+        SOURCE,
+        FULLTEXT_SEARCH_RESULTS
     }
 
     enum BuiltInFieldSet {

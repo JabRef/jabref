@@ -101,6 +101,9 @@ public class EntryEditorPreferences {
     private static List<EntryEditorTabModel> getDefaultTabModels() {
         List<EntryEditorTabModel> tabModels = new ArrayList<>();
 
+        // Always-present leading tab
+        tabModels.add(new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.PREVIEW, true));
+
         getDefaultEntryEditorTabs().forEach((name, fields) ->
                 tabModels.add(new EntryEditorTabModel.CustomizedFieldSet(name, fields, true)));
 
@@ -109,6 +112,9 @@ public class EntryEditorPreferences {
         }
 
         for (EntryEditorTabModel.StaticTab tab : EntryEditorTabModel.StaticTab.values()) {
+            if (tab == EntryEditorTabModel.StaticTab.PREVIEW) {
+                continue; // already added as the leading tab
+            }
             tabModels.add(new EntryEditorTabModel.Feature(tab, true));
         }
         return tabModels;
@@ -178,7 +184,17 @@ public class EntryEditorPreferences {
                                                             new EntryEditorTabModel.CustomizedFieldSet(model.getKey(), model.getValue(), true))
                                                     .toList();
         tabModels.removeIf(config -> config instanceof EntryEditorTabModel.CustomizedFieldSet);
-        tabModels.addAll(0, newFieldSet);
+        // Customized field-set tabs sit right after the always-present leading Preview tab.
+        tabModels.addAll(indexAfterLeadingPreview(), newFieldSet);
+    }
+
+    /// Index just past a leading {@link EntryEditorTabModel.StaticTab#PREVIEW} feature (1 if present, else 0),
+    /// so customized field-set tabs are inserted after the Preview tab instead of before it.
+    private int indexAfterLeadingPreview() {
+        return !tabModels.isEmpty()
+                && tabModels.getFirst() instanceof EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab type, boolean ignored)
+                && type == EntryEditorTabModel.StaticTab.PREVIEW
+                ? 1 : 0;
     }
 
     public static SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
