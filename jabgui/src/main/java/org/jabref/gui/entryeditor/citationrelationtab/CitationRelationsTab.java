@@ -61,6 +61,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
+import org.jabref.gui.entryeditor.NamedEntryEditorTab;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.MainTableTooltip;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
@@ -106,7 +107,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// GUI for tab displaying an articles citation relations in two lists based on the currently selected BibEntry
-public class CitationRelationsTab extends EntryEditorTab {
+public class CitationRelationsTab extends EntryEditorTab implements NamedEntryEditorTab {
 
     public static final String NAME = "Citation relations";
 
@@ -1057,5 +1058,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         }
 
         searchForRelations(citationComponents, otherCitationComponents, true);
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

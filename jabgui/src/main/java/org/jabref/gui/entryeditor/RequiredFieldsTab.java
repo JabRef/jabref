@@ -25,7 +25,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 
-public class RequiredFieldsTab extends FieldsEditorTab {
+public class RequiredFieldsTab extends FieldsEditorTab implements NamedEntryEditorTab {
 
     public static final String NAME = "Required fields";
     private final BibEntryTypesManager entryTypesManager;
@@ -71,5 +71,10 @@ public class RequiredFieldsTab extends FieldsEditorTab {
             fields.addAll(entry.getFields());
         }
         return fields;
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

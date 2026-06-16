@@ -16,7 +16,7 @@ import org.jabref.model.entry.identifier.MathSciNetId;
 
 import com.tobiasdiez.easybind.EasyBind;
 
-public class MathSciNetTab extends EntryEditorTab {
+public class MathSciNetTab extends EntryEditorTab implements NamedEntryEditorTab {
 
     public static final String NAME = "MathSciNet Review";
 
@@ -65,5 +65,10 @@ public class MathSciNetTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         setContent(getPane(entry));
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

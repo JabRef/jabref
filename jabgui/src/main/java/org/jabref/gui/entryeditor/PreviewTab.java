@@ -9,7 +9,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.logic.l10n.Localization;
 
-public class PreviewTab extends TabWithPreviewPanel {
+public class PreviewTab extends TabWithPreviewPanel implements NamedEntryEditorTab {
     public static final String NAME = "Preview";
 
     private final GuiPreferences preferences;
@@ -35,6 +35,11 @@ public class PreviewTab extends TabWithPreviewPanel {
     @Override
     public ObservableValue<Boolean> shouldShow() {
         return shouldShow;
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 
     protected void handleFocus() {
