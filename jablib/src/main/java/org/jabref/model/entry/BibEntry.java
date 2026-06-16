@@ -876,7 +876,7 @@ public class BibEntry {
     }
 
     public Collection<String> getFieldValues() {
-        return fields.values();
+        return new ArrayList<>(fields.values());
     }
 
     public Map<Field, String> getFieldMap() {

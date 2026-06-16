@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -842,5 +843,13 @@ class BibEntryTest {
     @MethodSource
     void isNotEmpty(BibEntry entry) {
         assertFalse(entry.isEmpty());
+    }
+
+    @Test
+    void getFieldValuesReflexivityHolds() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        entry.setField(StandardField.AUTHOR, "Turing, Alan");
+        Collection<String> values = entry.getFieldValues();
+        assertEquals(values, values);
     }
 }
