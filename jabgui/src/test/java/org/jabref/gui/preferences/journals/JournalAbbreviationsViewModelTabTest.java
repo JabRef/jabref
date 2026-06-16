@@ -175,7 +175,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @BeforeEach
     void setUpViewModel(@TempDir Path tempFolder) throws Exception {
-        repository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getDataSource());
+        repository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getConnection());
 
         AbbreviationPreferences abbreviationPreferences = mock(AbbreviationPreferences.class);
 

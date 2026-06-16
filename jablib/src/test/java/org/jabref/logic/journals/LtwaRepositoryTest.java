@@ -19,7 +19,7 @@ public class LtwaRepositoryTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        this.repository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getDataSource());
+        this.repository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getConnection());
     }
 
     @ParameterizedTest

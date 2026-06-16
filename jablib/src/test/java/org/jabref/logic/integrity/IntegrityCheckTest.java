@@ -49,7 +49,7 @@ class IntegrityCheckTest {
 
     @BeforeAll
     static void initRepository() throws Exception {
-        repository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getDataSource());
+        repository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getConnection());
     }
 
     @Test

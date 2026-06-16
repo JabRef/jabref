@@ -26,7 +26,7 @@ class AbbreviationCheckerTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        abbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getDataSource());
+        abbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getConnection());
         abbreviationRepository.addCustomAbbreviation(new Abbreviation("Test Journal", "T. J."));
         entry = new BibEntry(StandardEntryType.InProceedings);
         checker = new AbbreviationChecker(abbreviationRepository);

@@ -28,7 +28,7 @@ class JournalInAbbreviationListCheckerTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        abbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getDataSource());
+        abbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getConnection());
         abbreviationRepository.addCustomAbbreviation(new Abbreviation("IEEE Software", "IEEE SW"));
         checker = new JournalInAbbreviationListChecker(StandardField.JOURNAL, abbreviationRepository);
         checkerb = new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, abbreviationRepository);

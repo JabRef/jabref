@@ -35,7 +35,7 @@ class JournalAbbreviationRepositoryTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        repository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getDataSource());
+        repository = JournalAbbreviationLoader.loadBuiltInRepository(JournalAbbreviationTestUtil.getConnection());
     }
 
     @Test
