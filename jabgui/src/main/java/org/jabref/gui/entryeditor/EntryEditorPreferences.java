@@ -45,6 +45,15 @@ public class EntryEditorPreferences {
         }
     }
 
+    /// Names of the built-in {@link EntryEditorTabModel.FieldSet} tabs, in display order.
+    private static final List<String> BUILT_IN_FIELD_SET_NAMES = List.of(
+            RequiredFieldsTab.NAME,
+            ImportantOptionalFieldsTab.NAME,
+            DetailOptionalFieldsTab.NAME,
+            DeprecatedFieldsTab.NAME,
+            OtherFieldsTab.NAME
+    );
+
     /// Ordered list of all configurable tabs. {@link EntryEditorTabModel.FieldSet} entries
     /// always precede {@link EntryEditorTabModel.Feature} entries.
     private final ObservableList<EntryEditorTabModel> tabModels;
@@ -96,12 +105,17 @@ public class EntryEditorPreferences {
         this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
     }
 
-    /// The default tab list: default custom field-set tabs, followed by every static tab enabled.
+    /// The default tab list: default custom field-set tabs, followed by every built-in field tab
+    /// and every static tab enabled.
     private static List<EntryEditorTabModel> getDefaultTabModels() {
         List<EntryEditorTabModel> tabModels = new ArrayList<>();
 
         getDefaultEntryEditorTabs().forEach((name, fields) ->
-                tabModels.add(new EntryEditorTabModel.FieldSet(name, fields, true)));
+                tabModels.add(new EntryEditorTabModel.CustomizedFieldSet(name, fields, true)));
+
+        for (String builtInFieldSetName : BUILT_IN_FIELD_SET_NAMES) {
+            tabModels.add(new EntryEditorTabModel.FieldSet(builtInFieldSetName, true));
+        }
 
         for (EntryEditorTabModel.StaticTab tab : EntryEditorTabModel.StaticTab.values()) {
             tabModels.add(new EntryEditorTabModel.Feature(tab, true));
@@ -111,6 +125,27 @@ public class EntryEditorPreferences {
 
     public ObservableList<EntryEditorTabModel> getTabModels() {
         return tabModels;
+    }
+
+    public boolean isFieldSetVisible(String fieldSetName) {
+        for (EntryEditorTabModel model : tabModels) {
+            if (model instanceof EntryEditorTabModel.FieldSet(
+                    String name,
+                    boolean visible
+            ) && name.equals(fieldSetName)) {
+                return visible;
+            }
+        }
+        return false;
+    }
+
+    public void setFieldSetVisible(String fieldSetName, boolean show) {
+        for (int i = 0; i < tabModels.size(); i++) {
+            if (tabModels.get(i) instanceof EntryEditorTabModel.FieldSet fieldSet && fieldSet.name().equals(fieldSetName)) {
+                tabModels.set(i, new EntryEditorTabModel.FieldSet(fieldSetName, show));
+                return;
+            }
+        }
     }
 
     public boolean isStaticTabVisible(EntryEditorTabModel.StaticTab tabModel) {
@@ -134,12 +169,12 @@ public class EntryEditorPreferences {
         }
     }
 
-    /// Returns a snapshot map of field-set tabs (name → fields). Changes to this map are not reflected
-    /// in the preferences; use {@link #setEntryEditorTabList} to persist modifications.
+    /// Returns a snapshot map of customized field-set tabs (name → fields). Changes to this map are not
+    /// reflected in the preferences; use {@link #setEntryEditorTabList} to persist modifications.
     public Map<String, Set<Field>> getEntryEditorTabs() {
         SequencedMap<String, Set<Field>> map = new LinkedHashMap<>();
         for (EntryEditorTabModel config : tabModels) {
-            if (config instanceof EntryEditorTabModel.FieldSet fieldSet) {
+            if (config instanceof EntryEditorTabModel.CustomizedFieldSet fieldSet) {
                 map.put(fieldSet.name(), fieldSet.fields());
             }
         }
@@ -148,10 +183,10 @@ public class EntryEditorPreferences {
 
     public void setEntryEditorTabList(Map<String, Set<Field>> tabs) {
         List<EntryEditorTabModel> newFieldSet = tabs.entrySet().stream()
-                                                    .<EntryEditorTabModel>map(e ->
-                                                            new EntryEditorTabModel.FieldSet(e.getKey(), e.getValue(), true))
+                                                    .<EntryEditorTabModel>map(model ->
+                                                            new EntryEditorTabModel.CustomizedFieldSet(model.getKey(), model.getValue(), true))
                                                     .toList();
-        tabModels.removeIf(config -> config instanceof EntryEditorTabModel.FieldSet);
+        tabModels.removeIf(config -> config instanceof EntryEditorTabModel.CustomizedFieldSet);
         tabModels.addAll(0, newFieldSet);
     }
 

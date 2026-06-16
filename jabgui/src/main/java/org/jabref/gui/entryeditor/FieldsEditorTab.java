@@ -66,11 +66,11 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     private final ObservableValue<Boolean> shouldShow =
             EasyBind.map(currentEntryProperty(), entry -> (entry != null) && !determineFieldsToShow(entry).isEmpty());
 
-    /// Combines {@link #shouldShow} with a {@link EntryEditorTabModel.StaticTab} visibility preference,
-    /// for subclasses backing a tab that the user can turn off entirely (e.g. {@link RequiredFieldsTab}).
-    protected final ObservableValue<Boolean> gateByStaticTab(EntryEditorPreferences entryEditorPreferences, EntryEditorTabModel.StaticTab tab) {
+    /// Combines {@link #shouldShow} with a built-in {@link EntryEditorTabModel.FieldSet} visibility
+    /// preference, for subclasses backing a tab that the user can turn off entirely (e.g. {@link RequiredFieldsTab}).
+    protected final ObservableValue<Boolean> gateByFieldSetName(EntryEditorPreferences entryEditorPreferences, String fieldSetName) {
         return Bindings.createBooleanBinding(
-                () -> shouldShow.getValue() && entryEditorPreferences.isStaticTabVisible(tab),
+                () -> shouldShow.getValue() && entryEditorPreferences.isFieldSetVisible(fieldSetName),
                 shouldShow,
                 entryEditorPreferences.getTabModels());
     }
