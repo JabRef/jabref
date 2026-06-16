@@ -1,6 +1,7 @@
 plugins {
     id("org.jabref.gradle.module")
     id("org.jabref.gradle.feature.shadowjar")
+    id("org.jabref.gradle.feature.nativecompile")
     id("application")
 }
 
@@ -15,7 +16,6 @@ testModuleInfo {
     requires("org.junit.jupiter.api")
     requires("org.junit.jupiter.params")
     requires("org.mockito")
-    requires("com.google.common")
 }
 
 tasks.withType<Test>().configureEach {
@@ -73,4 +73,13 @@ tasks.register<JavaExec>("runJabKitPortableSmokeTest") {
     jvmArgs(application.applicationDefaultJvmArgs)
     workingDir = file("src/test/resources")
     args("--debug", "check", "consistency", "empty.bib")
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            imageName.set("jabkit")
+            mainClass.set("org.jabref.toolkit.JabKitLauncher")
+        }
+    }
 }

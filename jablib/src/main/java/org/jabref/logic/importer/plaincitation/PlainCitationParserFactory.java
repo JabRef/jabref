@@ -11,12 +11,13 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class PlainCitationParserFactory {
+
+    /// Creates a parser for any choice that does not require AI dependencies.
+    /// For {@link PlainCitationParserChoice#LLM} use {@link #getLlmPlainCitationParser}.
     public static PlainCitationParser getPlainCitationParser(PlainCitationParserChoice parserChoice,
                                                              CitationKeyPatternPreferences citationKeyPatternPreferences,
                                                              GrobidPreferences grobidPreferences,
-                                                             ImportFormatPreferences importFormatPreferences,
-                                                             AiPreferences aiPreferences,
-                                                             ChatModel chatModel) {
+                                                             ImportFormatPreferences importFormatPreferences) {
         return switch (parserChoice) {
             case PlainCitationParserChoice.RULE_BASED_GENERAL ->
                     new RuleBasedPlainCitationParser();
@@ -25,7 +26,13 @@ public class PlainCitationParserFactory {
             case PlainCitationParserChoice.GROBID ->
                     new GrobidPlainCitationParser(grobidPreferences, importFormatPreferences);
             case PlainCitationParserChoice.LLM ->
-                    new LlmPlainCitationParser(importFormatPreferences, aiPreferences.getCitationParsingSystemMessageTemplate(), chatModel);
+                    throw new IllegalArgumentException("LLM parser requires AI dependencies; call getLlmPlainCitationParser instead");
         };
+    }
+
+    public static PlainCitationParser getLlmPlainCitationParser(ImportFormatPreferences importFormatPreferences,
+                                                                AiPreferences aiPreferences,
+                                                                ChatModel chatModel) {
+        return new LlmPlainCitationParser(importFormatPreferences, aiPreferences.getCitationParsingSystemMessageTemplate(), chatModel);
     }
 }
