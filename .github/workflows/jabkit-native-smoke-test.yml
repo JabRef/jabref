@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  build-native:
+  native-smoke-test:
     strategy:
       fail-fast: false
       matrix:
@@ -29,36 +29,6 @@ jobs:
       - name: Build JabKit native binary
         run: ./gradlew :jabkit:nativeCompile
 
-      - name: Upload JabKit native binary
-        uses: actions/upload-artifact@v7
-        with:
-          name: jabkit-native-${{ matrix.os }}
-          path: jabkit/build/native/nativeCompile/jabkit
-
-  smoke-test:
-    needs: build-native
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-22.04, macos-15]
-    runs-on: ${{ matrix.os }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          submodules: 'true'
-          show-progress: 'false'
-
-      - name: Download JabKit native binary
-        uses: actions/download-artifact@v8
-        with:
-          name: jabkit-native-${{ matrix.os }}
-          path: jabkit/build/native/nativeCompile/
-
-      - name: Make binary executable
-        run: chmod +x jabkit/build/native/nativeCompile/jabkit
-
       - name: Install clitest
         uses: ethanjli/cached-download-action@v0.1.4
         with:
@@ -70,3 +40,9 @@ jobs:
 
       - name: Run JabKit native smoke tests
         run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit.md
+
+      - name: Upload JabKit native binary
+        uses: actions/upload-artifact@v7
+        with:
+          name: jabkit-native-${{ matrix.os }}
+          path: jabkit/build/native/nativeCompile/jabkit
