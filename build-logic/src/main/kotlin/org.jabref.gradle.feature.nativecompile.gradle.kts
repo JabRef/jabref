@@ -11,7 +11,7 @@ graalvmNative {
                 "-H:IncludeLocales=en",
                 "--enable-all-security-services",
                 "--enable-native-access=ALL-UNNAMED",
-                "--enable-url-protocols=https"
+                "--enable-url-protocols=http,https"
             )
         }
     }
