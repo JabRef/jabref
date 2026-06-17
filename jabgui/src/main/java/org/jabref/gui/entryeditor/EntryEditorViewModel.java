@@ -159,11 +159,9 @@ public class EntryEditorViewModel extends AbstractViewModel {
                                    .findFirst()
                                    .orElse(null);
 
-        // Newly created tabs need the current entry so their content-driven visibility resolves correctly.
-        BibEntry entry = currentlyEditedEntry.get();
-        if (entry != null) {
-            allPossibleTabs.forEach(tab -> tab.currentEntryProperty().set(entry));
-        }
+        // Each tab observes the currently edited entry directly, so its content-driven visibility reacts to
+        // entry and entry-type changes without the editor pushing the entry into every tab by hand.
+        allPossibleTabs.forEach(tab -> tab.currentEntryProperty().bind(currentlyEditedEntry));
 
         allPossibleTabs.forEach(tab ->
                 shouldShowSubscriptions.add(EasyBind.subscribe(tab.shouldShow(), _ -> refreshVisibleTabs())));
