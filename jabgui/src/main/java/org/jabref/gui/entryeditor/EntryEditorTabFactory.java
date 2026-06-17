@@ -206,42 +206,4 @@ public class EntryEditorTabFactory {
                     new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor, entryEditor);
         };
     }
-
-    /// Builds the {@link EntryEditorTabModel.Feature} entries for every {@link EntryEditorTabModel.StaticTab},
-    /// in enum declaration order, so callers can append them directly to a tab-models list.
-    public static List<EntryEditorTabModel> fromBoolean(
-            boolean showRelatedArticles,
-            boolean showAISummary,
-            boolean showAIChat,
-            boolean showLaTeXCitations,
-            boolean showFileAnnotations,
-            boolean showCitationInformation,
-            boolean showCommentsTab) {
-        return List.of(
-                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.RELATED_ARTICLES, showRelatedArticles),
-                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.AI_SUMMARY, showAISummary),
-                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.AI_CHAT, showAIChat),
-                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.LATEX_CITATIONS, showLaTeXCitations),
-                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.FILE_ANNOTATIONS, showFileAnnotations),
-                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.CITATION_INFORMATION, showCitationInformation),
-                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.COMMENTS, showCommentsTab)
-        );
-    }
-
-    /// Builds the {@link EntryEditorTabModel.FieldSet} entries for the built-in field tabs
-    /// (required/important-optional/detail-optional/deprecated/other), in display order.
-    public static List<EntryEditorTabModel> builtInFieldSetsFromBoolean(
-            boolean showRequiredFields,
-            boolean showImportantOptionalFields,
-            boolean showDetailOptionalFields,
-            boolean showDeprecatedFields,
-            boolean showOtherFields) {
-        return List.of(
-                new EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet.REQUIRED_FIELDS, showRequiredFields),
-                new EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet.IMPORTANT_OPTIONAL_FIELDS, showImportantOptionalFields),
-                new EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet.DETAIL_OPTIONAL_FIELDS, showDetailOptionalFields),
-                new EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet.DEPRECATED_FIELDS, showDeprecatedFields),
-                new EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet.OTHER_FIELDS, showOtherFields)
-        );
-    }
 }
