@@ -267,8 +267,8 @@ public class EntryEditorPreferences {
         this.enablementStatus.set(preferences.shouldEnableJournalPopup());
         this.citationFetcherType.set(preferences.getCitationFetcherType());
         this.citationCountFetcherType.set(preferences.getCitationCountFetcherType());
-        this.previewWidthDividerPosition.set(preferences.getPreviewWidthDividerPosition());
         this.showUserCommentsFields.set(preferences.shouldShowUserCommentsFields());
+        this.previewWidthDividerPosition.set(preferences.getPreviewWidthDividerPosition());
     }
 
     public boolean shouldOpenOnNewEntry() {
