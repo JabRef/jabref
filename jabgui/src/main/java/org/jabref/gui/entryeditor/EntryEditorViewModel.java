@@ -64,7 +64,7 @@ public class EntryEditorViewModel extends AbstractViewModel {
 
     /// Every tab that can possibly be shown for the current entry, in display order.
     private final List<EntryEditorTab> allPossibleTabs = new ArrayList<>();
-    /// One subscription per tab, observing its {@link EntryEditorTab#shouldShow()}.
+    /// One subscription per tab, observing its {@link EntryEditorTab#visibility()}.
     private final List<Subscription> shouldShowSubscriptions = new ArrayList<>();
     /// The subset of {@link #allPossibleTabs} currently shown — mutated incrementally so a bound TabPane
     /// replays adds/removes one by one (a full replace causes an ugly shift-in animation).
@@ -136,8 +136,8 @@ public class EntryEditorViewModel extends AbstractViewModel {
     private void updateTypeLabelText() {
         BibEntry entry = currentlyEditedEntry.get();
         typeLabelText.set(entry == null
-                ? ""
-                : new TypedBibEntry(entry, activeDatabaseContext()).getTypeForDisplay());
+                          ? ""
+                          : new TypedBibEntry(entry, activeDatabaseContext()).getTypeForDisplay());
     }
 
     private BibDatabaseContext activeDatabaseContext() {
@@ -183,9 +183,8 @@ public class EntryEditorViewModel extends AbstractViewModel {
         return Optional.empty();
     }
 
-    /// Recreates every possible tab from the factory, binds each to the current entry, subscribes to each tab's
-    /// {@link EntryEditorTab#shouldShow()}, and re-renders the visible set. Called by the View when the active
-    /// library tab changes, and internally when the configured tab models change.
+    /// Recreates every possible tab and re-renders the visible set. Called by the View when the active library
+    /// tab changes, and internally when the configured tab models change.
     public void rebuildTabs() {
         shouldShowSubscriptions.forEach(Subscription::unsubscribe);
         shouldShowSubscriptions.clear();
@@ -203,7 +202,7 @@ public class EntryEditorViewModel extends AbstractViewModel {
         allPossibleTabs.forEach(tab -> tab.currentEntryProperty().bind(currentlyEditedEntry));
 
         allPossibleTabs.forEach(tab ->
-                shouldShowSubscriptions.add(EasyBind.subscribe(tab.shouldShow(), _ -> refreshVisibleTabs())));
+                shouldShowSubscriptions.add(EasyBind.subscribe(tab.visibility(), _ -> refreshVisibleTabs())));
         refreshVisibleTabs();
     }
 
@@ -215,17 +214,17 @@ public class EntryEditorViewModel extends AbstractViewModel {
         visibleTabs.clear();
     }
 
-    /// Diffs {@link #allPossibleTabs} against {@link #visibleTabs} and adds/removes to match the tabs whose
-    /// {@link EntryEditorTab#shouldShow()} is {@code true}, preserving order without a full replace.
+    /// Adds/removes incrementally instead of replacing the whole list, to preserve order without triggering
+    /// the TabPane's shift-in animation on a full replace.
     private void refreshVisibleTabs() {
         if (currentlyEditedEntry.get() == null) {
             visibleTabs.clear();
             return;
         }
 
-        visibleTabs.removeAll(allPossibleTabs.stream().filter(tab -> !tab.shouldShow().getValue()).toList());
+        visibleTabs.removeAll(allPossibleTabs.stream().filter(tab -> !tab.visibility().getValue()).toList());
 
-        List<Tab> wanted = allPossibleTabs.stream().filter(tab -> tab.shouldShow().getValue()).collect(Collectors.toList());
+        List<Tab> wanted = allPossibleTabs.stream().filter(tab -> tab.visibility().getValue()).collect(Collectors.toList());
         for (int i = 0; i < wanted.size(); i++) {
             Tab toBeAdded = wanted.get(i);
             Tab shown = i < visibleTabs.size() ? visibleTabs.get(i) : null;
@@ -258,7 +257,6 @@ public class EntryEditorViewModel extends AbstractViewModel {
                 .fetchAndMerge(entry, fetcher);
     }
 
-    /// Generates a citation key for the current entry.
     public void generateCiteKey() {
         BibEntry entry = currentlyEditedEntry.get();
         if (entry == null) {
@@ -267,7 +265,6 @@ public class EntryEditorViewModel extends AbstractViewModel {
         new GenerateCitationKeySingleAction(entry, tabSupplier.get().getBibDatabaseContext(), dialogService, preferences, undoManager).execute();
     }
 
-    /// Runs the cleanup action on the current entry.
     public void cleanup() {
         BibEntry entry = currentlyEditedEntry.get();
         if (entry == null) {
@@ -276,7 +273,6 @@ public class EntryEditorViewModel extends AbstractViewModel {
         new CleanupSingleAction(entry, preferences, dialogService, stateManager, undoManager, journalAbbreviationRepository).execute();
     }
 
-    /// Deletes the current entry from the active library.
     public void deleteEntry() {
         BibEntry entry = currentlyEditedEntry.get();
         if (entry == null) {

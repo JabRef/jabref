@@ -71,9 +71,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     private final Supplier<LibraryTab> tabSupplier;
     private final ExternalFilesEntryLinker fileLinker;
     private final PreviewPanel previewPanel;
-    private final EntryEditorTabFactory tabFactory;
-    private final UndoAction undoAction;
-    private final RedoAction redoAction;
 
     private final EntryEditorViewModel viewModel;
     private final EntryEditorFocusUtils focusUtils;
@@ -101,8 +98,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
 
     public EntryEditor(Supplier<LibraryTab> tabSupplier, UndoAction undoAction, RedoAction redoAction) {
         this.tabSupplier = tabSupplier;
-        this.undoAction = undoAction;
-        this.redoAction = redoAction;
 
         ViewLoader.view(this)
                   .root(this)
@@ -122,7 +117,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 taskExecutor,
                 stateManager);
 
-        this.tabFactory = new EntryEditorTabFactory(
+        EntryEditorTabFactory tabFactory = new EntryEditorTabFactory(
                 previewPanel,
                 undoAction,
                 redoAction,
@@ -140,8 +135,16 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 keyBindingRepository,
                 searchCitationsRelationsService);
 
-        // The view model owns the tab collection and which tabs are visible; the editor only renders them.
-        this.viewModel = new EntryEditorViewModel(stateManager, preferences, taskExecutor, dialogService, undoManager, journalAbbreviationRepository, tabSupplier, tabFactory);
+        this.viewModel = new EntryEditorViewModel(
+                stateManager,
+                preferences,
+                taskExecutor,
+                dialogService,
+                undoManager,
+                journalAbbreviationRepository,
+                tabSupplier,
+                tabFactory);
+
         typeLabel.textProperty().bind(viewModel.typeLabelTextProperty());
         Bindings.bindContent(tabbed.getTabs(), viewModel.visibleTabs());
 
@@ -161,11 +164,13 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         setupDragAndDrop();
 
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
+            BibEntry currentlyEditedEntry = viewModel.getCurrentlyEditedEntry();
+
             EntryEditorTab activeTab = (EntryEditorTab) tab;
             if (activeTab != null) {
-                activeTab.notifyAboutFocus(viewModel.getCurrentlyEditedEntry());
+                activeTab.notifyAboutFocus(currentlyEditedEntry != null ? currentlyEditedEntry : new BibEntry());
                 if (activeTab instanceof FieldsEditorTab fieldsTab) {
-                    Platform.runLater(() -> setupNavigationForTab(fieldsTab));
+                    Platform.runLater(() -> focusUtils.setupNavigationForTab(fieldsTab));
                 }
             }
         });
@@ -220,67 +225,57 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         });
     }
 
-    private void setupNavigationForTab(FieldsEditorTab tab) {
-        focusUtils.setupNavigationForTab(tab);
-    }
-
-    /// Set up key bindings specific for the entry editor.
     private void setupKeyBindings() {
         this.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
-                    case ENTRY_EDITOR_NEXT_PANEL:
-                    case ENTRY_EDITOR_NEXT_PANEL_2:
+                    case ENTRY_EDITOR_NEXT_PANEL,
+                         ENTRY_EDITOR_NEXT_PANEL_2 -> {
                         tabbed.getSelectionModel().selectNext();
                         event.consume();
-                        break;
-                    case ENTRY_EDITOR_PREVIOUS_PANEL:
-                    case ENTRY_EDITOR_PREVIOUS_PANEL_2:
+                    }
+                    case ENTRY_EDITOR_PREVIOUS_PANEL,
+                         ENTRY_EDITOR_PREVIOUS_PANEL_2 -> {
                         tabbed.getSelectionModel().selectPrevious();
                         event.consume();
-                        break;
-                    case ENTRY_EDITOR_NEXT_ENTRY:
+                    }
+                    case ENTRY_EDITOR_NEXT_ENTRY -> {
                         focusUtils.captureFocusedField();
                         tabSupplier.get().selectNextEntry();
                         event.consume();
-                        break;
-                    case ENTRY_EDITOR_PREVIOUS_ENTRY:
+                    }
+                    case ENTRY_EDITOR_PREVIOUS_ENTRY -> {
                         focusUtils.captureFocusedField();
                         tabSupplier.get().selectPreviousEntry();
                         event.consume();
-                        break;
-                    case JUMP_TO_FIELD:
-                        selectFieldDialog();
+                    }
+                    case JUMP_TO_FIELD -> {
+                        if (getCurrentlyEditedEntry() != null) {
+                            JumpToFieldDialog dialog = new JumpToFieldDialog(this);
+                            dialog.initModality(Modality.NONE);
+                            dialog.show();
+                        }
                         event.consume();
-                        break;
-                    case HELP:
+                    }
+                    case HELP -> {
                         new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, preferences.getExternalApplicationsPreferences()).execute();
                         event.consume();
-                        break;
-                    case CLOSE:
+                    }
+                    case CLOSE ->
                         // We do not want to close the entry editor as such
                         // We just want to unfocus the field
-                        tabbed.requestFocus();
-                        break;
-                    case OPEN_CLOSE_ENTRY_EDITOR:
+                            tabbed.requestFocus();
+                    case OPEN_CLOSE_ENTRY_EDITOR -> {
                         close();
                         event.consume();
-                        break;
-                    default:
+                    }
+                    default -> {
                         // Pass other keys to parent
+                    }
                 }
             }
         });
-    }
-
-    public void selectFieldDialog() {
-        if (getCurrentlyEditedEntry() == null) {
-            return;
-        }
-        JumpToFieldDialog dialog = new JumpToFieldDialog(this);
-        dialog.initModality(Modality.NONE);
-        dialog.show();
     }
 
     @FXML
@@ -321,24 +316,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         return viewModel.getAllPossibleTabs();
     }
 
-    public void setCurrentlyEditedEntry(@NonNull BibEntry entry) {
-        viewModel.currentlyEditedEntryProperty().set(entry);
-    }
-
-    /// Reacts to a change of the current entry's type (via {@link EntryEditorViewModel#currentEntryTypeProperty()}):
-    /// rebuilds the toolbar and lets the focused tab rebuild its content for the new type.
-    private void onEntryTypeChanged() {
-        BibEntry entry = viewModel.getCurrentlyEditedEntry();
-        if (entry == null) {
-            return;
-        }
-        setupToolBar();
-        EntryEditorTab selectedTab = getSelectedTab();
-        if (selectedTab != null) {
-            selectedTab.notifyAboutFocus(entry);
-        }
-    }
-
     private void onEntryChanged(@NonNull BibEntry entry) {
         // Tabs observe viewModel.currentlyEditedEntryProperty() directly (bound in rebuildTabs), so no fan-out here.
         // Type changes are handled by onEntryTypeChanged via the view model's single type subscription.
@@ -348,7 +325,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         Platform.runLater(() -> {
             for (Tab tab : tabbed.getTabs()) {
                 if (tab instanceof FieldsEditorTab fieldsTab) {
-                    setupNavigationForTab(fieldsTab);
+                    focusUtils.setupNavigationForTab(fieldsTab);
                 }
             }
         });
@@ -361,6 +338,18 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         focusUtils.restoreLastFocusedField();
     }
 
+    private void onEntryTypeChanged() {
+        BibEntry entry = viewModel.getCurrentlyEditedEntry();
+        if (entry == null) {
+            return;
+        }
+        setupToolBar();
+        EntryEditorTab selectedTab = getSelectedTab();
+        if (selectedTab != null) {
+            selectedTab.notifyAboutFocus(entry);
+        }
+    }
+
     private EntryEditorTab getSelectedTab() {
         return (EntryEditorTab) tabbed.getSelectionModel().getSelectedItem();
     }
@@ -368,12 +357,16 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     private void setupToolBar() {
         BibEntry entry = viewModel.getCurrentlyEditedEntry();
 
-        // Add type change menu
-        ContextMenu typeMenu = new ChangeEntryTypeMenu(List.of(entry), tabSupplier.get().getBibDatabaseContext(), undoManager, bibEntryTypesManager).asContextMenu();
+        ContextMenu typeMenu = new ChangeEntryTypeMenu(
+                entry == null ? List.of() : List.of(entry),
+                tabSupplier.get().getBibDatabaseContext(),
+                undoManager,
+                bibEntryTypesManager
+        ).asContextMenu();
+
         typeLabel.setOnMouseClicked(_ -> typeMenu.show(typeLabel, Side.RIGHT, 0, 0));
         typeChangeButton.setOnMouseClicked(_ -> typeMenu.show(typeChangeButton, Side.RIGHT, 0, 0));
 
-        // Add menu for fetching bibliographic information
         ContextMenu fetcherMenu = new ContextMenu();
         for (EntryBasedFetcher fetcher : viewModel.getEntryBasedFetchers()) {
             MenuItem fetcherMenuItem = new MenuItem(fetcher.getName());

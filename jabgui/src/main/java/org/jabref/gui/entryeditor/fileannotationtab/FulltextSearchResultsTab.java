@@ -87,7 +87,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     }
 
     @Override
-    protected ObservableValue<Boolean> contentVisibility() {
+    protected ObservableValue<Boolean> contentDrivenVisibility() {
         return contentVisibility;
     }
 
