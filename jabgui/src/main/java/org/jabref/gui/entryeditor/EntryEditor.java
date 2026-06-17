@@ -30,7 +30,6 @@ import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
 import org.jabref.gui.cleanup.CleanupSingleAction;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
@@ -47,7 +46,6 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
-import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
@@ -386,15 +384,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         ContextMenu fetcherMenu = new ContextMenu();
         for (EntryBasedFetcher fetcher : viewModel.getEntryBasedFetchers()) {
             MenuItem fetcherMenuItem = new MenuItem(fetcher.getName());
-            if (fetcher instanceof PdfMergeMetadataImporter.EntryBasedFetcherWrapper) {
-                // Handle Grobid Opt-In in case of the PdfMergeMetadataImporter
-                fetcherMenuItem.setOnAction(_ -> {
-                    GrobidUseDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences());
-                    viewModel.fetchAndMergeFromPdfMetadata();
-                });
-            } else {
-                fetcherMenuItem.setOnAction(_ -> viewModel.fetchAndMerge(fetcher));
-            }
+            fetcherMenuItem.setOnAction(_ -> viewModel.fetchAndMerge(fetcher));
             fetcherMenu.getItems().add(fetcherMenuItem);
         }
 
