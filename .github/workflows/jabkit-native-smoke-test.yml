@@ -9,7 +9,10 @@ permissions:
 
 jobs:
   build-native:
-    runs-on: macos-15
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macos-15]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
@@ -28,12 +31,15 @@ jobs:
       - name: Upload JabKit native binary
         uses: actions/upload-artifact@v7
         with:
-          name: jabkit-native-macos-silicon
+          name: jabkit-native-${{ matrix.os }}
           path: jabkit/build/native/nativeCompile/jabkit
 
   smoke-test:
     needs: build-native
-    runs-on: macos-15
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macos-15]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
@@ -45,7 +51,7 @@ jobs:
       - name: Download JabKit native binary
         uses: actions/download-artifact@v8
         with:
-          name: jabkit-native-macos-silicon
+          name: jabkit-native-${{ matrix.os }}
           path: jabkit/build/native/nativeCompile/
 
       - name: Make binary executable
