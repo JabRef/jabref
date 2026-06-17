@@ -1,5 +1,6 @@
 package org.jabref.gui.externalfiles;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -10,11 +11,16 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImportFormatReader.ImportResult;
+import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -51,11 +57,15 @@ class ImportHandlerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
+        when(preferences.getExternalApplicationsPreferences()).thenReturn(mock(ExternalApplicationsPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        when(preferences.getImporterPreferences()).thenReturn(mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        when(preferences.getImporterPreferences().getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
 
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
@@ -87,6 +97,10 @@ class ImportHandlerTest {
         GuiPreferences preferences = mock(GuiPreferences.class);
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
+        when(preferences.getExternalApplicationsPreferences()).thenReturn(mock(ExternalApplicationsPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        when(preferences.getImporterPreferences()).thenReturn(mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        when(preferences.getImporterPreferences().getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
 
         ImportHandler importHandler = new ImportHandler(
                 mock(BibDatabaseContext.class),
@@ -115,6 +129,35 @@ class ImportHandlerTest {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Clear Author");
         BibEntry cleanedEntry = importHandler.cleanUpEntry(entry);
         assertEquals(new BibEntry().withField(StandardField.AUTHOR, "Clear Author"), cleanedEntry);
+    }
+
+    @Test
+    void createAutoDetectionImportOutcomeReturnsWarningResultForParsedFileWithWarnings() {
+        BibEntry importedEntry = new BibEntry(StandardEntryType.Article).withCitationKey("Warning2026");
+        ParserResult parserResult = new ParserResult(List.of(importedEntry));
+        parserResult.addWarning("Warning text");
+
+        ImportResult importResult = new ImportResult("RIS", parserResult);
+
+        ImportHandler.AutoDetectionImportOutcome outcome = importHandler.createAutoDetectionImportOutcome(Path.of("sample.ris"), importResult);
+
+        assertFalse(outcome.success());
+        assertEquals(List.of(importedEntry), outcome.entriesToAdd());
+        assertEquals("File was imported as RIS, but warnings were reported: Warning text", outcome.message());
+    }
+
+    @Test
+    void createAutoDetectionImportOutcomeReturnsEmptyEntryAndWarningMessageWhenNoEntriesWereParsed() {
+        ParserResult parserResult = new ParserResult();
+        parserResult.addWarning("Warning text");
+
+        ImportResult importResult = new ImportResult("RIS", parserResult);
+
+        ImportHandler.AutoDetectionImportOutcome outcome = importHandler.createAutoDetectionImportOutcome(Path.of("sample.ris"), importResult);
+
+        assertFalse(outcome.success());
+        assertEquals(1, outcome.entriesToAdd().size());
+        assertEquals("No importable data was found in RIS. An empty entry was created with file link. Warning text", outcome.message());
     }
 
     @Test
