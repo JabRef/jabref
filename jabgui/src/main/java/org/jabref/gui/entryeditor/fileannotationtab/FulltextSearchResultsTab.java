@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
@@ -24,7 +23,6 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.documentviewer.DocumentViewerView;
-import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.maintable.OpenFolderAction;
 import org.jabref.gui.maintable.OpenSingleExternalFileAction;
@@ -53,7 +51,6 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
     private final TaskExecutor taskExecutor;
-    private final AdaptVisibleTabs adaptVisibleTabs;
     private final TextFlow content;
 
     private BibEntry entry;
@@ -65,14 +62,12 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     public FulltextSearchResultsTab(StateManager stateManager,
                                     GuiPreferences preferences,
                                     DialogService dialogService,
-                                    TaskExecutor taskExecutor,
-                                    AdaptVisibleTabs adaptVisibleTabs) {
+                                    TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.actionFactory = new ActionFactory();
         this.taskExecutor = taskExecutor;
-        this.adaptVisibleTabs = adaptVisibleTabs;
 
         this.contentVisibility = Bindings.createBooleanBinding(
                 () -> stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get()
@@ -140,7 +135,8 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                 }
             }
         });
-        Platform.runLater(adaptVisibleTabs::adaptVisibleTabs);
+        // Tab visibility re-syncs reactively: contentVisibility() is bound to the active search query,
+        // and the entry editor observes shouldShow() for every tab.
     }
 
     private Text createFileLink(LinkedFile linkedFile) {
