@@ -28,7 +28,7 @@ class CSLItemTypeDefinitions {
             // Book
             Map.entry("book", StandardEntryType.Book),
             // Podcast, TV Broadcast, Radio Broadcast
-            Map.entry("broadcast",BiblatexNonStandardEntryType.Audio),
+            Map.entry("broadcast", BiblatexNonStandardEntryType.Audio),
             // Book Section
             Map.entry("chapter", StandardEntryType.InBook),
             // Dataset
