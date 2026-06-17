@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.SortedSet;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -35,7 +34,6 @@ import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
-import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewControls;
 import org.jabref.gui.preview.PreviewPanel;
@@ -46,11 +44,9 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
-import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.BuildInfo;
@@ -124,7 +120,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                   .root(this)
                   .load();
 
-        this.viewModel = new EntryEditorViewModel(stateManager, preferences.getEntryEditorPreferences());
+        this.viewModel = new EntryEditorViewModel(stateManager, preferences, taskExecutor, dialogService, undoManager);
+        typeLabel.textProperty().bind(viewModel.typeLabelTextProperty());
 
         this.fileLinker = new ExternalFilesEntryLinker(
                 preferences.getExternalApplicationsPreferences(),
@@ -392,12 +389,9 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         }
 
         typeSubscription = EasyBind.subscribe(entry.typeProperty(), _ -> {
-            typeLabel.setText(new TypedBibEntry(entry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
             setupToolBar();
             getSelectedTab().notifyAboutFocus(entry);
         });
-
-        typeLabel.setText(new TypedBibEntry(entry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
 
         setupToolBar();
 
@@ -426,46 +420,29 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     private void setupToolBar() {
         BibEntry entry = viewModel.getCurrentlyEditedEntry();
-        // Update type label
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, tabSupplier.get().getBibDatabaseContext().getMode());
-        typeLabel.setText(typedEntry.getTypeForDisplay());
 
         // Add type change menu
         ContextMenu typeMenu = new ChangeEntryTypeMenu(List.of(entry), tabSupplier.get().getBibDatabaseContext(), undoManager, bibEntryTypesManager).asContextMenu();
-        typeLabel.setOnMouseClicked(event -> typeMenu.show(typeLabel, Side.RIGHT, 0, 0));
-        typeChangeButton.setOnMouseClicked(event -> typeMenu.show(typeChangeButton, Side.RIGHT, 0, 0));
+        typeLabel.setOnMouseClicked(_ -> typeMenu.show(typeLabel, Side.RIGHT, 0, 0));
+        typeChangeButton.setOnMouseClicked(_ -> typeMenu.show(typeChangeButton, Side.RIGHT, 0, 0));
 
         // Add menu for fetching bibliographic information
         ContextMenu fetcherMenu = new ContextMenu();
-        SortedSet<EntryBasedFetcher> entryBasedFetchers = WebFetchers.getEntryBasedFetchers(
-                preferences.getImporterPreferences(),
-                preferences.getImportFormatPreferences(),
-                preferences.getFilePreferences(),
-                tabSupplier.get().getBibDatabaseContext());
-        for (EntryBasedFetcher fetcher : entryBasedFetchers) {
+        for (EntryBasedFetcher fetcher : viewModel.getEntryBasedFetchers()) {
             MenuItem fetcherMenuItem = new MenuItem(fetcher.getName());
             if (fetcher instanceof PdfMergeMetadataImporter.EntryBasedFetcherWrapper) {
                 // Handle Grobid Opt-In in case of the PdfMergeMetadataImporter
-                fetcherMenuItem.setOnAction(event -> {
+                fetcherMenuItem.setOnAction(_ -> {
                     GrobidUseDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences());
-                    PdfMergeMetadataImporter.EntryBasedFetcherWrapper pdfMergeMetadataImporter =
-                            new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(
-                                    preferences.getImportFormatPreferences(),
-                                    preferences.getFilePreferences(),
-                                    tabSupplier.get().getBibDatabaseContext());
-                    fetchAndMerge(pdfMergeMetadataImporter);
+                    viewModel.fetchAndMergeFromPdfMetadata();
                 });
             } else {
-                fetcherMenuItem.setOnAction(_ -> fetchAndMerge(fetcher));
+                fetcherMenuItem.setOnAction(_ -> viewModel.fetchAndMerge(fetcher));
             }
             fetcherMenu.getItems().add(fetcherMenuItem);
         }
 
         fetcherButton.setOnMouseClicked(_ -> fetcherMenu.show(fetcherButton, Side.RIGHT, 0, 0));
-    }
-
-    private void fetchAndMerge(EntryBasedFetcher fetcher) {
-        new FetchAndMergeEntry(tabSupplier.get().getBibDatabaseContext(), taskExecutor, preferences, dialogService, undoManager, stateManager).fetchAndMerge(viewModel.getCurrentlyEditedEntry(), fetcher);
     }
 
     public void selectField(String fieldName) {
