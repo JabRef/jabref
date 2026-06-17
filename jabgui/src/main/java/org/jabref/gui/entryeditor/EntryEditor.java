@@ -26,8 +26,6 @@ import javafx.stage.Modality;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
-import org.jabref.gui.cleanup.CleanupSingleAction;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -143,7 +141,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 searchCitationsRelationsService);
 
         // The view model owns the tab collection and which tabs are visible; the editor only renders them.
-        this.viewModel = new EntryEditorViewModel(stateManager, preferences, taskExecutor, dialogService, undoManager, tabFactory);
+        this.viewModel = new EntryEditorViewModel(stateManager, preferences, taskExecutor, dialogService, undoManager, journalAbbreviationRepository, tabSupplier, tabFactory);
         typeLabel.textProperty().bind(viewModel.typeLabelTextProperty());
         Bindings.bindContent(tabbed.getTabs(), viewModel.visibleTabs());
 
@@ -292,20 +290,17 @@ public class EntryEditor extends BorderPane implements PreviewControls {
 
     @FXML
     private void deleteEntry() {
-        tabSupplier.get().deleteEntry(viewModel.getCurrentlyEditedEntry());
+        viewModel.deleteEntry();
     }
 
     @FXML
     private void generateCiteKeyButton() {
-        GenerateCitationKeySingleAction action = new GenerateCitationKeySingleAction(getCurrentlyEditedEntry(), tabSupplier.get().getBibDatabaseContext(),
-                dialogService, preferences, undoManager);
-        action.execute();
+        viewModel.generateCiteKey();
     }
 
     @FXML
     private void generateCleanupButton() {
-        CleanupSingleAction action = new CleanupSingleAction(getCurrentlyEditedEntry(), preferences, dialogService, stateManager, undoManager, journalAbbreviationRepository);
-        action.execute();
+        viewModel.cleanup();
     }
 
     @FXML
