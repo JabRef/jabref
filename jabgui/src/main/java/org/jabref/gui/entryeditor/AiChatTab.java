@@ -26,6 +26,11 @@ public class AiChatTab extends EntryEditorTab {
         setContent(aiEntryChatView);
     }
 
+    @Override
+    public String getName() {
+        return "AI chat";
+    }
+
     /// @implNote Method similar to {@link AiSummaryTab#bindToEntry(BibEntry)}
     @Override
     protected void bindToEntry(BibEntry entry) {

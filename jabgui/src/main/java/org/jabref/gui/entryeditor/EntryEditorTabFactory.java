@@ -192,7 +192,6 @@ public class EntryEditorTabFactory {
                     new CommentsTab(preferences, undoManager, undoAction, redoAction, journalAbbreviationRepository, stateManager, previewPanel);
             case MATH_SCI_NET ->
                     new MathSciNetTab();
-            // SourceTab is not a NamedEntryEditorTab, because it has different names for BibTeX and biblatex mode
             case SOURCE ->
                     new SourceTab(
                             undoManager,

@@ -16,7 +16,7 @@ import org.jabref.model.entry.identifier.MathSciNetId;
 
 import com.tobiasdiez.easybind.EasyBind;
 
-public class MathSciNetTab extends EntryEditorTab implements NamedEntryEditorTab {
+public class MathSciNetTab extends EntryEditorTab {
 
     public static final String NAME = "MathSciNet Review";
 

@@ -33,7 +33,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
-public class CommentsTab extends FieldsEditorTab implements NamedEntryEditorTab {
+public class CommentsTab extends FieldsEditorTab {
     public static final String NAME = "Comments";
 
     private final String defaultOwner;

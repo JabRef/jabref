@@ -26,7 +26,7 @@ import org.jabref.model.entry.BibEntry;
 
 import com.tobiasdiez.easybind.EasyBind;
 
-public class LatexCitationsTab extends EntryEditorTab implements NamedEntryEditorTab {
+public class LatexCitationsTab extends EntryEditorTab {
 
     public static final String NAME = "LaTeX citations";
 

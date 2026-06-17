@@ -30,7 +30,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
-public class OtherFieldsTab extends FieldsEditorTab implements NamedEntryEditorTab {
+public class OtherFieldsTab extends FieldsEditorTab {
 
     public static final String NAME = "Other fields";
     private final List<Field> customTabsFieldNames;

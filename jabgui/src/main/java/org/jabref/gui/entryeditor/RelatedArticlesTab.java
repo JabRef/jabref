@@ -38,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Tab displaying article recommendations based on the currently selected BibEntry
-public class RelatedArticlesTab extends EntryEditorTab implements NamedEntryEditorTab {
+public class RelatedArticlesTab extends EntryEditorTab {
 
     public static final String NAME = "Related articles";
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedArticlesTab.class);
