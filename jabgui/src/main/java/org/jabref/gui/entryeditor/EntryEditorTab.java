@@ -19,16 +19,9 @@ public abstract class EntryEditorTab extends Tab {
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryEditorTab.class);
 
     /// The entry currently being edited in the editor. Bound by {@link EntryEditorViewModel} to its
-    /// currently-edited-entry property for every tab (not only the focused one), so that {@link #shouldShow()}
+    /// currently-edited-entry property for every tab (not only the focused one), so that {@link #visibility()}
     /// can react to entry and entry-type changes. Because it is bound, it must not be set directly.
     private final ObjectProperty<@Nullable BibEntry> currentEntry = new SimpleObjectProperty<>();
-
-    /// User-controlled visibility gate, injected by {@link EntryEditorTabFactory} from this tab's
-    /// {@link EntryEditorTabModel}. Defaults to always-on for tabs created without a model.
-    private ObservableValue<Boolean> visibilityGate = new SimpleBooleanProperty(true);
-
-    /// Lazily built combination of {@link #visibilityGate} and {@link #contentVisibility()}.
-    private @Nullable ObservableValue<Boolean> shouldShow;
 
     /// The entry (and its type) the tab content was last rendered for. Used to rebuild the content lazily on
     /// focus when the entry or its type changed. Kept separate from {@link #currentEntry} so that pushing a
@@ -36,58 +29,58 @@ public abstract class EntryEditorTab extends Tab {
     private @Nullable BibEntry renderedEntry;
     private @Nullable EntryType renderedEntryType;
 
-    public ObjectProperty<@Nullable BibEntry> currentEntryProperty() {
-        return currentEntry;
+    /// User-controlled visibility gate, injected by {@link EntryEditorTabFactory} from this tab's
+    /// {@link EntryEditorTabModel}. Defaults to always-on for tabs created without a model.
+    private ObservableValue<Boolean> preferenceDrivenVisibility = new SimpleBooleanProperty(true);
+
+    /// Lazily built combination of {@link #preferenceDrivenVisibility} and {@link #contentDrivenVisibility()}.
+    private @Nullable ObservableValue<Boolean> combinedVisibility;
+
+    public void setPreferenceDrivenVisibility(ObservableValue<Boolean> preferenceDrivenVisibility) {
+        this.preferenceDrivenVisibility = preferenceDrivenVisibility;
+        this.combinedVisibility = null;
+    }
+
+    /// Content-driven visibility: tabs that only make sense for certain entries override this to hide
+    /// themselves when the current entry has nothing to show.
+    protected ObservableValue<Boolean> contentDrivenVisibility() {
+        return new SimpleBooleanProperty(true);
+    }
+
+    public final ObservableValue<Boolean> visibility() {
+        if (combinedVisibility == null) {
+            combinedVisibility = EasyBind.combine(
+                    preferenceDrivenVisibility,
+                    contentDrivenVisibility(),
+                    (preference, content) -> preference && content
+            );
+        }
+
+        return combinedVisibility;
     }
 
     public @Nullable BibEntry getCurrentEntry() {
         return currentEntry.get();
     }
 
-    /// Sets the user-controlled visibility gate for this tab (its {@link EntryEditorTabModel} visibility,
-    /// or another preference for tabs whose toggle lives elsewhere). Called once by the factory after
-    /// construction, before the editor first reads {@link #shouldShow()}.
-    public void setVisibilityGate(ObservableValue<Boolean> visibilityGate) {
-        this.visibilityGate = visibilityGate;
-        this.shouldShow = null;
-    }
-
-    /// Content-driven visibility: whether the current entry actually has something to show in this tab
-    /// (e.g. matching fields, a MathSciNet id, an active fulltext search). Defaults to always available;
-    /// tabs that only appear for certain entries override this. It must not consult tab-visibility
-    /// preferences — that is the job of the {@link #setVisibilityGate(ObservableValue) visibility gate}.
-    protected ObservableValue<Boolean> contentVisibility() {
-        return new SimpleBooleanProperty(true);
-    }
-
-    /// Whether this tab should be shown for the current entry: the user visibility gate AND content
-    /// availability. The entry editor observes this value and adds or removes the tab accordingly, so the
-    /// editor re-renders without being told.
-    public final ObservableValue<Boolean> shouldShow() {
-        if (shouldShow == null) {
-            shouldShow = EasyBind.combine(visibilityGate, contentVisibility(), (gate, content) -> gate && content);
-        }
-        return shouldShow;
+    public ObjectProperty<@Nullable BibEntry> currentEntryProperty() {
+        return currentEntry;
     }
 
     /// Stable, well-known name of this tab (its English/config identifier, independent of the localized
     /// {@linkplain #getText() display text}).
     public abstract String getName();
 
-    /// Updates the view with the contents of the given entry.
     protected abstract void bindToEntry(BibEntry entry);
 
-    /// The tab just got the focus. Override this method if you want to perform a special action on focus (like selecting
-    /// the first field in the editor)
+    /// Override to perform a special action on focus (like selecting the first field in the editor).
     protected void handleFocus() {
-        // Do nothing by default
     }
 
-    /// Notifies the tab that it got focus and should display the given entry.
     public void notifyAboutFocus(BibEntry entry) {
-        // editedEntry is bound to the view model and updates itself; we only react to a changed entry/type here.
+        // currentEntry is bound to the view model and updates on its own; rebuild content only when the
+        // entry or its type actually changed (intentionally lazy: not on every push to the property).
         if (!entry.equals(renderedEntry) || !entry.getType().equals(renderedEntryType)) {
-            // bindToEntry is intentionally lazy: content rebuilds only on focus, not on every entry push to editedEntryProperty().
             LOGGER.trace("Tab got focus with different entry (or entry type) {}", entry);
             LOGGER.trace("Different entry: {}", !entry.equals(renderedEntry));
             LOGGER.trace("Different entry type: {}", !entry.getType().equals(renderedEntryType));

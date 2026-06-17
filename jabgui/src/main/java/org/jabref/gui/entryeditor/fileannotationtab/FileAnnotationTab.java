@@ -37,7 +37,7 @@ public class FileAnnotationTab extends EntryEditorTab {
     }
 
     @Override
-    protected ObservableValue<Boolean> contentVisibility() {
+    protected ObservableValue<Boolean> contentDrivenVisibility() {
         return contentVisibility;
     }
 

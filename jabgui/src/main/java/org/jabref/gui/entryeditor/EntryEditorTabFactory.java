@@ -86,18 +86,10 @@ public class EntryEditorTabFactory {
         this.searchCitationsRelationsService = searchCitationsRelationsService;
     }
 
-    /// Creates all tabs that can possibly be shown in the entry editor, in display order.
-    ///
-    /// The user-configurable tabs (built-in field sets, customized field sets, and feature tabs) are
-    /// generated from the {@link EntryEditorTabModel} list — their existence and order come from that
-    /// single source of truth, analogous to {@link org.jabref.gui.maintable.MainTableColumnFactory#createColumns()}
-    /// iterating the configured columns. The few always-present tabs that have no tab model are added as
-    /// fixed leading/trailing tabs (like the always-present match-category column).
-    ///
+    /// Creates all tabs that can possibly be shown from {@link EntryEditorTabModel}, in display order.
     public List<EntryEditorTab> createTabs() {
         List<EntryEditorTab> tabs = new LinkedList<>();
 
-        // Existence and order of every tab come from the configured tab models (single source of truth).
         // ToDo: Needs to be recreated on preferences change
         for (EntryEditorTabModel model : preferences.getEntryEditorPreferences().getTabModels()) {
             tabs.add(createTab(model));
@@ -107,11 +99,6 @@ public class EntryEditorTabFactory {
     }
 
     /// Maps a single {@link EntryEditorTabModel} to its concrete {@link EntryEditorTab} view.
-    ///
-    /// This is the single place that turns a tab model into a tab control, mirroring
-    /// {@link org.jabref.gui.maintable.MainTableColumnFactory#createColumn}. The exhaustive switches over
-    /// the sealed model and its enums mean adding a new tab kind is a compile error until it is wired here.
-    ///
     public EntryEditorTab createTab(EntryEditorTabModel model) {
         EntryEditorTab tab = switch (model) {
             case EntryEditorTabModel.FieldSet(
@@ -130,14 +117,14 @@ public class EntryEditorTabFactory {
             ) ->
                     createFeatureTab(type);
         };
-        tab.setVisibilityGate(visibilityGate(model));
+        tab.setPreferenceDrivenVisibility(getVisibility(model));
         return tab;
     }
 
     /// The user-controlled visibility for a tab, derived from its model. Customized field-set tabs are
     /// always enabled (toggled only by adding/removing them); the Preview tab's toggle lives in the
     /// preview preferences ("show preview as a separate tab"), not in its tab model.
-    private ObservableValue<Boolean> visibilityGate(EntryEditorTabModel model) {
+    private ObservableValue<Boolean> getVisibility(EntryEditorTabModel model) {
         EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
         return switch (model) {
             case EntryEditorTabModel.FieldSet(

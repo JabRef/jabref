@@ -199,7 +199,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     }
 
     @Override
-    protected ObservableValue<Boolean> contentVisibility() {
+    protected ObservableValue<Boolean> contentDrivenVisibility() {
         return contentVisibility;
     }
 
