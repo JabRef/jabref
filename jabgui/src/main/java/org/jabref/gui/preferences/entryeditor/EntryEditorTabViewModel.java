@@ -104,7 +104,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     /// Commits any pending name/fields edit for {@code oldItem} back into {@link #tabConfigs}.
     private void commitCurrentEdit(EntryEditorTabModel oldItem) {
-        if (!(oldItem instanceof EntryEditorTabModel.CustomizedFieldSet oldFieldSet)) {
+        if (!(oldItem instanceof EntryEditorTabModel.CustomizedFieldSet)) {
             return;
         }
         int index = tabConfigs.indexOf(oldItem);
@@ -112,7 +112,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
             return;
         }
         tabConfigs.set(index, new EntryEditorTabModel.CustomizedFieldSet(
-                selectedTabName.get(), new LinkedHashSet<>(selectedTabFields), oldFieldSet.visible()));
+                selectedTabName.get(), new LinkedHashSet<>(selectedTabFields)));
     }
 
     private void loadSelection(EntryEditorTabModel newItem) {
@@ -154,7 +154,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         tabConfigs.removeIf(config -> config instanceof EntryEditorTabModel.CustomizedFieldSet);
         List<EntryEditorTabModel> defaultFieldSets = EntryEditorPreferences.getDefaultEntryEditorTabs()
                                                                            .entrySet().stream()
-                                                                           .<EntryEditorTabModel>map(e -> new EntryEditorTabModel.CustomizedFieldSet(e.getKey(), e.getValue(), true))
+                                                                           .<EntryEditorTabModel>map(e -> new EntryEditorTabModel.CustomizedFieldSet(e.getKey(), e.getValue()))
                                                                            .toList();
         tabConfigs.addAll(indexAfterLeadingPreview(), defaultFieldSets);
         // selectedTab is cleared automatically when the ListView loses the old selected item
@@ -167,7 +167,10 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     }
 
     private static boolean isPreviewFeature(EntryEditorTabModel model) {
-        return model instanceof EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab type, boolean ignored)
+        return model instanceof EntryEditorTabModel.Feature(
+                EntryEditorTabModel.StaticTab type,
+                boolean ignored
+        )
                 && type == EntryEditorTabModel.StaticTab.PREVIEW;
     }
 
@@ -179,7 +182,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
             }
         }
         EntryEditorTabModel newTab = new EntryEditorTabModel.CustomizedFieldSet(
-                Localization.lang("New Tab"), Set.of(), true);
+                Localization.lang("New Tab"), Set.of());
         tabConfigs.add(insertIndex, newTab);
         selectedTab.set(newTab); // commits old, loads new empty state; view mirrors via EasyBind
     }

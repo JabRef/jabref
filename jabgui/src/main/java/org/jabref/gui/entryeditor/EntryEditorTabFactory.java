@@ -121,8 +121,7 @@ public class EntryEditorTabFactory {
                     createFieldSetTab(type);
             case EntryEditorTabModel.CustomizedFieldSet(
                     String name,
-                    Set<Field> fields,
-                    boolean _
+                    Set<Field> fields
             ) ->
                     new UserDefinedFieldsTab(name, fields, undoManager, undoAction, redoAction, preferences, journalAbbreviationRepository, stateManager, previewPanel);
             case EntryEditorTabModel.Feature(

@@ -429,7 +429,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             }
         }
         tabNamesToFields.forEach((name, fields) ->
-                tabModels.add(new EntryEditorTabModel.CustomizedFieldSet(name, fields, true)));
+                tabModels.add(new EntryEditorTabModel.CustomizedFieldSet(name, fields)));
 
         tabModels.addAll(List.<EntryEditorTabModel>of(
                 new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.RELATED_ARTICLES,
