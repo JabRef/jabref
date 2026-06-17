@@ -13,8 +13,6 @@ import org.jabref.model.entry.field.Field;
 public sealed interface EntryEditorTabModel
         permits EntryEditorTabModel.FieldSet, EntryEditorTabModel.CustomizedFieldSet, EntryEditorTabModel.Feature {
 
-    boolean visible();
-
     enum StaticTab {
         // Always-present leading tab (no field configuration; only visibility)
         PREVIEW,
@@ -43,7 +41,9 @@ public sealed interface EntryEditorTabModel
             implements EntryEditorTabModel {
     }
 
-    record CustomizedFieldSet(String name, Set<Field> fields, boolean visible)
+    /// Always shown; toggled only by being added to or removed from the tab list, so it carries no
+    /// visibility flag (unlike {@link FieldSet} and {@link Feature}).
+    record CustomizedFieldSet(String name, Set<Field> fields)
             implements EntryEditorTabModel {
     }
 

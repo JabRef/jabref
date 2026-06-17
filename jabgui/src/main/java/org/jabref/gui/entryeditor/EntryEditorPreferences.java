@@ -114,7 +114,7 @@ public class EntryEditorPreferences {
         tabModels.add(new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.PREVIEW, true));
 
         getDefaultEntryEditorTabs().forEach((name, fields) ->
-                tabModels.add(new EntryEditorTabModel.CustomizedFieldSet(name, fields, true)));
+                tabModels.add(new EntryEditorTabModel.CustomizedFieldSet(name, fields)));
 
         for (EntryEditorTabModel.BuiltInFieldSet fieldSet : EntryEditorTabModel.BuiltInFieldSet.values()) {
             tabModels.add(new EntryEditorTabModel.FieldSet(fieldSet, true));
@@ -202,7 +202,7 @@ public class EntryEditorPreferences {
     public void setEntryEditorTabList(Map<String, Set<Field>> tabs) {
         List<EntryEditorTabModel> newFieldSet = tabs.entrySet().stream()
                                                     .<EntryEditorTabModel>map(model ->
-                                                            new EntryEditorTabModel.CustomizedFieldSet(model.getKey(), model.getValue(), true))
+                                                            new EntryEditorTabModel.CustomizedFieldSet(model.getKey(), model.getValue()))
                                                     .toList();
         tabModels.removeIf(config -> config instanceof EntryEditorTabModel.CustomizedFieldSet);
         // Customized field-set tabs sit right after the always-present leading Preview tab.
