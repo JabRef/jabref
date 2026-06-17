@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
@@ -72,7 +73,7 @@ import org.jspecify.annotations.NonNull;
 /// the text fields to update themselves if the change is made from somewhere else.
 ///
 /// The editors for fields are created via {@link org.jabref.gui.fieldeditors.FieldEditors}.
-public class EntryEditor extends BorderPane implements PreviewControls, AdaptVisibleTabs {
+public class EntryEditor extends BorderPane implements PreviewControls {
     private final Supplier<LibraryTab> tabSupplier;
     private final ExternalFilesEntryLinker fileLinker;
     private final PreviewPanel previewPanel;
@@ -161,21 +162,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
         EasyBind.subscribe(stateManager.activeTabProperty(), tab -> {
             if (tab.isPresent()) {
-                tabbed.getTabs().clear();
-
-                shouldShowSubscriptions.forEach(Subscription::unsubscribe);
-                shouldShowSubscriptions.clear();
-                this.allPossibleTabs.clear();
-                this.allPossibleTabs.addAll(tabFactory.createTabs());
-                this.sourceTab = allPossibleTabs.stream()
-                                                .filter(SourceTab.class::isInstance)
-                                                .map(SourceTab.class::cast)
-                                                .findFirst()
-                                                .orElse(null);
-
-                allPossibleTabs.forEach(t ->
-                        shouldShowSubscriptions.add(EasyBind.subscribe(t.shouldShow(), _ -> syncTabPane())));
-                syncTabPane();
+                recreatePossibleTabs();
             } else {
                 shouldShowSubscriptions.forEach(Subscription::unsubscribe);
                 shouldShowSubscriptions.clear();
@@ -183,6 +170,12 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 close();
             }
         });
+
+        // Rebuild the tab set whenever the configured tab models change (tabs added, removed or reordered in
+        // the preferences). The View observes the single source of truth directly, replacing the former
+        // AdaptVisibleTabs callback that other view models used to poke the editor.
+        preferences.getEntryEditorPreferences().getTabModels().addListener(
+                (InvalidationListener) _ -> recreatePossibleTabs());
 
         setupDragAndDrop();
 
@@ -338,12 +331,29 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         tabSupplier.get().selectNextEntry();
     }
 
-    @Override
-    public void adaptVisibleTabs() {
+    /// Rebuilds {@link #allPossibleTabs} from the factory, re-subscribes to each tab's {@link EntryEditorTab#shouldShow()},
+    /// and re-renders. Invoked when the active library tab changes and when the configured tab models change.
+    private void recreatePossibleTabs() {
+        shouldShowSubscriptions.forEach(Subscription::unsubscribe);
+        shouldShowSubscriptions.clear();
+        tabbed.getTabs().clear();
+
+        this.allPossibleTabs.clear();
+        this.allPossibleTabs.addAll(tabFactory.createTabs());
+        this.sourceTab = allPossibleTabs.stream()
+                                        .filter(SourceTab.class::isInstance)
+                                        .map(SourceTab.class::cast)
+                                        .findFirst()
+                                        .orElse(null);
+
+        // Newly created tabs need the current entry so their content-driven visibility resolves correctly.
         BibEntry entry = viewModel.getCurrentlyEditedEntry();
         if (entry != null) {
             allPossibleTabs.forEach(tab -> tab.currentEntryProperty().set(entry));
         }
+
+        allPossibleTabs.forEach(t ->
+                shouldShowSubscriptions.add(EasyBind.subscribe(t.shouldShow(), _ -> syncTabPane())));
         syncTabPane();
     }
 
