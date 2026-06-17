@@ -61,6 +61,10 @@ public class EntryEditorPreferences {
     private final ObjectProperty<CitationCountFetcherType> citationCountFetcherType;
     private final DoubleProperty previewWidthDividerPosition;
 
+    /// Field-level toggle: whether the user-specific comments field is shown inside the Comments tab.
+    /// Distinct from the Comments tab's own visibility ({@link EntryEditorTabModel.StaticTab#COMMENTS}).
+    private final BooleanProperty showUserCommentsFields;
+
     private EntryEditorPreferences() {
         this(
                 getDefaultTabModels(),
@@ -72,6 +76,7 @@ public class EntryEditorPreferences {
                 JournalPopupEnabled.DISABLED,
                 CitationFetcherType.SEMANTIC_SCHOLAR,
                 CitationCountFetcherType.SEMANTIC_SCHOLAR,
+                true,
                 0.5
         );
     }
@@ -85,6 +90,7 @@ public class EntryEditorPreferences {
                                   JournalPopupEnabled journalPopupEnabled,
                                   CitationFetcherType citationFetcherType,
                                   CitationCountFetcherType citationCountFetcherType,
+                                  boolean showUserCommentsFields,
                                   double previewWidthDividerPosition) {
         this.tabModels = FXCollections.observableArrayList(tabModels);
         this.shouldOpenOnNewEntry = new SimpleBooleanProperty(shouldOpenOnNewEntry);
@@ -95,6 +101,7 @@ public class EntryEditorPreferences {
         this.enablementStatus = new SimpleObjectProperty<>(journalPopupEnabled);
         this.citationFetcherType = new SimpleObjectProperty<>(citationFetcherType);
         this.citationCountFetcherType = new SimpleObjectProperty<>(citationCountFetcherType);
+        this.showUserCommentsFields = new SimpleBooleanProperty(showUserCommentsFields);
         this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
     }
 
@@ -206,9 +213,12 @@ public class EntryEditorPreferences {
     /// so customized field-set tabs are inserted after the Preview tab instead of before it.
     private int indexAfterLeadingPreview() {
         return !tabModels.isEmpty()
-                && tabModels.getFirst() instanceof EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab type, boolean ignored)
-                && type == EntryEditorTabModel.StaticTab.PREVIEW
-                ? 1 : 0;
+                       && tabModels.getFirst() instanceof EntryEditorTabModel.Feature(
+                EntryEditorTabModel.StaticTab type,
+                boolean ignored
+        )
+                       && type == EntryEditorTabModel.StaticTab.PREVIEW
+               ? 1 : 0;
     }
 
     public static SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
@@ -258,6 +268,7 @@ public class EntryEditorPreferences {
         this.citationFetcherType.set(preferences.getCitationFetcherType());
         this.citationCountFetcherType.set(preferences.getCitationCountFetcherType());
         this.previewWidthDividerPosition.set(preferences.getPreviewWidthDividerPosition());
+        this.showUserCommentsFields.set(preferences.shouldShowUserCommentsFields());
     }
 
     public boolean shouldOpenOnNewEntry() {
@@ -354,6 +365,18 @@ public class EntryEditorPreferences {
 
     public ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty() {
         return citationCountFetcherType;
+    }
+
+    public boolean shouldShowUserCommentsFields() {
+        return showUserCommentsFields.get();
+    }
+
+    public BooleanProperty showUserCommentsFieldsProperty() {
+        return showUserCommentsFields;
+    }
+
+    public void setShowUserCommentsFields(boolean showUserCommentsFields) {
+        this.showUserCommentsFields.set(showUserCommentsFields);
     }
 
     public void setPreviewWidthDividerPosition(double previewWidthDividerPosition) {

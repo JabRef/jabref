@@ -24,7 +24,7 @@ public sealed interface EntryEditorTabModel
         FILE_ANNOTATIONS,
         LATEX_CITATIONS,
         CITATION_INFORMATION,
-        USER_COMMENTS,
+        COMMENTS,
         // Always-present trailing tabs
         MATH_SCI_NET,
         SOURCE,

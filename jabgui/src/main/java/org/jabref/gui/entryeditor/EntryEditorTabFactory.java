@@ -188,7 +188,7 @@ public class EntryEditorTabFactory {
                             themeManager,
                             bibEntryTypesManager,
                             searchCitationsRelationsService);
-            case USER_COMMENTS ->
+            case COMMENTS ->
                     new CommentsTab(preferences, undoManager, undoAction, redoAction, journalAbbreviationRepository, stateManager, previewPanel);
             case MATH_SCI_NET ->
                     new MathSciNetTab();
@@ -217,7 +217,7 @@ public class EntryEditorTabFactory {
             boolean showLaTeXCitations,
             boolean showFileAnnotations,
             boolean showCitationInformation,
-            boolean showUserComments) {
+            boolean showCommentsTab) {
         return List.of(
                 new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.RELATED_ARTICLES, showRelatedArticles),
                 new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.AI_SUMMARY, showAISummary),
@@ -225,7 +225,7 @@ public class EntryEditorTabFactory {
                 new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.LATEX_CITATIONS, showLaTeXCitations),
                 new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.FILE_ANNOTATIONS, showFileAnnotations),
                 new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.CITATION_INFORMATION, showCitationInformation),
-                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.USER_COMMENTS, showUserComments)
+                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.COMMENTS, showCommentsTab)
         );
     }
 
