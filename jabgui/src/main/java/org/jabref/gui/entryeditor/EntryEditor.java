@@ -2,14 +2,13 @@ package org.jabref.gui.entryeditor;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.control.Button;
@@ -86,8 +85,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     private final EntryEditorViewModel viewModel;
     private final EntryEditorFocusUtils focusUtils;
 
-    private SourceTab sourceTab;
-
     @FXML private TabPane tabbed;
 
     @FXML private Button typeChangeButton;
@@ -109,9 +106,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     @Inject private AiService aiService;
     @Inject private SearchCitationsRelationsService searchCitationsRelationsService;
 
-    private final List<EntryEditorTab> allPossibleTabs = new ArrayList<>();
-    private final List<Subscription> shouldShowSubscriptions = new ArrayList<>();
-
     public EntryEditor(Supplier<LibraryTab> tabSupplier, UndoAction undoAction, RedoAction redoAction) {
         this.tabSupplier = tabSupplier;
         this.undoAction = undoAction;
@@ -120,9 +114,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         ViewLoader.view(this)
                   .root(this)
                   .load();
-
-        this.viewModel = new EntryEditorViewModel(stateManager, preferences, taskExecutor, dialogService, undoManager);
-        typeLabel.textProperty().bind(viewModel.typeLabelTextProperty());
 
         this.fileLinker = new ExternalFilesEntryLinker(
                 preferences.getExternalApplicationsPreferences(),
@@ -156,26 +147,23 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 keyBindingRepository,
                 searchCitationsRelationsService);
 
+        // The view model owns the tab collection and which tabs are visible; the editor only renders them.
+        this.viewModel = new EntryEditorViewModel(stateManager, preferences, taskExecutor, dialogService, undoManager, tabFactory);
+        typeLabel.textProperty().bind(viewModel.typeLabelTextProperty());
+        Bindings.bindContent(tabbed.getTabs(), viewModel.visibleTabs());
+
         this.focusUtils = new EntryEditorFocusUtils(tabbed, this);
 
         setupKeyBindings();
 
         EasyBind.subscribe(stateManager.activeTabProperty(), tab -> {
             if (tab.isPresent()) {
-                recreatePossibleTabs();
+                viewModel.rebuildTabs();
             } else {
-                shouldShowSubscriptions.forEach(Subscription::unsubscribe);
-                shouldShowSubscriptions.clear();
-                this.allPossibleTabs.clear();
+                viewModel.clearTabs();
                 close();
             }
         });
-
-        // Rebuild the tab set whenever the configured tab models change (tabs added, removed or reordered in
-        // the preferences). The View observes the single source of truth directly, replacing the former
-        // AdaptVisibleTabs callback that other view models used to poke the editor.
-        preferences.getEntryEditorPreferences().getTabModels().addListener(
-                (InvalidationListener) _ -> recreatePossibleTabs());
 
         setupDragAndDrop();
 
@@ -331,60 +319,12 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         tabSupplier.get().selectNextEntry();
     }
 
-    /// Rebuilds {@link #allPossibleTabs} from the factory, re-subscribes to each tab's {@link EntryEditorTab#shouldShow()},
-    /// and re-renders. Invoked when the active library tab changes and when the configured tab models change.
-    private void recreatePossibleTabs() {
-        shouldShowSubscriptions.forEach(Subscription::unsubscribe);
-        shouldShowSubscriptions.clear();
-        tabbed.getTabs().clear();
-
-        this.allPossibleTabs.clear();
-        this.allPossibleTabs.addAll(tabFactory.createTabs());
-        this.sourceTab = allPossibleTabs.stream()
-                                        .filter(SourceTab.class::isInstance)
-                                        .map(SourceTab.class::cast)
-                                        .findFirst()
-                                        .orElse(null);
-
-        // Newly created tabs need the current entry so their content-driven visibility resolves correctly.
-        BibEntry entry = viewModel.getCurrentlyEditedEntry();
-        if (entry != null) {
-            allPossibleTabs.forEach(tab -> tab.currentEntryProperty().set(entry));
-        }
-
-        allPossibleTabs.forEach(t ->
-                shouldShowSubscriptions.add(EasyBind.subscribe(t.shouldShow(), _ -> syncTabPane())));
-        syncTabPane();
-    }
-
-    /// Diffs {@link #allPossibleTabs} against the current {@link #tabbed} contents and adds/removes tabs to match
-    /// the tabs whose {@link EntryEditorTab#shouldShow()} is {@code true}, preserving order without a full replace
-    /// (a full replace causes an ugly shift-in animation for all tabs).
-    private void syncTabPane() {
-        if (viewModel.getCurrentlyEditedEntry() == null) {
-            tabbed.getTabs().clear();
-            return;
-        }
-
-        List<EntryEditorTab> toBeRemoved = allPossibleTabs.stream().filter(tab -> !tab.shouldShow().getValue()).toList();
-        tabbed.getTabs().removeAll(toBeRemoved);
-
-        List<Tab> visibleTabs = allPossibleTabs.stream().filter(tab -> tab.shouldShow().getValue()).collect(Collectors.toList());
-        for (int i = 0; i < visibleTabs.size(); i++) {
-            Tab toBeAdded = visibleTabs.get(i);
-            Tab shown = i < tabbed.getTabs().size() ? tabbed.getTabs().get(i) : null;
-            if (!toBeAdded.equals(shown)) {
-                tabbed.getTabs().add(i, toBeAdded);
-            }
-        }
-    }
-
     public BibEntry getCurrentlyEditedEntry() {
         return viewModel.getCurrentlyEditedEntry();
     }
 
     public List<EntryEditorTab> getAllPossibleTabs() {
-        return allPossibleTabs;
+        return viewModel.getAllPossibleTabs();
     }
 
     public void setCurrentlyEditedEntry(@NonNull BibEntry entry) {
@@ -392,7 +332,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     }
 
     private void onEntryChanged(@NonNull BibEntry entry) {
-        allPossibleTabs.forEach(tab -> tab.currentEntryProperty().set(entry));
+        viewModel.getAllPossibleTabs().forEach(tab -> tab.currentEntryProperty().set(entry));
 
         if (typeSubscription != null) {
             typeSubscription.unsubscribe();
@@ -406,7 +346,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         setupToolBar();
 
         if (preferences.getEntryEditorPreferences().showSourceTabByDefault()) {
-            tabbed.getSelectionModel().select(sourceTab);
+            viewModel.sourceTab().ifPresent(tabbed.getSelectionModel()::select);
         }
         Platform.runLater(() -> {
             for (Tab tab : tabbed.getTabs()) {

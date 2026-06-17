@@ -1,6 +1,10 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.SortedSet;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -9,7 +13,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Tab;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -40,6 +46,16 @@ public class EntryEditorViewModel extends AbstractViewModel {
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final UndoManager undoManager;
+    private final EntryEditorTabFactory tabFactory;
+
+    /// Every tab that can possibly be shown for the current entry, in display order.
+    private final List<EntryEditorTab> allPossibleTabs = new ArrayList<>();
+    /// One subscription per tab, observing its {@link EntryEditorTab#shouldShow()}.
+    private final List<Subscription> shouldShowSubscriptions = new ArrayList<>();
+    /// The subset of {@link #allPossibleTabs} currently shown — mutated incrementally so a bound TabPane
+    /// replays adds/removes one by one (a full replace causes an ugly shift-in animation).
+    private final ObservableList<Tab> visibleTabs = FXCollections.observableArrayList();
+    private @Nullable SourceTab sourceTab;
 
     private @Nullable Subscription typeSubscription;
 
@@ -47,12 +63,14 @@ public class EntryEditorViewModel extends AbstractViewModel {
                                 GuiPreferences preferences,
                                 TaskExecutor taskExecutor,
                                 DialogService dialogService,
-                                UndoManager undoManager) {
+                                UndoManager undoManager,
+                                EntryEditorTabFactory tabFactory) {
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.undoManager = undoManager;
+        this.tabFactory = tabFactory;
 
         // [impl->req~entry-editor.keep-showing~1] — when selection becomes empty, keep the old entry showing
         stateManager.getSelectedEntries().addListener((InvalidationListener) _ -> {
@@ -64,6 +82,12 @@ public class EntryEditorViewModel extends AbstractViewModel {
         // Keep the type label in sync with the current entry, its type, and the active database mode.
         EasyBind.subscribe(currentlyEditedEntry, this::rebindTypeLabel);
         EasyBind.subscribe(stateManager.activeDatabaseProperty(), _ -> updateTypeLabelText());
+
+        // Rebuild the tab set whenever the configured tab models change (tabs added, removed or reordered in
+        // the preferences). This observes the single source of truth directly, replacing the former
+        // AdaptVisibleTabs callback that other view models used to poke the editor.
+        preferences.getEntryEditorPreferences().getTabModels()
+                   .addListener((InvalidationListener) _ -> rebuildTabs());
     }
 
     private void rebindTypeLabel(@Nullable BibEntry entry) {
@@ -102,6 +126,76 @@ public class EntryEditorViewModel extends AbstractViewModel {
 
     public ObservableList<EntryEditorTabModel> getTabModels() {
         return preferences.getEntryEditorPreferences().getTabModels();
+    }
+
+    /// Live, ordered list of the tabs that should currently be shown for the edited entry. The
+    /// {@link EntryEditor} binds its {@code TabPane} to this; it is mutated incrementally to avoid a full replace.
+    public ObservableList<Tab> visibleTabs() {
+        return FXCollections.unmodifiableObservableList(visibleTabs);
+    }
+
+    /// All tabs that can possibly be shown for the current entry (regardless of visibility), in display order.
+    public List<EntryEditorTab> getAllPossibleTabs() {
+        return List.copyOf(allPossibleTabs);
+    }
+
+    /// The source tab, if present, so the View can select it by default.
+    public Optional<SourceTab> sourceTab() {
+        return Optional.ofNullable(sourceTab);
+    }
+
+    /// Recreates every possible tab from the factory, pushes the current entry into them, subscribes to each
+    /// tab's {@link EntryEditorTab#shouldShow()}, and re-renders the visible set. Called by the View when the
+    /// active library tab changes, and internally when the configured tab models change.
+    public void rebuildTabs() {
+        shouldShowSubscriptions.forEach(Subscription::unsubscribe);
+        shouldShowSubscriptions.clear();
+
+        allPossibleTabs.clear();
+        allPossibleTabs.addAll(tabFactory.createTabs());
+        sourceTab = allPossibleTabs.stream()
+                                   .filter(SourceTab.class::isInstance)
+                                   .map(SourceTab.class::cast)
+                                   .findFirst()
+                                   .orElse(null);
+
+        // Newly created tabs need the current entry so their content-driven visibility resolves correctly.
+        BibEntry entry = currentlyEditedEntry.get();
+        if (entry != null) {
+            allPossibleTabs.forEach(tab -> tab.currentEntryProperty().set(entry));
+        }
+
+        allPossibleTabs.forEach(tab ->
+                shouldShowSubscriptions.add(EasyBind.subscribe(tab.shouldShow(), _ -> refreshVisibleTabs())));
+        refreshVisibleTabs();
+    }
+
+    /// Tears down the tab state when no entry is being edited (e.g. the last library was closed).
+    public void clearTabs() {
+        shouldShowSubscriptions.forEach(Subscription::unsubscribe);
+        shouldShowSubscriptions.clear();
+        allPossibleTabs.clear();
+        visibleTabs.clear();
+    }
+
+    /// Diffs {@link #allPossibleTabs} against {@link #visibleTabs} and adds/removes to match the tabs whose
+    /// {@link EntryEditorTab#shouldShow()} is {@code true}, preserving order without a full replace.
+    private void refreshVisibleTabs() {
+        if (currentlyEditedEntry.get() == null) {
+            visibleTabs.clear();
+            return;
+        }
+
+        visibleTabs.removeAll(allPossibleTabs.stream().filter(tab -> !tab.shouldShow().getValue()).toList());
+
+        List<Tab> wanted = allPossibleTabs.stream().filter(tab -> tab.shouldShow().getValue()).collect(Collectors.toList());
+        for (int i = 0; i < wanted.size(); i++) {
+            Tab toBeAdded = wanted.get(i);
+            Tab shown = i < visibleTabs.size() ? visibleTabs.get(i) : null;
+            if (!toBeAdded.equals(shown)) {
+                visibleTabs.add(i, toBeAdded);
+            }
+        }
     }
 
     /// Entry-based fetchers available for the active library; used to populate the "fetch and merge" menu.
