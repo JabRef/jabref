@@ -90,7 +90,6 @@ public class EntryEditorTabFactory {
     public List<EntryEditorTab> createTabs() {
         List<EntryEditorTab> tabs = new LinkedList<>();
 
-        // ToDo: Needs to be recreated on preferences change
         for (EntryEditorTabModel model : preferences.getEntryEditorPreferences().getTabModels()) {
             tabs.add(createTab(model));
         }
