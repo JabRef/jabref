@@ -106,7 +106,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     }
 
     private void setupTabList() {
-        tabConfigsList.setItems(viewModel.getTabConfigs());
+        tabConfigsList.setItems(viewModel.getTabModels());
         tabConfigsList.setCellFactory(_ -> new TabConfigCell());
 
         // Sync list selection → viewModel
@@ -233,11 +233,16 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     /// Display name for a built-in {@link EntryEditorTabModel.FieldSet}.
     private static String builtInFieldSetDisplayName(EntryEditorTabModel.BuiltInFieldSet type) {
         return switch (type) {
-            case REQUIRED_FIELDS -> Localization.lang("Required fields");
-            case IMPORTANT_OPTIONAL_FIELDS -> Localization.lang("Optional fields");
-            case DETAIL_OPTIONAL_FIELDS -> Localization.lang("Optional fields 2");
-            case DEPRECATED_FIELDS -> Localization.lang("Deprecated fields");
-            case OTHER_FIELDS -> Localization.lang("Other fields");
+            case REQUIRED_FIELDS ->
+                    Localization.lang("Required fields");
+            case IMPORTANT_OPTIONAL_FIELDS ->
+                    Localization.lang("Optional fields");
+            case DETAIL_OPTIONAL_FIELDS ->
+                    Localization.lang("Optional fields 2");
+            case DEPRECATED_FIELDS ->
+                    Localization.lang("Deprecated fields");
+            case OTHER_FIELDS ->
+                    Localization.lang("Other fields");
         };
     }
 

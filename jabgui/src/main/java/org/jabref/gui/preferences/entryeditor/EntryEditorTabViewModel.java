@@ -56,7 +56,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     /// Working copy of tab configurations — not the live preferences list.
     /// Written to preferences only in {@link #storeSettings()}.
-    private final ObservableList<EntryEditorTabModel> tabConfigs = FXCollections.observableArrayList();
+    private final ObservableList<EntryEditorTabModel> tabModels = FXCollections.observableArrayList();
 
     /// The tab currently selected in the list view. Drives {@link #selectedTabName} and
     /// {@link #selectedTabFields}. Updated by the view via {@code EasyBind.subscribe} on the
@@ -64,7 +64,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<EntryEditorTabModel> selectedTab = new SimpleObjectProperty<>();
 
     /// Staging property for the name of the currently selected field-set tab.
-    /// Not written to {@link #tabConfigs} until selection changes or {@link #storeSettings()} is called.
+    /// Not written to {@link #tabModels} until selection changes or {@link #storeSettings()} is called.
     private final StringProperty selectedTabName = new SimpleStringProperty("");
 
     /// Staging list for the fields of the currently selected field-set tab.
@@ -102,23 +102,26 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         EasyBind.subscribe(enableMscKeywordDescriptionsProperty, this::onMscKeywordDescriptionsChanged);
     }
 
-    /// Commits any pending name/fields edit for {@code oldItem} back into {@link #tabConfigs}.
+    /// Commits any pending name/fields edit for {@code oldItem} back into {@link #tabModels}.
     private void commitCurrentEdit(EntryEditorTabModel oldItem) {
         if (!(oldItem instanceof EntryEditorTabModel.CustomizedFieldSet)) {
             return;
         }
-        int index = tabConfigs.indexOf(oldItem);
+        int index = tabModels.indexOf(oldItem);
         if (index < 0) {
             return;
         }
-        tabConfigs.set(index, new EntryEditorTabModel.CustomizedFieldSet(
+        tabModels.set(index, new EntryEditorTabModel.CustomizedFieldSet(
                 selectedTabName.get(), new LinkedHashSet<>(selectedTabFields)));
     }
 
     private void loadSelection(EntryEditorTabModel newItem) {
-        if (newItem instanceof EntryEditorTabModel.CustomizedFieldSet fieldSet) {
-            selectedTabName.set(fieldSet.name());
-            selectedTabFields.setAll(fieldSet.fields());
+        if (newItem instanceof EntryEditorTabModel.CustomizedFieldSet(
+                String name,
+                Set<Field> fields
+        )) {
+            selectedTabName.set(name);
+            selectedTabFields.setAll(fields);
             fieldSetTabSelected.set(true);
             canRemoveSelectedTab.set(true);
         } else {
@@ -133,9 +136,9 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         // The Preview tab is configured via the "show preview as a separate tab" preference, not here,
         // so it is omitted from the configurable tab list (its model visibility bit is unused).
-        tabConfigs.setAll(entryEditorPreferences.getTabModels().stream()
-                                                .filter(model -> !model.isPreview())
-                                                .toList());
+        tabModels.setAll(entryEditorPreferences.getTabModels().stream()
+                                               .filter(model -> !model.isPreview())
+                                               .toList());
         selectedTab.set(null);
 
         openOnNewEntryProperty.setValue(entryEditorPreferences.shouldOpenOnNewEntry());
@@ -151,46 +154,46 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetToDefaults() {
-        tabConfigs.removeIf(config -> config instanceof EntryEditorTabModel.CustomizedFieldSet);
+        tabModels.removeIf(config -> config instanceof EntryEditorTabModel.CustomizedFieldSet);
         List<EntryEditorTabModel> defaultFieldSets = EntryEditorPreferences.getDefaultEntryEditorTabs()
                                                                            .entrySet().stream()
                                                                            .<EntryEditorTabModel>map(e -> new EntryEditorTabModel.CustomizedFieldSet(e.getKey(), e.getValue()))
                                                                            .toList();
-        tabConfigs.addAll(EntryEditorTabModel.indexAfterBuiltInFieldSets(tabConfigs), defaultFieldSets);
+        tabModels.addAll(EntryEditorTabModel.indexAfterBuiltInFieldSets(tabModels), defaultFieldSets);
         // selectedTab is cleared automatically when the ListView loses the old selected item
     }
 
     public void addFieldSetTab() {
-        int insertIndex = EntryEditorTabModel.indexAfterBuiltInFieldSets(tabConfigs);
-        for (int i = 0; i < tabConfigs.size(); i++) {
-            if (tabConfigs.get(i) instanceof EntryEditorTabModel.CustomizedFieldSet) {
+        int insertIndex = EntryEditorTabModel.indexAfterBuiltInFieldSets(tabModels);
+        for (int i = 0; i < tabModels.size(); i++) {
+            if (tabModels.get(i) instanceof EntryEditorTabModel.CustomizedFieldSet) {
                 insertIndex = i + 1;
             }
         }
         EntryEditorTabModel newTab = new EntryEditorTabModel.CustomizedFieldSet(
                 Localization.lang("New Tab"), Set.of());
-        tabConfigs.add(insertIndex, newTab);
+        tabModels.add(insertIndex, newTab);
         selectedTab.set(newTab); // commits old, loads new empty state; view mirrors via EasyBind
     }
 
     public void removeSelectedFieldSetTab() {
         if (selectedTab.get() instanceof EntryEditorTabModel.CustomizedFieldSet toRemove) {
-            tabConfigs.remove(toRemove);
+            tabModels.remove(toRemove);
             // ListView auto-updates selection; view listener propagates it back to selectedTab
         }
     }
 
     /// Toggles the visibility of a feature or built-in field-set tab. Called by the cell's checkbox.
     public void toggleFeatureTabVisibility(EntryEditorTabModel config) {
-        int index = tabConfigs.indexOf(config);
+        int index = tabModels.indexOf(config);
         if (index < 0) {
             return;
         }
         switch (config) {
             case EntryEditorTabModel.Feature feature ->
-                    tabConfigs.set(index, new EntryEditorTabModel.Feature(feature.type(), !feature.visible()));
+                    tabModels.set(index, new EntryEditorTabModel.Feature(feature.type(), !feature.visible()));
             case EntryEditorTabModel.FieldSet fieldSet ->
-                    tabConfigs.set(index, new EntryEditorTabModel.FieldSet(fieldSet.type(), !fieldSet.visible()));
+                    tabModels.set(index, new EntryEditorTabModel.FieldSet(fieldSet.type(), !fieldSet.visible()));
             case EntryEditorTabModel.CustomizedFieldSet ignored -> {
                 // Custom tabs are always visible; toggled only by adding/removing them.
             }
@@ -212,7 +215,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         abbreviationPreferences.setShouldEnableMscKeywordDescriptions(enableMscKeywordDescriptionsProperty.getValue());
 
         // Write feature- and built-in field-set-tab visibility from working copy
-        for (EntryEditorTabModel config : tabConfigs) {
+        for (EntryEditorTabModel config : tabModels) {
             switch (config) {
                 case EntryEditorTabModel.Feature feature ->
                         entryEditorPreferences.setStaticTabVisible(feature.type(), feature.visible());
@@ -229,15 +232,18 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         // from the staging properties so nothing is lost when the user clicks Apply without switching tabs.
         EntryEditorTabModel pendingItem = selectedTab.get();
         int pendingIndex = (pendingItem instanceof EntryEditorTabModel.CustomizedFieldSet)
-                           ? tabConfigs.indexOf(pendingItem) : -1;
+                           ? tabModels.indexOf(pendingItem) : -1;
 
         Map<String, Set<Field>> fieldSetMap = new LinkedHashMap<>();
-        for (int i = 0; i < tabConfigs.size(); i++) {
-            if (tabConfigs.get(i) instanceof EntryEditorTabModel.CustomizedFieldSet fieldSet) {
+        for (int i = 0; i < tabModels.size(); i++) {
+            if (tabModels.get(i) instanceof EntryEditorTabModel.CustomizedFieldSet(
+                    String name,
+                    Set<Field> fields
+            )) {
                 if (i == pendingIndex) {
                     fieldSetMap.put(selectedTabName.get(), new LinkedHashSet<>(selectedTabFields));
                 } else {
-                    fieldSetMap.put(fieldSet.name(), fieldSet.fields());
+                    fieldSetMap.put(name, fields);
                 }
             }
         }
@@ -246,8 +252,8 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     // region Properties
 
-    public ObservableList<EntryEditorTabModel> getTabConfigs() {
-        return tabConfigs;
+    public ObservableList<EntryEditorTabModel> getTabModels() {
+        return tabModels;
     }
 
     public ObjectProperty<EntryEditorTabModel> selectedTabProperty() {
