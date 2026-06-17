@@ -150,10 +150,6 @@ public class EntryEditorViewModel extends AbstractViewModel {
         return currentEntryType;
     }
 
-    public ObservableList<EntryEditorTabModel> getTabModels() {
-        return preferences.getEntryEditorPreferences().getTabModels();
-    }
-
     /// Live, ordered list of the tabs that should currently be shown for the edited entry. The
     /// {@link EntryEditor} binds its {@code TabPane} to this; it is mutated incrementally to avoid a full replace.
     public ObservableList<Tab> visibleTabs() {
