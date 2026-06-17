@@ -134,7 +134,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         // The Preview tab is configured via the "show preview as a separate tab" preference, not here,
         // so it is omitted from the configurable tab list (its model visibility bit is unused).
         tabConfigs.setAll(entryEditorPreferences.getTabModels().stream()
-                                                .filter(model -> !isPreviewFeature(model))
+                                                .filter(model -> !model.isPreview())
                                                 .toList());
         selectedTab.set(null);
 
@@ -156,26 +156,12 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
                                                                            .entrySet().stream()
                                                                            .<EntryEditorTabModel>map(e -> new EntryEditorTabModel.CustomizedFieldSet(e.getKey(), e.getValue()))
                                                                            .toList();
-        tabConfigs.addAll(indexAfterLeadingPreview(), defaultFieldSets);
+        tabConfigs.addAll(EntryEditorTabModel.indexAfterLeadingPreview(tabConfigs), defaultFieldSets);
         // selectedTab is cleared automatically when the ListView loses the old selected item
     }
 
-    /// Index just past a leading {@link EntryEditorTabModel.StaticTab#PREVIEW} feature (1 if present, else 0),
-    /// so customized field-set tabs are inserted after the always-present Preview tab instead of before it.
-    private int indexAfterLeadingPreview() {
-        return !tabConfigs.isEmpty() && isPreviewFeature(tabConfigs.getFirst()) ? 1 : 0;
-    }
-
-    private static boolean isPreviewFeature(EntryEditorTabModel model) {
-        return model instanceof EntryEditorTabModel.Feature(
-                EntryEditorTabModel.StaticTab type,
-                boolean ignored
-        )
-                && type == EntryEditorTabModel.StaticTab.PREVIEW;
-    }
-
     public void addFieldSetTab() {
-        int insertIndex = indexAfterLeadingPreview();
+        int insertIndex = EntryEditorTabModel.indexAfterLeadingPreview(tabConfigs);
         for (int i = 0; i < tabConfigs.size(); i++) {
             if (tabConfigs.get(i) instanceof EntryEditorTabModel.CustomizedFieldSet) {
                 insertIndex = i + 1;
