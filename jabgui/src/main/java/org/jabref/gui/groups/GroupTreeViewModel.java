@@ -25,7 +25,6 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.ai.chat.AiGroupChatWindow;
-import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -64,7 +63,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final AiService aiService;
     private final GuiPreferences preferences;
-    private final AdaptVisibleTabs adaptVisibleTabs;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
     private final BibEntryTypesManager entryTypesManager;
@@ -94,7 +92,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
                               @NonNull GuiPreferences preferences,
                               @NonNull DialogService dialogService,
                               @NonNull AiService aiService,
-                              @NonNull AdaptVisibleTabs adaptVisibleTabs,
                               @NonNull CustomLocalDragboard localDragboard,
                               @NonNull TaskExecutor taskExecutor
     ) {
@@ -104,7 +101,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
         this.fieldPreferences = preferences.getFieldPreferences();
         this.dialogService = dialogService;
         this.aiService = aiService;
-        this.adaptVisibleTabs = adaptVisibleTabs;
         this.localDragboard = localDragboard;
         this.taskExecutor = taskExecutor;
 
