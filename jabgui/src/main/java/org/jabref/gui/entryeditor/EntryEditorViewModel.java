@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.SortedSet;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -20,7 +21,10 @@ import javafx.scene.control.Tab;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
+import org.jabref.gui.cleanup.CleanupSingleAction;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -28,6 +32,7 @@ import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -53,6 +58,8 @@ public class EntryEditorViewModel extends AbstractViewModel {
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final UndoManager undoManager;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final Supplier<LibraryTab> tabSupplier;
     private final EntryEditorTabFactory tabFactory;
 
     /// Every tab that can possibly be shown for the current entry, in display order.
@@ -77,12 +84,16 @@ public class EntryEditorViewModel extends AbstractViewModel {
                                 TaskExecutor taskExecutor,
                                 DialogService dialogService,
                                 UndoManager undoManager,
+                                JournalAbbreviationRepository journalAbbreviationRepository,
+                                Supplier<LibraryTab> tabSupplier,
                                 EntryEditorTabFactory tabFactory) {
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.undoManager = undoManager;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.tabSupplier = tabSupplier;
         this.tabFactory = tabFactory;
 
         // [impl->req~entry-editor.keep-showing~1] — when selection becomes empty, keep the old entry showing
@@ -245,5 +256,32 @@ public class EntryEditorViewModel extends AbstractViewModel {
         }
         new FetchAndMergeEntry(activeDatabaseContext(), taskExecutor, preferences, dialogService, undoManager, stateManager)
                 .fetchAndMerge(entry, fetcher);
+    }
+
+    /// Generates a citation key for the current entry.
+    public void generateCiteKey() {
+        BibEntry entry = currentlyEditedEntry.get();
+        if (entry == null) {
+            return;
+        }
+        new GenerateCitationKeySingleAction(entry, tabSupplier.get().getBibDatabaseContext(), dialogService, preferences, undoManager).execute();
+    }
+
+    /// Runs the cleanup action on the current entry.
+    public void cleanup() {
+        BibEntry entry = currentlyEditedEntry.get();
+        if (entry == null) {
+            return;
+        }
+        new CleanupSingleAction(entry, preferences, dialogService, stateManager, undoManager, journalAbbreviationRepository).execute();
+    }
+
+    /// Deletes the current entry from the active library.
+    public void deleteEntry() {
+        BibEntry entry = currentlyEditedEntry.get();
+        if (entry == null) {
+            return;
+        }
+        tabSupplier.get().deleteEntry(entry);
     }
 }
