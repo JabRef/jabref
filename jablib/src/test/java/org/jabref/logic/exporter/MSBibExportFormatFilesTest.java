@@ -28,6 +28,7 @@ import org.xmlunit.diff.ElementSelectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.xmlunit.matchers.CompareMatcher.isSimilarTo;
 
 @Execution(ExecutionMode.SAME_THREAD)
@@ -60,7 +61,10 @@ public class MSBibExportFormatFilesTest {
         exporter = new MSBibExporter();
         Path path = testFolder.resolve("ARandomlyNamedFile.tmp");
         exportedFile = Files.createFile(path);
-        testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+
+        ImportFormatPreferences importPrefs = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importPrefs.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        testImporter = new BibtexImporter(importPrefs, new DummyFileUpdateMonitor());
     }
 
     @ParameterizedTest(name = "{index} file={0}")

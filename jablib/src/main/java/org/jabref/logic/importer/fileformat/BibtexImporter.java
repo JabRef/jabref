@@ -10,6 +10,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.exporter.SaveConfiguration;
@@ -19,6 +20,9 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseModeDetection;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.jspecify.annotations.NonNull;
@@ -32,6 +36,7 @@ public class BibtexImporter extends Importer {
 
     // Signature written at the top of the .bib file in earlier versions.
     private static final String SIGNATURE = "This file was created with JabRef";
+    private static final List<Character> IMPORT_KEYWORD_DELIMITERS = List.of(';', ',');
 
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
@@ -116,11 +121,27 @@ public class BibtexImporter extends Importer {
     public record EncodingResult(Charset encoding, boolean encodingExplicitlySupplied) {
     }
 
-    /// This method does not set the metadata encoding information. The caller needs to set the encoding of the supplied
-    /// reader manually to the metadata
     @Override
     public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
-        return new BibtexParser(importFormatPreferences, fileMonitor).parse(reader);
+        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(reader);
+        normalizeKeywordDelimiters(result);
+        return result;
+    }
+
+    /// Postprocessing for imported entries that replaces the delimiters in KEYWORDS with the default delimiters.
+    private void normalizeKeywordDelimiters(ParserResult result) {
+        Character separator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator();
+
+        for (BibEntry entry : result.getDatabase().getEntries()) {
+            Optional<String> rawKeywords = entry.getField(StandardField.KEYWORDS);
+            if (rawKeywords.isEmpty()) {
+                continue;
+            }
+
+            entry.clearField(StandardField.KEYWORDS);
+            KeywordList importedKeywords = KeywordList.parseImport(rawKeywords.get(), IMPORT_KEYWORD_DELIMITERS);
+            entry.addKeywords(importedKeywords, separator);
+        }
     }
 
     @Override

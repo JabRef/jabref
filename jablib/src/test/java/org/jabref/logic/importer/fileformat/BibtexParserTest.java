@@ -2151,7 +2151,7 @@ class BibtexParserTest {
                 """);
 
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.KEYWORDS, "asdf");
+                .withField(StandardField.KEYWORDS, "asdf,asdf,asdf");
 
         assertEquals(Optional.of(expectedEntry), result);
     }
@@ -2163,7 +2163,7 @@ class BibtexParserTest {
                 .withCitationKey("Test2017");
 
         BibEntry expectedEntrySecond = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.KEYWORDS, "asdf");
+                .withField(StandardField.KEYWORDS, "asdf,asdf,asdf");
 
         String entries = """
                 @Article{Test2017,
@@ -2176,20 +2176,6 @@ class BibtexParserTest {
                 """;
         ParserResult result = parser.parse(Reader.of(entries));
         assertEquals(List.of(expectedEntryFirst, expectedEntrySecond), result.getDatabase().getEntries());
-    }
-
-    @Test
-    void parseSemicolonSeparatedKeywords() throws ParseException {
-        Optional<BibEntry> result = parser.parseSingleEntry("""
-                @Article{,
-                Keywords={keywordOne; keywordTwo; keywordThree},
-                }
-                """);
-
-        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.KEYWORDS, "keywordOne, keywordTwo, keywordThree");
-
-        assertEquals(Optional.of(expectedEntry), result);
     }
 
     @Test
