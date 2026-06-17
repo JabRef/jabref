@@ -30,11 +30,11 @@ public abstract class EntryEditorTab extends Tab {
     /// Lazily built combination of {@link #visibilityGate} and {@link #contentVisibility()}.
     private @Nullable ObservableValue<Boolean> shouldShow;
 
-    /// The entry (and its type) the tab content was last built for. Used to rebuild the content lazily on
+    /// The entry (and its type) the tab content was last rendered for. Used to rebuild the content lazily on
     /// focus when the entry or its type changed. Kept separate from {@link #currentEntry} so that pushing a
     /// new entry into the property does not suppress the lazy rebuild in {@link #notifyAboutFocus(BibEntry)}.
-    private @Nullable BibEntry boundEntry;
-    private @Nullable EntryType boundEntryType;
+    private @Nullable BibEntry renderedEntry;
+    private @Nullable EntryType renderedEntryType;
 
     public ObjectProperty<@Nullable BibEntry> currentEntryProperty() {
         return currentEntry;
@@ -85,14 +85,14 @@ public abstract class EntryEditorTab extends Tab {
 
     /// Notifies the tab that it got focus and should display the given entry.
     public void notifyAboutFocus(BibEntry entry) {
-        // currentEntry is bound to the view model and updates itself; we only react to a changed entry/type here.
-        if (!entry.equals(boundEntry) || !entry.getType().equals(boundEntryType)) {
-            // bindToEntry is intentionally lazy: content rebuilds only on focus, not on every entry push to currentEntryProperty().
+        // editedEntry is bound to the view model and updates itself; we only react to a changed entry/type here.
+        if (!entry.equals(renderedEntry) || !entry.getType().equals(renderedEntryType)) {
+            // bindToEntry is intentionally lazy: content rebuilds only on focus, not on every entry push to editedEntryProperty().
             LOGGER.trace("Tab got focus with different entry (or entry type) {}", entry);
-            LOGGER.trace("Different entry: {}", !entry.equals(boundEntry));
-            LOGGER.trace("Different entry type: {}", !entry.getType().equals(boundEntryType));
-            boundEntry = entry;
-            boundEntryType = entry.getType();
+            LOGGER.trace("Different entry: {}", !entry.equals(renderedEntry));
+            LOGGER.trace("Different entry type: {}", !entry.getType().equals(renderedEntryType));
+            renderedEntry = entry;
+            renderedEntryType = entry.getType();
             bindToEntry(entry);
         }
         handleFocus();
