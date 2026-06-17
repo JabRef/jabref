@@ -24,7 +24,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.documentviewer.DocumentViewerView;
-import org.jabref.gui.entryeditor.EntryEditor;
+import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.maintable.OpenFolderAction;
 import org.jabref.gui.maintable.OpenSingleExternalFileAction;
@@ -53,7 +53,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
     private final TaskExecutor taskExecutor;
-    private final EntryEditor entryEditor;
+    private final AdaptVisibleTabs adaptVisibleTabs;
     private final TextFlow content;
 
     private BibEntry entry;
@@ -66,13 +66,13 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                                     GuiPreferences preferences,
                                     DialogService dialogService,
                                     TaskExecutor taskExecutor,
-                                    EntryEditor entryEditor) {
+                                    AdaptVisibleTabs adaptVisibleTabs) {
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.actionFactory = new ActionFactory();
         this.taskExecutor = taskExecutor;
-        this.entryEditor = entryEditor;
+        this.adaptVisibleTabs = adaptVisibleTabs;
 
         this.contentVisibility = Bindings.createBooleanBinding(
                 () -> stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get()
@@ -140,7 +140,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                 }
             }
         });
-        Platform.runLater(entryEditor::adaptVisibleTabs);
+        Platform.runLater(adaptVisibleTabs::adaptVisibleTabs);
     }
 
     private Text createFileLink(LinkedFile linkedFile) {

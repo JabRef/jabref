@@ -97,14 +97,14 @@ public class EntryEditorTabFactory {
     /// iterating the configured columns. The few always-present tabs that have no tab model are added as
     /// fixed leading/trailing tabs (like the always-present match-category column).
     ///
-    /// @param entryEditor the editor hosting the tabs (needed by {@link FulltextSearchResultsTab})
-    public List<EntryEditorTab> createTabs(EntryEditor entryEditor) {
+    /// @param adaptVisibleTabs callback to re-sync the visible tabs (needed by {@link FulltextSearchResultsTab})
+    public List<EntryEditorTab> createTabs(AdaptVisibleTabs adaptVisibleTabs) {
         List<EntryEditorTab> tabs = new LinkedList<>();
 
         // Existence and order of every tab come from the configured tab models (single source of truth).
         // ToDo: Needs to be recreated on preferences change
         for (EntryEditorTabModel model : preferences.getEntryEditorPreferences().getTabModels()) {
-            tabs.add(createTab(model, entryEditor));
+            tabs.add(createTab(model, adaptVisibleTabs));
         }
 
         return tabs;
@@ -116,15 +116,15 @@ public class EntryEditorTabFactory {
     /// {@link org.jabref.gui.maintable.MainTableColumnFactory#createColumn}. The exhaustive switches over
     /// the sealed model and its enums mean adding a new tab kind is a compile error until it is wired here.
     ///
-    /// @param entryEditor the editor hosting the tabs (needed by {@link FulltextSearchResultsTab})
-    public EntryEditorTab createTab(EntryEditorTabModel model, EntryEditor entryEditor) {
+    /// @param adaptVisibleTabs callback to re-sync the visible tabs (needed by {@link FulltextSearchResultsTab})
+    public EntryEditorTab createTab(EntryEditorTabModel model, AdaptVisibleTabs adaptVisibleTabs) {
         EntryEditorTab tab = switch (model) {
             case EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet type, boolean ignored) ->
                     createFieldSetTab(type);
             case EntryEditorTabModel.CustomizedFieldSet(String name, Set<Field> fields, boolean ignored) ->
                     new UserDefinedFieldsTab(name, fields, undoManager, undoAction, redoAction, preferences, journalAbbreviationRepository, stateManager, previewPanel);
             case EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab type, boolean ignored) ->
-                    createFeatureTab(type, entryEditor);
+                    createFeatureTab(type, adaptVisibleTabs);
         };
         tab.setVisibilityGate(visibilityGate(model));
         return tab;
@@ -163,7 +163,7 @@ public class EntryEditorTabFactory {
         };
     }
 
-    private EntryEditorTab createFeatureTab(EntryEditorTabModel.StaticTab type, EntryEditor entryEditor) {
+    private EntryEditorTab createFeatureTab(EntryEditorTabModel.StaticTab type, AdaptVisibleTabs adaptVisibleTabs) {
         return switch (type) {
             case PREVIEW ->
                     new PreviewTab(preferences, stateManager, previewPanel);
@@ -203,7 +203,7 @@ public class EntryEditorTabFactory {
                             keyBindingRepository,
                             stateManager);
             case FULLTEXT_SEARCH_RESULTS ->
-                    new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor, entryEditor);
+                    new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor, adaptVisibleTabs);
         };
     }
 }
