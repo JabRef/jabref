@@ -234,7 +234,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String SHOW_SCITE_TAB = "showSciteTab";
     private static final String SHOW_USER_COMMENTS_FIELDS = "showUserCommentsFields";
     private static final String SHOW_COMMENTS_TAB = "showCommentsTab";
-    private static final String SHOW_PREVIEW_TAB = "showPreviewTab";
     private static final String SHOW_MATHSCINET_TAB = "showMathSciNetTab";
     private static final String SHOW_SOURCE_TAB = "showSourceTab";
     private static final String SHOW_FULLTEXT_SEARCH_TAB = "showFulltextSearchTab";
@@ -401,9 +400,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private List<EntryEditorTabModel> getEntryEditorTabs(EntryEditorPreferences defaults) {
         List<EntryEditorTabModel> tabModels = new ArrayList<>();
 
-        // Always-present leading tab
-        tabModels.add(new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.PREVIEW,
-                getBoolean(SHOW_PREVIEW_TAB, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.PREVIEW))));
+        // Always-present leading tab. Its visibility is owned by PreviewPreferences (PREVIEW_AS_TAB /
+        // showPreviewAsExtraTab) — the single source the factory gates on — so the model bit is a constant
+        // and is not persisted separately here.
+        tabModels.add(new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.PREVIEW, true));
 
         tabModels.addAll(List.<EntryEditorTabModel>of(
                 new EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet.REQUIRED_FIELDS,
@@ -510,8 +510,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                             putBoolean(SHOW_SCITE_TAB, visible);
                     case COMMENTS ->
                             putBoolean(SHOW_COMMENTS_TAB, visible);
-                    case PREVIEW ->
-                            putBoolean(SHOW_PREVIEW_TAB, visible);
+                    case PREVIEW -> {
+                        // Preview-tab visibility is stored as showPreviewAsExtraTab in PreviewPreferences; nothing to persist here.
+                    }
                     case MATH_SCI_NET ->
                             putBoolean(SHOW_MATHSCINET_TAB, visible);
                     case SOURCE ->
