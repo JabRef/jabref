@@ -166,7 +166,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                 shouldShowSubscriptions.forEach(Subscription::unsubscribe);
                 shouldShowSubscriptions.clear();
                 this.allPossibleTabs.clear();
-                this.allPossibleTabs.addAll(tabFactory.createTabs(this));
+                this.allPossibleTabs.addAll(tabFactory.createTabs());
                 this.sourceTab = allPossibleTabs.stream()
                                                 .filter(SourceTab.class::isInstance)
                                                 .map(SourceTab.class::cast)
