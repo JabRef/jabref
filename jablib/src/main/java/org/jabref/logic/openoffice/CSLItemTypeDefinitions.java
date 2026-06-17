@@ -28,9 +28,9 @@ class CSLItemTypeDefinitions {
             // Book
             Map.entry("book", StandardEntryType.Book),
             // Podcast, TV Broadcast, Radio Broadcast
-            Map.entry("broadcast", StandardEntryType.Misc),
+            Map.entry("broadcast",BiblatexNonStandardEntryType.Audio),
             // Book Section
-            Map.entry("chapter", StandardEntryType.InCollection),
+            Map.entry("chapter", StandardEntryType.InBook),
             // Dataset
             Map.entry("dataset", StandardEntryType.Dataset),
             // Dictionary Entry
@@ -40,9 +40,9 @@ class CSLItemTypeDefinitions {
             // Artwork
             Map.entry("graphic", BiblatexNonStandardEntryType.Image),
             // Hearing
-            Map.entry("hearing", BiblatexApaEntryType.Jurisdiction),
+            Map.entry("hearing", BiblatexApaEntryType.Legal),
             // Interview
-            Map.entry("interview", StandardEntryType.Misc),
+            Map.entry("interview", BiblatexNonStandardEntryType.Audio),
             // Case
             Map.entry("legal_case", BiblatexApaEntryType.Jurisdiction),
             // Statute
@@ -68,9 +68,9 @@ class CSLItemTypeDefinitions {
             // Audio Recording
             Map.entry("song", BiblatexNonStandardEntryType.Music),
             // Presentation
-            Map.entry("speech", StandardEntryType.Misc),
+            Map.entry("speech", BiblatexNonStandardEntryType.Audio),
             // Standard
-            Map.entry("standard", StandardEntryType.Misc),
+            Map.entry("standard", BiblatexNonStandardEntryType.Standard),
             // Thesis
             Map.entry("thesis", StandardEntryType.Thesis),
             // Web Page
