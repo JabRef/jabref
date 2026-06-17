@@ -332,8 +332,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     }
 
     private void onEntryChanged(@NonNull BibEntry entry) {
-        viewModel.getAllPossibleTabs().forEach(tab -> tab.currentEntryProperty().set(entry));
-
+        // Tabs observe viewModel.currentlyEditedEntryProperty() directly (bound in rebuildTabs), so no fan-out here.
         if (typeSubscription != null) {
             typeSubscription.unsubscribe();
         }

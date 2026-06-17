@@ -88,9 +88,13 @@ class SourceTabTest {
         BibEntry entry = new BibEntry();
         entry.setField(new UnknownField("test"), "testvalue");
 
-        // Update source editor
+        // Update source editor. In production currentEntry is bound to the view model; here we drive the
+        // property directly, since notifyAboutFocus no longer sets it.
         robot.interact(() -> pane.getSelectionModel().select(2));
-        robot.interact(() -> sourceTab.notifyAboutFocus(entry));
+        robot.interact(() -> {
+            sourceTab.currentEntryProperty().set(entry);
+            sourceTab.notifyAboutFocus(entry);
+        });
         robot.clickOn(1200, 500);
         robot.interrupt(100);
 

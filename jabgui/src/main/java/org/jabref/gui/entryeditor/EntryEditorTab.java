@@ -21,8 +21,9 @@ public abstract class EntryEditorTab extends Tab {
     /// Content-availability fallback for tabs that are shown for every entry.
     private static final ObservableValue<Boolean> ALWAYS_VISIBLE = new SimpleBooleanProperty(true);
 
-    /// The entry currently being edited in the editor. The entry editor keeps this in sync for every tab
-    /// (not only the focused one) so that {@link #shouldShow()} can react to entry and entry-type changes.
+    /// The entry currently being edited in the editor. Bound by {@link EntryEditorViewModel} to its
+    /// currently-edited-entry property for every tab (not only the focused one), so that {@link #shouldShow()}
+    /// can react to entry and entry-type changes. Because it is bound, it must not be set directly.
     private final ObjectProperty<@Nullable BibEntry> currentEntry = new SimpleObjectProperty<>();
 
     /// User-controlled visibility gate, injected by {@link EntryEditorTabFactory} from this tab's
@@ -87,7 +88,7 @@ public abstract class EntryEditorTab extends Tab {
 
     /// Notifies the tab that it got focus and should display the given entry.
     public void notifyAboutFocus(BibEntry entry) {
-        currentEntry.set(entry);
+        // currentEntry is bound to the view model and updates itself; we only react to a changed entry/type here.
         if (!entry.equals(boundEntry) || !entry.getType().equals(boundEntryType)) {
             // bindToEntry is intentionally lazy: content rebuilds only on focus, not on every entry push to currentEntryProperty().
             LOGGER.trace("Tab got focus with different entry (or entry type) {}", entry);
