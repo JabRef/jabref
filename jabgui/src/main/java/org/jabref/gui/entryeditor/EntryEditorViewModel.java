@@ -13,6 +13,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Tab;
@@ -29,6 +30,7 @@ import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.types.EntryType;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
@@ -40,6 +42,10 @@ public class EntryEditorViewModel extends AbstractViewModel {
 
     /// Display name of the current entry's type — the single source for the entry editor's type label.
     private final SimpleStringProperty typeLabelText = new SimpleStringProperty("");
+
+    /// The current entry's type, updated by the single {@link #typeSubscription}. The editor observes this to
+    /// rebuild its toolbar, so there is no second listener on the entry's {@code typeProperty}.
+    private final ObjectProperty<@Nullable EntryType> currentEntryType = new SimpleObjectProperty<>();
 
     private final StateManager stateManager;
     private final GuiPreferences preferences;
@@ -55,8 +61,14 @@ public class EntryEditorViewModel extends AbstractViewModel {
     /// The subset of {@link #allPossibleTabs} currently shown — mutated incrementally so a bound TabPane
     /// replays adds/removes one by one (a full replace causes an ugly shift-in animation).
     private final ObservableList<Tab> visibleTabs = FXCollections.observableArrayList();
+    /// Read-only view handed to the editor for {@code Bindings.bindContent}. Held in a field on purpose: the
+    /// unmodifiable wrapper keeps only a weak listener on {@link #visibleTabs}, so it must stay strongly
+    /// referenced or a GC silently kills the content binding (the TabPane would stop updating).
+    private final ObservableList<Tab> unmodifiableVisibleTabs = FXCollections.unmodifiableObservableList(visibleTabs);
     private @Nullable SourceTab sourceTab;
 
+    /// Single subscription to the current entry's {@code typeProperty}; feeds both the type label and
+    /// {@link #currentEntryType}.
     private @Nullable Subscription typeSubscription;
 
     public EntryEditorViewModel(StateManager stateManager,
@@ -79,8 +91,9 @@ public class EntryEditorViewModel extends AbstractViewModel {
             }
         });
 
-        // Keep the type label in sync with the current entry, its type, and the active database mode.
-        EasyBind.subscribe(currentlyEditedEntry, this::rebindTypeLabel);
+        // Keep the type label and the exposed entry type in sync with the current entry, its type, and the
+        // active database mode, through a single subscription to the entry's typeProperty.
+        EasyBind.subscribe(currentlyEditedEntry, this::rebindToEntryType);
         EasyBind.subscribe(stateManager.activeDatabaseProperty(), _ -> updateTypeLabelText());
 
         // Rebuild the tab set whenever the configured tab models change (tabs added, removed or reordered in
@@ -90,15 +103,22 @@ public class EntryEditorViewModel extends AbstractViewModel {
                    .addListener((InvalidationListener) _ -> rebuildTabs());
     }
 
-    private void rebindTypeLabel(@Nullable BibEntry entry) {
+    /// (Re)subscribes the single listener on the current entry's type, driving both the type label and the
+    /// {@link #currentEntryType} property that the editor observes.
+    private void rebindToEntryType(@Nullable BibEntry entry) {
         if (typeSubscription != null) {
             typeSubscription.unsubscribe();
             typeSubscription = null;
         }
         if (entry != null) {
-            typeSubscription = EasyBind.subscribe(entry.typeProperty(), _ -> updateTypeLabelText());
+            typeSubscription = EasyBind.subscribe(entry.typeProperty(), type -> {
+                currentEntryType.set(type);
+                updateTypeLabelText();
+            });
+        } else {
+            currentEntryType.set(null);
+            updateTypeLabelText();
         }
-        updateTypeLabelText();
     }
 
     private void updateTypeLabelText() {
@@ -124,6 +144,12 @@ public class EntryEditorViewModel extends AbstractViewModel {
         return typeLabelText;
     }
 
+    /// The current entry's type, exposed so the editor can rebuild its toolbar when the type changes. Backed by
+    /// the single {@link #typeSubscription} shared with the type label — no duplicate listener on the entry.
+    public ObservableValue<@Nullable EntryType> currentEntryTypeProperty() {
+        return currentEntryType;
+    }
+
     public ObservableList<EntryEditorTabModel> getTabModels() {
         return preferences.getEntryEditorPreferences().getTabModels();
     }
@@ -131,7 +157,7 @@ public class EntryEditorViewModel extends AbstractViewModel {
     /// Live, ordered list of the tabs that should currently be shown for the edited entry. The
     /// {@link EntryEditor} binds its {@code TabPane} to this; it is mutated incrementally to avoid a full replace.
     public ObservableList<Tab> visibleTabs() {
-        return FXCollections.unmodifiableObservableList(visibleTabs);
+        return unmodifiableVisibleTabs;
     }
 
     /// All tabs that can possibly be shown for the current entry (regardless of visibility), in display order.
@@ -144,9 +170,9 @@ public class EntryEditorViewModel extends AbstractViewModel {
         return Optional.ofNullable(sourceTab);
     }
 
-    /// Recreates every possible tab from the factory, pushes the current entry into them, subscribes to each
-    /// tab's {@link EntryEditorTab#shouldShow()}, and re-renders the visible set. Called by the View when the
-    /// active library tab changes, and internally when the configured tab models change.
+    /// Recreates every possible tab from the factory, binds each to the current entry, subscribes to each tab's
+    /// {@link EntryEditorTab#shouldShow()}, and re-renders the visible set. Called by the View when the active
+    /// library tab changes, and internally when the configured tab models change.
     public void rebuildTabs() {
         shouldShowSubscriptions.forEach(Subscription::unsubscribe);
         shouldShowSubscriptions.clear();
