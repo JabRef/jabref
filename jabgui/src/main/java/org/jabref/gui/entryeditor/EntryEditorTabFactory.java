@@ -35,9 +35,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 /// keeping tab creation (and the GUI dependencies it needs) out of the view and the view model.
 public class EntryEditorTabFactory {
 
-    /// Visibility gate for tabs that are always enabled (e.g. customized field-set tabs).
-    private static final ObservableValue<Boolean> ALWAYS_ENABLED = new SimpleBooleanProperty(true);
-
     private final PreviewPanel previewPanel;
     private final UndoAction undoAction;
     private final RedoAction redoAction;
@@ -117,11 +114,21 @@ public class EntryEditorTabFactory {
     ///
     public EntryEditorTab createTab(EntryEditorTabModel model) {
         EntryEditorTab tab = switch (model) {
-            case EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet type, boolean ignored) ->
+            case EntryEditorTabModel.FieldSet(
+                    EntryEditorTabModel.BuiltInFieldSet type,
+                    boolean _
+            ) ->
                     createFieldSetTab(type);
-            case EntryEditorTabModel.CustomizedFieldSet(String name, Set<Field> fields, boolean ignored) ->
+            case EntryEditorTabModel.CustomizedFieldSet(
+                    String name,
+                    Set<Field> fields,
+                    boolean _
+            ) ->
                     new UserDefinedFieldsTab(name, fields, undoManager, undoAction, redoAction, preferences, journalAbbreviationRepository, stateManager, previewPanel);
-            case EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab type, boolean ignored) ->
+            case EntryEditorTabModel.Feature(
+                    EntryEditorTabModel.StaticTab type,
+                    boolean _
+            ) ->
                     createFeatureTab(type);
         };
         tab.setVisibilityGate(visibilityGate(model));
@@ -134,14 +141,23 @@ public class EntryEditorTabFactory {
     private ObservableValue<Boolean> visibilityGate(EntryEditorTabModel model) {
         EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
         return switch (model) {
-            case EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet type, boolean ignored) ->
+            case EntryEditorTabModel.FieldSet(
+                    EntryEditorTabModel.BuiltInFieldSet type,
+                    boolean _
+            ) ->
                     entryEditorPreferences.fieldSetVisibleProperty(type);
-            case EntryEditorTabModel.CustomizedFieldSet ignored ->
-                    ALWAYS_ENABLED;
-            case EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab type, boolean ignored)
+            case EntryEditorTabModel.CustomizedFieldSet _ ->
+                    new SimpleBooleanProperty(true);
+            case EntryEditorTabModel.Feature(
+                    EntryEditorTabModel.StaticTab type,
+                    boolean _
+            )
                     when type == EntryEditorTabModel.StaticTab.PREVIEW ->
                     preferences.getPreviewPreferences().showPreviewAsExtraTabProperty();
-            case EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab type, boolean ignored) ->
+            case EntryEditorTabModel.Feature(
+                    EntryEditorTabModel.StaticTab type,
+                    boolean _
+            ) ->
                     entryEditorPreferences.staticTabVisibleProperty(type);
         };
     }

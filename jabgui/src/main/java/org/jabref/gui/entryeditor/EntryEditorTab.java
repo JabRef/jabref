@@ -18,9 +18,6 @@ public abstract class EntryEditorTab extends Tab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryEditorTab.class);
 
-    /// Content-availability fallback for tabs that are shown for every entry.
-    private static final ObservableValue<Boolean> ALWAYS_VISIBLE = new SimpleBooleanProperty(true);
-
     /// The entry currently being edited in the editor. Bound by {@link EntryEditorViewModel} to its
     /// currently-edited-entry property for every tab (not only the focused one), so that {@link #shouldShow()}
     /// can react to entry and entry-type changes. Because it is bound, it must not be set directly.
@@ -60,7 +57,7 @@ public abstract class EntryEditorTab extends Tab {
     /// tabs that only appear for certain entries override this. It must not consult tab-visibility
     /// preferences — that is the job of the {@link #setVisibilityGate(ObservableValue) visibility gate}.
     protected ObservableValue<Boolean> contentVisibility() {
-        return ALWAYS_VISIBLE;
+        return new SimpleBooleanProperty(true);
     }
 
     /// Whether this tab should be shown for the current entry: the user visibility gate AND content
