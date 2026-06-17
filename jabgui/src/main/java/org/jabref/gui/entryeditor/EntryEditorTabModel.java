@@ -26,6 +26,20 @@ public sealed interface EntryEditorTabModel
         return !models.isEmpty() && models.getFirst().isPreview() ? 1 : 0;
     }
 
+    /// The one canonical insertion point for customized field-set tabs: right after the built-in
+    /// {@link FieldSet} tabs (so they sit between the built-in field sets and the feature tabs). This must
+    /// match the persisted load order; otherwise saving silently reorders the tabs on every round-trip.
+    /// Falls back to just after a leading Preview tab when no built-in field sets are present.
+    static int indexAfterBuiltInFieldSets(List<? extends EntryEditorTabModel> models) {
+        int lastFieldSet = -1;
+        for (int i = 0; i < models.size(); i++) {
+            if (models.get(i) instanceof FieldSet) {
+                lastFieldSet = i;
+            }
+        }
+        return lastFieldSet >= 0 ? lastFieldSet + 1 : indexAfterLeadingPreview(models);
+    }
+
     enum StaticTab {
         // Always-present leading tab (no field configuration; only visibility)
         PREVIEW,

@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -105,27 +106,23 @@ public class EntryEditorPreferences {
         this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
     }
 
-    /// The default tab list: default custom field-set tabs, followed by every built-in field tab
-    /// and every static tab enabled.
     private static List<EntryEditorTabModel> getDefaultTabModels() {
         List<EntryEditorTabModel> tabModels = new ArrayList<>();
 
         // Always-present leading tab
         tabModels.add(new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.PREVIEW, true));
 
+        Arrays.stream(EntryEditorTabModel.BuiltInFieldSet.values()).forEachOrdered(fieldSet ->
+                tabModels.add(new EntryEditorTabModel.FieldSet(fieldSet, true)));
+
         getDefaultEntryEditorTabs().forEach((name, fields) ->
                 tabModels.add(new EntryEditorTabModel.CustomizedFieldSet(name, fields)));
 
-        for (EntryEditorTabModel.BuiltInFieldSet fieldSet : EntryEditorTabModel.BuiltInFieldSet.values()) {
-            tabModels.add(new EntryEditorTabModel.FieldSet(fieldSet, true));
-        }
+        // already added as the leading tab
+        Arrays.stream(EntryEditorTabModel.StaticTab.values())
+              .filter(tab -> tab != EntryEditorTabModel.StaticTab.PREVIEW)
+              .forEachOrdered(tab -> tabModels.add(new EntryEditorTabModel.Feature(tab, true)));
 
-        for (EntryEditorTabModel.StaticTab tab : EntryEditorTabModel.StaticTab.values()) {
-            if (tab == EntryEditorTabModel.StaticTab.PREVIEW) {
-                continue; // already added as the leading tab
-            }
-            tabModels.add(new EntryEditorTabModel.Feature(tab, true));
-        }
         return tabModels;
     }
 
@@ -205,8 +202,9 @@ public class EntryEditorPreferences {
                                                             new EntryEditorTabModel.CustomizedFieldSet(model.getKey(), model.getValue()))
                                                     .toList();
         tabModels.removeIf(config -> config instanceof EntryEditorTabModel.CustomizedFieldSet);
-        // Customized field-set tabs sit right after the always-present leading Preview tab.
-        tabModels.addAll(EntryEditorTabModel.indexAfterLeadingPreview(tabModels), newFieldSet);
+        // Customized field-set tabs sit right after the built-in field-set tabs — same position the persisted
+        // list uses, so saving does not reorder the tabs.
+        tabModels.addAll(EntryEditorTabModel.indexAfterBuiltInFieldSets(tabModels), newFieldSet);
     }
 
     public static SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {

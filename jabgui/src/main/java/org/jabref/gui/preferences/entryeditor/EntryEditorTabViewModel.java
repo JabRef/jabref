@@ -156,12 +156,12 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
                                                                            .entrySet().stream()
                                                                            .<EntryEditorTabModel>map(e -> new EntryEditorTabModel.CustomizedFieldSet(e.getKey(), e.getValue()))
                                                                            .toList();
-        tabConfigs.addAll(EntryEditorTabModel.indexAfterLeadingPreview(tabConfigs), defaultFieldSets);
+        tabConfigs.addAll(EntryEditorTabModel.indexAfterBuiltInFieldSets(tabConfigs), defaultFieldSets);
         // selectedTab is cleared automatically when the ListView loses the old selected item
     }
 
     public void addFieldSetTab() {
-        int insertIndex = EntryEditorTabModel.indexAfterLeadingPreview(tabConfigs);
+        int insertIndex = EntryEditorTabModel.indexAfterBuiltInFieldSets(tabConfigs);
         for (int i = 0; i < tabConfigs.size(); i++) {
             if (tabConfigs.get(i) instanceof EntryEditorTabModel.CustomizedFieldSet) {
                 insertIndex = i + 1;
