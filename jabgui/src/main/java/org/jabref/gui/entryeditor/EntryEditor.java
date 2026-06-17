@@ -59,7 +59,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
-import com.tobiasdiez.easybind.Subscription;
 import jakarta.inject.Inject;
 import org.jspecify.annotations.NonNull;
 
@@ -79,8 +78,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     private final EntryEditorTabFactory tabFactory;
     private final UndoAction undoAction;
     private final RedoAction redoAction;
-
-    private Subscription typeSubscription;
 
     private final EntryEditorViewModel viewModel;
     private final EntryEditorFocusUtils focusUtils;
@@ -182,6 +179,10 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 onEntryChanged(newEntry);
             }
         });
+
+        // React to entry-type changes via the view model's single type subscription (no second listener on the
+        // entry here): rebuild the toolbar and let the focused tab rebuild its content for the new type.
+        EasyBind.subscribe(viewModel.currentEntryTypeProperty(), _ -> onEntryTypeChanged());
 
         EasyBind.listen(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(),
                 (_, _, newValue) -> {
@@ -331,17 +332,23 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         viewModel.currentlyEditedEntryProperty().set(entry);
     }
 
+    /// Reacts to a change of the current entry's type (via {@link EntryEditorViewModel#currentEntryTypeProperty()}):
+    /// rebuilds the toolbar and lets the focused tab rebuild its content for the new type.
+    private void onEntryTypeChanged() {
+        BibEntry entry = viewModel.getCurrentlyEditedEntry();
+        if (entry == null) {
+            return;
+        }
+        setupToolBar();
+        EntryEditorTab selectedTab = getSelectedTab();
+        if (selectedTab != null) {
+            selectedTab.notifyAboutFocus(entry);
+        }
+    }
+
     private void onEntryChanged(@NonNull BibEntry entry) {
         // Tabs observe viewModel.currentlyEditedEntryProperty() directly (bound in rebuildTabs), so no fan-out here.
-        if (typeSubscription != null) {
-            typeSubscription.unsubscribe();
-        }
-
-        typeSubscription = EasyBind.subscribe(entry.typeProperty(), _ -> {
-            setupToolBar();
-            getSelectedTab().notifyAboutFocus(entry);
-        });
-
+        // Type changes are handled by onEntryTypeChanged via the view model's single type subscription.
         setupToolBar();
 
         if (preferences.getEntryEditorPreferences().showSourceTabByDefault()) {
