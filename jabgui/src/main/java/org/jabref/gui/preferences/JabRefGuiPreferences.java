@@ -234,6 +234,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String JOURNAL_POPUP = "journalPopup";
     private static final String SHOW_SCITE_TAB = "showSciteTab";
     private static final String SHOW_USER_COMMENTS_FIELDS = "showUserCommentsFields";
+    private static final String SHOW_COMMENTS_TAB = "showCommentsTab";
     private static final String SHOW_PREVIEW_TAB = "showPreviewTab";
     private static final String SHOW_MATHSCINET_TAB = "showMathSciNetTab";
     private static final String SHOW_SOURCE_TAB = "showSourceTab";
@@ -339,7 +340,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     // region CopyToPreferences
-
     public CopyToPreferences getCopyToPreferences() {
         if (copyToPreferences != null) {
             return copyToPreferences;
@@ -358,10 +358,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(INCLUDE_CROSS_REFERENCES, defaults.getShouldIncludeCrossReferences())
         );
     }
-
     // endregion
-    // region EntryEditorPreferences
 
+    // region EntryEditorPreferences
     public EntryEditorPreferences getEntryEditorPreferences() {
         if (entryEditorPreferences != null) {
             return entryEditorPreferences;
@@ -377,6 +376,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(entryEditorPreferences.enableJournalPopupProperty(), (_, _, newValue) -> put(JOURNAL_POPUP, newValue.toString()));
         EasyBind.listen(entryEditorPreferences.previewWidthDividerPositionProperty(), (_, _, newValue) -> putDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, newValue.doubleValue()));
         EasyBind.listen(entryEditorPreferences.citationFetcherTypeProperty(), (_, _, newValue) -> put(CITATION_FETCHER_TYPE, newValue.name()));
+        EasyBind.listen(entryEditorPreferences.showUserCommentsFieldsProperty(), (_, _, newValue) -> putBoolean(SHOW_USER_COMMENTS_FIELDS, newValue));
         EasyBind.listen(entryEditorPreferences.citationCountFetcherTypeProperty(), (_, _, newValue) -> put(CITATION_COUNT_FETCHER_TYPE, newValue.name()));
         return entryEditorPreferences;
     }
@@ -392,6 +392,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP, defaults.shouldEnableJournalPopup().name())),
                 CitationFetcherType.valueOf(get(CITATION_FETCHER_TYPE, defaults.getCitationFetcherType().name())),
                 CitationCountFetcherType.valueOf(get(CITATION_COUNT_FETCHER_TYPE, defaults.getCitationCountFetcherType().name())),
+                getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields()),
                 getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewWidthDividerPosition())
         );
     }
@@ -432,7 +433,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(SHOW_LATEX_CITATIONS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.LATEX_CITATIONS)),
                 getBoolean(SMART_FILE_ANNOTATIONS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.FILE_ANNOTATIONS)),
                 getBoolean(SHOW_SCITE_TAB, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.CITATION_INFORMATION)),
-                getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.USER_COMMENTS))));
+                getBoolean(SHOW_COMMENTS_TAB, defaults.isStaticTabVisible(EntryEditorTabModel.StaticTab.COMMENTS))));
 
         // Always-present trailing tabs
         tabModels.add(new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.MATH_SCI_NET,
@@ -447,9 +448,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     private void storeTabConfigs(List<EntryEditorTabModel> configs) {
         List<EntryEditorTabModel.CustomizedFieldSet> fieldSetTabs = configs.stream()
-                                                                 .filter(EntryEditorTabModel.CustomizedFieldSet.class::isInstance)
-                                                                 .map(EntryEditorTabModel.CustomizedFieldSet.class::cast)
-                                                                 .toList();
+                                                                           .filter(EntryEditorTabModel.CustomizedFieldSet.class::isInstance)
+                                                                           .map(EntryEditorTabModel.CustomizedFieldSet.class::cast)
+                                                                           .toList();
 
         for (int i = 0; i < fieldSetTabs.size(); i++) {
             put(CUSTOM_TAB_NAME + i, fieldSetTabs.get(i).name());
@@ -494,8 +495,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                             putBoolean(SMART_FILE_ANNOTATIONS, visible);
                     case CITATION_INFORMATION ->
                             putBoolean(SHOW_SCITE_TAB, visible);
-                    case USER_COMMENTS ->
-                            putBoolean(SHOW_USER_COMMENTS_FIELDS, visible);
+                    case COMMENTS ->
+                            putBoolean(SHOW_COMMENTS_TAB, visible);
                     case PREVIEW ->
                             putBoolean(SHOW_PREVIEW_TAB, visible);
                     case MATH_SCI_NET ->
