@@ -6,7 +6,6 @@ import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.EntryEditorTab;
-import org.jabref.gui.entryeditor.NamedEntryEditorTab;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
@@ -16,7 +15,7 @@ import org.jabref.model.entry.field.StandardField;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 
-public class FileAnnotationTab extends EntryEditorTab implements NamedEntryEditorTab {
+public class FileAnnotationTab extends EntryEditorTab {
 
     public static final String NAME = "File annotations";
 

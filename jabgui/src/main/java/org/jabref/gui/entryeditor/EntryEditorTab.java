@@ -72,6 +72,10 @@ public abstract class EntryEditorTab extends Tab {
         return shouldShow;
     }
 
+    /// Stable, well-known name of this tab (its English/config identifier, independent of the localized
+    /// {@linkplain #getText() display text}).
+    public abstract String getName();
+
     /// Updates the view with the contents of the given entry.
     protected abstract void bindToEntry(BibEntry entry);
 

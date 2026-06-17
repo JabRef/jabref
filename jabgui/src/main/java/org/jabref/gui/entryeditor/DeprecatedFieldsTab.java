@@ -26,7 +26,7 @@ import org.jabref.model.entry.field.Field;
 
 import com.tobiasdiez.easybind.EasyBind;
 
-public class DeprecatedFieldsTab extends FieldsEditorTab implements NamedEntryEditorTab {
+public class DeprecatedFieldsTab extends FieldsEditorTab {
 
     public static final String NAME = "Deprecated fields";
     private final BibEntryTypesManager entryTypesManager;

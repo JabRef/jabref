@@ -26,7 +26,6 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.documentviewer.DocumentViewerView;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.entryeditor.EntryEditorTab;
-import org.jabref.gui.entryeditor.NamedEntryEditorTab;
 import org.jabref.gui.maintable.OpenFolderAction;
 import org.jabref.gui.maintable.OpenSingleExternalFileAction;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -44,7 +43,7 @@ import org.jabref.model.search.query.SearchResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FulltextSearchResultsTab extends EntryEditorTab implements NamedEntryEditorTab {
+public class FulltextSearchResultsTab extends EntryEditorTab {
 
     public static final String NAME = "Search results";
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextSearchResultsTab.class);
