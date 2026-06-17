@@ -17,7 +17,10 @@ public sealed interface EntryEditorTabModel
     /// Whether this is the always-present leading Preview feature tab (its visibility is owned by
     /// PreviewPreferences; customized field-set tabs are inserted right after it).
     default boolean isPreview() {
-        return this instanceof Feature(StaticTab type, boolean ignored) && type == StaticTab.PREVIEW;
+        return this instanceof Feature(
+                StaticTab type,
+                boolean ignored
+        ) && type == StaticTab.PREVIEW;
     }
 
     /// Index just past a leading {@link StaticTab#PREVIEW} feature in {@code models} (1 if present, else 0),
