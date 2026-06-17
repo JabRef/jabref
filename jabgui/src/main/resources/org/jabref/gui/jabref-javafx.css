@@ -899,3 +899,34 @@ TextFlow > .tooltip-text-monospaced {
 .web-view {
     -fx-page-fill: -jr-light-text-color;
 }
+
+/* ============================================================
+ * Utility style classes — replacements for inline setStyle()
+ * calls scattered across Java UI files. Using CSS classes here
+ * keeps styles in one place, supports theming, and avoids the
+ * specificity / string-concatenation pitfalls of setStyle().
+ * See: https://github.com/JabRef/jabref/issues/15934
+ *
+ * Note: simple bold/italic styling reuses the existing .bold
+ * and .italic classes from jabref-theme.css. Only classes with
+ * properties not covered by existing utilities are added here.
+ * ============================================================ */
+
+/* Used in FileAnnotationTabView: annotation marking label (small + bold).
+ * No existing utility covers the combined 0.75em + bold, so a dedicated
+ * class is warranted here. */
+.annotation-marking-label {
+    -fx-font-size: 0.75em;
+    -fx-font-weight: bold;
+}
+
+/* Used in FieldValueCell: render the hand/pointer cursor on a clickable label. */
+.clickable-label {
+    -fx-cursor: hand;
+}
+
+/* Used in LinkedFilesEditor: vertical padding on the info HBox to align
+ * it with the adjacent icon buttons which also carry 0.5em padding. */
+.linked-files-info-container {
+    -fx-padding: 0.5em 0 0.5em 0;
+}
