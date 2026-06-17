@@ -197,7 +197,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                 RemoteUtil::isStringUserPort,
                 ValidationMessage.error(Localization.lang("You must enter an integer value in the interval 1025-65535")));
 
-        this.trustStoreManager = new TrustStoreManager(Path.of(preferences.getSSLPreferences().getTruststorePath()));
+        this.trustStoreManager = new TrustStoreManager(preferences.getSSLPreferences().getTruststorePath());
     }
 
     public ValidationStatus remotePortValidationStatus() {
@@ -303,8 +303,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         libraryPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
         libraryPreferences.setAutoSave(autosaveLocalLibraries.getValue());
 
-        filePreferences.createBackupProperty().setValue(createBackupProperty.getValue());
-        filePreferences.backupDirectoryProperty().setValue(Path.of(backupDirectoryProperty.getValue()));
+        filePreferences.setCreateBackup(createBackupProperty.getValue());
+        filePreferences.setBackupDirectory(Path.of(backupDirectoryProperty.getValue()));
 
         searchPreferences.setUsePostgresSearch(usePostgresSearchProperty.getValue());
 

@@ -613,7 +613,8 @@ public class MedlineImporter extends Importer implements Parser {
     private void parseMeshHeading(XMLStreamReader reader, List<MeshHeading> meshHeadingList, String startElement)
             throws XMLStreamException {
         String descriptorName = "";
-        List<String> qualifierNames = new ArrayList<>();
+        boolean descriptorMajor = false;
+        List<MeshHeading.QualifierName> qualifierNames = new ArrayList<>();
 
         while (reader.hasNext()) {
             reader.next();
@@ -621,15 +622,17 @@ public class MedlineImporter extends Importer implements Parser {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
                     case "DescriptorName" -> {
+                        descriptorMajor = "Y".equals(reader.getAttributeValue(null, "MajorTopicYN"));
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
                             descriptorName = reader.getText();
                         }
                     }
                     case "QualifierName" -> {
+                        boolean qualifierMajor = "Y".equals(reader.getAttributeValue(null, "MajorTopicYN"));
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
-                            qualifierNames.add(reader.getText());
+                            qualifierNames.add(new MeshHeading.QualifierName(reader.getText(), qualifierMajor));
                         }
                     }
                 }
@@ -640,7 +643,7 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
 
-        meshHeadingList.add(new MeshHeading(descriptorName, qualifierNames));
+        meshHeadingList.add(new MeshHeading(descriptorName, descriptorMajor, qualifierNames));
     }
 
     private void parseGeneSymbolList(XMLStreamReader reader, Map<Field, String> fields, String startElement)
@@ -972,21 +975,14 @@ public class MedlineImporter extends Importer implements Parser {
     }
 
     private void addMeshHeading(Map<Field, String> fields, List<MeshHeading> meshHeadingList) {
-        List<String> keywords = new ArrayList<>();
-
-        if (!meshHeadingList.isEmpty()) {
-            for (MeshHeading meshHeading : meshHeadingList) {
-                StringBuilder result = new StringBuilder(meshHeading.descriptorName());
-                if (meshHeading.qualifierNames() != null) {
-                    for (String qualifierName : meshHeading.qualifierNames()) {
-                        result.append(", ").append(qualifierName);
-                    }
-                }
-                keywords.add(result.toString());
-            }
-
-            fields.put(StandardField.KEYWORDS, String.join(KEYWORD_SEPARATOR, keywords));
+        if (meshHeadingList.isEmpty()) {
+            return;
         }
+        List<String> keywords = new ArrayList<>();
+        for (MeshHeading meshHeading : meshHeadingList) {
+            keywords.addAll(meshHeading.toKeywords());
+        }
+        fields.put(StandardField.KEYWORDS, String.join(KEYWORD_SEPARATOR, keywords));
     }
 
     private void addPubDate(XMLStreamReader reader, Map<Field, String> fields, String startElement) throws XMLStreamException {

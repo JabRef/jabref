@@ -5,20 +5,27 @@ import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.logic.os.OS;
+import org.jabref.logic.util.Directories;
+import org.jabref.model.metadata.UserHostInfo;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// Preferences for the linked files
+@NullMarked
 public class FilePreferences {
 
     public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] {"[bibtexkey]", "[bibtexkey] - [title]"};
 
-    private final StringProperty userAndHost = new SimpleStringProperty();
-    private final SimpleStringProperty mainFileDirectory = new SimpleStringProperty();
+    private final SimpleObjectProperty<UserHostInfo> userAndHost = new SimpleObjectProperty<>();
+    private final ObjectProperty<@Nullable Path> mainFileDirectory = new SimpleObjectProperty<>();
     private final BooleanProperty storeFilesRelativeToBibFile = new SimpleBooleanProperty();
     private final BooleanProperty autoRenameFilesOnChange = new SimpleBooleanProperty();
     private final StringProperty fileNamePattern = new SimpleStringProperty();
@@ -40,8 +47,33 @@ public class FilePreferences {
     private final BooleanProperty openFileExplorerInFileDirectory = new SimpleBooleanProperty();
     private final BooleanProperty openFileExplorerInLastUsedDirectory = new SimpleBooleanProperty();
 
-    public FilePreferences(String userAndHost,
-                           String mainFileDirectory,
+    private FilePreferences() {
+        this(
+                new SimpleObjectProperty<>(OS.getUserHostInfo()), // userAndHost (needs to be sourced from InternalPreferences)
+                null,                                // mainFileDirectory
+                true,                                // storeFilesRelativeToBibFile
+                false,                               // autoRenameFilesOnChange
+                DEFAULT_FILENAME_PATTERNS[1],        // fileNamePattern
+                "",                                  // fileDirectoryPattern
+                true,                                // downloadLinkedFiles
+                true,                                // fulltextIndexLinkedFiles
+                Directories.getUserDirectory(),      // workingDirectory
+                true,                                // createBackup
+                Directories.getBackupDirectory(),    // backupDirectory
+                true,                                // confirmDeleteLinkedFile
+                false,                               // moveToTrash
+                true,                                // adjustFileLinksOnTransfer
+                true,                                // copyLinkedFilesOnTransfer
+                false,                               // moveLinkedFilesOnTransfer - defensive, not to cause the impression of files being lost
+                true,                                // shouldKeepDownloadUrl
+                Path.of("/"),                        // lastUsedDirectory
+                true,                                // openFileExplorerInFileDirectory
+                false                                // openFileExplorerInLastUsedDirectory
+        );
+    }
+
+    public FilePreferences(ReadOnlyObjectProperty<UserHostInfo> userAndHost,
+                           @Nullable Path mainFileDirectory,
                            boolean storeFilesRelativeToBibFile,
                            boolean autoRenameFilesOnChange,
                            String fileNamePattern,
@@ -60,7 +92,7 @@ public class FilePreferences {
                            Path lastUsedDirectory,
                            boolean openFileExplorerInFileDirectory,
                            boolean openFileExplorerInLastUsedDirectory) {
-        this.userAndHost.setValue(userAndHost);
+        this.userAndHost.bind(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
         this.autoRenameFilesOnChange.setValue(autoRenameFilesOnChange);
@@ -82,27 +114,46 @@ public class FilePreferences {
         this.openFileExplorerInLastUsedDirectory.set(openFileExplorerInLastUsedDirectory);
     }
 
-    public String getUserAndHost() {
-        return userAndHost.getValue();
+    public static FilePreferences getDefault() {
+        return new FilePreferences();
     }
 
-    public StringProperty getUserAndHostProperty() {
-        return userAndHost;
+    public void setAll(FilePreferences preferences) {
+        // userAndHost is always bound to InternalPreferences.getUserAndHost
+        this.mainFileDirectory.set(preferences.mainFileDirectoryProperty().get());
+        this.storeFilesRelativeToBibFile.set(preferences.shouldStoreFilesRelativeToBibFile());
+        this.autoRenameFilesOnChange.set(preferences.shouldAutoRenameFilesOnChange());
+        this.fileNamePattern.set(preferences.getFileNamePattern());
+        this.fileDirectoryPattern.set(preferences.getFileDirectoryPattern());
+        this.downloadLinkedFiles.set(preferences.shouldDownloadLinkedFiles());
+        this.fulltextIndexLinkedFiles.set(preferences.shouldFulltextIndexLinkedFiles());
+        this.workingDirectory.set(preferences.getWorkingDirectory());
+        this.createBackup.set(preferences.shouldCreateBackup());
+        this.backupDirectory.set(preferences.getBackupDirectory());
+        this.confirmDeleteLinkedFile.set(preferences.confirmDeleteLinkedFile());
+        this.moveToTrash.set(preferences.moveToTrash());
+        this.adjustFileLinksOnTransfer.set(preferences.shouldAdjustFileLinksOnTransfer());
+        this.copyLinkedFilesOnTransfer.set(preferences.shouldCopyLinkedFilesOnTransfer());
+        this.moveLinkedFilesOnTransfer.set(preferences.shouldMoveLinkedFilesOnTransfer());
+        this.shouldKeepDownloadUrl.set(preferences.shouldKeepDownloadUrl());
+        this.lastUsedDirectory.set(preferences.getLastUsedDirectory());
+        this.openFileExplorerInFileDirectory.set(preferences.shouldOpenFileExplorerInFileDirectory());
+        this.openFileExplorerInLastUsedDirectory.set(preferences.shouldOpenFileExplorerInLastUsedDirectory());
+    }
+
+    public String getUserAndHost() {
+        return userAndHost.getValue().getUserHostString();
     }
 
     public Optional<Path> getMainFileDirectory() {
-        if (StringUtil.isBlank(mainFileDirectory.getValue())) {
-            return Optional.empty();
-        } else {
-            return Optional.of(Path.of(mainFileDirectory.getValue()));
-        }
+        return Optional.ofNullable(mainFileDirectory.get());
     }
 
-    public StringProperty mainFileDirectoryProperty() {
+    public ObjectProperty<@Nullable Path> mainFileDirectoryProperty() {
         return mainFileDirectory;
     }
 
-    public void setMainFileDirectory(String mainFileDirectory) {
+    public void setMainFileDirectory(@Nullable Path mainFileDirectory) {
         this.mainFileDirectory.set(mainFileDirectory);
     }
 
@@ -320,5 +371,25 @@ public class FilePreferences {
 
     public void setOpenFileExplorerInLastUsedDirectory(boolean value) {
         this.openFileExplorerInLastUsedDirectory.set(value);
+    }
+
+    public FilePreferences withUserHostInfo(ReadOnlyObjectProperty<UserHostInfo> newUserHostInfo) {
+        this.userAndHost.bind(newUserHostInfo);
+        return this;
+    }
+
+    public FilePreferences withMoveToTrash(boolean moveToTrash) {
+        this.moveToTrash.set(moveToTrash);
+        return this;
+    }
+
+    public FilePreferences withMainFileDirectory(Path lastUsedDirectory) {
+        this.mainFileDirectory.set(lastUsedDirectory);
+        return this;
+    }
+
+    public FilePreferences withLastUsedDirectory(Path lastUsedDirectory) {
+        this.lastUsedDirectory.set(lastUsedDirectory);
+        return this;
     }
 }
