@@ -21,6 +21,12 @@ public class OcrMyPdfEngine implements OcrEngine {
     private static final int TIMEOUT_MINS = 10;
     private static final int CHECKING_TIMEOUT = 5;
 
+    private OcrPreferences ocrPreferences;
+
+    public OcrMyPdfEngine(OcrPreferences ocrPreferences) {
+        this.ocrPreferences = ocrPreferences;
+    }
+
     @Override
     public String getName() {
         return "OCRmyPDF";

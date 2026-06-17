@@ -52,7 +52,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
-        this.ocrEngine = new OcrMyPdfEngine();
+        this.ocrEngine = new OcrMyPdfEngine(preferences.getOcrPreferences());
         this.importHandler = new ImportHandler(
                 databaseContext,
                 preferences,
