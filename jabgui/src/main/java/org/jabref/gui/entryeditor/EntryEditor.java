@@ -349,9 +349,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         // Type changes are handled by onEntryTypeChanged via the view model's single type subscription.
         setupToolBar();
 
-        if (preferences.getEntryEditorPreferences().showSourceTabByDefault()) {
-            viewModel.sourceTab().ifPresent(tabbed.getSelectionModel()::select);
-        }
+        viewModel.preferredInitialTab().ifPresent(tabbed.getSelectionModel()::select);
         Platform.runLater(() -> {
             for (Tab tab : tabbed.getTabs()) {
                 if (tab instanceof FieldsEditorTab fieldsTab) {

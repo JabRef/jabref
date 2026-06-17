@@ -162,9 +162,14 @@ public class EntryEditorViewModel extends AbstractViewModel {
         return List.copyOf(allPossibleTabs);
     }
 
-    /// The source tab, if present, so the View can select it by default.
-    public Optional<SourceTab> sourceTab() {
-        return Optional.ofNullable(sourceTab);
+    /// The tab the editor should select when it (re)binds to an entry: the Source tab when the user opted
+    /// into "show source by default", otherwise empty (the editor keeps the current selection). The policy
+    /// lives here, not in the view.
+    public Optional<SourceTab> preferredInitialTab() {
+        if (preferences.getEntryEditorPreferences().showSourceTabByDefault()) {
+            return Optional.ofNullable(sourceTab);
+        }
+        return Optional.empty();
     }
 
     /// Recreates every possible tab from the factory, binds each to the current entry, subscribes to each tab's
