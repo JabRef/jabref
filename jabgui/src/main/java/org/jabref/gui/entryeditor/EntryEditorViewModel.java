@@ -222,9 +222,9 @@ public class EntryEditorViewModel extends AbstractViewModel {
             return;
         }
 
-        visibleTabs.removeAll(allPossibleTabs.stream().filter(tab -> !tab.visibility().getValue()).toList());
-
         List<Tab> wanted = allPossibleTabs.stream().filter(tab -> tab.visibility().getValue()).collect(Collectors.toList());
+        visibleTabs.retainAll(wanted);
+
         for (int i = 0; i < wanted.size(); i++) {
             Tab toBeAdded = wanted.get(i);
             Tab shown = i < visibleTabs.size() ? visibleTabs.get(i) : null;
