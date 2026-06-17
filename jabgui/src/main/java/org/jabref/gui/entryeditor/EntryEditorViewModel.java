@@ -21,6 +21,7 @@ import javafx.scene.control.Tab;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.bibtex.TypedBibEntry;
@@ -227,23 +228,17 @@ public class EntryEditorViewModel extends AbstractViewModel {
                 activeDatabaseContext());
     }
 
+    /// Fetches and merges bibliographic data for the current entry from the given fetcher. The PDF-metadata
+    /// fetcher first resolves the Grobid opt-in with the user — that policy lives here, not in the editor.
     public void fetchAndMerge(EntryBasedFetcher fetcher) {
         BibEntry entry = currentlyEditedEntry.get();
         if (entry == null) {
             return;
         }
+        if (fetcher instanceof PdfMergeMetadataImporter.EntryBasedFetcherWrapper) {
+            GrobidUseDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences());
+        }
         new FetchAndMergeEntry(activeDatabaseContext(), taskExecutor, preferences, dialogService, undoManager, stateManager)
                 .fetchAndMerge(entry, fetcher);
-    }
-
-    /// Fetches and merges bibliographic data from the linked PDF's embedded metadata.
-    /// The Grobid opt-in (a UI concern) is handled by the caller before invoking this.
-    public void fetchAndMergeFromPdfMetadata() {
-        PdfMergeMetadataImporter.EntryBasedFetcherWrapper fetcher =
-                new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(
-                        preferences.getImportFormatPreferences(),
-                        preferences.getFilePreferences(),
-                        activeDatabaseContext());
-        fetchAndMerge(fetcher);
     }
 }
