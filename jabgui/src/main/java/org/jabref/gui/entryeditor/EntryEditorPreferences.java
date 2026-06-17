@@ -206,19 +206,7 @@ public class EntryEditorPreferences {
                                                     .toList();
         tabModels.removeIf(config -> config instanceof EntryEditorTabModel.CustomizedFieldSet);
         // Customized field-set tabs sit right after the always-present leading Preview tab.
-        tabModels.addAll(indexAfterLeadingPreview(), newFieldSet);
-    }
-
-    /// Index just past a leading {@link EntryEditorTabModel.StaticTab#PREVIEW} feature (1 if present, else 0),
-    /// so customized field-set tabs are inserted after the Preview tab instead of before it.
-    private int indexAfterLeadingPreview() {
-        return !tabModels.isEmpty()
-                       && tabModels.getFirst() instanceof EntryEditorTabModel.Feature(
-                EntryEditorTabModel.StaticTab type,
-                boolean ignored
-        )
-                       && type == EntryEditorTabModel.StaticTab.PREVIEW
-               ? 1 : 0;
+        tabModels.addAll(EntryEditorTabModel.indexAfterLeadingPreview(tabModels), newFieldSet);
     }
 
     public static SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {

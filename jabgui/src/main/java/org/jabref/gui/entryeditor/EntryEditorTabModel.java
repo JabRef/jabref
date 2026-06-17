@@ -1,5 +1,6 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.List;
 import java.util.Set;
 
 import org.jabref.model.entry.field.Field;
@@ -12,6 +13,18 @@ import org.jabref.model.entry.field.Field;
 /// {@link Feature}            — fixed-implementation tab whose only user-facing knob is visibility.
 public sealed interface EntryEditorTabModel
         permits EntryEditorTabModel.FieldSet, EntryEditorTabModel.CustomizedFieldSet, EntryEditorTabModel.Feature {
+
+    /// Whether this is the always-present leading Preview feature tab (its visibility is owned by
+    /// PreviewPreferences; customized field-set tabs are inserted right after it).
+    default boolean isPreview() {
+        return this instanceof Feature(StaticTab type, boolean ignored) && type == StaticTab.PREVIEW;
+    }
+
+    /// Index just past a leading {@link StaticTab#PREVIEW} feature in {@code models} (1 if present, else 0),
+    /// so customized field-set tabs are inserted after the Preview tab instead of before it.
+    static int indexAfterLeadingPreview(List<? extends EntryEditorTabModel> models) {
+        return !models.isEmpty() && models.getFirst().isPreview() ? 1 : 0;
+    }
 
     enum StaticTab {
         // Always-present leading tab (no field configuration; only visibility)
