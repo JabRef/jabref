@@ -163,7 +163,7 @@ class ZoteroCitationMarkParserTest {
                                 "page":"10-20",
                                 "ISBN":"978-4-56"
                                 """,
-                        StandardEntryType.InCollection,
+                        StandardEntryType.InBook,
                         Map.of(
                                 StandardField.TITLE, "Chapter title",
                                 StandardField.BOOKTITLE, "Edited book",
