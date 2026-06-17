@@ -213,9 +213,6 @@
       ]
     },
     {
-      "type": "picocli.CommandLine$AutoHelpMixin"
-    },
-    {
       "type": "sun.management.VMManagementImpl",
       "jniAccessible": true,
       "fields": [
