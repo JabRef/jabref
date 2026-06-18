@@ -60,5 +60,8 @@ jobs:
       - name: Make clitest executable
         run: chmod +x /tmp/clitest
 
-      - name: Run JabKit native smoke tests
-        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit.md
+      - name: Run JabKit offline smoke tests
+        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline.md
+
+      - name: Run JabKit online smoke tests
+        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-online.md
