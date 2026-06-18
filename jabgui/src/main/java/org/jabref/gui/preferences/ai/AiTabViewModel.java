@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.ai;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -132,6 +133,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final Validator ragMaxResultsCountValidator;
     private final Validator ragMinScoreTypeValidator;
     private final Validator ragMinScoreRangeValidator;
+
+    private final List<String> restartWarnings = new ArrayList<>();
 
     public AiTabViewModel(CliPreferences preferences) {
         this.oldLocale = Locale.getDefault();
@@ -331,7 +334,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         geminiChatModel.setValue(aiPreferences.getGeminiChatModel());
         huggingFaceChatModel.setValue(aiPreferences.getHuggingFaceChatModel());
 
-        enableAi.setValue(aiPreferences.getEnableAi());
+        enableAi.setValue(aiPreferences.getAiFeaturesEnabledCurrently());
         autoGenerateSummaries.setValue(aiPreferences.getAutoGenerateSummaries());
         autoGenerateEmbeddings.setValue(aiPreferences.getAutoGenerateEmbeddings());
 
@@ -367,7 +370,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        aiPreferences.setEnableAi(enableAi.get());
+        // [impl->req~ai.general.enabling.restart~1]
+        if (enableAi.get() != aiPreferences.getAiFeaturesEnabledCurrently()) {
+            restartWarnings.add(Localization.lang("AI features turned on/off."));
+        }
+
+        aiPreferences.setAiFeaturesEnabledCurrently(enableAi.get());
         aiPreferences.setAutoGenerateEmbeddings(autoGenerateEmbeddings.get());
         aiPreferences.setAutoGenerateSummaries(autoGenerateSummaries.get());
 
@@ -520,6 +528,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         );
 
         return validators.stream().map(Validator::getValidationStatus).allMatch(ValidationStatus::isValid);
+    }
+
+    @Override
+    public List<String> getRestartWarnings() {
+        return restartWarnings;
     }
 
     public BooleanProperty enableAi() {

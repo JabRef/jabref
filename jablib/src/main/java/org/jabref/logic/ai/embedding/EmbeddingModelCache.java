@@ -3,6 +3,7 @@ package org.jabref.logic.ai.embedding;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
@@ -23,10 +24,15 @@ public class EmbeddingModelCache implements AutoCloseable {
 
     private final Map<PredefinedEmbeddingModel, AsyncEmbeddingModel> cache = new HashMap<>();
 
+    private final AiPreferences aiPreferences;
     private final NotificationService notificationService;
     private final TaskExecutor taskExecutor;
 
-    public EmbeddingModelCache(NotificationService notificationService, TaskExecutor taskExecutor) {
+    public EmbeddingModelCache(
+            AiPreferences aiPreferences,
+            NotificationService notificationService,
+            TaskExecutor taskExecutor) {
+        this.aiPreferences = aiPreferences;
         this.notificationService = notificationService;
         this.taskExecutor = taskExecutor;
     }
@@ -40,7 +46,7 @@ public class EmbeddingModelCache implements AutoCloseable {
     /// @return a (possibly still-loading) {@link AsyncEmbeddingModel} for `kind`
     public AsyncEmbeddingModel getOrCreate(PredefinedEmbeddingModel kind) {
         return cache.computeIfAbsent(kind,
-                k -> new AsyncEmbeddingModel(k, notificationService, taskExecutor));
+                k -> new AsyncEmbeddingModel(k, aiPreferences, notificationService, taskExecutor));
     }
 
     /// Closes all cached {@link AsyncEmbeddingModel} instances and clears the cache.
