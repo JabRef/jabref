@@ -16,8 +16,6 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class FileAnnotationTab extends EntryEditorTab {
 
-    public static final String NAME = "File annotations";
-
     private final StateManager stateManager;
 
     public FileAnnotationTab(StateManager stateManager,
@@ -44,10 +42,5 @@ public class FileAnnotationTab extends EntryEditorTab {
         } else {
             setContent(null);
         }
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
     }
 }

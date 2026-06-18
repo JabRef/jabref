@@ -68,10 +68,6 @@ public abstract class EntryEditorTab extends Tab {
         return currentEntry;
     }
 
-    /// Stable, well-known name of this tab (its English/config identifier, independent of the localized
-    /// {@linkplain #getText() display text}).
-    public abstract String getName();
-
     protected abstract void bindToEntry(BibEntry entry);
 
     /// Override to perform a special action on focus (like selecting the first field in the editor).

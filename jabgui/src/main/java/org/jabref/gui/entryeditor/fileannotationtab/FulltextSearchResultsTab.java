@@ -43,7 +43,6 @@ import org.slf4j.LoggerFactory;
 
 public class FulltextSearchResultsTab extends EntryEditorTab {
 
-    public static final String NAME = "Search results";
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextSearchResultsTab.class);
 
     private final StateManager stateManager;
@@ -195,10 +194,5 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         lineSeparator.prefWidthProperty().bind(content.widthProperty().multiply(widthMultiplier));
         lineSeparator.setPrefHeight(15);
         return lineSeparator;
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
     }
 }

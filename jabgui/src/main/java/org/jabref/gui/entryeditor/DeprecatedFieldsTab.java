@@ -28,7 +28,6 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class DeprecatedFieldsTab extends FieldsEditorTab {
 
-    public static final String NAME = "Deprecated fields";
     private final BibEntryTypesManager entryTypesManager;
 
     public DeprecatedFieldsTab(UndoManager undoManager,
@@ -73,10 +72,5 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
             // Entry type unknown -> treat all fields as required (thus no optional fields)
             return new LinkedHashSet<>();
         }
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
     }
 }

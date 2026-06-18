@@ -17,8 +17,6 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class MathSciNetTab extends EntryEditorTab {
 
-    public static final String NAME = "MathSciNet Review";
-
     public MathSciNetTab() {
         setText(Localization.lang("MathSciNet Review"));
         // Visible only when the current entry carries a MathSciNet (MR number) identifier.
@@ -58,10 +56,5 @@ public class MathSciNetTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         setContent(getPane(entry));
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
     }
 }

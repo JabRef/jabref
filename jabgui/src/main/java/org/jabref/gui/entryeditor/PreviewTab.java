@@ -11,7 +11,6 @@ import org.jabref.logic.l10n.Localization;
 /// @implNote The Preview tab's visibility is driven by the "show preview as a separate tab" preference
 /// (its {@link EntryEditorTabModel} visibility bit is unused); the factory wires that gate.
 public class PreviewTab extends TabWithPreviewPanel {
-    public static final String NAME = "Preview";
 
     private final SplitPane splitPane;
 
@@ -25,11 +24,6 @@ public class PreviewTab extends TabWithPreviewPanel {
 
         splitPane = new SplitPane();
         setContent(splitPane);
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
     }
 
     protected void handleFocus() {

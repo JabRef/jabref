@@ -28,8 +28,6 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class LatexCitationsTab extends EntryEditorTab {
 
-    public static final String NAME = "LaTeX citations";
-
     private final StateManager stateManager;
 
     private final LatexCitationsTabViewModel viewModel;
@@ -154,10 +152,5 @@ public class LatexCitationsTab extends EntryEditorTab {
             LibraryTab libraryTab = stateManager.activeTabProperty().get().get();
             viewModel.bindToEntry(libraryTab, entry);
         }
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
     }
 }

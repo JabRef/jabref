@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
 /// Tab displaying article recommendations based on the currently selected BibEntry
 public class RelatedArticlesTab extends EntryEditorTab {
 
-    public static final String NAME = "Related articles";
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedArticlesTab.class);
 
     private final DialogService dialogService;
@@ -255,10 +254,5 @@ public class RelatedArticlesTab extends EntryEditorTab {
             // Ask for consent to send data to Mr. DLib on first time to tab
             setContent(getPrivacyDialog(entry));
         }
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
     }
 }

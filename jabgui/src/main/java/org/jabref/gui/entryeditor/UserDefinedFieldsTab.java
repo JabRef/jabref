@@ -17,7 +17,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 public class UserDefinedFieldsTab extends FieldsEditorTab {
-    private final String name;
     private final LinkedHashSet<Field> fields;
 
     public UserDefinedFieldsTab(String name,
@@ -39,16 +38,10 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
                 stateManager,
                 previewPanel);
 
-        this.name = name;
         this.fields = new LinkedHashSet<>(fields);
 
         setText(name);
         setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     @Override

@@ -13,8 +13,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 
 public class DetailOptionalFieldsTab extends OptionalFieldsTabBase {
 
-    public static final String NAME = "Optional fields 2";
-
     public DetailOptionalFieldsTab(UndoManager undoManager,
                                    UndoAction undoAction,
                                    RedoAction redoAction,
@@ -35,10 +33,5 @@ public class DetailOptionalFieldsTab extends OptionalFieldsTabBase {
                 stateManager,
                 previewPanel
         );
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
     }
 }

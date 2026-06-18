@@ -113,11 +113,6 @@ public class SourceTab extends EntryEditorTab {
         stateManager.searchQueryProperty().addListener((_, _, _) -> Platform.runLater(this::highlightSearchPattern));
     }
 
-    @Override
-    public String getName() {
-        return "Source";
-    }
-
     private void highlightSearchPattern() {
         if (codeArea == null) {
             return;

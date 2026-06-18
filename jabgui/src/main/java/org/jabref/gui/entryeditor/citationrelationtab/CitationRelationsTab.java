@@ -106,8 +106,6 @@ import org.slf4j.LoggerFactory;
 /// GUI for tab displaying an articles citation relations in two lists based on the currently selected BibEntry
 public class CitationRelationsTab extends EntryEditorTab {
 
-    public static final String NAME = "Citation relations";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationsTab.class);
 
     // Tasks used to implement asynchronous fetching of related articles
@@ -1043,10 +1041,5 @@ public class CitationRelationsTab extends EntryEditorTab {
         }
 
         searchForRelations(citationComponents, otherCitationComponents, true);
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
     }
 }

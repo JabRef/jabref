@@ -32,7 +32,6 @@ import org.jabref.model.entry.field.UserSpecificCommentField;
 
 public class OtherFieldsTab extends FieldsEditorTab {
 
-    public static final String NAME = "Other fields";
     private final List<Field> customTabsFieldNames;
     private final BibEntryTypesManager entryTypesManager;
 
@@ -90,10 +89,5 @@ public class OtherFieldsTab extends FieldsEditorTab {
             // Entry type unknown -> treat all fields as required (thus no other fields)
             return new LinkedHashSet<>();
         }
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
     }
 }
