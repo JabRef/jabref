@@ -12,7 +12,11 @@ javaPlatform {
 val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
 
-val javafx = "26.0.1"
+val javafxDefault = "26.0.1"
+// The JavaFX version can be overridden via the gradle property `javafxVersion`.
+// Only the non-web modules follow the override; javafx-web always stays on the default version.
+val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
+val javafxWeb = javafxDefault
 
 val lucene = "10.4.0"
 
@@ -34,7 +38,7 @@ dependencies.constraints {
     api("org.openjfx:javafx-fxml:$javafx")
     api("org.openjfx:javafx-graphics:$javafx")
     api("org.openjfx:javafx-swing:$javafx")
-    api("org.openjfx:javafx-web:$javafx")
+    api("org.openjfx:javafx-web:$javafxWeb")
     api("org.openjfx:jdk-jsobject:$javafx")
 
     api("cc.jilt:jilt:1.9.1")
