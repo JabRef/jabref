@@ -1,5 +1,9 @@
 repositories {
-    if (providers.gradleProperty("USE_MAVEN_LOCAL").map(String::toBoolean).getOrElse(false)) {
+    // Resolve from the local Maven repository (~/.m2) when experimenting locally.
+    // Enabled by `useMavenLocal`, or implicitly by `javafxVersion` (a locally published JavaFX build).
+    val useMavenLocal = providers.gradleProperty("useMavenLocal").map(String::toBoolean).getOrElse(false)
+    val javafxOverride = providers.gradleProperty("javafxVersion").isPresent
+    if (useMavenLocal || javafxOverride) {
         mavenLocal()
     }
 

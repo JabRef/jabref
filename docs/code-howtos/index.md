@@ -27,10 +27,12 @@ A singleton can be added by `com.airhacks.afterburner.injection.Injector#setMode
 ## Using locally published artifacts (mavenLocal)
 
 By default, JabRef does not resolve dependencies from your local Maven repository (`~/.m2`).
-To test a locally published artifact (e.g., a SNAPSHOT of a dependency), enable `mavenLocal()` by setting the gradle property `USE_MAVEN_LOCAL`:
+To test a locally published artifact (e.g., a SNAPSHOT of a dependency), enable `mavenLocal()` by setting the gradle property `useMavenLocal`:
 
-* Command line: `./gradlew build -PUSE_MAVEN_LOCAL=true`
-* Persistent (per user, not versioned): add `USE_MAVEN_LOCAL=true` to `~/.gradle/gradle.properties` (the [Gradle user home](https://docs.gradle.org/current/userguide/directory_layout.html#dir:gradle_user_home), `$GRADLE_USER_HOME`). Do not add it to the project's `gradle.properties` — that file is versioned.
+* Command line: `./gradlew build -PuseMavenLocal=true`
+* Persistent (per user, not versioned): add `useMavenLocal=true` to `~/.gradle/gradle.properties` (the [Gradle user home](https://docs.gradle.org/current/userguide/directory_layout.html#dir:gradle_user_home), `$GRADLE_USER_HOME`). Do not add it to the project's `gradle.properties` — that file is versioned.
+
+`mavenLocal()` is also enabled implicitly when overriding the JavaFX version via `-PjavafxVersion=...`, since a custom JavaFX build is typically published to `~/.m2`. You then do not need to set `useMavenLocal` as well.
 
 ## Cleanup and Formatters
 
