@@ -387,7 +387,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // region OCR preferences
     private static final String OCR_PATH = "ocrPath";
-    private static final String OCR_DEFAULT_PATH = "";
     // endregion
 
     // region Push to application preferences
