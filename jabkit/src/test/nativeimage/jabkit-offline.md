@@ -20,24 +20,6 @@ $ grep -c "@Book{" build/tmp/convert.bib
 3
 $ "$JABKIT" citationkeys generate --porcelain --input=src/test/resources/org/jabref/toolkit/commands/origin.bib 2>/dev/null | grep -c "@Book{"
 3
-$ "$JABKIT" doi-to-bibtex --porcelain 10.1109/ICWS.2007.59 > build/tmp/doi-to-bibtex.out 2>/dev/null; echo $?
-0
-$ grep -i -c "10.1109/icws.2007.59" build/tmp/doi-to-bibtex.out
-1
-$ grep -c "BPEL4Chor" build/tmp/doi-to-bibtex.out
-1
-$ "$JABKIT" fetch --porcelain --provider=CrossRef --query="JabRef BibTeX-based literature management software" > build/tmp/fetch-crossref.out 2>/dev/null; echo $?
-0
-$ grep -i -c "10.47397/tb/44-3/tb138kopp-jabref" build/tmp/fetch-crossref.out
-1
-$ "$JABKIT" get-cited-works --porcelain 10.1016/j.jksuci.2024.102118 > build/tmp/get-cited-works.out 2>/dev/null; echo $?
-0
-$ grep -q "^@" build/tmp/get-cited-works.out; echo $?
-0
-$ "$JABKIT" get-citing-works --porcelain 10.1016/j.jksuci.2024.102118 > build/tmp/get-citing-works.out 2>/dev/null; echo $?
-0
-$ grep -q "^@" build/tmp/get-citing-works.out; echo $?
-0
 $ "$JABKIT" generate-bib-from-aux --porcelain --aux=src/test/resources/org/jabref/toolkit/commands/paper.aux --input=src/test/resources/org/jabref/toolkit/commands/origin.bib --output=build/tmp/generated.bib; echo $?
 0
 $ grep -c "Darwin1888" build/tmp/generated.bib
