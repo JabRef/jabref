@@ -2,6 +2,12 @@ name: JabKit Native Smoke Test
 
 on:
   workflow_dispatch:
+    inputs:
+      run-online-tests:
+        description: 'Run online JabKit smoke tests'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   actions: write
@@ -42,6 +48,7 @@ jobs:
         run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline.md
 
       - name: Run JabKit online smoke tests
+        if: ${{ inputs.run-online-tests }}
         run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-online.md
 
       - name: Upload JabKit native binary
