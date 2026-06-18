@@ -97,3 +97,8 @@ Zotero provides mappings from Zotero item type to BibTeX/BibLaTeX entry type. Ho
 * Good, because citation-js also supports other conversions. e.g. BibLaTeX to RIS.
 * Bad, because Better BibTeX contains many-to-one mappings when converting BibTeX/BibLaTeX entry type to Zotero item type, which may lose information.
 * Bad, because JabRef needs to track Better BibTeX's updates, or import it as a submodule.
+
+### More information
+
+* Implementation PR: [#15946](https://github.com/JabRef/jabref/pull/15946)
+* Implemented mapping can be found via [CSLItemTypeDefinitions.java](https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/logic/openoffice/CSLItemTypeDefinitions.java)
