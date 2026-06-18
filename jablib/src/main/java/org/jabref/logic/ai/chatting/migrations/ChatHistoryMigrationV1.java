@@ -126,7 +126,7 @@ public final class ChatHistoryMigrationV1 {
                 return;
             }
 
-            LOGGER.info("Starting migration of {} chat history maps from v1 to v2", oldMapNames.size());
+            LOGGER.debug("Starting migration of {} chat history maps from v1 to v2", oldMapNames.size());
 
             for (String oldMapName : oldMapNames) {
                 try {
@@ -138,7 +138,7 @@ public final class ChatHistoryMigrationV1 {
                 }
             }
 
-            LOGGER.info("Successfully migrated {} of {} chat history maps",
+            LOGGER.debug("Successfully migrated {} of {} chat history maps",
                     migratedMapNames.size(), oldMapNames.size());
         } catch (Exception e) {
             LOGGER.error("Failed to migrate chat history from v1 to v2", e);

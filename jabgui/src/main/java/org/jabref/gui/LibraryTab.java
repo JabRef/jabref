@@ -830,6 +830,14 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 stateManager));
     }
 
+    public void suspendChangeMonitor() {
+        changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
+    }
+
+    public void resumeChangeMonitor() {
+        bibDatabaseContext.getDatabasePath().ifPresent(_ -> resetChangeMonitor());
+    }
+
     public void insertEntry(final BibEntry bibEntry) {
         insertEntries(List.of(bibEntry));
     }
