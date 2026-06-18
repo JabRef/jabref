@@ -1,3 +1,5 @@
+import org.gradle.internal.impldep.org.apache.http.client.methods.RequestBuilder.options
+
 plugins {
     id("org.jabref.gradle.module")
     id("org.jabref.gradle.feature.shadowjar")
@@ -22,8 +24,7 @@ testModuleInfo {
     requires("org.mockito")
     requires("org.hamcrest")
 
-    requires("org.testfx")
-    requires("org.testfx.junit5")
+    requires("io.gitlab.fxlabs.testfx.junit")
 
     requires("com.tngtech.archunit")
     requires("com.tngtech.archunit.junit5.api")

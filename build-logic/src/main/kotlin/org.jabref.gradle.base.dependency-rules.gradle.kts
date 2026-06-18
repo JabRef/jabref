@@ -1,3 +1,4 @@
+import org.gradle.api.internal.artifacts.dsl.dependencies.DependenciesExtensionModule.module
 import org.gradlex.javamodule.dependencies.tasks.ModuleDirectivesOrderingCheck
 
 plugins {
@@ -88,9 +89,7 @@ jvmDependencyConflicts.patch {
         removeDependency("biz.aQute.bnd:biz.aQute.bnd.annotation")
     }
 
-    module("org.testfx:testfx-core") {
-        removeDependency("org.osgi:org.osgi.core")
-    }
+
     module("org.xmlunit:xmlunit-legacy") {
         removeDependency("junit:junit")
     }
@@ -300,17 +299,10 @@ extraJavaModuleInfo {
     module("org.scala-lang:scala-library", "scala.library")
     module("pt.davidafsilva.apple:jkeychain", "jkeychain")
 
-    module("org.testfx:testfx-core", "org.testfx") {
-        exportAllPackages()
-        // Content based on https://github.com/TestFX/TestFX/commit/bf4a08aa82c008fdd3c296aaafee1d222f3824cb
-        requires("java.desktop")
-        requiresTransitive("javafx.controls")
-        requiresTransitive("org.hamcrest")
-    }
-    module("org.testfx:testfx-junit5", "org.testfx.junit5") {
-        exportAllPackages()
-        requires("org.junit.jupiter.api")
-        requiresTransitive("org.testfx")
+    module("com.github.oshi:oshi-core", "oshi.core") {}
+
+    module("io.gitlab.fx-labs:testfx-junit", "io.gitlab.fxlabs.testfx.junit") {
+        preserveExisting()
     }
 
     module("org.xmlunit:xmlunit-core", "org.xmlunit") {

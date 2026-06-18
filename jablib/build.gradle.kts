@@ -1,5 +1,6 @@
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SourcesJar
 import dev.jbang.gradle.tasks.JBangTask
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway
@@ -41,7 +42,7 @@ testModuleInfo {
     requires("org.mockito")
 
     // Required for LocalizationConsistencyTest
-    requires("org.testfx.junit5")
+    requires("io.gitlab.fxlabs.testfx.junit")
 
     requires("org.xmlunit")
     requires("org.xmlunit.matchers")
@@ -358,7 +359,7 @@ mavenPublishing {
     // - `JavadocJar.Javadoc()` to publish standard javadocs
     javadocJar = JavadocJar.Javadoc(),
     // whether to publish a sources jar
-    sourcesJar = true,
+    sourcesJar = SourcesJar.Sources(),
   ))
 
   publishToMavenCentral()
