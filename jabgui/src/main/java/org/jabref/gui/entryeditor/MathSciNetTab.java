@@ -2,7 +2,6 @@ package org.jabref.gui.entryeditor;
 
 import java.util.Optional;
 
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
@@ -20,13 +19,11 @@ public class MathSciNetTab extends EntryEditorTab {
 
     public static final String NAME = "MathSciNet Review";
 
-    /// Content available only when the current entry carries a MathSciNet (MR number) identifier.
-    private final ObservableValue<Boolean> contentVisibility =
-            EasyBind.map(currentEntryProperty(), entry -> (entry != null) && getMathSciNetId(entry).isPresent());
-
     public MathSciNetTab() {
         setText(Localization.lang("MathSciNet Review"));
-        setContentDrivenVisibility(contentVisibility);
+        // Visible only when the current entry carries a MathSciNet (MR number) identifier.
+        setContentDrivenVisibility(EasyBind.map(currentEntryProperty(),
+                entry -> (entry != null) && getMathSciNetId(entry).isPresent()));
     }
 
     private Optional<MathSciNetId> getMathSciNetId(BibEntry entry) {

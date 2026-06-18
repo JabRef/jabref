@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
@@ -61,10 +60,6 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
 
     private Collection<Field> fields = new ArrayList<>();
 
-    /// Content available when the current entry (of its type) has at least one field to display in this tab.
-    private final ObservableValue<Boolean> contentVisibility =
-            EasyBind.map(currentEntryProperty(), entry -> (entry != null) && !determineFieldsToShow(entry).isEmpty());
-
     @SuppressWarnings("FieldCanBeLocal")
     private Subscription dividerPositionSubscription;
 
@@ -84,7 +79,9 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         this.preferences = preferences;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
 
-        setContentDrivenVisibility(contentVisibility);
+        // Visible when the current entry (of its type) has at least one field to display in this tab.
+        setContentDrivenVisibility(EasyBind.map(currentEntryProperty(),
+                entry -> (entry != null) && !determineFieldsToShow(entry).isEmpty()));
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {

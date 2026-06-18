@@ -1,6 +1,5 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
-import javafx.beans.value.ObservableValue;
 import javafx.scene.Parent;
 import javafx.scene.control.Tooltip;
 
@@ -21,17 +20,14 @@ public class FileAnnotationTab extends EntryEditorTab {
 
     private final StateManager stateManager;
 
-    /// Content available only when the current entry has a linked file to annotate.
-    private final ObservableValue<Boolean> contentVisibility;
-
     public FileAnnotationTab(StateManager stateManager,
                              GuiPreferences preferences) {
         this.stateManager = stateManager;
 
-        this.contentVisibility = EasyBind.map(
+        // Visible only when the current entry has a linked file to annotate.
+        setContentDrivenVisibility(EasyBind.map(
                 currentEntryProperty(),
-                entry -> (entry != null) && entry.getField(StandardField.FILE).isPresent());
-        setContentDrivenVisibility(contentVisibility);
+                entry -> (entry != null) && entry.getField(StandardField.FILE).isPresent()));
 
         setText(Localization.lang("File annotations"));
         setTooltip(new Tooltip(Localization.lang("Show file annotations")));
