@@ -81,7 +81,7 @@ public class GenerateEmbeddingsAiDatabaseListener implements AiDatabaseListener 
 
         @Subscribe
         public void listen(EntriesAddedEvent e) {
-            if (!aiPreferences.getEnableAi() || !aiPreferences.getAutoGenerateEmbeddings()) {
+            if (!aiPreferences.getAiFeaturesEnabled() || !aiPreferences.getAutoGenerateEmbeddings()) {
                 return;
             }
 
@@ -90,7 +90,7 @@ public class GenerateEmbeddingsAiDatabaseListener implements AiDatabaseListener 
 
         @Subscribe
         public void listen(FieldChangedEvent e) {
-            if (!aiPreferences.getEnableAi() || !aiPreferences.getAutoGenerateEmbeddings() || e.getField() != StandardField.FILE) {
+            if (!aiPreferences.getAiFeaturesEnabled() || !aiPreferences.getAutoGenerateEmbeddings() || e.getField() != StandardField.FILE) {
                 return;
             }
 
