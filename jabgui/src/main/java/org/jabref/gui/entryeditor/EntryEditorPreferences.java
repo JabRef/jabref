@@ -67,18 +67,18 @@ public class EntryEditorPreferences {
     private final BooleanProperty showUserCommentsFields;
 
     private EntryEditorPreferences() {
-        this(
-                getDefaultTabModels(),
-                true,
-                false,
-                true,
-                true,
-                true,
-                JournalPopupEnabled.DISABLED,
-                CitationFetcherType.SEMANTIC_SCHOLAR,
-                CitationCountFetcherType.SEMANTIC_SCHOLAR,
-                true,
-                0.5
+        this(// Default Entry Editor Tabs
+                getDefaultTabModels(),                     // Default Entry Editor Tabs
+                true,                                      // Open editor when a new entry is
+                false,                                     // Show BibTeX source by default
+                true,                                      // Show validation messages
+                true,                                      // Allow integers in 'edition' filed in BibTeX mode
+                true,                                      // Automatically search and show unlinked files in the entry editor
+                JournalPopupEnabled.DISABLED,              // Fetch journal information online to show
+                CitationFetcherType.SEMANTIC_SCHOLAR,      // Citation Fetcher Type
+                CitationCountFetcherType.SEMANTIC_SCHOLAR, // Citation Count Fetcher Type
+                true,                                      // Show user comments field
+                0.5                                        // Preview Width Divider Position
         );
     }
 
