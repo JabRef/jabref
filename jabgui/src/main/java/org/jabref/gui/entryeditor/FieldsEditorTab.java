@@ -83,6 +83,8 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         this.redoAction = redoAction;
         this.preferences = preferences;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+
+        setContentDrivenVisibility(contentVisibility);
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -196,11 +198,6 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         if (editors.containsKey(fieldName)) {
             editors.get(fieldName).focus();
         }
-    }
-
-    @Override
-    protected ObservableValue<Boolean> contentDrivenVisibility() {
-        return contentVisibility;
     }
 
     @Override

@@ -26,6 +26,7 @@ public class MathSciNetTab extends EntryEditorTab {
 
     public MathSciNetTab() {
         setText(Localization.lang("MathSciNet Review"));
+        setContentDrivenVisibility(contentVisibility);
     }
 
     private Optional<MathSciNetId> getMathSciNetId(BibEntry entry) {
@@ -55,11 +56,6 @@ public class MathSciNetTab extends EntryEditorTab {
             }
         });
         return root;
-    }
-
-    @Override
-    protected ObservableValue<Boolean> contentDrivenVisibility() {
-        return contentVisibility;
     }
 
     @Override

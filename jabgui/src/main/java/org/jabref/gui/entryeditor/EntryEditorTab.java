@@ -19,7 +19,7 @@ public abstract class EntryEditorTab extends Tab {
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryEditorTab.class);
 
     /// Shared always-visible gate. Immutable in value (never set), so it is safe to share across tabs and
-    /// reuse as the default for both {@link #preferenceDrivenVisibility} and {@link #contentDrivenVisibility()}.
+    /// reuse as the default for both {@link #preferenceDrivenVisibility} and {@link #contentDrivenVisibility}.
     private static final ObservableValue<Boolean> ALWAYS_VISIBLE = new SimpleBooleanProperty(true);
 
     /// The entry currently being edited in the editor. Bound by {@link EntryEditorViewModel} to its
@@ -37,7 +37,12 @@ public abstract class EntryEditorTab extends Tab {
     /// {@link EntryEditorTabModel}. Defaults to always-on for tabs created without a model.
     private ObservableValue<Boolean> preferenceDrivenVisibility = ALWAYS_VISIBLE;
 
-    /// Lazily built combination of {@link #preferenceDrivenVisibility} and {@link #contentDrivenVisibility()}.
+    /// Content-driven visibility gate: tabs that only make sense for certain entries supply a value that
+    /// hides them when the current entry has nothing to show, via
+    /// {@link #setContentDrivenVisibility(ObservableValue)} from their constructor. Defaults to always-on.
+    private ObservableValue<Boolean> contentDrivenVisibility = ALWAYS_VISIBLE;
+
+    /// Lazily built combination of {@link #preferenceDrivenVisibility} and {@link #contentDrivenVisibility}.
     private @Nullable ObservableValue<Boolean> combinedVisibility;
 
     public void setPreferenceDrivenVisibility(ObservableValue<Boolean> preferenceDrivenVisibility) {
@@ -45,13 +50,9 @@ public abstract class EntryEditorTab extends Tab {
         this.combinedVisibility = null;
     }
 
-    /// Content-driven visibility: tabs that only make sense for certain entries override this to hide
-    /// themselves when the current entry has nothing to show.
-    ///
-    /// Invoked exactly once, lazily, by {@link #visibility()} and cached there — implementations need not
-    /// memoize. JavaFX Application Thread only; the lazy cache here is not thread-safe.
-    protected ObservableValue<Boolean> contentDrivenVisibility() {
-        return ALWAYS_VISIBLE;
+    protected void setContentDrivenVisibility(ObservableValue<Boolean> contentDrivenVisibility) {
+        this.contentDrivenVisibility = contentDrivenVisibility;
+        this.combinedVisibility = null;
     }
 
     public final ObservableValue<Boolean> visibility() {
@@ -59,7 +60,7 @@ public abstract class EntryEditorTab extends Tab {
         if (combinedVisibility == null) {
             combinedVisibility = EasyBind.combine(
                     preferenceDrivenVisibility,
-                    contentDrivenVisibility(),
+                    contentDrivenVisibility,
                     (preference, content) -> preference && content
             );
         }

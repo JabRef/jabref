@@ -31,14 +31,10 @@ public class FileAnnotationTab extends EntryEditorTab {
         this.contentVisibility = EasyBind.map(
                 currentEntryProperty(),
                 entry -> (entry != null) && entry.getField(StandardField.FILE).isPresent());
+        setContentDrivenVisibility(contentVisibility);
 
         setText(Localization.lang("File annotations"));
         setTooltip(new Tooltip(Localization.lang("Show file annotations")));
-    }
-
-    @Override
-    protected ObservableValue<Boolean> contentDrivenVisibility() {
-        return contentVisibility;
     }
 
     @Override

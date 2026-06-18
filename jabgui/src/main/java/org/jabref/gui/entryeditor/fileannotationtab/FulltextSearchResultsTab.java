@@ -74,6 +74,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                                   .map(query -> query.isValid() && query.getSearchFlags().contains(SearchFlags.FULLTEXT))
                                   .orElse(false),
                 stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH));
+        setContentDrivenVisibility(contentVisibility);
 
         content = new TextFlow();
         ScrollPane scrollPane = new ScrollPane(content);
@@ -84,11 +85,6 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
         // Rebinding is necessary because of re-rendering of highlighting of matched text
         stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).addListener((_, _, _) -> updateSearch());
-    }
-
-    @Override
-    protected ObservableValue<Boolean> contentDrivenVisibility() {
-        return contentVisibility;
     }
 
     @Override
