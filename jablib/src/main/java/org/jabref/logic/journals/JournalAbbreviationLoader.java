@@ -44,7 +44,7 @@ public class JournalAbbreviationLoader {
             LOGGER.warn("No Postgres connection available; using demonstration journal repository");
             return new JournalAbbreviationRepository();
         }
-        
+
         JournalAbbreviationRepository repository;
 
         // Initialize built-in abbreviations in Postgres
