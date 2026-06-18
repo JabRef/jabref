@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ObservableValue;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -97,53 +96,39 @@ public class EntryEditorTabFactory {
         return tabs;
     }
 
-    /// Maps a single {@link EntryEditorTabModel} to its concrete {@link EntryEditorTab} view.
+    /// Maps a single {@link EntryEditorTabModel} to its concrete {@link EntryEditorTab} view, wiring in the
+    /// user-controlled visibility derived from the same model. Customized field-set tabs are always enabled
+    /// (toggled only by adding/removing them); the Preview tab's toggle lives in the preview preferences
+    /// ("show preview as a separate tab"), not in its tab model.
     public EntryEditorTab createTab(EntryEditorTabModel model) {
-        EntryEditorTab tab = switch (model) {
-            case EntryEditorTabModel.FieldSet(
-                    EntryEditorTabModel.BuiltInFieldSet type,
-                    boolean _
-            ) ->
-                    createFieldSetTab(type);
-            case EntryEditorTabModel.CustomizedFieldSet(
-                    String name,
-                    Set<Field> fields
-            ) ->
-                    new UserDefinedFieldsTab(name, fields, undoManager, undoAction, redoAction, preferences, journalAbbreviationRepository, stateManager, previewPanel);
-            case EntryEditorTabModel.Feature(
-                    EntryEditorTabModel.StaticTab type,
-                    boolean _
-            ) ->
-                    createFeatureTab(type);
-        };
-        tab.setPreferenceDrivenVisibility(getVisibility(model));
-        return tab;
-    }
-
-    /// The user-controlled visibility for a tab, derived from its model. Customized field-set tabs are
-    /// always enabled (toggled only by adding/removing them); the Preview tab's toggle lives in the
-    /// preview preferences ("show preview as a separate tab"), not in its tab model.
-    private ObservableValue<Boolean> getVisibility(EntryEditorTabModel model) {
         EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
         return switch (model) {
             case EntryEditorTabModel.FieldSet(
                     EntryEditorTabModel.BuiltInFieldSet type,
                     boolean _
-            ) ->
-                    entryEditorPreferences.fieldSetVisibleProperty(type);
-            case EntryEditorTabModel.CustomizedFieldSet _ ->
-                    new SimpleBooleanProperty(true);
+            ) -> {
+                EntryEditorTab tab = createFieldSetTab(type);
+                tab.setPreferenceDrivenVisibility(entryEditorPreferences.fieldSetVisibleProperty(type));
+                yield tab;
+            }
+            case EntryEditorTabModel.CustomizedFieldSet(
+                    String name,
+                    Set<Field> fields
+            ) -> {
+                EntryEditorTab tab = new UserDefinedFieldsTab(name, fields, undoManager, undoAction, redoAction, preferences, journalAbbreviationRepository, stateManager, previewPanel);
+                tab.setPreferenceDrivenVisibility(new SimpleBooleanProperty(true));
+                yield tab;
+            }
             case EntryEditorTabModel.Feature(
                     EntryEditorTabModel.StaticTab type,
                     boolean _
-            )
-                    when type == EntryEditorTabModel.StaticTab.PREVIEW ->
-                    preferences.getPreviewPreferences().showPreviewAsExtraTabProperty();
-            case EntryEditorTabModel.Feature(
-                    EntryEditorTabModel.StaticTab type,
-                    boolean _
-            ) ->
-                    entryEditorPreferences.staticTabVisibleProperty(type);
+            ) -> {
+                EntryEditorTab tab = createFeatureTab(type);
+                tab.setPreferenceDrivenVisibility(type == EntryEditorTabModel.StaticTab.PREVIEW
+                                                  ? preferences.getPreviewPreferences().showPreviewAsExtraTabProperty()
+                                                  : entryEditorPreferences.staticTabVisibleProperty(type));
+                yield tab;
+            }
         };
     }
 
