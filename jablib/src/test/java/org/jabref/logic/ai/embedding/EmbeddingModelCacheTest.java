@@ -1,5 +1,6 @@
 package org.jabref.logic.ai.embedding;
 
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
@@ -19,11 +20,13 @@ class EmbeddingModelCacheTest {
 
     @BeforeEach
     void setUp() {
+        AiPreferences aiPreferences = mock(AiPreferences.class);
+        when(aiPreferences.getAiFeaturesEnabled()).thenReturn(true);
         NotificationService notificationService = mock(NotificationService.class);
         TaskExecutor taskExecutor = mock(TaskExecutor.class);
         when(taskExecutor.execute(any())).thenReturn(mock(java.util.concurrent.Future.class));
 
-        cache = new EmbeddingModelCache(notificationService, taskExecutor);
+        cache = new EmbeddingModelCache(aiPreferences, notificationService, taskExecutor);
     }
 
     @Test
