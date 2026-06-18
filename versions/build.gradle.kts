@@ -13,6 +13,7 @@ val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
 
 val javafx = "26.0.1"
+val javafx_web = javafx
 
 val lucene = "10.4.0"
 
@@ -34,7 +35,7 @@ dependencies.constraints {
     api("org.openjfx:javafx-fxml:$javafx")
     api("org.openjfx:javafx-graphics:$javafx")
     api("org.openjfx:javafx-swing:$javafx")
-    api("org.openjfx:javafx-web:$javafx")
+    api("org.openjfx:javafx-web:$javafx_web")
     api("org.openjfx:jdk-jsobject:$javafx")
 
     api("cc.jilt:jilt:1.9.1")
