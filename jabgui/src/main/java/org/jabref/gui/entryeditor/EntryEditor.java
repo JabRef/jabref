@@ -57,6 +57,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// GUI component that allows editing of the fields of a BibEntry (i.e. the one that shows up, when you double click on
 /// an entry in the table)
@@ -166,8 +167,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
             BibEntry currentlyEditedEntry = viewModel.getCurrentlyEditedEntry();
 
-            EntryEditorTab activeTab = (EntryEditorTab) tab;
-            if (activeTab != null) {
+            if (tab instanceof EntryEditorTab activeTab) {
                 activeTab.notifyAboutFocus(currentlyEditedEntry != null ? currentlyEditedEntry : new BibEntry());
                 if (activeTab instanceof FieldsEditorTab fieldsTab) {
                     Platform.runLater(() -> focusUtils.setupNavigationForTab(fieldsTab));
@@ -308,7 +308,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         tabSupplier.get().selectNextEntry();
     }
 
-    public BibEntry getCurrentlyEditedEntry() {
+    public @Nullable BibEntry getCurrentlyEditedEntry() {
         return viewModel.getCurrentlyEditedEntry();
     }
 
@@ -350,8 +350,10 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         }
     }
 
-    private EntryEditorTab getSelectedTab() {
-        return (EntryEditorTab) tabbed.getSelectionModel().getSelectedItem();
+    private @Nullable EntryEditorTab getSelectedTab() {
+        return tabbed.getSelectionModel().getSelectedItem() instanceof EntryEditorTab entryEditorTab
+                ? entryEditorTab
+                : null;
     }
 
     private void setupToolBar() {
