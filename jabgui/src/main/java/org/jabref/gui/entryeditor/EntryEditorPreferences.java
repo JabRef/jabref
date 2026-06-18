@@ -67,7 +67,7 @@ public class EntryEditorPreferences {
     private final BooleanProperty showUserCommentsFields;
 
     private EntryEditorPreferences() {
-        this(// Default Entry Editor Tabs
+        this(
                 getDefaultTabModels(),                     // Default Entry Editor Tabs
                 true,                                      // Open editor when a new entry is
                 false,                                     // Show BibTeX source by default
