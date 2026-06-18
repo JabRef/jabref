@@ -25,7 +25,7 @@ Which mapping should JabRef use to convert between entry types and Zotero's item
 
 ## Decision Outcome
 
-Chosen option: Use citation-js's mapping, because it supports more types and the conversion makes more sense. 
+Chosen option: Use citation-js's mapping, because it supports more types and the conversion makes more sense.
 
 ### Consequences
 
@@ -92,7 +92,7 @@ Zotero provides mappings from Zotero item type to BibTeX/BibLaTeX entry type. Ho
 * Good, because citation-js supports more CSL item types/fields than Better BibTeX.
 * Good, because the repository is actively maintained.
 * Good, because citation-js provides mapping logic to deal with different CSL JSON.
-* Good, because some mapping in citation-js make more sense than Better BibTeX. 
+* Good, because some mapping in citation-js make more sense than Better BibTeX.
 * Good, because citation-js is designed specifically for CSL and BibTeX and BibLaTeX interoperability.
 * Good, because citation-js also supports other conversions. e.g. BibLaTeX to RIS.
 * Bad, because Better BibTeX contains many-to-one mappings when converting BibTeX/BibLaTeX entry type to Zotero item type, which may lose information.
