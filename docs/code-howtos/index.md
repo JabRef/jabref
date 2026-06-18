@@ -34,6 +34,18 @@ To test a locally published artifact (e.g., a SNAPSHOT of a dependency), enable 
 
 `mavenLocal()` is also enabled implicitly when overriding the JavaFX version via `-PjavafxVersion=...`, since a custom JavaFX build is typically published to `~/.m2`. You then do not need to set `useMavenLocal` as well.
 
+## Overriding the JavaFX version
+
+The JavaFX version is defined in `versions/build.gradle.kts`.
+To test a different (e.g., locally built) JavaFX, override it via the gradle property `javafxVersion`:
+
+* Pin a version: `./gradlew :jabgui:run -PjavafxVersion=27-ea+1`
+* Use the latest version available (Gradle dynamic version): `./gradlew :jabgui:run -PjavafxVersion=+`
+
+Setting `javafxVersion` enables `mavenLocal()` implicitly, so a JavaFX build published to `~/.m2` is picked up without setting `useMavenLocal`.
+
+The override applies only to the non-web JavaFX modules; `javafx-web` always stays on the default version defined in `versions/build.gradle.kts`.
+
 ## Cleanup and Formatters
 
 We try to build a cleanup mechanism based on formatters. The idea is that we can register these actions in arbitrary places, e.g., onSave, onImport, onExport, cleanup, etc. and apply them to different fields. The formatters themselves are independent of any logic and therefore easy to test.
