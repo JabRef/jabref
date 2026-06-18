@@ -52,7 +52,7 @@ public class AiPrivacyNoticeViewModel extends AbstractViewModel {
     }
 
     public void onPrivacyAgree() {
-        aiPreferences.setEnableAi(true);
+        aiPreferences.setAiFeaturesEnabledCurrently(true);
     }
 
     public void openBrowser(String link) {
@@ -68,7 +68,7 @@ public class AiPrivacyNoticeViewModel extends AbstractViewModel {
         entryEditorPreferences.setStaticTabVisible(EntryEditorTabModel.StaticTab.AI_CHAT, false);
         entryEditorPreferences.setStaticTabVisible(EntryEditorTabModel.StaticTab.AI_SUMMARY, false);
         groupsPreferences.setShowAiChatButton(false);
-        aiPreferences.setEnableAi(false);
+        aiPreferences.setAiFeaturesEnabledCurrently(false);
     }
 
     public ReadOnlyStringProperty embeddingModelSizeProperty() {
