@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -222,7 +221,7 @@ public class EntryEditorViewModel extends AbstractViewModel {
             return;
         }
 
-        List<Tab> wanted = allPossibleTabs.stream().filter(tab -> tab.visibility().getValue()).collect(Collectors.toList());
+        List<EntryEditorTab> wanted = allPossibleTabs.stream().filter(tab -> tab.visibility().getValue()).toList();
         visibleTabs.retainAll(wanted);
 
         for (int i = 0; i < wanted.size(); i++) {

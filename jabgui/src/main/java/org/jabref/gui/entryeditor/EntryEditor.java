@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -152,7 +151,11 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         this.focusUtils = new EntryEditorFocusUtils(tabbed, this);
 
         setupKeyBindings();
+        setupDragAndDrop();
+        setupSubscriptions();
+    }
 
+    private void setupSubscriptions() {
         EasyBind.subscribe(stateManager.activeTabProperty(), tab -> {
             if (tab.isPresent()) {
                 viewModel.rebuildTabs();
@@ -161,8 +164,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 close();
             }
         });
-
-        setupDragAndDrop();
 
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
             BibEntry currentlyEditedEntry = viewModel.getCurrentlyEditedEntry();
@@ -213,7 +214,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
 
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
                 TransferMode transferMode = event.getTransferMode();
-                List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
+                List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).toList();
                 // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
                 // Similar code as org.jabref.gui.externalfiles.ImportHandler.importFilesInBackground
                 DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);

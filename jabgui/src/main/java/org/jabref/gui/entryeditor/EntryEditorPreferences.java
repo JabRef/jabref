@@ -241,8 +241,6 @@ public class EntryEditorPreferences {
         return new EntryEditorPreferences();
     }
 
-    // endregion
-
     public void setAll(EntryEditorPreferences preferences) {
         tabModels.setAll(preferences.getTabModels());
         this.shouldOpenOnNewEntry.set(preferences.shouldOpenOnNewEntry());

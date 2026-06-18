@@ -18,6 +18,10 @@ public abstract class EntryEditorTab extends Tab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryEditorTab.class);
 
+    /// Shared always-visible gate. Immutable in value (never set), so it is safe to share across tabs and
+    /// reuse as the default for both {@link #preferenceDrivenVisibility} and {@link #contentDrivenVisibility()}.
+    private static final ObservableValue<Boolean> ALWAYS_VISIBLE = new SimpleBooleanProperty(true);
+
     /// The entry currently being edited in the editor. Bound by {@link EntryEditorViewModel} to its
     /// currently-edited-entry property for every tab (not only the focused one), so that {@link #visibility()}
     /// can react to entry and entry-type changes. Because it is bound, it must not be set directly.
@@ -31,7 +35,7 @@ public abstract class EntryEditorTab extends Tab {
 
     /// User-controlled visibility gate, injected by {@link EntryEditorTabFactory} from this tab's
     /// {@link EntryEditorTabModel}. Defaults to always-on for tabs created without a model.
-    private ObservableValue<Boolean> preferenceDrivenVisibility = new SimpleBooleanProperty(true);
+    private ObservableValue<Boolean> preferenceDrivenVisibility = ALWAYS_VISIBLE;
 
     /// Lazily built combination of {@link #preferenceDrivenVisibility} and {@link #contentDrivenVisibility()}.
     private @Nullable ObservableValue<Boolean> combinedVisibility;
@@ -43,11 +47,15 @@ public abstract class EntryEditorTab extends Tab {
 
     /// Content-driven visibility: tabs that only make sense for certain entries override this to hide
     /// themselves when the current entry has nothing to show.
+    ///
+    /// Invoked exactly once, lazily, by {@link #visibility()} and cached there — implementations need not
+    /// memoize. JavaFX Application Thread only; the lazy cache here is not thread-safe.
     protected ObservableValue<Boolean> contentDrivenVisibility() {
-        return new SimpleBooleanProperty(true);
+        return ALWAYS_VISIBLE;
     }
 
     public final ObservableValue<Boolean> visibility() {
+        // Built once and cached; JavaFX Application Thread only (no synchronization on the lazy init).
         if (combinedVisibility == null) {
             combinedVisibility = EasyBind.combine(
                     preferenceDrivenVisibility,
