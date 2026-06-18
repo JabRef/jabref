@@ -132,7 +132,7 @@ public final class SummariesMigrationV1 {
                 return;
             }
 
-            LOGGER.info("Starting migration of {} summaries from v1 to v2", oldMap.size());
+            LOGGER.debug("Starting migration of {} summaries from v1 to v2", oldMap.size());
 
             int migratedCount = 0;
             int failedCount = 0;
@@ -167,7 +167,7 @@ public final class SummariesMigrationV1 {
                 }
             }
 
-            LOGGER.info("Successfully migrated {} summaries, {} failed", migratedCount, failedCount);
+            LOGGER.debug("Successfully migrated {} summaries, {} failed", migratedCount, failedCount);
         } catch (Exception e) {
             LOGGER.error("Failed to migrate summaries from v1 to v2", e);
             notificationService.notify(Localization.lang("Failed to migrate AI summaries. See logs for details."));

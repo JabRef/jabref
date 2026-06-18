@@ -481,13 +481,6 @@ public class JabRefCliPreferences implements CliPreferences {
         // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
         // will never be translated.
         Localization.setLanguage(getLanguage());
-
-        // region Git preferences
-        defaults.put(GITHUB_PAT_KEY, "");
-        defaults.put(GITHUB_USERNAME_KEY, "");
-        defaults.put(GITHUB_REMOTE_URL_KEY, "");
-        defaults.put(GITHUB_REMEMBER_PAT_KEY, false);
-        // endregion
     }
 
     /// @deprecated Never ever add a call to this method. There should be only one
@@ -808,6 +801,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getGrobidPreferences().setAll(GrobidPreferences.getDefault());
         getOpenOfficePreferences(Injector.instantiateModelOrService(JournalAbbreviationRepository.class)).setAll(
                 OpenOfficePreferences.getDefault());
+        getGitPreferences().setAll(GitPreferences.getDefault());
     }
 
     /// Imports Preferences from an XML file.
@@ -850,6 +844,7 @@ public class JabRefCliPreferences implements CliPreferences {
         JournalAbbreviationRepository repository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
         getOpenOfficePreferences(repository).setAll(
                 getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
+        getGitPreferences().setAll(getGitPreferencesFromBackingStore(getGitPreferences()));
     }
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
@@ -1768,7 +1763,8 @@ public class JabRefCliPreferences implements CliPreferences {
         EnumSet<CleanupPreferences.CleanupStep> activeJobs;
         if (hasKey(CLEANUP_JOBS)) {
             Set<CleanupPreferences.CleanupStep> parsed = getStringList(CLEANUP_JOBS).stream()
-                                                                                    .map(CleanupPreferences.CleanupStep::valueOf)
+                                                                                    .map(CleanupPreferences.CleanupStep::safeValueOf)
+                                                                                    .flatMap(Optional::stream)
                                                                                     .collect(Collectors.toSet());
             activeJobs = parsed.isEmpty() ? EnumSet.noneOf(CleanupPreferences.CleanupStep.class) : EnumSet.copyOf(parsed);
         } else {
@@ -1873,7 +1869,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         aiPreferences = getAiPreferencesFromBackingStore(AiPreferences.getDefault());
 
-        EasyBind.listen(aiPreferences.enableAiProperty(), (_, _, newValue) -> putBoolean(AI_ENABLED, newValue));
+        EasyBind.listen(aiPreferences.aiFeaturesEnabledCurrentlyProperty(), (_, _, newValue) -> putBoolean(AI_ENABLED, newValue));
         EasyBind.listen(aiPreferences.autoGenerateEmbeddingsProperty(), (_, _, newValue) -> putBoolean(AI_AUTO_GENERATE_EMBEDDINGS, newValue));
         EasyBind.listen(aiPreferences.autoGenerateSummariesProperty(), (_, _, newValue) -> putBoolean(AI_AUTO_GENERATE_SUMMARIES, newValue));
         EasyBind.listen(aiPreferences.generateFollowUpQuestionsProperty(), (_, _, newValue) -> putBoolean(AI_GENERATE_FOLLOW_UP_QUESTIONS, newValue));
@@ -1924,7 +1920,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private AiPreferences getAiPreferencesFromBackingStore(AiPreferences defaults) {
         return new AiPreferences(
-                getBoolean(AI_ENABLED, defaults.getEnableAi()),
+                getBoolean(AI_ENABLED, defaults.getAiFeaturesEnabled()),
                 getBoolean(AI_AUTO_GENERATE_EMBEDDINGS, defaults.getAutoGenerateEmbeddings()),
                 getBoolean(AI_AUTO_GENERATE_SUMMARIES, defaults.getAutoGenerateSummaries()),
                 AiProvider.safeValueOf(get(AI_PROVIDER, defaults.getAiProvider().name())),
@@ -2359,18 +2355,14 @@ public class JabRefCliPreferences implements CliPreferences {
     }
     // endregion
 
+    // region GitPreferences
     @Override
     public GitPreferences getGitPreferences() {
         if (gitPreferences != null) {
             return gitPreferences;
         }
 
-        gitPreferences = new GitPreferences(
-                get(GITHUB_USERNAME_KEY),
-                getGitHubPat(),
-                get(GITHUB_REMOTE_URL_KEY),
-                getBoolean(GITHUB_REMEMBER_PAT_KEY)
-        );
+        gitPreferences = getGitPreferencesFromBackingStore(GitPreferences.getDefault());
 
         EasyBind.listen(gitPreferences.usernameProperty(), (_, _, newVal) -> put(GITHUB_USERNAME_KEY, newVal));
         EasyBind.listen(gitPreferences.patProperty(), (_, _, newVal) -> setGitHubPat(newVal));
@@ -2385,7 +2377,16 @@ public class JabRefCliPreferences implements CliPreferences {
         return gitPreferences;
     }
 
-    // endregion
+    private GitPreferences getGitPreferencesFromBackingStore(GitPreferences defaults) {
+        boolean rememberPat = getBoolean(GITHUB_REMEMBER_PAT_KEY, defaults.getPersistPat());
+
+        return new GitPreferences(
+                get(GITHUB_USERNAME_KEY, defaults.getUsername()),
+                rememberPat ? getGitHubPat().orElse(defaults.getPat()) : defaults.getPat(),
+                get(GITHUB_REMOTE_URL_KEY, defaults.getRepositoryUrl()),
+                rememberPat
+        );
+    }
 
     private static void deleteGitHubPat() {
         try (final Keyring keyring = Keyring.create()) {
@@ -2395,20 +2396,18 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
-    private String getGitHubPat() {
-        if (getBoolean(GITHUB_REMEMBER_PAT_KEY)) {
-            try (final Keyring keyring = Keyring.create()) {
-                return new Password(
-                        keyring.getPassword("org.jabref", "github"),
-                        getInternalPreferences().getUserHostInfo().getUserHostString())
-                        .decrypt();
-            } catch (PasswordAccessException ex) {
-                LOGGER.warn("No GitHub token stored in keyring");
-            } catch (Exception ex) {
-                LOGGER.warn("Could not read GitHub token from keyring", ex);
-            }
+    private Optional<String> getGitHubPat() {
+        try (final Keyring keyring = Keyring.create()) {
+            return Optional.of(new Password(
+                    keyring.getPassword("org.jabref", "github"),
+                    getInternalPreferences().getUserHostInfo().getUserHostString())
+                    .decrypt());
+        } catch (PasswordAccessException ex) {
+            LOGGER.warn("No GitHub token stored in keyring");
+        } catch (Exception ex) {
+            LOGGER.warn("Could not read GitHub token from keyring", ex);
         }
-        return (String) defaults.get(GITHUB_PAT_KEY);
+        return Optional.empty();
     }
 
     private void setGitHubPat(String pat) {
@@ -2427,4 +2426,5 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         }
     }
+    // endregion
 }
