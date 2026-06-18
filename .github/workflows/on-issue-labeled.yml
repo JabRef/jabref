@@ -89,7 +89,7 @@ jobs:
     if: "${{ github.event.label.name == 'good first issue' && github.repository_owner == 'JabRef' }}"
     runs-on: ubuntu-slim
     steps:
-      - uses: awalsh128/cache-apt-pkgs-action@latest
+      - uses: awalsh128/cache-apt-pkgs-action@v1.6.1
         with:
           packages: jq
           version: 1.0
@@ -103,7 +103,7 @@ jobs:
     if: github.event.label.name == 'needs-refinement' && github.repository_owner == 'JabRef'
     runs-on: ubuntu-slim
     steps:
-      - uses: awalsh128/cache-apt-pkgs-action@latest
+      - uses: awalsh128/cache-apt-pkgs-action@v1.6.1
         with:
           packages: jq
           version: 1.0
@@ -118,7 +118,7 @@ jobs:
     if: "${{ github.event.label.name == 'status: freeze' && github.repository_owner == 'JabRef' }}"
     runs-on: ubuntu-slim
     steps:
-      - uses: awalsh128/cache-apt-pkgs-action@latest
+      - uses: awalsh128/cache-apt-pkgs-action@v1.6.1
         with:
           packages: jq
           version: 1.0
