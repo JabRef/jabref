@@ -24,6 +24,14 @@ The main idea is to get instances by using `Injector.instantiateModelOrService(X
 The method `instantiateModelOrService` checks if there is already an instance of the given class. If yes, it returns it. If not, it creates a new one.
 A singleton can be added by `com.airhacks.afterburner.injection.Injector#setModelOrService(X.class, y)`, where X is the class and y the instance you want to inject.
 
+## Using locally published artifacts (mavenLocal)
+
+By default, JabRef does not resolve dependencies from your local Maven repository (`~/.m2`).
+To test a locally published artifact (e.g., a SNAPSHOT of a dependency), enable `mavenLocal()` by setting the gradle property `USE_MAVEN_LOCAL`:
+
+* Command line: `./gradlew build -PUSE_MAVEN_LOCAL=true`
+* Persistent (per user, not versioned): add `USE_MAVEN_LOCAL=true` to `~/.gradle/gradle.properties` (the [Gradle user home](https://docs.gradle.org/current/userguide/directory_layout.html#dir:gradle_user_home), `$GRADLE_USER_HOME`). Do not add it to the project's `gradle.properties` — that file is versioned.
+
 ## Cleanup and Formatters
 
 We try to build a cleanup mechanism based on formatters. The idea is that we can register these actions in arbitrary places, e.g., onSave, onImport, onExport, cleanup, etc. and apply them to different fields. The formatters themselves are independent of any logic and therefore easy to test.

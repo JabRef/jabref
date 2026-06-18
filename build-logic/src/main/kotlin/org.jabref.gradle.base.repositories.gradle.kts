@@ -1,5 +1,7 @@
 repositories {
-    mavenLocal()
+    if (providers.gradleProperty("USE_MAVEN_LOCAL").map(String::toBoolean).getOrElse(false)) {
+        mavenLocal()
+    }
 
     mavenCentral()
 
