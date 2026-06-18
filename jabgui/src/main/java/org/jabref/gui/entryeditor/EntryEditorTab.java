@@ -18,28 +18,20 @@ public abstract class EntryEditorTab extends Tab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryEditorTab.class);
 
-    /// Shared always-visible gate. Immutable in value (never set), so it is safe to share across tabs and
-    /// reuse as the default for both {@link #preferenceDrivenVisibility} and {@link #contentDrivenVisibility}.
     private static final ObservableValue<Boolean> ALWAYS_VISIBLE = new SimpleBooleanProperty(true);
 
-    /// The entry currently being edited in the editor. Bound by {@link EntryEditorViewModel} to its
-    /// currently-edited-entry property for every tab (not only the focused one), so that {@link #visibility()}
-    /// can react to entry and entry-type changes. Because it is bound, it must not be set directly.
+    /// The entry currently being edited in the editor. Bound by {@link EntryEditorViewModel}.
     private final ObjectProperty<@Nullable BibEntry> currentEntry = new SimpleObjectProperty<>();
 
-    /// The entry (and its type) the tab content was last rendered for. Used to rebuild the content lazily on
-    /// focus when the entry or its type changed. Kept separate from {@link #currentEntry} so that pushing a
-    /// new entry into the property does not suppress the lazy rebuild in {@link #notifyAboutFocus(BibEntry)}.
+    /// The entry (and its type) the tab content was last rendered for.
+    /// Tab is lazily rebuild in {@link #notifyAboutFocus(BibEntry)}.
     private @Nullable BibEntry renderedEntry;
     private @Nullable EntryType renderedEntryType;
 
-    /// User-controlled visibility gate, injected by {@link EntryEditorTabFactory} from this tab's
-    /// {@link EntryEditorTabModel}. Defaults to always-on for tabs created without a model.
+    /// User-controlled visibility gate, injected by {@link EntryEditorTabFactory}.
     private ObservableValue<Boolean> preferenceDrivenVisibility = ALWAYS_VISIBLE;
 
-    /// Content-driven visibility gate: tabs that only make sense for certain entries supply a value that
-    /// hides them when the current entry has nothing to show, via
-    /// {@link #setContentDrivenVisibility(ObservableValue)} from their constructor. Defaults to always-on.
+    /// Content-driven visibility gate for tabs that only make sense for certain entries.
     private ObservableValue<Boolean> contentDrivenVisibility = ALWAYS_VISIBLE;
 
     /// Lazily built combination of {@link #preferenceDrivenVisibility} and {@link #contentDrivenVisibility}.
