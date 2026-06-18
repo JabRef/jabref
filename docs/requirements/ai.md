@@ -6,6 +6,7 @@ parent: Requirements
 
 ## Features
 
+- [General](./ai/general.md)
 - [Chatting](./ai/chatting.md)
 - [Answer engines](./ai/answer-engines.md)
 - [Summarization](./ai/summarization.md)
