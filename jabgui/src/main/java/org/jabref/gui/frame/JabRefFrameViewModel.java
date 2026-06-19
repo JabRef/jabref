@@ -35,7 +35,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.groups.GroupsFactory;
+import org.jabref.logic.groups.GroupsHelper;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
@@ -52,7 +52,6 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -233,7 +232,7 @@ public class JabRefFrameViewModel {
                           if (preferences.getRemotePreferences().directHttpImport()) {
                               directImportEntries(parserResult, targetGroup);
                           } else {
-                              addParserResult(parserResult);
+                              addParserResult(parserResult, targetGroup);
                           }
                       })
                       .onFailure(e -> LOGGER.error("Unable to parse provided bibtex {}", importStr, e))
@@ -278,7 +277,9 @@ public class JabRefFrameViewModel {
         List<BibEntry> entries = parserResult.getDatabase().getEntries();
         newImportHandler(databaseContext).importEntries(entries);
         if (StringUtil.isNotBlank(targetGroup)) {
-            assignToGroup(databaseContext, entries, targetGroup);
+            // TODO: if an existing group is not assignable (e.g. a search or automatic group),
+            //       the assignment silently does nothing - no error is reported to the caller.
+            GroupsHelper.assignEntriesToGroup(databaseContext, entries, targetGroup, preferences.getBibEntryPreferences().getKeywordSeparator());
         }
     }
 
@@ -291,21 +292,6 @@ public class JabRefFrameViewModel {
                 stateManager,
                 dialogService,
                 taskExecutor);
-    }
-
-    /// Assigns the imported entries to the group named {@code groupName}, creating it as a
-    /// top-level group if it does not exist yet.
-    ///
-    /// TODO: if an existing group is not assignable (e.g. a search or automatic group),
-    ///       the assignment silently does nothing - no error is reported to the caller.
-    private void assignToGroup(BibDatabaseContext databaseContext, List<BibEntry> entries, String groupName) {
-        GroupTreeNode root = databaseContext.getMetaData().getGroups().orElseGet(() -> {
-            GroupTreeNode newRoot = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
-            databaseContext.getMetaData().setGroups(newRoot);
-            return newRoot;
-        });
-        root.findOrCreateExplicitGroup(groupName, preferences.getBibEntryPreferences().getKeywordSeparator())
-            .addEntriesToGroup(entries);
     }
 
     private void checkForBibInUpperDir() {
@@ -449,6 +435,14 @@ public class JabRefFrameViewModel {
 
     @VisibleForTesting
     void addParserResult(ParserResult parserResult) {
+        addParserResult(parserResult, null);
+    }
+
+    /// @param targetGroup optional group the imported entries are assigned to (e.g. the REST
+    ///                    `?group=` parameter). It pre-selects/falls back to that group in the import
+    ///                    dialog, which creates it (top-level) on confirm if missing. An explicit
+    ///                    pick in the dialog overrides it; cancelling imports nothing.
+    void addParserResult(ParserResult parserResult, @Nullable String targetGroup) {
         LOGGER.trace("Adding the entries to the open tab.");
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
         if (libraryTab == null) {
@@ -467,7 +461,7 @@ public class JabRefFrameViewModel {
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> parserResult);
         ImportCleanup cleanup = ImportCleanup.targeting(libraryTab.getBibDatabaseContext().getMode(), preferences.getFieldPreferences());
         cleanup.doPostCleanup(parserResult.getDatabase().getEntries());
-        ImportEntriesDialog dialog = new ImportEntriesDialog(libraryTab.getBibDatabaseContext(), task);
+        ImportEntriesDialog dialog = new ImportEntriesDialog(libraryTab.getBibDatabaseContext(), task, targetGroup);
 
         dialog.setTitle(Localization.lang("Import"));
         dialogService.showCustomDialogAndWait(dialog);
