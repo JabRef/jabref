@@ -236,7 +236,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         });
 
         hideTab.setOnAction(_ -> {
-            preferences.getEntryEditorPreferences().setStaticTabVisible(EntryEditorTabModel.StaticTab.RELATED_ARTICLES, false);
+            preferences.getEntryEditorPreferences().setTabVisible(EntryEditorTabModel.StaticTab.RELATED_ARTICLES, false);
         });
 
         hbox.getChildren().addAll(button, hideTab);

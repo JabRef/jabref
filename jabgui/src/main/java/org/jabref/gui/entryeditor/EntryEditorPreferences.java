@@ -130,55 +130,22 @@ public class EntryEditorPreferences {
         return tabModels;
     }
 
-    public boolean isFieldSetVisible(EntryEditorTabModel.BuiltInFieldSet fieldSetType) {
-        for (EntryEditorTabModel model : tabModels) {
-            if (model instanceof EntryEditorTabModel.FieldSet(
-                    EntryEditorTabModel.BuiltInFieldSet type,
-                    boolean visible
-            ) && type == fieldSetType) {
-                return visible;
-            }
-        }
-        return false;
+    public boolean isTabVisible(EntryEditorTabModel.TabKey key) {
+        return tabModels.stream()
+                        .filter(model -> model.key().filter(key::equals).isPresent())
+                        .findFirst()
+                        .map(EntryEditorTabModel::isVisible)
+                        .orElse(false);
     }
 
-    public void setFieldSetVisible(EntryEditorTabModel.BuiltInFieldSet fieldSetType, boolean show) {
+    public ObservableValue<Boolean> tabVisibleProperty(EntryEditorTabModel.TabKey key) {
+        return Bindings.createBooleanBinding(() -> isTabVisible(key), tabModels);
+    }
+
+    public void setTabVisible(EntryEditorTabModel.TabKey key, boolean show) {
         for (int i = 0; i < tabModels.size(); i++) {
-            if (tabModels.get(i) instanceof EntryEditorTabModel.FieldSet fieldSet && fieldSet.type() == fieldSetType) {
-                tabModels.set(i, new EntryEditorTabModel.FieldSet(fieldSetType, show));
-                return;
-            }
-        }
-    }
-
-    /// Reactive visibility of a built-in field-set tab, recomputed whenever the tab models change.
-    /// Used by {@link EntryEditorTabFactory} to gate the tab without each tab reaching into preferences.
-    public ObservableValue<Boolean> fieldSetVisibleProperty(EntryEditorTabModel.BuiltInFieldSet fieldSetType) {
-        return Bindings.createBooleanBinding(() -> isFieldSetVisible(fieldSetType), tabModels);
-    }
-
-    /// Reactive visibility of a static (feature) tab, recomputed whenever the tab models change.
-    /// Used by {@link EntryEditorTabFactory} to gate the tab without each tab reaching into preferences.
-    public ObservableValue<Boolean> staticTabVisibleProperty(EntryEditorTabModel.StaticTab tabType) {
-        return Bindings.createBooleanBinding(() -> isStaticTabVisible(tabType), tabModels);
-    }
-
-    public boolean isStaticTabVisible(EntryEditorTabModel.StaticTab tabModel) {
-        for (EntryEditorTabModel model : tabModels) {
-            if (model instanceof EntryEditorTabModel.Feature(
-                    EntryEditorTabModel.StaticTab staticTabModel,
-                    boolean visible
-            ) && staticTabModel == tabModel) {
-                return visible;
-            }
-        }
-        return false;
-    }
-
-    public void setStaticTabVisible(EntryEditorTabModel.StaticTab tab, boolean show) {
-        for (int i = 0; i < tabModels.size(); i++) {
-            if (tabModels.get(i) instanceof EntryEditorTabModel.Feature feature && feature.type() == tab) {
-                tabModels.set(i, new EntryEditorTabModel.Feature(tab, show));
+            if (tabModels.get(i).key().filter(key::equals).isPresent()) {
+                tabModels.set(i, tabModels.get(i).withVisible(show));
                 return;
             }
         }

@@ -108,7 +108,7 @@ public class EntryEditorTabFactory {
                     boolean _
             ) -> {
                 EntryEditorTab tab = createFieldSetTab(type);
-                tab.setPreferenceDrivenVisibility(entryEditorPreferences.fieldSetVisibleProperty(type));
+                tab.setPreferenceDrivenVisibility(entryEditorPreferences.tabVisibleProperty(type));
                 yield tab;
             }
             case EntryEditorTabModel.CustomizedFieldSet(
@@ -126,7 +126,7 @@ public class EntryEditorTabFactory {
                 EntryEditorTab tab = createFeatureTab(type);
                 tab.setPreferenceDrivenVisibility(type == EntryEditorTabModel.StaticTab.PREVIEW
                                                   ? preferences.getPreviewPreferences().showPreviewAsExtraTabProperty()
-                                                  : entryEditorPreferences.staticTabVisibleProperty(type));
+                                                  : entryEditorPreferences.tabVisibleProperty(type));
                 yield tab;
             }
         };

@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.model.entry.field.Field;
@@ -13,6 +14,21 @@ import org.jabref.model.entry.field.Field;
 /// {@link Feature}            — fixed-implementation tab whose only user-facing knob is visibility.
 public sealed interface EntryEditorTabModel
         permits EntryEditorTabModel.FieldSet, EntryEditorTabModel.CustomizedFieldSet, EntryEditorTabModel.Feature {
+
+    /// Stable identity of a visibility-toggleable tab: its enum discriminator
+    /// ({@link BuiltInFieldSet} for {@link FieldSet}, {@link StaticTab} for {@link Feature}). Lets callers
+    /// look up or toggle a tab by key without switching on the record subtype.
+    sealed interface TabKey permits StaticTab, BuiltInFieldSet {
+    }
+
+    /// This tab's key, or empty for {@link CustomizedFieldSet} (always visible, no toggle).
+    Optional<TabKey> key();
+
+    /// Whether this tab is currently shown. {@link CustomizedFieldSet} is always visible.
+    boolean isVisible();
+
+    /// A copy of this tab with the given visibility. No-op for {@link CustomizedFieldSet}.
+    EntryEditorTabModel withVisible(boolean visible);
 
     /// Whether this is the always-present leading Preview feature tab (its visibility is owned by
     /// PreviewPreferences; customized field-set tabs are inserted right after it).
@@ -43,7 +59,7 @@ public sealed interface EntryEditorTabModel
         return lastFieldSet >= 0 ? lastFieldSet + 1 : indexAfterLeadingPreview(models);
     }
 
-    enum StaticTab {
+    enum StaticTab implements TabKey {
         // Always-present leading tab (no field configuration; only visibility)
         PREVIEW,
         RELATED_ARTICLES,
@@ -59,7 +75,7 @@ public sealed interface EntryEditorTabModel
         FULLTEXT_SEARCH_RESULTS
     }
 
-    enum BuiltInFieldSet {
+    enum BuiltInFieldSet implements TabKey {
         REQUIRED_FIELDS,
         IMPORTANT_OPTIONAL_FIELDS,
         DETAIL_OPTIONAL_FIELDS,
@@ -69,15 +85,57 @@ public sealed interface EntryEditorTabModel
 
     record FieldSet(BuiltInFieldSet type, boolean visible)
             implements EntryEditorTabModel {
+        @Override
+        public Optional<TabKey> key() {
+            return Optional.of(type);
+        }
+
+        @Override
+        public boolean isVisible() {
+            return visible;
+        }
+
+        @Override
+        public EntryEditorTabModel withVisible(boolean visible) {
+            return new FieldSet(type, visible);
+        }
     }
 
     /// Always shown; toggled only by being added to or removed from the tab list, so it carries no
     /// visibility flag (unlike {@link FieldSet} and {@link Feature}).
     record CustomizedFieldSet(String name, Set<Field> fields)
             implements EntryEditorTabModel {
+        @Override
+        public Optional<TabKey> key() {
+            return Optional.empty();
+        }
+
+        @Override
+        public boolean isVisible() {
+            return true;
+        }
+
+        @Override
+        public EntryEditorTabModel withVisible(boolean visible) {
+            return this;
+        }
     }
 
     record Feature(StaticTab type, boolean visible)
             implements EntryEditorTabModel {
+        @Override
+        public Optional<TabKey> key() {
+            return Optional.of(type);
+        }
+
+        @Override
+        public boolean isVisible() {
+            return visible;
+        }
+
+        @Override
+        public EntryEditorTabModel withVisible(boolean visible) {
+            return new Feature(type, visible);
+        }
     }
 }

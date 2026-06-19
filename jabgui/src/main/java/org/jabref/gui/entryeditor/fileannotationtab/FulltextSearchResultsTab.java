@@ -130,8 +130,6 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                 }
             }
         });
-        // Tab visibility re-syncs reactively: contentVisibility() is bound to the active search query,
-        // and the entry editor observes shouldShow() for every tab.
     }
 
     private Text createFileLink(LinkedFile linkedFile) {

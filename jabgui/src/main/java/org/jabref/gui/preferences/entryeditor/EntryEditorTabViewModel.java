@@ -214,17 +214,10 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         entryEditorPreferences.setCitationCountFetcherType(citationCountFetcherTypeProperty.getValue());
         abbreviationPreferences.setShouldEnableMscKeywordDescriptions(enableMscKeywordDescriptionsProperty.getValue());
 
-        // Write feature- and built-in field-set-tab visibility from working copy
-        for (EntryEditorTabModel config : tabModels) {
-            switch (config) {
-                case EntryEditorTabModel.Feature feature ->
-                        entryEditorPreferences.setStaticTabVisible(feature.type(), feature.visible());
-                case EntryEditorTabModel.FieldSet fieldSet ->
-                        entryEditorPreferences.setFieldSetVisible(fieldSet.type(), fieldSet.visible());
-                case EntryEditorTabModel.CustomizedFieldSet ignored -> {
-                    // handled below
-                }
-            }
+        // Write feature- and built-in field-set-tab visibility from working copy. Customized field-set
+        // Tabs have no key (always visible) and are persisted separately below.
+        for (EntryEditorTabModel tabModel : tabModels) {
+            tabModel.key().ifPresent(key -> entryEditorPreferences.setTabVisible(key, tabModel.isVisible()));
         }
 
         // Write customized field-set tabs. The currently selected one may have pending edits that have
