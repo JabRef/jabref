@@ -269,6 +269,15 @@ tasks.javadoc {
     }
 }
 
+jmh {
+    warmupIterations = 5
+    iterations = 10
+    fork = 2
+    zip64  = true
+}
+
+val testSourceSet = sourceSets.test.get()
+
 tasks.test {
     useJUnitPlatform {
         excludeTags("DatabaseTest", "FetcherTest")
@@ -284,21 +293,18 @@ tasks.test {
     }
 }
 
-jmh {
-    warmupIterations = 5
-    iterations = 10
-    fork = 2
-    zip64  = true
-}
-
-val testSourceSet = sourceSets.test.get()
-
 tasks.register<Test>("fetcherTest") {
     group = LifecycleBasePlugin.VERIFICATION_GROUP
     testClassesDirs = testSourceSet.output.classesDirs
     classpath = testSourceSet.runtimeClasspath
     useJUnitPlatform {
         includeTags("FetcherTest")
+    }
+    testLogging {
+        events("FAILED")
+        exceptionFormat = TestExceptionFormat.FULL
+        showCauses = true
+        showStackTraces = true
     }
     maxParallelForks = 1
 }
