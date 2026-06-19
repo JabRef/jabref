@@ -5,8 +5,10 @@ import java.util.EnumSet;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.icon.JabRefSvgIcon;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
@@ -175,6 +177,38 @@ class GroupNodeViewModelTest {
 
         assertEquals(databaseContext.getEntries(), model.getGroupNode().getEntriesInGroup(databaseContext.getEntries()));
         assertEquals(groupName, entry.getField(StandardField.GROUPS).get());
+    }
+
+    @Test
+    void getIconPrefersJabRefSvgIcon() {
+        ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
+        group.setIconName("example_svg_star");
+
+        GroupNodeViewModel model = getViewModelForGroup(group);
+        Node graphicNode = model.getIcon().getGraphicNode();
+
+        assertEquals("EXAMPLE_SVG_STAR", model.getIcon().name());
+        assertEquals(JabRefSvgIcon.class, graphicNode.getClass());
+    }
+
+    @Test
+    void getIconResolvesPersistedLowerCaseJabRefIconName() {
+        ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
+        group.setIconName("close");
+
+        GroupNodeViewModel model = getViewModelForGroup(group);
+
+        assertEquals("CLOSE_CIRCLE", model.getIcon().name());
+    }
+
+    @Test
+    void getIconResolvesLegacyPersistedIkonliName() {
+        ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
+        group.setIconName("close_circle");
+
+        GroupNodeViewModel model = getViewModelForGroup(group);
+
+        assertEquals("CLOSE_CIRCLE", model.getIcon().name());
     }
 
     private GroupNodeViewModel getViewModelForGroup(AbstractGroup group) {
