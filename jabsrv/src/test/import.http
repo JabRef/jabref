@@ -20,7 +20,7 @@ GET http://localhost:23119/libraries
 
 ###
 
-@libraryId = Chocolate.bib-6a732609
+@libraryId = demo
 
 ### Add BibTeX to the active library (`current`)
 
@@ -112,7 +112,7 @@ Content-Type: application/x-bibtex
 
 ### Add empty BibTeX -> 400 Bad Request
 
-POST http://localhost:23119/libraries/current/entries
+POST http://localhost:23119/libraries/{{libraryId}}/entries
 Content-Type: application/x-bibtex
 
 
@@ -125,14 +125,7 @@ Content-Type: application/x-bibtex
 //
 // Copy the `parserCacheKey` from the lookup response into `@cacheKey` before running step 2.
 
-### Step 1: look up a citation against the active library
-
-POST http://localhost:23119/libraries/current/citations/lookup
-Content-Type: text/plain
-
-Smith, J. (2020). On the nature of chocolate. Journal of Sweets, 12(3), 45-67.
-
-### Step 1 (variant): look up against a specific open library
+### Step 1: look up a citation
 
 POST http://localhost:23119/libraries/{{libraryId}}/citations/lookup
 Content-Type: text/plain
