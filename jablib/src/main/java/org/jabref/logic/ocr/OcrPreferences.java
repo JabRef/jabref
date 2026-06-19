@@ -6,6 +6,10 @@ import javafx.beans.property.StringProperty;
 public class OcrPreferences {
     private final StringProperty ocrPath;
 
+    private OcrPreferences() {
+        this("ocrmypdf");
+    }
+
     public OcrPreferences(String ocrPath) {
         this.ocrPath = new SimpleStringProperty(ocrPath);
     }
@@ -23,7 +27,7 @@ public class OcrPreferences {
     }
 
     public static OcrPreferences getDefault() {
-        return new OcrPreferences("ocrmypdf");
+        return new OcrPreferences();
     }
 
     public void setAll(OcrPreferences preferences) {
