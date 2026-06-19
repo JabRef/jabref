@@ -5,7 +5,9 @@ runs:
   steps:
     - name: Install EA JBang
       shell: bash
-      run: curl -Ls https://sh.jbang.dev | JBANG_DOWNLOAD_VERSION=early-access bash -s - app setup --force
+      run: |
+        rm -f "$HOME/.jbang/bin/jbang" "$HOME/.jbang/bin/jbang.jar"
+        curl -Ls https://sh.jbang.dev | JBANG_DOWNLOAD_VERSION=early-access bash -s - app setup
     - run: jbang --version
       shell: bash
     - name: Build .jbang scripts
