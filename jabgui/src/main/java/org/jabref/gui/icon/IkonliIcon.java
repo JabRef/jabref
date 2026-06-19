@@ -75,7 +75,12 @@ public final class IkonliIcon implements JabRefIcon {
         }
 
         private static Map<String, Ikon> loadMap() {
-            return ALL.stream().collect(Collectors.toUnmodifiableMap(Ikon::toString, ikon -> ikon));
+            return ALL.stream()
+                      .collect(Collectors.toUnmodifiableMap(
+                              Ikon::toString,
+                              ikon -> ikon,
+                              (existing, duplicate) -> existing
+                      ));
         }
     }
 
