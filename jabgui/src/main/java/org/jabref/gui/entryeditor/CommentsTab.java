@@ -57,7 +57,7 @@ public class CommentsTab extends FieldsEditorTab {
                 stateManager,
                 previewPanel);
         this.defaultOwner = preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "-");
-        setText(Localization.lang("Comments"));
+        setText(EntryEditorTabModel.BuiltIn.COMMENTS.displayName());
         setGraphic(IconTheme.JabRefIcons.COMMENT.getGraphicNode());
 
         userSpecificCommentField = new UserSpecificCommentField(defaultOwner);

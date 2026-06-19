@@ -51,7 +51,7 @@ public class LatexCitationsTab extends EntryEditorTab {
         this.progressIndicator = new ProgressIndicator();
         this.citationsDisplay = new CitationsDisplay();
 
-        setText(Localization.lang("LaTeX citations"));
+        setText(EntryEditorTabModel.BuiltIn.LATEX_CITATIONS.displayName());
         setTooltip(new Tooltip(Localization.lang("Search citations for this entry in LaTeX files")));
         setGraphic(IconTheme.JabRefIcons.LATEX_CITATIONS.getGraphicNode());
         setSearchPane();

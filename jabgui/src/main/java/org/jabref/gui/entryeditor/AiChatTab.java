@@ -21,7 +21,7 @@ public class AiChatTab extends EntryEditorTab {
     ) {
         this.stateManager = stateManager;
 
-        setText(Localization.lang("AI chat"));
+        setText(EntryEditorTabModel.BuiltIn.AI_CHAT.displayName());
         setTooltip(new Tooltip(Localization.lang("Chat with AI about content of attached file(s)")));
         setContent(aiEntryChatView);
     }

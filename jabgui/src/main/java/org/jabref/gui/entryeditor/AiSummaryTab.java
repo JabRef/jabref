@@ -24,7 +24,7 @@ public class AiSummaryTab extends EntryEditorTab {
 
         this.aiSummaryView = new AiSummaryView();
 
-        setText(Localization.lang("AI summary"));
+        setText(EntryEditorTabModel.BuiltIn.AI_SUMMARY.displayName());
         setTooltip(new Tooltip(Localization.lang("AI-generated summary of attached file(s)")));
         setContent(aiSummaryView);
     }

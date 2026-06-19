@@ -59,6 +59,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
+import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.MainTableTooltip;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
@@ -143,7 +144,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.taskExecutor = taskExecutor;
         this.undoManager = undoManager;
         this.stateManager = stateManager;
-        setText(Localization.lang("Citations"));
+        setText(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION.displayName());
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
         setId("citationRelationsTab");
 

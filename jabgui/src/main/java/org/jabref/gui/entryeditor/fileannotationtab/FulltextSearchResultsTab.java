@@ -24,6 +24,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.documentviewer.DocumentViewerView;
 import org.jabref.gui.entryeditor.EntryEditorTab;
+import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.maintable.OpenFolderAction;
 import org.jabref.gui.maintable.OpenSingleExternalFileAction;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -80,7 +81,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         scrollPane.setFitToWidth(true);
         content.setPadding(new Insets(10));
         setContent(scrollPane);
-        setText(Localization.lang("Search results"));
+        setText(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS.displayName());
 
         // Rebinding is necessary because of re-rendering of highlighting of matched text
         stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).addListener((_, _, _) -> updateSearch());

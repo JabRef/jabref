@@ -5,6 +5,7 @@ import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.EntryEditorTab;
+import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
@@ -27,7 +28,7 @@ public class FileAnnotationTab extends EntryEditorTab {
                 currentEntryProperty(),
                 entry -> (entry != null) && entry.getField(StandardField.FILE).isPresent()));
 
-        setText(Localization.lang("File annotations"));
+        setText(EntryEditorTabModel.BuiltIn.FILE_ANNOTATIONS.displayName());
         setTooltip(new Tooltip(Localization.lang("Show file annotations")));
     }
 

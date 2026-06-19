@@ -61,7 +61,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
         this.preferences = preferences;
 
-        setText(Localization.lang("Related articles"));
+        setText(EntryEditorTabModel.BuiltIn.RELATED_ARTICLES.displayName());
         setTooltip(new Tooltip(Localization.lang("Related articles")));
     }
 
