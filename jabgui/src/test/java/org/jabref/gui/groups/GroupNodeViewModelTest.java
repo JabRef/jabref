@@ -201,6 +201,16 @@ class GroupNodeViewModelTest {
         assertEquals("CLOSE_CIRCLE", model.getIcon().name());
     }
 
+    @Test
+    void getIconResolvesLegacyPersistedIkonliName() {
+        ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
+        group.setIconName("close_circle");
+
+        GroupNodeViewModel model = getViewModelForGroup(group);
+
+        assertEquals("CLOSE_CIRCLE", model.getIcon().name());
+    }
+
     private GroupNodeViewModel getViewModelForGroup(AbstractGroup group) {
         return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferences);
     }

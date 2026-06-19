@@ -79,10 +79,15 @@ public class IconTheme {
     }
 
     public static Optional<JabRefIcon> findJabRefIcon(String iconCode) {
+        String normalizedIconCode = iconCode.toUpperCase(Locale.ENGLISH);
+
         try {
-            return Optional.of(JabRefIcons.valueOf(iconCode.toUpperCase(Locale.ENGLISH)));
+            return Optional.of(JabRefIcons.valueOf(normalizedIconCode));
         } catch (IllegalArgumentException ignored) {
-            return Optional.empty();
+            return java.util.Arrays.stream(JabRefIcons.values())
+                                   .filter(icon -> icon.matchesPersistedName(normalizedIconCode))
+                                   .findFirst()
+                                   .map(JabRefIcon.class::cast);
         }
     }
 
@@ -365,6 +370,10 @@ public class IconTheme {
         @Override
         public JabRefIcon disabled() {
             return icon.disabled();
+        }
+
+        private boolean matchesPersistedName(String persistedIconName) {
+            return name().equals(persistedIconName) || icon.name().equalsIgnoreCase(persistedIconName);
         }
     }
 }
