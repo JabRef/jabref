@@ -1,0 +1,151 @@
+// Import/Creation
+
+// All creation endpoints work in UI (GUI) mode only — they hand the parsed entry to the
+// running JabRef instance, which appends it to a real open tab.
+//
+// The `{id}` path segment selects the *target* library:
+//   * `current`                       -> the currently active tab (no tab switch)
+//   * `<filename>-<uniquePrefix>`      -> that specific open library; JabRef switches to its
+//                                         tab first, then appends (see the `### Get the list of
+//                                         all libraries` request above for the exact ids)
+//   * an unknown / closed id          -> 404 Not Found
+//
+// To target a specific library, run `GET /libraries`, copy the id of the library you want, and
+// paste it into the `@libraryId` variable below. IntelliJ's HTTP client substitutes it into the
+// `{{libraryId}}` placeholders. The demo id is shown as an example; replace it with one of yours.
+
+###
+
+GET http://localhost:23119/libraries
+
+@libraryId = Chocolate.bib-6a732609
+
+### Add BibTeX to the active library (`current`)
+
+POST http://localhost:23119/libraries/current/entries
+Content-Type: application/x-bibtex
+
+@article{demo,
+  title = {Added by REST}
+}
+
+### Add BibTeX to a specific open library (switches to its tab first)
+
+POST http://localhost:23119/libraries/{{libraryId}}/entries
+Content-Type: application/x-bibtex
+
+@article{demoTargeted,
+  title = {Added by REST to a specific library}
+}
+
+### Add BibTeX and also assign it to a group (created if missing)
+
+// The `group` query parameter additionally files the entry under a top-level group of that name.
+
+POST http://localhost:23119/libraries/current/entries?group=Imported%20via%20REST
+Content-Type: application/x-bibtex
+
+@article{demoGrouped,
+  title = {Added by REST and grouped}
+}
+
+### Add a plain-text citation (parsed via the configured plain-citation parser)
+
+// Consumes text/plain. The text is run through the parser selected in
+// Preferences > Import (e.g. Grobid or the LLM parser), then appended.
+
+POST http://localhost:23119/libraries/current/entries
+Content-Type: text/plain
+
+Smith, J. (2020). On the nature of chocolate. Journal of Sweets, 12(3), 45-67.
+
+### Import RIS to the active library (`current`)
+
+// Any content type other than BibTeX / text/plain is written to a temp file and imported
+// through JabRef's format detection — RIS, EndNote, etc. all take this path.
+
+POST http://localhost:23119/libraries/current/entries
+Content-Type: application/x-research-info-systems
+
+TY  - CHAP
+PY  - 2015
+Y1  - 2015/09/10
+Y2  - 2015/11/06
+M1  - 0
+DO  - doi:10.1201/b19107-2
+UR  - http://dx.doi.org/10.1201/b19107-2
+N1  - doi:10.1201/b19107-2
+AU  - Catarina Barata
+AU  - MEmre Celebi
+AU  - JorgeS Marques
+SP  - 1-22
+TI  - Toward a Robust Analysis of Dermoscopy Images Acquired under Different Conditions
+T2  - Dermoscopy Image Analysis
+T3  - Digital Imaging and Computer Vision
+SN  - 978-1-4822-5326-9
+PB  - CRC Press
+ER  -
+
+### Import RIS to a specific open library
+
+POST http://localhost:23119/libraries/{{libraryId}}/entries
+Content-Type: application/x-research-info-systems
+
+TY  - JOUR
+AU  - Doe, Jane
+TI  - Targeted RIS import
+PY  - 2021
+ER  -
+
+###
+
+# Creation — error cases
+
+### Add to an unknown library id -> 404 Not Found
+
+POST http://localhost:23119/libraries/does-not-exist/entries
+Content-Type: application/x-bibtex
+
+@article{x, title = {nope}}
+
+### Add empty BibTeX -> 400 Bad Request
+
+POST http://localhost:23119/libraries/current/entries
+Content-Type: application/x-bibtex
+
+
+## Cached plain-citation lookup, then add
+
+// Two-step flow so the (possibly expensive) parse happens once:
+//   1. POST .../citations/lookup parses the text, reports whether it already exists in the
+//      target / other open libraries, and returns a `parserCacheKey`.
+//   2. POST .../citations/<parserCacheKey> appends the cached parse to the target library.
+//
+// Copy the `parserCacheKey` from the lookup response into `@cacheKey` before running step 2.
+
+### Step 1: look up a citation against the active library
+
+POST http://localhost:23119/libraries/current/citations/lookup
+Content-Type: text/plain
+
+Smith, J. (2020). On the nature of chocolate. Journal of Sweets, 12(3), 45-67.
+
+### Step 1 (variant): look up against a specific open library
+
+POST http://localhost:23119/libraries/{{libraryId}}/citations/lookup
+Content-Type: text/plain
+
+Smith, J. (2020). On the nature of chocolate. Journal of Sweets, 12(3), 45-67.
+
+### Step 2: add the cached citation (201 Created; 200 already-exists; 410 Gone if expired)
+
+@cacheKey = paste-parserCacheKey-from-the-lookup-response
+
+POST http://localhost:23119/libraries/current/citations/{{cacheKey}}
+
+### Lookup against an unknown library id -> 404 Not Found
+
+POST http://localhost:23119/libraries/does-not-exist/citations/lookup
+Content-Type: text/plain
+
+Smith, J. (2020). On the nature of chocolate. Journal of Sweets, 12(3), 45-67.
