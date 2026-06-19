@@ -21,6 +21,7 @@ import tools.maran.svgnode.SvgNode;
 ///
 /// Bridges three CSS properties (which font icons already honor) onto this node:
 /// - {@code -fx-icon-color} → {@link #setSvgColor(Paint)}
+/// - {@code -glyph-size} (Ikonli alias used in existing theme CSS) → {@link #setSize(double)}
 /// - {@code -fx-icon-size} (absolute, e.g. {@code .action-icon}) → {@link #setSize(double)}
 /// - {@code -fx-font-size} (em, e.g. {@code .mainToolbar} at {@code 1.7em}) → {@link #setSize(double)}, resolved
 ///   against the ambient context font so it matches neighboring font icons
@@ -56,6 +57,19 @@ public class JabRefSvgIcon extends SvgNode {
                 }
             };
 
+    private static final CssMetaData<JabRefSvgIcon, Number> GLYPH_SIZE =
+            new CssMetaData<>("-glyph-size", SizeConverter.getInstance()) {
+                @Override
+                public boolean isSettable(JabRefSvgIcon node) {
+                    return !node.glyphSize.isBound();
+                }
+
+                @Override
+                public StyleableProperty<Number> getStyleableProperty(JabRefSvgIcon node) {
+                    return node.glyphSize;
+                }
+            };
+
     private static final CssMetaData<JabRefSvgIcon, Number> FONT_SIZE =
             new CssMetaData<>("-fx-font-size", SizeConverter.getInstance()) {
                 @Override
@@ -74,6 +88,7 @@ public class JabRefSvgIcon extends SvgNode {
     static {
         List<CssMetaData<? extends Styleable, ?>> metaData = new ArrayList<>(Parent.getClassCssMetaData());
         metaData.add(ICON_COLOR);
+        metaData.add(GLYPH_SIZE);
         metaData.add(ICON_SIZE);
         metaData.add(FONT_SIZE);
         CSS_META_DATA = Collections.unmodifiableList(metaData);
@@ -98,6 +113,14 @@ public class JabRefSvgIcon extends SvgNode {
                 }
             };
 
+    private final StyleableObjectProperty<Number> glyphSize =
+            new SimpleStyleableObjectProperty<>(GLYPH_SIZE, this, "glyphSize") {
+                @Override
+                protected void invalidated() {
+                    updateSize();
+                }
+            };
+
     private final StyleableObjectProperty<Number> fontSize =
             new SimpleStyleableObjectProperty<>(FONT_SIZE, this, "fontSize") {
                 @Override
@@ -114,7 +137,7 @@ public class JabRefSvgIcon extends SvgNode {
     /// Applies the CSS-resolved size, preferring an explicit {@code -fx-icon-size} over an em {@code -fx-font-size}.
     /// When neither is set by CSS, the constructor/programmatic size is left untouched.
     private void updateSize() {
-        Number size = iconSize.get() != null ? iconSize.get() : fontSize.get();
+        Number size = iconSize.get() != null ? iconSize.get() : glyphSize.get() != null ? glyphSize.get() : fontSize.get();
         if (size != null) {
             setSize(size.doubleValue());
         }
