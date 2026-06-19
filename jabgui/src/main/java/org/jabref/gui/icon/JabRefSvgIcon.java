@@ -20,15 +20,15 @@ import tools.maran.svgnode.SvgNode;
 /// special styling.
 ///
 /// Bridges three CSS properties (which font icons already honor) onto this node:
-/// - {@code -fx-icon-color} → {@link #setSvgColor(Paint)}
-/// - {@code -glyph-size} (Ikonli alias used in existing theme CSS) → {@link #setSize(double)}
-/// - {@code -fx-icon-size} (absolute, e.g. {@code .action-icon}) → {@link #setSize(double)}
-/// - {@code -fx-font-size} (em, e.g. {@code .mainToolbar} at {@code 1.7em}) → {@link #setSize(double)}, resolved
+/// - `-fx-icon-color` → [#setSvgColor(Paint)]
+/// - `-glyph-size` (Ikonli alias used in existing theme CSS) → [#setSize(double)]
+/// - `-fx-icon-size` (absolute, e.g. `.action-icon`) → [#setSize(double)]
+/// - `-fx-font-size` (em, e.g. `.mainToolbar` at `1.7em`) → [#setSize(double)], resolved
 ///   against the ambient context font so it matches neighboring font icons
 ///
-/// Tagged with the {@code glyph-icon} and {@code ikonli-font-icon} style classes so existing selectors match it.
-/// Works whether used bare (via {@link JabRefIcon#getGraphicNode()}, as in the toolbar/menus) or inside a
-/// {@link JabRefIconView}. {@code -fx-icon-size}, when present, takes precedence over {@code -fx-font-size}.
+/// Tagged with the `glyph-icon` and `ikonli-font-icon` style classes so existing selectors match it.
+/// Works whether used bare (via [JabRefIcon#getGraphicNode()], as in the toolbar/menus) or inside a
+/// [JabRefIconView]. `-fx-icon-size`, when present, takes precedence over `-fx-font-size`.
 public class JabRefSvgIcon extends SvgNode {
 
     private static final CssMetaData<JabRefSvgIcon, Paint> ICON_COLOR =
