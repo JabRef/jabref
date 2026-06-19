@@ -18,6 +18,8 @@
 
 GET http://localhost:23119/libraries
 
+###
+
 @libraryId = Chocolate.bib-6a732609
 
 ### Add BibTeX to the active library (`current`)
