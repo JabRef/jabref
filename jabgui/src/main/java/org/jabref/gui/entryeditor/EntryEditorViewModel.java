@@ -185,10 +185,8 @@ public class EntryEditorViewModel extends AbstractViewModel {
     /// Recreates every possible tab and re-renders the visible set. Called by the View when the active library
     /// tab changes, and internally when the configured tab models change.
     public void rebuildTabs() {
-        shouldShowSubscriptions.forEach(Subscription::unsubscribe);
-        shouldShowSubscriptions.clear();
+        disposeTabs();
 
-        allPossibleTabs.clear();
         allPossibleTabs.addAll(tabFactory.createTabs());
         sourceTab = allPossibleTabs.stream()
                                    .filter(SourceTab.class::isInstance)
@@ -207,10 +205,17 @@ public class EntryEditorViewModel extends AbstractViewModel {
 
     /// Tears down the tab state when no entry is being edited (e.g. the last library was closed).
     public void clearTabs() {
+        disposeTabs();
+        visibleTabs.clear();
+    }
+
+    /// Unsubscribes the visibility listeners and unbinds each tab's entry property before the old tab
+    /// instances are dropped, so discarded tabs are not kept alive by the binding to {@code currentlyEditedEntry}.
+    private void disposeTabs() {
         shouldShowSubscriptions.forEach(Subscription::unsubscribe);
         shouldShowSubscriptions.clear();
+        allPossibleTabs.forEach(tab -> tab.currentEntryProperty().unbind());
         allPossibleTabs.clear();
-        visibleTabs.clear();
     }
 
     /// Adds/removes incrementally instead of replacing the whole list, to preserve order without triggering
