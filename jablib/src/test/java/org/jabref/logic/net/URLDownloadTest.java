@@ -65,10 +65,11 @@ class URLDownloadTest {
 
     @Test
     void downloadToTemporaryFileKeepsName() throws MalformedURLException, FetcherException {
-        URLDownload robots = new URLDownload(URLUtil.create("https://httpbin.org/robots.txt"));
-
-        String path = robots.toTemporaryFile().toString();
-        assertTrue(path.contains("robots"), path);
+        URLDownload robots = new URLDownload(URLUtil.create("https://files.jabref.org/download-test.txt"));
+        Path path = robots.toTemporaryFile();
+        String fileName = path.getFileName().toString();
+        // fileName is something like jabref-download-test8822989014397910829.txt; thus we cannot use assertEquals
+        assertTrue(fileName.contains("download-test"));
     }
 
     @Test
