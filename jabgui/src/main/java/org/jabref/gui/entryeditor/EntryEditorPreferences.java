@@ -181,13 +181,10 @@ public class EntryEditorPreferences {
 
     public boolean isTabVisible(EntryEditorTabModel.BuiltIn key) {
         return tabModels.stream()
-                        .filter(model -> model instanceof EntryEditorTabModel.BuiltInTab(
+                        .anyMatch(model -> model instanceof EntryEditorTabModel.BuiltInTab(
                                 EntryEditorTabModel.BuiltIn type,
-                                boolean _
-                        ) && type == key)
-                        .findFirst()
-                        .map(EntryEditorTabModel::isVisible)
-                        .orElse(false);
+                                boolean visible
+                        ) && type == key && visible);
     }
 
     public ObservableValue<Boolean> tabVisibleProperty(EntryEditorTabModel.BuiltIn tabModel) {
