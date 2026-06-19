@@ -13,6 +13,8 @@ CLAUDE.md
 .gemini
 GEMINI.md
 
+.github/code-review-graph.instruction.md
+
 .kiro
 
 .opencode.json
