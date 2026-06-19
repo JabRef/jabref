@@ -157,6 +157,24 @@ public class EntryEditorPreferences {
         return defaultGeneralFields;
     }
 
+    public static EntryEditorPreferences getDefault() {
+        return new EntryEditorPreferences();
+    }
+
+    public void setAll(EntryEditorPreferences preferences) {
+        tabModels.setAll(preferences.getTabModels());
+        this.shouldOpenOnNewEntry.set(preferences.shouldOpenOnNewEntry());
+        this.showSourceTabByDefault.set(preferences.showSourceTabByDefault());
+        this.enableValidation.set(preferences.shouldEnableValidation());
+        this.allowIntegerEditionBibtex.set(preferences.shouldAllowIntegerEditionBibtex());
+        this.autoLinkFiles.set(preferences.autoLinkFilesEnabled());
+        this.enablementStatus.set(preferences.shouldEnableJournalPopup());
+        this.citationFetcherType.set(preferences.getCitationFetcherType());
+        this.citationCountFetcherType.set(preferences.getCitationCountFetcherType());
+        this.showUserCommentsFields.set(preferences.shouldShowUserCommentsFields());
+        this.previewWidthDividerPosition.set(preferences.getPreviewWidthDividerPosition());
+    }
+
     public ObservableList<EntryEditorTabModel> getTabModels() {
         return tabModels;
     }
@@ -185,8 +203,11 @@ public class EntryEditorPreferences {
     public Map<String, Set<Field>> getCustomizedFieldSets() {
         SequencedMap<String, Set<Field>> map = new LinkedHashMap<>();
         for (EntryEditorTabModel model : tabModels) {
-            if (model instanceof EntryEditorTabModel.CustomizedFieldSet fieldSet) {
-                map.put(fieldSet.name(), fieldSet.fields());
+            if (model instanceof EntryEditorTabModel.CustomizedFieldSet(
+                    String name,
+                    Set<Field> fields
+            )) {
+                map.put(name, fields);
             }
         }
         return map;
@@ -203,24 +224,6 @@ public class EntryEditorPreferences {
 
         // Customized field-set tabs sit right after the built-in field-set tabs
         this.tabModels.addAll(EntryEditorTabModel.indexAfterBuiltInFieldSets(this.tabModels), newFieldSet);
-    }
-
-    public static EntryEditorPreferences getDefault() {
-        return new EntryEditorPreferences();
-    }
-
-    public void setAll(EntryEditorPreferences preferences) {
-        tabModels.setAll(preferences.getTabModels());
-        this.shouldOpenOnNewEntry.set(preferences.shouldOpenOnNewEntry());
-        this.showSourceTabByDefault.set(preferences.showSourceTabByDefault());
-        this.enableValidation.set(preferences.shouldEnableValidation());
-        this.allowIntegerEditionBibtex.set(preferences.shouldAllowIntegerEditionBibtex());
-        this.autoLinkFiles.set(preferences.autoLinkFilesEnabled());
-        this.enablementStatus.set(preferences.shouldEnableJournalPopup());
-        this.citationFetcherType.set(preferences.getCitationFetcherType());
-        this.citationCountFetcherType.set(preferences.getCitationCountFetcherType());
-        this.showUserCommentsFields.set(preferences.shouldShowUserCommentsFields());
-        this.previewWidthDividerPosition.set(preferences.getPreviewWidthDividerPosition());
     }
 
     public boolean shouldOpenOnNewEntry() {
@@ -299,24 +302,24 @@ public class EntryEditorPreferences {
         return citationFetcherType.get();
     }
 
-    public void setCitationFetcherType(CitationFetcherType citationFetcherType) {
-        this.citationFetcherType.set(citationFetcherType);
-    }
-
     public ObjectProperty<CitationFetcherType> citationFetcherTypeProperty() {
         return citationFetcherType;
+    }
+
+    public void setCitationFetcherType(CitationFetcherType citationFetcherType) {
+        this.citationFetcherType.set(citationFetcherType);
     }
 
     public CitationCountFetcherType getCitationCountFetcherType() {
         return citationCountFetcherType.get();
     }
 
-    public void setCitationCountFetcherType(CitationCountFetcherType citationCountFetcherType) {
-        this.citationCountFetcherType.set(citationCountFetcherType);
-    }
-
     public ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty() {
         return citationCountFetcherType;
+    }
+
+    public void setCitationCountFetcherType(CitationCountFetcherType citationCountFetcherType) {
+        this.citationCountFetcherType.set(citationCountFetcherType);
     }
 
     public boolean shouldShowUserCommentsFields() {
@@ -331,8 +334,8 @@ public class EntryEditorPreferences {
         this.showUserCommentsFields.set(showUserCommentsFields);
     }
 
-    public void setPreviewWidthDividerPosition(double previewWidthDividerPosition) {
-        this.previewWidthDividerPosition.set(previewWidthDividerPosition);
+    public Double getPreviewWidthDividerPosition() {
+        return previewWidthDividerPosition.get();
     }
 
     /// Holds the horizontal divider position when the Preview is shown in the entry editor
@@ -340,7 +343,7 @@ public class EntryEditorPreferences {
         return previewWidthDividerPosition;
     }
 
-    public Double getPreviewWidthDividerPosition() {
-        return previewWidthDividerPosition.get();
+    public void setPreviewWidthDividerPosition(double previewWidthDividerPosition) {
+        this.previewWidthDividerPosition.set(previewWidthDividerPosition);
     }
 }
