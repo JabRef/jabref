@@ -78,7 +78,7 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
 
         int operator = ctx.operator().getStart().getType();
         if (operator == SearchParser.GT || operator == SearchParser.LT ||
-            operator == SearchParser.GTE || operator == SearchParser.LTE) {
+                operator == SearchParser.GTE || operator == SearchParser.LTE) {
             return ""; // Comparison operators not applicable to fulltext index
         }
 

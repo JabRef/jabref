@@ -110,7 +110,7 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
         int operator = ctx.operator().getStart().getType();
 
         if (operator == SearchParser.GT || operator == SearchParser.LT ||
-            operator == SearchParser.GTE || operator == SearchParser.LTE) {
+                operator == SearchParser.GTE || operator == SearchParser.LTE) {
             return compareFieldValue(fieldName, term, operator);
         }
 
@@ -261,9 +261,12 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
         try {
             String[] parts = term.split("-");
             return switch (dashes) {
-                case 0 -> LocalDate.of(Integer.parseInt(parts[0]), 1, 1);
-                case 1 -> LocalDate.of(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), 1);
-                default -> LocalDate.parse(term);
+                case 0 ->
+                        LocalDate.of(Integer.parseInt(parts[0]), 1, 1);
+                case 1 ->
+                        LocalDate.of(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), 1);
+                default ->
+                        LocalDate.parse(term);
             };
         } catch (Exception e) {
             return null;
@@ -279,15 +282,20 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
 
     private static boolean compareInts(int a, int b, int operator) {
         return switch (operator) {
-            case SearchParser.GT  -> a > b;
-            case SearchParser.LT  -> a < b;
-            case SearchParser.GTE -> a >= b;
-            case SearchParser.LTE -> a <= b;
-            default -> false;
+            case SearchParser.GT ->
+                    a > b;
+            case SearchParser.LT ->
+                    a < b;
+            case SearchParser.GTE ->
+                    a >= b;
+            case SearchParser.LTE ->
+                    a <= b;
+            default ->
+                    false;
         };
     }
 
-/// @param matchKind one of [SearchFlags#INEXACT_MATCH], [SearchFlags#EXACT_MATCH], [SearchFlags#REGULAR_EXPRESSION]
+    /// @param matchKind one of [SearchFlags#INEXACT_MATCH], [SearchFlags#EXACT_MATCH], [SearchFlags#REGULAR_EXPRESSION]
     private record OperatorFlags(SearchFlags matchKind, boolean caseSensitive, boolean negation) {
     }
 

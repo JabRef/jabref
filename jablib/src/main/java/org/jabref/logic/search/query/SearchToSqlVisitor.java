@@ -183,7 +183,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         int operator = ctx.operator().getStart().getType();
 
         if (operator == SearchParser.GT || operator == SearchParser.LT ||
-            operator == SearchParser.GTE || operator == SearchParser.LTE) {
+                operator == SearchParser.GTE || operator == SearchParser.LTE) {
             return buildComparisonQuery(field.toLowerCase(Locale.ROOT), term, operator);
         }
 
@@ -273,17 +273,22 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
     private SqlQueryNode buildComparisonQuery(String fieldName, String term, int operator) {
         String sqlOp = switch (operator) {
-            case SearchParser.GT  -> ">";
-            case SearchParser.LT  -> "<";
-            case SearchParser.GTE -> ">=";
-            case SearchParser.LTE -> "<=";
-            default -> ">=";
+            case SearchParser.GT ->
+                    ">";
+            case SearchParser.LT ->
+                    "<";
+            case SearchParser.GTE ->
+                    ">=";
+            case SearchParser.LTE ->
+                    "<=";
+            default ->
+                    ">=";
         };
 
         boolean isYear = FieldFactory.parseField(fieldName).getProperties().contains(FieldProperty.YEAR);
         String valueExpr = isYear
-                ? "CAST(" + FIELD_VALUE_LITERAL + " AS INTEGER)"
-                : FIELD_VALUE_LITERAL.toString();
+                           ? "CAST(" + FIELD_VALUE_LITERAL + " AS INTEGER)"
+                           : FIELD_VALUE_LITERAL.toString();
 
         String cte = """
                 cte%d AS (
@@ -292,7 +297,7 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
                     WHERE %s = ? AND %s %s ?
                 )
                 """.formatted(cteCounter, ENTRY_ID, mainTableName,
-                              FIELD_NAME, valueExpr, sqlOp);
+                FIELD_NAME, valueExpr, sqlOp);
 
         SqlQueryNode node = new SqlQueryNode(cte, List.of(fieldName, term));
         nodes.add(node);
