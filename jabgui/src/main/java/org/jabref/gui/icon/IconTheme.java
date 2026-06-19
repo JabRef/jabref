@@ -5,8 +5,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 
 import javafx.scene.Node;
@@ -74,6 +76,14 @@ public class IconTheme {
         return LOGO_SET.stream()
                        .map(name -> new Image(getIconUrl(name).toString()))
                        .toList();
+    }
+
+    public static Optional<JabRefIcon> findJabRefIcon(String iconCode) {
+        try {
+            return Optional.of(JabRefIcons.valueOf(iconCode.toUpperCase(Locale.ENGLISH)));
+        } catch (IllegalArgumentException ignored) {
+            return Optional.empty();
+        }
     }
 
     private static URL getIconUrl(String name) {

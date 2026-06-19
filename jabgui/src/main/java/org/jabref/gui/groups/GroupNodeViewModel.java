@@ -21,7 +21,6 @@ import javafx.scene.paint.Color;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.IkonliIcon;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -249,7 +248,8 @@ public class GroupNodeViewModel {
     }
 
     private Optional<JabRefIcon> parseIcon(String iconCode) {
-        return IkonliIcon.findIcon(iconCode, getColor());
+        return IconTheme.findJabRefIcon(iconCode)
+                        .map(icon -> icon.withColor(getColor()));
     }
 
     public ObservableList<GroupNodeViewModel> getChildren() {
