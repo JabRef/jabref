@@ -4,10 +4,25 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 public class BibEntryPreferences {
+
     private final ObjectProperty<Character> keywordSeparator;
+
+    private BibEntryPreferences() {
+        this(
+                ','  // Keyword separator
+        );
+    }
 
     public BibEntryPreferences(Character keywordSeparator) {
         this.keywordSeparator = new SimpleObjectProperty<>(keywordSeparator);
+    }
+
+    public static BibEntryPreferences getDefault() {
+        return new BibEntryPreferences();
+    }
+
+    public void setAll(BibEntryPreferences preferences) {
+        this.keywordSeparator.set(preferences.getKeywordSeparator());
     }
 
     public Character getKeywordSeparator() {

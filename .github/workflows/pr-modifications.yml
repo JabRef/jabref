@@ -9,7 +9,8 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  pull-requests: write
+  contents: read
+  pull-requests: read
 
 jobs:
   # This ensures that no git merge conflict markers (<<<, ...) are contained
@@ -28,7 +29,7 @@ jobs:
       )
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           show-progress: 'false'
       - name: Merge Conflict finder
@@ -49,7 +50,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Check force push
@@ -117,4 +118,3 @@ jobs:
         with:
           name: pr_number
           path: pr_number.txt
-

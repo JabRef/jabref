@@ -437,13 +437,28 @@ See [ADR-0000](docs/decisions/0000-use-markdown-architectural-decision-records.m
 
 ## Git & PR Etiquette
 
-When creating commits:
+### Syncing with upstream
+
+- **Never** use `git rebase`, `git pull --rebase` / `-r` / `--rebase-merges`, or any force-push (`--force`, `--force-with-lease`, `--force-if-includes`, `-f`, or `+`-prefixed refspecs). Rebasing rewrites commit SHAs already pushed and breaks review threads pinned to commits; force-push would then be required to publish the rewritten history.
+- **Preferred** sync via explicit fetch + merge:
+
+  ```bash
+  git fetch upstream --prune
+  git merge upstream/main
+  ```
+
+- Plain `git pull` is acceptable for updating the branch as long as your local config does not set `pull.rebase=true` (the enforcement hook blocks the explicit rebase variants regardless).
+- Resolve conflicts inside the merge commit. Do not squash or reorder existing commits.
+
+### Commits
 
 - One logical change per commit
 - Clear, technical commit messages
 - Do not reference issues in commits
 - Avoid force-pushes
 - No generated artifacts unless required
+
+### Pull requests
 
 PR title:
 
@@ -458,6 +473,7 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 5. Keep **all** checklist items. Mark each `[x]` (done), `[ ]` (TODO), or `[/]` (not applicable). Never `[ x]` or `[.]`.
 6. Remove **all** HTML comments before opening the PR.
 7. Write the body to a temp file and run `gh pr create --body-file <file>` — never `--body`, which bypasses the template.
+8. If the CHANGELOG.md entry used a `TODO` placeholder (no issue existed), immediately after the PR is created replace `TODO` with the real PR-number link (`[#NUM](https://github.com/JabRef/jabref/pull/NUM)`), then commit and push that change.
 
 ---
 
@@ -466,6 +482,8 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 - Add a CHANGELOG.md entry only if the change is visible to the user.
 - The CHANGELOG.md entry should be for end users (and not programmers).
 - Do not add extra blank lines in CHANGELOG.md
+- When no issue is known and the PR is not yet created, use `TODO` as the issue/PR reference placeholder — never invent a fake number.
+- Before using `TODO`, search <https://github.com/JabRef/jabref/issues> and <https://github.com/JabRef/jabref-koppor/issues> for a matching issue. Link it only on a confident match; otherwise list candidates for human review and keep `TODO`. Never use `closes`/`fixes` keywords for a merely-similar issue.
 - User documentation is available in a separate repository <https://github.com/JabRef/user-documentation>.
 - No AI-disclosure comments inside source code
 

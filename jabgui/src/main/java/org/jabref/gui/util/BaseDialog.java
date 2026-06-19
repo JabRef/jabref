@@ -42,7 +42,7 @@ public class BaseDialog<T> extends Dialog<T> {
 
         this.setOnShowing(_ -> applyButtonFix(this.getDialogPane()));
 
-        setDialogIcon(IconTheme.getJabRefImage());
+        setDialogIcon(IconTheme.getJabRefIcon());
         setResizable(true);
     }
 

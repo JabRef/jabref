@@ -32,6 +32,13 @@ public abstract class AbstractSrvStateManager implements SrvStateManager {
         searchContexts.put(database.getUid(), searchContext);
     }
 
+    /// Removes the [SearchContext] registered for the given database. Callers that replace
+    /// a [BibDatabaseContext] (e.g. after a re-parse) should call this with the *old*
+    /// context so its entry does not linger in the registry under a uid no caller holds.
+    public void removeSearchContext(BibDatabaseContext database) {
+        searchContexts.remove(database.getUid());
+    }
+
     @Override
     public SearchContext getSearchContext(BibDatabaseContext database) {
         SearchContext context = searchContexts.get(database.getUid());

@@ -26,8 +26,9 @@ jobs:
     runs-on: ubuntu-slim
     permissions:
       actions: read
-      contents: write
-      pull-requests: write
+      contents: read
+      issues: write
+      pull-requests: read
     timeout-minutes: 10
     steps:
       - name: Show GitHub context
@@ -53,6 +54,7 @@ jobs:
         continue-on-error: true
         with:
           name: pr_number
+          path: ${{ runner.temp }}/pr-artifacts
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
 
@@ -60,20 +62,45 @@ jobs:
         if: ${{ github.event_name != 'workflow_dispatch' }}
         id: read-pr_number
         run: |
-          touch pr_number.txt
-          PR_NUMBER=$(cat pr_number.txt)
+          ARTIFACT_FILE="${{ runner.temp }}/pr-artifacts/pr_number.txt"
+          if [ ! -f "$ARTIFACT_FILE" ]; then
+            echo "No pr_number.txt found in downloaded artifact"
+            echo "pr_number=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if ! IFS= read -r PR_NUMBER < "$ARTIFACT_FILE"; then
+            echo "Invalid PR number in artifact"
+            echo "pr_number=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          PR_NUMBER="${PR_NUMBER%$'\r'}"
+
+          if sed -n '2,$p' "$ARTIFACT_FILE" | grep -q '^'; then
+            echo "Invalid PR number in artifact"
+            echo "pr_number=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if ! [[ "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
+            echo "Invalid PR number in artifact"
+            echo "pr_number=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           echo "Read PR number $PR_NUMBER"
-          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-          echo "PR #" >> $GITHUB_STEP_SUMMARY
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "PR #$PR_NUMBER" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Checkout
         # required for gh tool and .github/ghprcomment.yml
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           show-progress: 'false'
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: awalsh128/cache-apt-pkgs-action@latest
+      - uses: awalsh128/cache-apt-pkgs-action@v1.6.1
         with:
           packages: jq
           version: 1.0

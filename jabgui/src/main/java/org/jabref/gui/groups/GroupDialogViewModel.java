@@ -438,7 +438,7 @@ public class GroupDialogViewModel {
         } else {
             nameProperty.setValue(editedGroup.getName());
             colorUseProperty.setValue(editedGroup.getColor().isPresent());
-            colorProperty.setValue(editedGroup.getColor().map(Color::valueOf).orElse(IconTheme.getDefaultGroupColor()));
+            colorProperty.setValue(editedGroup.getColor().map(Color::valueOf).orElse(IconTheme.DEFAULT_GROUP_COLOR));
             descriptionProperty.setValue(editedGroup.getDescription().orElse(""));
             iconProperty.setValue(editedGroup.getIconName().orElse(""));
             groupHierarchySelectedProperty.setValue(editedGroup.getHierarchicalContext());

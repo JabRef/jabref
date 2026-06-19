@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -59,20 +59,21 @@ jobs:
     # ubuntu-slim doesn't offer docker
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/format-java
       # job should fail in case there are changes
-      - name: Check if any files changed
-        run: git diff --exit-code
+      - uses: ./.github/actions/check-formatting
+        with:
+          artifact-name: formatting-fix-patch
 
   format-javadoc:
     # too slow on ubuntu-slim
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: 'jabref'
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: 'rmuller/Convert2MarkdownJavadoc'
           path: 'Convert2MarkdownJavadoc'
@@ -85,10 +86,10 @@ jobs:
       - run: |
           cd Convert2MarkdownJavadoc
           java Convert2MarkdownJavadoc.java ../jabref
-      - name: Check if any files changed
-        run: |
-          cd jabref
-          git diff --exit-code
+      - uses: ./jabref/.github/actions/check-formatting
+        with:
+          working-directory: jabref
+          artifact-name: javadoc-fix-patch
 
   checkstyle:
     name: Checkstyle
@@ -97,7 +98,7 @@ jobs:
     needs: format
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -112,7 +113,7 @@ jobs:
     needs: checkstyle
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -125,7 +126,11 @@ jobs:
       - uses: ./.github/actions/format-java
 
       - name: Fail if working directory is unclean
-        run: git diff --exit-code
+        uses: ./.github/actions/check-formatting
+        with:
+          artifact-name: openrewrite-fix-patch
+          annotation-title: OpenRewrite
+          annotation-message-prefix: "Uncommitted changes after OpenRewrite; run `gradle :rewriteRun`, reformat, and commit the result for"
 
   modernizer:
     name: Modernizer
@@ -133,7 +138,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -149,7 +154,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -166,7 +171,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -186,12 +191,11 @@ jobs:
         uses: jbangdev/setup-jbang@main
       - name: Lint CHANGELOG.md
         run: |
-          # run heylogs verification with GitHub Actions annotations
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.18.0:bin check --format github-actions CHANGELOG.md | tee heylogs.txt || true
+          # the grep is needed to filter out an error about all h2 containing a version, which is not relevant for us, because we have an "Unreleased" section
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.18.1:bin check --rule dot-space-link-style:ERROR --format github-actions CHANGELOG.md | grep -v all-h2-contain-a-version | tee heylogs.txt || true
 
-          # We have one acceptable error
           error_count=$(grep -c '^::error' heylogs.txt || true)
-          if [ "$error_count" -ne 1 ]; then
+          if [ "$error_count" -ne 0 ]; then
             {
               echo "heylogs<<EOF"
               cat heylogs.txt
@@ -206,7 +210,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -225,7 +229,7 @@ jobs:
           tar xzvf clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
       - name: Install clparse
         run: sudo mv /tmp/clparse /usr/local/bin/clparse
-      - uses: awalsh128/cache-apt-pkgs-action@latest
+      - uses: awalsh128/cache-apt-pkgs-action@v1.6.1
         with:
           packages: jq
           version: 1.0
@@ -241,7 +245,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -256,7 +260,7 @@ jobs:
         module: [ jablib, jabkit, jabsrv, jabgui ]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -267,7 +271,7 @@ jobs:
           CI: "true"
       - name: Prepare format failed test results
         if: failure()
-        uses: awalsh128/cache-apt-pkgs-action@latest
+        uses: awalsh128/cache-apt-pkgs-action@v1.6.1
         with:
           packages: xml-twig-tools xsltproc
           version: 1.0
@@ -290,7 +294,7 @@ jobs:
         module: [ jablib ]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -305,7 +309,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: 'true'
@@ -333,7 +337,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -359,7 +363,7 @@ jobs:
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop # Shutdown the Default MySQL to save memory, "sudo" is necessary, please do not remove it
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -387,7 +391,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -401,7 +405,7 @@ jobs:
     if: github.ref != 'refs/heads/main'
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -425,7 +429,7 @@ jobs:
         project: [ jablib-examples/maven3/doi-to-bibtex ]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -471,7 +475,7 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -483,7 +487,7 @@ jobs:
           CI: "true"
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           DBMS: "postgresql"
-      - uses: codecov/codecov-action@v6
+      - uses: codecov/codecov-action@v7
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -497,7 +501,7 @@ jobs:
     name: "Validate requirement coverage"
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
@@ -511,7 +515,7 @@ jobs:
     name: "Validate Gradle Wrapper"
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           show-progress: 'false'
       - uses: gradle/actions/wrapper-validation@v5
