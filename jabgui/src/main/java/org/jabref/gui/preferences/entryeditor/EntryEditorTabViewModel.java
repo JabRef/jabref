@@ -171,7 +171,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
             }
         }
         EntryEditorTabModel newTab = new EntryEditorTabModel.CustomizedFieldsTab(
-                Localization.lang("New Tab"), Set.of());
+                Localization.lang("New tab"), Set.of());
         tabModels.add(insertIndex, newTab);
         selectedTab.set(newTab); // commits old, loads new empty state; view mirrors via EasyBind
     }
