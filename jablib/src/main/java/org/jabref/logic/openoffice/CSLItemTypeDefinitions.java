@@ -365,8 +365,8 @@ class CSLItemTypeDefinitions {
                     "container-title")
     );
 
-    static Optional<EntryType> getEntryType(String cslItemType) {
-        return Optional.of(CSL2BIB_TYPES.getOrDefault(cslItemType, StandardEntryType.Misc));
+    static EntryType getEntryType(String cslItemType) {
+        return CSL2BIB_TYPES.getOrDefault(cslItemType, StandardEntryType.Misc);
     }
 
     static Map<String, Field> getFieldMappings(String cslItemType, ZoteroCitationData.ItemData itemData) {

@@ -65,12 +65,8 @@ public class ZoteroCitationMarkParser {
     private static Optional<BibEntry> toBibEntry(ZoteroCitationData.CitationItemData citationItem) {
         ZoteroCitationData.ItemData itemData = citationItem.itemData;
 
-        Optional<EntryType> entryType = CSLItemTypeDefinitions.getEntryType(itemData.type);
-        if (entryType.isEmpty()) {
-            return Optional.empty();
-        }
-
-        BibEntry entry = new BibEntry(entryType.get());
+        EntryType entryType = CSLItemTypeDefinitions.getEntryType(itemData.type);
+        BibEntry entry = new BibEntry(entryType);
         entry.withCitationKey("Zotero-" + (citationItem.id));
         setAuthors(itemData.author).ifPresent(authors -> entry.withField(StandardField.AUTHOR, authors));
         setDate(entry, itemData.issued);
