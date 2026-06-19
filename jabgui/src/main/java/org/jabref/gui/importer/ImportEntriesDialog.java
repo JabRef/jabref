@@ -290,10 +290,10 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
             if (button == importButton) {
                 if (groupListView.getItems().size() > 1) {
                     // 1 is the "All entries" group, so if more than 1, we have groups defined
-                    GroupTreeNode prevSelectedGroup = stateManager.getSelectedGroups(stateManager.getActiveDatabase().orElse(null)).getFirst();
+                    GroupTreeNode prevSelectedGroup = stateManager.getSelectedGroups(database).getFirst();
                     stateManager.setSelectedGroups(libraryListView.getSelectionModel().getSelectedItem(), List.of(groupListView.getSelectionModel().getSelectedItem()));
                     viewModel.importEntries(viewModel.getCheckedEntries().stream().toList(), downloadLinkedOnlineFiles.isSelected());
-                    stateManager.setSelectedGroups(stateManager.getActiveDatabase().orElse(null), List.of(prevSelectedGroup));
+                    stateManager.setSelectedGroups(database, List.of(prevSelectedGroup));
                 } else {
                     viewModel.importEntries(viewModel.getCheckedEntries().stream().toList(), downloadLinkedOnlineFiles.isSelected());
                 }
