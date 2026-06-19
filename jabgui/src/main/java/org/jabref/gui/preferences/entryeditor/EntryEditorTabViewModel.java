@@ -238,7 +238,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
                 }
             }
         }
-        entryEditorPreferences.setEntryEditorTabList(fieldSetMap);
+        entryEditorPreferences.setCustomizedFieldSets(fieldSetMap);
     }
 
     // region Properties

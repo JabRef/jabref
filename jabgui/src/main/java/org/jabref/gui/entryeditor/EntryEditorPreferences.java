@@ -182,9 +182,7 @@ public class EntryEditorPreferences {
         }
     }
 
-    /// Returns a snapshot map of customized field-set tabs (name → fields). Changes to this map are not
-    /// reflected in the preferences; use {@link #setEntryEditorTabList} to persist modifications.
-    public Map<String, Set<Field>> getEntryEditorTabs() {
+    public Map<String, Set<Field>> getCustomizedFieldSets() {
         SequencedMap<String, Set<Field>> map = new LinkedHashMap<>();
         for (EntryEditorTabModel model : tabModels) {
             if (model instanceof EntryEditorTabModel.CustomizedFieldSet fieldSet) {
@@ -194,7 +192,7 @@ public class EntryEditorPreferences {
         return map;
     }
 
-    public void setEntryEditorTabList(Map<String, Set<Field>> tabModels) {
+    public void setCustomizedFieldSets(Map<String, Set<Field>> tabModels) {
         List<EntryEditorTabModel> newFieldSet = tabModels.entrySet().stream()
                                                          .<EntryEditorTabModel>map(model ->
                                                                  new EntryEditorTabModel.CustomizedFieldSet(
@@ -202,8 +200,8 @@ public class EntryEditorPreferences {
                                                                          model.getValue()))
                                                          .toList();
         this.tabModels.removeIf(config -> config instanceof EntryEditorTabModel.CustomizedFieldSet);
-        // Customized field-set tabs sit right after the built-in field-set tabs — same position the persisted
-        // list uses, so saving does not reorder the tabs.
+
+        // Customized field-set tabs sit right after the built-in field-set tabs
         this.tabModels.addAll(EntryEditorTabModel.indexAfterBuiltInFieldSets(this.tabModels), newFieldSet);
     }
 

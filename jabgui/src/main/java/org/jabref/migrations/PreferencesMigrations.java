@@ -549,7 +549,7 @@ public class PreferencesMigrations {
     /// @param preferences the user's current GUI preferences
     /// @implNote The default fields for the "General" tab are defined by {@link EntryEditorPreferences#getDefaultGeneralFields()}.
     static void migrateGeneralTabDefaultFields(GuiPreferences preferences) {
-        Map<String, Set<Field>> entryEditorPrefs = preferences.getEntryEditorPreferences().getEntryEditorTabs();
+        Map<String, Set<Field>> entryEditorPrefs = preferences.getEntryEditorPreferences().getCustomizedFieldSets();
         Set<Field> currentGeneralPrefs = entryEditorPrefs.get(Localization.lang("General"));
         if (currentGeneralPrefs == null) {
             return;
@@ -583,16 +583,16 @@ public class PreferencesMigrations {
                 new HashSet<>(EntryEditorPreferences.getDefaultGeneralFields())
         );
 
-        preferences.getEntryEditorPreferences().setEntryEditorTabList(entryEditorPrefs);
+        preferences.getEntryEditorPreferences().setCustomizedFieldSets(entryEditorPrefs);
     }
 
     /// The tab "Comments" is hard coded using {@link org.jabref.gui.entryeditor.CommentsTab} since v5.10 (and thus hard-wired in {@link org.jabref.gui.entryeditor.EntryEditor#createTabs()}.
     /// Thus, the configuration ih the preferences is obsolete
     static void removeCommentsFromCustomEditorTabs(GuiPreferences preferences) {
         EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
-        Map<String, Set<Field>> tabs = new LinkedHashMap<>(entryEditorPreferences.getEntryEditorTabs());
+        Map<String, Set<Field>> tabs = new LinkedHashMap<>(entryEditorPreferences.getCustomizedFieldSets());
         if (tabs.remove("Comments") != null) {
-            entryEditorPreferences.setEntryEditorTabList(tabs);
+            entryEditorPreferences.setCustomizedFieldSets(tabs);
         }
     }
 
