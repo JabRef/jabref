@@ -215,7 +215,12 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         // Write feature- and built-in field-set-tab visibility from working copy. Customized field-set
         // Tabs have no key (always visible) and are persisted separately below.
         for (EntryEditorTabModel tabModel : tabModels) {
-            tabModel.key().ifPresent(key -> entryEditorPreferences.setTabVisible(key, tabModel.isVisible()));
+            if (tabModel instanceof EntryEditorTabModel.BuiltInTab(
+                    EntryEditorTabModel.BuiltIn key,
+                    boolean _
+            )) {
+                entryEditorPreferences.setTabVisible(key, tabModel.isVisible());
+            }
         }
 
         // Write customized field-set tabs. The currently selected one may have pending edits that have

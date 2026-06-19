@@ -1,7 +1,6 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.model.entry.field.Field;
@@ -16,15 +15,15 @@ import org.jabref.model.entry.field.Field;
 public sealed interface EntryEditorTabModel
         permits EntryEditorTabModel.BuiltInTab, EntryEditorTabModel.CustomizedFieldSet {
 
-    /// This tab's built-in identity, or empty for a {@link CustomizedFieldSet} (always visible, no toggle).
-    Optional<BuiltIn> key();
-
     boolean isVisible();
 
     EntryEditorTabModel withVisible(boolean visible);
 
     default boolean isPreview() {
-        return key().filter(type -> type == BuiltIn.PREVIEW).isPresent();
+        return this instanceof BuiltInTab(
+                BuiltIn type,
+                boolean _
+        ) && type == BuiltIn.PREVIEW;
     }
 
     static int indexAfterLeadingPreview(List<? extends EntryEditorTabModel> models) {
@@ -34,7 +33,10 @@ public sealed interface EntryEditorTabModel
     static int indexAfterBuiltInFieldSets(List<? extends EntryEditorTabModel> models) {
         int lastFieldSet = -1;
         for (int i = 0; i < models.size(); i++) {
-            if (models.get(i) instanceof BuiltInTab(BuiltIn type, boolean ignored) && type.isFieldSet()) {
+            if (models.get(i) instanceof BuiltInTab(
+                    BuiltIn type,
+                    boolean _
+            ) && type.isFieldSet()) {
                 lastFieldSet = i;
             }
         }
@@ -76,11 +78,6 @@ public sealed interface EntryEditorTabModel
     record BuiltInTab(BuiltIn type, boolean visible)
             implements EntryEditorTabModel {
         @Override
-        public Optional<BuiltIn> key() {
-            return Optional.of(type);
-        }
-
-        @Override
         public boolean isVisible() {
             return visible;
         }
@@ -95,11 +92,6 @@ public sealed interface EntryEditorTabModel
     /// visibility flag (unlike {@link BuiltInTab}).
     record CustomizedFieldSet(String name, Set<Field> fields)
             implements EntryEditorTabModel {
-        @Override
-        public Optional<BuiltIn> key() {
-            return Optional.empty();
-        }
-
         @Override
         public boolean isVisible() {
             return true;

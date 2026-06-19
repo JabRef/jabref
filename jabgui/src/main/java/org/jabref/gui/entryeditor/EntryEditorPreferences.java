@@ -179,9 +179,12 @@ public class EntryEditorPreferences {
         return tabModels;
     }
 
-    public boolean isTabVisible(EntryEditorTabModel.BuiltIn tabModel) {
+    public boolean isTabVisible(EntryEditorTabModel.BuiltIn key) {
         return tabModels.stream()
-                        .filter(model -> model.key().filter(tabModel::equals).isPresent())
+                        .filter(model -> model instanceof EntryEditorTabModel.BuiltInTab(
+                                EntryEditorTabModel.BuiltIn type,
+                                boolean _
+                        ) && type == key)
                         .findFirst()
                         .map(EntryEditorTabModel::isVisible)
                         .orElse(false);
@@ -193,7 +196,10 @@ public class EntryEditorPreferences {
 
     public void setTabVisible(EntryEditorTabModel.BuiltIn key, boolean show) {
         for (int i = 0; i < tabModels.size(); i++) {
-            if (tabModels.get(i).key().filter(key::equals).isPresent()) {
+            if (tabModels.get(i) instanceof EntryEditorTabModel.BuiltInTab(
+                    EntryEditorTabModel.BuiltIn type,
+                    boolean _
+            ) && type == key) {
                 tabModels.set(i, tabModels.get(i).withVisible(show));
                 return;
             }
