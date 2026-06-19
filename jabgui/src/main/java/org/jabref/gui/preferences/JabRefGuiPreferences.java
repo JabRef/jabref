@@ -225,7 +225,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String SHOW_AI_SUMMARY = "showAiSummary";
     private static final String SHOW_AI_CHAT = "showAiChat";
     private static final String SHOW_LATEX_CITATIONS = "showLatexCitations";
-    private static final String SMART_FILE_ANNOTATIONS = "smartFileAnnotations";
+    private static final String SHOW_FILE_ANNOTATIONS = "showFileAnnotations";
     private static final String DEFAULT_SHOW_SOURCE = "defaultShowSource";
     private static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
     private static final String ALLOW_INTEGER_EDITION_BIBTEX = "allowIntegerEditionBibtex";
@@ -441,7 +441,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.LATEX_CITATIONS,
                         getBoolean(SHOW_LATEX_CITATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.LATEX_CITATIONS))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.FILE_ANNOTATIONS,
-                        getBoolean(SMART_FILE_ANNOTATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FILE_ANNOTATIONS))),
+                        getBoolean(SHOW_FILE_ANNOTATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FILE_ANNOTATIONS))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION,
                         getBoolean(SHOW_SCITE_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.COMMENTS,
@@ -498,7 +498,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                     case AI_CHAT ->
                             putBoolean(SHOW_AI_CHAT, visible);
                     case FILE_ANNOTATIONS ->
-                            putBoolean(SMART_FILE_ANNOTATIONS, visible);
+                            putBoolean(SHOW_FILE_ANNOTATIONS, visible);
                     case LATEX_CITATIONS ->
                             putBoolean(SHOW_LATEX_CITATIONS, visible);
                     case CITATION_INFORMATION ->
