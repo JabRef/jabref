@@ -48,8 +48,6 @@ public class EntryEditorPreferences {
         }
     }
 
-    /// Ordered list of all configurable tabs. Built-in {@linkplain EntryEditorTabModel.BuiltIn#isFieldSet()
-    /// field-set} tabs always precede the feature tabs.
     private final ObservableList<EntryEditorTabModel> tabModels;
 
     private final BooleanProperty shouldOpenOnNewEntry;

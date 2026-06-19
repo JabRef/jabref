@@ -445,16 +445,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION,
                         getBoolean(SHOW_SCITE_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.COMMENTS,
-                        getBoolean(SHOW_COMMENTS_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.COMMENTS)))
+                        getBoolean(SHOW_COMMENTS_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.COMMENTS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.MATH_SCI_NET,
+                        getBoolean(SHOW_MATHSCINET_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.MATH_SCI_NET))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.SOURCE,
+                        getBoolean(SHOW_SOURCE_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.SOURCE))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS,
+                        getBoolean(SHOW_FULLTEXT_SEARCH_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS)))
         ));
-
-        // Always-present trailing tabs
-        tabModels.add(new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.MATH_SCI_NET,
-                getBoolean(SHOW_MATHSCINET_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.MATH_SCI_NET))));
-        tabModels.add(new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.SOURCE,
-                getBoolean(SHOW_SOURCE_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.SOURCE))));
-        tabModels.add(new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS,
-                getBoolean(SHOW_FULLTEXT_SEARCH_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS))));
 
         return tabModels;
     }
