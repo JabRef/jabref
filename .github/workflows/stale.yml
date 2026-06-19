@@ -40,7 +40,7 @@ jobs:
           days-before-pr-close: 10
           close-pr-message: >
             This PR is being closed due to continued inactivity.
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         if: ${{ steps.stale.outputs.closed-issues-prs != '[]' }}
       - name: Process closed issues/PRs
         if: ${{ steps.stale.outputs.closed-issues-prs != '[]' }}
