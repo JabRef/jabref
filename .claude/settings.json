@@ -19,6 +19,10 @@
           {
             "type": "command",
             "command": "python .claude/hooks/commit-msg-heredoc-guard.py"
+          },
+          {
+            "type": "command",
+            "command": "python .claude/hooks/checklist-done-guard.py"
           }
         ]
       }

@@ -629,7 +629,7 @@ jobs:
           branch: main
       - name: Install pigz and cache (Linux)
         if: startsWith(matrix.os, 'ubuntu')
-        uses: awalsh128/cache-apt-pkgs-action@latest
+        uses: awalsh128/cache-apt-pkgs-action@v1.6.1
         with:
           packages: pigz
           version: 1.0

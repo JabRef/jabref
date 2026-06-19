@@ -18,6 +18,7 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
+import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.net.URLDownload;
@@ -88,14 +89,10 @@ public class CrossRefCitationFetcher implements CitationFetcher {
             return List.of();
         }
 
-        final PlainCitationParser parser = PlainCitationParserFactory.getPlainCitationParser(
-                importerPreferences.getDefaultPlainCitationParser(),
-                citationKeyPatternPreferences,
-                grobidPreferences,
-                importFormatPreferences,
-                aiPreferences,
-                chatModel
-        );
+        PlainCitationParserChoice parserChoice = importerPreferences.getDefaultPlainCitationParser();
+        final PlainCitationParser parser = parserChoice == PlainCitationParserChoice.LLM
+                                           ? PlainCitationParserFactory.getLlmPlainCitationParser(importFormatPreferences, aiPreferences, chatModel)
+                                           : PlainCitationParserFactory.getPlainCitationParser(parserChoice, citationKeyPatternPreferences, grobidPreferences, importFormatPreferences);
 
         try (InputStream stream = new URLDownload(uri.get().toString()).asInputStream()) {
             JsonNode node = mapper.readTree(stream);

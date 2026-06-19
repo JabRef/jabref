@@ -58,7 +58,31 @@ def main():
 
     body = extract_body(tokens)
     if body is None:
-        # pr-template-guard.py handles the "no body" case; do not duplicate.
+        # If a body arg WAS supplied but we could not read it, fail closed.
+        # Windows Python resolves a Bash-tool "/tmp/..." path to "C:\tmp\..."
+        # which does not exist, so a declared --body-file silently read as
+        # None and off-template bodies slipped through. Do not defer here.
+        declared = any(
+            t in ("--body-file", "-F", "--body", "-b")
+            or t.startswith(("--body-file=", "--body="))
+            for t in tokens
+        )
+        if declared:
+            print(json.dumps({
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": "deny",
+                    "permissionDecisionReason": (
+                        "A PR body file/arg was given but the hook could not "
+                        "read it (Windows Python resolves a Bash-tool /tmp "
+                        "path differently). Write the body to an absolute "
+                        "path both shells share, then re-run — cannot verify "
+                        "§4.2 items against an unreadable body."
+                    ),
+                }
+            }))
+            sys.exit(0)
+        # Genuinely no body arg — pr-template-guard.py handles that case.
         sys.exit(0)
 
     missing = []

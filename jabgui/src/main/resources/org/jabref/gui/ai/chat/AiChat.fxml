@@ -26,6 +26,11 @@
             fx:id="privacyNotice"/>
 
     <UniversalStatusPaneView
+            fx:id="restartNeededPane"
+            title="%Restart needed"
+            description="%AI features were turned on/off. Please restart JabRef to apply the changes."/>
+
+    <UniversalStatusPaneView
             fx:id="noFilesErrorPane"
             title="%Unable to chat"
             description="%No files attached."/>
@@ -49,7 +54,7 @@
                         fitToWidth="true"
                         fitToHeight="true"
                         spacing="10"
-                        style="-fx-border-width: 1; -fx-border-color: black">
+                        styleClass="bordered">
                     <contentPadding>
                         <Insets top="10"
                                 right="10"
@@ -59,7 +64,7 @@
                 </ListScrollPane>
 
                 <Pane fx:id="transparentPane"
-                      style="-fx-background-color: transparent;"/>
+                      styleClass="bg-transparent"/>
 
                 <ProgressIndicator
                         fx:id="loadingIndicator"

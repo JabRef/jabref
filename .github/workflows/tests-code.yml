@@ -195,7 +195,7 @@ jobs:
       - name: Lint CHANGELOG.md
         run: |
           # the grep is needed to filter out an error about all h2 containing a version, which is not relevant for us, because we have an "Unreleased" section
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.18.1:bin check --format github-actions CHANGELOG.md | grep -v all-h2-contain-a-version | tee heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.18.1:bin check --rule dot-space-link-style:ERROR --format github-actions CHANGELOG.md | grep -v all-h2-contain-a-version | tee heylogs.txt || true
 
           error_count=$(grep -c '^::error' heylogs.txt || true)
           if [ "$error_count" -ne 0 ]; then
@@ -232,7 +232,7 @@ jobs:
           tar xzvf clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
       - name: Install clparse
         run: sudo mv /tmp/clparse /usr/local/bin/clparse
-      - uses: awalsh128/cache-apt-pkgs-action@latest
+      - uses: awalsh128/cache-apt-pkgs-action@v1.6.1
         with:
           packages: jq
           version: 1.0
@@ -274,7 +274,7 @@ jobs:
           CI: "true"
       - name: Prepare format failed test results
         if: failure()
-        uses: awalsh128/cache-apt-pkgs-action@latest
+        uses: awalsh128/cache-apt-pkgs-action@v1.6.1
         with:
           packages: xml-twig-tools xsltproc
           version: 1.0
@@ -490,7 +490,7 @@ jobs:
           CI: "true"
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           DBMS: "postgresql"
-      - uses: codecov/codecov-action@v6
+      - uses: codecov/codecov-action@v7
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

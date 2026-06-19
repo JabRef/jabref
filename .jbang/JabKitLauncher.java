@@ -41,6 +41,15 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Pseudonymize.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Search.java
 
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/service/CitationFetcherFactory.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/service/ExportService.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/service/ImportService.java
+
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/exception/CliException.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/exception/CliExceptionHandler.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/exception/ExportServiceException.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/exception/ImportServiceException.java
+
 //FILES tinylog.properties=../jabkit/src/main/resources/tinylog.properties
 
 // This is the main class - directly called by JBang
