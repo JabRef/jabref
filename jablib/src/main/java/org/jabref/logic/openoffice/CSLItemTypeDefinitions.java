@@ -18,8 +18,8 @@ import org.jabref.model.entry.types.StandardEntryType;
 class CSLItemTypeDefinitions {
     private static final Pattern CONTAINS_DIGIT_PATTERN = Pattern.compile("\\d");
 
-    /// CSL item type <-> Zotero item type mapping can be found via [zotero-schema/schema.json](https://github.com/zotero/zotero-schema/blob/62e983a2e575fe9b9a3677ad7c9772080b67a1e4/schema.json#L3219-L3324)
-    /// CSL item type <-> BibLaTeX entry type can be found via [zotero-better-bibtex/biblatex.ts](https://github.com/retorquere/zotero-better-bibtex/blob/master/translators/bibtex/biblatex.ts)
+    /// CSL item type <-> Zotero item type mapping can be found via [biblatexTypes.json](https://github.com/citation-js/citation-js/blob/main/packages/plugin-bibtex/src/mapping/biblatexTypes.json)
+    /// CSL item type <-> BibLaTeX entry type can be found via [biblatex.js](https://github.com/citation-js/citation-js/blob/main/packages/plugin-bibtex/src/mapping/biblatex.js)
     private static final Map<String, EntryType> CSL2BIB_TYPES = Map.ofEntries(
             // preprint
             Map.entry("article", StandardEntryType.Article),
@@ -123,8 +123,8 @@ class CSLItemTypeDefinitions {
     );
 
     private static final Map<String, Map<String, Field>> CSL2BIB_FIELD_OVERRIDES = Map.ofEntries(
-            Map.entry("article-journal", Map.of("number", StandardField.EID, "container-title", StandardField.JOURNALTITLE)),
             Map.entry("article", Map.of("number", StandardField.EID)),
+            Map.entry("article-journal", Map.of("number", StandardField.EID, "container-title", StandardField.JOURNALTITLE)),
             Map.entry("article-magazine", Map.of("container-title", StandardField.JOURNALTITLE)),
             Map.entry("article-newspaper", Map.of("container-title", StandardField.JOURNALTITLE)),
             Map.entry("manuscript", Map.of("publisher", StandardField.HOWPUBLISHED)),
@@ -197,7 +197,6 @@ class CSLItemTypeDefinitions {
                     "collection-number",
                     "publisher-place",
                     "publisher"),
-            // author -> creator
 
             cslTypeWithFields("chapter",
                     "collection-number",
@@ -289,7 +288,6 @@ class CSLItemTypeDefinitions {
                     "URL",
                     "publisher-place",
                     "publisher"),
-            // Author - > director
 
             cslTypeWithFields("paper-conference",
                     "collection-title",
@@ -409,7 +407,7 @@ class CSLItemTypeDefinitions {
                  "article-journal",
                  "article-magazine",
                  "article-newspaper" ->
-                    Optional.of(containsDigit ? StandardField.NUMBER : StandardField.ISSUE);
+                    containsDigit ? Optional.of(StandardField.NUMBER) : Optional.of(StandardField.ISSUE);
             case "paper-conference" ->
                     containsDigit ? Optional.of(StandardField.NUMBER) : Optional.empty();
             default ->

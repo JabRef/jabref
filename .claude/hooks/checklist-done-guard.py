@@ -11,12 +11,17 @@ verifies that:
      Each must be marked `[x]` (done) or `[/]` (not applicable).
 """
 import json
+import os
 import re
 import shlex
 import sys
 from pathlib import Path
 
-CHECKLIST = Path("CHECKLIST.md")
+# Resolve CHECKLIST.md from the project root, not the hook's cwd. Claude Code
+# sets CLAUDE_PROJECT_DIR for hook execution; the Bash tool's cwd may be a
+# subdirectory, in which case a bare Path("CHECKLIST.md") would not be found
+# and the guard would silently skip. Fall back to cwd if the var is unset.
+CHECKLIST = Path(os.environ.get("CLAUDE_PROJECT_DIR", ".")) / "CHECKLIST.md"
 
 # Matches "- [x] text", "- [ ] text", "- [.] text", "- [/] text".
 ITEM_RE = re.compile(r"^\s*-\s*\[(.)\]\s*(.+?)\s*$")
