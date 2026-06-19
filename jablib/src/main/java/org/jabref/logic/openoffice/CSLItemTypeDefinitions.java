@@ -16,8 +16,6 @@ import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
 class CSLItemTypeDefinitions {
-    private CSLItemTypeDefinitions() {}
-
     private static final Pattern CONTAINS_DIGIT_PATTERN = Pattern.compile("\\d");
 
     /// CSL item type <-> Zotero item type mapping can be found via [biblatexTypes.json](https://github.com/citation-js/citation-js/blob/main/packages/plugin-bibtex/src/mapping/biblatexTypes.json)
