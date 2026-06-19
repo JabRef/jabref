@@ -4,6 +4,9 @@ ARG VERSION="100.0.0"
 ARG VERSION_INFO="100.0.0"
 ARG TAG_BUILD="false"
 
+# bash required for jbang
+RUN apk add --no-cache bash
+
 WORKDIR /build
 
 COPY --from=jbangdev/jbang:0.136.0-java-21 /jbang-0.136.0/ /jbang/
@@ -44,9 +47,6 @@ COPY versions versions
 RUN ./gradlew --no-daemon :build-logic:jar
 
 COPY . .
-
-# bash required for jbang
-RUN apk update && apk add bash
 
 RUN ./gradlew --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabkit:jpackage
 
