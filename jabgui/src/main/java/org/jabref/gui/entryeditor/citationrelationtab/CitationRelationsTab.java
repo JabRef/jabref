@@ -60,12 +60,15 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.maintable.MainTableTooltip;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -124,6 +127,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final ProgressIndicator progressIndicator;
     private final GridPane sciteResultsPane;
     private final EntryEditorPreferences entryEditorPreferences;
+    private final MainTableTooltip previewTooltip;
     private ComboBox<CitationFetcherType> fetcherCombo;
 
     private boolean shouldClearSelectionOnDrop = false;
@@ -134,6 +138,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 FileUpdateMonitor fileUpdateMonitor,
                                 GuiPreferences preferences,
                                 TaskExecutor taskExecutor,
+                                ThemeManager themeManager,
                                 BibEntryTypesManager bibEntryTypesManager,
                                 SearchCitationsRelationsService searchCitationsRelationsService) {
         this.dialogService = dialogService;
@@ -169,6 +174,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         setSciteResultsPane();
 
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
+
+        this.previewTooltip = new MainTableTooltip(dialogService, preferences, themeManager, taskExecutor);
     }
 
     private void setSciteResultsPane() {
@@ -322,9 +329,9 @@ public class CitationRelationsTab extends EntryEditorTab {
         });
         tallies.getChildren().add(link);
 
-        Button providedByButtonMetrics = IconTheme.JabRefIcons.HELP.asButton();
+        Button providedByButtonMetrics = ControlHelper.iconButton(IconTheme.JabRefIcons.HELP);
         providedByButtonMetrics.setTooltip(new Tooltip(Localization.lang("Metrics provided by scite.ai")));
-        providedByButtonMetrics.setOnAction(event -> {
+        providedByButtonMetrics.setOnAction(_ -> {
             try {
                 NativeDesktop.openBrowser(URLs.SCITE_URL, preferences.getExternalApplicationsPreferences());
             } catch (IOException ioex) {
@@ -338,9 +345,9 @@ public class CitationRelationsTab extends EntryEditorTab {
         });
         tallies.getChildren().add(providedByButtonMetrics);
 
-        Button providedByButtonRelations = IconTheme.JabRefIcons.HELP.asButton();
+        Button providedByButtonRelations = ControlHelper.iconButton(IconTheme.JabRefIcons.HELP);
         providedByButtonRelations.setTooltip(new Tooltip(Localization.lang("Relations provided by Semantic Scholar")));
-        providedByButtonRelations.setOnAction(event -> {
+        providedByButtonRelations.setOnAction(_ -> {
             try {
                 NativeDesktop.openBrowser(URLs.SEMANTIC_SCHOLAR_URL, preferences.getExternalApplicationsPreferences());
             } catch (IOException ioex) {
@@ -402,10 +409,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByListView.setMinHeight(0);
 
         // Create refresh Buttons for both sides
-        Button refreshCitingButton = IconTheme.JabRefIcons.REFRESH.asButton();
+        Button refreshCitingButton = ControlHelper.iconButton(IconTheme.JabRefIcons.REFRESH);
         refreshCitingButton.setTooltip(new Tooltip(Localization.lang("Restart search")));
         styleTopBarNode(refreshCitingButton, 15.0);
-        Button refreshCitedByButton = IconTheme.JabRefIcons.REFRESH.asButton();
+        Button refreshCitedByButton = ControlHelper.iconButton(IconTheme.JabRefIcons.REFRESH);
         refreshCitedByButton.setTooltip(new Tooltip(Localization.lang("Restart search")));
         styleTopBarNode(refreshCitedByButton, 15.0);
 
@@ -425,11 +432,11 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByLabel.setContextMenu(createCitationContextMenu(entry, CitationFetcher.SearchType.CITED_BY));
 
         // Create abort buttons for both sides
-        Button abortCitingButton = IconTheme.JabRefIcons.CLOSE.asButton();
+        Button abortCitingButton = ControlHelper.iconButton(IconTheme.JabRefIcons.CLOSE);
         abortCitingButton.getGraphic().resize(30, 30);
         abortCitingButton.setTooltip(new Tooltip(Localization.lang("Cancel search")));
         styleTopBarNode(abortCitingButton, 15.0);
-        Button abortCitedButton = IconTheme.JabRefIcons.CLOSE.asButton();
+        Button abortCitedButton = ControlHelper.iconButton(IconTheme.JabRefIcons.CLOSE);
         abortCitedButton.getGraphic().resize(30, 30);
         abortCitedButton.setTooltip(new Tooltip(Localization.lang("Cancel search")));
         styleTopBarNode(abortCitedButton, 15.0);
@@ -442,10 +449,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         styleTopBarNode(citedByProgress, 50.0);
 
         // Create import buttons for both sides
-        Button importCitingButton = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
+        Button importCitingButton = ControlHelper.iconButton(IconTheme.JabRefIcons.ADD_ENTRY);
         importCitingButton.setTooltip(new Tooltip(Localization.lang("Add selected entry(s) to library")));
         styleTopBarNode(importCitingButton, 50.0);
-        Button importCitedByButton = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
+        Button importCitedByButton = ControlHelper.iconButton(IconTheme.JabRefIcons.ADD_ENTRY);
         importCitedByButton.setTooltip(new Tooltip(Localization.lang("Add selected entry(s) to library")));
         styleTopBarNode(importCitedByButton, 50.0);
         hideNodes(importCitingButton, importCitedByButton);
@@ -522,18 +529,18 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                     if (entry.isLocal()) {
                         hContainer.getStyleClass().add("duplicate-entry");
-                        Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
+                        Button jumpTo = ControlHelper.iconButton(IconTheme.JabRefIcons.LINK);
                         jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in library")));
                         jumpTo.getStyleClass().add("addEntryButton");
                         jumpTo.setOnMouseClicked(_ -> jumpToEntry(entry));
                         vContainer.getChildren().add(jumpTo);
 
-                        Button compareButton = IconTheme.JabRefIcons.MERGE_ENTRIES.asButton();
+                        Button compareButton = ControlHelper.iconButton(IconTheme.JabRefIcons.MERGE_ENTRIES);
                         compareButton.setTooltip(new Tooltip(Localization.lang("Compare with existing entry")));
                         compareButton.setOnMouseClicked(_ -> openPossibleDuplicateEntriesWindow(entry, listView));
                         vContainer.getChildren().add(compareButton);
                     } else {
-                        ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
+                        ToggleButton addToggle = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.ADD);
                         addToggle.setTooltip(new Tooltip(Localization.lang("Select entry")));
                         EasyBind.subscribe(addToggle.selectedProperty(), selected -> {
                             if (selected) {
@@ -548,7 +555,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     }
 
                     if (entry.entry().getDOI().isPresent() || entry.entry().getField(StandardField.URL).isPresent()) {
-                        Button openWeb = IconTheme.JabRefIcons.OPEN_LINK.asButton();
+                        Button openWeb = ControlHelper.iconButton(IconTheme.JabRefIcons.OPEN_LINK);
                         openWeb.setTooltip(new Tooltip(Localization.lang("Open URL or DOI")));
                         openWeb.setOnMouseClicked(_ -> {
                             String url = entry.entry().getDOI().flatMap(DOI::getExternalURI).map(URI::toString)
@@ -565,7 +572,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                         vContainer.getChildren().addLast(openWeb);
                     }
 
-                    Button showEntrySource = IconTheme.JabRefIcons.SOURCE.asButton();
+                    Button showEntrySource = ControlHelper.iconButton(IconTheme.JabRefIcons.SOURCE);
                     showEntrySource.setTooltip(new Tooltip(Localization.lang("%0 source", "BibTeX")));
                     showEntrySource.setOnMouseClicked(_ -> showEntrySourceDialog(entry.entry()));
 
@@ -573,6 +580,14 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                     hContainer.getChildren().addAll(entryNode, separator, vContainer);
                     hContainer.getStyleClass().add("entry-container");
+
+                    // [impl->req~entry-editor.citations.hover-preview~1]
+                    hContainer.setOnMouseEntered(_ -> {
+                        stateManager.getActiveDatabase().ifPresent(databaseContext -> {
+                            previewTooltip.createPreviewTooltip(databaseContext, entry.entry());
+                        });
+                    });
+                    Tooltip.install(hContainer, previewTooltip);
 
                     return hContainer;
                 })

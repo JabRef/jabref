@@ -1,5 +1,6 @@
 package org.jabref.http.server;
 
+import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -12,7 +13,6 @@ import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.dto.GsonMessageBodyReader;
 import org.jabref.http.dto.GsonMessageBodyWriter;
 import org.jabref.http.server.cayw.format.FormatterService;
-import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -42,7 +42,9 @@ public abstract class ServerTest extends JerseyTest {
 
     private static CliPreferences preferences;
 
-    private static final FilesToServe FILES_TO_SERVE = new FilesToServe();
+    /// Holds the libraries the next `configure()` will parse and pass to
+    /// [JabRefSrvStateManager]. Tests mutate this before the test container starts.
+    private static List<Path> filesToServe = List.of();
 
     @BeforeAll
     static void installLoggingBridge() {
@@ -55,24 +57,21 @@ public abstract class ServerTest extends JerseyTest {
 
     @BeforeEach
     public void setUp() throws Exception {
+        // The state manager bound in configure() (invoked from super.setUp()) snapshots
+        // the file list at construction time, so it must be set first.
+        filesToServe = List.of(TestBibFile.GENERAL_SERVER_TEST.path);
         super.setUp();
-        FILES_TO_SERVE.setFilesToServe(List.of(TestBibFile.GENERAL_SERVER_TEST.path));
-    }
-
-    protected void addFilesToServeToResourceConfig(ResourceConfig resourceConfig) {
-        resourceConfig.register(new AbstractBinder() {
-            @Override
-            protected void configure() {
-                bind(FILES_TO_SERVE).to(FilesToServe.class);
-            }
-        });
     }
 
     protected void addGuiBridgeToResourceConfig(ResourceConfig resourceConfig) {
         resourceConfig.register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bind(new JabRefSrvStateManager(preferences.getBibEntryPreferences(), List.of())).to(SrvStateManager.class);
+                bind(new JabRefSrvStateManager(
+                        preferences.getBibEntryPreferences(),
+                        preferences.getImportFormatPreferences(),
+                        filesToServe))
+                        .to(SrvStateManager.class);
             }
         });
     }
@@ -106,8 +105,20 @@ public abstract class ServerTest extends JerseyTest {
         });
     }
 
+    /// Restarts the Jersey test container so the state manager is rebuilt with the new
+    /// files. Necessary because the state manager snapshots the file list at
+    /// `configure()` time (see [#filesToServe]).
+    ///
+    /// Calls `super.setUp()` rather than this class's `setUp()` because the latter resets
+    /// {@link #filesToServe} to the default, which would discard the caller's selection.
     protected void setAvailableLibraries(EnumSet<TestBibFile> files) {
-        FILES_TO_SERVE.setFilesToServe(files.stream().map(file -> file.path).toList());
+        try {
+            tearDown();
+            filesToServe = files.stream().map(file -> file.path).toList();
+            super.setUp();
+        } catch (Exception e) {
+            throw new IllegalStateException("Could not restart test container with new files", e);
+        }
     }
 
     private static void initializePreferencesService() {

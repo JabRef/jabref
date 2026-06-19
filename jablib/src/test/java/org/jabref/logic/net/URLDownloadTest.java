@@ -65,10 +65,12 @@ class URLDownloadTest {
 
     @Test
     void downloadToTemporaryFileKeepsName() throws MalformedURLException, FetcherException {
-        URLDownload google = new URLDownload(URLUtil.create("https://github.com/JabRef/jabref/blob/main/LICENSE"));
-
-        String path = google.toTemporaryFile().toString();
-        assertTrue(path.contains("LICENSE"), path);
+        URLDownload urlDownload = new URLDownload(
+                URLUtil.create("https://files.jabref.org/download-test.txt"));
+        Path path = urlDownload.toTemporaryFile();
+        String fileName = path.getFileName().toString();
+        // fileName is something like jabref-download-test8822989014397910829.txt; thus we cannot use assertEquals
+        assertTrue(fileName.contains("download-test"));
     }
 
     @Test
@@ -121,13 +123,13 @@ class URLDownloadTest {
 
     @Test
     void test503ErrorThrowsFetcherServerException() throws MalformedURLException {
-        URLDownload urlDownload = new URLDownload(URLUtil.create("http://httpstat.us/503"));
+        URLDownload urlDownload = new URLDownload(URLUtil.create("https://gethttpstatus.com/503"));
         assertThrows(FetcherServerException.class, urlDownload::asString);
     }
 
     @Test
     void test429ErrorThrowsFetcherClientException() throws MalformedURLException {
-        URLDownload urlDownload = new URLDownload(URLUtil.create("http://httpstat.us/429"));
+        URLDownload urlDownload = new URLDownload(URLUtil.create("https://gethttpstatus.com/429"));
         assertThrows(FetcherClientException.class, urlDownload::asString);
     }
 }
