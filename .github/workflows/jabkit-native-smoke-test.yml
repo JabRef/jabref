@@ -27,7 +27,7 @@ jobs:
           distribution: graalvm
 
       - name: Build JabKit native binary
-        run: ./gradlew :jabkit:nativeCompile
+        run: gradle :jabkit:nativeCompile
 
       - name: Install clitest
         uses: ethanjli/cached-download-action@v0.1.4

@@ -414,7 +414,7 @@ jobs:
       # unreleased changes. -PprojVersion=6.0 makes the artifact 6.0-SNAPSHOT
       # (the default would be 0.1.0-SNAPSHOT, which the scripts do not reference).
       - name: Publish jablib to the local Maven repository
-        run: ./gradlew -PprojVersion=6.0 :jablib:publishToMavenLocal
+        run: gradle -PprojVersion=6.0 :jablib:publishToMavenLocal
       - name: Build JBang scripts and run launchers
         uses: ./.github/actions/jbang-check
 
