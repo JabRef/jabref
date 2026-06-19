@@ -229,7 +229,7 @@ class GitSyncServiceTest {
 
         applyAutoPlan(context, pullPlan.get().autoPlan());
         CliPreferences cliPreferences = mock(CliPreferences.class, RETURNS_DEEP_STUBS);
-        when(cliPreferences.getJournalAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
+        when(cliPreferences.getAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
         GitFileWriter.write(library, context, cliPreferences, mock(JournalAbbreviationRepository.class));
         BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan.orElse(null));
 
@@ -265,7 +265,7 @@ class GitSyncServiceTest {
 
         applyAutoPlan(context, pullPlan.get().autoPlan());
         CliPreferences cliPreferences = mock(CliPreferences.class, RETURNS_DEEP_STUBS);
-        when(cliPreferences.getJournalAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
+        when(cliPreferences.getAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
         GitFileWriter.write(library, context, cliPreferences, mock(JournalAbbreviationRepository.class));
 
         BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan.orElse(null));
@@ -363,7 +363,7 @@ class GitSyncServiceTest {
         applyResolved(context, resolvedEntries);
 
         CliPreferences cliPreferences = mock(CliPreferences.class, RETURNS_DEEP_STUBS);
-        when(cliPreferences.getJournalAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
+        when(cliPreferences.getAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
         GitFileWriter.write(library, context, cliPreferences, mock(JournalAbbreviationRepository.class));
         BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan.orElse(null));
         assertEquals(BookkeepingResult.Kind.NEW_COMMIT, bookkeepingResult.kind(), "Expected bookkeeping to create a new commit");

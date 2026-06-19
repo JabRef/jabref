@@ -37,6 +37,7 @@ import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibtexImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -75,7 +76,7 @@ public class ImportFormatReader {
 
     public void reset() {
         importers.add(new CopacImporter());
-        importers.add(new EndnoteImporter());
+        importers.add(new EndnoteImporter(citationKeyPatternPreferences));
         importers.add(new EndnoteXmlImporter(importFormatPreferences));
         importers.add(new InspecImporter());
         importers.add(new IsiImporter());
@@ -93,7 +94,7 @@ public class ImportFormatReader {
         }
         importers.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
         importers.add(new RepecNepImporter(importFormatPreferences));
-        importers.add(new ReferImporter());
+        importers.add(new ReferImporter(citationKeyPatternPreferences));
         importers.add(new RisImporter());
         importers.add(new CffImporter(citationKeyPatternPreferences));
         importers.add(new BiblioscapeImporter());
@@ -140,6 +141,13 @@ public class ImportFormatReader {
     /// @return All importers, elements are sorted by name
     public SortedSet<Importer> getImporters() {
         return new TreeSet<>(this.importers);
+    }
+
+    /// Checks whether at least one registered importer supports the file extension.
+    public boolean hasImporterForFile(Path filePath) {
+        return FileUtil.getFileExtension(filePath)
+                       .map(extension -> importers.stream().anyMatch(importer -> importer.supportsFileExtension(extension)))
+                       .orElse(false);
     }
 
     /// @param format       The name of the format used

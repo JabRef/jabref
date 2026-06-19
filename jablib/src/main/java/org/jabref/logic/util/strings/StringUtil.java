@@ -193,7 +193,7 @@ public class StringUtil {
         // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
         addWrappedLine(result, CharMatcher.whitespace().trimTrailingFrom(lines[0]), wrapAmount, newline);
         for (int i = 1; i < lines.length; i++) {
-            if (lines[i].trim().isEmpty()) {
+            if (lines[i].isBlank()) {
                 result.append(newline);
                 result.append('\t');
             } else {
@@ -569,29 +569,6 @@ public class StringUtil {
         return result;
     }
 
-    /// Return a String with n spaces
-    ///
-    /// @param n Number of spaces
-    /// @return String with n spaces
-    public static String repeatSpaces(int n) {
-        return repeat(Math.max(0, n), ' ');
-    }
-
-    /// Return a String with n copies of the char c
-    ///
-    /// @param n Number of copies
-    /// @param c char to copy
-    /// @return String with n copies of c
-    public static String repeat(int n, char c) {
-        StringBuilder resultSB = new StringBuilder(n);
-
-        for (int i = 0; i < n; i++) {
-            resultSB.append(c);
-        }
-
-        return resultSB.toString();
-    }
-
     public static boolean isNullOrEmpty(@Nullable String toTest) {
         return (toTest == null) || toTest.isEmpty();
     }
@@ -605,7 +582,7 @@ public class StringUtil {
     }
 
     /// Checks if a CharSequence is not empty (""), not null and not whitespace only.
-    public static boolean isNotBlank(String string) {
+    public static boolean isNotBlank(@Nullable String string) {
         return !isBlank(string);
     }
 
@@ -747,7 +724,7 @@ public class StringUtil {
             sb.append(WRAPPED_LINE_PREFIX);
             sb.append(pair.getKey());
 
-            sb.append(StringUtil.repeatSpaces(padding));
+            sb.repeat(" ", padding);
 
             sb.append(STRING_TABLE_DELIMITER);
             sb.append(pair.getValue());
@@ -755,5 +732,9 @@ public class StringUtil {
         }
 
         return sb.toString();
+    }
+
+    public static String makeSafe(@Nullable String string) {
+        return Optional.ofNullable(string).orElse("");
     }
 }

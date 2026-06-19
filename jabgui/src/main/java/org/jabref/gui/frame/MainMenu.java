@@ -351,7 +351,7 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, frame::getCurrentLibraryTab, dialogService, preferences)),
-                factory.createMenuItem(StandardActions.CLEAR_EMBEDDINGS_CACHE, new ClearEmbeddingsAction(stateManager, dialogService, aiService, taskExecutor)),
+                factory.createMenuItem(StandardActions.CLEAR_EMBEDDINGS_CACHE, new ClearEmbeddingsAction(stateManager, dialogService, aiService, taskExecutor, preferences.getFilePreferences())),
 
                 new SeparatorMenuItem(),
 

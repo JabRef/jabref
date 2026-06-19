@@ -11,9 +11,12 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
+import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
+import org.jabref.logic.os.OS;
 
 public class OpenOfficePreferences {
 
@@ -64,6 +67,44 @@ public class OpenOfficePreferences {
         this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat);
         this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
         this.addSpaceAfter = new SimpleBooleanProperty(addSpaceAfter);
+    }
+
+    private OpenOfficePreferences() {
+        this(
+                OS.WINDOWS ? DEFAULT_WIN_EXEC_PATH              // executablePath
+                           : OS.OS_X ? DEFAULT_OSX_EXEC_PATH
+                                     : DEFAULT_LINUX_EXEC_PATH,
+                true,                             // useAllDatabases
+                false,                                          // syncWhenCiting
+                List.of(),                                      // externalJStyles
+                JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,     // currentJStyle
+                CSLStyleLoader.getDefaultStyle(),               // currentStyle
+                false,                                          // alwaysAddCitedOnPages
+                "References",                                   // cslBibliographyTitle
+                "Heading 2",                                    // cslBibliographyHeaderFormat
+                "Text body",                                    // cslBibliographyBodyFormat
+                List.of(),                                      // externalCslStyles
+                true                                            // addSpaceAfter
+        );
+    }
+
+    public static OpenOfficePreferences getDefault() {
+        return new OpenOfficePreferences();
+    }
+
+    public void setAll(OpenOfficePreferences preferences) {
+        this.executablePath.set(preferences.getExecutablePath());
+        this.useAllDatabases.set(preferences.getUseAllDatabases());
+        this.syncWhenCiting.set(preferences.getSyncWhenCiting());
+        this.externalJStyles.setAll(preferences.getExternalJStyles());
+        this.currentJStyle.set(preferences.getCurrentJStyle());
+        this.currentStyle.set(preferences.getCurrentStyle());
+        this.alwaysAddCitedOnPages.set(preferences.getAlwaysAddCitedOnPages());
+        this.cslBibliographyTitle.set(preferences.getCslBibliographyTitle());
+        this.cslBibliographyHeaderFormat.set(preferences.getCslBibliographyHeaderFormat());
+        this.cslBibliographyBodyFormat.set(preferences.getCslBibliographyBodyFormat());
+        this.externalCslStyles.setAll(preferences.getExternalCslStyles());
+        this.addSpaceAfter.set(preferences.getAddSpaceAfter());
     }
 
     public void clearConnectionSettings() {
@@ -119,8 +160,7 @@ public class OpenOfficePreferences {
     }
 
     public void setExternalJStyles(List<String> list) {
-        externalJStyles.clear();
-        externalJStyles.addAll(list);
+        externalJStyles.setAll(list);
     }
 
     /// path to the used style file
@@ -204,8 +244,7 @@ public class OpenOfficePreferences {
     }
 
     public void setExternalCslStyles(List<String> paths) {
-        externalCslStyles.clear();
-        externalCslStyles.addAll(paths);
+        externalCslStyles.setAll(paths);
     }
 
     public boolean getAddSpaceAfter() {

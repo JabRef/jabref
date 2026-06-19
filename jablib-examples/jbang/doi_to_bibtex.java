@@ -12,9 +12,11 @@ import org.tinylog.Logger;
 
 //DESCRIPTION Converts a DOI to BibTeX
 
-//JAVA 25+
+//JAVA 25
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 //FILES tinylog.properties=tinylog.properties
+// see  https://github.com/gradlex-org/extra-java-module-info/issues/237 why we include e-adr here
+//DEPS io.github.adr:e-adr:2.0.0
 
 //REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/
 //DEPS org.jabref:jablib:6.0-SNAPSHOT

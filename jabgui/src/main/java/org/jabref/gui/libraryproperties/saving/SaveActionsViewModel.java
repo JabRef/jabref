@@ -47,7 +47,7 @@ public class SaveActionsViewModel implements PropertiesTabViewModel {
             fieldFormatterCleanupsDisableProperty.setValue(!value.isEnabled());
             fieldFormatterCleanupsProperty.setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
         }, () -> {
-            CleanupPreferences defaultPreset = preferences.getDefaultCleanupPreset();
+            CleanupPreferences defaultPreset = CleanupPreferences.getDefault();
             fieldFormatterCleanupsDisableProperty.setValue(!defaultPreset.getFieldFormatterCleanups().isEnabled());
             fieldFormatterCleanupsProperty.setValue(FXCollections.observableArrayList(defaultPreset.getFieldFormatterCleanups().getConfiguredActions()));
         });

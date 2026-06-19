@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 
+import org.jspecify.annotations.Nullable;
+
 public class YearChecker implements ValueChecker {
 
     private static final Predicate<String> CONTAINS_FOUR_DIGIT = Pattern.compile("([^0-9]|^)[0-9]{4}([^0-9]|$)").asPredicate();
@@ -19,7 +21,7 @@ public class YearChecker implements ValueChecker {
     /// can handle any year whose last four nonpunctuation characters are numerals, such as ‘(about 1984)’.
     /// Source: http://ftp.fernuni-hagen.de/ftp-dir/pub/mirrors/www.ctan.org/biblio/bibtex/base/btxdoc.pdf
     @Override
-    public Optional<String> checkValue(String value) {
+    public Optional<String> checkValue(@Nullable String value) {
         if (StringUtil.isBlank(value)) {
             return Optional.empty();
         }

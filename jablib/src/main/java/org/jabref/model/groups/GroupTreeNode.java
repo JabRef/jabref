@@ -35,7 +35,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     /// @param group the group underlying this node
     public GroupTreeNode(AbstractGroup group) {
         super(GroupTreeNode.class);
-        setGroup(group, false, false, null);
+        setGroup(group, false, false, List.of());
     }
 
     public static GroupTreeNode fromGroup(AbstractGroup group) {
@@ -209,6 +209,21 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         GroupTreeNode child = GroupTreeNode.fromGroup(subgroup);
         addChild(child);
         return child;
+    }
+
+    /// Returns the existing group with the given name from the subtree starting at this node,
+    /// or creates it as a top-level {@link ExplicitGroup} (direct subgroup of this node) using
+    /// the given keyword separator if no such group exists. The receiving node itself is
+    /// excluded from the search (it is usually the synthetic "All entries" root).
+    ///
+    /// Group names are unique within a library, so the name identifies the group anywhere
+    /// in the tree.
+    public GroupTreeNode findOrCreateExplicitGroup(String name, Character keywordSeparator) {
+        return iterateOverTree()
+                .filter(node -> node != this)
+                .filter(node -> name.equals(node.getName()))
+                .findFirst()
+                .orElseGet(() -> addSubgroup(new ExplicitGroup(name, GroupHierarchyType.INDEPENDENT, keywordSeparator)));
     }
 
     @Override

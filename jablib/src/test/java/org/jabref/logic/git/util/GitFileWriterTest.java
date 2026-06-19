@@ -50,7 +50,7 @@ class GitFileWriterTest {
 
         Path tempFile = Files.createTempFile("tempgitwriter", ".bib");
         CliPreferences cliPreferences = mock(CliPreferences.class, RETURNS_DEEP_STUBS);
-        when(cliPreferences.getJournalAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
+        when(cliPreferences.getAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
         GitFileWriter.write(tempFile, inputDatabaseContext, cliPreferences, mock(JournalAbbreviationRepository.class));
 
         String written = Files.readString(tempFile);

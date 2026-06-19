@@ -42,6 +42,7 @@ public class MetaData {
 
     public static final String META_FLAG = "jabref-meta: ";
     public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
+    public static final String ENTRYTYPE_FLAG_V2 = "jabref-entrytype-v2: ";
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig"; // ToDo: Rename in next major version to saveOrder, adapt testbibs
     public static final String FIELDFORMATTERCLEANUPACTIONS = "fieldFormatterCleanupActions";
     public static final String MULTIFIELDCLEANUPACTIONS = "multiFieldCleanupActions";
@@ -63,6 +64,7 @@ public class MetaData {
     public static final char SEPARATOR_CHARACTER = ';';
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHARACTER);
     public static final String BLG_FILE_PATH = "blgFilePath";
+    public static final String AI_LIBRARY_ID = "aiLibraryId";
 
     private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
@@ -91,6 +93,7 @@ public class MetaData {
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
     @Nullable private String versionDBStructure;
+    @Nullable private String aiLibraryId;
 
     /// Constructs an empty metadata.
     public MetaData() {
@@ -255,6 +258,15 @@ public class MetaData {
         postChange();
     }
 
+    public Optional<String> getAiLibraryId() {
+        return Optional.ofNullable(aiLibraryId);
+    }
+
+    public void setAiLibraryId(@NonNull String id) {
+        this.aiLibraryId = id;
+        postChange();
+    }
+
     public Optional<String> getUserFileDirectory(String user) {
         return Optional.ofNullable(userFileDirectory.get(user));
     }
@@ -415,18 +427,19 @@ public class MetaData {
                 && (mode == that.mode)
                 && Objects.equals(librarySpecificFileDirectory, that.librarySpecificFileDirectory)
                 && Objects.equals(contentSelectors, that.contentSelectors)
-                && Objects.equals(versionDBStructure, that.versionDBStructure);
+                && Objects.equals(versionDBStructure, that.versionDBStructure)
+                && Objects.equals(aiLibraryId, that.aiLibraryId);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrder, citeKeyPatterns, userFileDirectory,
-                latexFileDirectory, defaultCiteKeyPattern, fieldFormatterCleanupActions, multiFieldCleanups, journalAbbreviationCleanup, mode, librarySpecificFileDirectory, contentSelectors, versionDBStructure);
+                latexFileDirectory, defaultCiteKeyPattern, fieldFormatterCleanupActions, multiFieldCleanups, journalAbbreviationCleanup, mode, librarySpecificFileDirectory, contentSelectors, versionDBStructure, aiLibraryId);
     }
 
     @Override
     public String toString() {
-        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", fieldFormatterCleanupActions=" + fieldFormatterCleanupActions + ", multiFieldCleanups=" + multiFieldCleanups + ", journalAbbreviationCleanup=" + journalAbbreviationCleanup + ", mode=" + mode + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + "]";
+        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", fieldFormatterCleanupActions=" + fieldFormatterCleanupActions + ", multiFieldCleanups=" + multiFieldCleanups + ", journalAbbreviationCleanup=" + journalAbbreviationCleanup + ", mode=" + mode + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + ", aiLibraryId=" + aiLibraryId + "]";
     }
 
     public Optional<Path> getBlgFilePath(String user) {

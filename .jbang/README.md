@@ -13,7 +13,7 @@ Four use cases:
 ## Running `JabKit`
 
 ```bash
-$ jbang jabkit@jabref --help
+$ jbang --fresh jabkit@jabref --help
 
    &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
    &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
@@ -34,8 +34,7 @@ Usage: jabkit [-dhpv] [COMMAND]
   -p, --porcelain   Enable script-friendly output
   -v, --version     display version info
 Commands:
-  check-consistency       Check consistency of the library.
-  check-integrity         Check integrity of the database.
+  check                   Check the integrity and consistency of a library.
   convert                 Convert between bibliography formats.
   doi-to-bibtex           Converts a DOI to BibTeX
   fetch                   Fetch entries from a provider.
@@ -50,9 +49,19 @@ Commands:
 ```
 
 > [!NOTE]
-> Due to the high development pace, you need to sometimes refresh the dependencies
+> Due to the high development pace, `--fresh` is used to update `org.jabref:jablib:6.0-SNAPSHOT`.
+> As soon as JabRef 6.0 is released, this won't be required any more.
+
+> [!NOTE]
+> The scripts depend on the published `org.jabref:jablib:6.0-SNAPSHOT`.
+> When testing local, unmerged `jablib` changes, publish them to your local Maven repository first:
 >
-> `jbang --fresh jabkit@jabref --help`
+> ```console
+> ./gradlew -PprojVersion=6.0 :jablib:publishToMavenLocal
+> ```
+>
+> `-PprojVersion=6.0` is required: without it the artifact is published as `0.1.0-SNAPSHOT` and JBang will not pick it up.
+> The `mavenlocal` repository is listed first in the scripts, so the locally published `jablib` takes precedence.
 
 ### Installing and Running `JabKit` with JBang
 
@@ -93,19 +102,19 @@ Then you enable `alias jabkit='gg.cmd jbang jabkit@jabref`.
 In case you have [JBang installed], just run following command:
 
 ```terminal
-jbang jabls@jabref
+jbang --fresh jabls@jabref
 ```
 
 With `gg.cmd`:
 
 ```terminal
-sh ./gg.cmd jbang jabls@jabref
+sh ./gg.cmd jbang --fresh jabls@jabref
 ```
 
 With `npx`:
 
 ```terminal
-npx @jbangdev/jbang jabls@jabref
+npx @jbangdev/jbang --fresh jabls@jabref
 ```
 
 One can add `--help` to see available options.
@@ -115,24 +124,24 @@ One can add `--help` to see available options.
 In case you have [JBang installed], just run following command:
 
 ```terminal
-jbang jabsrv@jabref
+jbang --fresh jabsrv@jabref
 ```
 
 With `gg.cmd`:
 
 ```terminal
-sh ./gg.cmd jbang jabsrv@jabref
+sh ./gg.cmd jbang --fresh jabsrv@jabref
 ```
 
 With `npx`:
 
 ```terminal
-npx @jbangdev/jbang jabsrv@jabref
+npx @jbangdev/jbang --fresh jabsrv@jabref
 ```
 
 One can add `--help` to see available options. E.g., how to set another port and how to specify served libraries.
 
-JBang installed: https://www.jbang.dev/download/
+JBang installed: <https://www.jbang.dev/download/>
 
 ## Try out any pull request
 

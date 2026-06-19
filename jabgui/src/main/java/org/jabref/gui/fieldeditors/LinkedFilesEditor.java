@@ -33,6 +33,7 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.copyfiles.CopyLinkedFilesAction;
@@ -45,6 +46,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.linkedfile.LinkedFileEditDialog;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -56,6 +58,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -88,6 +91,10 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     private TaskExecutor taskExecutor;
     @Inject
     private UndoManager undoManager;
+    @Inject
+    private FileUpdateMonitor fileUpdateMonitor;
+    @Inject
+    private StateManager stateManager;
 
     private LinkedFilesEditorViewModel viewModel;
 
@@ -131,7 +138,11 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 preferences,
                 databaseContext,
                 bibEntry,
-                viewModel
+                viewModel,
+                taskExecutor,
+                fileUpdateMonitor,
+                undoManager,
+                stateManager
         );
 
         new ViewModelListCellFactory<LinkedFileViewModel>()
@@ -227,14 +238,14 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         info.setStyle("-fx-padding: 0.5em 0 0.5em 0;"); // To align with buttons below which also have 0.5em padding
         info.getChildren().setAll(label, progressIndicator);
 
-        Button acceptAutoLinkedFile = IconTheme.JabRefIcons.AUTO_LINKED_FILE.asButton();
+        Button acceptAutoLinkedFile = ControlHelper.iconButton(IconTheme.JabRefIcons.AUTO_LINKED_FILE);
         acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang("This file was found automatically. Do you want to link it to this entry?")));
         acceptAutoLinkedFile.visibleProperty().bind(linkedFile.isAutomaticallyFoundProperty());
         acceptAutoLinkedFile.managedProperty().bind(linkedFile.isAutomaticallyFoundProperty());
         acceptAutoLinkedFile.setOnAction(_ -> linkedFile.acceptAsLinked());
         acceptAutoLinkedFile.getStyleClass().setAll("icon-button");
 
-        Button writeMetadataToPdf = IconTheme.JabRefIcons.PDF_METADATA_WRITE.asButton();
+        Button writeMetadataToPdf = ControlHelper.iconButton(IconTheme.JabRefIcons.PDF_METADATA_WRITE);
         writeMetadataToPdf.setTooltip(new Tooltip(Localization.lang("Write BibTeX to PDF (XMP and embedded)")));
         writeMetadataToPdf.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
         writeMetadataToPdf.getStyleClass().setAll("icon-button");
@@ -248,7 +259,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         writeMetadataToPdf.disableProperty().bind(writeMetadataToSinglePdfAction.executableProperty().not());
         writeMetadataToPdf.setOnAction(_ -> writeMetadataToSinglePdfAction.execute());
 
-        Button parsePdfMetadata = IconTheme.JabRefIcons.PDF_METADATA_READ.asButton();
+        Button parsePdfMetadata = ControlHelper.iconButton(IconTheme.JabRefIcons.PDF_METADATA_READ);
         parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));
         parsePdfMetadata.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
         parsePdfMetadata.setOnAction(_ -> {

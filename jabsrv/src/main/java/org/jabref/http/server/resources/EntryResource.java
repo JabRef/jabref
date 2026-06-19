@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.http.SrvStateManager;
-import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.preferences.CliPreferences;
@@ -20,6 +19,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
+import com.google.common.html.HtmlEscapers;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
@@ -44,10 +44,7 @@ public class EntryResource {
     @Inject
     SrvStateManager srvStateManager;
 
-    @Inject
-    FilesToServe filesToServe;
-
-    /// At http://localhost:23119/libraries/{id}/entries/{entryId} <br><br>
+    /// At [http://localhost:23119/libraries/){id}/entries/{entryId}](http://localhost:23119/libraries/){id}/entries/{entryId} <br><br>
     ///
     /// Combines attributes of a given BibEntry into a basic entry preview for as plain text.
     ///
@@ -79,16 +76,14 @@ public class EntryResource {
         String releaseDate = entry.getField(StandardField.DATE).orElse("(N/A)");
 
         // the only difference to the HTML version of this method is the format of the output:
-        String preview =
-                "Author: " + author
-                        + "\nTitle: " + title
-                        + "\nJournal: " + journal
-                        + "\nVolume: " + volume
-                        + "\nNumber: " + number
-                        + "\nPages: " + pages
-                        + "\nReleased on: " + releaseDate;
 
-        return preview;
+        return "Author: " + author
+                + "\nTitle: " + title
+                + "\nJournal: " + journal
+                + "\nVolume: " + volume
+                + "\nNumber: " + number
+                + "\nPages: " + pages
+                + "\nReleased on: " + releaseDate;
     }
 
     /// At http://localhost:23119/libraries/{id}/entries/{entryId} <br><br>
@@ -98,14 +93,23 @@ public class EntryResource {
     /// @param id      The name of the library
     /// @param entryId The CitationKey of the BibEntry
     /// @return a basic entry preview as HTML text
-    /// @throws IOException
     @GET
     @Path("entries/{entryId}")
     @Produces(MediaType.TEXT_HTML + ";charset=UTF-8")
     public String getHTMLRepresentation(@PathParam("id") String id, @PathParam("entryId") String entryId) throws IOException {
         List<BibEntry> entriesByCitationKey = getDatabaseContext(id).getDatabase().getEntriesByCitationKey(entryId);
         if (entriesByCitationKey.isEmpty()) {
-            throw new NotFoundException("Entry with citation key '" + entryId + "' not found in library " + id);
+            // This response is served as text/html, so escape the user-controlled path
+            // parameters before reflecting them into the message (XSS). The message is
+            // attached as the text/html entity so it survives GlobalExceptionMapper, which
+            // forwards WebApplicationException.getResponse() verbatim.
+            String message = "Entry with citation key '"
+                    + HtmlEscapers.htmlEscaper().escape(entryId) + "' not found in library "
+                    + HtmlEscapers.htmlEscaper().escape(id);
+            throw new NotFoundException(Response.status(Response.Status.NOT_FOUND)
+                                                .type(MediaType.TEXT_HTML + ";charset=UTF-8")
+                                                .entity(message)
+                                                .build());
         }
         if (entriesByCitationKey.size() > 1) {
             LOGGER.warn("Multiple entries found with citation key '{}'. Using the first one.", entryId);
@@ -124,16 +128,22 @@ public class EntryResource {
         String releaseDate = entry.getField(StandardField.DATE).orElse("(N/A)");
 
         // the only difference to the plain text version of this method is the format of the output:
-        String preview =
-                "<strong>Author:</strong> " + author + "<br>" +
-                        "<strong>Title:</strong> " + title + "<br>" +
-                        "<strong>Journal:</strong> " + journal + "<br>" +
-                        "<strong>Volume:</strong> " + volume + "<br>" +
-                        "<strong>Number:</strong> " + number + "<br>" +
-                        "<strong>Pages:</strong> " + pages + "<br>" +
-                        "<strong>Released on:</strong> " + releaseDate;
-
-        return preview;
+        return """
+                <strong>Author:</strong> %s<br>
+                <strong>Title:</strong> %s<br>
+                <strong>Journal:</strong> %s<br>
+                <strong>Volume:</strong> %s<br>
+                <strong>Number:</strong> %s<br>
+                <strong>Pages:</strong> %s<br>
+                <strong>Released on:</strong> %s"""
+                .formatted(
+                        HtmlEscapers.htmlEscaper().escape(author),
+                        HtmlEscapers.htmlEscaper().escape(title),
+                        HtmlEscapers.htmlEscaper().escape(journal),
+                        HtmlEscapers.htmlEscaper().escape(volume),
+                        HtmlEscapers.htmlEscaper().escape(number),
+                        HtmlEscapers.htmlEscaper().escape(pages),
+                        HtmlEscapers.htmlEscaper().escape(releaseDate));
     }
 
     @POST
@@ -184,6 +194,6 @@ public class EntryResource {
 
     /// @param id - also "demo" for the Chocolate.bib file
     private BibDatabaseContext getDatabaseContext(String id) throws IOException {
-        return ServerUtils.getBibDatabaseContext(id, filesToServe, srvStateManager, preferences.getImportFormatPreferences());
+        return ServerUtils.getBibDatabaseContext(id, srvStateManager, preferences.getImportFormatPreferences());
     }
 }

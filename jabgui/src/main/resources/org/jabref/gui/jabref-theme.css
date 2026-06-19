@@ -1,0 +1,2452 @@
+/*
+* Contains styles for different style classes and non JavaFX components.
+*
+* Imports the JabRef colors and styles, which also includes a full customization of all JavaFX components.
+*/
+
+@import "jabref-javafx.css";
+
+/* JabRef variables and colors */
+* {
+    /* Consistent size for headers of tab-pane and side-panels*/
+    -jr-header-height: 3em;
+
+    /* Colors for messages and errors */
+    -jr-info: -jr-light-green;
+    -jr-warn: -jr-orange;
+    -jr-error: -jr-light-red;
+    -jr-success: -jr-green;
+
+    /* Generic colors */
+    -jr-white: #ffffff;
+    -jr-gray-1: #dddddd;
+    -jr-gray-2: #808080;
+    -jr-gray-3: #404040;
+    -jr-black: #000;
+
+    /* Main Table Matching */
+    -jr-match-1-odd: -jr-row-odd-background;
+    -jr-match-1-even: -jr-row-even-background;
+    -jr-match-1-text-color: -jr-text-foreground;
+
+    -jr-match-2-odd: derive(-jr-row-odd-background, -40%);
+    -jr-match-2-even: derive(-jr-row-even-background, -40%);
+    -jr-match-2-text-color: derive(-jr-text-foreground, -40%);
+
+    -jr-match-3-odd: derive(-jr-row-odd-background, -50%);
+    -jr-match-3-even: derive(-jr-row-even-background, -50%);
+    -jr-match-3-text-color: derive(-jr-text-foreground, -50%);
+
+    -jr-match-4-odd: derive(-jr-row-odd-background, -60%);
+    -jr-match-4-even: derive(-jr-row-even-background, -60%);
+    -jr-match-4-text-color: derive(-jr-text-foreground, -60%);
+
+    /* Used only in Code inside setStyle(..) */
+    -jr-ai-message-user: derive(-jr-accent, 50%);
+    -jr-ai-message-user-border: -jr-theme;
+    -jr-ai-message-ai: derive(-jr-accent, 80%);
+    -jr-ai-message-ai-border: -jr-theme;
+    -jr-ai-message-error: -jr-error;
+    -jr-ai-message-error-border: derive(-jr-error, -40%);
+}
+
+.unchanged,
+.text-unchanged {
+    -fx-fill: -fx-light-text-color;
+}
+
+.addition {
+    -rtfx-background-color: -jr-success;
+}
+
+.deletion {
+    -rtfx-background-color: -jr-error;
+}
+
+.bold {
+    -fx-font-weight: bold;
+}
+
+.italic {
+    -fx-font-style: italic;
+}
+
+.bordered {
+    -fx-border-width: 1;
+    -fx-border-color: -fx-outer-border;
+}
+
+.bg-transparent {
+    -fx-background-color: transparent;
+}
+
+.padding-right-15 {
+    -fx-padding: 0 15 0 0;
+}
+
+.merge-header-cell {
+    -fx-border-color: -fx-outer-border;
+    -fx-background-color: -jr-row-odd-background;
+}
+
+.merge-header {
+    -fx-background-color: -jr-row-odd-background;
+}
+
+.table-view .groupColumnBackground {
+    -fx-stroke: -jr-gray-3;
+}
+
+#groupTree .numberColumn > .hits:any-selected {
+    -fx-background-color: derive(-jr-green, 70%);
+}
+
+#groupTree .numberColumn > .hits:all-selected {
+    -fx-background-color: -jr-green;
+}
+
+.global-search-bar .toggle-button .glyph-icon {
+    -fx-icon-color: derive(-fx-text-base-color, 80%);
+}
+
+.rating > .container > .button {
+    -fx-icon-color: derive(-fx-text-base-color, 85%);
+}
+
+.rating > .container > .button.strong {
+    -fx-icon-color: -fx-text-base-color;
+}
+
+.file-row-text {
+    -fx-fill: -fx-text-base-color;
+}
+
+.walkthrough-spotlight {
+    -fx-fill: rgba(34, 47, 62, 0.75);
+}
+
+.walkthrough-darken {
+    -fx-fill: rgba(34, 47, 62, 0.75);
+}
+
+.walkthrough-ping {
+    -fx-fill: rgba(163, 183, 230, 0.75);
+}
+
+.walkthrough-tooltip .border {
+    -fx-fill: #f3f3f3 !important;
+}
+
+.updated {
+    -rtfx-background-color: rgba(41, 166, 236, 0.66);
+}
+
+#frame {
+    -fx-background-color: -jr-background-alt;
+}
+
+.TextFlow > .embeddedHyperlink {
+    -fx-padding: 0.166667em 0.25em 0.166667em 0.25em;
+}
+
+.glyph-icon {
+    /* This adjusts text alignment within the bounds of text nodes so that
+       the text is always vertically centered within the bounds. Based on
+       the cap height of the text. */
+    -fx-bounds-type: logical_vertical_center;
+
+    /* The base color of icons should always be the same as the text. */
+    -fx-fill: -fx-text-base-color;
+}
+
+.ikonli-font-icon {
+    -fx-icon-color: -fx-text-base-color;
+}
+
+.text-button {
+    -fx-border-width: 0;
+}
+
+.contained-button {
+    -fx-background-color: -jr-accent;
+    -fx-border-color: -jr-accent;
+}
+
+.icon-buttonNoSpaceBottom,
+.icon-buttonNoSpaceTop,
+.icon-button {
+    -fx-border-width: 0;
+    -fx-background-color: -jr-icon-background;
+    -fx-padding: 0.5em;
+}
+
+.icon-buttonNoSpaceBottom:hover,
+.icon-buttonNoSpaceTop:hover,
+.icon-button:hover {
+    -fx-background-color: -jr-icon-background-active;
+}
+
+.icon-buttonNoSpaceBottom:armed,
+.icon-buttonNoSpaceTop:armed,
+.icon-button:armed {
+    -fx-background-color: -jr-icon-background-armed;
+}
+
+.icon-button:selected {
+    -fx-background-color: -jr-icon-background-active;
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
+.icon-button:disabled {
+    -fx-opacity: 0.4;
+}
+
+.icon-buttonNoSpaceBottom {
+    -fx-padding: 0.5em 0.5em -0.1em 0.5em;
+}
+
+.icon-buttonNoSpaceTop {
+    -fx-padding: -0.1em 0.5em 0.5em 0.5em;
+}
+
+.numberColumn > .hits:any-selected {
+    -fx-background-color: derive(-jr-green, 70%);
+}
+
+.merge-field-value .action-icon {
+    -fx-icon-size: 14;
+    -fx-icon-color: -fx-text-background-color;
+}
+
+.merge-field-value:disabled .action-icon {
+    -fx-opacity: 0%;
+}
+
+.merge-header-cell {
+    -fx-border-width: 0 0 1 0;
+}
+
+.merge-header {
+    -fx-background-color: -jr-row-even-background;
+}
+
+.lib-change-header {
+    -fx-font-size: 130%;
+    -fx-padding: 0.2em 0em 0.2em 0.2em;
+}
+
+.lib-change-legend {
+    -fx-font-size: 11px;
+    -fx-text-fill: #555;
+    -fx-padding: 4 0 0 5;
+}
+
+.table-cell:invalid,
+.list-cell:invalid {
+    -fx-background-color: -jr-warn;
+}
+
+.duplicate-entry {
+    -fx-background-color: -jr-light-green;
+}
+
+.file-row-text:opacity {
+    -fx-fill: derive(-fx-text-base-color, 70%);
+}
+
+.sidePaneComponentHeader {
+    -fx-background-color: -jr-sidepane-header-background;
+    -fx-padding: 0.3em 0.9em 0.3em 0.9em;
+    -fx-pref-height: -jr-header-height;
+}
+
+.sidePaneComponentHeader > .label {
+    -fx-text-fill: -jr-theme;
+    -fx-font-weight: bold;
+    -fx-padding: 0.3em 0.9em 0.3em 0.9em;
+}
+
+.sidePaneComponentHeader .glyph-icon,
+.sidePaneComponentHeader .ikonli-font-icon {
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.0em;
+    -fx-icon-color: -jr-theme;
+}
+
+.progress-indicatorToolbar {
+    -fx-padding: 0.5em;
+}
+
+.progress-indicatorToolbar .percentage {
+    -fx-fill: null;
+}
+
+.mainMenu {
+    -fx-background-color: -jr-menu-background;
+    -fx-background-insets: 0;
+}
+
+.mainMenu > .container > .menu-button > .label {
+    -fx-text-fill: -jr-text-foreground;
+}
+
+.menu-item .glyph-icon {
+    -fx-fill: -jr-text-foreground;
+    -fx-text-fill: -jr-text-foreground;
+}
+
+.menu-item:focused .glyph-icon {
+    -fx-fill: -jr-menu-forground-active;
+    -fx-text-fill: -jr-menu-forground-active;
+}
+
+.mainToolbar {
+    -fx-background-color: -jr-toolbar;
+    -fx-border-color: derive(-jr-toolbar, 50%);
+    -fx-border-width: 0;
+}
+
+.mainToolbar .icon-button {
+    -fx-padding: 0.5em;
+}
+
+/*
+ * -fx-icon-size is intentionally omitted to prevent a rendering loop. The library sets font size
+ * based on the computed icon size, which is itself relative to the font size.
+ */
+.mainToolbar .glyph-icon,
+.mainToolbar .ikonli-font-icon {
+    /* `!important` is override library's default font size */
+    -fx-font-size: 1.7em!important;
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
+    -fx-icon-color: -jr-theme;
+}
+
+.mainToolbar .progress-indicator {
+    -fx-min-width: 2.8em;
+    -fx-max-width: 2.8em;
+}
+
+.search-field {
+    -fx-background-color: -jr-search-background;
+    -fx-border-width: 1;
+    -fx-border-color: -jr-separator;
+    -fx-border-radius: 2;
+    -fx-fill: -fx-text-base-color;
+}
+
+.search-field .button .glyph-icon {
+    -fx-fill: -fx-text-base-color;
+    -fx-text-fill: -fx-text-base-color;
+    -fx-icon-color: -fx-text-base-color;
+}
+
+/*
+ * The magnifying glass icon left of the search text field.
+ * Currently, hits "Web search" and "Groups" only (not the searchbar on the top).
+*/
+.search-field-icon {
+    -fx-icon-color: -fx-text-base-color;
+    -fx-font-size: 1.7em;
+}
+
+/* search modifier buttons */
+.global-search-bar .toggle-button:selected {
+    -fx-background-color: transparent;
+}
+
+.global-search-bar .toggle-button:hover,
+.global-search-bar .toggle-button:selected:hover {
+    -fx-background-color: -jr-icon-background-active;
+}
+
+.global-search-bar .toggle-button:selected .glyph-icon {
+    -fx-icon-color: -fx-text-base-color;
+}
+
+/* search text */
+.global-search-bar .label {
+    -fx-padding: 0em 1.8em 0em 0em;
+}
+
+.global-search-bar:illegal-search {
+    -fx-background-color: derive(-jr-light-red, 70%);
+}
+
+.mode-indicator {
+    -fx-font-size: 0.85em;
+    -fx-text-fill: -fx-mid-text-color;
+}
+
+/* The little arrow that shows up when not all tool-bar icons fit into the tool-bar.
+We want to have a look that matches our icons in the tool-bar */
+.mainToolbar .tool-bar-overflow-button > .arrow {
+    -fx-background-color: -jr-theme;
+}
+
+.mainToolbar .tool-bar-overflow-button:hover > .arrow {
+    -fx-background-color: -fx-mark-highlight-color, derive(-jr-theme, -30%);
+}
+
+.column-header .glyph-icon {
+    -fx-alignment: baseline-center;
+    -fx-text-fill: -fx-text-inner-color;
+    -fx-fill: -fx-text-inner-color;
+}
+
+.table-cell .glyph-icon,
+.tree-table-cell .glyph-icon {
+    -fx-cell-size: 4.0em;
+    -fx-padding: 0.5em 1em 0.5em 1em;
+    -fx-fill: -fx-text-background-color;
+    -fx-text-fill: -fx-text-background-color;
+}
+
+/* Drag and drop colored indicator */
+
+.table-row-cell:dragOver-bottom {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 0 0 -2 0;
+}
+
+.table-row-cell:dragOver-center,
+.table-row-cell:dragOver-center > .table-cell {
+    -fx-background-color: -jr-drag-target-hover;
+}
+
+.table-row-cell:dragOver-top {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 2 0 0 0;
+    -fx-padding: -2 0 0 0;
+}
+
+/* Improve the context menu of the main toolbar, when icons don't fit and you have to press the little arrow to see them */
+.mainToolbar .context-menu .glyph-icon {
+    -fx-fill: -jr-theme;
+}
+
+.mainToolbar .context-menu .glyph-icon:hover {
+    -fx-fill: -jr-menu-forground-active;
+    -fx-text-fill: -jr-menu-forground-active;
+    -fx-background-color: -jr-icon-background-active; /* TODO: This has no effect */
+}
+
+/* This is awful, but I don't know a better way*/
+.mainToolbar .context-menu * {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+#sidePane {
+    -fx-background-color: -jr-sidepane-background;
+}
+
+.sidePaneComponent {
+    -fx-background-color: -jr-sidepane-background;
+}
+
+.bibEntry .type {
+    -fx-font-size: 110%;
+}
+
+.bibEntry .title {
+    -fx-font-size: 110%;
+    -fx-font-weight: bold;
+}
+
+.bibEntry .year {
+    -fx-font-size: 101%;
+    -fx-font-weight: bold;
+}
+
+.bibEntry .journal {
+    -fx-font-size: 101%;
+}
+
+.bibEntry .authors {
+    -fx-font-size: 101%;
+}
+
+.bibEntry .summary {
+    -fx-padding: 1ex 0ex 0ex 0ex;
+}
+
+.warning-icon {
+    -fx-fill: -jr-warn;
+}
+
+.warning-message {
+    -fx-fill: -jr-warn;
+    -fx-text-fill: -jr-warn;
+}
+
+.error-message {
+    -fx-fill: -jr-error;
+    -fx-text-fill: -jr-error;
+}
+
+.error-icon {
+    -fx-text-fill: -jr-error;
+    -fx-fill: -jr-error;
+}
+
+.tooltip-warning {
+    -fx-background-color: -jr-warn;
+}
+
+.tooltip-error {
+    -fx-background-color: -jr-error;
+}
+
+.titleHeader {
+    -fx-font-size: 150%;
+    -fx-padding: 0em 0em 0.5em 0em;
+}
+
+.sectionHeader {
+    -fx-font-size: 130%;
+    -fx-padding: 1em 0em 0.2em 0em;
+}
+
+.innerGridPane {
+    -fx-hgap: 1em;
+    -fx-vgap: 1em;
+}
+
+.prefIndent {
+    -fx-padding: 0 0 0 1.667em;
+}
+
+.code-area .text {
+    -fx-fill: -fx-text-background-color;
+}
+
+.code-area .lineno {
+    -fx-text-fill: -fx-dark-text-color;
+}
+
+#bibtexcodearea {
+    -fx-padding: 4 4 4 4;
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.code-area .selection {
+    -fx-fill: -jr-accent;
+}
+
+.code-area .caret {
+    -fx-stroke: -fx-text-background-color;
+}
+
+.code-area .context-menu {
+    -fx-font-family: sans-serif;
+}
+
+.citationsList {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.citationsList .contextBox {
+    -fx-border-color: -fx-outer-border;
+    -fx-border-insets: 5;
+    -fx-border-style: dashed;
+    -fx-border-width: 2;
+    -fx-padding: 12;
+}
+
+.citationsList .contextBox * {
+    -fx-fill: -fx-text-base-color;
+}
+
+.citationsList .label {
+    -fx-font-family: monospace;
+    -fx-font-weight: bold;
+    -fx-label-padding: 5 0 10 10;
+}
+
+.tags-field {
+    -fx-pref-height: 1.875em;
+    -fx-margin: 0;
+    -fx-border-style: none;
+    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
+}
+
+.tags-field:focused {
+    -fx-border-color: -jr-accent;
+}
+
+.tags-field > .flow-pane > .tag-view {
+    -fx-background: -fx-default-button;
+    -fx-background-color: -fx-default-button;
+}
+
+.tags-field > .flow-pane > .tag-view:selected {
+    -fx-background-color: derive(-fx-default-button, -20%);
+    -fx-text-fill: -fx-focused-text-base-color;
+}
+
+.tags-field > .flow-pane > .tag-view:drag-over {
+    -fx-background-color: -jr-drag-target-hover;
+}
+
+.tags-field-editor {
+    -fx-border-width: 0;
+    -fx-text-fill: -fx-focused-text-base-color;
+    -fx-highlight-text-fill: -fx-text-inner-color;
+    -fx-highlight-fill: derive(-jr-accent, 20%);
+}
+
+.searchBar:invalid {
+    -fx-background-color: rgba(240, 128, 128, 0.5);
+}
+
+.searchBar:unsupported {
+    -fx-background-color: rgba(255, 159, 67, 0.5);
+
+}
+
+.mainTable-header {
+    -fx-fill: -fx-mid-text-color;
+}
+
+.fontsizeSpinner {
+    -fx-pref-width: 5em;
+}
+
+.text-field:invalid {
+    -fx-background-color: rgba(240, 128, 128, 0.5);
+}
+
+.rating {
+    -fx-skin: "org.jabref.gui.util.CustomRatingSkin";
+    -fx-padding: 0.5em 0.0em 0.0em 0.0em;
+}
+
+.table-column .rotated > .label {
+    -fx-content-display: graphic-only;
+}
+
+.customGenerateButton {
+    -fx-padding: 0.5em 2em;
+    -fx-min-width: 10em;
+}
+
+.chat-bubble {
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-border-width: 1;
+    -fx-padding: 10;
+    -fx-max-width: 600;
+}
+
+.chat-bubble:user {
+    -fx-background-color: -jr-ai-message-user;
+    -fx-border-color: -jr-ai-message-user-border;
+}
+
+.chat-bubble:ai {
+    -fx-background-color: -jr-ai-message-ai;
+    -fx-border-color: -jr-ai-message-ai-border;
+}
+
+.chat-bubble:error {
+    -fx-background-color: -jr-ai-message-error;
+    -fx-border-color: -jr-ai-message-error-border;
+}
+
+/* CitationKeyPatternsPanel */
+
+.citation-key-pattern-default-row {
+    -fx-background-color: -fx-default-button;
+}
+
+/* MainTable */
+
+.main-table .column-icon {
+    -fx-alignment: baseline-center;
+    -fx-padding: 0;
+}
+
+.padding-0 {
+    -fx-padding: 0;
+}
+
+.align-center-right {
+    -fx-alignment: CENTER-RIGHT;
+}
+
+.main-table .column-header.column-icon > .label {
+    -fx-padding: 0;
+    -fx-alignment: baseline-center;
+}
+
+.main-table .empty-special-field {
+    visibility: hidden;
+}
+
+.main-table .table-row-cell:hover .empty-special-field {
+    visibility: visible;
+    -fx-icon-color: -jr-gray-2;
+    -fx-fill: -jr-gray-2;
+}
+
+.main-table .table-row-cell:dragOver-bottom {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 0 0 -2 0;
+}
+
+.main-table .table-row-cell:dragOver-center {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 1 1 1 1;
+    -fx-padding: -1 -1 -1 -1;
+    -fx-background-color: -jr-drag-target-hover;
+}
+
+.main-table .table-row-cell:dragOver-top {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 2 0 0 0;
+    -fx-padding: -2 0 0 0;
+}
+
+/* matching-search-and-groups */
+
+.main-table .table-row-cell:matching-search-and-groups:even {
+    -fx-background-color: -jr-match-1-even;
+}
+.main-table .table-row-cell:matching-search-and-groups:odd {
+    -fx-background-color: -jr-match-1-odd;
+}
+
+.main-table .table-row-cell:matching-search-and-groups:selected {
+    -fx-background-color: -jr-selected;
+}
+
+.main-table .table-row-cell:matching-search-and-groups:selected:hover,
+.main-table .table-row-cell:matching-search-and-groups:hover {
+    -fx-background-color: -jr-hover
+}
+
+.main-table .table-row-cell:matching-search-and-groups > .table-cell,
+.main-table .table-row-cell:matching-search-and-groups > .table-cell > .ikonli-font-icon {
+    -fx-text-fill: -jr-match-1-text-color;
+}
+
+.main-table .table-row-cell:matching-search-and-groups:hover > .table-cell,
+.main-table .table-row-cell:matching-search-and-groups:focused:hover > .table-cell,
+.main-table .table-row-cell:matching-search-and-groups:selected:focused:hover > .table-cell {
+    -fx-text-fill: derive(-jr-match-1-text-color, 10%);
+}
+
+.main-table .table-row-cell:matching-search-and-groups:focused:hover > .table-cell > .ikonli-font-icon,
+.main-table .table-row-cell:matching-search-and-groups:hover > .table-cell > .ikonli-font-icon,
+.main-table .table-row-cell:matching-search-and-groups:selected:focused:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: derive(-jr-match-1-text-color, 10%);
+}
+
+/* matching-search-not-groups */
+
+.main-table .table-row-cell:matching-search-not-groups:even {
+    -fx-background-color: -jr-match-2-even;
+}
+
+.main-table .table-row-cell:matching-search-not-groups:odd {
+    -fx-background-color: -jr-match-2-odd;
+}
+
+.main-table .table-row-cell:matching-search-not-groups:selected {
+    -fx-background-color: -jr-selected;
+}
+
+.main-table .table-row-cell:matching-search-not-groups:selected:hover,
+.main-table .table-row-cell:matching-search-not-groups:hover {
+    -fx-background-color: -jr-hover;
+}
+
+.main-table .table-row-cell:matching-search-not-groups > .table-cell,
+.main-table .table-row-cell:matching-search-not-groups > .table-cell > .ikonli-font-icon {
+    -fx-text-fill: -jr-match-2-text-color;
+}
+
+.main-table .table-row-cell:matching-search-not-groups:hover > .table-cell,
+.main-table .table-row-cell:matching-search-not-groups:focused:hover > .table-cell,
+.main-table .table-row-cell:matching-search-not-groups:selected:focused:hover > .table-cell {
+    -fx-text-fill: derive(-jr-match-2-text-color, 10%);
+}
+
+.main-table .table-row-cell:matching-search-not-groups:focused:hover > .table-cell > .ikonli-font-icon,
+.main-table .table-row-cell:matching-search-not-groups:hover > .table-cell > .ikonli-font-icon,
+.main-table .table-row-cell:matching-search-not-groups:selected:focused:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: derive(-jr-match-2-text-color, 10%);
+}
+
+/* matching-groups-not-search */
+
+.main-table .table-row-cell:matching-groups-not-search:even {
+    -fx-background-color: -jr-match-3-even;
+}
+
+.main-table .table-row-cell:matching-groups-not-search:odd {
+    -fx-background-color: -jr-match-3-odd;
+}
+
+.main-table .table-row-cell:matching-groups-not-search:selected {
+    -fx-background-color: -jr-selected;
+}
+
+.main-table .table-row-cell:matching-groups-not-search:selected:hover,
+.main-table .table-row-cell:matching-groups-not-search:hover {
+    -fx-background-color: -jr-hover;
+}
+
+.main-table .table-row-cell:matching-groups-not-search > .table-cell,
+.main-table .table-row-cell:matching-groups-not-search > .table-cell > .ikonli-font-icon {
+    -fx-text-fill: -jr-match-3-text-color;
+}
+
+.main-table .table-row-cell:matching-groups-not-search:hover > .table-cell,
+.main-table .table-row-cell:matching-groups-not-search:focused:hover > .table-cell,
+.main-table .table-row-cell:matching-groups-not-search:selected:focused:hover > .table-cell {
+    -fx-text-fill: derive(-jr-match-3-text-color, 10%);
+}
+
+.main-table .table-row-cell:matching-groups-not-search:focused:hover > .table-cell > .ikonli-font-icon,
+.main-table .table-row-cell:matching-groups-not-search:hover > .table-cell > .ikonli-font-icon,
+.main-table .table-row-cell:matching-groups-not-search:selected:focused:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: derive(-jr-match-3-text-color, 10%);
+}
+
+/* not-matching-search-and-groups */
+
+.main-table .table-row-cell:not-matching-search-and-groups:even {
+    -fx-background-color: -jr-match-4-even;
+}
+
+.main-table .table-row-cell:not-matching-search-and-groups:odd {
+    -fx-background-color: -jr-match-4-odd;
+}
+
+.main-table .table-row-cell:not-matching-search-and-groups:selected {
+    -fx-background-color: -jr-selected;
+}
+
+.main-table .table-row-cell:not-matching-search-and-groups:selected:hover,
+.main-table .table-row-cell:not-matching-search-and-groups:hover {
+    -fx-background-color: -jr-hover;
+}
+
+.main-table .table-row-cell:not-matching-search-and-groups > .table-cell,
+.main-table .table-row-cell:not-matching-search-and-groups > .table-cell > .ikonli-font-icon {
+    -fx-text-fill: -jr-match-4-text-color;
+}
+
+.main-table .table-row-cell:not-matching-search-and-groups:hover > .table-cell,
+.main-table .table-row-cell:not-matching-search-and-groups:focused:hover > .table-cell,
+.main-table .table-row-cell:not-matching-search-and-groups:selected:focused:hover > .table-cell {
+    -fx-text-fill: derive(-jr-match-4-text-color, 10%);
+}
+
+.main-table .table-row-cell:not-matching-search-and-groups:focused:hover > .table-cell > .ikonli-font-icon,
+.main-table .table-row-cell:not-matching-search-and-groups:hover > .table-cell > .ikonli-font-icon,
+.main-table .table-row-cell:not-matching-search-and-groups:selected:focused:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: derive(-jr-match-4-text-color, 10%);
+}
+
+.rating > .container {
+    -fx-spacing: 2;
+}
+
+.rating > .container > .button {
+    -fx-pref-width: 16;
+    -fx-pref-height: 10;
+    -fx-background-repeat: no-repeat no-repeat;
+    -fx-background-size: 16 16;
+    -fx-border-style: none;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+}
+
+.rating > .container > .button:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 8, 0.0, 0, 0);
+}
+
+.welcome-label {
+    -fx-font-size: 2.75em;
+    -fx-text-fill: -jr-theme;
+    -fx-font-family: "Arial";
+}
+
+.welcome-description-label {
+    -fx-font-size: 1.75em;
+    -fx-font-family: "Arial";
+}
+
+.welcome-header-label {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+    -fx-font-family: "Arial";
+    -fx-text-fill: -fx-text-inner-color;
+}
+
+.welcome-no-recent-label {
+    -fx-font-size: 1.25em;
+    -fx-text-fill: -jr-theme;
+    -fx-font-family: "Arial";
+}
+
+.welcome-hyperlink {
+    -fx-font-size: 1.25em;
+    -fx-text-fill: -jr-theme;
+}
+
+.welcome-hyperlink:visited {
+    -fx-text-fill: -jr-theme;
+}
+
+
+/* Welcome Tab Layout Styles */
+.welcome-main-container {
+    -fx-max-width: 64em;
+    -fx-spacing: 2.333em;
+    -fx-alignment: center;
+    -fx-padding: 2.667em 2em;
+}
+
+.welcome-top-titles {
+    -fx-spacing: 0.833em;
+    -fx-alignment: top-left;
+    -fx-padding: 0 0 1.667em 0;
+}
+
+.welcome-columns-container {
+    -fx-hgap: 2.083em;
+    -fx-vgap: 2.083em;
+    -fx-alignment: top-center;
+}
+
+.welcome-left-column,
+.welcome-right-column {
+    -fx-min-width: 0;
+    -fx-pref-width: 50%;
+    -fx-max-width: 50em;
+}
+
+.welcome-content-column {
+    -fx-spacing: 2.083em;
+    -fx-alignment: top-left;
+}
+
+.welcome-section {
+    -fx-spacing: 1em;
+    -fx-alignment: top-left;
+}
+
+.welcome-links-content {
+    -fx-spacing: 0.667em;
+    -fx-alignment: top-left;
+}
+
+
+/* Welcome Community  */
+.welcome-community-content {
+    -fx-spacing: 1em;
+    -fx-alignment: top-left;
+}
+
+.welcome-community-icons {
+    -fx-hgap: 1em;
+    -fx-vgap: 0.667em;
+    -fx-alignment: center-left;
+}
+
+.welcome-community-links {
+    -fx-spacing: 1.25em;
+    -fx-alignment: center-left;
+}
+
+.welcome-community-link {
+    -fx-font-size: 1.0em;
+    -fx-text-fill: -jr-theme;
+    -fx-font-family: "Arial";
+}
+
+.welcome-community-link:hover {
+    -fx-underline: true;
+    -fx-text-fill: derive(-jr-theme, -20%);
+}
+
+.welcome-community-version {
+    -fx-alignment: center-left;
+    -fx-padding: 0.417em 0 0 0;
+}
+
+.welcome-community-version-text {
+    -fx-font-size: 0.9em;
+    -fx-text-fill: -jr-gray-2;
+    -fx-font-family: "Arial";
+}
+
+/* donation toast */
+.donation-toast {
+    -fx-background-color: -jr-background-alt;
+    -fx-background-radius: 0.8333333333em;
+    -fx-padding: 0.8333em 1em;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.075), 20, 0.25, 0, 6);
+    -fx-alignment: center-left;
+    -fx-border-color: derive(-jr-base, -10%);
+    -fx-border-radius: 0.8333333333em;
+    -fx-max-height: 4em;
+    -fx-spacing: 1.16667em;
+}
+
+.donation-toast .label {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.donation-toast-title {
+    -fx-font-size: 1.0em;
+    -fx-font-weight: bold;
+}
+
+.donation-toast-desc {
+    -fx-font-size: 0.92em;
+}
+
+.donation-toast-text {
+    -fx-spacing: 2;
+}
+
+.donation-btn-primary,
+.donation-btn-secondary,
+.donation-btn-ghost {
+    -fx-padding: 0.5em 1em;
+    -fx-background-radius: 0.5em;
+    -fx-border-radius: 0.5em;
+}
+
+.donation-btn-primary {
+    -fx-background-color: -jr-primary;
+}
+
+.donation-btn-secondary {
+    -fx-background-color: derive(-fx-control-inner-background, -6%);
+}
+
+.donation-btn-ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-gray-1;
+    -fx-stroke-width: 0;
+    -fx-border-width: 0
+}
+
+.donation-btn-ghost:hover {
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-gray-2;
+}
+
+/* AboutDialog */
+#aboutDialog .about-heading {
+    -fx-font-size: 2.40em;
+    -fx-text-fill: -jr-theme;
+}
+
+#aboutDialog .about-heading:pressed {
+    -fx-text-fill: -jr-selected;
+}
+
+#aboutDialog .top-padding {
+    -fx-padding: 5 0 0 0;
+}
+
+#aboutDialog .dev-heading {
+    -fx-font-size: 1.44em;
+    -fx-padding: -10 0 0 0;
+}
+
+#aboutDialog .sub-heading {
+    -fx-font-size: 1.44em;
+    -fx-padding: 0.312em;
+}
+
+#aboutDialog .about-top {
+    -fx-padding: 0 5 15 5;
+}
+
+#aboutDialog .space {
+    -fx-padding: 0 5 0 5;
+}
+
+#aboutDialog .space-after {
+    -fx-padding: 0 5 0 0;
+}
+
+#aboutDialog .info-sections {
+    -fx-padding: 0.312em;
+}
+
+#aboutDialog .contrib-section {
+    -fx-padding: 5 5 10 5;
+}
+
+#aboutDialog .logo-pane {
+    -fx-fill: transparent;
+}
+
+#aboutDialog .logo-pane SVGPath {
+    -fx-fill: #4f5f8f;
+}
+
+/* DocumentViewer */
+#documentViewerDialog #mainPane {
+    -fx-background-color: -fx-accented-background;
+    -fx-padding: 0;
+}
+
+#documentViewerDialog .document-viewer .page {
+    -fx-padding: 0em 0em 1em 0em;
+    -fx-background-insets: 0;
+}
+
+/* EntryEditor */
+#entryEditor .editorPane {
+    -fx-hgap: 10;
+    -fx-vgap: 6;
+    -fx-background-color: -fx-control-inner-background;
+    -fx-padding: 5 5 5 15;
+}
+
+#entryEditor Text {
+    -fx-text-fill: -fx-text-base-color;
+    -fx-fill: -fx-text-base-color;
+}
+
+#entryEditor .date-picker > .date-picker-display-node {
+    -fx-text-origin: baseline;
+}
+
+#entryEditor .date-picker > .date-picker-display-node *.text {
+    -fx-text-origin: bottom;
+}
+
+#entryEditor .combo-box > *.text {
+    -fx-text-origin: baseline;
+}
+
+#entryEditor #typeLabel {
+    -fx-padding: 0.1em;
+    -fx-font-size: 1.166667em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -jr-theme;
+}
+
+#entryEditor #typeLabel:hover {
+    -fx-padding: 0.1em;
+    -fx-font-size: 1.166667em;
+    -fx-font-weight: bold;
+    -fx-background-color: -jr-icon-background-active;
+}
+
+#entryEditor #typeLabel .context-menu {
+    -fx-font-size: 0.92em;
+    -fx-font-weight: normal;
+}
+
+#entryEditor #typeLabel .tooltip {
+    -fx-font-size: 1em;
+    -fx-font-weight: normal;
+}
+
+#entryEditor .icon-button.narrow {
+    -fx-padding: 0.1em;
+}
+
+#entryEditor .icon-buttonNoSpaceBottom.narrow {
+    -fx-padding: 0.1em 0.1em -0.2em 0.1em;
+}
+
+#entryEditor .icon-buttonNoSpaceTop.narrow {
+    -fx-padding: -0.2em 0.1em 0.1em 0.1em;
+}
+
+#entryEditor .tool-bar {
+    -fx-background-color: -jr-background-alt;
+    -fx-background-insets: 0;
+}
+
+#entryEditor .icon-button .glyph-icon,
+#entryEditor .icon-button .ikonli-font-icon,
+#entryEditor .icon-buttonNoSpaceBottom .glyph-icon,
+#entryEditor .icon-buttonNoSpaceBottom .ikonli-font-icon,
+#entryEditor .icon-buttonNoSpaceTop .glyph-icon,
+#entryEditor .icon-buttonNoSpaceTop .ikonli-font-icon {
+    -glyph-size: 1.0em;
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
+}
+
+#entryEditor .warning-icon {
+    -fx-fill: -jr-warn;
+}
+
+#entryEditor .error-icon {
+    -fx-text-fill: -jr-error;
+    -fx-fill: -jr-error;
+}
+
+#entryEditor .tooltip-warning {
+    -fx-background-color: -jr-warn;
+}
+
+#entryEditor .tooltip-error {
+    -fx-background-color: -jr-error;
+}
+
+#entryEditor .code-area .context-menu {
+    -fx-font-family: sans-serif;
+}
+
+#entryEditor #related-articles-tab {
+    -fx-padding: 20 20 20 20;
+    -fx-background-color: -fx-control-inner-background;
+}
+
+#entryEditor .ai-tab {
+    -fx-padding: 20 20 20 20;
+    -fx-background-color: -fx-control-inner-background;
+}
+
+#entryEditor .gdpr-notice {
+    -fx-border-color: -jr-warn;
+    -fx-border-insets: 5;
+    -fx-border-style: dashed;
+    -fx-border-width: 2;
+    -fx-padding: 12;
+    -fx-font-size: 1.3em;
+}
+
+#entryEditor .recommendation-item {
+    -fx-padding: 0 0 0 20;
+}
+
+#entryEditor #bibtexSourceCodeArea {
+    -fx-padding: 4 4 4 4;
+    -fx-background-color: -fx-control-inner-background;
+}
+
+#entryEditor #bibtexSourceCodeArea .search {
+    -rtfx-background-color: #ffff00;
+    -fx-fill: #7800A9;
+    -fx-font-size: 1.2em;
+    -fx-font-weight: bolder;
+}
+
+#entryEditor #citationsPane {
+    -fx-padding: 0;
+    -fx-background-color: -fx-control-inner-background;
+}
+
+#entryEditor #citationsPane *,
+#entryEditor #scitePane Label,
+#entryEditor #scitePane Text {
+    -fx-fill: -fx-text-background-color;
+}
+
+#entryEditor .heading {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+}
+
+#entryEditor .description {
+    -fx-font-style: italic;
+}
+
+#entryEditor .scite-tallies-label {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+}
+
+#entryEditor .scite-error-box {
+    -fx-padding: 30 0 0 30;
+}
+
+#entryEditor .scite-message-box {
+    -fx-padding: 30 0 0 30;
+}
+
+#entryEditor #scite-error-label {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -jr-error;
+}
+
+#entryEditor .latex-citations-directory-path {
+    -fx-font-family: monospace;
+    -fx-font-weight: bold;
+}
+
+#entryEditor .latex-citations-message-box {
+    -fx-padding: 30 0 0 30;
+}
+
+#entryEditor .latex-citations-error-label {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-accent;
+}
+
+/* ErrorConsole */
+#errorConsole .list-content {
+    -fx-padding: 0em;
+}
+
+#errorConsole .info-section {
+    -fx-graphic-text-gap: 0.8em;
+    -fx-font-size: 1.1em;
+    -fx-line-spacing: 0.2em;
+    -fx-padding: 0.6em 1em;
+    -fx-background-color: rgba(163, 183, 230, 0.16);
+}
+
+#errorConsole .button-bar {
+    -fx-padding: 1em 0em 0em 0em;
+}
+
+#errorConsole .error-console-cell {
+    -fx-padding: 0.6em 1em;
+}
+
+#errorConsole .error-console-cell HBox {
+    -fx-spacing: 0.8em;
+}
+
+#errorConsole .message-box {
+    -fx-spacing: 0.5em;
+}
+
+#errorConsole .info-section .glyph-icon,
+#errorConsole .exception .glyph-icon,
+#errorConsole .output .glyph-icon,
+#errorConsole .log .glyph-icon {
+    -fx-font-size: 1.5em;
+}
+
+#errorConsole .exception .glyph-icon {
+    -fx-icon-color: -jr-error;
+}
+
+#errorConsole .output .glyph-icon {
+    -fx-icon-color: -jr-warn;
+}
+
+#errorConsole .log .glyph-icon {
+    -fx-icon-color: -jr-info;
+}
+
+/* Poor readability on -jr-accent. See: https://webaim.org/resources/contrastchecker/?fcolor=9E4C00&bcolor=A3B7E6 */
+#errorConsole .error-console-cell:selected .exception .glyph-icon {
+    -fx-icon-color: derive(-jr-error, -50%);
+}
+
+#errorConsole .error-console-cell:selected .output .glyph-icon {
+    -fx-icon-color: derive(-jr-warn, -50%);
+}
+
+#errorConsole .error-console-cell:selected .log .glyph-icon {
+    -fx-icon-color: derive(-jr-info, -50%);
+}
+
+#errorConsole .exception,
+#errorConsole .output,
+#errorConsole .log {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+/* GroupTree */
+
+#groupTree:focused,
+#groupTree:filled:selected {
+    -fx-background-color: -jr-sidepane-background;
+    -fx-table-cell-border-color: transparent;
+}
+
+#groupTree, .tree-table-row-cell {
+    -fx-background-color: -jr-sidepane-background;
+}
+
+#groupTree .tree-table-cell {
+    -fx-padding: 0.35em 0em 0.25em 0em;
+}
+
+#groupTree .numberColumn {
+    -fx-alignment: top-right;
+    -fx-padding: 0.35em 0.2em 0.25em 0em;
+}
+
+#groupTree .numberColumn > .hits {
+    -fx-font-size: 0.75em;
+    -fx-background-color: -jr-group-hits-bg;
+    -fx-padding: 0.4em 0.4em 0.4em 0.4em;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0.7em;
+}
+
+#groupTree .numberColumn > .hits .text {
+    -fx-fill: -jr-group-hits-fg;
+}
+
+#groupTree .expansionNodeColumn {
+    -fx-alignment: top-right;
+}
+
+#groupTree .addSubgroupColumn {
+    -fx-padding: 0;
+    -fx-alignment: center;
+}
+
+#groupTree .tree-table-row-cell:dragOver-bottom {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 0 0 -2 0;
+}
+
+#groupTree .tree-table-row-cell:dragOver-center {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 1 1 1 1;
+    -fx-padding: -1 -1 -1 -1;
+    -fx-background-color: -jr-drag-target-hover;
+}
+
+#groupTree .tree-table-row-cell:dragOver-top {
+    -fx-border-color: -jr-drag-target;
+    -fx-border-width: 2 0 0 0;
+    -fx-padding: -2 0 0 0;
+}
+
+#groupTree .tree-table-row-cell:sub > .tree-table-cell {
+    -fx-padding: 0.20em 0em 0.20em 0em;
+}
+
+#groupTree .tree-table-row-cell:sub > .numberColumn {
+    -fx-padding: 0.20em 0.2em 0.20em 0em;
+}
+
+#groupTree .tree-table-row-cell:sub > .addSubgroupColumn {
+    -fx-padding: 0;
+}
+
+#groupTree .tree-table-row-cell:root {
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: -jr-separator;
+}
+
+#groupTree .tree-table-row-cell:root > .tree-table-cell {
+    -fx-padding: 0.65em 0em 0.65em 1em;
+}
+
+#groupTree .tree-table-row-cell:root > .numberColumn {
+    -fx-padding: 0.40em 0.2em 0.40em 0em;
+}
+
+#groupTree .tree-table-row-cell:root > .expansionNodeColumn {
+    -fx-padding: 0.45em 0.2em 0.45em 0.2em;
+}
+
+#groupTree .tree-table-row-cell:root > .addSubgroupColumn {
+    -fx-padding: 0;
+}
+
+#groupTree .tree-table-row-cell:empty {
+    -fx-background-color: transparent; /* hide cells which are not bound to a group */
+}
+
+#groupTree .column-header-background {
+    visibility: hidden; /* hide column header */
+    -fx-padding: -0.8em;
+}
+
+#groupTree .tree-table-row-cell > .tree-table-cell > .tree-disclosure-node > .arrow {
+    -fx-background-color: -fx-mid-text-color;
+    -fx-max-height: 0.5em;
+    -fx-max-width: 0.5em;
+    -fx-padding: 0.333333em 0.229em 0.333333em 0.229em; /* 4 */
+    -fx-shape: "m64,416l96,96l256,-256l-256,-256l-96,96l160,160l-160,160z";
+}
+
+#groupTree .tree-table-row-cell:expanded > .tree-table-cell > .tree-disclosure-node > .arrow {
+    -fx-rotate: 90;
+}
+
+#groupTree .tree-table-row-cell > .tree-table-cell > .icon {
+    -fx-translate-x: -0.4em;
+}
+
+#groupFilterBar {
+    -fx-background-color: -jr-search-background;
+    -fx-border-color: -jr-separator;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 0em 1em 0em 1em;
+}
+
+#groupFilterBar .glyph-icon {
+    -fx-font-size: 2em;
+}
+
+#groupBar .glyph-icon {
+    -fx-font-size: 2em;
+}
+
+/* ImportEntriesDialog */
+
+#importEntriesDialog .addEntryButton {
+    -fx-font-size: 2em;
+}
+
+#importEntriesDialog .addEntryButton:selected {
+    -fx-background-color: transparent;
+    -fx-fill: -jr-selected;
+}
+
+#importEntriesDialog .entry-container {
+    -fx-padding: 0.5em 0em 0.5em 0em;
+}
+
+/* ManageStudyDefinition */
+
+.slr-tab {
+    -fx-padding: 1em;
+}
+
+/* MultiMergeEntries */
+
+#multiMergeEntries .text-changed {
+    -fx-fill: -jr-orange;
+}
+
+#multiMergeEntries .text-added {
+    -fx-fill: -jr-green;
+}
+
+#multiMergeEntries .text-removed {
+    -fx-fill: -jr-red;
+}
+
+#multiMergeEntries .grid-pane {
+    -fx-hgap: 10;
+    -fx-vgap: 10;
+}
+
+#multiMergeEntries .toggle-button {
+    -fx-border-insets: 0;
+    -fx-background-insets: 0;
+    -fx-border-image-insets: 0;
+    -fx-padding: 0.5em;
+    -fx-background-radius: 0;
+}
+
+#multiMergeEntries .box {
+    -fx-spacing: 10;
+}
+
+/* ParseLatexResult */
+
+#referenceListView {
+    -fx-background-color: -jr-sidepane-background;
+}
+
+#referenceListView > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-padding: 4 4 4 4;
+    -fx-background: transparent;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+#referenceListView > .virtual-flow > .clipped-container > .sheet > .list-cell * {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+#parseLatexResultDialog > .split-pane > .split-pane-divider {
+    -fx-padding: 0 4 0 4;
+    -fx-background-color: transparent;
+}
+
+#parseLatexResultDialog .button-bar > .container {
+    -fx-border-width: 1 0 0 0;
+    -fx-border-color: -jr-sidepane-background;
+}
+
+#parseLatexResultDialog .parse-latex-reference-text {
+    -fx-fill: -fx-accent;
+}
+
+/* PreferenceDialog */
+#preferencesDialog #sidepane {
+    -fx-background-color: -jr-sidepane-background;
+}
+
+#preferencesDialog #preferenceTabList {
+    -fx-background-color: transparent;
+}
+
+#preferencesDialog #preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-padding: 8 8 8 8;
+    -fx-background: transparent;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+#preferencesDialog .button-bar > .container {
+    -fx-border-width: 1 0 0 0;
+    -fx-border-color: -jr-sidepane-background;
+}
+
+#preferencesDialog #preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected {
+    -fx-background: -fx-control-inner-background;
+}
+
+#preferencesDialog > .split-pane > .split-pane-divider {
+    -fx-padding: 0 4 0 4;
+    -fx-background-color: transparent;
+}
+
+#preferencesDialog .preferencesTab {
+    -fx-padding: 0.5em;
+}
+
+#preferencesDialog *:search-highlight {
+    -fx-background-color: -jr-light-red;
+}
+
+#preferencesDialog .code-area {
+    -fx-padding: 0;
+    -fx-border-width: 1;
+    -fx-background-color: transparent;
+}
+
+#preferencesDialog .code-area .text {
+    -fx-fill: -fx-text-background-color;
+}
+
+#preferencesDialog .code-area .lineno .text {
+    -fx-fill: -fx-dark-text-color;
+}
+
+#preferencesDialog .code-area .tagmark {
+    -fx-fill: gray;
+}
+
+#preferencesDialog .code-area .anytag {
+    -fx-fill: crimson;
+}
+
+#preferencesDialog .code-area .paren {
+    -fx-fill: firebrick;
+    -fx-font-weight: bold;
+}
+
+#preferencesDialog .code-area .attribute {
+    -fx-fill: darkviolet;
+}
+
+#preferencesDialog .code-area .avalue {
+    -fx-fill: green;
+}
+
+#preferencesDialog .code-area .comment {
+    -fx-fill: teal;
+}
+
+#preferencesDialog .code-area .highlight-keyword {
+    -fx-text-fill: -jr-purple;
+}
+
+#preferencesDialog .code-area .context-menu .menu-item .label {
+    -fx-padding: 2;
+}
+
+/* WebSearchTab */
+.fetcher-list-cell {
+    -fx-padding: 0.3em 0.6em;
+    -fx-alignment: center-left;
+    -fx-spacing: 0.5em;
+}
+
+.fetcher-list-cell:nth-child(odd) {
+    -fx-background-color: -jr-row-odd-background;
+}
+
+.fetcher-list-cell .label {
+    -fx-font-size: 100%;
+}
+
+.fetcher-list-cell .configure-button {
+    -fx-padding: 0.25em 0.5em;
+    -fx-background-color: -fx-control-inner-background;
+    -fx-text-fill: -fx-mid-text-color;
+}
+
+#testButton {
+    -fx-padding: 0.25em 0.5em;
+}
+
+#testButton.success {
+    -fx-text-fill: -jr-success;
+}
+
+#testButton.success .glyph-icon {
+    -fx-icon-color: -jr-success;
+}
+
+#testButton.error {
+    -fx-text-fill: -jr-error;
+}
+
+#testButton.error .glyph-icon {
+    -fx-icon-color: -jr-error;
+}
+
+.api-key-dialog-content {
+    -fx-padding: 1em;
+}
+
+/* CitationRelationsTab */
+
+.padding-5px {
+    -fx-padding: 5px;
+}
+
+.align-center {
+    -fx-alignment: center;
+}
+
+#citationRelationsTab .addEntryButton {
+    -fx-font-size: 2em;
+}
+
+#citationRelationsTab .addEntryButton:selected {
+    -fx-background-color: transparent;
+    -fx-fill: -jr-selected;
+}
+
+#citationRelationsTab .entry-container {
+    -fx-padding: 0.5em 0em 0.5em 0em;
+}
+
+/* JournalInfo */
+.journalInfo {
+    -fx-background-color: -jr-background-alt;
+}
+
+.journalInfo .info-heading {
+    -fx-font-size: 2.5em;
+    -fx-text-fill: -jr-theme;
+}
+
+.journalInfo .info-label {
+    -fx-font-size: 1.25em;
+    -fx-text-fill: -jr-theme;
+}
+
+.journalInfo .hIndex {
+    -fx-font-size: 2em;
+}
+
+.journalInfo .grid-cell {
+    -fx-border-color: transparent -fx-outer-border -fx-outer-border transparent;
+    -fx-border-width: 0 0.062em 0.062em 0;
+}
+
+.journalInfo .grid-cell-r {
+    -fx-border-color: transparent -fx-outer-border transparent transparent;
+    -fx-border-width: 0 0.062em 0 0;
+}
+
+journalInfo .grid-cell-b {
+    -fx-border-color: transparent transparent -fx-outer-border transparent;
+    -fx-border-width: 0 0 0.062em 0;
+}
+
+/* KeyBindingsTab */
+
+.keybinding-table {
+    -fx-table-cell-border-color: transparent;
+    -fx-background-color: transparent;
+}
+
+.keybinding-table .tree-table-row-cell {
+    -fx-background-color: transparent;
+    /* visibility: hidden; */
+}
+
+.keybinding-table .tree-table-row-cell:selected > .tree-table-cell > .icon,
+.keybinding-table .tree-table-row-cell:pressed > .tree-table-cell > .icon {
+    -fx-fill: white;
+}
+
+.keybinding-table-icon-cell {
+    -fx-alignment: CENTER-RIGHT;
+    -fx-padding: 0 5 0 0;
+}
+
+/* ThreeWayMergeView */
+.three-way-merge .merged-field .styled-text-area {
+    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-prompt-text-fill: -fx-mid-text-color;
+}
+
+.three-way-merge .merged-field .styled-text-area:focused {
+    -fx-highlight-fill: derive(-jr-accent, 20%);
+    -fx-background-color: -jr-accent, -fx-control-inner-background;
+    -fx-background-insets: 0, 2;
+    -fx-highlight-text-fill: -fx-text-inner-color;
+}
+
+.three-way-merge .merge-field-value:selected .selection-box {
+    -fx-background-color: -jr-accent-alt;
+    -fx-border-color: -jr-accent;
+}
+
+.three-way-merge .merge-field-value .selection-box {
+    -fx-background-color: #0000;
+    -fx-border-color: #0000;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 2.5;
+}
+
+.three-way-merge .styled-text-area .text {
+    -fx-fill: -fx-text-background-color;
+}
+
+.three-way-merge .field-cell:odd {
+    -fx-background-color: -jr-row-odd-background;
+}
+
+.three-way-merge .field-cell:even {
+    -fx-background-color: -jr-row-even-background;
+}
+
+.three-way-merge .field-cell {
+    -fx-padding: 8;
+}
+
+.three-way-merge .merge-toolbox {
+    -fx-background-color: -jr-menu-background;
+}
+
+.three-way-merge .merge-header-cell .label {
+    -fx-font-weight: bold;
+    -fx-padding: 1, 0, 1, 0;
+}
+
+.three-way-merge .field-name .glyph-icon,
+.three-way-merge .field-name .ikonli-font-icon {
+    -fx-icon-size: 17;
+    -fx-icon-color: -jr-theme;
+}
+
+/* Miscellaneous */
+
+.chatHistory {
+    -fx-border-color: black;
+}
+
+#styleSelectDialog .currentStyleLabel {
+    -fx-font-size: 1em;
+}
+
+#styleSelectDialog .currentStyleNameLabel {
+    -fx-font-size: 1em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -jr-theme;
+}
+
+.exampleQuestionStyle {
+    -fx-background-color: transparent;
+    -fx-padding: 2px 10px;
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+    -fx-border-width: 0.062em;
+    -fx-border-color: -fx-outer-border;
+    -fx-font-weight: bold;
+    -fx-underline: false !important;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.exampleQuestionStyle:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.12);
+}
+
+.refresh {
+    -fx-background-color: transparent;
+}
+
+.text-button-blue {
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.25em;
+    -fx-border-color: transparent;
+}
+
+.add-certificate {
+    -fx-pref-width: 17em;
+    -fx-min-width: 17em;
+}
+
+/* Quick Settings */
+.quick-settings-container,
+.walkthroughs-container {
+    -fx-spacing: 0.3333em;
+    -fx-alignment: top-left;
+}
+
+.quick-settings-button {
+    -fx-background-color: derive(-jr-base, 10%);
+    -fx-border-color: -jr-gray-1;
+    -fx-border-width: 0.08333em;
+    -fx-border-radius: 0.333em;
+    -fx-background-radius: 0.333em;
+    -fx-padding: 0.833em 1.167em;
+    -fx-alignment: center-left;
+    -fx-graphic-text-gap: 0.667em;
+    -fx-font-size: 1.0em;
+    -fx-text-fill: -fx-text-base-color;
+    -fx-cursor: hand;
+}
+
+.quick-settings-button:hover {
+    -fx-background-color: -jr-hover;
+    -fx-border-color: -jr-accent;
+}
+
+.quick-settings-button .glyph-icon,
+.quick-settings-button .ikonli-font-icon {
+    -fx-icon-color: -jr-theme;
+    -fx-fill: -jr-theme;
+    -fx-font-size: 1.1em;
+}
+
+.quick-settings-dialog-container {
+    -fx-padding: 1.333em;
+    -fx-spacing: 1.333em;
+    -fx-pref-width: 42.667em;
+    -fx-font-size: 1em;
+}
+
+.quick-settings-dialog-container > HBox {
+    -fx-alignment: center-left;
+    -fx-spacing: 0.667em;
+}
+
+.quick-settings-dialog-container > ScrollPane {
+    -fx-border-width: 0.083em;
+    -fx-border-color: derive(-fx-base, -20%);
+    -fx-border-radius: 0.333em;
+}
+
+/* Quick Settings: Theme Selection */
+.theme-option {
+    -fx-padding: 0.667em;
+    -fx-border-radius: 0.333em;
+    -fx-background-radius: 0.333em;
+    -fx-spacing: 1em;
+    -fx-alignment: center-left;
+}
+
+.theme-option:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Wireframe base styles */
+.wireframe-container {
+    -fx-border-width: 0.0625em;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 0.125em, 0.0, 0, 0.0625em);
+}
+
+.wireframe-menubar {
+    -fx-padding: 0.1875em 0.0625em;
+    -fx-background-color: -jr-wf-menubar-bg;
+}
+
+.wireframe-menu-item {
+    -fx-border-radius: 0.0625em;
+    -fx-background-radius: 0.0625em;
+    -fx-background-color: -jr-wf-menu-item-bg;
+}
+
+.wireframe-toolbar {
+    -fx-padding: 0.125em;
+    -fx-spacing: 0.375em;
+    -fx-background-color: -jr-wf-toolbar-bg;
+}
+
+.wireframe-tool-item {
+    -fx-border-radius: 0.0625em;
+    -fx-background-radius: 0.0625em;
+    -fx-background-color: -jr-wf-tool-item-bg;
+}
+
+.wireframe-search {
+    -fx-border-width: 0.03125em;
+    -fx-border-radius: 0.125em;
+    -fx-background-radius: 0.125em;
+    -fx-background-color: -jr-wf-search-bg;
+    -fx-border-color: -jr-wf-search-border;
+}
+
+.wireframe-search-field {
+    -fx-border-radius: 0.0625em;
+    -fx-background-radius: 0.0625em;
+    -fx-background-color: -jr-wf-search-field-bg;
+}
+
+.wireframe-sidebar {
+    -fx-padding: 0.25em 0.125em;
+    -fx-background-color: -jr-wf-sidebar-bg;
+}
+
+.wireframe-sidebar-item {
+    -fx-border-radius: 0.0625em;
+    -fx-background-radius: 0.0625em;
+    -fx-background-color: -jr-wf-sidebar-item-bg;
+}
+
+.wireframe-welcome-tab-area {
+    -fx-padding: 0.25em;
+    -fx-alignment: center;
+    -fx-background-color: -jr-wf-welcome-area-bg;
+}
+
+.wireframe-welcome-tab-item {
+    -fx-border-radius: 0.0625em;
+    -fx-background-radius: 0.0625em;
+    -fx-background-color: -jr-wf-welcome-item-bg;
+}
+
+/* Other color scheme */
+.wireframe-light {
+    -jr-wf-menubar-bg: #f9f9f9;
+    -jr-wf-menu-item-bg: -jr-gray-1;
+    -jr-wf-toolbar-bg: #f9f9f9;
+    -jr-wf-tool-item-bg: -jr-theme;
+    -jr-wf-search-bg: -jr-white;
+    -jr-wf-search-border: #dddddd;
+    -jr-wf-search-field-bg: #f8f8f8;
+    -jr-wf-sidebar-bg: -jr-gray-1;
+    -jr-wf-sidebar-item-bg: -jr-theme;
+    -jr-wf-welcome-area-bg: #f3f3f3;
+    -jr-wf-welcome-item-bg: #dddddd;
+}
+
+.wireframe-dark {
+    -jr-wf-menubar-bg: #141824;
+    -jr-wf-menu-item-bg: #424758;
+    -jr-wf-toolbar-bg: #141824;
+    -jr-wf-tool-item-bg: #2c9490;
+    -jr-wf-search-bg: #2c2e3b;
+    -jr-wf-search-border: #424758;
+    -jr-wf-search-field-bg: #424758;
+    -jr-wf-sidebar-bg: #212330;
+    -jr-wf-sidebar-item-bg: #2c9490;
+    -jr-wf-welcome-area-bg: #272b38;
+    -jr-wf-welcome-item-bg: #7d8591;
+}
+
+.wireframe-custom {
+    -jr-wf-menubar-bg: #f5ffe5;
+    -jr-wf-menu-item-bg: #346963;
+    -jr-wf-toolbar-bg: #f5ffe5;
+    -jr-wf-tool-item-bg: #2E838C;
+    -jr-wf-search-bg: -jr-white;
+    -jr-wf-search-border: #2E838C;
+    -jr-wf-search-field-bg: #f0f3ff;
+    -jr-wf-sidebar-bg: #e1ebd1;
+    -jr-wf-sidebar-item-bg: #2E838C;
+    -jr-wf-welcome-area-bg: #E8F2D8;
+    -jr-wf-welcome-item-bg: #2E838C;
+}
+
+/* Quick Settings: Optimization Checkboxes */
+.optimization-checkboxes {
+    -fx-padding: 0 0 0 1em;
+    -fx-spacing: 1.333em;
+}
+
+/* Quick Settings: Push Application Configuration */
+.applications-list {
+    -fx-pref-height: 16.667em;
+    -fx-pref-width: 33.333em;
+}
+
+.application-item {
+    -fx-padding: 0.667em;
+    -fx-border-radius: 0.333em;
+    -fx-background-color: transparent;
+}
+
+.detected-application {
+    -fx-background-color: derive(-jr-accent, 80%);
+    -fx-font-weight: bold;
+}
+
+.application-item:filled:selected {
+    -fx-background-color: -jr-accent;
+    -fx-text-fill: white;
+}
+
+.detected-application .glyph-icon,
+.detected-application .ikonli-font-icon {
+    -fx-icon-color: -jr-theme;
+    -fx-fill: -jr-theme;
+}
+
+/* Quick Settings: Online Fetchers */
+.fetchers-container {
+    -fx-padding: 1em;
+    -fx-spacing: 1em;
+}
+
+/* Walkthrough Styles */
+.walkthrough-overlay {
+    -fx-background-color: transparent;
+}
+
+/* Tooltip Content */
+.walkthrough-tooltip-content-container {
+    -fx-background-color: -jr-background-alt;
+}
+
+.walkthrough-tooltip-content-container {
+    -fx-spacing: 1em;
+    -fx-padding: 1em;
+}
+
+.walkthrough-title-container {
+    -fx-max-width: infinity;
+}
+
+.walkthrough-tooltip-title > *,
+.walkthrough-title > * {
+    -fx-text-fill: -jr-theme!important;
+    -fx-fill: -jr-theme!important;
+    -fx-font-weight: bold;
+    -fx-font-size: 1.75em;
+    -fx-line-spacing: -0.25em;
+}
+
+.walkthrough-side-panel-vertical,
+.walkthrough-side-panel-horizontal {
+    -fx-spacing: 1em;
+    -fx-padding: 2em;
+    -fx-background-color: -jr-background-alt;
+}
+
+.walkthrough-side-panel-vertical {
+    -fx-pref-width: 32em;
+    -fx-max-width: 32em;
+    -fx-min-width: 32em;
+}
+
+.walkthrough-side-panel-horizontal {
+    -fx-pref-height: 18em;
+    -fx-max-height: 18em;
+    -fx-min-height: 18em;
+}
+
+.walkthrough-content {
+    -fx-spacing: 1.5em;
+}
+
+/* Text content containers and flows */
+.walkthrough-text-container {
+    -fx-max-width: infinity;
+}
+
+.walkthrough-text-content {
+    -fx-text-fill: -fx-text-base-color;
+    -fx-font-size: 1.2em;
+    -fx-line-spacing: 0.5em;
+}
+
+/* Info block styling */
+.walkthrough-info-container {
+    -fx-border-color: -jr-theme;
+    -fx-border-width: 0 0 0 0.15em;
+    -fx-padding: 0 0 0 0.75em;
+    -fx-spacing: 0.5em;
+    -fx-alignment: top-left;
+}
+
+.walkthrough-info-container .ikonli-font-icon {
+    -fx-icon-color: -jr-theme;
+    /* 20px is used, since using em seems to lead infinite icon size growth */
+    -fx-icon-size: 20px;
+    /* Center align icon with the text */
+    -fx-translate-y: -0.05em;
+}
+
+.walkthrough-info-text {
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.2em;
+    -fx-line-spacing: 0.5em;
+}
+
+/* Action buttons */
+.walkthrough-actions {
+    -fx-spacing: 0;
+}
+
+.walkthrough-right-actions {
+    -fx-spacing: 0.5em;
+}
+
+.walkthrough-continue-button {
+    -fx-background-color: -jr-theme;
+    -fx-text-fill: -jr-white;
+    -fx-font-size: 1.1em;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
+    -fx-padding: 0.25em 0.5em;
+}
+
+.walkthrough-skip-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.1em;
+    -fx-border-color: -jr-theme;
+    -fx-border-width: 0.08em;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
+    -fx-padding: 0.25em 0.5em;
+}
+
+.walkthrough-back-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.1em;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
+    -fx-padding: 0.25em 0.5em;
+}
+
+.walkthrough-quit-button {
+    -fx-background-color: -jr-base;
+    -fx-border-color: transparent;
+    /* For easy clipping */
+    -fx-padding: 0.5em;
+    -fx-min-width: 2em;
+    -fx-min-height: 2em;
+    -fx-pref-width: 2em;
+    -fx-pref-height: 2em;
+    -fx-max-width: 2em;
+    -fx-max-height: 2em;
+}
+
+.walkthrough-quit-button:hover {
+    -fx-background-color: derive(-jr-base, -20%);
+}
+
+.walkthrough-quit-button:pressed {
+    -fx-background-color: derive(-jr-base, 30%);
+}
+
+.walkthrough-quit-button .glyph-icon,
+.walkthrough-quit-button .ikonli-font-icon {
+    -fx-icon-color: -jr-theme;
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.2em;
+}
+
+.walkthrough-fullscreen-content {
+    -fx-padding: 0.1875em;
+    -fx-spacing: 1em;
+    -fx-max-width: 48em;
+    -fx-fill-width: true;
+}
+
+/* FileSelectionPage */
+
+.file-selection-progress-pane {
+    -fx-alignment: center;
+    -fx-padding: 20;
+}
+
+/* TextFlowLimited */
+
+.text-flow-more-link {
+    -fx-background-color: -jr-white;
+}
+
+/* Markdown styles */
+.markdown-textflow {
+    -fx-text-alignment: left;
+}
+
+.markdown-textflow > * {
+    -fx-fill: -fx-text-base-color;
+}
+
+.markdown-h1 {
+    -fx-font-size: 2em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h2 {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h3 {
+    -fx-font-size: 1.25em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h4 {
+    -fx-font-size: 1.1em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h5 {
+    -fx-font-size: 1em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h6 {
+    -fx-font-size: 0.875em;
+    -fx-font-weight: bold;
+}
+
+.markdown-bold {
+    -fx-font-weight: bold;
+}
+
+.markdown-italic {
+    -fx-font-style: italic;
+}
+
+.markdown-code {
+    -fx-font-family: monospace;
+    -fx-fill: -jr-theme;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 1, 0, 0, 1);
+}
+
+.markdown-code-block {
+    -fx-font-family: monospace;
+    -fx-fill: -fx-text-base-color;
+}
+
+.markdown-list-bullet {
+    -fx-fill: -jr-theme;
+    -fx-font-weight: bold;
+}
+
+.markdown-list-number {
+    -fx-fill: -jr-theme;
+    -fx-font-weight: bold;
+}
+
+.markdown-blockquote-marker {
+    -fx-fill: transparent;
+}
+
+.markdown-blockquote {
+    -fx-fill: -fx-mid-text-color;
+    -fx-font-style: italic;
+}
+
+.markdown-link {
+    -fx-text-fill: -jr-theme;
+    -fx-underline: true;
+}
+
+.markdown-link:hover {
+    -fx-text-fill: #004499;
+}
+
+.invalid-path {
+    -fx-background-color: rgba(238, 82, 83, 0.2);
+    -fx-border-color: -jr-error;
+    -fx-border-width: 1px;
+}
+
+.checkbox-flowpane {
+    -fx-hgap: 1.5em;
+    -fx-vgap: 0.8em;
+}
+
+/* Automatic Field Editor */
+.edit-field-content-pane {
+    -fx-padding: 0em 1em;
+    -fx-spacing: 1em;
+}
+
+.edit-field-content-pane .text-field {
+    -fx-padding: 0.5625em 0.75em;
+}
+
+.edit-field-content-pane .actions {
+    -fx-spacing: 0.75em;
+    -fx-alignment: BASELINE_LEFT;
+}
+
+.edit-field-content-pane .grid-pane {
+    -fx-hgap: 0.75em;
+    -fx-vgap: 0.75em;
+}
+
+.edit-field-content-pane .grid-pane .label {
+    -fx-min-width: 3.5em;
+}
+
+.automatic-field-editor .button-bar .button:default {
+    -fx-min-width: 12em;
+}
+
+/* GemsFX Notifications */
+
+.info-center-view > .main-pane > .all-groups-container .groups-container > .group-view > .header > .group-name-label {
+    -fx-text-fill: -fx-mid-text-color;
+}
+
+.info-center-view .notification-view > .content > .text-container > .title-time-box > .title-label {
+    -fx-text-fill: -fx-dark-text-color;
+}
+
+.info-center-view .notification-view > .content > .close-icon-wrapper > .ikonli-font-icon {
+    -fx-icon-color: -fx-dark-text-color;
+}
+
+.info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .time-label {
+    -fx-text-fill: -fx-dark-text-color;
+}
+
+.info-center-view .notification-view > .content > .text-container > .description-label {
+    -fx-text-fill: -fx-dark-text-color;
+}
+
+.info-center-view .notification-view .default-icon {
+    -fx-icon-color: -fx-dark-text-color;
+}
+
+.info-center-view .notification-view > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane .ikonli-font-icon {
+    -fx-icon-color: -fx-dark-text-color;
+}
+
+.info-center-view .notification-view:expanded > .content > .text-container > .title-time-box > .upper-right-pane > .arrow-pane .ikonli-font-icon {
+    -fx-icon-color: -fx-dark-text-color;
+}
+
+.info-center-view .notification-view > .content > .text-container > .actions-box .button {
+    -fx-background-color: -fx-default-button;
+}
+
+/* Note: stack-pane comes from GemsFX */
+.stack-pane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0, 0;
+    -fx-padding: 0;
+}

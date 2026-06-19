@@ -220,11 +220,11 @@ public class SharedDatabaseUIManager {
                 preferences.getFieldPreferences(),
                 preferences.getFilePreferences(),
                 preferences.getTimestampPreferences(),
-                preferences.getJournalAbbreviationPreferences(),
+                preferences.getAbbreviationPreferences(),
                 preferences.getCitationKeyPatternPreferences().getKeyPatterns(),
                 fileUpdateMonitor,
                 preferences.getFilePreferences().getUserAndHost(),
-                JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()));
+                JournalAbbreviationLoader.loadRepository(preferences.getAbbreviationPreferences()));
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
         return bibDatabaseContext;
     }

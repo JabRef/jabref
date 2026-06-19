@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
@@ -176,7 +175,7 @@ public class BibDatabaseWriter {
                 preferences.getFilePreferences(),
                 preferences.getTimestampPreferences(),
                 preferences.getFieldPreferences(),
-                preferences.getJournalAbbreviationPreferences().shouldUseFJournalField(),
+                preferences.getAbbreviationPreferences().shouldUseFJournalField(),
                 journalAbbreviationRepository);
         List<FieldChange> saveActionChanges = saveActionsWorker.applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
         saveActionsFieldChanges.addAll(saveActionChanges);
@@ -285,6 +284,7 @@ public class BibDatabaseWriter {
         List<BibtexString> strings = database.getStringKeySet()
                                              .stream()
                                              .map(database::getString)
+                                             .flatMap(Optional::stream)
                                              .sorted(new BibtexStringComparator(true))
                                              .toList();
         // First, make a Map of all entries:
@@ -346,18 +346,14 @@ public class BibDatabaseWriter {
             bibWriter.writeLine(userComments);
         }
 
-        bibWriter.write(STRING_PREFIX + "{" + bibtexString.getName() + StringUtil
-                .repeatSpaces(maxKeyLength - bibtexString.getName().length()) + " = ");
+        bibWriter.write(STRING_PREFIX + "{" + bibtexString.getName()
+                + " ".repeat(maxKeyLength - bibtexString.getName().length()) + " = ");
         if (bibtexString.getContent().isEmpty()) {
             bibWriter.write("{}");
         } else {
-            try {
-                String formatted = new FieldWriter(preferences.getFieldPreferences())
-                        .write(InternalField.BIBTEX_STRING, bibtexString.getContent());
-                bibWriter.write(formatted);
-            } catch (InvalidFieldValueException ex) {
-                throw new IOException(ex);
-            }
+            String formatted = new FieldWriter(preferences.getFieldPreferences())
+                    .write(InternalField.BIBTEX_STRING, bibtexString.getContent());
+            bibWriter.write(formatted);
         }
 
         bibWriter.writeLine("}");
@@ -370,6 +366,11 @@ public class BibDatabaseWriter {
     }
 
     protected void writeEntryTypeDefinition(BibEntryType customType) throws IOException {
+        bibWriter.write(COMMENT_PREFIX + "{");
+        bibWriter.write(MetaDataSerializer.serializeCustomEntryTypesV2(customType));
+        bibWriter.writeLine("}");
+        bibWriter.finishBlock();
+
         bibWriter.write(COMMENT_PREFIX + "{");
         bibWriter.write(MetaDataSerializer.serializeCustomEntryTypes(customType));
         bibWriter.writeLine("}");

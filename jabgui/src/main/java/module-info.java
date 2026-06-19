@@ -1,3 +1,5 @@
+import org.jabref.gui.icon.JabRefIconProvider;
+
 open module org.jabref {
     requires org.jabref.jablib;
     requires org.jabref.jabls;
@@ -37,6 +39,7 @@ open module org.jabref {
 
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.javafx;
+    requires /*runtime*/ org.kordamp.ikonli.material;
     requires org.kordamp.ikonli.materialdesign2;
     uses org.kordamp.ikonli.IkonHandler;
     uses org.kordamp.ikonli.IkonProvider;
@@ -44,9 +47,11 @@ open module org.jabref {
     provides org.kordamp.ikonli.IkonHandler
             with org.jabref.gui.icon.JabRefIkonHandler;
     provides org.kordamp.ikonli.IkonProvider
-            with org.jabref.gui.icon.JabrefIconProvider;
+            with JabRefIconProvider;
 
     requires reactfx;
+
+    requires tools.maran.svgnode;
     // endregion
 
     // region: Logging
@@ -167,12 +172,11 @@ open module org.jabref {
     // uses org.eclipse.jgit.transport.SshSessionFactory;
     // uses org.eclipse.jgit.lib.Signer;
 
-    requires transitive org.jspecify;
+    requires org.jspecify;
 
     // region: other libraries (alphabetically)
     // requires cuid;
     requires com.dlsc.pdfviewfx;
-    requires com.pixelduke.fxthemes;
     // requires com.sun.jna;
     // requires dd.plist;
     requires static io.github.eadr;

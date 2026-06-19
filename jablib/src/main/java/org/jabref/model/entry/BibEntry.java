@@ -62,11 +62,19 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.function.Predicate.not;
+
 /// Represents a Bib(La)TeX entry, which can be BibTeX or BibLaTeX.
 ///
 /// Example:
 ///
-///     Some commment={fieldValue},otherFieldName ={otherFieldValue}
+/// ```bibtex
+/// Some comment
+/// @misc{key,
+///   fieldName = {fieldValue},
+///   otherFieldName = {otherFieldValue}
+/// }
+/// ```
 ///
 /// Then,
 ///
@@ -375,7 +383,7 @@ public class BibEntry {
     /// Sets the citation key. Note: This is *not* the internal Id of this entry.
     /// The internal Id is always present, whereas the citation key might not be present.
     ///
-    /// @param newKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
+    /// @param newKey The cite key to set. Must not be null; use {@link #clearCitationKey()} to remove the cite key.
     public Optional<FieldChange> setCitationKey(String newKey) {
         return setField(InternalField.KEY_FIELD, newKey);
     }
@@ -395,6 +403,10 @@ public class BibEntry {
 
     public boolean hasCitationKey() {
         return getCitationKey().isPresent();
+    }
+
+    public Optional<FieldChange> clearCitationKey() {
+        return clearField(InternalField.KEY_FIELD);
     }
 
     /// Returns this entry's type.
@@ -680,7 +692,7 @@ public class BibEntry {
             FieldPreferences fieldPreferences) {
         try (StringWriter writer = new StringWriter()) {
             BibWriter bibWriter = new BibWriter(writer, "\n");
-            FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
+            FieldWriter fieldWriter = new FieldWriter(fieldPreferences);
             BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, entryTypesManager);
             bibEntryWriter.write(entry, bibWriter, type, true);
             return writer.toString();
@@ -997,10 +1009,6 @@ public class BibEntry {
         return keywords;
     }
 
-    public Optional<FieldChange> clearCiteKey() {
-        return clearField(InternalField.KEY_FIELD);
-    }
-
     private void invalidateFieldCache(Field field) {
         latexFreeFields.remove(field);
         fieldsAsWords.remove(field);
@@ -1042,6 +1050,15 @@ public class BibEntry {
         return FileFieldParser.parse(oldValue.get());
     }
 
+    /// Checks if the BibEntry contains the linked file
+    ///
+    /// @param file the file that is checked if it's in the entry or not
+    /// @return true if the entry contains the file
+    public Boolean hasFile(LinkedFile file) {
+        List<LinkedFile> linkedFiles = getFiles();
+        return linkedFiles.contains(file);
+    }
+
     public Optional<FieldChange> addFile(LinkedFile file) {
         List<LinkedFile> linkedFiles = getFiles();
         linkedFiles.add(file);
@@ -1077,7 +1094,7 @@ public class BibEntry {
                    .stream()
                    .flatMap(content -> Arrays.stream(content.split(",")))
                    .map(String::trim)
-                   .filter(key -> !key.isEmpty())
+                   .filter(not(String::isEmpty))
                    .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 

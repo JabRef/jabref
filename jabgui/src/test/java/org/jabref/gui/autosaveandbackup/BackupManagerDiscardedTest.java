@@ -11,7 +11,7 @@ import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -44,7 +44,7 @@ class BackupManagerDiscardedTest {
     private BibEntryTypesManager bibEntryTypesManager;
     private Path backupDir;
     private JournalAbbreviationRepository journalAbbreviationRepository;
-    private JournalAbbreviationPreferences journalAbbreviationPreferences;
+    private AbbreviationPreferences journalAbbreviationPreferences;
 
     @BeforeEach
     void setup(@TempDir Path tempDir) throws IOException {
@@ -57,13 +57,13 @@ class BackupManagerDiscardedTest {
         bibDatabaseContext.setDatabasePath(testBib);
 
         journalAbbreviationRepository = mock(JournalAbbreviationRepository.class);
-        journalAbbreviationPreferences = mock(JournalAbbreviationPreferences.class);
+        journalAbbreviationPreferences = mock(AbbreviationPreferences.class);
         bibEntryTypesManager = new BibEntryTypesManager();
         saveConfiguration = new SelfContainedSaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
         preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
         when(journalAbbreviationPreferences.shouldUseFJournalField()).thenReturn(false);
-        when(preferences.getJournalAbbreviationPreferences()).thenReturn(journalAbbreviationPreferences);
+        when(preferences.getAbbreviationPreferences()).thenReturn(journalAbbreviationPreferences);
 
         saveDatabase();
 

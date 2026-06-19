@@ -8,6 +8,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class CitationKeyPatternPreferences {
 
     public enum KeySuffix {
@@ -16,8 +18,19 @@ public class CitationKeyPatternPreferences {
         SECOND_WITH_B   // CiteKey, CiteKeyB, CiteKeyC ...
     }
 
+    /// List of unwanted characters. These will be removed at the end.
+    /// Note that `+` is a wanted character to indicate "et al." in authorsAlpha.
+    /// Example: `ABC+`. See `org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()` for examples.
+    ///
+    /// Should never be used directly - use [CitationKeyPatternPreferences#getUnwantedCharacters()] instead, which respects the user's preferences
+    ///
+    /// See also #DISALLOWED_CHARACTERS
+    @VisibleForTesting
+    public static final String DEFAULT_UNWANTED_CHARACTERS = "-`ʹ:!;?^$";
+
     private static final GlobalCitationKeyPatterns DEFAULT_CITATION_KEY_PATTERN = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
-    private static final SimpleObjectProperty<Character> DEFAULT_KEYWORD_DELIMITER = new SimpleObjectProperty<>(',');
+
+    private static final SimpleObjectProperty<Character> DEFAULT_KEYWORD_SEPARATOR = new SimpleObjectProperty<>(',');
 
     private final BooleanProperty shouldTransliterateFieldsForCitationKey;
     private final BooleanProperty shouldAvoidOverwriteCiteKey;
@@ -28,9 +41,9 @@ public class CitationKeyPatternPreferences {
     private final StringProperty keyPatternReplacement;
     private final StringProperty unwantedCharacters;
     private final ObjectProperty<GlobalCitationKeyPatterns> keyPatterns;
-    private final SimpleObjectProperty<Character> keywordDelimiter;
+    private final SimpleObjectProperty<Character> keywordSeparator;
 
-    /// @param keywordDelimiter should always be BibEntryProperties#keyWordDelimiterProperty
+    /// @param keywordSeparator should always be org.jabref.model.entry.BibEntryPreferences#keywordSeparator
     public CitationKeyPatternPreferences(boolean shouldTransliterateFieldsForCitationKey,
                                          boolean shouldAvoidOverwriteCiteKey,
                                          boolean shouldWarnBeforeOverwriteCiteKey,
@@ -40,7 +53,7 @@ public class CitationKeyPatternPreferences {
                                          String keyPatternReplacement,
                                          String unwantedCharacters,
                                          GlobalCitationKeyPatterns keyPatterns,
-                                         ReadOnlyObjectProperty<Character> keywordDelimiter) {
+                                         ReadOnlyObjectProperty<Character> keywordSeparator) {
 
         this.shouldTransliterateFieldsForCitationKey = new SimpleBooleanProperty(shouldTransliterateFieldsForCitationKey);
         this.shouldAvoidOverwriteCiteKey = new SimpleBooleanProperty(shouldAvoidOverwriteCiteKey);
@@ -52,8 +65,8 @@ public class CitationKeyPatternPreferences {
         this.unwantedCharacters = new SimpleStringProperty(unwantedCharacters);
         this.keyPatterns = new SimpleObjectProperty<>(keyPatterns);
 
-        this.keywordDelimiter = new SimpleObjectProperty<>();
-        this.keywordDelimiter.bind(keywordDelimiter);
+        this.keywordSeparator = new SimpleObjectProperty<>();
+        this.keywordSeparator.bind(keywordSeparator);
     }
 
     private CitationKeyPatternPreferences() {
@@ -65,12 +78,12 @@ public class CitationKeyPatternPreferences {
                 KeySuffix.SECOND_WITH_A,
                 "",                           // keyPatternRegex
                 "",                           // keyPatternReplacement
-                "-`ʹ:!;?^$",                  // unwantedCharacters
+                DEFAULT_UNWANTED_CHARACTERS,
                 DEFAULT_CITATION_KEY_PATTERN,
                 new SimpleObjectProperty<>()  // keywordDelimiter
         );
 
-        this.keywordDelimiter.bind(DEFAULT_KEYWORD_DELIMITER);
+        this.keywordSeparator.bind(DEFAULT_KEYWORD_SEPARATOR);
     }
 
     public static CitationKeyPatternPreferences getDefault() {
@@ -198,19 +211,15 @@ public class CitationKeyPatternPreferences {
         this.keyPatterns.set(keyPatterns);
     }
 
-    public Character getKeywordDelimiter() {
-        return keywordDelimiter.get();
+    public Character getKeywordSeparator() {
+        return keywordSeparator.get();
     }
 
-    public CitationKeyPatternPreferences withKeywordDelimiter(ReadOnlyObjectProperty<Character> newDelimiter) {
-        if (this.keywordDelimiter.isBound()) {
-            this.keywordDelimiter.unbind();
-        }
-
+    public CitationKeyPatternPreferences withKeywordSeparator(ReadOnlyObjectProperty<Character> newDelimiter) {
         if (newDelimiter == null) {
-            this.keywordDelimiter.bind(DEFAULT_KEYWORD_DELIMITER);
+            this.keywordSeparator.bind(DEFAULT_KEYWORD_SEPARATOR);
         } else {
-            this.keywordDelimiter.bind(newDelimiter);
+            this.keywordSeparator.bind(newDelimiter);
         }
 
         return this;

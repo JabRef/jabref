@@ -14,7 +14,7 @@ import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.journals.Abbreviation;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
@@ -68,9 +68,9 @@ public class SaveActionsWorkerTest {
         when(importFormatPreferences.fieldPreferences()).thenReturn(fieldPreferences);
 
         cliPreferences = mock(CliPreferences.class);
-        JournalAbbreviationPreferences journalAbbreviationPreferences = mock(JournalAbbreviationPreferences.class);
+        AbbreviationPreferences journalAbbreviationPreferences = mock(AbbreviationPreferences.class);
         when(journalAbbreviationPreferences.shouldUseFJournalField()).thenReturn(false);
-        when(cliPreferences.getJournalAbbreviationPreferences()).thenReturn(journalAbbreviationPreferences);
+        when(cliPreferences.getAbbreviationPreferences()).thenReturn(journalAbbreviationPreferences);
         when(cliPreferences.getFieldPreferences()).thenReturn(fieldPreferences);
         when(cliPreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
         when(cliPreferences.getCustomEntryTypesRepository()).thenReturn(entryTypesManager);

@@ -141,7 +141,7 @@ public class SaveDatabaseAction {
             // Close AutosaveManager, BackupManager, and IndexManager for original library
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context, this.preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup());
-            libraryTab.closeIndexManger();
+            libraryTab.closeSearchContext();
         }
 
         // Set new location
@@ -163,7 +163,7 @@ public class SaveDatabaseAction {
             // Reset (here: uninstall and install again) AutosaveManager, BackupManager and IndexManager for the new file name
             libraryTab.resetChangeMonitor();
             libraryTab.installAutosaveManagerAndBackupManager();
-            libraryTab.createIndexManager();
+            libraryTab.createSearchContext();
 
             preferences.getLastFilesOpenedPreferences().getFileHistory().newFile(file);
         }
@@ -222,6 +222,8 @@ public class SaveDatabaseAction {
             libraryTab.setSaving(true);
         }
 
+        libraryTab.suspendChangeMonitor();
+
         try {
             Charset encoding = libraryTab.getBibDatabaseContext()
                                          .getMetaData()
@@ -244,6 +246,7 @@ public class SaveDatabaseAction {
             dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             return false;
         } finally {
+            libraryTab.resumeChangeMonitor();
             // release panel from save status
             libraryTab.setSaving(false);
         }

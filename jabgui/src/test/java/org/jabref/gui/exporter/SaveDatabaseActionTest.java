@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -66,7 +67,7 @@ class SaveDatabaseActionTest {
         when(filePreferences.getWorkingDirectory()).thenReturn(Path.of(TEST_BIBTEX_LIBRARY_LOCATION));
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getExportPreferences()).thenReturn(mock(ExportPreferences.class));
-        when(preferences.getJournalAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
+        when(preferences.getAbbreviationPreferences().shouldUseFJournalField()).thenReturn(false);
         saveDatabaseAction = spy(new SaveDatabaseAction(libraryTab, dialogService, preferences, mock(BibEntryTypesManager.class), stateManager, mock(JournalAbbreviationRepository.class)));
     }
 
@@ -162,5 +163,20 @@ class SaveDatabaseActionTest {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
         boolean result = saveDatabaseAction.save();
         assertFalse(result);
+    }
+
+    @Test
+    void saveSuspendsAndResumesChangeMonitorAroundSuccessfulSave() throws Exception {
+        BibDatabase database = new BibDatabase(List.of(new BibEntry().withField(StandardField.AUTHOR, "first")));
+        saveDatabaseAction = createSaveDatabaseActionForBibDatabase(database);
+        when(libraryTab.isSaving()).thenReturn(false);
+
+        saveDatabaseAction.save();
+
+        verify(libraryTab).suspendChangeMonitor();
+        verify(libraryTab).resumeChangeMonitor();
+        var inOrder = inOrder(libraryTab);
+        inOrder.verify(libraryTab).suspendChangeMonitor();
+        inOrder.verify(libraryTab).resumeChangeMonitor();
     }
 }

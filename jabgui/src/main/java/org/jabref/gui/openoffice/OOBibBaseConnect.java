@@ -15,6 +15,7 @@ import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoCast;
 import org.jabref.model.openoffice.uno.UnoTextDocument;
 import org.jabref.model.openoffice.util.OOResult;
+import org.jabref.model.openoffice.util.OOVoidResult;
 
 import com.sun.star.bridge.XBridge;
 import com.sun.star.bridge.XBridgeFactory;
@@ -23,6 +24,7 @@ import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XEnumeration;
 import com.sun.star.container.XEnumerationAccess;
 import com.sun.star.frame.XDesktop;
+import com.sun.star.lang.DisposedException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
@@ -167,28 +169,30 @@ public class OOBibBaseConnect {
     /// After successful selection connects to the selected document and extracts some frequently used parts (starting points for managing its content).
     ///
     /// Finally initializes this.xTextDocument with the selected document and parts extracted.
-    public void selectDocument(boolean autoSelectForSingle)
-            throws
-            NoDocumentFoundException,
-            NoSuchElementException,
-            WrappedTargetException {
+    public OOVoidResult<OOError> selectDocument(boolean autoSelectForSingle) {
+        try {
+            XTextDocument selected;
+            List<XTextDocument> textDocumentList = getTextDocuments(this.xDesktop);
+            if (textDocumentList.isEmpty()) {
+                return OOVoidResult.error(OOError.from(new NoDocumentFoundException()));
+            } else if ((textDocumentList.size() == 1) && autoSelectForSingle) {
+                selected = textDocumentList.getFirst(); // Get the only one
+            } else { // Bring up a dialog
+                selected = OOBibBaseConnect.selectDocumentDialog(textDocumentList,
+                        this.dialogService);
+            }
 
-        XTextDocument selected;
-        List<XTextDocument> textDocumentList = getTextDocuments(this.xDesktop);
-        if (textDocumentList.isEmpty()) {
-            throw new NoDocumentFoundException("No Writer documents found");
-        } else if ((textDocumentList.size() == 1) && autoSelectForSingle) {
-            selected = textDocumentList.getFirst(); // Get the only one
-        } else { // Bring up a dialog
-            selected = OOBibBaseConnect.selectDocumentDialog(textDocumentList,
-                    this.dialogService);
+            if (selected == null) {
+                return OOVoidResult.ok();
+            }
+
+            this.xTextDocument = selected;
+            return OOVoidResult.ok();
+        } catch (DisposedException e) {
+            return OOVoidResult.error(OOError.from(e).setTitle(Localization.lang("Problem connecting")));
+        } catch (NoSuchElementException | WrappedTargetException e) {
+            return OOVoidResult.error(OOError.fromMisc(e).setTitle(Localization.lang("Problem connecting")));
         }
-
-        if (selected == null) {
-            return;
-        }
-
-        this.xTextDocument = selected;
     }
 
     /// Mark the current document as missing.
@@ -218,16 +222,7 @@ public class OOBibBaseConnect {
         return false;
     }
 
-    /// Either return a valid XTextDocument or throw NoDocumentException.
-    public XTextDocument getXTextDocumentOrThrow()
-            throws
-            NoDocumentException {
-        if (isDocumentConnectionMissing()) {
-            throw new NoDocumentException("Not connected to document");
-        }
-        return this.xTextDocument;
-    }
-
+    /// Returns either a valid XTextDocument in OOResult or a NoDocumentException error
     public OOResult<XTextDocument, OOError> getXTextDocument() {
         if (isDocumentConnectionMissing()) {
             return OOResult.error(OOError.from(new NoDocumentException()));

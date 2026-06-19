@@ -50,8 +50,8 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
-import org.jabref.logic.search.IndexManager;
-import org.jabref.logic.search.PostgreServer;
+import org.jabref.logic.search.sqlbased.IndexManager;
+import org.jabref.logic.search.sqlbased.PostgreServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -177,7 +177,7 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(GitHandlerRegistry.class, gitHandlerRegistry);
 
         BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
-        journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
+        journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getAbbreviationPreferences());
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
         Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);
         Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
@@ -231,7 +231,6 @@ public class JabRefGUI extends Application {
         JabRefGUI.aiService = new AiService(
                 preferences.getAiPreferences(),
                 preferences.getFilePreferences(),
-                preferences.getCitationKeyPatternPreferences(),
                 dialogService,
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
@@ -244,7 +243,8 @@ public class JabRefGUI extends Application {
                 preferences.getEntryEditorPreferences().citationCountFetcherTypeProperty(),
                 preferences.getCitationKeyPatternPreferences(),
                 preferences.getGrobidPreferences(),
-                JabRefGUI.aiService,
+                preferences.getAiPreferences(),
+                aiService.getCurrentChatModel(),
                 entryTypesManager,
                 dialogService
         );
@@ -328,7 +328,7 @@ public class JabRefGUI extends Application {
         Scene scene = new Scene(powerpane);
 
         LOGGER.debug("installing CSS");
-        themeManager.installCssImmediately(scene);
+        themeManager.installCssOnScene(scene);
 
         LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
@@ -338,7 +338,7 @@ public class JabRefGUI extends Application {
         });
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
-        mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
+        mainStage.getIcons().addAll(IconTheme.getLogoSet());
         mainStage.setScene(scene);
         mainStage.setOnShowing(this::onShowing);
         mainStage.setOnCloseRequest(this::onCloseRequest);

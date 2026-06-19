@@ -16,7 +16,7 @@ import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SaveActionsWorker;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.util.MetaDataParser;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.shared.event.ConnectionLostEvent;
@@ -59,7 +59,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final FieldPreferences fieldPreferences;
     private final FilePreferences filePreferences;
     private final TimestampPreferences timestampPreferences;
-    private final JournalAbbreviationPreferences journalAbbreviationPreferences;
+    private final AbbreviationPreferences journalAbbreviationPreferences;
     private final FileUpdateMonitor fileMonitor;
     private Optional<BibEntry> lastEntryChanged;
     private final String userAndHost;
@@ -70,7 +70,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             FieldPreferences fieldPreferences,
                             FilePreferences filePreferences,
                             TimestampPreferences timestampPreferences,
-                            JournalAbbreviationPreferences journalAbbreviationPreferences,
+                            AbbreviationPreferences journalAbbreviationPreferences,
                             @NonNull GlobalCitationKeyPatterns globalCiteKeyPattern,
                             FileUpdateMonitor fileMonitor,
                             String userAndHost,

@@ -21,7 +21,7 @@ import org.kohsuke.github.PagedIterator;
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //DEPS org.kohsuke:github-api:2.0-rc.6
-//DEPS org.eclipse.jgit:org.eclipse.jgit.pgm:7.6.0.202603022253-r
+//DEPS org.eclipse.jgit:org.eclipse.jgit.pgm:7.7.0.202606012155-r
 
 public class CheckoutPR {
     static void main(String[] args) throws Exception {
