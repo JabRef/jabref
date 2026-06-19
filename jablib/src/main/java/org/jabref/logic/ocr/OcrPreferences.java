@@ -23,7 +23,7 @@ public class OcrPreferences {
     }
 
     public static OcrPreferences getDefault() {
-        return new OcrPreferences("");
+        return new OcrPreferences("ocrmypdf");
     }
 
     public void setAll(OcrPreferences preferences) {
