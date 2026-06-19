@@ -42,3 +42,5 @@ runs:
           jbang-
     - name: Setup JBang
       uses: jbangdev/setup-jbang@main
+      with:
+        version: early-access
