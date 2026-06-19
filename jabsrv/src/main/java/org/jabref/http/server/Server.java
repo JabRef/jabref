@@ -86,6 +86,9 @@ public class Server {
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, "statemanager", SrvStateManager.class);
+        // No GUI in standalone mode: bind the null object so the resources' mandatory
+        // UiMessageHandler injection resolves and GUI-only endpoints can reject with a clean 400.
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, UiMessageHandler.NONE, "uimessagehandler", UiMessageHandler.class);
         HttpServer httpServer = startServer(serviceLocator, uri);
 
         // Required for CLI only
@@ -103,19 +106,11 @@ public class Server {
         return httpServer;
     }
 
-    /// Entry point for the GUI
-    public HttpServer run(SrvStateManager srvStateManager, URI uri) {
-        return run(srvStateManager, null, uri);
-    }
-
     /// Entry point for the GUI with UiMessageHandler
-    public HttpServer run(SrvStateManager srvStateManager, @Nullable UiMessageHandler uiMessageHandler, URI uri) {
+    public HttpServer run(SrvStateManager srvStateManager, UiMessageHandler uiMessageHandler, URI uri) {
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, "statemanager", SrvStateManager.class);
-        if (uiMessageHandler != null) {
-            ServiceLocatorUtilities.addOneConstant(serviceLocator, uiMessageHandler, "uimessagehandler", UiMessageHandler.class);
-        }
-
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, uiMessageHandler, "uimessagehandler", UiMessageHandler.class);
         return startServer(serviceLocator, uri);
     }
 

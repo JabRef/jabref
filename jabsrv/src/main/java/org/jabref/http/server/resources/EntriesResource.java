@@ -73,7 +73,7 @@ public class EntriesResource {
     @POST
     @Consumes(MediaTypes.APPLICATION_BIBTEX)
     public void addBibtex(@PathParam("id") String id, @QueryParam("group") @Nullable String group, String bibtex) {
-        if (uiMessageHandler == null) {
+        if (!uiMessageHandler.isGuiConnected()) {
             throw new BadRequestException("Only possible in GUI mode.");
         }
         if (bibtex == null || bibtex.isBlank()) {
@@ -94,7 +94,7 @@ public class EntriesResource {
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
     public void addPlainCitation(@PathParam("id") String id, @QueryParam("group") @Nullable String group, String citationText) throws FetcherException, IOException {
-        if (uiMessageHandler == null) {
+        if (!uiMessageHandler.isGuiConnected()) {
             throw new BadRequestException("Only possible in GUI mode.");
         }
         if (StringUtil.isBlank(citationText)) {
@@ -138,7 +138,7 @@ public class EntriesResource {
     @POST
     @Consumes("*/*")
     public void addUnknown(@PathParam("id") String id, Reader body) throws IOException {
-        if (uiMessageHandler == null) {
+        if (!uiMessageHandler.isGuiConnected()) {
             throw new BadRequestException("Only possible in GUI mode.");
         }
         Optional<java.nio.file.Path> targetLibrary = resolveTargetLibrary(id);

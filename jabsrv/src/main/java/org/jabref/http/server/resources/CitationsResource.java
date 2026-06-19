@@ -65,7 +65,6 @@ public class CitationsResource {
     SrvStateManager srvStateManager;
 
     @Inject
-    @Nullable
     UiMessageHandler uiMessageHandler;
 
     @Inject
@@ -146,7 +145,7 @@ public class CitationsResource {
     public Response addFromCache(@PathParam("id") String id,
                                  @PathParam("parserCacheKey") String parserCacheKey,
                                  @QueryParam("group") @Nullable String group) {
-        if (uiMessageHandler == null) {
+        if (!uiMessageHandler.isGuiConnected()) {
             throw new BadRequestException("Only possible in GUI mode.");
         }
         BibDatabaseContext context = resolveTargetContext(id);
