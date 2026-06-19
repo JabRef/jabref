@@ -1182,7 +1182,7 @@ We want to have a look that matches our icons in the tool-bar */
 #entryEditor .icon-buttonNoSpaceBottom .ikonli-font-icon,
 #entryEditor .icon-buttonNoSpaceTop .glyph-icon,
 #entryEditor .icon-buttonNoSpaceTop .ikonli-font-icon {
-    -fx-icon-size: 14;
+    -glyph-size: 1.0em;
     -fx-fill: -jr-theme;
     -fx-text-fill: -jr-theme;
 }
