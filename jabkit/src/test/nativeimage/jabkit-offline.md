@@ -20,3 +20,9 @@ $ grep -c "@Book{" build/tmp/convert.bib
 3
 $ "$JABKIT" citationkeys generate --porcelain --input=src/test/resources/org/jabref/toolkit/commands/origin.bib 2>/dev/null | grep -c "@Book{"
 3
+$ "$JABKIT" generate-bib-from-aux --porcelain --aux=src/test/resources/org/jabref/toolkit/commands/paper.aux --input=src/test/resources/org/jabref/toolkit/commands/origin.bib --output=build/tmp/generated.bib; echo $?
+0
+$ grep -c "Darwin1888" build/tmp/generated.bib
+1
+$ grep -c "Einstein1920" build/tmp/generated.bib
+1
