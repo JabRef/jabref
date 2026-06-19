@@ -58,6 +58,8 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
+      - name: Setup TestLens
+        uses: testlens-app/setup-testlens@v1.9.2
       - name: Run fetcher tests
         run: gradle fetcherTest
         env:
