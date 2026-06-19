@@ -127,54 +127,6 @@ public class EntryEditorPreferences {
         return tabModels;
     }
 
-    public ObservableList<EntryEditorTabModel> getTabModels() {
-        return tabModels;
-    }
-
-    public boolean isTabVisible(EntryEditorTabModel.BuiltIn key) {
-        return tabModels.stream()
-                        .filter(model -> model.key().filter(key::equals).isPresent())
-                        .findFirst()
-                        .map(EntryEditorTabModel::isVisible)
-                        .orElse(false);
-    }
-
-    public ObservableValue<Boolean> tabVisibleProperty(EntryEditorTabModel.BuiltIn key) {
-        return Bindings.createBooleanBinding(() -> isTabVisible(key), tabModels);
-    }
-
-    public void setTabVisible(EntryEditorTabModel.BuiltIn key, boolean show) {
-        for (int i = 0; i < tabModels.size(); i++) {
-            if (tabModels.get(i).key().filter(key::equals).isPresent()) {
-                tabModels.set(i, tabModels.get(i).withVisible(show));
-                return;
-            }
-        }
-    }
-
-    /// Returns a snapshot map of customized field-set tabs (name → fields). Changes to this map are not
-    /// reflected in the preferences; use {@link #setEntryEditorTabList} to persist modifications.
-    public Map<String, Set<Field>> getEntryEditorTabs() {
-        SequencedMap<String, Set<Field>> map = new LinkedHashMap<>();
-        for (EntryEditorTabModel config : tabModels) {
-            if (config instanceof EntryEditorTabModel.CustomizedFieldSet fieldSet) {
-                map.put(fieldSet.name(), fieldSet.fields());
-            }
-        }
-        return map;
-    }
-
-    public void setEntryEditorTabList(Map<String, Set<Field>> tabs) {
-        List<EntryEditorTabModel> newFieldSet = tabs.entrySet().stream()
-                                                    .<EntryEditorTabModel>map(model ->
-                                                            new EntryEditorTabModel.CustomizedFieldSet(model.getKey(), model.getValue()))
-                                                    .toList();
-        tabModels.removeIf(config -> config instanceof EntryEditorTabModel.CustomizedFieldSet);
-        // Customized field-set tabs sit right after the built-in field-set tabs — same position the persisted
-        // list uses, so saving does not reorder the tabs.
-        tabModels.addAll(EntryEditorTabModel.indexAfterBuiltInFieldSets(tabModels), newFieldSet);
-    }
-
     public static SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
         SequencedMap<String, Set<Field>> defaultTabsMap = new LinkedHashMap<>();
         String defaultFields = getDefaultGeneralFields().stream()
@@ -203,6 +155,56 @@ public class EntryEditorPreferences {
         ));
         defaultGeneralFields.addAll(EnumSet.allOf(SpecialField.class));
         return defaultGeneralFields;
+    }
+
+    public ObservableList<EntryEditorTabModel> getTabModels() {
+        return tabModels;
+    }
+
+    public boolean isTabVisible(EntryEditorTabModel.BuiltIn tabModel) {
+        return tabModels.stream()
+                        .filter(model -> model.key().filter(tabModel::equals).isPresent())
+                        .findFirst()
+                        .map(EntryEditorTabModel::isVisible)
+                        .orElse(false);
+    }
+
+    public ObservableValue<Boolean> tabVisibleProperty(EntryEditorTabModel.BuiltIn tabModel) {
+        return Bindings.createBooleanBinding(() -> isTabVisible(tabModel), tabModels);
+    }
+
+    public void setTabVisible(EntryEditorTabModel.BuiltIn key, boolean show) {
+        for (int i = 0; i < tabModels.size(); i++) {
+            if (tabModels.get(i).key().filter(key::equals).isPresent()) {
+                tabModels.set(i, tabModels.get(i).withVisible(show));
+                return;
+            }
+        }
+    }
+
+    /// Returns a snapshot map of customized field-set tabs (name → fields). Changes to this map are not
+    /// reflected in the preferences; use {@link #setEntryEditorTabList} to persist modifications.
+    public Map<String, Set<Field>> getEntryEditorTabs() {
+        SequencedMap<String, Set<Field>> map = new LinkedHashMap<>();
+        for (EntryEditorTabModel model : tabModels) {
+            if (model instanceof EntryEditorTabModel.CustomizedFieldSet fieldSet) {
+                map.put(fieldSet.name(), fieldSet.fields());
+            }
+        }
+        return map;
+    }
+
+    public void setEntryEditorTabList(Map<String, Set<Field>> tabModels) {
+        List<EntryEditorTabModel> newFieldSet = tabModels.entrySet().stream()
+                                                         .<EntryEditorTabModel>map(model ->
+                                                                 new EntryEditorTabModel.CustomizedFieldSet(
+                                                                         model.getKey(),
+                                                                         model.getValue()))
+                                                         .toList();
+        this.tabModels.removeIf(config -> config instanceof EntryEditorTabModel.CustomizedFieldSet);
+        // Customized field-set tabs sit right after the built-in field-set tabs — same position the persisted
+        // list uses, so saving does not reorder the tabs.
+        this.tabModels.addAll(EntryEditorTabModel.indexAfterBuiltInFieldSets(this.tabModels), newFieldSet);
     }
 
     public static EntryEditorPreferences getDefault() {
