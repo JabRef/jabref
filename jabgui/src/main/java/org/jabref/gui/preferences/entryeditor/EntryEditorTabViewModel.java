@@ -190,10 +190,8 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
             return;
         }
         switch (config) {
-            case EntryEditorTabModel.Feature feature ->
-                    tabModels.set(index, new EntryEditorTabModel.Feature(feature.type(), !feature.visible()));
-            case EntryEditorTabModel.FieldSet fieldSet ->
-                    tabModels.set(index, new EntryEditorTabModel.FieldSet(fieldSet.type(), !fieldSet.visible()));
+            case EntryEditorTabModel.BuiltInTab builtIn ->
+                    tabModels.set(index, builtIn.withVisible(!builtIn.isVisible()));
             case EntryEditorTabModel.CustomizedFieldSet ignored -> {
                 // Custom tabs are always visible; toggled only by adding/removing them.
             }

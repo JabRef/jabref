@@ -203,8 +203,20 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         return label;
     }
 
-    private static String featureTabDisplayName(EntryEditorTabModel.StaticTab type) {
+    private static String builtInTabDisplayName(EntryEditorTabModel.BuiltIn type) {
         return switch (type) {
+            case PREVIEW ->
+                    Localization.lang("Preview");
+            case REQUIRED_FIELDS ->
+                    Localization.lang("Required fields");
+            case IMPORTANT_OPTIONAL_FIELDS ->
+                    Localization.lang("Optional fields");
+            case DETAIL_OPTIONAL_FIELDS ->
+                    Localization.lang("Optional fields 2");
+            case DEPRECATED_FIELDS ->
+                    Localization.lang("Deprecated fields");
+            case OTHER_FIELDS ->
+                    Localization.lang("Other fields");
             case RELATED_ARTICLES ->
                     Localization.lang("Related articles");
             case AI_SUMMARY ->
@@ -219,30 +231,12 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
                     Localization.lang("Citation information");
             case COMMENTS ->
                     Localization.lang("Comments");
-            case PREVIEW ->
-                    Localization.lang("Preview");
             case MATH_SCI_NET ->
                     Localization.lang("MathSciNet");
             case SOURCE ->
                     Localization.lang("%0 source", "BibTeX");
             case FULLTEXT_SEARCH_RESULTS ->
                     Localization.lang("Search results");
-        };
-    }
-
-    /// Display name for a built-in {@link EntryEditorTabModel.FieldSet}.
-    private static String builtInFieldSetDisplayName(EntryEditorTabModel.BuiltInFieldSet type) {
-        return switch (type) {
-            case REQUIRED_FIELDS ->
-                    Localization.lang("Required fields");
-            case IMPORTANT_OPTIONAL_FIELDS ->
-                    Localization.lang("Optional fields");
-            case DETAIL_OPTIONAL_FIELDS ->
-                    Localization.lang("Optional fields 2");
-            case DEPRECATED_FIELDS ->
-                    Localization.lang("Deprecated fields");
-            case OTHER_FIELDS ->
-                    Localization.lang("Other fields");
         };
     }
 
@@ -289,17 +283,11 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
             }
             updatingCell = true;
             switch (config) {
-                case EntryEditorTabModel.Feature feature -> {
+                case EntryEditorTabModel.BuiltInTab builtIn -> {
                     checkBox.setVisible(true);
                     checkBox.setManaged(true);
-                    checkBox.setSelected(feature.visible());
-                    nameLabel.setText(featureTabDisplayName(feature.type()));
-                }
-                case EntryEditorTabModel.FieldSet fieldSet -> {
-                    checkBox.setVisible(true);
-                    checkBox.setManaged(true);
-                    checkBox.setSelected(fieldSet.visible());
-                    nameLabel.setText(builtInFieldSetDisplayName(fieldSet.type()));
+                    checkBox.setSelected(builtIn.visible());
+                    nameLabel.setText(builtInTabDisplayName(builtIn.type()));
                 }
                 case EntryEditorTabModel.CustomizedFieldSet customizedFieldSet -> {
                     checkBox.setVisible(false);

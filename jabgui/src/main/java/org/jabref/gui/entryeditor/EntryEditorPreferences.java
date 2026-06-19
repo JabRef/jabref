@@ -48,8 +48,8 @@ public class EntryEditorPreferences {
         }
     }
 
-    /// Ordered list of all configurable tabs. {@link EntryEditorTabModel.FieldSet} entries
-    /// always precede {@link EntryEditorTabModel.Feature} entries.
+    /// Ordered list of all configurable tabs. Built-in {@linkplain EntryEditorTabModel.BuiltIn#isFieldSet()
+    /// field-set} tabs always precede the feature tabs.
     private final ObservableList<EntryEditorTabModel> tabModels;
 
     private final BooleanProperty shouldOpenOnNewEntry;
@@ -63,7 +63,7 @@ public class EntryEditorPreferences {
     private final DoubleProperty previewWidthDividerPosition;
 
     /// Field-level toggle: whether the user-specific comments field is shown inside the Comments tab.
-    /// Distinct from the Comments tab's own visibility ({@link EntryEditorTabModel.StaticTab#COMMENTS}).
+    /// Distinct from the Comments tab's own visibility ({@link EntryEditorTabModel.BuiltIn#COMMENTS}).
     private final BooleanProperty showUserCommentsFields;
 
     private EntryEditorPreferences() {
@@ -110,18 +110,19 @@ public class EntryEditorPreferences {
         List<EntryEditorTabModel> tabModels = new ArrayList<>();
 
         // Always-present leading tab
-        tabModels.add(new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.PREVIEW, true));
+        tabModels.add(new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.PREVIEW, true));
 
-        Arrays.stream(EntryEditorTabModel.BuiltInFieldSet.values()).forEachOrdered(fieldSet ->
-                tabModels.add(new EntryEditorTabModel.FieldSet(fieldSet, true)));
+        Arrays.stream(EntryEditorTabModel.BuiltIn.values())
+              .filter(EntryEditorTabModel.BuiltIn::isFieldSet)
+              .forEachOrdered(fieldSet -> tabModels.add(new EntryEditorTabModel.BuiltInTab(fieldSet, true)));
 
         getDefaultEntryEditorTabs().forEach((name, fields) ->
                 tabModels.add(new EntryEditorTabModel.CustomizedFieldSet(name, fields)));
 
-        // already added as the leading tab
-        Arrays.stream(EntryEditorTabModel.StaticTab.values())
-              .filter(tab -> tab != EntryEditorTabModel.StaticTab.PREVIEW)
-              .forEachOrdered(tab -> tabModels.add(new EntryEditorTabModel.Feature(tab, true)));
+        // The leading Preview and the field-set tabs are already added above
+        Arrays.stream(EntryEditorTabModel.BuiltIn.values())
+              .filter(tab -> tab != EntryEditorTabModel.BuiltIn.PREVIEW && !tab.isFieldSet())
+              .forEachOrdered(tab -> tabModels.add(new EntryEditorTabModel.BuiltInTab(tab, true)));
 
         return tabModels;
     }
@@ -130,7 +131,7 @@ public class EntryEditorPreferences {
         return tabModels;
     }
 
-    public boolean isTabVisible(EntryEditorTabModel.TabKey key) {
+    public boolean isTabVisible(EntryEditorTabModel.BuiltIn key) {
         return tabModels.stream()
                         .filter(model -> model.key().filter(key::equals).isPresent())
                         .findFirst()
@@ -138,11 +139,11 @@ public class EntryEditorPreferences {
                         .orElse(false);
     }
 
-    public ObservableValue<Boolean> tabVisibleProperty(EntryEditorTabModel.TabKey key) {
+    public ObservableValue<Boolean> tabVisibleProperty(EntryEditorTabModel.BuiltIn key) {
         return Bindings.createBooleanBinding(() -> isTabVisible(key), tabModels);
     }
 
-    public void setTabVisible(EntryEditorTabModel.TabKey key, boolean show) {
+    public void setTabVisible(EntryEditorTabModel.BuiltIn key, boolean show) {
         for (int i = 0; i < tabModels.size(); i++) {
             if (tabModels.get(i).key().filter(key::equals).isPresent()) {
                 tabModels.set(i, tabModels.get(i).withVisible(show));

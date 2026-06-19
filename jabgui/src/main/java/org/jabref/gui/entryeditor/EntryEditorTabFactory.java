@@ -103,12 +103,14 @@ public class EntryEditorTabFactory {
     public EntryEditorTab createTab(EntryEditorTabModel model) {
         EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
         return switch (model) {
-            case EntryEditorTabModel.FieldSet(
-                    EntryEditorTabModel.BuiltInFieldSet type,
+            case EntryEditorTabModel.BuiltInTab(
+                    EntryEditorTabModel.BuiltIn type,
                     boolean _
             ) -> {
-                EntryEditorTab tab = createFieldSetTab(type);
-                tab.setPreferenceDrivenVisibility(entryEditorPreferences.tabVisibleProperty(type));
+                EntryEditorTab tab = createBuiltInTab(type);
+                tab.setPreferenceDrivenVisibility(type == EntryEditorTabModel.BuiltIn.PREVIEW
+                                                  ? preferences.getPreviewPreferences().showPreviewAsExtraTabProperty()
+                                                  : entryEditorPreferences.tabVisibleProperty(type));
                 yield tab;
             }
             case EntryEditorTabModel.CustomizedFieldSet(
@@ -119,21 +121,13 @@ public class EntryEditorTabFactory {
                 tab.setPreferenceDrivenVisibility(new SimpleBooleanProperty(true));
                 yield tab;
             }
-            case EntryEditorTabModel.Feature(
-                    EntryEditorTabModel.StaticTab type,
-                    boolean _
-            ) -> {
-                EntryEditorTab tab = createFeatureTab(type);
-                tab.setPreferenceDrivenVisibility(type == EntryEditorTabModel.StaticTab.PREVIEW
-                                                  ? preferences.getPreviewPreferences().showPreviewAsExtraTabProperty()
-                                                  : entryEditorPreferences.tabVisibleProperty(type));
-                yield tab;
-            }
         };
     }
 
-    private EntryEditorTab createFieldSetTab(EntryEditorTabModel.BuiltInFieldSet type) {
+    private EntryEditorTab createBuiltInTab(EntryEditorTabModel.BuiltIn type) {
         return switch (type) {
+            case PREVIEW ->
+                    new PreviewTab(preferences, stateManager, previewPanel);
             case REQUIRED_FIELDS ->
                     new RequiredFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel);
             case IMPORTANT_OPTIONAL_FIELDS ->
@@ -144,13 +138,6 @@ public class EntryEditorTabFactory {
                     new DeprecatedFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel);
             case OTHER_FIELDS ->
                     new OtherFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel);
-        };
-    }
-
-    private EntryEditorTab createFeatureTab(EntryEditorTabModel.StaticTab type) {
-        return switch (type) {
-            case PREVIEW ->
-                    new PreviewTab(preferences, stateManager, previewPanel);
             case RELATED_ARTICLES ->
                     new RelatedArticlesTab(buildInfo, preferences, dialogService, stateManager, taskExecutor);
             case AI_SUMMARY ->

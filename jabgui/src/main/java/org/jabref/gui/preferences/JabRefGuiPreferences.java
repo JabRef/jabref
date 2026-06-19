@@ -396,26 +396,26 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     /// The single source of truth for the entry editor's tab list: the user-configured field-set tabs,
-    /// followed by every static (built-in) tab's visibility flag, in {@link EntryEditorTabModel.StaticTab} order.
+    /// followed by every static (built-in) tab's visibility flag, in {@link EntryEditorTabModel.BuiltIn} order.
     private List<EntryEditorTabModel> getEntryEditorTabs(EntryEditorPreferences defaults) {
         List<EntryEditorTabModel> tabModels = new ArrayList<>();
 
         // Always-present leading tab. Its visibility is owned by PreviewPreferences (PREVIEW_AS_TAB /
         // showPreviewAsExtraTab) — the single source the factory gates on — so the model bit is a constant
         // and is not persisted separately here.
-        tabModels.add(new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.PREVIEW, true));
+        tabModels.add(new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.PREVIEW, true));
 
         tabModels.addAll(List.<EntryEditorTabModel>of(
-                new EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet.REQUIRED_FIELDS,
-                        getBoolean(SHOW_REQUIRED_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltInFieldSet.REQUIRED_FIELDS))),
-                new EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet.IMPORTANT_OPTIONAL_FIELDS,
-                        getBoolean(SHOW_IMPORTANT_OPTIONAL_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltInFieldSet.IMPORTANT_OPTIONAL_FIELDS))),
-                new EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet.DETAIL_OPTIONAL_FIELDS,
-                        getBoolean(SHOW_DETAIL_OPTIONAL_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltInFieldSet.DETAIL_OPTIONAL_FIELDS))),
-                new EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet.DEPRECATED_FIELDS,
-                        getBoolean(SHOW_DEPRECATED_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltInFieldSet.DEPRECATED_FIELDS))),
-                new EntryEditorTabModel.FieldSet(EntryEditorTabModel.BuiltInFieldSet.OTHER_FIELDS,
-                        getBoolean(SHOW_OTHER_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltInFieldSet.OTHER_FIELDS)))
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.REQUIRED_FIELDS,
+                        getBoolean(SHOW_REQUIRED_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.REQUIRED_FIELDS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.IMPORTANT_OPTIONAL_FIELDS,
+                        getBoolean(SHOW_IMPORTANT_OPTIONAL_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.IMPORTANT_OPTIONAL_FIELDS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.DETAIL_OPTIONAL_FIELDS,
+                        getBoolean(SHOW_DETAIL_OPTIONAL_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.DETAIL_OPTIONAL_FIELDS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.DEPRECATED_FIELDS,
+                        getBoolean(SHOW_DEPRECATED_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.DEPRECATED_FIELDS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.OTHER_FIELDS,
+                        getBoolean(SHOW_OTHER_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.OTHER_FIELDS)))
         ));
 
         Map<String, Set<Field>> tabNamesToFields = new LinkedHashMap<>();
@@ -432,29 +432,29 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 tabModels.add(new EntryEditorTabModel.CustomizedFieldSet(name, fields)));
 
         tabModels.addAll(List.<EntryEditorTabModel>of(
-                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.RELATED_ARTICLES,
-                        getBoolean(SHOW_RECOMMENDATIONS, defaults.isTabVisible(EntryEditorTabModel.StaticTab.RELATED_ARTICLES))),
-                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.AI_SUMMARY,
-                        getBoolean(SHOW_AI_SUMMARY, defaults.isTabVisible(EntryEditorTabModel.StaticTab.AI_SUMMARY))),
-                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.AI_CHAT,
-                        getBoolean(SHOW_AI_CHAT, defaults.isTabVisible(EntryEditorTabModel.StaticTab.AI_CHAT))),
-                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.LATEX_CITATIONS,
-                        getBoolean(SHOW_LATEX_CITATIONS, defaults.isTabVisible(EntryEditorTabModel.StaticTab.LATEX_CITATIONS))),
-                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.FILE_ANNOTATIONS,
-                        getBoolean(SMART_FILE_ANNOTATIONS, defaults.isTabVisible(EntryEditorTabModel.StaticTab.FILE_ANNOTATIONS))),
-                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.CITATION_INFORMATION,
-                        getBoolean(SHOW_SCITE_TAB, defaults.isTabVisible(EntryEditorTabModel.StaticTab.CITATION_INFORMATION))),
-                new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.COMMENTS,
-                        getBoolean(SHOW_COMMENTS_TAB, defaults.isTabVisible(EntryEditorTabModel.StaticTab.COMMENTS)))
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.RELATED_ARTICLES,
+                        getBoolean(SHOW_RECOMMENDATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.RELATED_ARTICLES))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.AI_SUMMARY,
+                        getBoolean(SHOW_AI_SUMMARY, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.AI_SUMMARY))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.AI_CHAT,
+                        getBoolean(SHOW_AI_CHAT, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.AI_CHAT))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.LATEX_CITATIONS,
+                        getBoolean(SHOW_LATEX_CITATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.LATEX_CITATIONS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.FILE_ANNOTATIONS,
+                        getBoolean(SMART_FILE_ANNOTATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FILE_ANNOTATIONS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION,
+                        getBoolean(SHOW_SCITE_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.COMMENTS,
+                        getBoolean(SHOW_COMMENTS_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.COMMENTS)))
         ));
 
         // Always-present trailing tabs
-        tabModels.add(new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.MATH_SCI_NET,
-                getBoolean(SHOW_MATHSCINET_TAB, defaults.isTabVisible(EntryEditorTabModel.StaticTab.MATH_SCI_NET))));
-        tabModels.add(new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.SOURCE,
-                getBoolean(SHOW_SOURCE_TAB, defaults.isTabVisible(EntryEditorTabModel.StaticTab.SOURCE))));
-        tabModels.add(new EntryEditorTabModel.Feature(EntryEditorTabModel.StaticTab.FULLTEXT_SEARCH_RESULTS,
-                getBoolean(SHOW_FULLTEXT_SEARCH_TAB, defaults.isTabVisible(EntryEditorTabModel.StaticTab.FULLTEXT_SEARCH_RESULTS))));
+        tabModels.add(new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.MATH_SCI_NET,
+                getBoolean(SHOW_MATHSCINET_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.MATH_SCI_NET))));
+        tabModels.add(new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.SOURCE,
+                getBoolean(SHOW_SOURCE_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.SOURCE))));
+        tabModels.add(new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS,
+                getBoolean(SHOW_FULLTEXT_SEARCH_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS))));
 
         return tabModels;
     }
@@ -475,11 +475,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         purgeSeries(CUSTOM_TAB_FIELDS, fieldSetTabs.size());
 
         for (EntryEditorTabModel config : configs) {
-            if (config instanceof EntryEditorTabModel.FieldSet(
-                    EntryEditorTabModel.BuiltInFieldSet type,
+            if (config instanceof EntryEditorTabModel.BuiltInTab(
+                    EntryEditorTabModel.BuiltIn type,
                     boolean visible
             )) {
                 switch (type) {
+                    case PREVIEW -> {
+                        // Preview-tab visibility is stored as showPreviewAsExtraTab in PreviewPreferences; nothing to persist here.
+                    }
                     case REQUIRED_FIELDS ->
                             putBoolean(SHOW_REQUIRED_FIELDS, visible);
                     case IMPORTANT_OPTIONAL_FIELDS ->
@@ -490,29 +493,20 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                             putBoolean(SHOW_DEPRECATED_FIELDS, visible);
                     case OTHER_FIELDS ->
                             putBoolean(SHOW_OTHER_FIELDS, visible);
-                }
-            } else if (config instanceof EntryEditorTabModel.Feature(
-                    EntryEditorTabModel.StaticTab type,
-                    boolean visible
-            )) {
-                switch (type) {
                     case RELATED_ARTICLES ->
                             putBoolean(SHOW_RECOMMENDATIONS, visible);
                     case AI_SUMMARY ->
                             putBoolean(SHOW_AI_SUMMARY, visible);
                     case AI_CHAT ->
                             putBoolean(SHOW_AI_CHAT, visible);
-                    case LATEX_CITATIONS ->
-                            putBoolean(SHOW_LATEX_CITATIONS, visible);
                     case FILE_ANNOTATIONS ->
                             putBoolean(SMART_FILE_ANNOTATIONS, visible);
+                    case LATEX_CITATIONS ->
+                            putBoolean(SHOW_LATEX_CITATIONS, visible);
                     case CITATION_INFORMATION ->
                             putBoolean(SHOW_SCITE_TAB, visible);
                     case COMMENTS ->
                             putBoolean(SHOW_COMMENTS_TAB, visible);
-                    case PREVIEW -> {
-                        // Preview-tab visibility is stored as showPreviewAsExtraTab in PreviewPreferences; nothing to persist here.
-                    }
                     case MATH_SCI_NET ->
                             putBoolean(SHOW_MATHSCINET_TAB, visible);
                     case SOURCE ->
