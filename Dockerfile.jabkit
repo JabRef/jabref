@@ -9,7 +9,7 @@ RUN apk add --no-cache bash
 
 WORKDIR /build
 
-COPY --from=jbangdev/jbang:0.136.0-java-21 /jbang-0.136.0/ /jbang/
+COPY --from=jbangdev/jbang:0.138.0-java-21 /jbang-0.138.0/ /jbang/
 
 ENV PATH="${PATH}:/jbang/bin"
 ENV JBANG_DIR="/jbang/.jbang"
