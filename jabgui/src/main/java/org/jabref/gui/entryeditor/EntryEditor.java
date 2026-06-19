@@ -353,8 +353,8 @@ public class EntryEditor extends BorderPane implements PreviewControls {
 
     private @Nullable EntryEditorTab getSelectedTab() {
         return tabbed.getSelectionModel().getSelectedItem() instanceof EntryEditorTab entryEditorTab
-                ? entryEditorTab
-                : null;
+               ? entryEditorTab
+               : null;
     }
 
     private void setupToolBar() {
