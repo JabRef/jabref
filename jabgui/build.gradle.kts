@@ -1,5 +1,3 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-
 plugins {
     id("org.jabref.gradle.module")
     id("org.jabref.gradle.feature.shadowjar")
@@ -162,12 +160,6 @@ javaModulePackaging {
 }
 
 tasks.test {
-    testLogging {
-        events("FAILED")
-        exceptionFormat = TestExceptionFormat.FULL
-        showCauses = true
-        showStackTraces = true
-    }
     jvmArgs = listOf(
         "-javaagent:${configurations.mockitoAgent.get().asPath}",
 
