@@ -76,7 +76,7 @@ public class EntriesResource {
         if (!uiMessageHandler.isGuiConnected()) {
             throw new BadRequestException("Only possible in GUI mode.");
         }
-        if (bibtex == null || bibtex.isBlank()) {
+        if (StringUtil.isBlank(bibtex)) {
             throw new BadRequestException("BibTeX data must not be empty.");
         }
         Optional<java.nio.file.Path> targetLibrary = resolveTargetLibrary(id);
