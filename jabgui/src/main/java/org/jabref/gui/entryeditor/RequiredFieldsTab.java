@@ -48,7 +48,7 @@ public class RequiredFieldsTab extends FieldsEditorTab {
                 previewPanel
         );
         this.entryTypesManager = entryTypesManager;
-        setText(Localization.lang("Required fields"));
+        setText(EntryEditorTabModel.BuiltIn.REQUIRED_FIELDS.displayName());
         setTooltip(new Tooltip(Localization.lang("Show required fields")));
         setGraphic(IconTheme.JabRefIcons.REQUIRED.getGraphicNode());
     }

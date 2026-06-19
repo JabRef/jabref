@@ -8,7 +8,6 @@ import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 public class DetailOptionalFieldsTab extends OptionalFieldsTabBase {
@@ -22,7 +21,7 @@ public class DetailOptionalFieldsTab extends OptionalFieldsTabBase {
                                    StateManager stateManager,
                                    PreviewPanel previewPanel) {
         super(
-                Localization.lang("Optional fields 2"),
+                EntryEditorTabModel.BuiltIn.DETAIL_OPTIONAL_FIELDS.displayName(),
                 false,
                 undoManager,
                 undoAction,

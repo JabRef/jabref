@@ -50,7 +50,7 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
         );
         this.entryTypesManager = entryTypesManager;
 
-        setText(Localization.lang("Deprecated fields"));
+        setText(EntryEditorTabModel.BuiltIn.DEPRECATED_FIELDS.displayName());
         EasyBind.subscribe(preferences.getWorkspacePreferences().showAdvancedHintsProperty(), advancedHints -> {
             if (advancedHints) {
                 setTooltip(new Tooltip(Localization.lang("Shows fields having a successor in biblatex.\nFor instance, the publication month should be part of the date field.\nUse the Clean up Entries functionality to convert the entry to biblatex.")));

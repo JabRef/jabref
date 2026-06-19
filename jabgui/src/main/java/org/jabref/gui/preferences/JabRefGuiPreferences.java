@@ -429,7 +429,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             }
         }
         tabNamesToFields.forEach((name, fields) ->
-                tabModels.add(new EntryEditorTabModel.CustomizedFieldSet(name, fields)));
+                tabModels.add(new EntryEditorTabModel.CustomizedFieldsTab(name, fields)));
 
         tabModels.addAll(List.<EntryEditorTabModel>of(
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.RELATED_ARTICLES,
@@ -458,10 +458,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     private void storeTabConfigs(List<EntryEditorTabModel> configs) {
-        List<EntryEditorTabModel.CustomizedFieldSet> fieldSetTabs = configs.stream()
-                                                                           .filter(EntryEditorTabModel.CustomizedFieldSet.class::isInstance)
-                                                                           .map(EntryEditorTabModel.CustomizedFieldSet.class::cast)
-                                                                           .toList();
+        List<EntryEditorTabModel.CustomizedFieldsTab> fieldSetTabs = configs.stream()
+                                                                            .filter(EntryEditorTabModel.CustomizedFieldsTab.class::isInstance)
+                                                                            .map(EntryEditorTabModel.CustomizedFieldsTab.class::cast)
+                                                                            .toList();
 
         for (int i = 0; i < fieldSetTabs.size(); i++) {
             put(CUSTOM_TAB_NAME + i, fieldSetTabs.get(i).name());

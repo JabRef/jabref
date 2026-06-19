@@ -3,17 +3,15 @@ package org.jabref.gui.entryeditor;
 import java.util.List;
 import java.util.Set;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 
 /// Discriminated union of the kinds of tabs that appear in the entry editor.
 ///
-/// {@link BuiltInTab}         — a fixed tab identified by a {@link BuiltIn} constant; only its visibility
-///                             is configurable. Covers both the built-in field-set tabs (whose fields are
-///                             computed dynamically from the entry type, see {@link BuiltIn#isFieldSet()})
-///                             and the feature tabs (fixed implementations such as Preview or Source).
-/// {@link CustomizedFieldSet} — user-customizable tab backed by an explicit, named set of fields.
+/// {@link BuiltInTab}         — a fixed tab identified by a {@link BuiltIn} constant.
+/// {@link CustomizedFieldsTab} — user-customizable tab backed by an explicit, named set of fields.
 public sealed interface EntryEditorTabModel
-        permits EntryEditorTabModel.BuiltInTab, EntryEditorTabModel.CustomizedFieldSet {
+        permits EntryEditorTabModel.BuiltInTab, EntryEditorTabModel.CustomizedFieldsTab {
 
     boolean isVisible();
 
@@ -70,6 +68,44 @@ public sealed interface EntryEditorTabModel
         private static final Set<BuiltIn> FIELD_SETS = Set.of(
                 REQUIRED_FIELDS, IMPORTANT_OPTIONAL_FIELDS, DETAIL_OPTIONAL_FIELDS, DEPRECATED_FIELDS, OTHER_FIELDS);
 
+        // Create displayName dynamically for language preference change
+        public String displayName() {
+            return switch (this) {
+                case PREVIEW ->
+                        Localization.lang("Preview");
+                case REQUIRED_FIELDS ->
+                        Localization.lang("Required fields");
+                case IMPORTANT_OPTIONAL_FIELDS ->
+                        Localization.lang("Optional fields");
+                case DETAIL_OPTIONAL_FIELDS ->
+                        Localization.lang("Optional fields 2");
+                case DEPRECATED_FIELDS ->
+                        Localization.lang("Deprecated fields");
+                case OTHER_FIELDS ->
+                        Localization.lang("Other fields");
+                case RELATED_ARTICLES ->
+                        Localization.lang("Related articles");
+                case AI_SUMMARY ->
+                        Localization.lang("AI summary");
+                case AI_CHAT ->
+                        Localization.lang("AI chat");
+                case FILE_ANNOTATIONS ->
+                        Localization.lang("File annotations");
+                case LATEX_CITATIONS ->
+                        Localization.lang("LaTeX citations");
+                case CITATION_INFORMATION ->
+                        Localization.lang("Citations");
+                case COMMENTS ->
+                        Localization.lang("Comments");
+                case MATH_SCI_NET ->
+                        Localization.lang("MathSciNet Review");
+                case SOURCE ->
+                        Localization.lang("Source");
+                case FULLTEXT_SEARCH_RESULTS ->
+                        Localization.lang("Search results");
+            };
+        }
+
         public boolean isFieldSet() {
             return FIELD_SETS.contains(this);
         }
@@ -90,7 +126,7 @@ public sealed interface EntryEditorTabModel
 
     /// Always shown; toggled only by being added to or removed from the tab list, so it carries no
     /// visibility flag (unlike {@link BuiltInTab}).
-    record CustomizedFieldSet(String name, Set<Field> fields)
+    record CustomizedFieldsTab(String name, Set<Field> fields)
             implements EntryEditorTabModel {
         @Override
         public boolean isVisible() {

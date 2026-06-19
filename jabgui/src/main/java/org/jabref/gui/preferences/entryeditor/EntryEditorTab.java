@@ -203,43 +203,6 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         return label;
     }
 
-    private static String builtInTabDisplayName(EntryEditorTabModel.BuiltIn type) {
-        return switch (type) {
-            case PREVIEW ->
-                    Localization.lang("Preview");
-            case REQUIRED_FIELDS ->
-                    Localization.lang("Required fields");
-            case IMPORTANT_OPTIONAL_FIELDS ->
-                    Localization.lang("Optional fields");
-            case DETAIL_OPTIONAL_FIELDS ->
-                    Localization.lang("Optional fields 2");
-            case DEPRECATED_FIELDS ->
-                    Localization.lang("Deprecated fields");
-            case OTHER_FIELDS ->
-                    Localization.lang("Other fields");
-            case RELATED_ARTICLES ->
-                    Localization.lang("Related articles");
-            case AI_SUMMARY ->
-                    Localization.lang("AI Summary");
-            case AI_CHAT ->
-                    Localization.lang("AI Chat");
-            case FILE_ANNOTATIONS ->
-                    Localization.lang("File annotations");
-            case LATEX_CITATIONS ->
-                    Localization.lang("LaTeX citations");
-            case CITATION_INFORMATION ->
-                    Localization.lang("Citation information");
-            case COMMENTS ->
-                    Localization.lang("Comments");
-            case MATH_SCI_NET ->
-                    Localization.lang("MathSciNet");
-            case SOURCE ->
-                    Localization.lang("%0 source", "BibTeX");
-            case FULLTEXT_SEARCH_RESULTS ->
-                    Localization.lang("Search results");
-        };
-    }
-
     @FXML
     void addFieldSetTab() {
         viewModel.addFieldSetTab();
@@ -287,12 +250,12 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
                     checkBox.setVisible(true);
                     checkBox.setManaged(true);
                     checkBox.setSelected(builtIn.visible());
-                    nameLabel.setText(builtInTabDisplayName(builtIn.type()));
+                    nameLabel.setText(builtIn.type().displayName());
                 }
-                case EntryEditorTabModel.CustomizedFieldSet customizedFieldSet -> {
+                case EntryEditorTabModel.CustomizedFieldsTab customizedFieldsTab -> {
                     checkBox.setVisible(false);
                     checkBox.setManaged(false);
-                    nameLabel.setText(customizedFieldSet.name());
+                    nameLabel.setText(customizedFieldsTab.name());
                 }
             }
             updatingCell = false;

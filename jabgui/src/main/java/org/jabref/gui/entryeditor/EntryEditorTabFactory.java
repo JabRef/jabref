@@ -113,7 +113,7 @@ public class EntryEditorTabFactory {
                                                   : entryEditorPreferences.tabVisibleProperty(type));
                 yield tab;
             }
-            case EntryEditorTabModel.CustomizedFieldSet(
+            case EntryEditorTabModel.CustomizedFieldsTab(
                     String name,
                     Set<Field> fields
             ) -> {
