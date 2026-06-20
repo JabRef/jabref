@@ -67,23 +67,6 @@
     -fx-font-weight: bold;
 }
 
-.italic {
-    -fx-font-style: italic;
-}
-
-.bordered {
-    -fx-border-width: 1;
-    -fx-border-color: -fx-outer-border;
-}
-
-.bg-transparent {
-    -fx-background-color: transparent;
-}
-
-.padding-right-15 {
-    -fx-padding: 0 15 0 0;
-}
-
 .merge-header-cell {
     -fx-border-color: -fx-outer-border;
     -fx-background-color: -jr-row-odd-background;
@@ -634,27 +617,21 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-min-width: 10em;
 }
 
-.chat-bubble {
+.chat-message-text-area {
     -fx-border-radius: 10;
     -fx-background-radius: 10;
-    -fx-border-width: 1;
-    -fx-padding: 10;
-    -fx-max-width: 600;
 }
 
-.chat-bubble:user {
-    -fx-background-color: -jr-ai-message-user;
-    -fx-border-color: -jr-ai-message-user-border;
+.chat-message-text-area .scroll-pane {
+    -fx-background-color: transparent;
 }
 
-.chat-bubble:ai {
-    -fx-background-color: -jr-ai-message-ai;
-    -fx-border-color: -jr-ai-message-ai-border;
+.chat-message-text-area .scroll-pane .viewport {
+    -fx-background-color: transparent;
 }
 
-.chat-bubble:error {
-    -fx-background-color: -jr-ai-message-error;
-    -fx-border-color: -jr-ai-message-error-border;
+.chat-message-text-area .scroll-pane .content {
+    -fx-background-color: transparent;
 }
 
 /* CitationKeyPatternsPanel */
@@ -1176,13 +1153,9 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-insets: 0;
 }
 
-#entryEditor .icon-button .glyph-icon,
-#entryEditor .icon-button .ikonli-font-icon,
-#entryEditor .icon-buttonNoSpaceBottom .glyph-icon,
-#entryEditor .icon-buttonNoSpaceBottom .ikonli-font-icon,
-#entryEditor .icon-buttonNoSpaceTop .glyph-icon,
-#entryEditor .icon-buttonNoSpaceTop .ikonli-font-icon {
+#entryEditor .tool-bar .glyph-icon {
     -glyph-size: 1.0em;
+    -fx-font-size: 2em;
     -fx-fill: -jr-theme;
     -fx-text-fill: -jr-theme;
 }
