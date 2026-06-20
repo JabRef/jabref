@@ -19,7 +19,7 @@ jobs:
     if: (github.event.pull_request.user.login != 'dependabot[bot]') && (github.event.pull_request.user.login != 'renovate-bot')
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Check PR body for changelog note

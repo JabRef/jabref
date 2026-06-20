@@ -12,7 +12,11 @@ javaPlatform {
 val os = DefaultNativePlatform.getCurrentOperatingSystem()
 val arch = DefaultNativePlatform.getCurrentArchitecture()
 
-val javafx = "26.0.1"
+val javafxDefault = "26.0.1"
+// The JavaFX version can be overridden via the gradle property `javafxVersion`.
+// Only the non-web modules follow the override; javafx-web always stays on the default version.
+val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
+val javafxWeb = javafxDefault
 
 val lucene = "10.4.0"
 
@@ -34,7 +38,7 @@ dependencies.constraints {
     api("org.openjfx:javafx-fxml:$javafx")
     api("org.openjfx:javafx-graphics:$javafx")
     api("org.openjfx:javafx-swing:$javafx")
-    api("org.openjfx:javafx-web:$javafx")
+    api("org.openjfx:javafx-web:$javafxWeb")
     api("org.openjfx:jdk-jsobject:$javafx")
 
     api("cc.jilt:jilt:1.9.1")
@@ -65,11 +69,11 @@ dependencies.constraints {
     api("com.tngtech.archunit:archunit:1.4.2")
     api("com.tngtech.archunit:archunit-junit5-api:1.4.2")
     api("com.tngtech.archunit:archunit-junit5-engine:1.4.2")
-    api("com.uber.nullaway:nullaway:0.13.6")
+    api("com.uber.nullaway:nullaway:0.13.7")
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
     api("com.vladsch.flexmark:flexmark:0.64.8")
     api("commons-io:commons-io:2.22.0")
-    api("commons-logging:commons-logging:1.3.6")
+    api("commons-logging:commons-logging:1.4.0")
     api("de.rototor.snuggletex:snuggletex-core:1.3.0")
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
     api("de.saxsys:mvvmfx:1.8.0")
@@ -152,4 +156,5 @@ dependencies.constraints {
     api("org.xmlunit:xmlunit-matchers:2.12.0")
     api("org.yaml:snakeyaml:2.6")
     api("tech.units:indriya:2.2.4")
+    api("tools.maran:svgnode:1.0.0")
 }

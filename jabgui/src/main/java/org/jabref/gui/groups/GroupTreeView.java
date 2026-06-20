@@ -278,8 +278,8 @@ public class GroupTreeView extends BorderPane {
 
         // "Add subgroup" button shown on row hover
         addSubgroupColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
-        addSubgroupColumn.setCellFactory(col -> {
-            Button button = IconTheme.JabRefIcons.ADD.asButton();
+        addSubgroupColumn.setCellFactory(_ -> {
+            Button button = ControlHelper.iconButton(IconTheme.JabRefIcons.ADD);
             button.setVisible(false);
             button.managedProperty().bind(button.visibleProperty());
             StackPane pane = new StackPane(button);
@@ -662,7 +662,7 @@ public class GroupTreeView extends BorderPane {
             removeGroup = factory.createMenuItem(StandardActions.GROUP_REMOVE, new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE, group));
         }
 
-        if (preferences.getAiPreferences().getEnableAi() && preferences.getGroupsPreferences().showAiChatButton()) {
+        if (preferences.getAiPreferences().getAiFeaturesEnabled() && preferences.getGroupsPreferences().showAiChatButton()) {
             contextMenu.getItems().add(factory.createMenuItem(StandardActions.GROUP_CHAT, new ContextAction(StandardActions.GROUP_CHAT, group)));
         }
 
