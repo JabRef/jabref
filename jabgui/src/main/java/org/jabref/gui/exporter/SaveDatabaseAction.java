@@ -260,7 +260,8 @@ public class SaveDatabaseAction {
         synchronized (bibDatabaseContext) {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {
                 BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
-                BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(bibWriter,
+                BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(
+                        bibWriter,
                         saveConfiguration,
                         preferences,
                         entryTypesManager,

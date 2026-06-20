@@ -30,7 +30,12 @@ public class SaveActionsWorker {
     private final boolean useFJournalField;
     private final FieldPreferences fieldPreferences;
 
-    public SaveActionsWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences, FieldPreferences fieldPreferences, boolean useFJournalField, JournalAbbreviationRepository abbreviationRepository) {
+    public SaveActionsWorker(BibDatabaseContext databaseContext,
+                             FilePreferences filePreferences,
+                             TimestampPreferences timestampPreferences,
+                             FieldPreferences fieldPreferences,
+                             boolean useFJournalField,
+                             JournalAbbreviationRepository abbreviationRepository) {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
         this.timestampPreferences = timestampPreferences;

@@ -171,7 +171,8 @@ public class BibDatabaseWriter {
 
         // FIXME: "Clean" architecture violation: We modify the entries here, which should not happen during a write
         //        The cleanup should be done before the write operation
-        SaveActionsWorker saveActionsWorker = new SaveActionsWorker(bibDatabaseContext,
+        SaveActionsWorker saveActionsWorker = new SaveActionsWorker(
+                bibDatabaseContext,
                 preferences.getFilePreferences(),
                 preferences.getTimestampPreferences(),
                 preferences.getFieldPreferences(),
