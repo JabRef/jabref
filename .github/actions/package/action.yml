@@ -106,7 +106,7 @@ runs:
     - name: Upload ${{ inputs.component }} packages to GitHub
       # background: true
       if: ${{ inputs.uploadAsArtifact == 'true' && (inputs.archivePortable != 'NONE') }}
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ inputs.componentShort }} (${{ inputs.displayName }})
         path: |
@@ -145,7 +145,7 @@ runs:
     - name: Upload ShadowJar to GitHub
       # background: true
       if: ${{ (inputs.uploadAsArtifact == 'true') && (inputs.os == 'ubuntu-22.04') }}
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ inputs.componentShort }} (${{ inputs.displayName }}) (shadowJar)
         path: |
@@ -185,7 +185,7 @@ runs:
     - name: Upload jbundle artifact to GitHub
       # background: true
       if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.uploadAsArtifact == 'true') && (inputs.shouldJbundle == 'true') }}
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: jbundle-${{ inputs.displayName }}
         path: build/jbundle/${{ inputs.componentShort }}*

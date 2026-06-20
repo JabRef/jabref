@@ -21,13 +21,11 @@ runs:
         distribution: ${{ inputs.distribution }}
         check-latest: true
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v5
+      uses: gradle/actions/setup-gradle@v6
       with:
         gradle-version: current
       env:
         GRADLE_BUILD_ACTION_CACHE_DEBUG_ENABLED: false
-    - name: Setup TestLens
-      uses: testlens-app/setup-testlens@v1.8.0
     - name: Generate JBang cache key
       id: cache-key
       shell: bash

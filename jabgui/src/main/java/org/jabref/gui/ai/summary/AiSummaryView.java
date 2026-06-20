@@ -23,6 +23,7 @@ import jakarta.inject.Inject;
 
 public class AiSummaryView extends StackPane {
     @FXML private AiPrivacyNoticeView privacyNotice;
+    @FXML private UniversalStatusPaneView restartNeededPane;
 
     @FXML private UniversalStatusPaneView processingPane;
     @FXML private UniversalStatusPaneView errorPane;
@@ -72,6 +73,7 @@ public class AiSummaryView extends StackPane {
         ));
 
         privacyNotice.managedProperty().bind(privacyNotice.visibleProperty());
+        restartNeededPane.managedProperty().bind(restartNeededPane.visibleProperty());
         processingPane.managedProperty().bind(processingPane.visibleProperty());
         errorPane.managedProperty().bind(errorPane.visibleProperty());
         cancelledPane.managedProperty().bind(cancelledPane.visibleProperty());
@@ -81,6 +83,7 @@ public class AiSummaryView extends StackPane {
 
         // [pp->feat~ai.summarization.entries~1]
         privacyNotice.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.AI_TURNED_OFF));
+        restartNeededPane.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.RESTART_NEEDED));
         processingPane.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.PROCESSING));
         errorPane.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.ERROR_WHILE_GENERATING));
         cancelledPane.visibleProperty().bind(viewModel.stateProperty().isEqualTo(AiSummaryViewModel.State.CANCELLED));

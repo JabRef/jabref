@@ -46,6 +46,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.linkedfile.LinkedFileEditDialog;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -237,14 +238,14 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         info.setStyle("-fx-padding: 0.5em 0 0.5em 0;"); // To align with buttons below which also have 0.5em padding
         info.getChildren().setAll(label, progressIndicator);
 
-        Button acceptAutoLinkedFile = IconTheme.JabRefIcons.AUTO_LINKED_FILE.asButton();
+        Button acceptAutoLinkedFile = ControlHelper.iconButton(IconTheme.JabRefIcons.AUTO_LINKED_FILE);
         acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang("This file was found automatically. Do you want to link it to this entry?")));
         acceptAutoLinkedFile.visibleProperty().bind(linkedFile.isAutomaticallyFoundProperty());
         acceptAutoLinkedFile.managedProperty().bind(linkedFile.isAutomaticallyFoundProperty());
         acceptAutoLinkedFile.setOnAction(_ -> linkedFile.acceptAsLinked());
         acceptAutoLinkedFile.getStyleClass().setAll("icon-button");
 
-        Button writeMetadataToPdf = IconTheme.JabRefIcons.PDF_METADATA_WRITE.asButton();
+        Button writeMetadataToPdf = ControlHelper.iconButton(IconTheme.JabRefIcons.PDF_METADATA_WRITE);
         writeMetadataToPdf.setTooltip(new Tooltip(Localization.lang("Write BibTeX to PDF (XMP and embedded)")));
         writeMetadataToPdf.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
         writeMetadataToPdf.getStyleClass().setAll("icon-button");
@@ -258,7 +259,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         writeMetadataToPdf.disableProperty().bind(writeMetadataToSinglePdfAction.executableProperty().not());
         writeMetadataToPdf.setOnAction(_ -> writeMetadataToSinglePdfAction.execute());
 
-        Button parsePdfMetadata = IconTheme.JabRefIcons.PDF_METADATA_READ.asButton();
+        Button parsePdfMetadata = ControlHelper.iconButton(IconTheme.JabRefIcons.PDF_METADATA_READ);
         parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));
         parsePdfMetadata.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
         parsePdfMetadata.setOnAction(_ -> {
