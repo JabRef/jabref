@@ -133,7 +133,8 @@ public class MetaDataParser {
                 // The user-host string starts directly after FILE_DIRECTORY_LATEX + '-'
                 String userHostString = entry.getKey().substring(MetaData.FILE_DIRECTORY_LATEX.length() + 1);
                 metaData.setLatexFileDirectory(userHostString, parseDirectory(entry.getValue()));
-            } else if (MetaData.FIELDFORMATTERCLEANUPACTIONS.equals(entry.getKey())) {
+            } else if (MetaData.FIELDFORMATTERCLEANUPACTIONS.equals(entry.getKey())
+                    || MetaData.SAVE_ACTIONS_LEGACY.equals(entry.getKey())) {
                 metaData.setFieldFormatterCleanupActions(fieldFormatterCleanupsParse(values));
             } else if (MetaData.MULTIFIELDCLEANUPACTIONS.equals(entry.getKey())) {
                 metaData.setMultiFieldCleanups(multiFieldCleanupsParse(values));

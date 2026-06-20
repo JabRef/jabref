@@ -99,6 +99,26 @@ public class MetaDataParserTest {
     }
 
     @Test
+    void parseLegacySaveActionsAsFieldFormatterCleanupActions() throws ParseException {
+        // Libraries written before the save actions were split into separate metadata items store the
+        // field formatter cleanups under the legacy "saveActions" key. Should parse identically to the
+        // current "fieldFormatterCleanupActions" key so existing libraries keep their configured save actions.
+        Map<String, String> legacyData = Map.of("saveActions", "enabled;title[lower_case]");
+        MetaDataParser metaDataParser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsedFromLegacy = metaDataParser.parse(new MetaData(), legacyData, ',', "userAndHost");
+
+        Map<String, String> currentData = Map.of("fieldFormatterCleanupActions", "enabled;title[lower_case]");
+        MetaData parsedFromCurrent = metaDataParser.parse(new MetaData(), currentData, ',', "userAndHost");
+
+        MetaData expected = new MetaData();
+        FieldFormatterCleanupActions fieldFormatterCleanupActions = new FieldFormatterCleanupActions(true, List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
+        expected.setFieldFormatterCleanupActions(fieldFormatterCleanupActions);
+
+        assertEquals(expected, parsedFromLegacy);
+        assertEquals(parsedFromCurrent, parsedFromLegacy);
+    }
+
+    @Test
     void parseMultiFieldCleanups() throws ParseException {
         Map<String, String> data = Map.of("multiFieldCleanupActions", "DO_NOT_CONVERT_TIMESTAMP");
         MetaDataParser metaDataParser = new MetaDataParser(new DummyFileUpdateMonitor());

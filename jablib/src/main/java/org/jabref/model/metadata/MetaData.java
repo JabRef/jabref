@@ -44,6 +44,8 @@ public class MetaData {
     public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
     public static final String ENTRYTYPE_FLAG_V2 = "jabref-entrytype-v2: ";
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig"; // ToDo: Rename in next major version to saveOrder, adapt testbibs
+    /// Legacy key for backwards-compatible field formatter cleanups, now split up into CleanupActions.
+    public static final String SAVE_ACTIONS_LEGACY = "saveActions";
     public static final String FIELDFORMATTERCLEANUPACTIONS = "fieldFormatterCleanupActions";
     public static final String MULTIFIELDCLEANUPACTIONS = "multiFieldCleanupActions";
     public static final String JOURNALABBREVIATIONCLEANUP = "journalAbbreviationCleanup";
