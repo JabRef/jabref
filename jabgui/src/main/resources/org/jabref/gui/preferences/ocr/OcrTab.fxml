@@ -16,8 +16,6 @@
     <HBox alignment="CENTER_LEFT" spacing="8.0">
         <Text text="%Path to the OCR engine"/>
         <TextField fx:id="ocrPath" HBox.hgrow="ALWAYS" promptText="%Type the engine's path"/>
-<!--        <Button fx:id="browseButton" text="%Browse"/>-->
-<!--        <Button fx:id="autoDetectButton" text="Auto detect"/>-->
         <Button fx:id="browseButton">
             <graphic>
                 <JabRefIconView glyph="FOLDER"/>
