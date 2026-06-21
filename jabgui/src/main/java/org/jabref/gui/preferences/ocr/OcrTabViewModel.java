@@ -1,6 +1,8 @@
 package org.jabref.gui.preferences.ocr;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -41,18 +43,25 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     }
 
     Optional<String> autoDetectEnginePath() {
-        if (ocrmypdfPathExists()) {
+        if (pathExists("ocrmypdf")) {
             return Optional.of("ocrmypdf");
-        } else if (pythonOcrPathExists()) {
+        } else if (pathExists("python -m ocrmypdf")) {
             return Optional.of("python -m ocrmypdf");
+        } else if (pathExists("py -m ocrmypdf")) {
+            return Optional.of("py -m ocrmypdf");
+        } else if (pathExists("python3 -m ocrmypdf")) {
+            return Optional.of("python3 -m ocrmypdf");
         } else {
             return Optional.empty();
         }
     }
 
-    private boolean ocrmypdfPathExists() {
+    private boolean pathExists(String path) {
+        String[] pathParts = path.split(" ");
+        ArrayList<String> command = new ArrayList<>(Arrays.asList(pathParts));
+        command.add("--version");
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder("ocrmypdf", "--version");
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
 
@@ -63,43 +72,16 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
             boolean finished = process.waitFor(CHECKING_TIMEOUT, TimeUnit.SECONDS);
             if (!finished) {
                 process.destroyForcibly();
-                LOGGER.debug("Auto-detecting ocrmypdf as path timed out");
+                LOGGER.debug("Auto-detecting {} as path timed out", path);
                 return false;
             }
             return process.exitValue() == 0;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            LOGGER.debug("Auto detection of ocrmpdf as engine's path was interrupted", e);
+            LOGGER.debug("Auto detection of {} as engine's path was interrupted", path, e);
             return false;
         } catch (IOException e) {
-            LOGGER.debug("ocrmypdf is not available as engine's path: IOException occurred", e);
-            return false;
-        }
-    }
-
-    private boolean pythonOcrPathExists() {
-        try {
-            ProcessBuilder processBuilder = new ProcessBuilder("python", "-m", "ocrmypdf", "--version");
-            processBuilder.redirectErrorStream(true);
-            Process process = processBuilder.start();
-
-            // Get the output and the errors of the process
-            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
-            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
-
-            boolean finished = process.waitFor(CHECKING_TIMEOUT, TimeUnit.SECONDS);
-            if (!finished) {
-                process.destroyForcibly();
-                LOGGER.debug("Auto-detecting python -m ocrmypdf as path timed out");
-                return false;
-            }
-            return process.exitValue() == 0;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            LOGGER.debug("Auto detection of python -m ocrmpdf as engine's path was interrupted", e);
-            return false;
-        } catch (IOException e) {
-            LOGGER.debug("python -m ocrmpdf is not available as engine's path: IOException occurred", e);
+            LOGGER.debug("{} is not available as engine's path: IOException occurred", path, e);
             return false;
         }
     }
