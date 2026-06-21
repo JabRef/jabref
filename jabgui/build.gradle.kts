@@ -58,6 +58,20 @@ val useLibericaJdkFullJvmArgs = if (useLibericaJdkFull) listOf(
     "--add-opens", "javafx.controls/com.sun.javafx.scene.control=org.jabref,ALL-UNNAMED"
 ) else emptyList()
 
+// Compile-time counterpart of the JavaFX --add-exports above. When JavaFX is patched Maven jars, those
+// internal com.sun.javafx.* packages are exported via the metadata patches in dependency-rules; when JavaFX
+// comes from the JDK those patches are inert, so javac needs the exports too. Only the exports are required
+// at compile time (--add-opens is reflection-only and applies at runtime via the JVM args above).
+val useLibericaJdkFullCompilerArgs = if (useLibericaJdkFull) listOf(
+    "--add-exports", "javafx.base/com.sun.javafx.event=org.jabref",
+    "--add-exports", "javafx.graphics/com.sun.javafx.scene=org.jabref",
+    "--add-exports", "javafx.controls/com.sun.javafx.scene.control=org.jabref"
+) else emptyList()
+
+tasks.named<JavaCompile>("compileJava") {
+    options.compilerArgs.addAll(useLibericaJdkFullCompilerArgs)
+}
+
 application {
     mainClass= "org.jabref.Launcher"
 

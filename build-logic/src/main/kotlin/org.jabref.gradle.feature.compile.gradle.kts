@@ -41,7 +41,12 @@ java {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release = 25
+    // --release is incompatible with the --add-exports for JDK-bundled JavaFX system modules used on the
+    // -PuseLibericaJdkFull path (see jabgui/build.gradle.kts). The toolchain is pinned to the same Java
+    // version, so on that path we let the toolchain set the target release instead of passing --release.
+    if (!useLibericaJdkFull) {
+        options.release = 25
+    }
     // See https://docs.gradle.org/current/userguide/performance.html#a_run_the_compiler_as_a_separate_process
     options.isFork = true
 }
