@@ -40,7 +40,8 @@ class OpenAlexTest {
     @ParameterizedTest
     @ValueSource(strings = {
             "https://example.com/W4408614692",
-            "not-a-url"
+            "not-a-url",
+            ""
     })
     void returnsEmptyForInvalid(String url) {
         assertEquals(Optional.empty(), fetcher.extractOpenAlexId(url));

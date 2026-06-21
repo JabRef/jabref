@@ -7,6 +7,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.logic.ai.ingestion.tasks.UpdateEmbeddingModelTask;
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.ProgressCounter;
@@ -44,6 +45,7 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
 
     public AsyncEmbeddingModel(
             PredefinedEmbeddingModel embeddingModelKind,
+            AiPreferences aiPreferences,
             NotificationService notificationService,
             TaskExecutor taskExecutor
     ) {
@@ -51,7 +53,9 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
         this.notificationService = notificationService;
         this.taskExecutor = taskExecutor;
 
-        startRebuildingTask();
+        if (aiPreferences.getAiFeaturesEnabled()) {
+            startRebuildingTask();
+        }
     }
 
     public void startRebuildingTask() {

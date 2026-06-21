@@ -73,6 +73,13 @@ public abstract class Importer implements Comparable<Importer> {
         }
     }
 
+    /// Checks whether the file extension matches this importer.
+    ///
+    /// @param extension the extension to check, without leading dot
+    public boolean supportsFileExtension(String extension) {
+        return getFileType().getExtensions().contains(extension);
+    }
+
     /// Parse the database in the source.
     ///
     /// This method can be called in two different contexts - either when importing in a specified format, or when

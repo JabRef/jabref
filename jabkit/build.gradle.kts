@@ -1,6 +1,7 @@
 plugins {
     id("org.jabref.gradle.module")
     id("org.jabref.gradle.feature.shadowjar")
+    id("org.jabref.gradle.feature.nativecompile")
     id("application")
 }
 
@@ -9,6 +10,10 @@ version = providers.gradleProperty("projVersion")
     .orElse(providers.environmentVariable("VERSION"))
     .orElse("100.0.0")
     .get()
+
+mainModuleInfo {
+    annotationProcessor("info.picocli.codegen")
+}
 
 testModuleInfo {
     requires("org.jabref.testsupport")
@@ -72,4 +77,13 @@ tasks.register<JavaExec>("runJabKitPortableSmokeTest") {
     jvmArgs(application.applicationDefaultJvmArgs)
     workingDir = file("src/test/resources")
     args("--debug", "check", "consistency", "empty.bib")
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            imageName.set("jabkit")
+            mainClass.set("org.jabref.toolkit.JabKitLauncher")
+        }
+    }
 }

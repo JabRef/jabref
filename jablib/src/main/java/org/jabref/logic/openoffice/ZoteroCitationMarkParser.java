@@ -2,6 +2,7 @@ package org.jabref.logic.openoffice;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -10,8 +11,9 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.entry.types.EntryType;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -20,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 public class ZoteroCitationMarkParser {
     private static final Gson GSON = new Gson();
-    private static final String CSL_JOURNAL_ARTICLE = "article-journal";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZoteroCitationMarkParser.class);
 
@@ -64,25 +65,14 @@ public class ZoteroCitationMarkParser {
     private static Optional<BibEntry> toBibEntry(ZoteroCitationData.CitationItemData citationItem) {
         ZoteroCitationData.ItemData itemData = citationItem.itemData;
 
-        // TODO: Support more entry types
-        // These are temporary lines, to only allow "journal articles"
-        if (!CSL_JOURNAL_ARTICLE.equals(itemData.type)) {
-            return Optional.empty();
-        }
-
-        // TODO: Add more fields
-        // For now, "Useful" fields (can be seen in preview) are kept
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        EntryType entryType = CSLItemTypeDefinitions.getEntryType(itemData.type);
+        BibEntry entry = new BibEntry(entryType);
         entry.withCitationKey("Zotero-" + (citationItem.id));
         setAuthors(itemData.author).ifPresent(authors -> entry.withField(StandardField.AUTHOR, authors));
         setDate(entry, itemData.issued);
-        setField(entry, StandardField.TITLE, itemData.title);
-        setField(entry, StandardField.JOURNALTITLE, itemData.containerTitle);
-        setField(entry, StandardField.VOLUME, itemData.volume);
-        setField(entry, StandardField.NUMBER, itemData.issue);
-        setField(entry, StandardField.PAGES, itemData.page);
-        setField(entry, StandardField.DOI, itemData.doi);
-        setField(entry, StandardField.URL, itemData.url);
+        for (Map.Entry<String, Field> fieldMapping : CSLItemTypeDefinitions.getFieldMappings(itemData.type, itemData).entrySet()) {
+            setField(entry, fieldMapping.getValue(), itemData.getFieldValue(fieldMapping.getKey()));
+        }
 
         return Optional.of(entry);
     }
@@ -115,7 +105,7 @@ public class ZoteroCitationMarkParser {
         Date.parse(dateString).ifPresent(entry::withDate);
     }
 
-    private static void setField(BibEntry entry, StandardField field, String value) {
+    private static void setField(BibEntry entry, Field field, String value) {
         if (StringUtil.isBlank(value)) {
             return;
         }

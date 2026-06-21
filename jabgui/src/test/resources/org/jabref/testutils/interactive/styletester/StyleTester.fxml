@@ -213,7 +213,8 @@
                                                    visited="true"/>
                                         <Separator prefWidth="200.0"/>
                                         <ColorPicker/>
-                                    </children>
+                                    <JabRefIconView glyph="EXAMPLE_SVG_STAR" style="-fx-icon-color: #2d9d4f;"/>
+                                </children>
                                 </VBox>
                                 <Separator orientation="VERTICAL" prefHeight="200.0"/>
                                 <VBox spacing="4" HBox.hgrow="ALWAYS">

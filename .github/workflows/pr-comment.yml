@@ -95,12 +95,12 @@ jobs:
 
       - name: Checkout
         # required for gh tool and .github/ghprcomment.yml
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           show-progress: 'false'
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: awalsh128/cache-apt-pkgs-action@latest
+      - uses: awalsh128/cache-apt-pkgs-action@v1.6.1
         with:
           packages: jq
           version: 1.0

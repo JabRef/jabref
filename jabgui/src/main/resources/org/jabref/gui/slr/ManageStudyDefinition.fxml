@@ -288,7 +288,7 @@
                                       fx:id="validationContainer">
                                     <Label fx:id="validationHeaderLabel"
                                            text="%In order to proceed:"
-                                           style="-fx-text-fill: -jr-red; -fx-font-weight: bold"
+                                           styleClass="bold error-message"
                                            visible="false"
                                            managed="false"/>
                                     <VBox spacing="3.0">
