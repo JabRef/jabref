@@ -35,7 +35,7 @@ Chosen option: "Do not use a preference", because JabRef already uses citation-j
 
 ## Pros and Cons of the Options
 
-### Use a preference for the compatibility mode.
+### Use a preference for the compatibility mode
 
 If a document contains Zotero's reference mark, JabRef shows a popup asking users to choose the compatibility mode. If users choose "Zotero compact mode", Zotero's reference mark will be recognized. Otherwise, JabRef will skip it.
 
@@ -44,7 +44,7 @@ If a document contains Zotero's reference mark, JabRef shows a popup asking user
 * Bad, because a popup may disturb users workflow.
 * Bad, because JabRef uses citation-js's mapping logic in its converter, using a preference is unnecessary.
 
-### Do not use a preference.
+### Do not use a preference
 
 Since JabRef uses citation-js's mapping logic (see ADR-64) as fallback strategy, users do not need to manually enable a preference to recognize Zotero's reference mark. JabRef will convert the citation to BibLateX format when it reads Zotero's reference mark. Possible problems will be added in release page and user documentation.
 
