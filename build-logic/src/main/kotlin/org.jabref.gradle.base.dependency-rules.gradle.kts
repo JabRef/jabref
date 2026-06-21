@@ -1,4 +1,3 @@
-import org.gradlex.javamodule.dependencies.JavaModuleDependenciesExtension
 import org.gradlex.javamodule.dependencies.tasks.ModuleDirectivesOrderingCheck
 import org.jabref.gradle.useLibericaJdkFull
 
@@ -12,21 +11,19 @@ plugins {
 tasks.withType<ModuleDirectivesOrderingCheck> { enabled = false }
 
 // Opt-in (-PuseLibericaJdkFull=true): consume the JavaFX bundled in the JDK (e.g. Liberica Full) instead of Maven.
-// The java-module-dependencies plugin maps each 'requires javafx.*' to an 'org.openjfx:javafx-*' dependency.
-// Removing those module-name -> GA mappings makes the plugin add no dependency for those modules, so they are
-// resolved from the JDK's system module path. (The plugin only logs a [WARN] for an unmapped 'requires'.)
-// The JavaFX version pin (versions/build.gradle.kts), the platform-variant patches and the per-module
-// opens/exports patches below then have nothing to act on and stay inert; the runtime opens/exports they
-// provided are re-applied as JVM args in jabgui/build.gradle.kts. (Flag: org.jabref.gradle.JavaFxBundling)
+// The java-module-dependencies plugin maps each 'requires javafx.*' to an 'org.openjfx:javafx-*' dependency; we drop
+// those from every configuration via an exclude, so 'requires javafx.*' is satisfied by the JDK's own system modules.
+// The JavaFX version pin (versions/build.gradle.kts), the platform-variant patches and the per-module opens/exports
+// patches below then have nothing to act on and stay inert; the runtime opens/exports they provided are re-applied as
+// JVM args in jabgui/build.gradle.kts. (Flag: org.jabref.gradle.JavaFxBundling)
 if (useLibericaJdkFull) {
-    val javafxModuleNames = setOf(
-        "javafx.base", "javafx.controls", "javafx.fxml",
-        "javafx.graphics", "javafx.media", "javafx.swing", "javafx.web"
-    )
-    val javaModuleDependencies = extensions.getByType(JavaModuleDependenciesExtension::class.java)
-    javaModuleDependencies.moduleNameToGA.set(
-        javaModuleDependencies.moduleNameToGA.get().filterKeys { it !in javafxModuleNames }
-    )
+    // The exclude is applied lazily at resolution time and, crucially, leaves moduleNameToGA untouched: eagerly reading
+    // and replacing that map (moduleNameToGA.get()/.set()) snapshots it before the plugin finishes contributing the
+    // project's other module-name -> GA mappings, silently discarding entries such as 'unirest.modules.gson' and thereby
+    // breaking transitive versions for deps only pinned via that path (e.g. gson, xz).
+    configurations.all {
+        exclude(mapOf("group" to "org.openjfx"))
+    }
 }
 
 jvmDependencyConflicts {
