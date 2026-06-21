@@ -224,11 +224,12 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
 
         private final CheckBox checkBox = new CheckBox();
         private final Label nameLabel = new Label();
-        private final HBox container = new HBox(6, checkBox, nameLabel);
+        private final HBox container = new HBox(checkBox, nameLabel);
 
         private boolean updatingCell = false;
 
         TabConfigCell() {
+            container.getStyleClass().add("entry-editor-tab-cell");
             checkBox.selectedProperty().addListener((_, _, selected) -> {
                 if (updatingCell) {
                     return;
