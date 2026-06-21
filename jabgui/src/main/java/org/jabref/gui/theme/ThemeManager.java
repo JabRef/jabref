@@ -15,6 +15,7 @@ import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.effect.Light;
 import javafx.scene.web.WebEngine;
 import javafx.stage.Window;
 
@@ -28,24 +29,22 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Installs and manages style files and provides live reloading. JabRef provides two
-/// inbuilt themes and a user customizable one: Light, Dark and Custom. The Light and Dark theme
-/// is basically the jabref-theme.css theme. Every other theme is loaded as an addition to
-/// jabref-theme.css.
+/// Installs and manages style files and provides live reloading. JabRef provides themes and the ability
+/// to add a custom stylesheet on top.
 ///
-/// For type Custom, Theme will protect against removal of the CSS file, degrading as
+/// For a custom stylesheet, we will protect against removal of the CSS file, degrading as
 /// gracefully as possible. If the file becomes unavailable while the application is
 /// running, some Scenes that have not yet had the CSS installed may not be themed. The
 /// PreviewViewer, which uses WebEngine, supports data URLs and so generally is not
-/// affected by removal of the file; however Theme package will not attempt to URL-encode
-/// large style sheets so as to protect memory usage (see
-/// {@link StyleSheetFile#MAX_IN_MEMORY_CSS_LENGTH}).
+/// affected by removal of the file; however, Theme package will not attempt to URL-encode
+/// large style sheets to protect memory usage (see {@link StyleSheetFile#MAX_IN_MEMORY_CSS_LENGTH}).
 ///
 /// @see <a href="https://docs.jabref.org/advanced/custom-themes">Custom themes</a> in
-/// the Jabref documentation.
+/// the JabRef documentation.
 public class ThemeManager {
     public static Map<String, Node> downloadIconTitleMap = Map.of(
             Localization.lang("Downloading"), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode()
@@ -61,9 +60,9 @@ public class ThemeManager {
     private final FileUpdateListener cssLiveUpdate = this::cssLiveUpdate;
     private final FileUpdateListener customCssLiveUpdate = this::customCssLiveUpdate;
 
-    private ThemePreset theme;
+    private ThemePreset theme = ThemePreset.JABREF;
     private ThemeColorScheme colorScheme = ThemeColorScheme.FOLLOW_SYSTEM;
-    private StyleSheet customTheme;
+    private @Nullable StyleSheet customTheme;
 
     public ThemeManager(@NonNull WorkspacePreferences workspacePreferences,
                         @NonNull FileUpdateMonitor fileUpdateMonitor) {
@@ -184,7 +183,7 @@ public class ThemeManager {
         if (colorScheme != newColorScheme) {
             colorScheme = newColorScheme;
 
-            updateModeToAllScenes();
+            updateColorSchemeOnAllScenes();
 
             LOGGER.debug("Color Scheme set to {}", newColorScheme);
         }
@@ -206,12 +205,12 @@ public class ThemeManager {
         }
 
         if (cssChanged) {
-            updateCssToAllScenes();
+            updateCssOnAllScenes();
         }
     }
 
     private void updateFontSettings() {
-        updateFontToAllScenes();
+        updateFontOnAllScenes();
     }
 
     private void removeStylesheetFromWatchList(StyleSheet styleSheet, FileUpdateListener updateMethod) {
@@ -237,13 +236,14 @@ public class ThemeManager {
     }
 
     private void cssLiveUpdate() {
-        UiTaskExecutor.runInJavaFXThread(this::updateModeToAllScenes);
+        UiTaskExecutor.runInJavaFXThread(this::updateColorSchemeOnAllScenes);
     }
 
     private void customCssLiveUpdate() {
+        if (customTheme == null) {
+            return;
+        }
         customTheme.reload();
-
-        LOGGER.debug("Updating additional CSS for all scenes and {} web engines", webEngines.size());
 
         UiTaskExecutor.runInJavaFXThread(() -> {
             webEngines.forEach(webEngine -> {
@@ -257,31 +257,25 @@ public class ThemeManager {
         });
     }
 
-    private void updateCssToAllScenes() {
+    private void updateCssOnAllScenes() {
         Window.getWindows().stream()
               .map(Window::getScene)
               .filter(Objects::nonNull)
               .forEach(this::updateCssOnScene);
     }
 
-    private void updateModeToAllScenes() {
+    private void updateColorSchemeOnAllScenes() {
         Window.getWindows().stream()
               .map(Window::getScene)
               .filter(Objects::nonNull)
               .forEach(this::updateColorSchemeOnScene);
     }
 
-    private void updateFontToAllScenes() {
+    private void updateFontOnAllScenes() {
         Window.getWindows().stream()
               .map(Window::getScene)
               .filter(Objects::nonNull)
               .forEach(this::updateFontOnScene);
-    }
-
-    /// @return the currently active theme
-    @VisibleForTesting
-    ThemePreset getTheme() {
-        return this.theme;
     }
 
     /// @return the currently active custom theme
