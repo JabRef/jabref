@@ -1698,6 +1698,13 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 2;
 }
 
+/* EntryEditorTab — tab list rows, matching the row density of the Entry table */
+.entry-editor-tab-cell {
+    -fx-padding: 0.3em 0.6em;
+    -fx-alignment: center-left;
+    -fx-spacing: 0.5em;
+}
+
 /* WebSearchTab */
 .fetcher-list-cell {
     -fx-padding: 0.3em 0.6em;

@@ -24,6 +24,7 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.edit.CopyToPreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -219,11 +220,16 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String CUSTOM_TAB_NAME = "customTabName_";
     private static final String CUSTOM_TAB_FIELDS = "customTabFields_";
     private static final String AUTO_OPEN_FORM = "autoOpenForm";
+    private static final String SHOW_REQUIRED_FIELDS = "showRequiredFields";
+    private static final String SHOW_IMPORTANT_OPTIONAL_FIELDS = "showImportantOptionalFields";
+    private static final String SHOW_DETAIL_OPTIONAL_FIELDS = "showDetailOptionalFields";
+    private static final String SHOW_DEPRECATED_FIELDS = "showDeprecatedFields";
+    private static final String SHOW_OTHER_FIELDS = "showOtherFields";
     private static final String SHOW_RECOMMENDATIONS = "showRecommendations";
     private static final String SHOW_AI_SUMMARY = "showAiSummary";
     private static final String SHOW_AI_CHAT = "showAiChat";
     private static final String SHOW_LATEX_CITATIONS = "showLatexCitations";
-    private static final String SMART_FILE_ANNOTATIONS = "smartFileAnnotations";
+    private static final String SHOW_FILE_ANNOTATIONS = "showFileAnnotations";
     private static final String DEFAULT_SHOW_SOURCE = "defaultShowSource";
     private static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
     private static final String ALLOW_INTEGER_EDITION_BIBTEX = "allowIntegerEditionBibtex";
@@ -231,6 +237,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String JOURNAL_POPUP = "journalPopup";
     private static final String SHOW_SCITE_TAB = "showSciteTab";
     private static final String SHOW_USER_COMMENTS_FIELDS = "showUserCommentsFields";
+    private static final String SHOW_COMMENTS_TAB = "showCommentsTab";
+    private static final String SHOW_MATHSCINET_TAB = "showMathSciNetTab";
+    private static final String SHOW_SOURCE_TAB = "showSourceTab";
+    private static final String SHOW_FULLTEXT_SEARCH_TAB = "showFulltextSearchTab";
     private static final String ENTRY_EDITOR_PREVIEW_DIVIDER_POS = "entryEditorPreviewDividerPos";
     private static final String CITATION_FETCHER_TYPE = "citationFetcherType";
     private static final String CITATION_COUNT_FETCHER_TYPE = "citationCountFetcherType";
@@ -359,36 +369,24 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         }
         entryEditorPreferences = getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences.getDefault());
 
-        EasyBind.listen(entryEditorPreferences.entryEditorTabs(), (_, _, newValue) -> storeEntryEditorTabs(newValue));
-        // defaultEntryEditorTabs are read-only
+        entryEditorPreferences.getTabModels().addListener((InvalidationListener) _ -> storeTabConfigs(entryEditorPreferences.getTabModels()));
         EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (_, _, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowRecommendationsTabProperty(), (_, _, newValue) -> putBoolean(SHOW_RECOMMENDATIONS, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowAiSummaryTabProperty(), (_, _, newValue) -> putBoolean(SHOW_AI_SUMMARY, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowAiChatTabProperty(), (_, _, newValue) -> putBoolean(SHOW_AI_CHAT, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowLatexCitationsTabProperty(), (_, _, newValue) -> putBoolean(SHOW_LATEX_CITATIONS, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowFileAnnotationsTabProperty(), (_, _, newValue) -> putBoolean(SMART_FILE_ANNOTATIONS, newValue));
         EasyBind.listen(entryEditorPreferences.showSourceTabByDefaultProperty(), (_, _, newValue) -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
         EasyBind.listen(entryEditorPreferences.enableValidationProperty(), (_, _, newValue) -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
         EasyBind.listen(entryEditorPreferences.allowIntegerEditionBibtexProperty(), (_, _, newValue) -> putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, newValue));
         EasyBind.listen(entryEditorPreferences.autoLinkEnabledProperty(), (_, _, newValue) -> putBoolean(AUTOLINK_FILES_ENABLED, newValue));
         EasyBind.listen(entryEditorPreferences.enableJournalPopupProperty(), (_, _, newValue) -> put(JOURNAL_POPUP, newValue.toString()));
-        EasyBind.listen(entryEditorPreferences.shouldShowLSciteTabProperty(), (_, _, newValue) -> putBoolean(SHOW_SCITE_TAB, newValue));
-        EasyBind.listen(entryEditorPreferences.showUserCommentsFieldsProperty(), (_, _, newValue) -> putBoolean(SHOW_USER_COMMENTS_FIELDS, newValue));
         EasyBind.listen(entryEditorPreferences.previewWidthDividerPositionProperty(), (_, _, newValue) -> putDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, newValue.doubleValue()));
         EasyBind.listen(entryEditorPreferences.citationFetcherTypeProperty(), (_, _, newValue) -> put(CITATION_FETCHER_TYPE, newValue.name()));
+        EasyBind.listen(entryEditorPreferences.showUserCommentsFieldsProperty(), (_, _, newValue) -> putBoolean(SHOW_USER_COMMENTS_FIELDS, newValue));
         EasyBind.listen(entryEditorPreferences.citationCountFetcherTypeProperty(), (_, _, newValue) -> put(CITATION_COUNT_FETCHER_TYPE, newValue.name()));
         return entryEditorPreferences;
     }
 
     private EntryEditorPreferences getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences defaults) {
         return new EntryEditorPreferences(
-                getEntryEditorTabs(),
+                getEntryEditorTabs(defaults),
                 getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),
-                getBoolean(SHOW_RECOMMENDATIONS, defaults.shouldShowRecommendationsTab()),
-                getBoolean(SHOW_AI_SUMMARY, defaults.shouldShowAiSummaryTab()),
-                getBoolean(SHOW_AI_CHAT, defaults.shouldShowAiChatTab()),
-                getBoolean(SHOW_LATEX_CITATIONS, defaults.shouldShowLatexCitationsTab()),
-                getBoolean(SMART_FILE_ANNOTATIONS, defaults.shouldShowFileAnnotationsTab()),
                 getBoolean(DEFAULT_SHOW_SOURCE, defaults.showSourceTabByDefault()),
                 getBoolean(VALIDATE_IN_ENTRY_EDITOR, defaults.shouldEnableValidation()),
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaults.shouldAllowIntegerEditionBibtex()),
@@ -396,50 +394,130 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP, defaults.shouldEnableJournalPopup().name())),
                 CitationFetcherType.valueOf(get(CITATION_FETCHER_TYPE, defaults.getCitationFetcherType().name())),
                 CitationCountFetcherType.valueOf(get(CITATION_COUNT_FETCHER_TYPE, defaults.getCitationCountFetcherType().name())),
-                getBoolean(SHOW_SCITE_TAB, defaults.shouldShowSciteTab()),
                 getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields()),
                 getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewWidthDividerPosition())
         );
     }
 
-    /// Get a Map of defined tab names to default tab fields.
-    ///
-    /// @return A map of the currently defined tabs in the entry editor
-    private Map<String, Set<Field>> getEntryEditorTabs() {
-        Map<String, Set<Field>> tabs = new LinkedHashMap<>();
+    /// The single source of truth for the entry editor's tab list: the user-configured field-set tabs,
+    /// followed by every static (built-in) tab's visibility flag, in {@link EntryEditorTabModel.BuiltIn} order.
+    private List<EntryEditorTabModel> getEntryEditorTabs(EntryEditorPreferences defaults) {
+        List<EntryEditorTabModel> tabModels = new ArrayList<>();
+
+        // Always-present leading tab. Its visibility is owned by PreviewPreferences (PREVIEW_AS_TAB /
+        // showPreviewAsExtraTab) — the single source the factory gates on — so the model bit is a constant
+        // and is not persisted separately here.
+        tabModels.add(new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.PREVIEW, true));
+
+        tabModels.addAll(List.<EntryEditorTabModel>of(
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.REQUIRED_FIELDS,
+                        getBoolean(SHOW_REQUIRED_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.REQUIRED_FIELDS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.IMPORTANT_OPTIONAL_FIELDS,
+                        getBoolean(SHOW_IMPORTANT_OPTIONAL_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.IMPORTANT_OPTIONAL_FIELDS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.DETAIL_OPTIONAL_FIELDS,
+                        getBoolean(SHOW_DETAIL_OPTIONAL_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.DETAIL_OPTIONAL_FIELDS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.DEPRECATED_FIELDS,
+                        getBoolean(SHOW_DEPRECATED_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.DEPRECATED_FIELDS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.OTHER_FIELDS,
+                        getBoolean(SHOW_OTHER_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.OTHER_FIELDS)))
+        ));
+
+        Map<String, Set<Field>> tabNamesToFields = new LinkedHashMap<>();
         List<String> tabNames = getSeries(CUSTOM_TAB_NAME);
         List<String> tabFields = getSeries(CUSTOM_TAB_FIELDS);
-
         if (tabNames.isEmpty() || (tabNames.size() != tabFields.size())) {
-            return EntryEditorPreferences.getDefaultEntryEditorTabs();
+            tabNamesToFields = EntryEditorPreferences.getDefaultEntryEditorTabs();
+        } else {
+            for (int i = 0; i < tabNames.size(); i++) {
+                tabNamesToFields.put(tabNames.get(i), FieldFactory.parseFieldList(tabFields.get(i)));
+            }
         }
+        tabNamesToFields.forEach((name, fields) ->
+                tabModels.add(new EntryEditorTabModel.CustomizedFieldsTab(name, fields)));
 
-        for (int i = 0; i < tabNames.size(); i++) {
-            tabs.put(tabNames.get(i), FieldFactory.parseFieldList(tabFields.get(i)));
-        }
-        return tabs;
+        tabModels.addAll(List.<EntryEditorTabModel>of(
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.RELATED_ARTICLES,
+                        getBoolean(SHOW_RECOMMENDATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.RELATED_ARTICLES))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.AI_SUMMARY,
+                        getBoolean(SHOW_AI_SUMMARY, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.AI_SUMMARY))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.AI_CHAT,
+                        getBoolean(SHOW_AI_CHAT, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.AI_CHAT))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.LATEX_CITATIONS,
+                        getBoolean(SHOW_LATEX_CITATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.LATEX_CITATIONS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.FILE_ANNOTATIONS,
+                        getBoolean(SHOW_FILE_ANNOTATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FILE_ANNOTATIONS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION,
+                        getBoolean(SHOW_SCITE_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.COMMENTS,
+                        getBoolean(SHOW_COMMENTS_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.COMMENTS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.MATH_SCI_NET,
+                        getBoolean(SHOW_MATHSCINET_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.MATH_SCI_NET))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.SOURCE,
+                        getBoolean(SHOW_SOURCE_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.SOURCE))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS,
+                        getBoolean(SHOW_FULLTEXT_SEARCH_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS)))
+        ));
+
+        return tabModels;
     }
 
-    /// Stores the defined tabs and corresponding fields in the preferences.
-    ///
-    /// @param customTabs a map of tab names and the corresponding set of fields to be displayed in
-    private void storeEntryEditorTabs(Map<String, Set<Field>> customTabs) {
-        String[] names = customTabs.keySet().toArray(String[]::new);
-        String[] fields = customTabs.values().stream()
-                                    .map(set -> set.stream()
+    private void storeTabConfigs(List<EntryEditorTabModel> configs) {
+        List<EntryEditorTabModel.CustomizedFieldsTab> fieldSetTabs = configs.stream()
+                                                                            .filter(EntryEditorTabModel.CustomizedFieldsTab.class::isInstance)
+                                                                            .map(EntryEditorTabModel.CustomizedFieldsTab.class::cast)
+                                                                            .toList();
+
+        for (int i = 0; i < fieldSetTabs.size(); i++) {
+            put(CUSTOM_TAB_NAME + i, fieldSetTabs.get(i).name());
+            put(CUSTOM_TAB_FIELDS + i, fieldSetTabs.get(i).fields().stream()
                                                    .map(Field::getName)
-                                                   .collect(Collectors.joining(STRINGLIST_DELIMITER.toString())))
-                                    .toArray(String[]::new);
-
-        for (int i = 0; i < customTabs.size(); i++) {
-            put(CUSTOM_TAB_NAME + i, names[i]);
-            put(CUSTOM_TAB_FIELDS + i, fields[i]);
+                                                   .collect(Collectors.joining(STRINGLIST_DELIMITER.toString())));
         }
+        purgeSeries(CUSTOM_TAB_NAME, fieldSetTabs.size());
+        purgeSeries(CUSTOM_TAB_FIELDS, fieldSetTabs.size());
 
-        purgeSeries(CUSTOM_TAB_NAME, customTabs.size());
-        purgeSeries(CUSTOM_TAB_FIELDS, customTabs.size());
-
-        getEntryEditorTabs();
+        for (EntryEditorTabModel config : configs) {
+            if (config instanceof EntryEditorTabModel.BuiltInTab(
+                    EntryEditorTabModel.BuiltIn type,
+                    boolean visible
+            )) {
+                switch (type) {
+                    case PREVIEW -> {
+                        // Preview-tab visibility is stored as showPreviewAsExtraTab in PreviewPreferences; nothing to persist here.
+                    }
+                    case REQUIRED_FIELDS ->
+                            putBoolean(SHOW_REQUIRED_FIELDS, visible);
+                    case IMPORTANT_OPTIONAL_FIELDS ->
+                            putBoolean(SHOW_IMPORTANT_OPTIONAL_FIELDS, visible);
+                    case DETAIL_OPTIONAL_FIELDS ->
+                            putBoolean(SHOW_DETAIL_OPTIONAL_FIELDS, visible);
+                    case DEPRECATED_FIELDS ->
+                            putBoolean(SHOW_DEPRECATED_FIELDS, visible);
+                    case OTHER_FIELDS ->
+                            putBoolean(SHOW_OTHER_FIELDS, visible);
+                    case RELATED_ARTICLES ->
+                            putBoolean(SHOW_RECOMMENDATIONS, visible);
+                    case AI_SUMMARY ->
+                            putBoolean(SHOW_AI_SUMMARY, visible);
+                    case AI_CHAT ->
+                            putBoolean(SHOW_AI_CHAT, visible);
+                    case FILE_ANNOTATIONS ->
+                            putBoolean(SHOW_FILE_ANNOTATIONS, visible);
+                    case LATEX_CITATIONS ->
+                            putBoolean(SHOW_LATEX_CITATIONS, visible);
+                    case CITATION_INFORMATION ->
+                            putBoolean(SHOW_SCITE_TAB, visible);
+                    case COMMENTS ->
+                            putBoolean(SHOW_COMMENTS_TAB, visible);
+                    case MATH_SCI_NET ->
+                            putBoolean(SHOW_MATHSCINET_TAB, visible);
+                    case SOURCE ->
+                            putBoolean(SHOW_SOURCE_TAB, visible);
+                    case FULLTEXT_SEARCH_RESULTS ->
+                            putBoolean(SHOW_FULLTEXT_SEARCH_TAB, visible);
+                }
+            }
+        }
     }
     // endregion
 

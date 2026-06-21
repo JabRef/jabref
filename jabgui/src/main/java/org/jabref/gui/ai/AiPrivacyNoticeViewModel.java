@@ -10,6 +10,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.logic.ai.preferences.AiPreferences;
@@ -64,8 +65,8 @@ public class AiPrivacyNoticeViewModel extends AbstractViewModel {
     }
 
     public void privacyDisagree() {
-        entryEditorPreferences.setShouldShowAiChatTab(false);
-        entryEditorPreferences.setShouldShowAiSummaryTab(false);
+        entryEditorPreferences.setTabVisible(EntryEditorTabModel.BuiltIn.AI_CHAT, false);
+        entryEditorPreferences.setTabVisible(EntryEditorTabModel.BuiltIn.AI_SUMMARY, false);
         groupsPreferences.setShowAiChatButton(false);
         aiPreferences.setAiFeaturesEnabledCurrently(false);
     }

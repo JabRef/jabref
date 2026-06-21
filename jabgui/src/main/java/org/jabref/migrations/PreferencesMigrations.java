@@ -3,6 +3,7 @@ package org.jabref.migrations;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -75,6 +76,19 @@ public class PreferencesMigrations {
         migrateGeneralTabDefaultFields(preferences);
         upgradeResolveBibTeXStringsFields(preferences);
         upgradeTheme(preferences);
+        migrateFileAnnotationsTabVisibility(preferences);
+    }
+
+    /// The legacy key `smartFileAnnotations` toggled a "smart visibility" mode. Mode was adapted for all tabs in
+    /// EntryEditor as content driven visibility.
+    static void migrateFileAnnotationsTabVisibility(JabRefGuiPreferences prefs) {
+        final String V_6_0_SHOW_FILE_ANNOTATIONS = "showFileAnnotations";
+        final String LEGACY_SMART_FILE_ANNOTATIONS = "smartFileAnnotations";
+
+        if (prefs.get(V_6_0_SHOW_FILE_ANNOTATIONS, null) == null
+                && prefs.get(LEGACY_SMART_FILE_ANNOTATIONS, null) != null) {
+            prefs.putBoolean(V_6_0_SHOW_FILE_ANNOTATIONS, true);
+        }
     }
 
     /// Migrate all preferences from net/sf/jabref to org/jabref
@@ -550,7 +564,7 @@ public class PreferencesMigrations {
     /// @param preferences the user's current GUI preferences
     /// @implNote The default fields for the "General" tab are defined by {@link EntryEditorPreferences#getDefaultGeneralFields()}.
     static void migrateGeneralTabDefaultFields(GuiPreferences preferences) {
-        Map<String, Set<Field>> entryEditorPrefs = preferences.getEntryEditorPreferences().getEntryEditorTabs();
+        Map<String, Set<Field>> entryEditorPrefs = preferences.getEntryEditorPreferences().getCustomizedFieldSets();
         Set<Field> currentGeneralPrefs = entryEditorPrefs.get(Localization.lang("General"));
         if (currentGeneralPrefs == null) {
             return;
@@ -584,13 +598,18 @@ public class PreferencesMigrations {
                 new HashSet<>(EntryEditorPreferences.getDefaultGeneralFields())
         );
 
-        preferences.getEntryEditorPreferences().setEntryEditorTabList(entryEditorPrefs);
+        preferences.getEntryEditorPreferences().setCustomizedFieldSets(entryEditorPrefs);
     }
 
-    /// The tab "Comments" is hard coded using {@link org.jabref.gui.entryeditor.CommentsTab} since v5.10 (and thus hard-wired in {@link org.jabref.gui.entryeditor.EntryEditor#createTabs()}.
-    /// Thus, the configuration ih the preferences is obsolete
+    /// The tab "Comments" is hard coded using {@link org.jabref.gui.entryeditor.CommentsTab} since v5.10 (and thus
+    /// hard-wired in {@link org.jabref.gui.entryeditor.EntryEditorTabFactory#createTabs()}. Thus, the configuration in
+    /// the preferences is obsolete.
     static void removeCommentsFromCustomEditorTabs(GuiPreferences preferences) {
-        preferences.getEntryEditorPreferences().getEntryEditorTabs().remove("Comments");
+        EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
+        Map<String, Set<Field>> tabs = new LinkedHashMap<>(entryEditorPreferences.getCustomizedFieldSets());
+        if (tabs.remove("Comments") != null) {
+            entryEditorPreferences.setCustomizedFieldSets(tabs);
+        }
     }
 
     /// upgrade the old theme css names of the theme to the new theme properties

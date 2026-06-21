@@ -12,7 +12,6 @@ import org.jabref.model.entry.BibEntry;
 
 // [impl->feat~ai.summarization.entries~1]
 public class AiSummaryTab extends EntryEditorTab {
-    private final GuiPreferences preferences;
     private final StateManager stateManager;
 
     private final AiSummaryView aiSummaryView;
@@ -21,19 +20,13 @@ public class AiSummaryTab extends EntryEditorTab {
             GuiPreferences preferences,
             StateManager stateManager
     ) {
-        this.preferences = preferences;
         this.stateManager = stateManager;
 
         this.aiSummaryView = new AiSummaryView();
 
-        setText(Localization.lang("AI summary"));
+        setText(EntryEditorTabModel.BuiltIn.AI_SUMMARY.displayName());
         setTooltip(new Tooltip(Localization.lang("AI-generated summary of attached file(s)")));
         setContent(aiSummaryView);
-    }
-
-    @Override
-    public boolean shouldShow(BibEntry entry) {
-        return preferences.getEntryEditorPreferences().shouldShowAiSummaryTab();
     }
 
     /// @implNote Method similar to {@link AiChatTab#bindToEntry(BibEntry)}
