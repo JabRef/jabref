@@ -102,7 +102,7 @@ public sealed interface EntryEditorTabModel
                 case SOURCE ->
                         Localization.lang("Source");
                 case FULLTEXT_SEARCH_RESULTS ->
-                        Localization.lang("Search results");
+                        Localization.lang("Fulltext search results");
             };
         }
 
