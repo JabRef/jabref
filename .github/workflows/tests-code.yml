@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -59,7 +59,7 @@ jobs:
     # ubuntu-slim doesn't offer docker
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/format-java
       # job should fail in case there are changes
       - uses: ./.github/actions/check-formatting
@@ -70,10 +70,10 @@ jobs:
     # too slow on ubuntu-slim
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: 'jabref'
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: 'rmuller/Convert2MarkdownJavadoc'
           path: 'Convert2MarkdownJavadoc'
@@ -98,7 +98,7 @@ jobs:
     needs: format
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -113,7 +113,7 @@ jobs:
     needs: checkstyle
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -141,7 +141,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -157,7 +157,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -174,7 +174,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -213,7 +213,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -248,7 +248,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -263,7 +263,7 @@ jobs:
         module: [ jablib, jabkit, jabsrv, jabgui ]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -297,7 +297,7 @@ jobs:
         module: [ jablib ]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -312,7 +312,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: 'true'
@@ -340,7 +340,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -366,7 +366,7 @@ jobs:
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop # Shutdown the Default MySQL to save memory, "sudo" is necessary, please do not remove it
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -394,7 +394,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -408,7 +408,7 @@ jobs:
     if: github.ref != 'refs/heads/main'
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -432,7 +432,7 @@ jobs:
         project: [ jablib-examples/maven3/doi-to-bibtex ]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -478,7 +478,7 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -504,7 +504,7 @@ jobs:
     name: "Validate requirement coverage"
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
@@ -518,7 +518,7 @@ jobs:
     name: "Validate Gradle Wrapper"
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           show-progress: 'false'
       - uses: gradle/actions/wrapper-validation@v5

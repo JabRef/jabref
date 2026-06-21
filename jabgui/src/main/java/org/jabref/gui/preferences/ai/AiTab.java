@@ -22,6 +22,7 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.help.HelpFile;
@@ -268,11 +269,11 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         apiKeyTextField.textProperty().bindBidirectional(viewModel.apiKeyProperty());
         apiKeyTextField.disableProperty().bind(viewModel.disableBasicSettingsProperty());
 
-        Button revealApiKeyButton = IconTheme.JabRefIcons.PASSWORD_REVEALED.asButton();
+        Button revealApiKeyButton = ControlHelper.iconButton(IconTheme.JabRefIcons.PASSWORD_REVEALED);
         revealApiKeyButton.disableProperty().bind(apiKeyTextField.disableProperty());
         revealApiKeyButton.setOnAction(_ -> apiKeyTextField.setShowPassword(!apiKeyTextField.isShowPassword()));
 
-        Button clearApiKeyButton = IconTheme.JabRefIcons.DELETE_ENTRY.asButton();
+        Button clearApiKeyButton = ControlHelper.iconButton(IconTheme.JabRefIcons.DELETE_ENTRY);
         clearApiKeyButton.disableProperty().bind(apiKeyTextField.disableProperty());
         clearApiKeyButton.setOnAction(_ -> {
             apiKeyTextField.clear();

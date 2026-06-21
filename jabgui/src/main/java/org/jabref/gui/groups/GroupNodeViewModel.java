@@ -243,12 +243,13 @@ public class GroupNodeViewModel {
     }
 
     private JabRefIcon createDefaultIcon() {
-        Color color = groupNode.getGroup().getColor().map(Color::valueOf).orElse(IconTheme.getDefaultGroupColor());
+        Color color = groupNode.getGroup().getColor().map(Color::valueOf).orElse(IconTheme.DEFAULT_GROUP_COLOR);
         return IconTheme.JabRefIcons.DEFAULT_GROUP_ICON_COLORED.withColor(color);
     }
 
     private Optional<JabRefIcon> parseIcon(String iconCode) {
-        return IconTheme.findIcon(iconCode, getColor());
+        return IconTheme.findJabRefIcon(iconCode)
+                        .map(icon -> icon.withColor(getColor()));
     }
 
     public ObservableList<GroupNodeViewModel> getChildren() {
@@ -336,7 +337,7 @@ public class GroupNodeViewModel {
     }
 
     public Color getColor() {
-        return groupNode.getGroup().getColor().map(Color::valueOf).orElse(IconTheme.getDefaultGroupColor());
+        return groupNode.getGroup().getColor().map(Color::valueOf).orElse(IconTheme.DEFAULT_GROUP_COLOR);
     }
 
     public String getPath() {

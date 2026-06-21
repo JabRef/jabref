@@ -188,11 +188,15 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         update();
     }
 
+    public void clearEntry() {
+        setEntry(null);
+    }
+
     public void setDatabaseContext(BibDatabaseContext newDatabaseContext) {
         if (Objects.equals(databaseContext, newDatabaseContext)) {
             return;
         }
-        setEntry(null);
+        clearEntry();
         this.databaseContext = newDatabaseContext;
         update();
     }
