@@ -9,6 +9,7 @@ CLAUDE.md
 .claude/*
 !.claude/settings.json
 !.claude/hooks/
+memory/*
 
 .cursorrules
 
