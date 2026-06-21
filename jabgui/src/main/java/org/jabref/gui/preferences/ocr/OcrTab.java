@@ -1,6 +1,5 @@
 package org.jabref.gui.preferences.ocr;
 
-import java.nio.file.Path;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
@@ -9,7 +8,6 @@ import javafx.scene.control.TextField;
 
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 
@@ -39,11 +37,7 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> implement
 
     @FXML
     private void browseEnginePath() {
-        Optional<Path> selectedPath = dialogService.showFileOpenDialog(
-                new FileDialogConfiguration.Builder()
-                        .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
-                        .build());
-        selectedPath.ifPresent(path -> viewModel.ocrPathProperty().set(path.toString()));
+        viewModel.browseEnginePath(dialogService, preferences);
     }
 
     @FXML
@@ -54,8 +48,9 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> implement
         autoDetectTask.showToUser(true);
         autoDetectTask.onSuccess(result -> {
             if (result.isPresent()) {
-                viewModel.ocrPathProperty().set(result.get());
-                dialogService.notify(Localization.lang("OCRmyPDF detected at: %0", result.get()));
+                String path = result.get();
+                viewModel.ocrPathProperty().set(path);
+                dialogService.notify(Localization.lang("OCRmyPDF detected at: %0", path));
             } else {
                 dialogService.notify(Localization.lang("OCRmyPDF could not be detected automatically"));
             }

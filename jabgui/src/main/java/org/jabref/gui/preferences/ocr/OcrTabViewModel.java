@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.ocr;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
@@ -9,7 +10,10 @@ import java.util.concurrent.TimeUnit;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
@@ -40,6 +44,14 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty ocrPathProperty() {
         return ocrPath;
+    }
+
+    void browseEnginePath(DialogService dialogService, GuiPreferences preferences) {
+        Optional<Path> selectedPath = dialogService.showFileOpenDialog(
+                new FileDialogConfiguration.Builder()
+                        .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
+                        .build());
+        selectedPath.ifPresent(path -> ocrPathProperty().set(path.toString()));
     }
 
     Optional<String> autoDetectEnginePath() {
