@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.SequencedSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
@@ -27,6 +28,9 @@ import java.util.stream.Collectors;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.MapProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
@@ -397,6 +401,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String PUSH_EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
     private static final String PUSH_VIM_SERVER = "vimServer";
     private static final String PUSH_CITE_COMMAND = "citeCommand";
+    /// Synthetic registry key: command paths are persisted under per-application keys (see PUSH_APPLICATIONS_PATHS), not under this key
+    private static final String PUSH_APPLICATIONS_PATHS_KEY = "pushApplicationsCommandPaths";
 
     private static final Map<PushApplications, String> PUSH_APPLICATIONS_PATHS = Map.of(
             PushApplications.EMACS, "emacsPath",
@@ -649,6 +655,60 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> property.set(defaultValue)));
     }
 
+    private void bindString(StringProperty property, String key, String defaultValue) {
+        EasyBind.listen(property, (_, _, v) -> put(key, v));
+        allBindings.add(new PreferenceBinding(
+                property,
+                defaultValue,
+                key,
+                () -> property.set(get(key, defaultValue)),
+                () -> property.set(defaultValue)));
+    }
+
+    /// Binds an object-valued property whose persisted form is a String.
+    ///
+    /// @param serializer   converts the value to its stored String representation
+    /// @param deserializer reconstructs the value from its stored String representation
+    private <T> void bindObject(ObjectProperty<T> property,
+                                String key,
+                                T defaultValue,
+                                Function<T, String> serializer,
+                                Function<String, T> deserializer) {
+        EasyBind.listen(property, (_, _, v) -> put(key, serializer.apply(v)));
+        allBindings.add(new PreferenceBinding(
+                property,
+                defaultValue,
+                key,
+                () -> property.set(deserializer.apply(get(key, serializer.apply(defaultValue)))),
+                () -> property.set(defaultValue)));
+    }
+
+    /// Binds a map-valued property. Unlike the other `bind*` helpers, persistence is delegated to the given
+    /// `persistListener`, since map entries may be stored under multiple backing-store keys.
+    ///
+    /// @param persistListener persists individual entry changes to the backing store
+    /// @param loadFromStore   reads the stored map, falling back to the given defaults for missing entries
+    private void bindMap(MapProperty<String, String> map,
+                         String key,
+                         Map<String, String> defaultMap,
+                         MapChangeListener<? super String, ? super String> persistListener,
+                         Function<Map<String, String>, Map<String, String>> loadFromStore) {
+        Map<String, String> defaultCopy = Map.copyOf(defaultMap);
+        map.addListener(persistListener);
+        allBindings.add(new PreferenceBinding(
+                map,
+                defaultCopy,
+                key,
+                () -> {
+                    map.clear();
+                    map.putAll(loadFromStore.apply(defaultCopy));
+                },
+                () -> {
+                    map.clear();
+                    map.putAll(defaultCopy);
+                }));
+    }
+
     private void bindList(ObservableList<String> list, String key, List<String> defaultList) {
         List<String> defaultCopy = List.copyOf(defaultList);
         list.addListener((InvalidationListener) _ -> putStringList(key, list));
@@ -670,8 +730,14 @@ public class JabRefCliPreferences implements CliPreferences {
     private Object getObject(Observable observable) {
         if (observable instanceof BooleanProperty booleanProperty) {
             return booleanProperty.get();
+        } else if (observable instanceof StringProperty stringProperty) {
+            return stringProperty.get();
         } else if (observable instanceof ObservableList<?> observableList) {
             return observableList;
+        } else if (observable instanceof MapProperty<?, ?> mapProperty) {
+            return mapProperty.get();
+        } else if (observable instanceof ObjectProperty<?> objectProperty) {
+            return objectProperty.get();
         }
 
         return null;
@@ -740,7 +806,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getInternalPreferences().setAll(InternalPreferences.getDefault());
         getFieldPreferences().setAll(FieldPreferences.getDefault());
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
-        getPushToApplicationPreferences().setAll(PushToApplicationPreferences.getDefault());
         getLibraryPreferences().setAll(LibraryPreferences.getDefault());
         getDOIPreferences().setAll(DOIPreferences.getDefault());
         getOwnerPreferences().setAll(OwnerPreferences.getDefault());
@@ -776,6 +841,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 OpenOfficePreferences.getDefault());
         getGitPreferences().setAll(GitPreferences.getDefault());
 
+        // ensure registration of bindings
+        getPushToApplicationPreferences();
+        getAbbreviationPreferences();
+
         allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
 
@@ -794,7 +863,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getInternalPreferences().setAll(getInternalPreferencesFromBackingStore(getInternalPreferences()));
         getFieldPreferences().setAll(getFieldPreferencesFromBackingStore(getFieldPreferences()));
         getProxyPreferences().setAll(getProxyPreferencesFromBackingStore(getProxyPreferences()));
-        getPushToApplicationPreferences().setAll(getPushToApplicationPreferencesFromBackingStore(getPushToApplicationPreferences()));
         getLibraryPreferences().setAll(getLibraryPreferencesFromBackingStore(getLibraryPreferences()));
         getDOIPreferences().setAll(getDoiPreferencesFromBackingStore(getDOIPreferences()));
         getOwnerPreferences().setAll(getOwnerPreferencesFromBackingStore(getOwnerPreferences()));
@@ -821,7 +889,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
         getGitPreferences().setAll(getGitPreferencesFromBackingStore(getGitPreferences()));
 
-        getAbbreviationPreferences(); // ensure initialized, registers bindings
+        // ensure registration of bindings
+        getPushToApplicationPreferences();
+        getAbbreviationPreferences();
+
         allBindings.forEach(binding -> binding.importFromStore().run());
     }
 
@@ -874,26 +945,41 @@ public class JabRefCliPreferences implements CliPreferences {
             return pushToApplicationPreferences;
         }
 
-        pushToApplicationPreferences = getPushToApplicationPreferencesFromBackingStore(PushToApplicationPreferences.getDefault());
+        PushToApplicationPreferences defaultValues = PushToApplicationPreferences.getDefault();
 
-        EasyBind.listen(pushToApplicationPreferences.activeApplicationNameProperty(), (_, _, newValue) -> put(PUSH_TO_APPLICATION, newValue));
-        pushToApplicationPreferences.getCommandPaths().addListener((MapChangeListener<? super String, ? super String>) this::storePushToApplicationPath);
-        EasyBind.listen(pushToApplicationPreferences.emacsArgumentsProperty(), (_, _, newValue) -> put(PUSH_EMACS_ADDITIONAL_PARAMETERS, newValue));
-        EasyBind.listen(pushToApplicationPreferences.vimServerProperty(), (_, _, newValue) -> put(PUSH_VIM_SERVER, newValue));
-        EasyBind.listen(pushToApplicationPreferences.citeCommandProperty(),
-                (_, _, newValue) -> put(PUSH_CITE_COMMAND, newValue.toString()));
+        pushToApplicationPreferences = new PushToApplicationPreferences(
+                get(PUSH_TO_APPLICATION, defaultValues.getActiveApplicationName()),
+                readPushToApplicationPath(defaultValues.getCommandPaths()),
+                get(PUSH_EMACS_ADDITIONAL_PARAMETERS, defaultValues.getEmacsArguments()),
+                get(PUSH_VIM_SERVER, defaultValues.getVimServer()),
+                CitationCommandString.from(get(PUSH_CITE_COMMAND, defaultValues.getCiteCommand().toString()))
+        );
+
+        bindString(pushToApplicationPreferences.activeApplicationNameProperty(), PUSH_TO_APPLICATION, defaultValues.getActiveApplicationName());
+        bindString(pushToApplicationPreferences.emacsArgumentsProperty(), PUSH_EMACS_ADDITIONAL_PARAMETERS, defaultValues.getEmacsArguments());
+        bindString(pushToApplicationPreferences.vimServerProperty(), PUSH_VIM_SERVER, defaultValues.getVimServer());
+        bindObject(pushToApplicationPreferences.citeCommandProperty(), PUSH_CITE_COMMAND, defaultValues.getCiteCommand(),
+                CitationCommandString::toString, CitationCommandString::from);
+
+        // Command paths are persisted under per-application keys (see storePushToApplicationPath), not under a single preferences key
+        bindMap(pushToApplicationPreferences.getCommandPaths(), PUSH_APPLICATIONS_PATHS_KEY, defaultValues.getCommandPaths(),
+                this::storePushToApplicationPath, this::readPushToApplicationPath);
 
         return pushToApplicationPreferences;
     }
 
-    private PushToApplicationPreferences getPushToApplicationPreferencesFromBackingStore(PushToApplicationPreferences defaults) {
-        return new PushToApplicationPreferences(
-                get(PUSH_TO_APPLICATION, defaults.getActiveApplicationName()),
-                readPushToApplicationPath(defaults.getCommandPaths()),
-                get(PUSH_EMACS_ADDITIONAL_PARAMETERS, defaults.getEmacsArguments()),
-                get(PUSH_VIM_SERVER, defaults.getVimServer()),
-                CitationCommandString.from(get(PUSH_CITE_COMMAND, defaults.getCiteCommand().toString()))
-        );
+    /// An empty string is used as the default value to ensure that an installation of a tool leads to the new path
+    /// (instead of leaving the empty one). Reason: an empty string is returned by org.jabref.gui.desktop.os.Windows.
+    /// detectProgramPath if the program is not found. That path is stored in the preferences.
+    private Map<String, String> readPushToApplicationPath(Map<String, String> defaults) {
+        Map<String, String> commands = new HashMap<>();
+
+        PUSH_APPLICATIONS_PATHS.forEach((app, key) -> {
+            String value = get(key, defaults.getOrDefault(key, ""));
+            commands.put(app.getDisplayName(), value);
+        });
+
+        return commands;
     }
 
     private void storePushToApplicationPath(MapChangeListener.Change<? extends String, ? extends String> change) {
@@ -910,20 +996,6 @@ public class JabRefCliPreferences implements CliPreferences {
         } else if (change.wasAdded()) {
             put(key, change.getValueAdded());
         }
-    }
-
-    /// An empty string is used as the default value to ensure that an installation of a tool leads to the new path
-    /// (instead of leaving the empty one). Reason: an empty string is returned by org.jabref.gui.desktop.os.Windows.
-    /// detectProgramPath if the program is not found. That path is stored in the preferences.
-    private Map<String, String> readPushToApplicationPath(Map<String, String> defaults) {
-        Map<String, String> commands = new HashMap<>();
-
-        PUSH_APPLICATIONS_PATHS.forEach((app, key) -> {
-            String value = get(key, defaults.getOrDefault(key, ""));
-            commands.put(app.getDisplayName(), value);
-        });
-
-        return commands;
     }
     // endregion
 
