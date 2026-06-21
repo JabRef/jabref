@@ -446,10 +446,7 @@ public class JabRefFrameViewModel {
         addParserResult(parserResult, null);
     }
 
-    /// @param targetGroup optional group the imported entries are assigned to (e.g. the REST
-    ///                    `?group=` parameter). It pre-selects/falls back to that group in the import
-    ///                    dialog, which creates it (top-level) on confirm if missing. An explicit
-    ///                    pick in the dialog overrides it; cancelling imports nothing.
+    /// @param targetGroup optional group the imported entries are assigned to (e.g. the REST `?group=` parameter). It pre-selects/falls back to that group in the import dialog, which creates it (top-level) on confirm if missing. An explicit pick in the dialog overrides it; cancelling imports nothing.
     void addParserResult(ParserResult parserResult, @Nullable String targetGroup) {
         LOGGER.trace("Adding the entries to the open tab.");
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();

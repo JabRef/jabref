@@ -190,9 +190,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         importEntries(entriesToImport, shouldDownloadFiles, null);
     }
 
-    /// @param targetGroup name of a group the imported entries are additionally assigned to. If it is
-    ///                    non-blank and no group with that name exists yet, it is created as a
-    ///                    top-level explicit group. A blank/null value assigns no group.
+    /// @param targetGroup name of a group the imported entries are additionally assigned to. If it is non-blank and no group with that name exists yet, it is created as a top-level explicit group. A blank/null value assigns no group.
     public void importEntries(List<BibEntry> entriesToImport, boolean shouldDownloadFiles, @Nullable String targetGroup) {
         // Remember the selection in the dialog
         preferences.getFilePreferences().setDownloadLinkedFiles(shouldDownloadFiles);
