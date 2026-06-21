@@ -14,9 +14,12 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.OcrPreferences;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
+import org.jabref.logic.util.TaskExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +69,24 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         } else {
             return Optional.empty();
         }
+    }
+
+    void autoDetectEnginePath(DialogService dialogService, TaskExecutor taskExecutor) {
+        BackgroundTask<Optional<String>> autoDetectTask = BackgroundTask.wrap(() -> autoDetectEnginePath());
+
+        autoDetectTask.titleProperty().set(Localization.lang("Auto detection of engine path"));
+        autoDetectTask.showToUser(true);
+        autoDetectTask.onSuccess(result -> {
+            if (result.isPresent()) {
+                String path = result.get();
+                ocrPathProperty().set(path);
+                dialogService.notify(Localization.lang("OCRmyPDF detected at: %0", path));
+            } else {
+                dialogService.notify(Localization.lang("OCRmyPDF could not be detected automatically"));
+            }
+        });
+        autoDetectTask.onFailure(_ -> dialogService.notify(Localization.lang("Auto detect engine path failed")));
+        taskExecutor.execute(autoDetectTask);
     }
 
     private boolean pathExists(String path) {
