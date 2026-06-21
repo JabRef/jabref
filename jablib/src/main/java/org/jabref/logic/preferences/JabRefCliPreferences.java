@@ -25,8 +25,11 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 
@@ -434,8 +437,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // The only instance of this class:
     private static JabRefCliPreferences singleton;
-    /// HashMap that contains all preferences which are set by default
-    public final Map<String, Object> defaults = new HashMap<>();
 
     /// Cache variables
     private LibraryPreferences libraryPreferences;
@@ -466,6 +467,11 @@ public class JabRefCliPreferences implements CliPreferences {
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
     private PushToApplicationPreferences pushToApplicationPreferences;
     private GitPreferences gitPreferences;
+
+    private final List<PreferenceBinding> allBindings = new ArrayList<>();
+
+    private record PreferenceBinding(Observable property, Object defaultValue, String preferencesKey, Runnable importFromStore, Runnable resetToDefaults) {
+    }
 
     /// @implNote The constructor was made public because dependency injection via constructor
     /// required widespread refactoring, currently we are using reflection in some formatters
@@ -530,62 +536,20 @@ public class JabRefCliPreferences implements CliPreferences {
         return PREFS_NODE.get(key, null) != null;
     }
 
-    public String get(String key) {
-        return PREFS_NODE.get(key, (String) defaults.get(key));
-    }
-    // endregion
-
-    public String getEmptyIsDefault(String key) {
-        String defaultValue = (String) defaults.get(key);
-        String result = PREFS_NODE.get(key, defaultValue);
-        if ("".equals(result)) {
-            return defaultValue;
-        }
-        return result;
-    }
-
-    public Optional<String> getAsOptional(String key) {
-        return Optional.ofNullable(PREFS_NODE.get(key, (String) defaults.get(key)));
-    }
-
     public String get(String key, String def) {
         return PREFS_NODE.get(key, def);
-    }
-
-    public boolean getBoolean(String key) {
-        return PREFS_NODE.getBoolean(key, getBooleanDefault(key));
     }
 
     public boolean getBoolean(String key, boolean def) {
         return PREFS_NODE.getBoolean(key, def);
     }
 
-    private boolean getBooleanDefault(String key) {
-        return (Boolean) defaults.get(key);
-    }
-
-    public int getInt(String key) {
-        return PREFS_NODE.getInt(key, getIntDefault(key));
-    }
-
     public int getInt(String key, int def) {
         return PREFS_NODE.getInt(key, def);
     }
 
-    public int getIntDefault(String key) {
-        return (Integer) defaults.get(key);
-    }
-
-    public double getDouble(String key) {
-        return PREFS_NODE.getDouble(key, getDoubleDefault(key));
-    }
-
     public double getDouble(String key, double def) {
         return PREFS_NODE.getDouble(key, def);
-    }
-
-    private double getDoubleDefault(String key) {
-        return ((Number) defaults.get(key)).doubleValue();
     }
 
     public void put(String key, String value) {
@@ -626,7 +590,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     /// Returns a List of Strings containing the chosen columns.
     public List<String> getStringList(String key) {
-        return convertStringToList(get(key));
+        return convertStringToList(get(key, ""));
     }
 
     /// Returns a Sequenced Set of Fields.
@@ -636,7 +600,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     /// Returns a Path
     private Path getPath(String key, Path defaultValue) {
-        String rawPath = get(key);
+        String rawPath = get(key, "");
         return StringUtil.isNotBlank(rawPath) ? Path.of(rawPath) : defaultValue;
     }
 
@@ -675,46 +639,49 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
+    private void bindBoolean(BooleanProperty property, String key, boolean defaultValue) {
+        EasyBind.listen(property, (_, _, v) -> putBoolean(key, v));
+        allBindings.add(new PreferenceBinding(
+                property,
+                defaultValue,
+                key,
+                () -> property.set(getBoolean(key, defaultValue)),
+                () -> property.set(defaultValue)));
+    }
+
+    private void bindList(ObservableList<String> list, String key, List<String> defaultList) {
+        List<String> defaultCopy = List.copyOf(defaultList);
+        list.addListener((InvalidationListener) _ -> putStringList(key, list));
+        allBindings.add(new PreferenceBinding(
+                list,
+                defaultList,
+                key,
+                () -> list.setAll(convertStringToList(get(key, convertListToString(defaultCopy)))),
+                () -> list.setAll(defaultCopy)));
+    }
+
     @Override
     public Map<String, Object> getPreferences() {
         Map<String, Object> result = new HashMap<>();
-
-        try {
-            addPrefsRecursively(PREFS_NODE, result);
-        } catch (BackingStoreException e) {
-            LOGGER.info("could not retrieve preference keys", e);
-        }
+        allBindings.forEach(binding -> result.put(binding.preferencesKey, getObject(binding.property())));
         return result;
+    }
+
+    private Object getObject(Observable observable) {
+        if (observable instanceof BooleanProperty booleanProperty) {
+            return booleanProperty.get();
+        } else if (observable instanceof ObservableList<?> observableList) {
+            return observableList;
+        }
+
+        return null;
     }
 
     @Override
     public Map<String, Object> getDefaults() {
-        return defaults;
-    }
-
-    private void addPrefsRecursively(Preferences prefs, Map<String, Object> result) throws BackingStoreException {
-        for (String key : prefs.keys()) {
-            result.put(key, getObject(prefs, key));
-        }
-        for (String child : prefs.childrenNames()) {
-            addPrefsRecursively(prefs.node(child), result);
-        }
-    }
-
-    private Object getObject(Preferences prefs, String key) {
-        try {
-            return prefs.get(key, (String) defaults.get(key));
-        } catch (ClassCastException e) {
-            try {
-                return prefs.getBoolean(key, getBooleanDefault(key));
-            } catch (ClassCastException e2) {
-                try {
-                    return prefs.getInt(key, getIntDefault(key));
-                } catch (ClassCastException e3) {
-                    return prefs.getDouble(key, getDoubleDefault(key));
-                }
-            }
-        }
+        Map<String, Object> result = new HashMap<>();
+        allBindings.forEach(binding -> result.put(binding.preferencesKey, binding.defaultValue()));
+        return result;
     }
 
     /// Returns a list of Strings stored by key+N with N being an incrementing number
@@ -722,7 +689,7 @@ public class JabRefCliPreferences implements CliPreferences {
         int i = 0;
         List<String> series = new ArrayList<>();
         String item;
-        while (!StringUtil.isBlank(item = get(key + i))) {
+        while (!StringUtil.isBlank(item = get(key + i, null))) {
             series.add(item);
             i++;
         }
@@ -735,7 +702,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @param number or higher.
     protected void purgeSeries(String prefix, int number) {
         int n = number;
-        while (get(prefix + n) != null) {
+        while (get(prefix + n, null) != null) {
             remove(prefix + n);
             n++;
         }
@@ -774,7 +741,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getFieldPreferences().setAll(FieldPreferences.getDefault());
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
         getPushToApplicationPreferences().setAll(PushToApplicationPreferences.getDefault());
-        getAbbreviationPreferences().setAll(AbbreviationPreferences.getDefault());
         getLibraryPreferences().setAll(LibraryPreferences.getDefault());
         getDOIPreferences().setAll(DOIPreferences.getDefault());
         getOwnerPreferences().setAll(OwnerPreferences.getDefault());
@@ -809,6 +775,8 @@ public class JabRefCliPreferences implements CliPreferences {
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences())).setAll(
                 OpenOfficePreferences.getDefault());
         getGitPreferences().setAll(GitPreferences.getDefault());
+
+        allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
 
     /// Imports Preferences from an XML file.
@@ -827,7 +795,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getFieldPreferences().setAll(getFieldPreferencesFromBackingStore(getFieldPreferences()));
         getProxyPreferences().setAll(getProxyPreferencesFromBackingStore(getProxyPreferences()));
         getPushToApplicationPreferences().setAll(getPushToApplicationPreferencesFromBackingStore(getPushToApplicationPreferences()));
-        getAbbreviationPreferences().setAll(getJournalAbbreviationPreferencesFromBackingStore(getAbbreviationPreferences()));
         getLibraryPreferences().setAll(getLibraryPreferencesFromBackingStore(getLibraryPreferences()));
         getDOIPreferences().setAll(getDoiPreferencesFromBackingStore(getDOIPreferences()));
         getOwnerPreferences().setAll(getOwnerPreferencesFromBackingStore(getOwnerPreferences()));
@@ -853,6 +820,9 @@ public class JabRefCliPreferences implements CliPreferences {
         getOpenOfficePreferences(repository).setAll(
                 getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
         getGitPreferences().setAll(getGitPreferencesFromBackingStore(getGitPreferences()));
+
+        getAbbreviationPreferences(); // ensure initialized, registers bindings
+        allBindings.forEach(binding -> binding.importFromStore().run());
     }
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
@@ -882,24 +852,19 @@ public class JabRefCliPreferences implements CliPreferences {
             return abbreviationPreferences;
         }
 
-        abbreviationPreferences = getJournalAbbreviationPreferencesFromBackingStore(AbbreviationPreferences.getDefault());
+        AbbreviationPreferences defaultValues = AbbreviationPreferences.getDefault();
 
-        abbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) _ ->
-                putStringList(EXTERNAL_JOURNAL_LISTS, abbreviationPreferences.getExternalJournalLists()));
-        EasyBind.listen(abbreviationPreferences.useFJournalFieldProperty(),
-                (_, _, newValue) -> putBoolean(USE_AMS_FJOURNAL, newValue));
+        abbreviationPreferences = new AbbreviationPreferences(
+                convertStringToList(get(EXTERNAL_JOURNAL_LISTS, convertListToString(defaultValues.getExternalJournalLists()))),
+                getBoolean(USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get()),
+                getBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions())
+        );
 
-        EasyBind.listen(abbreviationPreferences.shouldEnableMscKeywordDescriptionsProperty(),
-                (_, _, newValue) -> putBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, newValue));
+        bindList(abbreviationPreferences.getExternalJournalLists(), EXTERNAL_JOURNAL_LISTS, defaultValues.getExternalJournalLists());
+        bindBoolean(abbreviationPreferences.useFJournalFieldProperty(), USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get());
+        bindBoolean(abbreviationPreferences.shouldEnableMscKeywordDescriptionsProperty(), ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions());
 
         return abbreviationPreferences;
-    }
-
-    private AbbreviationPreferences getJournalAbbreviationPreferencesFromBackingStore(AbbreviationPreferences defaults) {
-        return new AbbreviationPreferences(
-                convertStringToList(get(EXTERNAL_JOURNAL_LISTS, convertListToString(defaults.getExternalJournalLists()))),
-                getBoolean(USE_AMS_FJOURNAL, defaults.useFJournalFieldProperty().get()),
-                getBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaults.shouldEnableMscKeywordDescriptions()));
     }
     // endregion
 
@@ -1837,8 +1802,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
         Path lastFocused = null;
         if (hasKey(LAST_FOCUSED)) {
-            String stored = get(LAST_FOCUSED);
-            if (!stored.isBlank()) {
+            String stored = get(LAST_FOCUSED, null);
+            if (StringUtil.isNotBlank(stored)) {
                 lastFocused = Path.of(stored);
             }
         } else {
@@ -1853,9 +1818,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private FileHistory getFileHistory(FileHistory defaults) {
         if (hasKey(RECENT_DATABASES)) {
-            return FileHistory.of(convertStringToList(get(RECENT_DATABASES)).stream()
-                                                                            .map(Path::of)
-                                                                            .toList());
+            return FileHistory.of(convertStringToList(get(RECENT_DATABASES, "")).stream()
+                                                                                .map(Path::of)
+                                                                                .toList());
         } else {
             return defaults;
         }
