@@ -5,7 +5,7 @@
 * - Light colors slightly adjusted
 * - TabPane Style fixed (padding)
 * - removed hardcoded font size
-* - removed custom AtlantaFX classes (to make this stylesheet smaller and avoid accidental styles)
+* - removed custom AtlantaFX classes (to make this stylesheet smaller and avoid accidental style match)
 */
 
 @media (prefers-color-scheme: light) {
@@ -259,232 +259,6 @@ Text {
     -fx-fill: -color-fg-default;
 }
 
-.title-1 {
-    -fx-font-size: 2em;
-    -fx-font-weight: bolder;
-}
-
-.title-2 {
-    -fx-font-size: 1.75em;
-    -fx-font-weight: bolder;
-}
-
-.title-3 {
-    -fx-font-size: 1.5em;
-    -fx-font-weight: bolder;
-}
-
-.title-4 {
-    -fx-font-size: 1.25em;
-    -fx-font-weight: normal;
-}
-
-.text-caption {
-    -fx-font-size: 1em;
-    -fx-font-weight: bold;
-}
-
-.text-small {
-    -fx-font-size: 0.8em;
-}
-
-.text.accent {
-    -fx-fill: -color-accent-fg;
-}
-
-.text.success {
-    -fx-fill: -color-success-fg;
-}
-
-.text.warning {
-    -fx-fill: -color-warning-fg;
-}
-
-.text.danger {
-    -fx-fill: -color-danger-fg;
-}
-
-.text-muted {
-    -fx-fill: -color-fg-muted;
-}
-
-.text-subtle {
-    -fx-fill: -color-fg-subtle;
-}
-
-.text-on-emphasis {
-    -fx-fill: -color-fg-emphasis;
-}
-
-.text-bold {
-    -fx-font-weight: bold;
-}
-
-.text-bolder {
-    -fx-font-weight: bolder;
-}
-
-.text-normal {
-    -fx-font-weight: normal;
-}
-
-.text-lighter {
-    -fx-font-weight: lighter;
-}
-
-.text-italic {
-    -fx-font-style: italic;
-}
-
-.text-oblique {
-    -fx-font-style: oblique;
-}
-
-.text-underlined {
-    -fx-underline: true;
-}
-
-.text-strikethrough {
-    -fx-strikethrough: true;
-}
-
-.bb-code .sub {
-    -fx-translate-y: 0.3em;
-}
-.bb-code .sup {
-    -fx-translate-y: -0.3em;
-}
-.bb-code .hr {
-    -fx-border-color: -color-border-default;
-    -fx-border-width: 0 0 1 0;
-    -fx-border-style: solid;
-    -fx-border-insets: 10px 0 10px 0;
-}
-.bb-code .code {
-    -fx-font-family: monospace;
-    -fx-border-color: -color-border-default;
-    -fx-border-width: 1;
-    -fx-background-color: -color-bg-subtle;
-    -fx-text-fill: -color-danger-fg;
-    -fx-padding: 0 3 0 3;
-}
-.bb-code .abbr {
-    -fx-border-color: -color-fg-default;
-    -fx-border-width: 0 0 1 0;
-    -fx-border-style: dashed;
-}
-
-.bg-default {
-    -fx-background-color: -color-bg-default;
-}
-
-.bg-inset {
-    -fx-background-color: -color-bg-inset;
-}
-
-.bg-subtle {
-    -fx-background-color: -color-bg-subtle;
-}
-
-.bg-neutral-emphasis-plus {
-    -fx-background-color: -color-neutral-emphasis-plus;
-}
-
-.bg-neutral-emphasis {
-    -fx-background-color: -color-neutral-emphasis;
-}
-
-.bg-neutral-muted {
-    -fx-background-color: -color-neutral-muted;
-}
-
-.bg-neutral-subtle {
-    -fx-background-color: -color-neutral-subtle;
-}
-
-.bg-accent-emphasis {
-    -fx-background-color: -color-accent-emphasis;
-}
-
-.bg-accent-muted {
-    -fx-background-color: -color-accent-muted;
-}
-
-.bg-accent-subtle {
-    -fx-background-color: -color-accent-subtle;
-}
-
-.bg-warning-emphasis {
-    -fx-background-color: -color-warning-emphasis;
-}
-
-.bg-warning-muted {
-    -fx-background-color: -color-warning-muted;
-}
-
-.bg-warning-subtle {
-    -fx-background-color: -color-warning-subtle;
-}
-
-.bg-success-emphasis {
-    -fx-background-color: -color-success-emphasis;
-}
-
-.bg-success-muted {
-    -fx-background-color: -color-success-muted;
-}
-
-.bg-success-subtle {
-    -fx-background-color: -color-success-subtle;
-}
-
-.bg-danger-emphasis {
-    -fx-background-color: -color-danger-emphasis;
-}
-
-.bg-danger-muted {
-    -fx-background-color: -color-danger-muted;
-}
-
-.bg-danger-subtle {
-    -fx-background-color: -color-danger-subtle;
-}
-
-.border-default {
-    -fx-border-color: -color-border-default;
-    -fx-border-width: 1px;
-}
-
-.border-muted {
-    -fx-border-color: -color-border-muted;
-    -fx-border-width: 1px;
-}
-
-.border-subtle {
-    -fx-border-color: -color-border-subtle;
-    -fx-border-width: 1px;
-}
-
-.elevated-1 {
-    -fx-effect: dropshadow(three-pass-box, -color-shadow-default, 2px, 0.5, 0, 2);
-}
-
-.elevated-2 {
-    -fx-effect: dropshadow(three-pass-box, -color-shadow-default, 8px, 0.5, 0, 2);
-}
-
-.elevated-3 {
-    -fx-effect: dropshadow(three-pass-box, -color-shadow-default, 16px, 0.5, 0, 2);
-}
-
-.elevated-4 {
-    -fx-effect: dropshadow(three-pass-box, -color-shadow-default, 20px, 0.5, 0, 2);
-}
-
-.interactive:hover {
-    -fx-effect: dropshadow(three-pass-box, -color-shadow-default, 8px, 0.5, 0, 2);
-}
-
 .accordion > .titled-pane.first-titled-pane > .title {
     -fx-background-insets: 0, 1px;
     -fx-background-radius: 4px 4px 0 0;
@@ -494,13 +268,6 @@ Text {
     -fx-background-radius: 0;
 }
 
-/**
-== Structure ==
-.breadcrumbs {
-  >.crumb[:first|:last] { ... }
-  >.divider { ... }
-}
-*/
 .breadcrumbs {
     -fx-padding: 8px 12px 8px 12px;
 }
@@ -590,13 +357,8 @@ Text {
     -fx-background-color: -color-button-border-pressed, -color-button-bg-pressed;
     -fx-text-fill: -color-button-fg-pressed;
 }
-.button.button-outlined {
-    -color-button-bg: -color-bg-default;
-    -color-button-fg: -color-fg-default;
-    -color-button-bg-hover: -color-base-6;
-    -color-button-fg-hover: -color-button-fg;
-}
-.button:default, .button.accent {
+
+.button:default {
     -color-button-bg: -color-accent-emphasis;
     -color-button-fg: -color-fg-emphasis;
     -color-button-border: -color-accent-emphasis;
@@ -609,142 +371,6 @@ Text {
     -color-button-bg-pressed: -color-accent-emphasis;
     -color-button-fg-pressed: -color-fg-emphasis;
     -color-button-border-pressed: transparent;
-}
-.button:default.button-outlined, .button.accent.button-outlined {
-    -color-button-bg: -color-bg-default;
-    -color-button-fg: -color-accent-fg;
-    -color-button-bg-hover: -color-accent-emphasis;
-    -color-button-fg-hover: -color-fg-emphasis;
-}
-.button:default.flat, .button.accent.flat {
-    -color-button-fg: -color-accent-fg;
-    -color-button-bg-hover: -color-accent-subtle;
-}
-.button.success {
-    -color-button-bg: -color-success-emphasis;
-    -color-button-fg: -color-fg-emphasis;
-    -color-button-border: -color-success-emphasis;
-    -color-button-bg-hover: -color-success-emphasis;
-    -color-button-fg-hover: -color-fg-emphasis;
-    -color-button-border-hover: -color-success-emphasis;
-    -color-button-bg-focused: -color-success-6;
-    -color-button-fg-focused: -color-fg-emphasis;
-    -color-button-border-focused: -color-success-emphasis;
-    -color-button-bg-pressed: -color-success-emphasis;
-    -color-button-fg-pressed: -color-fg-emphasis;
-    -color-button-border-pressed: transparent;
-}
-.button.success.button-outlined {
-    -color-button-bg: -color-bg-default;
-    -color-button-fg: -color-success-fg;
-    -color-button-bg-hover: -color-success-emphasis;
-    -color-button-fg-hover: -color-fg-emphasis;
-}
-.button.success.flat {
-    -color-button-fg: -color-success-fg;
-    -color-button-bg-hover: -color-success-subtle;
-}
-.button.danger {
-    -color-button-bg: -color-danger-emphasis;
-    -color-button-fg: -color-fg-emphasis;
-    -color-button-border: -color-danger-emphasis;
-    -color-button-bg-hover: -color-danger-emphasis;
-    -color-button-fg-hover: -color-fg-emphasis;
-    -color-button-border-hover: -color-danger-emphasis;
-    -color-button-bg-focused: -color-danger-6;
-    -color-button-fg-focused: -color-fg-emphasis;
-    -color-button-border-focused: -color-danger-emphasis;
-    -color-button-bg-pressed: -color-danger-emphasis;
-    -color-button-fg-pressed: -color-fg-emphasis;
-    -color-button-border-pressed: transparent;
-}
-.button.danger.button-outlined {
-    -color-button-bg: -color-bg-default;
-    -color-button-fg: -color-danger-fg;
-    -color-button-bg-hover: -color-danger-emphasis;
-    -color-button-fg-hover: -color-fg-emphasis;
-}
-.button.danger.flat {
-    -color-button-fg: -color-danger-fg;
-    -color-button-bg-hover: -color-danger-subtle;
-}
-.button.flat {
-    -color-button-bg: transparent;
-    -color-button-fg: -color-fg-default;
-    -color-button-border: transparent;
-    -color-button-bg-hover: -color-bg-subtle;
-    -color-button-fg-hover: -color-button-fg;
-    -color-button-border-hover: -color-bg-subtle;
-    -color-button-bg-focused: -color-button-bg;
-    -color-button-fg-focused: -color-button-fg;
-    -color-button-border-focused: -color-button-bg;
-    -color-button-bg-pressed: -color-button-bg;
-    -color-button-fg-pressed: -color-button-fg;
-    -color-button-border-pressed: transparent;
-    -fx-effect: none;
-}
-.button.flat:hover {
-    -fx-underline: true;
-}
-.button.small {
-    -fx-padding: 5.7142857143px 8.5714285714px 5.7142857143px 8.5714285714px;
-    -fx-font-size: 0.8em;
-}
-.button.large {
-    -fx-padding: 11.2px 16.8px 11.2px 16.8px;
-    -fx-font-size: 1.25em;
-}
-.button.rounded {
-    -fx-background-radius: 10em;
-}
-
-.card > .container {
-    -fx-background-color: -color-bg-default;
-    -fx-background-radius: 4px;
-    -fx-alignment: TOP_LEFT;
-    -fx-padding: 1em 0 1em 0;
-    -fx-spacing: 1em;
-    -fx-border-color: -color-border-default;
-    -fx-border-width: 1px;
-    -fx-border-radius: 4px;
-}
-.card > .container > .header {
-    -fx-alignment: TOP_LEFT;
-    -fx-padding: 0 0.75em 0 0.75em 0;
-}
-.card > .container > .sub-header {
-    -fx-alignment: TOP_LEFT;
-    -fx-padding: 0 0.75em 0 0.75em 0;
-}
-.card > .container > .body {
-    -fx-padding: 0 0.75em 0 0.75em;
-    -fx-alignment: TOP_LEFT;
-}
-.card > .container > .footer {
-    -fx-alignment: TOP_LEFT;
-    -fx-padding: 0 0.75em 0 0.75em 0;
-}
-.card > .container TextFlow Text:disabled {
-    -fx-opacity: 0.4;
-}
-.card:has-image > .container > .sub-header {
-    -fx-padding: 0;
-}
-.card:has-image > .container > .sub-header:disabled {
-    -fx-opacity: 0.4;
-}
-.card.edge-to-edge > .container {
-    -fx-background-radius: 0;
-    -fx-border-width: 0;
-    -fx-border-radius: 0;
-    -fx-effect: none;
-}
-.card .tile > .container {
-    -fx-padding: 0;
-    -fx-background-radius: 0;
-}
-.card .tile > .container > .header > .title {
-    -fx-font-size: 1.25em;
 }
 
 .chart {
@@ -2113,19 +1739,19 @@ Text {
     -fx-padding: 0.333333em;
 }
 
-.combo-box-base.date-picker > .arrow-button {
+.date-picker > .arrow-button {
     -fx-cursor: hand;
 }
-.combo-box-base.date-picker > .arrow-button > .arrow {
+.date-picker > .arrow-button > .arrow {
     -fx-shape: "M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V10h16v11zm0-13H4V5h16v3z";
     -fx-scale-shape: true;
     -fx-background-color: -color-fg-muted;
     -fx-padding: 0.416667em;
 }
-.combo-box-base.date-picker > .text-field:readonly {
+.date-picker > .text-field:readonly {
     -fx-background-color: -color-input-border, -color-input-bg;
 }
-.combo-box-base.date-picker > .text-field:readonly:focused {
+.date-picker > .text-field:readonly:focused {
     -fx-background-color: -color-input-border-focused, -color-input-bg-focused;
 }
 
@@ -2242,54 +1868,6 @@ Text {
     -fx-background-color: -color-date-today-bg;
     -fx-text-fill: -color-date-today-fg;
     -fx-font-weight: bold;
-}
-
-.calendar {
-    -fx-effect: none;
-}
-.calendar > .top-node,
-.calendar > .bottom-node {
-    -fx-padding: 8px 16px 8px 16px;
-}
-.calendar > .month-year-pane {
-    -fx-padding: 8px 16px 8px 16px;
-    -fx-alignment: CENTER_LEFT;
-    -fx-spacing: 6px;
-}
-.calendar > .month-year-pane > .button {
-    -fx-background-color: transparent;
-    -fx-background-insets: 0;
-    -fx-background-radius: 0;
-    -fx-cursor: hand;
-}
-.calendar > .month-year-pane > .back-button {
-    -fx-padding: 0 1em 0 0;
-}
-.calendar > .month-year-pane > .back-button > .left-arrow {
-    -fx-shape: "M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z";
-    -fx-scale-shape: false;
-    -fx-background-color: -color-date-month-year-fg;
-}
-.calendar > .month-year-pane > .forward-button > .right-arrow {
-    -fx-shape: "M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z";
-    -fx-scale-shape: false;
-    -fx-background-color: -color-date-month-year-fg;
-}
-.calendar > .month-year-pane > .label {
-    -fx-text-fill: -color-date-month-year-fg;
-    -fx-font-size: 1.1em;
-}
-.calendar:disabled > .calendar-grid {
-    -fx-opacity: 0.4;
-}
-.calendar:disabled > .calendar-grid > .day-cell:disabled {
-    -fx-opacity: 1;
-}
-
-.edge-to-edge > .calendar.date-picker-popup {
-    -fx-background-color: -color-date-bg;
-    -fx-background-insets: 0;
-    -fx-background-radius: 0;
 }
 
 .date-picker-popup > .calendar-grid > .selected,
@@ -2574,22 +2152,6 @@ Text {
 .check-menu-item:hover:checked > .left-container > .check,
 .check-menu-item:focused:checked > .left-container > .check {
     -fx-background-color: -color-fg-default;
-}
-
-.caption-menu-item {
-    -fx-padding: 8px 12px 8px 12px;
-}
-.caption-menu-item:hover, .caption-menu-item:focused, .caption-menu-item:pressed {
-    -fx-background-color: transparent;
-}
-.caption-menu-item:hover > .label, .caption-menu-item:focused > .label, .caption-menu-item:pressed > .label {
-    -fx-text-fill: -color-fg-muted;
-}
-.caption-menu-item > .label {
-    -fx-text-fill: -color-fg-muted;
-}
-.caption-menu-item > .label > .text {
-    -fx-font-weight: bold;
 }
 
 .context-menu {
@@ -2936,36 +2498,6 @@ Text {
 .modal-pane > .scroll-pane > .scroll-bar {
     -fx-opacity: 1;
 }
-
-.modal-box {
-    -color-modal-box-bg: -color-bg-default;
-    -color-modal-box-close-fg: -color-fg-default;
-    -color-modal-box-close-bg-hover: -color-bg-subtle;
-    -fx-background-color: -color-modal-box-bg;
-}
-.modal-box > .close-button {
-    -fx-background-radius: 100px;
-    -fx-padding: 0.6em;
-}
-.modal-box > .close-button > .icon {
-    -fx-shape: "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z";
-    -fx-scale-shape: true;
-    -fx-background-color: -color-modal-box-close-fg;
-    -fx-padding: 0.3em;
-}
-.modal-box > .close-button:hover {
-    -fx-background-color: -color-border-muted, -color-modal-box-close-bg-hover;
-    -fx-background-insets: 0, 1;
-}
-.modal-box .tile {
-    -fx-padding: 0;
-    -fx-background-radius: 0;
-}
-.modal-box .tile > .container {
-    -fx-padding: 0;
-    -fx-background-radius: 0;
-}
-
 .notification {
     -color-notify-bg: -color-bg-subtle;
     -color-notify-fg: -color-fg-default;
@@ -3994,15 +3526,6 @@ Text {
     -fx-scale-shape: false;
     -fx-background-color: -color-fg-default;
 }
-.tab-pane.dense > .tab-header-area > .headers-region > .tab {
-    -fx-padding: 0.2em 0.3em 0.2em 0.3em;
-}
-.tab-pane.dense > .tab-header-area > .headers-region > .tab > .tab-container > .tab-label {
-    -fx-padding: 0.2em 0.2em 0.2em 0.2em;
-}
-.tab-pane.dense > .tab-header-area > .headers-region > .tab:left > .tab-container > .tab-label, .tab-pane.dense > .tab-header-area > .headers-region > .tab:right > .tab-container > .tab-label {
-    -fx-padding: 0.15em 0.3em 0.15em 0.3em;
-}
 .tab-pane.floating {
     -color-tab-bg-selected: -color-bg-default;
     -color-tab-fg-selected: -color-fg-default;
@@ -4045,12 +3568,6 @@ Text {
 }
 .tab-pane.floating > .tab-header-area > .headers-region > .tab:hover > .tab-container > .tab-close-button, .tab-pane.floating > .tab-header-area > .headers-region > .tab:selected > .tab-container > .tab-close-button {
     -fx-background-color: -color-tab-fg-selected;
-}
-.tab-pane.floating.dense > .tab-header-area > .headers-region > .tab {
-    -fx-padding: 0.2em 0 0.2em 3px;
-}
-.tab-pane.floating.dense > .tab-header-area > .headers-region > .tab > .tab-container > .tab-label {
-    -fx-padding: 0.4em 0.4em 0.4em 0.4em;
 }
 .tab-pane.classic {
     -color-tab-bg-selected: -color-bg-default;
@@ -4221,18 +3738,6 @@ Text {
     -fx-text-fill: -color-fg-default;
     -fx-effect: none;
 }
-.titled-pane.elevated-1 {
-    -fx-effect: dropshadow(three-pass-box, -color-shadow-default, 2px, 0.5, 0, 2);
-}
-.titled-pane.elevated-2 {
-    -fx-effect: dropshadow(three-pass-box, -color-shadow-default, 8px, 0.5, 0, 2);
-}
-.titled-pane.elevated-3 {
-    -fx-effect: dropshadow(three-pass-box, -color-shadow-default, 16px, 0.5, 0, 2);
-}
-.titled-pane.elevated-4 {
-    -fx-effect: dropshadow(three-pass-box, -color-shadow-default, 20px, 0.5, 0, 2);
-}
 .titled-pane > .title {
     -fx-background-color: -color-border-default, -color-bg-default;
     -fx-padding: 10px 20px 10px 20px;
@@ -4278,18 +3783,6 @@ Text {
 }
 .titled-pane:show-mnemonics > .mnemonic-underline {
     -fx-stroke: -color-fg-default;
-}
-.titled-pane.dense > .title {
-    -fx-padding: 5px 10px 5px 10px;
-}
-.titled-pane.dense > .title > .text {
-    -fx-font-size: 1.1em;
-}
-.titled-pane.dense > .title > .arrow-button {
-    -fx-padding: 0 10px 0 0;
-}
-.titled-pane.dense > .content {
-    -fx-padding: 10px 10px 5px 10px;
 }
 .titled-pane.alt-icon > .title > .arrow-button > .arrow {
     -fx-shape: "M7 10l5 5 5-5z";

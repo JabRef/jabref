@@ -1,11 +1,11 @@
 /*
 * Default JabRef theme
-* Uses the internal JabRef styles.
-* Uses '-jr-xxx' variables so custom styles can be built on top of it.
-* All hardcoded colors should be carefully removed at one point (extract to a variable) to improve custom theming.
+* ==========
+* - Uses '-jr-xxx' variables so custom styles can be built on top of it.
+* ==========
+* Future Work:
+* - All hardcoded colors should be carefully removed at one point (or extract to a variable) to improve custom theming.
 */
-
-@import "internal/jabref-base-colors.css";
 
 @media (prefers-color-scheme: light) {
     * {
@@ -739,12 +739,12 @@ TextFlow > .tooltip-text-monospaced {
 .column-header,
 .table-view .filler,
 .tree-table-view .filler {
-    -fx-background-color: transparent, -fx-control-inner-background;
+    -fx-background-color: transparent, -jr-inner-bg;
     -fx-background-insets: 0, 0 0.02em 0 0.02em;
     -fx-font-weight: bold;
     -fx-size: 3em;
     -fx-border-width: 0 0 1 0;
-    -fx-border-color: -fx-outer-border;
+    -fx-border-color: -jr-outer-border;
 }
 
 .column-header > .label {
