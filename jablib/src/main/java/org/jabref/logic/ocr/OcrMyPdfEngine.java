@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -63,8 +64,11 @@ public class OcrMyPdfEngine implements OcrEngine {
     /// @return the path of the engine as a list of strings to be passed to the process builder.
     private ArrayList<String> getExecutablePath() {
         String ocrmypdfPath = ocrPreferences.getOcrPath();
-        String[] pathList = ocrmypdfPath.split(" ");
-        return new ArrayList<>(Arrays.asList(pathList));
+        if (ocrmypdfPath.contains("/") || ocrmypdfPath.contains("\\")) {
+            return new ArrayList<>(List.of(ocrmypdfPath));
+        } else {
+            return new ArrayList<>(Arrays.asList(ocrmypdfPath.split(" ")));
+        }
     }
 
     /// OCRmyPDF writes the searchable PDF to a new file alongside the original file.
