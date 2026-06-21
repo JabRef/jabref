@@ -3,7 +3,7 @@ nav_order: 65
 parent: Decision Records
 ---
 
-# Do we need a preference for the compatibility mode?
+# Use Transparent Handling of Zotero Reference Marks
 
 ## Context and Problem Statement
 
@@ -20,7 +20,7 @@ Do we need a preference for the compatibility mode?
 ## Considered Options
 
 * Use a preference for the compatibility mode.
-* Do not use a preference.
+* Use transparent Handling of Zotero Reference Marks
 
 ## Decision Outcome
 
@@ -44,7 +44,7 @@ If a document contains Zotero's reference mark, JabRef shows a popup asking user
 * Bad, because a popup may disturb users workflow.
 * Bad, because JabRef uses citation-js's mapping logic in its converter, using a preference is unnecessary.
 
-### Do not use a preference
+### Use transparent Handling of Zotero Reference Marks
 
 Since JabRef uses citation-js's mapping logic (see ADR-64) as fallback strategy, users do not need to manually enable a preference to recognize Zotero's reference mark. JabRef will convert the citation to BibLateX format when it reads Zotero's reference mark. Possible problems will be added in release page and user documentation.
 
