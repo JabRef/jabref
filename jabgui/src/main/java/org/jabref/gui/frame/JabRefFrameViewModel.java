@@ -203,10 +203,12 @@ public class JabRefFrameViewModel {
                       .map(UiCommand.AppendBibTeXToLibrary.class::cast)
                       .findAny().ifPresent(importBibTex -> {
                           selectLibraryTab(importBibTex.library());
-                          importBibtexStringAndOpen(
+                          // selectLibraryTab may have just opened the target library, which loads in
+                          // the background; wait for it so the import targets the loaded tab.
+                          waitForLoadingFinished(() -> importBibtexStringAndOpen(
                                   importBibTex.bibtex(),
                                   // importBibtexStringAndOpen accepts null targetGroup to indicate "no group assignment"
-                                  importBibTex.targetGroup().orElse(null));
+                                  importBibTex.targetGroup().orElse(null)));
                       });
         }
 
@@ -254,11 +256,14 @@ public class JabRefFrameViewModel {
                       .executeWith(taskExecutor);
     }
 
-    /// Selects the already-open tab whose library lives at {@code library} so that the
-    /// subsequent append targets it instead of the previously active tab. An empty Optional
-    /// leaves the current tab unchanged; an unknown/closed path logs a warning and also keeps
-    /// the current tab (the server side already rejects unknown ids with 404, so this is only a
-    /// defensive fallback).
+    /// Selects the tab whose library lives at {@code library} so that the subsequent append
+    /// targets it instead of the previously active tab. An empty Optional leaves the current tab
+    /// unchanged. If the library is not open yet, it is opened in a new (raised) tab; the actual
+    /// loading happens in the background, so callers must run the append via
+    /// {@link #waitForLoadingFinished(Runnable)} to let the new tab finish loading first. A path
+    /// that does not exist (or is not a .bib file) is silently ignored by
+    /// {@link OpenDatabaseAction#openFile(Path)} and the current tab is kept (the server side
+    /// already rejects unknown ids with 404, so this is only a defensive fallback).
     private void selectLibraryTab(Optional<Path> library) {
         library.map(path -> path.toAbsolutePath().normalize()).ifPresent(normalized ->
                 tabContainer.getLibraryTabs().stream()
@@ -268,7 +273,10 @@ public class JabRefFrameViewModel {
                             .findFirst()
                             .ifPresentOrElse(
                                     tabContainer::showLibraryTab,
-                                    () -> LOGGER.warn("Requested library {} is not open; appending to the current tab instead", normalized)));
+                                    () -> {
+                                        LOGGER.info("Requested library {} is not open; opening it", normalized);
+                                        openDatabaseAction.get().openFile(normalized);
+                                    }));
     }
 
     private void directImportEntries(ParserResult parserResult, @Nullable String targetGroup) {
