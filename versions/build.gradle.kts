@@ -156,4 +156,5 @@ dependencies.constraints {
     api("org.xmlunit:xmlunit-matchers:2.12.0")
     api("org.yaml:snakeyaml:2.6")
     api("tech.units:indriya:2.2.4")
+    api("tools.maran:svgnode:1.0.0")
 }

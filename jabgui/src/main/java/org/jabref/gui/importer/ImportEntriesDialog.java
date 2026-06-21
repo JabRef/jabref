@@ -39,6 +39,7 @@ import org.jabref.gui.entryeditor.citationrelationtab.BibEntryView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
@@ -193,7 +194,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         PseudoClass entrySelected = PseudoClass.getPseudoClass("selected");
         new ViewModelListCellFactory<BibEntry>()
                 .withGraphic(entry -> {
-                    ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
+                    ToggleButton addToggle = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.ADD);
                     EasyBind.subscribe(addToggle.selectedProperty(), selected -> {
                         if (selected) {
                             addToggle.setGraphic(IconTheme.JabRefIcons.ADD_FILLED.withColor(IconTheme.SELECTED_COLOR).getGraphicNode());

@@ -1176,9 +1176,13 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-insets: 0;
 }
 
-#entryEditor .tool-bar .glyph-icon {
+#entryEditor .icon-button .glyph-icon,
+#entryEditor .icon-button .ikonli-font-icon,
+#entryEditor .icon-buttonNoSpaceBottom .glyph-icon,
+#entryEditor .icon-buttonNoSpaceBottom .ikonli-font-icon,
+#entryEditor .icon-buttonNoSpaceTop .glyph-icon,
+#entryEditor .icon-buttonNoSpaceTop .ikonli-font-icon {
     -glyph-size: 1.0em;
-    -fx-font-size: 2em;
     -fx-fill: -jr-theme;
     -fx-text-fill: -jr-theme;
 }
