@@ -11,6 +11,7 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 
@@ -64,16 +65,12 @@ public class ZoteroCitationMarkParser {
     private static Optional<BibEntry> toBibEntry(ZoteroCitationData.CitationItemData citationItem) {
         ZoteroCitationData.ItemData itemData = citationItem.itemData;
 
-        Optional<EntryType> entryType = CSLItemTypeDefinitions.getEntryType(itemData.type);
-        if (entryType.isEmpty()) {
-            return Optional.empty();
-        }
-
-        BibEntry entry = new BibEntry(entryType.get());
+        EntryType entryType = CSLItemTypeDefinitions.getEntryType(itemData.type);
+        BibEntry entry = new BibEntry(entryType);
         entry.withCitationKey("Zotero-" + (citationItem.id));
         setAuthors(itemData.author).ifPresent(authors -> entry.withField(StandardField.AUTHOR, authors));
         setDate(entry, itemData.issued);
-        for (Map.Entry<String, StandardField> fieldMapping : CSLItemTypeDefinitions.getFieldMappings(itemData.type).entrySet()) {
+        for (Map.Entry<String, Field> fieldMapping : CSLItemTypeDefinitions.getFieldMappings(itemData.type, itemData).entrySet()) {
             setField(entry, fieldMapping.getValue(), itemData.getFieldValue(fieldMapping.getKey()));
         }
 
@@ -108,7 +105,7 @@ public class ZoteroCitationMarkParser {
         Date.parse(dateString).ifPresent(entry::withDate);
     }
 
-    private static void setField(BibEntry entry, StandardField field, String value) {
+    private static void setField(BibEntry entry, Field field, String value) {
         if (StringUtil.isBlank(value)) {
             return;
         }
