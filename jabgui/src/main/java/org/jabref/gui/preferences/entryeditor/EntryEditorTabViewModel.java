@@ -154,13 +154,14 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetToDefaults() {
-        // Restore built-in tab visibility (the check marks); all built-in tabs are visible by default.
+        // Enable visibility of built-in tabs
         for (int i = 0; i < tabModels.size(); i++) {
             if (tabModels.get(i) instanceof EntryEditorTabModel.BuiltInTab builtIn && !builtIn.isVisible()) {
                 tabModels.set(i, builtIn.withVisible(true));
             }
         }
 
+        // Reload default custom field-set tabs
         tabModels.removeIf(config -> config instanceof EntryEditorTabModel.CustomizedFieldsTab);
         List<EntryEditorTabModel> defaultFieldSets = EntryEditorPreferences.getDefaultEntryEditorTabs()
                                                                            .entrySet().stream()
