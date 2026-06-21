@@ -1,5 +1,6 @@
 import org.gradlex.javamodule.dependencies.JavaModuleDependenciesExtension
 import org.gradlex.javamodule.dependencies.tasks.ModuleDirectivesOrderingCheck
+import org.jabref.gradle.useLibericaJdkFull
 
 plugins {
     id("org.gradlex.extra-java-module-info")
@@ -16,8 +17,7 @@ tasks.withType<ModuleDirectivesOrderingCheck> { enabled = false }
 // resolved from the JDK's system module path. (The plugin only logs a [WARN] for an unmapped 'requires'.)
 // The JavaFX version pin (versions/build.gradle.kts), the platform-variant patches and the per-module
 // opens/exports patches below then have nothing to act on and stay inert; the runtime opens/exports they
-// provided are re-applied as JVM args in jabgui/build.gradle.kts.
-val useLibericaJdkFull = providers.gradleProperty("useLibericaJdkFull").map { it != "false" }.getOrElse(false)
+// provided are re-applied as JVM args in jabgui/build.gradle.kts. (Flag: org.jabref.gradle.JavaFxBundling)
 if (useLibericaJdkFull) {
     val javafxModuleNames = setOf(
         "javafx.base", "javafx.controls", "javafx.fxml",

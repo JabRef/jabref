@@ -1,15 +1,15 @@
+import org.jabref.gradle.useLibericaJdkFull
+
 plugins {
     id("java")
 }
 
-// Opt-in: build against a JDK that bundles JavaFX (e.g. BellSoft Liberica "Full").
-// When set, JabRef does NOT pull JavaFX from Maven; 'requires javafx.*' resolves
-// against the JDK's own system modules instead. See the JavaFX handling in
+// Opt-in (-PuseLibericaJdkFull, see org.jabref.gradle.JavaFxBundling): build against a JDK that bundles
+// JavaFX (BellSoft Liberica "Full"). When set, JabRef does NOT pull JavaFX from Maven; 'requires javafx.*'
+// resolves against the JDK's own system modules instead. See also:
 // - versions/build.gradle.kts
 // - org.jabref.gradle.base.dependency-rules.gradle.kts
 // - jabgui/build.gradle.kts (runtime --add-opens/--add-exports)
-// Enable with: -PuseLibericaJdkFull (bare flag = on; pass -PuseLibericaJdkFull=false to force off)
-val useLibericaJdkFull = providers.gradleProperty("useLibericaJdkFull").map { it != "false" }.getOrElse(false)
 
 java {
     toolchain {
