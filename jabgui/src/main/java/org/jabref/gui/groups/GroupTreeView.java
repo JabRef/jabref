@@ -274,8 +274,8 @@ public class GroupTreeView extends BorderPane {
 
         // "Add subgroup" button shown on row hover
         addSubgroupColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
-        addSubgroupColumn.setCellFactory(col -> {
-            Button button = IconTheme.JabRefIcons.ADD.asButton();
+        addSubgroupColumn.setCellFactory(_ -> {
+            Button button = ControlHelper.iconButton(IconTheme.JabRefIcons.ADD);
             button.setVisible(false);
             button.managedProperty().bind(button.visibleProperty());
             StackPane pane = new StackPane(button);
