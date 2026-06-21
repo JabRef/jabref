@@ -161,7 +161,7 @@ class ThemeManagerTest {
 
         themeManager.updateCssOnScene(scene);
 
-        assertEquals(2, scene.getStylesheets().size());
+        assertEquals(3, scene.getStylesheets().size());
         assertTrue(scene.getStylesheets().contains(testCss.toUri().toURL().toExternalForm()));
     }
 
