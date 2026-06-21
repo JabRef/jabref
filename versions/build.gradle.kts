@@ -33,6 +33,8 @@ dependencies {
 }
 
 dependencies.constraints {
+    // With -PuseLibericaJdkFull=true, no org.openjfx:* dependency is requested (see
+    // org.jabref.gradle.base.dependency-rules.gradle.kts), so these JavaFX version pins stay inert.
     api("org.openjfx:javafx-base:$javafx")
     api("org.openjfx:javafx-controls:$javafx")
     api("org.openjfx:javafx-fxml:$javafx")

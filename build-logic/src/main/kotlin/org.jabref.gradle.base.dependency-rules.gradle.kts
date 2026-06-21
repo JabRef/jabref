@@ -1,3 +1,4 @@
+import org.gradlex.javamodule.dependencies.JavaModuleDependenciesExtension
 import org.gradlex.javamodule.dependencies.tasks.ModuleDirectivesOrderingCheck
 
 plugins {
@@ -8,6 +9,25 @@ plugins {
 
 // module-info entry order not checked
 tasks.withType<ModuleDirectivesOrderingCheck> { enabled = false }
+
+// Opt-in (-PuseLibericaJdkFull=true): consume the JavaFX bundled in the JDK (e.g. Liberica Full) instead of Maven.
+// The java-module-dependencies plugin maps each 'requires javafx.*' to an 'org.openjfx:javafx-*' dependency.
+// Removing those module-name -> GA mappings makes the plugin add no dependency for those modules, so they are
+// resolved from the JDK's system module path. (The plugin only logs a [WARN] for an unmapped 'requires'.)
+// The JavaFX version pin (versions/build.gradle.kts), the platform-variant patches and the per-module
+// opens/exports patches below then have nothing to act on and stay inert; the runtime opens/exports they
+// provided are re-applied as JVM args in jabgui/build.gradle.kts.
+val useLibericaJdkFull = providers.gradleProperty("useLibericaJdkFull").map { it != "false" }.getOrElse(false)
+if (useLibericaJdkFull) {
+    val javafxModuleNames = setOf(
+        "javafx.base", "javafx.controls", "javafx.fxml",
+        "javafx.graphics", "javafx.media", "javafx.swing", "javafx.web"
+    )
+    val javaModuleDependencies = extensions.getByType(JavaModuleDependenciesExtension::class.java)
+    javaModuleDependencies.moduleNameToGA.set(
+        javaModuleDependencies.moduleNameToGA.get().filterKeys { it !in javafxModuleNames }
+    )
+}
 
 jvmDependencyConflicts {
     consistentResolution {

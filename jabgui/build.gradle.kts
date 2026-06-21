@@ -31,10 +31,36 @@ testModuleInfo {
     runtimeOnly("com.tngtech.archunit.junit5.engine")
 }
 
+// Opt-in (-PuseLibericaJdkFull=true): JavaFX comes from the JDK (e.g. Liberica Full), not from patched Maven jars.
+// The per-module opens/exports declared in org.jabref.gradle.base.dependency-rules.gradle.kts (javafx.base,
+// javafx.fxml, javafx.graphics, javafx.controls) are then lost and must be re-applied as JVM args here.
+// Qualified opens keep their original target module; unqualified opens/exports are reproduced for the
+// JabRef application module plus ALL-UNNAMED. If a runtime InaccessibleObjectException names another reader
+// module, append it (comma-separated) to the corresponding entry.
+val useLibericaJdkFull = providers.gradleProperty("useLibericaJdkFull").map { it != "false" }.getOrElse(false)
+val useLibericaJdkFullJvmArgs = if (useLibericaJdkFull) listOf(
+    // javafx.base
+    "--add-exports", "javafx.base/com.sun.javafx.event=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.base/javafx.collections=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.base/javafx.collections.transformation=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.base/com.sun.javafx.beans=net.bytebuddy",
+    // javafx.fxml
+    "--add-opens", "javafx.fxml/javafx.fxml=org.jabref.jablib",
+    // javafx.graphics
+    "--add-exports", "javafx.graphics/com.sun.javafx.scene=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.graphics/javafx.scene=org.controlsfx.controls",
+    // javafx.controls
+    "--add-opens", "javafx.controls/javafx.scene.control=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.controls/javafx.scene.control.cell=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.controls/javafx.scene.control.skin=org.jabref,ALL-UNNAMED",
+    "--add-exports", "javafx.controls/com.sun.javafx.scene.control=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.controls/com.sun.javafx.scene.control=org.jabref,ALL-UNNAMED"
+) else emptyList()
+
 application {
     mainClass= "org.jabref.Launcher"
 
-    applicationDefaultJvmArgs = listOf(
+    applicationDefaultJvmArgs = useLibericaJdkFullJvmArgs + listOf(
         "--add-modules", "jdk.incubator.vector",
         "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain",
 
@@ -172,7 +198,7 @@ tasks.test {
 
         // "--add-reads", "org.mockito=java.prefs",
         // "--add-reads", "org.jabref=wiremock"
-    )
+    ) + useLibericaJdkFullJvmArgs
 
     maxParallelForks = 1
 }

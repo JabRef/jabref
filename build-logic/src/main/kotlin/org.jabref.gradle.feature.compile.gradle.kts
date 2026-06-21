@@ -2,6 +2,15 @@ plugins {
     id("java")
 }
 
+// Opt-in: build against a JDK that bundles JavaFX (e.g. BellSoft Liberica "Full").
+// When set, JabRef does NOT pull JavaFX from Maven; 'requires javafx.*' resolves
+// against the JDK's own system modules instead. See the JavaFX handling in
+// - versions/build.gradle.kts
+// - org.jabref.gradle.base.dependency-rules.gradle.kts
+// - jabgui/build.gradle.kts (runtime --add-opens/--add-exports)
+// Enable with: -PuseLibericaJdkFull (bare flag = on; pass -PuseLibericaJdkFull=false to force off)
+val useLibericaJdkFull = providers.gradleProperty("useLibericaJdkFull").map { it != "false" }.getOrElse(false)
+
 java {
     toolchain {
         // If this is updated, also update
@@ -21,9 +30,13 @@ java {
         languageVersion = JavaLanguageVersion.of(25)
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
         // Temurin does not ship jmods, thus we need to use another JDK -- see https://github.com/actions/setup-java/issues/804
-        // We also need a JDK without JavaFX, because we patch JavaFX due to modularity issues
+        // We default to a JDK without JavaFX (Amazon Corretto), because we patch JavaFX (Maven) due to modularity issues.
+        // With -PuseLibericaJdkFull=true we instead use BellSoft Liberica, which ships JavaFX, and consume that bundled JavaFX.
+        // NOTE: foojay auto-provisioning resolves BellSoft to Liberica *Standard* (no JavaFX). To actually get the
+        //       bundled JavaFX, install Liberica *Full* JDK 25 locally so the toolchain detects it (and avoid having a
+        //       Standard 25 of the same vendor installed, as the toolchain query cannot distinguish the two).
         // If this is changed, binaries.yml needs to be adapted (e.g., sed'ing to another JDK)
-        vendor = JvmVendorSpec.AMAZON
+        vendor = if (useLibericaJdkFull) JvmVendorSpec.BELLSOFT else JvmVendorSpec.AMAZON
     }
 }
 
