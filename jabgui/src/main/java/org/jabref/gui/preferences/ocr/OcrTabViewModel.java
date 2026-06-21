@@ -90,7 +90,12 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     }
 
     private boolean pathExists(String path) {
-        String[] pathParts = path.split(" ");
+        String[] pathParts;
+        if (path.contains("/") || path.contains("\\")) {
+            pathParts = new String[] {path};
+        } else {
+            pathParts = path.split(" ");
+        }
         ArrayList<String> command = new ArrayList<>(Arrays.asList(pathParts));
         command.add("--version");
         try {
