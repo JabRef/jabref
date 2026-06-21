@@ -3,13 +3,6 @@ description: 'Builds all JBang scripts and verifies the launchers support --help
 runs:
   using: 'composite'
   steps:
-    - name: Install EA JBang
-      shell: bash
-      run: |
-        rm -f "$HOME/.jbang/bin/jbang" "$HOME/.jbang/bin/jbang.jar"
-        curl -Ls https://sh.jbang.dev | JBANG_DOWNLOAD_VERSION=early-access bash -s - app setup
-    - run: jbang --version
-      shell: bash
     - name: Build .jbang scripts
       shell: bash
       run: |
