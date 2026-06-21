@@ -46,9 +46,9 @@ If a document contains Zotero's reference mark, JabRef shows a popup asking user
 
 ### Use transparent Handling of Zotero Reference Marks
 
-Since JabRef uses citation-js's mapping logic (see ADR-64) as fallback strategy, users do not need to manually enable a preference to recognize Zotero's reference mark. JabRef will convert the citation to BibLateX format when it reads Zotero's reference mark. Possible problems will be added in release page and user documentation.
+Since JabRef uses citation-js's mapping logic (see ADR-64) as fallback strategy, users do not need to manually enable a preference to recognize Zotero's reference mark. JabRef will convert the citation to BibLaTeX format when it reads Zotero's reference mark. Possible problems will be documented in release page and user documentation. For example, CSL item type `map` is converted to `Misc`, and the CSL field `Scale` is lost during the conversion. JabRef maps CSL item types and fields into BibLaTeX ones, but the field mapping for each CSL type may be incomplete.
 
 * Good, because JabRef reads and converts Zotero's reference mark automatically, which does not disturb users.
 * Good, because user does not need to enable anything to use this feature.
 * Good, because it avoids the risk Zotero's reference mark being ignored if user forgets to enable the compatibility mode.
-* Bad, because user may not be aware of the problems it may bring, such as information loss, unless they read the release page or user documentation.
+* Bad, because user may not be aware of the problems it may bring, unless they read the release page or user documentation. 
