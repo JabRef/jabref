@@ -51,4 +51,4 @@ Since JabRef uses citation-js's mapping logic (see ADR-64) as fallback strategy,
 * Good, because JabRef reads and converts Zotero's reference mark automatically, which does not disturb users.
 * Good, because user does not need to enable anything to use this feature.
 * Good, because it avoids the risk Zotero's reference mark being ignored if user forgets to enable the compatibility mode.
-* Bad, because user may not be aware of the problems it may bring, unless they read the release page or user documentation. 
+* Bad, because user may not be aware of the problems it may bring, unless they read the release page or user documentation.
