@@ -1,5 +1,7 @@
 package org.jabref.logic.journals;
 
+import org.jabref.logic.util.CurrentThreadTaskExecutor;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +29,10 @@ class AbbreviationsTest {
 
     @Test
     void backgroundLoadedRepositoryReturnsBuiltInAbbreviations() {
-        JournalAbbreviationRepository backgroundLoadedRepository = JournalAbbreviationLoader.loadRepositoryInBackground(new AbbreviationPreferences(java.util.List.of(), true, false));
+        JournalAbbreviationRepository backgroundLoadedRepository = JournalAbbreviationLoader.loadRepositoryInBackground(
+                new AbbreviationPreferences(java.util.List.of(), true, false),
+                new CurrentThreadTaskExecutor()
+        );
 
         assertNotNull(backgroundLoadedRepository);
         assertEquals("2D Mater.", backgroundLoadedRepository.getNextAbbreviation("2D Materials").get());

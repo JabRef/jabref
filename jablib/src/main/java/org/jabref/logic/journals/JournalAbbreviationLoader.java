@@ -10,10 +10,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.jabref.logic.journals.ltwa.LtwaRepository;
-import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -41,13 +44,16 @@ public class JournalAbbreviationLoader {
         return loadRepositorySynchronously(abbreviationPreferences);
     }
 
-    public static JournalAbbreviationRepository loadRepositoryInBackground(AbbreviationPreferences abbreviationPreferences) {
-        CompletableFuture<JournalAbbreviationRepository> repositoryFuture = CompletableFuture.supplyAsync(
-                () -> loadRepositorySynchronously(abbreviationPreferences),
-                HeadlessExecutorService.INSTANCE
-        );
-
-        return new AsyncJournalAbbreviationRepository(repositoryFuture);
+    public static JournalAbbreviationRepository loadRepositoryInBackground(AbbreviationPreferences abbreviationPreferences, TaskExecutor taskExecutor) {
+        AsyncJournalAbbreviationRepository repository = new AsyncJournalAbbreviationRepository();
+        BackgroundTask.wrap(() -> loadRepositorySynchronously(abbreviationPreferences))
+                      .onSuccess(repository::setLoadedRepository)
+                      .onFailure(e -> {
+                          LOGGER.error("Error while loading journal abbreviation repository in background", e);
+                          repository.setFallbackRepository();
+                      })
+                      .executeWith(taskExecutor);
+        return repository;
     }
 
     private static JournalAbbreviationRepository loadRepositorySynchronously(AbbreviationPreferences abbreviationPreferences) {
@@ -69,7 +75,7 @@ public class JournalAbbreviationLoader {
             }
         } catch (IOException e) {
             LOGGER.error("Error while loading journal abbreviation repository", e);
-            return null;
+            return getFallbackRepository();
         }
 
         // Read external lists
@@ -88,6 +94,11 @@ public class JournalAbbreviationLoader {
             }
         }
         return repository;
+    }
+
+    private static JournalAbbreviationRepository getFallbackRepository() {
+        LOGGER.warn("Falling back to the default journal abbreviation repository");
+        return new JournalAbbreviationRepository();
     }
 
     private static LtwaRepository loadLtwaRepository() throws IOException {
@@ -112,79 +123,124 @@ public class JournalAbbreviationLoader {
     }
 
     private static class AsyncJournalAbbreviationRepository extends JournalAbbreviationRepository {
-        private final CompletableFuture<JournalAbbreviationRepository> repositoryFuture;
+        private final AtomicBoolean loaded = new AtomicBoolean(false);
+        private final AtomicReference<JournalAbbreviationRepository> currentRepository = new AtomicReference<>();
+        private final Set<Abbreviation> pendingCustomAbbreviations = new TreeSet<>();
 
-        private AsyncJournalAbbreviationRepository(CompletableFuture<JournalAbbreviationRepository> repositoryFuture) {
-            this.repositoryFuture = repositoryFuture;
+        private AsyncJournalAbbreviationRepository() {
+            currentRepository.set(getFallbackRepository());
         }
 
         @Override
         public boolean isKnownName(String journalName) {
-            return delegate().isKnownName(journalName);
+            return loadedDelegate()
+                    .map(repository -> repository.isKnownName(journalName))
+                    .orElse(false);
         }
 
         @Override
-        public java.util.Optional<String> getLtwaAbbreviation(String journalName) {
-            return delegate().getLtwaAbbreviation(journalName);
+        public Optional<String> getLtwaAbbreviation(String journalName) {
+            return loadedDelegate()
+                    .flatMap(repository -> repository.getLtwaAbbreviation(journalName));
         }
 
         @Override
         public boolean isAbbreviatedName(String journalName) {
-            return delegate().isAbbreviatedName(journalName);
+            return loadedDelegate()
+                    .map(repository -> repository.isAbbreviatedName(journalName))
+                    .orElse(false);
         }
 
         @Override
-        public java.util.Optional<Abbreviation> get(String input) {
-            return delegate().get(input);
+        public Optional<Abbreviation> get(String input) {
+            return loadedDelegate()
+                    .flatMap(repository -> repository.get(input));
         }
 
         @Override
         public void addCustomAbbreviation(@NonNull Abbreviation abbreviation) {
-            delegate().addCustomAbbreviation(abbreviation);
+            synchronized (pendingCustomAbbreviations) {
+                pendingCustomAbbreviations.add(abbreviation);
+                currentRepository().addCustomAbbreviation(abbreviation);
+            }
         }
 
         @Override
         public Collection<Abbreviation> getCustomAbbreviations() {
-            return delegate().getCustomAbbreviations();
+            return Set.copyOf(currentRepository().getCustomAbbreviations());
         }
 
         @Override
         public void addCustomAbbreviations(Collection<Abbreviation> abbreviationsToAdd) {
-            delegate().addCustomAbbreviations(abbreviationsToAdd);
+            abbreviationsToAdd.forEach(this::addCustomAbbreviation);
         }
 
         @Override
         public Optional<String> getNextAbbreviation(String text) {
-            return delegate().getNextAbbreviation(text);
+            return loadedDelegate()
+                    .flatMap(repository -> repository.getNextAbbreviation(text));
         }
 
         @Override
         public Optional<String> getDefaultAbbreviation(String text) {
-            return delegate().getDefaultAbbreviation(text);
+            return loadedDelegate()
+                    .flatMap(repository -> repository.getDefaultAbbreviation(text));
         }
 
         @Override
         public Optional<String> getDotless(String text) {
-            return delegate().getDotless(text);
+            return loadedDelegate()
+                    .flatMap(repository -> repository.getDotless(text));
         }
 
         @Override
         public Optional<String> getShortestUniqueAbbreviation(String text) {
-            return delegate().getShortestUniqueAbbreviation(text);
+            return loadedDelegate()
+                    .flatMap(repository -> repository.getShortestUniqueAbbreviation(text));
         }
 
         @Override
         public Set<String> getFullNames() {
-            return delegate().getFullNames();
+            return loadedDelegate()
+                    .map(repository -> Set.copyOf(repository.getFullNames()))
+                    .orElse(Set.of());
         }
 
         @Override
         public Collection<Abbreviation> getAllLoaded() {
-            return delegate().getAllLoaded();
+            return loadedDelegate()
+                    .map(repository -> List.copyOf(repository.getAllLoaded()))
+                    .orElse(List.of());
         }
 
-        private JournalAbbreviationRepository delegate() {
-            return repositoryFuture.join();
+        private void setLoadedRepository(JournalAbbreviationRepository repository) {
+            synchronized (pendingCustomAbbreviations) {
+                repository.addCustomAbbreviations(pendingCustomAbbreviations);
+                currentRepository.set(repository);
+                loaded.set(true);
+            }
+        }
+
+        private void setFallbackRepository() {
+            currentRepository.set(getFallbackRepository());
+            loaded.set(true);
+        }
+
+        private Optional<JournalAbbreviationRepository> loadedDelegate() {
+            if (!loaded.get()) {
+                return Optional.empty();
+            }
+            return Optional.of(currentRepository());
+        }
+
+        private JournalAbbreviationRepository currentRepository() {
+            JournalAbbreviationRepository repository = currentRepository.get();
+            if (repository == null) {
+                JournalAbbreviationRepository fallbackRepository = getFallbackRepository();
+                currentRepository.set(fallbackRepository);
+                return fallbackRepository;
+            }
+            return repository;
         }
     }
 }
