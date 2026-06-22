@@ -6,15 +6,16 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.jabref.logic.journals.ltwa.LtwaRepository;
 import org.jabref.logic.util.HeadlessExecutorService;
 
 import org.jspecify.annotations.NonNull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -153,27 +154,27 @@ public class JournalAbbreviationLoader {
         }
 
         @Override
-        public java.util.Optional<String> getNextAbbreviation(String text) {
+        public Optional<String> getNextAbbreviation(String text) {
             return delegate().getNextAbbreviation(text);
         }
 
         @Override
-        public java.util.Optional<String> getDefaultAbbreviation(String text) {
+        public Optional<String> getDefaultAbbreviation(String text) {
             return delegate().getDefaultAbbreviation(text);
         }
 
         @Override
-        public java.util.Optional<String> getDotless(String text) {
+        public Optional<String> getDotless(String text) {
             return delegate().getDotless(text);
         }
 
         @Override
-        public java.util.Optional<String> getShortestUniqueAbbreviation(String text) {
+        public Optional<String> getShortestUniqueAbbreviation(String text) {
             return delegate().getShortestUniqueAbbreviation(text);
         }
 
         @Override
-        public java.util.Set<String> getFullNames() {
+        public Set<String> getFullNames() {
             return delegate().getFullNames();
         }
 
