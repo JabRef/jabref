@@ -309,7 +309,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         }
         return uriBuilder.build().toURL();
     }
-    
+
     @Override
     public Page<BibEntry> performRawSearchQueryPaged(String rawQuery, int pageNumber) throws FetcherException {
         if (rawQuery.isBlank()) {
@@ -318,7 +318,9 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         transformer = new IEEEQueryTransformer();
         try {
             URL url = buildSearchURL(rawQuery, pageNumber);
-            return new Page<>(rawQuery, pageNumber, getParser().parseEntries(getUrlDownload(url).asInputStream()));
+            try (var stream = getUrlDownload(url).asInputStream()) {
+                return new Page<>(rawQuery, pageNumber, getParser().parseEntries(stream));
+            }
         } catch (URISyntaxException e) {
             throw new FetcherException("IEEE raw search URL is malformed for query: " + rawQuery, e);
         } catch (IOException e) {
