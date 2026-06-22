@@ -208,7 +208,9 @@ public class ImporterPreferences {
     }
 
     /// @param name of the fetcher
-    /// @return either a customized API key if configured or the default key
+    /// @return either a customized API key if configured or the default key. A blank key (e.g. an
+    ///         unsubstituted build secret) is treated as absent, so callers never receive a
+    ///         present-but-empty value and stop sending empty `api_key=` parameters to fetchers.
     /// @implNote See `fetchers.md` for general information on fetchers.
     public Optional<String> getApiKey(String name) {
         return apiKeys.stream()
@@ -216,7 +218,8 @@ public class ImporterPreferences {
                       .filter(FetcherApiKey::shouldUse)
                       .findFirst()
                       .map(FetcherApiKey::getKey)
-                      .or(() -> Optional.ofNullable(getDefaultFetcherKeys().get(name)));
+                      .or(() -> Optional.ofNullable(getDefaultFetcherKeys().get(name)))
+                      .filter(key -> !key.isBlank());
     }
 
     public void setCatalogs(List<String> catalogs) {

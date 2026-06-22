@@ -34,7 +34,10 @@ import static org.mockito.Mockito.when;
 
 @FetcherTest
 class OpenAlexFetcherTest {
-    private static final Optional<String> API_KEY = Optional.of(new BuildInfo().openAlexApiKey);
+    // Mirror ImporterPreferences#getApiKey, which treats a blank key (e.g. an unsubstituted build
+    // secret) as absent. Without a substituted key this is Optional.empty(), so the offline
+    // URL-builder assertions see the clean keyless URL that production also produces.
+    private static final Optional<String> API_KEY = Optional.of(new BuildInfo().openAlexApiKey).filter(key -> !key.isBlank());
 
     private OpenAlex fetcher;
 
