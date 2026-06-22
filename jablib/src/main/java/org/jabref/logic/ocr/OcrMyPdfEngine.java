@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ public class OcrMyPdfEngine implements OcrEngine {
 
     @Override
     public boolean isAvailable() {
-        ArrayList<String> command = ocrPreferences.splitPath(ocrPreferences.getOcrPath());
+        ArrayList<String> command = StringUtil.splitCommandRespectingQuotes(ocrPreferences.getOcrPath());
         command.add("--version");
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
@@ -61,7 +62,7 @@ public class OcrMyPdfEngine implements OcrEngine {
     ///
     /// @return the path of the engine as a list of strings to be passed to the process builder.
     private ArrayList<String> getExecutablePath() {
-        return ocrPreferences.splitPath(ocrPreferences.getOcrPath());
+        return StringUtil.splitCommandRespectingQuotes(ocrPreferences.getOcrPath());
     }
 
     /// OCRmyPDF writes the searchable PDF to a new file alongside the original file.
@@ -79,7 +80,7 @@ public class OcrMyPdfEngine implements OcrEngine {
         Path outputPath = makeOutputFilePath(pdfPath);
         String outputFile = outputPath.toString();
         // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
-        ArrayList<String> command = ocrPreferences.splitPath(ocrPreferences.getOcrPath());
+        ArrayList<String> command = StringUtil.splitCommandRespectingQuotes(ocrPreferences.getOcrPath());
         command.add("--skip-text");
         command.add(pdfPath.toString());
         command.add(outputFile);

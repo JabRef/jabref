@@ -20,6 +20,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +98,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     }
 
     private boolean pathExists(String path) {
-        ArrayList<String> command = ocrPreferences.splitPath(path);
+        ArrayList<String> command = StringUtil.splitCommandRespectingQuotes(ocrPreferences.getOcrPath());
         command.add("--version");
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
