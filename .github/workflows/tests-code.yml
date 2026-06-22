@@ -532,6 +532,10 @@ jobs:
           show-progress: 'false'
       - name: Ensure gradlew.bat blob has no CRLF
         run: |
+          if ! git cat-file -e HEAD:gradlew.bat 2>/dev/null; then
+            echo "❌ gradlew.bat not found at HEAD. Cannot validate line endings; failing closed."
+            exit 1
+          fi
           if git show HEAD:gradlew.bat | grep -q $'\r'; then
             echo "❌ gradlew.bat is committed with CRLF. The repository blob must be LF;"
             echo "   .gitattributes (\"*.bat text eol=crlf\") converts it to CRLF on checkout."
