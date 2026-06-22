@@ -45,15 +45,7 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadRepositoryInBackground(AbbreviationPreferences abbreviationPreferences, TaskExecutor taskExecutor) {
-        AsyncJournalAbbreviationRepository repository = new AsyncJournalAbbreviationRepository();
-        BackgroundTask.wrap(() -> loadRepositorySynchronously(abbreviationPreferences))
-                      .onSuccess(repository::setLoadedRepository)
-                      .onFailure(e -> {
-                          LOGGER.error("Error while loading journal abbreviation repository in background", e);
-                          repository.setFallbackRepository();
-                      })
-                      .executeWith(taskExecutor);
-        return repository;
+        return new AsyncJournalAbbreviationRepository(abbreviationPreferences, taskExecutor);
     }
 
     private static JournalAbbreviationRepository loadRepositorySynchronously(AbbreviationPreferences abbreviationPreferences) {
@@ -123,16 +115,21 @@ public class JournalAbbreviationLoader {
     }
 
     private static class AsyncJournalAbbreviationRepository extends JournalAbbreviationRepository {
+        private final AbbreviationPreferences abbreviationPreferences;
+        private final TaskExecutor taskExecutor;
+        private final AtomicBoolean loadingStarted = new AtomicBoolean(false);
         private final AtomicBoolean loaded = new AtomicBoolean(false);
         private final AtomicReference<JournalAbbreviationRepository> currentRepository = new AtomicReference<>();
         private final Set<Abbreviation> pendingCustomAbbreviations = new TreeSet<>();
 
-        private AsyncJournalAbbreviationRepository() {
-            currentRepository.set(getFallbackRepository());
+        private AsyncJournalAbbreviationRepository(AbbreviationPreferences abbreviationPreferences, TaskExecutor taskExecutor) {
+            this.abbreviationPreferences = abbreviationPreferences;
+            this.taskExecutor = taskExecutor;
         }
 
         @Override
         public boolean isKnownName(String journalName) {
+            ensureLoadingStarted();
             return loadedDelegate()
                     .map(repository -> repository.isKnownName(journalName))
                     .orElse(false);
@@ -140,12 +137,14 @@ public class JournalAbbreviationLoader {
 
         @Override
         public Optional<String> getLtwaAbbreviation(String journalName) {
+            ensureLoadingStarted();
             return loadedDelegate()
                     .flatMap(repository -> repository.getLtwaAbbreviation(journalName));
         }
 
         @Override
         public boolean isAbbreviatedName(String journalName) {
+            ensureLoadingStarted();
             return loadedDelegate()
                     .map(repository -> repository.isAbbreviatedName(journalName))
                     .orElse(false);
@@ -153,21 +152,28 @@ public class JournalAbbreviationLoader {
 
         @Override
         public Optional<Abbreviation> get(String input) {
+            ensureLoadingStarted();
             return loadedDelegate()
                     .flatMap(repository -> repository.get(input));
         }
 
         @Override
         public void addCustomAbbreviation(@NonNull Abbreviation abbreviation) {
+            ensureLoadingStarted();
             synchronized (pendingCustomAbbreviations) {
                 pendingCustomAbbreviations.add(abbreviation);
-                currentRepository().addCustomAbbreviation(abbreviation);
+                loadedDelegate().ifPresent(repository -> repository.addCustomAbbreviation(abbreviation));
             }
         }
 
         @Override
         public Collection<Abbreviation> getCustomAbbreviations() {
-            return Set.copyOf(currentRepository().getCustomAbbreviations());
+            ensureLoadingStarted();
+            synchronized (pendingCustomAbbreviations) {
+                return loadedDelegate()
+                        .<Collection<Abbreviation>>map(repository -> Set.copyOf(repository.getCustomAbbreviations()))
+                        .orElseGet(() -> Set.copyOf(pendingCustomAbbreviations));
+            }
         }
 
         @Override
@@ -177,30 +183,35 @@ public class JournalAbbreviationLoader {
 
         @Override
         public Optional<String> getNextAbbreviation(String text) {
+            ensureLoadingStarted();
             return loadedDelegate()
                     .flatMap(repository -> repository.getNextAbbreviation(text));
         }
 
         @Override
         public Optional<String> getDefaultAbbreviation(String text) {
+            ensureLoadingStarted();
             return loadedDelegate()
                     .flatMap(repository -> repository.getDefaultAbbreviation(text));
         }
 
         @Override
         public Optional<String> getDotless(String text) {
+            ensureLoadingStarted();
             return loadedDelegate()
                     .flatMap(repository -> repository.getDotless(text));
         }
 
         @Override
         public Optional<String> getShortestUniqueAbbreviation(String text) {
+            ensureLoadingStarted();
             return loadedDelegate()
                     .flatMap(repository -> repository.getShortestUniqueAbbreviation(text));
         }
 
         @Override
         public Set<String> getFullNames() {
+            ensureLoadingStarted();
             return loadedDelegate()
                     .map(repository -> Set.copyOf(repository.getFullNames()))
                     .orElse(Set.of());
@@ -208,9 +219,24 @@ public class JournalAbbreviationLoader {
 
         @Override
         public Collection<Abbreviation> getAllLoaded() {
+            ensureLoadingStarted();
             return loadedDelegate()
                     .map(repository -> List.copyOf(repository.getAllLoaded()))
                     .orElse(List.of());
+        }
+
+        private void ensureLoadingStarted() {
+            if (!loadingStarted.compareAndSet(false, true)) {
+                return;
+            }
+
+            BackgroundTask.wrap(() -> loadRepositorySynchronously(abbreviationPreferences))
+                          .onSuccess(this::setLoadedRepository)
+                          .onFailure(e -> {
+                              LOGGER.error("Error while loading journal abbreviation repository in background", e);
+                              setFallbackRepository();
+                          })
+                          .executeWith(taskExecutor);
         }
 
         private void setLoadedRepository(JournalAbbreviationRepository repository) {
@@ -222,25 +248,19 @@ public class JournalAbbreviationLoader {
         }
 
         private void setFallbackRepository() {
-            currentRepository.set(getFallbackRepository());
-            loaded.set(true);
+            synchronized (pendingCustomAbbreviations) {
+                JournalAbbreviationRepository fallbackRepository = getFallbackRepository();
+                fallbackRepository.addCustomAbbreviations(pendingCustomAbbreviations);
+                currentRepository.set(fallbackRepository);
+                loaded.set(true);
+            }
         }
 
         private Optional<JournalAbbreviationRepository> loadedDelegate() {
             if (!loaded.get()) {
                 return Optional.empty();
             }
-            return Optional.of(currentRepository());
-        }
-
-        private JournalAbbreviationRepository currentRepository() {
-            JournalAbbreviationRepository repository = currentRepository.get();
-            if (repository == null) {
-                JournalAbbreviationRepository fallbackRepository = getFallbackRepository();
-                currentRepository.set(fallbackRepository);
-                return fallbackRepository;
-            }
-            return repository;
+            return Optional.ofNullable(currentRepository.get());
         }
     }
 }
