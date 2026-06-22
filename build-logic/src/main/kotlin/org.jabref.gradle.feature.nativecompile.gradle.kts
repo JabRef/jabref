@@ -3,6 +3,9 @@ plugins {
 }
 
 graalvmNative {
+    metadataRepository {
+        enabled = true
+    }
     binaries {
         named("main") {
             buildArgs.addAll(

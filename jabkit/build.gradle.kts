@@ -87,3 +87,15 @@ graalvmNative {
         }
     }
 }
+
+// This launcher override is only needed for tracing-agent execution paths
+if (project.hasProperty("agent")) {
+    tasks.named<JavaExec>("run") {
+        javaLauncher.set(
+            javaToolchains.launcherFor {
+                languageVersion.set(JavaLanguageVersion.of(25))
+                vendor.set(JvmVendorSpec.GRAAL_VM)
+            }
+        )
+    }
+}
