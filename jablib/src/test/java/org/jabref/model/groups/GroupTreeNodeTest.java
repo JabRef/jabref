@@ -339,4 +339,18 @@ public class GroupTreeNodeTest {
 
         assertEquals(List.of(), fieldChanges);
     }
+
+    @Test
+    void getMatchingGroupsReevaluatesKeywordGroupsAfterEntryChange() {
+        GroupTreeNode root = getRoot();
+        GroupTreeNode parent = root.addSubgroup(new WordKeywordGroup("parent", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "alpha", true, ',', false));
+        GroupTreeNode child = parent.addSubgroup(new WordKeywordGroup("child", GroupHierarchyType.REFINING, StandardField.KEYWORDS, "beta", true, ',', false));
+        BibEntry keywordEntry = new BibEntry().withField(StandardField.KEYWORDS, "alpha");
+
+        assertEquals(List.of(root, parent), root.getMatchingGroups(keywordEntry));
+
+        keywordEntry.setField(StandardField.KEYWORDS, "alpha, beta");
+
+        assertEquals(List.of(root, parent, child), root.getMatchingGroups(keywordEntry));
+    }
 }

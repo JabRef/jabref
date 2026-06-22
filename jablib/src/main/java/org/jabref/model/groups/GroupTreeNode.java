@@ -2,6 +2,8 @@ package org.jabref.model.groups;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -170,20 +172,18 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     /// Determines all groups in the subtree starting at this node which contain at least one of the given entries.
     public List<GroupTreeNode> getMatchingGroups(List<BibEntry> entries) {
         List<GroupTreeNode> groups = new ArrayList<>();
+        IdentityHashMap<BibEntry, IdentityHashMap<GroupTreeNode, EnumMap<GroupHierarchyType, Boolean>>> matchCaches = new IdentityHashMap<>();
 
-        // Add myself if I contain the entries
-        SearchMatcher matcher = getSearchMatcher();
-        for (BibEntry entry : entries) {
-            if (matcher.isMatch(entry)) {
-                groups.add(this);
-                break;
+        iterateOverTree().forEach(node -> {
+            for (BibEntry entry : entries) {
+                IdentityHashMap<GroupTreeNode, EnumMap<GroupHierarchyType, Boolean>> cacheForEntry =
+                        matchCaches.computeIfAbsent(entry, _ -> new IdentityHashMap<>());
+                if (node.matches(entry, node.getGroup().getHierarchicalContext(), cacheForEntry)) {
+                    groups.add(node);
+                    break;
+                }
             }
-        }
-
-        // Traverse children
-        for (GroupTreeNode child : getChildren()) {
-            groups.addAll(child.getMatchingGroups(entries));
-        }
+        });
 
         return groups;
     }
@@ -252,7 +252,34 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
     /// Returns whether this group matches the specified {@link BibEntry} while taking the hierarchical information into account.
     public boolean matches(BibEntry entry) {
-        return getSearchMatcher().isMatch(entry);
+        return matches(entry, getGroup().getHierarchicalContext(), new IdentityHashMap<>());
+    }
+
+    private boolean matches(BibEntry entry,
+                            GroupHierarchyType originalContext,
+                            IdentityHashMap<GroupTreeNode, EnumMap<GroupHierarchyType, Boolean>> cache) {
+        EnumMap<GroupHierarchyType, Boolean> cachedByContext = cache.computeIfAbsent(this, _ -> new EnumMap<>(GroupHierarchyType.class));
+        Boolean cachedMatch = cachedByContext.get(originalContext);
+        if (cachedMatch != null) {
+            return cachedMatch;
+        }
+
+        GroupHierarchyType context = getGroup().getHierarchicalContext();
+        boolean matches = getGroup().contains(entry);
+        if ((context == GroupHierarchyType.INCLUDING) && !matches && (originalContext != GroupHierarchyType.REFINING)) {
+            for (GroupTreeNode child : getChildren()) {
+                if (child.matches(entry, originalContext, cache)) {
+                    matches = true;
+                    break;
+                }
+            }
+        } else if ((context == GroupHierarchyType.REFINING) && matches && !isRoot() && (originalContext != GroupHierarchyType.INCLUDING)) {
+            // noinspection OptionalGetWithoutIsPresent
+            matches = getParent().get().matches(entry, originalContext, cache);
+        }
+
+        cachedByContext.put(originalContext, matches);
+        return matches;
     }
 
     /// Get the path from the root of the tree as a string (every group name is separated by {@link #PATH_DELIMITER}.
