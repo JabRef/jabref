@@ -18,6 +18,8 @@
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationPreferences.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationRepository.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/ltwa/*.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/FallbackExceptionHandler.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/HeadlessExecutorService.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/strings/StringSimilarity.java
 
 //SOURCES ../../../../jablib/build/generated-src/antlr/main/org/jabref/logic/journals/ltwa/*.java
