@@ -737,7 +737,7 @@ public class StringUtil {
     /// Gets the path of the engine
     ///
     /// @return the path of the engine as a list of strings to be passed to the process builder.
-    public static ArrayList<String> splitCommandRespectingQuotes(String path) {
+    public static ArrayList<String> splitPathRespectingQuotes(String path) {
         ArrayList<String> result = new ArrayList<>();
         // first check if the path contains a slash or backslash, if so it gets the first space after the last slash
         // then it splits the rest of the string by spaces, otherwise it just splits the whole string by spaces

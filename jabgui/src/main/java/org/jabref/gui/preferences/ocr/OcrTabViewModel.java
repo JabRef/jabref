@@ -98,7 +98,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     }
 
     private boolean pathExists(String path) {
-        ArrayList<String> command = StringUtil.splitCommandRespectingQuotes(ocrPreferences.getOcrPath());
+        ArrayList<String> command = StringUtil.splitPathRespectingQuotes(ocrPreferences.getOcrPath());
         command.add("--version");
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
