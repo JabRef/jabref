@@ -331,10 +331,10 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
     }
 
     /// Builds the IEEE search API URL for the given raw query string and page number.
-    /// The caller is responsible for setting {@link #transformer} before invoking {@link #getParser()}.
+    /// The caller is responsible for setting `transformer` before invoking `getParser()`.
     ///
-    /// @param rawQuery   the query string to pass directly as the {@code querytext} parameter
-    /// @param pageNumber zero indexed page number; converted to a 1 indexed {@code start_record} value
+    /// @param rawQuery   the query string to pass directly as the `querytext` parameter
+    /// @param pageNumber zero based page number; converted to a one based `start_record` value.
     private URL buildSearchURL(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
         importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("apikey", apiKey));
