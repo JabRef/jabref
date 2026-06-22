@@ -27,9 +27,13 @@ import org.jabref.model.entry.identifier.DOI;
 ///  2. the DOI field holds an arXiv DOI matching the eprint -> drop the redundant eprint fields.
 ///  3. otherwise (e.g. a real publisher DOI next to an arXiv eprint, or no arXiv data) -> keep both.
 ///
-/// This job is self-contained and order-independent with respect to {@link DoiCleanup} and
-/// {@link EprintCleanup}: it re-parses the raw field values via {@link DOI#parse} and
-/// {@link ArXivIdentifier#parse}, both of which tolerate URL/prefix forms.
+/// This job is self-contained and independent of cleanup job ordering. The consolidation reads the
+/// already-normalized `eprint` and `doi` fields. When no consolidation is possible from the
+/// fields as they are, the arXiv identifier might still live in a field such as url/journal/note, from
+/// where [EprintCleanup] would move it into the eprint field. In that case this job applies
+/// [EprintCleanup] itself, but only after probing (on a copy) that doing so actually enables a
+/// consolidation - an entry without arXiv data is left untouched, regardless of whether
+/// [EprintCleanup] runs separately or at all.
 public class ArXivDoiCleanup implements CleanupJob {
 
     /// arXiv DOIs use the prefix "10.48550/arXiv." (the DOI registrant assigned to arXiv).
@@ -37,6 +41,32 @@ public class ArXivDoiCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
+        // First, try to consolidate using the fields as they currently are.
+        List<FieldChange> changes = consolidate(entry);
+        if (!changes.isEmpty()) {
+            return changes;
+        }
+
+        // No consolidation was possible. The arXiv identifier might still sit in url/journal/note/etc.,
+        // from where EprintCleanup would move it into the eprint field. Probe on a copy (which does not
+        // fire entry listeners) whether running EprintCleanup first would enable a consolidation. Only
+        // when it would do we touch the real entry; otherwise the entry is left untouched.
+        BibEntry probe = new BibEntry(entry);
+        new EprintCleanup().cleanup(probe);
+        if (consolidate(probe).isEmpty()) {
+            return List.of();
+        }
+
+        // Consolidation becomes possible once the eprint is populated: apply the eprint move and the
+        // consolidation to the real entry.
+        List<FieldChange> appliedChanges = new ArrayList<>(new EprintCleanup().cleanup(entry));
+        appliedChanges.addAll(consolidate(entry));
+        return appliedChanges;
+    }
+
+    /// Consolidates the arXiv identifier onto the DOI field using the already-populated `eprint`
+    /// and `doi` fields. Returns the changes made, or an empty list when no rule applies.
+    private List<FieldChange> consolidate(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
 
         Optional<ArXivIdentifier> eprint = entry.getField(StandardField.EPRINT)

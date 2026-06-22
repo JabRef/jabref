@@ -74,6 +74,25 @@ class ArXivDoiCleanupTest {
                 // No arXiv data at all -> unchanged
                 Arguments.of(
                         new BibEntry().withField(StandardField.DOI, "10.1145/2594455"),
-                        new BibEntry().withField(StandardField.DOI, "10.1145/2594455")));
+                        new BibEntry().withField(StandardField.DOI, "10.1145/2594455")),
+
+                // Order-independent: arXiv id still in the url, no eprint yet -> move it internally, then consolidate
+                Arguments.of(
+                        new BibEntry()
+                                .withField(StandardField.DOI, "10.48550/arxiv.2106.12345"),
+                        new BibEntry()
+                                .withField(StandardField.URL, "https://arxiv.org/abs/2106.12345")),
+
+                // Order-independent: arXiv id still in the journal field, no eprint yet -> consolidate, journal cleared
+                Arguments.of(
+                        new BibEntry()
+                                .withField(StandardField.DOI, "10.48550/arxiv.2106.12345"),
+                        new BibEntry()
+                                .withField(StandardField.JOURNAL, "arXiv:2106.12345")),
+
+                // No arXiv data: the probed eprint move yields nothing, so the entry is left untouched
+                Arguments.of(
+                        new BibEntry().withField(StandardField.URL, "https://example.com/article"),
+                        new BibEntry().withField(StandardField.URL, "https://example.com/article")));
     }
 }
