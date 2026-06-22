@@ -27,18 +27,18 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> implement
     }
 
     public void initialize() {
-        this.viewModel = new OcrTabViewModel(preferences.getOcrPreferences());
+        this.viewModel = new OcrTabViewModel(dialogService, preferences, taskExecutor);
 
         ocrPath.textProperty().bindBidirectional(viewModel.ocrPathProperty());
     }
 
     @FXML
     private void browseEnginePath() {
-        viewModel.browseEnginePath(dialogService, preferences);
+        viewModel.browseEnginePath();
     }
 
     @FXML
     private void autoDetectEnginePath() {
-        viewModel.autoDetectEnginePath(dialogService, taskExecutor);
+        viewModel.autoDetectEnginePath();
     }
 }

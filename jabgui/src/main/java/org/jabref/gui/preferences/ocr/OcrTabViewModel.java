@@ -3,7 +3,7 @@ package org.jabref.gui.preferences.ocr;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -27,12 +27,24 @@ import org.slf4j.LoggerFactory;
 public class OcrTabViewModel implements PreferenceTabViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(OcrTabViewModel.class);
     private static final int CHECKING_TIMEOUT = 10;
+    private static final List<String> DEFAULT_OCR_PATHS = List.of(
+            "ocrmypdf",
+            "python -m ocrmypdf",
+            "py -m ocrmypdf",
+            "python3 -m ocrmypdf"
+    );
     private final StringProperty ocrPath = new SimpleStringProperty();
 
+    private final DialogService dialogService;
+    private final GuiPreferences preferences;
     private final OcrPreferences ocrPreferences;
+    private final TaskExecutor taskExecutor;
 
-    public OcrTabViewModel(OcrPreferences ocrPreferences) {
-        this.ocrPreferences = ocrPreferences;
+    public OcrTabViewModel(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
+        this.dialogService = dialogService;
+        this.preferences = preferences;
+        this.ocrPreferences = preferences.getOcrPreferences();
+        this.taskExecutor = taskExecutor;
     }
 
     @Override
@@ -49,7 +61,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         return ocrPath;
     }
 
-    void browseEnginePath(DialogService dialogService, GuiPreferences preferences) {
+    public void browseEnginePath() {
         Optional<Path> selectedPath = dialogService.showFileOpenDialog(
                 new FileDialogConfiguration.Builder()
                         .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
@@ -57,22 +69,14 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         selectedPath.ifPresent(path -> ocrPathProperty().set(path.toString()));
     }
 
-    Optional<String> autoDetectEnginePath() {
-        if (pathExists("ocrmypdf")) {
-            return Optional.of("ocrmypdf");
-        } else if (pathExists("python -m ocrmypdf")) {
-            return Optional.of("python -m ocrmypdf");
-        } else if (pathExists("py -m ocrmypdf")) {
-            return Optional.of("py -m ocrmypdf");
-        } else if (pathExists("python3 -m ocrmypdf")) {
-            return Optional.of("python3 -m ocrmypdf");
-        } else {
-            return Optional.empty();
-        }
+    public Optional<String> autoDetectDefaultEnginePath() {
+        return DEFAULT_OCR_PATHS.stream()
+                                .filter(this::pathExists)
+                                .findFirst();
     }
 
-    void autoDetectEnginePath(DialogService dialogService, TaskExecutor taskExecutor) {
-        BackgroundTask<Optional<String>> autoDetectTask = BackgroundTask.wrap(() -> autoDetectEnginePath());
+    public void autoDetectEnginePath() {
+        BackgroundTask<Optional<String>> autoDetectTask = BackgroundTask.wrap(this::autoDetectDefaultEnginePath);
 
         autoDetectTask.titleProperty().set(Localization.lang("Auto detection of engine path"));
         autoDetectTask.showToUser(true);
@@ -90,13 +94,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     }
 
     private boolean pathExists(String path) {
-        String[] pathParts;
-        if (path.contains("/") || path.contains("\\")) {
-            pathParts = new String[] {path};
-        } else {
-            pathParts = path.split(" ");
-        }
-        ArrayList<String> command = new ArrayList<>(Arrays.asList(pathParts));
+        ArrayList<String> command = ocrPreferences.splitPath(path);
         command.add("--version");
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
