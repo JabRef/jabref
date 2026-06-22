@@ -10,7 +10,6 @@ import org.jabref.logic.ai.ingestion.tasks.UpdateEmbeddingModelTask;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.NotificationService;
-import org.jabref.logic.util.ProgressCounter;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 
