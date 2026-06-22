@@ -8,17 +8,19 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 
 import org.jabref.gui.util.WebViewStore;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.MathSciNetId;
 
+import com.tobiasdiez.easybind.EasyBind;
+
 public class MathSciNetTab extends EntryEditorTab {
 
-    public static final String NAME = "MathSciNet Review";
-
     public MathSciNetTab() {
-        setText(Localization.lang("MathSciNet Review"));
+        setText(EntryEditorTabModel.BuiltIn.MATH_SCI_NET.displayName());
+        // Visible only when the current entry carries a MathSciNet (MR number) identifier.
+        setContentDrivenVisibility(EasyBind.map(currentEntryProperty(),
+                entry -> (entry != null) && getMathSciNetId(entry).isPresent()));
     }
 
     private Optional<MathSciNetId> getMathSciNetId(BibEntry entry) {
@@ -48,11 +50,6 @@ public class MathSciNetTab extends EntryEditorTab {
             }
         });
         return root;
-    }
-
-    @Override
-    public boolean shouldShow(BibEntry entry) {
-        return getMathSciNetId(entry).isPresent();
     }
 
     @Override

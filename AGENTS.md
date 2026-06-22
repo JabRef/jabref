@@ -125,7 +125,7 @@ Agents **must not**:
    and then PATTERN.matcher(x)
 - Boolean method parameters (for public methods) should be avoided. Better create two distinct methods (which maybe call some private methods)
 - Minimal quality for variable names: Not extraEntry2, extraEntry3; but include meaning/intention into the variable names
-- Use Markdown Javadoc comments (`///`) for multi-line comments
+- Use Markdown Javadoc comments (`///`) for multi-line comments. Within them, use Markdown syntax, not JavaDoc inline tags: `` `code` `` instead of `{@code code}`, and `[ClassName]` instead of `{@link ClassName}`.
 
 ### Comments
 

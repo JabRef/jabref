@@ -59,6 +59,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
+import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.MainTableTooltip;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
@@ -107,8 +108,6 @@ import org.slf4j.LoggerFactory;
 /// GUI for tab displaying an articles citation relations in two lists based on the currently selected BibEntry
 public class CitationRelationsTab extends EntryEditorTab {
 
-    public static final String NAME = "Citation relations";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationsTab.class);
 
     // Tasks used to implement asynchronous fetching of related articles
@@ -146,7 +145,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.taskExecutor = taskExecutor;
         this.undoManager = undoManager;
         this.stateManager = stateManager;
-        setText(Localization.lang("Citations"));
+        setText(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION.displayName());
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
         setId("citationRelationsTab");
 
@@ -274,7 +273,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     private EventHandler<ActionEvent> doiLookUp() {
         return actionEvent -> {
-            citationsRelationsTabViewModel.lookUpDoi(currentEntry);
+            citationsRelationsTabViewModel.lookUpDoi(getCurrentEntry());
         };
     }
 
@@ -613,7 +612,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 jumpToEntry(item);
             } else {
                 // Entry not in library -> import it
-                importEntries(List.of(item), citationComponents.searchType(), currentEntry);
+                importEntries(List.of(item), citationComponents.searchType(), getCurrentEntry());
             }
             return;
         }
@@ -764,16 +763,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         AnchorPane.setTopAnchor(node, 0.0);
         AnchorPane.setBottomAnchor(node, 0.0);
         AnchorPane.setRightAnchor(node, offset);
-    }
-
-    /// Determines if tab should be shown according to preferences
-    ///
-    /// @param entry Currently selected BibEntry
-    /// @return whether tab should be shown
-    @Override
-    public boolean shouldShow(BibEntry entry) {
-        // TODO: Create a preference and show tab only if preference is enabled
-        return true;
     }
 
     @Override
