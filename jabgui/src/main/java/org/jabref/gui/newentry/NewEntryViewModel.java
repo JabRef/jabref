@@ -21,6 +21,7 @@ import javafx.concurrent.Task;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.BookCoverFetcher;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -52,6 +53,7 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -248,6 +250,22 @@ public class NewEntryViewModel {
         return entry;
     }
 
+    /// Imports the given entries and, once the (asynchronous) import has finished, selects and
+    /// scrolls to them in the main table so the user does not have to hunt for the new entry.
+    private void importEntriesAndSelect(@Nullable TransferInformation transferInformation, List<BibEntry> entries) {
+        final ImportHandler handler = new ImportHandler(
+                libraryTab.getBibDatabaseContext(),
+                preferences,
+                fileUpdateMonitor,
+                libraryTab.getUndoManager(),
+                stateManager,
+                dialogService,
+                taskExecutor);
+        final EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, entries.size());
+        tracker.setOnFinish(() -> UiTaskExecutor.runInJavaFXThread(() -> libraryTab.clearAndSelect(entries)));
+        handler.importEntriesWithDuplicateCheck(transferInformation, entries, tracker);
+    }
+
     private class WorkerLookupId extends Task<Optional<BibEntry>> {
         @Override
         protected Optional<BibEntry> call() throws FetcherException {
@@ -349,15 +367,9 @@ public class NewEntryViewModel {
                 return;
             }
 
-            final ImportHandler handler = new ImportHandler(
-                    libraryTab.getBibDatabaseContext(),
-                    preferences,
-                    fileUpdateMonitor,
-                    libraryTab.getUndoManager(),
-                    stateManager,
-                    dialogService,
-                    taskExecutor);
-            handler.importEntryWithDuplicateCheck(new TransferInformation(libraryTab.getBibDatabaseContext(), TransferMode.NONE), result.get());
+            importEntriesAndSelect(
+                    new TransferInformation(libraryTab.getBibDatabaseContext(), TransferMode.NONE),
+                    List.of(result.get()));
 
             executedSuccessfully.set(true);
             executing.set(false);
@@ -447,15 +459,7 @@ public class NewEntryViewModel {
                 return;
             }
 
-            final ImportHandler handler = new ImportHandler(
-                    libraryTab.getBibDatabaseContext(),
-                    preferences,
-                    fileUpdateMonitor,
-                    libraryTab.getUndoManager(),
-                    stateManager,
-                    dialogService,
-                    taskExecutor);
-            handler.importEntriesWithDuplicateCheck(null, result.get());
+            importEntriesAndSelect(null, result.get());
 
             executedSuccessfully.set(true);
             executing.set(false);
@@ -532,15 +536,7 @@ public class NewEntryViewModel {
                 return;
             }
 
-            final ImportHandler handler = new ImportHandler(
-                    libraryTab.getBibDatabaseContext(),
-                    preferences,
-                    fileUpdateMonitor,
-                    libraryTab.getUndoManager(),
-                    stateManager,
-                    dialogService,
-                    taskExecutor);
-            handler.importEntriesWithDuplicateCheck(null, result.get());
+            importEntriesAndSelect(null, result.get());
 
             executedSuccessfully.set(true);
             executing.set(false);
