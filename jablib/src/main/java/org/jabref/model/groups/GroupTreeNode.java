@@ -172,6 +172,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     /// Determines all groups in the subtree starting at this node which contain at least one of the given entries.
     public List<GroupTreeNode> getMatchingGroups(List<BibEntry> entries) {
         List<GroupTreeNode> groups = new ArrayList<>();
+        // Identity-based cache: memoize results for the exact BibEntry and GroupTreeNode instances evaluated in this pass.
         IdentityHashMap<BibEntry, IdentityHashMap<GroupTreeNode, EnumMap<GroupHierarchyType, Boolean>>> matchCaches = new IdentityHashMap<>();
 
         iterateOverTree().forEach(node -> {
