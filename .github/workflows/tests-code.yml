@@ -523,7 +523,7 @@ jobs:
   # Guards against a committer (e.g. a dependabot wrapper bump) baking CRLF into
   # the committed gradlew.bat blob. .gitattributes stores it as LF and smudges it
   # to CRLF on checkout, so we inspect the committed blob, not the working-tree file.
-  line-endings:
+  line_endings:
     name: "Line endings (gradlew.bat)"
     runs-on: ubuntu-slim
     steps:
