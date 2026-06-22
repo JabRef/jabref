@@ -21,6 +21,11 @@
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/ltwa/LtwaRepository.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/ltwa/NormalizeUtils.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/ltwa/PrefixTree.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/BackgroundTask.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/DelayTaskThrottler.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/FallbackExceptionHandler.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/HeadlessExecutorService.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/TaskExecutor.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/strings/StringSimilarity.java
 
 //SOURCES ../../../../jablib/build/generated-src/antlr/main/org/jabref/logic/journals/ltwa/*.java
