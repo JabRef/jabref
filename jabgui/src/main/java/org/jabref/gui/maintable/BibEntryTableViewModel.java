@@ -154,6 +154,7 @@ public class BibEntryTableViewModel {
         return value;
     }
 
+    /// Cache the dependency array so each field binding can reuse it instead of rebuilding the same observable list.
     private Observable[] getFieldValueDependencies() {
         if (fieldValueDependencies == null) {
             Observable[] entryObservables = entry.getObservables();
