@@ -3,7 +3,9 @@ package org.jabref.gui.maintable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -265,15 +267,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void restoreConfiguredSortOrder(MainTablePreferences mainTablePreferences) {
-        List<TableColumn<BibEntryTableViewModel, ?>> restoredSortOrder = new java.util.ArrayList<>(mainTablePreferences.getColumnPreferences().getColumnSortOrder().stream()
-                                                                                                                                 .map(columnModel -> this.getColumns().stream()
-                                                                                                                                                         .map(column -> (MainTableColumn<?>) column)
-                                                                                                                                                         .filter(column -> column.getModel().equals(columnModel))
-                                                                                                                                                         .findFirst()
-                                                                                                                                                         .orElse(null))
-                                                                                                                                 .filter(column -> column != null)
-                                                                                                                                 .map(column -> (TableColumn<BibEntryTableViewModel, ?>) column)
-                                                                                                                                 .toList());
+        List<TableColumn<BibEntryTableViewModel, ?>> restoredSortOrder =
+                new ArrayList<>(mainTablePreferences.getColumnPreferences()
+                                                    .getColumnSortOrder()
+                                                    .stream()
+                                                    .map(columnModel ->
+                                                            this.getColumns().stream()
+                                                                .map(column -> (MainTableColumn<?>) column)
+                                                                .filter(column -> column.getModel().equals(columnModel))
+                                                                .findFirst()
+                                                                .orElse(null))
+                                                    .filter(Objects::nonNull)
+                                                    .map(column -> (TableColumn<BibEntryTableViewModel, ?>) column)
+                                                    .toList());
 
         if (restoredSortOrder.isEmpty()) {
             return;
