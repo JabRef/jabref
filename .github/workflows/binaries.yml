@@ -429,7 +429,7 @@ jobs:
       url: ${{ steps.url.outputs.url }}
     steps:
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           show-progress: 'false'
@@ -494,7 +494,7 @@ jobs:
     name: ${{ matrix.displayName }} installer and portable version
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
           submodules: 'true'
@@ -629,7 +629,7 @@ jobs:
           branch: main
       - name: Install pigz and cache (Linux)
         if: startsWith(matrix.os, 'ubuntu')
-        uses: awalsh128/cache-apt-pkgs-action@latest
+        uses: awalsh128/cache-apt-pkgs-action@v1.6.1
         with:
           packages: pigz
           version: 1.0

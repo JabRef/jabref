@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added auto-detection import for drag-and-dropped library files. [#15391](https://github.com/JabRef/jabref/issues/15391)
 - We added a preview style selection bar which shows the current preview style and allows to select a specific style without cycling through all of them. [#15820](https://github.com/JabRef/jabref/pull/15820)
 - We added the ability to view citation previews rendered using the selected style on hover in the "Citations" tab. [#15914](https://github.com/JabRef/jabref/pull/15914)
 - We added support for selecting answer engines and summarization algorithms, allowing users to change the underlying AI behavior. [#15688](https://github.com/JabRef/jabref/pull/15688)
@@ -34,6 +35,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We extended the per-fetcher timeout for fulltext PDF lookups from 10 to 120 seconds so fetchers that bounce through an institutional sign-in or a slow publisher CDN have a chance to complete. [#15877](https://github.com/JabRef/jabref/pull/15877)
 - When an imported entry has an empty citation key, it is generated. [#15624](https://github.com/JabRef/jabref/pull/15624)
 - We made the `Move file to directory` operation for Linked Files show every configured JabRef directory as possible options. [#12287](https://github.com/JabRef/jabref/issues/12287)
+- We reworked the entry editor tab preferences into a single "Editor tabs" list where you can show, hide, add, and remove both built-in and custom tabs. [#15998](https://github.com/JabRef/jabref/pull/15998)
 - We extended library pseudonymization to also pseudonymize group names, not just the entries. [#14117](https://github.com/JabRef/jabref/issues/14117)
 - We introduced a leightweight search engine without fulltext search in linked files as default variant. [#15599](https://github.com/JabRef/jabref/pull/15599)
 - Resolving of Math Subject Classification (MSC) needs to be activated in the references now. [#15883](https://github.com/JabRef/jabref/pull/15883)
@@ -41,6 +43,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where the global search dialog kept showing the previous entry preview when the search returned no results. [#15613](https://github.com/JabRef/jabref/issues/15613)
 - We fixed an issue where preferences referencing removed cleanup steps are now ignored instead of failing to load. [#15948](https://github.com/JabRef/jabref/pull/15948)
 - We fixed an issue where keyboard navigation shortcuts <kbd>Alt</kbd>+<kbd>Up</kbd>/<kbd>Alt</kbd>+<kbd>Down</kbd> in the entry editor did not preserve focus on the current field when switching between entries. [#14943](https://github.com/JabRef/jabref/issues/14943)
 - EndNote and Refer importers now respect the citation key preferences for unwanted characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
@@ -52,6 +55,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where non latin caseless author names being parsed as nameprefix instead of familyname. [#15813](https://github.com/JabRef/jabref/issues/15813)
 - We fixed an issue where `Quality-> Cleanup -> Rename PDF` together with `Moved linked files to file directory` would lead to an exception. [#15833](https://github.com/JabRef/jabref/issues/15833)
 - We fixed an issue where renaming a linked file with a very long title showed a misleading "file is being used by another process" error instead of renaming successfully. [#14771](https://github.com/JabRef/jabref/issues/14771)
+- We fixed an issue where JabRef would trigger `The libray has been changed` while still saving. [#4877](https://github.com/JabRef/jabref/issues/4877)
 
 ### Removed
 

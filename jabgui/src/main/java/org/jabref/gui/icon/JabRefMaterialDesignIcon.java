@@ -1,5 +1,6 @@
 package org.jabref.gui.icon;
 
+import org.jspecify.annotations.NullMarked;
 import org.kordamp.ikonli.Ikon;
 
 /// Provides the same true-type font interface as MaterialDesignIcon itself, but uses a font we created ourselves that
@@ -11,6 +12,7 @@ import org.kordamp.ikonli.Ikon;
 ///
 /// @see <a href="https://github.com/JabRef/jabref/wiki/Custom-SVG-Icons-for-JabRef">Tutorial on our Wiki</a>
 /// @see <a href="https://materialdesignicons.com/custom">Material Design Icon custom page</a>
+@NullMarked
 public enum JabRefMaterialDesignIcon implements Ikon {
 
     TEX_STUDIO("jab-texstudio", '\ue900'),
