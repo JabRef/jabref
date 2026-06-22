@@ -13,14 +13,15 @@ import org.jabref.gui.groups.GroupModeViewModel;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 
 public class GroupsSidePaneComponent extends SidePaneComponent {
     private final GroupsPreferences groupsPreferences;
     private final DialogService dialogService;
-    private final Button intersectionUnionToggle = IconTheme.JabRefIcons.GROUP_INTERSECTION.asButton();
-    private final ToggleButton filterToggle = IconTheme.JabRefIcons.FILTER.asToggleButton();
-    private final ToggleButton invertToggle = IconTheme.JabRefIcons.INVERT.asToggleButton();
+    private final Button intersectionUnionToggle = ControlHelper.iconButton(IconTheme.JabRefIcons.GROUP_INTERSECTION);
+    private final ToggleButton filterToggle = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.FILTER);
+    private final ToggleButton invertToggle = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.INVERT);
 
     public GroupsSidePaneComponent(SimpleCommand closeCommand,
                                    SimpleCommand moveUpCommand,

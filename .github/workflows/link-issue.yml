@@ -96,7 +96,7 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           show-progress: 'false'
       - uses: awalsh128/cache-apt-pkgs-action@v1.6.1

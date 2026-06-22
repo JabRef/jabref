@@ -169,6 +169,39 @@
       "type": "org.h2.store.fs.zip.FilePathZip"
     },
     {
+      "type": "org.jabref.logic.importer.fetcher.citation.opencitations.CitationItem",
+      "unsafeAllocated": true,
+      "fields": [
+        {
+          "name": "oci"
+        },
+        {
+          "name": "citing"
+        },
+        {
+          "name": "cited"
+        },
+        {
+          "name": "creation"
+        },
+        {
+          "name": "timespan"
+        },
+        {
+          "name": "journalSelfCitation"
+        },
+        {
+          "name": "authorSelfCitation"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "org.jabref.logic.journals.Abbreviation",
       "serializable": true
     },

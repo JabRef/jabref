@@ -2,6 +2,12 @@ name: JabKit Native Smoke Test
 
 on:
   workflow_dispatch:
+    inputs:
+      run-online-tests:
+        description: 'Run online JabKit smoke tests'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   actions: write
@@ -17,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -27,7 +33,7 @@ jobs:
           distribution: graalvm
 
       - name: Build JabKit native binary
-        run: ./gradlew :jabkit:nativeCompile
+        run: gradle :jabkit:nativeCompile
 
       - name: Install clitest
         uses: ethanjli/cached-download-action@v0.1.4
@@ -38,8 +44,12 @@ jobs:
       - name: Make clitest executable
         run: chmod +x /tmp/clitest
 
-      - name: Run JabKit native smoke tests
-        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit.md
+      - name: Run JabKit offline smoke tests
+        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline.md
+
+      - name: Run JabKit online smoke tests
+        if: ${{ inputs.run-online-tests }}
+        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-online.md
 
       - name: Upload JabKit native binary
         uses: actions/upload-artifact@v7

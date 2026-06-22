@@ -184,6 +184,11 @@ public class StudyRepository {
                     .collect(Collectors.toList());
     }
 
+    /// Returns all query definitions of the study, preserving catalog-specific overrides.
+    public List<StudyQuery> getStudyQueries() {
+        return study.getQueries();
+    }
+
     /// Extracts all active fetchers from the library entries.
     ///
     /// @return List of BibEntries of type Library
