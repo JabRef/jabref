@@ -15,7 +15,6 @@ import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.effect.Light;
 import javafx.scene.web.WebEngine;
 import javafx.stage.Window;
 
