@@ -24,6 +24,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The `jabkit check consistency` command now supports the `errorformat` output format (`file:line:column: message`), which is the default output format for both `check` subcommands. [#15759](https://github.com/JabRef/jabref/pull/15759)
 - The `jabkit check` subcommands now support a `github-actions` output format that emits findings as [GitHub Actions workflow commands](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#setting-an-error-message), so findings show up as annotations on pull requests. [#15789](https://github.com/JabRef/jabref/pull/15789)
 - The `jabkit check` command now runs both the consistency and integrity checks when given an input file without a subcommand (e.g. `jabkit check references.bib`). [#15759](https://github.com/JabRef/jabref/pull/15759)
+- We added an "arXiv DOI" cleanup that derives the [version-stable DOI](https://info.arxiv.org/help/doi.html) for arXiv entries and drops redundant eprint fields. [#TODO](https://github.com/JabRef/jabref/pull/TODO)
 - We added OCR feature using OCRmyPDF to extract text from scanned PDFs and create searchable PDFs including the extracted text. [#15712](https://github.com/JabRef/jabref/pull/15712)
 - We added generic CSV export filter that exports all standard BibTeX fields [#15711](https://github.com/JabRef/jabref/issues/15711)
 
@@ -34,6 +35,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We made the `Move file to directory` operation for Linked Files show every configured JabRef directory as possible options. [#12287](https://github.com/JabRef/jabref/issues/12287)
 - We extended library pseudonymization to also pseudonymize group names, not just the entries. [#14117](https://github.com/JabRef/jabref/issues/14117)
 - We introduced a leightweight search engine without fulltext search in linked files as default variant. [#15599](https://github.com/JabRef/jabref/pull/15599)
+- We moved arXiv handling out of the DOI cleanup into the dedicated "arXiv DOI" cleanup. [#TODO](https://github.com/JabRef/jabref/pull/TODO)
 
 ### Fixed
 
