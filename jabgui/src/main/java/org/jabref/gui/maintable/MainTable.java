@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
@@ -57,6 +56,7 @@ import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DragDrop;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
@@ -245,7 +245,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 })
         );
 
-        Platform.runLater(() -> restoreConfiguredSortOrder(mainTablePreferences));
+        UiTaskExecutor.runInJavaFXThread(() -> restoreConfiguredSortOrder(mainTablePreferences));
 
         // Store visual state
         new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences()).addListeners();
@@ -286,7 +286,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         }
 
         restoredSortOrder.forEach(column -> LOGGER.trace("Adding sort order for col {} ", column));
-        restoredSortOrder.add(0, getColumns().getFirst());
+        restoredSortOrder.addFirst(getColumns().getFirst());
         this.getSortOrder().setAll(restoredSortOrder);
     }
 
