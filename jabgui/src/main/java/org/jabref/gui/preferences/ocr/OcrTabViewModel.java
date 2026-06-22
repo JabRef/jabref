@@ -11,9 +11,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.util.BackgroundTask;
@@ -36,14 +36,17 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     private final StringProperty ocrPath = new SimpleStringProperty();
 
     private final DialogService dialogService;
-    private final GuiPreferences preferences;
+    private final FilePreferences filePreferences;
     private final OcrPreferences ocrPreferences;
     private final TaskExecutor taskExecutor;
 
-    public OcrTabViewModel(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
+    public OcrTabViewModel(DialogService dialogService,
+                           FilePreferences filePreferences,
+                           OcrPreferences ocrPreferences,
+                           TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
-        this.preferences = preferences;
-        this.ocrPreferences = preferences.getOcrPreferences();
+        this.filePreferences = filePreferences;
+        this.ocrPreferences = ocrPreferences;
         this.taskExecutor = taskExecutor;
     }
 
@@ -64,7 +67,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     public void browseEnginePath() {
         Optional<Path> selectedPath = dialogService.showFileOpenDialog(
                 new FileDialogConfiguration.Builder()
-                        .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
+                        .withInitialDirectory(filePreferences.getWorkingDirectory())
                         .build());
         selectedPath.ifPresent(path -> ocrPathProperty().set(path.toString()));
     }
