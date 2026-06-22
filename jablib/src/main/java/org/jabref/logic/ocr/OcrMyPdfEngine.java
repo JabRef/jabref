@@ -58,13 +58,6 @@ public class OcrMyPdfEngine implements OcrEngine {
         }
     }
 
-    /// Gets the path of the engine
-    ///
-    /// @return the path of the engine as a list of strings to be passed to the process builder.
-    private ArrayList<String> getExecutablePath() {
-        return StringUtil.splitCommandRespectingQuotes(ocrPreferences.getOcrPath());
-    }
-
     /// OCRmyPDF writes the searchable PDF to a new file alongside the original file.
     ///
     /// Example: document.pdf -> document_ocr.pdf.
