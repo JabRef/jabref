@@ -49,6 +49,15 @@ class ArXivDoiCleanupTest {
                                 .withField(StandardField.EPRINT, "2106.12345v2")
                                 .withField(StandardField.EPRINTTYPE, "arxiv")),
 
+                // Rule 1: a present-but-invalid DOI is treated as missing and overwritten from the eprint
+                Arguments.of(
+                        new BibEntry()
+                                .withField(StandardField.DOI, "10.48550/arxiv.2106.12345"),
+                        new BibEntry()
+                                .withField(StandardField.DOI, "not-a-valid-doi")
+                                .withField(StandardField.EPRINT, "2106.12345")
+                                .withField(StandardField.EPRINTTYPE, "arxiv")),
+
                 // Rule 3: a real (non-arXiv) DOI alongside an arXiv eprint -> keep both
                 Arguments.of(
                         new BibEntry()

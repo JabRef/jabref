@@ -23,7 +23,7 @@ import org.jabref.model.entry.identifier.DOI;
 /// See the [arXiv DOI documentation](https://info.arxiv.org/help/doi.html).
 ///
 /// Rules:
-///  1. eprint holds an arXiv ID and the DOI field is empty -> create the DOI from the eprint.
+///  1. eprint holds an arXiv ID and there is no valid DOI (absent or unparseable) -> create the DOI from the eprint.
 ///  2. the DOI field holds an arXiv DOI matching the eprint -> drop the redundant eprint fields.
 ///  3. otherwise (e.g. a real publisher DOI next to an arXiv eprint, or no arXiv data) -> keep both.
 ///
@@ -72,8 +72,11 @@ public class ArXivDoiCleanup implements CleanupJob {
         Optional<ArXivIdentifier> eprint = entry.getField(StandardField.EPRINT)
                                                 .flatMap(ArXivIdentifier::parse);
 
-        // Rule 1: create the DOI from the arXiv eprint if no DOI is present yet.
-        if (eprint.isPresent() && entry.getField(StandardField.DOI).isEmpty()) {
+        // Rule 1: create the DOI from the arXiv eprint if there is no valid DOI yet. A present-but-invalid
+        // doi value (garbage that DOI.parse rejects) is treated as missing and gets overwritten; a valid
+        // non-arXiv publisher DOI parses successfully and is preserved (rule 3).
+        boolean noValidDoi = entry.getField(StandardField.DOI).flatMap(DOI::parse).isEmpty();
+        if (eprint.isPresent() && noValidDoi) {
             eprint.flatMap(ArXivIdentifier::inferDOI)
                   .ifPresent(inferredDoi -> entry.setField(StandardField.DOI, inferredDoi.asString())
                                                  .ifPresent(changes::add));
