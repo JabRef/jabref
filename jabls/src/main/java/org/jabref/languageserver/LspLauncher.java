@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
@@ -47,12 +48,12 @@ public class LspLauncher extends Thread {
         this.messageHandler = messageHandler;
     }
 
-    public LspLauncher(RemoteMessageHandler messageHandler, CliPreferences cliPreferences, int port) {
-        this(messageHandler, cliPreferences, JournalAbbreviationLoader.loadRepository(cliPreferences.getAbbreviationPreferences()), cliPreferences.getCustomEntryTypesRepository(), port);
+    public LspLauncher(RemoteMessageHandler messageHandler, CliPreferences cliPreferences, Connection connection, int port) {
+        this(messageHandler, cliPreferences, JournalAbbreviationLoader.loadRepository(cliPreferences.getAbbreviationPreferences(), connection), cliPreferences.getCustomEntryTypesRepository(), port);
     }
 
-    public LspLauncher(JabRefCliPreferences instance, Integer port) {
-        this(_ -> LOGGER.warn("LSP cannot handle UICommands in standalone mode."), instance, port);
+    public LspLauncher(JabRefCliPreferences instance, Connection connection, Integer port) {
+        this(_ -> LOGGER.warn("LSP cannot handle UICommands in standalone mode."), instance, connection, port);
         this.standalone = true;
     }
 

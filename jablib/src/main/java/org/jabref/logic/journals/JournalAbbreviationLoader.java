@@ -2,9 +2,14 @@ package org.jabref.logic.journals;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -15,9 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 ///
-/// This class loads abbreviations from a CSV file and stores them into a MV file ({@link #readAbbreviationsFromCsvFile(Path)}
-/// It can also create an {@link JournalAbbreviationRepository} based on an MV file ({@link #loadRepository(AbbreviationPreferences)}.
+/// This class loads abbreviations and populates the Postgres database for use by {@link JournalAbbreviationRepository}.
 ///
+/// Built-in abbreviations are loaded from a bundled SQL file (`journal-list.sql`) into Postgres.
+/// Custom abbreviations from external CSV files are loaded in memory via {@link JournalAbbreviationRepository#addCustomAbbreviations}.
 ///
 /// Abbreviations are available at <a href="https://github.com/JabRef/abbrv.jabref.org/">https://github.com/JabRef/abbrv.jabref.org/</a>.
 ///
@@ -32,31 +38,28 @@ public class JournalAbbreviationLoader {
         return parser.getAbbreviations();
     }
 
-    public static JournalAbbreviationRepository loadRepository(AbbreviationPreferences abbreviationPreferences) {
+    public static JournalAbbreviationRepository loadRepository(AbbreviationPreferences abbreviationPreferences,
+                                                               Connection connection) {
+        if (connection == null) {
+            LOGGER.warn("No Postgres connection available; using demonstration journal repository");
+            return new JournalAbbreviationRepository();
+        }
+
         JournalAbbreviationRepository repository;
 
-        // Initialize with built-in list
-        try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/journal-list.mv")) {
-            if (resourceAsStream == null) {
-                LOGGER.warn("There is no journal-list.mv. We use a default journal list.");
-                repository = new JournalAbbreviationRepository();
-            } else {
-                Path tempDir = Files.createTempDirectory("jabref-journal");
-                Path tempJournalList = tempDir.resolve("journal-list.mv");
-                Files.copy(resourceAsStream, tempJournalList);
-                repository = new JournalAbbreviationRepository(tempJournalList, loadLtwaRepository());
-                tempDir.toFile().deleteOnExit();
-                tempJournalList.toFile().deleteOnExit();
-                LOGGER.debug("Loaded journal abbreviations from {}", tempJournalList.toAbsolutePath());
-            }
-        } catch (IOException e) {
+        // Initialize built-in abbreviations in Postgres
+        try {
+            populateDatabase(connection);
+            LtwaRepository ltwaRepository = loadLtwaRepository();
+            repository = new JournalAbbreviationRepository(connection, ltwaRepository);
+            LOGGER.debug("Loaded journal abbreviations from Postgres");
+        } catch (IOException | SQLException e) {
             LOGGER.error("Error while loading journal abbreviation repository", e);
             return null;
         }
 
         // Read external lists
         List<String> lists = abbreviationPreferences.getExternalJournalLists();
-        // might produce NPE in tests
         if (lists != null && !lists.isEmpty()) {
             // reversing ensures that the latest lists overwrites the former one
             Collections.reverse(lists);
@@ -72,8 +75,32 @@ public class JournalAbbreviationLoader {
         return repository;
     }
 
+    /// Populates the Postgres database with the built-in journal abbreviation list.
+    /// The SQL file is bundled as a resource and contains CREATE TABLE + INSERT statements.
+    /// Uses `ON CONFLICT` so it is safe to call multiple times (idempotent).
+    private static void populateDatabase(Connection connection) throws IOException, SQLException {
+        // Skip if table already exists — safe for parallel test execution
+        try (ResultSet tables = connection.getMetaData().getTables(null, null, "journal_abbreviation", null)) {
+            if (tables.next()) {
+                LOGGER.debug("Journal abbreviation table already exists, skipping population");
+                return;
+            }
+        }
+        try (InputStream resourceAsStream = JournalAbbreviationLoader.class.getResourceAsStream("/journals/journal-list.sql")) {
+            if (resourceAsStream == null) {
+                LOGGER.warn("There is no journal-list.sql. Skipping built-in abbreviation loading.");
+                return;
+            }
+            String sql = new String(resourceAsStream.readAllBytes(), StandardCharsets.UTF_8);
+            try (Statement stmt = connection.createStatement()) {
+                stmt.execute(sql);
+            }
+            LOGGER.debug("Populated journal abbreviation table from journal-list.sql");
+        }
+    }
+
     private static LtwaRepository loadLtwaRepository() throws IOException {
-        try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/ltwa-list.mv")) {
+        try (InputStream resourceAsStream = JournalAbbreviationLoader.class.getResourceAsStream("/journals/ltwa-list.mv")) {
             if (resourceAsStream == null) {
                 LOGGER.warn("There is no ltwa-list.mv. We cannot load the LTWA repository.");
                 throw new IOException("LTWA repository not found");
@@ -89,7 +116,8 @@ public class JournalAbbreviationLoader {
         }
     }
 
-    public static JournalAbbreviationRepository loadBuiltInRepository() {
-        return loadRepository(new AbbreviationPreferences(List.of(), true, false));
+    /// Loads the built-in repository using the given connection. Used for testing.
+    public static JournalAbbreviationRepository loadBuiltInRepository(Connection connection) {
+        return loadRepository(new AbbreviationPreferences(List.of(), true, false), connection);
     }
 }

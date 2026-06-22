@@ -3,7 +3,6 @@ package org.jabref.logic.cleanup;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -45,9 +44,8 @@ public class UnabbreviateJournalCleanup implements CleanupJob {
             return changes;
         }
 
-        String text = entry.getFieldLatexFree(field).orElse("");
-        String origText = text;
-        text = database.resolveForStrings(origText);
+        String origText = entry.getField(field).orElse("");
+        String text = database.resolveForStrings(origText);
 
         if (!journalAbbreviationRepository.isKnownName(text)) {
             return List.of(); // Cannot do anything if it is not known.
@@ -57,8 +55,14 @@ public class UnabbreviateJournalCleanup implements CleanupJob {
             return List.of(); // Cannot unabbreviate unabbreviated name.
         }
 
-        Abbreviation abbreviation = journalAbbreviationRepository.get(text).orElseThrow();
-        String newText = abbreviation.getName().replaceAll("(?<!\\\\)&", "\\\\&");
+        String newText = journalAbbreviationRepository.getFullName(text)
+                                                      .map(name -> name.replaceAll("(?<!\\\\)&", "\\\\&"))
+                                                      .orElse(origText);
+
+        if (newText.equals(origText)) {
+            return List.of();
+        }
+
         entry.setField(field, newText);
         changes.add(new FieldChange(entry, field, origText, newText));
         return changes;

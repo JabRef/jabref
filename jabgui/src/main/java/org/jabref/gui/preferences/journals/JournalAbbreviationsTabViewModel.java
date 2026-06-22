@@ -20,6 +20,7 @@ import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.sqlbased.PostgreServer;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -317,9 +318,12 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                         shouldWriteLists = false;
                     }
                 })
-                .onSuccess(_ -> Injector.setModelOrService(
-                        JournalAbbreviationRepository.class,
-                        JournalAbbreviationLoader.loadRepository(abbreviationsPreferences)))
+                .onSuccess(_ -> {
+                    PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
+                    Injector.setModelOrService(
+                            JournalAbbreviationRepository.class,
+                            JournalAbbreviationLoader.loadRepository(abbreviationsPreferences, postgreServer.getConnection()));
+                })
                 .onFailure(exception -> LOGGER.error("Failed to store journal preferences.", exception))
                 .executeWith(taskExecutor);
     }

@@ -27,7 +27,7 @@ public class AbbreviationParser {
      *
      * @param file Path the given file
      */
-    void readJournalListFromFile(Path file) throws IOException {
+    public void readJournalListFromFile(Path file) throws IOException {
         char delimiter = detectDelimiter(file);
 
         try (CSVParser csvParser = new CSVParser(Files.newBufferedReader(file, StandardCharsets.UTF_8), AbbreviationFormat.getCSVFormatWithDelimiter(delimiter))) {

@@ -57,7 +57,6 @@ import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.journals.AbbreviationPreferences;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
@@ -102,6 +101,7 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.google.common.annotations.VisibleForTesting;
@@ -799,7 +799,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getXmpPreferences().setAll(XmpPreferences.getDefault());
         getProtectedTermsPreferences().setAll(ProtectedTermsPreferences.getDefault());
         getGrobidPreferences().setAll(GrobidPreferences.getDefault());
-        getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences())).setAll(
+        getOpenOfficePreferences(Injector.instantiateModelOrService(JournalAbbreviationRepository.class)).setAll(
                 OpenOfficePreferences.getDefault());
         getGitPreferences().setAll(GitPreferences.getDefault());
     }
@@ -841,7 +841,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getXmpPreferences().setAll(getXmpPreferencesFromBackingStore(getXmpPreferences()));
         getProtectedTermsPreferences().setAll(getProtectedTermsPreferencesFromBackingStore(getProtectedTermsPreferences()));
         getGrobidPreferences().setAll(getGrobidPreferencesFromBackingStore(getGrobidPreferences()));
-        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences());
+        JournalAbbreviationRepository repository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
         getOpenOfficePreferences(repository).setAll(
                 getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
         getGitPreferences().setAll(getGitPreferencesFromBackingStore(getGitPreferences()));

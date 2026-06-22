@@ -16,12 +16,13 @@ import org.jabref.logic.integrity.IntegrityCheckResultErrorFormatWriter;
 import org.jabref.logic.integrity.IntegrityCheckResultGitHubActionsWriter;
 import org.jabref.logic.integrity.IntegrityCheckResultWriter;
 import org.jabref.logic.integrity.IntegrityMessage;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.toolkit.exception.ImportServiceException;
 import org.jabref.toolkit.service.ImportService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -77,7 +78,7 @@ class CheckIntegrity implements Callable<Integer> {
                 databaseContext,
                 jabKit.cliPreferences.getFilePreferences(),
                 jabKit.cliPreferences.getCitationKeyPatternPreferences(),
-                JournalAbbreviationLoader.loadRepository(jabKit.cliPreferences.getAbbreviationPreferences()),
+                Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                 allowIntegerEdition
         );
 

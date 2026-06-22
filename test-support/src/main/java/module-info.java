@@ -9,6 +9,8 @@ open module org.jabref.testsupport {
     requires org.junit.platform.commons;
 
     requires static com.fasterxml.jackson.annotation;
+    requires java.sql;
+    requires embedded.postgres;
 
     exports org.jabref.support;
 }
