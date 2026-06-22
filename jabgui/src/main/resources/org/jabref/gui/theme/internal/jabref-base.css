@@ -17,12 +17,10 @@
     * {
         -jr-theme: #50618F;
         -jr-selected: #A3B7E6;
-        -jr-hover: #0002;
 
         -jr-icon-background-active: #0001;
         -jr-icon-background-armed: #0002;
 
-        -jr-background-alt: #F0F0F0;
         -jr-search-background: #FBFBFB;
 
         -jr-group-hits-bg: #6F6F6F;
@@ -51,12 +49,10 @@
     * {
         -jr-theme: #2C9490;
         -jr-selected: #255652;
-        -jr-hover: #FFF1;
 
         -jr-icon-background-active: #FFF1;
         -jr-icon-background-armed: #FFF2;
 
-        -jr-background-alt: #151924;
         -jr-search-background: #2C2E3B;
 
         -jr-group-hits-bg: #151924;
@@ -83,8 +79,8 @@
 
 /* JabRef variables and colors */
 .root {
-    -jr-white: #ffffff;
-    -jr-gray-1: #dddddd;
+    -jr-white: #FFFFFF;
+    -jr-gray-1: #DDDDDD;
     -jr-gray-2: #808080;
     -jr-gray-3: #404040;
     -jr-black: #000;
@@ -248,13 +244,6 @@
     -fx-background-color: -fx-control-inner-background-alt;
 }
 
-#groupTree .numberColumn > .hits:any-selected {
-    -fx-background-color: derive(-jr-green, 70%);
-}
-
-#groupTree .numberColumn > .hits:all-selected {
-    -fx-background-color: -jr-green;
-}
 
 .global-search-bar .toggle-button .glyph-icon {
     -fx-icon-color: derive(-fx-text-base-color, 80%);
@@ -290,10 +279,6 @@
 
 .updated {
     -rtfx-background-color: rgba(41, 166, 236, 0.66);
-}
-
-#frame {
-    -fx-background-color: -jr-background-alt;
 }
 
 .glyph-icon {
@@ -807,11 +792,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -jr-selected;
 }
 
-.main-table .table-row-cell:matching-search-and-groups:selected:hover,
-.main-table .table-row-cell:matching-search-and-groups:hover {
-    -fx-background-color: -jr-hover;
-}
-
 .main-table .table-row-cell:matching-search-and-groups > .table-cell,
 .main-table .table-row-cell:matching-search-and-groups > .table-cell > .ikonli-font-icon {
     -fx-text-fill: -jr-match-1-text-color;
@@ -841,11 +821,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 .main-table .table-row-cell:matching-search-not-groups:selected {
     -fx-background-color: -jr-selected;
-}
-
-.main-table .table-row-cell:matching-search-not-groups:selected:hover,
-.main-table .table-row-cell:matching-search-not-groups:hover {
-    -fx-background-color: -jr-hover;
 }
 
 .main-table .table-row-cell:matching-search-not-groups > .table-cell,
@@ -879,11 +854,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -jr-selected;
 }
 
-.main-table .table-row-cell:matching-groups-not-search:selected:hover,
-.main-table .table-row-cell:matching-groups-not-search:hover {
-    -fx-background-color: -jr-hover;
-}
-
 .main-table .table-row-cell:matching-groups-not-search > .table-cell,
 .main-table .table-row-cell:matching-groups-not-search > .table-cell > .ikonli-font-icon {
     -fx-text-fill: -jr-match-3-text-color;
@@ -915,11 +885,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-color: -jr-selected;
 }
 
-.main-table .table-row-cell:not-matching-search-and-groups:selected:hover,
-.main-table .table-row-cell:not-matching-search-and-groups:hover {
-    -fx-background-color: -jr-hover;
-}
-
 .main-table .table-row-cell:not-matching-search-and-groups > .table-cell,
 .main-table .table-row-cell:not-matching-search-and-groups > .table-cell > .ikonli-font-icon {
     -fx-text-fill: -jr-match-4-text-color;
@@ -935,6 +900,17 @@ We want to have a look that matches our icons in the tool-bar */
 .main-table .table-row-cell:not-matching-search-and-groups:hover > .table-cell > .ikonli-font-icon,
 .main-table .table-row-cell:not-matching-search-and-groups:selected:focused:hover > .table-cell > .ikonli-font-icon {
     -fx-icon-color: derive(-jr-match-4-text-color, 10%);
+}
+
+.main-table .table-row-cell:matching-search-and-groups:selected:hover,
+.main-table .table-row-cell:matching-search-and-groups:hover,
+.main-table .table-row-cell:matching-search-not-groups:selected:hover,
+.main-table .table-row-cell:matching-search-not-groups:hover,
+.main-table .table-row-cell:matching-groups-not-search:selected:hover,
+.main-table .table-row-cell:matching-groups-not-search:hover,
+.main-table .table-row-cell:not-matching-search-and-groups:selected:hover,
+.main-table .table-row-cell:not-matching-search-and-groups:hover {
+    -fx-background-color: -fx-outer-border;
 }
 
 .rating > .container {
@@ -1073,7 +1049,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* donation toast */
 .donation-toast {
-    -fx-background-color: -jr-background-alt;
     -fx-background-radius: 0.8333333333em;
     -fx-padding: 0.8333em 1em;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.075), 20, 0.25, 0, 6);
@@ -1247,7 +1222,6 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #entryEditor .tool-bar {
-    -fx-background-color: -jr-background-alt;
     -fx-background-insets: 0;
 }
 
@@ -1439,9 +1413,87 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -fx-text-base-color;
 }
 
+/* ImportEntriesDialog */
+
+#importEntriesDialog .addEntryButton {
+    -fx-font-size: 2em;
+}
+
+#importEntriesDialog .addEntryButton:selected {
+    -fx-background-color: transparent;
+    -fx-fill: -jr-selected;
+}
+
+#importEntriesDialog .entry-container {
+    -fx-padding: 0.5em 0em 0.5em 0em;
+}
+
+/* ManageStudyDefinition */
+
+.slr-tab {
+    -fx-padding: 1em;
+}
+
+/* MultiMergeEntries */
+
+#multiMergeEntries .text-changed {
+    -fx-fill: -jr-orange;
+}
+
+#multiMergeEntries .text-added {
+    -fx-fill: -jr-green;
+}
+
+#multiMergeEntries .text-removed {
+    -fx-fill: -jr-red;
+}
+
+#multiMergeEntries .grid-pane {
+    -fx-hgap: 10;
+    -fx-vgap: 10;
+}
+
+#multiMergeEntries .toggle-button {
+    -fx-border-insets: 0;
+    -fx-background-insets: 0;
+    -fx-border-image-insets: 0;
+    -fx-padding: 0.5em;
+    -fx-background-radius: 0;
+}
+
+#multiMergeEntries .box {
+    -fx-spacing: 10;
+}
+
+/* ParseLatexResult */
+
+#parseLatexResultDialog > .split-pane > .split-pane-divider {
+    -fx-padding: 0 4 0 4;
+    -fx-background-color: transparent;
+}
+
+#parseLatexResultDialog .button-bar > .container {
+    -fx-border-width: 1 0 0 0;
+}
+
+#parseLatexResultDialog .parse-latex-reference-text {
+    -fx-fill: -fx-accent;
+}
+
+/* PreferenceDialog */
+
+#preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-padding: 8;
+    -fx-background: -fx-control-inner-background-alt;
+}
+
 /* GroupTree */
 
-#groupTree .tree-table-cell {
+#groupTree > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell {
+    -fx-background: -fx-control-inner-background-alt;
+}
+
+#groupTree > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell > .tree-table-cell {
     -fx-padding: 0.35em 0em 0.25em 0em;
 }
 
@@ -1557,85 +1609,17 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-size: 2em;
 }
 
-/* ImportEntriesDialog */
-
-#importEntriesDialog .addEntryButton {
-    -fx-font-size: 2em;
+#groupTree .numberColumn > .hits:any-selected {
+    -fx-background-color: derive(-jr-green, 70%);
 }
 
-#importEntriesDialog .addEntryButton:selected {
-    -fx-background-color: transparent;
-    -fx-fill: -jr-selected;
-}
-
-#importEntriesDialog .entry-container {
-    -fx-padding: 0.5em 0em 0.5em 0em;
-}
-
-/* ManageStudyDefinition */
-
-.slr-tab {
-    -fx-padding: 1em;
-}
-
-/* MultiMergeEntries */
-
-#multiMergeEntries .text-changed {
-    -fx-fill: -jr-orange;
-}
-
-#multiMergeEntries .text-added {
-    -fx-fill: -jr-green;
-}
-
-#multiMergeEntries .text-removed {
-    -fx-fill: -jr-red;
-}
-
-#multiMergeEntries .grid-pane {
-    -fx-hgap: 10;
-    -fx-vgap: 10;
-}
-
-#multiMergeEntries .toggle-button {
-    -fx-border-insets: 0;
-    -fx-background-insets: 0;
-    -fx-border-image-insets: 0;
-    -fx-padding: 0.5em;
-    -fx-background-radius: 0;
-}
-
-#multiMergeEntries .box {
-    -fx-spacing: 10;
-}
-
-/* ParseLatexResult */
-
-#parseLatexResultDialog > .split-pane > .split-pane-divider {
-    -fx-padding: 0 4 0 4;
-    -fx-background-color: transparent;
-}
-
-#parseLatexResultDialog .button-bar > .container {
-    -fx-border-width: 1 0 0 0;
-}
-
-#parseLatexResultDialog .parse-latex-reference-text {
-    -fx-fill: -fx-accent;
-}
-
-/* PreferenceDialog */
-
-#preferencesDialog #preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell {
-    -fx-padding: 8;
+#groupTree .numberColumn > .hits:all-selected {
+    -fx-background-color: -jr-green;
 }
 
 #preferencesDialog .button-bar > .container {
     -fx-border-width: 1 0 0 0;
-}
-
-#preferencesDialog #preferenceTabList > .virtual-flow > .clipped-container > .sheet > .list-cell:filled {
-    -fx-background: -fx-control-inner-background;
+    -fx-border-color: -fx-background;
 }
 
 #preferencesDialog > .split-pane > .split-pane-divider {
@@ -1771,11 +1755,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 #citationRelationsTab .entry-container {
     -fx-padding: 0.5em 0em 0.5em 0em;
-}
-
-/* JournalInfo */
-.journalInfo {
-    -fx-background-color: -jr-background-alt;
 }
 
 .journalInfo .info-heading {
@@ -1957,7 +1936,6 @@ journalInfo .grid-cell-b {
 }
 
 .quick-settings-button:hover {
-    -fx-background-color: -jr-hover;
     -fx-border-color: -fx-accent;
 }
 
@@ -1997,117 +1975,6 @@ journalInfo .grid-cell-b {
 
 .theme-option:hover {
     -fx-background-color: rgba(0, 0, 0, 0.05);
-}
-
-/* Wireframe base styles */
-.wireframe-container {
-    -fx-border-width: 0.0625em;
-    -fx-border-radius: 0.25em;
-    -fx-background-radius: 0.25em;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 0.125em, 0.0, 0, 0.0625em);
-}
-
-.wireframe-menubar {
-    -fx-padding: 0.1875em 0.0625em;
-    -fx-background-color: -jr-wf-menubar-bg;
-}
-
-.wireframe-menu-item {
-    -fx-border-radius: 0.0625em;
-    -fx-background-radius: 0.0625em;
-    -fx-background-color: -jr-wf-menu-item-bg;
-}
-
-.wireframe-toolbar {
-    -fx-padding: 0.125em;
-    -fx-spacing: 0.375em;
-    -fx-background-color: -jr-wf-toolbar-bg;
-}
-
-.wireframe-tool-item {
-    -fx-border-radius: 0.0625em;
-    -fx-background-radius: 0.0625em;
-    -fx-background-color: -jr-wf-tool-item-bg;
-}
-
-.wireframe-search {
-    -fx-border-width: 0.03125em;
-    -fx-border-radius: 0.125em;
-    -fx-background-radius: 0.125em;
-    -fx-background-color: -jr-wf-search-bg;
-    -fx-border-color: -jr-wf-search-border;
-}
-
-.wireframe-search-field {
-    -fx-border-radius: 0.0625em;
-    -fx-background-radius: 0.0625em;
-    -fx-background-color: -jr-wf-search-field-bg;
-}
-
-.wireframe-sidebar {
-    -fx-padding: 0.25em 0.125em;
-    -fx-background-color: -jr-wf-sidebar-bg;
-}
-
-.wireframe-sidebar-item {
-    -fx-border-radius: 0.0625em;
-    -fx-background-radius: 0.0625em;
-    -fx-background-color: -jr-wf-sidebar-item-bg;
-}
-
-.wireframe-welcome-tab-area {
-    -fx-padding: 0.25em;
-    -fx-alignment: center;
-    -fx-background-color: -jr-wf-welcome-area-bg;
-}
-
-.wireframe-welcome-tab-item {
-    -fx-border-radius: 0.0625em;
-    -fx-background-radius: 0.0625em;
-    -fx-background-color: -jr-wf-welcome-item-bg;
-}
-
-/* Other color scheme */
-.wireframe-light {
-    -jr-wf-menubar-bg: #f9f9f9;
-    -jr-wf-menu-item-bg: -jr-gray-1;
-    -jr-wf-toolbar-bg: #f9f9f9;
-    -jr-wf-tool-item-bg: -jr-theme;
-    -jr-wf-search-bg: -jr-white;
-    -jr-wf-search-border: #dddddd;
-    -jr-wf-search-field-bg: #f8f8f8;
-    -jr-wf-sidebar-bg: -jr-gray-1;
-    -jr-wf-sidebar-item-bg: -jr-theme;
-    -jr-wf-welcome-area-bg: #f3f3f3;
-    -jr-wf-welcome-item-bg: #dddddd;
-}
-
-.wireframe-dark {
-    -jr-wf-menubar-bg: #141824;
-    -jr-wf-menu-item-bg: #424758;
-    -jr-wf-toolbar-bg: #141824;
-    -jr-wf-tool-item-bg: #2c9490;
-    -jr-wf-search-bg: #2c2e3b;
-    -jr-wf-search-border: #424758;
-    -jr-wf-search-field-bg: #424758;
-    -jr-wf-sidebar-bg: #212330;
-    -jr-wf-sidebar-item-bg: #2c9490;
-    -jr-wf-welcome-area-bg: #272b38;
-    -jr-wf-welcome-item-bg: #7d8591;
-}
-
-.wireframe-custom {
-    -jr-wf-menubar-bg: #f5ffe5;
-    -jr-wf-menu-item-bg: #346963;
-    -jr-wf-toolbar-bg: #f5ffe5;
-    -jr-wf-tool-item-bg: #2E838C;
-    -jr-wf-search-bg: -jr-white;
-    -jr-wf-search-border: #2E838C;
-    -jr-wf-search-field-bg: #f0f3ff;
-    -jr-wf-sidebar-bg: #e1ebd1;
-    -jr-wf-sidebar-item-bg: #2E838C;
-    -jr-wf-welcome-area-bg: #E8F2D8;
-    -jr-wf-welcome-item-bg: #2E838C;
 }
 
 /* Quick Settings: Optimization Checkboxes */
@@ -2155,11 +2022,6 @@ journalInfo .grid-cell-b {
     -fx-background-color: transparent;
 }
 
-/* Tooltip Content */
-.walkthrough-tooltip-content-container {
-    -fx-background-color: -jr-background-alt;
-}
-
 .walkthrough-tooltip-content-container {
     -fx-spacing: 1em;
     -fx-padding: 1em;
@@ -2182,7 +2044,6 @@ journalInfo .grid-cell-b {
 .walkthrough-side-panel-horizontal {
     -fx-spacing: 1em;
     -fx-padding: 2em;
-    -fx-background-color: -jr-background-alt;
 }
 
 .walkthrough-side-panel-vertical {

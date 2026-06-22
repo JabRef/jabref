@@ -10,7 +10,7 @@
 @media (prefers-color-scheme: light) {
     * {
         -jr-base: #EBEBEB;
-        -jr-background: #F0F0F0;
+        -jr-background: #FFFFFF;
         -jr-accent: #A3B7E6;
 
         -jr-checked: #50618F;
@@ -24,14 +24,14 @@
         -jr-inner-bg: #FEFEFE;
         -jr-mid-text-color: #404040;
         -jr-light-text-color: #FFFFFF;
-        -jr-outer-border: #DFDFDF;
+        -jr-outer-border: #DDDDDD;
     }
 }
 
 @media (prefers-color-scheme: dark) {
     * {
         -jr-base: #141824;
-        -jr-background: #323C5B;
+        -jr-background: #000000;
         -jr-accent: #255652;
 
         -jr-checked: #2C9490;
@@ -141,7 +141,6 @@
     -fx-background: -fx-default-button;
 }
 
-
 /* JavaFX ToggleButton */
 .toggle-button:hover,
 .toggle-button:selected:hover {
@@ -191,7 +190,7 @@
 .radio-button > .radio {
     -fx-background-radius: 1.0em; /* large value to make sure this remains circular */
     -fx-padding: 0.35em; /* padding from outside edge to the inner dot */
-    -fx-background-color: rgba(0, 0, 0, 0.54), -jr-inner-bg;
+    -fx-background-color: -jr-scrollbar-thumb, -jr-inner-bg;
     -fx-background-insets: 0, 0.125em;
     -fx-text-fill: -fx-text-base-color;
 }
@@ -344,8 +343,8 @@ TextFlow > .tooltip-text-monospaced {
 .menu-bar > .container > .menu-button:hover,
 .menu-bar > .container > .menu-button:focused,
 .menu-bar > .container > .menu-button:showing {
-    -fx-background-color: -jr-hover;
-    -fx-background: -jr-hover;
+    -fx-background: -jr-outer-border;
+    -fx-background-color: -fx-background;
 }
 
 .menu-bar > .container > .menu-button:hover > .label,
@@ -363,9 +362,9 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .menu-item:focused {
-    -fx-text-fill: -jr-hover;
-    -fx-background: -jr-hover;
-    -fx-background-color: -jr-hover;
+    -fx-text-fill: -jr-outer-border;
+    -fx-background: -jr-outer-border;
+    -fx-background-color: -fx-background;
 }
 
 .menu-item:focused > .label {
@@ -404,7 +403,7 @@ TextFlow > .tooltip-text-monospaced {
 .tab-pane > .tab-header-area > .headers-region > .tab {
     -fx-background-insets: 0;
     -fx-background-radius: 0;
-    -fx-background-color: -jr-background-alt;
+    -fx-background-color: -jr-outer-border;
     -fx-border-color: -jr-outer-border;
     -fx-border-width: 0.5 0.5 0.5 0.5;
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
@@ -443,7 +442,7 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .tab-pane > .tab-header-area > .tab-header-background {
-    -fx-background-color: -jr-background-alt;
+    -fx-background-color: -jr-outer-border;
 }
 
 .tab-pane > .tab-header-area {
@@ -619,7 +618,7 @@ TextFlow > .tooltip-text-monospaced {
 .text-input {
     -fx-background-color: -jr-outer-border, -jr-inner-bg;
     -fx-background-insets: 0, 1;
-    -fx-prompt-text-fill: #808080;
+    -fx-prompt-text-fill: -jr-scrollbar-thumb;
 }
 
 .text-input:focused {
@@ -691,9 +690,10 @@ TextFlow > .tooltip-text-monospaced {
 .tree-table-row-cell:filled:hover,
 .table-row-cell:filled:hover,
 .tree-table-row-cell:filled:hover {
-    -fx-background-color: -jr-hover;
-    -fx-fill: -jr-light-text-color;
-    -fx-text-fill: -jr-light-text-color;
+    -fx-background: -jr-outer-border;
+    -fx-background-color: -fx-background;
+    /*-fx-fill: -jr-light-text-color;*/
+    /*-fx-text-fill: -jr-light-text-color;*/
 }
 
 .table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:filled:selected,
