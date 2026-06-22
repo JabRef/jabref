@@ -97,7 +97,9 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
-        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("api_key", apiKey));
+        importerPreferences.getApiKey(FETCHER_NAME)
+                           .filter(apiKey -> !apiKey.isBlank())
+                           .ifPresent(apiKey -> uriBuilder.addParameter("api_key", apiKey));
         uriBuilder.addParameter("search", new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse(""));
         URL result = uriBuilder.build().toURL();
         LOGGER.debug("URL for query: {}", result);
@@ -128,7 +130,9 @@ public class OpenAlex implements CustomizableKeyFetcher, SearchBasedParserFetche
     private URIBuilder getUriBuilder(String tail, List<String> fieldsToSelect) throws MalformedURLException {
         try {
             URIBuilder uriBuilder = new URIBuilder(URL_PATTERN + tail);
-            importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("api_key", apiKey));
+            importerPreferences.getApiKey(FETCHER_NAME)
+                               .filter(apiKey -> !apiKey.isBlank())
+                               .ifPresent(apiKey -> uriBuilder.addParameter("api_key", apiKey));
             String fieldList = fieldsToSelect.stream()
                                              .collect(Collectors.joining(","));
             if (!fieldList.isEmpty()) {
