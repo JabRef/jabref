@@ -6,10 +6,14 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.journals.ltwa.LtwaRepository;
+import org.jabref.logic.util.HeadlessExecutorService;
+
+import org.jspecify.annotations.NonNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +37,19 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadRepository(AbbreviationPreferences abbreviationPreferences) {
+        return loadRepositorySynchronously(abbreviationPreferences);
+    }
+
+    public static JournalAbbreviationRepository loadRepositoryInBackground(AbbreviationPreferences abbreviationPreferences) {
+        CompletableFuture<JournalAbbreviationRepository> repositoryFuture = CompletableFuture.supplyAsync(
+                () -> loadRepositorySynchronously(abbreviationPreferences),
+                HeadlessExecutorService.INSTANCE
+        );
+
+        return new AsyncJournalAbbreviationRepository(repositoryFuture);
+    }
+
+    private static JournalAbbreviationRepository loadRepositorySynchronously(AbbreviationPreferences abbreviationPreferences) {
         JournalAbbreviationRepository repository;
 
         // Initialize with built-in list
@@ -91,5 +108,82 @@ public class JournalAbbreviationLoader {
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
         return loadRepository(new AbbreviationPreferences(List.of(), true, false));
+    }
+
+    private static class AsyncJournalAbbreviationRepository extends JournalAbbreviationRepository {
+        private final CompletableFuture<JournalAbbreviationRepository> repositoryFuture;
+
+        private AsyncJournalAbbreviationRepository(CompletableFuture<JournalAbbreviationRepository> repositoryFuture) {
+            this.repositoryFuture = repositoryFuture;
+        }
+
+        @Override
+        public boolean isKnownName(String journalName) {
+            return delegate().isKnownName(journalName);
+        }
+
+        @Override
+        public java.util.Optional<String> getLtwaAbbreviation(String journalName) {
+            return delegate().getLtwaAbbreviation(journalName);
+        }
+
+        @Override
+        public boolean isAbbreviatedName(String journalName) {
+            return delegate().isAbbreviatedName(journalName);
+        }
+
+        @Override
+        public java.util.Optional<Abbreviation> get(String input) {
+            return delegate().get(input);
+        }
+
+        @Override
+        public void addCustomAbbreviation(@NonNull Abbreviation abbreviation) {
+            delegate().addCustomAbbreviation(abbreviation);
+        }
+
+        @Override
+        public Collection<Abbreviation> getCustomAbbreviations() {
+            return delegate().getCustomAbbreviations();
+        }
+
+        @Override
+        public void addCustomAbbreviations(Collection<Abbreviation> abbreviationsToAdd) {
+            delegate().addCustomAbbreviations(abbreviationsToAdd);
+        }
+
+        @Override
+        public java.util.Optional<String> getNextAbbreviation(String text) {
+            return delegate().getNextAbbreviation(text);
+        }
+
+        @Override
+        public java.util.Optional<String> getDefaultAbbreviation(String text) {
+            return delegate().getDefaultAbbreviation(text);
+        }
+
+        @Override
+        public java.util.Optional<String> getDotless(String text) {
+            return delegate().getDotless(text);
+        }
+
+        @Override
+        public java.util.Optional<String> getShortestUniqueAbbreviation(String text) {
+            return delegate().getShortestUniqueAbbreviation(text);
+        }
+
+        @Override
+        public java.util.Set<String> getFullNames() {
+            return delegate().getFullNames();
+        }
+
+        @Override
+        public Collection<Abbreviation> getAllLoaded() {
+            return delegate().getAllLoaded();
+        }
+
+        private JournalAbbreviationRepository delegate() {
+            return repositoryFuture.join();
+        }
     }
 }

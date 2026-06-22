@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class AbbreviationsTest {
 
@@ -22,5 +23,13 @@ class AbbreviationsTest {
     @Test
     void getNextAbbreviationConvertsAbbreviationToDotlessAbbreviation() {
         assertEquals("2D Mater", repository.getNextAbbreviation("2D Mater.").get());
+    }
+
+    @Test
+    void backgroundLoadedRepositoryReturnsBuiltInAbbreviations() {
+        JournalAbbreviationRepository backgroundLoadedRepository = JournalAbbreviationLoader.loadRepositoryInBackground(new AbbreviationPreferences(java.util.List.of(), true, false));
+
+        assertNotNull(backgroundLoadedRepository);
+        assertEquals("2D Mater.", backgroundLoadedRepository.getNextAbbreviation("2D Materials").get());
     }
 }
