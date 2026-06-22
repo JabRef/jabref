@@ -16,6 +16,8 @@ tasks.withType<ModuleDirectivesOrderingCheck> { enabled = false }
 // The JavaFX version pin (versions/build.gradle.kts), the platform-variant patches and the per-module opens/exports
 // patches below then have nothing to act on and stay inert; the runtime opens/exports they provided are re-applied as
 // JVM args in jabgui/build.gradle.kts. (Flag: org.jabref.gradle.JavaFxBundling)
+// Because this exclude removes the Maven JavaFX, org.jabref.gradle.feature.compile verifies the resolved toolchain
+// actually ships JavaFX (Liberica Full, not Standard) and fails fast otherwise.
 if (useLibericaJdkFull) {
     // The exclude is applied lazily at resolution time and, crucially, leaves moduleNameToGA untouched: eagerly reading
     // and replacing that map (moduleNameToGA.get()/.set()) snapshots it before the plugin finishes contributing the

@@ -40,6 +40,35 @@ java {
     }
 }
 
+// -PuseLibericaJdkFull only selects vendor BELLSOFT, but Gradle's toolchain query cannot distinguish Liberica
+// "Full" (bundles JavaFX) from Liberica "Standard" (does not). If Standard gets selected, compilation fails later
+// with a cryptic "module javafx.* not found", because the Maven JavaFX was already dropped (see
+// org.jabref.gradle.base.dependency-rules). Resolve the toolchain and fail fast with an actionable message if its
+// jmods/ does not contain JavaFX.
+if (useLibericaJdkFull) {
+    val launcher = javaToolchains.launcherFor(java.toolchain)
+    tasks.withType<JavaCompile>().configureEach {
+        doFirst {
+            val installationPath = launcher.get().metadata.installationPath
+            val javafxJmod = installationPath.file("jmods/javafx.controls.jmod").asFile
+            if (!javafxJmod.exists()) {
+                throw GradleException(
+                    """
+                    -PuseLibericaJdkFull is set, but the resolved JDK toolchain does not bundle JavaFX:
+                      ${installationPath.asFile}
+                    (missing $javafxJmod)
+
+                    A BellSoft Liberica *Standard* JDK was most likely selected instead of Liberica *Full*.
+                    Install Liberica *Full* JDK 25 and ensure no Liberica *Standard* 25 of the same vendor/version
+                    is installed (the toolchain query cannot tell them apart), or point Gradle at the Full JDK via
+                    the org.gradle.java.installations.paths property.
+                    """.trimIndent()
+                )
+            }
+        }
+    }
+}
+
 tasks.withType<JavaCompile>().configureEach {
     // --release is incompatible with the --add-exports for JDK-bundled JavaFX system modules used on the
     // -PuseLibericaJdkFull path (see jabgui/build.gradle.kts). The toolchain is pinned to the same Java
