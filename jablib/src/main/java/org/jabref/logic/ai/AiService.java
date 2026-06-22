@@ -32,6 +32,7 @@ import org.jabref.logic.ai.summarization.migration.SummariesMigrationV1;
 import org.jabref.logic.ai.summarization.repositories.MVStoreSummariesRepository;
 import org.jabref.logic.ai.summarization.repositories.SummariesRepository;
 import org.jabref.logic.ai.summarization.util.SummarizatorFactory;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.ObservablesHelper;
@@ -51,6 +52,8 @@ public class AiService implements AutoCloseable {
     private static final String FULLY_INGESTED_FILE_NAME = "fully-ingested.mv";
     private static final String SUMMARIES_FILE_NAME = "summaries.mv";
 
+    private final AiPreferences aiPreferences;
+    private final TaskExecutor taskExecutor;
     private final NotificationService notificationService;
 
     // Chatting components
@@ -81,6 +84,8 @@ public class AiService implements AutoCloseable {
             NotificationService notificationService,
             TaskExecutor taskExecutor
     ) {
+        this.aiPreferences = aiPreferences;
+        this.taskExecutor = taskExecutor;
         this.notificationService = notificationService;
 
         // Chatting components
@@ -95,7 +100,7 @@ public class AiService implements AutoCloseable {
         ));
 
         // Ingestion components
-        this.embeddingModelCache = new EmbeddingModelCache(notificationService, taskExecutor);
+        this.embeddingModelCache = new EmbeddingModelCache(aiPreferences, notificationService, taskExecutor);
         this.mvStoreEmbeddingStore = new MVStoreEmbeddingStore(
                 Directories.getAiFilesDirectory().resolve(EMBEDDINGS_FILE_NAME),
                 notificationService
@@ -150,9 +155,10 @@ public class AiService implements AutoCloseable {
         generateEmbeddingsAiDatabaseListener.setupDatabase(context);
         generateSummaryAiDatabaseListener.setupDatabase(context);
 
-        if (!isDummyContext) {
+        if (!isDummyContext && aiPreferences.getAiFeaturesEnabled()) {
             ensureAiLibraryIdPresent(context);
-            migrateDatabase(context);
+            BackgroundTask.wrap(() -> migrateDatabase(context))
+                          .executeWith(taskExecutor);
         }
     }
 

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -12,6 +13,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.openoffice.style.CitedKey;
 import org.jabref.model.openoffice.style.CitedKeys;
 import org.jabref.model.openoffice.uno.NoDocumentException;
+import org.jabref.model.openoffice.util.OOResult;
 
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
@@ -37,51 +39,51 @@ public class ExportCited {
     /// If a key is not found, it is added to result.unresolvedKeys
     ///
     /// Cross references (in StandardField.CROSSREF) are followed (not recursively): If the referenced entry is found, it is included in the result. If it is not found, it is silently ignored.
-    public static GenerateDatabaseResult generateDatabase(XTextDocument doc, List<BibDatabase> databases)
-            throws
-            NoDocumentException,
-            WrappedTargetException {
+    public static OOResult<GenerateDatabaseResult, JabRefException> generateDatabase(XTextDocument doc, List<BibDatabase> databases) {
+        try {
+            OOFrontend frontend = new OOFrontend(doc);
+            CitedKeys citationKeys = frontend.citationGroups.getCitedKeysUnordered();
+            citationKeys.lookupInDatabases(databases);
 
-        OOFrontend frontend = new OOFrontend(doc);
-        CitedKeys citationKeys = frontend.citationGroups.getCitedKeysUnordered();
-        citationKeys.lookupInDatabases(databases);
+            List<String> unresolvedKeys = new ArrayList<>();
+            BibDatabase resultDatabase = new BibDatabase();
 
-        List<String> unresolvedKeys = new ArrayList<>();
-        BibDatabase resultDatabase = new BibDatabase();
+            List<BibEntry> entriesToInsert = new ArrayList<>();
+            Set<String> seen = new HashSet<>(); // Only add crossReference once.
 
-        List<BibEntry> entriesToInsert = new ArrayList<>();
-        Set<String> seen = new HashSet<>(); // Only add crossReference once.
+            for (CitedKey citation : citationKeys.values()) {
+                if (citation.getLookupResult().isEmpty()) {
+                    unresolvedKeys.add(citation.citationKey);
+                } else {
+                    BibEntry entry = citation.getLookupResult().get().entry;
+                    BibDatabase loopDatabase = citation.getLookupResult().get().database;
 
-        for (CitedKey citation : citationKeys.values()) {
-            if (citation.getLookupResult().isEmpty()) {
-                unresolvedKeys.add(citation.citationKey);
-            } else {
-                BibEntry entry = citation.getLookupResult().get().entry;
-                BibDatabase loopDatabase = citation.getLookupResult().get().database;
+                    // If entry found
+                    BibEntry clonedEntry = new BibEntry(entry);
 
-                // If entry found
-                BibEntry clonedEntry = new BibEntry(entry);
+                    // Insert a copy of the entry
+                    entriesToInsert.add(clonedEntry);
 
-                // Insert a copy of the entry
-                entriesToInsert.add(clonedEntry);
-
-                // Check if the cloned entry has a cross-reference field
-                clonedEntry
-                        .getField(StandardField.CROSSREF)
-                        .ifPresent(crossReference -> {
-                            boolean isNew = !seen.contains(crossReference);
-                            if (isNew) {
-                                // Add it if it is in the current library
-                                loopDatabase
-                                        .getEntryByCitationKey(crossReference)
-                                        .ifPresent(entriesToInsert::add);
-                                seen.add(crossReference);
-                            }
-                        });
+                    // Check if the cloned entry has a cross-reference field
+                    clonedEntry
+                            .getField(StandardField.CROSSREF)
+                            .ifPresent(crossReference -> {
+                                boolean isNew = !seen.contains(crossReference);
+                                if (isNew) {
+                                    // Add it if it is in the current library
+                                    loopDatabase
+                                            .getEntryByCitationKey(crossReference)
+                                            .ifPresent(entriesToInsert::add);
+                                    seen.add(crossReference);
+                                }
+                            });
+                }
             }
-        }
 
-        resultDatabase.insertEntries(entriesToInsert);
-        return new GenerateDatabaseResult(unresolvedKeys, resultDatabase);
+            resultDatabase.insertEntries(entriesToInsert);
+            return OOResult.ok(new GenerateDatabaseResult(unresolvedKeys, resultDatabase));
+        } catch (NoDocumentException | WrappedTargetException e) {
+            return OOResult.error(new JabRefException(e.getMessage(), e));
+        }
     }
 }
