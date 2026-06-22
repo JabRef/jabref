@@ -3,8 +3,8 @@ package org.jabref.logic.journals;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.TaskExecutor;
 
