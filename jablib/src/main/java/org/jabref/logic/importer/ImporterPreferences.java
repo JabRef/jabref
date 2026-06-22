@@ -208,9 +208,7 @@ public class ImporterPreferences {
     }
 
     /// @param name of the fetcher
-    /// @return either a customized API key if configured or the default key. A blank key (e.g. an
-    ///         unsubstituted build secret) is treated as absent, so callers never receive a
-    ///         present-but-empty value and stop sending empty `api_key=` parameters to fetchers.
+    /// @return the configured or default API key; a blank key is treated as absent.
     /// @implNote See `fetchers.md` for general information on fetchers.
     public Optional<String> getApiKey(String name) {
         return apiKeys.stream()
