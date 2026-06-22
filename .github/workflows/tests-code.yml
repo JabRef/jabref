@@ -519,3 +519,23 @@ jobs:
         with:
           show-progress: 'false'
       - uses: gradle/actions/wrapper-validation@v5
+
+  # Guards against a committer (e.g. a dependabot wrapper bump) baking CRLF into
+  # the committed gradlew.bat blob. .gitattributes stores it as LF and smudges it
+  # to CRLF on checkout, so we inspect the committed blob, not the working-tree file.
+  line-endings:
+    name: "Line endings (gradlew.bat)"
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          show-progress: 'false'
+      - name: Ensure gradlew.bat blob has no CRLF
+        run: |
+          if git show HEAD:gradlew.bat | grep -q $'\r'; then
+            echo "❌ gradlew.bat is committed with CRLF. The repository blob must be LF;"
+            echo "   .gitattributes (\"*.bat text eol=crlf\") converts it to CRLF on checkout."
+            echo "   Fix: git add --renormalize gradlew.bat && git commit"
+            exit 1
+          fi
+          echo "✅ gradlew.bat blob is LF"
