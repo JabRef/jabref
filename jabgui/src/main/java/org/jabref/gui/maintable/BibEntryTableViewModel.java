@@ -43,9 +43,6 @@ public class BibEntryTableViewModel {
     private final ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter;
     private final Map<OrFields, ObservableValue<String>> fieldValues = new HashMap<>();
     private final Map<SpecialField, OptionalBinding<SpecialFieldValueViewModel>> specialFieldValues = new HashMap<>();
-    private final EasyBinding<List<LinkedFile>> linkedFiles;
-    private final EasyBinding<Map<Field, String>> linkedIdentifiers;
-    private final Binding<List<AbstractGroup>> matchedGroups;
     private final BibDatabaseContext bibDatabaseContext;
     private final BooleanProperty hasFullTextResults = new SimpleBooleanProperty(false);
     private final BooleanProperty isMatchedBySearch = new SimpleBooleanProperty(true);
@@ -53,15 +50,14 @@ public class BibEntryTableViewModel {
     private final BooleanProperty isMatchedByGroup = new SimpleBooleanProperty(true);
     private final BooleanProperty isVisibleByGroup = new SimpleBooleanProperty(true);
     private final ObjectProperty<MatchCategory> matchCategory = new SimpleObjectProperty<>(MatchCategory.MATCHING_SEARCH_AND_GROUPS);
+    private EasyBinding<List<LinkedFile>> linkedFiles;
+    private EasyBinding<Map<Field, String>> linkedIdentifiers;
+    private Binding<List<AbstractGroup>> matchedGroups;
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
         this.bibDatabaseContext = bibDatabaseContext;
         this.fieldValueFormatter = fieldValueFormatter;
-
-        this.linkedFiles = getField(StandardField.FILE).mapOpt(FileFieldParser::parse).orElseOpt(List.of());
-        this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
-        this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
     }
 
     private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
@@ -102,14 +98,23 @@ public class BibEntryTableViewModel {
     }
 
     public ObservableValue<List<LinkedFile>> getLinkedFiles() {
+        if (linkedFiles == null) {
+            linkedFiles = getField(StandardField.FILE).mapOpt(FileFieldParser::parse).orElseOpt(List.of());
+        }
         return linkedFiles;
     }
 
     public ObservableValue<Map<Field, String>> getLinkedIdentifiers() {
+        if (linkedIdentifiers == null) {
+            linkedIdentifiers = createLinkedIdentifiersBinding(entry);
+        }
         return linkedIdentifiers;
     }
 
     public ObservableValue<List<AbstractGroup>> getMatchedGroups() {
+        if (matchedGroups == null) {
+            matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
+        }
         return matchedGroups;
     }
 
