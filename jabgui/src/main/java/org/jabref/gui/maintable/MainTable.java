@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
@@ -184,16 +185,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             }
         });
 
-        mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
-                this.getColumns().stream()
-                    .map(column -> (MainTableColumn<?>) column)
-                    .filter(column -> column.getModel().equals(columnModel))
-                    .findFirst()
-                    .ifPresent(column -> {
-                        LOGGER.trace("Adding sort order for col {} ", column);
-                        this.getSortOrder().add(column);
-                    }));
-
         if (mainTablePreferences.getResizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
         }
@@ -252,6 +243,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 })
         );
 
+        Platform.runLater(() -> restoreConfiguredSortOrder(mainTablePreferences));
+
         // Store visual state
         new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences()).addListeners();
 
@@ -269,6 +262,26 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // Enable the header right-click menu.
         new MainTableHeaderContextMenu(this, mainTableColumnFactory, tabContainer, dialogService).show(true);
+    }
+
+    private void restoreConfiguredSortOrder(MainTablePreferences mainTablePreferences) {
+        List<TableColumn<BibEntryTableViewModel, ?>> restoredSortOrder = new java.util.ArrayList<>(mainTablePreferences.getColumnPreferences().getColumnSortOrder().stream()
+                                                                                                                                 .map(columnModel -> this.getColumns().stream()
+                                                                                                                                                         .map(column -> (MainTableColumn<?>) column)
+                                                                                                                                                         .filter(column -> column.getModel().equals(columnModel))
+                                                                                                                                                         .findFirst()
+                                                                                                                                                         .orElse(null))
+                                                                                                                                 .filter(column -> column != null)
+                                                                                                                                 .map(column -> (TableColumn<BibEntryTableViewModel, ?>) column)
+                                                                                                                                 .toList());
+
+        if (restoredSortOrder.isEmpty()) {
+            return;
+        }
+
+        restoredSortOrder.forEach(column -> LOGGER.trace("Adding sort order for col {} ", column));
+        restoredSortOrder.add(0, getColumns().getFirst());
+        this.getSortOrder().setAll(restoredSortOrder);
     }
 
     /// This is called, if a user starts typing some characters into the keyboard with focus on main table. The {@link MainTable} will scroll to the cell with the same starting column value and typed string

@@ -1,7 +1,7 @@
 package org.jabref.gui.maintable;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +53,7 @@ public class BibEntryTableViewModel {
     private EasyBinding<List<LinkedFile>> linkedFiles;
     private EasyBinding<Map<Field, String>> linkedIdentifiers;
     private Binding<List<AbstractGroup>> matchedGroups;
+    private Observable[] fieldValueDependencies;
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
@@ -146,14 +147,20 @@ public class BibEntryTableViewModel {
             return value;
         }
 
-        ArrayList<Observable> observables = new ArrayList<>(List.of(entry.getObservables()));
-        observables.add(fieldValueFormatter);
-
         value = Bindings.createStringBinding(() ->
                         fieldValueFormatter.getValue().formatFieldsValues(fields, entry),
-                observables.toArray(Observable[]::new));
+                getFieldValueDependencies());
         fieldValues.put(fields, value);
         return value;
+    }
+
+    private Observable[] getFieldValueDependencies() {
+        if (fieldValueDependencies == null) {
+            Observable[] entryObservables = entry.getObservables();
+            fieldValueDependencies = Arrays.copyOf(entryObservables, entryObservables.length + 1);
+            fieldValueDependencies[entryObservables.length] = fieldValueFormatter;
+        }
+        return fieldValueDependencies;
     }
 
     public StringProperty bibDatabasePathProperty() {
