@@ -32,7 +32,6 @@ import org.jabref.model.entry.field.UserSpecificCommentField;
 
 public class OtherFieldsTab extends FieldsEditorTab {
 
-    public static final String NAME = "Other fields";
     private final List<Field> customTabsFieldNames;
     private final BibEntryTypesManager entryTypesManager;
 
@@ -57,9 +56,9 @@ public class OtherFieldsTab extends FieldsEditorTab {
 
         this.entryTypesManager = entryTypesManager;
         this.customTabsFieldNames = new ArrayList<>();
-        preferences.getEntryEditorPreferences().getEntryEditorTabs().values().forEach(customTabsFieldNames::addAll);
+        preferences.getEntryEditorPreferences().getCustomizedFieldSets().values().forEach(customTabsFieldNames::addAll);
 
-        setText(Localization.lang("Other fields"));
+        setText(EntryEditorTabModel.BuiltIn.OTHER_FIELDS.displayName());
         setTooltip(new Tooltip(Localization.lang("Show remaining fields")));
         setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());
     }
