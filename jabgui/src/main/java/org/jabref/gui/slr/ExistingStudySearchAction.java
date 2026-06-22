@@ -14,6 +14,7 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
@@ -39,6 +40,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
     private final TaskExecutor taskExecutor;
     private final LibraryTabContainer tabContainer;
     private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     /// @param tabContainer               Required to close the tab before the study is updated
     /// @param openDatabaseActionSupplier Required to open the tab after the study is executed
@@ -49,7 +51,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
             FileUpdateMonitor fileUpdateMonitor,
             TaskExecutor taskExecutor,
             CliPreferences preferences,
-            StateManager stateManager) {
+            StateManager stateManager, JournalAbbreviationRepository journalAbbreviationRepository) {
         this(tabContainer,
                 openDatabaseActionSupplier,
                 dialogService,
@@ -57,7 +59,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
                 taskExecutor,
                 preferences,
                 stateManager,
-                false);
+                false, journalAbbreviationRepository);
     }
 
     protected ExistingStudySearchAction(
@@ -68,7 +70,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
             TaskExecutor taskExecutor,
             CliPreferences preferences,
             StateManager stateManager,
-            boolean isNew) {
+            boolean isNew, JournalAbbreviationRepository journalAbbreviationRepository) {
         this.tabContainer = tabContainer;
         this.openDatabaseActionSupplier = openDatabaseActionSupplier;
         this.dialogService = dialogService;
@@ -76,6 +78,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
         this.stateManager = stateManager;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         if (!isNew) {
             this.executable.bind(ActionHelper.needsStudyDatabase(stateManager));
@@ -114,7 +117,8 @@ public class ExistingStudySearchAction extends SimpleCommand {
                     new SlrGitHandler(this.studyDirectory, preferences.getGitPreferences()),
                     preferences,
                     new BibEntryTypesManager(),
-                    fileUpdateMonitor);
+                    fileUpdateMonitor,
+                    journalAbbreviationRepository);
         } catch (IOException | ParseException | JabRefException e) {
             LOGGER.error("Error during reading of study definition file.", e);
             dialogService.showErrorDialogAndWait(Localization.lang("Error during reading of study definition file."), e);

@@ -1,33 +1,29 @@
 package org.jabref.gui.cleanup;
 
 import java.util.EnumSet;
+import java.util.Optional;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SetProperty;
+import javafx.beans.property.SimpleSetProperty;
+import javafx.collections.FXCollections;
 
 import org.jabref.logic.cleanup.CleanupPreferences;
 
 public class CleanupJournalRelatedViewModel {
-    public static final EnumSet<CleanupPreferences.CleanupStep> CLEANUP_JOURNAL_METHODS = EnumSet.of(
-            CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT,
-            CleanupPreferences.CleanupStep.ABBREVIATE_DOTLESS,
-            CleanupPreferences.CleanupStep.ABBREVIATE_SHORTEST_UNIQUE,
-            CleanupPreferences.CleanupStep.ABBREVIATE_LTWA,
-            CleanupPreferences.CleanupStep.UNABBREVIATE
-    );
-
-    public final ObjectProperty<CleanupPreferences.CleanupStep> selectedJournalCleanupOption = new SimpleObjectProperty<>();
+    public final SetProperty<CleanupPreferences.CleanupStep> selectedJournalCleanupOption = new SimpleSetProperty<>(FXCollections.observableSet());
+    public final EnumSet<CleanupPreferences.CleanupStep> allSupportedJobs;
     public final CleanupPreferences preferences;
 
     public CleanupJournalRelatedViewModel(CleanupPreferences preferences) {
         this.preferences = preferences;
-        selectedJournalCleanupOption.set(getInitialMethod());
+
+        allSupportedJobs = JournalAbbreviationPanel.getAllCleanupOptions();
+        getInitialMethod().ifPresent(selectedJournalCleanupOption::add);
     }
 
-    private CleanupPreferences.CleanupStep getInitialMethod() {
-        return CLEANUP_JOURNAL_METHODS.stream()
-                                      .filter(preferences::isActive)
-                                      .findFirst()
-                                      .orElse(CleanupPreferences.CleanupStep.ABBREVIATE_DEFAULT);
+    private Optional<CleanupPreferences.CleanupStep> getInitialMethod() {
+        return allSupportedJobs.stream()
+                               .filter(preferences::isActive)
+                               .findFirst();
     }
 }

@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
-<?import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel?>
 <?import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel?>
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
@@ -16,9 +14,4 @@
     <Label styleClass="sectionHeader" text="%Save sort order"/>
     <SaveOrderConfigPanel fx:id="saveOrderConfigPanel" />
 
-    <Label styleClass="sectionHeader" text="%Save actions"/>
-    <FieldFormatterCleanupsPanel fx:id="fieldFormatterCleanupsPanel" />
-    <padding>
-        <Insets bottom="12.0" />
-    </padding>
 </fx:root>

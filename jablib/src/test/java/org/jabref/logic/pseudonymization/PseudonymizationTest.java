@@ -15,6 +15,9 @@ import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.logic.journals.AbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -36,6 +39,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class PseudonymizationTest {
 
@@ -48,6 +52,9 @@ class PseudonymizationTest {
     private FieldPreferences fieldPreferences;
     private CitationKeyPatternPreferences citationKeyPatternPreferences;
     private BibEntryTypesManager entryTypesManager;
+    private CliPreferences preferences;
+    private JournalAbbreviationRepository journalAbbreviationRepository;
+    private AbbreviationPreferences journalAbbreviationPreferences;
 
     @BeforeEach
     void setUp() {
@@ -59,13 +66,21 @@ class PseudonymizationTest {
         fieldPreferences = new FieldPreferences(true, List.of(), List.of());
         citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS);
         entryTypesManager = new BibEntryTypesManager();
+        preferences = mock(CliPreferences.class);
+        journalAbbreviationRepository = mock(JournalAbbreviationRepository.class);
+        journalAbbreviationPreferences = mock(AbbreviationPreferences.class);
+
+        when(journalAbbreviationPreferences.shouldUseFJournalField()).thenReturn(false);
+        when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
+        when(preferences.getAbbreviationPreferences()).thenReturn(journalAbbreviationPreferences);
 
         databaseWriter = new BibDatabaseWriter(
                 bibWriter,
                 saveConfiguration,
-                fieldPreferences,
-                citationKeyPatternPreferences,
-                entryTypesManager);
+                preferences,
+                entryTypesManager,
+                journalAbbreviationRepository);
     }
 
     @Test

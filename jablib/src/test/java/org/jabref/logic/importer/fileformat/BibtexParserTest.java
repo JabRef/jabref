@@ -1213,13 +1213,13 @@ class BibtexParserTest {
                           ISSN                     = {0886-5930}
                         }
 
-                        @comment{jabref-meta: saveActions:enabled;title[lower_case]}"""));
+                        @comment{jabref-meta: fieldFormatterCleanupActions:enabled;title[lower_case]}"""));
 
-        FieldFormatterCleanupActions saveActions = parserResult.getMetaData().getSaveActions().get();
+        FieldFormatterCleanupActions fieldFormatterCleanupActions = parserResult.getMetaData().getFieldFormatterCleanupActions().get();
 
-        assertTrue(saveActions.isEnabled());
+        assertTrue(fieldFormatterCleanupActions.isEnabled());
         assertEquals(List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())),
-                saveActions.getConfiguredActions());
+                fieldFormatterCleanupActions.getConfiguredActions());
     }
 
     @Test
@@ -1237,7 +1237,7 @@ class BibtexParserTest {
                           ISSN                     = {0886-5930}
                         }
 
-                        @Comment{jabref-meta: saveActions:enabled;
+                        @Comment{jabref-meta: fieldFormatterCleanupActions:enabled;
                         month[normalize_month]
                         pages[normalize_page_numbers]
                         title[escapeAmpersands,escapeDollarSign,escapeUnderscores,latex_cleanup]
@@ -1248,9 +1248,9 @@ class BibtexParserTest {
                         ;}
                         """));
 
-        FieldFormatterCleanupActions saveActions = parserResult.getMetaData().getSaveActions().get();
+        FieldFormatterCleanupActions fieldFormatterCleanupActions = parserResult.getMetaData().getFieldFormatterCleanupActions().get();
 
-        assertTrue(saveActions.isEnabled());
+        assertTrue(fieldFormatterCleanupActions.isEnabled());
 
         List<FieldFormatterCleanup> expected = new ArrayList<>(30);
         expected.add(new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()));
@@ -1261,7 +1261,7 @@ class BibtexParserTest {
             expected.add(new FieldFormatterCleanup(field, new EscapeUnderscoresFormatter()));
             expected.add(new FieldFormatterCleanup(field, new LatexCleanupFormatter()));
         }
-        assertEquals(expected, saveActions.getConfiguredActions());
+        assertEquals(expected, fieldFormatterCleanupActions.getConfiguredActions());
     }
 
     @Test
@@ -1303,13 +1303,13 @@ class BibtexParserTest {
     @Test
     void integrationTestSaveActions() throws IOException {
         ParserResult parserResult = parser
-                .parse(Reader.of("@comment{jabref-meta: saveActions:enabled;title[lower_case]}"));
+                .parse(Reader.of("@comment{jabref-meta: fieldFormatterCleanupActions:enabled;title[lower_case]}"));
 
-        FieldFormatterCleanupActions saveActions = parserResult.getMetaData().getSaveActions().get();
+        FieldFormatterCleanupActions fieldFormatterCleanupActions = parserResult.getMetaData().getFieldFormatterCleanupActions().get();
 
-        assertTrue(saveActions.isEnabled());
+        assertTrue(fieldFormatterCleanupActions.isEnabled());
         assertEquals(List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())),
-                saveActions.getConfiguredActions());
+                fieldFormatterCleanupActions.getConfiguredActions());
     }
 
     @Test

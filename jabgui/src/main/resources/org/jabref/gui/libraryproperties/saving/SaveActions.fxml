@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel?>
+<?import org.jabref.gui.cleanup.MultiFieldsCleanupPanel?>
+<?import org.jabref.gui.cleanup.JournalAbbreviationPanel?>
+<fx:root spacing="10.0" type="VBox"
+         xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+         fx:controller="org.jabref.gui.libraryproperties.saving.SaveActionsView">
+
+    <Label styleClass="sectionHeader" text="%Save actions"/>
+
+    <Label text="%Single field"/>
+    <FieldFormatterCleanupsPanel fx:id="fieldFormatterCleanupsPanel" />
+
+    <Label text="%Multi-field"/>
+    <MultiFieldsCleanupPanel fx:id="multiFieldsCleanupPanel" />
+
+    <Label text="%Journal-related"/>
+    <JournalAbbreviationPanel fx:id="journalAbbreviationPanel" />
+    <padding>
+        <Insets bottom="12.0" />
+    </padding>
+</fx:root>

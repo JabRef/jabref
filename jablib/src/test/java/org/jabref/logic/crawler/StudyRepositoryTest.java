@@ -22,6 +22,7 @@ import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
@@ -95,7 +96,8 @@ class StudyRepositoryTest {
                 gitHandler,
                 preferences,
                 new DummyFileUpdateMonitor(),
-                entryTypesManager));
+                entryTypesManager,
+                mock(JournalAbbreviationRepository.class)));
     }
 
     /// Tests whether the file structure of the repository is created correctly from the study definitions file.
@@ -226,7 +228,8 @@ class StudyRepositoryTest {
                 gitHandler,
                 preferences,
                 new DummyFileUpdateMonitor(),
-                entryTypesManager);
+                entryTypesManager,
+                mock(JournalAbbreviationRepository.class));
         return studyRepository;
     }
 

@@ -26,6 +26,7 @@ import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
@@ -78,6 +79,7 @@ public class StudyRepository {
     private final CliPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager bibEntryTypesManager;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     /// Creates a study repository.
     ///
@@ -89,11 +91,13 @@ public class StudyRepository {
                            SlrGitHandler gitHandler,
                            CliPreferences preferences,
                            FileUpdateMonitor fileUpdateMonitor,
-                           BibEntryTypesManager bibEntryTypesManager) throws IOException {
+                           BibEntryTypesManager bibEntryTypesManager,
+                           JournalAbbreviationRepository journalAbbreviationRepository) throws IOException {
         this.repositoryPath = pathToRepository;
         this.gitHandler = gitHandler;
         this.preferences = preferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.studyDefinitionFile = Path.of(repositoryPath.toString(), STUDY_DEFINITION_FILE_NAME);
         this.bibEntryTypesManager = bibEntryTypesManager;
 
@@ -432,13 +436,13 @@ public class StudyRepository {
                     .withSaveOrder(context.getMetaData().getSaveOrder().map(SelfContainedSaveOrder::of).orElse(SaveOrder.getDefaultSaveOrder()))
                     .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
-            BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
-                    bibWriter,
+
+            BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(bibWriter,
                     saveConfiguration,
-                    preferences.getFieldPreferences(),
-                    preferences.getCitationKeyPatternPreferences(),
-                    bibEntryTypesManager);
-            databaseWriter.writeDatabase(context);
+                    preferences,
+                    bibEntryTypesManager,
+                    journalAbbreviationRepository);
+            bibDatabaseWriter.writeDatabase(context);
         } catch (UnsupportedCharsetException ex) {
             throw new SaveException(Localization.lang("Character encoding UTF-8 is not supported.", ex));
         } catch (IOException ex) {

@@ -12,6 +12,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.pseudonymization.Pseudonymization;
@@ -31,11 +32,13 @@ public class PseudonymizeAction extends SimpleCommand {
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final CliPreferences preferences;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
-    public PseudonymizeAction(StateManager stateManager, DialogService dialogService, CliPreferences preferences) {
+    public PseudonymizeAction(StateManager stateManager, DialogService dialogService, CliPreferences preferences, JournalAbbreviationRepository journalAbbreviationRepository) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
         executable.bind(ActionHelper.needsDatabase(stateManager));
     }
 
@@ -82,11 +85,13 @@ public class PseudonymizeAction extends SimpleCommand {
             LOGGER.error("Invalid output file type provided.");
         }
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(pseudoBibPath, StandardCharsets.UTF_8)) {
-            BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
+            BibDatabaseWriter bibDatabaseWriter = new BibDatabaseWriter(
                     fileWriter,
                     result.bibDatabaseContext(),
-                    preferences);
-            databaseWriter.writeDatabase(result.bibDatabaseContext());
+                    preferences,
+                    journalAbbreviationRepository
+            );
+            bibDatabaseWriter.writeDatabase(result.bibDatabaseContext());
 
             // Show just a warning message if encoding did not work for all characters:
             if (fileWriter.hasEncodingProblems()) {

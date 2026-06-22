@@ -5,6 +5,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.event.AutosaveEvent;
 import org.jabref.model.entry.BibEntryTypesManager;
 
@@ -19,8 +20,8 @@ public class AutosaveUiManager {
 
     private final SaveDatabaseAction saveDatabaseAction;
 
-    public AutosaveUiManager(LibraryTab libraryTab, DialogService dialogService, GuiPreferences preferences, BibEntryTypesManager entryTypesManager, StateManager stateManager) {
-        this.saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferences, entryTypesManager, stateManager);
+    public AutosaveUiManager(LibraryTab libraryTab, DialogService dialogService, GuiPreferences preferences, BibEntryTypesManager entryTypesManager, StateManager stateManager, JournalAbbreviationRepository journalAbbreviationRepository) {
+        this.saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository);
     }
 
     @Subscribe

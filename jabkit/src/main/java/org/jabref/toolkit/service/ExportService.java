@@ -50,6 +50,7 @@ public class ExportService {
     private final ExporterFactory exporterFactory;
     private final Exporter bibtexExporter;
     private final BibEntryTypesManager entryTypesManager;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     private final boolean porcelain;
 
@@ -57,6 +58,7 @@ public class ExportService {
         this.cliPreferences = cliPreferences;
         entryTypesManager = cliPreferences.getCustomEntryTypesRepository();
         exporterFactory = ExporterFactory.create(cliPreferences);
+        journalAbbreviationRepository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
         this.porcelain = porcelain;
         bibtexExporter = createBibtexExporter();
     }
@@ -87,7 +89,7 @@ public class ExportService {
     public void printDatabaseContextToStdOut(BibDatabaseContext bibDatabaseContext) throws ExportServiceException {
         try (OutputStreamWriter writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8)) {
             generateCitationKeys(bibDatabaseContext, cliPreferences.getCitationKeyPatternPreferences());
-            BibDatabaseWriter bibWriter = new BibDatabaseWriter(writer, bibDatabaseContext, cliPreferences);
+            BibDatabaseWriter bibWriter = new BibDatabaseWriter(writer, bibDatabaseContext, cliPreferences, journalAbbreviationRepository);
             bibWriter.writeDatabase(bibDatabaseContext);
         } catch (IOException ex) {
             throw new ExportServiceException("Unable to write to stdout",
@@ -137,9 +139,9 @@ public class ExportService {
             BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
-                    cliPreferences.getFieldPreferences(),
-                    cliPreferences.getCitationKeyPatternPreferences(),
-                    entryTypesManager);
+                    cliPreferences,
+                    entryTypesManager,
+                    journalAbbreviationRepository);
             databaseWriter.writeDatabase(bibDatabaseContext);
 
             // Show just a warning message if encoding did not work for all characters:
@@ -198,9 +200,8 @@ public class ExportService {
             List<Path> fileDirForDatabase) throws ExportServiceException {
 
         try {
-            JournalAbbreviationRepository abbreviationRepository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
             printOut(Localization.lang("Exporting '%0'.", outputFile.toAbsolutePath().toString()));
-            exporter.export(databaseContext, outputFile, entries, fileDirForDatabase, abbreviationRepository);
+            exporter.export(databaseContext, outputFile, entries, fileDirForDatabase, journalAbbreviationRepository);
         } catch (IOException | SaveException | ParserConfigurationException | TransformerException ex) {
             throw new ExportServiceException("Failed to export file.",
                     Localization.lang("Failed to export file."),

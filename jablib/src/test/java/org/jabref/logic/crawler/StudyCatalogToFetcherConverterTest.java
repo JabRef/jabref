@@ -13,6 +13,7 @@ import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -58,7 +59,8 @@ class StudyCatalogToFetcherConverterTest {
                 gitHandler,
                 preferences,
                 new DummyFileUpdateMonitor(),
-                entryTypesManager);
+                entryTypesManager,
+                mock(JournalAbbreviationRepository.class));
         StudyCatalogToFetcherConverter converter = new StudyCatalogToFetcherConverter(
                 studyRepository.getActiveLibraryEntries(),
                 mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),

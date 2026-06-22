@@ -19,6 +19,7 @@ import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.os.OS;
@@ -129,13 +130,18 @@ public class Benchmarks {
         SelfContainedSaveConfiguration saveConfiguration = new SelfContainedSaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
         FieldPreferences fieldPreferences = new FieldPreferences(true, List.of(), List.of());
         CitationKeyPatternPreferences citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        JournalAbbreviationRepository journalAbbreviationRepository = mock(JournalAbbreviationRepository.class);
+
+        CliPreferences preferences = mock(CliPreferences.class);
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
+        when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
 
         BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                 bibWriter,
                 saveConfiguration,
-                fieldPreferences,
-                citationKeyPatternPreferences,
-                new BibEntryTypesManager());
+                preferences,
+                new BibEntryTypesManager(),
+                journalAbbreviationRepository);
         databaseWriter.writePartOfDatabase(new BibDatabaseContext(database, new MetaData()), database.getEntries());
         return outputWriter;
     }

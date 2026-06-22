@@ -8,6 +8,7 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.study.QueryResult;
@@ -33,13 +34,15 @@ public class Crawler {
                    SlrGitHandler gitHandler,
                    CliPreferences preferences,
                    BibEntryTypesManager bibEntryTypesManager,
-                   FileUpdateMonitor fileUpdateMonitor) throws IllegalArgumentException, IOException, ParseException, JabRefException {
+                   FileUpdateMonitor fileUpdateMonitor,
+                   JournalAbbreviationRepository journalAbbreviationRepository) throws IllegalArgumentException, IOException, ParseException, JabRefException {
         this.studyRepository = new StudyRepository(
                 studyRepositoryRoot,
                 gitHandler,
                 preferences,
                 fileUpdateMonitor,
-                bibEntryTypesManager);
+                bibEntryTypesManager,
+                journalAbbreviationRepository);
         StudyCatalogToFetcherConverter studyCatalogToFetcherConverter = new StudyCatalogToFetcherConverter(
                 studyRepository.getActiveLibraryEntries(),
                 preferences.getImportFormatPreferences(),
