@@ -53,12 +53,12 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        ocrPath.setValue(ocrPreferences.getOcrPath());
+        ocrPath.setValue(ocrPreferences.getOcrEnginePath());
     }
 
     @Override
     public void storeSettings() {
-        ocrPreferences.setOcrPath(ocrPath.getValue());
+        ocrPreferences.setOcrEnginePath(ocrPath.getValue());
     }
 
     public StringProperty ocrPathProperty() {

@@ -100,7 +100,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
     String getFailureResult(OcrResult.Failure failure) {
         return switch (failure.reason()) {
             case NOT_AVAILABLE ->
-                    Localization.lang("OCRmyPDF is not available at: %0", preferences.getOcrPreferences().getOcrPath());
+                    Localization.lang("OCRmyPDF is not available at: %0", preferences.getOcrPreferences().getOcrEnginePath());
             case TIMEOUT ->
                     Localization.lang("OCR timed out");
             case NON_ZERO_EXIT ->

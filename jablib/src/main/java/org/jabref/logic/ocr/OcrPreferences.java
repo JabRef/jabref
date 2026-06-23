@@ -4,26 +4,26 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class OcrPreferences {
-    private final StringProperty ocrPath;
+    private final StringProperty ocrEnginePath;
 
     private OcrPreferences() {
         this("ocrmypdf");
     }
 
-    public OcrPreferences(String ocrPath) {
-        this.ocrPath = new SimpleStringProperty(ocrPath);
+    public OcrPreferences(String ocrEnginePath) {
+        this.ocrEnginePath = new SimpleStringProperty(ocrEnginePath);
     }
 
-    public String getOcrPath() {
-        return ocrPath.get();
+    public String getOcrEnginePath() {
+        return ocrEnginePath.get();
     }
 
-    public StringProperty ocrPathProperty() {
-        return ocrPath;
+    public StringProperty ocrEnginePathProperty() {
+        return ocrEnginePath;
     }
 
-    public void setOcrPath(String ocrPath) {
-        this.ocrPath.set(ocrPath);
+    public void setOcrEnginePath(String ocrEnginePath) {
+        this.ocrEnginePath.set(ocrEnginePath);
     }
 
     public static OcrPreferences getDefault() {
@@ -31,6 +31,6 @@ public class OcrPreferences {
     }
 
     public void setAll(OcrPreferences preferences) {
-        this.ocrPath.set(preferences.getOcrPath());
+        this.ocrEnginePath.set(preferences.getOcrEnginePath());
     }
 }

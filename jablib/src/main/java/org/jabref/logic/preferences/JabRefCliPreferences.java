@@ -386,7 +386,7 @@ public class JabRefCliPreferences implements CliPreferences {
     // endregion
 
     // region OCR preferences
-    private static final String OCR_PATH = "ocrPath";
+    private static final String OCR_ENGINE_PATH = "ocrEnginePath";
     // endregion
 
     // region Push to application preferences
@@ -1974,14 +1974,14 @@ public class JabRefCliPreferences implements CliPreferences {
 
         ocrPreferences = getOcrPreferencesFromBackingStore(OcrPreferences.getDefault());
 
-        EasyBind.listen(ocrPreferences.ocrPathProperty(), (_, _, newValue) -> put(OCR_PATH, newValue));
+        EasyBind.listen(ocrPreferences.ocrEnginePathProperty(), (_, _, newValue) -> put(OCR_ENGINE_PATH, newValue));
 
         return ocrPreferences;
     }
 
     private OcrPreferences getOcrPreferencesFromBackingStore(OcrPreferences defaults) {
         return new OcrPreferences(
-                get(OCR_PATH, defaults.getOcrPath())
+                get(OCR_ENGINE_PATH, defaults.getOcrEnginePath())
         );
     }
     // endregion

@@ -15,7 +15,7 @@
     <Label styleClass="sectionHeader" text="%OCR engine path"/>
     <HBox alignment="CENTER_LEFT" spacing="8.0">
         <Text text="%Path to the OCR engine"/>
-        <TextField fx:id="ocrPath" HBox.hgrow="ALWAYS" promptText="%Type the engine's path"/>
+        <TextField fx:id="ocrEnginePath" HBox.hgrow="ALWAYS" promptText="%Type the engine's path"/>
         <Button fx:id="browseButton" onAction="#browseEnginePath">
             <graphic>
                 <JabRefIconView glyph="FOLDER"/>

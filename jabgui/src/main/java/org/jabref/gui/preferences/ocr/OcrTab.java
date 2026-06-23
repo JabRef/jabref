@@ -11,7 +11,7 @@ import org.jabref.logic.l10n.Localization;
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> implements PreferencesTab {
-    @FXML private TextField ocrPath;
+    @FXML private TextField ocrEnginePath;
     @FXML private Button browseButton;
     @FXML private Button autoDetectButton;
 
@@ -29,7 +29,7 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> implement
     public void initialize() {
         this.viewModel = new OcrTabViewModel(dialogService, preferences.getFilePreferences(), preferences.getOcrPreferences(), taskExecutor);
 
-        ocrPath.textProperty().bindBidirectional(viewModel.ocrPathProperty());
+        ocrEnginePath.textProperty().bindBidirectional(viewModel.ocrPathProperty());
     }
 
     @FXML
