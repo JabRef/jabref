@@ -35,6 +35,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
 
     /// Array of children, may be empty if this node has no children (but never null)
     private final ObservableList<T> children;
+    private final ObservableList<T> unmodifiableChildren;
     /// This node's parent, or null if this node has no parent
     private T parent;
     /// The function which is invoked when something changed in the subtree.
@@ -48,6 +49,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     public TreeNode(Class<T> derivingClass) {
         parent = null;
         children = FXCollections.observableArrayList();
+        unmodifiableChildren = FXCollections.unmodifiableObservableList(children);
 
         if (!derivingClass.isInstance(this)) {
             throw new UnsupportedOperationException("The class extending TreeNode<T> has to derive from T");
@@ -343,7 +345,11 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     ///
     /// @return a list of this node's children
     public ObservableList<T> getChildren() {
-        return FXCollections.unmodifiableObservableList(children);
+        return unmodifiableChildren;
+    }
+
+    protected ObservableList<T> getChildrenInternal() {
+        return children;
     }
 
     /// Removes the given child from this node's child list, giving it an empty parent.
@@ -529,6 +535,6 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     }
 
     public Stream<T> iterateOverTree() {
-        return Stream.concat(Stream.of((T) this), getChildren().stream().flatMap(TreeNode::iterateOverTree));
+        return Stream.concat(Stream.of((T) this), getChildrenInternal().stream().flatMap(TreeNode::iterateOverTree));
     }
 }

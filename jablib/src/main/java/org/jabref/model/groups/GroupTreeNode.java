@@ -2,7 +2,6 @@ package org.jabref.model.groups;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Objects;
@@ -173,18 +172,8 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     public List<GroupTreeNode> getMatchingGroups(List<BibEntry> entries) {
         List<GroupTreeNode> groups = new ArrayList<>();
         // Identity-based cache: memoize results for the exact BibEntry and GroupTreeNode instances evaluated in this pass.
-        IdentityHashMap<BibEntry, IdentityHashMap<GroupTreeNode, EnumMap<GroupHierarchyType, Boolean>>> matchCaches = new IdentityHashMap<>();
-
-        iterateOverTree().forEach(node -> {
-            for (BibEntry entry : entries) {
-                IdentityHashMap<GroupTreeNode, EnumMap<GroupHierarchyType, Boolean>> cacheForEntry =
-                        matchCaches.computeIfAbsent(entry, _ -> new IdentityHashMap<>());
-                if (node.matches(entry, node.getGroup().getHierarchicalContext(), cacheForEntry)) {
-                    groups.add(node);
-                    break;
-                }
-            }
-        });
+        IdentityHashMap<BibEntry, IdentityHashMap<GroupTreeNode, MatchCache>> matchCaches = new IdentityHashMap<>();
+        collectMatchingGroups(entries, groups, matchCaches);
 
         return groups;
     }
@@ -258,18 +247,18 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
     private boolean matches(BibEntry entry,
                             GroupHierarchyType originalContext,
-                            IdentityHashMap<GroupTreeNode, EnumMap<GroupHierarchyType, Boolean>> cache) {
-        EnumMap<GroupHierarchyType, Boolean> cachedByContext = cache.computeIfAbsent(this, _ -> new EnumMap<>(GroupHierarchyType.class));
-        Boolean cachedMatch = cachedByContext.get(originalContext);
-        if (cachedMatch != null) {
-            return cachedMatch;
+                            IdentityHashMap<GroupTreeNode, MatchCache> cache) {
+        MatchCache cachedByContext = cache.computeIfAbsent(this, _ -> new MatchCache());
+        if (cachedByContext.hasValue(originalContext)) {
+            return cachedByContext.get(originalContext);
         }
 
         GroupHierarchyType context = getGroup().getHierarchicalContext();
         boolean matches = getGroup().contains(entry);
         if ((context == GroupHierarchyType.INCLUDING) && !matches && (originalContext != GroupHierarchyType.REFINING)) {
-            for (GroupTreeNode child : getChildren()) {
-                if (child.matches(entry, originalContext, cache)) {
+            List<GroupTreeNode> children = getChildrenInternal();
+            for (int i = 0; i < children.size(); i++) {
+                if (children.get(i).matches(entry, originalContext, cache)) {
                     matches = true;
                     break;
                 }
@@ -281,6 +270,50 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
         cachedByContext.put(originalContext, matches);
         return matches;
+    }
+
+    private void collectMatchingGroups(List<BibEntry> entries,
+                                       List<GroupTreeNode> groups,
+                                       IdentityHashMap<BibEntry, IdentityHashMap<GroupTreeNode, MatchCache>> matchCaches) {
+        for (BibEntry entry : entries) {
+            IdentityHashMap<GroupTreeNode, MatchCache> cacheForEntry = matchCaches.computeIfAbsent(entry, _ -> new IdentityHashMap<>());
+            if (matches(entry, getGroup().getHierarchicalContext(), cacheForEntry)) {
+                groups.add(this);
+                break;
+            }
+        }
+
+        List<GroupTreeNode> children = getChildrenInternal();
+        for (int i = 0; i < children.size(); i++) {
+            children.get(i).collectMatchingGroups(entries, groups, matchCaches);
+        }
+    }
+
+    private static final class MatchCache {
+        private int knownMask;
+        private int trueMask;
+
+        boolean hasValue(GroupHierarchyType context) {
+            return (knownMask & bit(context)) != 0;
+        }
+
+        boolean get(GroupHierarchyType context) {
+            return (trueMask & bit(context)) != 0;
+        }
+
+        void put(GroupHierarchyType context, boolean value) {
+            int bit = bit(context);
+            knownMask |= bit;
+            if (value) {
+                trueMask |= bit;
+            } else {
+                trueMask &= ~bit;
+            }
+        }
+
+        private static int bit(GroupHierarchyType context) {
+            return 1 << context.ordinal();
+        }
     }
 
     /// Get the path from the root of the tree as a string (every group name is separated by {@link #PATH_DELIMITER}.
