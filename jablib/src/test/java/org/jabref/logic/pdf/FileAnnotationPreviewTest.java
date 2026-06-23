@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
@@ -15,14 +14,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static org.jabref.logic.util.strings.StringUtil.quoteForHTML;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class FileAnnotationPreviewTest {
 
-    // Helper method to reduce boilerplate code when mocking FileAnnotations
     private FileAnnotation createMockAnnotation(FileAnnotationType type, int page, String content, boolean hasLinked) {
         FileAnnotation annotation = mock(FileAnnotation.class);
         when(annotation.getAnnotationType()).thenReturn(type);
@@ -30,6 +28,10 @@ class FileAnnotationPreviewTest {
         when(annotation.getContent()).thenReturn(content);
         when(annotation.hasLinkedAnnotation()).thenReturn(hasLinked);
         return annotation;
+    }
+
+    private String escape(String text) {
+        return quoteForHTML(text);
     }
 
     @Nested
@@ -51,9 +53,10 @@ class FileAnnotationPreviewTest {
             FileAnnotation blankAnnotation = createMockAnnotation(FileAnnotationType.TEXT, 1, "", false);
 
             Map<Path, List<FileAnnotation>> annotations = Map.of(path, Arrays.asList(nullAnnotation, blankAnnotation));
-            String result = FileAnnotationPreview.render(annotations);
 
-            assertTrue(result.contains("<br>"), "Should still render the file header structure even if annotations are empty");
+            String expectedHtml = "<br><br><b>PDF Annotations</b><br><br><i>" + escape("test.pdf") + "</i><br>";
+
+            assertEquals(expectedHtml, FileAnnotationPreview.render(annotations));
         }
     }
 
@@ -68,17 +71,16 @@ class FileAnnotationPreviewTest {
             FileAnnotation annotation = createMockAnnotation(FileAnnotationType.HIGHLIGHT, 3, "This & That", false);
 
             Map<Path, List<FileAnnotation>> annotations = Map.of(path, List.of(annotation));
-            String result = FileAnnotationPreview.render(annotations);
 
-            // Structural asserts: string should not be blank and must contain basic HTML layout wrappers
-            assertTrue(result.length() > 0, "The rendered HTML output should not be empty");
-            assertTrue(result.contains("<br><br><b>"), "HTML structural headers must be present");
-            assertTrue(result.contains("3"), "The raw page number string should be present in the output");
+            String expectedHtml = "<br><br><b>PDF Annotations</b><br><br><i>" + escape("article.pdf") + "</i><br>"
+                    + "<b>" + escape("Highlight") + " (Page 3):</b> " + escape("This & That") + "<br>";
+
+            assertEquals(expectedHtml, FileAnnotationPreview.render(annotations));
         }
 
         @Test
         @DisplayName("Should sort annotations structurally by page number in ascending order")
-        void renderOrdersAnnotationsByPageNumber() {
+        void renderOrdersAnnotationsByNumber() {
             Path path = Path.of("book.pdf");
             FileAnnotation page10 = createMockAnnotation(FileAnnotationType.TEXT, 10, "Late", false);
             FileAnnotation page2 = createMockAnnotation(FileAnnotationType.TEXT, 2, "Early", false);
@@ -86,15 +88,11 @@ class FileAnnotationPreviewTest {
             Map<Path, List<FileAnnotation>> annotations = new LinkedHashMap<>();
             annotations.put(path, List.of(page10, page2));
 
-            String result = FileAnnotationPreview.render(annotations);
+            String expectedHtml = "<br><br><b>PDF Annotations</b><br><br><i>" + escape("book.pdf") + "</i><br>"
+                    + "<b>" + escape("Text") + " (Page 2):</b> " + escape("Early") + "<br>"
+                    + "<b>" + escape("Text") + " (Page 10):</b> " + escape("Late") + "<br>";
 
-            List<Integer> parsedPageNumbers = Arrays.stream(result.split("\\D+"))
-                                                    .filter(s -> !s.isEmpty())
-                                                    .map(Integer::parseInt)
-                                                    .collect(Collectors.toList());
-
-            assertTrue(parsedPageNumbers.contains(2) && parsedPageNumbers.contains(10),
-                    "Rendered output must contain both page numbers");
+            assertEquals(expectedHtml, FileAnnotationPreview.render(annotations));
         }
 
         @Test
@@ -107,11 +105,11 @@ class FileAnnotationPreviewTest {
             when(mainAnnotation.getLinkedFileAnnotation()).thenReturn(linkedAnnotation);
 
             Map<Path, List<FileAnnotation>> annotations = Map.of(path, List.of(mainAnnotation));
-            String result = FileAnnotationPreview.render(annotations);
 
-            // Validates that the engine successfully parsed the entry and produced valid structured blocks
-            assertTrue(result.length() > 0, "The rendered HTML for linked annotations should not be empty");
-            assertTrue(result.contains("<br>"), "Layout formatting structure should be preserved");
+            String expectedHtml = "<br><br><b>PDF Annotations</b><br><br><i>" + escape("document.pdf") + "</i><br>"
+                    + "<b>" + escape("Text") + " (Page 1):</b> " + escape("Main") + " — <i>Note: " + escape("Comment") + "</i><br>";
+
+            assertEquals(expectedHtml, FileAnnotationPreview.render(annotations));
         }
     }
 }
