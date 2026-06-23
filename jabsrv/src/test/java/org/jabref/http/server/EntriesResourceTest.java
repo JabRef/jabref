@@ -27,7 +27,9 @@ class EntriesResourceTest extends ServerTest {
     @BeforeEach
     @Override
     public void setUp() throws Exception {
-        uiMessageHandler = Mockito.mock(UiMessageHandler.class);
+        // CALLS_REAL_METHODS so the default isGuiConnected() runs (this != NONE -> true);
+        // a plain mock would return false and every request would be rejected with 400.
+        uiMessageHandler = Mockito.mock(UiMessageHandler.class, Mockito.CALLS_REAL_METHODS);
         super.setUp();
     }
 
