@@ -683,6 +683,24 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> property.set(defaultValue)));
     }
 
+    /// Binds an object-valued property whose persisted form is a boolean.
+    ///
+    /// @param serializer   converts the value to its stored boolean representation
+    /// @param deserializer reconstructs the value from its stored boolean representation
+    private <T> void bindBooleanObject(ObjectProperty<T> property,
+                                       String key,
+                                       T defaultValue,
+                                       Function<T, Boolean> serializer,
+                                       Function<Boolean, T> deserializer) {
+        EasyBind.listen(property, (_, _, v) -> putBoolean(key, serializer.apply(v)));
+        allBindings.add(new PreferenceBinding(
+                property,
+                defaultValue,
+                key,
+                () -> property.set(deserializer.apply(getBoolean(key, serializer.apply(defaultValue)))),
+                () -> property.set(defaultValue)));
+    }
+
     /// Binds a map-valued property. Unlike the other `bind*` helpers, persistence is delegated to the given
     /// `persistListener`, since map entries may be stored under multiple backing-store keys.
     ///
@@ -806,7 +824,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getInternalPreferences().setAll(InternalPreferences.getDefault());
         getFieldPreferences().setAll(FieldPreferences.getDefault());
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
-        getLibraryPreferences().setAll(LibraryPreferences.getDefault());
         getDOIPreferences().setAll(DOIPreferences.getDefault());
         getOwnerPreferences().setAll(OwnerPreferences.getDefault());
         getTimestampPreferences().setAll(TimestampPreferences.getDefault());
@@ -842,6 +859,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getGitPreferences().setAll(GitPreferences.getDefault());
 
         // ensure registration of bindings
+        getLibraryPreferences();
         getPushToApplicationPreferences();
         getAbbreviationPreferences();
 
@@ -863,7 +881,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getInternalPreferences().setAll(getInternalPreferencesFromBackingStore(getInternalPreferences()));
         getFieldPreferences().setAll(getFieldPreferencesFromBackingStore(getFieldPreferences()));
         getProxyPreferences().setAll(getProxyPreferencesFromBackingStore(getProxyPreferences()));
-        getLibraryPreferences().setAll(getLibraryPreferencesFromBackingStore(getLibraryPreferences()));
         getDOIPreferences().setAll(getDoiPreferencesFromBackingStore(getDOIPreferences()));
         getOwnerPreferences().setAll(getOwnerPreferencesFromBackingStore(getOwnerPreferences()));
         getTimestampPreferences().setAll(getTimestampPreferencesFromBackingStore(getTimestampPreferences()));
@@ -890,6 +907,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getGitPreferences().setAll(getGitPreferencesFromBackingStore(getGitPreferences()));
 
         // ensure registration of bindings
+        getLibraryPreferences();
         getPushToApplicationPreferences();
         getAbbreviationPreferences();
 
@@ -1101,24 +1119,24 @@ public class JabRefCliPreferences implements CliPreferences {
             return libraryPreferences;
         }
 
-        libraryPreferences = getLibraryPreferencesFromBackingStore(LibraryPreferences.getDefault());
+        LibraryPreferences defaultValues = LibraryPreferences.getDefault();
 
-        EasyBind.listen(libraryPreferences.defaultBibDatabaseModeProperty(), (_, _, newValue) -> putBoolean(LIBRARY_BIBLATEX_DEFAULT_MODE, newValue == BibDatabaseMode.BIBLATEX));
-        EasyBind.listen(libraryPreferences.alwaysReformatOnSaveProperty(), (_, _, newValue) -> putBoolean(LIBRARY_REFORMAT_ON_SAVE_AND_EXPORT, newValue));
-        EasyBind.listen(libraryPreferences.autoSaveProperty(), (_, _, newValue) -> putBoolean(LIBRARY_AUTO_SAVE, newValue));
-        EasyBind.listen(libraryPreferences.addImportedEntriesProperty(), (_, _, newValue) -> putBoolean(LIBRARY_ADD_IMPORTED_ENTRIES, newValue));
-        EasyBind.listen(libraryPreferences.addImportedEntriesGroupNameProperty(), (_, _, newValue) -> put(LIBRARY_ADD_IMPORTED_ENTRIES_GROUP_NAME, newValue));
+        libraryPreferences = new LibraryPreferences(
+                getBoolean(LIBRARY_BIBLATEX_DEFAULT_MODE, defaultValues.getDefaultBibDatabaseMode() == BibDatabaseMode.BIBLATEX) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
+                getBoolean(LIBRARY_REFORMAT_ON_SAVE_AND_EXPORT, defaultValues.shouldAlwaysReformatOnSave()),
+                getBoolean(LIBRARY_AUTO_SAVE, defaultValues.shouldAutoSave()),
+                getBoolean(LIBRARY_ADD_IMPORTED_ENTRIES, defaultValues.shouldAddImportedEntries()),
+                get(LIBRARY_ADD_IMPORTED_ENTRIES_GROUP_NAME, defaultValues.getAddImportedEntriesGroupName()));
+
+        bindBooleanObject(libraryPreferences.defaultBibDatabaseModeProperty(), LIBRARY_BIBLATEX_DEFAULT_MODE, defaultValues.getDefaultBibDatabaseMode(),
+                mode -> mode == BibDatabaseMode.BIBLATEX,
+                isBiblatex -> isBiblatex ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX);
+        bindBoolean(libraryPreferences.alwaysReformatOnSaveProperty(), LIBRARY_REFORMAT_ON_SAVE_AND_EXPORT, defaultValues.shouldAlwaysReformatOnSave());
+        bindBoolean(libraryPreferences.autoSaveProperty(), LIBRARY_AUTO_SAVE, defaultValues.shouldAutoSave());
+        bindBoolean(libraryPreferences.addImportedEntriesProperty(), LIBRARY_ADD_IMPORTED_ENTRIES, defaultValues.shouldAddImportedEntries());
+        bindString(libraryPreferences.addImportedEntriesGroupNameProperty(), LIBRARY_ADD_IMPORTED_ENTRIES_GROUP_NAME, defaultValues.getAddImportedEntriesGroupName());
 
         return libraryPreferences;
-    }
-
-    private @NonNull LibraryPreferences getLibraryPreferencesFromBackingStore(LibraryPreferences defaults) {
-        return new LibraryPreferences(
-                getBoolean(LIBRARY_BIBLATEX_DEFAULT_MODE, defaults.getDefaultBibDatabaseMode() == BibDatabaseMode.BIBLATEX) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
-                getBoolean(LIBRARY_REFORMAT_ON_SAVE_AND_EXPORT, defaults.shouldAlwaysReformatOnSave()),
-                getBoolean(LIBRARY_AUTO_SAVE, defaults.shouldAutoSave()),
-                getBoolean(LIBRARY_ADD_IMPORTED_ENTRIES, defaults.shouldAddImportedEntries()),
-                get(LIBRARY_ADD_IMPORTED_ENTRIES_GROUP_NAME, defaults.getAddImportedEntriesGroupName()));
     }
     // endregion
 
