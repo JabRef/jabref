@@ -171,7 +171,8 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     /// Determines all groups in the subtree starting at this node which contain at least one of the given entries.
     public List<GroupTreeNode> getMatchingGroups(List<BibEntry> entries) {
         List<GroupTreeNode> groups = new ArrayList<>();
-        // Identity-based cache: memoize results for the exact BibEntry and GroupTreeNode instances evaluated in this pass.
+        // Identity-based cache: matching is evaluated repeatedly while walking the same in-memory tree,
+        // so using object identity avoids hashing by value and keeps the cache local to this traversal.
         IdentityHashMap<BibEntry, IdentityHashMap<GroupTreeNode, MatchCache>> matchCaches = new IdentityHashMap<>();
         collectMatchingGroups(entries, groups, matchCaches);
 
@@ -276,6 +277,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
                                        List<GroupTreeNode> groups,
                                        IdentityHashMap<BibEntry, IdentityHashMap<GroupTreeNode, MatchCache>> matchCaches) {
         for (BibEntry entry : entries) {
+            // Reuse all match decisions already computed for this exact entry while visiting sibling groups.
             IdentityHashMap<GroupTreeNode, MatchCache> cacheForEntry = matchCaches.computeIfAbsent(entry, _ -> new IdentityHashMap<>());
             if (matches(entry, getGroup().getHierarchicalContext(), cacheForEntry)) {
                 groups.add(this);
@@ -290,6 +292,8 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     private static final class MatchCache {
+        // GroupHierarchyType has only a few enum constants, so two bit masks are cheaper than an EnumMap:
+        // one marks which contexts were computed, the other stores which of those computed to true.
         private int knownMask;
         private int trueMask;
 

@@ -29,6 +29,28 @@ FLAGS = [
     "Flag 04",
 ]
 
+FIRST_NAMES = [
+    "Ada", "Alan", "Alice", "Amelia", "Anders", "Anika", "Beatrice", "Benedikt", "Bjorn", "Carla",
+    "Carlos", "Celine", "Clara", "Daniel", "Daphne", "David", "Elena", "Elias", "Elise", "Emma",
+    "Felix", "Franziska", "George", "Grace", "Greta", "Hannah", "Hugo", "Ida", "Iris", "Jakob",
+    "Jana", "Jonas", "Julia", "Kai", "Karla", "Lara", "Laura", "Lea", "Leon", "Lina",
+    "Linus", "Lotte", "Louis", "Luca", "Lukas", "Maja", "Mara", "Marie", "Matteo", "Max",
+    "Mia", "Mila", "Mira", "Moritz", "Nina", "Noah", "Nora", "Oskar", "Paula", "Paul",
+    "Quentin", "Rafael", "Robert", "Rosa", "Sofia", "Sophie", "Theo", "Tobias", "Valentina", "Yara",
+    "Bj{\\\"o}rn", "J{\\\"u}rgen", "M{\\\"a}rta", "G{\\\"u}nther", "S{\\\"o}ren", "L{\\\"u}ne",
+    "{\\L}ukasz", "Ma{\\l}gorzata", "{\\Z}aneta", "Bartosz", "Joanna", "{\\S}wiatos{\\l}aw", "{\\'E}lodie", "Ji{\\v r}{\\'i}",
+]
+
+LAST_NAMES = [
+    "Anderson", "Bauer", "Becker", "Bergmann", "Brown", "Chen", "Clark", "Davis", "Dubois", "Fischer",
+    "Garcia", "Gonzalez", "Gruber", "Hansen", "Hoffmann", "Ivanov", "Johansson", "Johnson", "Kim", "Klein",
+    "Kowalski", "Krause", "Lee", "Lopez", "Maier", "Martin", "Meier", "Meyer", "Miller", "Muller",
+    "Nguyen", "Novak", "Patel", "Petrov", "Rossi", "Schmidt", "Schneider", "Schulz", "Silva", "Smith",
+    "Taylor", "Thomas", "Wagner", "Walker", "Weber", "White", "Williams", "Wilson", "Wright", "Zhang",
+    "M{\\\"u}ller", "Schr{\\\"o}der", "G{\\\"o}tz", "J{\\\"a}ger", "Kr{\\\"u}ger", "H{\\\"o}fler",
+    "{\\L}uczak", "{\\'S}wi{\\k a}tek", "{\\'Z}ebrowski", "Brz{\\k e}czyszczykiewicz", "Dvo{\\v r}{\\'a}k", "Garc{\\'i}a", "Smr{\\v z}", "N{\\k e}mec",
+]
+
 
 # Adapted from: https://stackoverflow.com/a/50012689/873282
 def int_to_roman(num):
@@ -100,12 +122,26 @@ def keywords_for_entry(entry_number):
     return KEYWORD_SEPARATOR.join((topic, subtopic, flag))
 
 
+def authors_for_entry(entry_number):
+    authors = []
+
+    for author_offset in range(3):
+        first_name_index = (entry_number * 7 + author_offset * 11) % len(FIRST_NAMES)
+        last_name_index = (entry_number * 13 + author_offset * 17) % len(LAST_NAMES)
+        suffix = (entry_number + author_offset * 37) % 200
+
+        authors.append(f"{FIRST_NAMES[first_name_index]} {LAST_NAMES[last_name_index]} {suffix:03d}")
+
+    return " and ".join(authors)
+
+
 def entry_text(entry_number):
     year = 1900 + (entry_number - 1) % (2025 - 1900)
     keywords = keywords_for_entry(entry_number)
+    authors = authors_for_entry(entry_number)
     return f"""@article{{id{entry_number:06d},
   title    = {{This is my title{entry_number}}},
-  author   = {{FirstnameA{entry_number} LastnameA{entry_number} and FirstnameB{entry_number} LastnameB{entry_number} and FirstnameC{entry_number} LastnameC{entry_number}}},
+  author   = {{{authors}}},
   journal  = {{Journal Title {int_to_roman(entry_number)}}},
   volume   = {{{entry_number}}},
   year     = {{{year}}},
