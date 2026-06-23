@@ -62,10 +62,11 @@ if (useLibericaJdkFull) {
                       ${installationPath.asFile}
                     (missing $javafxJmod)
 
-                    A BellSoft Liberica *Standard* JDK was most likely selected instead of Liberica *Full*.
+                    A BellSoft Liberica *Standard* JDK was most likely selected instead of Liberica *Full*
+                    (or the vendor was overridden via -Pjdk to a JDK that does not bundle JavaFX).
                     Install Liberica *Full* JDK 25 and ensure no Liberica *Standard* 25 of the same vendor/version
                     is installed (the toolchain query cannot tell them apart), or point Gradle at the Full JDK via
-                    the org.gradle.java.installations.paths property.
+                    the org.gradle.java.installations.paths property. Do not pass -Pjdk together with -PuseLibericaJdkFull.
                     """.trimIndent()
                 )
             }

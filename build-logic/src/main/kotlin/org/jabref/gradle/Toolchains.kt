@@ -42,8 +42,15 @@ private fun parseUseLibericaJdkFull(value: String): Boolean =
  */
 val Project.javaVersion: Int
     get() = providers.gradleProperty("javaVersion").map { value ->
-        value.trim().toIntOrNull()
+        val parsed = value.trim().toIntOrNull()
             ?: throw IllegalArgumentException("Invalid value '$value' for property 'javaVersion'. Expected an integer like '25' or '26'.")
+        if (parsed < 25) {
+            throw IllegalArgumentException(
+                "Invalid value '$value' for property 'javaVersion': must be >= 25 because the build targets --release 25 " +
+                    "(see org.jabref.gradle.feature.compile). A lower toolchain JDK cannot satisfy --release 25."
+            )
+        }
+        parsed
     }.getOrElse(25)
 
 /**
@@ -54,8 +61,19 @@ val Project.javaVersion: Int
  * non-Liberica-Full vendors do NOT bundle JavaFX, so do not combine them with `-PuseLibericaJdkFull`.
  */
 val Project.jdkVendor: JvmVendorSpec
-    get() = providers.gradleProperty("jdk").map { parseJdkVendor(it) }
-        .getOrElse(if (useLibericaJdkFull) JvmVendorSpec.BELLSOFT else JvmVendorSpec.AMAZON)
+    get() = providers.gradleProperty("jdk").map { value ->
+        val vendor = parseJdkVendor(value)
+        // -PuseLibericaJdkFull relies on a BellSoft Liberica *Full* JDK bundling JavaFX (Maven JavaFX is dropped,
+        // see org.jabref.gradle.base.dependency-rules). Overriding the vendor to anything else yields a JDK without
+        // JavaFX and a misleading "Liberica Standard was selected" failure later. Reject the combination up front.
+        if (useLibericaJdkFull && vendor != JvmVendorSpec.BELLSOFT) {
+            throw IllegalArgumentException(
+                "Do not combine -PuseLibericaJdkFull with -Pjdk=$value; that vendor does not bundle JavaFX. " +
+                    "Either remove -Pjdk (to use BellSoft Liberica Full) or disable -PuseLibericaJdkFull."
+            )
+        }
+        vendor
+    }.getOrElse(if (useLibericaJdkFull) JvmVendorSpec.BELLSOFT else JvmVendorSpec.AMAZON)
 
 /**
  * Maps a friendly `-Pjdk` name to a Gradle [JvmVendorSpec]. Eclipse OpenJ9 ships as IBM Semeru,
