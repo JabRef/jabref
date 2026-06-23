@@ -734,10 +734,13 @@ public class StringUtil {
         return sb.toString();
     }
 
-    /// Gets the path of the engine
+    /// Splits a string by whitespace, treating backslash-escaped spaces as part of the same token.
     ///
-    /// @return the path of the engine as a list of strings to be passed to the process builder.
-    public static ArrayList<String> splitPathRespectingQuotes(String path) {
+    /// Example: {@code ""C:\Current Python\python.exe" -m ocrmypdf"} -> {@code [""C:\Current Python\python.exe"", "-m", "ocrmypdf"]}
+    ///
+    /// @param path the string to split
+    /// @return a list of tokens
+    public static ArrayList<String> splitRespectingEscapedWhitespace(String path) {
         ArrayList<String> result = new ArrayList<>();
         // first check if the path contains a slash or backslash, if so it gets the first space after the last slash
         // then it splits the rest of the string by spaces, otherwise it just splits the whole string by spaces
