@@ -24,8 +24,8 @@ public class LatexToUnicodeAdapter {
 
     private static final Pattern UNDERSCORE_PLACEHOLDER_MATCHER = Pattern.compile(REPLACEMENT_CHAR);
     private static final Cache<String, String> FORMAT_CACHE = Caffeine.newBuilder()
-                                                                     .maximumSize(CACHE_SIZE)
-                                                                     .build();
+                                                                      .maximumSize(CACHE_SIZE)
+                                                                      .build();
 
     /// Attempts to resolve all LaTeX in the given string.
     ///
