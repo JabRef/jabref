@@ -429,10 +429,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 String annotationsHtml = FileAnnotationPreview.render(annotationsMap);
                 previewHtml.append(annotationsHtml);
             }
-        } catch (java.io.IOException e) {
-            LOGGER.warn("Could not read PDF files for entry annotation preview: {}", currentEntry.getCitationKey().orElse("unknown"), e);
         } catch (Exception e) {
-            LOGGER.error("Unexpected error processing PDF annotations in background", e);
+            LOGGER.warn("Could not read PDF files for entry annotation preview: {}", currentEntry.getCitationKey().orElse("unknown"), e);
         }
 
         return previewHtml.toString();
