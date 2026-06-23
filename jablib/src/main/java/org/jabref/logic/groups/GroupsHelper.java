@@ -6,6 +6,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class GroupsHelper {
 
     private GroupsHelper() {
