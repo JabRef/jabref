@@ -20,6 +20,7 @@ import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.IEEEQueryTransformer;
 import org.jabref.logic.net.URLDownload;
@@ -31,6 +32,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.BaseQueryNode;
 
 import kong.unirest.core.UnirestException;
@@ -290,12 +292,8 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         // the transformer stores the min and max year
         transformer = new IEEEQueryTransformer();
         String transformedQuery = transformer.transformSearchQuery(queryNode).orElse("");
-        URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
-        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("apikey", apiKey));
-        if (!transformedQuery.isBlank()) {
-            uriBuilder.addParameter("querytext", transformedQuery);
-        }
-        uriBuilder.addParameter("max_records", String.valueOf(getPageSize()));
+        URL baseUrl = buildSearchURL(transformedQuery, pageNumber);
+        URIBuilder uriBuilder = new URIBuilder(baseUrl.toURI());
         // Currently not working as part of the query string
         if (transformer.getJournal().isPresent()) {
             uriBuilder.addParameter("publication_title", transformer.getJournal().get());
@@ -309,7 +307,41 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         if (transformer.getArticleNumber().isPresent()) {
             uriBuilder.addParameter("article_number", transformer.getArticleNumber().get());
         }
-        // Starts to index at 1 for the first entry
+        return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public Page<BibEntry> performRawSearchQueryPaged(String rawQuery, int pageNumber) throws FetcherException {
+        if (rawQuery.isBlank()) {
+            return new Page<>(rawQuery, pageNumber, List.of());
+        }
+        transformer = new IEEEQueryTransformer();
+        try {
+            URL url = buildSearchURL(rawQuery, pageNumber);
+            try (var stream = getUrlDownload(url).asInputStream()) {
+                return new Page<>(rawQuery, pageNumber, getParser().parseEntries(stream));
+            }
+        } catch (URISyntaxException e) {
+            throw new FetcherException("IEEE raw search URL is malformed for query: " + rawQuery, e);
+        } catch (IOException e) {
+            throw new FetcherException(rawQuery, e);
+        } catch (ParseException e) {
+            throw new FetcherException("IEEE raw search parse error for query: " + rawQuery, e);
+        }
+    }
+
+    /// Builds the IEEE search API URL for the given raw query string and page number.
+    /// The caller is responsible for setting `transformer` before invoking `getParser()`.
+    ///
+    /// @param rawQuery   the query string to pass directly as the `querytext` parameter
+    /// @param pageNumber zero based page number; converted to a one based `start_record` value.
+    private URL buildSearchURL(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+        URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
+        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("apikey", apiKey));
+        if (!rawQuery.isBlank()) {
+            uriBuilder.addParameter("querytext", rawQuery);
+        }
+        uriBuilder.addParameter("max_records", String.valueOf(getPageSize()));
         uriBuilder.addParameter("start_record", String.valueOf(getPageSize() * pageNumber + 1));
 
         return uriBuilder.build().toURL();
