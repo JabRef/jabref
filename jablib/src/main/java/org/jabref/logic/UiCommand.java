@@ -45,8 +45,8 @@ public sealed interface UiCommand {
             this(Optional.empty(), bibtex, toGroup(targetGroup));
         }
 
-        public AppendBibTeXToLibrary(Optional<Path> library, String bibtex, @Nullable String targetGroup) {
-            this(library, bibtex, toGroup(targetGroup));
+        public AppendBibTeXToLibrary(Path library, String bibtex, @Nullable String targetGroup) {
+            this(Optional.of(library), bibtex, toGroup(targetGroup));
         }
 
         private static Optional<String> toGroup(@Nullable String targetGroup) {

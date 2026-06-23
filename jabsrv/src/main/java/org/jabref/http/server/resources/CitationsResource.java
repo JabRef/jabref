@@ -204,7 +204,9 @@ public class CitationsResource {
         }
 
         // uiMessageHandler is null-checked at the top of addFromCache; safe here.
-        uiMessageHandler.handleUiCommands(List.of(new UiCommand.AppendBibTeXToLibrary(targetLibrary, rawEntry.toString(), group)));
+        uiMessageHandler.handleUiCommands(List.of(targetLibrary
+                .map(library -> new UiCommand.AppendBibTeXToLibrary(library, rawEntry.toString(), group))
+                .orElseGet(() -> new UiCommand.AppendBibTeXToLibrary(rawEntry.toString(), group))));
 
         // Evict so the same token can't add a second copy. The client
         // already has confirmation it landed; re-tries fall through to

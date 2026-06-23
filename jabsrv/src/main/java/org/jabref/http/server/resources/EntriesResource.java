@@ -80,7 +80,9 @@ public class EntriesResource {
         if (!uiMessageHandler.isGuiConnected()) {
             throw new BadRequestException("Only possible in GUI mode.");
         }
-        uiMessageHandler.handleUiCommands(List.of(new UiCommand.AppendBibTeXToLibrary(targetLibrary, bibtex, group)));
+        uiMessageHandler.handleUiCommands(List.of(targetLibrary
+                .map(library -> new UiCommand.AppendBibTeXToLibrary(library, bibtex, group))
+                .orElseGet(() -> new UiCommand.AppendBibTeXToLibrary(bibtex, group))));
     }
 
     /// Parses a plain-text bibliography reference into a BibTeX entry and appends it to the
@@ -113,7 +115,9 @@ public class EntriesResource {
                 new BibEntryTypesManager());
         entryWriter.write(parsed, bibWriter, BibDatabaseMode.BIBTEX);
 
-        uiMessageHandler.handleUiCommands(List.of(new UiCommand.AppendBibTeXToLibrary(targetLibrary, rawEntry.toString(), group)));
+        uiMessageHandler.handleUiCommands(List.of(targetLibrary
+                .map(library -> new UiCommand.AppendBibTeXToLibrary(library, rawEntry.toString(), group))
+                .orElseGet(() -> new UiCommand.AppendBibTeXToLibrary(rawEntry.toString(), group))));
     }
 
     private Optional<BibEntry> parsePlainCitation(PlainCitationParserChoice choice, String citationText) throws FetcherException {
