@@ -874,8 +874,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 showAndEdit(entries.getFirst());
             } else {
                 clearAndSelect(entries.getFirst());
+                mainTable.requestFocus(); // Only request focus when staying in the table grid
             }
-            mainTable.requestFocus();
         }
     }
 
