@@ -137,7 +137,7 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
         boolean contains(BibEntry entry);
     }
 
-        @AllowedToUseLogic("Uses StringUtil temporarily")
+    @AllowedToUseLogic("Uses StringUtil temporarily")
     class StringSearchStrategy implements SearchStrategy {
         private final Set<String> searchWords;
         private final String[] caseInsensitiveSearchWords;
