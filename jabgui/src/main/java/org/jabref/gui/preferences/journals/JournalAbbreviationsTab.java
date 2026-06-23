@@ -1,15 +1,8 @@
 package org.jabref.gui.preferences.journals;
 
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.animation.PauseTransition;
 import javafx.collections.transformation.FilteredList;
-import javafx.event.ActionEvent;
+import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -19,13 +12,11 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -39,7 +30,8 @@ import org.controlsfx.control.textfield.CustomTextField;
 /// This class controls the user interface of the journal abbreviations dialog. The UI elements and their layout are
 /// defined in the FXML file.
 public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAbbreviationsTabViewModel> implements PreferencesTab {
-
+    private final PseudoClass INVALID =
+            PseudoClass.getPseudoClass("invalid");
     @FXML private Label loadingLabel;
     @FXML private ProgressIndicator progressIndicator;
 
@@ -61,7 +53,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
 
-    private Timeline invalidateSearch;
+    private PauseTransition invalidateSearch;
 
     public JournalAbbreviationsTab() {
         ViewLoader.view(this)
@@ -136,19 +128,13 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     }
 
     private void setAnimations() {
-        ObjectProperty<Color> flashingColor = new SimpleObjectProperty<>(Color.TRANSPARENT);
-        StringProperty flashingColorStringProperty = ColorUtil.createFlashingColorStringProperty(flashingColor);
+        searchBox.pseudoClassStateChanged(INVALID, false);
+        invalidateSearch = new PauseTransition(Duration.seconds(0.25));
 
-        searchBox.styleProperty().bind(
-                new SimpleStringProperty("-fx-control-inner-background: ").concat(flashingColorStringProperty).concat(";")
-        );
-        invalidateSearch = new Timeline(
-                new KeyFrame(Duration.seconds(0), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR)),
-                new KeyFrame(Duration.seconds(0.25), new KeyValue(flashingColor, Color.RED, Interpolator.LINEAR)),
-                new KeyFrame(Duration.seconds(0.25), new KeyValue(searchBox.textProperty(), "", Interpolator.DISCRETE)),
-                new KeyFrame(Duration.seconds(0.25), (ActionEvent event) -> addAbbreviationActions()),
-                new KeyFrame(Duration.seconds(0.5), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR))
-        );
+        invalidateSearch.setOnFinished(event -> {
+            searchBox.clear();
+            searchBox.pseudoClassStateChanged(INVALID, false);
+        });
     }
 
     @FXML
@@ -169,7 +155,8 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @FXML
     private void addAbbreviation() {
         if (!searchBox.getText().isEmpty()) {
-            invalidateSearch.play();
+            searchBox.pseudoClassStateChanged(INVALID, true);
+            invalidateSearch.playFromStart();
         } else {
             addAbbreviationActions();
         }
