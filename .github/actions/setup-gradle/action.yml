@@ -10,6 +10,11 @@ inputs:
     description: Java version
     required: false
     default: '25'
+  javaPackage:
+    # 'jdk+fx' pulls a JavaFX-bundling JDK (e.g. BellSoft Liberica Full), required for the -PuseLibericaJdkFull build (Windows ARM)
+    description: Java package (jdk or jdk+fx)
+    required: false
+    default: jdk
 
 runs:
   using: composite
@@ -19,6 +24,7 @@ runs:
       with:
         java-version: ${{ inputs.javaVersion }}
         distribution: ${{ inputs.distribution }}
+        java-package: ${{ inputs.javaPackage }}
         check-latest: true
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v6

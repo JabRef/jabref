@@ -386,6 +386,18 @@ jobs:
                 "archForDebianRepack": ""
               },
               {
+                "os": "windows-11-arm",
+                "displayName": "windows-arm",
+                "archivePortable": "7z a -r jabgui/build/packages/windows-11-arm/JabRef-portable_windows_arm64.zip ./jabgui/build/packages/windows-11-arm/JabRef && rm -R jabgui/build/packages/windows-11-arm/JabRef",
+                "archivePortableJabKit": "7z a -r jabkit/build/packages/windows-11-arm/jabkit-portable_windows_arm64.zip ./jabkit/build/packages/windows-11-arm/jabkit && rm -R jabkit/build/packages/windows-11-arm/jabkit",
+                "archivePortableJabLS": "7z a -r jabls-cli/build/packages/windows-11-arm/jabls-portable_windows_arm64.zip ./jabls-cli/build/packages/windows-11-arm/jabls && rm -R jabls-cli/build/packages/windows-11-arm/jabls",
+                "suffix": "_arm64",
+                "archForDebianRepack": "",
+                "jvmDistribution": "liberica",
+                "javaPackage": "jdk+fx",
+                "additionalGradleParameter": "-PuseLibericaJdkFull"
+              },
+              {
                 "os": "macos-15-intel",
                 "displayName": "macOS-intel",
                 "archivePortable": "7z a -r jabgui/build/packages/macos-15-intel/JabRef-portable_macos-intel.zip ./jabgui/build/packages/macos-15-intel/JabRef.app && rm -R jabgui/build/packages/macos-15-intel/JabRef.app",
@@ -509,7 +521,7 @@ jobs:
         if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
         run: brew install rsync
       - name: Setup rsync (Windows)
-        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'windows')) }}
         # We want to have rsync available at this place to avoid uploading and downloading from GitHub artifact store (taking > 5 minutes in total)
         # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
         # We cannot use "setup-rsync", because that does not work on Windows
@@ -551,7 +563,10 @@ jobs:
 
       - uses: ./.github/actions/setup-gradle
         with:
-          distribution: ${{ needs.conditions.outputs.jvmDistribution }}
+          # matrix.jvmDistribution (e.g. "liberica" for Windows ARM) overrides the workflow-wide default
+          distribution: ${{ matrix.jvmDistribution || needs.conditions.outputs.jvmDistribution }}
+          # "jdk+fx" for the Liberica Full path (Windows ARM); "jdk" everywhere else
+          javaPackage: ${{ matrix.javaPackage || 'jdk' }}
       - name: Output current Java environment
         shell: bash
         run: |
@@ -569,7 +584,7 @@ jobs:
         id: jablib-jar
         # wait: gitversion
         # background: true
-        run: gradle :jablib:jar
+        run: gradle :jablib:jar ${{ matrix.additionalGradleParameter }}
         env:
           VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
           VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
@@ -592,14 +607,14 @@ jobs:
       - name: jabls jar
         # background: true
         id: jabls-jar
-        run: gradle :jabls:jar
+        run: gradle :jabls:jar ${{ matrix.additionalGradleParameter }}
         env:
           VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
           VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
       - name: jabsrv jar
         # background: true
         id: jabsrv-jar
-        run: gradle :jabsrv:jar
+        run: gradle :jabsrv:jar ${{ matrix.additionalGradleParameter }}
         env:
           VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
           VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
@@ -665,6 +680,7 @@ jobs:
           archivePortable: ${{ matrix.archivePortableJabLS }}
           archForDebianRepack: ${{ matrix.archForDebianRepack }}
           suffix: ${{ matrix.suffix }}
+          additionalGradleParameter: ${{ matrix.additionalGradleParameter }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
           subdir: "/tools"
@@ -690,6 +706,7 @@ jobs:
           archivePortable: 'NONE'
           archForDebianRepack: ${{ matrix.archForDebianRepack }}
           suffix: ${{ matrix.suffix }}
+          additionalGradleParameter: ${{ matrix.additionalGradleParameter }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
           subdir: "/tools"
@@ -716,6 +733,7 @@ jobs:
           archivePortable: ${{ matrix.archivePortable }}
           archForDebianRepack: ${{ matrix.archForDebianRepack }}
           suffix: ${{ matrix.suffix }}
+          additionalGradleParameter: ${{ matrix.additionalGradleParameter }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
           subdir: ""
@@ -741,6 +759,7 @@ jobs:
           archivePortable: ${{ matrix.archivePortableJabKit }}
           archForDebianRepack: ${{ matrix.archForDebianRepack }}
           suffix: ${{ matrix.suffix }}
+          additionalGradleParameter: ${{ matrix.additionalGradleParameter }}
           shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
           subdir: "/tools"

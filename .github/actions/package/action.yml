@@ -34,6 +34,10 @@ inputs:
     required: true
   subdir:
     required: true
+  additionalGradleParameter:
+    description: 'Extra gradle args appended to jpackage/smoke-test calls, e.g. "-PuseLibericaJdkFull" for Windows ARM'
+    required: false
+    default: ''
 
   secretsPresent:
     required: true
@@ -53,7 +57,7 @@ runs:
   steps:
     - name: jpackage ${{ inputs.component }}
       shell: bash
-      run: gradle -i :${{ inputs.component }}:jpackage
+      run: gradle -i :${{ inputs.component }}:jpackage ${{ inputs.additionalGradleParameter }}
       env:
         VERSION: ${{ inputs.AssemblySemVer }}
         VERSION_INFO: ${{ inputs.InformationalVersion }}
@@ -71,7 +75,7 @@ runs:
     - name: Smoke test ${{ inputs.component }}
       shell: bash
       run: |
-        gradle -i :${{ inputs.component }}:run --args="--help"
+        gradle -i :${{ inputs.component }}:run --args="--help" ${{ inputs.additionalGradleParameter }}
       env:
         VERSION: ${{ inputs.AssemblySemVer }}
         VERSION_INFO: ${{ inputs.InformationalVersion }}
@@ -120,7 +124,7 @@ runs:
     - name: Upload ${{ inputs.component }} to builds.jabref.org (Windows)
       # background: true
       # jabsrv-cli doesn't have any installer and no archivePortable; thus we do not upload
-      if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'windows-latest') && (inputs.archivePortable != 'NONE') }}
+      if: ${{ (inputs.diskSpaceAvailable == 'true') && (startsWith(inputs.os, 'windows')) && (inputs.archivePortable != 'NONE') }}
       shell: cmd
       # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
       run: |
