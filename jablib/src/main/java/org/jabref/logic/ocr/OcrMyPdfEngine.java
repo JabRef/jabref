@@ -35,7 +35,7 @@ public class OcrMyPdfEngine implements OcrEngine {
 
     @Override
     public boolean isAvailable() {
-        ArrayList<String> command = StringUtil.splitPathRespectingQuotes(ocrPreferences.getOcrPath());
+        ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrPath());
         command.add("--version");
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
@@ -49,7 +49,7 @@ public class OcrMyPdfEngine implements OcrEngine {
             }
             return process.exitValue() == 0;
         } catch (IOException e) {
-            LOGGER.error("OCRmyPDF is not available: IOException occurred", e);
+            LOGGER.error("OCRmyPDF is not available at {}: IOException occurred", ocrPreferences.getOcrPath(), e);
             return false;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -73,7 +73,7 @@ public class OcrMyPdfEngine implements OcrEngine {
         Path outputPath = makeOutputFilePath(pdfPath);
         String outputFile = outputPath.toString();
         // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
-        ArrayList<String> command = StringUtil.splitPathRespectingQuotes(ocrPreferences.getOcrPath());
+        ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrPath());
         command.add("--skip-text");
         command.add(pdfPath.toString());
         command.add(outputFile);
