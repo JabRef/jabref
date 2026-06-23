@@ -875,6 +875,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             } else {
                 clearAndSelect(entries.getFirst());
             }
+            mainTable.requestFocus();
         }
     }
 
