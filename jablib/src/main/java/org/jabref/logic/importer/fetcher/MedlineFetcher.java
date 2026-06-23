@@ -128,7 +128,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
     }
 
     @Override
-    public Optional<HelpFile> getHelpPage() {
+    public @NonNull Optional<HelpFile> getHelpPage() {
         return Optional.of(HelpFile.FETCHER_MEDLINE);
     }
 
@@ -195,7 +195,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
     }
 
     @Override
-    public List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
+    public @NonNull List<BibEntry> performSearch(@NonNull BaseQueryNode queryNode) throws FetcherException {
         List<BibEntry> entryList;
         MedlineQueryTransformer transformer = new MedlineQueryTransformer();
         Optional<String> transformedQuery = transformer.transformSearchQuery(queryNode);
