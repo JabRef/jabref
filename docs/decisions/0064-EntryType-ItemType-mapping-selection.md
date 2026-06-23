@@ -2,7 +2,7 @@
 nav_order: 64
 parent: Decision Records
 ---
-# Entry type and item type mapping selection
+# Use citation-js's mapping for CSL item type/field <-> BibLaTeX type/field conversion
 
 ## Context and Problem Statement
 
