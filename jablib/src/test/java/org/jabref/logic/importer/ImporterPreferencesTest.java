@@ -9,9 +9,8 @@ import java.util.Set;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.preferences.FetcherApiKey;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -34,21 +33,20 @@ class ImporterPreferencesTest {
                 Map.of());
     }
 
-    @Test
-    void getApiKeyReturnsConfiguredKey() {
-        assertEquals(Optional.of("real-key"), withCustomKey("real-key").getApiKey(FETCHER));
-    }
-
     @ParameterizedTest
-    @ValueSource(strings = {"", " ", "\t", "\n", "   "})
-    void getApiKeyTreatsBlankKeyAsAbsent(String blank) {
-        // A blank key (e.g. an unsubstituted build secret) must be reported as absent so callers
-        // do not send an empty api_key= parameter to the remote service.
-        assertEquals(Optional.empty(), withCustomKey(blank).getApiKey(FETCHER));
-    }
+    @CsvSource(textBlock = """
+            # a real key is returned as-is
+            SomeFetcher,    real-key,  real-key
 
-    @Test
-    void getApiKeyReturnsEmptyForUnknownFetcher() {
-        assertEquals(Optional.empty(), withCustomKey("real-key").getApiKey("UnknownFetcher"));
+            # a blank key (e.g. an unsubstituted build secret) is treated as absent,
+            # so callers never send an empty api_key= parameter
+            SomeFetcher,    '',
+            SomeFetcher,    '   ',
+
+            # an unknown fetcher has no key
+            UnknownFetcher, real-key,
+            """)
+    void getApiKeyTreatsBlankAndUnknownAsAbsent(String queried, String configured, String expected) {
+        assertEquals(Optional.ofNullable(expected), withCustomKey(configured).getApiKey(queried));
     }
 }
