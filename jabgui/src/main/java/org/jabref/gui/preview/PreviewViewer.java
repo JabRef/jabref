@@ -31,12 +31,15 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.WebViewStore;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.Number;
+import org.jabref.logic.pdf.EntryAnnotationImporter;
+import org.jabref.logic.pdf.FileAnnotationPreview;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.search.query.SearchQuery;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -210,11 +213,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         Number.serialExportNumber = 1;
         BibEntry currentEntry = entry;
 
-        BackgroundTask.wrap(() -> layout.generatePreview(currentEntry, databaseContext))
-                      .onSuccess(previewText -> {
-                          setPreviewText(previewText);
+        org.jabref.logic.FilePreferences filePreferences = preferences.getFilePreferences();
+
+        BackgroundTask.wrap(() -> generatePreviewWithAnnotations(currentEntry, filePreferences))
+                      .onSuccess(htmlComplete -> {
+                          setPreviewText(htmlComplete);
                           if (preferences.getPreviewPreferences().shouldDownloadCovers()) {
-                              downloadCoverAndRefresh(currentEntry, previewText);
+                              downloadCoverAndRefresh(currentEntry, htmlComplete);
                           }
                       })
                       .onFailure(e -> setPreviewText(formatError(currentEntry, e)))
@@ -406,5 +411,30 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public String getSelectionHtmlContent() {
         return (String) previewView.getEngine().executeScript(JS_GET_SELECTION_HTML_SCRIPT);
+    }
+
+    private String generatePreviewWithAnnotations(BibEntry currentEntry, org.jabref.logic.FilePreferences filePreferences) {
+        if (currentEntry == null || databaseContext == null || layout == null) {
+            return "";
+        }
+
+        StringBuilder previewHtml = new StringBuilder(layout.generatePreview(currentEntry, databaseContext));
+
+        try {
+            EntryAnnotationImporter entryAnnotationImporter = new EntryAnnotationImporter(currentEntry);
+            java.util.Map<java.nio.file.Path, List<FileAnnotation>> annotationsMap =
+                    entryAnnotationImporter.importAnnotationsFromFiles(databaseContext, filePreferences);
+
+            if (annotationsMap != null && !annotationsMap.isEmpty()) {
+                String annotationsHtml = FileAnnotationPreview.render(annotationsMap);
+                previewHtml.append(annotationsHtml);
+            }
+        } catch (java.io.IOException e) {
+            LOGGER.warn("Could not read PDF files for entry annotation preview: {}", currentEntry.getCitationKey().orElse("unknown"), e);
+        } catch (Exception e) {
+            LOGGER.error("Unexpected error processing PDF annotations in background", e);
+        }
+
+        return previewHtml.toString();
     }
 }
