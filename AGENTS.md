@@ -176,7 +176,7 @@ Both comments must not be added.
 ### Dealing with `null`
 
 - New public methods should not return `null`. They should make use of `java.util.Optional`. In case `null` really needs to be used, the [JSpecify](https://jspecify.dev/) annotations must be used.
-- Use JSpecify annotations (`@Nullable`, `@Nullmarked`, `@NonNull`, ...) instead of `null` checks
+- Use JSpecify annotations (`@Nullable`, `@NullMarked`, `@NonNull`, ...) instead of `null` checks
 - Annotate every new class with `@NullMarked` (`org.jspecify.annotations.NullMarked`) so members default to non-null.
 - `null` should never be passed to a method (except it has the same name).
 - DO NOT use `Objects.requireNonNull`, use JSpecify's `@NullMarked` and `@NonNull` annotations.
