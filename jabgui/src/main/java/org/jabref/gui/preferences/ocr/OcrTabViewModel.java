@@ -34,7 +34,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
             "py -m ocrmypdf",
             "python3 -m ocrmypdf"
     );
-    private final StringProperty ocrPath = new SimpleStringProperty();
+    private final StringProperty ocrEnginePath = new SimpleStringProperty();
 
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
@@ -53,16 +53,16 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        ocrPath.setValue(ocrPreferences.getOcrEnginePath());
+        ocrEnginePath.setValue(ocrPreferences.getOcrEnginePath());
     }
 
     @Override
     public void storeSettings() {
-        ocrPreferences.setOcrEnginePath(ocrPath.getValue());
+        ocrPreferences.setOcrEnginePath(ocrEnginePath.getValue());
     }
 
-    public StringProperty ocrPathProperty() {
-        return ocrPath;
+    public StringProperty ocrEnginePathProperty() {
+        return ocrEnginePath;
     }
 
     public void browseEnginePath() {
@@ -70,12 +70,12 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
                 new FileDialogConfiguration.Builder()
                         .withInitialDirectory(filePreferences.getWorkingDirectory())
                         .build());
-        selectedPath.ifPresent(path -> ocrPathProperty().set(path.toString()));
+        selectedPath.ifPresent(path -> ocrEnginePathProperty().set(path.toString()));
     }
 
     public Optional<String> autoDetectDefaultEnginePath() {
         return DEFAULT_OCR_PATHS.stream()
-                                .filter(this::pathExists)
+                                .filter(this::enginePathExists)
                                 .findFirst();
     }
 
@@ -87,7 +87,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         autoDetectTask.onSuccess(result -> {
             if (result.isPresent()) {
                 String path = result.get();
-                ocrPathProperty().set(path);
+                ocrEnginePathProperty().set(path);
                 dialogService.notify(Localization.lang("OCRmyPDF detected at: %0", path));
             } else {
                 dialogService.notify(Localization.lang("OCRmyPDF could not be detected automatically"));
@@ -97,7 +97,7 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
         taskExecutor.execute(autoDetectTask);
     }
 
-    private boolean pathExists(String path) {
+    private boolean enginePathExists(String path) {
         ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(path);
         command.add("--version");
         try {
