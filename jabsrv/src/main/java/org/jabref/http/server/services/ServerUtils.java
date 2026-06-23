@@ -17,6 +17,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import com.google.common.html.HtmlEscapers;
 import jakarta.ws.rs.NotFoundException;
 import org.jspecify.annotations.NonNull;
 
@@ -75,6 +76,6 @@ public class ServerUtils {
                                   return (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id);
                               })
                               .findFirst()
-                              .orElseThrow(() -> new NotFoundException("No library with id " + id + " found"));
+                              .orElseThrow(() -> new NotFoundException("No library with id " + HtmlEscapers.htmlEscaper().escape(id) + " found"));
     }
 }

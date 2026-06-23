@@ -78,30 +78,13 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
             if (newValue != null) {
                 previewViewer.setEntry(newValue.getEntry());
             } else {
-                previewViewer.setEntry(oldValue.getEntry());
+                previewViewer.clearEntry();
             }
         });
 
         Stage stage = (Stage) getDialogPane().getScene().getWindow();
 
-        resultsTable.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                BibEntryTableViewModel selectedEntry = resultsTable.getSelectionModel().getSelectedItem();
-                if (selectedEntry == null) {
-                    return;
-                }
-                libraryTabContainer.getLibraryTabs().stream()
-                                   .filter(tab -> tab.getBibDatabaseContext().equals(selectedEntry.getBibDatabaseContext()))
-                                   .findFirst()
-                                   .ifPresent(libraryTabContainer::showLibraryTab);
-
-                stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).set(stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).get());
-                stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(selectedEntry.getEntry()));
-                if (!keepOnTop.isSelected()) {
-                    stage.hide();
-                }
-            }
-        });
+        setupTableDoubleClickHandler(resultsTable, stage);
 
         container.getItems().addAll(resultsTable, previewViewer);
 
@@ -125,6 +108,27 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
             preferences.getSearchPreferences().setSearchWindowHeight(getHeight());
             preferences.getSearchPreferences().setSearchWindowWidth(getWidth());
             preferences.getSearchPreferences().setSearchWindowDividerPosition(container.getDividers().getFirst().getPosition());
+        });
+    }
+
+    private void setupTableDoubleClickHandler(SearchResultsTable resultsTable, Stage stage) {
+        resultsTable.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                BibEntryTableViewModel selectedEntry = resultsTable.getSelectionModel().getSelectedItem();
+                if (selectedEntry == null) {
+                    return;
+                }
+                libraryTabContainer.getLibraryTabs().stream()
+                                   .filter(tab -> tab.getBibDatabaseContext().equals(selectedEntry.getBibDatabaseContext()))
+                                   .findFirst()
+                                   .ifPresent(libraryTabContainer::showLibraryTab);
+
+                stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).set(stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).get());
+                stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(selectedEntry.getEntry()));
+                if (!keepOnTop.isSelected()) {
+                    stage.hide();
+                }
+            }
         });
     }
 }

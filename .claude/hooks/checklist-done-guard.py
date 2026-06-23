@@ -11,12 +11,17 @@ verifies that:
      Each must be marked `[x]` (done) or `[/]` (not applicable).
 """
 import json
+import os
 import re
 import shlex
 import sys
 from pathlib import Path
 
-CHECKLIST = Path("CHECKLIST.md")
+# Resolve CHECKLIST.md from the project root, not the hook's cwd. Claude Code
+# sets CLAUDE_PROJECT_DIR for hook execution; the Bash tool's cwd may be a
+# subdirectory, in which case a bare Path("CHECKLIST.md") would not be found
+# and the guard would silently skip. Fall back to cwd if the var is unset.
+CHECKLIST = Path(os.environ.get("CLAUDE_PROJECT_DIR", ".")) / "CHECKLIST.md"
 
 # Matches "- [x] text", "- [ ] text", "- [.] text", "- [/] text".
 ITEM_RE = re.compile(r"^\s*-\s*\[(.)\]\s*(.+?)\s*$")
@@ -55,13 +60,30 @@ def checklist_items():
 
 
 def body_marks(body):
-    """Map normalized item text -> the mark character found in the PR body."""
-    marks = {}
+    """Return list of (normalized_text, mark) for every checkbox line in the body."""
+    marks = []
     for line in body.splitlines():
         m = ITEM_RE.match(line)
         if m:
-            marks[norm(m.group(2))] = m.group(1)
+            marks.append((norm(m.group(2)), m.group(1)))
     return marks
+
+
+def lookup_mark(marks, key):
+    """Find the mark for a checklist item.
+
+    An item matches a body line when the line's text equals the item text or
+    begins with it. The prefix form lets contributors append a trailing note
+    (e.g. "... passes. (no Java changed)") while still satisfying the item.
+    Exact matches win over prefix matches.
+    """
+    for text, mark in marks:
+        if text == key:
+            return mark
+    for text, mark in marks:
+        if text.startswith(key):
+            return mark
+    return None
 
 
 def main():
@@ -100,7 +122,7 @@ def main():
     unfinished = []  # item present but still [.] or [ ]
 
     for key, raw in items:
-        mark = marks.get(key)
+        mark = lookup_mark(marks, key)
         if mark is None:
             missing.append(raw)
         elif mark not in ("x", "/", "X"):

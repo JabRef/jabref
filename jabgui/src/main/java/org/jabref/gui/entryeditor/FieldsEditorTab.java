@@ -78,6 +78,10 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         this.redoAction = redoAction;
         this.preferences = preferences;
         this.journalAbbreviationRepository = journalAbbreviationRepository;
+
+        // Visible when the current entry (of its type) has at least one field to display in this tab.
+        setContentDrivenVisibility(EasyBind.map(currentEntryProperty(),
+                entry -> (entry != null) && !determineFieldsToShow(entry).isEmpty()));
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -191,11 +195,6 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         if (editors.containsKey(fieldName)) {
             editors.get(fieldName).focus();
         }
-    }
-
-    @Override
-    public boolean shouldShow(BibEntry entry) {
-        return !determineFieldsToShow(entry).isEmpty();
     }
 
     @Override
