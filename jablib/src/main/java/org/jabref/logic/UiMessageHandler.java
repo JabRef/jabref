@@ -6,8 +6,6 @@ import java.util.List;
 ///
 /// See {@link org.jabref.logic.remote.server.RemoteMessageHandler}
 public interface UiMessageHandler {
-    void handleUiCommands(List<UiCommand> uiCommands);
-
     /// Null object bound by the standalone HTTP server, which runs without a GUI.
     ///
     /// The REST resources declare a mandatory `@Inject UiMessageHandler`, so *something* has to be
@@ -21,6 +19,8 @@ public interface UiMessageHandler {
     UiMessageHandler NONE = uiCommands -> {
         throw new UnsupportedOperationException("No GUI is connected to the JabRef HTTP server");
     };
+
+    void handleUiCommands(List<UiCommand> uiCommands);
 
     /// Whether a GUI is connected. `false` only for the [#NONE] null object used by the standalone
     /// server; any real handler returns `true`.
