@@ -1,6 +1,7 @@
 package org.jabref.gui.preview;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Objects;
@@ -230,7 +231,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                                       && Objects.equals(currentEntry, this.entry)
                                       && Objects.equals(currentDatabaseContext, this.databaseContext)
                                       && (currentLayout == null || Objects.equals(currentLayout, this.layout))) {
-
                                   setPreviewText(htmlComplete);
 
                                   if (preferences.getPreviewPreferences().shouldDownloadCovers()) {
@@ -241,7 +241,14 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                                           currentEntry != null ? currentEntry.getCitationKey().orElse("") : "");
                               }
                           })
-                          .onFailure(exception -> LOGGER.error("Error generating preview text", exception))
+                          .onFailure(exception -> {
+                              if (requestId == latestRequestId.get() && currentEntry != null) {
+                                  String errorHtml = formatError(currentEntry, exception);
+                                  setPreviewText(errorHtml);
+                              } else {
+                                  LOGGER.error("Error generating preview text", exception);
+                              }
+                          })
                           .executeWith(taskExecutor);
         });
     }
@@ -436,6 +443,14 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private String generatePreviewWithAnnotations(BibEntry currentEntry, FilePreferences filePreferences) {
         if (currentEntry == null || databaseContext == null || layout == null) {
             return "";
+        }
+
+        try {
+            Field field = org.jabref.logic.layout.format.Number.class.getDeclaredField("serialExportNumber");
+            field.setAccessible(true);
+            field.setInt(null, 1);
+        } catch (Exception e) {
+            LOGGER.warn("Could not reset Number.serialExportNumber", e);
         }
 
         StringBuilder previewHtml = new StringBuilder(layout.generatePreview(currentEntry, databaseContext));

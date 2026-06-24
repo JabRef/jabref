@@ -6,14 +6,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.jspecify.annotations.Nullable;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.pdf.FileAnnotation;
 
+import org.jspecify.annotations.Nullable;
+
 import static org.jabref.logic.util.strings.StringUtil.quoteForHTML;
 
 public class FileAnnotationPreview {
+
     public static String render(@Nullable Map<Path, List<FileAnnotation>> annotations) {
         if (annotations == null || annotations.isEmpty()) {
             return "";
@@ -78,7 +80,7 @@ public class FileAnnotationPreview {
 
             if (StringUtil.isNotBlank(noteContent)) {
                 String noteLabel = Localization.lang("Note");
-                String formattedNote = " — %s: %s".formatted(noteLabel, noteContent);
+                String formattedNote = " — " + noteLabel + ": " + noteContent;
 
                 html.append("<i>")
                     .append(quoteForHTML(formattedNote))

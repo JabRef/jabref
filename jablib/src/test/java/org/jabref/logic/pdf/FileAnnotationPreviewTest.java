@@ -6,10 +6,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -19,6 +21,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class FileAnnotationPreviewTest {
+
+    @BeforeAll
+    static void setUp() {
+        Localization.setLanguage(Language.ENGLISH);
+    }
 
     private FileAnnotation createMockAnnotation(FileAnnotationType type, int page, String content, boolean hasLinked) {
         FileAnnotation annotation = mock(FileAnnotation.class);
@@ -45,10 +52,9 @@ class FileAnnotationPreviewTest {
         @Test
         void renderFiltersOutNullAnnotationsAndEmptyContent() {
             Path path = Path.of("test.pdf");
-            FileAnnotation nullAnnotation = null;
             FileAnnotation blankAnnotation = createMockAnnotation(FileAnnotationType.TEXT, 1, "", false);
 
-            Map<Path, List<FileAnnotation>> annotations = Map.of(path, Arrays.asList(nullAnnotation, blankAnnotation));
+            Map<Path, List<FileAnnotation>> annotations = Map.of(path, Arrays.asList((FileAnnotation) null, blankAnnotation));
 
             String expectedHtml = "<br><br><b>PDF Annotations</b><br><br><i>" + escape("test.pdf") + "</i><br>";
 
@@ -65,8 +71,7 @@ class FileAnnotationPreviewTest {
             FileAnnotation annotation = createMockAnnotation(FileAnnotationType.HIGHLIGHT, 3, "This & That", false);
             Map<Path, List<FileAnnotation>> annotations = Map.of(path, List.of(annotation));
 
-            // Monta o cabeçalho exatamente como o novo método faz
-            String expectedHeader = "Highlight (" + Localization.lang("Page") + " 3):";
+            String expectedHeader = "highlight (page 3)";
             String expectedHtml = "<br><br><b>PDF Annotations</b><br><br><i>" + escape("article.pdf") + "</i><br>"
                     + "<b>" + escape(expectedHeader) + "</b> " + escape("This & That") + "<br>";
 
@@ -81,9 +86,8 @@ class FileAnnotationPreviewTest {
             Map<Path, List<FileAnnotation>> annotations = new LinkedHashMap<>();
             annotations.put(path, List.of(page10, page2));
 
-            String pageStr = Localization.lang("Page");
-            String headerPage2 = "Text (" + pageStr + " 2):";
-            String headerPage10 = "Text (" + pageStr + " 10):";
+            String headerPage2 = "text (page 2)";
+            String headerPage10 = "text (page 10)";
 
             String expectedHtml = "<br><br><b>PDF Annotations</b><br><br><i>" + escape("book.pdf") + "</i><br>"
                     + "<b>" + escape(headerPage2) + "</b> " + escape("Early") + "<br>"
@@ -100,7 +104,7 @@ class FileAnnotationPreviewTest {
             when(mainAnnotation.getLinkedFileAnnotation()).thenReturn(linkedAnnotation);
             Map<Path, List<FileAnnotation>> annotations = Map.of(path, List.of(mainAnnotation));
 
-            String expectedHeader = "Text (" + Localization.lang("Page") + " 1):";
+            String expectedHeader = "text (page 1)";
             String expectedNote = " — " + Localization.lang("Note") + ": Comment";
 
             String expectedHtml = "<br><br><b>PDF Annotations</b><br><br><i>" + escape("document.pdf") + "</i><br>"
