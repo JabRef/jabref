@@ -49,7 +49,8 @@ public class FileAnnotationPreview {
         int page = annotation.getPage();
         String content = annotation.getContent();
 
-        String headerLabel = Localization.lang("%0 (Page %1):", type, String.valueOf(page));
+        String pageLabel = Localization.lang("Page");
+        String headerLabel = String.format("%s (%s %d):", type, pageLabel, page);
 
         html.append("<b>")
             .append(quoteForHTML(headerLabel))
@@ -60,10 +61,11 @@ public class FileAnnotationPreview {
             String noteContent = annotation.getLinkedFileAnnotation().getContent();
 
             if (StringUtil.isNotBlank(noteContent)) {
-                String noteLabel = Localization.lang(" — Note: %0", noteContent);
+                String noteLabel = Localization.lang("Note");
+                String formattedNote = String.format(" — %s: %s", noteLabel, noteContent);
 
                 html.append("<i>")
-                    .append(quoteForHTML(noteLabel))
+                    .append(quoteForHTML(formattedNote))
                     .append("</i>");
             }
         }

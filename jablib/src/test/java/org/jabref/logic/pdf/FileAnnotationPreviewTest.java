@@ -2,7 +2,6 @@ package org.jabref.logic.pdf;
 
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,10 +63,10 @@ class FileAnnotationPreviewTest {
         void renderFormatsValidAnnotationsCorrectlyWithHtmlEscaping() {
             Path path = Path.of("article.pdf");
             FileAnnotation annotation = createMockAnnotation(FileAnnotationType.HIGHLIGHT, 3, "This & That", false);
-
             Map<Path, List<FileAnnotation>> annotations = Map.of(path, List.of(annotation));
 
-            String expectedHeader = Localization.lang("%0 (Page %1):", "Highlight", "3");
+            // Monta o cabeçalho exatamente como o novo método faz
+            String expectedHeader = "Highlight (" + Localization.lang("Page") + " 3):";
             String expectedHtml = "<br><br><b>PDF Annotations</b><br><br><i>" + escape("article.pdf") + "</i><br>"
                     + "<b>" + escape(expectedHeader) + "</b> " + escape("This & That") + "<br>";
 
@@ -79,12 +78,12 @@ class FileAnnotationPreviewTest {
             Path path = Path.of("book.pdf");
             FileAnnotation page10 = createMockAnnotation(FileAnnotationType.TEXT, 10, "Late", false);
             FileAnnotation page2 = createMockAnnotation(FileAnnotationType.TEXT, 2, "Early", false);
-
             Map<Path, List<FileAnnotation>> annotations = new LinkedHashMap<>();
             annotations.put(path, List.of(page10, page2));
 
-            String headerPage2 = Localization.lang("%0 (Page %1):", "Text", "2");
-            String headerPage10 = Localization.lang("%0 (Page %1):", "Text", "10");
+            String pageStr = Localization.lang("Page");
+            String headerPage2 = "Text (" + pageStr + " 2):";
+            String headerPage10 = "Text (" + pageStr + " 10):";
 
             String expectedHtml = "<br><br><b>PDF Annotations</b><br><br><i>" + escape("book.pdf") + "</i><br>"
                     + "<b>" + escape(headerPage2) + "</b> " + escape("Early") + "<br>"
@@ -98,13 +97,11 @@ class FileAnnotationPreviewTest {
             Path path = Path.of("document.pdf");
             FileAnnotation mainAnnotation = createMockAnnotation(FileAnnotationType.TEXT, 1, "Main", true);
             FileAnnotation linkedAnnotation = createMockAnnotation(FileAnnotationType.TEXT, 1, "Comment", false);
-
             when(mainAnnotation.getLinkedFileAnnotation()).thenReturn(linkedAnnotation);
-
             Map<Path, List<FileAnnotation>> annotations = Map.of(path, List.of(mainAnnotation));
 
-            String expectedHeader = Localization.lang("%0 (Page %1):", "Text", "1");
-            String expectedNote = Localization.lang(" — Note: %0", "Comment");
+            String expectedHeader = "Text (" + Localization.lang("Page") + " 1):";
+            String expectedNote = " — " + Localization.lang("Note") + ": Comment";
 
             String expectedHtml = "<br><br><b>PDF Annotations</b><br><br><i>" + escape("document.pdf") + "</i><br>"
                     + "<b>" + escape(expectedHeader) + "</b> " + escape("Main") + "<i>" + escape(expectedNote) + "</i><br>";
