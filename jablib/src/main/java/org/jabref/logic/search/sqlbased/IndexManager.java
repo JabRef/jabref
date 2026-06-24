@@ -70,14 +70,14 @@ public class IndexManager {
     public IndexManager(BibDatabaseContext databaseContext,
                         TaskExecutor executor,
                         CliPreferences preferences,
-                        PostgreServer postgreServer) {
+                        PostgresServer postgresServer) {
         this.taskExecutor = executor;
         this.databaseContext = databaseContext;
         this.shouldIndexLinkedFiles = preferences.getFilePreferences().fulltextIndexLinkedFilesProperty();
         this.preferencesListener = (_, _, newValue) -> bindToPreferences(newValue);
         this.shouldIndexLinkedFiles.addListener(preferencesListener);
 
-        bibFieldsIndexer = new BibFieldsIndexer(preferences.getBibEntryPreferences(), databaseContext, postgreServer.getConnection());
+        bibFieldsIndexer = new BibFieldsIndexer(preferences.getBibEntryPreferences(), databaseContext, postgresServer.getConnection());
 
         LuceneIndexer indexer;
         try {
@@ -88,7 +88,7 @@ public class IndexManager {
         }
         linkedFilesIndexer = indexer;
 
-        this.bibFieldsSearcher = new BibFieldsSearcher(postgreServer.getConnection(), bibFieldsIndexer.getTable());
+        this.bibFieldsSearcher = new BibFieldsSearcher(postgresServer.getConnection(), bibFieldsIndexer.getTable());
         this.linkedFilesSearcher = new LinkedFilesSearcher(databaseContext, linkedFilesIndexer, preferences.getFilePreferences());
         this.indexUpdateThrottler = taskExecutor.createThrottler(700);
         updateOnStart();

@@ -83,19 +83,19 @@ class SqlBasedLibrarySearcherWithBibFilesTest {
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
 
-    private PostgreServer postgreServer;
+    private PostgresServer postgresServer;
 
     @TempDir
     private Path indexDir;
 
     @BeforeEach
     void setUp() {
-        postgreServer = new PostgreServer();
+        postgresServer = new PostgresServer();
     }
 
     @AfterEach
     void tearDown() {
-        postgreServer.close();
+        postgresServer.close();
     }
 
     private BibDatabaseContext initializeDatabaseFromPath(String testFile) throws URISyntaxException, IOException {
@@ -158,7 +158,7 @@ class SqlBasedLibrarySearcherWithBibFilesTest {
     void searchLibrary(List<BibEntry> expected, String testFile, String query, boolean isFullText) throws URISyntaxException, IOException {
         BibDatabaseContext databaseContext = initializeDatabaseFromPath(testFile);
         EnumSet<SearchFlags> flags = isFullText ? EnumSet.of(SearchFlags.FULLTEXT) : EnumSet.noneOf(SearchFlags.class);
-        List<BibEntry> matches = new SqlBasedLibrarySearcher(databaseContext, TASK_EXECUTOR, preferences, postgreServer).getMatches(new SearchQuery(query, flags));
+        List<BibEntry> matches = new SqlBasedLibrarySearcher(databaseContext, TASK_EXECUTOR, preferences, postgresServer).getMatches(new SearchQuery(query, flags));
         assertThat(expected, Matchers.containsInAnyOrder(matches.toArray()));
     }
 }
