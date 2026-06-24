@@ -45,7 +45,7 @@ Read your own diff once, top to bottom, and confirm each point.
 ### Tests
 
 - [ ] Behavior changes in `org.jabref.model` / `org.jabref.logic` have added or updated tests.
-- [ ] Tests assert object contents (`assertEquals`), use plain JUnit asserts (not AssertJ), have no `@DisplayName`, do not catch exceptions, and use `@TempDir` instead of manual temp directories.
+- [ ] Tests assert object contents (`assertEquals`), use plain JUnit asserts (not AssertJ), have no `@DisplayName`, do not catch exceptions (let them propagate so JUnit reports setup/teardown failures directly), and use `@TempDir` instead of manual temp directories.
 
 ## 2. Verification commands
 
