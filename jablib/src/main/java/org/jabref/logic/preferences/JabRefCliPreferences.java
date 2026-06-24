@@ -931,7 +931,6 @@ public class JabRefCliPreferences implements CliPreferences {
         PREFS_NODE.clear();
         new SharedDatabasePreferences().clear();
 
-        getInternalPreferences().setAll(InternalPreferences.getDefault());
         getFieldPreferences().setAll(FieldPreferences.getDefault());
         getFilePreferences().setAll(FilePreferences.getDefault()
                                                    .withUserHostInfo(getInternalPreferences().getUserAndHostInfoProperty())
@@ -957,6 +956,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 OpenOfficePreferences.getDefault());
 
         // ensure registration of bindings
+        getInternalPreferences();
         getProxyPreferences();
         getLibraryPreferences();
         getDOIPreferences();
@@ -985,7 +985,6 @@ public class JabRefCliPreferences implements CliPreferences {
         //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
 
         // in case of incomplete or corrupt XML fall back to current preferences
-        getInternalPreferences().setAll(getInternalPreferencesFromBackingStore(getInternalPreferences()));
         getFieldPreferences().setAll(getFieldPreferencesFromBackingStore(getFieldPreferences()));
         getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
@@ -1005,6 +1004,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
 
         // ensure registration of bindings
+        getInternalPreferences();
         getProxyPreferences();
         getLibraryPreferences();
         getDOIPreferences();
@@ -1287,8 +1287,15 @@ public class JabRefCliPreferences implements CliPreferences {
                     put(OWNER_DEFAULT, newValue);
                     getInternalPreferences().setUserHostInfo(OS.getUserHostInfo(newValue));
                 },
-                () -> ownerPreferences.defaultOwnerProperty().set(get(OWNER_DEFAULT, defaultValues.getDefaultOwner())),
-                () -> ownerPreferences.defaultOwnerProperty().set(defaultValues.getDefaultOwner()));
+                () -> {
+                    String owner = get(OWNER_DEFAULT, defaultValues.getDefaultOwner());
+                    ownerPreferences.defaultOwnerProperty().set(owner);
+                    getInternalPreferences().setUserHostInfo(OS.getUserHostInfo(owner));
+                },
+                () -> {
+                    ownerPreferences.defaultOwnerProperty().set(defaultValues.getDefaultOwner());
+                    getInternalPreferences().setUserHostInfo(OS.getUserHostInfo(defaultValues.getDefaultOwner()));
+                });
         bindBoolean(ownerPreferences.overwriteOwnerProperty(), OWNER_OVERWRITE, defaultValues.shouldOverwriteOwner());
 
         return ownerPreferences;
@@ -1557,37 +1564,38 @@ public class JabRefCliPreferences implements CliPreferences {
             return internalPreferences;
         }
 
-        internalPreferences = getInternalPreferencesFromBackingStore(InternalPreferences.getDefault());
+        InternalPreferences defaultValues = InternalPreferences.getDefault();
 
-        EasyBind.listen(internalPreferences.ignoredVersionProperty(),
-                (_, _, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
-        EasyBind.listen(internalPreferences.versionCheckEnabledProperty(),
-                (_, _, newValue) -> putBoolean(VERSION_CHECK_ENABLED, newValue));
-        EasyBind.listen(internalPreferences.lastPreferencesExportPathProperty(),
-                (_, _, newValue) -> put(PREFS_EXPORT_PATH, newValue.toString()));
-        // user is a static value, should only be changed for debugging
-        EasyBind.listen(internalPreferences.memoryStickModeProperty(), (_, _, newValue) -> {
-            putBoolean(MEMORY_STICK_MODE, newValue);
-            if (!newValue) {
-                try {
-                    Files.deleteIfExists(Path.of("jabref.xml"));
-                } catch (IOException e) {
-                    LOGGER.warn("Error accessing filesystem", e);
-                }
-            }
-        });
+        internalPreferences = new InternalPreferences(
+                Version.parse(get(VERSION_IGNORED_UPDATE, defaultValues.getIgnoredVersion().toString())),
+                getBoolean(VERSION_CHECK_ENABLED, defaultValues.isVersionCheckEnabled()),
+                getPath(PREFS_EXPORT_PATH, defaultValues.getLastPreferencesExportPath()),
+                // userHostInfo is derived from the owner and persisted/restored by the OwnerPreferences binding
+                OS.getUserHostInfo(get(OWNER_DEFAULT, OwnerPreferences.getDefault().getDefaultOwner())),
+                getBoolean(MEMORY_STICK_MODE, defaultValues.isMemoryStickMode()));
+
+        bindObject(internalPreferences.ignoredVersionProperty(), VERSION_IGNORED_UPDATE, defaultValues.getIgnoredVersion(),
+                Version::toString, Version::parse);
+        bindBoolean(internalPreferences.versionCheckEnabledProperty(), VERSION_CHECK_ENABLED, defaultValues.isVersionCheckEnabled());
+        bindCustom(internalPreferences.lastPreferencesExportPathProperty(), PREFS_EXPORT_PATH, defaultValues.getLastPreferencesExportPath(),
+                (_, _, newValue) -> put(PREFS_EXPORT_PATH, newValue.toString()),
+                () -> internalPreferences.lastPreferencesExportPathProperty().set(getPath(PREFS_EXPORT_PATH, defaultValues.getLastPreferencesExportPath())),
+                () -> internalPreferences.lastPreferencesExportPathProperty().set(defaultValues.getLastPreferencesExportPath()));
+        bindCustom(internalPreferences.memoryStickModeProperty(), MEMORY_STICK_MODE, defaultValues.isMemoryStickMode(),
+                (_, _, newValue) -> {
+                    putBoolean(MEMORY_STICK_MODE, newValue);
+                    if (!newValue) {
+                        try {
+                            Files.deleteIfExists(Path.of("jabref.xml"));
+                        } catch (IOException e) {
+                            LOGGER.warn("Error accessing filesystem", e);
+                        }
+                    }
+                },
+                () -> internalPreferences.memoryStickModeProperty().set(getBoolean(MEMORY_STICK_MODE, defaultValues.isMemoryStickMode())),
+                () -> internalPreferences.memoryStickModeProperty().set(defaultValues.isMemoryStickMode()));
 
         return internalPreferences;
-    }
-
-    private InternalPreferences getInternalPreferencesFromBackingStore(InternalPreferences defaults) {
-        return new InternalPreferences(
-                Version.parse(get(VERSION_IGNORED_UPDATE, defaults.getIgnoredVersion().toString())),
-                getBoolean(VERSION_CHECK_ENABLED, defaults.isVersionCheckEnabled()),
-                getPath(PREFS_EXPORT_PATH, defaults.getLastPreferencesExportPath()),
-                OS.getUserHostInfo(get(OWNER_DEFAULT, OwnerPreferences.getDefault().getDefaultOwner())),
-                getBoolean(MEMORY_STICK_MODE, defaults.isMemoryStickMode())
-        );
     }
     // endregion
 
