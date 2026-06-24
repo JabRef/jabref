@@ -8,8 +8,10 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -198,6 +200,21 @@ public class StudyRepository {
                     .parallelStream()
                     .filter(StudyCatalog::isEnabled)
                     .toList();
+    }
+
+    /// returns the effective result limit per catalog, applying each catalog's own
+    /// override over the study wide default, catalogs with neither set are deleted
+    public Map<String, Integer> getResultLimitsPerCatalog() {
+        Map<String, Integer> limits = new LinkedHashMap<>();
+        for (StudyCatalog catalog : study.getCatalogs()) {
+            Integer limit = catalog.getMaxResults() != null
+                            ? catalog.getMaxResults()
+                            : study.getMaxResultsPerCatalog();
+            if (limit != null) {
+                limits.put(catalog.getName(), limit);
+            }
+        }
+        return limits;
     }
 
     public Study getStudy() {
