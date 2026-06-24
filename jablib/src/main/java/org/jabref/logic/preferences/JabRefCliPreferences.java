@@ -30,7 +30,9 @@ import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.MapProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
@@ -645,24 +647,38 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
-    private void bindBoolean(BooleanProperty property, String key, boolean defaultValue) {
-        EasyBind.listen(property, (_, _, v) -> putBoolean(key, v));
+    /// General binding primitive. All scalar `bind*` helpers delegate here.
+    ///
+    /// @param persistListener persists value changes to the backing store
+    /// @param importFromStore loads the stored value into the property (falling back to the default)
+    /// @param resetToDefaults resets the property to its default value
+    private <T> void bindCustom(Property<T> property,
+                                String key,
+                                T defaultValue,
+                                ChangeListener<? super T> persistListener,
+                                Runnable importFromStore,
+                                Runnable resetToDefaults) {
+        EasyBind.listen(property, persistListener);
         allBindings.add(new PreferenceBinding(
                 property,
                 defaultValue,
                 key,
+                importFromStore,
+                resetToDefaults));
+    }
+
+    private void bindBoolean(BooleanProperty property, String key, boolean defaultValue) {
+        bindCustom(property, key, defaultValue,
+                (_, _, v) -> putBoolean(key, v),
                 () -> property.set(getBoolean(key, defaultValue)),
-                () -> property.set(defaultValue)));
+                () -> property.set(defaultValue));
     }
 
     private void bindString(StringProperty property, String key, String defaultValue) {
-        EasyBind.listen(property, (_, _, v) -> put(key, v));
-        allBindings.add(new PreferenceBinding(
-                property,
-                defaultValue,
-                key,
+        bindCustom(property, key, defaultValue,
+                (_, _, v) -> put(key, v),
                 () -> property.set(get(key, defaultValue)),
-                () -> property.set(defaultValue)));
+                () -> property.set(defaultValue));
     }
 
     /// Binds an object-valued property whose persisted form is a String.
@@ -674,13 +690,10 @@ public class JabRefCliPreferences implements CliPreferences {
                                 T defaultValue,
                                 Function<T, String> serializer,
                                 Function<String, T> deserializer) {
-        EasyBind.listen(property, (_, _, v) -> put(key, serializer.apply(v)));
-        allBindings.add(new PreferenceBinding(
-                property,
-                defaultValue,
-                key,
+        bindCustom(property, key, defaultValue,
+                (_, _, v) -> put(key, serializer.apply(v)),
                 () -> property.set(deserializer.apply(get(key, serializer.apply(defaultValue)))),
-                () -> property.set(defaultValue)));
+                () -> property.set(defaultValue));
     }
 
     /// Binds an object-valued property whose persisted form is a boolean.
@@ -692,13 +705,10 @@ public class JabRefCliPreferences implements CliPreferences {
                                        T defaultValue,
                                        Function<T, Boolean> serializer,
                                        Function<Boolean, T> deserializer) {
-        EasyBind.listen(property, (_, _, v) -> putBoolean(key, serializer.apply(v)));
-        allBindings.add(new PreferenceBinding(
-                property,
-                defaultValue,
-                key,
+        bindCustom(property, key, defaultValue,
+                (_, _, v) -> putBoolean(key, serializer.apply(v)),
                 () -> property.set(deserializer.apply(getBoolean(key, serializer.apply(defaultValue)))),
-                () -> property.set(defaultValue)));
+                () -> property.set(defaultValue));
     }
 
     /// Binds a map-valued property. Unlike the other `bind*` helpers, persistence is delegated to the given
@@ -824,7 +834,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getInternalPreferences().setAll(InternalPreferences.getDefault());
         getFieldPreferences().setAll(FieldPreferences.getDefault());
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
-        getOwnerPreferences().setAll(OwnerPreferences.getDefault());
         getTimestampPreferences().setAll(TimestampPreferences.getDefault());
         getRemotePreferences().setAll(RemotePreferences.getDefault());
         getBibEntryPreferences().setAll(BibEntryPreferences.getDefault());
@@ -860,6 +869,7 @@ public class JabRefCliPreferences implements CliPreferences {
         // ensure registration of bindings
         getLibraryPreferences();
         getDOIPreferences();
+        getOwnerPreferences();
         getPushToApplicationPreferences();
         getAbbreviationPreferences();
 
@@ -881,7 +891,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getInternalPreferences().setAll(getInternalPreferencesFromBackingStore(getInternalPreferences()));
         getFieldPreferences().setAll(getFieldPreferencesFromBackingStore(getFieldPreferences()));
         getProxyPreferences().setAll(getProxyPreferencesFromBackingStore(getProxyPreferences()));
-        getOwnerPreferences().setAll(getOwnerPreferencesFromBackingStore(getOwnerPreferences()));
         getTimestampPreferences().setAll(getTimestampPreferencesFromBackingStore(getTimestampPreferences()));
         getRemotePreferences().setAll(getRemotePreferencesFromBackingStore(getRemotePreferences()));
         getCitationKeyPatternPreferences().setAll(getCitationKeyPatternPreferencesFromBackingStore(getCitationKeyPatternPreferences()));
@@ -908,6 +917,7 @@ public class JabRefCliPreferences implements CliPreferences {
         // ensure registration of bindings
         getLibraryPreferences();
         getDOIPreferences();
+        getOwnerPreferences();
         getPushToApplicationPreferences();
         getAbbreviationPreferences();
 
@@ -1167,24 +1177,24 @@ public class JabRefCliPreferences implements CliPreferences {
             return ownerPreferences;
         }
 
-        ownerPreferences = getOwnerPreferencesFromBackingStore(OwnerPreferences.getDefault());
+        OwnerPreferences defaultValues = OwnerPreferences.getDefault();
 
-        EasyBind.listen(ownerPreferences.useOwnerProperty(), (_, _, newValue) -> putBoolean(OWNER_ENABLE, newValue));
-        EasyBind.listen(ownerPreferences.defaultOwnerProperty(), (_, _, newValue) -> {
-            put(OWNER_DEFAULT, newValue);
-            getInternalPreferences().setUserHostInfo(OS.getUserHostInfo(newValue));
-        });
-        EasyBind.listen(ownerPreferences.overwriteOwnerProperty(), (_, _, newValue) -> putBoolean(OWNER_OVERWRITE, newValue));
+        ownerPreferences = new OwnerPreferences(
+                getBoolean(OWNER_ENABLE, defaultValues.shouldUseOwner()),
+                get(OWNER_DEFAULT, defaultValues.getDefaultOwner()),
+                getBoolean(OWNER_OVERWRITE, defaultValues.shouldOverwriteOwner()));
+
+        bindBoolean(ownerPreferences.useOwnerProperty(), OWNER_ENABLE, defaultValues.shouldUseOwner());
+        bindCustom(ownerPreferences.defaultOwnerProperty(), OWNER_DEFAULT, defaultValues.getDefaultOwner(),
+                (_, _, newValue) -> {
+                    put(OWNER_DEFAULT, newValue);
+                    getInternalPreferences().setUserHostInfo(OS.getUserHostInfo(newValue));
+                },
+                () -> ownerPreferences.defaultOwnerProperty().set(get(OWNER_DEFAULT, defaultValues.getDefaultOwner())),
+                () -> ownerPreferences.defaultOwnerProperty().set(defaultValues.getDefaultOwner()));
+        bindBoolean(ownerPreferences.overwriteOwnerProperty(), OWNER_OVERWRITE, defaultValues.shouldOverwriteOwner());
 
         return ownerPreferences;
-    }
-
-    private @NonNull OwnerPreferences getOwnerPreferencesFromBackingStore(OwnerPreferences defaults) {
-        return new OwnerPreferences(
-                getBoolean(OWNER_ENABLE, defaults.shouldUseOwner()),
-                get(OWNER_DEFAULT, defaults.getDefaultOwner()),
-                getBoolean(OWNER_OVERWRITE, defaults.shouldOverwriteOwner())
-        );
     }
     // endregion
 
