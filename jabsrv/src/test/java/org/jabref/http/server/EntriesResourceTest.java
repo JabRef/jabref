@@ -63,14 +63,10 @@ class EntriesResourceTest extends ServerTest {
 
     /// Rebinds the standalone null object ([UiMessageHandler#NONE], not GUI-connected) and restarts
     /// the test container so the resource sees it. Mirrors {@link ServerTest#setAvailableLibraries}.
-    private void useStandaloneMode() {
-        try {
-            tearDown();
-            uiMessageHandler = UiMessageHandler.NONE;
-            super.setUp();
-        } catch (Exception e) {
-            throw new IllegalStateException("Could not restart test container in standalone mode", e);
-        }
+    private void useStandaloneMode() throws Exception {
+        tearDown();
+        uiMessageHandler = UiMessageHandler.NONE;
+        super.setUp();
     }
 
     @SuppressWarnings("unchecked")
@@ -129,7 +125,7 @@ class EntriesResourceTest extends ServerTest {
     /// unknown-id 404 that `resolveTargetLibrary` would otherwise raise, for every POST endpoint.
     @ParameterizedTest
     @MethodSource("standaloneEndpoints")
-    void importToUnknownLibraryInStandaloneModeReturns400(String mediaType, String body) {
+    void importToUnknownLibraryInStandaloneModeReturns400(String mediaType, String body) throws Exception {
         useStandaloneMode();
 
         Response response = target("/libraries/does-not-exist/entries")
