@@ -36,6 +36,7 @@ public class Highlighter {
     private static final String REGEXP_MARK = "SELECT regexp_mark(?, ?)";
     private static final String REGEXP_POSITIONS = "SELECT * FROM regexp_positions(?, ?)";
     private static Connection connection;
+    private static GuiPreferences guiPreferences;
 
     private Highlighter() {
         // prevent instantiation
@@ -65,7 +66,7 @@ public class Highlighter {
     }
 
     private static String highlightNode(String text, String searchPattern) {
-        if (!Injector.instantiateModelOrService(GuiPreferences.class).getSearchPreferences().shouldUsePostgresSearch()) {
+        if (!shouldUsePostgresSearch()) {
             return text.replaceAll(
                     "(?i)(" + searchPattern + ")",
                     "<mark style=\"background: orange\">$1</mark>"
@@ -91,7 +92,7 @@ public class Highlighter {
     }
 
     public static List<Range> findMatchPositions(String text, String pattern) {
-        if (!Injector.instantiateModelOrService(GuiPreferences.class).getSearchPreferences().shouldUsePostgresSearch()) {
+        if (!shouldUsePostgresSearch()) {
             List<Range> positions = new ArrayList<>();
             Matcher matcher = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE).matcher(text);
             while (matcher.find()) {
@@ -150,5 +151,12 @@ public class Highlighter {
 
     public static Optional<String> buildSearchPattern(List<String> terms) {
         return terms.isEmpty() ? Optional.empty() : Optional.of(String.join("|", terms));
+    }
+
+    private static boolean shouldUsePostgresSearch() {
+        if (guiPreferences == null) {
+            guiPreferences = Injector.instantiateModelOrService(GuiPreferences.class);
+        }
+        return guiPreferences.getSearchPreferences().shouldUsePostgresSearch();
     }
 }
