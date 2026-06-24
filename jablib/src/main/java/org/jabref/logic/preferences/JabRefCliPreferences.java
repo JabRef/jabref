@@ -668,6 +668,15 @@ public class JabRefCliPreferences implements CliPreferences {
                 resetToDefaults));
     }
 
+    /// Persist-only binding for secrets that live in the system keyring rather than the backing store.
+    /// It registers no [PreferenceBinding], so the value is intentionally excluded from [#getPreferences()] and
+    /// [#getDefaults()]. Loading and resetting are owned by its accompanying persist flag.
+    ///
+    /// @param persistListener writes value changes to the keyring
+    private <T> void bindToKeyring(Property<T> property, ChangeListener<? super T> persistListener) {
+        EasyBind.listen(property, persistListener);
+    }
+
     private void bindBoolean(BooleanProperty property, String key, boolean defaultValue) {
         bindCustom(property, key, defaultValue,
                 (_, _, v) -> putBoolean(key, v),
@@ -871,7 +880,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getGrobidPreferences().setAll(GrobidPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences())).setAll(
                 OpenOfficePreferences.getDefault());
-        getGitPreferences().setAll(GitPreferences.getDefault());
 
         // ensure registration of bindings
         getProxyPreferences();
@@ -882,6 +890,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getRemotePreferences();
         getPushToApplicationPreferences();
         getAbbreviationPreferences();
+        getGitPreferences();
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
@@ -919,7 +928,6 @@ public class JabRefCliPreferences implements CliPreferences {
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences());
         getOpenOfficePreferences(repository).setAll(
                 getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
-        getGitPreferences().setAll(getGitPreferencesFromBackingStore(getGitPreferences()));
 
         // ensure registration of bindings
         getProxyPreferences();
@@ -930,6 +938,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getRemotePreferences();
         getPushToApplicationPreferences();
         getAbbreviationPreferences();
+        getGitPreferences();
 
         allBindings.forEach(binding -> binding.importFromStore().run());
     }
@@ -1287,12 +1296,7 @@ public class JabRefCliPreferences implements CliPreferences {
         bindString(proxyPreferences.portProperty(), PROXY_PORT, defaultValues.getPort());
         bindBoolean(proxyPreferences.useAuthenticationProperty(), PROXY_USE_AUTHENTICATION, defaultValues.shouldUseAuthentication());
         bindString(proxyPreferences.usernameProperty(), PROXY_USERNAME, defaultValues.getUsername());
-
-        // The proxy password lives in the system keyring, not in the backing store, so it is intentionally not bound via
-        // the PreferenceBinding mechanism (which would expose it through getPreferences()). Its persistence is handled by
-        // the subscriber below; loading and resetting it are tied to the persistPassword binding that follows.
-        EasyBind.listen(proxyPreferences.passwordProperty(), (_, _, newValue) -> setProxyPassword(newValue));
-
+        bindToKeyring(proxyPreferences.passwordProperty(), (_, _, newValue) -> setProxyPassword(newValue));
         bindCustom(proxyPreferences.persistPasswordProperty(), PROXY_PERSIST_PASSWORD, defaultValues.shouldPersistPassword(),
                 (_, _, newValue) -> {
                     putBoolean(PROXY_PERSIST_PASSWORD, newValue);
@@ -2475,30 +2479,37 @@ public class JabRefCliPreferences implements CliPreferences {
             return gitPreferences;
         }
 
-        gitPreferences = getGitPreferencesFromBackingStore(GitPreferences.getDefault());
+        GitPreferences defaultValues = GitPreferences.getDefault();
+        boolean rememberPat = getBoolean(GITHUB_REMEMBER_PAT_KEY, defaultValues.getPersistPat());
 
-        EasyBind.listen(gitPreferences.usernameProperty(), (_, _, newVal) -> put(GITHUB_USERNAME_KEY, newVal));
-        EasyBind.listen(gitPreferences.patProperty(), (_, _, newVal) -> setGitHubPat(newVal));
-        EasyBind.listen(gitPreferences.repositoryUrlProperty(), (_, _, newVal) -> put(GITHUB_REMOTE_URL_KEY, newVal));
-        EasyBind.listen(gitPreferences.rememberPatProperty(), (_, _, newVal) -> {
-            putBoolean(GITHUB_REMEMBER_PAT_KEY, newVal);
-            if (!newVal) {
-                deleteGitHubPat();
-            }
-        });
+        gitPreferences = new GitPreferences(
+                get(GITHUB_USERNAME_KEY, defaultValues.getUsername()),
+                rememberPat ? getGitHubPat().orElse(defaultValues.getPat()) : defaultValues.getPat(),
+                get(GITHUB_REMOTE_URL_KEY, defaultValues.getRepositoryUrl()),
+                rememberPat);
+
+        bindString(gitPreferences.usernameProperty(), GITHUB_USERNAME_KEY, defaultValues.getUsername());
+        bindString(gitPreferences.repositoryUrlProperty(), GITHUB_REMOTE_URL_KEY, defaultValues.getRepositoryUrl());
+        bindToKeyring(gitPreferences.patProperty(), (_, _, newVal) -> setGitHubPat(newVal));
+        bindCustom(gitPreferences.rememberPatProperty(), GITHUB_REMEMBER_PAT_KEY, defaultValues.getPersistPat(),
+                (_, _, newValue) -> {
+                    putBoolean(GITHUB_REMEMBER_PAT_KEY, newValue);
+                    if (!newValue) {
+                        deleteGitHubPat();
+                    }
+                },
+                () -> {
+                    boolean shouldRemember = getBoolean(GITHUB_REMEMBER_PAT_KEY, defaultValues.getPersistPat());
+                    gitPreferences.rememberPatProperty().set(shouldRemember);
+                    gitPreferences.patProperty().set(
+                            shouldRemember ? getGitHubPat().orElse(defaultValues.getPat()) : defaultValues.getPat());
+                },
+                () -> {
+                    gitPreferences.rememberPatProperty().set(defaultValues.getPersistPat());
+                    gitPreferences.patProperty().set(defaultValues.getPat());
+                });
 
         return gitPreferences;
-    }
-
-    private GitPreferences getGitPreferencesFromBackingStore(GitPreferences defaults) {
-        boolean rememberPat = getBoolean(GITHUB_REMEMBER_PAT_KEY, defaults.getPersistPat());
-
-        return new GitPreferences(
-                get(GITHUB_USERNAME_KEY, defaults.getUsername()),
-                rememberPat ? getGitHubPat().orElse(defaults.getPat()) : defaults.getPat(),
-                get(GITHUB_REMOTE_URL_KEY, defaults.getRepositoryUrl()),
-                rememberPat
-        );
     }
 
     private static void deleteGitHubPat() {
