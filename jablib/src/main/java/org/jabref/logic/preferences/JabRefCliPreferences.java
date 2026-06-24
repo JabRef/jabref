@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.MapProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
@@ -674,6 +675,13 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> property.set(defaultValue));
     }
 
+    private void bindInt(IntegerProperty property, String key, int defaultValue) {
+        bindCustom(property, key, defaultValue,
+                (_, _, v) -> putInt(key, v),
+                () -> property.set(getInt(key, defaultValue)),
+                () -> property.set(defaultValue));
+    }
+
     private void bindString(StringProperty property, String key, String defaultValue) {
         bindCustom(property, key, defaultValue,
                 (_, _, v) -> put(key, v),
@@ -758,6 +766,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private Object getObject(Observable observable) {
         if (observable instanceof BooleanProperty booleanProperty) {
             return booleanProperty.get();
+        } else if (observable instanceof IntegerProperty integerProperty) {
+            return integerProperty.get();
         } else if (observable instanceof StringProperty stringProperty) {
             return stringProperty.get();
         } else if (observable instanceof ObservableList<?> observableList) {
@@ -834,7 +844,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getInternalPreferences().setAll(InternalPreferences.getDefault());
         getFieldPreferences().setAll(FieldPreferences.getDefault());
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
-        getRemotePreferences().setAll(RemotePreferences.getDefault());
         getBibEntryPreferences().setAll(BibEntryPreferences.getDefault());
         getCitationKeyPatternPreferences().setAll(
                 CitationKeyPatternPreferences.getDefault()
@@ -870,6 +879,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getDOIPreferences();
         getOwnerPreferences();
         getTimestampPreferences();
+        getRemotePreferences();
         getPushToApplicationPreferences();
         getAbbreviationPreferences();
 
@@ -891,7 +901,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getInternalPreferences().setAll(getInternalPreferencesFromBackingStore(getInternalPreferences()));
         getFieldPreferences().setAll(getFieldPreferencesFromBackingStore(getFieldPreferences()));
         getProxyPreferences().setAll(getProxyPreferencesFromBackingStore(getProxyPreferences()));
-        getRemotePreferences().setAll(getRemotePreferencesFromBackingStore(getRemotePreferences()));
         getCitationKeyPatternPreferences().setAll(getCitationKeyPatternPreferencesFromBackingStore(getCitationKeyPatternPreferences()));
         getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
         getBibEntryPreferences().setAll(getBibEntryPreferencesFromBackingStore(getBibEntryPreferences()));
@@ -918,6 +927,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getDOIPreferences();
         getOwnerPreferences();
         getTimestampPreferences();
+        getRemotePreferences();
         getPushToApplicationPreferences();
         getAbbreviationPreferences();
 
@@ -1230,26 +1240,26 @@ public class JabRefCliPreferences implements CliPreferences {
             return remotePreferences;
         }
 
-        remotePreferences = getRemotePreferencesFromBackingStore(RemotePreferences.getDefault());
+        RemotePreferences defaultValues = RemotePreferences.getDefault();
 
-        EasyBind.listen(remotePreferences.remoteServerPortProperty(), (_, _, newValue) -> putInt(SERVER_REMOTE_PORT, newValue));
-        EasyBind.listen(remotePreferences.enableRemoteServerProperty(), (_, _, newValue) -> putBoolean(SERVER_REMOTE_ENABLE, newValue));
-        EasyBind.listen(remotePreferences.httpServerPortProperty(), (_, _, newValue) -> putInt(SERVER_HTTP_PORT, newValue));
-        EasyBind.listen(remotePreferences.enableHttpServerProperty(), (_, _, newValue) -> putBoolean(SERVER_HTTP_ENABLE, newValue));
-        EasyBind.listen(remotePreferences.languageServerPortProperty(), (_, _, newValue) -> putInt(SERVER_LANGUAGE_PORT, newValue));
-        EasyBind.listen(remotePreferences.enableLanguageServerProperty(), (_, _, newValue) -> putBoolean(SERVER_LANGUAGE_ENABLE, newValue));
-        EasyBind.listen(remotePreferences.directHttpImportProperty(), (_, _, newValue) -> putBoolean(SERVER_DIRECT_HTTP_IMPORT, newValue));
+        remotePreferences = new RemotePreferences(
+                getBoolean(SERVER_REMOTE_ENABLE, defaultValues.shouldEnableRemoteServer()),
+                getInt(SERVER_REMOTE_PORT, defaultValues.getRemoteServerPort()),
+                getBoolean(SERVER_HTTP_ENABLE, defaultValues.shouldEnableHttpServer()),
+                getInt(SERVER_HTTP_PORT, defaultValues.getHttpServerPort()),
+                getBoolean(SERVER_LANGUAGE_ENABLE, defaultValues.shouldEnableLanguageServer()),
+                getInt(SERVER_LANGUAGE_PORT, defaultValues.getLanguageServerPort()),
+                getBoolean(SERVER_DIRECT_HTTP_IMPORT, defaultValues.directHttpImport()));
+
+        bindInt(remotePreferences.remoteServerPortProperty(), SERVER_REMOTE_PORT, defaultValues.getRemoteServerPort());
+        bindBoolean(remotePreferences.enableRemoteServerProperty(), SERVER_REMOTE_ENABLE, defaultValues.shouldEnableRemoteServer());
+        bindInt(remotePreferences.httpServerPortProperty(), SERVER_HTTP_PORT, defaultValues.getHttpServerPort());
+        bindBoolean(remotePreferences.enableHttpServerProperty(), SERVER_HTTP_ENABLE, defaultValues.shouldEnableHttpServer());
+        bindInt(remotePreferences.languageServerPortProperty(), SERVER_LANGUAGE_PORT, defaultValues.getLanguageServerPort());
+        bindBoolean(remotePreferences.enableLanguageServerProperty(), SERVER_LANGUAGE_ENABLE, defaultValues.shouldEnableLanguageServer());
+        bindBoolean(remotePreferences.directHttpImportProperty(), SERVER_DIRECT_HTTP_IMPORT, defaultValues.directHttpImport());
 
         return remotePreferences;
-    }
-
-    private @NonNull RemotePreferences getRemotePreferencesFromBackingStore(RemotePreferences defaults) {
-        return new RemotePreferences(
-                getBoolean(SERVER_REMOTE_ENABLE, defaults.shouldEnableRemoteServer()), getInt(SERVER_REMOTE_PORT, defaults.getRemoteServerPort()),
-                getBoolean(SERVER_HTTP_ENABLE, defaults.shouldEnableHttpServer()), getInt(SERVER_HTTP_PORT, defaults.getHttpServerPort()),
-                getBoolean(SERVER_LANGUAGE_ENABLE, defaults.shouldEnableLanguageServer()),
-                getInt(SERVER_LANGUAGE_PORT, defaults.getLanguageServerPort()),
-                getBoolean(SERVER_DIRECT_HTTP_IMPORT, defaults.directHttpImport()));
     }
     // endregion
 
