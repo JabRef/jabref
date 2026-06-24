@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.SequencedSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
@@ -482,6 +483,12 @@ public class JabRefCliPreferences implements CliPreferences {
     private record PreferenceBinding(Observable property, Object defaultValue, String preferencesKey, Runnable importFromStore, Runnable resetToDefaults) {
     }
 
+    /// Identifies a single secret in the system keyring by its `service` and `account`.
+    private record KeyringSlot(String service, String account) {
+        static final KeyringSlot PROXY_PASSWORD = new KeyringSlot("org.jabref", "proxy");
+        static final KeyringSlot GITHUB_PAT = new KeyringSlot("org.jabref", "github");
+    }
+
     /// @implNote The constructor was made public because dependency injection via constructor
     /// required widespread refactoring, currently we are using reflection in some formatters
     /// to gain access
@@ -668,15 +675,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 resetToDefaults));
     }
 
-    /// Persist-only binding for secrets that live in the system keyring rather than the backing store.
-    /// It registers no [PreferenceBinding], so the value is intentionally excluded from [#getPreferences()] and
-    /// [#getDefaults()]. Loading and resetting are owned by its accompanying persist flag.
-    ///
-    /// @param persistListener writes value changes to the keyring
-    private <T> void bindToKeyring(Property<T> property, ChangeListener<? super T> persistListener) {
-        EasyBind.listen(property, persistListener);
-    }
-
     private void bindBoolean(BooleanProperty property, String key, boolean defaultValue) {
         bindCustom(property, key, defaultValue,
                 (_, _, v) -> putBoolean(key, v),
@@ -763,6 +761,53 @@ public class JabRefCliPreferences implements CliPreferences {
                 key,
                 () -> list.setAll(convertStringToList(get(key, convertListToString(defaultCopy)))),
                 () -> list.setAll(defaultCopy)));
+    }
+
+    /// Persist-only binding for secrets that live in the system keyring rather than the backing store.
+    /// It registers no [PreferenceBinding], so the value is intentionally excluded from [#getPreferences()] and
+    /// [#getDefaults()]. Loading and resetting are owned by its accompanying persist flag, whose binding is
+    /// also responsible for clearing the keyring when persistence is turned off.
+    ///
+    /// @param slot          the keyring location to write to
+    /// @param shouldPersist gate evaluated on every change; the value is written only while it returns true
+    private void bindToKeyring(StringProperty property, KeyringSlot slot, BooleanSupplier shouldPersist) {
+        EasyBind.listen(property, (_, _, newValue) -> {
+            if (shouldPersist.getAsBoolean()) {
+                writeKeyring(slot, newValue);
+            }
+        });
+    }
+
+    /// Reads and decrypts the secret stored at the given keyring slot, or empty if none is stored or the
+    /// keyring is unavailable.
+    private Optional<String> readKeyring(KeyringSlot slot) {
+        try (Keyring keyring = Keyring.create()) {
+            return Optional.of(new Password(
+                    keyring.getPassword(slot.service(), slot.account()),
+                    getInternalPreferences().getUserHostInfo().getUserHostString())
+                    .decrypt());
+        } catch (PasswordAccessException ex) {
+            LOGGER.warn("No secret stored in keyring for {}/{}", slot.service(), slot.account());
+        } catch (Exception ex) {
+            LOGGER.warn("Could not read keyring for {}/{}", slot.service(), slot.account(), ex);
+        }
+        return Optional.empty();
+    }
+
+    /// Encrypts and writes the secret to the given keyring slot. A blank secret clears the slot.
+    private void writeKeyring(KeyringSlot slot, String secret) {
+        try (Keyring keyring = Keyring.create()) {
+            if (StringUtil.isBlank(secret)) {
+                keyring.deletePassword(slot.service(), slot.account());
+            } else {
+                keyring.setPassword(slot.service(), slot.account(), new Password(
+                        secret.trim(),
+                        getInternalPreferences().getUserHostInfo().getUserHostString())
+                        .encrypt());
+            }
+        } catch (Exception ex) {
+            LOGGER.warn("Could not write keyring for {}/{}", slot.service(), slot.account(), ex);
+        }
     }
 
     @Override
@@ -1288,7 +1333,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(PROXY_PORT, defaultValues.getPort()),
                 getBoolean(PROXY_USE_AUTHENTICATION, defaultValues.shouldUseAuthentication()),
                 get(PROXY_USERNAME, defaultValues.getUsername()),
-                persistPassword ? getProxyPassword().orElse(defaultValues.getPassword()) : defaultValues.getPassword(),
+                persistPassword ? readKeyring(KeyringSlot.PROXY_PASSWORD).orElse(defaultValues.getPassword())
+                                : defaultValues.getPassword(),
                 persistPassword);
 
         bindBoolean(proxyPreferences.useProxyProperty(), PROXY_USE, defaultValues.shouldUseProxy());
@@ -1296,19 +1342,20 @@ public class JabRefCliPreferences implements CliPreferences {
         bindString(proxyPreferences.portProperty(), PROXY_PORT, defaultValues.getPort());
         bindBoolean(proxyPreferences.useAuthenticationProperty(), PROXY_USE_AUTHENTICATION, defaultValues.shouldUseAuthentication());
         bindString(proxyPreferences.usernameProperty(), PROXY_USERNAME, defaultValues.getUsername());
-        bindToKeyring(proxyPreferences.passwordProperty(), (_, _, newValue) -> setProxyPassword(newValue));
+        bindToKeyring(proxyPreferences.passwordProperty(), KeyringSlot.PROXY_PASSWORD, proxyPreferences::shouldPersistPassword);
         bindCustom(proxyPreferences.persistPasswordProperty(), PROXY_PERSIST_PASSWORD, defaultValues.shouldPersistPassword(),
                 (_, _, newValue) -> {
                     putBoolean(PROXY_PERSIST_PASSWORD, newValue);
                     if (!newValue) {
-                        deleteProxyPassword();
+                        writeKeyring(KeyringSlot.PROXY_PASSWORD, "");
                     }
                 },
                 () -> {
                     boolean shouldPersist = getBoolean(PROXY_PERSIST_PASSWORD, defaultValues.shouldPersistPassword());
                     proxyPreferences.persistPasswordProperty().set(shouldPersist);
                     proxyPreferences.passwordProperty().set(
-                            shouldPersist ? getProxyPassword().orElse(defaultValues.getPassword()) : defaultValues.getPassword());
+                            shouldPersist ? readKeyring(KeyringSlot.PROXY_PASSWORD).orElse(defaultValues.getPassword())
+                                          : defaultValues.getPassword());
                 },
                 () -> {
                     proxyPreferences.persistPasswordProperty().set(defaultValues.shouldPersistPassword());
@@ -1316,46 +1363,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 });
 
         return proxyPreferences;
-    }
-
-    private Optional<String> getProxyPassword() {
-        try (final Keyring keyring = Keyring.create()) {
-            return Optional.of(new Password(
-                    keyring.getPassword("org.jabref", "proxy"),
-                    getInternalPreferences().getUserHostInfo().getUserHostString())
-                    .decrypt());
-        } catch (PasswordAccessException ex) {
-            LOGGER.warn("JabRef uses proxy password from key store but no password is stored");
-        } catch (Exception ex) {
-            LOGGER.warn("JabRef could not open the key store", ex);
-        }
-
-        return Optional.empty();
-    }
-
-    private void setProxyPassword(String password) {
-        if (getProxyPreferences().shouldPersistPassword()) {
-            try (final Keyring keyring = Keyring.create()) {
-                if (StringUtil.isBlank(password)) {
-                    keyring.deletePassword("org.jabref", "proxy");
-                } else {
-                    keyring.setPassword("org.jabref", "proxy", new Password(
-                            password.trim(),
-                            getInternalPreferences().getUserHostInfo().getUserHostString())
-                            .encrypt());
-                }
-            } catch (Exception ex) {
-                LOGGER.warn("Unable to open key store", ex);
-            }
-        }
-    }
-
-    private static void deleteProxyPassword() {
-        try (final Keyring keyring = Keyring.create()) {
-            keyring.deletePassword("org.jabref", "proxy");
-        } catch (Exception ex) {
-            LOGGER.warn("Unable to remove proxy credentials");
-        }
     }
     // endregion
 
@@ -2484,25 +2491,27 @@ public class JabRefCliPreferences implements CliPreferences {
 
         gitPreferences = new GitPreferences(
                 get(GITHUB_USERNAME_KEY, defaultValues.getUsername()),
-                rememberPat ? getGitHubPat().orElse(defaultValues.getPat()) : defaultValues.getPat(),
+                rememberPat ? readKeyring(KeyringSlot.GITHUB_PAT).orElse(defaultValues.getPat())
+                            : defaultValues.getPat(),
                 get(GITHUB_REMOTE_URL_KEY, defaultValues.getRepositoryUrl()),
                 rememberPat);
 
         bindString(gitPreferences.usernameProperty(), GITHUB_USERNAME_KEY, defaultValues.getUsername());
         bindString(gitPreferences.repositoryUrlProperty(), GITHUB_REMOTE_URL_KEY, defaultValues.getRepositoryUrl());
-        bindToKeyring(gitPreferences.patProperty(), (_, _, newVal) -> setGitHubPat(newVal));
+        bindToKeyring(gitPreferences.patProperty(), KeyringSlot.GITHUB_PAT, gitPreferences::getPersistPat);
         bindCustom(gitPreferences.rememberPatProperty(), GITHUB_REMEMBER_PAT_KEY, defaultValues.getPersistPat(),
                 (_, _, newValue) -> {
                     putBoolean(GITHUB_REMEMBER_PAT_KEY, newValue);
                     if (!newValue) {
-                        deleteGitHubPat();
+                        writeKeyring(KeyringSlot.GITHUB_PAT, "");
                     }
                 },
                 () -> {
                     boolean shouldRemember = getBoolean(GITHUB_REMEMBER_PAT_KEY, defaultValues.getPersistPat());
                     gitPreferences.rememberPatProperty().set(shouldRemember);
                     gitPreferences.patProperty().set(
-                            shouldRemember ? getGitHubPat().orElse(defaultValues.getPat()) : defaultValues.getPat());
+                            shouldRemember ? readKeyring(KeyringSlot.GITHUB_PAT).orElse(defaultValues.getPat())
+                                           : defaultValues.getPat());
                 },
                 () -> {
                     gitPreferences.rememberPatProperty().set(defaultValues.getPersistPat());
@@ -2510,45 +2519,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 });
 
         return gitPreferences;
-    }
-
-    private static void deleteGitHubPat() {
-        try (final Keyring keyring = Keyring.create()) {
-            keyring.deletePassword("org.jabref", "github");
-        } catch (Exception ex) {
-            LOGGER.warn("Unable to remove GitHub credentials", ex);
-        }
-    }
-
-    private Optional<String> getGitHubPat() {
-        try (final Keyring keyring = Keyring.create()) {
-            return Optional.of(new Password(
-                    keyring.getPassword("org.jabref", "github"),
-                    getInternalPreferences().getUserHostInfo().getUserHostString())
-                    .decrypt());
-        } catch (PasswordAccessException ex) {
-            LOGGER.warn("No GitHub token stored in keyring");
-        } catch (Exception ex) {
-            LOGGER.warn("Could not read GitHub token from keyring", ex);
-        }
-        return Optional.empty();
-    }
-
-    private void setGitHubPat(String pat) {
-        if (getGitPreferences().rememberPatProperty().get()) {
-            try (final Keyring keyring = Keyring.create()) {
-                if (StringUtil.isBlank(pat)) {
-                    keyring.deletePassword("org.jabref", "github");
-                } else {
-                    keyring.setPassword("org.jabref", "github", new Password(
-                            pat.trim(),
-                            getInternalPreferences().getUserHostInfo().getUserHostString())
-                            .encrypt());
-                }
-            } catch (Exception ex) {
-                LOGGER.warn("Failed to save GitHub token to keyring", ex);
-            }
-        }
     }
     // endregion
 }
