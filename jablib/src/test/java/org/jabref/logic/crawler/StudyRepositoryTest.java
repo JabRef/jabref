@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javafx.collections.FXCollections;
@@ -33,6 +34,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
+import org.jabref.model.study.Study;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -217,6 +219,25 @@ class StudyRepositoryTest {
         List<QueryResult> mockResults = getMockResults();
         studyRepository.persist(mockResults);
         assertEquals(new HashSet<>(getNonDuplicateBibEntryResult().getEntries()), new HashSet<>(getTestStudyRepository().getStudyResultEntries().getEntries()));
+    }
+
+    @Test
+    void resolvesResultLimitsWithCatalogOverrideAndStudyDefault() {
+        Study study = studyRepository.getStudy();
+        study.setMaxResultsPerCatalog(100);
+        study.getCatalogs().getFirst().setMaxResults(500);
+
+        Map<String, Integer> limits = studyRepository.getResultLimitsPerCatalog();
+
+        String overriddenCatalog = study.getCatalogs().getFirst().getName();
+        assertEquals(500, limits.get(overriddenCatalog));
+        assertEquals(100, limits.get(study.getCatalogs().get(1).getName()));
+    }
+
+    @Test
+    void omitsCatalogsWithNoLimitSet() {
+        // no study default, no catalog override -> empty map -> StudyFetcher falls back to its constant
+        assertTrue(studyRepository.getResultLimitsPerCatalog().isEmpty());
     }
 
     private StudyRepository getTestStudyRepository() throws IOException, URISyntaxException, JabRefException {
