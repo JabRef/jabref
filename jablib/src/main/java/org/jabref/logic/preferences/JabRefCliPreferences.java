@@ -824,7 +824,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getInternalPreferences().setAll(InternalPreferences.getDefault());
         getFieldPreferences().setAll(FieldPreferences.getDefault());
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
-        getDOIPreferences().setAll(DOIPreferences.getDefault());
         getOwnerPreferences().setAll(OwnerPreferences.getDefault());
         getTimestampPreferences().setAll(TimestampPreferences.getDefault());
         getRemotePreferences().setAll(RemotePreferences.getDefault());
@@ -860,6 +859,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // ensure registration of bindings
         getLibraryPreferences();
+        getDOIPreferences();
         getPushToApplicationPreferences();
         getAbbreviationPreferences();
 
@@ -881,7 +881,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getInternalPreferences().setAll(getInternalPreferencesFromBackingStore(getInternalPreferences()));
         getFieldPreferences().setAll(getFieldPreferencesFromBackingStore(getFieldPreferences()));
         getProxyPreferences().setAll(getProxyPreferencesFromBackingStore(getProxyPreferences()));
-        getDOIPreferences().setAll(getDoiPreferencesFromBackingStore(getDOIPreferences()));
         getOwnerPreferences().setAll(getOwnerPreferencesFromBackingStore(getOwnerPreferences()));
         getTimestampPreferences().setAll(getTimestampPreferencesFromBackingStore(getTimestampPreferences()));
         getRemotePreferences().setAll(getRemotePreferencesFromBackingStore(getRemotePreferences()));
@@ -908,6 +907,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // ensure registration of bindings
         getLibraryPreferences();
+        getDOIPreferences();
         getPushToApplicationPreferences();
         getAbbreviationPreferences();
 
@@ -1147,19 +1147,16 @@ public class JabRefCliPreferences implements CliPreferences {
             return doiPreferences;
         }
 
-        doiPreferences = getDoiPreferencesFromBackingStore(DOIPreferences.getDefault());
+        DOIPreferences defaultValues = DOIPreferences.getDefault();
 
-        EasyBind.listen(doiPreferences.useCustomProperty(), (_, _, newValue) -> putBoolean(DOI_USE_CUSTOM_URI, newValue));
-        EasyBind.listen(doiPreferences.defaultBaseURIProperty(), (_, _, newValue) -> put(DOI_BASE_URI, newValue));
+        doiPreferences = new DOIPreferences(
+                getBoolean(DOI_USE_CUSTOM_URI, defaultValues.shouldUseCustom()),
+                get(DOI_BASE_URI, defaultValues.getDefaultBaseURI()));
+
+        bindBoolean(doiPreferences.useCustomProperty(), DOI_USE_CUSTOM_URI, defaultValues.shouldUseCustom());
+        bindString(doiPreferences.defaultBaseURIProperty(), DOI_BASE_URI, defaultValues.getDefaultBaseURI());
 
         return doiPreferences;
-    }
-
-    private @NonNull DOIPreferences getDoiPreferencesFromBackingStore(DOIPreferences defaults) {
-        return new DOIPreferences(
-                getBoolean(DOI_USE_CUSTOM_URI, defaults.shouldUseCustom()),
-                get(DOI_BASE_URI, defaults.getDefaultBaseURI())
-        );
     }
     // endregion
 
