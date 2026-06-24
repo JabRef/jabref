@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.search.query.SearchQueryConversion;
@@ -64,7 +66,10 @@ public class Highlighter {
 
     private static String highlightNode(String text, String searchPattern) {
         if (!Injector.instantiateModelOrService(GuiPreferences.class).getSearchPreferences().shouldUsePostgresSearch()) {
-            return text;
+            return text.replaceAll(
+                    "(?i)(" + searchPattern + ")",
+                    "<mark style=\"background: orange\">$1</mark>"
+            );
         }
         if (connection == null) {
             connection = Injector.instantiateModelOrService(PostgreServer.class).getConnection();
@@ -87,7 +92,12 @@ public class Highlighter {
 
     public static List<Range> findMatchPositions(String text, String pattern) {
         if (!Injector.instantiateModelOrService(GuiPreferences.class).getSearchPreferences().shouldUsePostgresSearch()) {
-            return List.of();
+            List<Range> positions = new ArrayList<>();
+            Matcher matcher = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE).matcher(text);
+            while (matcher.find()) {
+                positions.add(new Range(matcher.start() + 1, matcher.end())); // +1 for 1-based like Postgres
+            }
+            return positions;
         }
         if (connection == null) {
             connection = Injector.instantiateModelOrService(PostgreServer.class).getConnection();
