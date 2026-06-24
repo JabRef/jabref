@@ -783,35 +783,66 @@ public class JabRefCliPreferences implements CliPreferences {
         });
     }
 
-    /// Reads and decrypts the secret stored at the given keyring slot, or empty if none is stored or the
-    /// keyring is unavailable.
+    /// Reads the secret at a single slot, or empty if it is absent/blank or the keyring is unavailable.
     private Optional<String> readKeyring(KeyringSlot slot) {
-        try (Keyring keyring = Keyring.create()) {
-            return Optional.of(new Password(
-                    keyring.getPassword(slot.service(), slot.account()),
-                    getInternalPreferences().getUserHostInfo().getUserHostString())
-                    .decrypt());
-        } catch (PasswordAccessException ex) {
-            LOGGER.warn("No secret stored in keyring for {}/{}", slot.service(), slot.account());
-        } catch (Exception ex) {
-            LOGGER.warn("Could not read keyring for {}/{}", slot.service(), slot.account(), ex);
-        }
-        return Optional.empty();
+        return Optional.ofNullable(readKeyring(List.of(slot)).get(slot))
+                       .filter(StringUtil::isNotBlank);
     }
 
-    /// Encrypts and writes the secret to the given keyring slot. A blank secret clears the slot.
-    private void writeKeyring(KeyringSlot slot, String secret) {
+    /// Reads and decrypts the secrets at the given slots in a single keyring session.
+    ///
+    /// On a successful open the returned map contains an entry for **every** requested slot, whose value is the
+    /// decrypted secret or an empty string when nothing is stored for that slot. If the keyring cannot be opened
+    /// at all, an empty map is returned. Callers therefore distinguish failure from "all slots empty" by size:
+    /// `result.size() == slots.size()` iff the open succeeded (the only collision, an empty `slots`, is a no-op).
+    private Map<KeyringSlot, String> readKeyring(List<KeyringSlot> slots) {
+        Map<KeyringSlot, String> result = new HashMap<>();
         try (Keyring keyring = Keyring.create()) {
-            if (StringUtil.isBlank(secret)) {
-                keyring.deletePassword(slot.service(), slot.account());
-            } else {
-                keyring.setPassword(slot.service(), slot.account(), new Password(
-                        secret.trim(),
-                        getInternalPreferences().getUserHostInfo().getUserHostString())
-                        .encrypt());
+            for (KeyringSlot slot : slots) {
+                try {
+                    result.put(slot, new Password(
+                            keyring.getPassword(slot.service(), slot.account()),
+                            getInternalPreferences().getUserHostInfo().getUserHostString())
+                            .decrypt());
+                } catch (PasswordAccessException ex) {
+                    LOGGER.debug("No secret stored in keyring for {}/{}", slot.service(), slot.account());
+                    result.put(slot, "");
+                }
             }
         } catch (Exception ex) {
-            LOGGER.warn("Could not write keyring for {}/{}", slot.service(), slot.account(), ex);
+            LOGGER.warn("Could not open keyring", ex);
+            return Map.of();
+        }
+        return result;
+    }
+
+    /// Writes (or, for a blank secret, clears) a single slot.
+    private void writeKeyring(KeyringSlot slot, String secret) {
+        Map<KeyringSlot, String> single = new HashMap<>();
+        single.put(slot, secret);
+        writeKeyring(single);
+    }
+
+    /// Encrypts and writes each secret to its slot in a single keyring session. A blank secret clears its slot.
+    private void writeKeyring(Map<KeyringSlot, String> secrets) {
+        try (Keyring keyring = Keyring.create()) {
+            for (Map.Entry<KeyringSlot, String> entry : secrets.entrySet()) {
+                KeyringSlot slot = entry.getKey();
+                if (StringUtil.isBlank(entry.getValue())) {
+                    try {
+                        keyring.deletePassword(slot.service(), slot.account());
+                    } catch (PasswordAccessException ex) {
+                        // already absent, nothing to clear
+                    }
+                } else {
+                    keyring.setPassword(slot.service(), slot.account(), new Password(
+                            entry.getValue().trim(),
+                            getInternalPreferences().getUserHostInfo().getUserHostString())
+                            .encrypt());
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.warn("Could not open keyring", ex);
         }
     }
 
@@ -2310,86 +2341,44 @@ public class JabRefCliPreferences implements CliPreferences {
         return fetcherApiKeys;
     }
 
+    /// Reads the stored API keys aligned to `names` order ("" where a key is absent), or an empty list if the
+    /// keyring is unavailable, so the caller falls back to default keys on a size mismatch.
     private List<String> getFetcherKeysFromKeyring(List<String> names) {
-        List<String> keys = new ArrayList<>();
-
-        try (final Keyring keyring = Keyring.create()) {
-            for (String fetcher : names) {
-                KeyringSlot slot = KeyringSlot.customApiKey(fetcher);
-                try {
-                    keys.add(new Password(
-                            keyring.getPassword(slot.service(), slot.account()),
-                            getInternalPreferences().getUserHostInfo().getUserHostString())
-                            .decrypt());
-                } catch (PasswordAccessException ex) {
-                    LOGGER.debug("No api key stored for {} fetcher", fetcher);
-                    keys.add("");
-                }
-            }
-        } catch (Exception ex) {
-            LOGGER.warn("JabRef could not open the key store");
+        List<KeyringSlot> slots = names.stream().map(KeyringSlot::customApiKey).toList();
+        Map<KeyringSlot, String> stored = readKeyring(slots);
+        if (stored.size() != slots.size()) {
+            return List.of();
         }
-
-        return keys;
+        return slots.stream().map(stored::get).toList();
     }
 
     private void storeFetcherKeys(ImporterPreferences defaults) {
         List<String> names = new ArrayList<>();
         List<String> uses = new ArrayList<>();
-        List<String> keys = new ArrayList<>();
+        Map<KeyringSlot, String> keys = new HashMap<>();
 
         for (FetcherApiKey apiKey : defaults.getApiKeys()) {
             names.add(apiKey.getName());
             uses.add(String.valueOf(apiKey.shouldUse()));
-            keys.add(apiKey.getKey());
+            keys.put(KeyringSlot.customApiKey(apiKey.getName()), apiKey.getKey());
         }
 
         putStringList(FETCHER_CUSTOM_KEY_NAMES, names);
         putStringList(FETCHER_CUSTOM_KEY_USES, uses);
 
         if (defaults.shouldPersistCustomKeys()) {
-            storeFetcherKeysToKeyring(names, keys);
+            writeKeyring(keys);
         } else {
             clearCustomFetcherKeys();
         }
     }
 
-    private void storeFetcherKeysToKeyring(List<String> names, List<String> keys) {
-        try (final Keyring keyring = Keyring.create()) {
-            for (int i = 0; i < names.size(); i++) {
-                KeyringSlot slot = KeyringSlot.customApiKey(names.get(i));
-                if (StringUtil.isNullOrEmpty(keys.get(i))) {
-                    try {
-                        keyring.deletePassword(slot.service(), slot.account());
-                    } catch (PasswordAccessException ex) {
-                        // Already removed
-                    }
-                } else {
-                    keyring.setPassword(slot.service(), slot.account(), new Password(
-                            keys.get(i),
-                            getInternalPreferences().getUserHostInfo().getUserHostString())
-                            .encrypt());
-                }
-            }
-        } catch (Exception ex) {
-            LOGGER.error("Unable to open key store", ex);
-        }
-    }
-
     private void clearCustomFetcherKeys() {
-        List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
-        try (final Keyring keyring = Keyring.create()) {
-            try {
-                for (String name : names) {
-                    KeyringSlot slot = KeyringSlot.customApiKey(name);
-                    keyring.deletePassword(slot.service(), slot.account());
-                }
-            } catch (PasswordAccessException ex) {
-                // nothing to do, no password to remove
-            }
-        } catch (Exception ex) {
-            LOGGER.error("Unable to open key store");
+        Map<KeyringSlot, String> cleared = new HashMap<>();
+        for (String name : getStringList(FETCHER_CUSTOM_KEY_NAMES)) {
+            cleared.put(KeyringSlot.customApiKey(name), "");
         }
+        writeKeyring(cleared);
     }
 
     private PlainCitationParserChoice getDefaultPlainCitationParser(PlainCitationParserChoice defaultPlainCitationParser) {
