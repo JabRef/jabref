@@ -2,6 +2,7 @@ package org.jabref.logic.crawler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.jabref.logic.importer.FetcherException;
@@ -24,10 +25,12 @@ class StudyFetcher {
 
     private final List<SearchBasedFetcher> activeFetchers;
     private final List<StudyQuery> searchQueries;
+    private final Map<String, Integer> resultLimits;
 
-    StudyFetcher(List<SearchBasedFetcher> activeFetchers, List<StudyQuery> searchQueries) throws IllegalArgumentException {
+    StudyFetcher(List<SearchBasedFetcher> activeFetchers, List<StudyQuery> searchQueries, Map<String, Integer> resultLimits) throws IllegalArgumentException {
         this.searchQueries = searchQueries;
         this.activeFetchers = activeFetchers;
+        this.resultLimits = resultLimits;
     }
 
     /// Each Map Entry contains the results for one search term for all libraries.
@@ -58,7 +61,8 @@ class StudyFetcher {
         try {
             List<BibEntry> fetchResult = new ArrayList<>();
             if (fetcher instanceof PagedSearchBasedFetcher basedFetcher) {
-                int pages = (int) Math.ceil(((double) MAX_AMOUNT_OF_RESULTS_PER_FETCHER) / basedFetcher.getPageSize());
+                int limit = resolveLimit(fetcher.getName());
+                int pages = (int) Math.ceil(((double) limit) / basedFetcher.getPageSize());
                 for (int page = 0; page < pages; page++) {
                     fetchResult.addAll(basedFetcher.performSearchPaged(searchQuery.getQuery(), page).getContent());
                 }
@@ -70,5 +74,15 @@ class StudyFetcher {
             LOGGER.warn("{} API request failed", fetcher.getName(), e);
             return null;
         }
+    }
+
+    /// returns the result limit for the given fetcher, matched case insensitively by name,
+    /// falls back to [#MAX_AMOUNT_OF_RESULTS_PER_FETCHER] when the study defines none
+    private int resolveLimit(String fetcherName) {
+        return resultLimits.entrySet().stream()
+                           .filter(e -> e.getKey().equalsIgnoreCase(fetcherName))
+                           .map(Map.Entry::getValue)
+                           .findFirst()
+                           .orElse(MAX_AMOUNT_OF_RESULTS_PER_FETCHER);
     }
 }
