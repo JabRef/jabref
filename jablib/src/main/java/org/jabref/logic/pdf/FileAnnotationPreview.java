@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.jspecify.annotations.Nullable;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.pdf.FileAnnotation;
@@ -13,7 +14,7 @@ import org.jabref.model.pdf.FileAnnotation;
 import static org.jabref.logic.util.strings.StringUtil.quoteForHTML;
 
 public class FileAnnotationPreview {
-    public static String render(Map<Path, List<FileAnnotation>> annotations) {
+    public static String render(@Nullable Map<Path, List<FileAnnotation>> annotations) {
         if (annotations == null || annotations.isEmpty()) {
             return "";
         }
@@ -45,12 +46,27 @@ public class FileAnnotationPreview {
     }
 
     private static void renderAnnotation(StringBuilder html, FileAnnotation annotation) {
-        String type = annotation.getAnnotationType() != null ? annotation.getAnnotationType().toString() : Localization.lang("Unknown");
+        String typeStr;
+
+        if (annotation.getAnnotationType() != null) {
+            String typeName = annotation.getAnnotationType().toString();
+
+            if ("HIGHLIGHT".equalsIgnoreCase(typeName)) {
+                typeStr = Localization.lang("highlight");
+            } else if ("UNDERLINE".equalsIgnoreCase(typeName)) {
+                typeStr = Localization.lang("underline");
+            } else if ("STRIKEOUT".equalsIgnoreCase(typeName)) {
+                typeStr = Localization.lang("strikeout");
+            } else {
+                typeStr = typeName.toLowerCase();
+            }
+        } else {
+            typeStr = Localization.lang("unknown");
+        }
+
         int page = annotation.getPage();
         String content = annotation.getContent();
-
-        String pageLabel = Localization.lang("Page");
-        String headerLabel = "%s (%s %d):".formatted(type, pageLabel, page);
+        String headerLabel = Localization.lang("%0 (page %1)", typeStr, String.valueOf(page));
 
         html.append("<b>")
             .append(quoteForHTML(headerLabel))

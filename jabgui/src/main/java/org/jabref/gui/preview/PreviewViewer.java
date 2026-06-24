@@ -211,6 +211,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     databaseContext == null ? "null" : databaseContext,
                     entry == null ? "null" : entry,
                     layout == null ? "null" : layout);
+            previewThrottler.cancel();
+            latestRequestId.incrementAndGet();
             setPreviewText("");
             return;
         }
@@ -224,10 +226,19 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
             BackgroundTask.wrap(() -> generatePreviewWithAnnotations(currentEntry, filePreferences))
                           .onSuccess(htmlComplete -> {
-                              if (requestId == latestRequestId.get() && currentEntry.equals(this.entry) && currentDatabaseContext.equals(this.databaseContext) && (currentLayout == null || currentLayout.equals(this.layout))) {
+                              if (requestId == latestRequestId.get()
+                                      && Objects.equals(currentEntry, this.entry)
+                                      && Objects.equals(currentDatabaseContext, this.databaseContext)
+                                      && (currentLayout == null || Objects.equals(currentLayout, this.layout))) {
+
                                   setPreviewText(htmlComplete);
+
+                                  if (preferences.getPreviewPreferences().shouldDownloadCovers()) {
+                                      downloadCoverAndRefresh(currentEntry, htmlComplete);
+                                  }
                               } else {
-                                  LOGGER.debug("Stale preview task discarded for entry: {}", currentEntry.getCitationKey().orElse(""));
+                                  LOGGER.debug("Stale preview task discarded for entry: {}",
+                                          currentEntry != null ? currentEntry.getCitationKey().orElse("") : "");
                               }
                           })
                           .onFailure(exception -> LOGGER.error("Error generating preview text", exception))
@@ -438,8 +449,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 String annotationsHtml = FileAnnotationPreview.render(annotationsMap);
                 previewHtml.append(annotationsHtml);
             }
-        } catch (RuntimeException e) {
-            LOGGER.error("Failed to generate preview with annotations due to a runtime error", e);
+        } catch (Exception e) {
+            LOGGER.error("Failed to read PDF annotations for preview", e);
+            throw new RuntimeException("Error loading PDF annotations", e);
         }
 
         return previewHtml.toString();
