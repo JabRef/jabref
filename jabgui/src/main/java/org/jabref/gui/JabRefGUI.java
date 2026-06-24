@@ -560,10 +560,12 @@ public class JabRefGUI extends Application {
             });
 
             executor.submit(() -> {
-                LOGGER.trace("Shutting down postgreServer");
-                PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
-                postgreServer.close();
-                LOGGER.trace("PostgreServer shut down");
+                if (preferences.getSearchPreferences().shouldUsePostgresSearch()) {
+                    LOGGER.trace("Shutting down postgreServer");
+                    PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
+                    postgreServer.close();
+                    LOGGER.trace("PostgreServer shut down");
+                }
             });
 
             executor.submit(() -> {
