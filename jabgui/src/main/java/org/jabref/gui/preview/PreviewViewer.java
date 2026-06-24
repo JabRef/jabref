@@ -298,12 +298,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         String queryText = searchQueryProperty.get();
         if (StringUtil.isNotBlank(queryText)) {
             SearchQuery searchQuery = new SearchQuery(queryText);
-            String highlighted;
-            if (preferences.getSearchPreferences().shouldUsePostgresSearch()) {
-                highlighted = Highlighter.highlightHtml(layoutText, searchQuery);
-            } else {
-                highlighted = layoutText; // fallback if not using postgres
-            }
+            String highlighted = Highlighter.highlightHtml(layoutText, searchQuery);
             UiTaskExecutor.runInJavaFXThread(() -> previewView.getEngine().loadContent(highlighted));
         } else {
             UiTaskExecutor.runInJavaFXThread(() -> previewView.getEngine().loadContent(layoutText));
