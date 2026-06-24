@@ -14,7 +14,7 @@ public class GroupsHelper {
     private GroupsHelper() {
     }
 
-    /// Assigns {@code entries} to the explicit group named {@code groupName} in {@code databaseContext},
+    /// Assigns `entries` to the explicit group named `groupName` in `databaseContext`,
     /// creating the group as a top-level explicit group (and the group-tree root) if it does not exist yet.
     ///
     /// @param keywordSeparator separator used when the group is created as a keyword-backed explicit group

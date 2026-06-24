@@ -256,13 +256,13 @@ public class JabRefFrameViewModel {
                       .executeWith(taskExecutor);
     }
 
-    /// Selects the tab whose library lives at {@code library} so that the subsequent append
+    /// Selects the tab whose library lives at `library` so that the subsequent append
     /// targets it instead of the previously active tab. An empty Optional leaves the current tab
     /// unchanged. If the library is not open yet, it is opened in a new (raised) tab; the actual
     /// loading happens in the background, so callers must run the append via
-    /// {@link #waitForLoadingFinished(Runnable)} to let the new tab finish loading first. A path
+    /// [#waitForLoadingFinished(Runnable)] to let the new tab finish loading first. A path
     /// that does not exist (or is not a .bib file) is silently ignored by
-    /// {@link OpenDatabaseAction#openFile(Path)} and the current tab is kept (the server side
+    /// [OpenDatabaseAction#openFile(Path)] and the current tab is kept (the server side
     /// already rejects unknown ids with 404, so this is only a defensive fallback).
     private void selectLibraryTab(Optional<Path> library) {
         library.map(path -> path.toAbsolutePath().normalize()).ifPresent(normalized ->
