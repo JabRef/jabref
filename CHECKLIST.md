@@ -8,6 +8,7 @@ code until all points are fulfilled. Do not skip any point.
 ## Code rules
 
 - [ ] JSpecify annotations used instead of `== null` checks.
+- [ ] New classes annotated with `@NullMarked` (`org.jspecify.annotations.NullMarked`).
 - [ ] `org.jabref.logic.util.strings.StringUtil.isBlank(java.lang.String)` used instead of `== null || ...isBlank()`.
 - [ ] No `catch (Exception e)` — only specific exceptions caught.
 - [ ] No commented-out code left behind.
