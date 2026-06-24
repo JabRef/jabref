@@ -50,7 +50,7 @@ public class FileAnnotationPreview {
         String content = annotation.getContent();
 
         String pageLabel = Localization.lang("Page");
-        String headerLabel = String.format("%s (%s %d):", type, pageLabel, page);
+        String headerLabel = "%s (%s %d):".formatted(type, pageLabel, page);
 
         html.append("<b>")
             .append(quoteForHTML(headerLabel))
