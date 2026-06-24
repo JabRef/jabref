@@ -23,7 +23,7 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
-import org.jabref.logic.search.sqlbased.PostgreServer;
+import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
 import org.jabref.migrations.PreferencesMigrations;
@@ -93,8 +93,8 @@ public class Launcher {
             PreferencesMigrations.runMigrations(preferences);
 
             if (preferences.getSearchPreferences().shouldUsePostgresSearch()) {
-                PostgreServer postgreServer = new PostgreServer();
-                Injector.setModelOrService(PostgreServer.class, postgreServer);
+                PostgresServer postgresServer = new PostgresServer();
+                Injector.setModelOrService(PostgresServer.class, postgresServer);
             }
 
             CSLStyleLoader.loadInternalStyles();
