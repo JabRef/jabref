@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.search.query.SearchQueryConversion;
 import org.jabref.logic.search.sqlbased.PostgreServer;
 import org.jabref.model.entry.field.Field;
@@ -62,6 +63,9 @@ public class Highlighter {
     }
 
     private static String highlightNode(String text, String searchPattern) {
+        if (!Injector.instantiateModelOrService(GuiPreferences.class).getSearchPreferences().shouldUsePostgresSearch()) {
+            return text;
+        }
         if (connection == null) {
             connection = Injector.instantiateModelOrService(PostgreServer.class).getConnection();
         }
@@ -82,6 +86,9 @@ public class Highlighter {
     }
 
     public static List<Range> findMatchPositions(String text, String pattern) {
+        if (!Injector.instantiateModelOrService(GuiPreferences.class).getSearchPreferences().shouldUsePostgresSearch()) {
+            return List.of();
+        }
         if (connection == null) {
             connection = Injector.instantiateModelOrService(PostgreServer.class).getConnection();
         }
