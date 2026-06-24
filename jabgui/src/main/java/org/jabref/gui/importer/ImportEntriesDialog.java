@@ -325,10 +325,14 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                 if (selectedGroup != null && selectedGroup.getGroup() instanceof ExplicitGroup) {
                     // The user picked an existing explicit group; assign to it via the selected-groups
                     // mechanism. An explicit pick overrides any REST-requested group.
-                    GroupTreeNode prevSelectedGroup = stateManager.getSelectedGroups(stateManager.getActiveDatabase().orElse(null)).getFirst();
-                    stateManager.setSelectedGroups(libraryListView.getSelectionModel().getSelectedItem(), List.of(selectedGroup));
+                    // Use the dialog's selected library (the one entries are imported into), not the
+                    // active database: getSelectedGroups/setSelectedGroups dereference the context, so
+                    // it must be non-null and must match the library whose selection we restore.
+                    BibDatabaseContext selectedDatabaseContext = libraryListView.getSelectionModel().getSelectedItem();
+                    GroupTreeNode prevSelectedGroup = stateManager.getSelectedGroups(selectedDatabaseContext).getFirst();
+                    stateManager.setSelectedGroups(selectedDatabaseContext, List.of(selectedGroup));
                     viewModel.importEntries(selectedEntries, downloadLinkedOnlineFiles.isSelected());
-                    stateManager.setSelectedGroups(stateManager.getActiveDatabase().orElse(null), List.of(prevSelectedGroup));
+                    stateManager.setSelectedGroups(selectedDatabaseContext, List.of(prevSelectedGroup));
                 } else {
                     // No explicit group picked: fall back to the REST-requested group, creating it
                     // (top-level) if it does not exist yet. Null/blank means "no group".
