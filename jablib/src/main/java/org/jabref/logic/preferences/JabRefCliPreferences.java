@@ -843,7 +843,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         getInternalPreferences().setAll(InternalPreferences.getDefault());
         getFieldPreferences().setAll(FieldPreferences.getDefault());
-        getProxyPreferences().setAll(ProxyPreferences.getDefault());
         getBibEntryPreferences().setAll(BibEntryPreferences.getDefault());
         getCitationKeyPatternPreferences().setAll(
                 CitationKeyPatternPreferences.getDefault()
@@ -875,6 +874,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getGitPreferences().setAll(GitPreferences.getDefault());
 
         // ensure registration of bindings
+        getProxyPreferences();
         getLibraryPreferences();
         getDOIPreferences();
         getOwnerPreferences();
@@ -900,7 +900,6 @@ public class JabRefCliPreferences implements CliPreferences {
         // in case of incomplete or corrupt XML fall back to current preferences
         getInternalPreferences().setAll(getInternalPreferencesFromBackingStore(getInternalPreferences()));
         getFieldPreferences().setAll(getFieldPreferencesFromBackingStore(getFieldPreferences()));
-        getProxyPreferences().setAll(getProxyPreferencesFromBackingStore(getProxyPreferences()));
         getCitationKeyPatternPreferences().setAll(getCitationKeyPatternPreferencesFromBackingStore(getCitationKeyPatternPreferences()));
         getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
         getBibEntryPreferences().setAll(getBibEntryPreferencesFromBackingStore(getBibEntryPreferences()));
@@ -923,6 +922,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getGitPreferences().setAll(getGitPreferencesFromBackingStore(getGitPreferences()));
 
         // ensure registration of bindings
+        getProxyPreferences();
         getLibraryPreferences();
         getDOIPreferences();
         getOwnerPreferences();
@@ -1270,40 +1270,48 @@ public class JabRefCliPreferences implements CliPreferences {
             return proxyPreferences;
         }
 
-        proxyPreferences = getProxyPreferencesFromBackingStore(ProxyPreferences.getDefault());
+        ProxyPreferences defaultValues = ProxyPreferences.getDefault();
+        boolean persistPassword = getBoolean(PROXY_PERSIST_PASSWORD, defaultValues.shouldPersistPassword());
 
-        EasyBind.listen(proxyPreferences.useProxyProperty(), (_, _, newValue) -> putBoolean(PROXY_USE, newValue));
-        EasyBind.listen(proxyPreferences.hostnameProperty(), (_, _, newValue) -> put(PROXY_HOSTNAME, newValue));
-        EasyBind.listen(proxyPreferences.portProperty(), (_, _, newValue) -> put(PROXY_PORT, newValue));
-        EasyBind.listen(proxyPreferences.useAuthenticationProperty(), (_, _, newValue) -> putBoolean(PROXY_USE_AUTHENTICATION, newValue));
-        EasyBind.listen(proxyPreferences.usernameProperty(), (_, _, newValue) -> put(PROXY_USERNAME, newValue));
+        proxyPreferences = new ProxyPreferences(
+                getBoolean(PROXY_USE, defaultValues.shouldUseProxy()),
+                get(PROXY_HOSTNAME, defaultValues.getHostname()),
+                get(PROXY_PORT, defaultValues.getPort()),
+                getBoolean(PROXY_USE_AUTHENTICATION, defaultValues.shouldUseAuthentication()),
+                get(PROXY_USERNAME, defaultValues.getUsername()),
+                persistPassword ? getProxyPassword().orElse(defaultValues.getPassword()) : defaultValues.getPassword(),
+                persistPassword);
+
+        bindBoolean(proxyPreferences.useProxyProperty(), PROXY_USE, defaultValues.shouldUseProxy());
+        bindString(proxyPreferences.hostnameProperty(), PROXY_HOSTNAME, defaultValues.getHostname());
+        bindString(proxyPreferences.portProperty(), PROXY_PORT, defaultValues.getPort());
+        bindBoolean(proxyPreferences.useAuthenticationProperty(), PROXY_USE_AUTHENTICATION, defaultValues.shouldUseAuthentication());
+        bindString(proxyPreferences.usernameProperty(), PROXY_USERNAME, defaultValues.getUsername());
+
+        // The proxy password lives in the system keyring, not in the backing store, so it is intentionally not bound via
+        // the PreferenceBinding mechanism (which would expose it through getPreferences()). Its persistence is handled by
+        // the subscriber below; loading and resetting it are tied to the persistPassword binding that follows.
         EasyBind.listen(proxyPreferences.passwordProperty(), (_, _, newValue) -> setProxyPassword(newValue));
-        EasyBind.listen(proxyPreferences.persistPasswordProperty(), (_, _, newValue) -> {
-            putBoolean(PROXY_PERSIST_PASSWORD, newValue);
-            if (!newValue) {
-                try (final Keyring keyring = Keyring.create()) {
-                    keyring.deletePassword("org.jabref", "proxy");
-                } catch (Exception ex) {
-                    LOGGER.warn("Unable to remove proxy credentials");
-                }
-            }
-        });
+
+        bindCustom(proxyPreferences.persistPasswordProperty(), PROXY_PERSIST_PASSWORD, defaultValues.shouldPersistPassword(),
+                (_, _, newValue) -> {
+                    putBoolean(PROXY_PERSIST_PASSWORD, newValue);
+                    if (!newValue) {
+                        deleteProxyPassword();
+                    }
+                },
+                () -> {
+                    boolean shouldPersist = getBoolean(PROXY_PERSIST_PASSWORD, defaultValues.shouldPersistPassword());
+                    proxyPreferences.persistPasswordProperty().set(shouldPersist);
+                    proxyPreferences.passwordProperty().set(
+                            shouldPersist ? getProxyPassword().orElse(defaultValues.getPassword()) : defaultValues.getPassword());
+                },
+                () -> {
+                    proxyPreferences.persistPasswordProperty().set(defaultValues.shouldPersistPassword());
+                    proxyPreferences.passwordProperty().set(defaultValues.getPassword());
+                });
 
         return proxyPreferences;
-    }
-
-    private ProxyPreferences getProxyPreferencesFromBackingStore(ProxyPreferences defaults) {
-        boolean persistPassword = getBoolean(PROXY_PERSIST_PASSWORD, defaults.shouldPersistPassword());
-
-        return new ProxyPreferences(
-                getBoolean(PROXY_USE, defaults.shouldUseProxy()),
-                get(PROXY_HOSTNAME, defaults.getHostname()),
-                get(PROXY_PORT, defaults.getPort()),
-                getBoolean(PROXY_USE_AUTHENTICATION, defaults.shouldUseAuthentication()),
-                get(PROXY_USERNAME, defaults.getUsername()),
-                persistPassword ? getProxyPassword().orElse(defaults.getPassword()) : defaults.getPassword(),
-                persistPassword
-        );
     }
 
     private Optional<String> getProxyPassword() {
@@ -1335,6 +1343,14 @@ public class JabRefCliPreferences implements CliPreferences {
             } catch (Exception ex) {
                 LOGGER.warn("Unable to open key store", ex);
             }
+        }
+    }
+
+    private static void deleteProxyPassword() {
+        try (final Keyring keyring = Keyring.create()) {
+            keyring.deletePassword("org.jabref", "proxy");
+        } catch (Exception ex) {
+            LOGGER.warn("Unable to remove proxy credentials");
         }
     }
     // endregion
