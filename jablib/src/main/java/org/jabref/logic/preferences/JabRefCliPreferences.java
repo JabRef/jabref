@@ -66,6 +66,7 @@ import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
+import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
@@ -384,6 +385,10 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_MARKDOWN_CHAT_EXPORT_TEMPLATE = "aiMarkdownChatExportTemplate";
     // endregion
 
+    // region OCR preferences
+    private static final String OCR_ENGINE_PATH = "ocrEnginePath";
+    // endregion
+
     // region Push to application preferences
     private static final String PUSH_TO_APPLICATION = "pushToApplication";
     private static final String PUSH_EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
@@ -457,6 +462,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private AbbreviationPreferences abbreviationPreferences;
     private FieldPreferences fieldPreferences;
     private AiPreferences aiPreferences;
+    private OcrPreferences ocrPreferences;
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
     private PushToApplicationPreferences pushToApplicationPreferences;
     private GitPreferences gitPreferences;
@@ -786,6 +792,7 @@ public class JabRefCliPreferences implements CliPreferences {
                                                    .withLastUsedDirectory(getDefaultPath())
         );
         getAiPreferences().setAll(AiPreferences.getDefault());
+        getOcrPreferences().setAll(OcrPreferences.getDefault());
         getNameFormatterPreferences().setAll(NameFormatterPreferences.getDefault());
         getCleanupPreferences().setAll(CleanupPreferences.getDefault());
         getImporterPreferences().setAll(ImporterPreferences.getDefault());
@@ -830,6 +837,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
         getBibEntryPreferences().setAll(getBibEntryPreferencesFromBackingStore(getBibEntryPreferences()));
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
+        getOcrPreferences().setAll(getOcrPreferencesFromBackingStore(getOcrPreferences()));
         getNameFormatterPreferences().setAll(getNameFormatterPreferencesFromBackingStore(getNameFormatterPreferences()));
         getCleanupPreferences().setAll(getCleanupPreferencesFromBackingStore(getCleanupPreferences()));
         getImporterPreferences().setAll(getImporterPreferencesFromBackingStore(getImporterPreferences()));
@@ -1869,7 +1877,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         aiPreferences = getAiPreferencesFromBackingStore(AiPreferences.getDefault());
 
-        EasyBind.listen(aiPreferences.enableAiProperty(), (_, _, newValue) -> putBoolean(AI_ENABLED, newValue));
+        EasyBind.listen(aiPreferences.aiFeaturesEnabledCurrentlyProperty(), (_, _, newValue) -> putBoolean(AI_ENABLED, newValue));
         EasyBind.listen(aiPreferences.autoGenerateEmbeddingsProperty(), (_, _, newValue) -> putBoolean(AI_AUTO_GENERATE_EMBEDDINGS, newValue));
         EasyBind.listen(aiPreferences.autoGenerateSummariesProperty(), (_, _, newValue) -> putBoolean(AI_AUTO_GENERATE_SUMMARIES, newValue));
         EasyBind.listen(aiPreferences.generateFollowUpQuestionsProperty(), (_, _, newValue) -> putBoolean(AI_GENERATE_FOLLOW_UP_QUESTIONS, newValue));
@@ -1920,7 +1928,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private AiPreferences getAiPreferencesFromBackingStore(AiPreferences defaults) {
         return new AiPreferences(
-                getBoolean(AI_ENABLED, defaults.getEnableAi()),
+                getBoolean(AI_ENABLED, defaults.getAiFeaturesEnabled()),
                 getBoolean(AI_AUTO_GENERATE_EMBEDDINGS, defaults.getAutoGenerateEmbeddings()),
                 getBoolean(AI_AUTO_GENERATE_SUMMARIES, defaults.getAutoGenerateSummaries()),
                 AiProvider.safeValueOf(get(AI_PROVIDER, defaults.getAiProvider().name())),
@@ -1954,6 +1962,26 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(AI_GENERATE_FOLLOW_UP_QUESTIONS, defaults.getGenerateFollowUpQuestions()),
                 getInt(AI_FOLLOW_UP_QUESTIONS_COUNT, defaults.getFollowUpQuestionsCount()),
                 get(AI_FOLLOW_UP_QUESTIONS_TEMPLATE, defaults.getFollowUpQuestionsTemplate())
+        );
+    }
+    // endregion
+
+    // region OCR preferences
+    public OcrPreferences getOcrPreferences() {
+        if (ocrPreferences != null) {
+            return ocrPreferences;
+        }
+
+        ocrPreferences = getOcrPreferencesFromBackingStore(OcrPreferences.getDefault());
+
+        EasyBind.listen(ocrPreferences.ocrEnginePathProperty(), (_, _, newValue) -> put(OCR_ENGINE_PATH, newValue));
+
+        return ocrPreferences;
+    }
+
+    private OcrPreferences getOcrPreferencesFromBackingStore(OcrPreferences defaults) {
+        return new OcrPreferences(
+                get(OCR_ENGINE_PATH, defaults.getOcrEnginePath())
         );
     }
     // endregion

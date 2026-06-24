@@ -24,7 +24,7 @@ class Pdf implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        System.err.println(Localization.lang("Specify a subcommand (write-xmp, update)."));
+        System.err.println(Localization.lang("Specify a subcommand (update)."));
         return 2;
     }
 }

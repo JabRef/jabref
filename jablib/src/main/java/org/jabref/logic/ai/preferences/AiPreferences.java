@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -31,6 +33,12 @@ import com.github.javakeyring.PasswordAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/// AI preferences.
+///
+/// Quick note about [#aiFeaturesEnabledInitially] and [#aiFeaturesEnabledCurrently]:
+/// As per `req~ai.general.enabling.restart~1`, when enabled property is changed, a restart required. This implies that
+/// AI processes should start and work only if they were initially enabled. So whenever you want to guard some code from
+/// executing only if AI is enabled, please use [#aiFeaturesEnabledInitially] via [#getAiFeaturesEnabled()]`.
 public class AiPreferences {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiPreferences.class);
 
@@ -46,7 +54,12 @@ public class AiPreferences {
             AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE
     );
 
-    private final BooleanProperty enableAi;
+    /// Controls whether the AI features should start/work in a JabRef session.
+    /// This property is set when JabRef has started, and is not persisted.
+    private final BooleanProperty aiFeaturesEnabledInitially;
+    /// Controls whether to show the privacy policy banner and whether to request a restart.
+    /// This property is persisted and controlled by preferences.
+    private final BooleanProperty aiFeaturesEnabledCurrently;
     private final BooleanProperty autoGenerateEmbeddings;
     private final BooleanProperty autoGenerateSummaries;
 
@@ -138,7 +151,7 @@ public class AiPreferences {
     }
 
     public AiPreferences(
-            boolean enableAi,
+            boolean aiFeaturesEnabledCurrently,
             boolean autoGenerateEmbeddings,
             boolean autoGenerateSummaries,
             AiProvider aiProvider,
@@ -173,7 +186,8 @@ public class AiPreferences {
             int followUpQuestionsCount,
             String followUpQuestionsTemplate
     ) {
-        this.enableAi = new SimpleBooleanProperty(enableAi);
+        this.aiFeaturesEnabledInitially = new SimpleBooleanProperty(aiFeaturesEnabledCurrently);
+        this.aiFeaturesEnabledCurrently = new SimpleBooleanProperty(aiFeaturesEnabledCurrently);
         this.autoGenerateEmbeddings = new SimpleBooleanProperty(autoGenerateEmbeddings);
         this.autoGenerateSummaries = new SimpleBooleanProperty(autoGenerateSummaries);
 
@@ -216,6 +230,22 @@ public class AiPreferences {
         this.generateFollowUpQuestions = new SimpleBooleanProperty(generateFollowUpQuestions);
         this.followUpQuestionsCount = new SimpleIntegerProperty(followUpQuestionsCount);
         this.followUpQuestionsTemplate = new SimpleStringProperty(followUpQuestionsTemplate);
+
+        // This listener is needed for the following scenario:
+        //
+        // 1. AI features initially are enabled.
+        // 2. User turns off AI features.
+        // 3. User sees the privacy notice pane, and again enables AI features.
+        //
+        // If there was no such listener as written below, AI features would continue to work,
+        // however, between steps 2 and 3, the user could change a lot in the running JabRef
+        // instance, such as opening many libraries, which then wouldn't get tracked by the AI.
+        // As a result, it is better to set [#aiFeaturesEnabledInitially] to just `false`.
+        this.aiFeaturesEnabledCurrently.addListener((_, _, newValue) -> {
+            if (!newValue) {
+                this.aiFeaturesEnabledInitially.set(false);
+            }
+        });
     }
 
     public static AiPreferences getDefault() {
@@ -223,7 +253,7 @@ public class AiPreferences {
     }
 
     public void setAll(AiPreferences preferences) {
-        this.enableAi.set(preferences.getEnableAi());
+        this.aiFeaturesEnabledCurrently.set(preferences.getAiFeaturesEnabled());
         this.autoGenerateEmbeddings.set(preferences.getAutoGenerateEmbeddings());
         this.autoGenerateSummaries.set(preferences.getAutoGenerateSummaries());
         this.aiProvider.set(preferences.getAiProvider());
@@ -292,16 +322,29 @@ public class AiPreferences {
         }
     }
 
-    public BooleanProperty enableAiProperty() {
-        return enableAi;
+    public BooleanBinding restartNeededBinding() {
+        return (aiFeaturesEnabledProperty().not().and(aiFeaturesEnabledCurrentlyProperty()))
+                .or(aiFeaturesEnabledProperty().and(aiFeaturesEnabledCurrentlyProperty().not()));
     }
 
-    public boolean getEnableAi() {
-        return enableAi.get();
+    public ReadOnlyBooleanProperty aiFeaturesEnabledProperty() {
+        return aiFeaturesEnabledInitially;
     }
 
-    public void setEnableAi(boolean enableAi) {
-        this.enableAi.set(enableAi);
+    public boolean getAiFeaturesEnabled() {
+        return aiFeaturesEnabledInitially.get();
+    }
+
+    public BooleanProperty aiFeaturesEnabledCurrentlyProperty() {
+        return aiFeaturesEnabledCurrently;
+    }
+
+    public boolean getAiFeaturesEnabledCurrently() {
+        return aiFeaturesEnabledCurrently.get();
+    }
+
+    public void setAiFeaturesEnabledCurrently(boolean aiFeaturesEnabledCurrently) {
+        this.aiFeaturesEnabledCurrently.set(aiFeaturesEnabledCurrently);
     }
 
     public BooleanProperty autoGenerateEmbeddingsProperty() {
@@ -636,7 +679,7 @@ public class AiPreferences {
 
     public List<Property<?>> getChatProperties() {
         return (List<Property<?>>) Stream.of(
-                List.of(enableAi, aiProvider, customizeExpertSettings, temperature, contextWindowSize, tokenEstimatorKind),
+                List.of(aiFeaturesEnabledCurrently, aiProvider, customizeExpertSettings, temperature, contextWindowSize, tokenEstimatorKind),
                 getChatModelNamesProperties(),
                 getApiBaseUrlsProperties()
         ).flatMap(List::stream).toList();
@@ -644,14 +687,14 @@ public class AiPreferences {
 
     public List<? extends Property<?>> getSummarizatorProperties() {
         return Stream.of(
-                List.of(enableAi, customizeExpertSettings, summarizatorKind),
+                List.of(aiFeaturesEnabledCurrently, customizeExpertSettings, summarizatorKind),
                 List.of(summarizationChunkSystemMessageTemplate, summarizationCombineSystemMessageTemplate, summarizationFullDocumentSystemMessageTemplate)
         ).flatMap(List::stream).toList();
     }
 
     public List<? extends Property<?>> getAnswerEngineProperties() {
         return List.of(
-                enableAi,
+                aiFeaturesEnabledCurrently,
                 embeddingModel,
                 customizeExpertSettings,
                 answerEngineKind,
@@ -662,7 +705,7 @@ public class AiPreferences {
 
     public List<? extends Property<?>> getDocumentSplitterProperties() {
         return List.of(
-                enableAi,
+                aiFeaturesEnabledCurrently,
                 customizeExpertSettings,
                 documentSplitterKind,
                 documentSplitterChunkSize,

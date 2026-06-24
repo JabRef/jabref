@@ -39,6 +39,7 @@ import org.jabref.gui.entryeditor.citationrelationtab.BibEntryView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
@@ -170,7 +171,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         PseudoClass entrySelected = PseudoClass.getPseudoClass("selected");
         new ViewModelListCellFactory<BibEntry>()
                 .withGraphic(entry -> {
-                    ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
+                    ToggleButton addToggle = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.ADD);
                     EasyBind.subscribe(addToggle.selectedProperty(), selected -> {
                         if (selected) {
                             addToggle.setGraphic(IconTheme.JabRefIcons.ADD_FILLED.withColor(IconTheme.SELECTED_COLOR).getGraphicNode());
@@ -289,10 +290,10 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
             if (button == importButton) {
                 if (groupListView.getItems().size() > 1) {
                     // 1 is the "All entries" group, so if more than 1, we have groups defined
-                    GroupTreeNode prevSelectedGroup = stateManager.getSelectedGroups(stateManager.getActiveDatabase().orElse(null)).getFirst();
+                    GroupTreeNode prevSelectedGroup = stateManager.getSelectedGroups(database).getFirst();
                     stateManager.setSelectedGroups(libraryListView.getSelectionModel().getSelectedItem(), List.of(groupListView.getSelectionModel().getSelectedItem()));
                     viewModel.importEntries(viewModel.getCheckedEntries().stream().toList(), downloadLinkedOnlineFiles.isSelected());
-                    stateManager.setSelectedGroups(stateManager.getActiveDatabase().orElse(null), List.of(prevSelectedGroup));
+                    stateManager.setSelectedGroups(database, List.of(prevSelectedGroup));
                 } else {
                     viewModel.importEntries(viewModel.getCheckedEntries().stream().toList(), downloadLinkedOnlineFiles.isSelected());
                 }

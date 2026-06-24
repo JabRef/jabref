@@ -163,6 +163,15 @@ public class JabRefGUI extends Application {
     }
 
     public void initialize() {
+        JabRefGUI.stateManager = new JabRefGuiStateManager();
+        Injector.setModelOrService(StateManager.class, stateManager);
+
+        // our Default task executor is the UITaskExecutor which can use the fx thread
+        JabRefGUI.taskExecutor = new UiTaskExecutor();
+        Injector.setModelOrService(TaskExecutor.class, taskExecutor);
+
+        journalAbbreviationRepository = JournalAbbreviationLoader.loadRepositoryInBackground(preferences.getAbbreviationPreferences(), taskExecutor);
+
         WebViewStore.init();
 
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
@@ -177,7 +186,6 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(GitHandlerRegistry.class, gitHandlerRegistry);
 
         BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
-        journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getAbbreviationPreferences());
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
         Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);
         Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
@@ -193,9 +201,6 @@ public class JabRefGUI extends Application {
         JabRefGUI.languageServerController = new LanguageServerController(preferences, journalAbbreviationRepository, entryTypesManager);
         Injector.setModelOrService(LanguageServerController.class, JabRefGUI.languageServerController);
 
-        JabRefGUI.stateManager = new JabRefGuiStateManager();
-        Injector.setModelOrService(StateManager.class, stateManager);
-
         Injector.setModelOrService(KeyBindingRepository.class, preferences.getKeyBindingRepository());
 
         JabRefGUI.themeManager = new ThemeManager(
@@ -207,10 +212,6 @@ public class JabRefGUI extends Application {
         JabRefGUI.countingUndoManager = new CountingUndoManager();
         Injector.setModelOrService(UndoManager.class, countingUndoManager);
         Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);
-
-        // our Default task executor is the UITaskExecutor which can use the fx thread
-        JabRefGUI.taskExecutor = new UiTaskExecutor();
-        Injector.setModelOrService(TaskExecutor.class, taskExecutor);
 
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);
@@ -338,7 +339,7 @@ public class JabRefGUI extends Application {
         });
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
-        mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
+        mainStage.getIcons().addAll(IconTheme.getLogoSet());
         mainStage.setScene(scene);
         mainStage.setOnShowing(this::onShowing);
         mainStage.setOnCloseRequest(this::onCloseRequest);
