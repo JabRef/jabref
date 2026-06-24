@@ -62,7 +62,7 @@ public class FileAnnotationPreview {
 
             if (StringUtil.isNotBlank(noteContent)) {
                 String noteLabel = Localization.lang("Note");
-                String formattedNote = String.format(" — %s: %s", noteLabel, noteContent);
+                String formattedNote = " — %s: %s".formatted(noteLabel, noteContent);
 
                 html.append("<i>")
                     .append(quoteForHTML(formattedNote))
