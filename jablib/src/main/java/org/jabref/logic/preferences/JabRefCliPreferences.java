@@ -757,15 +757,27 @@ public class JabRefCliPreferences implements CliPreferences {
                 }));
     }
 
-    private void bindList(ObservableList<String> list, String key, List<String> defaultList) {
-        List<String> defaultCopy = List.copyOf(defaultList);
-        list.addListener((InvalidationListener) _ -> putStringList(key, list));
+    /// Binds an observable list whose persisted form is a single String.
+    ///
+    /// @param serializer   converts the list to its stored String representation
+    /// @param deserializer reconstructs the list elements from their stored String representation
+    private <T> void bindList(ObservableList<T> list,
+                              String key,
+                              List<T> defaultList,
+                              Function<List<T>, String> serializer,
+                              Function<String, ? extends Collection<T>> deserializer) {
+        List<T> defaultCopy = List.copyOf(defaultList);
+        list.addListener((InvalidationListener) _ -> put(key, serializer.apply(list)));
         allBindings.add(new PreferenceBinding(
                 list,
-                defaultList,
+                defaultCopy,
                 key,
-                () -> list.setAll(convertStringToList(get(key, convertListToString(defaultCopy)))),
+                () -> list.setAll(deserializer.apply(get(key, serializer.apply(defaultCopy)))),
                 () -> list.setAll(defaultCopy)));
+    }
+
+    private void bindList(ObservableList<String> list, String key, List<String> defaultList) {
+        bindList(list, key, defaultList, JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
     }
 
     /// Persist-only binding for secrets that live in the system keyring rather than the backing store.
@@ -931,7 +943,6 @@ public class JabRefCliPreferences implements CliPreferences {
         PREFS_NODE.clear();
         new SharedDatabasePreferences().clear();
 
-        getFieldPreferences().setAll(FieldPreferences.getDefault());
         getFilePreferences().setAll(FilePreferences.getDefault()
                                                    .withUserHostInfo(getInternalPreferences().getUserAndHostInfoProperty())
                                                    .withMoveToTrash(moveToTrashSupported())
@@ -957,6 +968,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // ensure registration of bindings
         getInternalPreferences();
+        getFieldPreferences();
         getProxyPreferences();
         getLibraryPreferences();
         getDOIPreferences();
@@ -985,7 +997,6 @@ public class JabRefCliPreferences implements CliPreferences {
         //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
 
         // in case of incomplete or corrupt XML fall back to current preferences
-        getFieldPreferences().setAll(getFieldPreferencesFromBackingStore(getFieldPreferences()));
         getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
         getOcrPreferences().setAll(getOcrPreferencesFromBackingStore(getOcrPreferences()));
@@ -1005,6 +1016,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // ensure registration of bindings
         getInternalPreferences();
+        getFieldPreferences();
         getProxyPreferences();
         getLibraryPreferences();
         getDOIPreferences();
@@ -1606,25 +1618,26 @@ public class JabRefCliPreferences implements CliPreferences {
             return fieldPreferences;
         }
 
-        fieldPreferences = getFieldPreferencesFromBackingStore(FieldPreferences.getDefault());
+        FieldPreferences defaultValues = FieldPreferences.getDefault();
 
-        EasyBind.listen(fieldPreferences.resolveStringsProperty(), (_, _, newValue) -> putBoolean(DO_NOT_RESOLVE_STRINGS, !newValue));
-        fieldPreferences.getResolvableFields().addListener((InvalidationListener) _ ->
-                put(RESOLVE_STRINGS_FOR_FIELDS, FieldFactory.serializeFieldsList(fieldPreferences.getResolvableFields())));
-        fieldPreferences.getNonWrappableFields().addListener((InvalidationListener) _ ->
-                put(NON_WRAPPABLE_FIELDS, FieldFactory.serializeFieldsList(fieldPreferences.getNonWrappableFields())));
+        fieldPreferences = new FieldPreferences(
+                !getBoolean(DO_NOT_RESOLVE_STRINGS, !defaultValues.shouldResolveStrings()),
+                List.copyOf(FieldFactory.parseFieldList(get(RESOLVE_STRINGS_FOR_FIELDS,
+                        FieldFactory.serializeFieldsList(defaultValues.getResolvableFields())))),
+                List.copyOf(FieldFactory.parseFieldList(get(NON_WRAPPABLE_FIELDS,
+                        FieldFactory.serializeFieldsList(defaultValues.getNonWrappableFields())))));
+
+        // resolveStrings is persisted inverted as DO_NOT_RESOLVE_STRINGS, so it needs a custom binding.
+        bindCustom(fieldPreferences.resolveStringsProperty(), DO_NOT_RESOLVE_STRINGS, defaultValues.shouldResolveStrings(),
+                (_, _, newValue) -> putBoolean(DO_NOT_RESOLVE_STRINGS, !newValue),
+                () -> fieldPreferences.resolveStringsProperty().set(!getBoolean(DO_NOT_RESOLVE_STRINGS, !defaultValues.shouldResolveStrings())),
+                () -> fieldPreferences.resolveStringsProperty().set(defaultValues.shouldResolveStrings()));
+        bindList(fieldPreferences.getResolvableFields(), RESOLVE_STRINGS_FOR_FIELDS, List.copyOf(defaultValues.getResolvableFields()),
+                FieldFactory::serializeFieldsList, FieldFactory::parseFieldList);
+        bindList(fieldPreferences.getNonWrappableFields(), NON_WRAPPABLE_FIELDS, List.copyOf(defaultValues.getNonWrappableFields()),
+                FieldFactory::serializeFieldsList, FieldFactory::parseFieldList);
 
         return fieldPreferences;
-    }
-
-    private FieldPreferences getFieldPreferencesFromBackingStore(FieldPreferences defaults) {
-        return new FieldPreferences(
-                !getBoolean(DO_NOT_RESOLVE_STRINGS, !defaults.shouldResolveStrings()),
-                List.copyOf(FieldFactory.parseFieldList(get(RESOLVE_STRINGS_FOR_FIELDS,
-                        FieldFactory.serializeFieldsList(defaults.getResolvableFields())))),
-                List.copyOf(FieldFactory.parseFieldList(get(NON_WRAPPABLE_FIELDS,
-                        FieldFactory.serializeFieldsList(defaults.getNonWrappableFields()))))
-        );
     }
     // endregion
 
