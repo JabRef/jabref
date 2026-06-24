@@ -834,7 +834,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getInternalPreferences().setAll(InternalPreferences.getDefault());
         getFieldPreferences().setAll(FieldPreferences.getDefault());
         getProxyPreferences().setAll(ProxyPreferences.getDefault());
-        getTimestampPreferences().setAll(TimestampPreferences.getDefault());
         getRemotePreferences().setAll(RemotePreferences.getDefault());
         getBibEntryPreferences().setAll(BibEntryPreferences.getDefault());
         getCitationKeyPatternPreferences().setAll(
@@ -870,6 +869,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getLibraryPreferences();
         getDOIPreferences();
         getOwnerPreferences();
+        getTimestampPreferences();
         getPushToApplicationPreferences();
         getAbbreviationPreferences();
 
@@ -891,7 +891,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getInternalPreferences().setAll(getInternalPreferencesFromBackingStore(getInternalPreferences()));
         getFieldPreferences().setAll(getFieldPreferencesFromBackingStore(getFieldPreferences()));
         getProxyPreferences().setAll(getProxyPreferencesFromBackingStore(getProxyPreferences()));
-        getTimestampPreferences().setAll(getTimestampPreferencesFromBackingStore(getTimestampPreferences()));
         getRemotePreferences().setAll(getRemotePreferencesFromBackingStore(getRemotePreferences()));
         getCitationKeyPatternPreferences().setAll(getCitationKeyPatternPreferencesFromBackingStore(getCitationKeyPatternPreferences()));
         getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
@@ -918,6 +917,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getLibraryPreferences();
         getDOIPreferences();
         getOwnerPreferences();
+        getTimestampPreferences();
         getPushToApplicationPreferences();
         getAbbreviationPreferences();
 
@@ -1205,24 +1205,21 @@ public class JabRefCliPreferences implements CliPreferences {
             return timestampPreferences;
         }
 
-        timestampPreferences = getTimestampPreferencesFromBackingStore(TimestampPreferences.getDefault());
+        TimestampPreferences defaultValues = TimestampPreferences.getDefault();
 
-        EasyBind.listen(timestampPreferences.addCreationDateProperty(), (_, _, newValue) -> putBoolean(TIMESTAMP_ADD_CREATION_DATE, newValue));
-        EasyBind.listen(timestampPreferences.addModificationDateProperty(), (_, _, newValue) -> putBoolean(TIMESTAMP_ADD_MODIFICATION_DATE, newValue));
-
-        return timestampPreferences;
-    }
-
-    private @NonNull TimestampPreferences getTimestampPreferencesFromBackingStore(TimestampPreferences defaults) {
-        return new TimestampPreferences(
-                getBoolean(TIMESTAMP_ADD_CREATION_DATE, defaults.shouldAddCreationDate()),
-                getBoolean(TIMESTAMP_ADD_MODIFICATION_DATE, defaults.shouldAddModificationDate()),
+        timestampPreferences = new TimestampPreferences(
+                getBoolean(TIMESTAMP_ADD_CREATION_DATE, defaultValues.shouldAddCreationDate()),
+                getBoolean(TIMESTAMP_ADD_MODIFICATION_DATE, defaultValues.shouldAddModificationDate()),
 
                 // legacy pre-5.3 fields for library cleanups
-                getBoolean(TIMESTAMP_DEPRECATED_UPDATE, defaults.shouldUpdateTimestamp()),
-                FieldFactory.parseField(get(TIMESTAMP_DEPRECATED_FIELD, defaults.getTimestampField().getName())),
-                get(TIMESTAMP_DEPRECATED_FORMAT, defaults.getTimestampFormat())
-        );
+                getBoolean(TIMESTAMP_DEPRECATED_UPDATE, defaultValues.shouldUpdateTimestamp()),
+                FieldFactory.parseField(get(TIMESTAMP_DEPRECATED_FIELD, defaultValues.getTimestampField().getName())),
+                get(TIMESTAMP_DEPRECATED_FORMAT, defaultValues.getTimestampFormat()));
+
+        bindBoolean(timestampPreferences.addCreationDateProperty(), TIMESTAMP_ADD_CREATION_DATE, defaultValues.shouldAddCreationDate());
+        bindBoolean(timestampPreferences.addModificationDateProperty(), TIMESTAMP_ADD_MODIFICATION_DATE, defaultValues.shouldAddModificationDate());
+
+        return timestampPreferences;
     }
     // endregion
 
