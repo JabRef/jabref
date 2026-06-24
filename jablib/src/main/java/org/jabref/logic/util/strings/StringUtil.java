@@ -734,6 +734,39 @@ public class StringUtil {
         return sb.toString();
     }
 
+    /// Splits a string by whitespace, treating backslash-escaped spaces as part of the same token.
+    ///
+    /// Example: {@code ""C:\Current Python\python.exe" -m ocrmypdf"} -> {@code [""C:\Current Python\python.exe"", "-m", "ocrmypdf"]}
+    ///
+    /// @param path the string to split
+    /// @return a list of tokens
+    public static ArrayList<String> splitRespectingEscapedWhitespace(String path) {
+        ArrayList<String> result = new ArrayList<>();
+        // first check if the path contains a slash or backslash, if so it gets the first space after the last slash
+        // then it splits the rest of the string by spaces, otherwise it just splits the whole string by spaces
+        if (path.contains("/") || path.contains("\\")) {
+            int lastSlash = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"));
+            lastSlash = path.indexOf(" ", lastSlash);
+            if (lastSlash == -1) {
+                return new ArrayList<>(List.of(path));
+            }
+            result.add(path.substring(0, lastSlash));
+            for (int i = lastSlash + 1; i < path.length(); i++) {
+                int spaceIndex = path.indexOf(' ', i);
+                if (spaceIndex == -1) {
+                    result.add(path.substring(i));
+                    break;
+                } else {
+                    result.add(path.substring(i, spaceIndex));
+                    i = spaceIndex;
+                }
+            }
+        } else {
+            return new ArrayList<>(Arrays.asList(path.split(" ")));
+        }
+        return result;
+    }
+
     public static String makeSafe(@Nullable String string) {
         return Optional.ofNullable(string).orElse("");
     }

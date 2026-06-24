@@ -128,7 +128,7 @@ Agents **must not**:
    and then PATTERN.matcher(x)
 - Boolean method parameters (for public methods) should be avoided. Better create two distinct methods (which maybe call some private methods)
 - Minimal quality for variable names: Not extraEntry2, extraEntry3; but include meaning/intention into the variable names
-- Use Markdown Javadoc comments (`///`) for multi-line comments
+- Use Markdown Javadoc comments (`///`) for multi-line comments. Within them, use Markdown syntax, not JavaDoc inline tags: `` `code` `` instead of `{@code code}`, and `[ClassName]` instead of `{@link ClassName}`.
 
 ### Comments
 
@@ -179,7 +179,8 @@ Both comments must not be added.
 ### Dealing with `null`
 
 - New public methods should not return `null`. They should make use of `java.util.Optional`. In case `null` really needs to be used, the [JSpecify](https://jspecify.dev/) annotations must be used.
-- Use JSpecify annotations (`@Nullable`, `@Nullmarked`, `@NonNull`, ...) instead of `null` checks
+- Use JSpecify annotations (`@Nullable`, `@NullMarked`, `@NonNull`, ...) instead of `null` checks
+- Annotate every new class with `@NullMarked` (`org.jspecify.annotations.NullMarked`) so members default to non-null.
 - `null` should never be passed to a method (except it has the same name).
 - DO NOT use `Objects.requireNonNull`, use JSpecify's `@NullMarked` and `@NonNull` annotations.
 

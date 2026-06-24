@@ -181,7 +181,7 @@ jobs:
         run: |
           echo "cache_key=jbang-heylogs-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -192,7 +192,7 @@ jobs:
       - name: Lint CHANGELOG.md
         run: |
           # the grep is needed to filter out an error about all h2 containing a version, which is not relevant for us, because we have an "Unreleased" section
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.18.1:bin check --rule dot-space-link-style:ERROR --format github-actions CHANGELOG.md | grep -v all-h2-contain-a-version | tee heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.19.1:bin check --rule dot-space-link-style:ERROR --format github-actions CHANGELOG.md | grep -v all-h2-contain-a-version | tee heylogs.txt || true
 
           error_count=$(grep -c '^::error' heylogs.txt || true)
           if [ "$error_count" -ne 0 ]; then
@@ -217,7 +217,7 @@ jobs:
           fetch-depth: 0
       - name: Cache clparse jar
         id: cache-clparse
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: /tmp/clparse
           key: clparse-0.9.1
@@ -519,3 +519,27 @@ jobs:
         with:
           show-progress: 'false'
       - uses: gradle/actions/wrapper-validation@v5
+
+  # Guards against a committer (e.g. a dependabot wrapper bump) baking CRLF into
+  # the committed gradlew.bat blob. .gitattributes stores it as LF and smudges it
+  # to CRLF on checkout, so we inspect the committed blob, not the working-tree file.
+  line_endings:
+    name: "Line endings (gradlew.bat)"
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          show-progress: 'false'
+      - name: Ensure gradlew.bat blob has no CRLF
+        run: |
+          if ! git cat-file -e HEAD:gradlew.bat 2>/dev/null; then
+            echo "❌ gradlew.bat not found at HEAD. Cannot validate line endings; failing closed."
+            exit 1
+          fi
+          if git show HEAD:gradlew.bat | grep -q $'\r'; then
+            echo "❌ gradlew.bat is committed with CRLF. The repository blob must be LF;"
+            echo "   .gitattributes (\"*.bat text eol=crlf\") converts it to CRLF on checkout."
+            echo "   Fix: git add --renormalize gradlew.bat && git commit"
+            exit 1
+          fi
+          echo "✅ gradlew.bat blob is LF"
