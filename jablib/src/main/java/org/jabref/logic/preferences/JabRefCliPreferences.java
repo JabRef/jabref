@@ -933,7 +933,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         getInternalPreferences().setAll(InternalPreferences.getDefault());
         getFieldPreferences().setAll(FieldPreferences.getDefault());
-        getBibEntryPreferences().setAll(BibEntryPreferences.getDefault());
         getFilePreferences().setAll(FilePreferences.getDefault()
                                                    .withUserHostInfo(getInternalPreferences().getUserAndHostInfoProperty())
                                                    .withMoveToTrash(moveToTrashSupported())
@@ -968,6 +967,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getAbbreviationPreferences();
         getGitPreferences();
         getSSLPreferences();
+        getBibEntryPreferences();
         getCitationKeyPatternPreferences();
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
@@ -988,7 +988,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getInternalPreferences().setAll(getInternalPreferencesFromBackingStore(getInternalPreferences()));
         getFieldPreferences().setAll(getFieldPreferencesFromBackingStore(getFieldPreferences()));
         getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
-        getBibEntryPreferences().setAll(getBibEntryPreferencesFromBackingStore(getBibEntryPreferences()));
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
         getOcrPreferences().setAll(getOcrPreferencesFromBackingStore(getOcrPreferences()));
         getNameFormatterPreferences().setAll(getNameFormatterPreferencesFromBackingStore(getNameFormatterPreferences()));
@@ -1016,6 +1015,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getAbbreviationPreferences();
         getGitPreferences();
         getSSLPreferences();
+        getBibEntryPreferences();
         getCitationKeyPatternPreferences();
 
         allBindings.forEach(binding -> binding.importFromStore().run());
@@ -1538,17 +1538,15 @@ public class JabRefCliPreferences implements CliPreferences {
             return bibEntryPreferences;
         }
 
-        bibEntryPreferences = getBibEntryPreferencesFromBackingStore(BibEntryPreferences.getDefault());
+        BibEntryPreferences defaultValues = BibEntryPreferences.getDefault();
 
-        EasyBind.listen(bibEntryPreferences.keywordSeparatorProperty(), (_, _, newValue) -> put(KEYWORD_SEPARATOR, String.valueOf(newValue)));
+        bibEntryPreferences = new BibEntryPreferences(
+                get(KEYWORD_SEPARATOR, String.valueOf(defaultValues.getKeywordSeparator())).charAt(0));
+
+        bindObject(bibEntryPreferences.keywordSeparatorProperty(), KEYWORD_SEPARATOR, defaultValues.getKeywordSeparator(),
+                String::valueOf, separator -> separator.charAt(0));
 
         return bibEntryPreferences;
-    }
-
-    private BibEntryPreferences getBibEntryPreferencesFromBackingStore(BibEntryPreferences defaults) {
-        return new BibEntryPreferences(
-                get(KEYWORD_SEPARATOR, String.valueOf(defaults.getKeywordSeparator())).charAt(0)
-        );
     }
     // endregion
 
