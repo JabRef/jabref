@@ -76,10 +76,10 @@ public class EntriesResource {
         if (StringUtil.isBlank(bibtex)) {
             throw new BadRequestException("BibTeX data must not be empty.");
         }
-        Optional<java.nio.file.Path> targetLibrary = resolveTargetLibrary(id);
         if (!uiMessageHandler.isGuiConnected()) {
             throw new BadRequestException("Only possible in GUI mode.");
         }
+        Optional<java.nio.file.Path> targetLibrary = resolveTargetLibrary(id);
         uiMessageHandler.handleUiCommands(List.of(targetLibrary
                 .map(library -> new UiCommand.AppendBibTeXToLibrary(library, bibtex, group))
                 .orElseGet(() -> new UiCommand.AppendBibTeXToLibrary(bibtex, group))));
@@ -99,10 +99,10 @@ public class EntriesResource {
         if (StringUtil.isBlank(citationText)) {
             throw new BadRequestException("Citation text must not be empty.");
         }
-        Optional<java.nio.file.Path> targetLibrary = resolveTargetLibrary(id);
         if (!uiMessageHandler.isGuiConnected()) {
             throw new BadRequestException("Only possible in GUI mode.");
         }
+        Optional<java.nio.file.Path> targetLibrary = resolveTargetLibrary(id);
 
         PlainCitationParserChoice choice = preferences.getImporterPreferences().getDefaultPlainCitationParser();
         BibEntry parsed = parsePlainCitation(choice, citationText)
@@ -142,10 +142,10 @@ public class EntriesResource {
     @POST
     @Consumes("*/*")
     public void addUnknown(@PathParam("id") String id, Reader body) throws IOException {
-        Optional<java.nio.file.Path> targetLibrary = resolveTargetLibrary(id);
         if (!uiMessageHandler.isGuiConnected()) {
             throw new BadRequestException("Only possible in GUI mode.");
         }
+        Optional<java.nio.file.Path> targetLibrary = resolveTargetLibrary(id);
 
         // Stream is read in another thread - when Grizzly already closed the stream
         // Therefore, we need to create a copy
