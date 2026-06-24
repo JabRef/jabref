@@ -92,8 +92,10 @@ public class Launcher {
 
             PreferencesMigrations.runMigrations(preferences);
 
-            PostgreServer postgreServer = new PostgreServer();
-            Injector.setModelOrService(PostgreServer.class, postgreServer);
+            if (preferences.getSearchPreferences().shouldUsePostgresSearch()) {
+                PostgreServer postgreServer = new PostgreServer();
+                Injector.setModelOrService(PostgreServer.class, postgreServer);
+            }
 
             CSLStyleLoader.loadInternalStyles();
 
