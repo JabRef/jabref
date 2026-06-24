@@ -23,6 +23,7 @@ import javafx.collections.ObservableSet;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.bibtex.BibEntryWriter;
@@ -211,11 +212,15 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 stateManager,
                 dialogService,
                 taskExecutor);
-        importHandler.importEntriesWithDuplicateCheck(null, entriesToImport);
-
+        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, entriesToImport.size());
         if (StringUtil.isNotBlank(targetGroup)) {
-            GroupsHelper.assignEntriesToGroup(selectedDb.getValue(), entriesToImport, targetGroup, preferences.getBibEntryPreferences().getKeywordSeparator());
+            // Assign the group to the actually imported BibEntry instances (the copies inserted into the
+            // database), not to the originals. The import runs asynchronously, so this must happen in the
+            // tracker's onFinish callback after all entries have been inserted/merged.
+            tracker.setOnFinish(() ->
+                    GroupsHelper.assignEntriesToGroup(selectedDb.getValue(), tracker.getImportedEntries(), targetGroup, preferences.getBibEntryPreferences().getKeywordSeparator()));
         }
+        importHandler.importEntriesWithDuplicateCheck(null, entriesToImport, tracker);
     }
 
     /// Checks if there are duplicates to the given entry in the list of entries to be imported.

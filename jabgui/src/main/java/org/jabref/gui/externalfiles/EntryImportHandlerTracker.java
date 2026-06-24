@@ -66,6 +66,12 @@ public class EntryImportHandlerTracker {
         stateManager.setSelectedEntries(importedEntries);
     }
 
+    /// Returns the actually imported `BibEntry` instances (the copies inserted into the database),
+    /// not the originals passed to the import call.
+    public List<BibEntry> getImportedEntries() {
+        return importedEntries;
+    }
+
     public int getImportedCount() {
         return imported.get();
     }
