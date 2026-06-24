@@ -487,6 +487,11 @@ public class JabRefCliPreferences implements CliPreferences {
     private record KeyringSlot(String service, String account) {
         static final KeyringSlot PROXY_PASSWORD = new KeyringSlot("org.jabref", "proxy");
         static final KeyringSlot GITHUB_PAT = new KeyringSlot("org.jabref", "github");
+
+        /// Slot holding a custom API key for the fetcher with the given name.
+        static KeyringSlot customApiKey(String fetcherName) {
+            return new KeyringSlot("org.jabref.customapikeys", fetcherName);
+        }
     }
 
     /// @implNote The constructor was made public because dependency injection via constructor
@@ -2310,9 +2315,10 @@ public class JabRefCliPreferences implements CliPreferences {
 
         try (final Keyring keyring = Keyring.create()) {
             for (String fetcher : names) {
+                KeyringSlot slot = KeyringSlot.customApiKey(fetcher);
                 try {
                     keys.add(new Password(
-                            keyring.getPassword("org.jabref.customapikeys", fetcher),
+                            keyring.getPassword(slot.service(), slot.account()),
                             getInternalPreferences().getUserHostInfo().getUserHostString())
                             .decrypt());
                 } catch (PasswordAccessException ex) {
@@ -2351,14 +2357,15 @@ public class JabRefCliPreferences implements CliPreferences {
     private void storeFetcherKeysToKeyring(List<String> names, List<String> keys) {
         try (final Keyring keyring = Keyring.create()) {
             for (int i = 0; i < names.size(); i++) {
+                KeyringSlot slot = KeyringSlot.customApiKey(names.get(i));
                 if (StringUtil.isNullOrEmpty(keys.get(i))) {
                     try {
-                        keyring.deletePassword("org.jabref.customapikeys", names.get(i));
+                        keyring.deletePassword(slot.service(), slot.account());
                     } catch (PasswordAccessException ex) {
                         // Already removed
                     }
                 } else {
-                    keyring.setPassword("org.jabref.customapikeys", names.get(i), new Password(
+                    keyring.setPassword(slot.service(), slot.account(), new Password(
                             keys.get(i),
                             getInternalPreferences().getUserHostInfo().getUserHostString())
                             .encrypt());
@@ -2374,7 +2381,8 @@ public class JabRefCliPreferences implements CliPreferences {
         try (final Keyring keyring = Keyring.create()) {
             try {
                 for (String name : names) {
-                    keyring.deletePassword("org.jabref.customapikeys", name);
+                    KeyringSlot slot = KeyringSlot.customApiKey(name);
+                    keyring.deletePassword(slot.service(), slot.account());
                 }
             } catch (PasswordAccessException ex) {
                 // nothing to do, no password to remove
