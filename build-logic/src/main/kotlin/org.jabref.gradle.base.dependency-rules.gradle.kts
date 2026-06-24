@@ -15,7 +15,7 @@ tasks.withType<ModuleDirectivesOrderingCheck> { enabled = false }
 // those from every configuration via an exclude, so 'requires javafx.*' is satisfied by the JDK's own system modules.
 // The JavaFX version pin (versions/build.gradle.kts), the platform-variant patches and the per-module opens/exports
 // patches below then have nothing to act on and stay inert; the runtime opens/exports they provided are re-applied as
-// JVM args in jabgui/build.gradle.kts. (Flag: org.jabref.gradle.JavaFxBundling)
+// JVM args in jabgui/build.gradle.kts. (Flag: org.jabref.gradle.Toolchains)
 // Because this exclude removes the Maven JavaFX, org.jabref.gradle.feature.compile verifies the resolved toolchain
 // actually ships JavaFX (Liberica Full, not Standard) and fails fast otherwise.
 if (useLibericaJdkFull) {
