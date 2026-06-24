@@ -7,10 +7,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -35,18 +35,15 @@ class FileAnnotationPreviewTest {
     }
 
     @Nested
-    @DisplayName("Edge Cases and Filtering")
-    class EdgeCasesTests {
+    class EdgeCasesAndFilteringTests {
 
         @Test
-        @DisplayName("Should return empty string when annotation map is empty")
         void renderReturnsEmptyStringWhenMapIsEmpty() {
-            assertEquals("", FileAnnotationPreview.render(Collections.emptyMap()),
+            assertEquals("", FileAnnotationPreview.render(Map.of()),
                     "An empty map must produce an empty string output");
         }
 
         @Test
-        @DisplayName("Should handle maps with empty content or null elements gracefully")
         void renderFiltersOutNullAnnotationsAndEmptyContent() {
             Path path = Path.of("test.pdf");
             FileAnnotation nullAnnotation = null;
@@ -61,26 +58,24 @@ class FileAnnotationPreviewTest {
     }
 
     @Nested
-    @DisplayName("HTML Content Formatting and Ordering")
-    class FormattingTests {
+    class HtmlContentFormattingAndOrderingTests {
 
         @Test
-        @DisplayName("Should format valid annotations and safely include type and page metadata")
         void renderFormatsValidAnnotationsCorrectlyWithHtmlEscaping() {
             Path path = Path.of("article.pdf");
             FileAnnotation annotation = createMockAnnotation(FileAnnotationType.HIGHLIGHT, 3, "This & That", false);
 
             Map<Path, List<FileAnnotation>> annotations = Map.of(path, List.of(annotation));
 
+            String expectedHeader = Localization.lang("%0 (Page %1):", "Highlight", "3");
             String expectedHtml = "<br><br><b>PDF Annotations</b><br><br><i>" + escape("article.pdf") + "</i><br>"
-                    + "<b>" + escape("Highlight") + " (Page 3):</b> " + escape("This & That") + "<br>";
+                    + "<b>" + escape(expectedHeader) + "</b> " + escape("This & That") + "<br>";
 
             assertEquals(expectedHtml, FileAnnotationPreview.render(annotations));
         }
 
         @Test
-        @DisplayName("Should sort annotations structurally by page number in ascending order")
-        void renderOrdersAnnotationsByNumber() {
+        void renderOrdersAnnotationsByPageNumberInAscendingOrder() {
             Path path = Path.of("book.pdf");
             FileAnnotation page10 = createMockAnnotation(FileAnnotationType.TEXT, 10, "Late", false);
             FileAnnotation page2 = createMockAnnotation(FileAnnotationType.TEXT, 2, "Early", false);
@@ -88,16 +83,18 @@ class FileAnnotationPreviewTest {
             Map<Path, List<FileAnnotation>> annotations = new LinkedHashMap<>();
             annotations.put(path, List.of(page10, page2));
 
+            String headerPage2 = Localization.lang("%0 (Page %1):", "Text", "2");
+            String headerPage10 = Localization.lang("%0 (Page %1):", "Text", "10");
+
             String expectedHtml = "<br><br><b>PDF Annotations</b><br><br><i>" + escape("book.pdf") + "</i><br>"
-                    + "<b>" + escape("Text") + " (Page 2):</b> " + escape("Early") + "<br>"
-                    + "<b>" + escape("Text") + " (Page 10):</b> " + escape("Late") + "<br>";
+                    + "<b>" + escape(headerPage2) + "</b> " + escape("Early") + "<br>"
+                    + "<b>" + escape(headerPage10) + "</b> " + escape("Late") + "<br>";
 
             assertEquals(expectedHtml, FileAnnotationPreview.render(annotations));
         }
 
         @Test
-        @DisplayName("Should append secondary linked note comments when present")
-        void renderAppendsLinkedAnnotationsWhenPresent() {
+        void renderAppendsSecondaryLinkedNoteCommentsWhenPresent() {
             Path path = Path.of("document.pdf");
             FileAnnotation mainAnnotation = createMockAnnotation(FileAnnotationType.TEXT, 1, "Main", true);
             FileAnnotation linkedAnnotation = createMockAnnotation(FileAnnotationType.TEXT, 1, "Comment", false);
@@ -106,8 +103,11 @@ class FileAnnotationPreviewTest {
 
             Map<Path, List<FileAnnotation>> annotations = Map.of(path, List.of(mainAnnotation));
 
+            String expectedHeader = Localization.lang("%0 (Page %1):", "Text", "1");
+            String expectedNote = Localization.lang(" — Note: %0", "Comment");
+
             String expectedHtml = "<br><br><b>PDF Annotations</b><br><br><i>" + escape("document.pdf") + "</i><br>"
-                    + "<b>" + escape("Text") + " (Page 1):</b> " + escape("Main") + " — <i>Note: " + escape("Comment") + "</i><br>";
+                    + "<b>" + escape(expectedHeader) + "</b> " + escape("Main") + "<i>" + escape(expectedNote) + "</i><br>";
 
             assertEquals(expectedHtml, FileAnnotationPreview.render(annotations));
         }

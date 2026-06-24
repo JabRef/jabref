@@ -13,11 +13,6 @@ import org.jabref.model.pdf.FileAnnotation;
 import static org.jabref.logic.util.strings.StringUtil.quoteForHTML;
 
 public class FileAnnotationPreview {
-
-    private FileAnnotationPreview() {
-        // Utility Class
-    }
-
     public static String render(Map<Path, List<FileAnnotation>> annotations) {
         if (annotations == null || annotations.isEmpty()) {
             return "";
@@ -50,29 +45,25 @@ public class FileAnnotationPreview {
     }
 
     private static void renderAnnotation(StringBuilder html, FileAnnotation annotation) {
-        String type = annotation.getAnnotationType() != null ? annotation.getAnnotationType().toString() : "Unknown";
+        String type = annotation.getAnnotationType() != null ? annotation.getAnnotationType().toString() : Localization.lang("Unknown");
         int page = annotation.getPage();
         String content = annotation.getContent();
 
-        String pageLabel = Localization.lang("Page");
+        String headerLabel = Localization.lang("%0 (Page %1):", type, String.valueOf(page));
 
         html.append("<b>")
-            .append(quoteForHTML(type))
-            .append(" (")
-            .append(pageLabel)
-            .append(" ")
-            .append(page)
-            .append("):</b> ")
+            .append(quoteForHTML(headerLabel))
+            .append("</b> ")
             .append(quoteForHTML(content));
 
         if (annotation.hasLinkedAnnotation() && annotation.getLinkedFileAnnotation() != null) {
             String noteContent = annotation.getLinkedFileAnnotation().getContent();
 
             if (StringUtil.isNotBlank(noteContent)) {
-                String noteLabel = Localization.lang("Note");
+                String noteLabel = Localization.lang(" — Note: %0", noteContent);
 
-                html.append(" — <i>").append(noteLabel).append(": ")
-                    .append(quoteForHTML(noteContent))
+                html.append("<i>")
+                    .append(quoteForHTML(noteLabel))
                     .append("</i>");
             }
         }
