@@ -953,7 +953,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 AutoLinkPreferences.getDefault()
                                    .withKeywordSeparator(getBibEntryPreferences().keywordSeparatorProperty()));
         getExportPreferences().setAll(ExportPreferences.getDefault());
-        getSSLPreferences().setAll(SSLPreferences.getDefault());
         getSearchPreferences().setAll(SearchPreferences.getDefault());
         getLastFilesOpenedPreferences().setAll(LastFilesOpenedPreferences.getDefault());
         getXmpPreferences().setAll(XmpPreferences.getDefault());
@@ -972,6 +971,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getPushToApplicationPreferences();
         getAbbreviationPreferences();
         getGitPreferences();
+        getSSLPreferences();
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
@@ -1000,7 +1000,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getImporterPreferences().setAll(getImporterPreferencesFromBackingStore(getImporterPreferences()));
         getAutoLinkPreferences().setAll(getAutoLinkPreferencesFromBackingStore(getAutoLinkPreferences()));
         getExportPreferences().setAll(getExportPreferencesFromBackingStore(getExportPreferences()));
-        getSSLPreferences().setAll(getSSLPreferencesFromBackingStore(getSSLPreferences()));
         getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
         getLastFilesOpenedPreferences().setAll(getLastFilesOpenedPreferencesFromBackingStore(getLastFilesOpenedPreferences()));
         getXmpPreferences().setAll(getXmpPreferencesFromBackingStore(getXmpPreferences()));
@@ -1020,6 +1019,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getPushToApplicationPreferences();
         getAbbreviationPreferences();
         getGitPreferences();
+        getSSLPreferences();
 
         allBindings.forEach(binding -> binding.importFromStore().run());
     }
@@ -1409,14 +1409,15 @@ public class JabRefCliPreferences implements CliPreferences {
             return sslPreferences;
         }
 
-        sslPreferences = getSSLPreferencesFromBackingStore(SSLPreferences.getDefault());
+        SSLPreferences defaultValues = SSLPreferences.getDefault();
+
+        sslPreferences = new SSLPreferences(
+                Path.of(get(SSL_TRUSTSTORE_PATH, defaultValues.getTruststorePath().toString())));
+
+        bindObject(sslPreferences.truststorePathProperty(), SSL_TRUSTSTORE_PATH, defaultValues.getTruststorePath(),
+                Path::toString, Path::of);
 
         return sslPreferences;
-    }
-
-    private SSLPreferences getSSLPreferencesFromBackingStore(SSLPreferences defaults) {
-        return new SSLPreferences(
-                Path.of(get(SSL_TRUSTSTORE_PATH, defaults.getTruststorePath().toString())));
     }
     // endregion
 
