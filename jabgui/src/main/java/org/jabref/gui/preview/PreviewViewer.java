@@ -224,11 +224,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
             BackgroundTask.wrap(() -> generatePreviewWithAnnotations(currentEntry, filePreferences))
                           .onSuccess(htmlComplete -> {
-                              if (requestId == latestRequestId.get()
-                                      && currentEntry.equals(this.entry)
-                                      && currentDatabaseContext.equals(this.databaseContext)
-                                      && (currentLayout == null || currentLayout.equals(this.layout))) {
-
+                              if (requestId == latestRequestId.get() && currentEntry.equals(this.entry) && currentDatabaseContext.equals(this.databaseContext) && (currentLayout == null || currentLayout.equals(this.layout))) {
                                   setPreviewText(htmlComplete);
                               } else {
                                   LOGGER.debug("Stale preview task discarded for entry: {}", currentEntry.getCitationKey().orElse(""));
