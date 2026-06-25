@@ -29,8 +29,14 @@ jobs:
           show-progress: 'false'
 
       - uses: ./.github/actions/setup-gradle
+
+      - name: Set up Liberica NIK (native-image with AWT support)
+        uses: graalvm/setup-graalvm@v1
         with:
-          distribution: graalvm
+          distribution: 'liberica'
+          java-package: 'jdk+fx'
+          java-version: '25'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build JabKit native binary
         run: gradle :jabkit:nativeCompile
