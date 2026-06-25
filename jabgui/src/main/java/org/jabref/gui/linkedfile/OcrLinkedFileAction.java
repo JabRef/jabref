@@ -82,7 +82,6 @@ public class OcrLinkedFileAction extends SimpleCommand {
         ocrTask.onSuccess(result -> {
             switch (result) {
                 case OcrResult.Success success -> {
-                    dialogService.notify(Localization.lang("OCR succeeded"));
                     Path ocredPdf = success.outputFile();
                     dialogService.notify(new OcredFileSuccessNotification(ocredPdf));
                     for (BibEntry entry : linkedEntries) {
