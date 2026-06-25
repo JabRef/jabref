@@ -18,7 +18,7 @@ val javafxDefault = "26.0.1"
 val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
 val javafxWeb = javafxDefault
 
-val lucene = "10.4.0"
+val lucene = "10.5.0"
 
 val pdfbox = "3.0.7"
 
