@@ -741,6 +741,59 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> property.set(defaultValue));
     }
 
+    /// Binds an enum-valued property persisted as a set of mutually exclusive boolean keys, one per `flag`.
+    /// On change, every flag is written as `true` only for the currently selected value; selecting `implicitValue`
+    /// therefore stores all flags as `false`. Loading and resetting reuse [#readExclusiveFlags]. The first flag's key
+    /// doubles as the binding's reporting key in [#getPreferences()] and [#getDefaults()].
+    ///
+    /// @param <T>           the enum type held by the property
+    /// @param property      the property to bind
+    /// @param defaultValue  the value reported as the default and restored on reset; also returned on load when no flag
+    ///                     has ever been stored
+    /// @param implicitValue the enum constant that owns no key and is thus encoded as all flags being `false`
+    /// @param flags         the backing-store key for each non-implicit value, in lookup order (first match wins on load)
+    @SafeVarargs
+    protected final <T> void bindExclusiveFlags(ObjectProperty<T> property, T defaultValue, T implicitValue, Map.Entry<String, T>... flags) {
+        bindCustom(property, flags[0].getKey(), defaultValue,
+                (_, _, newValue) -> {
+                    for (Map.Entry<String, T> flag : flags) {
+                        putBoolean(flag.getKey(), newValue == flag.getValue());
+                    }
+                },
+                () -> property.set(readExclusiveFlags(defaultValue, implicitValue, flags)),
+                () -> property.set(defaultValue));
+    }
+
+    /// Reads an enum persisted as mutually exclusive boolean keys (see [#bindExclusiveFlags]). When no flag key has
+    /// ever been stored, `defaultValue` is returned. Otherwise, the first flag stored as `true` (in `flags` order)
+    /// wins; if all flags are `false`, `implicitValue` is returned. A flag stored as `true` always wins over a later
+    /// one, so the non-canonical "multiple flags true" state resolves to the earliest matching value rather than failing.
+    ///
+    /// @param <T>           the enum type to reconstruct
+    /// @param defaultValue  returned when none of the flag keys exist in the backing store
+    /// @param implicitValue the value that owns no key, returned when all flags are stored as `false`
+    /// @param flags         the backing-store key for each non-implicit value, in lookup order (first match wins)
+    /// @return the stored enum value, or `defaultValue`/`implicitValue` per the rules above
+    @SafeVarargs
+    protected final <T> T readExclusiveFlags(T defaultValue, T implicitValue, Map.Entry<String, T>... flags) {
+        boolean anyStored = false;
+        for (Map.Entry<String, T> flag : flags) {
+            if (hasKey(flag.getKey())) {
+                anyStored = true;
+                break;
+            }
+        }
+        if (!anyStored) {
+            return defaultValue;
+        }
+        for (Map.Entry<String, T> flag : flags) {
+            if (getBoolean(flag.getKey(), false)) {
+                return flag.getValue();
+            }
+        }
+        return implicitValue;
+    }
+
     /// Binds a map-valued property. Unlike the other `bind*` helpers, persistence is delegated to the given
     /// `persistListener`, since map entries may be stored under multiple backing-store keys.
     ///
@@ -1454,7 +1507,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(CITATION_KEY_AVOID_OVERWRITING, defaultValues.shouldAvoidOverwriteCiteKey()),
                 getBoolean(CITATION_KEY_WARN_BEFORE_OVERWRITE, defaultValues.shouldWarnBeforeOverwriteCiteKey()),
                 getBoolean(CITATION_KEY_GENERATE_BEFORE_SAVING, defaultValues.shouldGenerateCiteKeysBeforeSaving()),
-                getKeySuffix(defaultValues),
+                readExclusiveFlags(defaultValues.getKeySuffix(),
+                        CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B,
+                        Map.entry(CITATION_KEY_GEN_ALWAYS_ADD_LETTER, CitationKeyPatternPreferences.KeySuffix.ALWAYS),
+                        Map.entry(CITATION_KEY_GEN_FIRST_LETTER_A, CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A)),
                 get(CITATION_KEY_PATTERN_REGEX, defaultValues.getKeyPatternRegex()),
                 get(CITATION_KEY_PATTERN_REPLACEMENT, defaultValues.getKeyPatternReplacement()),
                 get(CITATION_KEY_UNWANTED_CHARACTERS, defaultValues.getUnwantedCharacters()),
@@ -1469,14 +1525,12 @@ public class JabRefCliPreferences implements CliPreferences {
         bindString(citationKeyPatternPreferences.keyPatternReplacementProperty(), CITATION_KEY_PATTERN_REPLACEMENT, defaultValues.getKeyPatternReplacement());
         bindString(citationKeyPatternPreferences.unwantedCharactersProperty(), CITATION_KEY_UNWANTED_CHARACTERS, defaultValues.getUnwantedCharacters());
 
-        // KeySuffix is persisted across two boolean keys, so it needs a custom binding.
-        bindCustom(citationKeyPatternPreferences.keySuffixProperty(), CITATION_KEY_GEN_ALWAYS_ADD_LETTER, defaultValues.getKeySuffix(),
-                (_, _, newValue) -> {
-                    putBoolean(CITATION_KEY_GEN_ALWAYS_ADD_LETTER, newValue == CitationKeyPatternPreferences.KeySuffix.ALWAYS);
-                    putBoolean(CITATION_KEY_GEN_FIRST_LETTER_A, newValue == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A);
-                },
-                () -> citationKeyPatternPreferences.keySuffixProperty().set(getKeySuffix(defaultValues)),
-                () -> citationKeyPatternPreferences.keySuffixProperty().set(defaultValues.getKeySuffix()));
+        // KeySuffix is persisted across two boolean keys; SECOND_WITH_B owns no key (the absence of both).
+        bindExclusiveFlags(citationKeyPatternPreferences.keySuffixProperty(),
+                defaultValues.getKeySuffix(),
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B,
+                Map.entry(CITATION_KEY_GEN_ALWAYS_ADD_LETTER, CitationKeyPatternPreferences.KeySuffix.ALWAYS),
+                Map.entry(CITATION_KEY_GEN_FIRST_LETTER_A, CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A));
 
         // KeyPatterns are persisted in a dedicated child node, so they need a custom binding.
         bindCustom(citationKeyPatternPreferences.keyPatternsProperty(), CITATION_KEY_DEFAULT_PATTERN, defaultValues.getKeyPatterns(),
@@ -1485,23 +1539,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> citationKeyPatternPreferences.keyPatternsProperty().set(defaultValues.getKeyPatterns()));
 
         return citationKeyPatternPreferences;
-    }
-
-    private CitationKeyPatternPreferences.KeySuffix getKeySuffix(CitationKeyPatternPreferences defaults) {
-        if (!hasKey(CITATION_KEY_GEN_ALWAYS_ADD_LETTER) && !hasKey(CITATION_KEY_GEN_FIRST_LETTER_A)) {
-            return defaults.getKeySuffix();
-        }
-
-        boolean alwaysAddLetter = getBoolean(CITATION_KEY_GEN_ALWAYS_ADD_LETTER, false);
-        boolean firstLetterA = getBoolean(CITATION_KEY_GEN_FIRST_LETTER_A, false);
-
-        if (alwaysAddLetter && !firstLetterA) {
-            return CitationKeyPatternPreferences.KeySuffix.ALWAYS;
-        } else if (!alwaysAddLetter && firstLetterA) {
-            return CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
-        } else {
-            return CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
-        }
     }
 
     private @NonNull GlobalCitationKeyPatterns getGlobalCitationKeyPattern(CitationKeyPatternPreferences defaults) {
@@ -1717,34 +1754,24 @@ public class JabRefCliPreferences implements CliPreferences {
 
         AutoLinkPreferences defaultValues = AutoLinkPreferences.getDefault();
 
+        // citationKeyDependency is persisted across two boolean keys; START owns no key (the absence of both).
         autoLinkPreferences = new AutoLinkPreferences(
-                getAutoLinkKeyDependency(defaultValues.getCitationKeyDependency()),
+                readExclusiveFlags(defaultValues.getCitationKeyDependency(),
+                        AutoLinkPreferences.CitationKeyDependency.START,
+                        Map.entry(AUTOLINK_EXACT_KEY_ONLY, AutoLinkPreferences.CitationKeyDependency.EXACT),
+                        Map.entry(AUTOLINK_USE_REG_EXP_SEARCH_KEY, AutoLinkPreferences.CitationKeyDependency.REGEX)),
                 get(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultValues.getRegularExpression()),
                 getBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, defaultValues.shouldAskAutoNamingPdfs()),
                 bibEntryPreferences.keywordSeparatorProperty());
 
-        // citationKeyDependency is persisted across two boolean keys (START being the absence of both), so it needs a custom binding.
-        bindCustom(autoLinkPreferences.citationKeyDependencyProperty(), AUTOLINK_EXACT_KEY_ONLY, defaultValues.getCitationKeyDependency(),
-                (_, _, newValue) -> {
-                    // START is omitted, as it is not being saved
-                    putBoolean(AUTOLINK_EXACT_KEY_ONLY, newValue == AutoLinkPreferences.CitationKeyDependency.EXACT);
-                    putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, newValue == AutoLinkPreferences.CitationKeyDependency.REGEX);
-                },
-                () -> autoLinkPreferences.citationKeyDependencyProperty().set(getAutoLinkKeyDependency(defaultValues.getCitationKeyDependency())),
-                () -> autoLinkPreferences.citationKeyDependencyProperty().set(defaultValues.getCitationKeyDependency()));
+        bindExclusiveFlags(autoLinkPreferences.citationKeyDependencyProperty(),
+                defaultValues.getCitationKeyDependency(), AutoLinkPreferences.CitationKeyDependency.START,
+                Map.entry(AUTOLINK_EXACT_KEY_ONLY, AutoLinkPreferences.CitationKeyDependency.EXACT),
+                Map.entry(AUTOLINK_USE_REG_EXP_SEARCH_KEY, AutoLinkPreferences.CitationKeyDependency.REGEX));
         bindString(autoLinkPreferences.regularExpressionProperty(), AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultValues.getRegularExpression());
         bindBoolean(autoLinkPreferences.askAutoNamingPdfsProperty(), ASK_AUTO_NAMING_PDFS_AGAIN, defaultValues.shouldAskAutoNamingPdfs());
 
         return autoLinkPreferences;
-    }
-
-    private AutoLinkPreferences.CitationKeyDependency getAutoLinkKeyDependency(AutoLinkPreferences.CitationKeyDependency defaultDependency) {
-        if (getBoolean(AUTOLINK_EXACT_KEY_ONLY, defaultDependency == AutoLinkPreferences.CitationKeyDependency.EXACT)) {
-            return AutoLinkPreferences.CitationKeyDependency.EXACT;
-        } else if (getBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, defaultDependency == AutoLinkPreferences.CitationKeyDependency.REGEX)) {
-            return AutoLinkPreferences.CitationKeyDependency.REGEX;
-        }
-        return AutoLinkPreferences.CitationKeyDependency.START;
     }
     // endregion
 
