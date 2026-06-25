@@ -235,9 +235,10 @@ class StudyRepositoryTest {
     }
 
     @Test
-    void omitsCatalogsWithNoLimitSet() {
-        // no study default, no catalog override -> empty map -> StudyFetcher falls back to its constant
-        assertTrue(studyRepository.getResultLimitsPerCatalog().isEmpty());
+    void resolvesToDefaultWhenNoLimitSet() {
+        Map<String, Integer> limits = studyRepository.getResultLimitsPerCatalog();
+        // no study default, no catalog override -> every catalog resolves to the default
+        assertTrue(limits.values().stream().allMatch(limit -> limit == StudyRepository.DEFAULT_RESULT_LIMIT));
     }
 
     private StudyRepository getTestStudyRepository() throws IOException, URISyntaxException, JabRefException {
