@@ -78,7 +78,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
             AuxParserResult auxResult = auxParser.parse(filePath);
             keysUsedInAux = auxResult.getUniqueKeys();
         }
-        
+
         return entry.getCitationKey().map(keysUsedInAux::contains).orElse(false);
     }
 
