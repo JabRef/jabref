@@ -30,6 +30,8 @@ jobs:
 
       - uses: ./.github/actions/setup-gradle
 
+      # In graalvm/setup-graalvm, distribution "liberica" means Liberica NIK.
+      # jdk+fx maps to the Full Liberica package, used here for the AWT/java.desktop path triggered by PDFBox.
       - name: Set up Liberica NIK (native-image with AWT support)
         uses: graalvm/setup-graalvm@v1
         with:
