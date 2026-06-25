@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.auxparser.AuxParser;
-import org.jabref.logic.util.LazyValue;
+import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
@@ -24,7 +24,8 @@ import org.jspecify.annotations.Nullable;
 public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     private final Path filePath;
-    private final LazyValue<Set<String>> keysUsedInAux;
+    // Lazily computed value, therefore, nullable.
+    private @Nullable Set<String> keysUsedInAux;
     private final FileUpdateMonitor fileMonitor;
     private final AuxParser auxParser;
     private final MetaData metaData;
@@ -38,14 +39,11 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
              MetaData metaData,
              String user) {
         super(name, context);
-
         this.metaData = metaData;
         this.user = user;
         this.filePath = expandPath(filePath);
         this.auxParser = auxParser;
         this.fileMonitor = fileMonitor;
-
-        this.keysUsedInAux = new LazyValue<>(() -> auxParser.parse(filePath).getUniqueKeys());
     }
 
     public static TexGroup create(String name,
@@ -76,9 +74,12 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     @Override
     public boolean contains(BibEntry entry) {
-        return entry.getCitationKey()
-                    .map(keysUsedInAux.get()::contains)
-                    .orElse(false);
+        if (keysUsedInAux == null) {
+            AuxParserResult auxResult = auxParser.parse(filePath);
+            keysUsedInAux = auxResult.getUniqueKeys();
+        }
+        
+        return entry.getCitationKey().map(keysUsedInAux::contains).orElse(false);
     }
 
     @Override
@@ -128,7 +129,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     @Override
     public void fileUpdated() {
         // Reset previous parse result
-        keysUsedInAux.invalidate();
+        keysUsedInAux = null;
         metaData.groupsBinding().invalidate();
     }
 
