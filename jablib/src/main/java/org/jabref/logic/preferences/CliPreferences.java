@@ -24,6 +24,7 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
+import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.push.PushToApplicationPreferences;
@@ -127,4 +128,6 @@ public interface CliPreferences {
                 getDOIPreferences(),
                 getFilePreferences().mainFileDirectoryProperty());
     }
+
+    OcrPreferences getOcrPreferences();
 }

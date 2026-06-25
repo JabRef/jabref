@@ -9,16 +9,16 @@ import java.util.stream.Collectors;
 
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.search.PostgreConstants;
+import org.jabref.model.search.PostgresConstants;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.query.SqlQueryNode;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
-import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
-import static org.jabref.model.search.PostgreConstants.FIELD_NAME;
-import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_LITERAL;
-import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_TRANSFORMED;
+import static org.jabref.model.search.PostgresConstants.ENTRY_ID;
+import static org.jabref.model.search.PostgresConstants.FIELD_NAME;
+import static org.jabref.model.search.PostgresConstants.FIELD_VALUE_LITERAL;
+import static org.jabref.model.search.PostgresConstants.FIELD_VALUE_TRANSFORMED;
 import static org.jabref.model.search.SearchFlags.CASE_INSENSITIVE;
 import static org.jabref.model.search.SearchFlags.CASE_SENSITIVE;
 import static org.jabref.model.search.SearchFlags.EXACT_MATCH;
@@ -44,8 +44,8 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
     public SearchToSqlVisitor(String table, EnumSet<SearchFlags> searchBarFlags) {
         this.searchBarFlags = searchBarFlags;
-        this.mainTableName = PostgreConstants.getMainTableSchemaReference(table);
-        this.splitValuesTableName = PostgreConstants.getSplitTableSchemaReference(table);
+        this.mainTableName = PostgresConstants.getMainTableSchemaReference(table);
+        this.splitValuesTableName = PostgresConstants.getSplitTableSchemaReference(table);
     }
 
     @Override

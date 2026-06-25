@@ -2,7 +2,7 @@ package org.jabref.model.search;
 
 import java.util.List;
 
-public enum PostgreConstants {
+public enum PostgresConstants {
     BIB_FIELDS_SCHEME("bib_fields"),
     SPLIT_TABLE_SUFFIX("_split_values"),
     ENTRY_ID("entryid"),
@@ -55,7 +55,7 @@ public enum PostgreConstants {
 
     private final String value;
 
-    PostgreConstants(String value) {
+    PostgresConstants(String value) {
         this.value = value;
     }
 

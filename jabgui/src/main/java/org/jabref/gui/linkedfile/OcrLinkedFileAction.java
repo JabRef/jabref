@@ -1,5 +1,6 @@
 package org.jabref.gui.linkedfile;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -7,8 +8,10 @@ import java.util.Optional;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Notifications;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -22,6 +25,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.dlsc.gemsfx.infocenter.NotificationAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +56,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
-        this.ocrEngine = new OcrMyPdfEngine();
+        this.ocrEngine = new OcrMyPdfEngine(preferences.getOcrPreferences());
         this.importHandler = new ImportHandler(
                 databaseContext,
                 preferences,
@@ -80,6 +84,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
                 case OcrResult.Success success -> {
                     dialogService.notify(Localization.lang("OCR succeeded"));
                     Path ocredPdf = success.outputFile();
+                    dialogService.notify(new OcredFileSuccessNotification(ocredPdf));
                     for (BibEntry entry : linkedEntries) {
                         importHandler.getFileLinker().linkFilesToEntry(entry, List.of(ocredPdf));
                     }
@@ -100,7 +105,7 @@ public class OcrLinkedFileAction extends SimpleCommand {
     String getFailureResult(OcrResult.Failure failure) {
         return switch (failure.reason()) {
             case NOT_AVAILABLE ->
-                    Localization.lang("OCRmyPDF is not available");
+                    Localization.lang("OCRmyPDF is not available at: %0", preferences.getOcrPreferences().getOcrEnginePath());
             case TIMEOUT ->
                     Localization.lang("OCR timed out");
             case NON_ZERO_EXIT ->
@@ -110,5 +115,22 @@ public class OcrLinkedFileAction extends SimpleCommand {
             case INTERRUPTED ->
                     Localization.lang("OCR was cancelled");
         };
+    }
+
+    private class OcredFileSuccessNotification extends Notifications.FileNotification {
+        public OcredFileSuccessNotification(Path path) {
+            super(Localization.lang("OCR finished successfully."), path.toString());
+
+            NotificationAction<Path> action = new NotificationAction<>(Localization.lang("Show file"), _ -> {
+                try {
+                    NativeDesktop.openFolderAndSelectFile(path, preferences.getExternalApplicationsPreferences(), dialogService);
+                } catch (IOException e) {
+                    LOGGER.error("Could not open OCRed file.", e);
+                }
+                return OnClickBehaviour.REMOVE;
+            });
+
+            getActions().add(action);
+        }
     }
 }

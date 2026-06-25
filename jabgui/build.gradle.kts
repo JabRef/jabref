@@ -38,7 +38,7 @@ testModuleInfo {
 // javafx.fxml, javafx.graphics, javafx.controls) are then lost and must be re-applied as JVM args here.
 // Qualified opens keep their original target module; unqualified opens/exports are reproduced for the
 // JabRef application module plus ALL-UNNAMED. If a runtime InaccessibleObjectException names another reader
-// module, append it (comma-separated) to the corresponding entry. (Flag: org.jabref.gradle.JavaFxBundling)
+// module, append it (comma-separated) to the corresponding entry. (Flag: org.jabref.gradle.Toolchains)
 val useLibericaJdkFullJvmArgs = if (useLibericaJdkFull) listOf(
     // javafx.base
     "--add-exports", "javafx.base/com.sun.javafx.event=org.jabref,ALL-UNNAMED",
