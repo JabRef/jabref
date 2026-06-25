@@ -958,9 +958,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getNameFormatterPreferences().setAll(NameFormatterPreferences.getDefault());
         getCleanupPreferences().setAll(CleanupPreferences.getDefault());
         getImporterPreferences().setAll(ImporterPreferences.getDefault());
-        getAutoLinkPreferences().setAll(
-                AutoLinkPreferences.getDefault()
-                                   .withKeywordSeparator(getBibEntryPreferences().keywordSeparatorProperty()));
         getExportPreferences().setAll(ExportPreferences.getDefault());
         getSearchPreferences().setAll(SearchPreferences.getDefault());
         getLastFilesOpenedPreferences().setAll(LastFilesOpenedPreferences.getDefault());
@@ -986,6 +983,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getSSLPreferences();
         getBibEntryPreferences();
         getCitationKeyPatternPreferences();
+        getAutoLinkPreferences();
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
@@ -1007,7 +1005,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getNameFormatterPreferences().setAll(getNameFormatterPreferencesFromBackingStore(getNameFormatterPreferences()));
         getCleanupPreferences().setAll(getCleanupPreferencesFromBackingStore(getCleanupPreferences()));
         getImporterPreferences().setAll(getImporterPreferencesFromBackingStore(getImporterPreferences()));
-        getAutoLinkPreferences().setAll(getAutoLinkPreferencesFromBackingStore(getAutoLinkPreferences()));
         getExportPreferences().setAll(getExportPreferencesFromBackingStore(getExportPreferences()));
         getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
         getLastFilesOpenedPreferences().setAll(getLastFilesOpenedPreferencesFromBackingStore(getLastFilesOpenedPreferences()));
@@ -1034,6 +1031,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getSSLPreferences();
         getBibEntryPreferences();
         getCitationKeyPatternPreferences();
+        getAutoLinkPreferences();
 
         allBindings.forEach(binding -> binding.importFromStore().run());
     }
@@ -1717,27 +1715,27 @@ public class JabRefCliPreferences implements CliPreferences {
             return autoLinkPreferences;
         }
 
-        autoLinkPreferences = getAutoLinkPreferencesFromBackingStore(AutoLinkPreferences.getDefault());
+        AutoLinkPreferences defaultValues = AutoLinkPreferences.getDefault();
 
-        EasyBind.listen(autoLinkPreferences.citationKeyDependencyProperty(), (_, _, newValue) -> {
-            // Starts bibtex only omitted, as it is not being saved
-            putBoolean(AUTOLINK_EXACT_KEY_ONLY, newValue == AutoLinkPreferences.CitationKeyDependency.EXACT);
-            putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, newValue == AutoLinkPreferences.CitationKeyDependency.REGEX);
-        });
-        EasyBind.listen(autoLinkPreferences.askAutoNamingPdfsProperty(),
-                (_, _, newValue) -> putBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, newValue));
-        EasyBind.listen(autoLinkPreferences.regularExpressionProperty(),
-                (_, _, newValue) -> put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, newValue));
+        autoLinkPreferences = new AutoLinkPreferences(
+                getAutoLinkKeyDependency(defaultValues.getCitationKeyDependency()),
+                get(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultValues.getRegularExpression()),
+                getBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, defaultValues.shouldAskAutoNamingPdfs()),
+                bibEntryPreferences.keywordSeparatorProperty());
+
+        // citationKeyDependency is persisted across two boolean keys (START being the absence of both), so it needs a custom binding.
+        bindCustom(autoLinkPreferences.citationKeyDependencyProperty(), AUTOLINK_EXACT_KEY_ONLY, defaultValues.getCitationKeyDependency(),
+                (_, _, newValue) -> {
+                    // START is omitted, as it is not being saved
+                    putBoolean(AUTOLINK_EXACT_KEY_ONLY, newValue == AutoLinkPreferences.CitationKeyDependency.EXACT);
+                    putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, newValue == AutoLinkPreferences.CitationKeyDependency.REGEX);
+                },
+                () -> autoLinkPreferences.citationKeyDependencyProperty().set(getAutoLinkKeyDependency(defaultValues.getCitationKeyDependency())),
+                () -> autoLinkPreferences.citationKeyDependencyProperty().set(defaultValues.getCitationKeyDependency()));
+        bindString(autoLinkPreferences.regularExpressionProperty(), AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultValues.getRegularExpression());
+        bindBoolean(autoLinkPreferences.askAutoNamingPdfsProperty(), ASK_AUTO_NAMING_PDFS_AGAIN, defaultValues.shouldAskAutoNamingPdfs());
 
         return autoLinkPreferences;
-    }
-
-    private AutoLinkPreferences getAutoLinkPreferencesFromBackingStore(AutoLinkPreferences defaults) {
-        return new AutoLinkPreferences(
-                getAutoLinkKeyDependency(defaults.getCitationKeyDependency()),
-                get(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaults.getRegularExpression()),
-                getBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, defaults.shouldAskAutoNamingPdfs()),
-                bibEntryPreferences.keywordSeparatorProperty());
     }
 
     private AutoLinkPreferences.CitationKeyDependency getAutoLinkKeyDependency(AutoLinkPreferences.CitationKeyDependency defaultDependency) {
