@@ -1,6 +1,7 @@
 package org.jabref.logic.bibtex.comparator;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibtexString;
@@ -68,8 +69,8 @@ class BibStringDiffTest {
         BibtexString bsOne = new BibtexString("aKahle", "Kahle, Brewster");
         BibtexString bsTwo = new BibtexString("iMIT", "Institute of Technology");
         BibStringDiff diff = new BibStringDiff(bsOne, bsTwo);
-        assertEquals(diff.getOriginalString(), bsOne);
-        assertEquals(diff.getNewString(), bsTwo);
+        assertEquals(diff.getOriginalString(), Optional.of(bsOne));
+        assertEquals(diff.getNewString(), Optional.of(bsTwo));
     }
 
     @Test
