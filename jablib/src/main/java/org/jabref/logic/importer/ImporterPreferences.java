@@ -32,6 +32,7 @@ import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class ImporterPreferences {
     private final BooleanProperty importerEnabled;
@@ -217,7 +218,7 @@ public class ImporterPreferences {
                       .findFirst()
                       .map(FetcherApiKey::getKey)
                       .or(() -> Optional.ofNullable(getDefaultFetcherKeys().get(name)))
-                      .filter(key -> !key.isBlank());
+                      .filter(StringUtil::isNotBlank);
     }
 
     public void setCatalogs(List<String> catalogs) {

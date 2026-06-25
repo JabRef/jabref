@@ -38,7 +38,7 @@ public class SqlBasedLibrarySearcherTest {
     private final CliPreferences preferences = mock(CliPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
-    private PostgreServer postgreServer;
+    private PostgresServer postgresServer;
 
     @TempDir
     private Path indexDir;
@@ -55,12 +55,12 @@ public class SqlBasedLibrarySearcherTest {
         databaseContext = spy(new BibDatabaseContext());
         when(databaseContext.getFulltextIndexPath()).thenReturn(indexDir);
 
-        postgreServer = new PostgreServer();
+        postgresServer = new PostgresServer();
     }
 
     @AfterEach
     void tearDown() {
-        postgreServer.close();
+        postgresServer.close();
     }
 
     @ParameterizedTest
@@ -69,7 +69,7 @@ public class SqlBasedLibrarySearcherTest {
         for (BibEntry entry : entries) {
             databaseContext.getDatabase().insertEntry(entry);
         }
-        List<BibEntry> matches = new SqlBasedLibrarySearcher(databaseContext, TASK_EXECUTOR, preferences, postgreServer).getMatches(query);
+        List<BibEntry> matches = new SqlBasedLibrarySearcher(databaseContext, TASK_EXECUTOR, preferences, postgresServer).getMatches(query);
         // Order-insensitive comparison: SQL-backed searcher does not guarantee result ordering.
         assertEquals(Set.copyOf(expectedMatches), Set.copyOf(matches));
     }

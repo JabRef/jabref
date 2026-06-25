@@ -1,10 +1,12 @@
+import org.jabref.gradle.javaVersion
+import org.jabref.gradle.jdkVendor
 import org.jabref.gradle.useLibericaJdkFull
 
 plugins {
     id("java")
 }
 
-// Opt-in (-PuseLibericaJdkFull, see org.jabref.gradle.JavaFxBundling): build against a JDK that bundles
+// Opt-in (-PuseLibericaJdkFull, see org.jabref.gradle.Toolchains): build against a JDK that bundles
 // JavaFX (BellSoft Liberica "Full"). When set, JabRef does NOT pull JavaFX from Maven; 'requires javafx.*'
 // resolves against the JDK's own system modules instead. See also:
 // - versions/build.gradle.kts
@@ -27,7 +29,8 @@ java {
         // - jablib-examples/jbang/*.java
         // - jablib-examples/maven3/*/pom.xml
         // - Dockerfile.* (first line)
-        languageVersion = JavaLanguageVersion.of(25)
+        // Default 25; override with -PjavaVersion=26 (e.g. to test an EA JDK).
+        languageVersion = JavaLanguageVersion.of(javaVersion)
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
         // Temurin does not ship jmods, thus we need to use another JDK -- see https://github.com/actions/setup-java/issues/804
         // We default to a JDK without JavaFX (Amazon Corretto), because we patch JavaFX (Maven) due to modularity issues.
@@ -35,8 +38,9 @@ java {
         // NOTE: foojay auto-provisioning resolves BellSoft to Liberica *Standard* (no JavaFX). To actually get the
         //       bundled JavaFX, install Liberica *Full* JDK 25 locally so the toolchain detects it (and avoid having a
         //       Standard 25 of the same vendor installed, as the toolchain query cannot distinguish the two).
-        // If this is changed, binaries.yml needs to be adapted (e.g., sed'ing to another JDK)
-        vendor = if (useLibericaJdkFull) JvmVendorSpec.BELLSOFT else JvmVendorSpec.AMAZON
+        // Default depends on -PuseLibericaJdkFull (BELLSOFT) vs not (AMAZON); override with -Pjdk=<name>,
+        // e.g. -Pjdk=openj9 for Eclipse OpenJ9 (IBM Semeru). See org.jabref.gradle.Toolchains.
+        vendor = jdkVendor
     }
 }
 
@@ -58,10 +62,11 @@ if (useLibericaJdkFull) {
                       ${installationPath.asFile}
                     (missing $javafxJmod)
 
-                    A BellSoft Liberica *Standard* JDK was most likely selected instead of Liberica *Full*.
+                    A BellSoft Liberica *Standard* JDK was most likely selected instead of Liberica *Full*
+                    (or the vendor was overridden via -Pjdk to a JDK that does not bundle JavaFX).
                     Install Liberica *Full* JDK 25 and ensure no Liberica *Standard* 25 of the same vendor/version
                     is installed (the toolchain query cannot tell them apart), or point Gradle at the Full JDK via
-                    the org.gradle.java.installations.paths property.
+                    the org.gradle.java.installations.paths property. Do not pass -Pjdk together with -PuseLibericaJdkFull.
                     """.trimIndent()
                 )
             }
