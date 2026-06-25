@@ -16,7 +16,10 @@ This document defines rules and expectations for **automated agents** (AI tools,
 
 JabRef is an open-source, research-grade reference manager with high standards for correctness, reproducibility, and maintainability.
 
-This file is guidance to follow *while* developing. After the work is finished, go through each point of `CHECKLIST.md` as a final quality check and ensure that all points are fulfilled. If not, fix the code until all points are fulfilled. Do not skip any point of the checklist.
+This file is guidance to follow *while* developing.
+
+> [!IMPORTANT]
+> **Final step — do not skip.** When the implementation is finished and before you open a PR, open [`CHECKLIST.md`](./CHECKLIST.md) and work through **every** point. Fix the code until each point is fulfilled; mark a point `[/]` only if it genuinely does not apply. The checklist is the mandatory quality gate for the finished result.
 
 ---
 
@@ -125,7 +128,7 @@ Agents **must not**:
    and then PATTERN.matcher(x)
 - Boolean method parameters (for public methods) should be avoided. Better create two distinct methods (which maybe call some private methods)
 - Minimal quality for variable names: Not extraEntry2, extraEntry3; but include meaning/intention into the variable names
-- Use Markdown Javadoc comments (`///`) for multi-line comments
+- Use Markdown Javadoc comments (`///`) for multi-line comments. Within them, use Markdown syntax, not JavaDoc inline tags: `` `code` `` instead of `{@code code}`, and `[ClassName]` instead of `{@link ClassName}`.
 
 ### Comments
 
@@ -176,7 +179,8 @@ Both comments must not be added.
 ### Dealing with `null`
 
 - New public methods should not return `null`. They should make use of `java.util.Optional`. In case `null` really needs to be used, the [JSpecify](https://jspecify.dev/) annotations must be used.
-- Use JSpecify annotations (`@Nullable`, `@Nullmarked`, `@NonNull`, ...) instead of `null` checks
+- Use JSpecify annotations (`@Nullable`, `@NullMarked`, `@NonNull`, ...) instead of `null` checks
+- Annotate every new class with `@NullMarked` (`org.jspecify.annotations.NullMarked`) so members default to non-null.
 - `null` should never be passed to a method (except it has the same name).
 - DO NOT use `Objects.requireNonNull`, use JSpecify's `@NullMarked` and `@NonNull` annotations.
 

@@ -3,18 +3,25 @@ package org.jabref.model.entry;
 import java.util.Locale;
 import java.util.Objects;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /// This class models a BibTex String ("@String")
+@NullMarked
 public class BibtexString implements Cloneable {
 
-    /// Type of a \@String.
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexString.class);
+
+    /// Type of \@String.
     ///
     /// Differentiate a \@String based on its usage:
     ///
-    /// - {@link #AUTHOR}: prefix "a", for author and editor fields.
-    /// - {@link #INSTITUTION}: prefix "i", for institution and organization
-    /// field
-    /// - {@link #PUBLISHER}: prefix "p", for publisher fields
-    /// - {@link #OTHER}: no prefix, for any field
+    /// - [#AUTHOR]: prefix "a", for author and editor fields.
+    /// - [#INSTITUTION: prefix "i", for institution and organization field
+    /// - [#PUBLISHER]: prefix "p", for publisher fields
+    /// - [#OTHER]: no prefix, for any field
     ///
     /// Examples:
     ///
@@ -29,13 +36,15 @@ public class BibtexString implements Cloneable {
     ///
     /// Usage:
     ///
-    /// \@Misc {
-    /// title       = "The GNU Project"
-    /// author      = aStallman # et # aKahle
-    /// institution = iMIT
-    /// publisher   = pMIT
-    /// note        = "Just " # eg
+    /// ```bibtex
+    /// @Misc {
+    ///   title       = "The GNU Project"
+    ///   author      = aStallman # et # aKahle
+    ///   institution = iMIT
+    ///   publisher   = pMIT
+    ///   note        = "Just " # eg
     /// }
+    /// ```
     public enum Type {
         AUTHOR("a"),
         INSTITUTION("i"),
@@ -82,6 +91,7 @@ public class BibtexString implements Cloneable {
         this.id = IdGenerator.next();
         this.name = name;
         this.content = content;
+        this.parsedSerialization = "";
         hasChanged = true;
         type = Type.get(name);
     }
@@ -116,11 +126,8 @@ public class BibtexString implements Cloneable {
         type = Type.get(name);
     }
 
-    /*
-     * Never returns null
-     */
     public String getContent() {
-        return content == null ? "" : content;
+        return content;
     }
 
     public void setContent(String content) {
@@ -144,13 +151,13 @@ public class BibtexString implements Cloneable {
      * Returns user comments (arbitrary text before the string) if there are any. If not returns the empty string
      */
     public String getUserComments() {
-        if (parsedSerialization != null) {
+        if (!parsedSerialization.isEmpty()) {
             try {
                 // get the text before the string
-                String prolog = parsedSerialization.substring(0, parsedSerialization.indexOf('@'));
-                return prolog;
-            } catch (StringIndexOutOfBoundsException ignore) {
-                // if this occurs a broken parsed serialization has been set, so just do nothing
+                return parsedSerialization.substring(0, parsedSerialization.indexOf('@'));
+            } catch (StringIndexOutOfBoundsException e) {
+                // if this occurs a broken parsed serialization has been set, so just do nothing.
+                LOGGER.error("Got an unexpected error, ignoring", e);
             }
         }
         return "";
@@ -159,7 +166,7 @@ public class BibtexString implements Cloneable {
     @Override
     public Object clone() {
         BibtexString clone;
-        if (parsedSerialization == null) {
+        if (parsedSerialization.isEmpty()) {
             clone = new BibtexString(name, content);
         } else {
             clone = new BibtexString(name, content, parsedSerialization);
@@ -174,7 +181,7 @@ public class BibtexString implements Cloneable {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

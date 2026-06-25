@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -59,7 +59,7 @@ jobs:
     # ubuntu-slim doesn't offer docker
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/format-java
       # job should fail in case there are changes
       - uses: ./.github/actions/check-formatting
@@ -70,10 +70,10 @@ jobs:
     # too slow on ubuntu-slim
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: 'jabref'
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           repository: 'rmuller/Convert2MarkdownJavadoc'
           path: 'Convert2MarkdownJavadoc'
@@ -98,7 +98,7 @@ jobs:
     needs: format
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -113,7 +113,7 @@ jobs:
     needs: checkstyle
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -138,7 +138,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -154,7 +154,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -171,7 +171,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -181,7 +181,7 @@ jobs:
         run: |
           echo "cache_key=jbang-heylogs-$(date +%Y-%m)" >> $GITHUB_OUTPUT
       - name: Use cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
@@ -192,7 +192,7 @@ jobs:
       - name: Lint CHANGELOG.md
         run: |
           # the grep is needed to filter out an error about all h2 containing a version, which is not relevant for us, because we have an "Unreleased" section
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.18.1:bin check --rule dot-space-link-style:ERROR --format github-actions CHANGELOG.md | grep -v all-h2-contain-a-version | tee heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.19.1:bin check --rule dot-space-link-style:ERROR --format github-actions CHANGELOG.md | grep -v all-h2-contain-a-version | tee heylogs.txt || true
 
           error_count=$(grep -c '^::error' heylogs.txt || true)
           if [ "$error_count" -ne 0 ]; then
@@ -210,14 +210,14 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'false'
           show-progress: 'false'
           fetch-depth: 0
       - name: Cache clparse jar
         id: cache-clparse
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: /tmp/clparse
           key: clparse-0.9.1
@@ -229,7 +229,7 @@ jobs:
           tar xzvf clparse-0.9.1-x86_64-unknown-linux-musl.tar.gz
       - name: Install clparse
         run: sudo mv /tmp/clparse /usr/local/bin/clparse
-      - uses: awalsh128/cache-apt-pkgs-action@latest
+      - uses: awalsh128/cache-apt-pkgs-action@v1.6.1
         with:
           packages: jq
           version: 1.0
@@ -245,7 +245,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -260,7 +260,7 @@ jobs:
         module: [ jablib, jabkit, jabsrv, jabgui ]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -271,7 +271,7 @@ jobs:
           CI: "true"
       - name: Prepare format failed test results
         if: failure()
-        uses: awalsh128/cache-apt-pkgs-action@latest
+        uses: awalsh128/cache-apt-pkgs-action@v1.6.1
         with:
           packages: xml-twig-tools xsltproc
           version: 1.0
@@ -294,7 +294,7 @@ jobs:
         module: [ jablib ]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -309,7 +309,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: 'true'
@@ -337,7 +337,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -363,7 +363,7 @@ jobs:
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop # Shutdown the Default MySQL to save memory, "sudo" is necessary, please do not remove it
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -391,7 +391,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -405,7 +405,7 @@ jobs:
     if: github.ref != 'refs/heads/main'
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -414,7 +414,7 @@ jobs:
       # unreleased changes. -PprojVersion=6.0 makes the artifact 6.0-SNAPSHOT
       # (the default would be 0.1.0-SNAPSHOT, which the scripts do not reference).
       - name: Publish jablib to the local Maven repository
-        run: ./gradlew -PprojVersion=6.0 :jablib:publishToMavenLocal
+        run: gradle -PprojVersion=6.0 :jablib:publishToMavenLocal
       - name: Build JBang scripts and run launchers
         uses: ./.github/actions/jbang-check
 
@@ -429,7 +429,7 @@ jobs:
         project: [ jablib-examples/maven3/doi-to-bibtex ]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -475,7 +475,7 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -501,7 +501,7 @@ jobs:
     name: "Validate requirement coverage"
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           show-progress: 'false'
       - uses: ./.github/actions/setup-gradle
@@ -515,7 +515,31 @@ jobs:
     name: "Validate Gradle Wrapper"
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           show-progress: 'false'
       - uses: gradle/actions/wrapper-validation@v5
+
+  # Guards against a committer (e.g. a dependabot wrapper bump) baking CRLF into
+  # the committed gradlew.bat blob. .gitattributes stores it as LF and smudges it
+  # to CRLF on checkout, so we inspect the committed blob, not the working-tree file.
+  line_endings:
+    name: "Line endings (gradlew.bat)"
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          show-progress: 'false'
+      - name: Ensure gradlew.bat blob has no CRLF
+        run: |
+          if ! git cat-file -e HEAD:gradlew.bat 2>/dev/null; then
+            echo "❌ gradlew.bat not found at HEAD. Cannot validate line endings; failing closed."
+            exit 1
+          fi
+          if git show HEAD:gradlew.bat | grep -q $'\r'; then
+            echo "❌ gradlew.bat is committed with CRLF. The repository blob must be LF;"
+            echo "   .gitattributes (\"*.bat text eol=crlf\") converts it to CRLF on checkout."
+            echo "   Fix: git add --renormalize gradlew.bat && git commit"
+            exit 1
+          fi
+          echo "✅ gradlew.bat blob is LF"

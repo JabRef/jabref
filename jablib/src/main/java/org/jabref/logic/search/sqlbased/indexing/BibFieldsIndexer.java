@@ -22,7 +22,7 @@ import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.search.PostgreConstants;
+import org.jabref.model.search.PostgresConstants;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import io.github.thibaultmeyer.cuid.CUID;
@@ -30,11 +30,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.jabref.model.entry.field.InternalField.TYPE_HEADER;
-import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
-import static org.jabref.model.search.PostgreConstants.FIELD_NAME;
-import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_LITERAL;
-import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_TRANSFORMED;
-import static org.jabref.model.search.PostgreConstants.SPLIT_TABLE_SUFFIX;
+import static org.jabref.model.search.PostgresConstants.ENTRY_ID;
+import static org.jabref.model.search.PostgresConstants.FIELD_NAME;
+import static org.jabref.model.search.PostgresConstants.FIELD_VALUE_LITERAL;
+import static org.jabref.model.search.PostgresConstants.FIELD_VALUE_TRANSFORMED;
+import static org.jabref.model.search.PostgresConstants.SPLIT_TABLE_SUFFIX;
 
 public class BibFieldsIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibFieldsIndexer.class);
@@ -60,8 +60,8 @@ public class BibFieldsIndexer {
         this.mainTable = CUID.randomCUID2(12).toString();
         this.splitValuesTable = mainTable + SPLIT_TABLE_SUFFIX;
 
-        this.schemaMainTableReference = PostgreConstants.getMainTableSchemaReference(mainTable);
-        this.schemaSplitValuesTableReference = PostgreConstants.getSplitTableSchemaReference(mainTable);
+        this.schemaMainTableReference = PostgresConstants.getMainTableSchemaReference(mainTable);
+        this.schemaSplitValuesTableReference = PostgresConstants.getSplitTableSchemaReference(mainTable);
         // TODO: Set-up should be in a background task
         setup();
     }

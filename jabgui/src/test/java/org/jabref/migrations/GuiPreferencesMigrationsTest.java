@@ -2,6 +2,7 @@ package org.jabref.migrations;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
@@ -249,6 +250,18 @@ class GuiPreferencesMigrationsTest {
             verify(keyring).setPassword(eq("org.jabref.customapikeys"), eq("FetcherC"), any());
             verify(preferences).deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
         }
+    }
+
+    @Test
+    void upgradeCleanupsRemovesRemovedIssnCleanupJob() {
+        when(preferences.hasKey(JabRefCliPreferences.CLEANUP_JOBS)).thenReturn(true);
+        when(preferences.getStringList(JabRefCliPreferences.CLEANUP_JOBS)).thenReturn(List.of("CLEAN_UP_DOI", "CLEAN_UP_ISSN", "RENAME_PDF"));
+        when(preferences.getAsOptional(anyString())).thenReturn(Optional.empty());
+        when(preferences.get(anyString(), anyString())).thenReturn("");
+
+        PreferencesMigrations.upgradeCleanups(preferences);
+
+        verify(preferences).putStringList(JabRefCliPreferences.CLEANUP_JOBS, List.of("CLEAN_UP_DOI", "RENAME_PDF"));
     }
 
     @Test

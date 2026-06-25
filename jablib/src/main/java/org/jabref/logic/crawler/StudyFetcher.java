@@ -11,6 +11,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
+import org.jabref.model.study.StudyQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +23,9 @@ class StudyFetcher {
     private static final int MAX_AMOUNT_OF_RESULTS_PER_FETCHER = 100;
 
     private final List<SearchBasedFetcher> activeFetchers;
-    private final List<String> searchQueries;
+    private final List<StudyQuery> searchQueries;
 
-    StudyFetcher(List<SearchBasedFetcher> activeFetchers, List<String> searchQueries) throws IllegalArgumentException {
+    StudyFetcher(List<SearchBasedFetcher> activeFetchers, List<StudyQuery> searchQueries) throws IllegalArgumentException {
         this.searchQueries = searchQueries;
         this.activeFetchers = activeFetchers;
     }
@@ -38,31 +39,31 @@ class StudyFetcher {
                             .toList();
     }
 
-    private QueryResult getQueryResult(String searchQuery) {
-        return new QueryResult(searchQuery, performSearchOnQuery(searchQuery));
+    private QueryResult getQueryResult(StudyQuery searchQuery) {
+        return new QueryResult(searchQuery.getQuery(), performSearchOnQuery(searchQuery));
     }
 
     /// Queries all catalogs on the given searchQuery.
     ///
     /// @param searchQuery The query the search is performed for.
     /// @return Mapping of each fetcher by name and all their retrieved publications as a BibDatabase
-    private List<FetchResult> performSearchOnQuery(String searchQuery) {
+    private List<FetchResult> performSearchOnQuery(StudyQuery searchQuery) {
         return activeFetchers.parallelStream()
                              .map(fetcher -> performSearchOnQueryForFetcher(searchQuery, fetcher))
                              .flatMap(Optional::stream)
                              .toList();
     }
 
-    private Optional<FetchResult> performSearchOnQueryForFetcher(String searchQuery, SearchBasedFetcher fetcher) {
+    private Optional<FetchResult> performSearchOnQueryForFetcher(StudyQuery searchQuery, SearchBasedFetcher fetcher) {
         try {
             List<BibEntry> fetchResult = new ArrayList<>();
             if (fetcher instanceof PagedSearchBasedFetcher basedFetcher) {
                 int pages = (int) Math.ceil(((double) MAX_AMOUNT_OF_RESULTS_PER_FETCHER) / basedFetcher.getPageSize());
                 for (int page = 0; page < pages; page++) {
-                    fetchResult.addAll(basedFetcher.performSearchPaged(searchQuery, page).getContent());
+                    fetchResult.addAll(basedFetcher.performSearchPaged(searchQuery.getQuery(), page).getContent());
                 }
             } else {
-                fetchResult = fetcher.performSearch(searchQuery);
+                fetchResult = fetcher.performSearch(searchQuery.getQuery());
             }
             return Optional.of(new FetchResult(fetcher.getName(), new BibDatabase(fetchResult)));
         } catch (FetcherException e) {

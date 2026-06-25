@@ -151,7 +151,7 @@ public class JabRefDialogService implements DialogService {
 
     private <T> ChoiceDialog<T> createChoiceDialog(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices) {
         ChoiceDialog<T> choiceDialog = new ChoiceDialog<>(defaultChoice, choices);
-        ((Stage) choiceDialog.getDialogPane().getScene().getWindow()).getIcons().add(IconTheme.getJabRefImage());
+        ((Stage) choiceDialog.getDialogPane().getScene().getWindow()).getIcons().add(IconTheme.getJabRefIcon());
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
         choiceDialog.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, okButtonType);
         choiceDialog.setHeaderText(title);
@@ -393,7 +393,7 @@ public class JabRefDialogService implements DialogService {
         progressDialog.setTitle(title);
         progressDialog.setContentText(content);
         progressDialog.setGraphic(null);
-        ((Stage) progressDialog.getDialogPane().getScene().getWindow()).getIcons().add(IconTheme.getJabRefImage());
+        ((Stage) progressDialog.getDialogPane().getScene().getWindow()).getIcons().add(IconTheme.getJabRefIcon());
         progressDialog.setOnCloseRequest(_ -> task.cancel());
         DialogPane dialogPane = progressDialog.getDialogPane();
         dialogPane.getButtonTypes().add(ButtonType.CANCEL);

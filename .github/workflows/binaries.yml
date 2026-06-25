@@ -429,7 +429,7 @@ jobs:
       url: ${{ steps.url.outputs.url }}
     steps:
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           show-progress: 'false'
@@ -494,7 +494,7 @@ jobs:
     name: ${{ matrix.displayName }} installer and portable version
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
           submodules: 'true'
@@ -522,11 +522,9 @@ jobs:
         shell: bash
         run: |
           set -ex
-          PS4='+$LINENO: '
-          SED_I=(-i)
-          [[ '${{ startsWith(matrix.os, 'macos') }}' == 'true' ]] && SED_I=(-i '')
-          sed "${SED_I[@]}" "s/AMAZON/${{ inputs.jvmVendor }}/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
-          cat build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          # Override the toolchain vendor via the gradle property `jdk` (see org.jabref.gradle.Toolchains).
+          echo "jdk=${{ inputs.jvmVendor }}" >> gradle.properties
+          cat gradle.properties
 
       # Setup JDK EA and JavaFX EA
       - name: Set up latest JDK EA from jdk.java.net
@@ -541,13 +539,14 @@ jobs:
         shell: bash
         run: |
           set -ex
-          PS4='+$LINENO: '
-          SED_I=(-i)
-          [[ '${{ startsWith(matrix.os, 'macos') }}' == 'true' ]] && SED_I=(-i '')
-
-          sed "${SED_I[@]}" "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(${{ needs.conditions.outputs.jdkVersion }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
-          sed "${SED_I[@]}" "s/AMAZON/ORACLE/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
-          sed "${SED_I[@]}" "s|val javafx = .*|val javafx = \"${{ needs.conditions.outputs.javafxVersion }}\"|" versions/build.gradle.kts
+          # Override toolchain version/vendor and JavaFX version via gradle properties
+          # (javaVersion + jdk -> org.jabref.gradle.Toolchains; javafxVersion -> versions/build.gradle.kts).
+          {
+            echo "javaVersion=${{ needs.conditions.outputs.jdkVersion }}"
+            echo "jdk=ORACLE"
+            echo "javafxVersion=${{ needs.conditions.outputs.javafxVersion }}"
+          } >> gradle.properties
+          cat gradle.properties
 
       - uses: ./.github/actions/setup-gradle
         with:
@@ -629,7 +628,7 @@ jobs:
           branch: main
       - name: Install pigz and cache (Linux)
         if: startsWith(matrix.os, 'ubuntu')
-        uses: awalsh128/cache-apt-pkgs-action@latest
+        uses: awalsh128/cache-apt-pkgs-action@v1.6.1
         with:
           packages: pigz
           version: 1.0

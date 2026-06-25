@@ -14,6 +14,7 @@ import org.jspecify.annotations.NonNull;
 
 public class CleanupMultiFieldPanel extends VBox implements CleanupPanel {
     @FXML private CheckBox cleanupDoi;
+    @FXML private CheckBox cleanupArXivDoi;
     @FXML private CheckBox cleanupEprint;
     @FXML private CheckBox cleanupUrl;
     @FXML private CheckBox cleanupBibLaTeX;
@@ -39,6 +40,7 @@ public class CleanupMultiFieldPanel extends VBox implements CleanupPanel {
 
     private void bindProperties() {
         cleanupDoi.selectedProperty().bindBidirectional(viewModel.doiSelected);
+        cleanupArXivDoi.selectedProperty().bindBidirectional(viewModel.arXivDoiSelected);
         cleanupEprint.selectedProperty().bindBidirectional(viewModel.eprintSelected);
         cleanupUrl.selectedProperty().bindBidirectional(viewModel.urlSelected);
         cleanupBibTeX.selectedProperty().bindBidirectional(viewModel.bibTexSelected);

@@ -31,16 +31,19 @@ public class UpdateEmbeddingModelTask extends BackgroundTask<DeepJavaEmbeddingMo
 
     private void configure() {
         titleProperty().set(Localization.lang("Downloading local embedding model..."));
-        showToUser(true);
 
         progressCounter.listenToAllProperties(this::updateProgress);
     }
 
     @Override
     public @NonNull DeepJavaEmbeddingModel call() {
-        LOGGER.info("Downloading embedding model...");
-
         boolean originallyDownloaded = DeepJavaEmbeddingModel.isDownloaded(embeddingModelName);
+        if (!originallyDownloaded) {
+            LOGGER.info("Downloading embedding model...");
+            showToUser(true);
+        } else {
+            LOGGER.info("Loading embedding model from local cache");
+        }
 
         try {
             DeepJavaEmbeddingModel model = new DeepJavaEmbeddingModel(
