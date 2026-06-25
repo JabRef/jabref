@@ -121,6 +121,7 @@ import com.google.common.base.Splitter;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Singleton;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -716,6 +717,15 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> property.set(defaultValue));
     }
 
+    /// Binds a path-valued property. The path is persisted as its String form (a null value as ""), and read via
+    /// [#getPath], so a blank stored value falls back to the given default.
+    private void bindPath(ObjectProperty<@Nullable Path> property, String key, @Nullable Path defaultValue) {
+        bindCustom(property, key, defaultValue,
+                (_, _, newValue) -> put(key, newValue != null ? newValue.toString() : ""),
+                () -> property.set(getPath(key, defaultValue)),
+                () -> property.set(defaultValue));
+    }
+
     /// Binds an object-valued property whose persisted form is a boolean.
     ///
     /// @param serializer   converts the value to its stored boolean representation
@@ -943,12 +953,6 @@ public class JabRefCliPreferences implements CliPreferences {
         PREFS_NODE.clear();
         new SharedDatabasePreferences().clear();
 
-        getFilePreferences().setAll(FilePreferences.getDefault()
-                                                   .withUserHostInfo(getInternalPreferences().getUserAndHostInfoProperty())
-                                                   .withMoveToTrash(moveToTrashSupported())
-                                                   .withMainFileDirectory(getDefaultPath())
-                                                   .withLastUsedDirectory(getDefaultPath())
-        );
         getAiPreferences().setAll(AiPreferences.getDefault());
         getOcrPreferences().setAll(OcrPreferences.getDefault());
         getNameFormatterPreferences().setAll(NameFormatterPreferences.getDefault());
@@ -969,6 +973,7 @@ public class JabRefCliPreferences implements CliPreferences {
         // ensure registration of bindings
         getInternalPreferences();
         getFieldPreferences();
+        getFilePreferences();
         getProxyPreferences();
         getLibraryPreferences();
         getDOIPreferences();
@@ -997,7 +1002,6 @@ public class JabRefCliPreferences implements CliPreferences {
         //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
 
         // in case of incomplete or corrupt XML fall back to current preferences
-        getFilePreferences().setAll(getFilePreferencesFromBackingStore(getFilePreferences()));
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
         getOcrPreferences().setAll(getOcrPreferencesFromBackingStore(getOcrPreferences()));
         getNameFormatterPreferences().setAll(getNameFormatterPreferencesFromBackingStore(getNameFormatterPreferences()));
@@ -1017,6 +1021,7 @@ public class JabRefCliPreferences implements CliPreferences {
         // ensure registration of bindings
         getInternalPreferences();
         getFieldPreferences();
+        getFilePreferences();
         getProxyPreferences();
         getLibraryPreferences();
         getDOIPreferences();
@@ -1648,55 +1653,56 @@ public class JabRefCliPreferences implements CliPreferences {
             return filePreferences;
         }
 
-        filePreferences = getFilePreferencesFromBackingStore(FilePreferences.getDefault());
+        FilePreferences defaultValues = FilePreferences.getDefault();
 
-        EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (_, _, newValue) -> put(FILES_MAIN_DIRECTORY, newValue != null ? newValue.toString() : ""));
-        EasyBind.listen(filePreferences.storeFilesRelativeToBibFileProperty(), (_, _, newValue) -> putBoolean(FILES_STORE_RELATIVE_TO_BIB, newValue));
-        EasyBind.listen(filePreferences.autoRenameFilesOnChangeProperty(), (_, _, newValue) -> putBoolean(FILES_AUTO_RENAME_ON_CHANGE, newValue));
-        EasyBind.listen(filePreferences.fileNamePatternProperty(), (_, _, newValue) -> put(FILES_IMPORT_NAMEPATTERN, newValue));
-        EasyBind.listen(filePreferences.fileDirectoryPatternProperty(), (_, _, newValue) -> put(FILES_IMPORT_DIRPATTERN, newValue));
-        EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (_, _, newValue) -> putBoolean(FILES_DOWNLOAD_LINKED, newValue));
-        EasyBind.listen(filePreferences.fulltextIndexLinkedFilesProperty(), (_, _, newValue) -> putBoolean(FILES_FULLTEXT_INDEX, newValue));
-        EasyBind.listen(filePreferences.workingDirectoryProperty(), (_, _, newValue) -> put(FILES_WORKING_DIRECTORY, newValue.toString()));
-        EasyBind.listen(filePreferences.createBackupProperty(), (_, _, newValue) -> putBoolean(BACKUP_ENABLED, newValue));
-        EasyBind.listen(filePreferences.backupDirectoryProperty(), (_, _, newValue) -> put(BACKUP_DIRECTORY, newValue.toString()));
-        EasyBind.listen(filePreferences.confirmDeleteLinkedFileProperty(), (_, _, newValue) -> putBoolean(FILES_CONFIRM_DELETE_LINKED, newValue));
-        EasyBind.listen(filePreferences.moveToTrashProperty(), (_, _, newValue) -> putBoolean(FILES_TRASH_INSTEAD_OF_DELETE, newValue));
-        EasyBind.listen(filePreferences.adjustFileLinksOnTransferProperty(), (_, _, newValue) -> putBoolean(FILES_ADJUST_FILE_LINKS_ON_TRANSFER, newValue));
-        EasyBind.listen(filePreferences.copyLinkedFilesOnTransferProperty(), (_, _, newValue) -> putBoolean(FILES_COPY_LINKED_FILES_ON_TRANSFER, newValue));
-        EasyBind.listen(filePreferences.moveLinkedFilesOnTransferPropertyProperty(), (_, _, newValue) -> putBoolean(FILES_MOVE_LINKED_FILES_ON_TRANSFER, newValue));
-        EasyBind.listen(filePreferences.shouldKeepDownloadUrlProperty(), (_, _, newValue) -> putBoolean(FILES_KEEP_DOWNLOAD_URL, newValue));
-        EasyBind.listen(filePreferences.lastUsedDirectoryProperty(), (_, _, newValue) -> put(FILES_LAST_USED_DIRECTORY, newValue.toString()));
-        EasyBind.listen(filePreferences.openFileExplorerInFileDirectoryProperty(), (_, _, newValue) -> putBoolean(FILES_OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, newValue));
-        EasyBind.listen(filePreferences.openFileExplorerInLastUsedDirectoryProperty(), (_, _, newValue) -> putBoolean(FILES_OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, newValue));
+        filePreferences = new FilePreferences(
+                getInternalPreferences().getUserAndHostInfoProperty(),
+                getPath(FILES_MAIN_DIRECTORY, defaultValues.mainFileDirectoryProperty().get()),
+                getBoolean(FILES_STORE_RELATIVE_TO_BIB, defaultValues.shouldStoreFilesRelativeToBibFile()),
+                getBoolean(FILES_AUTO_RENAME_ON_CHANGE, defaultValues.shouldAutoRenameFilesOnChange()),
+                get(FILES_IMPORT_NAMEPATTERN, defaultValues.getFileNamePattern()),
+                get(FILES_IMPORT_DIRPATTERN, defaultValues.getFileDirectoryPattern()),
+                getBoolean(FILES_DOWNLOAD_LINKED, defaultValues.shouldDownloadLinkedFiles()),
+                getBoolean(FILES_FULLTEXT_INDEX, defaultValues.shouldFulltextIndexLinkedFiles()),
+                getPath(FILES_WORKING_DIRECTORY, defaultValues.getWorkingDirectory()),
+                getBoolean(BACKUP_ENABLED, defaultValues.shouldCreateBackup()),
+                // Backups should sit in the data directory, because a ".bak" file should survive cache cleanups
+                getPath(BACKUP_DIRECTORY, defaultValues.getBackupDirectory()),
+                getBoolean(FILES_CONFIRM_DELETE_LINKED, defaultValues.confirmDeleteLinkedFile()),
+                // Use fallback method in case AWT is not initialized in headless (JabKit) mode
+                getBoolean(FILES_TRASH_INSTEAD_OF_DELETE, moveToTrashSupported()),
+                getBoolean(FILES_ADJUST_FILE_LINKS_ON_TRANSFER, defaultValues.shouldAdjustFileLinksOnTransfer()),
+                getBoolean(FILES_COPY_LINKED_FILES_ON_TRANSFER, defaultValues.shouldCopyLinkedFilesOnTransfer()),
+                getBoolean(FILES_MOVE_LINKED_FILES_ON_TRANSFER, defaultValues.shouldMoveLinkedFilesOnTransfer()),
+                getBoolean(FILES_KEEP_DOWNLOAD_URL, defaultValues.shouldKeepDownloadUrl()),
+                getPath(FILES_LAST_USED_DIRECTORY, defaultValues.getLastUsedDirectory()),
+                getBoolean(FILES_OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, defaultValues.shouldOpenFileExplorerInFileDirectory()),
+                getBoolean(FILES_OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, defaultValues.shouldOpenFileExplorerInLastUsedDirectory()));
+
+        // mainFileDirectory defaults to getDefaultPath(), which the GUI overrides to a meaningful location.
+        bindPath(filePreferences.mainFileDirectoryProperty(), FILES_MAIN_DIRECTORY, getDefaultPath());
+        bindBoolean(filePreferences.storeFilesRelativeToBibFileProperty(), FILES_STORE_RELATIVE_TO_BIB, defaultValues.shouldStoreFilesRelativeToBibFile());
+        bindBoolean(filePreferences.autoRenameFilesOnChangeProperty(), FILES_AUTO_RENAME_ON_CHANGE, defaultValues.shouldAutoRenameFilesOnChange());
+        bindString(filePreferences.fileNamePatternProperty(), FILES_IMPORT_NAMEPATTERN, defaultValues.getFileNamePattern());
+        bindString(filePreferences.fileDirectoryPatternProperty(), FILES_IMPORT_DIRPATTERN, defaultValues.getFileDirectoryPattern());
+        bindBoolean(filePreferences.downloadLinkedFilesProperty(), FILES_DOWNLOAD_LINKED, defaultValues.shouldDownloadLinkedFiles());
+        bindBoolean(filePreferences.fulltextIndexLinkedFilesProperty(), FILES_FULLTEXT_INDEX, defaultValues.shouldFulltextIndexLinkedFiles());
+        bindPath(filePreferences.workingDirectoryProperty(), FILES_WORKING_DIRECTORY, defaultValues.getWorkingDirectory());
+        bindBoolean(filePreferences.createBackupProperty(), BACKUP_ENABLED, defaultValues.shouldCreateBackup());
+        bindPath(filePreferences.backupDirectoryProperty(), BACKUP_DIRECTORY, defaultValues.getBackupDirectory());
+        bindBoolean(filePreferences.confirmDeleteLinkedFileProperty(), FILES_CONFIRM_DELETE_LINKED, defaultValues.confirmDeleteLinkedFile());
+        // moveToTrash falls back to moveToTrashSupported(), which the GUI overrides when AWT is initialized.
+        bindBoolean(filePreferences.moveToTrashProperty(), FILES_TRASH_INSTEAD_OF_DELETE, moveToTrashSupported());
+        bindBoolean(filePreferences.adjustFileLinksOnTransferProperty(), FILES_ADJUST_FILE_LINKS_ON_TRANSFER, defaultValues.shouldAdjustFileLinksOnTransfer());
+        bindBoolean(filePreferences.copyLinkedFilesOnTransferProperty(), FILES_COPY_LINKED_FILES_ON_TRANSFER, defaultValues.shouldCopyLinkedFilesOnTransfer());
+        bindBoolean(filePreferences.moveLinkedFilesOnTransferPropertyProperty(), FILES_MOVE_LINKED_FILES_ON_TRANSFER, defaultValues.shouldMoveLinkedFilesOnTransfer());
+        bindBoolean(filePreferences.shouldKeepDownloadUrlProperty(), FILES_KEEP_DOWNLOAD_URL, defaultValues.shouldKeepDownloadUrl());
+        // lastUsedDirectory defaults to getDefaultPath(), which the GUI overrides to a meaningful location.
+        bindPath(filePreferences.lastUsedDirectoryProperty(), FILES_LAST_USED_DIRECTORY, getDefaultPath());
+        bindBoolean(filePreferences.openFileExplorerInFileDirectoryProperty(), FILES_OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, defaultValues.shouldOpenFileExplorerInFileDirectory());
+        bindBoolean(filePreferences.openFileExplorerInLastUsedDirectoryProperty(), FILES_OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, defaultValues.shouldOpenFileExplorerInLastUsedDirectory());
 
         return filePreferences;
-    }
-
-    private FilePreferences getFilePreferencesFromBackingStore(FilePreferences defaults) {
-        return new FilePreferences(
-                getInternalPreferences().getUserAndHostInfoProperty(),
-                getPath(FILES_MAIN_DIRECTORY, defaults.mainFileDirectoryProperty().get()),
-                getBoolean(FILES_STORE_RELATIVE_TO_BIB, defaults.shouldStoreFilesRelativeToBibFile()),
-                getBoolean(FILES_AUTO_RENAME_ON_CHANGE, defaults.shouldAutoRenameFilesOnChange()),
-                get(FILES_IMPORT_NAMEPATTERN, defaults.getFileNamePattern()),
-                get(FILES_IMPORT_DIRPATTERN, defaults.getFileDirectoryPattern()),
-                getBoolean(FILES_DOWNLOAD_LINKED, defaults.shouldDownloadLinkedFiles()),
-                getBoolean(FILES_FULLTEXT_INDEX, defaults.shouldFulltextIndexLinkedFiles()),
-                Path.of(get(FILES_WORKING_DIRECTORY, defaults.getWorkingDirectory().toString())),
-                getBoolean(BACKUP_ENABLED, defaults.shouldCreateBackup()),
-                // We choose the data directory, because a ".bak" file should survive cache cleanups
-                getPath(BACKUP_DIRECTORY, defaults.getBackupDirectory()),
-                getBoolean(FILES_CONFIRM_DELETE_LINKED, defaults.confirmDeleteLinkedFile()),
-                // We make use of the fallback, because we need AWT being initialized, which is not the case at the constructor JabRefPreferences()
-                getBoolean(FILES_TRASH_INSTEAD_OF_DELETE, moveToTrashSupported()),
-                getBoolean(FILES_ADJUST_FILE_LINKS_ON_TRANSFER, defaults.shouldAdjustFileLinksOnTransfer()),
-                getBoolean(FILES_COPY_LINKED_FILES_ON_TRANSFER, defaults.shouldCopyLinkedFilesOnTransfer()),
-                getBoolean(FILES_MOVE_LINKED_FILES_ON_TRANSFER, defaults.shouldMoveLinkedFilesOnTransfer()),
-                getBoolean(FILES_KEEP_DOWNLOAD_URL, defaults.shouldKeepDownloadUrl()),
-                getPath(FILES_LAST_USED_DIRECTORY, defaults.getLastUsedDirectory()),
-                getBoolean(FILES_OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, defaults.shouldOpenFileExplorerInFileDirectory()),
-                getBoolean(FILES_OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, defaults.shouldOpenFileExplorerInLastUsedDirectory()));
     }
 
     protected boolean moveToTrashSupported() {
