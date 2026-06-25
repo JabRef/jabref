@@ -16,7 +16,10 @@ This document defines rules and expectations for **automated agents** (AI tools,
 
 JabRef is an open-source, research-grade reference manager with high standards for correctness, reproducibility, and maintainability.
 
-This file is guidance to follow *while* developing. After the work is finished, go through each point of `CHECKLIST.md` as a final quality check and ensure that all points are fulfilled. If not, fix the code until all points are fulfilled. Do not skip any point of the checklist.
+This file is guidance to follow *while* developing.
+
+> [!IMPORTANT]
+> **Final step — do not skip.** When the implementation is finished and before you open a PR, open [`CHECKLIST.md`](./CHECKLIST.md) and work through **every** point. Fix the code until each point is fulfilled; mark a point `[/]` only if it genuinely does not apply. The checklist is the mandatory quality gate for the finished result.
 
 ---
 
