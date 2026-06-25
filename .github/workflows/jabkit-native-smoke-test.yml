@@ -53,12 +53,16 @@ jobs:
       - name: Run JabKit offline smoke tests
         run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline.md
 
+      - name: Run JabKit PDF native smoke test (Linux only)
+        if: ${{ runner.os == 'Linux' }}
+        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline-pdf.md
+
       - name: Run JabKit online smoke tests
         if: ${{ inputs.run-online-tests }}
         run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-online.md
 
-      - name: Upload JabKit native binary
+      - name: Upload JabKit native image (binary + libraries)
         uses: actions/upload-artifact@v7
         with:
           name: jabkit-native-${{ matrix.os }}
-          path: jabkit/build/native/nativeCompile/jabkit
+          path: jabkit/build/native/nativeCompile/
