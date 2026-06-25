@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 /// and aggregates the results returned by the fetchers by query and E-Library.
 class StudyFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(StudyFetcher.class);
-    private static final int MAX_AMOUNT_OF_RESULTS_PER_FETCHER = 100;
 
     private final List<SearchBasedFetcher> activeFetchers;
     private final List<StudyQuery> searchQueries;
@@ -61,8 +60,8 @@ class StudyFetcher {
         try {
             List<BibEntry> fetchResult = new ArrayList<>();
             if (fetcher instanceof PagedSearchBasedFetcher basedFetcher) {
-                int limit = resolveLimit(fetcher.getName());
-                int pages = (int) Math.ceil(((double) limit) / basedFetcher.getPageSize());
+                int limit = resultLimits.getOrDefault(fetcher.getName(), StudyRepository.DEFAULT_RESULT_LIMIT);
+                int pages = (int) Math.ceil((double) limit / basedFetcher.getPageSize());
                 for (int page = 0; page < pages; page++) {
                     fetchResult.addAll(basedFetcher.performSearchPaged(searchQuery.getQuery(), page).getContent());
                 }
@@ -74,15 +73,5 @@ class StudyFetcher {
             LOGGER.warn("{} API request failed", fetcher.getName(), e);
             return null;
         }
-    }
-
-    /// returns the result limit for the given fetcher, matched case insensitively by name,
-    /// falls back to [#MAX_AMOUNT_OF_RESULTS_PER_FETCHER] when the study defines none
-    private int resolveLimit(String fetcherName) {
-        return resultLimits.entrySet().stream()
-                           .filter(e -> e.getKey().equalsIgnoreCase(fetcherName))
-                           .map(Map.Entry::getValue)
-                           .findFirst()
-                           .orElse(MAX_AMOUNT_OF_RESULTS_PER_FETCHER);
     }
 }
