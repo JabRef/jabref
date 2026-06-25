@@ -120,6 +120,7 @@ public class AuthorList implements Iterable<Author> {
     private static final int AUTHOR_CACHE_SIZE = 50_000;
 
     private static final Cache<String, AuthorList> AUTHOR_CACHE = Caffeine.newBuilder()
+                                                                          .weakKeys()
                                                                           .maximumSize(AUTHOR_CACHE_SIZE)
                                                                           .build();
 
