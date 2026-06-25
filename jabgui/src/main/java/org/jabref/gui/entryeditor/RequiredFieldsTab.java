@@ -27,7 +27,6 @@ import org.jabref.model.entry.field.OrFields;
 
 public class RequiredFieldsTab extends FieldsEditorTab {
 
-    public static final String NAME = "Required fields";
     private final BibEntryTypesManager entryTypesManager;
 
     public RequiredFieldsTab(UndoManager undoManager,
@@ -49,7 +48,7 @@ public class RequiredFieldsTab extends FieldsEditorTab {
                 previewPanel
         );
         this.entryTypesManager = entryTypesManager;
-        setText(Localization.lang("Required fields"));
+        setText(EntryEditorTabModel.BuiltIn.REQUIRED_FIELDS.displayName());
         setTooltip(new Tooltip(Localization.lang("Show required fields")));
         setGraphic(IconTheme.JabRefIcons.REQUIRED.getGraphicNode());
     }

@@ -187,7 +187,7 @@ runs:
       if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.uploadAsArtifact == 'true') && (inputs.shouldJbundle == 'true') }}
       uses: actions/upload-artifact@v7
       with:
-        name: jbundle-${{ inputs.displayName }}
+        name: jbundle-${{ inputs.componentShort }}-${{ inputs.displayName }}
         path: build/jbundle/${{ inputs.componentShort }}*
     - name: Upload jbundle artifact to builds.jabref.org
       # background: true
