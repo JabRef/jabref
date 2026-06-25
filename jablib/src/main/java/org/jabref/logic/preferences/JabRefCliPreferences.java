@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
@@ -820,6 +821,33 @@ public class JabRefCliPreferences implements CliPreferences {
                 }));
     }
 
+    /// Binds an observable list. This is the general primitive behind the other `bindList` overloads: persistence and
+    /// loading are delegated to the given callbacks, so the entries may be stored under one or several backing-store
+    /// keys (e.g. a numbered series). Persistence is wholesale — `persist` runs on any change and rewrites the entire
+    /// stored representation — which is why it is a plain [Runnable]. Compare [#bindMap], which receives the individual
+    /// change because map entries are persisted incrementally under per-entry keys.
+    ///
+    /// @param <T>           the element type of the list
+    /// @param list          the observable list to bind
+    /// @param key           the binding's reporting key in [#getPreferences()] and [#getDefaults()]
+    /// @param defaultList   the values restored on reset and reported as the default
+    /// @param persist       rewrites the whole list to the backing store; run on every change
+    /// @param loadFromStore reads the stored list, falling back to `defaultList` for absent entries
+    private <T> void bindList(ObservableList<T> list,
+                              String key,
+                              List<T> defaultList,
+                              Runnable persist,
+                              Supplier<? extends Collection<? extends T>> loadFromStore) {
+        List<T> defaultCopy = List.copyOf(defaultList);
+        list.addListener((InvalidationListener) _ -> persist.run());
+        allBindings.add(new PreferenceBinding(
+                list,
+                defaultCopy,
+                key,
+                () -> list.setAll(loadFromStore.get()),
+                () -> list.setAll(defaultCopy)));
+    }
+
     /// Binds an observable list whose persisted form is a single String.
     ///
     /// @param serializer   converts the list to its stored String representation
@@ -829,18 +857,9 @@ public class JabRefCliPreferences implements CliPreferences {
                               List<T> defaultList,
                               Function<List<T>, String> serializer,
                               Function<String, ? extends Collection<T>> deserializer) {
-        List<T> defaultCopy = List.copyOf(defaultList);
-        list.addListener((InvalidationListener) _ -> put(key, serializer.apply(list)));
-        allBindings.add(new PreferenceBinding(
-                list,
-                defaultCopy,
-                key,
-                () -> list.setAll(deserializer.apply(get(key, serializer.apply(defaultCopy)))),
-                () -> list.setAll(defaultCopy)));
-    }
-
-    private void bindList(ObservableList<String> list, String key, List<String> defaultList) {
-        bindList(list, key, defaultList, JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
+        bindList(list, key, defaultList,
+                () -> put(key, serializer.apply(list)),
+                () -> deserializer.apply(get(key, serializer.apply(defaultList))));
     }
 
     /// Persist-only binding for secrets that live in the system keyring rather than the backing store.
@@ -1011,7 +1030,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getNameFormatterPreferences().setAll(NameFormatterPreferences.getDefault());
         getCleanupPreferences().setAll(CleanupPreferences.getDefault());
         getImporterPreferences().setAll(ImporterPreferences.getDefault());
-        getExportPreferences().setAll(ExportPreferences.getDefault());
         getSearchPreferences().setAll(SearchPreferences.getDefault());
         getLastFilesOpenedPreferences().setAll(LastFilesOpenedPreferences.getDefault());
         getXmpPreferences().setAll(XmpPreferences.getDefault());
@@ -1037,6 +1055,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getBibEntryPreferences();
         getCitationKeyPatternPreferences();
         getAutoLinkPreferences();
+        getExportPreferences();
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
@@ -1058,7 +1077,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getNameFormatterPreferences().setAll(getNameFormatterPreferencesFromBackingStore(getNameFormatterPreferences()));
         getCleanupPreferences().setAll(getCleanupPreferencesFromBackingStore(getCleanupPreferences()));
         getImporterPreferences().setAll(getImporterPreferencesFromBackingStore(getImporterPreferences()));
-        getExportPreferences().setAll(getExportPreferencesFromBackingStore(getExportPreferences()));
         getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
         getLastFilesOpenedPreferences().setAll(getLastFilesOpenedPreferencesFromBackingStore(getLastFilesOpenedPreferences()));
         getXmpPreferences().setAll(getXmpPreferencesFromBackingStore(getXmpPreferences()));
@@ -1085,6 +1103,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getBibEntryPreferences();
         getCitationKeyPatternPreferences();
         getAutoLinkPreferences();
+        getExportPreferences();
 
         allBindings.forEach(binding -> binding.importFromStore().run());
     }
@@ -1124,7 +1143,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions())
         );
 
-        bindList(abbreviationPreferences.getExternalJournalLists(), EXTERNAL_JOURNAL_LISTS, defaultValues.getExternalJournalLists());
+        bindList(abbreviationPreferences.getExternalJournalLists(), EXTERNAL_JOURNAL_LISTS, defaultValues.getExternalJournalLists(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
         bindBoolean(abbreviationPreferences.useFJournalFieldProperty(), USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get());
         bindBoolean(abbreviationPreferences.shouldEnableMscKeywordDescriptionsProperty(), ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions());
 
@@ -1782,22 +1802,28 @@ public class JabRefCliPreferences implements CliPreferences {
             return exportPreferences;
         }
 
-        exportPreferences = getExportPreferencesFromBackingStore(ExportPreferences.getDefault());
+        ExportPreferences defaultValues = ExportPreferences.getDefault();
 
-        EasyBind.listen(exportPreferences.lastExportExtensionProperty(), (_, _, newValue) -> put(LAST_USED_EXPORT, newValue));
-        EasyBind.listen(exportPreferences.exportWorkingDirectoryProperty(), (_, _, newValue) -> put(EXPORT_WORKING_DIRECTORY, newValue.toString()));
-        EasyBind.listen(exportPreferences.exportSaveOrderProperty(), (_, _, newValue) -> storeExportSaveOrder(newValue));
-        exportPreferences.getCustomExporters().addListener((InvalidationListener) _ -> storeCustomExportFormats(exportPreferences.getCustomExporters()));
+        exportPreferences = new ExportPreferences(
+                get(LAST_USED_EXPORT, defaultValues.getLastExportExtension()),
+                Path.of(get(EXPORT_WORKING_DIRECTORY, defaultValues.getExportWorkingDirectory().toString())),
+                getExportSaveOrder(defaultValues.getExportSaveOrder()),
+                getCustomExportFormats(defaultValues.getCustomExporters()));
+
+        bindString(exportPreferences.lastExportExtensionProperty(), LAST_USED_EXPORT, defaultValues.getLastExportExtension());
+        bindObject(exportPreferences.exportWorkingDirectoryProperty(), EXPORT_WORKING_DIRECTORY, defaultValues.getExportWorkingDirectory(),
+                Path::toString, Path::of);
+        // exportSaveOrder is persisted across several backing-store keys, so it needs a custom binding.
+        bindCustom(exportPreferences.exportSaveOrderProperty(), EXPORT_PRIMARY_SORT_FIELD, defaultValues.getExportSaveOrder(),
+                (_, _, newValue) -> storeExportSaveOrder(newValue),
+                () -> exportPreferences.exportSaveOrderProperty().set(getExportSaveOrder(defaultValues.getExportSaveOrder())),
+                () -> exportPreferences.exportSaveOrderProperty().set(defaultValues.getExportSaveOrder()));
+        // customExporters are persisted as a numbered series, so they need a delegated list binding.
+        bindList(exportPreferences.getCustomExporters(), CUSTOM_EXPORT_FORMAT, defaultValues.getCustomExporters(),
+                () -> storeCustomExportFormats(exportPreferences.getCustomExporters()),
+                () -> getCustomExportFormats(defaultValues.getCustomExporters()));
 
         return exportPreferences;
-    }
-
-    private ExportPreferences getExportPreferencesFromBackingStore(ExportPreferences defaults) {
-        return new ExportPreferences(
-                get(LAST_USED_EXPORT, defaults.getLastExportExtension()),
-                Path.of(get(EXPORT_WORKING_DIRECTORY, defaults.getExportWorkingDirectory().toString())),
-                getExportSaveOrder(defaults.getExportSaveOrder()),
-                getCustomExportFormats(defaults.getCustomExporters()));
     }
 
     protected SaveOrder getExportSaveOrder(SaveOrder defaults) {
