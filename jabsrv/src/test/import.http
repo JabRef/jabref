@@ -28,7 +28,7 @@ POST http://localhost:23119/libraries/current/entries
 Content-Type: application/x-bibtex
 
 @article{demo,
-  title = {Added by REST}
+  title = {Added by http API}
 }
 
 ### Add BibTeX to a specific open library (switches to its tab first)
@@ -37,7 +37,7 @@ POST http://localhost:23119/libraries/{{libraryId}}/entries
 Content-Type: application/x-bibtex
 
 @article{demoTargeted,
-  title = {Added by REST to a specific library}
+  title = {Added by http API to a specific library}
 }
 
 ### Add BibTeX and also assign it to a group (created if missing)
@@ -48,7 +48,7 @@ POST http://localhost:23119/libraries/current/entries?group=import-test-group
 Content-Type: application/x-bibtex
 
 @article{demoGrouped,
-  title = {Added by REST and grouped}
+  title = {Added by http API and grouped}
 }
 
 ### Add a plain-text citation (parsed via the configured plain-citation parser)
