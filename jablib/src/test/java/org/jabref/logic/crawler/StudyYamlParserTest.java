@@ -91,6 +91,8 @@ class StudyYamlParserTest {
                      .findFirst()
                      .orElseThrow()
                      .getReason());
+        assertEquals(100, study.getMaxResultsPerCatalog());
+        assertEquals(500, study.getCatalogs().getFirst().getMaxResults());
     }
 
     @Test
@@ -111,5 +113,26 @@ class StudyYamlParserTest {
         Study roundTripped = new StudyYamlParser().parseStudyYamlFile(destination);
 
         assertEquals(original, roundTripped);
+    }
+
+    @Test
+    void writeAndReadStudyWithResultLimitsPreservesData() throws IOException {
+        StudyCatalog catalogWithLimit = new StudyCatalog("Springer", true, "Primary source");
+        catalogWithLimit.setMaxResults(500);
+        Study original = new Study(
+                List.of("Oscar Wilde"),
+                "Limit Study",
+                List.of("Q1"),
+                List.of(new StudyQuery("Quantum")),
+                List.of(catalogWithLimit));
+        original.setMaxResultsPerCatalog(100);
+        Path destination = testDirectory.resolve("limit-study.yml");
+
+        new StudyYamlParser().writeStudyYamlFile(original, destination);
+        Study roundTripped = new StudyYamlParser().parseStudyYamlFile(destination);
+
+        assertEquals(original, roundTripped);
+        assertEquals(100, roundTripped.getMaxResultsPerCatalog());
+        assertEquals(500, roundTripped.getCatalogs().getFirst().getMaxResults());
     }
 }

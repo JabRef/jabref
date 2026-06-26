@@ -46,7 +46,8 @@ public class Crawler {
                 preferences.getImporterPreferences());
         this.studyFetcher = new StudyFetcher(
                 studyCatalogToFetcherConverter.getActiveFetchers(),
-                studyRepository.getStudyQueries());
+                studyRepository.getStudyQueries(),
+                studyRepository.getResultLimitsPerCatalog());
     }
 
     /// This methods performs the crawling of the active libraries defined in the study definition file.
