@@ -13,9 +13,9 @@ Do we need a preference for the compatibility mode?
 
 ## Decision Drivers
 
-* Users should be disturbed as little as possible.
-* Users should be warned about the possible problems.
-* Users should be able to use this feature with as few steps as possible.
+* Users should be disturbed as little as possible
+* Users should be warned about the possible problems
+* Users should be able to use this feature with as few steps as possible
 
 ## Considered Options
 
