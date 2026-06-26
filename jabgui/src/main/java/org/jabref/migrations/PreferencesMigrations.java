@@ -20,7 +20,9 @@ import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
-import org.jabref.gui.theme.Theme;
+import org.jabref.gui.theme.StyleSheet;
+import org.jabref.gui.theme.ThemeColorScheme;
+import org.jabref.gui.theme.ThemePreset;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
@@ -613,12 +615,33 @@ public class PreferencesMigrations {
     /// upgrade the old theme css names of the theme to the new theme properties
     /// Theme names were changed in [#15573](https://github.com/JabRef/jabref/pull/15573)
     static void upgradeTheme(JabRefGuiPreferences preferences) {
-        if ("Dark.css".equals(preferences.get("fxTheme", ""))) {
-            preferences.getWorkspacePreferences().setTheme(Theme.dark());
-        }
+        String theme = preferences.get("fxTheme", "");
+        boolean themeSyncOs = preferences.getBoolean("themeSyncOs", false);
+
         // no value means light theme when sync with os theme switch is not on
-        if ("".equals(preferences.get("fxTheme", "")) && !preferences.getBoolean("themeSyncOs", false)) {
-            preferences.getWorkspacePreferences().setTheme(Theme.light());
+        if ("".equals(theme) && !themeSyncOs) {
+            preferences.getWorkspacePreferences().setTheme(ThemePreset.JABREF);
+            preferences.getWorkspacePreferences().setColorScheme(ThemeColorScheme.LIGHT);
+
+            return;
+        }
+
+        if ("Base.css".equals(theme) || "light".equals(theme)) {
+            preferences.getWorkspacePreferences().setTheme(ThemePreset.JABREF);
+            preferences.getWorkspacePreferences().setColorScheme(ThemeColorScheme.LIGHT);
+
+            return;
+        }
+
+        if ("Dark.css".equals(theme) || "dark".equals(theme)) {
+            preferences.getWorkspacePreferences().setTheme(ThemePreset.JABREF);
+            preferences.getWorkspacePreferences().setColorScheme(ThemeColorScheme.DARK);
+
+            return;
+        }
+
+        if (!Set.of("", "Base.css", "light", "Dark.css", "dark").contains(theme)) {
+            preferences.getWorkspacePreferences().setCustomTheme(StyleSheet.create(theme));
         }
     }
 }

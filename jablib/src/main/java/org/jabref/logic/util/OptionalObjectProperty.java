@@ -19,6 +19,10 @@ public class OptionalObjectProperty<T> extends SimpleObjectProperty<Optional<T>>
         return new OptionalObjectProperty<>(Optional.empty());
     }
 
+    public static <T> OptionalObjectProperty<T> ofNullable(T value) {
+        return new OptionalObjectProperty<>(Optional.ofNullable(value));
+    }
+
     /// Returns a new ObservableValue that holds the value held by this
     /// ObservableValue, or `other` when this ObservableValue is empty.
     public ObjectBinding<T> orElseOpt(T other) {

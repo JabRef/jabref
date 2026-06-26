@@ -6,6 +6,6 @@
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
          fx:controller="org.jabref.gui.fieldeditors.DateEditor">
     <EditorTextField fx:id="textField" prefHeight="0" HBox.hgrow="ALWAYS" maxHeight="Infinity" maxWidth="Infinity"/>
-    <TemporalAccessorPicker fx:id="datePicker" editable="false" focusTraversable="false" prefWidth="32.0"
-                            minWidth="32.0" maxWidth="32.0" prefHeight="0" maxHeight="Infinity"/>
+    <TemporalAccessorPicker fx:id="datePicker" editable="false" focusTraversable="false" prefWidth="24.0"
+                            minWidth="24.0" maxWidth="24.0" prefHeight="0" maxHeight="Infinity"/>
 </fx:root>

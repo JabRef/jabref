@@ -109,6 +109,8 @@ public class JabRefGUI extends Application {
     public void start(Stage stage) {
         try {
             this.mainStage = stage;
+            // Load JavaFX stylesheet now instead of loading it later when the first Control is initialized.
+            setUserAgentStylesheet(null);
             Injector.setModelOrService(Stage.class, mainStage);
 
             initialize();
@@ -329,7 +331,7 @@ public class JabRefGUI extends Application {
         Scene scene = new Scene(powerpane);
 
         LOGGER.debug("installing CSS");
-        themeManager.installCssOnScene(scene);
+        themeManager.updateCssOnScene(scene);
 
         LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {

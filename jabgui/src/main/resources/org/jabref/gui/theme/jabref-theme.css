@@ -1,134 +1,51 @@
 /*
-* This is the default JabRef theme.
-* It will automatically use the OS color scheme, of not overridden inside JavaFX.
-*
-* Contains all JabRef colors and overrides the JavaFX variables and components with it.
+* Default JabRef theme
+* ==========
+* - Uses '-jr-xxx' variables so custom styles can be built on top of it.
+* ==========
+* Future Work:
+* - All hardcoded colors should be carefully removed at one point (or extract to a variable) to improve custom theming.
 */
 
 @media (prefers-color-scheme: light) {
     * {
-        -jr-theme: #50618F;
+        -jr-base: #EBEBEB;
+        -jr-background: #FFFFFF;
         -jr-accent: #A3B7E6;
-        -jr-accent-alt: derive(-jr-accent, 15%);
 
-        -jr-row-odd-background: -fx-control-inner-background-alt;
-        -jr-row-even-background: -fx-control-inner-background;
+        -jr-checked: #50618F;
 
-        -jr-checked: -jr-theme;
-        -jr-selected: -jr-accent;
-
-        -jr-hover: #0002;
-
-        -jr-base: #ebebeb;
-
-        -jr-background-alt: -fx-background;
-        -jr-search-background: derive(-jr-base, 80%);
-
-        -jr-menu-background: derive(-jr-base, 46%);
-        -jr-menu-forground-active: -fx-dark-text-color;
-
-        -jr-text-foreground: -fx-dark-text-color;
-        -jr-toolbar: derive(-jr-base, 46%);
-
-        -jr-icon-background: transparent;
-        -jr-icon-background-active: #0001;
-        -jr-icon-background-armed: #0002;
-
-        -jr-group-hits-bg: derive(-jr-sidepane-background, -50%);
-        -jr-group-hits-fg: ladder(
-                -jr-group-hits-bg,
-                -fx-light-text-color 45%,
-                -fx-dark-text-color 46%,
-                -fx-dark-text-color 59%,
-                -fx-mid-text-color 60%
-        );
-
-        -jr-tooltip-bg: -jr-accent;
+        -jr-tooltip-bg: #A3B7E6;
         -jr-tooltip-fg: #000;
 
-        -jr-sidepane-background: #DDDDDD;
-        -jr-sidepane-header-background: #DDDDDD;
+        -jr-scrollbar-thumb: #999999;
+        -jr-scrollbar-track: #FCFCFC;
 
-        -jr-scrollbar-thumb: derive(-fx-outer-border, -30%);
-        -jr-scrollbar-track: derive(-fx-control-inner-background, -10%);
-
-        -jr-separator: derive(-fx-color, -5%);
-
-        -jr-drag-target: -jr-purple;
-        -jr-drag-target-hover: derive(-jr-purple, 80%);
-
-        -jr-inner-bg: derive(-fx-base, 95%);
+        -jr-inner-bg: #FEFEFE;
         -jr-mid-text-color: #404040;
-        -jr-light-text-color: #ffffff;
-        -jr-outer-border: derive(-fx-color, -5%);
-
-        -jr-purple: #7559C2;
-        -jr-green: #10ac84;
-        -jr-light-green: #1dd1a1;
-        -jr-red: #ee5253;
-        -jr-light-red: #ff6b6b;
-        -jr-orange: #ff9f43;
+        -jr-light-text-color: #FFFFFF;
+        -jr-outer-border: #DDDDDD;
     }
 }
 
 @media (prefers-color-scheme: dark) {
     * {
-        -jr-theme: #2C9490;
-
-        -jr-accent: #255652;
-        -jr-accent-alt: derive(-jr-accent, 15%);
-
-        -jr-row-odd-background: #272b38;
-        -jr-row-even-background: #212330;
-
-        -jr-checked: -jr-theme;
-        -jr-selected: -jr-accent;
-
-        -jr-hover: #fff1;
-
         -jr-base: #141824;
+        -jr-background: #000000;
+        -jr-accent: #255652;
 
-        -jr-background-alt: #151924;
-        -jr-sidepane-background: #212330;
-        -jr-search-background: #2C2E3B;
+        -jr-checked: #2C9490;
 
-        -jr-menu-background: #141824;
-        -jr-menu-forground-active: derive(-fx-light-text-color, 50%);
+        -jr-tooltip-bg: #255652;
+        -jr-tooltip-fg:#EFF1F5;
 
-        -jr-text-foreground: -fx-light-text-color;
-        -jr-toolbar: -jr-menu-background;
+        -jr-scrollbar-thumb: #E5E7EA;
+        -jr-scrollbar-track: #040406;
 
-        -jr-icon-background: transparent;
-        -jr-icon-background-active: -jr-hover;
-        -jr-icon-background-armed: #fff2;
-
-        -jr-group-hits-bg: -jr-background-alt;
-        -jr-group-hits-fg: -fx-light-text-color;
-
-        -jr-tooltip-bg: -jr-accent;
-        -jr-tooltip-fg: derive(-fx-light-text-color, 50%);
-
-        -jr-sidepane-header-background: -jr-background-alt;
-
-        -jr-scrollbar-thumb: -fx-light-text-color;
-        -jr-scrollbar-track: derive(-fx-control-inner-background, -90%);
-
-        -jr-separator: #333744;
-
-        -jr-drag-target: -jr-accent;
-        -jr-drag-target-hover: -jr-accent;
-
-        -jr-inner-bg: #272b38;
-        -jr-mid-text-color: #7d8591;
-        -jr-light-text-color: #e5e7ea;
+        -jr-inner-bg: #272B38;
+        -jr-mid-text-color: #7D8591;
+        -jr-light-text-color: #E5E7EA;
         -jr-outer-border: #424758;
-
-        -jr-purple: #b72486;
-        -jr-green: #1cb631;
-        -jr-light-green: #28d93c;
-        -jr-red: #b71c1f;
-        -jr-light-red: #db1d2b;
-        -jr-orange: #b77620;
     }
 }
 
@@ -136,57 +53,50 @@
 .root {
     -fx-base: -jr-base;
 
-    -fx-background: derive(-fx-base, 26%);
+    -fx-background: -jr-background;
+    -fx-color: -jr-base;
+    -fx-accent: -jr-accent;
+
+    -fx-body-color: derive(-jr-base, 20%);
+    -fx-body-color-bottomup: derive(-jr-base, 20%);
+    -fx-body-color-to-right: derive(-jr-base, 20%);
 
     -fx-control-inner-background: -jr-inner-bg;
-    -fx-control-inner-background-alt: derive(-fx-control-inner-background, -5%);
+    -fx-control-inner-background-alt: derive(-jr-inner-bg, -5%);
 
     -fx-dark-text-color: #000;
     -fx-mid-text-color: -jr-mid-text-color;
     -fx-light-text-color: -jr-light-text-color;
 
-    -fx-accent: red;
+    -fx-box-border: derive(-jr-base, -5%);
+    -fx-text-box-border: derive(-jr-base, 10%);
+    -fx-outer-border: -jr-outer-border;
 
-    -fx-default-button: derive(-jr-accent, 50%);
+    -fx-inner-border: derive(-jr-base, 65%);
+    -fx-inner-border-horizontal: derive(-jr-base, 65%);
+    -fx-inner-border-bottomup: derive(-jr-base, 65%);
 
     -fx-focus-color: -jr-accent;
     -fx-faint-focus-color: derive(-jr-accent, 50%);
 
-    -fx-color: -fx-base;
+    -fx-default-button: derive(-jr-accent, 50%);
+    -fx-hover-base: derive(-jr-base, 30%);
+    -fx-pressed-base: derive(-jr-base, -5%);
 
-    -fx-hover-base: derive(-fx-base, 30%);
-
-    -fx-pressed-base: derive(-fx-base, -6%);
-
-    -fx-box-border: derive(-fx-color, -5%);
-
-    -fx-text-box-border: derive(-fx-background, -15%);
-
-    -fx-shadow-highlight-color: rgba(255, 255, 255, 0.07) 70%;
-
-    -fx-outer-border: -jr-outer-border;
-
-    -fx-inner-border: derive(-fx-color, 65%);
-    -fx-inner-border-horizontal: derive(-fx-color, 65%);
-    -fx-inner-border-bottomup: derive(-fx-color, 65%);
-
-    -fx-body-color: derive(-fx-color, 20%);
-    -fx-body-color-bottomup: derive(-fx-color, 20%);
-    -fx-body-color-to-right: derive(-fx-color, 20%);
+    -fx-shadow-highlight-color: #FFFFFF12;
 
     -fx-mark-color: -fx-text-base-color;
     -fx-mark-highlight-color: transparent;
 
     -fx-selection-bar: -jr-accent;
-
     -fx-selection-bar-non-focused: lightgrey;
 
-    -fx-selection-bar-text: -fx-text-background-color;
+    -fx-cell-focus-inner-border: derive(-jr-accent, 30%);
 
-    -fx-cell-focus-inner-border: derive(-fx-selection-bar, 30%);
+    -fx-focused-text-base-color: -jr-light-text-color;
+    -fx-focused-mark-color: -jr-light-text-color;
 
-    -fx-focused-text-base-color: -fx-light-text-color;
-    -fx-focused-mark-color: -fx-focused-text-base-color;
+    -fx-background-color: -jr-background;
 }
 
 /* JavaFX Button-like */
@@ -196,22 +106,106 @@
 .choice-box,
 .combo-box-base,
 .combo-box-base:editable > .arrow-button {
-    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-background-color: -fx-background;
     -fx-background-insets: 0;
     -fx-background-radius: 0.25em;
+}
+
+/* JavaFX Button */
+.button {
+    -fx-border-color: -jr-outer-border;
+    -fx-border-width: 0.062em;
+    -fx-padding: 0.5em 1em 0.5em 1em;
+}
+
+.button:hover {
+    -fx-background: rgba(0, 0, 0, 0.12);
+}
+
+.button:focused,
+.button:pressed {
+    -fx-background: rgba(0, 0, 0, 0.3);
+}
+
+.button:default {
+    -fx-background: -fx-default-button;
+}
+
+.button:default:hover {
+    -fx-background: -fx-default-button;
+}
+
+.button:default:focused,
+.button:default:pressed {
+    -fx-background: -fx-default-button;
+}
+
+/* JavaFX ToggleButton */
+.toggle-button:hover,
+.toggle-button:selected:hover {
+    -fx-background-color: -jr-icon-background-active;
+}
+
+.toggle-button:selected {
+    -fx-background-color: -jr-icon-background-active;
+    -fx-text-fill: -jr-selected;
+    -fx-fill: -jr-selected;
+}
+
+/* JavaFX CheckBox */
+.check-box {
+    -fx-label-padding: 0.0em 0.0em 0.0em 0.75em;
+    -fx-text-fill: -fx-text-background-color;
+}
+
+.check-box > .box {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-text-fill: -fx-text-base-color;
+    -fx-border-color: -jr-outer-border;
+    -fx-border-width: 0.125em;
+    -fx-border-radius: 0.062em;
+    -fx-padding: 0.1em 0.1em 0.2em 0.2em;
+}
+
+.check-box:selected > .box {
+    -fx-background-insets: 0.125em;
+    -fx-border-color: -jr-checked;
+    -fx-background-color: -jr-checked;
+}
+
+.check-box > .box > .mark {
+    -fx-padding: 0.2em 0.2em 0.2em 0.2em;
+}
+
+.check-box:selected > .box > .mark {
+    -fx-background-color: -jr-inner-bg;
+    -fx-shape: "M6.61 11.89L3.5 8.78 2.44 9.84 6.61 14l8.95-8.95L14.5 4z";
+    -fx-stroke-width: 5;
+}
+
+/* JavaFX RadioButton */
+.radio-button > .radio {
+    -fx-background-radius: 1.0em; /* large value to make sure this remains circular */
+    -fx-padding: 0.35em; /* padding from outside edge to the inner dot */
+    -fx-background-color: -jr-scrollbar-thumb, -jr-inner-bg;
+    -fx-background-insets: 0, 0.125em;
     -fx-text-fill: -fx-text-base-color;
 }
 
-/* JavaFX Focus */
-.scroll-pane:focused,
-.split-pane:focused,
-.list-view:focused,
-.tree-view:focused,
-.table-view:focused,
-.tree-table-view:focused {
-    -fx-background-color: -fx-control-inner-background;
+.radio-button:selected > .radio {
+    -fx-background-color: -jr-checked, -fx-background;
+}
+
+.radio-button > .radio > .dot {
+    -fx-padding: 0.25em; /* radius of the inner dot when selected */
     -fx-background-insets: 0;
-    -fx-background-radius: 0;
+}
+
+.radio-button:selected > .radio > .dot {
+    -fx-background-color: -jr-checked;
 }
 
 /* JavaFX Layout container */
@@ -219,14 +213,14 @@
 .scroll-pane > .viewport,
 .split-pane {
     -fx-background-color: transparent;
-    -fx-background-insets: 0, 0;
+    -fx-background-insets: 0;
     -fx-padding: 0;
 }
 
 /* JavaFX Dialog */
 .dialog-pane {
     -fx-font-size: 1em;
-    -fx-background-color: -fx-control-inner-background;
+    -fx-background-color: -jr-inner-bg;
 }
 
 /* JavaFX TextFlow / HyperLink */
@@ -239,7 +233,7 @@ TextFlow > .hyperlink,
     -fx-padding: 0;
     -fx-underline: false;
     -fx-border-style: null;
-    -fx-border-color: null;
+    -fx-border-color: transparent;
     -fx-text-fill: -jr-theme;
     -fx-fill: -jr-theme;
 }
@@ -272,8 +266,10 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background: -jr-tooltip-bg;
     -fx-background-color: -fx-background;
     -fx-opacity: 95%;
-    -fx-text-fill: -jr-tooltip-fg;
     -fx-font-size: 1em;
+    -fx-font-family: sans-serif;
+    -fx-font-weight: normal;
+    -fx-text-fill: -jr-tooltip-fg;
     -fx-show-delay: 300ms;
     -fx-hide-delay: 300ms;
 }
@@ -282,108 +278,12 @@ TextFlow > .tooltip-text-monospaced {
     -fx-font-size: 1em;
 }
 
-/* JavaFX Button */
-.button {
-    -fx-border-color: -fx-outer-border; /* rgba(0, 0, 0, 0.23); */
-    -fx-border-width: 0.062em;
-    -fx-padding: 0.5em 1em 0.5em 1em;
-}
-
-.button:hover {
-    -fx-background-color: rgba(0, 0, 0, 0.12);
-}
-
-.button:focused,
-.button:pressed {
-    -fx-background-color: rgba(0, 0, 0, 0.3);
-}
-
-.button:default {
-    -fx-background-color: -fx-default-button;
-}
-
-.button:default:hover {
-    -fx-background-color: derive(-fx-default-button, -10%);
-}
-
-.button:default:focused,
-.button:default:pressed {
-    -fx-background-color: derive(-fx-default-button, -20%);
-}
-
-/* JavaFX ToggleButton */
-.toggle-button:hover,
-.toggle-button:selected:hover {
-    -fx-background-color: -jr-icon-background-active;
-}
-
-.toggle-button:selected {
-    -fx-background-color: -jr-icon-background-active;
-    -fx-text-fill: -jr-selected;
-    -fx-fill: -jr-selected;
-}
-
-/* JavaFX CheckBox */
-.check-box {
-    -fx-label-padding: 0.0em 0.0em 0.0em 0.75em;
-    -fx-text-fill: -fx-text-background-color;
-}
-
-.check-box > .box {
-    -fx-background-color: transparent;
-    -fx-background-insets: 0;
-    -fx-background-radius: 0;
-    -fx-text-fill: -fx-text-base-color;
-    -fx-border-color: -fx-outer-border; /* rgba(0, 0, 0, 0.54); */
-    -fx-border-width: 0.125em;
-    -fx-border-radius: 0.062em;
-    -fx-padding: 0.1em 0.1em 0.2em 0.2em;
-}
-
-.check-box:selected > .box {
-    -fx-background-insets: 0.125em;
-    -fx-border-color: -jr-checked;
-    -fx-background-color: -jr-checked;
-}
-
-.check-box > .box > .mark {
-    -fx-padding: 0.2em 0.2em 0.2em 0.2em;
-}
-
-.check-box:selected > .box > .mark {
-    -fx-background-color: -fx-control-inner-background;
-    -fx-shape: "M6.61 11.89L3.5 8.78 2.44 9.84 6.61 14l8.95-8.95L14.5 4z";
-    -fx-stroke-width: 5;
-}
-
-/* JavaFX RadioButton */
-.radio-button > .radio {
-    -fx-background-radius: 1.0em; /* large value to make sure this remains circular */
-    -fx-padding: 0.35em; /* padding from outside edge to the inner dot */
-    -fx-background-color: rgba(0, 0, 0, 0.54), -fx-control-inner-background;
-    -fx-background-insets: 0, 0.125em;
-    -fx-text-fill: -fx-text-base-color;
-}
-
-.radio-button:selected > .radio {
-    -fx-background-color: -jr-checked, -fx-background;
-}
-
-.radio-button > .radio > .dot {
-    -fx-padding: 0.25em; /* radius of the inner dot when selected */
-    -fx-background-insets: 0;
-}
-
-.radio-button:selected > .radio > .dot {
-    -fx-background-color: -jr-checked;
-}
-
 /* JavaFX ColorPicker */
 .color-picker:armed,
 .color-picker:hover,
 .color-picker:focused,
 .color-picker {
-    -fx-background-color: transparent, transparent, transparent, transparent;
+    -fx-background-color: transparent;
     -fx-background-radius: 0;
     -fx-background-insets: 0;
     -fx-effect: null;
@@ -400,14 +300,14 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .custom-color-dialog {
-    -fx-background-color: -fx-control-inner-background;
+    -fx-background-color: -jr-inner-bg;
 }
 
 /* JavaFX Progress Indicator */
 .progress-indicator {
     -fx-progress-color: -jr-theme;
     -fx-border-width: 0;
-    -fx-background-color: -jr-icon-background;
+    -fx-background-color: transparent;
 }
 
 .progress-indicator:hover {
@@ -443,8 +343,8 @@ TextFlow > .tooltip-text-monospaced {
 .menu-bar > .container > .menu-button:hover,
 .menu-bar > .container > .menu-button:focused,
 .menu-bar > .container > .menu-button:showing {
-    -fx-background-color: -jr-hover;
-    -fx-background: -jr-hover;
+    -fx-background: -jr-outer-border;
+    -fx-background-color: -fx-background;
 }
 
 .menu-bar > .container > .menu-button:hover > .label,
@@ -462,9 +362,9 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .menu-item:focused {
-    -fx-text-fill: -jr-hover;
-    -fx-background: -jr-hover;
-    -fx-background-color: -jr-hover;
+    -fx-text-fill: -jr-outer-border;
+    -fx-background: -jr-outer-border;
+    -fx-background-color: -fx-background;
 }
 
 .menu-item:focused > .label {
@@ -477,7 +377,7 @@ TextFlow > .tooltip-text-monospaced {
 
 /* JavaFX ContextMenu */
 .context-menu {
-    -fx-border-color: -fx-outer-border;
+    -fx-border-color: -jr-outer-border;
     -fx-border-width: 1;
 }
 
@@ -503,15 +403,15 @@ TextFlow > .tooltip-text-monospaced {
 .tab-pane > .tab-header-area > .headers-region > .tab {
     -fx-background-insets: 0;
     -fx-background-radius: 0;
-    -fx-background-color: -jr-background-alt;
-    -fx-border-color: -fx-outer-border;
+    -fx-background-color: -jr-outer-border;
+    -fx-border-color: -jr-outer-border;
     -fx-border-width: 0.5 0.5 0.5 0.5;
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
     -fx-pref-height: 3em;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab .tab-label {
-    -fx-text-fill: -fx-mid-text-color;
+    -fx-text-fill: -jr-mid-text-color;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .control-buttons-tab {
@@ -521,7 +421,7 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected {
-    -fx-background-color: -fx-control-inner-background;
+    -fx-background-color: -jr-inner-bg;
     -fx-border-color: -jr-theme;
     -fx-border-width: 3 0 0 0;
 }
@@ -535,105 +435,68 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-color: -jr-theme;
 }
 
-.tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
-    -fx-fill: -fx-mid-text-color;
-    -fx-text-fill: -fx-mid-text-color;
-}
-
 .tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
     -fx-border-width: 0;
     -fx-border-insets: 0;
     -fx-border-radius: 0;
 }
 
-.tab-pane > .tab-header-area > .headers-region > .tab.drop {
-    -fx-border-color: -jr-drag-target;
-    -fx-background-color: -jr-drag-target-hover;
-    -fx-border-width: 3 1 1 1;
-}
-
-.tab-pane > .tab-header-area > .headers-region > .tab.drop .tab-label {
-    -fx-fill: -jr-drag-target;
-    -fx-text-fill: -jr-drag-target;
-}
-
 .tab-pane > .tab-header-area > .tab-header-background {
-    -fx-background-color: -jr-background-alt;
-}
-
-.tab-pane > .tab-header-area > .headers-region > .tab .glyph-icon {
-    -glyph-size: 0.812em;
-    -fx-fill: -fx-mid-text-color;
-    -fx-text-fill: -fx-mid-text-color;
-}
-
-.tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
-    -fx-fill: -jr-theme;
-    -fx-text-fill: -jr-theme;
+    -fx-background-color: -jr-outer-border;
 }
 
 .tab-pane > .tab-header-area {
     -fx-padding: 0 0 0 0;
 }
 
-.tab-pane.hide-tab-bar > .tab-header-area {
-    -fx-min-height: 0;
-    -fx-max-height: 0;
-    -fx-pref-height: 0;
-    -fx-padding: 0;
-}
-
 /* JavaFX SplitPane */
 .split-pane > .split-pane-divider {
-    -fx-background-color: -jr-sidepane-background;
+    -fx-background-color: -jr-separator;
     -fx-padding: 0 .5 0 .5;
 }
 
 /* JavaFX ComboBoxBase / ComboBox / DatePicker */
 .combo-box-base {
-    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
+    -fx-background-color: -jr-outer-border, -jr-inner-bg;
     -fx-background-insets: 0, 1;
-    -fx-background-radius: 0, 0;
+    -fx-background-radius: 0;
 }
 
 .combo-box > .list-cell {
-    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
+    -fx-background-color: -jr-outer-border, -jr-inner-bg;
     -fx-background-insets: 0, 1 0 1 1;
     -fx-text-fill: -fx-text-base-color;
 }
 
 .combo-box-popup > .list-view {
-    -fx-background-color: -fx-control-inner-background;
+    -fx-background-color: -jr-inner-bg;
     -fx-background-insets: 0;
     -fx-effect: null;
     -fx-border-width: 1;
-    -fx-border-color: -fx-outer-border;
+    -fx-border-color: -jr-outer-border;
     -fx-padding: 0;
 }
 
 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
     -fx-padding: 4 0 4 5;
-    /* No alternate highlighting */
-    -fx-background: -fx-control-inner-background;
+    -fx-background: -jr-inner-bg;
+    -fx-background-color: -jr-inner-bg;
 }
 
 .combo-box-popup > .list-view > .placeholder > .label {
     -fx-text-fill: -fx-text-base-color;
 }
 
-.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
-    -fx-background: -fx-selection-bar;
-}
-
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover,
 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
-    -fx-background: -fx-selection-bar;
+    -fx-background: -jr-accent;
+    -fx-background-color: -jr-accent;
 }
-
 
 .combo-box-base:editable > .text-field,
 .date-picker > .text-field {
-    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
+    -fx-background-color: -jr-outer-border, -jr-inner-bg;
     -fx-background-insets: 0, 1;
     -fx-background-radius: 0;
 }
@@ -641,20 +504,20 @@ TextFlow > .tooltip-text-monospaced {
 .combo-box-base:editable:focused > .text-field,
 .combo-box-base:editable > .text-field:focused,
 .date-picker > .text-field:focused {
-    -fx-background-color: -jr-accent, -fx-control-inner-background;
+    -fx-background-color: -jr-accent, -jr-inner-bg;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 0;
 }
 
 .date-picker:focused > .text-field {
-    -fx-background-color: -fx-control-inner-background;
+    -fx-background-color: -jr-inner-bg;
     -fx-background-insets: 0;
 }
 
 .date-picker-popup > * > .spinner > .button > .left-arrow,
 .date-picker-popup > * > .spinner > .button > .right-arrow {
     -fx-background: -jr-accent;
-    -fx-background-color: -fx-background;
+    -fx-background-color: -jr-accent;
 }
 
 /* JavaFX Accordion / TitledPane */
@@ -707,13 +570,13 @@ TextFlow > .tooltip-text-monospaced {
 
 .scroll-bar .thumb:hover,
 .scroll-bar .thumb:pressed {
-    -fx-background-color: derive(-jr-scrollbar-thumb, -30%);
+    -fx-background-color: -jr-scrollbar-thumb;
 }
 
 /* Hide increment and decrement buttons */
 .scroll-bar > .increment-button,
 .scroll-bar > .decrement-button {
-    -fx-background-color: null;
+    -fx-background-color: transparent;
     -fx-background-radius: 0;
     -fx-background-insets: 0;
     -fx-padding: 0;
@@ -724,7 +587,7 @@ TextFlow > .tooltip-text-monospaced {
 .scroll-bar:horizontal > .increment-button > .increment-arrow,
 .scroll-bar:vertical > .decrement-button > .decrement-arrow,
 .scroll-bar:vertical > .increment-button > .increment-arrow {
-    -fx-background-color: null;
+    -fx-background-color: transparent;
     -fx-background-radius: 0;
     -fx-background-insets: 0;
     -fx-shape: null;
@@ -753,31 +616,31 @@ TextFlow > .tooltip-text-monospaced {
 /* JavaFX TextInput / TextField / TextArea */
 
 .text-input {
-    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
+    -fx-background-color: -jr-outer-border, -jr-inner-bg;
     -fx-background-insets: 0, 1;
-    -fx-prompt-text-fill: #808080;
+    -fx-prompt-text-fill: -jr-scrollbar-thumb;
 }
 
 .text-input:focused {
-    -fx-highlight-fill: derive(-jr-accent, 20%);
-    -fx-background-color: -jr-accent, -fx-control-inner-background;
+    -fx-highlight-fill: -jr-accent;
+    -fx-background-color: -jr-accent, -jr-inner-bg;
     -fx-background-insets: 0, 2;
     -fx-highlight-text-fill: -fx-text-inner-color;
 }
 
 .text-area {
-    -fx-background-color: -fx-control-inner-background;
+    -fx-background-color: -jr-inner-bg;
 }
 
 .text-area .content {
-    -fx-background-color: -fx-outer-border, -fx-control-inner-background;
+    -fx-background-color: -jr-outer-border, -jr-inner-bg;
     -fx-background-insets: 0, 1;
     -fx-padding: 0.333333em 0.583em 0.333333em 0.583em;
     -fx-background-radius: 0;
 }
 
 .text-area:focused .content {
-    -fx-background-color: -jr-accent, -fx-control-inner-background;
+    -fx-background-color: -jr-accent, -jr-inner-bg;
     -fx-background-insets: 0, 2;
     -fx-background-radius: 0;
 }
@@ -827,14 +690,10 @@ TextFlow > .tooltip-text-monospaced {
 .tree-table-row-cell:filled:hover,
 .table-row-cell:filled:hover,
 .tree-table-row-cell:filled:hover {
-    -fx-background-color: -jr-hover;
-    -fx-fill: -fx-focused-text-base-color;
-    -fx-text-fill: -fx-focused-text-base-color;
-}
-
-.tree-table-row-cell:selected > .tree-table-cell > .glyph-icon {
-    -fx-fill: white;
-    -fx-text-fill: white;
+    -fx-background: -jr-outer-border;
+    -fx-background-color: -fx-background;
+    /*-fx-fill: -jr-light-text-color;*/
+    /*-fx-text-fill: -jr-light-text-color;*/
 }
 
 .table-view > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:filled:selected,
@@ -870,23 +729,23 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .column-header-background {
-    -fx-background-color: -fx-control-inner-background;
+    -fx-background-color: -jr-inner-bg;
     -fx-border-width: 0;
 }
 
 .column-header-background:hover {
-    -fx-background-color: -fx-outer-border;
+    -fx-background-color: -jr-outer-border;
 }
 
 .column-header,
 .table-view .filler,
 .tree-table-view .filler {
-    -fx-background-color: transparent, -fx-control-inner-background;
+    -fx-background-color: transparent, -jr-inner-bg;
     -fx-background-insets: 0, 0 0.02em 0 0.02em;
     -fx-font-weight: bold;
     -fx-size: 3em;
     -fx-border-width: 0 0 1 0;
-    -fx-border-color: -fx-outer-border;
+    -fx-border-color: -jr-outer-border;
 }
 
 .column-header > .label {

@@ -44,7 +44,9 @@ import org.jabref.gui.newentry.NewEntryPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
-import org.jabref.gui.theme.Theme;
+import org.jabref.gui.theme.StyleSheet;
+import org.jabref.gui.theme.ThemeColorScheme;
+import org.jabref.gui.theme.ThemePreset;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.exporter.BibDatabaseWriter;
@@ -62,6 +64,7 @@ import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -111,8 +114,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // region WorkspacePreferences
     private static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
     private static final String MAIN_FONT_SIZE = "mainFontSize";
-    private static final String THEME = "fxTheme";
-    private static final String THEME_SYNC_OS = "themeSyncOs";
+    private static final String THEME = "theme";
+    private static final String THEME_COLOR_SCHEME = "themeColorScheme";
+    private static final String THEME_CUSTOM = "themeCustom";
     private static final String OPEN_LAST_EDITED = "openLastEdited";
     private static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
     private static final String CONFIRM_DELETE = "confirmDelete";
@@ -653,9 +657,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(workspacePreferences.mainFontSizeProperty(), (_, _, newValue) ->
                 putInt(MAIN_FONT_SIZE, newValue));
         EasyBind.listen(workspacePreferences.themeProperty(), (_, _, newValue) ->
-                put(THEME, newValue.getName()));
-        EasyBind.listen(workspacePreferences.themeSyncOsProperty(), (_, _, newValue) ->
-                putBoolean(THEME_SYNC_OS, newValue));
+                put(THEME, newValue.getPreferenceName()));
+        EasyBind.listen(workspacePreferences.colorSchemeProperty(), (_, _, newValue) ->
+                put(THEME_COLOR_SCHEME, newValue.getPreferenceName()));
+        EasyBind.listen(workspacePreferences.customThemeProperty(), (_, _, newValue) ->
+                put(THEME_CUSTOM, newValue.map(StyleSheet::getName).orElse("")));
         EasyBind.listen(workspacePreferences.openLastEditedProperty(), (_, _, newValue) ->
                 putBoolean(OPEN_LAST_EDITED, newValue));
         EasyBind.listen(workspacePreferences.showAdvancedHintsProperty(), (_, _, newValue) ->
@@ -674,13 +680,21 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getLanguage(),
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE, defaults.shouldOverrideDefaultFontSize()),
                 getInt(MAIN_FONT_SIZE, defaults.getMainFontSize()),
-                new Theme(get(THEME, Theme.SYSTEM)),
-                getBoolean(THEME_SYNC_OS, defaults.shouldThemeSyncOs()),
+                ThemePreset.of(get(THEME)),
+                ThemeColorScheme.of(get(THEME_COLOR_SCHEME)),
+                asStyleSheet(get(THEME_CUSTOM)),
                 getBoolean(OPEN_LAST_EDITED, defaults.shouldOpenLastEdited()),
                 getBoolean(SHOW_ADVANCED_HINTS, defaults.shouldShowAdvancedHints()),
                 getBoolean(CONFIRM_DELETE, defaults.shouldConfirmDelete()),
                 getBoolean(CONFIRM_HIDE_TAB_BAR, defaults.shouldHideTabBar()),
                 getStringList(SELECTED_SLR_CATALOGS));
+    }
+
+    private StyleSheet asStyleSheet(String path) {
+        if (StringUtil.isBlank(path)) {
+            return null;
+        }
+        return StyleSheet.create(path).orElse(null);
     }
     // endregion
 

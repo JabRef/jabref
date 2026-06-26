@@ -39,8 +39,8 @@ public class JavaFxCssLogFilter implements Filter {
 
         // Restrict to JavaFX default theme (modena.bss) or JabRef's own theme CSS
         final boolean isJavaFxTheme = msg.contains("modena.bss") || msg.contains("javafx-controls");
-        final boolean isJabRefBaseCss = msg.contains("/org/jabref/gui/jabref-theme.css");
-        if (!(isJavaFxTheme || isJabRefBaseCss)) {
+        final boolean isJabRefCss = msg.contains("/org/jabref/gui/theme/jabref-theme.css");
+        if (!(isJavaFxTheme || isJabRefCss)) {
             return true;
         }
 

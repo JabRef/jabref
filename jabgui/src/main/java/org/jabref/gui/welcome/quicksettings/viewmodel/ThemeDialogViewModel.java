@@ -1,31 +1,44 @@
 package org.jabref.gui.welcome.quicksettings.viewmodel;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.Optional;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyListProperty;
+import javafx.beans.property.ReadOnlyListWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.theme.Theme;
-import org.jabref.gui.theme.ThemeTypes;
+import org.jabref.gui.theme.StyleSheet;
+import org.jabref.gui.theme.ThemeColorScheme;
+import org.jabref.gui.theme.ThemePreset;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class ThemeDialogViewModel extends AbstractViewModel {
 
-    private final ObjectProperty<ThemeTypes> selectedThemeProperty = new SimpleObjectProperty<>();
-    private final StringProperty customPathProperty = new SimpleStringProperty("");
+    private final ReadOnlyListProperty<ThemePreset> themesListProperty =
+            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(ThemePreset.values()));
+    private final ObjectProperty<ThemePreset> selectedThemeProperty = new SimpleObjectProperty<>();
+
+    private final ReadOnlyListProperty<ThemeColorScheme> colorSchemeListProperty =
+            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(ThemeColorScheme.values()));
+    private final ObjectProperty<ThemeColorScheme> selectedThemeColorSchemeProperty = new SimpleObjectProperty<>();
+
+    private final BooleanProperty customThemeEnabled = new SimpleBooleanProperty(false);
+    private final StringProperty customPathToThemeProperty = new SimpleStringProperty("");
 
     private final WorkspacePreferences workspacePreferences;
     private final GuiPreferences preferences;
     private final DialogService dialogService;
-    private boolean shouldThemeSyncOs;
 
     public ThemeDialogViewModel(GuiPreferences preferences, DialogService dialogService) {
         this.preferences = preferences;
@@ -36,82 +49,70 @@ public class ThemeDialogViewModel extends AbstractViewModel {
     }
 
     private void initializeFromCurrentTheme() {
-        shouldThemeSyncOs = workspacePreferences.shouldThemeSyncOs();
+        selectedThemeProperty.set(workspacePreferences.getTheme());
+        selectedThemeColorSchemeProperty.set(workspacePreferences.getColorScheme());
+        customThemeEnabled.setValue(workspacePreferences.getCustomTheme().isPresent());
+        customPathToThemeProperty.setValue(workspacePreferences.getCustomTheme().map(StyleSheet::getName).orElse(""));
+    }
 
-        Theme currentTheme = workspacePreferences.getTheme();
-        switch (currentTheme.getType()) {
-            case LIGHT ->
-                    selectedThemeProperty.set(ThemeTypes.LIGHT);
-            case DARK ->
-                    selectedThemeProperty.set(ThemeTypes.DARK);
-            case CUSTOM -> {
-                selectedThemeProperty.set(ThemeTypes.CUSTOM);
-                customPathProperty.set(currentTheme.getName());
-            }
+    public ReadOnlyListProperty<ThemePreset> themesListProperty() {
+        return this.themesListProperty;
+    }
+
+    public ObjectProperty<ThemePreset> selectedThemeProperty() {
+        return selectedThemeProperty;
+    }
+
+    public ReadOnlyListProperty<ThemeColorScheme> colorSchemeListProperty() {
+        return colorSchemeListProperty;
+    }
+
+    public ObjectProperty<ThemeColorScheme> selectedThemeColorSchemeProperty() {
+        return selectedThemeColorSchemeProperty;
+    }
+
+    public StringProperty customPathToThemeProperty() {
+        return customPathToThemeProperty;
+    }
+
+    public boolean isValidConfiguration() {
+        return getSelectedTheme() != null && getSelectedThemeColorScheme() != null;
+    }
+
+    public void saveSettings() {
+        workspacePreferences.setTheme(getSelectedTheme());
+        workspacePreferences.setColorScheme(getSelectedThemeColorScheme());
+
+        String customTheme = customPathToThemeProperty.getValue();
+        if (customThemeEnabled.get() && !StringUtil.isBlank(customTheme)) {
+            workspacePreferences.setCustomTheme(StyleSheet.create(customTheme));
+        } else {
+            workspacePreferences.setCustomTheme(Optional.empty());
         }
     }
 
-    public ThemeTypes getSelectedTheme() {
-        return selectedThemeProperty.get();
-    }
-
-    public void setSelectedTheme(ThemeTypes theme) {
-        selectedThemeProperty.set(theme);
-    }
-
-    public StringProperty customPathProperty() {
-        return customPathProperty;
-    }
-
-    public void setCustomPath(String path) {
-        customPathProperty.set(path);
-    }
-
-    public void browseForThemeFile() {
-        String fileDir = customPathProperty.get().isEmpty() ?
-                         preferences.getInternalPreferences().getLastPreferencesExportPath().toString() :
-                         customPathProperty.get();
+    public void importCSSFile() {
+        String fileDir = customPathToThemeProperty.getValue().isEmpty() ? preferences.getInternalPreferences().getLastPreferencesExportPath().toString()
+                                                                        : customPathToThemeProperty.getValue();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.CSS)
                 .withDefaultExtension(StandardFileType.CSS)
-                .withInitialDirectory(fileDir)
-                .build();
+                .withInitialDirectory(fileDir).build();
 
-        dialogService.showFileOpenDialog(fileDialogConfiguration)
-                     .ifPresent(file -> setCustomPath(file.toAbsolutePath().toString()));
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file ->
+                customPathToThemeProperty.setValue(file.toAbsolutePath().toString()));
     }
 
-    public boolean isValidConfiguration() {
-        if (selectedThemeProperty.get() == ThemeTypes.CUSTOM) {
-            return !customPathProperty.get().isBlank() && Files.exists(Path.of(customPathProperty.get()));
-        }
-        return selectedThemeProperty.get() != null;
+    private ThemePreset getSelectedTheme() {
+        return selectedThemeProperty.get();
     }
 
-    public void saveSettings() {
-        workspacePreferences.setThemeSyncOs(shouldThemeSyncOs);
-
-        if (shouldThemeSyncOs) {
-            workspacePreferences.setTheme(Theme.system());
-        } else if (selectedThemeProperty.get() != null) {
-            Theme newTheme = switch (selectedThemeProperty.get()) {
-                case LIGHT ->
-                        Theme.light();
-                case DARK ->
-                        Theme.dark();
-                case CUSTOM ->
-                        Theme.custom(customPathProperty.get().trim());
-            };
-            workspacePreferences.setTheme(newTheme);
-        }
+    private ThemeColorScheme getSelectedThemeColorScheme() {
+        return selectedThemeColorSchemeProperty.get();
     }
 
-    public void setThemeSyncOs(boolean selected) {
-        this.shouldThemeSyncOs = selected;
-    }
-
-    public boolean shouldThemeSyncOs() {
-        return shouldThemeSyncOs;
+    public BooleanProperty customThemeEnabledProperty() {
+        return customThemeEnabled;
     }
 }
