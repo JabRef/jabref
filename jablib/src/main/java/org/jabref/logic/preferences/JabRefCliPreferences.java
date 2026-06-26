@@ -727,21 +727,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> property.set(defaultValue));
     }
 
-    /// Binds an object-valued property whose persisted form is a boolean.
-    ///
-    /// @param serializer   converts the value to its stored boolean representation
-    /// @param deserializer reconstructs the value from its stored boolean representation
-    private <T> void bindBooleanObject(ObjectProperty<T> property,
-                                       String key,
-                                       T defaultValue,
-                                       Function<T, Boolean> serializer,
-                                       Function<Boolean, T> deserializer) {
-        bindCustom(property, key, defaultValue,
-                (_, _, v) -> putBoolean(key, serializer.apply(v)),
-                () -> property.set(deserializer.apply(getBoolean(key, serializer.apply(defaultValue)))),
-                () -> property.set(defaultValue));
-    }
-
     /// Binds an enum-valued property persisted as a set of mutually exclusive boolean keys, one per `flag`.
     /// On change, every flag is written as `true` only for the currently selected value; selecting `implicitValue`
     /// therefore stores all flags as `false`. Loading and resetting reuse [#readExclusiveFlags]. The first flag's key
@@ -1323,9 +1308,11 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(LIBRARY_ADD_IMPORTED_ENTRIES, defaultValues.shouldAddImportedEntries()),
                 get(LIBRARY_ADD_IMPORTED_ENTRIES_GROUP_NAME, defaultValues.getAddImportedEntriesGroupName()));
 
-        bindBooleanObject(libraryPreferences.defaultBibDatabaseModeProperty(), LIBRARY_BIBLATEX_DEFAULT_MODE, defaultValues.getDefaultBibDatabaseMode(),
-                mode -> mode == BibDatabaseMode.BIBLATEX,
-                isBiblatex -> isBiblatex ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX);
+        // defaultBibDatabaseMode is persisted as a single boolean: BIBLATEX owns the key, BIBTEX is the implicit (false) value.
+        bindExclusiveFlags(libraryPreferences.defaultBibDatabaseModeProperty(),
+                defaultValues.getDefaultBibDatabaseMode(),
+                BibDatabaseMode.BIBTEX,
+                Map.entry(LIBRARY_BIBLATEX_DEFAULT_MODE, BibDatabaseMode.BIBLATEX));
         bindBoolean(libraryPreferences.alwaysReformatOnSaveProperty(), LIBRARY_REFORMAT_ON_SAVE_AND_EXPORT, defaultValues.shouldAlwaysReformatOnSave());
         bindBoolean(libraryPreferences.autoSaveProperty(), LIBRARY_AUTO_SAVE, defaultValues.shouldAutoSave());
         bindBoolean(libraryPreferences.addImportedEntriesProperty(), LIBRARY_ADD_IMPORTED_ENTRIES, defaultValues.shouldAddImportedEntries());
