@@ -37,9 +37,9 @@ class GroupsHelperTest {
         BibEntry first = entry("first");
         BibEntry second = entry("second");
 
-        GroupsHelper.assignEntriesToGroup(context, List.of(first, second), "Imported via REST", KEYWORD_SEPARATOR);
+        GroupsHelper.assignEntriesToGroup(context, List.of(first, second), "assignCreatesTopLevelGroupAndAssignsEntries", KEYWORD_SEPARATOR);
 
-        GroupTreeNode created = groupNamed(context, "Imported via REST");
+        GroupTreeNode created = groupNamed(context, "assignCreatesTopLevelGroupAndAssignsEntries");
         assertInstanceOf(ExplicitGroup.class, created.getGroup());
         assertTrue(created.getGroup().contains(first));
         assertTrue(created.getGroup().contains(second));
