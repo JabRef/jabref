@@ -51,7 +51,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.search.sqlbased.IndexManager;
-import org.jabref.logic.search.sqlbased.PostgreServer;
+import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -560,10 +560,12 @@ public class JabRefGUI extends Application {
             });
 
             executor.submit(() -> {
-                LOGGER.trace("Shutting down postgreServer");
-                PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
-                postgreServer.close();
-                LOGGER.trace("PostgreServer shut down");
+                if (preferences.getSearchPreferences().shouldUsePostgresSearch()) {
+                    LOGGER.trace("Shutting down postgreServer");
+                    PostgresServer postgresServer = Injector.instantiateModelOrService(PostgresServer.class);
+                    postgresServer.close();
+                    LOGGER.trace("PostgreServer shut down");
+                }
             });
 
             executor.submit(() -> {

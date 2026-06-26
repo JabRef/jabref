@@ -5,14 +5,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.List;
 
-import org.jabref.logic.search.sqlbased.PostgreServer;
+import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.search.PostgreConstants;
+import org.jabref.model.search.PostgresConstants;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,27 +29,27 @@ import static org.mockito.Mockito.when;
 @ResourceLock("embeddedPostgres")
 public class BibFieldsIndexerTest {
 
-    private PostgreServer postgreServer;
+    private PostgresServer postgresServer;
 
     private final BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
 
     @BeforeEach
     void setUp() {
         when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
-        postgreServer = new PostgreServer();
+        postgresServer = new PostgresServer();
     }
 
     @AfterEach
     void tearDown() {
-        if (postgreServer != null) {
-            postgreServer.close();
+        if (postgresServer != null) {
+            postgresServer.close();
         }
     }
 
     @Test
     void addToIndexIsIdempotentForSameEntry() throws Exception {
         BibDatabaseContext databaseContext = new BibDatabaseContext();
-        Connection connection = postgreServer.getConnection();
+        Connection connection = postgresServer.getConnection();
         BibFieldsIndexer indexer = new BibFieldsIndexer(bibEntryPreferences, databaseContext, connection);
 
         BibEntry entry = new BibEntry(StandardEntryType.Article);
@@ -70,8 +70,8 @@ public class BibFieldsIndexerTest {
         indexer.addToIndex(List.of(entry), dummyTask);
 
         // Verify that there's exactly one row for (entryid, 'citationkey')
-        String tableRef = PostgreConstants.getMainTableSchemaReference(indexer.getTable());
-        String sql = "SELECT COUNT(*) FROM " + tableRef + " WHERE \"" + PostgreConstants.ENTRY_ID + "\" = ? AND \"" + PostgreConstants.FIELD_NAME + "\" = ?";
+        String tableRef = PostgresConstants.getMainTableSchemaReference(indexer.getTable());
+        String sql = "SELECT COUNT(*) FROM " + tableRef + " WHERE \"" + PostgresConstants.ENTRY_ID + "\" = ? AND \"" + PostgresConstants.FIELD_NAME + "\" = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, entry.getId());
             ps.setString(2, "citationkey");
