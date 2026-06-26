@@ -1,9 +1,5 @@
 package org.jabref.gui.preferences.keybindings;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
@@ -13,7 +9,6 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.paint.Color;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
@@ -21,7 +16,6 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.preferences.keybindings.presets.KeyBindingPreset;
-import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -94,14 +88,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
             viewModel.filterValues(searchTerm);
             setCategoriesExpanded(!searchTerm.isEmpty() || previousText.isEmpty());
         });
-
-        ObjectProperty<Color> flashingColor = new SimpleObjectProperty<>(Color.TRANSPARENT);
-        StringProperty flashingColorStringProperty = ColorUtil.createFlashingColorStringProperty(flashingColor);
-
-        searchBox.styleProperty().bind(
-                new SimpleStringProperty("-fx-control-inner-background: ").concat(flashingColorStringProperty).concat(";")
-        );
-
+        searchBox.getStyleClass().add("keybindings-search-box");
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
     }
