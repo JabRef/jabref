@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.Nullable;
 
 public class StudyCatalog {
     @JsonProperty("name")
@@ -60,7 +61,7 @@ public class StudyCatalog {
         this.reason = reason;
     }
 
-    public Integer getMaxResults() {
+    public @Nullable Integer getMaxResults() {
         return maxResults;
     }
 

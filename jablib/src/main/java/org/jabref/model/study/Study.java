@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// This class represents a scientific study.
 ///
@@ -106,7 +107,7 @@ public class Study {
         this.researchQuestions = researchQuestions;
     }
 
-    public Integer getMaxResultsPerCatalog() {
+    public @Nullable Integer getMaxResultsPerCatalog() {
         return maxResultsPerCatalog;
     }
 

@@ -65,6 +65,9 @@ class StudyFetcher {
                 for (int page = 0; page < pages; page++) {
                     fetchResult.addAll(basedFetcher.performSearchPaged(searchQuery.getQuery(), page).getContent());
                 }
+                if (fetchResult.size() > limit) {
+                    fetchResult = new ArrayList<>(fetchResult.subList(0, limit));
+                }
             } else {
                 fetchResult = fetcher.performSearch(searchQuery.getQuery());
             }
