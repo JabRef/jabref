@@ -36,7 +36,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
@@ -847,6 +846,19 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> deserializer.apply(get(key, serializer.apply(defaultList))));
     }
 
+    /// Binds an observable list of paths whose persisted form is a single delimited string: each path is stored via
+    /// [Path#toString] and reconstructed with [Path#of]. The paths are stored verbatim, so any normalization (e.g.
+    /// converting to absolute paths) is the caller's responsibility before the values reach the bound list.
+    ///
+    /// @param list        the observable list of paths to bind
+    /// @param key         the binding's reporting key in [#getPreferences()] and [#getDefaults()]
+    /// @param defaultList the values restored on reset and reported as the default
+    protected void bindPathList(ObservableList<Path> list, String key, List<Path> defaultList) {
+        bindList(list, key, defaultList,
+                paths -> convertListToString(paths.stream().map(Path::toString).toList()),
+                stored -> convertStringToList(stored).stream().map(Path::of).toList());
+    }
+
     /// Binds an observable set. The set counterpart of [#bindList]: persistence and loading are delegated to the
     /// given callbacks, so the entries may be stored under one or several backing-store keys. Persistence is
     /// wholesale — `persist` runs on any change and rewrites the entire stored representation.
@@ -1048,7 +1060,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getNameFormatterPreferences().setAll(NameFormatterPreferences.getDefault());
         getImporterPreferences().setAll(ImporterPreferences.getDefault());
         getSearchPreferences().setAll(SearchPreferences.getDefault());
-        getLastFilesOpenedPreferences().setAll(LastFilesOpenedPreferences.getDefault());
         getXmpPreferences().setAll(XmpPreferences.getDefault());
         getProtectedTermsPreferences().setAll(ProtectedTermsPreferences.getDefault());
         getGrobidPreferences().setAll(GrobidPreferences.getDefault());
@@ -1074,6 +1085,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getAutoLinkPreferences();
         getExportPreferences();
         getCleanupPreferences();
+        getLastFilesOpenedPreferences();
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
@@ -1095,7 +1107,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getNameFormatterPreferences().setAll(getNameFormatterPreferencesFromBackingStore(getNameFormatterPreferences()));
         getImporterPreferences().setAll(getImporterPreferencesFromBackingStore(getImporterPreferences()));
         getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
-        getLastFilesOpenedPreferences().setAll(getLastFilesOpenedPreferencesFromBackingStore(getLastFilesOpenedPreferences()));
         getXmpPreferences().setAll(getXmpPreferencesFromBackingStore(getXmpPreferences()));
         getProtectedTermsPreferences().setAll(getProtectedTermsPreferencesFromBackingStore(getProtectedTermsPreferences()));
         getGrobidPreferences().setAll(getGrobidPreferencesFromBackingStore(getGrobidPreferences()));
@@ -1122,6 +1133,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getAutoLinkPreferences();
         getExportPreferences();
         getCleanupPreferences();
+        getLastFilesOpenedPreferences();
 
         allBindings.forEach(binding -> binding.importFromStore().run());
     }
@@ -2036,70 +2048,18 @@ public class JabRefCliPreferences implements CliPreferences {
             return lastFilesOpenedPreferences;
         }
 
-        lastFilesOpenedPreferences = getLastFilesOpenedPreferencesFromBackingStore(LastFilesOpenedPreferences.getDefault());
+        LastFilesOpenedPreferences defaultValues = LastFilesOpenedPreferences.getDefault();
 
-        lastFilesOpenedPreferences.getLastFilesOpened().addListener((ListChangeListener<Path>) change -> {
-            if (change.getList().isEmpty()) {
-                remove(LAST_EDITED);
-            } else {
-                putStringList(LAST_EDITED, lastFilesOpenedPreferences.getLastFilesOpened().stream()
-                                                                     .map(Path::toAbsolutePath)
-                                                                     .map(Path::toString)
-                                                                     .toList());
-            }
-        });
-        EasyBind.listen(lastFilesOpenedPreferences.lastFocusedFileProperty(), (_, _, newValue) -> {
-            if (newValue != null && !newValue.toString().isBlank()) {
-                put(LAST_FOCUSED, newValue.toAbsolutePath().toString());
-            } else {
-                remove(LAST_FOCUSED);
-            }
-        });
-        lastFilesOpenedPreferences.getFileHistory().addListener((InvalidationListener) _ -> storeFileHistory(lastFilesOpenedPreferences.getFileHistory()));
+        lastFilesOpenedPreferences = new LastFilesOpenedPreferences(
+                getStringList(LAST_EDITED).stream().map(Path::of).toList(),
+                getPath(LAST_FOCUSED, defaultValues.getLastFocusedFile()),
+                FileHistory.of(getStringList(RECENT_DATABASES).stream().map(Path::of).toList()));
+
+        bindPathList(lastFilesOpenedPreferences.getLastFilesOpened(), LAST_EDITED, defaultValues.getLastFilesOpened());
+        bindPathList(lastFilesOpenedPreferences.getFileHistory(), RECENT_DATABASES, defaultValues.getFileHistory());
+        bindPath(lastFilesOpenedPreferences.lastFocusedFileProperty(), LAST_FOCUSED, defaultValues.getLastFocusedFile());
 
         return lastFilesOpenedPreferences;
-    }
-
-    private LastFilesOpenedPreferences getLastFilesOpenedPreferencesFromBackingStore(LastFilesOpenedPreferences defaults) {
-        List<Path> lastFilesOpened;
-        if (hasKey(LAST_EDITED)) {
-            lastFilesOpened = convertStringToList(get(LAST_EDITED, "")).stream()
-                                                                       .map(Path::of)
-                                                                       .toList();
-        } else {
-            lastFilesOpened = defaults.getLastFilesOpened();
-        }
-
-        Path lastFocused = null;
-        if (hasKey(LAST_FOCUSED)) {
-            String stored = get(LAST_FOCUSED, null);
-            if (StringUtil.isNotBlank(stored)) {
-                lastFocused = Path.of(stored);
-            }
-        } else {
-            lastFocused = defaults.getLastFocusedFile();
-        }
-
-        return new LastFilesOpenedPreferences(
-                lastFilesOpened,
-                lastFocused,
-                getFileHistory(defaults.getFileHistory()));
-    }
-
-    private FileHistory getFileHistory(FileHistory defaults) {
-        if (hasKey(RECENT_DATABASES)) {
-            return FileHistory.of(convertStringToList(get(RECENT_DATABASES, "")).stream()
-                                                                                .map(Path::of)
-                                                                                .toList());
-        } else {
-            return defaults;
-        }
-    }
-
-    private void storeFileHistory(FileHistory history) {
-        putStringList(RECENT_DATABASES, history.stream()
-                                               .map(Path::toString)
-                                               .toList());
     }
     // endregion
 
