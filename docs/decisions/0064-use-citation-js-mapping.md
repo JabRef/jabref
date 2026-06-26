@@ -90,7 +90,7 @@ Zotero provides mappings from Zotero item type to BibTeX/BibLaTeX entry type. Ho
 * Good, because citation-js provides mapping logic to deal with different CSL JSON.
 * Good, because some mapping in citation-js make more sense than Better BibTeX. For example, citation-js maps CSL item type `chapter` to `Inbook`, Better BibTeX maps it to `Incollection`
 * Good, because citation-js is designed specifically for CSL and BibTeX and BibLaTeX interoperability.
-* Good, because citation-js also supports other mappings. e.g. BibLaTeX to RIS.
+* Good, because citation-js also supports other mappings, such as BibLaTeX to RIS.
 * Bad, because JabRef needs to track citation-js's updates, or import it as a submodule.
 
 ### More information
