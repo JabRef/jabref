@@ -242,7 +242,7 @@ class StudyRepositoryTest {
         study.getCatalogs().getFirst().setMaxResults(500);
 
         Map<String, Integer> limits = studyRepository.getResultLimitsPerCatalog();
-        
+
         assertEquals(500, limits.get(catalogName.toUpperCase(Locale.ROOT)));
     }
 
