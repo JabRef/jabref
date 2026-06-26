@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -235,10 +236,23 @@ class StudyRepositoryTest {
     }
 
     @Test
+    void resolvesResultLimitCaseInsensitively() {
+        Study study = studyRepository.getStudy();
+        String catalogName = study.getCatalogs().getFirst().getName();
+        study.getCatalogs().getFirst().setMaxResults(500);
+
+        Map<String, Integer> limits = studyRepository.getResultLimitsPerCatalog();
+        
+        assertEquals(500, limits.get(catalogName.toUpperCase(Locale.ROOT)));
+    }
+
+    @Test
     void resolvesToDefaultWhenNoLimitSet() {
         Map<String, Integer> limits = studyRepository.getResultLimitsPerCatalog();
         // no study default, no catalog override -> every catalog resolves to the default
-        assertTrue(limits.values().stream().allMatch(limit -> limit == StudyRepository.DEFAULT_RESULT_LIMIT));
+        limits.forEach((catalog, limit) ->
+                assertEquals(StudyRepository.DEFAULT_RESULT_LIMIT, limit,
+                        () -> "Catalog '" + catalog + "' did not resolve to the default"));
     }
 
     private StudyRepository getTestStudyRepository() throws IOException, URISyntaxException, JabRefException {
