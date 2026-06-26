@@ -847,6 +847,37 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> deserializer.apply(get(key, serializer.apply(defaultList))));
     }
 
+    /// Binds an observable set. The set counterpart of [#bindList]: persistence and loading are delegated to the
+    /// given callbacks, so the entries may be stored under one or several backing-store keys. Persistence is
+    /// wholesale — `persist` runs on any change and rewrites the entire stored representation.
+    ///
+    /// @param <T>           the element type of the set
+    /// @param set           the observable set to bind
+    /// @param key           the binding's reporting key in [#getPreferences()] and [#getDefaults()]
+    /// @param defaultSet    the values restored on reset and reported as the default
+    /// @param persist       rewrites the whole set to the backing store; run on every change
+    /// @param loadFromStore reads the stored set, falling back to `defaultSet` for absent entries
+    private <T> void bindSet(ObservableSet<T> set,
+                             String key,
+                             Set<T> defaultSet,
+                             Runnable persist,
+                             Supplier<? extends Collection<? extends T>> loadFromStore) {
+        Set<T> defaultCopy = Set.copyOf(defaultSet);
+        set.addListener((InvalidationListener) _ -> persist.run());
+        allBindings.add(new PreferenceBinding(
+                set,
+                defaultCopy,
+                key,
+                () -> {
+                    set.clear();
+                    set.addAll(loadFromStore.get());
+                },
+                () -> {
+                    set.clear();
+                    set.addAll(defaultCopy);
+                }));
+    }
+
     /// Persist-only binding for secrets that live in the system keyring rather than the backing store.
     /// It registers no [PreferenceBinding], so the value is intentionally excluded from [#getPreferences()] and
     /// [#getDefaults()]. Loading and resetting are owned by its accompanying persist flag, whose binding is
@@ -941,6 +972,8 @@ public class JabRefCliPreferences implements CliPreferences {
             return stringProperty.get();
         } else if (observable instanceof ObservableList<?> observableList) {
             return observableList;
+        } else if (observable instanceof ObservableSet<?> observableSet) {
+            return observableSet;
         } else if (observable instanceof MapProperty<?, ?> mapProperty) {
             return mapProperty.get();
         } else if (observable instanceof ObjectProperty<?> objectProperty) {
@@ -1013,7 +1046,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getAiPreferences().setAll(AiPreferences.getDefault());
         getOcrPreferences().setAll(OcrPreferences.getDefault());
         getNameFormatterPreferences().setAll(NameFormatterPreferences.getDefault());
-        getCleanupPreferences().setAll(CleanupPreferences.getDefault());
         getImporterPreferences().setAll(ImporterPreferences.getDefault());
         getSearchPreferences().setAll(SearchPreferences.getDefault());
         getLastFilesOpenedPreferences().setAll(LastFilesOpenedPreferences.getDefault());
@@ -1041,6 +1073,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getCitationKeyPatternPreferences();
         getAutoLinkPreferences();
         getExportPreferences();
+        getCleanupPreferences();
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
@@ -1060,7 +1093,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getAiPreferences().setAll(getAiPreferencesFromBackingStore(getAiPreferences()));
         getOcrPreferences().setAll(getOcrPreferencesFromBackingStore(getOcrPreferences()));
         getNameFormatterPreferences().setAll(getNameFormatterPreferencesFromBackingStore(getNameFormatterPreferences()));
-        getCleanupPreferences().setAll(getCleanupPreferencesFromBackingStore(getCleanupPreferences()));
         getImporterPreferences().setAll(getImporterPreferencesFromBackingStore(getImporterPreferences()));
         getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
         getLastFilesOpenedPreferences().setAll(getLastFilesOpenedPreferencesFromBackingStore(getLastFilesOpenedPreferences()));
@@ -1089,6 +1121,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getCitationKeyPatternPreferences();
         getAutoLinkPreferences();
         getExportPreferences();
+        getCleanupPreferences();
 
         allBindings.forEach(binding -> binding.importFromStore().run());
     }
@@ -1942,48 +1975,57 @@ public class JabRefCliPreferences implements CliPreferences {
             return cleanupPreferences;
         }
 
-        cleanupPreferences = getCleanupPreferencesFromBackingStore(CleanupPreferences.getDefault());
+        CleanupPreferences defaultValues = CleanupPreferences.getDefault();
 
-        cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) _ -> {
-            if (cleanupPreferences.getActiveJobs().isEmpty()) {
-                remove(CLEANUP_JOBS);
-            } else {
-                putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList()));
-            }
-        });
+        cleanupPreferences = new CleanupPreferences(
+                getCleanupActiveJobs(defaultValues.getActiveJobs()),
+                getCleanupFieldFormatters(defaultValues.getFieldFormatterCleanups()));
 
-        EasyBind.listen(cleanupPreferences.fieldFormatterCleanupsProperty(), (_, _, newValue) -> {
-            putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, newValue.isEnabled());
-            put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanupActions.getMetaDataString(newValue.getConfiguredActions(), OS.NEWLINE));
-        });
+        // activeJobs is persisted as a single string list, removing the key entirely when empty.
+        bindSet(cleanupPreferences.getObservableActiveJobs(), CLEANUP_JOBS, defaultValues.getActiveJobs(),
+                () -> {
+                    if (cleanupPreferences.getActiveJobs().isEmpty()) {
+                        remove(CLEANUP_JOBS);
+                    } else {
+                        putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream()
+                                                                      .map(Enum::name)
+                                                                      .collect(Collectors.toList()));
+                    }
+                },
+                () -> getCleanupActiveJobs(defaultValues.getActiveJobs()));
+
+        // fieldFormatterCleanups is persisted across two backing-store keys, so it needs a custom binding.
+        bindCustom(cleanupPreferences.fieldFormatterCleanupsProperty(), CLEANUP_FIELD_FORMATTERS_ENABLED, defaultValues.getFieldFormatterCleanups(),
+                (_, _, newValue) -> {
+                    putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, newValue.isEnabled());
+                    put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanupActions.getMetaDataString(newValue.getConfiguredActions(), OS.NEWLINE));
+                },
+                () -> cleanupPreferences.setFieldFormatterCleanups(getCleanupFieldFormatters(defaultValues.getFieldFormatterCleanups())),
+                () -> cleanupPreferences.setFieldFormatterCleanups(defaultValues.getFieldFormatterCleanups()));
 
         return cleanupPreferences;
     }
 
-    private CleanupPreferences getCleanupPreferencesFromBackingStore(CleanupPreferences defaults) {
-        EnumSet<CleanupPreferences.CleanupStep> activeJobs;
-        if (hasKey(CLEANUP_JOBS)) {
-            Set<CleanupPreferences.CleanupStep> parsed = getStringList(CLEANUP_JOBS).stream()
-                                                                                    .map(CleanupPreferences.CleanupStep::safeValueOf)
-                                                                                    .flatMap(Optional::stream)
-                                                                                    .collect(Collectors.toSet());
-            activeJobs = parsed.isEmpty() ? EnumSet.noneOf(CleanupPreferences.CleanupStep.class) : EnumSet.copyOf(parsed);
-        } else {
-            activeJobs = EnumSet.copyOf(defaults.getActiveJobs());
+    private Set<CleanupPreferences.CleanupStep> getCleanupActiveJobs(Set<CleanupPreferences.CleanupStep> defaults) {
+        if (!hasKey(CLEANUP_JOBS)) {
+            return EnumSet.copyOf(defaults);
         }
+        Set<CleanupPreferences.CleanupStep> parsed = getStringList(CLEANUP_JOBS).stream()
+                                                                                .map(CleanupPreferences.CleanupStep::safeValueOf)
+                                                                                .flatMap(Optional::stream)
+                                                                                .collect(Collectors.toSet());
+        return parsed.isEmpty() ? EnumSet.noneOf(CleanupPreferences.CleanupStep.class) : EnumSet.copyOf(parsed);
+    }
 
-        FieldFormatterCleanupActions actions = new FieldFormatterCleanupActions(
-                getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, defaults.getFieldFormatterCleanups().isEnabled()),
+    private FieldFormatterCleanupActions getCleanupFieldFormatters(FieldFormatterCleanupActions defaults) {
+        return new FieldFormatterCleanupActions(
+                getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, defaults.isEnabled()),
                 FieldFormatterCleanupMapper.parseActions(
                         StringUtil.unifyLineBreaks(get(
                                         CLEANUP_FIELD_FORMATTERS,
-                                        FieldFormatterCleanupActions.getMetaDataString(defaults.getFieldFormatterCleanups()
-                                                                                               .getConfiguredActions(),
-                                                OS.NEWLINE)),
+                                        FieldFormatterCleanupActions.getMetaDataString(defaults.getConfiguredActions(), OS.NEWLINE)),
                                 ""))
         );
-
-        return new CleanupPreferences(activeJobs, actions);
     }
     // endregion
 
