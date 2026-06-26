@@ -44,7 +44,7 @@ Content-Type: application/x-bibtex
 
 // The `group` query parameter additionally files the entry under a top-level group of that name.
 
-POST http://localhost:23119/libraries/current/entries?group=Imported%20via%20REST
+POST http://localhost:23119/libraries/current/entries?group=import-test-group
 Content-Type: application/x-bibtex
 
 @article{demoGrouped,
