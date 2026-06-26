@@ -68,3 +68,4 @@ jobs:
         with:
           name: jabkit-native-${{ matrix.os }}
           path: jabkit/build/native/nativeCompile/
+          if-no-files-found: error
