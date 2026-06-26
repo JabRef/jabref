@@ -28,7 +28,7 @@ Chosen option: "Do not use a preference", because JabRef already uses [citation-
 
 ### Consequences
 
-* Good, because JabRef reads and converts Zotero's reference mark automatically, which does not disturb users.
+* Good, because JabRef reads and maps Zotero's reference mark automatically, which does not disturb users.
 * Good, because user does not need to enable anything to use this feature.
 * Good, because it avoids the risk Zotero's reference mark being ignored if user forgets to enable the compatibility mode.
 * Bad, because user may not be aware of the problems it may bring (information loss), unless they read the release page or user documentation.
@@ -42,13 +42,13 @@ If a document contains Zotero's reference mark, JabRef shows a popup asking user
 * Good, because it gives user the freedom to enable/disable compatibility mode.
 * Bad, because it may make user confuse about which mode to choose.
 * Bad, because a popup may disturb users workflow.
-* Bad, because JabRef uses [citation-js's mapping logic](https://github.com/JabRef/jabref/blob/07e475dcf8e2f00447667ebd1814a09176293948/jablib/src/main/java/org/jabref/logic/openoffice/CSLItemTypeDefinitions.java#L23-L84) in its converter, using a preference is unnecessary.
+* Bad, because JabRef uses [citation-js's mapping logic](https://github.com/JabRef/jabref/blob/07e475dcf8e2f00447667ebd1814a09176293948/jablib/src/main/java/org/jabref/logic/openoffice/CSLItemTypeDefinitions.java#L23-L84) in its mapper, using a preference is unnecessary.
 
 ### Use transparent Handling of Zotero Reference Marks
 
-Since JabRef uses [citation-js's mapping logic](https://github.com/JabRef/jabref/blob/07e475dcf8e2f00447667ebd1814a09176293948/jablib/src/main/java/org/jabref/logic/openoffice/CSLItemTypeDefinitions.java#L23-L84) (see ADR-64) as fallback strategy, users do not need to manually enable a preference to recognize Zotero's reference mark. JabRef will convert the citation to BibLaTeX format when it reads Zotero's reference mark. Possible problems will be documented in release page and user documentation. For example, CSL item type `map` is converted to `Misc`, and the CSL field `Scale` is lost during the conversion. JabRef maps CSL item types and fields into BibLaTeX ones, but the field mapping for each CSL type may be incomplete.
+Since JabRef uses [citation-js's mapping logic](https://github.com/JabRef/jabref/blob/07e475dcf8e2f00447667ebd1814a09176293948/jablib/src/main/java/org/jabref/logic/openoffice/CSLItemTypeDefinitions.java#L23-L84) (see ADR-64) as fallback strategy, users do not need to manually enable a preference to recognize Zotero's reference mark. JabRef will map the citation to BibLaTeX format when it reads Zotero's reference mark. Possible problems will be documented in release page and user documentation. For example, CSL item type `map` is mapped to `Misc`, and the CSL field `Scale` is lost during the conversion. JabRef maps CSL item types and fields into BibLaTeX ones, but the field mapping for each CSL type may be incomplete.
 
-* Good, because JabRef reads and converts Zotero's reference mark automatically, which does not disturb users.
+* Good, because JabRef reads and maps Zotero's reference mark automatically, which does not disturb users.
 * Good, because user does not need to enable anything to use this feature.
 * Good, because it avoids the risk Zotero's reference mark being ignored if user forgets to enable the compatibility mode.
 * Bad, because user may not be aware of the problems it may bring, unless they read the release page or user documentation.
