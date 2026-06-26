@@ -212,18 +212,27 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         return child;
     }
 
-    /// Returns the existing group with the given name from the subtree starting at this node,
-    /// or creates it as a top-level {@link ExplicitGroup} (direct subgroup of this node) using
-    /// the given keyword separator if no such group exists. The receiving node itself is
-    /// excluded from the search (it is usually the synthetic "All entries" root).
+    /// Returns the existing group with the given name from the subtree starting at this node, if any.
+    /// The receiving node itself is excluded from the search (it is usually the synthetic "All entries" root).
     ///
-    /// Group names are unique within a library, so the name identifies the group anywhere
-    /// in the tree.
-    public GroupTreeNode findOrCreateExplicitGroup(String name, Character keywordSeparator) {
+    /// Group names are unique within a library, so the name identifies the group anywhere in the tree.
+    public Optional<GroupTreeNode> findGroupByName(String name) {
         return iterateOverTree()
                 .filter(node -> node != this)
                 .filter(node -> name.equals(node.getName()))
-                .findFirst()
+                .findFirst();
+    }
+
+    /// Returns the existing group with the given name from the subtree starting at this node,
+    /// or creates it as a top-level {@link ExplicitGroup} (direct subgroup of this node) using
+    /// the given keyword separator if no such group exists.
+    ///
+    /// Note: the created group is attached to the tree immediately. Callers that need to assign
+    /// entries to a freshly created group should instead use {@link #findGroupByName} and create
+    /// the node themselves, so that the entries can be assigned BEFORE the node is attached - see
+    /// {@link org.jabref.logic.groups.GroupsHelper#assignEntriesToGroup}.
+    public GroupTreeNode findOrCreateExplicitGroup(String name, Character keywordSeparator) {
+        return findGroupByName(name)
                 .orElseGet(() -> addSubgroup(new ExplicitGroup(name, GroupHierarchyType.INDEPENDENT, keywordSeparator)));
     }
 
