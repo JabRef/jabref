@@ -37,8 +37,8 @@ Chosen option: Use citation-js's mapping, because it supports more types and the
 * Good, because some mapping in citation-js make more sense than Better BibTeX.
 * Good, because citation-js is designed specifically for CSL and BibTeX and BibLaTeX interoperability.
 * Good, because citation-js also supports other conversions. e.g. BibLaTeX to RIS.
-* Bad, because Better BibTeX contains many-to-one mappings when converting BibTeX/BibLaTeX entry type to Zotero item type, which may lose information.
-* Bad, because JabRef needs to track Better BibTeX's updates, or import it as a submodule.
+* Bad, because citation-js contains many-to-one mappings when converting BibTeX/BibLaTeX entry type to CSL item type, which may lose information.
+* Bad, because JabRef needs to track citation-js's updates, or import it as a submodule.
 
 ## Pros and Cons of the Options
 
@@ -46,11 +46,10 @@ Chosen option: Use citation-js's mapping, because it supports more types and the
 
 Converter can be found via [BibTeXConverter#toType](https://github.com/michel-kraemer/citeproc-java/blob/09d31a49090e06e6ab062016012b593897b3cb26/citeproc-java/src/main/java/de/undercouch/citeproc/bibtex/BibTeXConverter.java#L420-L461)
 
-* Good, because citeproc-java provides an existing converter, reducing the amount of time to customize mapping.
 * Good, because citeproc-java is already a JabRef's submodule, no new dependency is needed
-* Bad, because citeproc-java only provides converter from entry type to item type.
+* Bad, because citeproc-java only provides mappings from entry type to item type.
 * Bad, because entry type to item type mapping contains multiple many-to-one mappings, mapping back from item type to entry type would lose information
-* Bad, because citeproc-java converts unsupported entry type to "journal-article"
+* Bad, because citeproc-java maps unsupported entry type to `journal-article`.
 * Bad, because the repository is not actively maintained.
 
 ### Use Zotero's import/export mapping
@@ -72,7 +71,6 @@ Zotero provides mappings from Zotero item type to BibTeX/BibLaTeX entry type. Ho
 2. Converter from CSL/Zotero item type to BibTeX entry type can be found via [bibtex.ts](https://github.com/retorquere/zotero-better-bibtex/blob/7b7237e60aad44c47656484cd5eaa40201882449/translators/bibtex/bibtex.ts#L56-L131).
 3. Converter from CSL/Zotero item type to BibLaTeX entry type can be found via [biblatex.ts](https://github.com/retorquere/zotero-better-bibtex/blob/7b7237e60aad44c47656484cd5eaa40201882449/translators/bibtex/biblatex.ts#L47-L127).
 
-* Good, because Better BibTeX provides mapping directly from CSL item type to BibTeX/BibLaTeX entry type.
 * Good, because Better BibTeX provides mapping between Zotero item type and BibTeX/BibLaTeX entry type.
 * Good, because Better BibTeX supports mapping for both BibTeX and BibLaTeX entry types.
 * Good, because Better BibTeX supports more entry types than citeproc-java.
@@ -81,6 +79,7 @@ Zotero provides mappings from Zotero item type to BibTeX/BibLaTeX entry type. Ho
 * Bad, because Better BibTeX does not support all JabRef's entry types.
 * Bad, because Better BibTeX contains many-to-one mappings when converting BibTeX/BibLaTeX entry type to Zotero item type, which may lose information.
 * Bad, because JabRef needs to track Better BibTeX's updates, or import it as a submodule.
+* Bad, because some mappings in Better BibTeX do not make sense. For example, CSL item type `chapter` is mapped to `Incollection`, while `Inbook` makes more sense.
 
 ### Use citation-js's mapping
 
@@ -92,11 +91,11 @@ Zotero provides mappings from Zotero item type to BibTeX/BibLaTeX entry type. Ho
 * Good, because citation-js supports more CSL item types/fields than Better BibTeX.
 * Good, because the repository is actively maintained.
 * Good, because citation-js provides mapping logic to deal with different CSL JSON.
-* Good, because some mapping in citation-js make more sense than Better BibTeX.
+* Good, because some mapping in citation-js make more sense than Better BibTeX. For example, citation-js maps CSL item type `chapter` to `Inbook`, Better BibTeX maps it to `Incollection`
 * Good, because citation-js is designed specifically for CSL and BibTeX and BibLaTeX interoperability.
 * Good, because citation-js also supports other conversions. e.g. BibLaTeX to RIS.
-* Bad, because Better BibTeX contains many-to-one mappings when converting BibTeX/BibLaTeX entry type to Zotero item type, which may lose information.
-* Bad, because JabRef needs to track Better BibTeX's updates, or import it as a submodule.
+* Bad, because citation-js contains many-to-one mappings when converting BibTeX/BibLaTeX entry type to CSL item type, which may lose information.
+* Bad, because JabRef needs to track citation-js's updates, or import it as a submodule.
 
 ### More information
 
