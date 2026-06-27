@@ -662,11 +662,12 @@ public class JabRefCliPreferences implements CliPreferences {
         }
     }
 
-    /// General binding primitive. All scalar `bind*` helpers delegate here.
+    /// General binding primitive that all scalar `bind*` helpers delegate to. Registers the property in [#allBindings]
+    /// and starts persisting its changes.
     ///
-    /// @param persistListener persists value changes to the backing store
-    /// @param importFromStore loads the stored value into the property (falling back to the default)
-    /// @param resetToDefaults resets the property to its default value
+    /// @param persistListener writes value changes to the backing store
+    /// @param importFromStore loads the stored value (or the default) into the property
+    /// @param resetToDefaults restores the property to its default value
     private <T> void bindCustom(Property<T> property,
                                 String key,
                                 T defaultValue,
@@ -710,10 +711,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> property.set(defaultValue));
     }
 
-    /// Binds an object-valued property whose persisted form is a String.
+    /// Binds an object-valued property persisted as a String.
     ///
-    /// @param serializer   converts the value to its stored String representation
-    /// @param deserializer reconstructs the value from its stored String representation
+    /// @param serializer   converts a value to its stored String form
+    /// @param deserializer reconstructs a value from its stored String form
     private <T> void bindObject(ObjectProperty<T> property,
                                 String key,
                                 T defaultValue,
@@ -725,8 +726,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> property.set(defaultValue));
     }
 
-    /// Binds a path-valued property. The path is persisted as its String form (a null value as ""), and read via
-    /// [#getPath], so a blank stored value falls back to the given default.
+    /// Binds a path-valued property persisted as a String (null as ""). A blank stored value falls back to the default
+    /// (see [#getPath]).
     private void bindPath(ObjectProperty<@Nullable Path> property, String key, @Nullable Path defaultValue) {
         bindCustom(property, key, defaultValue,
                 (_, _, newValue) -> put(key, newValue != null ? newValue.toString() : ""),
@@ -734,17 +735,14 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> property.set(defaultValue));
     }
 
-    /// Binds an enum-valued property persisted as a set of mutually exclusive boolean keys, one per `flag`.
-    /// On change, every flag is written as `true` only for the currently selected value; selecting `implicitValue`
-    /// therefore stores all flags as `false`. Loading and resetting reuse [#readExclusiveFlags]. The first flag's key
-    /// doubles as the binding's reporting key in [#getPreferences()] and [#getDefaults()].
+    /// Binds an enum-valued property persisted as a set of mutually exclusive boolean keys, one per `flag`. On change,
+    /// each flag is stored `true` only for the selected value, so selecting `implicitValue` stores all flags `false`.
+    /// Loading and resetting delegate to [#readExclusiveFlags]; the first flag's key is the binding's reporting key
+    /// in [#getPreferences()] and [#getDefaults()].
     ///
-    /// @param <T>           the enum type held by the property
-    /// @param property      the property to bind
-    /// @param defaultValue  the value reported as the default and restored on reset; also returned on load when no flag
-    ///                                           has ever been stored
-    /// @param implicitValue the enum constant that owns no key and is thus encoded as all flags being `false`
-    /// @param flags         the backing-store key for each non-implicit value, in lookup order (first match wins on load)
+    /// @param defaultValue  reported as the default, restored on reset, and returned on load when no flag was ever stored
+    /// @param implicitValue the value owning no key, encoded as all flags `false`
+    /// @param flags         the backing-store key for each non-implicit value, in load lookup order (first match wins)
     @SafeVarargs
     protected final <T> void bindExclusiveFlags(ObjectProperty<T> property, T defaultValue, T implicitValue, Map.Entry<String, T>... flags) {
         bindCustom(property, flags[0].getKey(), defaultValue,
@@ -757,14 +755,13 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> property.set(defaultValue));
     }
 
-    /// Reads an enum persisted as mutually exclusive boolean keys (see [#bindExclusiveFlags]). When no flag key has
-    /// ever been stored, `defaultValue` is returned. Otherwise, the first flag stored as `true` (in `flags` order)
-    /// wins; if all flags are `false`, `implicitValue` is returned. A flag stored as `true` always wins over a later
-    /// one, so the non-canonical "multiple flags true" state resolves to the earliest matching value rather than failing.
+    /// Reads an enum persisted as mutually exclusive boolean keys (see [#bindExclusiveFlags]). Returns `defaultValue`
+    /// when no flag key was ever stored; otherwise the first flag stored `true` (in `flags` order), or `implicitValue`
+    /// when all are `false`. An earlier `true` flag wins, so the non-canonical "multiple true" state resolves to the
+    /// first match rather than failing.
     ///
-    /// @param <T>           the enum type to reconstruct
-    /// @param defaultValue  returned when none of the flag keys exist in the backing store
-    /// @param implicitValue the value that owns no key, returned when all flags are stored as `false`
+    /// @param defaultValue  returned when none of the flag keys exist
+    /// @param implicitValue returned when all flag keys are stored `false`
     /// @param flags         the backing-store key for each non-implicit value, in lookup order (first match wins)
     /// @return the stored enum value, or `defaultValue`/`implicitValue` per the rules above
     @SafeVarargs
@@ -787,11 +784,11 @@ public class JabRefCliPreferences implements CliPreferences {
         return implicitValue;
     }
 
-    /// Binds a map-valued property. Unlike the other `bind*` helpers, persistence is delegated to the given
-    /// `persistListener`, since map entries may be stored under multiple backing-store keys.
+    /// Binds a map-valued property. Unlike the scalar helpers, persistence is delegated to `serializer`, since entries
+    /// may be stored under several backing-store keys.
     ///
     /// @param serializer   persists individual entry changes to the backing store
-    /// @param deserializer reads the stored map, falling back to the given defaults for missing entries
+    /// @param deserializer reads the stored map, falling back to `defaultMap` for missing entries
     private void bindMap(MapProperty<String, String> map,
                          String key,
                          Map<String, String> defaultMap,
@@ -813,17 +810,14 @@ public class JabRefCliPreferences implements CliPreferences {
                 }));
     }
 
-    /// Binds an observable list with caller-supplied persistence. This is the general primitive behind [#bindCustomList]:
-    /// persistence and loading are delegated to the given callbacks, so the entries may be stored under one or several
-    /// backing-store keys (e.g. a numbered series). Persistence is wholesale — `persist` receives the bound list and
-    /// rewrites the entire stored representation on every change. Compare [#bindMap], which receives the individual
-    /// change because map entries are persisted incrementally under per-entry keys.
+    /// Binds an observable list with caller-supplied persistence; the general primitive behind the other
+    /// [#bindCustomList]. Entries may be stored under one or several backing-store keys (e.g. a numbered series).
+    /// Persistence is wholesale: `persist` runs on every change and rewrites the entire stored representation. Compare
+    /// [#bindMap], which persists entries individually under per-entry keys.
     ///
-    /// @param <T>           the element type of the list
-    /// @param list          the observable list to bind
     /// @param key           the binding's reporting key in [#getPreferences()] and [#getDefaults()]
-    /// @param defaultList   the values restored on reset and reported as the default
-    /// @param persist       rewrites the whole list to the backing store; receives the bound list and runs on every change
+    /// @param defaultList   restored on reset and reported as the default
+    /// @param persist       rewrites the whole list to the backing store; receives the bound list, runs on every change
     /// @param loadFromStore reads the stored list, falling back to `defaultList` for absent entries
     private <T> void bindCustomList(ObservableList<T> list,
                                     String key,
@@ -840,11 +834,11 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> list.setAll(defaultCopy)));
     }
 
-    /// Binds an observable list whose persisted form is a single String. The callbacks are pure transforms; the actual
-    /// backing-store read/write is performed by this method (delegating to [#bindCustomList]).
+    /// Binds an observable list persisted as a single String. The callbacks are pure transforms; the backing-store
+    /// read/write is performed here (delegating to the primitive [#bindCustomList]).
     ///
-    /// @param serializer   converts the list to its stored String representation
-    /// @param deserializer reconstructs the list elements from their stored String representation
+    /// @param serializer   converts the list to its stored String form
+    /// @param deserializer reconstructs the list elements from their stored String form
     private <T> void bindCustomList(ObservableList<T> list,
                                     String key,
                                     List<T> defaultList,
@@ -855,28 +849,24 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> deserializer.apply(get(key, serializer.apply(defaultList))));
     }
 
-    /// Binds an observable list of paths whose persisted form is a single delimited string: each path is stored via
-    /// [Path#toString] and reconstructed with [Path#of]. The paths are stored verbatim, so any normalization (e.g.
-    /// converting to absolute paths) is the caller's responsibility before the values reach the bound list.
+    /// Binds an observable list of paths persisted as a single delimited String (each path via [Path#toString], read
+    /// back via [Path#of]). Paths are stored verbatim; any normalization (e.g. to absolute paths) is the caller's job.
     ///
-    /// @param list        the observable list of paths to bind
     /// @param key         the binding's reporting key in [#getPreferences()] and [#getDefaults()]
-    /// @param defaultList the values restored on reset and reported as the default
+    /// @param defaultList restored on reset and reported as the default
     protected void bindPathList(ObservableList<Path> list, String key, List<Path> defaultList) {
         bindCustomList(list, key, defaultList,
                 paths -> convertListToString(paths.stream().map(Path::toString).toList()),
                 stored -> convertStringToList(stored).stream().map(Path::of).toList());
     }
 
-    /// Binds an observable set. The set counterpart of [#bindCustomList]: persistence and loading are delegated to the
-    /// given callbacks, so the entries may be stored under one or several backing-store keys. Persistence is
-    /// wholesale — `persist` runs on any change and rewrites the entire stored representation.
+    /// Binds an observable set; the set counterpart of the primitive [#bindCustomList]. Persistence and loading are
+    /// delegated to the callbacks, so entries may be stored under one or several backing-store keys. Persistence is
+    /// wholesale: `serializer` runs on every change and rewrites the entire stored representation.
     ///
-    /// @param <T>          the element type of the set
-    /// @param set          the observable set to bind
     /// @param key          the binding's reporting key in [#getPreferences()] and [#getDefaults()]
-    /// @param defaultSet   the values restored on reset and reported as the default
-    /// @param serializer   rewrites the whole set to the backing store; receives the bound set and runs on every change
+    /// @param defaultSet   restored on reset and reported as the default
+    /// @param serializer   rewrites the whole set to the backing store; receives the bound set, runs on every change
     /// @param deserializer reads the stored set, falling back to `defaultSet` for absent entries
     private <T> void bindSet(ObservableSet<T> set,
                              String key,
@@ -899,10 +889,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 }));
     }
 
-    /// Persist-only binding for secrets that live in the system keyring rather than the backing store.
-    /// It registers no [PreferenceBinding], so the value is intentionally excluded from [#getPreferences()] and
-    /// [#getDefaults()]. Loading and resetting are owned by its accompanying persist flag, whose binding is
-    /// also responsible for clearing the keyring when persistence is turned off.
+    /// Persist-only binding for secrets kept in the system keyring rather than the backing store. Registers no
+    /// [PreferenceBinding], so the value is excluded from [#getPreferences()] and [#getDefaults()]; loading and
+    /// resetting are owned by the accompanying persist flag, whose binding also clears the keyring when persistence
+    /// is turned off.
     ///
     /// @param slot          the keyring location to write to
     /// @param shouldPersist gate evaluated on every change; the value is written only while it returns true
@@ -920,12 +910,10 @@ public class JabRefCliPreferences implements CliPreferences {
                        .filter(StringUtil::isNotBlank);
     }
 
-    /// Reads and decrypts the secrets at the given slots in a single keyring session.
-    ///
-    /// On a successful open the returned map contains an entry for **every** requested slot, whose value is the
-    /// decrypted secret or an empty string when nothing is stored for that slot. If the keyring cannot be opened
-    /// at all, an empty map is returned. Callers therefore distinguish failure from "all slots empty" by size:
-    /// `result.size() == slots.size()` iff the open succeeded (the only collision, an empty `slots`, is a no-op).
+    /// Reads and decrypts the secrets at the given slots in a single keyring session. On a successful open the result
+    /// holds an entry for **every** requested slot — the decrypted secret, or "" when that slot is empty. Returns an
+    /// empty map if the keyring cannot be opened, so callers tell failure from "all slots empty" by size
+    /// (`result.size() == slots.size()` iff the open succeeded; an empty `slots` is a no-op).
     private Map<KeyringSlot, String> readKeyring(List<KeyringSlot> slots) {
         Map<KeyringSlot, String> result = new HashMap<>();
         try (Keyring keyring = Keyring.create()) {
