@@ -68,8 +68,13 @@ class StudyFetcher {
                 if (catalogOverride != null) {
                     int limit = resultLimits.getOrDefault(fetcher.getName(), StudyRepository.DEFAULT_RESULT_LIMIT);
                     int pages = (int) Math.ceil((double) limit / basedFetcher.getPageSize());
-                    for (int page = 0; page < pages; page++) {
-                        fetchResult.addAll(basedFetcher.performRawSearchQueryPaged(catalogOverride, page).getContent());
+                    try {
+                        for (int page = 0; page < pages; page++) {
+                            fetchResult.addAll(basedFetcher.performRawSearchQueryPaged(catalogOverride, page).getContent());
+                        }
+                    } catch (UnsupportedOperationException e) {
+                        LOGGER.warn("{} does not support raw search queries", fetcher.getName(), e);
+                        fetchResult = new ArrayList<>();
                     }
                     if (fetchResult.size() > limit) {
                         fetchResult = new ArrayList<>(fetchResult.subList(0, limit));
@@ -86,13 +91,18 @@ class StudyFetcher {
                 }
             } else {
                 if (catalogOverride != null) {
-                    fetchResult = fetcher.performRawSearchQuery(catalogOverride);
+                    try {
+                        fetchResult = fetcher.performRawSearchQuery(catalogOverride);
+                    } catch (UnsupportedOperationException e) {
+                        LOGGER.warn("{} does not support raw search queries", fetcher.getName(), e);
+                        fetchResult = new ArrayList<>();
+                    }
                 } else {
                     fetchResult = fetcher.performSearch(searchQuery.getQuery());
                 }
             }
             return new FetchResult(fetcher.getName(), new BibDatabase(fetchResult));
-        } catch (FetcherException | UnsupportedOperationException e) {
+        } catch (FetcherException e) {
             LOGGER.warn("{} API request failed", fetcher.getName(), e);
             return null;
         }
