@@ -92,21 +92,6 @@ public class OpenOfficePreferences {
         return new OpenOfficePreferences();
     }
 
-    public void setAll(OpenOfficePreferences preferences) {
-        this.executablePath.set(preferences.getExecutablePath());
-        this.useAllDatabases.set(preferences.getUseAllDatabases());
-        this.syncWhenCiting.set(preferences.getSyncWhenCiting());
-        this.externalJStyles.setAll(preferences.getExternalJStyles());
-        this.currentJStyle.set(preferences.getCurrentJStyle());
-        this.currentStyle.set(preferences.getCurrentStyle());
-        this.alwaysAddCitedOnPages.set(preferences.getAlwaysAddCitedOnPages());
-        this.cslBibliographyTitle.set(preferences.getCslBibliographyTitle());
-        this.cslBibliographyHeaderFormat.set(preferences.getCslBibliographyHeaderFormat());
-        this.cslBibliographyBodyFormat.set(preferences.getCslBibliographyBodyFormat());
-        this.externalCslStyles.setAll(preferences.getExternalCslStyles());
-        this.addSpaceAfter.set(preferences.getAddSpaceAfter());
-    }
-
     public void clearConnectionSettings() {
         this.executablePath.set("");
     }

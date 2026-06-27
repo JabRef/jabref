@@ -1064,9 +1064,6 @@ public class JabRefCliPreferences implements CliPreferences {
         PREFS_NODE.clear();
         new SharedDatabasePreferences().clear();
 
-        getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences())).setAll(
-                OpenOfficePreferences.getDefault());
-
         // ensure registration of bindings
         getInternalPreferences();
         getFieldPreferences();
@@ -1095,6 +1092,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getNameFormatterPreferences();
         getImporterPreferences();
         getGrobidPreferences();
+        getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences()));
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
@@ -1107,14 +1105,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public void importPreferences(Path path) throws JabRefException {
         importPreferencesToBackingStore(path);
 
-        // TODO: We need to load all CLI preferences from the backing store
-        //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
-
-        // in case of incomplete or corrupt XML fall back to current preferences
-        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences());
-        getOpenOfficePreferences(repository).setAll(
-                getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
-
         // ensure registration of bindings
         getInternalPreferences();
         getFieldPreferences();
@@ -1143,6 +1133,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getNameFormatterPreferences();
         getImporterPreferences();
         getGrobidPreferences();
+        getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences()));
 
         allBindings.forEach(binding -> binding.importFromStore().run());
     }
@@ -2510,58 +2501,64 @@ public class JabRefCliPreferences implements CliPreferences {
             return openOfficePreferences;
         }
 
-        openOfficePreferences = getOpenOfficePreferencesFromBackingStore(OpenOfficePreferences.getDefault(), journalAbbreviationRepository);
+        OpenOfficePreferences defaultValues = OpenOfficePreferences.getDefault();
 
-        EasyBind.listen(openOfficePreferences.executablePathProperty(), (_, _, newValue) -> put(OO_EXECUTABLE_PATH, newValue));
-        EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (_, _, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
-        EasyBind.listen(openOfficePreferences.alwaysAddCitedOnPagesProperty(), (_, _, newValue) -> putBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES, newValue));
-        EasyBind.listen(openOfficePreferences.syncWhenCitingProperty(), (_, _, newValue) -> putBoolean(OO_SYNC_WHEN_CITING, newValue));
-        EasyBind.listen(openOfficePreferences.addSpaceAfterProperty(), (_, _, newValue) -> putBoolean(OO_ADD_SPACE_AFTER, newValue));
+        openOfficePreferences = new OpenOfficePreferences(
+                get(OO_EXECUTABLE_PATH, defaultValues.getExecutablePath()),
+                getBoolean(OO_USE_ALL_OPEN_BASES, defaultValues.getUseAllDatabases()),
+                getBoolean(OO_SYNC_WHEN_CITING, defaultValues.getSyncWhenCiting()),
+                getStringList(OO_EXTERNAL_STYLE_FILES),
+                get(OO_BIBLIOGRAPHY_STYLE_FILE, defaultValues.getCurrentJStyle()),
+                getCurrentOOStyle(defaultValues.getCurrentStyle(), journalAbbreviationRepository),
+                getBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES, defaultValues.getAlwaysAddCitedOnPages()),
+                get(OO_CSL_BIBLIOGRAPHY_TITLE, defaultValues.getCslBibliographyTitle()),
+                get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, defaultValues.getCslBibliographyHeaderFormat()),
+                get(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, defaultValues.getCslBibliographyBodyFormat()),
+                getStringList(OO_EXTERNAL_CSL_STYLES),
+                getBoolean(OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter()));
 
-        openOfficePreferences.getExternalJStyles().addListener((InvalidationListener) _ ->
-                putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalJStyles()));
-        openOfficePreferences.getExternalCslStyles().addListener((InvalidationListener) _ ->
-                putStringList(OO_EXTERNAL_CSL_STYLES, openOfficePreferences.getExternalCslStyles()));
-        EasyBind.listen(openOfficePreferences.currentJStyleProperty(), (_, _, newValue) -> put(OO_BIBLIOGRAPHY_STYLE_FILE, newValue));
-        EasyBind.listen(openOfficePreferences.currentStyleProperty(), (_, _, newValue) -> put(OO_CURRENT_STYLE, newValue.getPath()));
+        bindString(openOfficePreferences.executablePathProperty(), OO_EXECUTABLE_PATH, defaultValues.getExecutablePath());
+        bindBoolean(openOfficePreferences.useAllDatabasesProperty(), OO_USE_ALL_OPEN_BASES, defaultValues.getUseAllDatabases());
+        bindBoolean(openOfficePreferences.alwaysAddCitedOnPagesProperty(), OO_ALWAYS_ADD_CITED_ON_PAGES, defaultValues.getAlwaysAddCitedOnPages());
+        bindBoolean(openOfficePreferences.syncWhenCitingProperty(), OO_SYNC_WHEN_CITING, defaultValues.getSyncWhenCiting());
+        bindBoolean(openOfficePreferences.addSpaceAfterProperty(), OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter());
 
-        EasyBind.listen(openOfficePreferences.cslBibliographyTitleProperty(), (_, _, newValue) -> put(OO_CSL_BIBLIOGRAPHY_TITLE, newValue));
-        EasyBind.listen(openOfficePreferences.cslBibliographyHeaderFormatProperty(), (_, _, newValue) -> put(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, newValue));
-        EasyBind.listen(openOfficePreferences.cslBibliographyBodyFormatProperty(), (_, _, newValue) -> put(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, newValue));
+        bindCustomList(openOfficePreferences.getExternalJStyles(), OO_EXTERNAL_STYLE_FILES, defaultValues.getExternalJStyles(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
+        bindCustomList(openOfficePreferences.getExternalCslStyles(), OO_EXTERNAL_CSL_STYLES, defaultValues.getExternalCslStyles(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
+        bindString(openOfficePreferences.currentJStyleProperty(), OO_BIBLIOGRAPHY_STYLE_FILE, defaultValues.getCurrentJStyle());
+        // currentStyle is persisted as a style path and reconstructed into a CSL style or JStyle on load, so it needs a custom binding.
+        bindCustom(openOfficePreferences.currentStyleProperty(), OO_CURRENT_STYLE, defaultValues.getCurrentStyle(),
+                (_, _, newValue) -> put(OO_CURRENT_STYLE, newValue.getPath()),
+                () -> openOfficePreferences.currentStyleProperty().set(getCurrentOOStyle(defaultValues.getCurrentStyle(), journalAbbreviationRepository)),
+                () -> openOfficePreferences.currentStyleProperty().set(defaultValues.getCurrentStyle()));
+
+        bindString(openOfficePreferences.cslBibliographyTitleProperty(), OO_CSL_BIBLIOGRAPHY_TITLE, defaultValues.getCslBibliographyTitle());
+        bindString(openOfficePreferences.cslBibliographyHeaderFormatProperty(), OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, defaultValues.getCslBibliographyHeaderFormat());
+        bindString(openOfficePreferences.cslBibliographyBodyFormatProperty(), OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, defaultValues.getCslBibliographyBodyFormat());
 
         return openOfficePreferences;
     }
 
-    private OpenOfficePreferences getOpenOfficePreferencesFromBackingStore(OpenOfficePreferences defaults, JournalAbbreviationRepository journalAbbreviationRepository) {
-        String currentStylePath = get(OO_CURRENT_STYLE, defaults.getCurrentStyle().getPath());
-        OOStyle currentStyle = defaults.getCurrentStyle();
+    /// Reconstructs the persisted [OOStyle] from its stored path: a CSL style file becomes a [CitationStyle], otherwise
+    /// it is treated as a [JStyle] (requiring `journalAbbreviationRepository`). Falls back to `defaultStyle` when the
+    /// path is absent, the repository is missing, or the JStyle cannot be created.
+    private OOStyle getCurrentOOStyle(OOStyle defaultStyle, JournalAbbreviationRepository journalAbbreviationRepository) {
+        String currentStylePath = get(OO_CURRENT_STYLE, defaultStyle.getPath());
 
-        // Reassign currentStyle based on actual last used CSL style or JStyle
         if (CSLStyleUtils.isCitationStyleFile(currentStylePath)) {
-            currentStyle = CSLStyleUtils.createCitationStyleFromFile(currentStylePath)
-                                        .orElse(CSLStyleLoader.getDefaultStyle());
+            return CSLStyleUtils.createCitationStyleFromFile(currentStylePath)
+                                .orElse(CSLStyleLoader.getDefaultStyle());
         } else if (journalAbbreviationRepository != null) {
-            // For now, must be a JStyle. In future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
+            // For now, must be a JStyle. In the future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
             try {
-                currentStyle = new JStyle(currentStylePath, getLayoutFormatterPreferences(), journalAbbreviationRepository);
+                return new JStyle(currentStylePath, getLayoutFormatterPreferences(), journalAbbreviationRepository);
             } catch (IOException ex) {
                 LOGGER.warn("Could not create JStyle", ex);
             }
         }
-
-        return new OpenOfficePreferences(
-                get(OO_EXECUTABLE_PATH, defaults.getExecutablePath()),
-                getBoolean(OO_USE_ALL_OPEN_BASES, defaults.getUseAllDatabases()),
-                getBoolean(OO_SYNC_WHEN_CITING, defaults.getSyncWhenCiting()),
-                getStringList(OO_EXTERNAL_STYLE_FILES),
-                get(OO_BIBLIOGRAPHY_STYLE_FILE, defaults.getCurrentJStyle()),
-                currentStyle,
-                getBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES, defaults.getAlwaysAddCitedOnPages()),
-                get(OO_CSL_BIBLIOGRAPHY_TITLE, defaults.getCslBibliographyTitle()),
-                get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, defaults.getCslBibliographyHeaderFormat()),
-                get(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, defaults.getCslBibliographyBodyFormat()),
-                getStringList(OO_EXTERNAL_CSL_STYLES),
-                getBoolean(OO_ADD_SPACE_AFTER, defaults.getAddSpaceAfter()));
+        return defaultStyle;
     }
     // endregion
 
