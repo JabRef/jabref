@@ -35,6 +35,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
 
     /// Array of children, may be empty if this node has no children (but never null)
     private final ObservableList<T> children;
+    /// Cached read-only view of `children` to avoid allocating a new wrapper on every `getChildren()` call.
     private final ObservableList<T> unmodifiableChildren;
     /// This node's parent, or null if this node has no parent
     private T parent;
