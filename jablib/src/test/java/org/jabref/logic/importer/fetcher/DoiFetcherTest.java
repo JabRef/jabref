@@ -27,14 +27,14 @@ class DoiFetcherTest {
             .withField(StandardField.PUBLISHER, "Wiley")
             .withField(StandardField.YEAR, "2011")
             .withField(StandardField.AUTHOR, "Burd, Barry")
-            .withField(StandardField.MONTH, "#jul#")
+            .withField(StandardField.MONTH, "#July#")
             .withField(StandardField.DOI, "10.1002/9781118257517")
             .withField(StandardField.ISBN, "9781118257517");
     private final BibEntry bibEntryDecker2007 = new BibEntry(StandardEntryType.InProceedings)
             .withCitationKey("Decker_2007")
             .withField(StandardField.AUTHOR, "Decker, Gero and Kopp, Oliver and Leymann, Frank and Weske, Mathias")
             .withField(StandardField.BOOKTITLE, "IEEE International Conference on Web Services (ICWS 2007)")
-            .withField(StandardField.MONTH, "#jul#")
+            .withField(StandardField.MONTH, "#July#")
             .withField(StandardField.PUBLISHER, "IEEE")
             .withField(StandardField.TITLE, "BPEL4Chor: Extending BPEL for Modeling Choreographies")
             .withField(StandardField.YEAR, "2007")
@@ -42,8 +42,7 @@ class DoiFetcherTest {
             .withField(StandardField.DOI, "10.1109/icws.2007.59");
     private final BibEntry bibEntryIannarelli2019 = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.AUTHOR,
-                    ""
-                            + "Iannarelli Riccardo  and "
+                    "Iannarelli Riccardo  and "
                             + "Novello Anna  and "
                             + "Stricker Damien  and "
                             + "Cisternino Marco  and "
@@ -65,7 +64,7 @@ class DoiFetcherTest {
             .withField(StandardField.JOURNAL, "Physical Review A")
             .withField(StandardField.TITLE, "Topological phases in the Fermi-Hofstadter-Hubbard model on hybrid-space ladders")
             .withField(StandardField.YEAR, "2020")
-            .withField(StandardField.MONTH, "#aug#")
+            .withField(StandardField.MONTH, "#Aug#")
             .withField(StandardField.VOLUME, "102")
             .withField(StandardField.DOI, "10.1103/physreva.102.023315")
             .withField(StandardField.ISSN, "2469-9934")
@@ -79,7 +78,7 @@ class DoiFetcherTest {
             .withField(StandardField.JOURNAL, "Mathematical Methods in the Applied Sciences")
             .withField(StandardField.TITLE, "On the motion of a vortex ring with a sharply concentrated vorticity")
             .withField(StandardField.YEAR, "2000")
-            .withField(StandardField.MONTH, "#jan#")
+            .withField(StandardField.MONTH, "#Jan#")
             .withField(StandardField.VOLUME, "23")
             .withField(StandardField.DOI, "10.1002/(sici)1099-1476(20000125)23:2<147::aid-mma108>3.0.co;2-j")
             .withField(StandardField.ISSN, "1099-1476")
