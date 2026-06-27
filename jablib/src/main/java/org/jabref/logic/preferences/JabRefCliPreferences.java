@@ -1065,7 +1065,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         getNameFormatterPreferences().setAll(NameFormatterPreferences.getDefault());
         getImporterPreferences().setAll(ImporterPreferences.getDefault());
-        getSearchPreferences().setAll(SearchPreferences.getDefault());
         getXmpPreferences().setAll(XmpPreferences.getDefault());
         getProtectedTermsPreferences().setAll(ProtectedTermsPreferences.getDefault());
         getGrobidPreferences().setAll(GrobidPreferences.getDefault());
@@ -1094,6 +1093,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getLastFilesOpenedPreferences();
         getAiPreferences();
         getOcrPreferences();
+        getSearchPreferences();
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
@@ -1112,7 +1112,6 @@ public class JabRefCliPreferences implements CliPreferences {
         // in case of incomplete or corrupt XML fall back to current preferences
         getNameFormatterPreferences().setAll(getNameFormatterPreferencesFromBackingStore(getNameFormatterPreferences()));
         getImporterPreferences().setAll(getImporterPreferencesFromBackingStore(getImporterPreferences()));
-        getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
         getXmpPreferences().setAll(getXmpPreferencesFromBackingStore(getXmpPreferences()));
         getProtectedTermsPreferences().setAll(getProtectedTermsPreferencesFromBackingStore(getProtectedTermsPreferences()));
         getGrobidPreferences().setAll(getGrobidPreferencesFromBackingStore(getGrobidPreferences()));
@@ -1142,6 +1141,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getLastFilesOpenedPreferences();
         getAiPreferences();
         getOcrPreferences();
+        getSearchPreferences();
 
         allBindings.forEach(binding -> binding.importFromStore().run());
     }
@@ -2188,34 +2188,53 @@ public class JabRefCliPreferences implements CliPreferences {
             return searchPreferences;
         }
 
-        searchPreferences = getSearchPreferencesFromBackingStore(SearchPreferences.getDefault());
+        SearchPreferences defaultValues = SearchPreferences.getDefault();
 
-        EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (_, _, newValue) -> putBoolean(SEARCH_DISPLAY_MODE, newValue == SearchDisplayMode.FILTER));
-        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchFlags>) _ ->
-                putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchFlags.FULLTEXT)));
-        // Regular expression and case-sensitive search flags should always be set to default values on startup
-        EasyBind.listen(searchPreferences.keepSearchStringProperty(), (_, _, newValue) -> putBoolean(SEARCH_KEEP_SEARCH_STRING, newValue));
-        EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (_, _, _) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));
-        EasyBind.listen(searchPreferences.getSearchWindowHeightProperty(), (_, _, _) -> putDouble(SEARCH_WINDOW_HEIGHT, searchPreferences.getSearchWindowHeight()));
-        EasyBind.listen(searchPreferences.getSearchWindowWidthProperty(), (_, _, _) -> putDouble(SEARCH_WINDOW_WIDTH, searchPreferences.getSearchWindowWidth()));
-        EasyBind.listen(searchPreferences.getSearchWindowDividerPositionProperty(), (_, _, _) -> putDouble(SEARCH_WINDOW_DIVIDER_POS, searchPreferences.getSearchWindowDividerPosition()));
-        EasyBind.listen(searchPreferences.usePostgresSearchProperty(), (_, _, newValue) -> putBoolean(SEARCH_USE_POSTGRES, newValue));
+        searchPreferences = new SearchPreferences(
+                getBoolean(SEARCH_DISPLAY_MODE, defaultValues.getSearchDisplayMode() == SearchDisplayMode.FILTER) ? SearchDisplayMode.FILTER : SearchDisplayMode.FLOAT,
+                getBoolean(SEARCH_REG_EXP, defaultValues.isRegularExpression()),
+                getBoolean(SEARCH_CASE_SENSITIVE, defaultValues.isCaseSensitive()),
+                getBoolean(SEARCH_FULLTEXT, defaultValues.isFulltext()),
+                getBoolean(SEARCH_USE_POSTGRES, defaultValues.shouldUsePostgresSearch()),
+                getBoolean(SEARCH_KEEP_SEARCH_STRING, defaultValues.shouldKeepSearchString()),
+                getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, defaultValues.shouldKeepWindowOnTop()),
+                getDouble(SEARCH_WINDOW_HEIGHT, defaultValues.getSearchWindowHeight()),
+                getDouble(SEARCH_WINDOW_WIDTH, defaultValues.getSearchWindowWidth()),
+                getDouble(SEARCH_WINDOW_DIVIDER_POS, defaultValues.getSearchWindowDividerPosition()));
+
+        // searchDisplayMode is persisted as a single boolean: FILTER owns the key, FLOAT is the implicit (key=false) value.
+        bindExclusiveFlags(searchPreferences.searchDisplayModeProperty(), defaultValues.getSearchDisplayMode(),
+                SearchDisplayMode.FLOAT,
+                Map.entry(SEARCH_DISPLAY_MODE, SearchDisplayMode.FILTER));
+
+        // Only the fulltext flag is persisted; the regular expression and case-sensitive flags should always be
+        // set to default values on startup, as nothing ever writes their keys.
+        bindSet(searchPreferences.getObservableSearchFlags(), SEARCH_FULLTEXT, getSearchFlags(defaultValues),
+                () -> putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchFlags.FULLTEXT)),
+                () -> getSearchFlags(defaultValues));
+
+        bindBoolean(searchPreferences.keepSearchStringProperty(), SEARCH_KEEP_SEARCH_STRING, defaultValues.shouldKeepSearchString());
+        bindBoolean(searchPreferences.keepWindowOnTopProperty(), SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, defaultValues.shouldKeepWindowOnTop());
+        bindDouble(searchPreferences.getSearchWindowHeightProperty(), SEARCH_WINDOW_HEIGHT, defaultValues.getSearchWindowHeight());
+        bindDouble(searchPreferences.getSearchWindowWidthProperty(), SEARCH_WINDOW_WIDTH, defaultValues.getSearchWindowWidth());
+        bindDouble(searchPreferences.getSearchWindowDividerPositionProperty(), SEARCH_WINDOW_DIVIDER_POS, defaultValues.getSearchWindowDividerPosition());
+        bindBoolean(searchPreferences.usePostgresSearchProperty(), SEARCH_USE_POSTGRES, defaultValues.shouldUsePostgresSearch());
 
         return searchPreferences;
     }
 
-    private SearchPreferences getSearchPreferencesFromBackingStore(SearchPreferences defaults) {
-        return new SearchPreferences(
-                getBoolean(SEARCH_DISPLAY_MODE, defaults.getSearchDisplayMode() == SearchDisplayMode.FILTER) ? SearchDisplayMode.FILTER : SearchDisplayMode.FLOAT,
-                getBoolean(SEARCH_REG_EXP, defaults.isRegularExpression()),
-                getBoolean(SEARCH_CASE_SENSITIVE, defaults.isCaseSensitive()),
-                getBoolean(SEARCH_FULLTEXT, defaults.isFulltext()),
-                getBoolean(SEARCH_USE_POSTGRES, defaults.shouldUsePostgresSearch()),
-                getBoolean(SEARCH_KEEP_SEARCH_STRING, defaults.shouldKeepSearchString()),
-                getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, defaults.shouldKeepWindowOnTop()),
-                getDouble(SEARCH_WINDOW_HEIGHT, defaults.getSearchWindowHeight()),
-                getDouble(SEARCH_WINDOW_WIDTH, defaults.getSearchWindowWidth()),
-                getDouble(SEARCH_WINDOW_DIVIDER_POS, defaults.getSearchWindowDividerPosition()));
+    private Set<SearchFlags> getSearchFlags(SearchPreferences defaults) {
+        EnumSet<SearchFlags> flags = EnumSet.noneOf(SearchFlags.class);
+        if (getBoolean(SEARCH_REG_EXP, defaults.isRegularExpression())) {
+            flags.add(SearchFlags.REGULAR_EXPRESSION);
+        }
+        if (getBoolean(SEARCH_CASE_SENSITIVE, defaults.isCaseSensitive())) {
+            flags.add(SearchFlags.CASE_SENSITIVE);
+        }
+        if (getBoolean(SEARCH_FULLTEXT, defaults.isFulltext())) {
+            flags.add(SearchFlags.FULLTEXT);
+        }
+        return flags;
     }
     // endregion
 
