@@ -1064,7 +1064,6 @@ public class JabRefCliPreferences implements CliPreferences {
         PREFS_NODE.clear();
         new SharedDatabasePreferences().clear();
 
-        getImporterPreferences().setAll(ImporterPreferences.getDefault());
         getGrobidPreferences().setAll(GrobidPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences())).setAll(
                 OpenOfficePreferences.getDefault());
@@ -1095,6 +1094,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getXmpPreferences();
         getProtectedTermsPreferences();
         getNameFormatterPreferences();
+        getImporterPreferences();
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
@@ -1111,7 +1111,6 @@ public class JabRefCliPreferences implements CliPreferences {
         //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
 
         // in case of incomplete or corrupt XML fall back to current preferences
-        getImporterPreferences().setAll(getImporterPreferencesFromBackingStore(getImporterPreferences()));
         getGrobidPreferences().setAll(getGrobidPreferencesFromBackingStore(getGrobidPreferences()));
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences());
         getOpenOfficePreferences(repository).setAll(
@@ -1143,6 +1142,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getXmpPreferences();
         getProtectedTermsPreferences();
         getNameFormatterPreferences();
+        getImporterPreferences();
 
         allBindings.forEach(binding -> binding.importFromStore().run());
     }
@@ -2331,36 +2331,45 @@ public class JabRefCliPreferences implements CliPreferences {
             return importerPreferences;
         }
 
-        importerPreferences = getImporterPreferencesFromBackingStore(ImporterPreferences.getDefault());
+        ImporterPreferences defaultValues = ImporterPreferences.getDefault();
 
-        EasyBind.listen(importerPreferences.importerEnabledProperty(), (_, _, newValue) -> putBoolean(IMPORTER_ENABLED, newValue));
-        EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (_, _, newValue) -> putBoolean(IMPORTER_GENERATE_KEY_ON_IMPORT, newValue));
-        EasyBind.listen(importerPreferences.importWorkingDirectoryProperty(), (_, _, newValue) -> put(IMPORTER_WORKING_DIRECTORY, newValue.toString()));
-        EasyBind.listen(importerPreferences.warnAboutDuplicatesOnImportProperty(), (_, _, newValue) -> putBoolean(IMPORTER_WARN_ABOUT_DUPLICATES, newValue));
-        EasyBind.listen(importerPreferences.persistCustomKeysProperty(), (_, _, newValue) -> putBoolean(FETCHER_CUSTOM_KEY_PERSIST, newValue));
-        importerPreferences.getApiKeys().addListener((InvalidationListener) _ -> storeFetcherKeys(importerPreferences));
-        importerPreferences.getCustomImporters().addListener((InvalidationListener) _ -> storeCustomImportFormats(importerPreferences.getCustomImporters()));
-        importerPreferences.getCatalogs().addListener((InvalidationListener) _ -> putStringList(IMPORTER_CATALOGS, importerPreferences.getCatalogs()));
-        EasyBind.listen(importerPreferences.defaultPlainCitationParserProperty(), (_, _, newValue) -> put(IMPORTER_DEFAULT_PLAIN_CITATION_PARSER, newValue.name()));
-        EasyBind.listen(importerPreferences.citationsRelationsStoreTTLProperty(), (_, _, newValue) -> put(IMPORTER_CITATIONS_RELATIONS_STORE_TTL, newValue.toString()));
+        importerPreferences = new ImporterPreferences(
+                getBoolean(IMPORTER_ENABLED, defaultValues.areImporterEnabled()),
+                getBoolean(IMPORTER_GENERATE_KEY_ON_IMPORT, defaultValues.shouldGenerateNewKeyOnImport()),
+                Path.of(get(IMPORTER_WORKING_DIRECTORY, defaultValues.getImportWorkingDirectory().toString())),
+                getBoolean(IMPORTER_WARN_ABOUT_DUPLICATES, defaultValues.shouldWarnAboutDuplicatesOnImport()),
+                getCustomImportFormats(defaultValues.getCustomImporters()),
+                getFetcherKeys(defaultValues.getApiKeys()),
+                getBoolean(FETCHER_CUSTOM_KEY_PERSIST, defaultValues.shouldPersistCustomKeys()),
+                hasKey(IMPORTER_CATALOGS) ? getStringList(IMPORTER_CATALOGS) : defaultValues.getCatalogs(),
+                getDefaultPlainCitationParser(defaultValues.getDefaultPlainCitationParser()),
+                getInt(IMPORTER_CITATIONS_RELATIONS_STORE_TTL, defaultValues.getCitationsRelationsStoreTTL()),
+                Map.of());
+
+        bindBoolean(importerPreferences.importerEnabledProperty(), IMPORTER_ENABLED, defaultValues.areImporterEnabled());
+        bindBoolean(importerPreferences.generateNewKeyOnImportProperty(), IMPORTER_GENERATE_KEY_ON_IMPORT, defaultValues.shouldGenerateNewKeyOnImport());
+        bindObject(importerPreferences.importWorkingDirectoryProperty(), IMPORTER_WORKING_DIRECTORY, defaultValues.getImportWorkingDirectory(),
+                Path::toString, Path::of);
+        bindBoolean(importerPreferences.warnAboutDuplicatesOnImportProperty(), IMPORTER_WARN_ABOUT_DUPLICATES, defaultValues.shouldWarnAboutDuplicatesOnImport());
+        // persistCustomKeys must be bound before apiKeys: loading the keys re-persists them and reads this flag to
+        // decide whether to write the keyring, so the flag has to be in place first.
+        bindBoolean(importerPreferences.persistCustomKeysProperty(), FETCHER_CUSTOM_KEY_PERSIST, defaultValues.shouldPersistCustomKeys());
+        bindSet(importerPreferences.getApiKeys(), FETCHER_CUSTOM_KEY_NAMES, defaultValues.getApiKeys(),
+                _ -> storeFetcherKeys(importerPreferences),
+                () -> getFetcherKeys(defaultValues.getApiKeys()));
+        bindSet(importerPreferences.getCustomImporters(), IMPORTER_CUSTOM_FORMAT, defaultValues.getCustomImporters(),
+                this::storeCustomImportFormats,
+                () -> getCustomImportFormats(defaultValues.getCustomImporters()));
+        bindCustomList(importerPreferences.getCatalogs(), IMPORTER_CATALOGS, defaultValues.getCatalogs(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
+        // defaultPlainCitationParser falls back to the default on an unparseable stored value, so it needs a custom binding.
+        bindCustom(importerPreferences.defaultPlainCitationParserProperty(), IMPORTER_DEFAULT_PLAIN_CITATION_PARSER, defaultValues.getDefaultPlainCitationParser(),
+                (_, _, newValue) -> put(IMPORTER_DEFAULT_PLAIN_CITATION_PARSER, newValue.name()),
+                () -> importerPreferences.defaultPlainCitationParserProperty().set(getDefaultPlainCitationParser(defaultValues.getDefaultPlainCitationParser())),
+                () -> importerPreferences.defaultPlainCitationParserProperty().set(defaultValues.getDefaultPlainCitationParser()));
+        bindInt(importerPreferences.citationsRelationsStoreTTLProperty(), IMPORTER_CITATIONS_RELATIONS_STORE_TTL, defaultValues.getCitationsRelationsStoreTTL());
 
         return importerPreferences;
-    }
-
-    private ImporterPreferences getImporterPreferencesFromBackingStore(ImporterPreferences defaults) {
-        return new ImporterPreferences(
-                getBoolean(IMPORTER_ENABLED, defaults.areImporterEnabled()),
-                getBoolean(IMPORTER_GENERATE_KEY_ON_IMPORT, defaults.shouldGenerateNewKeyOnImport()),
-                Path.of(get(IMPORTER_WORKING_DIRECTORY, defaults.getImportWorkingDirectory().toString())),
-                getBoolean(IMPORTER_WARN_ABOUT_DUPLICATES, defaults.shouldWarnAboutDuplicatesOnImport()),
-                getCustomImportFormats(defaults.getCustomImporters()),
-                getFetcherKeys(defaults.getApiKeys()),
-                getBoolean(FETCHER_CUSTOM_KEY_PERSIST, defaults.shouldPersistCustomKeys()),
-                hasKey(IMPORTER_CATALOGS) ? getStringList(IMPORTER_CATALOGS) : defaults.getCatalogs(),
-                getDefaultPlainCitationParser(defaults.getDefaultPlainCitationParser()),
-                getInt(IMPORTER_CITATIONS_RELATIONS_STORE_TTL, defaults.getCitationsRelationsStoreTTL()),
-                Map.of()
-        );
     }
 
     private Set<CustomImporter> getCustomImportFormats(Set<CustomImporter> defaults) {
