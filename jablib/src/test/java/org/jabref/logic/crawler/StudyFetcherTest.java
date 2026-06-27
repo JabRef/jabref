@@ -15,6 +15,9 @@ import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -30,6 +33,9 @@ class StudyFetcherTest {
 
         PagedSearchBasedFetcher pagedFetcher = mock(PagedSearchBasedFetcher.class);
         when(pagedFetcher.getName()).thenReturn("TestPagedFetcher");
+        when(pagedFetcher.getPageSize()).thenReturn(10);
+        when(pagedFetcher.performRawSearchQueryPaged(anyString(), anyInt()))
+                .thenReturn(new Page<>("native:query", 0, List.of()));
         when(pagedFetcher.performRawSearchQueryPaged("native:query", 0))
                 .thenReturn(new Page<>("native:query", 0, List.of(new BibEntry())));
 
@@ -38,7 +44,7 @@ class StudyFetcherTest {
 
         assertFalse(results.isEmpty());
         verify(pagedFetcher).performRawSearchQueryPaged("native:query", 0);
-        verify(pagedFetcher, never()).performSearchPaged(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyInt());
+        verify(pagedFetcher, never()).performSearchPaged(anyString(), anyInt());
     }
 
     @Test
@@ -55,7 +61,7 @@ class StudyFetcherTest {
 
         assertFalse(results.isEmpty());
         verify(plainFetcher).performRawSearchQuery("native:query");
-        verify(plainFetcher, never()).performSearch(org.mockito.ArgumentMatchers.anyString());
+        verify(plainFetcher, never()).performSearch(anyString());
     }
 
     @Test
@@ -65,7 +71,7 @@ class StudyFetcherTest {
         PagedSearchBasedFetcher pagedFetcher = mock(PagedSearchBasedFetcher.class);
         when(pagedFetcher.getName()).thenReturn("TestPagedFetcher");
         when(pagedFetcher.getPageSize()).thenReturn(10);
-        when(pagedFetcher.performSearchPaged(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyInt()))
+        when(pagedFetcher.performSearchPaged(anyString(), anyInt()))
                 .thenReturn(new Page<>("machine learning", 0, List.of()));
         when(pagedFetcher.performSearchPaged("machine learning", 0))
                 .thenReturn(new Page<>("machine learning", 0, List.of(new BibEntry())));
@@ -74,6 +80,44 @@ class StudyFetcherTest {
         studyFetcher.crawl();
 
         verify(pagedFetcher).performSearchPaged("machine learning", 0);
-        verify(pagedFetcher, never()).performRawSearchQueryPaged(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyInt());
+        verify(pagedFetcher, never()).performRawSearchQueryPaged(anyString(), anyInt());
+    }
+
+    @Test
+    void caseInsensitiveOverrideMatchesFetcher() throws FetcherException {
+        StudyQuery studyQuery = new StudyQuery("machine learning");
+        studyQuery.setCatalogSpecific(Map.of("ieeexplore", "native:query"));
+
+        PagedSearchBasedFetcher pagedFetcher = mock(PagedSearchBasedFetcher.class);
+        when(pagedFetcher.getName()).thenReturn("IEEEXplore");
+        when(pagedFetcher.getPageSize()).thenReturn(10);
+        when(pagedFetcher.performRawSearchQueryPaged(anyString(), anyInt()))
+                .thenReturn(new Page<>("native:query", 0, List.of()));
+        when(pagedFetcher.performRawSearchQueryPaged("native:query", 0))
+                .thenReturn(new Page<>("native:query", 0, List.of(new BibEntry())));
+
+        StudyFetcher studyFetcher = new StudyFetcher(List.of(pagedFetcher), List.of(studyQuery), Map.of());
+        studyFetcher.crawl();
+
+        verify(pagedFetcher).performRawSearchQueryPaged("native:query", 0);
+        verify(pagedFetcher, never()).performSearchPaged(anyString(), anyInt());
+    }
+
+    @Test
+    void unsupportedOperationOnRawPathReturnsEmptyAndContinues() throws FetcherException {
+        StudyQuery studyQuery = new StudyQuery("machine learning");
+        studyQuery.setCatalogSpecific(Map.of("TestPagedFetcher", "native:query"));
+
+        PagedSearchBasedFetcher pagedFetcher = mock(PagedSearchBasedFetcher.class);
+        when(pagedFetcher.getName()).thenReturn("TestPagedFetcher");
+        when(pagedFetcher.getPageSize()).thenReturn(10);
+        when(pagedFetcher.performRawSearchQueryPaged(anyString(), anyInt()))
+                .thenThrow(new UnsupportedOperationException("not implemented"));
+
+        StudyFetcher studyFetcher = new StudyFetcher(List.of(pagedFetcher), List.of(studyQuery), Map.of());
+        List<QueryResult> results = studyFetcher.crawl();
+
+        assertNotNull(results);
+        verify(pagedFetcher, never()).performSearchPaged(anyString(), anyInt());
     }
 }
