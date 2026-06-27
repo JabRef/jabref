@@ -59,17 +59,26 @@ class StudyFetcher {
     private FetchResult performSearchOnQueryForFetcher(StudyQuery searchQuery, SearchBasedFetcher fetcher) {
         try {
             List<BibEntry> fetchResult = new ArrayList<>();
+            String catalogOverride = searchQuery.getCatalogSpecific().get(fetcher.getName());
             if (fetcher instanceof PagedSearchBasedFetcher basedFetcher) {
-                int limit = resultLimits.getOrDefault(fetcher.getName(), StudyRepository.DEFAULT_RESULT_LIMIT);
-                int pages = (int) Math.ceil((double) limit / basedFetcher.getPageSize());
-                for (int page = 0; page < pages; page++) {
-                    fetchResult.addAll(basedFetcher.performSearchPaged(searchQuery.getQuery(), page).getContent());
-                }
-                if (fetchResult.size() > limit) {
-                    fetchResult = new ArrayList<>(fetchResult.subList(0, limit));
+                if (catalogOverride != null) {
+                    fetchResult.addAll(basedFetcher.performRawSearchQueryPaged(catalogOverride, 0).getContent());
+                } else {
+                    int limit = resultLimits.getOrDefault(fetcher.getName(), StudyRepository.DEFAULT_RESULT_LIMIT);
+                    int pages = (int) Math.ceil((double) limit / basedFetcher.getPageSize());
+                    for (int page = 0; page < pages; page++) {
+                        fetchResult.addAll(basedFetcher.performSearchPaged(searchQuery.getQuery(), page).getContent());
+                    }
+                    if (fetchResult.size() > limit) {
+                        fetchResult = new ArrayList<>(fetchResult.subList(0, limit));
+                    }
                 }
             } else {
-                fetchResult = fetcher.performSearch(searchQuery.getQuery());
+                if (catalogOverride != null) {
+                    fetchResult = fetcher.performRawSearchQuery(catalogOverride);
+                } else {
+                    fetchResult = fetcher.performSearch(searchQuery.getQuery());
+                }
             }
             return new FetchResult(fetcher.getName(), new BibDatabase(fetchResult));
         } catch (FetcherException e) {
