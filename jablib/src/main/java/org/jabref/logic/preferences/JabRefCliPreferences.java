@@ -742,7 +742,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @param <T>           the enum type held by the property
     /// @param property      the property to bind
     /// @param defaultValue  the value reported as the default and restored on reset; also returned on load when no flag
-    ///                     has ever been stored
+    ///                      has ever been stored
     /// @param implicitValue the enum constant that owns no key and is thus encoded as all flags being `false`
     /// @param flags         the backing-store key for each non-implicit value, in lookup order (first match wins on load)
     @SafeVarargs
