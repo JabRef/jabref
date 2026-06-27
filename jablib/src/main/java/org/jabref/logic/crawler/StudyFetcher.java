@@ -81,7 +81,7 @@ class StudyFetcher {
                 }
             }
             return new FetchResult(fetcher.getName(), new BibDatabase(fetchResult));
-        } catch (FetcherException e) {
+        } catch (FetcherException | UnsupportedOperationException e) {
             LOGGER.warn("{} API request failed", fetcher.getName(), e);
             return null;
         }
