@@ -20,6 +20,7 @@ import java.util.SequencedSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.prefs.BackingStoreException;
@@ -789,22 +790,22 @@ public class JabRefCliPreferences implements CliPreferences {
     /// Binds a map-valued property. Unlike the other `bind*` helpers, persistence is delegated to the given
     /// `persistListener`, since map entries may be stored under multiple backing-store keys.
     ///
-    /// @param persistListener persists individual entry changes to the backing store
-    /// @param loadFromStore   reads the stored map, falling back to the given defaults for missing entries
+    /// @param serializer   persists individual entry changes to the backing store
+    /// @param deserializer reads the stored map, falling back to the given defaults for missing entries
     private void bindMap(MapProperty<String, String> map,
                          String key,
                          Map<String, String> defaultMap,
-                         MapChangeListener<? super String, ? super String> persistListener,
-                         Function<Map<String, String>, Map<String, String>> loadFromStore) {
+                         MapChangeListener<? super String, ? super String> serializer,
+                         Function<Map<String, String>, Map<String, String>> deserializer) {
         Map<String, String> defaultCopy = Map.copyOf(defaultMap);
-        map.addListener(persistListener);
+        map.addListener(serializer);
         allBindings.add(new PreferenceBinding(
                 map,
                 defaultCopy,
                 key,
                 () -> {
                     map.clear();
-                    map.putAll(loadFromStore.apply(defaultCopy));
+                    map.putAll(deserializer.apply(defaultCopy));
                 },
                 () -> {
                     map.clear();
@@ -812,25 +813,25 @@ public class JabRefCliPreferences implements CliPreferences {
                 }));
     }
 
-    /// Binds an observable list. This is the general primitive behind the other `bindList` overloads: persistence and
-    /// loading are delegated to the given callbacks, so the entries may be stored under one or several backing-store
-    /// keys (e.g. a numbered series). Persistence is wholesale — `persist` runs on any change and rewrites the entire
-    /// stored representation — which is why it is a plain [Runnable]. Compare [#bindMap], which receives the individual
+    /// Binds an observable list with caller-supplied persistence. This is the general primitive behind [#bindCustomList]:
+    /// persistence and loading are delegated to the given callbacks, so the entries may be stored under one or several
+    /// backing-store keys (e.g. a numbered series). Persistence is wholesale — `persist` receives the bound list and
+    /// rewrites the entire stored representation on every change. Compare [#bindMap], which receives the individual
     /// change because map entries are persisted incrementally under per-entry keys.
     ///
     /// @param <T>           the element type of the list
     /// @param list          the observable list to bind
     /// @param key           the binding's reporting key in [#getPreferences()] and [#getDefaults()]
     /// @param defaultList   the values restored on reset and reported as the default
-    /// @param persist       rewrites the whole list to the backing store; run on every change
+    /// @param persist       rewrites the whole list to the backing store; receives the bound list and runs on every change
     /// @param loadFromStore reads the stored list, falling back to `defaultList` for absent entries
-    private <T> void bindList(ObservableList<T> list,
-                              String key,
-                              List<T> defaultList,
-                              Runnable persist,
-                              Supplier<? extends Collection<? extends T>> loadFromStore) {
+    private <T> void bindCustomList(ObservableList<T> list,
+                                    String key,
+                                    List<T> defaultList,
+                                    Consumer<? super ObservableList<T>> persist,
+                                    Supplier<? extends Collection<? extends T>> loadFromStore) {
         List<T> defaultCopy = List.copyOf(defaultList);
-        list.addListener((InvalidationListener) _ -> persist.run());
+        list.addListener((InvalidationListener) _ -> persist.accept(list));
         allBindings.add(new PreferenceBinding(
                 list,
                 defaultCopy,
@@ -839,17 +840,18 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> list.setAll(defaultCopy)));
     }
 
-    /// Binds an observable list whose persisted form is a single String.
+    /// Binds an observable list whose persisted form is a single String. The callbacks are pure transforms; the actual
+    /// backing-store read/write is performed by this method (delegating to [#bindCustomList]).
     ///
     /// @param serializer   converts the list to its stored String representation
     /// @param deserializer reconstructs the list elements from their stored String representation
-    private <T> void bindList(ObservableList<T> list,
-                              String key,
-                              List<T> defaultList,
-                              Function<List<T>, String> serializer,
-                              Function<String, ? extends Collection<T>> deserializer) {
-        bindList(list, key, defaultList,
-                () -> put(key, serializer.apply(list)),
+    private <T> void bindCustomList(ObservableList<T> list,
+                                    String key,
+                                    List<T> defaultList,
+                                    Function<List<T>, String> serializer,
+                                    Function<String, ? extends Collection<T>> deserializer) {
+        bindCustomList(list, key, defaultList,
+                boundList -> put(key, serializer.apply(boundList)),
                 () -> deserializer.apply(get(key, serializer.apply(defaultList))));
     }
 
@@ -861,35 +863,35 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @param key         the binding's reporting key in [#getPreferences()] and [#getDefaults()]
     /// @param defaultList the values restored on reset and reported as the default
     protected void bindPathList(ObservableList<Path> list, String key, List<Path> defaultList) {
-        bindList(list, key, defaultList,
+        bindCustomList(list, key, defaultList,
                 paths -> convertListToString(paths.stream().map(Path::toString).toList()),
                 stored -> convertStringToList(stored).stream().map(Path::of).toList());
     }
 
-    /// Binds an observable set. The set counterpart of [#bindList]: persistence and loading are delegated to the
+    /// Binds an observable set. The set counterpart of [#bindCustomList]: persistence and loading are delegated to the
     /// given callbacks, so the entries may be stored under one or several backing-store keys. Persistence is
     /// wholesale — `persist` runs on any change and rewrites the entire stored representation.
     ///
-    /// @param <T>           the element type of the set
-    /// @param set           the observable set to bind
-    /// @param key           the binding's reporting key in [#getPreferences()] and [#getDefaults()]
-    /// @param defaultSet    the values restored on reset and reported as the default
-    /// @param persist       rewrites the whole set to the backing store; run on every change
-    /// @param loadFromStore reads the stored set, falling back to `defaultSet` for absent entries
+    /// @param <T>          the element type of the set
+    /// @param set          the observable set to bind
+    /// @param key          the binding's reporting key in [#getPreferences()] and [#getDefaults()]
+    /// @param defaultSet   the values restored on reset and reported as the default
+    /// @param serializer   rewrites the whole set to the backing store; receives the bound set and runs on every change
+    /// @param deserializer reads the stored set, falling back to `defaultSet` for absent entries
     private <T> void bindSet(ObservableSet<T> set,
                              String key,
                              Set<T> defaultSet,
-                             Runnable persist,
-                             Supplier<? extends Collection<? extends T>> loadFromStore) {
+                             Consumer<? super ObservableSet<T>> serializer,
+                             Supplier<? extends Collection<? extends T>> deserializer) {
         Set<T> defaultCopy = Set.copyOf(defaultSet);
-        set.addListener((InvalidationListener) _ -> persist.run());
+        set.addListener((InvalidationListener) _ -> serializer.accept(set));
         allBindings.add(new PreferenceBinding(
                 set,
                 defaultCopy,
                 key,
                 () -> {
                     set.clear();
-                    set.addAll(loadFromStore.get());
+                    set.addAll(deserializer.get());
                 },
                 () -> {
                     set.clear();
@@ -1180,7 +1182,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions())
         );
 
-        bindList(abbreviationPreferences.getExternalJournalLists(), EXTERNAL_JOURNAL_LISTS, defaultValues.getExternalJournalLists(),
+        bindCustomList(abbreviationPreferences.getExternalJournalLists(), EXTERNAL_JOURNAL_LISTS, defaultValues.getExternalJournalLists(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
         bindBoolean(abbreviationPreferences.useFJournalFieldProperty(), USE_AMS_FJOURNAL, defaultValues.useFJournalFieldProperty().get());
         bindBoolean(abbreviationPreferences.shouldEnableMscKeywordDescriptionsProperty(), ENABLE_MSC_KEYWORD_DESCRIPTIONS, defaultValues.shouldEnableMscKeywordDescriptions());
@@ -1731,9 +1733,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 (_, _, newValue) -> putBoolean(DO_NOT_RESOLVE_STRINGS, !newValue),
                 () -> fieldPreferences.resolveStringsProperty().set(!getBoolean(DO_NOT_RESOLVE_STRINGS, !defaultValues.shouldResolveStrings())),
                 () -> fieldPreferences.resolveStringsProperty().set(defaultValues.shouldResolveStrings()));
-        bindList(fieldPreferences.getResolvableFields(), RESOLVE_STRINGS_FOR_FIELDS, List.copyOf(defaultValues.getResolvableFields()),
+        bindCustomList(fieldPreferences.getResolvableFields(), RESOLVE_STRINGS_FOR_FIELDS, List.copyOf(defaultValues.getResolvableFields()),
                 FieldFactory::serializeFieldsList, FieldFactory::parseFieldList);
-        bindList(fieldPreferences.getNonWrappableFields(), NON_WRAPPABLE_FIELDS, List.copyOf(defaultValues.getNonWrappableFields()),
+        bindCustomList(fieldPreferences.getNonWrappableFields(), NON_WRAPPABLE_FIELDS, List.copyOf(defaultValues.getNonWrappableFields()),
                 FieldFactory::serializeFieldsList, FieldFactory::parseFieldList);
 
         return fieldPreferences;
@@ -1858,8 +1860,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> exportPreferences.exportSaveOrderProperty().set(getExportSaveOrder(defaultValues.getExportSaveOrder())),
                 () -> exportPreferences.exportSaveOrderProperty().set(defaultValues.getExportSaveOrder()));
         // customExporters are persisted as a numbered series, so they need a delegated list binding.
-        bindList(exportPreferences.getCustomExporters(), CUSTOM_EXPORT_FORMAT, defaultValues.getCustomExporters(),
-                () -> storeCustomExportFormats(exportPreferences.getCustomExporters()),
+        bindCustomList(exportPreferences.getCustomExporters(), CUSTOM_EXPORT_FORMAT, defaultValues.getCustomExporters(),
+                this::storeCustomExportFormats,
                 () -> getCustomExportFormats(defaultValues.getCustomExporters()));
 
         return exportPreferences;
@@ -2002,13 +2004,13 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // activeJobs is persisted as a single string list, removing the key entirely when empty.
         bindSet(cleanupPreferences.getObservableActiveJobs(), CLEANUP_JOBS, defaultValues.getActiveJobs(),
-                () -> {
-                    if (cleanupPreferences.getActiveJobs().isEmpty()) {
+                activeJobs -> {
+                    if (activeJobs.isEmpty()) {
                         remove(CLEANUP_JOBS);
                     } else {
-                        putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream()
-                                                                      .map(Enum::name)
-                                                                      .collect(Collectors.toList()));
+                        putStringList(CLEANUP_JOBS, activeJobs.stream()
+                                                              .map(Enum::name)
+                                                              .collect(Collectors.toList()));
                     }
                 },
                 () -> getCleanupActiveJobs(defaultValues.getActiveJobs()));
@@ -2207,7 +2209,11 @@ public class JabRefCliPreferences implements CliPreferences {
                 Map.entry(SEARCH_DISPLAY_MODE, SearchDisplayMode.FILTER));
 
         bindSet(searchPreferences.getObservableSearchFlags(), SEARCH_FULLTEXT, getSearchFlags(defaultValues),
-                () -> storeSearchFlags(),
+                flags -> {
+                    // Only the fulltext flag is persisted; the regular expression and case-sensitive flags should always be
+                    // set to default values on startup, as nothing ever writes their keys.
+                    putBoolean(SEARCH_FULLTEXT, flags.contains(SearchFlags.FULLTEXT));
+                },
                 () -> getSearchFlags(defaultValues));
 
         bindBoolean(searchPreferences.keepSearchStringProperty(), SEARCH_KEEP_SEARCH_STRING, defaultValues.shouldKeepSearchString());
@@ -2233,12 +2239,6 @@ public class JabRefCliPreferences implements CliPreferences {
         }
         return flags;
     }
-
-    /// Only the fulltext flag is persisted; the regular expression and case-sensitive flags should always be
-    /// set to default values on startup, as nothing ever writes their keys.
-    private void storeSearchFlags() {
-        putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchFlags.FULLTEXT));
-    }
     // endregion
 
     // region XmpPreferences
@@ -2257,7 +2257,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
         bindBoolean(xmpPreferences.useXmpPrivacyFilterProperty(), XMP_USE_PRIVACY_FILTER, defaultValues.shouldUseXmpPrivacyFilter());
         bindSet(xmpPreferences.getXmpPrivacyFilter(), XMP_PRIVACY_FILTERS, defaultValues.getXmpPrivacyFilter(),
-                () -> storeXmpPrivacyFilter(),
+                filter -> putStringList(XMP_PRIVACY_FILTERS, filter.stream()
+                                                                   .map(Field::getName)
+                                                                   .collect(Collectors.toList())),
                 () -> getXmpPrivacyFilter(defaultValues.getXmpPrivacyFilter()));
 
         return xmpPreferences;
@@ -2269,12 +2271,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 .stream()
                 .map(FieldFactory::parseField)
                 .collect(Collectors.toSet());
-    }
-
-    private void storeXmpPrivacyFilter() {
-        putStringList(XMP_PRIVACY_FILTERS, xmpPreferences.getXmpPrivacyFilter().stream()
-                                                         .map(Field::getName)
-                                                         .collect(Collectors.toList()));
     }
     // endregion
 
