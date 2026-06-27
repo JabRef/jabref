@@ -1063,7 +1063,6 @@ public class JabRefCliPreferences implements CliPreferences {
         PREFS_NODE.clear();
         new SharedDatabasePreferences().clear();
 
-        getOcrPreferences().setAll(OcrPreferences.getDefault());
         getNameFormatterPreferences().setAll(NameFormatterPreferences.getDefault());
         getImporterPreferences().setAll(ImporterPreferences.getDefault());
         getSearchPreferences().setAll(SearchPreferences.getDefault());
@@ -1094,6 +1093,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getCleanupPreferences();
         getLastFilesOpenedPreferences();
         getAiPreferences();
+        getOcrPreferences();
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
@@ -1110,7 +1110,6 @@ public class JabRefCliPreferences implements CliPreferences {
         //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
 
         // in case of incomplete or corrupt XML fall back to current preferences
-        getOcrPreferences().setAll(getOcrPreferencesFromBackingStore(getOcrPreferences()));
         getNameFormatterPreferences().setAll(getNameFormatterPreferencesFromBackingStore(getNameFormatterPreferences()));
         getImporterPreferences().setAll(getImporterPreferencesFromBackingStore(getImporterPreferences()));
         getSearchPreferences().setAll(getSearchPreferencesFromBackingStore(getSearchPreferences()));
@@ -1142,6 +1141,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getCleanupPreferences();
         getLastFilesOpenedPreferences();
         getAiPreferences();
+        getOcrPreferences();
 
         allBindings.forEach(binding -> binding.importFromStore().run());
     }
@@ -2170,17 +2170,14 @@ public class JabRefCliPreferences implements CliPreferences {
             return ocrPreferences;
         }
 
-        ocrPreferences = getOcrPreferencesFromBackingStore(OcrPreferences.getDefault());
+        OcrPreferences defaultValues = OcrPreferences.getDefault();
 
-        EasyBind.listen(ocrPreferences.ocrEnginePathProperty(), (_, _, newValue) -> put(OCR_ENGINE_PATH, newValue));
+        ocrPreferences = new OcrPreferences(
+                get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()));
+
+        bindString(ocrPreferences.ocrEnginePathProperty(), OCR_ENGINE_PATH, defaultValues.getOcrEnginePath());
 
         return ocrPreferences;
-    }
-
-    private OcrPreferences getOcrPreferencesFromBackingStore(OcrPreferences defaults) {
-        return new OcrPreferences(
-                get(OCR_ENGINE_PATH, defaults.getOcrEnginePath())
-        );
     }
     // endregion
 
