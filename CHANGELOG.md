@@ -48,6 +48,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed the Library of Congress fetcher to retrieve entries by LCCN again. [#16055](https://github.com/JabRef/jabref/issues/16055)
 - We fixed an issue where fetchers sent an empty API-key parameter (e.g. `api_key=`) to the remote service when no key was configured. [#16044](https://github.com/JabRef/jabref/pull/16044)
 - We fixed an issue where the global search dialog kept showing the previous entry preview when the search returned no results. [#15613](https://github.com/JabRef/jabref/issues/15613)
 - We fixed an issue where preferences referencing removed cleanup steps are now ignored instead of failing to load. [#15948](https://github.com/JabRef/jabref/pull/15948)

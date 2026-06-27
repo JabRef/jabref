@@ -14,6 +14,8 @@ import org.apache.hc.core5.net.URIBuilder;
 /// Fetcher for the Library of Congress Control Number (LCCN) using https://lccn.loc.gov/
 public class LibraryOfCongress implements IdBasedParserFetcher {
 
+    private static final String API_URL = "http://lx2.loc.gov:210/LCDB";
+
     private final ImportFormatPreferences importFormatPreferences;
 
     public LibraryOfCongress(ImportFormatPreferences importFormatPreferences) {
@@ -27,7 +29,13 @@ public class LibraryOfCongress implements IdBasedParserFetcher {
 
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
-        URIBuilder uriBuilder = new URIBuilder("https://lccn.loc.gov/" + identifier + "/mods");
+        URIBuilder uriBuilder = new URIBuilder(API_URL);
+        uriBuilder.addParameter("version", "1.1");
+        uriBuilder.addParameter("operation", "searchRetrieve");
+        uriBuilder.addParameter("query", "bath.lccn=\"" + identifier + "\"");
+        uriBuilder.addParameter("startRecord", "1");
+        uriBuilder.addParameter("maximumRecords", "1");
+        uriBuilder.addParameter("recordSchema", "mods");
         return uriBuilder.build().toURL();
     }
 
