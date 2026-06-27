@@ -40,7 +40,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
-import javafx.collections.SetChangeListener;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
@@ -1065,7 +1064,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         getNameFormatterPreferences().setAll(NameFormatterPreferences.getDefault());
         getImporterPreferences().setAll(ImporterPreferences.getDefault());
-        getXmpPreferences().setAll(XmpPreferences.getDefault());
         getProtectedTermsPreferences().setAll(ProtectedTermsPreferences.getDefault());
         getGrobidPreferences().setAll(GrobidPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences())).setAll(
@@ -1094,6 +1092,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getAiPreferences();
         getOcrPreferences();
         getSearchPreferences();
+        getXmpPreferences();
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
@@ -1112,7 +1111,6 @@ public class JabRefCliPreferences implements CliPreferences {
         // in case of incomplete or corrupt XML fall back to current preferences
         getNameFormatterPreferences().setAll(getNameFormatterPreferencesFromBackingStore(getNameFormatterPreferences()));
         getImporterPreferences().setAll(getImporterPreferencesFromBackingStore(getImporterPreferences()));
-        getXmpPreferences().setAll(getXmpPreferencesFromBackingStore(getXmpPreferences()));
         getProtectedTermsPreferences().setAll(getProtectedTermsPreferencesFromBackingStore(getProtectedTermsPreferences()));
         getGrobidPreferences().setAll(getGrobidPreferencesFromBackingStore(getGrobidPreferences()));
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences());
@@ -1142,6 +1140,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getAiPreferences();
         getOcrPreferences();
         getSearchPreferences();
+        getXmpPreferences();
 
         allBindings.forEach(binding -> binding.importFromStore().run());
     }
@@ -2207,10 +2206,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 SearchDisplayMode.FLOAT,
                 Map.entry(SEARCH_DISPLAY_MODE, SearchDisplayMode.FILTER));
 
-        // Only the fulltext flag is persisted; the regular expression and case-sensitive flags should always be
-        // set to default values on startup, as nothing ever writes their keys.
         bindSet(searchPreferences.getObservableSearchFlags(), SEARCH_FULLTEXT, getSearchFlags(defaultValues),
-                () -> putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchFlags.FULLTEXT)),
+                () -> storeSearchFlags(),
                 () -> getSearchFlags(defaultValues));
 
         bindBoolean(searchPreferences.keepSearchStringProperty(), SEARCH_KEEP_SEARCH_STRING, defaultValues.shouldKeepSearchString());
@@ -2236,6 +2233,12 @@ public class JabRefCliPreferences implements CliPreferences {
         }
         return flags;
     }
+
+    /// Only the fulltext flag is persisted; the regular expression and case-sensitive flags should always be
+    /// set to default values on startup, as nothing ever writes their keys.
+    private void storeSearchFlags() {
+        putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchFlags.FULLTEXT));
+    }
     // endregion
 
     // region XmpPreferences
@@ -2245,27 +2248,33 @@ public class JabRefCliPreferences implements CliPreferences {
             return xmpPreferences;
         }
 
-        xmpPreferences = getXmpPreferencesFromBackingStore(XmpPreferences.getDefault());
+        XmpPreferences defaultValues = XmpPreferences.getDefault();
 
-        EasyBind.listen(xmpPreferences.useXmpPrivacyFilterProperty(),
-                (_, _, newValue) -> putBoolean(XMP_USE_PRIVACY_FILTER, newValue));
-        xmpPreferences.getXmpPrivacyFilter().addListener((SetChangeListener<Field>) _ ->
-                putStringList(XMP_PRIVACY_FILTERS, xmpPreferences.getXmpPrivacyFilter().stream()
-                                                                 .map(Field::getName)
-                                                                 .collect(Collectors.toList())));
+        xmpPreferences = new XmpPreferences(
+                getBoolean(XMP_USE_PRIVACY_FILTER, defaultValues.shouldUseXmpPrivacyFilter()),
+                getXmpPrivacyFilter(defaultValues.getXmpPrivacyFilter()),
+                getBibEntryPreferences().keywordSeparatorProperty());
+
+        bindBoolean(xmpPreferences.useXmpPrivacyFilterProperty(), XMP_USE_PRIVACY_FILTER, defaultValues.shouldUseXmpPrivacyFilter());
+        bindSet(xmpPreferences.getXmpPrivacyFilter(), XMP_PRIVACY_FILTERS, defaultValues.getXmpPrivacyFilter(),
+                () -> storeXmpPrivacyFilter(),
+                () -> getXmpPrivacyFilter(defaultValues.getXmpPrivacyFilter()));
 
         return xmpPreferences;
     }
 
-    private XmpPreferences getXmpPreferencesFromBackingStore(XmpPreferences defaults) {
-        return new XmpPreferences(
-                getBoolean(XMP_USE_PRIVACY_FILTER, defaults.shouldUseXmpPrivacyFilter()),
-                convertStringToList(get(XMP_PRIVACY_FILTERS,
-                        convertListToString(defaults.getXmpPrivacyFilter().stream().map(Field::getName).toList())))
-                        .stream()
-                        .map(FieldFactory::parseField)
-                        .collect(Collectors.toSet()),
-                getBibEntryPreferences().keywordSeparatorProperty());
+    private Set<Field> getXmpPrivacyFilter(Set<Field> defaults) {
+        return convertStringToList(get(XMP_PRIVACY_FILTERS,
+                convertListToString(defaults.stream().map(Field::getName).toList())))
+                .stream()
+                .map(FieldFactory::parseField)
+                .collect(Collectors.toSet());
+    }
+
+    private void storeXmpPrivacyFilter() {
+        putStringList(XMP_PRIVACY_FILTERS, xmpPreferences.getXmpPrivacyFilter().stream()
+                                                         .map(Field::getName)
+                                                         .collect(Collectors.toList()));
     }
     // endregion
 
