@@ -989,6 +989,8 @@ public class JabRefCliPreferences implements CliPreferences {
             return booleanProperty.get();
         } else if (observable instanceof IntegerProperty integerProperty) {
             return integerProperty.get();
+        } else if (observable instanceof DoubleProperty doubleProperty) {
+            return doubleProperty.get();
         } else if (observable instanceof StringProperty stringProperty) {
             return stringProperty.get();
         } else if (observable instanceof ObservableList<?> observableList) {
