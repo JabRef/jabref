@@ -32,6 +32,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support to the JabKit commands `get-cited-works` and `get-citing-works` to output to files in various export formats. [#15913](https://github.com/JabRef/jabref/pull/15913)
 - We added generic CSV export filter that exports all standard BibTeX fields. [#15711](https://github.com/JabRef/jabref/issues/15711)
 - We added OCR engine's executable path as the first OCR preference to let users specify the exact path of the engine they are using. [#15990](https://github.com/JabRef/jabref/pull/15990)
+- We added file notification to OCRed file to let users open the directory and show the new file. [#16082](https://github.com/JabRef/jabref/pull/16082)
 
 ### Changed
 
