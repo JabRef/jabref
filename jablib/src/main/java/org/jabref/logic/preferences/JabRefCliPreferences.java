@@ -1066,7 +1066,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         getNameFormatterPreferences().setAll(NameFormatterPreferences.getDefault());
         getImporterPreferences().setAll(ImporterPreferences.getDefault());
-        getProtectedTermsPreferences().setAll(ProtectedTermsPreferences.getDefault());
         getGrobidPreferences().setAll(GrobidPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences())).setAll(
                 OpenOfficePreferences.getDefault());
@@ -1095,6 +1094,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getOcrPreferences();
         getSearchPreferences();
         getXmpPreferences();
+        getProtectedTermsPreferences();
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
@@ -1113,7 +1113,6 @@ public class JabRefCliPreferences implements CliPreferences {
         // in case of incomplete or corrupt XML fall back to current preferences
         getNameFormatterPreferences().setAll(getNameFormatterPreferencesFromBackingStore(getNameFormatterPreferences()));
         getImporterPreferences().setAll(getImporterPreferencesFromBackingStore(getImporterPreferences()));
-        getProtectedTermsPreferences().setAll(getProtectedTermsPreferencesFromBackingStore(getProtectedTermsPreferences()));
         getGrobidPreferences().setAll(getGrobidPreferencesFromBackingStore(getGrobidPreferences()));
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences());
         getOpenOfficePreferences(repository).setAll(
@@ -1143,6 +1142,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getOcrPreferences();
         getSearchPreferences();
         getXmpPreferences();
+        getProtectedTermsPreferences();
 
         allBindings.forEach(binding -> binding.importFromStore().run());
     }
@@ -2305,27 +2305,24 @@ public class JabRefCliPreferences implements CliPreferences {
             return protectedTermsPreferences;
         }
 
-        protectedTermsPreferences = getProtectedTermsPreferencesFromBackingStore(ProtectedTermsPreferences.getDefault());
+        ProtectedTermsPreferences defaultValues = ProtectedTermsPreferences.getDefault();
 
-        protectedTermsPreferences.getEnabledExternalTermLists().addListener((InvalidationListener) _ ->
-                putStringList(PROTECTED_TERMS_ENABLED_EXTERNAL, protectedTermsPreferences.getEnabledExternalTermLists()));
-        protectedTermsPreferences.getDisabledExternalTermLists().addListener((InvalidationListener) _ ->
-                putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, protectedTermsPreferences.getDisabledExternalTermLists()));
-        protectedTermsPreferences.getEnabledInternalTermLists().addListener((InvalidationListener) _ ->
-                putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, protectedTermsPreferences.getEnabledInternalTermLists()));
-        protectedTermsPreferences.getDisabledInternalTermLists().addListener((InvalidationListener) _ ->
-                putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, protectedTermsPreferences.getDisabledInternalTermLists()));
+        protectedTermsPreferences = new ProtectedTermsPreferences(
+                convertStringToList(get(PROTECTED_TERMS_ENABLED_INTERNAL, convertListToString(defaultValues.getEnabledInternalTermLists()))),
+                convertStringToList(get(PROTECTED_TERMS_ENABLED_EXTERNAL, convertListToString(defaultValues.getEnabledExternalTermLists()))),
+                convertStringToList(get(PROTECTED_TERMS_DISABLED_INTERNAL, convertListToString(defaultValues.getDisabledInternalTermLists()))),
+                convertStringToList(get(PROTECTED_TERMS_DISABLED_EXTERNAL, convertListToString(defaultValues.getDisabledExternalTermLists()))));
+
+        bindCustomList(protectedTermsPreferences.getEnabledInternalTermLists(), PROTECTED_TERMS_ENABLED_INTERNAL, defaultValues.getEnabledInternalTermLists(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
+        bindCustomList(protectedTermsPreferences.getEnabledExternalTermLists(), PROTECTED_TERMS_ENABLED_EXTERNAL, defaultValues.getEnabledExternalTermLists(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
+        bindCustomList(protectedTermsPreferences.getDisabledInternalTermLists(), PROTECTED_TERMS_DISABLED_INTERNAL, defaultValues.getDisabledInternalTermLists(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
+        bindCustomList(protectedTermsPreferences.getDisabledExternalTermLists(), PROTECTED_TERMS_DISABLED_EXTERNAL, defaultValues.getDisabledExternalTermLists(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
 
         return protectedTermsPreferences;
-    }
-
-    private ProtectedTermsPreferences getProtectedTermsPreferencesFromBackingStore(ProtectedTermsPreferences defaults) {
-        return new ProtectedTermsPreferences(
-                convertStringToList(get(PROTECTED_TERMS_ENABLED_INTERNAL, convertListToString(defaults.getEnabledInternalTermLists()))),
-                convertStringToList(get(PROTECTED_TERMS_ENABLED_EXTERNAL, convertListToString(defaults.getEnabledExternalTermLists()))),
-                convertStringToList(get(PROTECTED_TERMS_DISABLED_INTERNAL, convertListToString(defaults.getDisabledInternalTermLists()))),
-                convertStringToList(get(PROTECTED_TERMS_DISABLED_EXTERNAL, convertListToString(defaults.getDisabledExternalTermLists())))
-        );
     }
     // endregion
 
