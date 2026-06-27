@@ -6,27 +6,81 @@ from pathlib import Path
 NUMBER_OF_ENTRIES = 100_000
 OUTPUT_FILE = Path("generated-large-library.bib")
 KEYWORD_SEPARATOR = ","
+KEYWORD_HIERARCHY_SEPARATOR = ">"
 
-TOP_LEVEL_KEYWORDS = [
-    "Topic 00",
-    "Topic 01",
-    "Topic 02",
-    "Topic 03",
-    "Topic 04",
-    "Topic 05",
-    "Topic 06",
-    "Topic 07",
-    "Topic 08",
-    "Topic 09",
+TOPICS = {
+    "Machine learning": [
+        "Representation learning",
+        "Graph neural networks",
+        "Probabilistic models",
+        "Reinforcement learning",
+    ],
+    "Human-computer interaction": [
+        "Accessibility",
+        "Visualization",
+        "Collaboration tools",
+        "User studies",
+    ],
+    "Software engineering": [
+        "Testing",
+        "Static analysis",
+        "Program comprehension",
+        "Build systems",
+    ],
+    "Digital libraries": [
+        "Metadata quality",
+        "Deduplication",
+        "Scholarly search",
+        "Citation analysis",
+    ],
+    "Information retrieval": [
+        "Ranking",
+        "Query expansion",
+        "Entity linking",
+        "Evaluation",
+    ],
+    "Data management": [
+        "Data integration",
+        "Knowledge graphs",
+        "Stream processing",
+        "Reproducibility",
+    ],
+}
+
+METHODS = [
+    "Systematic review",
+    "Controlled experiment",
+    "Benchmark study",
+    "Case study",
+    "Simulation",
+    "Survey",
 ]
 
-SUB_KEYWORDS_PER_TOPIC = 10
-FLAGS = [
-    "Flag 00",
-    "Flag 01",
-    "Flag 02",
-    "Flag 03",
-    "Flag 04",
+READ_STATUS = [
+    "unread",
+    "skimmed",
+    "read",
+]
+
+VENUES = [
+    "Journal of Open Research Software",
+    "Empirical Software Engineering",
+    "Information Processing and Management",
+    "ACM Transactions on Information Systems",
+    "Scientometrics",
+    "Journal of Documentation",
+    "Research Evaluation",
+    "International Journal on Digital Libraries",
+    "SoftwareX",
+    "Data and Knowledge Engineering",
+]
+
+TITLE_PATTERNS = [
+    "A comparative study of {subtopic} for {topic_lower}",
+    "Improving {topic_lower} with {subtopic_lower}",
+    "An empirical evaluation of {subtopic_lower} in {topic_lower}",
+    "Towards reproducible {topic_lower}: lessons from {subtopic_lower}",
+    "{subtopic} in practice: evidence from {method_lower}",
 ]
 
 FIRST_NAMES = [
@@ -52,34 +106,6 @@ LAST_NAMES = [
 ]
 
 
-# Adapted from: https://stackoverflow.com/a/50012689/873282
-def int_to_roman(num):
-    values = [
-        1000000, 900000, 500000, 400000, 100000, 90000, 50000, 40000, 10000, 9000, 5000, 4000, 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1
-    ]
-    strings = [
-        "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"
-    ]
-
-    result = ""
-    decimal = num
-
-    while decimal > 0:
-        for index, value in enumerate(values):
-            if decimal >= value:
-                if value > 1000:
-                    result += "\u0304".join(list(strings[index])) + "\u0304"
-                else:
-                    result += strings[index]
-                decimal -= value
-                break
-    return result
-
-
-def escape_group_value(value):
-    return value.replace("\\", "\\\\").replace(";", "\\;")
-
-
 def group_tree_metadata():
     lines = [
         "@comment{jabref-meta: saveOrderConfig:specified;author;false;title;false;year;false;}",
@@ -88,64 +114,115 @@ def group_tree_metadata():
         "",
         "@comment{jabref-meta: groupstree:",
         "0 AllEntriesGroup:;",
+        "1 StaticGroup:By status\\;2\\;1\\;0x8a8a8aff\\;\\;Manual reading buckets\\;;",
+        "2 StaticGroup:To discuss\\;0\\;0\\;0xcc3333ff\\;chat\\;Entries for next lab meeting\\;;",
+        "2 StaticGroup:Core reading\\;0\\;0\\;0x336699ff\\;book\\;Papers worth revisiting\\;;",
+        "2 StaticGroup:Background\\;0\\;0\\;0x8a8a8aff\\;archive\\;General background material\\;;",
+        "1 StaticGroup:Projects\\;0\\;1\\;0x336633ff\\;briefcase\\;Manual project folders\\;;",
+        "2 StaticGroup:Literature review\\;0\\;0\\;0x4d3399ff\\;file_document\\;Survey and review material\\;;",
+        "2 StaticGroup:Replication study\\;0\\;0\\;0x008080ff\\;flask\\;Replication candidates and notes\\;;",
+        "2 StaticGroup:Teaching\\;0\\;0\\;0xe6994dff\\;school\\;Course reading shortlist\\;;",
+        "1 AutomaticKeywordGroup:Keywords\\;2\\;keywords\\;,\\;>\\;1\\;\\;\\;Generated from hierarchical keywords\\;;",
+        "1 AutomaticPersonsGroup:Authors\\;0\\;author\\;1\\;\\;\\;Generated from author last names\\;;",
+        "1 SearchGroup:Recently published\\;0\\;year=2021 or year=2022 or year=2023 or year=2024 or year=2025\\;0\\;0\\;1\\;\\;\\;Recent publications\\;;",
+        "1 SearchGroup:Machine learning reviews\\;0\\;keywords=Machine learning and keywords=Systematic review\\;0\\;0\\;1\\;\\;\\;Machine learning review papers\\;;",
+        "1 SearchGroup:Empirical software engineering\\;0\\;keywords=Software engineering and keywords=Controlled experiment\\;0\\;0\\;1\\;\\;\\;Empirical software engineering papers\\;;",
+        "}",
+        "",
+        "@comment{jabref-meta: groups-search-syntax-version:6.0-alpha_1}",
+        "",
     ]
-
-    for topic in TOP_LEVEL_KEYWORDS:
-        lines.append(
-            f"1 KeywordGroup:{escape_group_value(topic)}\\;0\\;keywords\\;{escape_group_value(topic)}\\;0\\;0\\;;"
-        )
-
-        for sub_index in range(SUB_KEYWORDS_PER_TOPIC):
-            sub_keyword = f"{topic} / Subtopic {sub_index:02d}"
-            lines.append(
-                f"2 KeywordGroup:{escape_group_value(sub_keyword)}\\;0\\;keywords\\;{escape_group_value(sub_keyword)}\\;0\\;0\\;;"
-            )
-
-    for flag in FLAGS:
-        lines.append(
-            f"1 KeywordGroup:{escape_group_value(flag)}\\;0\\;keywords\\;{escape_group_value(flag)}\\;0\\;0\\;;"
-        )
-
-    lines.extend(["}", ""])
     return "\n".join(lines)
 
 
+def topic_and_subtopic_for_entry(entry_number):
+    topic_names = list(TOPICS)
+    topic_index = (entry_number - 1) % len(topic_names)
+    topic = topic_names[topic_index]
+    subtopics = TOPICS[topic]
+    subtopic_index = ((entry_number - 1) // len(topic_names)) % len(subtopics)
+    return topic, subtopics[subtopic_index]
+
+
+def method_for_entry(entry_number):
+    return METHODS[((entry_number - 1) // 3) % len(METHODS)]
+
+
+def read_status_for_entry(entry_number):
+    return READ_STATUS[(entry_number - 1) % len(READ_STATUS)]
+
+
 def keywords_for_entry(entry_number):
-    topic_index = (entry_number - 1) % len(TOP_LEVEL_KEYWORDS)
-    subtopic_index = ((entry_number - 1) // len(TOP_LEVEL_KEYWORDS)) % SUB_KEYWORDS_PER_TOPIC
-    flag_index = ((entry_number - 1) // (len(TOP_LEVEL_KEYWORDS) * SUB_KEYWORDS_PER_TOPIC)) % len(FLAGS)
+    topic, subtopic = topic_and_subtopic_for_entry(entry_number)
+    keywords = [
+        f"{topic}{KEYWORD_HIERARCHY_SEPARATOR}{subtopic}",
+        method_for_entry(entry_number),
+        read_status_for_entry(entry_number),
+    ]
 
-    topic = TOP_LEVEL_KEYWORDS[topic_index]
-    subtopic = f"{topic} / Subtopic {subtopic_index:02d}"
-    flag = FLAGS[flag_index]
+    if entry_number % 5 == 0:
+        keywords.append("open science")
 
-    return KEYWORD_SEPARATOR.join((topic, subtopic, flag))
+    if entry_number % 7 == 0:
+        keywords.append("replication package")
+
+    return f"{KEYWORD_SEPARATOR} ".join(keywords)
 
 
 def authors_for_entry(entry_number):
     authors = []
+    author_count = 2 + (entry_number % 3)
 
-    for author_offset in range(3):
+    for author_offset in range(author_count):
         first_name_index = (entry_number * 7 + author_offset * 11) % len(FIRST_NAMES)
         last_name_index = (entry_number * 13 + author_offset * 17) % len(LAST_NAMES)
         suffix = (entry_number + author_offset * 37) % 200
-
         authors.append(f"{FIRST_NAMES[first_name_index]} {LAST_NAMES[last_name_index]} {suffix:03d}")
 
     return " and ".join(authors)
 
 
+def title_for_entry(entry_number):
+    topic, subtopic = topic_and_subtopic_for_entry(entry_number)
+    method = method_for_entry(entry_number)
+    pattern = TITLE_PATTERNS[(entry_number - 1) % len(TITLE_PATTERNS)]
+    return pattern.format(
+        topic=topic,
+        topic_lower=topic.lower(),
+        subtopic=subtopic,
+        subtopic_lower=subtopic.lower(),
+        method=method,
+        method_lower=method.lower(),
+    )
+
+
+def venue_for_entry(entry_number):
+    return VENUES[(entry_number - 1) % len(VENUES)]
+
+
 def entry_text(entry_number):
-    year = 1900 + (entry_number - 1) % (2025 - 1900)
+    year = 1995 + (entry_number - 1) % 31
+    month = 1 + ((entry_number - 1) % 12)
+    venue = venue_for_entry(entry_number)
     keywords = keywords_for_entry(entry_number)
     authors = authors_for_entry(entry_number)
+    title = title_for_entry(entry_number)
+    read_status = read_status_for_entry(entry_number)
+    doi_prefix = 10_000 + (entry_number % 90_000)
+    doi_suffix = 100_000 + entry_number
+
     return f"""@article{{id{entry_number:06d},
-  title    = {{This is my title{entry_number}}},
-  author   = {{{authors}}},
-  journal  = {{Journal Title {int_to_roman(entry_number)}}},
-  volume   = {{{entry_number}}},
-  year     = {{{year}}},
-  keywords = {{{keywords}}},
+  title      = {{{title}}},
+  author     = {{{authors}}},
+  journal    = {{{venue}}},
+  volume     = {{{1 + ((entry_number - 1) % 24)}}},
+  number     = {{{1 + ((entry_number - 1) % 6)}}},
+  pages      = {{{10 + ((entry_number - 1) % 180)}--{17 + ((entry_number - 1) % 180)}}},
+  year       = {{{year}}},
+  month      = {{{month}}},
+  doi        = {{10.{doi_prefix}/jabref.synthetic.{doi_suffix}}},
+  keywords   = {{{keywords}}},
+  readstatus = {{{read_status}}},
 }}
 
 """

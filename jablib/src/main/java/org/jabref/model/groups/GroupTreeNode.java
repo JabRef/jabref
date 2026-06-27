@@ -20,6 +20,7 @@ import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -243,15 +244,23 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
     /// Returns whether this group matches the specified {@link BibEntry} while taking the hierarchical information into account.
     public boolean matches(BibEntry entry) {
-        return matches(entry, getGroup().getHierarchicalContext(), new IdentityHashMap<>());
+        GroupHierarchyType context = getGroup().getHierarchicalContext();
+        if (context == GroupHierarchyType.INDEPENDENT) {
+            return getGroup().contains(entry);
+        }
+
+        return matches(entry, context, new IdentityHashMap<>());
     }
 
     private boolean matches(BibEntry entry,
                             GroupHierarchyType originalContext,
-                            IdentityHashMap<GroupTreeNode, MatchCache> cache) {
-        MatchCache cachedByContext = cache.computeIfAbsent(this, _ -> new MatchCache());
-        if (cachedByContext.hasValue(originalContext)) {
-            return cachedByContext.get(originalContext);
+                            @Nullable IdentityHashMap<GroupTreeNode, MatchCache> cache) {
+        MatchCache cachedByContext = null;
+        if (cache != null) {
+            cachedByContext = cache.computeIfAbsent(this, _ -> new MatchCache());
+            if (cachedByContext.hasValue(originalContext)) {
+                return cachedByContext.get(originalContext);
+            }
         }
 
         GroupHierarchyType context = getGroup().getHierarchicalContext();
@@ -269,17 +278,23 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
             matches = getParent().get().matches(entry, originalContext, cache);
         }
 
-        cachedByContext.put(originalContext, matches);
+        if (cachedByContext != null) {
+            cachedByContext.put(originalContext, matches);
+        }
         return matches;
     }
 
     private void collectMatchingGroups(List<BibEntry> entries,
                                        List<GroupTreeNode> groups,
                                        IdentityHashMap<BibEntry, IdentityHashMap<GroupTreeNode, MatchCache>> matchCaches) {
+        GroupHierarchyType context = getGroup().getHierarchicalContext();
         for (BibEntry entry : entries) {
-            // Reuse all match decisions already computed for this exact entry while visiting sibling groups.
-            IdentityHashMap<GroupTreeNode, MatchCache> cacheForEntry = matchCaches.computeIfAbsent(entry, _ -> new IdentityHashMap<>());
-            if (matches(entry, getGroup().getHierarchicalContext(), cacheForEntry)) {
+            @Nullable IdentityHashMap<GroupTreeNode, MatchCache> cacheForEntry = null;
+            if (context != GroupHierarchyType.INDEPENDENT) {
+                // Reuse all match decisions already computed for this exact entry while visiting sibling groups.
+                cacheForEntry = matchCaches.computeIfAbsent(entry, _ -> new IdentityHashMap<>());
+            }
+            if (matches(entry, context, cacheForEntry)) {
                 groups.add(this);
                 break;
             }
