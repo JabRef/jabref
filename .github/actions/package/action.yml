@@ -104,7 +104,7 @@ runs:
         rm debian-binary control.tar.* data.tar.*
         mv -f jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}${{ inputs.archForDebianRepack }}_repackaged.deb jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}.deb
     - name: Upload ${{ inputs.component }} packages to GitHub
-      # background: true
+      background: true
       if: ${{ inputs.uploadAsArtifact == 'true' && (inputs.archivePortable != 'NONE') }}
       uses: actions/upload-artifact@v7
       with:
@@ -112,13 +112,13 @@ runs:
         path: |
           ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.*
     - name: Upload ${{ inputs.component }} to builds.jabref.org (Linux, macOS)
-      # background: true
+      background: true
       if: ${{ (inputs.diskSpaceAvailable == 'true') && (startsWith(inputs.os, 'macos') || startsWith(inputs.os, 'ubuntu')) && (inputs.archivePortable != 'NONE') }}
       shell: bash
       run: |
         rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}${{ inputs.subdir }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}${{ inputs.subdir }}/
     - name: Upload ${{ inputs.component }} to builds.jabref.org (Windows)
-      # background: true
+      background: true
       # jabsrv-cli doesn't have any installer and no archivePortable; thus we do not upload
       if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'windows-latest') && (inputs.archivePortable != 'NONE') }}
       shell: cmd
@@ -143,7 +143,7 @@ runs:
       run: |
         get-childitem -Path '${{ inputs.component }}/build/libs/*-all.jar' | rename-item -NewName {$_.name -replace "${{ inputs.AssemblySemVer }}","${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}"}
     - name: Upload ShadowJar to GitHub
-      # background: true
+      background: true
       if: ${{ (inputs.uploadAsArtifact == 'true') && (inputs.os == 'ubuntu-22.04') }}
       uses: actions/upload-artifact@v7
       with:
@@ -151,7 +151,7 @@ runs:
         path: |
           ${{ inputs.component }}/build/libs/*-all.jar
     - name: Upload ${{ inputs.componentShort }} ShadowJar to builds.jabref.org (Linux)
-      # background: true
+      background: true
       if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'ubuntu-22.04') }}
       shell: bash
       run: |
@@ -183,14 +183,14 @@ runs:
       run: |
         build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }} --help
     - name: Upload jbundle artifact to GitHub
-      # background: true
+      background: true
       if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.uploadAsArtifact == 'true') && (inputs.shouldJbundle == 'true') }}
       uses: actions/upload-artifact@v7
       with:
         name: jbundle-${{ inputs.componentShort }}-${{ inputs.displayName }}
         path: build/jbundle/${{ inputs.componentShort }}*
     - name: Upload jbundle artifact to builds.jabref.org
-      # background: true
+      background: true
       if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.diskSpaceAvailable == 'true') && (inputs.shouldJbundle == 'true') }}
       shell: bash
       run: |
