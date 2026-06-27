@@ -286,8 +286,8 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         }
 
         List<GroupTreeNode> children = getChildrenInternal();
-        for (int i = 0; i < children.size(); i++) {
-            children.get(i).collectMatchingGroups(entries, groups, matchCaches);
+        for (GroupTreeNode child : children) {
+            child.collectMatchingGroups(entries, groups, matchCaches);
         }
     }
 
