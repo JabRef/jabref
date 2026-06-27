@@ -1064,7 +1064,6 @@ public class JabRefCliPreferences implements CliPreferences {
         PREFS_NODE.clear();
         new SharedDatabasePreferences().clear();
 
-        getGrobidPreferences().setAll(GrobidPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences())).setAll(
                 OpenOfficePreferences.getDefault());
 
@@ -1095,6 +1094,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getProtectedTermsPreferences();
         getNameFormatterPreferences();
         getImporterPreferences();
+        getGrobidPreferences();
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
@@ -1111,7 +1111,6 @@ public class JabRefCliPreferences implements CliPreferences {
         //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
 
         // in case of incomplete or corrupt XML fall back to current preferences
-        getGrobidPreferences().setAll(getGrobidPreferencesFromBackingStore(getGrobidPreferences()));
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences());
         getOpenOfficePreferences(repository).setAll(
                 getOpenOfficePreferencesFromBackingStore(getOpenOfficePreferences(repository), repository));
@@ -1143,6 +1142,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getProtectedTermsPreferences();
         getNameFormatterPreferences();
         getImporterPreferences();
+        getGrobidPreferences();
 
         allBindings.forEach(binding -> binding.importFromStore().run());
     }
@@ -2488,20 +2488,18 @@ public class JabRefCliPreferences implements CliPreferences {
             return grobidPreferences;
         }
 
-        grobidPreferences = getGrobidPreferencesFromBackingStore(GrobidPreferences.getDefault());
+        GrobidPreferences defaultValues = GrobidPreferences.getDefault();
 
-        EasyBind.listen(grobidPreferences.grobidEnabledProperty(), (_, _, newValue) -> putBoolean(GROBID_ENABLED, newValue));
-        EasyBind.listen(grobidPreferences.grobidUseAskedProperty(), (_, _, newValue) -> putBoolean(GROBID_PREFERENCE, newValue));
-        EasyBind.listen(grobidPreferences.grobidURLProperty(), (_, _, newValue) -> put(GROBID_URL, newValue));
+        grobidPreferences = new GrobidPreferences(
+                getBoolean(GROBID_ENABLED, defaultValues.isGrobidEnabled()),
+                getBoolean(GROBID_PREFERENCE, defaultValues.isGrobidUseAsked()),
+                get(GROBID_URL, defaultValues.getGrobidURL()));
+
+        bindBoolean(grobidPreferences.grobidEnabledProperty(), GROBID_ENABLED, defaultValues.isGrobidEnabled());
+        bindBoolean(grobidPreferences.grobidUseAskedProperty(), GROBID_PREFERENCE, defaultValues.isGrobidUseAsked());
+        bindString(grobidPreferences.grobidURLProperty(), GROBID_URL, defaultValues.getGrobidURL());
 
         return grobidPreferences;
-    }
-
-    private GrobidPreferences getGrobidPreferencesFromBackingStore(GrobidPreferences defaults) {
-        return new GrobidPreferences(
-                getBoolean(GROBID_ENABLED, defaults.isGrobidEnabled()),
-                getBoolean(GROBID_PREFERENCE, defaults.isGrobidUseAsked()),
-                get(GROBID_URL, defaults.getGrobidURL()));
     }
     // endregion
 
