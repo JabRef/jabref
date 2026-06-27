@@ -41,14 +41,7 @@ class DoiFetcherTest {
             .withField(StandardField.PAGES, "296--303")
             .withField(StandardField.DOI, "10.1109/icws.2007.59");
     private final BibEntry bibEntryIannarelli2019 = new BibEntry(StandardEntryType.Article)
-            .withField(StandardField.AUTHOR,
-                    "Iannarelli Riccardo  and "
-                            + "Novello Anna  and "
-                            + "Stricker Damien  and "
-                            + "Cisternino Marco  and "
-                            + "Gallizio Federico  and "
-                            + "Telib Haysam  and "
-                            + "Meyer Thierry ")
+            .withField(StandardField.AUTHOR, "Iannarelli Riccardo  and Novello Anna  and Stricker Damien  and Cisternino Marco  and Gallizio Federico  and Telib Haysam  and Meyer Thierry ")
             .withField(StandardField.PUBLISHER, "AIDIC: Italian Association of Chemical Engineering")
             .withField(StandardField.TITLE, "Safety in research institutions: how to better communicate the risks using numerical simulations")
             .withField(StandardField.YEAR, "2019")
