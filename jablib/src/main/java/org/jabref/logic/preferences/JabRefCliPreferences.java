@@ -1064,7 +1064,6 @@ public class JabRefCliPreferences implements CliPreferences {
         PREFS_NODE.clear();
         new SharedDatabasePreferences().clear();
 
-        getNameFormatterPreferences().setAll(NameFormatterPreferences.getDefault());
         getImporterPreferences().setAll(ImporterPreferences.getDefault());
         getGrobidPreferences().setAll(GrobidPreferences.getDefault());
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences())).setAll(
@@ -1095,6 +1094,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getSearchPreferences();
         getXmpPreferences();
         getProtectedTermsPreferences();
+        getNameFormatterPreferences();
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
@@ -1111,7 +1111,6 @@ public class JabRefCliPreferences implements CliPreferences {
         //       See org.jabref.gui.preferences.JabRefGuiPreferences.importPreferences for the GUI
 
         // in case of incomplete or corrupt XML fall back to current preferences
-        getNameFormatterPreferences().setAll(getNameFormatterPreferencesFromBackingStore(getNameFormatterPreferences()));
         getImporterPreferences().setAll(getImporterPreferencesFromBackingStore(getImporterPreferences()));
         getGrobidPreferences().setAll(getGrobidPreferencesFromBackingStore(getGrobidPreferences()));
         JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences());
@@ -1143,6 +1142,7 @@ public class JabRefCliPreferences implements CliPreferences {
         getSearchPreferences();
         getXmpPreferences();
         getProtectedTermsPreferences();
+        getNameFormatterPreferences();
 
         allBindings.forEach(binding -> binding.importFromStore().run());
     }
@@ -2281,20 +2281,18 @@ public class JabRefCliPreferences implements CliPreferences {
             return nameFormatterPreferences;
         }
 
-        nameFormatterPreferences = getNameFormatterPreferencesFromBackingStore(NameFormatterPreferences.getDefault());
+        NameFormatterPreferences defaultValues = NameFormatterPreferences.getDefault();
 
-        nameFormatterPreferences.getNameFormatterKey().addListener((InvalidationListener) _ ->
-                putStringList(NAME_FORMATER_KEY, nameFormatterPreferences.getNameFormatterKey()));
-        nameFormatterPreferences.getNameFormatterValue().addListener((InvalidationListener) _ ->
-                putStringList(NAME_FORMATTER_VALUE, nameFormatterPreferences.getNameFormatterValue()));
+        nameFormatterPreferences = new NameFormatterPreferences(
+                convertStringToList(get(NAME_FORMATER_KEY, convertListToString(defaultValues.getNameFormatterKey()))),
+                convertStringToList(get(NAME_FORMATTER_VALUE, convertListToString(defaultValues.getNameFormatterValue()))));
+
+        bindCustomList(nameFormatterPreferences.getNameFormatterKey(), NAME_FORMATER_KEY, defaultValues.getNameFormatterKey(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
+        bindCustomList(nameFormatterPreferences.getNameFormatterValue(), NAME_FORMATTER_VALUE, defaultValues.getNameFormatterValue(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
 
         return nameFormatterPreferences;
-    }
-
-    private NameFormatterPreferences getNameFormatterPreferencesFromBackingStore(NameFormatterPreferences defaults) {
-        return new NameFormatterPreferences(
-                convertStringToList(get(NAME_FORMATER_KEY, convertListToString(defaults.getNameFormatterKey()))),
-                convertStringToList(get(NAME_FORMATTER_VALUE, convertListToString(defaults.getNameFormatterValue()))));
     }
     // endregion
 
