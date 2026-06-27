@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// Represents a node in a tree.
 ///
@@ -38,6 +39,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// Cached read-only view of `children` to avoid allocating a new wrapper on every `getChildren()` call.
     private final ObservableList<T> unmodifiableChildren;
     /// This node's parent, or null if this node has no parent
+    @Nullable
     private T parent;
     /// The function which is invoked when something changed in the subtree.
     private Consumer<T> onDescendantChanged = t -> {
@@ -225,7 +227,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// from the old parent. You should probably call moveTo or remove to change the tree.
     ///
     /// @param parent the new parent
-    protected void setParent(T parent) {
+    protected void setParent(@Nullable T parent) {
         this.parent = parent;
     }
 
