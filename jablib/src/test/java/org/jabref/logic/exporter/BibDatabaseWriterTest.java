@@ -789,13 +789,32 @@ class BibDatabaseWriterTest {
         databaseWriter.writePartOfDatabase(bibtexContext, List.of());
 
         // The order should be kept (the cleanups are a list, not a set)
-        assertEquals("@Comment{jabref-meta: saveActions:enabled;"
-                + OS.NEWLINE
-                + "title[lower_case]" + OS.NEWLINE
-                + "journal[title_case]" + OS.NEWLINE
-                + "day[upper_case]" + OS.NEWLINE
-                + ";}"
-                + OS.NEWLINE, stringWriter.toString());
+        String expected = """
+                @Comment{jabref-meta: saveActions:enabled;
+                title[lower_case]
+                journal[title_case]
+                day[upper_case]
+                ;}
+
+                @Comment{jabref-meta-0.1.0
+                {
+                  "saveActions": {
+                    "state": true,
+                    "journal": [
+                      "title_case"
+                    ],
+                    "title": [
+                      "lower_case"
+                    ],
+                    "day": [
+                      "upper_case"
+                    ]
+                  }
+                }
+                }
+                """;
+
+        assertEquals(expected, stringWriter.toString());
     }
 
     @Test

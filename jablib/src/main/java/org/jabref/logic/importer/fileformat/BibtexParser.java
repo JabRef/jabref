@@ -26,6 +26,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
+import org.jabref.logic.cleanup.SaveActionsConverter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.groups.GroupsFactory;
@@ -35,6 +37,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.MetaDataParser;
+import org.jabref.logic.importer.util.SaveActionsDTOConverter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabase;
@@ -53,6 +56,7 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.SaveActionsDTO;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -60,6 +64,8 @@ import com.dd.plist.BinaryPropertyListParser;
 import com.dd.plist.NSArray;
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSString;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import io.github.adr.linked.ADR;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -113,6 +119,7 @@ public class BibtexParser implements Parser {
 
     private ParserResult parserResult;
     private final MetaDataParser metaDataParser;
+    private Optional<JsonObject> parsedJsonMetaData = Optional.empty();
     private final Map<String, String> parsedBibDeskGroups;
 
     private GroupTreeNode bibDeskGroupTreeNode;
@@ -295,6 +302,14 @@ public class BibtexParser implements Parser {
                 );
             }
             parserResult.setMetaData(metaData);
+
+            parsedJsonMetaData.ifPresent(json -> {
+                if (json.has(MetaData.SAVE_ACTIONS)) {
+                    SaveActionsDTO saveActionsDTO = SaveActionsDTOConverter.fromJson(json.getAsJsonObject(MetaData.SAVE_ACTIONS));
+                    FieldFormatterCleanupActions saveActions = SaveActionsConverter.fromDTO(saveActionsDTO);
+                    metaData.setSaveActions(saveActions);
+                }
+            });
         } catch (ParseException exception) {
             parserResult.addException(new ParserResult.Range(startLine, startColumn, line, column), exception);
         }
@@ -405,7 +420,15 @@ public class BibtexParser implements Parser {
             } catch (ParseException ex) {
                 parserResult.addException(new ParserResult.Range(startLine, startColumn, line, column), ex);
             }
+        } else if (comment.startsWith(MetaData.META_FLAG_V1)) {
+            parsedJsonMetaData = parseCommentToJson(comment);
         }
+    }
+
+    Optional<JsonObject> parseCommentToJson(String comment) {
+        Gson gson = new Gson();
+        String content = comment.substring(MetaData.META_FLAG_V1.length());
+        return Optional.ofNullable(gson.fromJson(content, JsonObject.class));
     }
 
     /// Adds BibDesk group entries to the JabRef database
