@@ -336,6 +336,34 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     @Override
+    public Page<BibEntry> performRawSearchQueryPaged(String rawQuery, int pageNumber) throws FetcherException {
+        if (rawQuery.isBlank()) {
+            return new Page<>(rawQuery, pageNumber, List.of());
+        }
+        Page<BibEntry> result = arXiv.performRawSearchQueryPaged(rawQuery, pageNumber);
+        if (this.doiFetcher == null) {
+            return result;
+        }
+
+        ExecutorService executor = Executors.newFixedThreadPool(getPageSize() * 2);
+
+        Collection<CompletableFuture<BibEntry>> futureSearchResult = result.getContent()
+                                                                           .stream()
+                                                                           .map(bibEntry ->
+                                                                                   CompletableFuture.supplyAsync(() -> {
+                                                                                       this.inplaceAsyncInfuseArXivWithDoi(bibEntry);
+                                                                                       return bibEntry;
+                                                                                   }, executor))
+                                                                           .toList();
+
+        Collection<BibEntry> modifiedSearchResult = futureSearchResult.stream()
+                                                                      .map(CompletableFuture::join)
+                                                                      .collect(Collectors.toList());
+
+        return new Page<>(result.getQuery(), result.getPageNumber(), modifiedSearchResult);
+    }
+
+    @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         CompletableFuture<Optional<BibEntry>> arXivBibEntryPromise = arXiv.asyncPerformSearchById(identifier);
         if (this.doiFetcher != null) {
@@ -583,6 +611,17 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                     .collect(Collectors.toList());
 
             return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
+        }
+        @Override
+        public Page<BibEntry> performRawSearchQueryPaged(String rawQuery, int pageNumber) throws FetcherException {
+            if (rawQuery.isBlank()) {
+                return new Page<>(rawQuery, pageNumber, List.of());
+            }
+            List<BibEntry> searchResult = searchForEntries(rawQuery, pageNumber)
+                    .stream()
+                    .map(arXivEntry -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
+                    .collect(Collectors.toList());
+            return new Page<>(rawQuery, pageNumber, searchResult);
         }
 
         private List<BibEntry> filterYears(List<BibEntry> searchResult, ArXivQueryTransformer transformer) {
