@@ -62,9 +62,9 @@ class StudyFetcher {
             String catalogOverride = searchQuery.getCatalogSpecific().entrySet().stream()
                                                 .filter(entry -> entry.getKey().equalsIgnoreCase(fetcher.getName()))
                                                 .map(Map.Entry::getValue)
-                                                 .findFirst()
-                                                 .filter(s -> !s.isBlank())
-                                                 .orElse(null);
+                                                .findFirst()
+                                                .filter(s -> !s.isBlank())
+                                                .orElse(null);
             if (fetcher instanceof PagedSearchBasedFetcher basedFetcher) {
                 if (catalogOverride != null) {
                     int limit = resultLimits.getOrDefault(fetcher.getName(), StudyRepository.DEFAULT_RESULT_LIMIT);
