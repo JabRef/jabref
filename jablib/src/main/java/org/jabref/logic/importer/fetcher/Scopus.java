@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -7,14 +8,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.ScopusQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.BaseQueryNode;
 
 import kong.unirest.core.json.JSONArray;
@@ -58,22 +62,48 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
         transformer = new ScopusQueryTransformer();
         String transformedQuery = transformer.transformSearchQuery(queryNode).orElse("");
+        return buildSearchURL(transformedQuery, pageNumber);
+    }
 
+    @Override
+    public Page<BibEntry> performRawSearchQueryPaged(String rawQuery, int pageNumber) throws FetcherException {
+        if (rawQuery.isBlank()) {
+            return new Page<>(rawQuery, pageNumber, List.of());
+        }
+        // reset the transformer so the parser's year filter (shouldIncludeEntry) carries no stale bounds
+        // the raw path intentionally bypasses year filtering, consistent with IEEE
+        transformer = new ScopusQueryTransformer();
+        try {
+            URL url = buildSearchURL(rawQuery, pageNumber);
+            try (var stream = getUrlDownload(url).asInputStream()) {
+                return new Page<>(rawQuery, pageNumber, getParser().parseEntries(stream));
+            }
+        } catch (URISyntaxException e) {
+            throw new FetcherException("Scopus raw search URL is malformed for query: " + rawQuery, e);
+        } catch (IOException e) {
+            throw new FetcherException(rawQuery, e);
+        } catch (ParseException e) {
+            throw new FetcherException("Scopus raw search parse error for query: " + rawQuery, e);
+        }
+    }
+
+    /// Builds the Scopus search API URL for the given raw query string and page number.
+    /// The raw query is sent verbatim as the `query` parameter, bypassing [ScopusQueryTransformer].
+    ///
+    /// @param rawQuery   the query string to pass directly as the `query` parameter
+    /// @param pageNumber zero based page number; converted to a zero based `start` offset.
+    private URL buildSearchURL(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("apiKey", apiKey));
-
-        if (!transformedQuery.isBlank()) {
-            uriBuilder.addParameter("query", transformedQuery);
+        if (!rawQuery.isBlank()) {
+            uriBuilder.addParameter("query", rawQuery);
         }
-
         uriBuilder.addParameter("count", String.valueOf(getPageSize()));
         uriBuilder.addParameter("start", String.valueOf(pageNumber * getPageSize()));
         uriBuilder.addParameter("view", "STANDARD");
         uriBuilder.addParameter("suppressNavLinks", "true");
         uriBuilder.addParameter("sort", "relevancy");
-
         LOGGER.debug("Scopus Search URL: {}", uriBuilder.build().toString());
-
         return uriBuilder.build().toURL();
     }
 
