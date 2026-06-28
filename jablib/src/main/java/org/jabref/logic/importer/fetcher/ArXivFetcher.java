@@ -612,6 +612,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
             return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
         }
+
         @Override
         public Page<BibEntry> performRawSearchQueryPaged(String rawQuery, int pageNumber) throws FetcherException {
             if (rawQuery.isBlank()) {
