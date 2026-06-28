@@ -18,8 +18,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,6 +46,7 @@ class StudyFetcherTest {
 
         assertFalse(results.isEmpty());
         verify(pagedFetcher).performRawSearchQueryPaged("native:query", 0);
+        verify(pagedFetcher, times(10)).performRawSearchQueryPaged(eq("native:query"), anyInt());
         verify(pagedFetcher, never()).performSearchPaged(anyString(), anyInt());
     }
 
