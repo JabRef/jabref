@@ -18,6 +18,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.ZbMathQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.AMSField;
@@ -29,8 +30,10 @@ import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// Fetches data from the Zentralblatt Math (https://www.zbmath.org/)
 public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, EntryBasedParserFetcher {
@@ -52,7 +55,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
     }
 
     @Override
-    public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
+    public @Nullable URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
         Optional<String> zblidInEntry = entry.getField(StandardField.ZBL_NUMBER);
         if (zblidInEntry.isPresent()) {
             // zbmath id is already present
@@ -88,17 +91,18 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         String urlString = uriBuilder.build().toString();
         HttpResponse<JsonNode> response = Unirest.get(urlString)
                                                  .asJson();
-        String zblid = null;
+        String zblid = "";
         if (response.getStatus() == 200 && response.getBody() != null) {
-            JSONArray result = response.getBody()
-                                       .getObject()
-                                       .optJSONArray("results");
-            if (result != null && !result.isEmpty()) {
-                zblid = result.getJSONObject(0)
-                              .optString("zbl_id", null);
+            JSONObject root = response.getBody().getObject();
+            if (root != null) {
+                JSONArray result = root.optJSONArray("results");
+                if (result != null && !result.isEmpty()) {
+                    zblid = result.getJSONObject(0)
+                                  .optString("zbl_id");
+                }
             }
         }
-        if (zblid == null) {
+        if (StringUtil.isBlank(zblid)) {
             // citation matching API found no matching entry
             return null;
         } else {
