@@ -89,14 +89,13 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         HttpResponse<JsonNode> response = Unirest.get(urlString)
                                                  .asJson();
         String zblid = null;
-        if (response.getStatus() == 200) {
+        if (response.getStatus() == 200 && response.getBody() != null) {
             JSONArray result = response.getBody()
                                        .getObject()
-                                       .getJSONArray("results");
-            if (!result.isEmpty()) {
+                                       .optJSONArray("results");
+            if (result != null && !result.isEmpty()) {
                 zblid = result.getJSONObject(0)
-                              .get("zbl_id")
-                              .toString();
+                              .optString("zbl_id", null);
             }
         }
         if (zblid == null) {
