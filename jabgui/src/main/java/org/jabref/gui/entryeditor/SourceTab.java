@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import javax.swing.undo.UndoManager;
 
@@ -82,7 +83,6 @@ public class SourceTab extends EntryEditorTab {
     private CodeArea codeArea;
     private BibEntry previousEntry;
     private final BibTeXSyntaxHighlighter syntaxHighlighter;
-
 
     public SourceTab(CountingUndoManager undoManager,
                      FieldPreferences fieldPreferences,
@@ -209,10 +209,13 @@ public class SourceTab extends EntryEditorTab {
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
 
-        codeArea.textProperty().addListener((observable, oldText, newText) -> {
-            if (newText != null && syntaxHighlighter != null && codeArea != null) {
-                Platform.runLater(() -> syntaxHighlighter.applyHighlighting(newText, codeArea));
+        codeArea.textProperty().addListener((obs, oldText, newText) -> {
+            if (newText == null) {
+                return;
             }
+
+            CompletableFuture.supplyAsync(() -> syntaxHighlighter.computeHighlighting(newText))
+                             .thenAccept(regions -> Platform.runLater(() -> syntaxHighlighter.applyHighlighting(regions, codeArea)));
         });
 
         ActionFactory factory = new ActionFactory();
@@ -249,11 +252,7 @@ public class SourceTab extends EntryEditorTab {
 
             codeArea.clear();
             try {
-                String source = getSourceString(getCurrentEntry(), mode, fieldPreferences);
-
-                codeArea.appendText(source);
-                syntaxHighlighter.applyHighlighting(source, codeArea);
-
+                codeArea.appendText(getSourceString(getCurrentEntry(), mode, fieldPreferences));
                 codeArea.setEditable(true);
                 Platform.runLater(this::highlightSearchPattern);
             } catch (IOException ex) {

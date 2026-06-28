@@ -1,5 +1,8 @@
 package org.jabref.gui.bibtexhighlighter;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public enum BibTeXStyleClass {
     COMMENT("bibtex-comment"),
     KEYWORD("bibtex-keyword"),

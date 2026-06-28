@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.bibtexhighlighter.BibTeXStyleClass;
+import org.jabref.gui.bibtexhighlighter.HighlightRegion;
 import org.jabref.gui.bibtexhighlighter.VeneerSyntaxHighlighter;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.search.SearchType;
@@ -34,6 +35,7 @@ import org.mockito.Answers;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
+import org.testfx.util.WaitForAsyncUtils;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -121,7 +123,8 @@ class SourceTabTest {
         testArea.appendText(bibtexInput);
 
         VeneerSyntaxHighlighter highlighter = new VeneerSyntaxHighlighter();
-        highlighter.applyHighlighting(bibtexInput, testArea);
+        List<HighlightRegion> regions = highlighter.computeHighlighting(bibtexInput);
+        highlighter.applyHighlighting(regions, testArea);
 
         int articleIndex = bibtexInput.indexOf("@Article");
         int keyIndex = bibtexInput.indexOf("Shor94");
@@ -153,6 +156,7 @@ class SourceTabTest {
         int authorPos = renderedText.indexOf("author");
 
         if (authorPos != -1) {
+            WaitForAsyncUtils.waitForFxEvents();
             assertTrue(sourceCodeArea.getStyleOfChar(authorPos).contains(BibTeXStyleClass.FIELD.getClassName()));
         }
     }

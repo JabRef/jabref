@@ -1,7 +1,13 @@
 package org.jabref.gui.bibtexhighlighter;
 
-import org.fxmisc.richtext.CodeArea;
+import java.util.List;
 
+import org.fxmisc.richtext.CodeArea;
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public interface BibTeXSyntaxHighlighter {
-    void applyHighlighting(String source, CodeArea codeArea);
+    List<HighlightRegion> computeHighlighting(String source);
+
+    void applyHighlighting(List<HighlightRegion> regions, CodeArea codeArea);
 }
