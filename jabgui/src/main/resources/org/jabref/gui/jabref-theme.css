@@ -2466,3 +2466,40 @@ journalInfo .grid-cell-b {
     -fx-background-insets: 0, 0;
     -fx-padding: 0;
 }
+
+/* BibTeX Source CodeArea Syntax Highlighting */
+.bibtex-keyword {
+    -fx-fill: #E06C75 !important;
+    -fx-font-weight: bold !important;
+}
+
+.bibtex-key {
+    -fx-fill: #61AFEF !important;
+    -fx-font-weight: bold !important;
+}
+
+.bibtex-field {
+    -fx-fill: #D19A66 !important;
+    -fx-font-weight: bold !important;
+}
+
+.bibtex-string {
+    -fx-fill: #98C379 !important;
+    -fx-font-weight: bold !important;
+}
+
+.bibtex-number {
+    -fx-fill: #56B6C2 !important;
+    -fx-font-weight: bold !important;
+}
+
+.bibtex-comment {
+    -fx-fill: #7F848E !important;
+    -fx-font-style: italic !important;
+    -fx-font-weight: bold !important;
+}
+
+.bibtex-type {
+    -fx-fill: #C678DD !important;
+    -fx-font-weight: bold !important;
+}

@@ -26,6 +26,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.bibtexhighlighter.BibTeXSyntaxHighlighter;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -80,6 +81,8 @@ public class SourceTab extends EntryEditorTab {
     private Map<Field, Range> fieldPositions;
     private CodeArea codeArea;
     private BibEntry previousEntry;
+    private final BibTeXSyntaxHighlighter syntaxHighlighter;
+
 
     public SourceTab(CountingUndoManager undoManager,
                      FieldPreferences fieldPreferences,
@@ -88,7 +91,8 @@ public class SourceTab extends EntryEditorTab {
                      DialogService dialogService,
                      BibEntryTypesManager entryTypesManager,
                      KeyBindingRepository keyBindingRepository,
-                     StateManager stateManager) {
+                     StateManager stateManager,
+                     BibTeXSyntaxHighlighter syntaxHighlighter) {
         this.stateManager = stateManager;
         this.setGraphic(IconTheme.JabRefIcons.SOURCE.getGraphicNode());
         this.undoManager = undoManager;
@@ -98,6 +102,7 @@ public class SourceTab extends EntryEditorTab {
         this.dialogService = dialogService;
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
+        this.syntaxHighlighter = syntaxHighlighter;
 
         EasyBind.subscribe(stateManager.activeTabProperty(), library -> {
             if (library.isEmpty()) {
@@ -118,7 +123,6 @@ public class SourceTab extends EntryEditorTab {
             return;
         }
 
-        codeArea.setStyleClass(0, codeArea.getLength(), TEXT_STYLE);
         if (StringUtil.isBlank(stateManager.searchQueryProperty().get())) {
             return;
         }
@@ -205,6 +209,12 @@ public class SourceTab extends EntryEditorTab {
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
 
+        codeArea.textProperty().addListener((observable, oldText, newText) -> {
+            if (newText != null && syntaxHighlighter != null && codeArea != null) {
+                Platform.runLater(() -> syntaxHighlighter.applyHighlighting(newText, codeArea));
+            }
+        });
+
         ActionFactory factory = new ActionFactory();
         ContextMenu contextMenu = new ContextMenu();
         contextMenu.getItems().addAll(
@@ -239,7 +249,11 @@ public class SourceTab extends EntryEditorTab {
 
             codeArea.clear();
             try {
-                codeArea.appendText(getSourceString(getCurrentEntry(), mode, fieldPreferences));
+                String source = getSourceString(getCurrentEntry(), mode, fieldPreferences);
+
+                codeArea.appendText(source);
+                syntaxHighlighter.applyHighlighting(source, codeArea);
+
                 codeArea.setEditable(true);
                 Platform.runLater(this::highlightSearchPattern);
             } catch (IOException ex) {

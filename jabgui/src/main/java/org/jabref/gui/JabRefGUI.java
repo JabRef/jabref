@@ -20,6 +20,8 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import org.jabref.gui.clipboard.ClipBoardManager;
+import org.jabref.gui.bibtexhighlighter.BibTeXSyntaxHighlighter;
+import org.jabref.gui.bibtexhighlighter.VeneerSyntaxHighlighter;
 import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
@@ -250,6 +252,9 @@ public class JabRefGUI extends Application {
                 dialogService
         );
         Injector.setModelOrService(SearchCitationsRelationsService.class, citationsAndRelationsSearchService);
+
+        BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter = new VeneerSyntaxHighlighter();
+        Injector.setModelOrService(BibTeXSyntaxHighlighter.class, bibTeXSyntaxHighlighter);
     }
 
     private void setupProxy() {

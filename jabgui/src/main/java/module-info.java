@@ -180,6 +180,7 @@ open module org.jabref {
     // requires com.sun.jna;
     // requires dd.plist;
     requires static io.github.eadr;
+    requires veneer;
     // required by okhttp and some AI library
     // requires kotlin.stdlib;
     // requires mslinks;

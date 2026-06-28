@@ -555,6 +555,13 @@ extraJavaModuleInfo {
     module("com.github.kevinstern:software-and-algorithms", "software.and.algorithms")
 
     module("com.uber.nullaway:nullaway", "nullaway")
+
+    module("io.github.kusoroadeolu:veneer", "veneer") {
+        exportAllPackages()
+        requires("org.antlr.antlr4.runtime")
+        requires("clique.core")
+        requires("clique.spi")
+    }
 }
 
 // Configure consistent resolution across the whole project
