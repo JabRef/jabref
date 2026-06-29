@@ -15,14 +15,10 @@ import org.jabref.http.dto.LinkedPdfFileDTO;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.UiMessageHandler;
-import org.jabref.logic.ai.chatting.ChatModel;
-import org.jabref.logic.ai.chatting.util.ChatModelFactory;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
-import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
@@ -104,9 +100,8 @@ public class EntriesResource {
         }
         Optional<java.nio.file.Path> targetLibrary = resolveTargetLibrary(id);
 
-        PlainCitationParserChoice choice = preferences.getImporterPreferences().getDefaultPlainCitationParser();
-        BibEntry parsed = parsePlainCitation(choice, citationText)
-                .orElseThrow(() -> new BadRequestException("Could not parse a bibliography entry from the given text."));
+        BibEntry parsed = ServerUtils.parsePlainCitation(preferences, citationText)
+                                     .orElseThrow(() -> new BadRequestException("Could not parse a bibliography entry from the given text."));
 
         StringWriter rawEntry = new StringWriter();
         BibWriter bibWriter = new BibWriter(rawEntry, "\n");
@@ -118,25 +113,6 @@ public class EntriesResource {
         uiMessageHandler.handleUiCommands(List.of(targetLibrary
                 .map(library -> new UiCommand.AppendBibTeXToLibrary(library, rawEntry.toString(), group))
                 .orElseGet(() -> new UiCommand.AppendBibTeXToLibrary(rawEntry.toString(), group))));
-    }
-
-    private Optional<BibEntry> parsePlainCitation(PlainCitationParserChoice choice, String citationText) throws FetcherException {
-        if (choice == PlainCitationParserChoice.LLM) {
-            // The LLM parser needs a ChatModel; build one for this request and
-            // close it afterwards so the underlying HTTP client is released.
-            try (ChatModel chatModel = ChatModelFactory.create(preferences.getAiPreferences())) {
-                return PlainCitationParserFactory.getLlmPlainCitationParser(
-                                                         preferences.getImportFormatPreferences(),
-                                                         preferences.getAiPreferences(),
-                                                         chatModel)
-                                                 .parsePlainCitation(citationText);
-            }
-        }
-        return PlainCitationParserFactory.getPlainCitationParser(
-                choice,
-                preferences.getCitationKeyPatternPreferences(),
-                preferences.getGrobidPreferences(),
-                preferences.getImportFormatPreferences()).parsePlainCitation(citationText);
     }
 
     @POST
