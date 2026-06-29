@@ -57,6 +57,8 @@ public class XmpPdfExporter extends Exporter {
                 LOGGER.error("Could not create PDF file", e);
             }
         }
-        new XmpUtilWriter(xmpPreferences).writeXmp(filePath, entries, databaseContext.getDatabase());
+        if (!entries.isEmpty()) {
+            new XmpUtilWriter(xmpPreferences).writeXmp(filePath, entries, databaseContext.getDatabase());
+        }
     }
 }

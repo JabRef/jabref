@@ -20,6 +20,7 @@ testModuleInfo {
     requires("org.junit.jupiter.api")
     requires("org.junit.jupiter.params")
     requires("org.mockito")
+    requires("org.apache.pdfbox")
 }
 
 tasks.withType<Test>().configureEach {
