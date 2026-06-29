@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -159,5 +160,20 @@ class SaveDatabaseActionTest {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
         boolean result = saveDatabaseAction.save();
         assertFalse(result);
+    }
+
+    @Test
+    void saveSuspendsAndResumesChangeMonitorAroundSuccessfulSave() throws Exception {
+        BibDatabase database = new BibDatabase(List.of(new BibEntry().withField(StandardField.AUTHOR, "first")));
+        saveDatabaseAction = createSaveDatabaseActionForBibDatabase(database);
+        when(libraryTab.isSaving()).thenReturn(false);
+
+        saveDatabaseAction.save();
+
+        verify(libraryTab).suspendChangeMonitor();
+        verify(libraryTab).resumeChangeMonitor();
+        var inOrder = inOrder(libraryTab);
+        inOrder.verify(libraryTab).suspendChangeMonitor();
+        inOrder.verify(libraryTab).resumeChangeMonitor();
     }
 }

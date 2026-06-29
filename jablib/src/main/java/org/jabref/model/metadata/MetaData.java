@@ -87,6 +87,7 @@ public class MetaData {
     private boolean encodingExplicitlySupplied;
     @Nullable private String versionDBStructure;
     @Nullable private String aiLibraryId;
+    private boolean containsSearchGroups;
 
     /// Constructs an empty metadata.
     public MetaData() {
@@ -126,6 +127,14 @@ public class MetaData {
 
     public Optional<Version> getGroupSearchSyntaxVersion() {
         return this.groupSearchSyntaxVersion;
+    }
+
+    public boolean containsSearchGroups() {
+        return containsSearchGroups;
+    }
+
+    public void setContainsSearchGroups(boolean containsSearchGroups) {
+        this.containsSearchGroups = containsSearchGroups;
     }
 
     /// @return the stored label patterns

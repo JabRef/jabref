@@ -97,49 +97,18 @@ Accept: application/json
 GET http://localhost:23119/libraries/demo
 Accept: application/x-bibtex-library-csl+json
 
-## Error cases
+###
+
+# Error Cases
 
 ### GET not available library
 
 GET http://localhost:23119/libraries/notfound
 
-## Creation
+### GET HTML entry preview for unknown citation key (404; key is HTML-escaped in the message)
 
-JabRef offers `current` for the currently selected tab
+// The citation key below is `<script>alert(1)</script>` URL-encoded. The 404 body is served
+// as text/html, so the key is HTML-escaped (`&lt;script&gt;...`) and not reflected as raw markup.
 
-### Add BibTeX to current library
-
-// Works in UI mode only
-
-POST http://localhost:23119/libraries/current/entries
-Content-Type: application/x-bibtex
-
-@article{demo,
-  title = {Added by REST}
-}
-
-### Import RIS to current library
-
-// Works in UI mode only
-
-POST http://localhost:23119/libraries/current/entries
-Content-Type: application/x-research-info-systems
-
-TY  - CHAP
-PY  - 2015
-Y1  - 2015/09/10
-Y2  - 2015/11/06
-M1  - 0
-DO  - doi:10.1201/b19107-2
-UR  - http://dx.doi.org/10.1201/b19107-2
-N1  - doi:10.1201/b19107-2
-AU  - Catarina Barata
-AU  - MEmre Celebi
-AU  - JorgeS Marques
-SP  - 1-22
-TI  - Toward a Robust Analysis of Dermoscopy Images Acquired under Different Conditions
-T2  - Dermoscopy Image Analysis
-T3  - Digital Imaging and Computer Vision
-SN  - 978-1-4822-5326-9
-PB  - CRC Press
-ER  -
+GET http://localhost:23119/libraries/demo/entries/%3Cscript%3Ealert(1)%3C%2Fscript%3E/entries/%3Cscript%3Ealert(1)%3C%2Fscript%3E
+Accept: text/html

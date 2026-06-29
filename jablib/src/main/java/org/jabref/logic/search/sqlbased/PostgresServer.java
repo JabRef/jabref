@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.jabref.model.search.PostgreConstants;
+import org.jabref.model.search.PostgresConstants;
 
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import org.jspecify.annotations.NullMarked;
@@ -14,15 +14,15 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.model.search.PostgreConstants.BIB_FIELDS_SCHEME;
+import static org.jabref.model.search.PostgresConstants.BIB_FIELDS_SCHEME;
 
 @NullMarked
-public class PostgreServer implements AutoCloseable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PostgreServer.class);
+public class PostgresServer implements AutoCloseable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PostgresServer.class);
     private final EmbeddedPostgres embeddedPostgres;
     private final DataSource dataSource;
 
-    public PostgreServer() {
+    public PostgresServer() {
         EmbeddedPostgres embeddedPostgres;
         try {
             embeddedPostgres = EmbeddedPostgres.builder()
@@ -70,7 +70,7 @@ public class PostgreServer implements AutoCloseable {
         try (Connection connection = getConnection()) {
             if (connection != null) {
                 LOGGER.debug("Adding functions to Postgres server");
-                for (String function : PostgreConstants.POSTGRES_FUNCTIONS) {
+                for (String function : PostgresConstants.POSTGRES_FUNCTIONS) {
                     connection.createStatement().execute(function);
                 }
             }

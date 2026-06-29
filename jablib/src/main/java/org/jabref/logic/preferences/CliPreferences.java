@@ -18,12 +18,13 @@ import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.util.GrobidPreferences;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
+import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.push.PushToApplicationPreferences;
@@ -49,7 +50,7 @@ public interface CliPreferences {
 
     BibEntryPreferences getBibEntryPreferences();
 
-    JournalAbbreviationPreferences getJournalAbbreviationPreferences();
+    AbbreviationPreferences getAbbreviationPreferences();
 
     FilePreferences getFilePreferences();
 
@@ -127,4 +128,6 @@ public interface CliPreferences {
                 getDOIPreferences(),
                 getFilePreferences().mainFileDirectoryProperty());
     }
+
+    OcrPreferences getOcrPreferences();
 }

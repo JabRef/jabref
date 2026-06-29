@@ -2,6 +2,7 @@ package org.jabref.logic.cleanup;
 
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import javafx.beans.property.ObjectProperty;
@@ -13,9 +14,9 @@ public class CleanupPreferences {
 
     private static final EnumSet<CleanupStep> DEFAULT_ACTIVE_JOBS = EnumSet.of(
             CleanupStep.CLEAN_UP_DOI,
+            CleanupStep.CLEAN_UP_ARXIV_DOI,
             CleanupStep.CLEANUP_EPRINT,
             CleanupStep.CLEAN_UP_URL,
-            CleanupStep.CLEAN_UP_ISSN,
             CleanupStep.MAKE_PATHS_RELATIVE,
             CleanupStep.RENAME_PDF,
             CleanupStep.FIX_FILE_LINKS,
@@ -99,9 +100,11 @@ public class CleanupPreferences {
         // Removes the http://... for each DOI. Moves DOIs from URL and NOTE filed to DOI field.
         CLEAN_UP_DOI,
 
+        // Consolidates the arXiv identifier onto the (version-stable) DOI field and drops the redundant eprint.
+        CLEAN_UP_ARXIV_DOI,
+
         CLEANUP_EPRINT,
         CLEAN_UP_URL,
-        CLEAN_UP_ISSN,
 
         MAKE_PATHS_RELATIVE,
         RENAME_PDF,
@@ -129,6 +132,19 @@ public class CleanupPreferences {
         ABBREVIATE_DOTLESS,
         ABBREVIATE_SHORTEST_UNIQUE,
         ABBREVIATE_LTWA,
-        UNABBREVIATE
+        UNABBREVIATE;
+
+        /// Parses a step name, returning an empty Optional for unknown or removed values.
+        ///
+        /// Used when loading preferences written by older versions: e.g. the former `CLEAN_UP_ISSN`
+        /// step was removed (ISSN normalization now happens via the `NormalizeIssn` field formatter),
+        /// and such a stored value must not break preference loading.
+        public static Optional<CleanupStep> safeValueOf(String name) {
+            try {
+                return Optional.of(valueOf(name));
+            } catch (IllegalArgumentException e) {
+                return Optional.empty();
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SourcesJar
 import dev.jbang.gradle.tasks.JBangTask
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway
@@ -14,7 +15,7 @@ plugins {
 
     id("me.champeau.jmh") version "0.7.3"
 
-    id("com.vanniktech.maven.publish") version "0.36.0"
+    id("com.vanniktech.maven.publish") version "0.37.0"
 
     id("dev.jbang") version "0.4.0"
 
@@ -164,7 +165,7 @@ abstract class JoinNonCommentedLines : DefaultTask() {
     }
 }
 
-val extractMaintainers by tasks.registering(JoinNonCommentedLines::class) {
+val extractMaintainers = tasks.register<JoinNonCommentedLines>("extractMaintainers") {
     inputFile = layout.projectDirectory.file("../MAINTAINERS")
     outputFile = layout.buildDirectory.file("maintainers.txt")
 }
@@ -362,7 +363,7 @@ mavenPublishing {
     // - `JavadocJar.Javadoc()` to publish standard javadocs
     javadocJar = JavadocJar.Javadoc(),
     // whether to publish a sources jar
-    sourcesJar = true,
+    sourcesJar = SourcesJar.Sources(),
   ))
 
   publishToMavenCentral()

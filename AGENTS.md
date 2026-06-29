@@ -16,7 +16,10 @@ This document defines rules and expectations for **automated agents** (AI tools,
 
 JabRef is an open-source, research-grade reference manager with high standards for correctness, reproducibility, and maintainability.
 
-This file is guidance to follow *while* developing. After the work is finished, go through each point of `CHECKLIST.md` as a final quality check and ensure that all points are fulfilled. If not, fix the code until all points are fulfilled. Do not skip any point of the checklist.
+This file is guidance to follow *while* developing.
+
+> [!IMPORTANT]
+> **Final step — do not skip.** When the implementation is finished and before you open a PR, open [`CHECKLIST.md`](./CHECKLIST.md) and work through **every** point. Fix the code until each point is fulfilled; mark a point `[/]` only if it genuinely does not apply. The checklist is the mandatory quality gate for the finished result.
 
 ---
 
@@ -125,7 +128,7 @@ Agents **must not**:
    and then PATTERN.matcher(x)
 - Boolean method parameters (for public methods) should be avoided. Better create two distinct methods (which maybe call some private methods)
 - Minimal quality for variable names: Not extraEntry2, extraEntry3; but include meaning/intention into the variable names
-- Use Markdown Javadoc comments (`///`) for multi-line comments
+- Use Markdown Javadoc comments (`///`) for multi-line comments. Within them, use Markdown syntax, not JavaDoc inline tags: `` `code` `` instead of `{@code code}`, and `[ClassName]` instead of `{@link ClassName}`.
 
 ### Comments
 
@@ -176,7 +179,8 @@ Both comments must not be added.
 ### Dealing with `null`
 
 - New public methods should not return `null`. They should make use of `java.util.Optional`. In case `null` really needs to be used, the [JSpecify](https://jspecify.dev/) annotations must be used.
-- Use JSpecify annotations (`@Nullable`, `@Nullmarked`, `@NonNull`, ...) instead of `null` checks
+- Use JSpecify annotations (`@Nullable`, `@NullMarked`, `@NonNull`, ...) instead of `null` checks
+- Annotate every new class with `@NullMarked` (`org.jspecify.annotations.NullMarked`) so members default to non-null.
 - `null` should never be passed to a method (except it has the same name).
 - DO NOT use `Objects.requireNonNull`, use JSpecify's `@NullMarked` and `@NonNull` annotations.
 
@@ -473,6 +477,7 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 5. Keep **all** checklist items. Mark each `[x]` (done), `[ ]` (TODO), or `[/]` (not applicable). Never `[ x]` or `[.]`.
 6. Remove **all** HTML comments before opening the PR.
 7. Write the body to a temp file and run `gh pr create --body-file <file>` — never `--body`, which bypasses the template.
+8. If the CHANGELOG.md entry used a `TODO` placeholder (no issue existed), immediately after the PR is created replace `TODO` with the real PR-number link (`[#NUM](https://github.com/JabRef/jabref/pull/NUM)`), then commit and push that change.
 
 ---
 
@@ -481,6 +486,8 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 - Add a CHANGELOG.md entry only if the change is visible to the user.
 - The CHANGELOG.md entry should be for end users (and not programmers).
 - Do not add extra blank lines in CHANGELOG.md
+- When no issue is known and the PR is not yet created, use `TODO` as the issue/PR reference placeholder — never invent a fake number.
+- Before using `TODO`, search <https://github.com/JabRef/jabref/issues> and <https://github.com/JabRef/jabref-koppor/issues> for a matching issue. Link it only on a confident match; otherwise list candidates for human review and keep `TODO`. Never use `closes`/`fixes` keywords for a merely-similar issue.
 - User documentation is available in a separate repository <https://github.com/JabRef/user-documentation>.
 - No AI-disclosure comments inside source code
 

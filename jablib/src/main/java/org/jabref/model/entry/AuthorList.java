@@ -1,11 +1,8 @@
 package org.jabref.model.entry;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -13,6 +10,8 @@ import java.util.stream.Collectors;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.importer.AuthorListParser;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -118,8 +117,12 @@ import org.jspecify.annotations.Nullable;
 /// </ol>
 @AllowedToUseLogic("because it needs access to AuthorList parser")
 public class AuthorList implements Iterable<Author> {
+    private static final int AUTHOR_CACHE_SIZE = 50_000;
 
-    private static final Map<String, AuthorList> AUTHOR_CACHE = Collections.synchronizedMap(new WeakHashMap<>());
+    private static final Cache<String, AuthorList> AUTHOR_CACHE = Caffeine.newBuilder()
+                                                                          .weakKeys()
+                                                                          .maximumSize(AUTHOR_CACHE_SIZE)
+                                                                          .build();
 
     private final List<Author> authors;
     @Nullable private AuthorList latexFreeAuthors;
@@ -173,7 +176,7 @@ public class AuthorList implements Iterable<Author> {
     /// @param authors The string of authors or editors in bibtex format to parse.
     /// @return An AuthorList object representing the given authors.
     public static AuthorList parse(@NonNull final String authors) {
-        return AUTHOR_CACHE.computeIfAbsent(authors, string -> {
+        return AUTHOR_CACHE.get(authors, string -> {
             AuthorListParser parser = new AuthorListParser();
             return parser.parse(string);
         });

@@ -8,12 +8,9 @@ import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 public class ImportantOptionalFieldsTab extends OptionalFieldsTabBase {
-
-    public static final String NAME = "Optional fields";
 
     public ImportantOptionalFieldsTab(UndoManager undoManager,
                                       UndoAction undoAction,
@@ -24,7 +21,7 @@ public class ImportantOptionalFieldsTab extends OptionalFieldsTabBase {
                                       StateManager stateManager,
                                       PreviewPanel previewPanel) {
         super(
-                Localization.lang("Optional fields"),
+                EntryEditorTabModel.BuiltIn.IMPORTANT_OPTIONAL_FIELDS.displayName(),
                 true,
                 undoManager,
                 undoAction,

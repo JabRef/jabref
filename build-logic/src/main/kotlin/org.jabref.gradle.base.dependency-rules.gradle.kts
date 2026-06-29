@@ -1,4 +1,5 @@
 import org.gradlex.javamodule.dependencies.tasks.ModuleDirectivesOrderingCheck
+import org.jabref.gradle.useLibericaJdkFull
 
 plugins {
     id("org.gradlex.extra-java-module-info")
@@ -8,6 +9,24 @@ plugins {
 
 // module-info entry order not checked
 tasks.withType<ModuleDirectivesOrderingCheck> { enabled = false }
+
+// Opt-in (-PuseLibericaJdkFull=true): consume the JavaFX bundled in the JDK (e.g. Liberica Full) instead of Maven.
+// The java-module-dependencies plugin maps each 'requires javafx.*' to an 'org.openjfx:javafx-*' dependency; we drop
+// those from every configuration via an exclude, so 'requires javafx.*' is satisfied by the JDK's own system modules.
+// The JavaFX version pin (versions/build.gradle.kts), the platform-variant patches and the per-module opens/exports
+// patches below then have nothing to act on and stay inert; the runtime opens/exports they provided are re-applied as
+// JVM args in jabgui/build.gradle.kts. (Flag: org.jabref.gradle.Toolchains)
+// Because this exclude removes the Maven JavaFX, org.jabref.gradle.feature.compile verifies the resolved toolchain
+// actually ships JavaFX (Liberica Full, not Standard) and fails fast otherwise.
+if (useLibericaJdkFull) {
+    // The exclude is applied lazily at resolution time and, crucially, leaves moduleNameToGA untouched: eagerly reading
+    // and replacing that map (moduleNameToGA.get()/.set()) snapshots it before the plugin finishes contributing the
+    // project's other module-name -> GA mappings, silently discarding entries such as 'unirest.modules.gson' and thereby
+    // breaking transitive versions for deps only pinned via that path (e.g. gson, xz).
+    configurations.all {
+        exclude(mapOf("group" to "org.openjfx"))
+    }
+}
 
 jvmDependencyConflicts {
     consistentResolution {
