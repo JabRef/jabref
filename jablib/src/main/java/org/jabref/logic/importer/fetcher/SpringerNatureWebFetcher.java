@@ -13,8 +13,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.SpringerQueryTransformer;
 import org.jabref.logic.net.URLDownload;
@@ -26,6 +28,7 @@ import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.BaseQueryNode;
 
 import com.google.common.base.Strings;
@@ -191,8 +194,37 @@ public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, 
     /// @return URL
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
+        String transformedQuery = new SpringerQueryTransformer().transformSearchQuery(queryNode).orElse("");
+        return buildSearchURL(transformedQuery, pageNumber);
+    }
+
+    @Override
+    public Page<BibEntry> performRawSearchQueryPaged(String rawQuery, int pageNumber) throws FetcherException {
+        if (rawQuery.isBlank()) {
+            return new Page<>(rawQuery, pageNumber, List.of());
+        }
+        try {
+            URL url = buildSearchURL(rawQuery, pageNumber);
+            try (var stream = getUrlDownload(url).asInputStream()) {
+                return new Page<>(rawQuery, pageNumber, getParser().parseEntries(stream));
+            }
+        } catch (URISyntaxException e) {
+            throw new FetcherException("Springer raw search URL is malformed for query: " + rawQuery, e);
+        } catch (IOException e) {
+            throw new FetcherException(rawQuery, e);
+        } catch (ParseException e) {
+            throw new FetcherException("Springer raw search parse error for query: " + rawQuery, e);
+        }
+    }
+
+    /// Builds the Springer Nature search API URL for the given raw query string and page number.
+    /// The raw query is sent verbatim as the `q` parameter, bypassing [SpringerQueryTransformer].
+    ///
+    /// @param rawQuery   the query string to pass directly as the `q` parameter
+    /// @param pageNumber zero based page number; converted to a one based `s` start value.
+    private URL buildSearchURL(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
-        uriBuilder.addParameter("q", new SpringerQueryTransformer().transformSearchQuery(queryNode).orElse("")); // Search query
+        uriBuilder.addParameter("q", rawQuery); // Search query
         importerPreferences.getApiKey(getName()).ifPresent(key -> uriBuilder.addParameter("api_key", key)); // API key
         uriBuilder.addParameter("s", String.valueOf(getPageSize() * pageNumber + 1)); // Start entry, starts indexing at 1
         uriBuilder.addParameter("p", String.valueOf(getPageSize())); // Page size
