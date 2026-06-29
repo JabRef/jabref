@@ -11,15 +11,11 @@ import org.jabref.http.server.services.CitationCacheService;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.UiMessageHandler;
-import org.jabref.logic.ai.chatting.ChatModel;
-import org.jabref.logic.ai.chatting.util.ChatModelFactory;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
-import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -103,9 +99,8 @@ public class CitationsResource {
         // library, any other id -> that open library (404 if unknown/closed).
         BibDatabaseContext targetContext = resolveTargetContext(id);
 
-        PlainCitationParserChoice choice = preferences.getImporterPreferences().getDefaultPlainCitationParser();
-        BibEntry parsed = parsePlainCitation(choice, citationText)
-                .orElseThrow(() -> new BadRequestException("Could not parse a bibliography entry from the given text."));
+        BibEntry parsed = ServerUtils.parsePlainCitation(preferences, citationText)
+                                     .orElseThrow(() -> new BadRequestException("Could not parse a bibliography entry from the given text."));
 
         // Cross-library lookup: walk every open library so we can tell the
         // client whether the citation is in the *target* library (Ctrl+J
@@ -239,24 +234,5 @@ public class CitationsResource {
             return Optional.empty();
         }
         return Optional.of(ServerUtils.getLibraryPath(id, srvStateManager));
-    }
-
-    /// Mirrors `EntriesResource.parsePlainCitation` — kept in sync by hand for
-    /// now; pulling it into a shared helper is a follow-up refactor.
-    private Optional<BibEntry> parsePlainCitation(PlainCitationParserChoice choice, String citationText) throws FetcherException {
-        if (choice == PlainCitationParserChoice.LLM) {
-            try (ChatModel chatModel = ChatModelFactory.create(preferences.getAiPreferences())) {
-                return PlainCitationParserFactory.getLlmPlainCitationParser(
-                                                         preferences.getImportFormatPreferences(),
-                                                         preferences.getAiPreferences(),
-                                                         chatModel)
-                                                 .parsePlainCitation(citationText);
-            }
-        }
-        return PlainCitationParserFactory.getPlainCitationParser(
-                choice,
-                preferences.getCitationKeyPatternPreferences(),
-                preferences.getGrobidPreferences(),
-                preferences.getImportFormatPreferences()).parsePlainCitation(citationText);
     }
 }
