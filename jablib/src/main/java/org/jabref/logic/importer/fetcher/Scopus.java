@@ -60,9 +60,23 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
     /// @return URL for the Scopus API request
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
-        transformer = new ScopusQueryTransformer();
-        String transformedQuery = transformer.transformSearchQuery(queryNode).orElse("");
+        String transformedQuery = new ScopusQueryTransformer().transformSearchQuery(queryNode).orElse("");
         return buildSearchURL(transformedQuery, pageNumber);
+    }
+
+    @Override
+    public List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
+        return new ArrayList<>(performSearchPaged(queryNode, 0).getContent());
+    }
+
+    @Override
+    public Page<BibEntry> performSearchPaged(BaseQueryNode queryNode, int pageNumber) throws FetcherException {
+        ScopusQueryTransformer transformer = new ScopusQueryTransformer();
+        String transformedQuery = transformer.transformSearchQuery(queryNode).orElse("");
+        List<BibEntry> entries = fetchEntries(transformedQuery, pageNumber).stream()
+                                                                           .filter(entry -> shouldIncludeEntry(entry, transformer))
+                                                                           .toList();
+        return new Page<>(transformedQuery, pageNumber, entries);
     }
 
     @Override
@@ -70,20 +84,26 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
         if (rawQuery.isBlank()) {
             return new Page<>(rawQuery, pageNumber, List.of());
         }
-        // reset the transformer so the parser's year filter (shouldIncludeEntry) carries no stale bounds
-        // the raw path intentionally bypasses year filtering, consistent with IEEE
-        transformer = new ScopusQueryTransformer();
+        // raw path sends the query verbatim and bypasses year filtering
+        return new Page<>(rawQuery, pageNumber, fetchEntries(rawQuery, pageNumber));
+    }
+
+    /// Downloads and parses Scopus search results for an already built query string
+    ///
+    /// @param query      the value placed verbatim into the Scopus `query` parameter
+    /// @param pageNumber zero based page number
+    private List<BibEntry> fetchEntries(String query, int pageNumber) throws FetcherException {
         try {
-            URL url = buildSearchURL(rawQuery, pageNumber);
+            URL url = buildSearchURL(query, pageNumber);
             try (var stream = getUrlDownload(url).asInputStream()) {
-                return new Page<>(rawQuery, pageNumber, getParser().parseEntries(stream));
+                return getParser().parseEntries(stream);
             }
         } catch (URISyntaxException e) {
-            throw new FetcherException("Scopus raw search URL is malformed for query: " + rawQuery, e);
+            throw new FetcherException("Scopus search URL is malformed for query: " + query, e);
         } catch (IOException e) {
-            throw new FetcherException(rawQuery, e);
+            throw new FetcherException(query, e);
         } catch (ParseException e) {
-            throw new FetcherException("Scopus raw search parse error for query: " + rawQuery, e);
+            throw new FetcherException("Scopus search parse error for query: " + query, e);
         }
     }
 
@@ -149,12 +169,7 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
                         continue;
                     }
 
-                    Optional<BibEntry> entryOpt = parseScopusEntry(jsonEntry);
-                    entryOpt.ifPresent(entry -> {
-                        if (shouldIncludeEntry(entry)) {
-                            entries.add(entry);
-                        }
-                    });
+                    parseScopusEntry(jsonEntry).ifPresent(entries::add);
                 } catch (JSONException e) {
                     LOGGER.warn("Error parsing Scopus entry at index {}", i, e);
                 }
@@ -165,11 +180,7 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
     }
 
     /// Checks if the entry should be included based on year filtering.
-    private boolean shouldIncludeEntry(BibEntry entry) {
-        if (transformer == null) {
-            return true;
-        }
-
+    private boolean shouldIncludeEntry(BibEntry entry, ScopusQueryTransformer transformer) {
         Optional<Integer> startYear = transformer.getStartYear();
         Optional<Integer> endYear = transformer.getEndYear();
 
