@@ -3,12 +3,15 @@ package org.jabref.toolkit.commands;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.logic.xmp.XmpUtilReader;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -39,10 +42,9 @@ class PdfUpdateTest extends AbstractJabKitTest {
                 }
                 """);
 
-        when(preferences.getXmpPreferences()).thenReturn(new XmpPreferences(false, Set.of(), new SimpleObjectProperty<>(',')));
+        XmpPreferences xmpPreferences = new XmpPreferences(false, Set.of(), new SimpleObjectProperty<>(','));
+        when(preferences.getXmpPreferences()).thenReturn(xmpPreferences);
         when(preferences.getFilePreferences().shouldStoreFilesRelativeToBibFile()).thenReturn(true);
-
-        byte[] contentBefore = Files.readAllBytes(pdfFile);
 
         int exitCode = commandLine.executeToLog(
                 "pdf", "update",
@@ -52,7 +54,10 @@ class PdfUpdateTest extends AbstractJabKitTest {
                 "--citation-key=TestEntry");
 
         assertEquals(0, exitCode);
-        assertFalse(Arrays.equals(contentBefore, Files.readAllBytes(pdfFile)),
-                "PDF file should have been modified with XMP metadata, but content did not change");
+
+        List<BibEntry> writtenEntries = new XmpUtilReader().readXmp(pdfFile, xmpPreferences);
+        assertFalse(writtenEntries.isEmpty(), "No XMP metadata found in PDF after update");
+        assertEquals("Test Author", writtenEntries.getFirst().getField(StandardField.AUTHOR).orElse(""),
+                "Author field in XMP metadata does not match the bib entry");
     }
 }
