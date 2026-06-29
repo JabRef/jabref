@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
@@ -68,6 +69,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     private static final FieldFormatterCleanup NORMALIZE_PAGES = new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter());
     private static final FieldFormatterCleanup CLEAR_URL = new FieldFormatterCleanup(StandardField.URL, new ClearFormatter());
     private static final FieldFormatterCleanup HTML_TO_LATEX_TITLE = new FieldFormatterCleanup(StandardField.TITLE, new HtmlToLatexFormatter());
+    private static final FieldFormatterCleanup NORMALIZE_MONTH = new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter());
 
     private final ImportFormatPreferences preferences;
 
@@ -184,6 +186,8 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         NORMALIZE_PAGES.cleanup(entry);
         CLEAR_URL.cleanup(entry);
         HTML_TO_LATEX_TITLE.cleanup(entry);
+        NORMALIZE_MONTH.cleanup(entry);
+
         entry.trimLeft();
     }
 
