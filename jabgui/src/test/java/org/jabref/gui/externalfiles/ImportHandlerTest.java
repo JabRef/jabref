@@ -14,6 +14,7 @@ import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.database.DuplicateCheck;
@@ -21,6 +22,8 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImportFormatReader.ImportResult;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.preferences.OwnerPreferences;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -39,6 +42,8 @@ import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -70,6 +75,10 @@ class ImportHandlerTest {
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
         when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
+
+        when(preferences.getOwnerPreferences()).thenReturn(mock(OwnerPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        when(preferences.getTimestampPreferences()).thenReturn(mock(TimestampPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        when(preferences.getLibraryPreferences()).thenReturn(mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         bibDatabaseContext = mock(BibDatabaseContext.class);
         BibDatabase bibDatabase = new BibDatabase();
@@ -164,6 +173,40 @@ class ImportHandlerTest {
     void findDuplicateTest() {
         // Assume there is no duplicate initially
         assertTrue(importHandler.findDuplicate(testEntry).isEmpty());
+    }
+
+    @Test
+    void importWithDuplicateCheckTracksInsertedCopyForGroupAssignment() {
+        // Use a real database context so group metadata can be created/queried
+        BibDatabaseContext realContext = new BibDatabaseContext(new BibDatabase());
+        StateManager stateManager = mock(StateManager.class);
+        when(stateManager.getSelectedGroups(any())).thenReturn(FXCollections.observableArrayList());
+        ImportHandler handler = new ImportHandler(
+                realContext,
+                preferences,
+                new DummyFileUpdateMonitor(),
+                mock(UndoManager.class),
+                stateManager,
+                mock(DialogService.class),
+                new CurrentThreadTaskExecutor());
+
+        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, 1);
+        handler.importEntriesWithDuplicateCheck(null, List.of(testEntry), tracker);
+
+        // The tracker exposes the actual inserted copy, not the original
+        List<BibEntry> imported = tracker.getImportedEntries();
+        assertEquals(1, imported.size());
+        BibEntry insertedEntry = realContext.getDatabase().getEntries().getFirst();
+        assertSame(insertedEntry, imported.getFirst());
+        // The tracked/inserted entry is a copy, not the caller's original
+        assertNotSame(testEntry, insertedEntry);
+
+        // Assigning the group to the tracked entries puts the actual database entry into the group
+        org.jabref.logic.groups.GroupsHelper.assignEntriesToGroup(realContext, imported, "MyGroup", ',');
+
+        assertTrue(insertedEntry.getField(StandardField.GROUPS).orElse("").contains("MyGroup"));
+        // The original entry passed by the caller is untouched
+        assertTrue(testEntry.getField(StandardField.GROUPS).isEmpty());
     }
 
     @Test

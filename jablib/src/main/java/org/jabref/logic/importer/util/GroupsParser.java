@@ -60,6 +60,7 @@ public class GroupsParser {
         try {
             GroupTreeNode cursor = null;
             GroupTreeNode root = null;
+            boolean containsSearchGroups = false;
             for (String string : orderedData) {
                 string = string.trim();
                 if (string.isEmpty()) {
@@ -75,6 +76,7 @@ public class GroupsParser {
                 if (group == null) {
                     continue;
                 }
+                containsSearchGroups |= group instanceof SearchGroup;
                 GroupTreeNode newNode = GroupTreeNode.fromGroup(group);
                 if (cursor == null) {
                     cursor = newNode;
@@ -87,6 +89,7 @@ public class GroupsParser {
                     cursor = newNode;
                 }
             }
+            metaData.setContainsSearchGroups(containsSearchGroups);
             return root;
         } catch (ParseException e) {
             throw new ParseException(Localization

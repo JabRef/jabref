@@ -73,18 +73,16 @@ public class EntriesResource {
     @POST
     @Consumes(MediaTypes.APPLICATION_BIBTEX)
     public void addBibtex(@PathParam("id") String id, @QueryParam("group") @Nullable String group, String bibtex) {
-        if (uiMessageHandler == null) {
-            throw new BadRequestException("Only possible in GUI mode.");
-        }
-        if (!"current".equals(id)) {
-            throw new BadRequestException("Only currently selected library possible");
-        }
-        if (bibtex == null || bibtex.isBlank()) {
+        if (StringUtil.isBlank(bibtex)) {
             throw new BadRequestException("BibTeX data must not be empty.");
         }
-        uiMessageHandler.handleUiCommands(List.of(group == null
-                                                  ? new UiCommand.AppendBibTeXToCurrentLibrary(bibtex)
-                                                  : new UiCommand.AppendBibTeXToCurrentLibrary(bibtex, group)));
+        if (!uiMessageHandler.isGuiConnected()) {
+            throw new BadRequestException("Only possible in GUI mode.");
+        }
+        Optional<java.nio.file.Path> targetLibrary = resolveTargetLibrary(id);
+        uiMessageHandler.handleUiCommands(List.of(targetLibrary
+                .map(library -> new UiCommand.AppendBibTeXToLibrary(library, bibtex, group))
+                .orElseGet(() -> new UiCommand.AppendBibTeXToLibrary(bibtex, group))));
     }
 
     /// Parses a plain-text bibliography reference into a BibTeX entry and appends it to the
@@ -98,15 +96,13 @@ public class EntriesResource {
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
     public void addPlainCitation(@PathParam("id") String id, @QueryParam("group") @Nullable String group, String citationText) throws FetcherException, IOException {
-        if (uiMessageHandler == null) {
-            throw new BadRequestException("Only possible in GUI mode.");
-        }
-        if (!"current".equals(id)) {
-            throw new BadRequestException("Only currently selected library possible");
-        }
         if (StringUtil.isBlank(citationText)) {
             throw new BadRequestException("Citation text must not be empty.");
         }
+        if (!uiMessageHandler.isGuiConnected()) {
+            throw new BadRequestException("Only possible in GUI mode.");
+        }
+        Optional<java.nio.file.Path> targetLibrary = resolveTargetLibrary(id);
 
         PlainCitationParserChoice choice = preferences.getImporterPreferences().getDefaultPlainCitationParser();
         BibEntry parsed = parsePlainCitation(choice, citationText)
@@ -119,9 +115,9 @@ public class EntriesResource {
                 new BibEntryTypesManager());
         entryWriter.write(parsed, bibWriter, BibDatabaseMode.BIBTEX);
 
-        uiMessageHandler.handleUiCommands(List.of(group == null
-                                                  ? new UiCommand.AppendBibTeXToCurrentLibrary(rawEntry.toString())
-                                                  : new UiCommand.AppendBibTeXToCurrentLibrary(rawEntry.toString(), group)));
+        uiMessageHandler.handleUiCommands(List.of(targetLibrary
+                .map(library -> new UiCommand.AppendBibTeXToLibrary(library, rawEntry.toString(), group))
+                .orElseGet(() -> new UiCommand.AppendBibTeXToLibrary(rawEntry.toString(), group))));
     }
 
     private Optional<BibEntry> parsePlainCitation(PlainCitationParserChoice choice, String citationText) throws FetcherException {
@@ -146,23 +142,32 @@ public class EntriesResource {
     @POST
     @Consumes("*/*")
     public void addUnknown(@PathParam("id") String id, Reader body) throws IOException {
-        if (uiMessageHandler == null) {
+        if (!uiMessageHandler.isGuiConnected()) {
             throw new BadRequestException("Only possible in GUI mode.");
         }
-        if (!"current".equals(id)) {
-            throw new BadRequestException("Only currently selected library possible");
-        }
+        Optional<java.nio.file.Path> targetLibrary = resolveTargetLibrary(id);
 
         // Stream is read in another thread - when Grizzly already closed the stream
         // Therefore, we need to create a copy
-        java.nio.file.Path tempFile;
-        tempFile = Files.createTempFile("JabRef-import", "data");
+        java.nio.file.Path tempFile = Files.createTempFile("JabRef-import", "data");
 
         try (BufferedWriter writer = Files.newBufferedWriter(tempFile, StandardCharsets.UTF_8)) {
             body.transferTo(writer);
         }
 
-        uiMessageHandler.handleUiCommands(List.of(new UiCommand.AppendFilesToCurrentLibrary(List.of(tempFile))));
+        uiMessageHandler.handleUiCommands(List.of(new UiCommand.AppendFilesToLibrary(targetLibrary, List.of(tempFile))));
+    }
+
+    /// Resolves the path-segment library id into the on-disk path the append should target.
+    ///
+    /// "current" keeps the previous behaviour (empty Optional -> active library). Any other id
+    /// is looked up among the open libraries; an unknown or closed id yields 404 via
+    /// {@link ServerUtils#getLibraryPath}.
+    private Optional<java.nio.file.Path> resolveTargetLibrary(String id) {
+        if ("current".equals(id)) {
+            return Optional.empty();
+        }
+        return Optional.of(ServerUtils.getLibraryPath(id, srvStateManager));
     }
 
     /// Loops through all entries in the specified library and adds attached files of type "PDF" to

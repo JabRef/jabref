@@ -7,6 +7,7 @@ plugins {
 
 testModuleInfo {
     requires("org.junit.jupiter.api")
+    requires("org.junit.jupiter.params")
     requires("org.mockito")
     requires("org.glassfish.jersey.tests.framework.core")
     requires("jul.to.slf4j")

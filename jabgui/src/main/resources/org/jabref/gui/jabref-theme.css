@@ -2452,6 +2452,15 @@ journalInfo .grid-cell-b {
     -fx-background-color: -fx-default-button;
 }
 
+.linked-files-info {
+    -fx-padding: 0.5em 0 0.5em 0;
+}
+
+.delete-files-dialog {
+    -fx-padding: 10px;
+    -fx-background-color: -fx-background;
+}
+
 /* Note: stack-pane comes from GemsFX */
 .stack-pane {
     -fx-background-color: transparent;
