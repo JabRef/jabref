@@ -34,7 +34,7 @@ public abstract class Command {
 
     protected Response execute(UiCommand uiCommand) {
         UiMessageHandler uiMessageHandler = serviceLocator.getService(UiMessageHandler.class);
-        if (uiMessageHandler == null) {
+        if (uiMessageHandler == null || !uiMessageHandler.isGuiConnected()) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                            .entity("This command is not supported in CLI mode.")
                            .build();

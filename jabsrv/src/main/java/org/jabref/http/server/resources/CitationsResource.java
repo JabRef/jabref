@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.services.CitationCacheService;
+import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.UiMessageHandler;
 import org.jabref.logic.ai.chatting.ChatModel;
@@ -64,7 +65,6 @@ public class CitationsResource {
     SrvStateManager srvStateManager;
 
     @Inject
-    @Nullable
     UiMessageHandler uiMessageHandler;
 
     @Inject
@@ -96,28 +96,26 @@ public class CitationsResource {
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.APPLICATION_JSON)
     public LookupResponse lookup(@PathParam("id") String id, String citationText) throws FetcherException {
-        if (!"current".equals(id)) {
-            throw new BadRequestException("Only currently selected library possible");
-        }
         if (StringUtil.isBlank(citationText)) {
             throw new BadRequestException("Citation text must not be empty.");
         }
+        // The target library is the one Ctrl+J would add to: "current" -> active
+        // library, any other id -> that open library (404 if unknown/closed).
+        BibDatabaseContext targetContext = resolveTargetContext(id);
 
         PlainCitationParserChoice choice = preferences.getImporterPreferences().getDefaultPlainCitationParser();
         BibEntry parsed = parsePlainCitation(choice, citationText)
                 .orElseThrow(() -> new BadRequestException("Could not parse a bibliography entry from the given text."));
 
         // Cross-library lookup: walk every open library so we can tell the
-        // client whether the citation is in the *active* library (Ctrl+J
+        // client whether the citation is in the *target* library (Ctrl+J
         // would create a duplicate → mint) vs an *other* open library (still
         // worth surfacing — the user may want to switch libraries or copy
         // across → olive, AnchorHub's related-match colour).
-        BibDatabaseContext activeContext = srvStateManager.getActiveDatabase()
-                                                          .orElseThrow(() -> new BadRequestException("No active library"));
         DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         List<LookupMatch> matches = new ArrayList<>();
         for (BibDatabaseContext ctx : srvStateManager.getOpenDatabases()) {
-            boolean isActive = ctx == activeContext;
+            boolean isActive = ctx == targetContext;
             duplicateCheck.containsDuplicate(ctx.getDatabase(), parsed, ctx.getMode())
                           .ifPresent(existing -> matches.add(new LookupMatch(
                                   libraryIdFor(ctx),
@@ -147,12 +145,11 @@ public class CitationsResource {
     public Response addFromCache(@PathParam("id") String id,
                                  @PathParam("parserCacheKey") String parserCacheKey,
                                  @QueryParam("group") @Nullable String group) {
-        if (uiMessageHandler == null) {
+        if (!uiMessageHandler.isGuiConnected()) {
             throw new BadRequestException("Only possible in GUI mode.");
         }
-        if (!"current".equals(id)) {
-            throw new BadRequestException("Only currently selected library possible");
-        }
+        BibDatabaseContext context = resolveTargetContext(id);
+        Optional<java.nio.file.Path> targetLibrary = targetLibrary(id);
 
         Optional<CitationCacheService.CachedCitation> cached = citationCacheService.get(parserCacheKey);
         if (cached.isEmpty()) {
@@ -171,13 +168,11 @@ public class CitationsResource {
         // citation. Returns 200 with `{"status":"already-exists"}` instead
         // of 201 so the client can show a "Citation is already in library"
         // notification without treating it as a hard error.
-        BibDatabaseContext context = srvStateManager.getActiveDatabase()
-                                                    .orElseThrow(() -> new BadRequestException("No active library"));
         BibDatabaseMode mode = context.getMode();
         DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         return duplicateCheck.containsDuplicate(context.getDatabase(), parsed, mode)
                              .map(existingEntry -> alreadyExistsResponse(parserCacheKey, existingEntry))
-                             .orElseGet(() -> appendParsedAndRespond(parsed, group, parserCacheKey));
+                             .orElseGet(() -> appendParsedAndRespond(parsed, targetLibrary, group, parserCacheKey));
     }
 
     /// Returns a 200 OK `{"status":"already-exists","entryId":"…"}` body and
@@ -196,7 +191,7 @@ public class CitationsResource {
 
     /// Writes the parsed entry as BibTeX, forwards it to the UI for append,
     /// evicts the cache token, and returns 201 Created.
-    private Response appendParsedAndRespond(BibEntry parsed, @Nullable String group, String parserCacheKey) {
+    private Response appendParsedAndRespond(BibEntry parsed, Optional<java.nio.file.Path> targetLibrary, @Nullable String group, String parserCacheKey) {
         StringWriter rawEntry = new StringWriter();
         BibWriter bibWriter = new BibWriter(rawEntry, "\n");
         BibEntryWriter entryWriter = new BibEntryWriter(
@@ -209,15 +204,41 @@ public class CitationsResource {
         }
 
         // uiMessageHandler is null-checked at the top of addFromCache; safe here.
-        uiMessageHandler.handleUiCommands(List.of(group == null
-                                                  ? new UiCommand.AppendBibTeXToCurrentLibrary(rawEntry.toString())
-                                                  : new UiCommand.AppendBibTeXToCurrentLibrary(rawEntry.toString(), group)));
+        uiMessageHandler.handleUiCommands(List.of(targetLibrary
+                .map(library -> new UiCommand.AppendBibTeXToLibrary(library, rawEntry.toString(), group))
+                .orElseGet(() -> new UiCommand.AppendBibTeXToLibrary(rawEntry.toString(), group))));
 
         // Evict so the same token can't add a second copy. The client
         // already has confirmation it landed; re-tries fall through to
         // the 410 branch above and trigger a fresh lookup.
         citationCacheService.invalidate(parserCacheKey);
         return Response.status(Response.Status.CREATED).build();
+    }
+
+    /// Resolves the path-segment library id to the library this request operates on.
+    /// "current" -> active library; any other id -> that open library (404 if unknown or
+    /// closed). Same id semantics as {@link EntriesResource}.
+    private BibDatabaseContext resolveTargetContext(String id) {
+        try {
+            return ServerUtils.getBibDatabaseContext(id, srvStateManager, preferences.getImportFormatPreferences());
+        } catch (IOException e) {
+            throw new InternalServerErrorException("Could not load library " + id, e);
+        }
+    }
+
+    /// The append target for the resolved library: empty for "current" (append to the active
+    /// tab without switching), otherwise the open library's on-disk path so the GUI switches to it
+    /// first. Mirrors {@link EntriesResource#resolveTargetLibrary}.
+    ///
+    /// Non-"current" ids are resolved against the *open* libraries via [ServerUtils#getLibraryPath]
+    /// rather than the resolved context's path. This rejects path-less contexts such as the bundled
+    /// "demo" library with 404 instead of silently falling back to an empty Optional (which
+    /// [UiCommand.AppendBibTeXToLibrary] would interpret as "append to the active library").
+    private Optional<java.nio.file.Path> targetLibrary(String id) {
+        if ("current".equals(id)) {
+            return Optional.empty();
+        }
+        return Optional.of(ServerUtils.getLibraryPath(id, srvStateManager));
     }
 
     /// Mirrors `EntriesResource.parsePlainCitation` — kept in sync by hand for
