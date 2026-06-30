@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -50,7 +49,7 @@ public class FulltextFetchers {
         // PDF by reading the magic bytes.
         if (url.startsWith("file:")) {
             try {
-                Path path = Paths.get(java.net.URI.create(url));
+                Path path = Path.of(new java.net.URI(url));
                 if (!Files.isReadable(path)) {
                     return false;
                 }
@@ -63,7 +62,7 @@ public class FulltextFetchers {
                             && magic[3] == 'F'
                             && magic[4] == '-';
                 }
-            } catch (IllegalArgumentException | IOException e) {
+            } catch (java.net.URISyntaxException | IllegalArgumentException | IOException e) {
                 LOGGER.debug("Could not verify PDF magic bytes for {}", url, e);
                 return false;
             }

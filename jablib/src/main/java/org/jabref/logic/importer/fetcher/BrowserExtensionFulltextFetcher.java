@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -144,7 +145,13 @@ public class BrowserExtensionFulltextFetcher implements FulltextFetcher {
             return Optional.empty();
         }
 
-        URI endpoint = URI.create("http://127.0.0.1:" + provider.port() + "/v1/fulltext");
+        URI endpoint;
+        try {
+            endpoint = new URI("http", null, "127.0.0.1", provider.port(), "/v1/fulltext", null, null);
+        } catch (URISyntaxException e) {
+            LOGGER.debug("Could not build endpoint URI for provider {}", provider.name(), e);
+            return Optional.empty();
+        }
         HttpRequest request = HttpRequest.newBuilder(endpoint)
                                          .timeout(socketTimeout)
                                          .header("Content-Type", "application/json")
