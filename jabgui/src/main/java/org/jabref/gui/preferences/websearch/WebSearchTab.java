@@ -131,6 +131,19 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
                 Bindings.size(externalFetcherTable.getItems())
                         .add(HEADER_HEIGHT_ESTIMATE)
                         .multiply(rowHeight));
+        // The table content exactly fits the prefHeight but JavaFX still
+        // reserves a vertical scrollbar gutter. Hide it once the skin is
+        // attached so the table reads as a tight read-only list.
+        externalFetcherTable.skinProperty().addListener((_, _, newSkin) -> {
+            if (newSkin == null) {
+                return;
+            }
+            Node vBar = externalFetcherTable.lookup(".scroll-bar:vertical");
+            if (vBar != null) {
+                vBar.setVisible(false);
+                vBar.setManaged(false);
+            }
+        });
 
         enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
