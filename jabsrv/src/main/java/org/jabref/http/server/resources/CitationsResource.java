@@ -173,10 +173,11 @@ public class CitationsResource {
             }
             try {
                 results.add(doLookup(citationText, targetContext, openDatabases, duplicateCheck));
-            } catch (UncheckedFetcherException e) {
-                // One citation failing to parse shouldn't fail the batch.
-                // Surface as an empty response so the client paints "no match"
-                // (= gray ring) for that slot; the others still resolve.
+            } catch (UncheckedFetcherException | BadRequestException e) {
+                // One citation failing — fetcher error (UncheckedFetcherException) or
+                // parser-returned-empty (BadRequestException) — must not fail the batch.
+                // Surface as a "no match" slot so the client paints a gray ring there;
+                // the rest of the batch still resolves.
                 results.add(new LookupResponse(List.of(), MatchScope.NONE));
             }
         }
