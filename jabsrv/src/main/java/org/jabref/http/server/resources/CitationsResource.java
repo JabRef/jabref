@@ -23,6 +23,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ClientErrorException;
@@ -71,14 +72,39 @@ public class CitationsResource {
     public record LookupMatch(String libraryId, String entryId, boolean inActiveLibrary) {
     }
 
+    /// Categorisation of a [LookupResponse]'s `matches` list. Surfaced as a
+    /// dedicated field so clients can colour the hover badge without walking
+    /// the array themselves.
+    public enum MatchScope {
+        /// At least one match in the currently-active library — Ctrl+J would
+        /// create a duplicate. Mint badge.
+        ACTIVE("active"),
+        /// Match(es) only in *other* open libraries — Ctrl+J would still
+        /// create a new entry in the active library. Olive badge.
+        OTHER("other"),
+        /// No match in any open library. Gray badge.
+        NONE("none");
+
+        private final String jsonValue;
+
+        MatchScope(String jsonValue) {
+            this.jsonValue = jsonValue;
+        }
+
+        @JsonValue
+        public String jsonValue() {
+            return jsonValue;
+        }
+    }
+
     /// Result of a single plain-citation lookup.
     ///
     /// @param matches duplicate hits across every open library. Empty list when no library contains the parsed entry, or when the parse itself failed (batch-lookup blank-slot / parser-failure rows).
-    /// @param matchScope derived from `matches`, surfaced separately so clients can colour the hover badge without walking the array: `"active"` — at least one match in the currently-active library (the one Ctrl+J would add to → duplicate, mint badge); `"other"` — match(es) only in *other* open libraries (Ctrl+J would still create a new entry → related, olive badge); `"none"` — no match in any open library (gray badge).
+    /// @param matchScope categorisation of `matches` — see [MatchScope].
     /// @param parserCacheKey opaque token redeemable at `POST /libraries/{id}/citations/{parserCacheKey}` to append the already-parsed `BibEntry` without paying for the LLM parse again. Null when no entry was parsed.
     /// @param parsedEntryType BibTeX entry-type name of the parsed entry (e.g. `"article"`, `"inproceedings"`) — lets the client preview the type before redeeming the cache key. Null when no entry was parsed.
     @NullMarked
-    public record LookupResponse(List<LookupMatch> matches, String matchScope,
+    public record LookupResponse(List<LookupMatch> matches, MatchScope matchScope,
                                  @Nullable String parserCacheKey, @Nullable String parsedEntryType) {
     }
 
@@ -147,7 +173,7 @@ public class CitationsResource {
             if (StringUtil.isBlank(citationText)) {
                 // Empty slot — return a "none" response so client indexing
                 // stays aligned. Skipping would shift downstream results.
-                results.add(new LookupResponse(List.of(), "none", null, null));
+                results.add(new LookupResponse(List.of(), MatchScope.NONE, null, null));
                 continue;
             }
             try {
@@ -156,7 +182,7 @@ public class CitationsResource {
                 // One citation failing to parse shouldn't fail the batch.
                 // Surface as an empty response so the client paints "no match"
                 // (= gray ring) for that slot; the others still resolve.
-                results.add(new LookupResponse(List.of(), "none", null, null));
+                results.add(new LookupResponse(List.of(), MatchScope.NONE, null, null));
             }
         }
         return new BatchLookupResponse(results);
@@ -196,9 +222,9 @@ public class CitationsResource {
                                   existing.getCitationKey().orElse(""),
                                   isActive)));
         }
-        String matchScope = matches.stream()
-                                   .anyMatch(LookupMatch::inActiveLibrary) ? "active"
-                                                                           : matches.isEmpty() ? "none" : "other";
+        MatchScope matchScope = matches.stream()
+                                       .anyMatch(LookupMatch::inActiveLibrary) ? MatchScope.ACTIVE
+                                                                               : matches.isEmpty() ? MatchScope.NONE : MatchScope.OTHER;
 
         String cacheKey = citationCacheService.put(parsed, citationText);
         return new LookupResponse(matches, matchScope, cacheKey, parsed.getType().getName());
