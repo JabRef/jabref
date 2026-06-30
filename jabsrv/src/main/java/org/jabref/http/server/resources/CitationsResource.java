@@ -54,6 +54,7 @@ import org.jspecify.annotations.Nullable;
 ///    token. Returns 410 Gone when the token expired so the client can fall
 ///    back to `POST /libraries/current/entries` and pay for the parse again.
 @Path("libraries/{id}/citations")
+@NullMarked
 public class CitationsResource {
 
     @Inject
@@ -68,7 +69,6 @@ public class CitationsResource {
     @Inject
     CitationCacheService citationCacheService;
 
-    @NullMarked
     public record LookupMatch(String libraryId, String entryId, boolean inActiveLibrary) {
     }
 
@@ -103,12 +103,10 @@ public class CitationsResource {
     /// @param matchScope categorisation of `matches` — see [MatchScope].
     /// @param parserCacheKey opaque token redeemable at `POST /libraries/{id}/citations/{parserCacheKey}` to append the already-parsed `BibEntry` without paying for the LLM parse again. Null when no entry was parsed.
     /// @param parsedEntryType BibTeX entry-type name of the parsed entry (e.g. `"article"`, `"inproceedings"`) — lets the client preview the type before redeeming the cache key. Null when no entry was parsed.
-    @NullMarked
     public record LookupResponse(List<LookupMatch> matches, MatchScope matchScope,
                                  @Nullable String parserCacheKey, @Nullable String parsedEntryType) {
     }
 
-    @NullMarked
     public record AlreadyExistsResponse(String status, String entryId) {
         public AlreadyExistsResponse(String entryId) {
             this("already-exists", entryId);
@@ -135,14 +133,12 @@ public class CitationsResource {
     /// too, but a named record makes the JSON self-describing and leaves room
     /// to add per-request options (e.g. include-snippets) without breaking the
     /// schema.
-    @NullMarked
     public record BatchLookupRequest(List<String> citations) {
     }
 
     /// Aligned-by-index with the request: `results[i]` corresponds to
     /// `citations[i]`. Blank input slots yield an empty `LookupResponse`
     /// (matches=[], matchScope="none") rather than failing the whole batch.
-    @NullMarked
     public record BatchLookupResponse(List<LookupResponse> results) {
     }
 
