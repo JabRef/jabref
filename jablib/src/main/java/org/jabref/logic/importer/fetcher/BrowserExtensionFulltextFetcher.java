@@ -52,10 +52,6 @@ import org.slf4j.LoggerFactory;
 /// Other responses (404, 503, network errors, timeouts) are treated as a
 /// soft miss — there is no retry and no polling. See
 /// `docs/requirements/browser-extension-fulltext.md` for the wire spec.
-///
-/// [impl->req~bxf.fetch~1]
-/// [impl->req~bxf.sync-hold~1]
-/// [impl->req~bxf.auth-bearer~1]
 @NullMarked
 public class BrowserExtensionFulltextFetcher implements FulltextFetcher {
 
@@ -136,7 +132,6 @@ public class BrowserExtensionFulltextFetcher implements FulltextFetcher {
         }
     }
 
-    /// [impl->req~bxf.fetch-errors~1]
     private Optional<URL> tryProvider(BrowserExtensionProvider provider,
                                       String requestBody,
                                       ExecutorService executor) {

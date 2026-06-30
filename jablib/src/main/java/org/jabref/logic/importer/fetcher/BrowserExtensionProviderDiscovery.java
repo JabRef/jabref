@@ -24,9 +24,6 @@ import org.slf4j.LoggerFactory;
 /// discovery directory.
 ///
 /// See `docs/requirements/browser-extension-fulltext.md`.
-///
-/// [impl->req~bxf.discovery-dir~1]
-/// [impl->req~bxf.discovery-schema~1]
 @NullMarked
 public final class BrowserExtensionProviderDiscovery {
 
@@ -52,8 +49,8 @@ public final class BrowserExtensionProviderDiscovery {
         if (OS.WINDOWS) {
             String appData = System.getenv("APPDATA");
             Path baseDir = StringUtil.isBlank(appData)
-                    ? Path.of(System.getProperty("user.home"), "AppData", "Roaming")
-                    : Path.of(appData);
+                           ? Path.of(System.getProperty("user.home"), "AppData", "Roaming")
+                           : Path.of(appData);
             return baseDir.resolve("JabRef").resolve("fulltext-providers");
         }
         if (OS.OS_X) {
@@ -63,8 +60,8 @@ public final class BrowserExtensionProviderDiscovery {
         // Linux + other Unixy: honour $XDG_CONFIG_HOME, fall back to ~/.config.
         String xdg = System.getenv("XDG_CONFIG_HOME");
         Path baseDir = StringUtil.isBlank(xdg)
-                ? Path.of(System.getProperty("user.home"), ".config")
-                : Path.of(xdg);
+                       ? Path.of(System.getProperty("user.home"), ".config")
+                       : Path.of(xdg);
         return baseDir.resolve("jabref").resolve("fulltext-providers");
     }
 

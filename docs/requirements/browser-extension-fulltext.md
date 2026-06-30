@@ -73,10 +73,6 @@ JabRef enumerates provider discovery files from a well-known directory at fetche
 
 Each provider drops exactly one JSON file at install time. The filename is provider-chosen (for example `<provider-name>.json`) and must be unique across providers. Files with parse errors are skipped and logged at warn level; they do not abort the enumeration.
 
-Needs: impl
-
-<!-- markdownlint-disable-file MD022 -->
-
 ## Discovery file schema
 `req~bxf.discovery-schema~1`
 
@@ -102,14 +98,10 @@ Each discovery file contains a single JSON object with these fields:
 
 The discovery file is provider-managed. The provider rewrites it whenever the port changes and removes it on uninstall. JabRef treats the values as authoritative; it does not cache them across sessions.
 
-Needs: impl
-
 ## Loopback binding
 `req~bxf.loopback-bind~1`
 
 Every endpoint binds `127.0.0.1` only. Providers must not expose the HTTP server on a routable interface. The protocol assumes single-machine deployment; cross-host scenarios (for example a Linux JabRef talking to a provider in a Windows VM) are explicitly out of scope for version 1.
-
-Needs: impl
 
 ## Authentication: bearer token
 `req~bxf.auth-bearer~1`
@@ -118,21 +110,15 @@ Every request carries an `Authorization: Bearer <token>` header. The token value
 
 Providers must reject requests with a missing or wrong token with HTTP `401`. The token file must be created with user-only filesystem permissions (`0600` on POSIX; current-user-only ACL on Windows).
 
-Needs: impl
-
 ## Origin check
 `req~bxf.origin-check~1`
 
 Providers must reject any request whose `Origin` header is set to anything other than absent or the literal string `null` with HTTP `403`. Loopback callers (JabRef, `curl`) do not set `Origin`; a set origin implies a browser is calling, which is not the intended client. This is the primary defence against malicious web pages reaching the provider via the user's browser.
 
-Needs: impl
-
 ## Versioning
 `req~bxf.versioning~1`
 
 All endpoints are prefixed `/v1`. Breaking changes go to `/v2`; providers may serve both during a transition. Backwards-compatible additions (new optional fields, new error codes) ship within `/v1`. Clients must ignore unknown fields. The `GET /v1/health` response includes a `protocolVersion` integer (currently `1`) so clients can detect a provider that only serves a future version.
-
-Needs: impl
 
 ## Endpoint: GET /v1/health
 `req~bxf.health~1`
@@ -144,8 +130,6 @@ Needs: impl
 ```
 
 JabRef calls this once per session per provider before sending the first fetch and on a configurable interval to update the "provider reachable" indicator in the UI.
-
-Needs: impl
 
 ## Endpoint: POST /v1/fulltext
 `req~bxf.fetch~1`
@@ -181,8 +165,6 @@ Success response (HTTP `200`):
 
 The file at `path` must be a readable PDF (not an HTML error page) when the response is sent. JabRef copies or moves it into the library's file directory via its existing attach pipeline.
 
-Needs: impl
-
 ## Endpoint: error responses
 `req~bxf.fetch-errors~1`
 
@@ -207,8 +189,6 @@ Defined short codes:
 
 JabRef treats every non-200 as a soft miss: it logs the `error` and `message` and proceeds to the next fetcher in `FulltextFetchers`. Specifically, JabRef does **not** retry `503 busy` (see [`req~bxf.sync-hold~1`](#sync-hold-no-retry)).
 
-Needs: impl
-
 ## Endpoint: DELETE /v1/fulltext/{id} (optional cleanup)
 `req~bxf.cleanup~1`
 
@@ -218,16 +198,12 @@ Response: HTTP `204 No Content`. The endpoint is idempotent — a second DELETE 
 
 JabRef may omit the DELETE call; providers must not rely on it.
 
-Needs: impl
-
 ## Concurrency caps in the provider
 `req~bxf.concurrency-cap~1`
 
 The provider holds the HTTP connection open for the full duration of the fetch. Long-running fetches (paywalled pages, slow tabs) may block the connection for minutes. Clients must configure a long client-side socket timeout (suggested 5 minutes); on timeout the client treats the result as a soft miss.
 
 Providers should cap concurrent fetches (each request opens a browser tab). Suggested defaults: a global cap of 3 concurrent fetches, plus a per-publisher cap of 1 (most publishers throttle aggressively against parallel requests from the same client). When a cap is hit, providers should queue incoming requests internally (FIFO) and continue to hold the client's connection until the request reaches the front of the queue and completes.
-
-Needs: impl
 
 ## Synchronous hold, no client retry
 `req~bxf.sync-hold~1` <a id="sync-hold-no-retry"></a>
@@ -236,14 +212,10 @@ Clients (JabRef) issue a single synchronous `POST /v1/fulltext` per fetch attemp
 
 JabRef races multiple registered providers in parallel via separate concurrent HTTP requests and uses the first successful response, cancelling the rest by closing their connections.
 
-Needs: impl
-
 ## Safety valve: 503 busy
 `req~bxf.safety-valve~1` <a id="safety-valve"></a>
 
 `503 busy` is a safety valve, not a normal flow-control mechanism. Providers may return `503 busy` if the internal queue exceeds a sane depth (suggested 50) or if the browser-side queue has stalled and the provider judges the request will not complete within the client timeout. A well-behaved provider should rarely emit it; a misbehaving one that emits it constantly makes itself invisible to clients without breaking them.
-
-Needs: impl
 
 ## Cancellation via connection close
 `req~bxf.cancellation~1`
@@ -251,8 +223,6 @@ Needs: impl
 Cancellation flows out-of-band. When JabRef closes the TCP connection (the losing fetchers in `FulltextFetchers#findFullTextPDF` after a winner is chosen), the provider must treat the closed connection as a signal to abort the underlying browser tab if the fetch has not finished and dequeue any pending work tied to that connection.
 
 Implementations that cannot detect mid-request client disconnect (for example `HttpListener` on .NET) may rely on the provider-side safety-valve timer to fire abort instead; this satisfies the requirement at the cost of higher abort latency.
-
-Needs: impl
 
 ## Security model
 `req~bxf.security~1`
@@ -264,8 +234,6 @@ Needs: impl
 - No CSRF protection beyond the Origin and bearer checks; the bearer is the CSRF defence because a malicious page cannot read the token file.
 
 Threat model: another user on the same machine must not be able to drive fulltext fetches against the current user's browser session. The token file's ACL is the primary defence.
-
-Needs: impl
 
 ## Non-goals (informational)
 

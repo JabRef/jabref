@@ -304,7 +304,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         // type list; ifPresent keeps the contract explicit without an
         // `orElse` fallback that would never fire.
         ExternalFileTypes.getExternalFileTypeByExt("pdf",
-                                                  preferences.getExternalApplicationsPreferences())
+                                 preferences.getExternalApplicationsPreferences())
                          .ifPresent(externalFileType ->
                                  attachLocalPdf(sourcePath, externalFileType));
     }

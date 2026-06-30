@@ -8,8 +8,6 @@ import org.jspecify.annotations.NullMarked;
 /// well-known discovery directory.
 ///
 /// See `docs/requirements/browser-extension-fulltext.md`.
-///
-/// [impl->req~bxf.discovery-schema~1]
 @NullMarked
 public record BrowserExtensionProvider(
         String name,
