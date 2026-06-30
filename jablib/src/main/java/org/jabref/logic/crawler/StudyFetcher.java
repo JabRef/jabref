@@ -74,8 +74,7 @@ class StudyFetcher {
                             fetchResult.addAll(basedFetcher.performRawSearchQueryPaged(catalogOverride, page).getContent());
                         }
                     } catch (UnsupportedOperationException e) {
-                        LOGGER.warn("{} does not support raw search queries", fetcher.getName(), e);
-                        fetchResult = new ArrayList<>();
+                        throw new FetcherException(fetcher.getName() + " does not support raw search queries for catalogSpecific override", e);
                     }
                     if (fetchResult.size() > limit) {
                         fetchResult = new ArrayList<>(fetchResult.subList(0, limit));
@@ -95,8 +94,7 @@ class StudyFetcher {
                     try {
                         fetchResult = fetcher.performRawSearchQuery(catalogOverride);
                     } catch (UnsupportedOperationException e) {
-                        LOGGER.warn("{} does not support raw search queries", fetcher.getName(), e);
-                        fetchResult = new ArrayList<>();
+                        throw new FetcherException(fetcher.getName() + " does not support raw search queries for catalogSpecific override", e);
                     }
                 } else {
                     fetchResult = fetcher.performSearch(searchQuery.getQuery());

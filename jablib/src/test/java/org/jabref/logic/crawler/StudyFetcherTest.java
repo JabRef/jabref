@@ -15,7 +15,7 @@ import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -107,7 +107,7 @@ class StudyFetcherTest {
     }
 
     @Test
-    void unsupportedOperationOnRawPathReturnsEmptyAndContinues() throws FetcherException {
+    void unsupportedOperationOnRawPathOmitsFetcherFromResults() throws FetcherException {
         StudyQuery studyQuery = new StudyQuery("machine learning");
         studyQuery.setCatalogSpecific(Map.of("TestPagedFetcher", "native:query"));
 
@@ -120,7 +120,8 @@ class StudyFetcherTest {
         StudyFetcher studyFetcher = new StudyFetcher(List.of(pagedFetcher), List.of(studyQuery), Map.of());
         List<QueryResult> results = studyFetcher.crawl();
 
-        assertNotNull(results);
+        assertFalse(results.isEmpty());
+        assertTrue(results.getFirst().getResultsPerFetcher().isEmpty());
         verify(pagedFetcher, never()).performSearchPaged(anyString(), anyInt());
     }
 }
