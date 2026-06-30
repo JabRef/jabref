@@ -32,7 +32,7 @@ public class CitationCacheService {
     private static final int TOKEN_MAX_ENTRIES = 256;
     private static final Duration TOKEN_TTL = Duration.ofHours(1);
     private static final int TEXT_MAX_ENTRIES = 1024;
-    private static final Duration TEXT_TTL = Duration.ofHours(24);
+    private static final Duration TEXT_TTL = Duration.ofDays(1);
     /// Token length picked to match the CUID2 size already used by
     /// [BibFieldsIndexer]: long enough to be collision-resistant in a 256-slot
     /// cache without being noisy in HTTP responses.
