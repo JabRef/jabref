@@ -62,8 +62,8 @@ class StudyFetcher {
             String catalogOverride = searchQuery.getCatalogSpecific().entrySet().stream()
                                                 .filter(entry -> entry.getKey().equalsIgnoreCase(fetcher.getName()))
                                                 .map(Map.Entry::getValue)
+                                                .filter(v -> v != null && !v.isBlank())
                                                 .findFirst()
-                                                .filter(s -> !s.isBlank())
                                                 .orElse(null);
             if (fetcher instanceof PagedSearchBasedFetcher basedFetcher) {
                 if (catalogOverride != null) {
