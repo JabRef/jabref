@@ -17,6 +17,7 @@ catalogs:
   - name: Springer
     enabled: true
     reason: Primary source
+    max-results: 500
   - name: ArXiv
     enabled: true
     reason: ""
@@ -26,4 +27,5 @@ catalogs:
   - name: IEEEXplore
     enabled: false
     reason: ""
+max-results-per-catalog: 100
 

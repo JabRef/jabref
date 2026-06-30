@@ -23,6 +23,7 @@ import javafx.collections.ObservableSet;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.bibtex.BibEntryWriter;
@@ -30,6 +31,7 @@ import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.groups.GroupsHelper;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -37,11 +39,13 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -184,6 +188,11 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     ///
     /// @param entriesToImport subset of the entries contained in parserResult
     public void importEntries(List<BibEntry> entriesToImport, boolean shouldDownloadFiles) {
+        importEntries(entriesToImport, shouldDownloadFiles, null);
+    }
+
+    /// @param targetGroup name of a group the imported entries are additionally assigned to. If it is non-blank and no group with that name exists yet, it is created as a top-level explicit group. A blank/null value assigns no group.
+    public void importEntries(List<BibEntry> entriesToImport, boolean shouldDownloadFiles, @Nullable String targetGroup) {
         // Remember the selection in the dialog
         preferences.getFilePreferences().setDownloadLinkedFiles(shouldDownloadFiles);
 
@@ -203,7 +212,15 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 stateManager,
                 dialogService,
                 taskExecutor);
-        importHandler.importEntriesWithDuplicateCheck(null, entriesToImport);
+        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, entriesToImport.size());
+        if (StringUtil.isNotBlank(targetGroup)) {
+            // Assign the group to the actually imported BibEntry instances (the copies inserted into the
+            // database), not to the originals. The import runs asynchronously, so this must happen in the
+            // tracker's onFinish callback after all entries have been inserted/merged.
+            tracker.setOnFinish(() ->
+                    GroupsHelper.assignEntriesToGroup(selectedDb.getValue(), tracker.getImportedEntries(), targetGroup, preferences.getBibEntryPreferences().getKeywordSeparator()));
+        }
+        importHandler.importEntriesWithDuplicateCheck(null, entriesToImport, tracker);
     }
 
     /// Checks if there are duplicates to the given entry in the list of entries to be imported.

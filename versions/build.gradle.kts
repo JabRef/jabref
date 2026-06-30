@@ -18,21 +18,23 @@ val javafxDefault = "26.0.1"
 val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
 val javafxWeb = javafxDefault
 
-val lucene = "10.4.0"
+val lucene = "10.5.0"
 
 val pdfbox = "3.0.7"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.16.3"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.17.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.4.0"))
-    api(platform("org.junit:junit-bom:6.1.0"))
+    api(platform("org.junit:junit-bom:6.1.1"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
     api(platform("tools.jackson:jackson-bom:3.2.0"))
 }
 
 dependencies.constraints {
+    // With -PuseLibericaJdkFull=true, no org.openjfx:* dependency is requested (see
+    // org.jabref.gradle.base.dependency-rules.gradle.kts), so these JavaFX version pins stay inert.
     api("org.openjfx:javafx-base:$javafx")
     api("org.openjfx:javafx-controls:$javafx")
     api("org.openjfx:javafx-fxml:$javafx")
@@ -105,7 +107,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-csv:1.14.1")
     api("org.apache.commons:commons-lang3:3.20.0")
     api("org.apache.commons:commons-text:1.15.0")
-    api("org.apache.httpcomponents.core5:httpcore5:5.4.2")
+    api("org.apache.httpcomponents.core5:httpcore5:5.4.3")
     api("org.apache.httpcomponents.client5:httpclient5:5.6.1")
     api("org.apache.logging.log4j:log4j-to-slf4j:2.26.0")
     api("org.apache.lucene:lucene-analysis-common:$lucene")
@@ -127,7 +129,7 @@ dependencies.constraints {
     api("org.glassfish.hk2:hk2-utils:4.0.1")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.9")
     api("org.hamcrest:hamcrest:3.0")
-    api("org.hibernate.validator:hibernate-validator:9.1.0.Final")
+    api("org.hibernate.validator:hibernate-validator:9.1.1.Final")
     api("org.hisp.dhis:json-tree:1.9.4")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")

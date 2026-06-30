@@ -235,7 +235,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         HBox info = new HBox(8);
         HBox.setHgrow(info, Priority.ALWAYS);
-        info.setStyle("-fx-padding: 0.5em 0 0.5em 0;"); // To align with buttons below which also have 0.5em padding
+        info.getStyleClass().add("linked-files-info"); // To align with buttons below which also have 0.5em padding
         info.getChildren().setAll(label, progressIndicator);
 
         Button acceptAutoLinkedFile = ControlHelper.iconButton(IconTheme.JabRefIcons.AUTO_LINKED_FILE);

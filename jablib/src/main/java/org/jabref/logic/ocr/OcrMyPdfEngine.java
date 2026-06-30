@@ -2,12 +2,13 @@ package org.jabref.logic.ocr;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,12 @@ public class OcrMyPdfEngine implements OcrEngine {
     private static final int TIMEOUT_MINS = 10;
     private static final int CHECKING_TIMEOUT = 5;
 
+    private final OcrPreferences ocrPreferences;
+
+    public OcrMyPdfEngine(OcrPreferences ocrPreferences) {
+        this.ocrPreferences = ocrPreferences;
+    }
+
     @Override
     public String getName() {
         return "OCRmyPDF";
@@ -28,8 +35,10 @@ public class OcrMyPdfEngine implements OcrEngine {
 
     @Override
     public boolean isAvailable() {
+        ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
+        command.add("--version");
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder("ocrmypdf", "--version");
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
             boolean finished = process.waitFor(CHECKING_TIMEOUT, TimeUnit.SECONDS);
@@ -40,7 +49,7 @@ public class OcrMyPdfEngine implements OcrEngine {
             }
             return process.exitValue() == 0;
         } catch (IOException e) {
-            LOGGER.error("OCRmyPDF is not available: IOException occurred", e);
+            LOGGER.error("OCRmyPDF is not available at {}: IOException occurred", ocrPreferences.getOcrEnginePath(), e);
             return false;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -64,7 +73,10 @@ public class OcrMyPdfEngine implements OcrEngine {
         Path outputPath = makeOutputFilePath(pdfPath);
         String outputFile = outputPath.toString();
         // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
-        List<String> command = List.of("ocrmypdf", "--skip-text", pdfPath.toString(), outputFile);
+        ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
+        command.add("--skip-text");
+        command.add(pdfPath.toString());
+        command.add(outputFile);
         Process process = null;
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(command);

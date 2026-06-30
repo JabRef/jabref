@@ -34,7 +34,8 @@ import static org.mockito.Mockito.when;
 
 @FetcherTest
 class OpenAlexFetcherTest {
-    private static final Optional<String> API_KEY = Optional.of(new BuildInfo().openAlexApiKey);
+    // Mirror getApiKey: a blank (unsubstituted) key is absent, so offline tests see the keyless URL.
+    private static final Optional<String> API_KEY = Optional.of(new BuildInfo().openAlexApiKey).filter(key -> !key.isBlank());
 
     private OpenAlex fetcher;
 
@@ -71,8 +72,8 @@ class OpenAlexFetcherTest {
                 "\"type\":\"article\"," +
                 "\"title\":\"Sample Title\"," +
                 "\"publication_year\":2020," +
-                "\"doi\":\"https://doi.org/10.1234/ABC.5678\"," +
                 "\"id\":\"https://openalex.org/W12345\"," +
+                "\"ids\":{\"doi\":\"https://doi.org/10.1234/ABC.5678\"}," +
                 "\"authorships\":[{" +
                 "\"author\":{\"display_name\":\"Alice\"}}," +
                 "{\"author\":{\"display_name\":\"Bob\"}}]," +
@@ -104,8 +105,8 @@ class OpenAlexFetcherTest {
                     "type":"article",
                     "title":"Single Title",
                     "publication_year":2019,
-                    "doi":"https://doi.org/10.5555/xyz",
                     "id":"https://openalex.org/W999",
+                    "ids":{"doi":"https://doi.org/10.5555/xyz"},
                     "authorships":[{"author":{"display_name":"Carol"}}],
                     "biblio":{"first_page":"1","last_page":"10"}
                 }
