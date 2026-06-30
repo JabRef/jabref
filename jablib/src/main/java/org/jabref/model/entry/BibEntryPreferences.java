@@ -21,10 +21,6 @@ public class BibEntryPreferences {
         return new BibEntryPreferences();
     }
 
-    public void setAll(BibEntryPreferences preferences) {
-        this.keywordSeparator.set(preferences.getKeywordSeparator());
-    }
-
     public Character getKeywordSeparator() {
         return keywordSeparator.get();
     }
