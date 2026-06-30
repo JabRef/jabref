@@ -35,7 +35,6 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-import com.airhacks.afterburner.injection.Injector;
 import net.harawata.appdirs.AppDirsFactory;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
@@ -120,7 +119,7 @@ public class Server {
         ServiceLocatorUtilities.addOneConstant(serviceLocator, new CitationCacheService());
         ServiceLocatorUtilities.addOneConstant(serviceLocator, new FormatterService());
         ServiceLocatorUtilities.addOneConstant(serviceLocator,
-                Injector.instantiateModelOrService(BibEntryTypesManager.class),
+                preferences.getCustomEntryTypesRepository(),
                 "entrytypesmanager", BibEntryTypesManager.class);
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
 
