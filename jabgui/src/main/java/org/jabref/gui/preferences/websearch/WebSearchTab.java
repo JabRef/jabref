@@ -23,11 +23,14 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+import javafx.beans.property.ReadOnlyStringWrapper;
+
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.HelpButton;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.fetcher.BrowserExtensionProvider;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
@@ -62,6 +65,10 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private TableView<SearchEngineItem> searchEngineTable;
     @FXML private TableColumn<SearchEngineItem, String> searchEngineName;
     @FXML private TableColumn<SearchEngineItem, String> searchEngineUrlTemplate;
+
+    @FXML private TableView<BrowserExtensionProvider> externalFetcherTable;
+    @FXML private TableColumn<BrowserExtensionProvider, String> externalFetcherName;
+    @FXML private TableColumn<BrowserExtensionProvider, String> externalFetcherPort;
 
     @FXML private VBox fetchersContainer;
 
@@ -104,6 +111,10 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         searchEngineUrlTemplate.setEditable(true);
 
         searchEngineTable.setItems(viewModel.getSearchEngines());
+
+        externalFetcherName.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().displayName()));
+        externalFetcherPort.setCellValueFactory(param -> new ReadOnlyStringWrapper(Integer.toString(param.getValue().port())));
+        externalFetcherTable.setItems(viewModel.getExternalFetchers());
 
         // Dynamic height based on font size and number of items
         DoubleBinding rowHeight = Bindings.createDoubleBinding(
