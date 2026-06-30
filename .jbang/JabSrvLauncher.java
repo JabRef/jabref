@@ -61,6 +61,7 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/BibEntryDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GlobalExceptionMapper.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/UncheckedFetcherException.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonFactory.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GroupDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonMessageBodyReader.java
