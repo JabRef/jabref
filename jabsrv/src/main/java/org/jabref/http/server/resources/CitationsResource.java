@@ -73,30 +73,10 @@ public class CitationsResource {
 
     /// Result of a single plain-citation lookup.
     ///
-    /// @param matches          duplicate hits across every open library.
-    ///                         Empty list when no library contains the parsed
-    ///                         entry, or when the parse itself failed
-    ///                         (batch-lookup blank-slot / parser-failure rows).
-    /// @param matchScope       derived from `matches`, surfaced separately so
-    ///                         clients can colour the hover badge without
-    ///                         walking the array:
-    ///                         `"active"` — at least one match in the
-    ///                         currently-active library (the one Ctrl+J would
-    ///                         add to → duplicate, mint badge);
-    ///                         `"other"` — match(es) only in *other* open
-    ///                         libraries (Ctrl+J would still create a new
-    ///                         entry → related, olive badge);
-    ///                         `"none"` — no match in any open library
-    ///                         (gray badge).
-    /// @param parserCacheKey   opaque token redeemable at
-    ///                         `POST /libraries/{id}/citations/{parserCacheKey}`
-    ///                         to append the already-parsed `BibEntry` without
-    ///                         paying for the LLM parse again. Null when no
-    ///                         entry was parsed.
-    /// @param parsedEntryType  BibTeX entry-type name of the parsed entry
-    ///                         (e.g. `"article"`, `"inproceedings"`) — lets
-    ///                         the client preview the type before redeeming
-    ///                         the cache key. Null when no entry was parsed.
+    /// @param matches duplicate hits across every open library. Empty list when no library contains the parsed entry, or when the parse itself failed (batch-lookup blank-slot / parser-failure rows).
+    /// @param matchScope derived from `matches`, surfaced separately so clients can colour the hover badge without walking the array: `"active"` — at least one match in the currently-active library (the one Ctrl+J would add to → duplicate, mint badge); `"other"` — match(es) only in *other* open libraries (Ctrl+J would still create a new entry → related, olive badge); `"none"` — no match in any open library (gray badge).
+    /// @param parserCacheKey opaque token redeemable at `POST /libraries/{id}/citations/{parserCacheKey}` to append the already-parsed `BibEntry` without paying for the LLM parse again. Null when no entry was parsed.
+    /// @param parsedEntryType BibTeX entry-type name of the parsed entry (e.g. `"article"`, `"inproceedings"`) — lets the client preview the type before redeeming the cache key. Null when no entry was parsed.
     @NullMarked
     public record LookupResponse(List<LookupMatch> matches, String matchScope,
                                  @Nullable String parserCacheKey, @Nullable String parsedEntryType) {
