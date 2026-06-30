@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.http.SrvStateManager;
+import org.jabref.http.dto.UncheckedFetcherException;
 import org.jabref.http.server.services.CitationCacheService;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.UiCommand;
@@ -126,7 +127,7 @@ public class CitationsResource {
     @Path("lookup")
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.APPLICATION_JSON)
-    public LookupResponse lookup(@PathParam("id") String id, String citationText) throws FetcherException {
+    public LookupResponse lookup(@PathParam("id") String id, String citationText) {
         if (StringUtil.isBlank(citationText)) {
             throw new BadRequestException("Citation text must not be empty.");
         }
@@ -161,7 +162,7 @@ public class CitationsResource {
     @Path("lookup:batch")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public BatchLookupResponse lookupBatch(@PathParam("id") String id, BatchLookupRequest request) throws FetcherException {
+    public BatchLookupResponse lookupBatch(@PathParam("id") String id, BatchLookupRequest request) {
         if (request == null || request.citations() == null || request.citations().isEmpty()) {
             throw new BadRequestException("Citations list must not be empty.");
         }
@@ -179,7 +180,7 @@ public class CitationsResource {
             }
             try {
                 results.add(doLookup(citationText, targetContext, openDatabases, duplicateCheck));
-            } catch (FetcherException e) {
+            } catch (UncheckedFetcherException e) {
                 // One citation failing to parse shouldn't fail the batch.
                 // Surface as an empty response so the client paints "no match"
                 // (= gray ring) for that slot; the others still resolve.
@@ -196,18 +197,10 @@ public class CitationsResource {
     private LookupResponse doLookup(String citationText,
                                     BibDatabaseContext targetContext,
                                     List<BibDatabaseContext> openDatabases,
-                                    DuplicateCheck duplicateCheck) throws FetcherException {
-        // Text cache first: lets a re-scan of the same PDF page (or two
-        // distinct PDFs that cite the same paper) reuse the prior parse and
-        // skip the LLM call entirely.
+                                    DuplicateCheck duplicateCheck) {
         BibEntry parsed = citationCacheService.getByText(citationText)
                                               .map(CitationCacheService.CachedCitation::parsed)
-                                              .orElse(null);
-        if (parsed == null) {
-            parsed = ServerUtils.parsePlainCitation(preferences, citationText)
-                                 .orElseThrow(() -> new BadRequestException("Could not parse a bibliography entry from the given text."));
-            citationCacheService.putByText(parsed, citationText);
-        }
+                                              .orElseGet(() -> parseAndCache(citationText));
 
         // Cross-library lookup: walk every open library so we can tell the
         // client whether the citation is in the *target* library (Ctrl+J
@@ -229,6 +222,24 @@ public class CitationsResource {
 
         String cacheKey = citationCacheService.put(parsed, citationText);
         return new LookupResponse(matches, matchScope, cacheKey, parsed.getType().getName());
+    }
+
+    /// Cache miss → invoke the configured plain-citation parser and stash the
+    /// result by text-hash. `FetcherException` is wrapped in
+    /// [UncheckedFetcherException] so this method fits an `Optional.orElseGet`
+    /// supplier; `lookupBatch` unwraps it per-citation to surface "no match"
+    /// for the failing slot, and `GlobalExceptionMapper` translates uncaught
+    /// occurrences back to the original fetch failure response.
+    private BibEntry parseAndCache(String citationText) {
+        BibEntry parsed;
+        try {
+            parsed = ServerUtils.parsePlainCitation(preferences, citationText)
+                                .orElseThrow(() -> new BadRequestException("Could not parse a bibliography entry from the given text."));
+        } catch (FetcherException e) {
+            throw new UncheckedFetcherException(e);
+        }
+        citationCacheService.putByText(parsed, citationText);
+        return parsed;
     }
 
     /// Stable-ish library identifier for response bodies. Saved libraries use

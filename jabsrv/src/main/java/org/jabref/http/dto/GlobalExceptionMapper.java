@@ -15,6 +15,15 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
 
     @Override
     public Response toResponse(Throwable exception) {
+        if (exception instanceof UncheckedFetcherException ufe) {
+            // Unwrap to the original FetcherException's message so callers see
+            // the actual fetch failure, not the carrier's identity.
+            LOGGER.warn("Plain-citation fetcher failed", ufe.getCause());
+            return Response.serverError()
+                           .entity(ufe.getCause().getLocalizedMessage())
+                           .type(MediaType.TEXT_PLAIN)
+                           .build();
+        }
         if (exception instanceof WebApplicationException webex) {
             Response response = webex.getResponse();
             // Preserve responses that already carry their own body and content type — e.g. the
