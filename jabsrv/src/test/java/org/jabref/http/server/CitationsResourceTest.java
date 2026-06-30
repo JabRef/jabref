@@ -3,7 +3,6 @@ package org.jabref.http.server;
 import org.jabref.http.server.resources.CitationsResource;
 import org.jabref.http.server.services.CitationCacheService;
 import org.jabref.logic.UiMessageHandler;
-import org.jabref.model.entry.BibEntryTypesManager;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Application;
@@ -38,12 +37,12 @@ class CitationsResourceTest extends ServerTest {
         addGsonToResourceConfig(resourceConfig);
         addPreferencesToResourceConfig(resourceConfig);
         addGlobalExceptionMapperToResourceConfig(resourceConfig);
+        addEntryTypesManagerToResourceConfig(resourceConfig);
         resourceConfig.register(new AbstractBinder() {
             @Override
             protected void configure() {
                 bind(uiMessageHandler).to(UiMessageHandler.class);
                 bind(new CitationCacheService()).to(CitationCacheService.class);
-                bind(new BibEntryTypesManager()).to(BibEntryTypesManager.class);
             }
         });
         return resourceConfig.getApplication();
