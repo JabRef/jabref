@@ -230,6 +230,9 @@ public class CitationsResource {
     /// supplier; `lookupBatch` unwraps it per-citation to surface "no match"
     /// for the failing slot, and `GlobalExceptionMapper` translates uncaught
     /// occurrences back to the original fetch failure response.
+    ///
+    /// @throws BadRequestException if the parser returns an empty result (the citation text could not be parsed into a BibEntry).
+    /// @throws UncheckedFetcherException if the parser itself failed (network, LLM, or backend error). The cause is the original `FetcherException`.
     private BibEntry parseAndCache(String citationText) {
         BibEntry parsed;
         try {
