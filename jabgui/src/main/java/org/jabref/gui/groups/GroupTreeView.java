@@ -387,7 +387,7 @@ public class GroupTreeView extends BorderPane {
                     }
                 });
         text.getStyleClass().setAll("text");
-        
+
         preferences.getWorkspacePreferences().mainFontSizeProperty().addListener((obs, oldValue, newValue) -> {
             text.getStyleClass().removeAll(
                     "group-tree-font-1",

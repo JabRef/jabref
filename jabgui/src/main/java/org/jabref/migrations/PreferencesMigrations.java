@@ -208,7 +208,7 @@ public class PreferencesMigrations {
 
     static void upgradeResolveBibTeXStringsFields(JabRefCliPreferences prefs) {
         String oldPrefsValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon";
-        String currentPrefs = prefs.get(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS);
+        String currentPrefs = prefs.get(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS, null);
 
         if (oldPrefsValue.equals(currentPrefs)) {
             currentPrefs += ";monthfiled";
@@ -241,7 +241,7 @@ public class PreferencesMigrations {
     private static void migrateFileImportPattern(String oldStylePattern,
                                                  String newStylePattern,
                                                  JabRefCliPreferences prefs) {
-        String preferenceFileNamePattern = prefs.get(V4_0_IMPORT_FILENAME_PATTERN);
+        String preferenceFileNamePattern = prefs.get(V4_0_IMPORT_FILENAME_PATTERN, null);
 
         if (oldStylePattern.equals(preferenceFileNamePattern)) {
             // Upgrade the old-style File Name pattern to new one:
@@ -276,7 +276,7 @@ public class PreferencesMigrations {
         // LinkedHashSet because we want to retain the order and add new fields to the end
         String oldPrefs = "author;editor;title;journal;publisher;keywords";
         String newFieldsToAdd = "crossref;related;entryset";
-        String currentPrefs = prefs.get(JabRefGuiPreferences.AUTOCOMPLETER_COMPLETE_FIELDS);
+        String currentPrefs = prefs.get(JabRefGuiPreferences.AUTOCOMPLETER_COMPLETE_FIELDS, null);
 
         if (oldPrefs.equals(currentPrefs)) {
             currentPrefs += ";" + newFieldsToAdd;
@@ -289,7 +289,7 @@ public class PreferencesMigrations {
         LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
 
         GlobalCitationKeyPatterns keyPattern = GlobalCitationKeyPatterns.fromPattern(
-                prefs.get(JabRefCliPreferences.CITATION_KEY_DEFAULT_PATTERN));
+                prefs.get(JabRefCliPreferences.CITATION_KEY_DEFAULT_PATTERN, null));
         for (String key : oldPatternPrefs.keys()) {
             keyPattern.addCitationKeyPattern(EntryTypeFactory.parse(key), oldPatternPrefs.get(key, null));
         }
@@ -454,7 +454,7 @@ public class PreferencesMigrations {
         try {
             // some versions stored the font size as double to the **same** key
             // since the preference store is type-safe, we need to add this workaround
-            String fontSizeAsString = preferences.get(V5_0_MAIN_FONT_SIZE);
+            String fontSizeAsString = preferences.get(V5_0_MAIN_FONT_SIZE, null);
             if (fontSizeAsString == null) {
                 return;
             }
@@ -508,7 +508,7 @@ public class PreferencesMigrations {
 
         List<String> activeJobs = new ArrayList<>();
         for (CleanupPreferences.CleanupStep action : EnumSet.allOf(CleanupPreferences.CleanupStep.class)) {
-            Optional<String> job = prefs.getAsOptional(V5_8_CLEANUP + action.name());
+            Optional<String> job = Optional.ofNullable(prefs.get(V5_8_CLEANUP + action.name(), null));
             if (job.isPresent() && Boolean.parseBoolean(job.get())) {
                 activeJobs.add(action.name());
                 // prefs.deleteKey(V5_8_CLEANUP + action.name()); // for backward compatibility in comments
