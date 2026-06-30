@@ -10,7 +10,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -60,6 +62,7 @@ import org.slf4j.LoggerFactory;
 public class StudyRepository {
     // Tests work with study.yml
     public static final String STUDY_DEFINITION_FILE_NAME = "study.yml";
+    public static final int DEFAULT_RESULT_LIMIT = 100;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StudyRepository.class);
 
@@ -198,6 +201,19 @@ public class StudyRepository {
                     .parallelStream()
                     .filter(StudyCatalog::isEnabled)
                     .toList();
+    }
+
+    /// returns the effective result limit per catalog: its own override, else the study wide
+    /// default, else [#DEFAULT_RESULT_LIMIT], keys match catalog names case-insensitively
+    public Map<String, Integer> getResultLimitsPerCatalog() {
+        Map<String, Integer> limits = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        for (StudyCatalog catalog : study.getCatalogs()) {
+            Integer limit = catalog.getMaxResults() != null
+                            ? catalog.getMaxResults()
+                            : study.getMaxResultsPerCatalog();
+            limits.put(catalog.getName(), limit != null ? limit : DEFAULT_RESULT_LIMIT);
+        }
+        return limits;
     }
 
     public Study getStudy() {

@@ -435,18 +435,14 @@ jobs:
           show-progress: 'false'
       - name: Install GitVersion
         id: pre-gitversion
-        # background: true
         uses: gittools/actions/gitversion/setup@v3.2.1
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
-        # wait: pre-gitversion
-        # background: true
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
       - name: Normalize branch name
         id: normalize
-        # wait: gitversion
         shell: bash
         run: |
           branch="${{ steps.gitversion.outputs.EscapedBranchName }}"
@@ -472,7 +468,6 @@ jobs:
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
       - name: Create backlink to PR at builds.jabref.org
-        # background: true
         if: ${{ (github.event_name == 'pull_request') && (needs.disk-space-check.outputs.available == 'true') }}
         run: |
           echo "Link to PR: ${{ github.event.pull_request.html_url }}" >> _h5ai.header.md
@@ -566,8 +561,6 @@ jobs:
       # jablib is used by all components - thus, compile it first
       - name: jablib jar
         id: jablib-jar
-        # wait: gitversion
-        # background: true
         run: gradle :jablib:jar
         env:
           VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
@@ -576,29 +569,22 @@ jobs:
       # Save disk space
       # Hint by https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
       - run: sudo rm -rf /usr/local/lib/android/sdk
-        # background: true
+        background: true
         if: startsWith(matrix.os, 'ubuntu')
       - run: sudo rm -rf /usr/local/.ghcup
-        # background: true
+        background: true
         if: startsWith(matrix.os, 'ubuntu')
       - run: sudo rm -rf /usr/share/swift
-        # background: true
+        background: true
         if: startsWith(matrix.os, 'ubuntu')
 
-      # Both JabRef Language Server and JabRef HTTP Server are required by the GUI
-      # They are independent from each other and could be build in parallel.
-      # - wait: jablib-jar # plus "normalize"
-      - name: jabls jar
-        # background: true
-        id: jabls-jar
-        run: gradle :jabls:jar
-        env:
-          VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
-          VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
-      - name: jabsrv jar
-        # background: true
-        id: jabsrv-jar
-        run: gradle :jabsrv:jar
+      # Both JabRef Language Server and JabRef HTTP Server are required by the GUI.
+      # They are independent of each other, so build them in a single Gradle
+      # invocation with --parallel. One daemon builds both subprojects concurrently,
+      # avoiding the lock contention / heap blow-up of two separate `gradle` processes.
+      - name: jabls and jabsrv jars
+        id: jabls-jabsrv-jar
+        run: gradle --parallel :jabls:jar :jabsrv:jar
         env:
           VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
           VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
@@ -643,13 +629,11 @@ jobs:
         run: candle -?
         if: startsWith(matrix.os, 'windows')
 
-      # jars already exists - thus, these calls will build on the jar result (hopefully).
-      # - wait: [ jabls-jar, jabsrv-jar ]
+      # jars already exist - thus, these calls build on the jar result.
 
       - uses: ./.github/actions/package
         name: Package JabRef Language Server
         id: jabls-cli
-        # background: true
         with:
           component: jabls-cli
           componentShort: jabls
@@ -674,7 +658,6 @@ jobs:
           springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
       - uses: ./.github/actions/package
         name: Package JabRef HTTP Server
-        # background: true
         with:
           component: jabsrv-cli
           componentShort: jabsrv
@@ -700,7 +683,6 @@ jobs:
       - uses: ./.github/actions/package
         name: Package JabGUI
         id: jabgui
-        # background: true
         with:
           component: jabgui
           componentShort: jabgui
@@ -725,7 +707,6 @@ jobs:
           springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
       - uses: ./.github/actions/package
         name: Package JabKit
-        # background: true
         with:
           component: jabkit
           componentShort: jabkit
@@ -751,7 +732,6 @@ jobs:
 
       - name: Upload jabgui and jabls-cli to GitHub workflow artifacts store for notarization (macOS)
         if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
-        # wait: [ jabgui, jabls-cli ]
         uses: actions/upload-artifact@v7
         with:
           # tbn = to-be-notarized
