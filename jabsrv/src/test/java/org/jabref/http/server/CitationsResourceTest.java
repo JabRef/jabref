@@ -3,6 +3,7 @@ package org.jabref.http.server;
 import org.jabref.http.server.resources.CitationsResource;
 import org.jabref.http.server.services.CitationCacheService;
 import org.jabref.logic.UiMessageHandler;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Application;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CitationsResourceTest extends ServerTest {
 
@@ -41,6 +43,7 @@ class CitationsResourceTest extends ServerTest {
             protected void configure() {
                 bind(uiMessageHandler).to(UiMessageHandler.class);
                 bind(new CitationCacheService()).to(CitationCacheService.class);
+                bind(new BibEntryTypesManager()).to(BibEntryTypesManager.class);
             }
         });
         return resourceConfig.getApplication();
@@ -76,5 +79,45 @@ class CitationsResourceTest extends ServerTest {
         Response response = postAddFromCache(TestBibFile.GENERAL_SERVER_TEST.id, "expired-or-unknown");
 
         assertEquals(Response.Status.GONE.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    void lookupBlankTextReturns400() {
+        Response response = target("/libraries/" + TestBibFile.GENERAL_SERVER_TEST.id + "/citations/lookup")
+                .request()
+                .post(Entity.text("   "));
+
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    void lookupOnUnknownLibraryReturns404() {
+        Response response = target("/libraries/does-not-exist/citations/lookup")
+                .request()
+                .post(Entity.text("Smith, J. (2020). Chocolate. J. Sweets, 12, 45."));
+
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    void batchLookupEmptyListReturns400() {
+        Response response = target("/libraries/" + TestBibFile.GENERAL_SERVER_TEST.id + "/citations/lookup:batch")
+                .request()
+                .post(Entity.json("{\"citations\":[]}"));
+
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    void batchLookupBlankSlotReturnsNoneScope() {
+        // All-blank batch never invokes the parser; each slot short-circuits to a "none" response,
+        // exercising the batch wiring + JSON serialization without needing a real plain-citation parser.
+        Response response = target("/libraries/" + TestBibFile.GENERAL_SERVER_TEST.id + "/citations/lookup:batch")
+                .request()
+                .post(Entity.json("{\"citations\":[\"\",\"   \"]}"));
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        String body = response.readEntity(String.class);
+        assertTrue(body.contains("\"matchScope\":\"none\""), body);
     }
 }
