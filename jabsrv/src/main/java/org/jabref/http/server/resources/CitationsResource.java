@@ -108,6 +108,12 @@ public class CitationsResource {
     /// @param parsedEntryType BibTeX entry-type name of the parsed entry (e.g. `"article"`, `"inproceedings"`) — lets the client preview the type before redeeming the cache key. Null when no entry was parsed.
     public record LookupResponse(List<LookupMatch> matches, MatchScope matchScope,
                                  @Nullable String parserCacheKey, @Nullable String parsedEntryType) {
+
+        /// Convenience constructor for blank-slot and parser-failure rows in
+        /// batch lookup — no entry was parsed, so neither key nor type apply.
+        public LookupResponse(List<LookupMatch> matches, MatchScope matchScope) {
+            this(matches, matchScope, null, null);
+        }
     }
 
     public record AlreadyExistsResponse(String status, String entryId) {
@@ -168,7 +174,7 @@ public class CitationsResource {
             if (StringUtil.isBlank(citationText)) {
                 // Empty slot — return a "none" response so client indexing
                 // stays aligned. Skipping would shift downstream results.
-                results.add(new LookupResponse(List.of(), MatchScope.NONE, null, null));
+                results.add(new LookupResponse(List.of(), MatchScope.NONE));
                 continue;
             }
             try {
@@ -177,7 +183,7 @@ public class CitationsResource {
                 // One citation failing to parse shouldn't fail the batch.
                 // Surface as an empty response so the client paints "no match"
                 // (= gray ring) for that slot; the others still resolve.
-                results.add(new LookupResponse(List.of(), MatchScope.NONE, null, null));
+                results.add(new LookupResponse(List.of(), MatchScope.NONE));
             }
         }
         return new BatchLookupResponse(results);
