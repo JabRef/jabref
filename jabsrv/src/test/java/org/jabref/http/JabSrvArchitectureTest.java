@@ -1,5 +1,7 @@
 package org.jabref.http;
 
+import org.jabref.support.CommonArchitectureTest;
+
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
@@ -7,7 +9,7 @@ import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
 
 @AnalyzeClasses(packages = "org.jabref.http", importOptions = ImportOption.DoNotIncludeTests.class)
-public class JabSrvArchitectureTests {
+public class JabSrvArchitectureTest extends CommonArchitectureTest {
 
     /// jabsrv is a JAX-RS / HK2 module — resources receive collaborators via
     /// `@Inject`, not via the afterburner DI used by the GUI. Smuggling in

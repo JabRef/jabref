@@ -11,6 +11,7 @@ testModuleInfo {
     requires("org.mockito")
     requires("org.glassfish.jersey.tests.framework.core")
     requires("jul.to.slf4j")
+    requires("org.jabref.testsupport")
     requires("com.tngtech.archunit")
     requires("com.tngtech.archunit.junit5.api")
     runtimeOnly("com.tngtech.archunit.junit5.engine")
