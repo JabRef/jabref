@@ -24,7 +24,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.gson.annotations.SerializedName;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ClientErrorException;
@@ -79,26 +79,19 @@ public class CitationsResource {
     /// Categorisation of a [LookupResponse]'s `matches` list. Surfaced as a
     /// dedicated field so clients can colour the hover badge without walking
     /// the array themselves.
+    ///
+    /// `@SerializedName` pins the wire format because Gson (this module's
+    /// JSON writer, see `GsonMessageBodyWriter`) otherwise emits the upper-
+    /// case enum constant name. Jackson's `@JsonValue` would be ignored here.
     public enum MatchScope {
         /// At least one match in the currently-active library — Ctrl+J would
         /// create a duplicate. Mint badge.
-        ACTIVE("active"),
+        @SerializedName("active") ACTIVE,
         /// Match(es) only in *other* open libraries — Ctrl+J would still
         /// create a new entry in the active library. Olive badge.
-        OTHER("other"),
+        @SerializedName("other") OTHER,
         /// No match in any open library. Gray badge.
-        NONE("none");
-
-        private final String jsonValue;
-
-        MatchScope(String jsonValue) {
-            this.jsonValue = jsonValue;
-        }
-
-        @JsonValue
-        public String jsonValue() {
-            return jsonValue;
-        }
+        @SerializedName("none") NONE
     }
 
     /// Result of a single plain-citation lookup.
