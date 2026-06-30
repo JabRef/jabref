@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -205,7 +206,7 @@ public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, 
         }
         try {
             URL url = buildSearchURL(rawQuery, pageNumber);
-            try (var stream = getUrlDownload(url).asInputStream()) {
+            try (InputStream stream = getUrlDownload(url).asInputStream()) {
                 return new Page<>(rawQuery, pageNumber, getParser().parseEntries(stream));
             }
         } catch (URISyntaxException e) {
