@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -95,7 +96,7 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
     private List<BibEntry> fetchEntries(String query, int pageNumber) throws FetcherException {
         try {
             URL url = buildSearchURL(query, pageNumber);
-            try (var stream = getUrlDownload(url).asInputStream()) {
+            try (InputStream stream = getUrlDownload(url).asInputStream()) {
                 return getParser().parseEntries(stream);
             }
         } catch (URISyntaxException e) {
