@@ -847,6 +847,16 @@ class BibDatabaseWriterTest {
     }
 
     @Test
+    void writeAiLibraryId() throws IOException {
+        metaData.setAiLibraryId("test-ai-library-id");
+
+        databaseWriter.writePartOfDatabase(bibtexContext, List.of());
+
+        assertEquals("@Comment{jabref-meta: aiLibraryId:test-ai-library-id;}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
+
+    @Test
     void writeFileDirectories() throws IOException {
         metaData.setLibrarySpecificFileDirectory("\\Literature\\");
         metaData.setUserFileDirectory("defaultOwner-user", "D:\\Documents");

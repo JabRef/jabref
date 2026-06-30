@@ -2,7 +2,6 @@ package org.jabref.migrations;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.prefs.Preferences;
 
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
@@ -30,7 +29,6 @@ import static org.mockito.Mockito.when;
 class GuiPreferencesMigrationsTest {
 
     private JabRefGuiPreferences preferences;
-    private Preferences mainPrefsNode;
 
     private final String[] oldStylePatterns = new String[] {"\\bibtexkey",
             "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
@@ -41,44 +39,37 @@ class GuiPreferencesMigrationsTest {
     void setUp() {
         preferences = mock(JabRefGuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
         Injector.setModelOrService(CliPreferences.class, preferences);
-        mainPrefsNode = mock(Preferences.class);
     }
 
     @Test
     void oldStyleBibtexkeyPattern0() {
-        when(preferences.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(oldStylePatterns[0]);
-        when(mainPrefsNode.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, null)).thenReturn(oldStylePatterns[0]);
-        when(preferences.hasKey(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(true);
+        when(preferences.get(eq(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN), any())).thenReturn(oldStylePatterns[0]);
+        when(preferences.hasKey(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN)).thenReturn(true);
 
-        PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences, mainPrefsNode);
+        PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences);
 
-        verify(preferences).put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, newStylePatterns[0]);
-        verify(mainPrefsNode).put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, newStylePatterns[0]);
+        verify(preferences).put(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN, newStylePatterns[0]);
     }
 
     @Test
     void oldStyleBibtexkeyPattern1() {
-        when(preferences.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(oldStylePatterns[1]);
-        when(mainPrefsNode.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, null)).thenReturn(oldStylePatterns[1]);
-        when(preferences.hasKey(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(true);
+        when(preferences.get(eq(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN), any())).thenReturn(oldStylePatterns[1]);
+        when(preferences.hasKey(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN)).thenReturn(true);
 
-        PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences, mainPrefsNode);
+        PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences);
 
-        verify(preferences).put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, newStylePatterns[1]);
-        verify(mainPrefsNode).put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, newStylePatterns[1]);
+        verify(preferences).put(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN, newStylePatterns[1]);
     }
 
     @Test
     void arbitraryBibtexkeyPattern() {
         String arbitraryPattern = "[anyUserPrividedString]";
 
-        when(preferences.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(arbitraryPattern);
-        when(mainPrefsNode.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, null)).thenReturn(arbitraryPattern);
+        when(preferences.get(eq(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN), any())).thenReturn(arbitraryPattern);
 
-        PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences, mainPrefsNode);
+        PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences);
 
-        verify(preferences, never()).put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, arbitraryPattern);
-        verify(mainPrefsNode, never()).put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, arbitraryPattern);
+        verify(preferences, never()).put(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN, arbitraryPattern);
     }
 
     @Test
@@ -226,7 +217,7 @@ class GuiPreferencesMigrationsTest {
 
         when(preferences.getStringList("columnNames")).thenReturn(updatedNames);
 
-        when(preferences.get("mainFontSize")).thenReturn("11.2");
+        when(preferences.get(eq("mainFontSize"), any())).thenReturn("11.2");
 
         PreferencesMigrations.restoreVariablesForBackwardCompatibility(preferences);
 
@@ -246,7 +237,7 @@ class GuiPreferencesMigrationsTest {
 
         when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEY_NAMES)).thenReturn(List.of("FetcherA", "FetcherB", "FetcherC"));
         when(preferences.getStringList(V5_9_FETCHER_CUSTOM_KEYS)).thenReturn(List.of("KeyA", "KeyB", "KeyC"));
-        when(preferences.getInternalPreferences().getUserAndHost()).thenReturn("user-host");
+        when(preferences.getInternalPreferences().getUserHostInfo().getUserHostString()).thenReturn("user-host");
 
         try (MockedStatic<Keyring> keyringFactory = Mockito.mockStatic(Keyring.class, Answers.RETURNS_DEEP_STUBS)) {
             keyringFactory.when(Keyring::create).thenReturn(keyring);
@@ -261,10 +252,21 @@ class GuiPreferencesMigrationsTest {
     }
 
     @Test
+    void upgradeCleanupsRemovesRemovedIssnCleanupJob() {
+        when(preferences.hasKey(JabRefCliPreferences.CLEANUP_JOBS)).thenReturn(true);
+        when(preferences.getStringList(JabRefCliPreferences.CLEANUP_JOBS)).thenReturn(List.of("CLEAN_UP_DOI", "CLEAN_UP_ISSN", "RENAME_PDF"));
+        when(preferences.get(anyString(), anyString())).thenReturn("");
+
+        PreferencesMigrations.upgradeCleanups(preferences);
+
+        verify(preferences).putStringList(JabRefCliPreferences.CLEANUP_JOBS, List.of("CLEAN_UP_DOI", "RENAME_PDF"));
+    }
+
+    @Test
     void resolveBibTexStringsFields() {
         String oldPrefsValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon";
         String expectedValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon;monthfiled";
-        when(preferences.get(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS)).thenReturn(oldPrefsValue);
+        when(preferences.get(eq(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS), any())).thenReturn(oldPrefsValue);
 
         PreferencesMigrations.upgradeResolveBibTeXStringsFields(preferences);
         verify(preferences).put(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS, expectedValue);

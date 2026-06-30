@@ -2,7 +2,7 @@ package org.jabref.toolkit.commands;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.auxparser.AuxParser;
@@ -14,10 +14,12 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.toolkit.converter.CygWinPathConverter;
+import org.jabref.toolkit.exception.ExportServiceException;
+import org.jabref.toolkit.exception.ImportServiceException;
+import org.jabref.toolkit.service.ExportService;
+import org.jabref.toolkit.service.ImportService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
@@ -25,8 +27,7 @@ import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "generate-bib-from-aux", description = "Generate small bib from aux file.")
-class GenerateBibFromAux implements Runnable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateBibFromAux.class);
+class GenerateBibFromAux implements Callable<Integer> {
 
     @ParentCommand
     private JabKit argumentProcessor;
@@ -37,9 +38,8 @@ class GenerateBibFromAux implements Runnable {
     @Option(names = "--aux", required = true)
     private Path auxFile;
 
-    // [impl->req~jabkit.cli.input-flag~1]
-    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
-    private Path inputFile;
+    @Mixin
+    private InputOption inputOption = new InputOption();
 
     @Option(names = "--output")
     private Path outputFile;
@@ -48,27 +48,23 @@ class GenerateBibFromAux implements Runnable {
     private String fieldFormatters;
 
     @Override
-    public void run() {
-        Optional<ParserResult> pr = JabKit.importFile(
+    public Integer call() throws ImportServiceException, ExportServiceException {
+        Path inputFile = inputOption.getInputFile();
+        ParserResult pr = ImportService.importBibTexFile(
                 inputFile,
-                "bibtex",
                 argumentProcessor.cliPreferences,
                 sharedOptions.porcelain);
-        if (pr.isEmpty()) {
-            System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return;
-        }
 
         if (!Files.exists(auxFile)) {
-            System.out.println(Localization.lang("Unable to open file '%0'.", auxFile));
-            return;
+            System.err.println(Localization.lang("Unable to open file '%0'.", auxFile));
+            return 2;
         }
 
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Creating excerpt of from '%0' with '%1'.", inputFile, auxFile.toAbsolutePath()));
         }
 
-        AuxParser auxParser = new DefaultAuxParser(pr.get().getDatabase());
+        AuxParser auxParser = new DefaultAuxParser(pr.getDatabase());
         AuxParserResult result = auxParser.parse(auxFile);
 
         if (!sharedOptions.porcelain) {
@@ -78,7 +74,7 @@ class GenerateBibFromAux implements Runnable {
         BibDatabase subDatabase = result.getGeneratedBibDatabase();
         if (subDatabase == null || !subDatabase.hasEntries()) {
             System.out.println(Localization.lang("No library generated."));
-            return;
+            return CommandLine.ExitCode.OK;
         }
 
         FieldFormatterCleanupMapper.applyFormatters(fieldFormatters, subDatabase.getEntries());
@@ -87,17 +83,12 @@ class GenerateBibFromAux implements Runnable {
             System.out.println(subDatabase.getEntries().stream()
                                           .map(BibEntry::toString)
                                           .collect(Collectors.joining("\n\n")));
-            return;
         } else {
-            JabKit.saveDatabase(
-                    argumentProcessor.cliPreferences,
-                    argumentProcessor.entryTypesManager,
-                    subDatabase,
-                    outputFile);
+            ExportService.create(argumentProcessor.cliPreferences, sharedOptions.porcelain).saveDatabase(subDatabase, outputFile);
+            if (!sharedOptions.porcelain) {
+                System.out.println(Localization.lang("Created library with '%0' entries.", subDatabase.getEntryCount()));
+            }
         }
-
-        if (!sharedOptions.porcelain) {
-            System.out.println(Localization.lang("Created library with '%0' entries.", subDatabase.getEntryCount()));
-        }
+        return CommandLine.ExitCode.OK;
     }
 }

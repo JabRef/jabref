@@ -2,7 +2,7 @@ package org.jabref.toolkit.commands;
 
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -16,13 +16,15 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.UnknownEntryType;
-import org.jabref.toolkit.converter.CygWinPathConverter;
 import org.jabref.toolkit.converter.KeySuffixConverter;
+import org.jabref.toolkit.exception.ExportServiceException;
+import org.jabref.toolkit.exception.ImportServiceException;
+import org.jabref.toolkit.service.ExportService;
+import org.jabref.toolkit.service.ImportService;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
@@ -30,8 +32,7 @@ import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "generate", description = "Generate citation keys for entries in a .bib file.")
-class GenerateCitationKeys implements Runnable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateCitationKeys.class);
+class GenerateCitationKeys implements Callable<Integer> {
 
     @ParentCommand
     private CitationKeys parentCommand;
@@ -39,9 +40,8 @@ class GenerateCitationKeys implements Runnable {
     @Mixin
     private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
-    // [impl->req~jabkit.cli.input-flag~1]
-    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input .bib file", required = true)
-    private Path inputFile;
+    @Mixin
+    private InputOption inputOption = new InputOption();
 
     @Option(names = "--output", description = "Output .bib file")
     private Path outputFile;
@@ -80,24 +80,14 @@ class GenerateCitationKeys implements Runnable {
     private Map<String, String> keyPatterns;
 
     @Override
-    public void run() {
-        Optional<ParserResult> parserResult = JabKit.importFile(
+    public Integer call() throws ImportServiceException, ExportServiceException {
+        Path inputFile = inputOption.getInputFile();
+        ParserResult parserResult = ImportService.importBibTexFile(
                 inputFile,
-                "bibtex",
                 parentCommand.getParent().cliPreferences,
                 sharedOptions.porcelain);
 
-        if (parserResult.isEmpty()) {
-            System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return;
-        }
-
-        if (parserResult.get().isInvalid()) {
-            System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
-            return;
-        }
-
-        BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
+        BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
 
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Regenerating citation keys according to metadata."));
@@ -108,15 +98,13 @@ class GenerateCitationKeys implements Runnable {
             keyGenerator.generateAndSetKey(entry);
         }
 
+        ExportService exportService = ExportService.create(parentCommand.getParent().cliPreferences, sharedOptions.porcelain);
         if (outputFile != null) {
-            JabKit.saveDatabase(
-                    parentCommand.getParent().cliPreferences,
-                    parentCommand.getParent().entryTypesManager,
-                    parserResult.get().getDatabase(),
-                    outputFile);
+            exportService.saveDatabase(parserResult.getDatabase(), outputFile);
         } else {
-            JabKit.outputDatabaseContext(parentCommand.getParent().cliPreferences, parserResult.get().getDatabaseContext());
+            exportService.printDatabaseContextToStdOut(parserResult.getDatabaseContext());
         }
+        return CommandLine.ExitCode.OK;
     }
 
     private @NonNull CitationKeyGenerator getCitationKeyGenerator(BibDatabaseContext databaseContext) {
@@ -132,7 +120,7 @@ class GenerateCitationKeys implements Runnable {
                 keyPatternReplacement != null ? keyPatternReplacement : existingPreferences.getKeyPatternReplacement(),
                 unwantedCharacters != null ? unwantedCharacters : existingPreferences.getUnwantedCharacters(),
                 getKeyPatterns(keyPatterns, existingPreferences.getKeyPatterns()),
-                new SimpleObjectProperty<>(keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordDelimiter())
+                new SimpleObjectProperty<>(keywordDelimiter != null ? keywordDelimiter : existingPreferences.getKeywordSeparator())
         );
         return new CitationKeyGenerator(databaseContext, preferencesToUse);
     }
@@ -152,7 +140,7 @@ class GenerateCitationKeys implements Runnable {
         keyPatternsOption.forEach((type, pattern) -> {
             EntryType passedEntryType = EntryTypeFactory.parse(type);
             if (passedEntryType instanceof UnknownEntryType) {
-                System.out.println(Localization.lang("The default entry type will be used since the invalid key was passed."));
+                System.err.println(Localization.lang("The default entry type will be used since the invalid key was passed."));
             }
             patternsCopy.addCitationKeyPattern(passedEntryType, pattern);
         });

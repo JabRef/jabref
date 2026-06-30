@@ -9,7 +9,6 @@ import java.util.Objects;
 import org.jabref.http.JabrefMediaType;
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.BibEntryDTO;
-import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
 import org.jabref.logic.preferences.CliPreferences;
@@ -41,9 +40,6 @@ public class LibraryResource {
 
     @Inject
     SrvStateManager srvStateManager;
-
-    @Inject
-    FilesToServe filesToServe;
 
     @Inject
     Gson gson;
@@ -90,7 +86,7 @@ public class LibraryResource {
                            .build();
         }
 
-        java.nio.file.Path library = ServerUtils.getLibraryPath(id, filesToServe, srvStateManager);
+        java.nio.file.Path library = ServerUtils.getLibraryPath(id, srvStateManager);
         String libraryAsString;
         try {
             libraryAsString = Files.readString(library);
@@ -111,6 +107,6 @@ public class LibraryResource {
 
     /// @param id - also "demo" for the Chocolate.bib file
     private BibDatabaseContext getDatabaseContext(String id) throws IOException {
-        return ServerUtils.getBibDatabaseContext(id, filesToServe, srvStateManager, preferences.getImportFormatPreferences());
+        return ServerUtils.getBibDatabaseContext(id, srvStateManager, preferences.getImportFormatPreferences());
     }
 }

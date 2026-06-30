@@ -254,8 +254,11 @@ public class MainTableColumnFactory {
     private Node createGroupIconRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
         List<JabRefIcon> groupIcons = matchedGroups.stream()
                                                    .filter(abstractGroup -> abstractGroup.getIconName().isPresent())
-                                                   .flatMap(group -> IconTheme.findIcon(group.getIconName().get(), group.getColor().map(Color::valueOf).orElse(IconTheme.getDefaultGroupColor())).stream()
-                                                   )
+                                                   .flatMap(group -> IconTheme.findJabRefIcon(group.getIconName().get())
+                                                                              .map(icon -> icon.withColor(group.getColor()
+                                                                                                               .map(Color::valueOf)
+                                                                                                               .orElse(IconTheme.DEFAULT_GROUP_COLOR)))
+                                                                              .stream())
                                                    .toList();
         if (!groupIcons.isEmpty()) {
             HBox container = new HBox();

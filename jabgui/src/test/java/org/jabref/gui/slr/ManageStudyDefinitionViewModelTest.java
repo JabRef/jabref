@@ -9,7 +9,7 @@ import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.model.study.Study;
-import org.jabref.model.study.StudyDatabase;
+import org.jabref.model.study.StudyCatalog;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -104,15 +104,49 @@ class ManageStudyDefinitionViewModelTest {
         ), manageStudyDefinitionViewModel.getCatalogs());
     }
 
-    private ManageStudyDefinitionViewModel getManageStudyDefinitionViewModel(Path tempDir) {
-        List<StudyDatabase> databases = List.of(
-                new StudyDatabase("ACM Portal", true));
+    @Test
+    void studyConstructorPreservesCatalogReason(@TempDir Path tempDir) {
+        List<StudyCatalog> catalogs = List.of(
+                new StudyCatalog("ACM Portal", true, "Primary source"));
         Study study = new Study(
                 List.of("Name"),
                 "title",
                 List.of("Q1"),
                 List.of(),
-                databases
+                catalogs
+        );
+        ManageStudyDefinitionViewModel viewModel = new ManageStudyDefinitionViewModel(
+                study,
+                tempDir,
+                importFormatPreferences,
+                importerPreferences,
+                workspacePreferences,
+                gitPreferences,
+                dialogService);
+        String reason = viewModel.getCatalogs().stream()
+                                 .filter(item -> "ACM Portal".equals(item.getName()))
+                                 .findFirst()
+                                 .map(StudyCatalogItem::getReason)
+                                 .orElse("");
+        assertEquals("Primary source", reason);
+    }
+
+    @Test
+    void saveStudyHasCurrentSchemaVersion(@TempDir Path tempDir) {
+        ManageStudyDefinitionViewModel viewModel = getManageStudyDefinitionViewModel(tempDir);
+        SlrStudyAndDirectory result = viewModel.saveStudy();
+        assertEquals(Study.CURRENT_SCHEMA_VERSION, result.getStudy().getVersion());
+    }
+
+    private ManageStudyDefinitionViewModel getManageStudyDefinitionViewModel(Path tempDir) {
+        List<StudyCatalog> catalogs = List.of(
+                new StudyCatalog("ACM Portal", true));
+        Study study = new Study(
+                List.of("Name"),
+                "title",
+                List.of("Q1"),
+                List.of(),
+                catalogs
         );
         return new ManageStudyDefinitionViewModel(
                 study,
