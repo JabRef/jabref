@@ -6,6 +6,7 @@ plugins {
 }
 
 testModuleInfo {
+    requires("org.jabref.testsupport")
     requires("org.junit.jupiter.api")
     requires("org.junit.jupiter.params")
     requires("org.mockito")
