@@ -45,14 +45,6 @@ public class InternalPreferences {
         return new InternalPreferences();
     }
 
-    public void setAll(InternalPreferences preferences) {
-        this.ignoredVersion.set(preferences.getIgnoredVersion());
-        this.versionCheckEnabled.set(preferences.isVersionCheckEnabled());
-        this.lastPreferencesExportPath.set(preferences.getLastPreferencesExportPath());
-        this.userHostInfo.set(preferences.getUserHostInfo());
-        this.memoryStickMode.set(preferences.isMemoryStickMode());
-    }
-
     public Version getIgnoredVersion() {
         return ignoredVersion.getValue();
     }
