@@ -126,6 +126,12 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
                         .add(HEADER_HEIGHT_ESTIMATE)
                         .multiply(rowHeight));
 
+        externalFetcherTable.fixedCellSizeProperty().bind(rowHeight);
+        externalFetcherTable.prefHeightProperty().bind(
+                Bindings.size(externalFetcherTable.getItems())
+                        .add(HEADER_HEIGHT_ESTIMATE)
+                        .multiply(rowHeight));
+
         enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
         downloadLinkedOnlineFiles.selectedProperty().bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());
