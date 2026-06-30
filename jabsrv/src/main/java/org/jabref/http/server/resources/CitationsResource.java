@@ -35,6 +35,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /// Cached plain-citation lookup + later add.
@@ -66,6 +67,7 @@ public class CitationsResource {
     @Inject
     CitationCacheService citationCacheService;
 
+    @NullMarked
     public record LookupMatch(String libraryId, String entryId, boolean inActiveLibrary) {
     }
 
@@ -77,10 +79,15 @@ public class CitationsResource {
     ///   "none"   — no match in any open library.
     /// Clients use this to colour the hover badge without having to walk the
     /// matches array themselves (mint vs olive vs grey).
+    ///
+    /// `parserCacheKey` and `parsedEntryType` are null when no entry was
+    /// parsed (blank-slot or parser-failure paths in batch lookup).
+    @NullMarked
     public record LookupResponse(List<LookupMatch> matches, String matchScope,
-                                 String parserCacheKey, String parsedEntryType) {
+                                 @Nullable String parserCacheKey, @Nullable String parsedEntryType) {
     }
 
+    @NullMarked
     public record AlreadyExistsResponse(String status, String entryId) {
         public AlreadyExistsResponse(String entryId) {
             this("already-exists", entryId);
@@ -107,12 +114,14 @@ public class CitationsResource {
     /// too, but a named record makes the JSON self-describing and leaves room
     /// to add per-request options (e.g. include-snippets) without breaking the
     /// schema.
+    @NullMarked
     public record BatchLookupRequest(List<String> citations) {
     }
 
     /// Aligned-by-index with the request: `results[i]` corresponds to
     /// `citations[i]`. Blank input slots yield an empty `LookupResponse`
     /// (matches=[], matchScope="none") rather than failing the whole batch.
+    @NullMarked
     public record BatchLookupResponse(List<LookupResponse> results) {
     }
 
@@ -169,13 +178,12 @@ public class CitationsResource {
         // Text cache first: lets a re-scan of the same PDF page (or two
         // distinct PDFs that cite the same paper) reuse the prior parse and
         // skip the LLM call entirely.
-        Optional<CitationCacheService.CachedCitation> cachedByText = citationCacheService.getByText(citationText);
-        BibEntry parsed;
-        if (cachedByText.isPresent()) {
-            parsed = cachedByText.get().parsed();
-        } else {
+        BibEntry parsed = citationCacheService.getByText(citationText)
+                                              .map(CitationCacheService.CachedCitation::parsed)
+                                              .orElse(null);
+        if (parsed == null) {
             parsed = ServerUtils.parsePlainCitation(preferences, citationText)
-                    .orElseThrow(() -> new BadRequestException("Could not parse a bibliography entry from the given text."));
+                                 .orElseThrow(() -> new BadRequestException("Could not parse a bibliography entry from the given text."));
             citationCacheService.putByText(parsed, citationText);
         }
 
