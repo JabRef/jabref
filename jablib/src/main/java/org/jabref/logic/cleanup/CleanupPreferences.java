@@ -62,11 +62,6 @@ public class CleanupPreferences {
         return new CleanupPreferences();
     }
 
-    public void setAll(CleanupPreferences other) {
-        setActiveJobs(other.getActiveJobs());
-        setFieldFormatterCleanups(other.getFieldFormatterCleanups());
-    }
-
     public Set<CleanupStep> getActiveJobs() {
         return activeJobs;
     }
