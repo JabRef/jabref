@@ -29,7 +29,6 @@ import org.jabref.model.entry.field.StandardField;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -80,7 +79,7 @@ public class BrowserExtensionFulltextFetcher implements FulltextFetcher {
     }
 
     @Override
-    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Optional<String> doi = entry.getField(StandardField.DOI).filter(s -> !StringUtil.isBlank(s));
         Optional<String> url = entry.getField(StandardField.URL).filter(s -> !StringUtil.isBlank(s));
         if (doi.isEmpty() && url.isEmpty()) {
@@ -111,13 +110,13 @@ public class BrowserExtensionFulltextFetcher implements FulltextFetcher {
 
         @SuppressWarnings("unchecked")
         CompletableFuture<Void>[] tasks = providers.stream()
-                .map(provider -> CompletableFuture.runAsync(() -> {
-                    Optional<URL> outcome = tryProvider(provider, requestBody, executor);
-                    if (outcome.isPresent()) {
-                        winner.complete(outcome);
-                    }
-                }, executor))
-                .toArray(CompletableFuture[]::new);
+                                                   .map(provider -> CompletableFuture.runAsync(() -> {
+                                                       Optional<URL> outcome = tryProvider(provider, requestBody, executor);
+                                                       if (outcome.isPresent()) {
+                                                           winner.complete(outcome);
+                                                       }
+                                                   }, executor))
+                                                   .toArray(CompletableFuture[]::new);
 
         CompletableFuture.allOf(tasks).whenComplete((unused, throwable) ->
                 winner.complete(Optional.empty()));
@@ -147,16 +146,16 @@ public class BrowserExtensionFulltextFetcher implements FulltextFetcher {
 
         URI endpoint = URI.create("http://127.0.0.1:" + provider.port() + "/v1/fulltext");
         HttpRequest request = HttpRequest.newBuilder(endpoint)
-                .timeout(socketTimeout)
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + token)
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
-                .build();
+                                         .timeout(socketTimeout)
+                                         .header("Content-Type", "application/json")
+                                         .header("Authorization", "Bearer " + token)
+                                         .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
+                                         .build();
 
         try (HttpClient client = HttpClient.newBuilder()
-                .connectTimeout(CONNECT_TIMEOUT)
-                .executor(executor)
-                .build()) {
+                                           .connectTimeout(CONNECT_TIMEOUT)
+                                           .executor(executor)
+                                           .build()) {
             HttpResponse<String> response = client.send(request, BodyHandlers.ofString(StandardCharsets.UTF_8));
             if (response.statusCode() != 200) {
                 LOGGER.debug("Provider {} returned HTTP {}: {}", provider.name(), response.statusCode(), response.body());
