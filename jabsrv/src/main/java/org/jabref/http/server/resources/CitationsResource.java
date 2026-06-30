@@ -23,6 +23,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
@@ -126,7 +127,7 @@ public class CitationsResource {
         BibDatabaseContext targetContext = resolveTargetContext(id);
         return doLookup(citationText, targetContext,
                         srvStateManager.getOpenDatabases(),
-                        new DuplicateCheck(new BibEntryTypesManager()));
+                        new DuplicateCheck(Injector.instantiateModelOrService(BibEntryTypesManager.class)));
     }
 
     /// Wrapper for the batched lookup payload. Plain `List<String>` would work
@@ -158,7 +159,7 @@ public class CitationsResource {
         }
         BibDatabaseContext targetContext = resolveTargetContext(id);
         List<BibDatabaseContext> openDatabases = srvStateManager.getOpenDatabases();
-        DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
+        DuplicateCheck duplicateCheck = new DuplicateCheck(Injector.instantiateModelOrService(BibEntryTypesManager.class));
 
         List<LookupResponse> results = new ArrayList<>(request.citations().size());
         for (String citationText : request.citations()) {
@@ -261,7 +262,7 @@ public class CitationsResource {
         // of 201 so the client can show a "Citation is already in library"
         // notification without treating it as a hard error.
         BibDatabaseMode mode = context.getMode();
-        DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
+        DuplicateCheck duplicateCheck = new DuplicateCheck(Injector.instantiateModelOrService(BibEntryTypesManager.class));
         return duplicateCheck.containsDuplicate(context.getDatabase(), parsed, mode)
                              .map(existingEntry -> alreadyExistsResponse(parserCacheKey, existingEntry))
                              .orElseGet(() -> appendParsedAndRespond(parsed, targetLibrary, group, parserCacheKey));
@@ -288,7 +289,7 @@ public class CitationsResource {
         BibWriter bibWriter = new BibWriter(rawEntry, "\n");
         BibEntryWriter entryWriter = new BibEntryWriter(
                 new FieldWriter(preferences.getFieldPreferences()),
-                new BibEntryTypesManager());
+                Injector.instantiateModelOrService(BibEntryTypesManager.class));
         try {
             entryWriter.write(parsed, bibWriter, BibDatabaseMode.BIBTEX);
         } catch (IOException e) {
