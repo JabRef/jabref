@@ -116,20 +116,6 @@ public class ImporterPreferences {
         );
     }
 
-    public void setAll(ImporterPreferences preferences) {
-        this.importerEnabled.set(preferences.areImporterEnabled());
-        this.generateNewKeyOnImport.set(preferences.shouldGenerateNewKeyOnImport());
-        this.importWorkingDirectory.set(preferences.getImportWorkingDirectory());
-        this.warnAboutDuplicatesOnImport.set(preferences.shouldWarnAboutDuplicatesOnImport());
-        setCustomImporters(preferences.getCustomImporters());
-        this.persistCustomKeys.set(preferences.shouldPersistCustomKeys()); // Before getApiKeys to avoid stale keys in keyring
-        setApiKeys(preferences.getApiKeys());
-        this.catalogs.setAll(preferences.getCatalogs());
-        this.defaultPlainCitationParser.set(preferences.getDefaultPlainCitationParser());
-        this.citationsRelationsStoreTTL.set(preferences.getCitationsRelationsStoreTTL());
-        setSearchEngineUrlTemplates(preferences.getSearchEngineUrlTemplates());
-    }
-
     public boolean areImporterEnabled() {
         return importerEnabled.get();
     }
