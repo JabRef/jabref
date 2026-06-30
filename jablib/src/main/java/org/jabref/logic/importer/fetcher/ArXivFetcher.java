@@ -317,22 +317,22 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             return result;
         }
 
-        ExecutorService executor = Executors.newFixedThreadPool(getPageSize() * 2);
+        try (ExecutorService executor = Executors.newFixedThreadPool(getPageSize() * 2)) {
+            Collection<CompletableFuture<BibEntry>> futureSearchResult = result.getContent()
+                                                                               .stream()
+                                                                               .map(bibEntry ->
+                                                                                       CompletableFuture.supplyAsync(() -> {
+                                                                                           this.inplaceAsyncInfuseArXivWithDoi(bibEntry);
+                                                                                           return bibEntry;
+                                                                                       }, executor))
+                                                                               .toList();
 
-        Collection<CompletableFuture<BibEntry>> futureSearchResult = result.getContent()
-                                                                           .stream()
-                                                                           .map(bibEntry ->
-                                                                                   CompletableFuture.supplyAsync(() -> {
-                                                                                       this.inplaceAsyncInfuseArXivWithDoi(bibEntry);
-                                                                                       return bibEntry;
-                                                                                   }, executor))
-                                                                           .toList();
+            Collection<BibEntry> modifiedSearchResult = futureSearchResult.stream()
+                                                                          .map(CompletableFuture::join)
+                                                                          .toList();
 
-        Collection<BibEntry> modifiedSearchResult = futureSearchResult.stream()
-                                                                      .map(CompletableFuture::join)
-                                                                      .collect(Collectors.toList());
-
-        return new Page<>(result.getQuery(), result.getPageNumber(), modifiedSearchResult);
+            return new Page<>(result.getQuery(), result.getPageNumber(), modifiedSearchResult);
+        }
     }
 
     @Override
@@ -345,22 +345,22 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             return result;
         }
 
-        ExecutorService executor = Executors.newFixedThreadPool(getPageSize() * 2);
+        try (ExecutorService executor = Executors.newFixedThreadPool(getPageSize() * 2)) {
+            Collection<CompletableFuture<BibEntry>> futureSearchResult = result.getContent()
+                                                                               .stream()
+                                                                               .map(bibEntry ->
+                                                                                       CompletableFuture.supplyAsync(() -> {
+                                                                                           this.inplaceAsyncInfuseArXivWithDoi(bibEntry);
+                                                                                           return bibEntry;
+                                                                                       }, executor))
+                                                                               .toList();
 
-        Collection<CompletableFuture<BibEntry>> futureSearchResult = result.getContent()
-                                                                           .stream()
-                                                                           .map(bibEntry ->
-                                                                                   CompletableFuture.supplyAsync(() -> {
-                                                                                       this.inplaceAsyncInfuseArXivWithDoi(bibEntry);
-                                                                                       return bibEntry;
-                                                                                   }, executor))
-                                                                           .toList();
+            Collection<BibEntry> modifiedSearchResult = futureSearchResult.stream()
+                                                                          .map(CompletableFuture::join)
+                                                                          .toList();
 
-        Collection<BibEntry> modifiedSearchResult = futureSearchResult.stream()
-                                                                      .map(CompletableFuture::join)
-                                                                      .collect(Collectors.toList());
-
-        return new Page<>(result.getQuery(), result.getPageNumber(), modifiedSearchResult);
+            return new Page<>(result.getQuery(), result.getPageNumber(), modifiedSearchResult);
+        }
     }
 
     @Override
