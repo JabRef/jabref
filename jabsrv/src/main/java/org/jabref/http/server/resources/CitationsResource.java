@@ -157,10 +157,6 @@ public class CitationsResource {
             throw new BadRequestException("Citations list must not be empty.");
         }
         BibDatabaseContext targetContext = resolveTargetContext(id);
-        // Resolve once and reuse across every citation in the batch: the
-        // open-database list and DuplicateCheck are independent of the
-        // individual citation text, so re-creating per iteration would burn
-        // CPU for no benefit.
         List<BibDatabaseContext> openDatabases = srvStateManager.getOpenDatabases();
         DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
 
