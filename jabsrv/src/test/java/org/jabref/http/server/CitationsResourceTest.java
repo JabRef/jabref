@@ -117,6 +117,6 @@ class CitationsResourceTest extends ServerTest {
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         String body = response.readEntity(String.class);
-        assertTrue(body.contains("\"matchScope\":\"none\""), body);
+        assertTrue(body.contains("\"matchScope\": \"none\""), body);
     }
 }
