@@ -35,7 +35,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.groups.GroupsFactory;
+import org.jabref.logic.groups.GroupsHelper;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
@@ -52,7 +52,6 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -180,13 +179,12 @@ public class JabRefFrameViewModel {
                       .forEach(command -> openDatabaseAction.get().openFiles(command.toImport()));
 
             uiCommands.stream()
-                      .filter(UiCommand.AppendFilesToCurrentLibrary.class::isInstance)
-                      .map(UiCommand.AppendFilesToCurrentLibrary.class::cast)
-                      .map(UiCommand.AppendFilesToCurrentLibrary::toAppend)
-                      .filter(Objects::nonNull)
-                      .findAny().ifPresent(toAppend -> {
-                          LOGGER.debug("Append to current library {} requested", toAppend);
-                          waitForLoadingFinished(() -> appendToCurrentLibrary(toAppend));
+                      .filter(UiCommand.AppendFilesToLibrary.class::isInstance)
+                      .map(UiCommand.AppendFilesToLibrary.class::cast)
+                      .findAny().ifPresent(command -> {
+                          LOGGER.debug("Append to library {} requested", command.toAppend());
+                          selectLibraryTab(command.library());
+                          waitForLoadingFinished(() -> appendToCurrentLibrary(command.toAppend()));
                       });
 
             uiCommands.stream()
@@ -203,13 +201,17 @@ public class JabRefFrameViewModel {
                       .map(UiCommand.AppendFileOrUrlToCurrentLibrary.class::cast)
                       .findAny().ifPresent(importFile -> importFromFileAndOpen(importFile.location()));
 
-            uiCommands.stream().filter(UiCommand.AppendBibTeXToCurrentLibrary.class::isInstance)
-                      .map(UiCommand.AppendBibTeXToCurrentLibrary.class::cast)
-                      .findAny().ifPresent(importBibTex ->
-                              importBibtexStringAndOpen(
-                                      importBibTex.bibtex(),
-                                      // importBibtexStringAndOpen accepts null targetGroup to indicate "no group assignment"
-                                      importBibTex.targetGroup().orElse(null)));
+            uiCommands.stream().filter(UiCommand.AppendBibTeXToLibrary.class::isInstance)
+                      .map(UiCommand.AppendBibTeXToLibrary.class::cast)
+                      .findAny().ifPresent(importBibTex -> {
+                          selectLibraryTab(importBibTex.library());
+                          // selectLibraryTab may have just opened the target library, which loads in
+                          // the background; wait for it so the import targets the loaded tab.
+                          waitForLoadingFinished(() -> importBibtexStringAndOpen(
+                                  importBibTex.bibtex(),
+                                  // importBibtexStringAndOpen accepts null targetGroup to indicate "no group assignment"
+                                  importBibTex.targetGroup().orElse(null)));
+                      });
         }
 
         // Handle jumpToEntry
@@ -234,7 +236,7 @@ public class JabRefFrameViewModel {
                           if (preferences.getRemotePreferences().directHttpImport()) {
                               directImportEntries(parserResult, targetGroup);
                           } else {
-                              addParserResult(parserResult);
+                              addParserResult(parserResult, targetGroup);
                           }
                       })
                       .onFailure(e -> LOGGER.error("Unable to parse provided bibtex {}", importStr, e))
@@ -256,13 +258,38 @@ public class JabRefFrameViewModel {
                       .executeWith(taskExecutor);
     }
 
+    /// Selects the tab whose library lives at `library` so that the subsequent append
+    /// targets it instead of the previously active tab. An empty Optional leaves the current tab
+    /// unchanged. If the library is not open yet, it is opened in a new (raised) tab; the actual
+    /// loading happens in the background, so callers must run the append via
+    /// [#waitForLoadingFinished(Runnable)] to let the new tab finish loading first. A path
+    /// that does not exist (or is not a .bib file) is silently ignored by
+    /// [OpenDatabaseAction#openFile(Path)] and the current tab is kept (the server side
+    /// already rejects unknown ids with 404, so this is only a defensive fallback).
+    private void selectLibraryTab(Optional<Path> library) {
+        library.map(path -> path.toAbsolutePath().normalize()).ifPresent(normalized ->
+                tabContainer.getLibraryTabs().stream()
+                            .filter(tab -> tab.getBibDatabaseContext().getDatabasePath()
+                                              .map(path -> path.toAbsolutePath().normalize().equals(normalized))
+                                              .orElse(false))
+                            .findFirst()
+                            .ifPresentOrElse(
+                                    tabContainer::showLibraryTab,
+                                    () -> {
+                                        LOGGER.info("Requested library {} is not open; opening it", normalized);
+                                        openDatabaseAction.get().openFile(normalized);
+                                    }));
+    }
+
     private void directImportEntries(ParserResult parserResult, @Nullable String targetGroup) {
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
         BibDatabaseContext databaseContext = libraryTab.getBibDatabaseContext();
         List<BibEntry> entries = parserResult.getDatabase().getEntries();
         newImportHandler(databaseContext).importEntries(entries);
         if (StringUtil.isNotBlank(targetGroup)) {
-            assignToGroup(databaseContext, entries, targetGroup);
+            // TODO: if an existing group is not assignable (e.g. a search or automatic group),
+            //       the assignment silently does nothing - no error is reported to the caller.
+            GroupsHelper.assignEntriesToGroup(databaseContext, entries, targetGroup, preferences.getBibEntryPreferences().getKeywordSeparator());
         }
     }
 
@@ -275,21 +302,6 @@ public class JabRefFrameViewModel {
                 stateManager,
                 dialogService,
                 taskExecutor);
-    }
-
-    /// Assigns the imported entries to the group named {@code groupName}, creating it as a
-    /// top-level group if it does not exist yet.
-    ///
-    /// TODO: if an existing group is not assignable (e.g. a search or automatic group),
-    ///       the assignment silently does nothing - no error is reported to the caller.
-    private void assignToGroup(BibDatabaseContext databaseContext, List<BibEntry> entries, String groupName) {
-        GroupTreeNode root = databaseContext.getMetaData().getGroups().orElseGet(() -> {
-            GroupTreeNode newRoot = GroupTreeNode.fromGroup(GroupsFactory.createAllEntriesGroup());
-            databaseContext.getMetaData().setGroups(newRoot);
-            return newRoot;
-        });
-        root.findOrCreateExplicitGroup(groupName, preferences.getBibEntryPreferences().getKeywordSeparator())
-            .addEntriesToGroup(entries);
     }
 
     private void checkForBibInUpperDir() {
@@ -433,6 +445,11 @@ public class JabRefFrameViewModel {
 
     @VisibleForTesting
     void addParserResult(ParserResult parserResult) {
+        addParserResult(parserResult, null);
+    }
+
+    /// @param targetGroup optional group the imported entries are assigned to (e.g. the REST `?group=` parameter). It pre-selects/falls back to that group in the import dialog, which creates it (top-level) on confirm if missing. An explicit pick in the dialog overrides it; cancelling imports nothing.
+    void addParserResult(ParserResult parserResult, @Nullable String targetGroup) {
         LOGGER.trace("Adding the entries to the open tab.");
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
         if (libraryTab == null) {
@@ -451,7 +468,7 @@ public class JabRefFrameViewModel {
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> parserResult);
         ImportCleanup cleanup = ImportCleanup.targeting(libraryTab.getBibDatabaseContext().getMode(), preferences.getFieldPreferences());
         cleanup.doPostCleanup(parserResult.getDatabase().getEntries());
-        ImportEntriesDialog dialog = new ImportEntriesDialog(libraryTab.getBibDatabaseContext(), task);
+        ImportEntriesDialog dialog = new ImportEntriesDialog(libraryTab.getBibDatabaseContext(), task, targetGroup);
 
         dialog.setTitle(Localization.lang("Import"));
         dialogService.showCustomDialogAndWait(dialog);
