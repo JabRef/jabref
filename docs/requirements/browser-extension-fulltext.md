@@ -1,6 +1,7 @@
 ---
 parent: Requirements
 ---
+<!-- markdownlint-disable-file MD022 -->
 # Browser-Extension Fulltext Provider Protocol
 
 A loopback HTTP protocol by which JabRef requests fulltext PDFs from a locally-running browser-extension companion. The companion uses the user's already-authenticated browser session to obtain a PDF that JabRef cannot reach directly (paywall, anti-bot, 418, institutional SSO).
@@ -65,11 +66,11 @@ Notes:
 
 JabRef enumerates provider discovery files from a well-known directory at fetcher initialisation:
 
-| Platform | Path |
-| --- | --- |
-| Windows | `%APPDATA%\JabRef\fulltext-providers\*.json` |
-| Linux | `$XDG_CONFIG_HOME/jabref/fulltext-providers/*.json` (default `~/.config/jabref/fulltext-providers/`) |
-| macOS | `~/Library/Application Support/JabRef/fulltext-providers/*.json` |
+| Platform | Path                                                                                                 |
+| -------- | ---------------------------------------------------------------------------------------------------- |
+| Windows  | `%APPDATA%\JabRef\fulltext-providers\*.json`                                                         |
+| Linux    | `$XDG_CONFIG_HOME/jabref/fulltext-providers/*.json` (default `~/.config/jabref/fulltext-providers/`) |
+| macOS    | `~/Library/Application Support/JabRef/fulltext-providers/*.json`                                     |
 
 Each provider drops exactly one JSON file at install time. The filename is provider-chosen (for example `<provider-name>.json`) and must be unique across providers. Files with parse errors are skipped and logged at warn level; they do not abort the enumeration.
 
@@ -88,13 +89,13 @@ Each discovery file contains a single JSON object with these fields:
 }
 ```
 
-| Field | Type | Required | Notes |
-| --- | --- | --- | --- |
-| `name` | string | yes | machine identifier; `[a-z0-9-]+`; unique across providers; chosen by each provider implementation |
-| `displayName` | string | yes | shown in JabRef's preferences UI; chosen by each provider implementation |
-| `port` | integer | yes | loopback TCP port; provider-chosen; may change between runs (provider rewrites the discovery file on startup) |
-| `tokenFile` | string | yes | absolute path to a file containing a single line: the bearer token |
-| `protocolVersion` | integer | yes | must be `1` for this revision |
+| Field             | Type    | Required | Notes                                                                                                         |
+| ----------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------- |
+| `name`            | string  | yes      | machine identifier; `[a-z0-9-]+`; unique across providers; chosen by each provider implementation             |
+| `displayName`     | string  | yes      | shown in JabRef's preferences UI; chosen by each provider implementation                                      |
+| `port`            | integer | yes      | loopback TCP port; provider-chosen; may change between runs (provider rewrites the discovery file on startup) |
+| `tokenFile`       | string  | yes      | absolute path to a file containing a single line: the bearer token                                            |
+| `protocolVersion` | integer | yes      | must be `1` for this revision                                                                                 |
 
 The discovery file is provider-managed. The provider rewrites it whenever the port changes and removes it on uninstall. JabRef treats the values as authoritative; it does not cache them across sessions.
 
@@ -157,11 +158,11 @@ Success response (HTTP `200`):
 }
 ```
 
-| Field | Type | Required | Notes |
-| --- | --- | --- | --- |
-| `id` | string | yes | opaque, provider-chosen; used by the optional DELETE call |
-| `path` | string | yes | absolute path to a readable PDF file on local disk |
-| `sourceUrl` | string | no | URL the PDF was fetched from; informational |
+| Field       | Type   | Required | Notes                                                     |
+| ----------- | ------ | -------- | --------------------------------------------------------- |
+| `id`        | string | yes      | opaque, provider-chosen; used by the optional DELETE call |
+| `path`      | string | yes      | absolute path to a readable PDF file on local disk        |
+| `sourceUrl` | string | no       | URL the PDF was fetched from; informational               |
 
 The file at `path` must be a readable PDF (not an HTML error page) when the response is sent. JabRef copies or moves it into the library's file directory via its existing attach pipeline.
 
@@ -176,16 +177,16 @@ Non-success responses carry a structured error code:
 
 Defined short codes:
 
-| Code | HTTP status | Meaning |
-| --- | --- | --- |
-| `no-pdf-found` | 404 | provider opened the page but could not extract a PDF |
-| `no-adapter` | 404 | provider has no adapter for this DOI's publisher and no generic fallback succeeded |
-| `auth-required` | 404 | provider's browser session is not authenticated for this publisher |
-| `not-reachable` | 404 | DOI redirect failed or page would not load |
-| `timeout` | 504 | fetch exceeded provider's internal timeout |
-| `busy` | 503 | safety valve: provider's queue is overflowing (see [`req~bxf.safety-valve~1`](#safety-valve)) |
-| `bad-request` | 400 | malformed request body |
-| `internal-error` | 500 | provider bug; see `message` |
+| Code             | HTTP status | Meaning                                                                                       |
+| ---------------- | ----------- | --------------------------------------------------------------------------------------------- |
+| `no-pdf-found`   | 404         | provider opened the page but could not extract a PDF                                          |
+| `no-adapter`     | 404         | provider has no adapter for this DOI's publisher and no generic fallback succeeded            |
+| `auth-required`  | 404         | provider's browser session is not authenticated for this publisher                            |
+| `not-reachable`  | 404         | DOI redirect failed or page would not load                                                    |
+| `timeout`        | 504         | fetch exceeded provider's internal timeout                                                    |
+| `busy`           | 503         | safety valve: provider's queue is overflowing (see [`req~bxf.safety-valve~1`](#safety-valve)) |
+| `bad-request`    | 400         | malformed request body                                                                        |
+| `internal-error` | 500         | provider bug; see `message`                                                                   |
 
 JabRef treats every non-200 as a soft miss: it logs the `error` and `message` and proceeds to the next fetcher in `FulltextFetchers`. Specifically, JabRef does **not** retry `503 busy` (see [`req~bxf.sync-hold~1`](#sync-hold-no-retry)).
 
