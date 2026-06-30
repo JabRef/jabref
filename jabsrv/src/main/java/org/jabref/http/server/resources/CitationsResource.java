@@ -96,9 +96,9 @@ public class CitationsResource {
 
     /// Result of a single plain-citation lookup.
     ///
-    /// @param matches duplicate hits across every open library. Empty list when no library contains the parsed entry, or when the parse itself failed (batch-lookup blank-slot / parser-failure rows).
-    /// @param matchScope categorisation of `matches` — see [MatchScope].
-    /// @param parserCacheKey opaque token redeemable at `POST /libraries/{id}/citations/{parserCacheKey}` to append the already-parsed `BibEntry` without paying for the LLM parse again. Null when no entry was parsed.
+    /// @param matches         duplicate hits across every open library. Empty list when no library contains the parsed entry, or when the parse itself failed (batch-lookup blank-slot / parser-failure rows).
+    /// @param matchScope      categorisation of `matches` — see [MatchScope].
+    /// @param parserCacheKey  opaque token redeemable at `POST /libraries/{id}/citations/{parserCacheKey}` to append the already-parsed `BibEntry` without paying for the LLM parse again. Null when no entry was parsed.
     /// @param parsedEntryType BibTeX entry-type name of the parsed entry (e.g. `"article"`, `"inproceedings"`) — lets the client preview the type before redeeming the cache key. Null when no entry was parsed.
     public record LookupResponse(List<LookupMatch> matches, MatchScope matchScope,
                                  @Nullable String parserCacheKey, @Nullable String parsedEntryType) {
@@ -127,9 +127,11 @@ public class CitationsResource {
         // The target library is the one Ctrl+J would add to: "current" -> active
         // library, any other id -> that open library (404 if unknown/closed).
         BibDatabaseContext targetContext = resolveTargetContext(id);
-        return doLookup(citationText, targetContext,
-                        srvStateManager.getOpenDatabases(),
-                        new DuplicateCheck(entryTypesManager));
+        return doLookup(
+                citationText,
+                targetContext,
+                srvStateManager.getOpenDatabases(),
+                new DuplicateCheck(entryTypesManager));
     }
 
     /// Wrapper for the batched lookup payload. Plain `List<String>` would work
