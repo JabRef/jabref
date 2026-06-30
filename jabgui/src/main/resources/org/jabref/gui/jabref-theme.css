@@ -2472,3 +2472,19 @@ journalInfo .grid-cell-b {
 .keybindings-search-box {
     -fx-control-inner-background: transparent;
 }
+/* GroupTreeView Fonts */
+.group-tree-font-1 {
+    -fx-font-size: 0.25em;
+}
+
+.group-tree-font-2 {
+    -fx-font-size: 0.35em;
+}
+
+.group-tree-font-3 {
+    -fx-font-size: 0.55em;
+}
+
+.group-tree-font-4 {
+    -fx-font-size: 0.75em;
+}
