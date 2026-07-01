@@ -697,7 +697,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> property.set(defaultValue));
     }
 
-    private void bindDouble(DoubleProperty property, String key, double defaultValue) {
+    protected void bindDouble(DoubleProperty property, String key, double defaultValue) {
         bindCustom(property, key, defaultValue,
                 (_, _, v) -> putDouble(key, v.doubleValue()),
                 () -> property.set(getDouble(key, defaultValue)),
@@ -715,7 +715,7 @@ public class JabRefCliPreferences implements CliPreferences {
     ///
     /// @param serializer   converts a value to its stored String form
     /// @param deserializer reconstructs a value from its stored String form
-    private <T> void bindObject(ObjectProperty<T> property,
+    protected <T> void bindObject(ObjectProperty<T> property,
                                 String key,
                                 T defaultValue,
                                 Function<T, String> serializer,
@@ -819,7 +819,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @param defaultList   restored on reset and reported as the default
     /// @param persist       rewrites the whole list to the backing store; receives the bound list, runs on every change
     /// @param loadFromStore reads the stored list, falling back to `defaultList` for absent entries
-    private <T> void bindCustomList(ObservableList<T> list,
+    protected <T> void bindCustomList(ObservableList<T> list,
                                     String key,
                                     List<T> defaultList,
                                     Consumer<? super ObservableList<T>> persist,

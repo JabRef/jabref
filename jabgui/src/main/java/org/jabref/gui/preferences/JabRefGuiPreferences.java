@@ -213,6 +213,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // endregion
 
     // region EntryEditorPreferences
+    // The tab list is persisted across the many SHOW_* flags and the CUSTOM_TAB_* series below; this synthetic key is
+    // never written to the backing store and only serves as the tabModels binding's reporting key in
+    // getPreferences()/getDefaults() (see bindMap/PUSH_APPLICATIONS_PATHS_KEY for the same pattern).
+    private static final String ENTRY_EDITOR_TABS = "entryEditorTabs";
     private static final String CUSTOM_TAB_NAME = "customTabName_";
     private static final String CUSTOM_TAB_FIELDS = "customTabFields_";
     private static final String AUTO_OPEN_FORM = "autoOpenForm";
@@ -287,11 +291,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public void clear() throws BackingStoreException {
         // ensure registration of bindings
         getCopyToPreferences();
+        getEntryEditorPreferences();
 
         super.clear();
 
         getDonationPreferences().setAll(DonationPreferences.getDefault());
-        getEntryEditorPreferences().setAll(EntryEditorPreferences.getDefault());
         getGroupsPreferences().setAll(GroupsPreferences.getDefault());
         getGuiPreferences().setAll(CoreGuiPreferences.getDefault());
         getSpecialFieldsPreferences().setAll(SpecialFieldsPreferences.getDefault());
@@ -317,12 +321,12 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public void importPreferences(Path path) throws JabRefException {
         // ensure registration of bindings
         getCopyToPreferences();
+        getEntryEditorPreferences();
 
         super.importPreferences(path);
 
         // in case of incomplete or corrupt xml fall back to current preferences
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
-        getEntryEditorPreferences().setAll(getEntryEditorPreferencesFromBackingStore(getEntryEditorPreferences()));
         getGroupsPreferences().setAll(getGroupsPreferencesFromBackingStore(getGroupsPreferences()));
         getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
         getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
@@ -365,36 +369,40 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         if (entryEditorPreferences != null) {
             return entryEditorPreferences;
         }
-        entryEditorPreferences = getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences.getDefault());
 
-        entryEditorPreferences.getTabModels().addListener((InvalidationListener) _ -> storeTabConfigs(entryEditorPreferences.getTabModels()));
-        EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (_, _, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
-        EasyBind.listen(entryEditorPreferences.showSourceTabByDefaultProperty(), (_, _, newValue) -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
-        EasyBind.listen(entryEditorPreferences.enableValidationProperty(), (_, _, newValue) -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
-        EasyBind.listen(entryEditorPreferences.allowIntegerEditionBibtexProperty(), (_, _, newValue) -> putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, newValue));
-        EasyBind.listen(entryEditorPreferences.autoLinkEnabledProperty(), (_, _, newValue) -> putBoolean(AUTOLINK_FILES_ENABLED, newValue));
-        EasyBind.listen(entryEditorPreferences.enableJournalPopupProperty(), (_, _, newValue) -> put(JOURNAL_POPUP, newValue.toString()));
-        EasyBind.listen(entryEditorPreferences.previewWidthDividerPositionProperty(), (_, _, newValue) -> putDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, newValue.doubleValue()));
-        EasyBind.listen(entryEditorPreferences.citationFetcherTypeProperty(), (_, _, newValue) -> put(CITATION_FETCHER_TYPE, newValue.name()));
-        EasyBind.listen(entryEditorPreferences.showUserCommentsFieldsProperty(), (_, _, newValue) -> putBoolean(SHOW_USER_COMMENTS_FIELDS, newValue));
-        EasyBind.listen(entryEditorPreferences.citationCountFetcherTypeProperty(), (_, _, newValue) -> put(CITATION_COUNT_FETCHER_TYPE, newValue.name()));
-        return entryEditorPreferences;
-    }
+        EntryEditorPreferences defaultValues = EntryEditorPreferences.getDefault();
 
-    private EntryEditorPreferences getEntryEditorPreferencesFromBackingStore(EntryEditorPreferences defaults) {
-        return new EntryEditorPreferences(
-                getEntryEditorTabs(defaults),
-                getBoolean(AUTO_OPEN_FORM, defaults.shouldOpenOnNewEntry()),
-                getBoolean(DEFAULT_SHOW_SOURCE, defaults.showSourceTabByDefault()),
-                getBoolean(VALIDATE_IN_ENTRY_EDITOR, defaults.shouldEnableValidation()),
-                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaults.shouldAllowIntegerEditionBibtex()),
-                getBoolean(AUTOLINK_FILES_ENABLED, defaults.autoLinkFilesEnabled()),
-                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP, defaults.shouldEnableJournalPopup().name())),
-                CitationFetcherType.valueOf(get(CITATION_FETCHER_TYPE, defaults.getCitationFetcherType().name())),
-                CitationCountFetcherType.valueOf(get(CITATION_COUNT_FETCHER_TYPE, defaults.getCitationCountFetcherType().name())),
-                getBoolean(SHOW_USER_COMMENTS_FIELDS, defaults.shouldShowUserCommentsFields()),
-                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaults.getPreviewWidthDividerPosition())
+        entryEditorPreferences = new EntryEditorPreferences(
+                getEntryEditorTabs(defaultValues),
+                getBoolean(AUTO_OPEN_FORM, defaultValues.shouldOpenOnNewEntry()),
+                getBoolean(DEFAULT_SHOW_SOURCE, defaultValues.showSourceTabByDefault()),
+                getBoolean(VALIDATE_IN_ENTRY_EDITOR, defaultValues.shouldEnableValidation()),
+                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaultValues.shouldAllowIntegerEditionBibtex()),
+                getBoolean(AUTOLINK_FILES_ENABLED, defaultValues.autoLinkFilesEnabled()),
+                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP, defaultValues.shouldEnableJournalPopup().name())),
+                CitationFetcherType.valueOf(get(CITATION_FETCHER_TYPE, defaultValues.getCitationFetcherType().name())),
+                CitationCountFetcherType.valueOf(get(CITATION_COUNT_FETCHER_TYPE, defaultValues.getCitationCountFetcherType().name())),
+                getBoolean(SHOW_USER_COMMENTS_FIELDS, defaultValues.shouldShowUserCommentsFields()),
+                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaultValues.getPreviewWidthDividerPosition())
         );
+
+        bindCustomList(entryEditorPreferences.getTabModels(), ENTRY_EDITOR_TABS, defaultValues.getTabModels(),
+                this::storeTabConfigs, () -> getEntryEditorTabs(defaultValues));
+        bindBoolean(entryEditorPreferences.shouldOpenOnNewEntryProperty(), AUTO_OPEN_FORM, defaultValues.shouldOpenOnNewEntry());
+        bindBoolean(entryEditorPreferences.showSourceTabByDefaultProperty(), DEFAULT_SHOW_SOURCE, defaultValues.showSourceTabByDefault());
+        bindBoolean(entryEditorPreferences.enableValidationProperty(), VALIDATE_IN_ENTRY_EDITOR, defaultValues.shouldEnableValidation());
+        bindBoolean(entryEditorPreferences.allowIntegerEditionBibtexProperty(), ALLOW_INTEGER_EDITION_BIBTEX, defaultValues.shouldAllowIntegerEditionBibtex());
+        bindBoolean(entryEditorPreferences.autoLinkEnabledProperty(), AUTOLINK_FILES_ENABLED, defaultValues.autoLinkFilesEnabled());
+        bindObject(entryEditorPreferences.enableJournalPopupProperty(), JOURNAL_POPUP, defaultValues.shouldEnableJournalPopup(),
+                EntryEditorPreferences.JournalPopupEnabled::name, EntryEditorPreferences.JournalPopupEnabled::fromString);
+        bindDouble(entryEditorPreferences.previewWidthDividerPositionProperty(), ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaultValues.getPreviewWidthDividerPosition());
+        bindObject(entryEditorPreferences.citationFetcherTypeProperty(), CITATION_FETCHER_TYPE, defaultValues.getCitationFetcherType(),
+                CitationFetcherType::name, CitationFetcherType::valueOf);
+        bindBoolean(entryEditorPreferences.showUserCommentsFieldsProperty(), SHOW_USER_COMMENTS_FIELDS, defaultValues.shouldShowUserCommentsFields());
+        bindObject(entryEditorPreferences.citationCountFetcherTypeProperty(), CITATION_COUNT_FETCHER_TYPE, defaultValues.getCitationCountFetcherType(),
+                CitationCountFetcherType::name, CitationCountFetcherType::valueOf);
+
+        return entryEditorPreferences;
     }
 
     /// The single source of truth for the entry editor's tab list: the user-configured field-set tabs,
