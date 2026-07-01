@@ -668,7 +668,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @param persistListener writes value changes to the backing store
     /// @param importFromStore loads the stored value (or the default) into the property
     /// @param resetToDefaults restores the property to its default value
-    private <T> void bindCustom(Property<T> property,
+    protected <T> void bindCustom(Property<T> property,
                                 String key,
                                 T defaultValue,
                                 ChangeListener<? super T> persistListener,
@@ -690,7 +690,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> property.set(defaultValue));
     }
 
-    private void bindInt(IntegerProperty property, String key, int defaultValue) {
+    protected void bindInt(IntegerProperty property, String key, int defaultValue) {
         bindCustom(property, key, defaultValue,
                 (_, _, v) -> putInt(key, v),
                 () -> property.set(getInt(key, defaultValue)),

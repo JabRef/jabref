@@ -13,7 +13,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
-import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn;
 
@@ -295,6 +294,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getMergeDialogPreferences();
         getAutoCompletePreferences();
         getGuiPreferences();
+        getWorkspacePreferences();
 
         super.clear();
 
@@ -307,7 +307,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
         getSearchDialogColumnPreferences().setAll(ColumnPreferences.getDefault());
         getUnlinkedFilesDialogPreferences().setAll(UnlinkedFilesDialogPreferences.getDefault());
-        getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
         getSidePanePreferences().setAll(SidePanePreferences.getDefault());
         getNameDisplayPreferences().setAll(NameDisplayPreferences.getDefault());
         getPreviewPreferences().setAll(PreviewPreferences.getDefaultWithStyles(
@@ -325,6 +324,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getMergeDialogPreferences();
         getAutoCompletePreferences();
         getGuiPreferences();
+        getWorkspacePreferences();
 
         super.importPreferences(path);
 
@@ -338,7 +338,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
         getSearchDialogColumnPreferences().setAll(getSearchDialogColumnPreferencesFromBackingStore(getSearchDialogColumnPreferences()));
         getUnlinkedFilesDialogPreferences().setAll(getUnlinkedFilesDialogPreferences());
-        getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
         getSidePanePreferences().setAll(getSidePanePreferencesFromBackingStore(getSidePanePreferences()));
         getNameDisplayPreferences().setAll(getNameDisplayPreferencesFromBackingStore(getNameDisplayPreferences()));
         getPreviewPreferences().setAll(getPreviewPreferencesFromBackingStore(getPreviewPreferences()));
@@ -630,48 +629,43 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return workspacePreferences;
         }
 
-        workspacePreferences = getWorkspacePreferencesFromBackingStore(WorkspacePreferences.getDefault());
+        WorkspacePreferences defaultValues = WorkspacePreferences.getDefault();
 
-        EasyBind.listen(workspacePreferences.languageProperty(), (_, oldValue, newValue) -> {
-            put(LANGUAGE, newValue.getId());
-            if (oldValue != newValue) {
-                Localization.setLanguage(newValue);
-            }
-        });
-
-        EasyBind.listen(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), (_, _, newValue) ->
-                putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
-        EasyBind.listen(workspacePreferences.mainFontSizeProperty(), (_, _, newValue) ->
-                putInt(MAIN_FONT_SIZE, newValue));
-        EasyBind.listen(workspacePreferences.themeProperty(), (_, _, newValue) ->
-                put(THEME, newValue.getName()));
-        EasyBind.listen(workspacePreferences.themeSyncOsProperty(), (_, _, newValue) ->
-                putBoolean(THEME_SYNC_OS, newValue));
-        EasyBind.listen(workspacePreferences.openLastEditedProperty(), (_, _, newValue) ->
-                putBoolean(OPEN_LAST_EDITED, newValue));
-        EasyBind.listen(workspacePreferences.showAdvancedHintsProperty(), (_, _, newValue) ->
-                putBoolean(SHOW_ADVANCED_HINTS, newValue));
-        EasyBind.listen(workspacePreferences.confirmDeleteProperty(), (_, _, newValue) ->
-                putBoolean(CONFIRM_DELETE, newValue));
-        EasyBind.listen(workspacePreferences.hideTabBarProperty(), (_, _, newValue) ->
-                putBoolean(CONFIRM_HIDE_TAB_BAR, newValue));
-        workspacePreferences.getSelectedSlrCatalogs().addListener((ListChangeListener<String>) _ ->
-                putStringList(SELECTED_SLR_CATALOGS, workspacePreferences.getSelectedSlrCatalogs()));
-        return workspacePreferences;
-    }
-
-    private WorkspacePreferences getWorkspacePreferencesFromBackingStore(WorkspacePreferences defaults) {
-        return new WorkspacePreferences(
+        workspacePreferences = new WorkspacePreferences(
                 getLanguage(),
-                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE, defaults.shouldOverrideDefaultFontSize()),
-                getInt(MAIN_FONT_SIZE, defaults.getMainFontSize()),
+                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE, defaultValues.shouldOverrideDefaultFontSize()),
+                getInt(MAIN_FONT_SIZE, defaultValues.getMainFontSize()),
                 new Theme(get(THEME, Theme.SYSTEM)),
-                getBoolean(THEME_SYNC_OS, defaults.shouldThemeSyncOs()),
-                getBoolean(OPEN_LAST_EDITED, defaults.shouldOpenLastEdited()),
-                getBoolean(SHOW_ADVANCED_HINTS, defaults.shouldShowAdvancedHints()),
-                getBoolean(CONFIRM_DELETE, defaults.shouldConfirmDelete()),
-                getBoolean(CONFIRM_HIDE_TAB_BAR, defaults.shouldHideTabBar()),
+                getBoolean(THEME_SYNC_OS, defaultValues.shouldThemeSyncOs()),
+                getBoolean(OPEN_LAST_EDITED, defaultValues.shouldOpenLastEdited()),
+                getBoolean(SHOW_ADVANCED_HINTS, defaultValues.shouldShowAdvancedHints()),
+                getBoolean(CONFIRM_DELETE, defaultValues.shouldConfirmDelete()),
+                getBoolean(CONFIRM_HIDE_TAB_BAR, defaultValues.shouldHideTabBar()),
                 getStringList(SELECTED_SLR_CATALOGS));
+
+        bindCustom(workspacePreferences.languageProperty(), LANGUAGE, defaultValues.getLanguage(),
+                (_, oldValue, newValue) -> {
+                    put(LANGUAGE, newValue.getId());
+                    if (oldValue != newValue) {
+                        Localization.setLanguage(newValue);
+                    }
+                },
+                () -> workspacePreferences.languageProperty().set(getLanguage()),
+                () -> workspacePreferences.languageProperty().set(defaultValues.getLanguage()));
+        bindBoolean(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), OVERRIDE_DEFAULT_FONT_SIZE, defaultValues.shouldOverrideDefaultFontSize());
+        bindInt(workspacePreferences.mainFontSizeProperty(), MAIN_FONT_SIZE, defaultValues.getMainFontSize());
+        bindObject(workspacePreferences.themeProperty(), THEME, defaultValues.getTheme(),
+                Theme::getName, Theme::new);
+        bindBoolean(workspacePreferences.themeSyncOsProperty(), THEME_SYNC_OS, defaultValues.shouldThemeSyncOs());
+        bindBoolean(workspacePreferences.openLastEditedProperty(), OPEN_LAST_EDITED, defaultValues.shouldOpenLastEdited());
+        bindBoolean(workspacePreferences.showAdvancedHintsProperty(), SHOW_ADVANCED_HINTS, defaultValues.shouldShowAdvancedHints());
+        bindBoolean(workspacePreferences.confirmDeleteProperty(), CONFIRM_DELETE, defaultValues.shouldConfirmDelete());
+        bindBoolean(workspacePreferences.hideTabBarProperty(), CONFIRM_HIDE_TAB_BAR, defaultValues.shouldHideTabBar());
+        bindCustomList(workspacePreferences.getSelectedSlrCatalogs(), SELECTED_SLR_CATALOGS, defaultValues.getSelectedSlrCatalogs(),
+                boundList -> putStringList(SELECTED_SLR_CATALOGS, boundList),
+                () -> getStringList(SELECTED_SLR_CATALOGS));
+
+        return workspacePreferences;
     }
     // endregion
 
