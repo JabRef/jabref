@@ -578,7 +578,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
 
     @Test
     void performRawSearchQueryPagedWithBlankQueryReturnsEmptyPage() throws FetcherException {
-        assertEquals(List.of(), fetcher.performRawSearchQueryPaged("", 0).getContent());
+        assertTrue(fetcher.performRawSearchQueryPaged("", 0).getContent().isEmpty());
     }
 
     @Test
