@@ -5,7 +5,7 @@ parent: Code Howtos
 
 JabKit is JabRef's command-line toolkit.
 
-It is currently shipped through `jpackage` (installer and portable build, both bundling a JDK) and [JBang](../../.jbang) (which downloads a JRE plus `jablib`). For a command-line tool, **JVM start-up is the bottleneck**.
+It is currently shipped through `jpackage` (installer and portable build, both bundling a JDK) and [JBang](https://github.com/JabRef/jabref/tree/main/.jbang#running-jabkit) (which downloads a JRE plus `jablib`). For a command-line tool, **JVM start-up is the bottleneck**.
 
 [GraalVM Native Image](https://www.graalvm.org/latest/reference-manual/native-image/) turns JabKit into a self-contained executable that starts in milliseconds. JabKit is the first target because it is headless; the JabLS, JabSrv and JabGui come later.
 
@@ -20,7 +20,7 @@ Native Image compilation has two inputs: the **code** to compile (JabKit plus ev
 The metadata comes from three places:
 
 | Source | Who maintains it | What it covers |
-|---|---|---|
+| --- | --- | --- |
 | [GraalVM Reachability Metadata Repository](https://github.com/oracle/graalvm-reachability-metadata) | Upstream/community | Common third-party libraries |
 | [picocli-generated native-image config](https://github.com/remkop/picocli/blob/main/picocli-codegen/README.adoc) | picocli annotation processor | JabKit's command model |
 | `reachability-metadata.json` | JabRef | Gaps not covered by the first two sources |
@@ -58,6 +58,7 @@ jabkit/src/main/resources/META-INF/native-image/org.jabref/jabkit/
 jablib/src/main/resources/META-INF/native-image/org.jabref/jablib/
     reachability-metadata.json      <- JabLib's own (core library)
 ```
+
 Both use GraalVM's unified [`reachability-metadata.json`](https://www.graalvm.org/latest/reference-manual/native-image/metadata/) schema, one file with `reflection`, `resources`, and `bundles` sections (JNI is expressed as a `jniAccessible` flag on reflection entries).
 
 > [!NOTE]
@@ -165,7 +166,7 @@ clitest src/test/nativeimage/jabkit-offline.md
 ### Test files
 
 | File | Scope | Runs |
-|---|---|---|
+| --- | --- | --- |
 | `jabkit-offline.md` | Commands needing no network | Linux and macOS |
 | `jabkit-offline-pdf.md` | The PDF/AWT path | Linux only; see [Liberica NIK](#liberica-nik) |
 | `jabkit-online.md` | Commands hitting external APIs | Opt-in with `run-online-tests` |
