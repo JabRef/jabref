@@ -46,12 +46,6 @@ public class XmpPreferences {
         return new XmpPreferences();
     }
 
-    public void setAll(XmpPreferences other) {
-        this.useXmpPrivacyFilter.set(other.shouldUseXmpPrivacyFilter());
-        this.xmpPrivacyFilter.clear();
-        this.xmpPrivacyFilter.addAll(other.getXmpPrivacyFilter());
-    }
-
     public boolean shouldUseXmpPrivacyFilter() {
         return useXmpPrivacyFilter.getValue();
     }

@@ -14,7 +14,7 @@ public class SSLPreferences {
         this(
                 Directories.getSslDirectory().resolve("truststore.jks")  // Truststore path
         );
-    }        // SSL
+    }
 
     public SSLPreferences(Path truststorePath) {
         this.truststorePath = new SimpleObjectProperty<>(truststorePath);
@@ -24,11 +24,11 @@ public class SSLPreferences {
         return new SSLPreferences();
     }
 
-    public void setAll(SSLPreferences preferences) {
-        this.truststorePath.set(preferences.getTruststorePath());
-    }
-
     public Path getTruststorePath() {
         return truststorePath.getValue();
+    }
+
+    public ObjectProperty<Path> truststorePathProperty() {
+        return truststorePath;
     }
 }
