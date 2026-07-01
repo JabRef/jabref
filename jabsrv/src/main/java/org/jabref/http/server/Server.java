@@ -118,8 +118,7 @@ public class Server {
         ServiceLocatorUtilities.addOneConstant(serviceLocator, preferences, "preferences", CliPreferences.class);
         ServiceLocatorUtilities.addOneConstant(serviceLocator, new CitationCacheService());
         ServiceLocatorUtilities.addOneConstant(serviceLocator, new FormatterService());
-        ServiceLocatorUtilities.addOneConstant(
-                serviceLocator, preferences.getCustomEntryTypesRepository(), "entrytypesmanager", BibEntryTypesManager.class);
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, preferences.getCustomEntryTypesRepository(), "entrytypesmanager", BibEntryTypesManager.class);
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
 
         // see https://stackoverflow.com/a/33794265/873282
