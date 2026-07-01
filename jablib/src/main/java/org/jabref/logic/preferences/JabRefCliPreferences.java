@@ -704,7 +704,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> property.set(defaultValue));
     }
 
-    private void bindString(StringProperty property, String key, String defaultValue) {
+    protected void bindString(StringProperty property, String key, String defaultValue) {
         bindCustom(property, key, defaultValue,
                 (_, _, v) -> put(key, v),
                 () -> property.set(get(key, defaultValue)),

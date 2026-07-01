@@ -295,6 +295,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getAutoCompletePreferences();
         getGuiPreferences();
         getWorkspacePreferences();
+        getUnlinkedFilesDialogPreferences();
 
         super.clear();
 
@@ -306,7 +307,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getMainTablePreferences().setAll(MainTablePreferences.getDefault());
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
         getSearchDialogColumnPreferences().setAll(ColumnPreferences.getDefault());
-        getUnlinkedFilesDialogPreferences().setAll(UnlinkedFilesDialogPreferences.getDefault());
         getSidePanePreferences().setAll(SidePanePreferences.getDefault());
         getNameDisplayPreferences().setAll(NameDisplayPreferences.getDefault());
         getPreviewPreferences().setAll(PreviewPreferences.getDefaultWithStyles(
@@ -325,6 +325,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getAutoCompletePreferences();
         getGuiPreferences();
         getWorkspacePreferences();
+        getUnlinkedFilesDialogPreferences();
 
         super.importPreferences(path);
 
@@ -337,7 +338,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
         getSearchDialogColumnPreferences().setAll(getSearchDialogColumnPreferencesFromBackingStore(getSearchDialogColumnPreferences()));
-        getUnlinkedFilesDialogPreferences().setAll(getUnlinkedFilesDialogPreferences());
         getSidePanePreferences().setAll(getSidePanePreferencesFromBackingStore(getSidePanePreferences()));
         getNameDisplayPreferences().setAll(getNameDisplayPreferencesFromBackingStore(getNameDisplayPreferences()));
         getPreviewPreferences().setAll(getPreviewPreferencesFromBackingStore(getPreviewPreferences()));
@@ -676,21 +676,21 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return unlinkedFilesDialogPreferences;
         }
 
-        unlinkedFilesDialogPreferences = getUnlinkedFilesDialogPreferencesFromBackingStore(UnlinkedFilesDialogPreferences.getDefault());
+        UnlinkedFilesDialogPreferences defaultValues = UnlinkedFilesDialogPreferences.getDefault();
 
-        EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedExtensionProperty(), (_, _, newValue) -> put(UNLINKED_FILES_SELECTED_EXTENSION, newValue));
-        EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedDateRangeProperty(), (_, _, newValue) -> put(UNLINKED_FILES_SELECTED_DATE_RANGE, newValue.name()));
-        EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedSortProperty(), (_, _, newValue) -> put(UNLINKED_FILES_SELECTED_SORT, newValue.name()));
+        unlinkedFilesDialogPreferences = new UnlinkedFilesDialogPreferences(
+                get(UNLINKED_FILES_SELECTED_EXTENSION, defaultValues.getUnlinkedFilesSelectedExtension()),
+                DateRange.parse(get(UNLINKED_FILES_SELECTED_DATE_RANGE, defaultValues.getUnlinkedFilesSelectedDateRange().name())),
+                ExternalFileSorter.parse(get(UNLINKED_FILES_SELECTED_SORT, defaultValues.getUnlinkedFilesSelectedSort().name()))
+        );
+
+        bindString(unlinkedFilesDialogPreferences.unlinkedFilesSelectedExtensionProperty(), UNLINKED_FILES_SELECTED_EXTENSION, defaultValues.getUnlinkedFilesSelectedExtension());
+        bindObject(unlinkedFilesDialogPreferences.unlinkedFilesSelectedDateRangeProperty(), UNLINKED_FILES_SELECTED_DATE_RANGE, defaultValues.getUnlinkedFilesSelectedDateRange(),
+                DateRange::name, DateRange::parse);
+        bindObject(unlinkedFilesDialogPreferences.unlinkedFilesSelectedSortProperty(), UNLINKED_FILES_SELECTED_SORT, defaultValues.getUnlinkedFilesSelectedSort(),
+                ExternalFileSorter::name, ExternalFileSorter::parse);
 
         return unlinkedFilesDialogPreferences;
-    }
-
-    private UnlinkedFilesDialogPreferences getUnlinkedFilesDialogPreferencesFromBackingStore(UnlinkedFilesDialogPreferences defaults) {
-        return new UnlinkedFilesDialogPreferences(
-                get(UNLINKED_FILES_SELECTED_EXTENSION, defaults.getUnlinkedFilesSelectedExtension()),
-                DateRange.parse(get(UNLINKED_FILES_SELECTED_DATE_RANGE, defaults.getUnlinkedFilesSelectedDateRange().name())),
-                ExternalFileSorter.parse(get(UNLINKED_FILES_SELECTED_SORT, defaults.getUnlinkedFilesSelectedSort().name()))
-        );
     }
     // endregion
 
