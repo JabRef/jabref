@@ -294,12 +294,12 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getEntryEditorPreferences();
         getMergeDialogPreferences();
         getAutoCompletePreferences();
+        getGuiPreferences();
 
         super.clear();
 
         getDonationPreferences().setAll(DonationPreferences.getDefault());
         getGroupsPreferences().setAll(GroupsPreferences.getDefault());
-        getGuiPreferences().setAll(CoreGuiPreferences.getDefault());
         getSpecialFieldsPreferences().setAll(SpecialFieldsPreferences.getDefault());
         getExternalApplicationsPreferences().setAll(ExternalApplicationsPreferences.getDefault());
         getMainTableColumnPreferences().setAll(ColumnPreferences.getDefault());
@@ -324,13 +324,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getEntryEditorPreferences();
         getMergeDialogPreferences();
         getAutoCompletePreferences();
+        getGuiPreferences();
 
         super.importPreferences(path);
 
         // in case of incomplete or corrupt xml fall back to current preferences
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
         getGroupsPreferences().setAll(getGroupsPreferencesFromBackingStore(getGroupsPreferences()));
-        getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
         getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
         getExternalApplicationsPreferences().setAll(getExternalApplicationsPreferencesFromBackingStore(getExternalApplicationsPreferences()));
         getMainTableColumnPreferences().setAll(getMainTableColumnPreferencesFromBackingStore(getMainTableColumnPreferences()));
@@ -600,28 +600,26 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return coreGuiPreferences;
         }
 
-        coreGuiPreferences = getCoreGuiPreferencesFromBackingStore(CoreGuiPreferences.getDefault());
+        CoreGuiPreferences defaultValues = CoreGuiPreferences.getDefault();
 
-        EasyBind.listen(coreGuiPreferences.positionXProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_POS_X, newValue.doubleValue()));
-        EasyBind.listen(coreGuiPreferences.positionYProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_POS_Y, newValue.doubleValue()));
-        EasyBind.listen(coreGuiPreferences.sizeXProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_WIDTH, newValue.doubleValue()));
-        EasyBind.listen(coreGuiPreferences.sizeYProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_HEIGHT, newValue.doubleValue()));
-        EasyBind.listen(coreGuiPreferences.windowMaximisedProperty(), (_, _, newValue) -> putBoolean(MAIN_WINDOW_MAXIMISED, newValue));
-        EasyBind.listen(coreGuiPreferences.horizontalDividerPositionProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_SIDEPANE_WIDTH, newValue.doubleValue()));
-        EasyBind.listen(coreGuiPreferences.getVerticalDividerPositionProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_EDITOR_HEIGHT, newValue.doubleValue()));
+        coreGuiPreferences = new CoreGuiPreferences(
+                getDouble(MAIN_WINDOW_POS_X, defaultValues.getPositionX()),
+                getDouble(MAIN_WINDOW_POS_Y, defaultValues.getPositionY()),
+                getDouble(MAIN_WINDOW_WIDTH, defaultValues.getSizeX()),
+                getDouble(MAIN_WINDOW_HEIGHT, defaultValues.getSizeY()),
+                getBoolean(MAIN_WINDOW_MAXIMISED, defaultValues.isWindowMaximised()),
+                getDouble(MAIN_WINDOW_SIDEPANE_WIDTH, defaultValues.getHorizontalDividerPosition()),
+                getDouble(MAIN_WINDOW_EDITOR_HEIGHT, defaultValues.getVerticalDividerPosition()));
+
+        bindDouble(coreGuiPreferences.positionXProperty(), MAIN_WINDOW_POS_X, defaultValues.getPositionX());
+        bindDouble(coreGuiPreferences.positionYProperty(), MAIN_WINDOW_POS_Y, defaultValues.getPositionY());
+        bindDouble(coreGuiPreferences.sizeXProperty(), MAIN_WINDOW_WIDTH, defaultValues.getSizeX());
+        bindDouble(coreGuiPreferences.sizeYProperty(), MAIN_WINDOW_HEIGHT, defaultValues.getSizeY());
+        bindBoolean(coreGuiPreferences.windowMaximisedProperty(), MAIN_WINDOW_MAXIMISED, defaultValues.isWindowMaximised());
+        bindDouble(coreGuiPreferences.horizontalDividerPositionProperty(), MAIN_WINDOW_SIDEPANE_WIDTH, defaultValues.getHorizontalDividerPosition());
+        bindDouble(coreGuiPreferences.getVerticalDividerPositionProperty(), MAIN_WINDOW_EDITOR_HEIGHT, defaultValues.getVerticalDividerPosition());
 
         return coreGuiPreferences;
-    }
-
-    private CoreGuiPreferences getCoreGuiPreferencesFromBackingStore(CoreGuiPreferences defaults) {
-        return new CoreGuiPreferences(
-                getDouble(MAIN_WINDOW_POS_X, defaults.getPositionX()),
-                getDouble(MAIN_WINDOW_POS_Y, defaults.getPositionY()),
-                getDouble(MAIN_WINDOW_WIDTH, defaults.getSizeX()),
-                getDouble(MAIN_WINDOW_HEIGHT, defaults.getSizeY()),
-                getBoolean(MAIN_WINDOW_MAXIMISED, defaults.isWindowMaximised()),
-                getDouble(MAIN_WINDOW_SIDEPANE_WIDTH, defaults.getHorizontalDividerPosition()),
-                getDouble(MAIN_WINDOW_EDITOR_HEIGHT, defaults.getVerticalDividerPosition()));
     }
     // endregion
 
