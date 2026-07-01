@@ -13,14 +13,17 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
@@ -106,19 +109,39 @@ public class BrowserExtensionFulltextFetcher implements FulltextFetcher {
                                         String requestBody,
                                         ExecutorService executor) {
         CompletableFuture<Optional<URL>> winner = new CompletableFuture<>();
+        List<Future<?>> tasks = new ArrayList<>(providers.size());
 
-        @SuppressWarnings("unchecked")
-        CompletableFuture<Void>[] tasks = providers.stream()
-                                                   .map(provider -> CompletableFuture.runAsync(() -> {
-                                                       Optional<URL> outcome = tryProvider(provider, requestBody, executor);
-                                                       if (outcome.isPresent()) {
-                                                           winner.complete(outcome);
-                                                       }
-                                                   }, executor))
-                                                   .toArray(CompletableFuture[]::new);
+        for (BrowserExtensionProvider provider : providers) {
+            tasks.add(executor.submit(() -> {
+                if (winner.isDone()) {
+                    return;
+                }
+                tryProvider(provider, requestBody, executor)
+                        .ifPresent(url -> winner.complete(Optional.of(url)));
+            }));
+        }
 
-        CompletableFuture.allOf(tasks).whenComplete((unused, throwable) ->
-                winner.complete(Optional.empty()));
+        // Once a winner is chosen, cancel the losers. Future#cancel(true)
+        // interrupts the blocking HttpClient#send in tryProvider, which
+        // together with the try-with-resources on HttpClient closes the
+        // underlying socket — the cancellation-via-connection-close signal
+        // the wire spec expects (req~bxf.cancellation~1).
+        winner.thenRun(() -> tasks.forEach(f -> f.cancel(true)));
+
+        // Fallback: if every task finishes without a hit, resolve empty.
+        CompletableFuture.runAsync(() -> {
+            for (Future<?> task : tasks) {
+                try {
+                    task.get();
+                } catch (CancellationException | ExecutionException ignored) {
+                    // Losers get cancelled once winner completes — expected.
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+            }
+            winner.complete(Optional.empty());
+        }, executor);
 
         try {
             return winner.get(socketTimeout.toMillis(), TimeUnit.MILLISECONDS);
@@ -131,6 +154,10 @@ public class BrowserExtensionFulltextFetcher implements FulltextFetcher {
         } catch (ExecutionException e) {
             LOGGER.debug("Browser-extension fulltext race failed", e);
             return Optional.empty();
+        } finally {
+            // Belt-and-braces: if we exit via timeout or interrupt without a
+            // winner, make sure the in-flight tasks unwind too.
+            tasks.forEach(f -> f.cancel(true));
         }
     }
 
