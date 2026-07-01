@@ -289,7 +289,7 @@ class StudyRepositoryTest {
         List<StudyQuery> lockQueries = lock.getQueries();
         assertEquals(3, lockQueries.size());
 
-        StudyQuery quantumLock = lockQueries.get(0);
+        StudyQuery quantumLock = lockQueries.getFirst();
         assertEquals("Quantum", quantumLock.getQuery());
         assertEquals(Map.of("ArXiv", "Quantum", "Springer", "Quantum"), quantumLock.getCatalogSpecific());
 
