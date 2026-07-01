@@ -868,7 +868,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @param defaultSet   restored on reset and reported as the default
     /// @param serializer   rewrites the whole set to the backing store; receives the bound set, runs on every change
     /// @param deserializer reads the stored set, falling back to `defaultSet` for absent entries
-    private <T> void bindSet(ObservableSet<T> set,
+    protected <T> void bindSet(ObservableSet<T> set,
                              String key,
                              Set<T> defaultSet,
                              Consumer<? super ObservableSet<T>> serializer,

@@ -293,6 +293,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getCopyToPreferences();
         getEntryEditorPreferences();
         getMergeDialogPreferences();
+        getAutoCompletePreferences();
 
         super.clear();
 
@@ -307,7 +308,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getSearchDialogColumnPreferences().setAll(ColumnPreferences.getDefault());
         getUnlinkedFilesDialogPreferences().setAll(UnlinkedFilesDialogPreferences.getDefault());
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
-        getAutoCompletePreferences().setAll(AutoCompletePreferences.getDefault());
         getSidePanePreferences().setAll(SidePanePreferences.getDefault());
         getNameDisplayPreferences().setAll(NameDisplayPreferences.getDefault());
         getPreviewPreferences().setAll(PreviewPreferences.getDefaultWithStyles(
@@ -323,6 +323,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getCopyToPreferences();
         getEntryEditorPreferences();
         getMergeDialogPreferences();
+        getAutoCompletePreferences();
 
         super.importPreferences(path);
 
@@ -338,7 +339,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getSearchDialogColumnPreferences().setAll(getSearchDialogColumnPreferencesFromBackingStore(getSearchDialogColumnPreferences()));
         getUnlinkedFilesDialogPreferences().setAll(getUnlinkedFilesDialogPreferences());
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
-        getAutoCompletePreferences().setAll(getAutoCompletePreferencesFromBackingStore(getAutoCompletePreferences()));
         getSidePanePreferences().setAll(getSidePanePreferencesFromBackingStore(getSidePanePreferences()));
         getNameDisplayPreferences().setAll(getNameDisplayPreferencesFromBackingStore(getNameDisplayPreferences()));
         getPreviewPreferences().setAll(getPreviewPreferencesFromBackingStore(getPreviewPreferences()));
@@ -568,44 +568,29 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return autoCompletePreferences;
         }
 
-        autoCompletePreferences = getAutoCompletePreferencesFromBackingStore(AutoCompletePreferences.getDefault());
+        AutoCompletePreferences defaultValues = AutoCompletePreferences.getDefault();
 
-        EasyBind.listen(autoCompletePreferences.autoCompleteProperty(), (_, _, newValue) -> putBoolean(AUTO_COMPLETE, newValue));
-        EasyBind.listen(autoCompletePreferences.firstNameModeProperty(), (_, _, newValue) -> put(AUTOCOMPLETER_FIRSTNAME_MODE, newValue.name()));
-        autoCompletePreferences.getCompleteFields().addListener((SetChangeListener<Field>) _ ->
-                putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteFields().stream()
-                                                                                    .map(Field::getName)
-                                                                                    .collect(Collectors.toList())));
-        EasyBind.listen(autoCompletePreferences.nameFormatProperty(), (_, _, _) -> {
-            if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.BOTH) {
-                putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
-                putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
-            } else if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.LAST_FIRST) {
-                putBoolean(AUTOCOMPLETER_LAST_FIRST, true);
-                putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
-            } else {
-                putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
-                putBoolean(AUTOCOMPLETER_FIRST_LAST, true);
-            }
-        });
+        autoCompletePreferences = new AutoCompletePreferences(
+                getBoolean(AUTO_COMPLETE, defaultValues.shouldAutoComplete()),
+                AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE, defaultValues.getFirstNameMode().name())),
+                readExclusiveFlags(defaultValues.getNameFormat(), AutoCompletePreferences.NameFormat.BOTH,
+                        Map.entry(AUTOCOMPLETER_LAST_FIRST, AutoCompletePreferences.NameFormat.LAST_FIRST),
+                        Map.entry(AUTOCOMPLETER_FIRST_LAST, AutoCompletePreferences.NameFormat.FIRST_LAST)),
+                getFieldSequencedSet(AUTOCOMPLETER_COMPLETE_FIELDS, defaultValues.getCompleteFields()));
+
+        bindBoolean(autoCompletePreferences.autoCompleteProperty(), AUTO_COMPLETE, defaultValues.shouldAutoComplete());
+        bindObject(autoCompletePreferences.firstNameModeProperty(), AUTOCOMPLETER_FIRSTNAME_MODE, defaultValues.getFirstNameMode(),
+                AutoCompleteFirstNameMode::name, AutoCompleteFirstNameMode::parse);
+        // NameFormat.BOTH is the implicit value (both flags stored false); LAST_FIRST wins over FIRST_LAST on the
+        // non-canonical "both true" state, per readExclusiveFlags.
+        bindExclusiveFlags(autoCompletePreferences.nameFormatProperty(), defaultValues.getNameFormat(), AutoCompletePreferences.NameFormat.BOTH,
+                Map.entry(AUTOCOMPLETER_LAST_FIRST, AutoCompletePreferences.NameFormat.LAST_FIRST),
+                Map.entry(AUTOCOMPLETER_FIRST_LAST, AutoCompletePreferences.NameFormat.FIRST_LAST));
+        bindSet(autoCompletePreferences.getCompleteFields(), AUTOCOMPLETER_COMPLETE_FIELDS, defaultValues.getCompleteFields(),
+                set -> putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, set.stream().map(Field::getName).collect(Collectors.toList())),
+                () -> getFieldSequencedSet(AUTOCOMPLETER_COMPLETE_FIELDS, defaultValues.getCompleteFields()));
 
         return autoCompletePreferences;
-    }
-
-    private AutoCompletePreferences getAutoCompletePreferencesFromBackingStore(AutoCompletePreferences defaults) {
-        AutoCompletePreferences.NameFormat nameFormat = defaults.getNameFormat();
-        final boolean firstLast = getBoolean(AUTOCOMPLETER_FIRST_LAST, false);
-        final boolean lastFirst = getBoolean(AUTOCOMPLETER_LAST_FIRST, false);
-        if (firstLast && !lastFirst) {
-            nameFormat = AutoCompletePreferences.NameFormat.FIRST_LAST;
-        } else if (!firstLast && lastFirst) {
-            nameFormat = AutoCompletePreferences.NameFormat.LAST_FIRST;
-        }
-
-        return new AutoCompletePreferences(getBoolean(AUTO_COMPLETE, defaults.shouldAutoComplete()),
-                AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE, defaults.getFirstNameMode().name())),
-                nameFormat,
-                getFieldSequencedSet(AUTOCOMPLETER_COMPLETE_FIELDS, defaults.getCompleteFields()));
     }
     // endregion
 
