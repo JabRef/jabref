@@ -61,6 +61,9 @@ public class EntriesResource {
     @Inject
     UiMessageHandler uiMessageHandler;
 
+    @Inject
+    BibEntryTypesManager entryTypesManager;
+
     /// Appends BibTeX entries to the currently selected library.
     ///
     /// [impl->req~jabsrv.import.group~1]
@@ -107,7 +110,7 @@ public class EntriesResource {
         BibWriter bibWriter = new BibWriter(rawEntry, "\n");
         BibEntryWriter entryWriter = new BibEntryWriter(
                 new FieldWriter(preferences.getFieldPreferences()),
-                new BibEntryTypesManager());
+                entryTypesManager);
         entryWriter.write(parsed, bibWriter, BibDatabaseMode.BIBTEX);
 
         uiMessageHandler.handleUiCommands(List.of(targetLibrary
