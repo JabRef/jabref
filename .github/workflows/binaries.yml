@@ -630,105 +630,105 @@ jobs:
         if: startsWith(matrix.os, 'windows')
 
       # jars already exist - thus, these calls build on the jar result.
-
-      - uses: ./.github/actions/package
-        name: Package JabRef Language Server
-        id: jabls-cli
-        with:
-          component: jabls-cli
-          componentShort: jabls
-          branchName: ${{ needs.pre-build.outputs.branch }}
-          AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
-          Major: ${{ needs.pre-build.outputs.Major }}
-          Minor: ${{ needs.pre-build.outputs.Minor }}
-          InformationalVersion: ${{ needs.pre-build.outputs.InformationalVersion }}
-          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
-          os: ${{ matrix.os }}
-          displayName: ${{ matrix.displayName }}
-          archivePortable: ${{ matrix.archivePortableJabLS }}
-          archForDebianRepack: ${{ matrix.archForDebianRepack }}
-          suffix: ${{ matrix.suffix }}
-          shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
-          uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
-          subdir: "/tools"
-          secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
-          astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
-          biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
-          ieeeApiKey: ${{ secrets.IEEEAPIKey }}
-          springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
-      - uses: ./.github/actions/package
-        name: Package JabRef HTTP Server
-        with:
-          component: jabsrv-cli
-          componentShort: jabsrv
-          branchName: ${{ needs.pre-build.outputs.branch }}
-          AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
-          Major: ${{ needs.pre-build.outputs.Major }}
-          Minor: ${{ needs.pre-build.outputs.Minor }}
-          InformationalVersion: ${{ needs.pre-build.outputs.InformationalVersion }}
-          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
-          os: ${{ matrix.os }}
-          displayName: ${{ matrix.displayName }}
-          archivePortable: 'NONE'
-          archForDebianRepack: ${{ matrix.archForDebianRepack }}
-          suffix: ${{ matrix.suffix }}
-          shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
-          uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
-          subdir: "/tools"
-          secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
-          astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
-          biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
-          ieeeApiKey: ${{ secrets.IEEEAPIKey }}
-          springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
-      - uses: ./.github/actions/package
-        name: Package JabGUI
-        id: jabgui
-        with:
-          component: jabgui
-          componentShort: jabgui
-          branchName: ${{ needs.pre-build.outputs.branch }}
-          AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
-          Major: ${{ needs.pre-build.outputs.Major }}
-          Minor: ${{ needs.pre-build.outputs.Minor }}
-          InformationalVersion: ${{ needs.pre-build.outputs.InformationalVersion }}
-          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
-          os: ${{ matrix.os }}
-          displayName: ${{ matrix.displayName }}
-          archivePortable: ${{ matrix.archivePortable }}
-          archForDebianRepack: ${{ matrix.archForDebianRepack }}
-          suffix: ${{ matrix.suffix }}
-          shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
-          uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
-          subdir: ""
-          secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
-          astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
-          biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
-          ieeeApiKey: ${{ secrets.IEEEAPIKey }}
-          springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
-      - uses: ./.github/actions/package
-        name: Package JabKit
-        with:
-          component: jabkit
-          componentShort: jabkit
-          branchName: ${{ needs.pre-build.outputs.branch }}
-          AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
-          Major: ${{ needs.pre-build.outputs.Major }}
-          Minor: ${{ needs.pre-build.outputs.Minor }}
-          InformationalVersion: ${{ needs.pre-build.outputs.InformationalVersion }}
-          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
-          os: ${{ matrix.os }}
-          displayName: ${{ matrix.displayName }}
-          archivePortable: ${{ matrix.archivePortableJabKit }}
-          archForDebianRepack: ${{ matrix.archForDebianRepack }}
-          suffix: ${{ matrix.suffix }}
-          shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
-          uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
-          subdir: "/tools"
-          secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
-          astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
-          biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
-          ieeeApiKey: ${{ secrets.IEEEAPIKey }}
-          springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
+      - parallel:
+        - uses: ./.github/actions/package
+          name: Package JabRef Language Server
+          id: jabls-cli
+          with:
+            component: jabls-cli
+            componentShort: jabls
+            branchName: ${{ needs.pre-build.outputs.branch }}
+            AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
+            Major: ${{ needs.pre-build.outputs.Major }}
+            Minor: ${{ needs.pre-build.outputs.Minor }}
+            InformationalVersion: ${{ needs.pre-build.outputs.InformationalVersion }}
+            diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+            os: ${{ matrix.os }}
+            displayName: ${{ matrix.displayName }}
+            archivePortable: ${{ matrix.archivePortableJabLS }}
+            archForDebianRepack: ${{ matrix.archForDebianRepack }}
+            suffix: ${{ matrix.suffix }}
+            shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
+            uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+            subdir: "/tools"
+            secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
+            astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+            biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
+            ieeeApiKey: ${{ secrets.IEEEAPIKey }}
+            springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
+        - uses: ./.github/actions/package
+          name: Package JabRef HTTP Server
+          with:
+            component: jabsrv-cli
+            componentShort: jabsrv
+            branchName: ${{ needs.pre-build.outputs.branch }}
+            AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
+            Major: ${{ needs.pre-build.outputs.Major }}
+            Minor: ${{ needs.pre-build.outputs.Minor }}
+            InformationalVersion: ${{ needs.pre-build.outputs.InformationalVersion }}
+            diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+            os: ${{ matrix.os }}
+            displayName: ${{ matrix.displayName }}
+            archivePortable: 'NONE'
+            archForDebianRepack: ${{ matrix.archForDebianRepack }}
+            suffix: ${{ matrix.suffix }}
+            shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
+            uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+            subdir: "/tools"
+            secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
+            astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+            biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
+            ieeeApiKey: ${{ secrets.IEEEAPIKey }}
+            springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
+        - uses: ./.github/actions/package
+          name: Package JabGUI
+          id: jabgui
+          with:
+            component: jabgui
+            componentShort: jabgui
+            branchName: ${{ needs.pre-build.outputs.branch }}
+            AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
+            Major: ${{ needs.pre-build.outputs.Major }}
+            Minor: ${{ needs.pre-build.outputs.Minor }}
+            InformationalVersion: ${{ needs.pre-build.outputs.InformationalVersion }}
+            diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+            os: ${{ matrix.os }}
+            displayName: ${{ matrix.displayName }}
+            archivePortable: ${{ matrix.archivePortable }}
+            archForDebianRepack: ${{ matrix.archForDebianRepack }}
+            suffix: ${{ matrix.suffix }}
+            shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
+            uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+            subdir: ""
+            secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
+            astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+            biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
+            ieeeApiKey: ${{ secrets.IEEEAPIKey }}
+            springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
+        - uses: ./.github/actions/package
+          name: Package JabKit
+          with:
+            component: jabkit
+            componentShort: jabkit
+            branchName: ${{ needs.pre-build.outputs.branch }}
+            AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
+            Major: ${{ needs.pre-build.outputs.Major }}
+            Minor: ${{ needs.pre-build.outputs.Minor }}
+            InformationalVersion: ${{ needs.pre-build.outputs.InformationalVersion }}
+            diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+            os: ${{ matrix.os }}
+            displayName: ${{ matrix.displayName }}
+            archivePortable: ${{ matrix.archivePortableJabKit }}
+            archForDebianRepack: ${{ matrix.archForDebianRepack }}
+            suffix: ${{ matrix.suffix }}
+            shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
+            uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+            subdir: "/tools"
+            secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
+            astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+            biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
+            ieeeApiKey: ${{ secrets.IEEEAPIKey }}
+            springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
 
       - name: Upload jabgui and jabls-cli to GitHub workflow artifacts store for notarization (macOS)
         if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
