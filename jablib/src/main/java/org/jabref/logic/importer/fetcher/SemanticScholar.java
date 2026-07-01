@@ -122,12 +122,15 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
 
     String getURLBySource(String source) throws IOException, FetcherException {
         URLDownload download = new URLDownload(source);
+        importerPreferences.getApiKey(getName()).ifPresent(
+                key -> download.addHeader("x-api-key", key));
         JSONObject json = new JSONObject(download.asString());
         if (!json.has("paperId")) {
             throw new FetcherException("Page does not contain field \"paperId\"");
         }
-        LOGGER.debug("URL for source: https://www.semanticscholar.org/paper/{}", json.get("paperId").toString());
-        return "https://www.semanticscholar.org/paper/" + json.get("paperId").toString();
+        String paperId = json.get("paperId").toString();
+        LOGGER.debug("URL for source: https://www.semanticscholar.org/paper/{}", paperId);
+        return "https://www.semanticscholar.org/paper/" + paperId;
     }
 
     @Override
