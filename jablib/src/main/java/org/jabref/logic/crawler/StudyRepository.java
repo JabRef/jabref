@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +64,7 @@ public class StudyRepository {
     // Tests work with study.yml
     public static final String STUDY_DEFINITION_FILE_NAME = "study.yml";
     public static final int DEFAULT_RESULT_LIMIT = 100;
+    public static final String STUDY_LOCK_FILE_NAME = "study-lock.yml";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StudyRepository.class);
 
@@ -245,6 +247,11 @@ public class StudyRepository {
             }
             // Patch new results into work branch
             gitHandler.appendLatestSearchResultsOntoCurrentBranch(commitMessage + " - Patch", SEARCH_BRANCH);
+            // Copy study-lock.yml from search branch into the work branch working directory
+            Study studyLock = buildStudyLock(crawlResults);
+            new StudyYamlParser().writeStudyYamlFile(studyLock, repositoryPath.resolve(STUDY_LOCK_FILE_NAME));
+            // Commit study-lock before push
+            gitHandler.createCommitOnCurrentBranch("Update study-lock.yml on work branch", false);
             // Update both remote tracked branches
             updateRemoteSearchAndWorkBranch();
         } catch (GitAPIException e) {
@@ -434,6 +441,9 @@ public class StudyRepository {
             addFetcherGroupToMetaData(existingStudyResultEntries, fetcherName);
         }
         writeResultToFile(getPathToStudyResultFile(), existingStudyResultEntries);
+
+        Study studyLock = buildStudyLock(crawlResults);
+        new StudyYamlParser().writeStudyYamlFile(studyLock, repositoryPath.resolve(STUDY_LOCK_FILE_NAME));
     }
 
     private void generateCiteKeys(BibDatabaseContext existingEntries, BibDatabase targetEntries) {
@@ -495,6 +505,37 @@ public class StudyRepository {
                     preferences.getBibEntryPreferences().getKeywordSeparator());
             rootNode.addSubgroup(fetcherGroup);
         }
+    }
+
+    /// Builds a lock representation of the study recording the effective query sent to each catalog.
+    ///
+    /// For every (query, catalog) pair that was actually executed the effective query is:
+    /// the catalog-specific override if one is defined in the study definition, or the general query string otherwise.
+    private Study buildStudyLock(List<QueryResult> crawlResults) {
+        Map<String, QueryResult> resultsByQuery = crawlResults.stream()
+                                                              .collect(Collectors.toMap(QueryResult::getQuery, r -> r));
+
+        List<StudyQuery> lockQueries = study.getQueries().stream()
+                                            .map(originalQuery -> getStudyQuery(originalQuery, resultsByQuery))
+                                            .toList();
+
+        return new Study(study.getAuthors(), study.getTitle(), study.getResearchQuestions(), lockQueries, study.getCatalogs());
+    }
+
+    private StudyQuery getStudyQuery(StudyQuery originalQuery, Map<String, QueryResult> resultsByQuery) {
+        String queryString = originalQuery.getQuery();
+        Map<String, String> lockedCatalogSpecific = new LinkedHashMap<>(originalQuery.getCatalogSpecific());
+
+        if (resultsByQuery.containsKey(queryString)) {
+            QueryResult queryResult = resultsByQuery.get(queryString);
+            for (FetchResult fetchResult : queryResult.getResultsPerFetcher()) {
+                lockedCatalogSpecific.putIfAbsent(fetchResult.getFetcherName(), queryString);
+            }
+        }
+
+        StudyQuery lockQuery = new StudyQuery(queryString);
+        lockQuery.setCatalogSpecific(lockedCatalogSpecific);
+        return lockQuery;
     }
 
     private Path getPathToFetcherResultFile(String query, String fetcherName) {

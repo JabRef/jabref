@@ -36,6 +36,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.study.Study;
+import org.jabref.model.study.StudyQuery;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -253,6 +254,52 @@ class StudyRepositoryTest {
         limits.forEach((catalog, limit) ->
                 assertEquals(StudyRepository.DEFAULT_RESULT_LIMIT, limit,
                         () -> "Catalog '" + catalog + "' did not resolve to the default"));
+    }
+
+    @Test
+    void studyLockFileIsCreatedAfterPersist() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.persist(getMockResults());
+        assertTrue(Files.exists(tempRepositoryDirectory.resolve(StudyRepository.STUDY_LOCK_FILE_NAME)));
+    }
+
+    @Test
+    void studyLockFileContainsEffectiveQueryPerCatalog() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.persist(getMockResults());
+
+        Study lock = new StudyYamlParser().parseStudyYamlFile(
+                tempRepositoryDirectory.resolve(StudyRepository.STUDY_LOCK_FILE_NAME));
+
+        List<StudyQuery> lockQueries = lock.getQueries();
+        assertEquals(3, lockQueries.size());
+
+        StudyQuery quantumLock = lockQueries.get(0);
+        assertEquals("Quantum", quantumLock.getQuery());
+        assertEquals(Map.of("ArXiv", "Quantum", "Springer", "Quantum"), quantumLock.getCatalogSpecific());
+
+        StudyQuery cloudLock = lockQueries.get(1);
+        assertEquals("Cloud Computing", cloudLock.getQuery());
+        assertEquals(Map.of("Springer", "Cloud Computing"), cloudLock.getCatalogSpecific());
+    }
+
+    @Test
+    void studyLockFilePreservesCatalogSpecificOverrides() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        // Override the Quantum query catalog-specific entry for ArXiv before persisting
+        studyRepository.getStudy().getQueries().stream()
+             .filter(q -> "Quantum".equals(q.getQuery()))
+             .findFirst()
+             .ifPresent(q -> q.getCatalogSpecific().put("ArXiv", "ti:Quantum"));
+
+        studyRepository.persist(getMockResults());
+
+        Study lock = new StudyYamlParser().parseStudyYamlFile(
+                tempRepositoryDirectory.resolve(StudyRepository.STUDY_LOCK_FILE_NAME));
+
+        StudyQuery quantumLock = lock.getQueries().stream()
+                                     .filter(q -> "Quantum".equals(q.getQuery()))
+                                     .findFirst()
+                                     .orElseThrow();
+        assertEquals("ti:Quantum", quantumLock.getCatalogSpecific().get("ArXiv"));
+        assertEquals("Quantum", quantumLock.getCatalogSpecific().get("Springer"));
     }
 
     private StudyRepository getTestStudyRepository() throws IOException, URISyntaxException, JabRefException {
