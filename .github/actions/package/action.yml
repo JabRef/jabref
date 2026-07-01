@@ -138,13 +138,13 @@ runs:
         IEEEAPIKey: ${{ inputs.ieeeApiKey }}
         SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
     - name: Rename ShadowJar
-      if: ${{ (inputs.os == 'ubuntu-22.04') }}
+      if: (inputs.os == 'ubuntu-22.04')
       shell: pwsh
       run: |
         get-childitem -Path '${{ inputs.component }}/build/libs/*-all.jar' | rename-item -NewName {$_.name -replace "${{ inputs.AssemblySemVer }}","${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}"}
     - name: Upload ShadowJar to GitHub
       # background: true
-      if: ${{ (inputs.uploadAsArtifact == 'true') && (inputs.os == 'ubuntu-22.04') }}
+      if: (inputs.uploadAsArtifact == 'true') && (inputs.os == 'ubuntu-22.04')
       uses: actions/upload-artifact@v7
       with:
         name: ${{ inputs.componentShort }} (${{ inputs.displayName }}) (shadowJar)
@@ -152,7 +152,7 @@ runs:
           ${{ inputs.component }}/build/libs/*-all.jar
     - name: Upload ${{ inputs.componentShort }} ShadowJar to builds.jabref.org (Linux)
       # background: true
-      if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'ubuntu-22.04') }}
+      if: (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'ubuntu-22.04')
       shell: bash
       run: |
         rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/libs/*-all.jar jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}${{ inputs.subdir }}/
