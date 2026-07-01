@@ -311,28 +311,11 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     /// @return A list of entries matching the complex query
     @Override
     public Page<BibEntry> performSearchPaged(BaseQueryNode queryNode, int pageNumber) throws FetcherException {
-
         Page<BibEntry> result = arXiv.performSearchPaged(queryNode, pageNumber);
         if (this.doiFetcher == null) {
             return result;
         }
-
-        try (ExecutorService executor = Executors.newFixedThreadPool(getPageSize() * 2)) {
-            Collection<CompletableFuture<BibEntry>> futureSearchResult = result.getContent()
-                                                                               .stream()
-                                                                               .map(bibEntry ->
-                                                                                       CompletableFuture.supplyAsync(() -> {
-                                                                                           this.inplaceAsyncInfuseArXivWithDoi(bibEntry);
-                                                                                           return bibEntry;
-                                                                                       }, executor))
-                                                                               .toList();
-
-            Collection<BibEntry> modifiedSearchResult = futureSearchResult.stream()
-                                                                          .map(CompletableFuture::join)
-                                                                          .toList();
-
-            return new Page<>(result.getQuery(), result.getPageNumber(), modifiedSearchResult);
-        }
+        return enrichPageWithDoi(result);
     }
 
     @Override
@@ -344,7 +327,10 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         if (this.doiFetcher == null) {
             return result;
         }
+        return enrichPageWithDoi(result);
+    }
 
+    private Page<BibEntry> enrichPageWithDoi(Page<BibEntry> result) {
         try (ExecutorService executor = Executors.newFixedThreadPool(getPageSize() * 2)) {
             Collection<CompletableFuture<BibEntry>> futureSearchResult = result.getContent()
                                                                                .stream()
