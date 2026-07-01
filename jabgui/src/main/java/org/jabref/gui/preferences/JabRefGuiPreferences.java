@@ -292,6 +292,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // ensure registration of bindings
         getCopyToPreferences();
         getEntryEditorPreferences();
+        getMergeDialogPreferences();
 
         super.clear();
 
@@ -301,7 +302,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getSpecialFieldsPreferences().setAll(SpecialFieldsPreferences.getDefault());
         getExternalApplicationsPreferences().setAll(ExternalApplicationsPreferences.getDefault());
         getMainTableColumnPreferences().setAll(ColumnPreferences.getDefault());
-        getMergeDialogPreferences().setAll(MergeDialogPreferences.getDefault());
         getMainTablePreferences().setAll(MainTablePreferences.getDefault());
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
         getSearchDialogColumnPreferences().setAll(ColumnPreferences.getDefault());
@@ -322,6 +322,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // ensure registration of bindings
         getCopyToPreferences();
         getEntryEditorPreferences();
+        getMergeDialogPreferences();
 
         super.importPreferences(path);
 
@@ -332,7 +333,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
         getExternalApplicationsPreferences().setAll(getExternalApplicationsPreferencesFromBackingStore(getExternalApplicationsPreferences()));
         getMainTableColumnPreferences().setAll(getMainTableColumnPreferencesFromBackingStore(getMainTableColumnPreferences()));
-        getMergeDialogPreferences().setAll(getMergeDialogPreferencesFromBackingStore(getMergeDialogPreferences()));
         getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
         getSearchDialogColumnPreferences().setAll(getSearchDialogColumnPreferencesFromBackingStore(getSearchDialogColumnPreferences()));
@@ -534,32 +534,30 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return mergeDialogPreferences;
         }
 
-        MergeDialogPreferences defaults = MergeDialogPreferences.getDefault();
+        MergeDialogPreferences defaultValues = MergeDialogPreferences.getDefault();
 
-        mergeDialogPreferences = getMergeDialogPreferencesFromBackingStore(defaults);
+        mergeDialogPreferences = new MergeDialogPreferences(
+                DiffMode.valueOf(get(MERGE_ENTRIES_DIFF_MODE, defaultValues.getMergeDiffMode().name())),
+                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF, defaultValues.getMergeShouldShowDiff()),
+                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, defaultValues.getMergeShouldShowUnifiedDiff()),
+                getBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, defaultValues.getMergeHighlightWords()),
+                getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, defaultValues.shouldMergeShowChangedFieldsOnly()),
+                getBoolean(MERGE_APPLY_TO_ALL_ENTRIES, defaultValues.shouldMergeApplyToAllEntries()),
+                DuplicateResolverDialog.DuplicateResolverResult.valueOf(
+                        get(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, defaultValues.getAllEntriesDuplicateResolverDecision().name()))
+        );
 
-        EasyBind.listen(mergeDialogPreferences.mergeDiffModeProperty(), (_, _, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
-        EasyBind.listen(mergeDialogPreferences.mergeShouldShowDiffProperty(), (_, _, newValue) -> putBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF, newValue));
-        EasyBind.listen(mergeDialogPreferences.mergeShouldShowUnifiedDiffProperty(), (_, _, newValue) -> putBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, newValue));
-        EasyBind.listen(mergeDialogPreferences.mergeHighlightWordsProperty(), (_, _, newValue) -> putBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, newValue));
-        EasyBind.listen(mergeDialogPreferences.mergeShowChangedFieldOnlyProperty(), (_, _, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue));
-        EasyBind.listen(mergeDialogPreferences.mergeApplyToAllEntriesProperty(), (_, _, newValue) -> putBoolean(MERGE_APPLY_TO_ALL_ENTRIES, newValue));
-        EasyBind.listen(mergeDialogPreferences.allEntriesDuplicateResolverDecisionProperty(), (_, _, newValue) -> put(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, newValue.name()));
+        bindObject(mergeDialogPreferences.mergeDiffModeProperty(), MERGE_ENTRIES_DIFF_MODE, defaultValues.getMergeDiffMode(),
+                DiffMode::name, DiffMode::valueOf);
+        bindBoolean(mergeDialogPreferences.mergeShouldShowDiffProperty(), MERGE_ENTRIES_SHOULD_SHOW_DIFF, defaultValues.getMergeShouldShowDiff());
+        bindBoolean(mergeDialogPreferences.mergeShouldShowUnifiedDiffProperty(), MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, defaultValues.getMergeShouldShowUnifiedDiff());
+        bindBoolean(mergeDialogPreferences.mergeHighlightWordsProperty(), MERGE_ENTRIES_HIGHLIGHT_WORDS, defaultValues.getMergeHighlightWords());
+        bindBoolean(mergeDialogPreferences.mergeShowChangedFieldOnlyProperty(), MERGE_SHOW_ONLY_CHANGED_FIELDS, defaultValues.shouldMergeShowChangedFieldsOnly());
+        bindBoolean(mergeDialogPreferences.mergeApplyToAllEntriesProperty(), MERGE_APPLY_TO_ALL_ENTRIES, defaultValues.shouldMergeApplyToAllEntries());
+        bindObject(mergeDialogPreferences.allEntriesDuplicateResolverDecisionProperty(), DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, defaultValues.getAllEntriesDuplicateResolverDecision(),
+                DuplicateResolverDialog.DuplicateResolverResult::name, DuplicateResolverDialog.DuplicateResolverResult::valueOf);
 
         return mergeDialogPreferences;
-    }
-
-    private MergeDialogPreferences getMergeDialogPreferencesFromBackingStore(MergeDialogPreferences defaults) {
-        return new MergeDialogPreferences(
-                DiffMode.valueOf(get(MERGE_ENTRIES_DIFF_MODE, defaults.getMergeDiffMode().name())),
-                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF, defaults.getMergeShouldShowDiff()),
-                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, defaults.getMergeShouldShowUnifiedDiff()),
-                getBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, defaults.getMergeHighlightWords()),
-                getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, defaults.shouldMergeShowChangedFieldsOnly()),
-                getBoolean(MERGE_APPLY_TO_ALL_ENTRIES, defaults.shouldMergeApplyToAllEntries()),
-                DuplicateResolverDialog.DuplicateResolverResult.valueOf(
-                        get(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, defaults.getAllEntriesDuplicateResolverDecision().name()))
-        );
     }
     // endregion
 
