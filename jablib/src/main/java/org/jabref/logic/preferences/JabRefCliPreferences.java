@@ -683,7 +683,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 resetToDefaults));
     }
 
-    private void bindBoolean(BooleanProperty property, String key, boolean defaultValue) {
+    protected void bindBoolean(BooleanProperty property, String key, boolean defaultValue) {
         bindCustom(property, key, defaultValue,
                 (_, _, v) -> putBoolean(key, v),
                 () -> property.set(getBoolean(key, defaultValue)),

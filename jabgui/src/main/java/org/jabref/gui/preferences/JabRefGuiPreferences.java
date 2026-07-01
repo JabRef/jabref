@@ -285,12 +285,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     @Override
     public void clear() throws BackingStoreException {
+        // ensure registration of bindings
+        getCopyToPreferences();
+
         super.clear();
 
         getDonationPreferences().setAll(DonationPreferences.getDefault());
         getEntryEditorPreferences().setAll(EntryEditorPreferences.getDefault());
         getGroupsPreferences().setAll(GroupsPreferences.getDefault());
-        getCopyToPreferences().setAll(CopyToPreferences.getDefault());
         getGuiPreferences().setAll(CoreGuiPreferences.getDefault());
         getSpecialFieldsPreferences().setAll(SpecialFieldsPreferences.getDefault());
         getExternalApplicationsPreferences().setAll(ExternalApplicationsPreferences.getDefault());
@@ -313,13 +315,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     @Override
     public void importPreferences(Path path) throws JabRefException {
+        // ensure registration of bindings
+        getCopyToPreferences();
+
         super.importPreferences(path);
 
         // in case of incomplete or corrupt xml fall back to current preferences
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
         getEntryEditorPreferences().setAll(getEntryEditorPreferencesFromBackingStore(getEntryEditorPreferences()));
         getGroupsPreferences().setAll(getGroupsPreferencesFromBackingStore(getGroupsPreferences()));
-        getCopyToPreferences().setAll(getCopyToPreferencesFromBackingStore(getCopyToPreferences()));
         getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
         getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
         getExternalApplicationsPreferences().setAll(getExternalApplicationsPreferencesFromBackingStore(getExternalApplicationsPreferences()));
@@ -342,19 +346,17 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         if (copyToPreferences != null) {
             return copyToPreferences;
         }
-        copyToPreferences = getCopyToPreferencesFromBackingStore(CopyToPreferences.getDefault());
 
-        EasyBind.listen(copyToPreferences.shouldAskForIncludingCrossReferencesProperty(), (_, _, newValue) -> putBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES, newValue));
-        EasyBind.listen(copyToPreferences.shouldIncludeCrossReferencesProperty(), (_, _, newValue) -> putBoolean(INCLUDE_CROSS_REFERENCES, newValue));
+        CopyToPreferences defaultValues = CopyToPreferences.getDefault();
+
+        copyToPreferences = new CopyToPreferences(
+                getBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES, defaultValues.getShouldAskForIncludingCrossReferences()),
+                getBoolean(INCLUDE_CROSS_REFERENCES, defaultValues.getShouldIncludeCrossReferences()));
+
+        bindBoolean(copyToPreferences.shouldAskForIncludingCrossReferencesProperty(), ASK_FOR_INCLUDING_CROSS_REFERENCES, defaultValues.getShouldAskForIncludingCrossReferences());
+        bindBoolean(copyToPreferences.shouldIncludeCrossReferencesProperty(), INCLUDE_CROSS_REFERENCES, defaultValues.getShouldIncludeCrossReferences());
 
         return copyToPreferences;
-    }
-
-    private CopyToPreferences getCopyToPreferencesFromBackingStore(CopyToPreferences defaults) {
-        return new CopyToPreferences(
-                getBoolean(ASK_FOR_INCLUDING_CROSS_REFERENCES, defaults.getShouldAskForIncludingCrossReferences()),
-                getBoolean(INCLUDE_CROSS_REFERENCES, defaults.getShouldIncludeCrossReferences())
-        );
     }
     // endregion
 
