@@ -53,6 +53,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -263,6 +265,21 @@ class StudyRepositoryTest {
     }
 
     @Test
+    void persistUpdatesStudyLockOnWorkBranchWhenNewResultsExist() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        when(gitHandler.createCommitOnCurrentBranch(anyString(), anyBoolean())).thenReturn(true);
+
+        studyRepository.persist(getMockResults());
+
+        Study lock = new StudyYamlParser().parseStudyYamlFile(
+                tempRepositoryDirectory.resolve(StudyRepository.STUDY_LOCK_FILE_NAME));
+        StudyQuery quantumLock = lock.getQueries().stream()
+                                     .filter(q -> "Quantum".equals(q.getQuery()))
+                                     .findFirst()
+                                     .orElseThrow();
+        assertEquals(Map.of("ArXiv", "Quantum", "Springer", "Quantum"), quantumLock.getCatalogSpecific());
+    }
+
+    @Test
     void studyLockFileContainsEffectiveQueryPerCatalog() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
         studyRepository.persist(getMockResults());
 
@@ -285,9 +302,9 @@ class StudyRepositoryTest {
     void studyLockFilePreservesCatalogSpecificOverrides() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
         // Override the Quantum query catalog-specific entry for ArXiv before persisting
         studyRepository.getStudy().getQueries().stream()
-             .filter(q -> "Quantum".equals(q.getQuery()))
-             .findFirst()
-             .ifPresent(q -> q.getCatalogSpecific().put("ArXiv", "ti:Quantum"));
+                       .filter(q -> "Quantum".equals(q.getQuery()))
+                       .findFirst()
+                       .ifPresent(q -> q.getCatalogSpecific().put("ArXiv", "ti:Quantum"));
 
         studyRepository.persist(getMockResults());
 
@@ -300,6 +317,25 @@ class StudyRepositoryTest {
                                      .orElseThrow();
         assertEquals("ti:Quantum", quantumLock.getCatalogSpecific().get("ArXiv"));
         assertEquals("Quantum", quantumLock.getCatalogSpecific().get("Springer"));
+    }
+
+    @Test
+    void studyLockHandlesDuplicateQueryResults() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        QueryResult quantumFromArXiv = new QueryResult("Quantum", List.of(
+                new FetchResult("ArXiv", new BibDatabase(stripCitationKeys(getArXivQuantumMockResults())))));
+        QueryResult quantumFromSpringer = new QueryResult("Quantum", List.of(
+                new FetchResult("Springer", new BibDatabase(stripCitationKeys(getSpringerQuantumMockResults())))));
+
+        studyRepository.persist(List.of(quantumFromArXiv, quantumFromSpringer));
+
+        Study lock = new StudyYamlParser().parseStudyYamlFile(
+                tempRepositoryDirectory.resolve(StudyRepository.STUDY_LOCK_FILE_NAME));
+
+        StudyQuery quantumLock = lock.getQueries().stream()
+                                     .filter(q -> "Quantum".equals(q.getQuery()))
+                                     .findFirst()
+                                     .orElseThrow();
+        assertEquals(Map.of("ArXiv", "Quantum", "Springer", "Quantum"), quantumLock.getCatalogSpecific());
     }
 
     private StudyRepository getTestStudyRepository() throws IOException, URISyntaxException, JabRefException {

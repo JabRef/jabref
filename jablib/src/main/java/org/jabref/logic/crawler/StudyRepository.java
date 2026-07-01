@@ -14,8 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -238,21 +240,16 @@ public class StudyRepository {
         gitHandler.checkoutBranch(SEARCH_BRANCH);
         persistResults(crawlResults);
         try {
-            // First commit changes to search branch and update remote
             String commitMessage = "Conducted search: " + LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
             boolean newSearchResults = gitHandler.createCommitOnCurrentBranch(commitMessage, false);
             gitHandler.checkoutBranch(WORK_BRANCH);
             if (!newSearchResults) {
                 return;
             }
-            // Patch new results into work branch
             gitHandler.appendLatestSearchResultsOntoCurrentBranch(commitMessage + " - Patch", SEARCH_BRANCH);
-            // Copy study-lock.yml from search branch into the work branch working directory
             Study studyLock = buildStudyLock(crawlResults);
             new StudyYamlParser().writeStudyYamlFile(studyLock, repositoryPath.resolve(STUDY_LOCK_FILE_NAME));
-            // Commit study-lock before push
             gitHandler.createCommitOnCurrentBranch("Update study-lock.yml on work branch", false);
-            // Update both remote tracked branches
             updateRemoteSearchAndWorkBranch();
         } catch (GitAPIException e) {
             LOGGER.error("Updating remote repository failed", e);
@@ -513,7 +510,15 @@ public class StudyRepository {
     /// the catalog-specific override if one is defined in the study definition, or the general query string otherwise.
     private Study buildStudyLock(List<QueryResult> crawlResults) {
         Map<String, QueryResult> resultsByQuery = crawlResults.stream()
-                                                              .collect(Collectors.toMap(QueryResult::getQuery, r -> r));
+                                                              .collect(Collectors.toMap(
+                                                                      QueryResult::getQuery,
+                                                                      Function.identity(),
+                                                                      (a, b) -> new QueryResult(a.getQuery(),
+                                                                              Stream.concat(
+                                                                                      a.getResultsPerFetcher().stream(),
+                                                                                      b.getResultsPerFetcher().stream()
+                                                                              ).toList()),
+                                                                      LinkedHashMap::new));
 
         List<StudyQuery> lockQueries = study.getQueries().stream()
                                             .map(originalQuery -> getStudyQuery(originalQuery, resultsByQuery))
