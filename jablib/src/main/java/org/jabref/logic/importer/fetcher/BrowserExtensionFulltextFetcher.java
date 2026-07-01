@@ -13,7 +13,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -88,7 +90,7 @@ public class BrowserExtensionFulltextFetcher implements FulltextFetcher {
             return Optional.empty();
         }
 
-        String requestBody = buildRequestBody(doi.orElse(null), url.orElse(null));
+        String requestBody = buildRequestBody(doi, url);
 
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             return raceProviders(providers, requestBody, executor);
@@ -212,13 +214,11 @@ public class BrowserExtensionFulltextFetcher implements FulltextFetcher {
         }
     }
 
-    private static String buildRequestBody(@Nullable String doi, @Nullable String url) {
-        return GSON.toJson(new FulltextRequest(doi, url));
-    }
-
-    /// Wire-format request body, serialised by Gson. Nulls are omitted by
-    /// Gson's default serialisation.
-    private record FulltextRequest(@Nullable String doi, @Nullable String url) {
+    private static String buildRequestBody(Optional<String> doi, Optional<String> url) {
+        Map<String, String> body = new LinkedHashMap<>();
+        doi.ifPresent(v -> body.put("doi", v));
+        url.ifPresent(v -> body.put("url", v));
+        return GSON.toJson(body);
     }
 
     /// Wire-format success response body. Fields not relevant to the
