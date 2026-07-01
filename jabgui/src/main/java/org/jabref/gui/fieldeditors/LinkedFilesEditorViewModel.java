@@ -311,25 +311,29 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     private void attachLocalPdf(Path sourcePath, ExternalFileType externalFileType) {
         LinkedFile linkedFile = new LinkedFile("", sourcePath, externalFileType.getName());
-
         LinkedFileHandler handler = new LinkedFileHandler(
                 linkedFile, entry, databaseContext, preferences.getFilePreferences());
-        try {
-            // shouldMove=true, shouldRenameToFilenamePattern=true — same
-            // behaviour as a drag-drop onto the main table.
-            handler.copyOrMoveToDefaultDirectory(true, true);
-        } catch (IOException e) {
-            LOGGER.warn("Could not move fetcher-returned file {} into the library directory",
-                    sourcePath, e);
-            // Keep the original path; the user can move/rename it manually.
-        }
 
-        // Write through to the entry's FILE field. The bidirectional binding
-        // installed in the constructor pulls the new file into the editor's
-        // observable list (via parseToFileViewModel), so the LinkedFilesEditor
-        // UI refreshes without us having to construct a LinkedFileViewModel
-        // ourselves.
-        entry.addFile(linkedFile);
+        // copyOrMoveToDefaultDirectory does blocking filesystem I/O; run it
+        // off the JavaFX Application Thread. shouldMove=true,
+        // shouldRenameToFilenamePattern=true — same behaviour as a drag-drop
+        // onto the main table. The bidirectional binding installed in the
+        // constructor pulls the new file into the editor's observable list
+        // (via parseToFileViewModel) once entry.addFile fires on the UI
+        // thread.
+        BackgroundTask
+                .wrap(() -> {
+                    handler.copyOrMoveToDefaultDirectory(true, true);
+                    return linkedFile;
+                })
+                .onSuccess(entry::addFile)
+                .onFailure(e -> {
+                    LOGGER.warn("Could not move fetcher-returned file {} into the library directory",
+                            sourcePath, e);
+                    // Keep the original path; the user can move/rename it manually.
+                    entry.addFile(linkedFile);
+                })
+                .executeWith(taskExecutor);
     }
 
     public void deleteFile(LinkedFileViewModel file) {

@@ -1,6 +1,5 @@
 package org.jabref.gui.externalfiles;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -24,6 +23,7 @@ import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.importer.FetcherResult;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -187,15 +187,22 @@ public class DownloadFullTextAction extends SimpleCommand {
 
         LinkedFileHandler handler = new LinkedFileHandler(
                 linkedFile, entry, databaseContext, preferences.getFilePreferences());
-        try {
-            // shouldMove=true, shouldRenameToFilenamePattern=true — same fate
-            // a successful HTTP download would have via DownloadLinkedFileAction.
-            handler.copyOrMoveToDefaultDirectory(true, true);
-        } catch (IOException e) {
-            LOGGER.warn("Could not move fetcher-returned file {} into the library directory",
-                    sourcePath, e);
-        }
 
-        entry.addFile(linkedFile);
+        // copyOrMoveToDefaultDirectory does blocking filesystem I/O; run it
+        // off the JavaFX Application Thread. shouldMove=true,
+        // shouldRenameToFilenamePattern=true — same fate a successful HTTP
+        // download would have via DownloadLinkedFileAction.
+        BackgroundTask
+                .wrap(() -> {
+                    handler.copyOrMoveToDefaultDirectory(true, true);
+                    return linkedFile;
+                })
+                .onSuccess(entry::addFile)
+                .onFailure(e -> {
+                    LOGGER.warn("Could not move fetcher-returned file {} into the library directory",
+                            sourcePath, e);
+                    entry.addFile(linkedFile);
+                })
+                .executeWith(taskExecutor);
     }
 }
