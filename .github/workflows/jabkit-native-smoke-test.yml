@@ -12,6 +12,10 @@ on:
     tags:
       - '*'
   pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - 'src/test/**'
+      - 'README.md'
   workflow_dispatch:
     inputs:
       run-online-tests:
@@ -57,7 +61,8 @@ jobs:
       - name: Install clitest
         uses: ethanjli/cached-download-action@v0.1.4
         with:
-          url: https://raw.githubusercontent.com/aureliojargas/clitest/master/clitest
+          # clitest v0.5.0 (https://github.com/aureliojargas/clitest/releases/tag/0.5.0)
+          url: https://raw.githubusercontent.com/aureliojargas/clitest/8bdaae2f56e524f8824307d5c443e6353fe0dbd9/clitest
           destination: /tmp/clitest
 
       - name: Make clitest executable
