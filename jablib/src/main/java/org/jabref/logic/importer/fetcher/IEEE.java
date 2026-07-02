@@ -309,7 +309,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
     }
 
     /// Builds the IEEE search URL for a raw, catalog-native query, sent verbatim as the `querytext` parameter.
-    /// Resets `transformer` so {@link #getParser()} applies no year filtering to raw results.
+    /// Resets `transformer` so [#getParser()] applies no year filtering to raw results.
     @Override
     public URL getURLForRawQuery(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         transformer = new IEEEQueryTransformer();

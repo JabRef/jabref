@@ -13,21 +13,21 @@ import org.jabref.model.search.query.BaseQueryNode;
 /// Provides a convenient interface for search-based fetcher, which follows the usual three-step procedure:
 ///
 /// - Open a URL based on the search query
-/// - Parse the response to get a list of {@link BibEntry}
+/// - Parse the response to get a list of [BibEntry]
 /// - Post-process fetched entries
 ///
 ///
-/// This interface is used for web resources which do NOT provide BibTeX data {@link BibEntry}.
-/// JabRef's infrastructure to convert arbitrary input data to BibTeX is {@link Parser}.
+/// This interface is used for web resources which do NOT provide BibTeX data [BibEntry].
+/// JabRef's infrastructure to convert arbitrary input data to BibTeX is [Parser].
 ///
 ///
-/// This interface inherits {@link SearchBasedFetcher}, because the methods `performSearch` have to be provided by both.
-/// As non-BibTeX web fetcher one could do "magic" stuff without this helper interface and directly use {@link WebFetcher}, but this is more work.
+/// This interface inherits [SearchBasedFetcher], because the methods `performSearch` have to be provided by both.
+/// As non-BibTeX web fetcher one could do "magic" stuff without this helper interface and directly use [WebFetcher], but this is more work.
 ///
 ///
 /// Note that this interface "should" be an abstract class.
 /// However, Java does not support multi inheritance with classes (but with interfaces).
-/// We need multi inheritance, because a fetcher might implement multiple query types (such as id fetching {@link IdBasedFetcher}), complete entry {@link EntryBasedFetcher}, and search-based fetcher (this class).
+/// We need multi inheritance, because a fetcher might implement multiple query types (such as id fetching [IdBasedFetcher]), complete entry [EntryBasedFetcher], and search-based fetcher (this class).
 
 public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetcher {
 
@@ -48,7 +48,7 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetc
         return getBibEntries(urlForQuery);
     }
 
-    /// Default implementation: builds the URL via {@link #getURLForRawQuery(String)}, then downloads, parses, and post-cleans the result.
+    /// Default implementation: builds the URL via [#getURLForRawQuery(String)], then downloads, parses, and post-cleans the result.
     @Override
     default List<BibEntry> performRawSearchQuery(String rawQuery) throws FetcherException {
         if (rawQuery.isBlank()) {
@@ -77,7 +77,7 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetc
         }
     }
 
-    /// Returns the parser used to convert the response to a list of {@link BibEntry}.
+    /// Returns the parser used to convert the response to a list of [BibEntry].
     Parser getParser();
 
     /// Constructs a URL based on the lucene query.
