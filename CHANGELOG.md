@@ -121,6 +121,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where the active group filter was reset after deleting an entry. [#15587](https://github.com/JabRef/jabref/issues/15587)
 - We fixed an issue in the LibreOffice integration where the user could insert a CSL citation inside an existing one. [#15701](https://github.com/JabRef/jabref/issues/15701)
 - We fixed an issue where multiple entries are not cited as a single citation for CSL in-text. [#15703](https://github.com/JabRef/jabref/issues/15703)
 - We fixed an issue where the citation key generator did not show the date for child entries due to orphaned crossref links. [#9071](https://github.com/JabRef/jabref/issues/9071)

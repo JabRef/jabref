@@ -63,6 +63,8 @@ public class MainTableDataModel {
     private final Subscription groupViewModeSubscription;
     private final SearchIndexListener indexUpdatedListener;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
+    private final ListProperty<GroupTreeNode> selectedGroupsProperty;
+    @Nullable private final IndexManager indexManager;
     @Nullable private final SearchContext searchContext;
 
     private Optional<MatcherSet> groupsMatcher;
@@ -83,7 +85,7 @@ public class MainTableDataModel {
         this.searchQueryProperty = searchQueryProperty;
         this.indexUpdatedListener = new SearchIndexListener();
         this.groupsMatcher = createGroupMatcher(selectedGroupsProperty.get(), groupsPreferences);
-
+        this.selectedGroupsProperty = selectedGroupsProperty;
         this.bibDatabaseContext.getDatabase().registerListener(indexUpdatedListener);
         resetFieldFormatter();
 
@@ -273,6 +275,7 @@ public class MainTableDataModel {
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
             // When entries are removed, we need to refresh the search matches
             // to ensure the filtered list is properly updated and doesn't show stale entries
+            ObservableList<GroupTreeNode> selectedGroups = selectedGroupsProperty.get();
             BackgroundTask.wrap(() -> {
                 // Re-run the current search to update the filtered results
                 if (searchQueryProperty.get().isPresent()) {
@@ -280,6 +283,7 @@ public class MainTableDataModel {
                 } else {
                     clearSearchMatches();
                 }
+                updateGroupMatches(selectedGroups);
             }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
         }
     }
