@@ -629,30 +629,32 @@ jobs:
           OSXCERT: ${{ needs.conditions.outputs.secretspresent }}
 
       # jbundle drives Gradle itself; each invocation reads a different subproject's build outputs
-      - name: jbundle all components
-        if: (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true')
-        # Version information passed as environment variables, because jbundle does not support gradle properties
+      - # Version information passed as environment variables, because jbundle does not support gradle properties
         # See https://github.com/avelino/jbundle/issues/59
         parallel:
           - name: jabgui
+            if: (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true')
             shell: bash
             env:
               VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
               VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
             run: jbundle build --no-appcds --input . --gradle-project jabgui --output ./build/jbundle/jabgui-${{ matrix.displayName }}
           - name: jabkit
+            if: (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true')
             shell: bash
             env:
               VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
               VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
             run: jbundle build --no-appcds --input . --gradle-project jabkit --output ./build/jbundle/jabkit-${{ matrix.displayName }}
           - name: jabls-cli
+            if: (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true')
             shell: bash
             env:
               VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
               VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
             run: jbundle build --no-appcds --input . --gradle-project jabls-cli --output ./build/jbundle/jabls-${{ matrix.displayName }}
           - name: jabsrv-cli
+            if: (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true')
             shell: bash
             env:
               VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
