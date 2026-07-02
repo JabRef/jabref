@@ -24,7 +24,7 @@ val pdfbox = "3.0.7"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.17.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.17.1"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.4.0"))
     api(platform("org.junit:junit-bom:6.1.1"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
@@ -45,7 +45,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.1")
 
-    api("com.dlsc.gemsfx:gemsfx:4.1.0")
+    api("com.dlsc.gemsfx:gemsfx:4.2.0")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -108,8 +108,8 @@ dependencies.constraints {
     api("org.apache.commons:commons-lang3:3.20.0")
     api("org.apache.commons:commons-text:1.15.0")
     api("org.apache.httpcomponents.core5:httpcore5:5.4.3")
-    api("org.apache.httpcomponents.client5:httpclient5:5.6.1")
-    api("org.apache.logging.log4j:log4j-to-slf4j:2.26.0")
+    api("org.apache.httpcomponents.client5:httpclient5:5.6.2")
+    api("org.apache.logging.log4j:log4j-to-slf4j:2.26.1")
     api("org.apache.lucene:lucene-analysis-common:$lucene")
     api("org.apache.lucene:lucene-core:$lucene")
     api("org.apache.lucene:lucene-highlighter:$lucene")

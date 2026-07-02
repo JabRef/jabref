@@ -13,6 +13,7 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 import org.jabref.testutils.category.FetcherTest;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -240,6 +241,12 @@ class SpringerNatureWebFetcherTest implements SearchBasedFetcherCapabilityTest, 
                           .map(bibEntry -> bibEntry.getField(StandardField.AUTHOR))
                           .filter(Optional::isPresent)
                           .map(Optional::get).forEach(authorField -> assertTrue(authorField.contains("Redmiles")));
+    }
+
+    @Test
+    void performRawSearchQueryPagedWithBlankQueryReturnsEmptyPage() throws FetcherException {
+        Page<BibEntry> result = fetcher.performRawSearchQueryPaged("", 0);
+        assertEquals(List.of(), result.getContent());
     }
 
     @Override

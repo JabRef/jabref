@@ -138,6 +138,22 @@ Smith, J. (2020). On the nature of chocolate. Journal of Sweets, 12(3), 45-67.
 
 POST http://localhost:23119/libraries/current/citations/{{cacheKey}}
 
+### Batched citation lookup (SumatraPDF page-scan flow)
+
+// One round-trip for every citation on a PDF page. Each `results[i]` aligns with `citations[i]`;
+// blank slots and parser failures come back as `matchScope: "none"` without failing the batch.
+
+POST http://localhost:23119/libraries/{{libraryId}}/citations/lookup:batch
+Content-Type: application/json
+
+{
+  "citations": [
+    "Smith, J. (2020). On the nature of chocolate. Journal of Sweets, 12(3), 45-67.",
+    "Doe, J. (2019). Cocoa cultivation. Plant Sci, 5(1), 1-10.",
+    ""
+  ]
+}
+
 ### Lookup against an unknown library id -> 404 Not Found
 
 POST http://localhost:23119/libraries/does-not-exist/citations/lookup
