@@ -94,11 +94,7 @@ JAVA_TOOL_OPTIONS="-agentlib:native-image-agent=config-output-dir=<dir>,experime
 ```
 
 > [!NOTE]
-> **Minimal wins.** Add the narrowest entry that fixes the failure — the
-> constructor named by the error, the single missing resource glob, or the
-> specific JNI access required. Small entries are reviewable and make it clear
-> why each line exists. Use the existing entries in `reachability-metadata.json`
-> as templates for the JSON shape.
+> **Minimal wins.** Add the narrowest entry that fixes the failure: the constructor named by the error, the single missing resource glob, or the specific JNI access required. Small entries are reviewable and make it clear why each line exists. Use the existing entries in `reachability-metadata.json` as templates for the JSON shape.
 
 See GraalVM's [Automatic Metadata Collection](https://www.graalvm.org/latest/reference-manual/native-image/metadata/AutomaticMetadataCollection/) documentation for the agent options.
 
