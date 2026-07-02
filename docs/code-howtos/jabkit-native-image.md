@@ -33,8 +33,7 @@ The metadata comes from three places:
 
 The executable is written to `jabkit/build/native/nativeCompile/jabkit`. The image name is configured in `jabkit/build.gradle.kts`, and the entry point is `org.jabref.toolkit.JabKitLauncher`.
 
-On Linux, ship the whole `nativeCompile` directory, because the executable is accompanied by `.so`
-libraries.
+On Linux, ship the whole `nativeCompile` directory, because the executable is accompanied by `.so` libraries.
 
 ### Toolchain
 
@@ -42,14 +41,11 @@ The build uses Liberica NIK Full because JabKit reaches `java.desktop`/AWT throu
 
 ### Platform support
 
-CI builds on Linux (`ubuntu-22.04`) and macOS (`macos-15`). The PDF attachment command currently
-works only on Linux because it uses an AWT path. See [Liberica NIK](#liberica-nik).
+CI builds on Linux (`ubuntu-22.04`) and macOS (`macos-15`). The PDF attachment command currently works only on Linux because it uses an AWT path. See [Liberica NIK](#liberica-nik).
 
 ## Where the metadata lives
 
-GraalVM auto-discovers metadata on the classpath under a per-artifact path:
-`META-INF/native-image/<group>/<artifact>/`. We keep each module's metadata
-under its own module, so JabLib's stays with JabLib:
+GraalVM auto-discovers metadata on the classpath under a per-artifact path: `META-INF/native-image/<group>/<artifact>/`. We keep each module's metadata under its own module, so JabLib's stays with JabLib:
 
 ```text
 jabkit/src/main/resources/META-INF/native-image/org.jabref/jabkit/
@@ -62,10 +58,7 @@ jablib/src/main/resources/META-INF/native-image/org.jabref/jablib/
 Both use GraalVM's unified [`reachability-metadata.json`](https://www.graalvm.org/latest/reference-manual/native-image/metadata/) schema, one file with `reflection`, `resources`, and `bundles` sections (JNI is expressed as a `jniAccessible` flag on reflection entries).
 
 > [!NOTE]
-> Ownership rule: metadata for a class belongs in that class's module. A
-> reflection entry for a JabLib type goes in JabLib's file, even when only a
-> JabKit command triggers it. This keeps JabLib self-describing for any future
-> native consumer, such as JabSrv or JabLS.
+> Ownership rule: metadata for a class belongs in that class's module. A reflection entry for a JabLib type goes in JabLib's file, even when only a JabKit command triggers it. This keeps JabLib self-describing for any future native consumer, such as JabSrv or JabLS.
 
 ## Adding metadata for a new command
 
