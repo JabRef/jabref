@@ -1,10 +1,17 @@
 name: Package JabRef Component
-description: Package JabRef Component
+description: >
+  Post-processes and uploads a JabRef component: smoke test, archiving, renaming,
+  and uploads. This action is Gradle-free by design; all Gradle work (jpackage,
+  shadowJar, jbundle) happens in the workflow in a single sequential invocation.
+  Thus, multiple instances of this action can safely run in parallel.
 
 inputs:
   component:
     required: true
   componentShort:
+    required: true
+  binaryName:
+    description: Name of the jpackage application image and its launcher (e.g., JabRef, jabkit)
     required: true
   branchName:
     required: true
@@ -13,8 +20,6 @@ inputs:
   Major:
     required: true
   Minor:
-    required: true
-  InformationalVersion:
     required: true
   diskSpaceAvailable:
     required: true
@@ -38,32 +43,11 @@ inputs:
   secretsPresent:
     required: true
 
-  # API keys
-  astrophysicsDataSystemApiKey:
-    required: true
-  biodiversityHeritageApiKey:
-    required: true
-  ieeeApiKey:
-    required: true
-  springerNatureApiKey:
-    required: true
-
 runs:
   using: composite
   steps:
-    - name: jpackage ${{ inputs.component }}
-      shell: bash
-      run: gradle -i :${{ inputs.component }}:jpackage
-      env:
-        VERSION: ${{ inputs.AssemblySemVer }}
-        VERSION_INFO: ${{ inputs.InformationalVersion }}
-        OSXCERT: ${{ inputs.secretsPresent }}
-        AstrophysicsDataSystemAPIKey: ${{ inputs.astrophysicsDataSystemApiKey }}
-        BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
-        IEEEAPIKey: ${{ inputs.ieeeApiKey }}
-        SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
     - name: Validate Signature
-      if: inputs.secretsPresent == 'true' && inputs.os == 'macos-latest' && inputs.component == 'jabgui'
+      if: inputs.secretsPresent == 'true' && startsWith(inputs.os, 'macos') && inputs.component == 'jabgui'
       shell: bash
       run: |
         ls -la ${{ inputs.component }}/build/packages/${{ inputs.os }}/
@@ -71,14 +55,20 @@ runs:
     - name: Smoke test ${{ inputs.component }}
       shell: bash
       run: |
-        gradle -i :${{ inputs.component }}:run --args="--help"
-      env:
-        VERSION: ${{ inputs.AssemblySemVer }}
-        VERSION_INFO: ${{ inputs.InformationalVersion }}
-        AstrophysicsDataSystemAPIKey: ${{ inputs.astrophysicsDataSystemApiKey }}
-        BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
-        IEEEAPIKey: ${{ inputs.ieeeApiKey }}
-        SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
+        set -e
+        PACKAGE_DIR="${{ inputs.component }}/build/packages/${{ inputs.os }}"
+        case "${{ inputs.os }}" in
+          windows*)
+            BINARY="$PACKAGE_DIR/${{ inputs.binaryName }}/${{ inputs.binaryName }}.exe"
+            ;;
+          macos*)
+            BINARY="$PACKAGE_DIR/${{ inputs.binaryName }}.app/Contents/MacOS/${{ inputs.binaryName }}"
+            ;;
+          *)
+            BINARY="$PACKAGE_DIR/${{ inputs.binaryName }}/bin/${{ inputs.binaryName }}"
+            ;;
+        esac
+        "$BINARY" --help
     - name: Package ${{ inputs.component }} application image
       shell: bash
       if: inputs.archivePortable != 'NONE'
@@ -126,17 +116,7 @@ runs:
       run: |
         rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}${{ inputs.subdir }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.* jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}${{ inputs.subdir }}/
 
-    - name: ShadowJar ${{ inputs.component }}
-      if: (inputs.os == 'ubuntu-22.04')
-      shell: bash
-      run: gradle -i :${{ inputs.component }}:shadowJar
-      env:
-        VERSION: ${{ inputs.AssemblySemVer }}
-        VERSION_INFO: ${{ inputs.InformationalVersion }}
-        AstrophysicsDataSystemAPIKey: ${{ inputs.astrophysicsDataSystemApiKey }}
-        BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
-        IEEEAPIKey: ${{ inputs.ieeeApiKey }}
-        SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
+    # The shadowJar itself is built in the workflow's single Gradle invocation
     - name: Rename ShadowJar
       if: (inputs.os == 'ubuntu-22.04')
       shell: pwsh
@@ -157,20 +137,7 @@ runs:
       run: |
         rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/libs/*-all.jar jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}${{ inputs.subdir }}/
 
-    - name: jbundle ${{ inputs.component }}
-      if: (inputs.os == 'ubuntu-22.04') && (inputs.shouldJbundle == 'true')
-      shell: bash
-      run: |
-        jbundle build --no-appcds --input . --gradle-project ${{ inputs.component }} --output ./build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }}
-      # Version information passed as environment variables, because jbundle does not support gradle properties
-      # See https://github.com/avelino/jbundle/issues/59
-      env:
-        VERSION: ${{ inputs.AssemblySemVer }}
-        VERSION_INFO: ${{ inputs.InformationalVersion }}
-        AstrophysicsDataSystemAPIKey: ${{ inputs.astrophysicsDataSystemApiKey }}
-        BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
-        IEEEAPIKey: ${{ inputs.ieeeApiKey }}
-        SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
+    # The jbundle binary itself is built in the workflow (jbundle drives Gradle and must not run in parallel)
     - name: jbundle JabGui filename fix (Windows)
       # if: ${{ inputs.os == 'windows-latest' }}
       if: false

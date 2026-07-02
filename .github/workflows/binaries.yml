@@ -558,14 +558,6 @@ jobs:
           which jlink
           jlink --version
 
-      # jablib is used by all components - thus, compile it first
-      - name: jablib jar
-        id: jablib-jar
-        run: gradle :jablib:jar
-        env:
-          VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
-          VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
-
       # Save disk space
       # Hint by https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
       - run: sudo rm -rf /usr/local/lib/android/sdk
@@ -577,17 +569,6 @@ jobs:
       - run: sudo rm -rf /usr/share/swift
         background: true
         if: startsWith(matrix.os, 'ubuntu')
-
-      # Both JabRef Language Server and JabRef HTTP Server are required by the GUI.
-      # They are independent of each other, so build them in a single Gradle
-      # invocation with --parallel. One daemon builds both subprojects concurrently,
-      # avoiding the lock contention / heap blow-up of two separate `gradle` processes.
-      - name: jabls and jabsrv jars
-        id: jabls-jabsrv-jar
-        run: gradle --parallel :jabls:jar :jabsrv:jar
-        env:
-          VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
-          VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
 
       - name: Setup macOS key chain
         if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
@@ -629,7 +610,39 @@ jobs:
         run: candle -?
         if: startsWith(matrix.os, 'windows')
 
-      # jars already exist - thus, these calls build on the jar result.
+      # All Gradle work happens in this single invocation: one daemon, one task graph.
+      # Shared upstream projects (e.g., jablib) are built exactly once; parallelism across
+      # subprojects comes from org.gradle.parallel=true in gradle.properties.
+      # Do NOT run multiple Gradle processes concurrently on the same checkout: they race
+      # on shared task outputs (stale output cleanup deletes e.g. jablib/build while a
+      # sibling build reads it).
+      - name: Build all packages
+        run: >
+          gradle --parallel
+          :jabgui:jpackage :jabkit:jpackage :jabls-cli:jpackage :jabsrv-cli:jpackage
+          ${{ matrix.os == 'ubuntu-22.04' && ':jabgui:shadowJar :jabkit:shadowJar :jabls-cli:shadowJar :jabsrv-cli:shadowJar' || '' }}
+        env:
+          VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
+          OSXCERT: ${{ needs.conditions.outputs.secretspresent }}
+
+      # jbundle drives Gradle itself - therefore sequential and not part of the parallel block below
+      - name: jbundle all components
+        if: (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true')
+        shell: bash
+        # Version information passed as environment variables, because jbundle does not support gradle properties
+        # See https://github.com/avelino/jbundle/issues/59
+        env:
+          VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
+        run: |
+          jbundle build --no-appcds --input . --gradle-project jabgui --output ./build/jbundle/jabgui-${{ matrix.displayName }}
+          jbundle build --no-appcds --input . --gradle-project jabkit --output ./build/jbundle/jabkit-${{ matrix.displayName }}
+          jbundle build --no-appcds --input . --gradle-project jabls-cli --output ./build/jbundle/jabls-${{ matrix.displayName }}
+          jbundle build --no-appcds --input . --gradle-project jabsrv-cli --output ./build/jbundle/jabsrv-${{ matrix.displayName }}
+
+      # Everything below is Gradle-free per-component post-processing
+      # (smoke test, archiving, renaming, uploads) - safe to run in parallel.
       - parallel:
         - uses: ./.github/actions/package
           name: Package JabRef Language Server
@@ -637,11 +650,11 @@ jobs:
           with:
             component: jabls-cli
             componentShort: jabls
+            binaryName: jabls
             branchName: ${{ needs.pre-build.outputs.branch }}
             AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
             Major: ${{ needs.pre-build.outputs.Major }}
             Minor: ${{ needs.pre-build.outputs.Minor }}
-            InformationalVersion: ${{ needs.pre-build.outputs.InformationalVersion }}
             diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
             os: ${{ matrix.os }}
             displayName: ${{ matrix.displayName }}
@@ -652,20 +665,16 @@ jobs:
             uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
             subdir: "/tools"
             secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
-            astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
-            biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
-            ieeeApiKey: ${{ secrets.IEEEAPIKey }}
-            springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
         - uses: ./.github/actions/package
           name: Package JabRef HTTP Server
           with:
             component: jabsrv-cli
             componentShort: jabsrv
+            binaryName: jabsrv
             branchName: ${{ needs.pre-build.outputs.branch }}
             AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
             Major: ${{ needs.pre-build.outputs.Major }}
             Minor: ${{ needs.pre-build.outputs.Minor }}
-            InformationalVersion: ${{ needs.pre-build.outputs.InformationalVersion }}
             diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
             os: ${{ matrix.os }}
             displayName: ${{ matrix.displayName }}
@@ -676,21 +685,17 @@ jobs:
             uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
             subdir: "/tools"
             secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
-            astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
-            biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
-            ieeeApiKey: ${{ secrets.IEEEAPIKey }}
-            springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
         - uses: ./.github/actions/package
           name: Package JabGUI
           id: jabgui
           with:
             component: jabgui
             componentShort: jabgui
+            binaryName: JabRef
             branchName: ${{ needs.pre-build.outputs.branch }}
             AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
             Major: ${{ needs.pre-build.outputs.Major }}
             Minor: ${{ needs.pre-build.outputs.Minor }}
-            InformationalVersion: ${{ needs.pre-build.outputs.InformationalVersion }}
             diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
             os: ${{ matrix.os }}
             displayName: ${{ matrix.displayName }}
@@ -701,20 +706,16 @@ jobs:
             uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
             subdir: ""
             secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
-            astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
-            biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
-            ieeeApiKey: ${{ secrets.IEEEAPIKey }}
-            springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
         - uses: ./.github/actions/package
           name: Package JabKit
           with:
             component: jabkit
             componentShort: jabkit
+            binaryName: jabkit
             branchName: ${{ needs.pre-build.outputs.branch }}
             AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
             Major: ${{ needs.pre-build.outputs.Major }}
             Minor: ${{ needs.pre-build.outputs.Minor }}
-            InformationalVersion: ${{ needs.pre-build.outputs.InformationalVersion }}
             diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
             os: ${{ matrix.os }}
             displayName: ${{ matrix.displayName }}
@@ -725,10 +726,6 @@ jobs:
             uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
             subdir: "/tools"
             secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
-            astrophysicsDataSystemApiKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
-            biodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey }}
-            ieeeApiKey: ${{ secrets.IEEEAPIKey }}
-            springerNatureApiKey: ${{ secrets.SpringerNatureAPIKey }}
 
       - name: Upload jabgui and jabls-cli to GitHub workflow artifacts store for notarization (macOS)
         if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
