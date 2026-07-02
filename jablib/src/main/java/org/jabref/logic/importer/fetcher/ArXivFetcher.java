@@ -607,7 +607,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             List<BibEntry> searchResult = searchForEntries(rawQuery, pageNumber)
                     .stream()
                     .map(arXivEntry -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
-                    .collect(Collectors.toList());
+                    .toList();
             return new Page<>(rawQuery, pageNumber, searchResult);
         }
 
