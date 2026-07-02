@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -7,14 +9,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.ScopusQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.BaseQueryNode;
 
 import kong.unirest.core.json.JSONArray;
@@ -56,24 +61,70 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
     /// @return URL for the Scopus API request
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
-        transformer = new ScopusQueryTransformer();
-        String transformedQuery = transformer.transformSearchQuery(queryNode).orElse("");
+        String transformedQuery = new ScopusQueryTransformer().transformSearchQuery(queryNode).orElse("");
+        return buildSearchURL(transformedQuery, pageNumber);
+    }
 
+    @Override
+    public List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
+        return new ArrayList<>(performSearchPaged(queryNode, 0).getContent());
+    }
+
+    @Override
+    public Page<BibEntry> performSearchPaged(BaseQueryNode queryNode, int pageNumber) throws FetcherException {
+        ScopusQueryTransformer transformer = new ScopusQueryTransformer();
+        String transformedQuery = transformer.transformSearchQuery(queryNode).orElse("");
+        List<BibEntry> entries = fetchEntries(transformedQuery, pageNumber).stream()
+                                                                           .filter(entry -> shouldIncludeEntry(entry, transformer))
+                                                                           .toList();
+        return new Page<>(transformedQuery, pageNumber, entries);
+    }
+
+    @Override
+    public Page<BibEntry> performRawSearchQueryPaged(String rawQuery, int pageNumber) throws FetcherException {
+        if (rawQuery.isBlank()) {
+            return new Page<>(rawQuery, pageNumber, List.of());
+        }
+        // raw path sends the query verbatim and bypasses year filtering
+        return new Page<>(rawQuery, pageNumber, fetchEntries(rawQuery, pageNumber));
+    }
+
+    /// Downloads and parses Scopus search results for an already built query string
+    ///
+    /// @param query      the value placed verbatim into the Scopus `query` parameter
+    /// @param pageNumber zero based page number
+    private List<BibEntry> fetchEntries(String query, int pageNumber) throws FetcherException {
+        try {
+            URL url = buildSearchURL(query, pageNumber);
+            try (InputStream stream = getUrlDownload(url).asInputStream()) {
+                return getParser().parseEntries(stream);
+            }
+        } catch (URISyntaxException e) {
+            throw new FetcherException("Scopus search URL is malformed for query: " + query, e);
+        } catch (IOException e) {
+            throw new FetcherException(query, e);
+        } catch (ParseException e) {
+            throw new FetcherException("Scopus search parse error for query: " + query, e);
+        }
+    }
+
+    /// Builds the Scopus search API URL for the given raw query string and page number.
+    /// The raw query is sent verbatim as the `query` parameter, bypassing [ScopusQueryTransformer].
+    ///
+    /// @param rawQuery   the query string to pass directly as the `query` parameter
+    /// @param pageNumber zero based page number; converted to a zero based `start` offset.
+    private URL buildSearchURL(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("apiKey", apiKey));
-
-        if (!transformedQuery.isBlank()) {
-            uriBuilder.addParameter("query", transformedQuery);
+        if (!rawQuery.isBlank()) {
+            uriBuilder.addParameter("query", rawQuery);
         }
-
         uriBuilder.addParameter("count", String.valueOf(getPageSize()));
         uriBuilder.addParameter("start", String.valueOf(pageNumber * getPageSize()));
         uriBuilder.addParameter("view", "STANDARD");
         uriBuilder.addParameter("suppressNavLinks", "true");
         uriBuilder.addParameter("sort", "relevancy");
-
         LOGGER.debug("Scopus Search URL: {}", uriBuilder.build().toString());
-
         return uriBuilder.build().toURL();
     }
 
@@ -119,12 +170,7 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
                         continue;
                     }
 
-                    Optional<BibEntry> entryOpt = parseScopusEntry(jsonEntry);
-                    entryOpt.ifPresent(entry -> {
-                        if (shouldIncludeEntry(entry)) {
-                            entries.add(entry);
-                        }
-                    });
+                    parseScopusEntry(jsonEntry).ifPresent(entries::add);
                 } catch (JSONException e) {
                     LOGGER.warn("Error parsing Scopus entry at index {}", i, e);
                 }
@@ -135,11 +181,7 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
     }
 
     /// Checks if the entry should be included based on year filtering.
-    private boolean shouldIncludeEntry(BibEntry entry) {
-        if (transformer == null) {
-            return true;
-        }
-
+    private boolean shouldIncludeEntry(BibEntry entry, ScopusQueryTransformer transformer) {
         Optional<Integer> startYear = transformer.getStartYear();
         Optional<Integer> endYear = transformer.getEndYear();
 
