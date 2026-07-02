@@ -52,4 +52,13 @@ public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher,
     default List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
         return SearchBasedParserFetcher.super.performSearch(queryNode);
     }
+
+    /// Resolves the diamond inheritance of `performRawSearchQuery`: this interface inherits one default from
+    /// {@link SearchBasedParserFetcher} (single-page, via `getURLForRawQuery`) and another from
+    /// {@link PagedSearchBasedFetcher} (paged, via `performRawSearchQueryPaged`). Paged fetchers implement the paged
+    /// hook, so we route through the paged default.
+    @Override
+    default List<BibEntry> performRawSearchQuery(String rawQuery) throws FetcherException {
+        return PagedSearchBasedFetcher.super.performRawSearchQuery(rawQuery);
+    }
 }

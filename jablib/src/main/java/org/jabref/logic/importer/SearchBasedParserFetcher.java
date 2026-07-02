@@ -48,6 +48,21 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetc
         return getBibEntries(urlForQuery);
     }
 
+    /// Default implementation: builds the URL via {@link #getURLForRawQuery(String)}, then downloads, parses, and post-cleans the result.
+    @Override
+    default List<BibEntry> performRawSearchQuery(String rawQuery) throws FetcherException {
+        if (rawQuery.isBlank()) {
+            return List.of();
+        }
+        URL urlForQuery;
+        try {
+            urlForQuery = getURLForRawQuery(rawQuery);
+        } catch (URISyntaxException | MalformedURLException | FetcherException e) {
+            throw new FetcherException("Search URI crafted from raw search query is malformed: " + rawQuery, e);
+        }
+        return getBibEntries(urlForQuery);
+    }
+
     private List<BibEntry> getBibEntries(URL urlForQuery) throws FetcherException {
         try (InputStream stream = getUrlDownload(urlForQuery).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
@@ -69,4 +84,11 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetc
     ///
     /// @param queryList the list that contains the parsed nodes
     URL getURLForQuery(BaseQueryNode queryList) throws URISyntaxException, MalformedURLException, FetcherException;
+
+    /// Constructs a URL that sends the raw, catalog-native query verbatim to the catalog (bypassing the query transformer).
+    ///
+    /// @param rawQuery catalog-native query string sent verbatim to the catalog
+    default URL getURLForRawQuery(String rawQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+        throw new UnsupportedOperationException(getName() + " has not yet been migrated to performRawSearchQuery");
+    }
 }
