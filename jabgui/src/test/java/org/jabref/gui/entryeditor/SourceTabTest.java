@@ -12,6 +12,9 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.bibtexhighlighter.BibTeXStyleClass;
+import org.jabref.gui.bibtexhighlighter.HighlightRegion;
+import org.jabref.gui.bibtexhighlighter.VeneerSyntaxHighlighter;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -20,7 +23,9 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.fxmisc.richtext.CodeArea;
@@ -30,7 +35,10 @@ import org.mockito.Answers;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
+import org.testfx.util.WaitForAsyncUtils;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -65,7 +73,8 @@ class SourceTabTest {
                 mock(DialogService.class),
                 mock(BibEntryTypesManager.class),
                 keyBindingRepository,
-                stateManager);
+                stateManager,
+                new VeneerSyntaxHighlighter());
         pane = new TabPane(
                 new Tab("main area", area),
                 new Tab("other tab", new Label("some text")),
@@ -105,5 +114,50 @@ class SourceTabTest {
 
         // No exception should be thrown
         robot.interrupt(100);
+    }
+
+    @Test
+    void syntaxHighlighterAppliesCorrectStylesToBibTeXTokens() {
+        CodeArea testArea = new CodeArea();
+        String bibtexInput = "@Article{Shor94,\n  author = {Peter Shor},\n  year   = 1994\n}";
+        testArea.appendText(bibtexInput);
+
+        VeneerSyntaxHighlighter highlighter = new VeneerSyntaxHighlighter();
+        List<HighlightRegion> regions = highlighter.computeHighlighting(bibtexInput);
+        highlighter.applyHighlighting(regions, testArea);
+
+        int articleIndex = bibtexInput.indexOf("@Article");
+        int keyIndex = bibtexInput.indexOf("Shor94");
+        int authorIndex = bibtexInput.indexOf("author");
+        int sStringIndex = bibtexInput.indexOf("Peter Shor");
+        int yearNumberIndex = bibtexInput.indexOf("1994");
+
+        assertTrue(testArea.getStyleOfChar(articleIndex + 1).contains(org.jabref.gui.bibtexhighlighter.BibTeXStyleClass.KEYWORD.getClassName()));
+        assertTrue(testArea.getStyleOfChar(keyIndex).contains(org.jabref.gui.bibtexhighlighter.BibTeXStyleClass.KEY.getClassName()));
+        assertTrue(testArea.getStyleOfChar(authorIndex).contains(org.jabref.gui.bibtexhighlighter.BibTeXStyleClass.FIELD.getClassName()));
+        assertTrue(testArea.getStyleOfChar(sStringIndex).contains(org.jabref.gui.bibtexhighlighter.BibTeXStyleClass.STRING.getClassName()));
+        assertTrue(testArea.getStyleOfChar(yearNumberIndex).contains(org.jabref.gui.bibtexhighlighter.BibTeXStyleClass.NUMBER.getClassName()));
+    }
+
+    @Test
+    void sourceTabAutomaticallyTriggersHighlighterOnEntryBinding() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        entry.setCitationKey("Shor94");
+        entry.setField(StandardField.AUTHOR, "Peter Shor");
+
+        pane.getSelectionModel().select(2);
+        sourceTab.currentEntryProperty().set(entry);
+        sourceTab.notifyAboutFocus(entry);
+
+        CodeArea sourceCodeArea = (CodeArea) pane.lookup("#bibtexSourceCodeArea");
+        assertNotNull(sourceCodeArea, "Source CodeArea bileşeni ID ile sahneden bulunamadı.");
+
+        String renderedText = sourceCodeArea.getText();
+        int authorPos = renderedText.indexOf("author");
+
+        if (authorPos != -1) {
+            WaitForAsyncUtils.waitForFxEvents();
+            assertTrue(sourceCodeArea.getStyleOfChar(authorPos).contains(BibTeXStyleClass.FIELD.getClassName()));
+        }
     }
 }

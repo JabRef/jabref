@@ -11,6 +11,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.citationrelationtab.CitationRelationsTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
+import org.jabref.gui.bibtexhighlighter.BibTeXSyntaxHighlighter;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
@@ -50,6 +51,7 @@ public class EntryEditorTabFactory {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final KeyBindingRepository keyBindingRepository;
     private final SearchCitationsRelationsService searchCitationsRelationsService;
+    private final BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter;
 
     public EntryEditorTabFactory(PreviewPanel previewPanel,
                                  UndoAction undoAction,
@@ -66,7 +68,8 @@ public class EntryEditorTabFactory {
                                  BibEntryTypesManager bibEntryTypesManager,
                                  JournalAbbreviationRepository journalAbbreviationRepository,
                                  KeyBindingRepository keyBindingRepository,
-                                 SearchCitationsRelationsService searchCitationsRelationsService) {
+                                 SearchCitationsRelationsService searchCitationsRelationsService,
+                                 BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter) {
         this.previewPanel = previewPanel;
         this.undoAction = undoAction;
         this.redoAction = redoAction;
@@ -83,6 +86,7 @@ public class EntryEditorTabFactory {
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.keyBindingRepository = keyBindingRepository;
         this.searchCitationsRelationsService = searchCitationsRelationsService;
+        this.bibTeXSyntaxHighlighter = bibTeXSyntaxHighlighter;
     }
 
     /// Creates all tabs that can possibly be shown from {@link EntryEditorTabModel}, in display order.
@@ -172,7 +176,8 @@ public class EntryEditorTabFactory {
                             dialogService,
                             bibEntryTypesManager,
                             keyBindingRepository,
-                            stateManager);
+                            stateManager,
+                            bibTeXSyntaxHighlighter);
             case FULLTEXT_SEARCH_RESULTS ->
                     new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor);
         };
