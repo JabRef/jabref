@@ -27,6 +27,7 @@ import org.jabref.logic.importer.fetcher.DiVA;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.importer.fetcher.EuropePmcFetcher;
+import org.jabref.logic.importer.fetcher.GenericUrlBasedFetcher;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.INSPIREFetcher;
@@ -214,6 +215,13 @@ public class WebFetchers {
         set.add(new RfcFetcher(importFormatPreferences));
         set.add(new Medra());
         // set.add(new JstorFetcher(importFormatPreferences));
+        return set;
+    }
+
+    /// @return sorted set containing url based fetchers
+    public static SortedSet<UrlBasedFetcher> getUrlBasedFetchers(ImportFormatPreferences importFormatPreferences) {
+        SortedSet<UrlBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName, String.CASE_INSENSITIVE_ORDER));
+        set.add(new GenericUrlBasedFetcher(importFormatPreferences));
         return set;
     }
 

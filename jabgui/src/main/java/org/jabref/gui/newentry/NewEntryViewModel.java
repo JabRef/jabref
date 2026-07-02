@@ -32,6 +32,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.UrlBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.plaincitation.PlainCitationParser;
@@ -87,6 +88,10 @@ public class NewEntryViewModel {
     private final ListProperty<PlainCitationParserChoice> interpretParsers;
     private final ObjectProperty<PlainCitationParserChoice> interpretParser;
     private Task<Optional<List<BibEntry>>> interpretWorker;
+
+    private final StringProperty urlText;
+    private final Validator urlTextValidator;
+    private Task<Optional<List<BibEntry>>> urlWorker;
 
     private final StringProperty bibtexText;
     private final Validator bibtexTextValidator;
@@ -146,6 +151,13 @@ public class NewEntryViewModel {
         }
         interpretParser = new SimpleObjectProperty<>();
         interpretWorker = null;
+
+        urlText = new SimpleStringProperty();
+        urlTextValidator = new FunctionBasedValidator<>(
+                urlText,
+                StringUtil::isNotBlank,
+                ValidationMessage.error(Localization.lang("You must specify a URL.")));
+        urlWorker = null;
 
         bibtexText = new SimpleStringProperty();
         bibtexTextValidator = new FunctionBasedValidator<>(
@@ -231,6 +243,14 @@ public class NewEntryViewModel {
 
     public ObjectProperty<PlainCitationParserChoice> interpretParserProperty() {
         return interpretParser;
+    }
+
+    public StringProperty urlTextProperty() {
+        return urlText;
+    }
+
+    public ReadOnlyBooleanProperty urlTextValidatorProperty() {
+        return urlTextValidator.getValidationStatus().validProperty();
     }
 
     public StringProperty bibtexTextProperty() {
@@ -364,6 +384,94 @@ public class NewEntryViewModel {
         });
 
         taskExecutor.execute(idLookupWorker);
+    }
+
+    private class WorkerEnterUrl extends Task<Optional<List<BibEntry>>> {
+        @Override
+        protected Optional<List<BibEntry>> call() throws FetcherException {
+            final String text = urlText.getValue();
+            final boolean textValid = urlTextValidator.getValidationStatus().isValid();
+
+            if (text == null || !textValid) {
+                return Optional.empty();
+            }
+
+            final UrlBasedFetcher fetcher = WebFetchers.getUrlBasedFetchers(preferences.getImportFormatPreferences()).getFirst();
+            final List<BibEntry> entries = fetcher.performSearch(text);
+
+            if (entries.isEmpty()) {
+                return Optional.empty();
+            }
+            return Optional.of(entries);
+        }
+    }
+
+    public void executeEnterUrl() {
+        executing.setValue(true);
+
+        cancel();
+        urlWorker = new WorkerEnterUrl();
+
+        urlWorker.setOnFailed(_ -> {
+            final Throwable exception = urlWorker.getException();
+            final String exceptionMessage = exception.getMessage();
+            final String urlString = urlText.getValue();
+
+            final String dialogTitle = Localization.lang("Failed to create entry from URL");
+
+            if (exception instanceof FetcherServerException) {
+                dialogService.showInformationDialogAndWait(
+                        dialogTitle,
+                        Localization.lang(
+                                "Bibliographic data could not be retrieved.\n" +
+                                        "This is likely due to an issue being experienced by the server.\n" +
+                                        "Try again later.\n" +
+                                        "%0",
+                                exceptionMessage));
+            } else {
+                dialogService.showInformationDialogAndWait(
+                        dialogTitle,
+                        Localization.lang(
+                                "Bibliographic data could not be retrieved.\n" +
+                                        "The following error was encountered:\n" +
+                                        "%0",
+                                exceptionMessage));
+            }
+
+            LOGGER.error("An exception occurred when creating an entry from the URL '{}'.", urlString, exception);
+
+            executing.set(false);
+        });
+
+        urlWorker.setOnSucceeded(_ -> {
+            final Optional<List<BibEntry>> result = urlWorker.getValue();
+
+            if (result.isEmpty()) {
+                dialogService.showWarningDialogAndWait(
+                        Localization.lang("Invalid result"),
+                        Localization.lang(
+                                "An unknown error has occurred.\n" +
+                                        "Entries may need to be added manually."));
+                LOGGER.error("An invalid result was returned when creating an entry from a URL.");
+                executing.set(false);
+                return;
+            }
+
+            final ImportHandler handler = new ImportHandler(
+                    libraryTab.getBibDatabaseContext(),
+                    preferences,
+                    fileUpdateMonitor,
+                    libraryTab.getUndoManager(),
+                    stateManager,
+                    dialogService,
+                    taskExecutor);
+            handler.importEntriesWithDuplicateCheck(null, result.get());
+
+            executedSuccessfully.set(true);
+            executing.set(false);
+        });
+
+        taskExecutor.execute(urlWorker);
     }
 
     private class WorkerInterpretCitations extends Task<Optional<List<BibEntry>>> {
@@ -552,6 +660,9 @@ public class NewEntryViewModel {
     public void cancel() {
         if (idLookupWorker != null) {
             idLookupWorker.cancel();
+        }
+        if (urlWorker != null) {
+            urlWorker.cancel();
         }
         if (interpretWorker != null) {
             interpretWorker.cancel();
