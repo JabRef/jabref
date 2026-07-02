@@ -1,6 +1,17 @@
 name: JabKit Native Smoke Test
 
 on:
+  push:
+    branches:
+      - main
+      - main-release
+    paths-ignore:
+      - 'docs/**'
+      - 'src/test/**'
+      - 'README.md'
+    tags:
+      - '*'
+  pull_request:
   workflow_dispatch:
     inputs:
       run-online-tests:
