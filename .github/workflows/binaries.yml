@@ -169,15 +169,6 @@ jobs:
             exit 0
           fi
 
-          # jbundle is built on explicit request only (workflow_dispatch input)
-          if [[ "${{ github.event.inputs.jbundle || 'false' }}" == "true" ]]; then
-            echo "🧰 jbundle build"
-            echo "🧰 jbundle build" >> $GITHUB_STEP_SUMMARY
-            echo "should-jbundle=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "should-jbundle=false" >> "$GITHUB_OUTPUT"
-          fi
-
           if [[ "${{ github.event.inputs.useEaJdk || 'false' }}" == "true" ]]; then
             echo "🚀 JDK EA build enabled"
             echo "🚀 JDK EA build enabled" >> "$GITHUB_STEP_SUMMARY"
@@ -229,6 +220,8 @@ jobs:
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             echo "🏷️ tag build" >> $GITHUB_STEP_SUMMARY
             echo "tagbuild=true" >> "$GITHUB_OUTPUT"
+            echo "🧰 jbundle build" >> $GITHUB_STEP_SUMMARY
+            echo "should-jbundle=true" >> "$GITHUB_OUTPUT"
           else
             echo "⊘ no tag bulid" >> $GITHUB_STEP_SUMMARY
             echo "tagbuild=false" >> "$GITHUB_OUTPUT"
@@ -260,11 +253,15 @@ jobs:
               echo "☁️ Push to \`main\` – will upload"
               echo "☁️ Push to \`main\` – will upload" >> $GITHUB_STEP_SUMMARY
               echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+              echo "🚫🧰 no jbundle build" >> $GITHUB_STEP_SUMMARY
+              echo "should-jbundle=false" >> "$GITHUB_OUTPUT"
               exit 0
             fi;
             echo "⊘ Push to some branch not main – skipping upload"
             echo "⊘ Push to some branch not main – skipping upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "🚫🧰 no jbundle build" >> $GITHUB_STEP_SUMMARY
+            echo "should-jbundle=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi;
 
@@ -272,6 +269,7 @@ jobs:
             echo "☁️? Dispatch event – will upload: ${{ github.event.inputs.upload || 'false' }}"
             echo "☁️= Dispatch event – will upload: ${{ github.event.inputs.upload || 'false' }}" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=${{ github.event.inputs.upload || 'false' }}" >> "$GITHUB_OUTPUT"
+            echo "should-jbundle=${{ github.event.inputs.jbundle || 'false' }}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -281,10 +279,14 @@ jobs:
             echo "☁️ Label 'dev: binaries' found – will upload"
             echo "☁️ Label 'dev: binaries' found – will upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+            echo "🧰 jbundle build" >> $GITHUB_STEP_SUMMARY
+            echo "should-jbundle=true" >> "$GITHUB_OUTPUT"
           else
             echo "⊘ Label 'dev: binaries' not found – skipping upload"
             echo "⊘ Label 'dev: binaries' not found – skipping upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "🚫🧰 no jbundle build" >> $GITHUB_STEP_SUMMARY
+            echo "should-jbundle=false" >> "$GITHUB_OUTPUT"
           fi
 
   disk-space-check:
