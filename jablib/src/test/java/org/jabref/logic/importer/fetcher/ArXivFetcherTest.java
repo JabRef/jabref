@@ -35,7 +35,6 @@ import org.mockito.Mockito;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -585,7 +584,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     @Test
     void performRawSearchQueryPagedWithNullDoiFetcherReturnsResults() throws FetcherException {
         ArXivFetcher fetcherWithoutDoi = new ArXivFetcher(importFormatPreferences, null);
-        assertNotNull(fetcherWithoutDoi.performRawSearchQueryPaged("machine learning", 0).getContent());
+        assertFalse(fetcherWithoutDoi.performRawSearchQueryPaged("machine learning", 0).getContent().isEmpty());
     }
 
     @Test
