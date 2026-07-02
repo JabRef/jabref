@@ -130,9 +130,8 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
                 Bindings.size(externalFetcherTable.getItems())
                         .add(HEADER_HEIGHT_ESTIMATE)
                         .multiply(rowHeight));
-        // The table content exactly fits the prefHeight but JavaFX still
-        // reserves a vertical scrollbar gutter. Hide it once the skin is
-        // attached so the table reads as a tight read-only list.
+        // Content fits prefHeight exactly, but JavaFX still reserves a vertical scrollbar gutter.
+        // Hide it once the skin is attached so the table reads as a tight read-only list.
         externalFetcherTable.skinProperty().addListener((_, _, newSkin) -> {
             if (newSkin == null) {
                 return;

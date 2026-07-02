@@ -269,12 +269,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     private void addFromURLAndDownload(URL url, Map<String, String> headers) {
-        // Some fetchers (browser-extension companion, local cache) return a
-        // file:// URL pointing at a PDF already on disk. There is nothing to
-        // download — attach the file directly, move it into the configured
-        // file directory, and rename it per the file-naming pattern (the
-        // same fate a successful HTTP download would have via
-        // DownloadLinkedFileAction).
+        // A file: URL points at a PDF already on disk; attach it directly instead of downloading,
+        // then move and rename it into the configured file directory like a completed HTTP download.
         if ("file".equalsIgnoreCase(url.getProtocol())) {
             attachLocalFile(url);
             return;

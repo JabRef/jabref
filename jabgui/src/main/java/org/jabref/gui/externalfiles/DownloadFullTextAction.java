@@ -133,10 +133,8 @@ public class DownloadFullTextAction extends SimpleCommand {
     /// @param entry           the entry "value"
     private void addLinkedFileFromURL(BibDatabaseContext databaseContext, FetcherResult result, BibEntry entry) {
         URL source = result.source();
-        // Browser-extension / local-cache fetchers return a file:// URL pointing
-        // at a PDF already on disk. Route to a local-attach path so the same
-        // move-and-rename pipeline a successful HTTP download would use kicks in;
-        // online URLs keep the existing LinkedFileViewModel.download path.
+        // A file: URL points at a PDF already on disk; attach it locally so it runs through the
+        // same move-and-rename pipeline as an HTTP download. Online URLs use the download path below.
         if ("file".equalsIgnoreCase(source.getProtocol())) {
             attachLocalFile(databaseContext, source, entry);
             return;
