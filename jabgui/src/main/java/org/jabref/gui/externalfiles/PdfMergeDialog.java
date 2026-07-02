@@ -2,10 +2,13 @@ package org.jabref.gui.externalfiles;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.importer.IdentifierBasedEntryFetcher;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
@@ -14,10 +17,19 @@ import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibtexImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
+
+import com.google.common.base.Suppliers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PdfMergeDialog {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PdfMergeDialog.class);
 
     /// Constructs a merge dialog for a PDF file. This dialog calls various {@link org.jabref.logic.importer.fileformat.pdf.PdfImporter}s, collects the results, and lets the user choose between them.
     ///
@@ -33,13 +45,13 @@ public class PdfMergeDialog {
     public static MultiMergeEntriesView createMergeDialog(BibEntry entry, Path filePath, GuiPreferences preferences, TaskExecutor taskExecutor) {
         MultiMergeEntriesView dialog = initDialog(preferences, taskExecutor);
         dialog.addSource(Localization.lang("Entry"), entry);
-        finishDialog(dialog, filePath, preferences);
+        finishDialog(dialog, filePath, preferences, taskExecutor);
         return dialog;
     }
 
     public static MultiMergeEntriesView createMergeDialog(Path filePath, GuiPreferences preferences, TaskExecutor taskExecutor) {
         MultiMergeEntriesView dialog = initDialog(preferences, taskExecutor);
-        finishDialog(dialog, filePath, preferences);
+        finishDialog(dialog, filePath, preferences, taskExecutor);
         return dialog;
     }
 
@@ -49,14 +61,61 @@ public class PdfMergeDialog {
         return dialog;
     }
 
-    private static void finishDialog(MultiMergeEntriesView dialog, Path filePath, GuiPreferences preferences) {
-        dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibtexImporter(preferences.getImportFormatPreferences()), filePath));
-        dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
+    private static void finishDialog(MultiMergeEntriesView dialog, Path filePath, GuiPreferences preferences, TaskExecutor taskExecutor) {
+        Supplier<BibEntry> verbatimSupplier = memoize(
+                wrapImporterToSupplier(new PdfVerbatimBibtexImporter(preferences.getImportFormatPreferences()), filePath));
+        Supplier<BibEntry> embeddedSupplier = memoize(
+                wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
+        Supplier<BibEntry> xmpSupplier = memoize(
+                wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
+        Supplier<BibEntry> contentSupplier = memoize(
+                wrapImporterToSupplier(new PdfContentImporter(), filePath));
+
+        dialog.addSource(Localization.lang("Verbatim"), verbatimSupplier);
+        dialog.addSource(Localization.lang("Embedded"), embeddedSupplier);
+
+        List<Supplier<BibEntry>> parsedEntrySuppliers = new ArrayList<>(List.of(
+                verbatimSupplier,
+                embeddedSupplier,
+                xmpSupplier,
+                contentSupplier
+        ));
+
         if (preferences.getGrobidPreferences().isGrobidEnabled()) {
-            dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidImporter(preferences.getImportFormatPreferences()), filePath));
+            Supplier<BibEntry> grobidSupplier = memoize(
+                    wrapImporterToSupplier(new PdfGrobidImporter(preferences.getImportFormatPreferences()), filePath));
+            dialog.addSource("Grobid", grobidSupplier);
+            parsedEntrySuppliers.add(grobidSupplier);
         }
-        dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
-        dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentImporter(), filePath));
+
+        dialog.addSource(Localization.lang("XMP metadata"), xmpSupplier);
+        dialog.addSource(Localization.lang("Content"), contentSupplier);
+
+        Supplier<List<BibEntry>> parsedEntriesSupplier = memoize(() -> getAvailableEntries(parsedEntrySuppliers));
+        IdentifierBasedEntryFetcher identifierBasedEntryFetcher = new IdentifierBasedEntryFetcher(preferences.getImportFormatPreferences());
+
+        BackgroundTask.wrap(() -> identifierBasedEntryFetcher.fetchByFields(parsedEntriesSupplier.get(), IdentifierBasedEntryFetcher.SUPPORTED_FIELDS))
+                      .onSuccess(fetchedEntries -> {
+                          for (Field field : IdentifierBasedEntryFetcher.SUPPORTED_FIELDS) {
+                              BibEntry fetchedEntry = fetchedEntries.get(field);
+                              if (fetchedEntry != null) {
+                                  dialog.addSource(Localization.lang("Entry from %0", FieldTextMapper.getDisplayName(field)), fetchedEntry);
+                              }
+                          }
+                      })
+                      .onFailure(exception -> LOGGER.debug("Identifier enrichment failed.", exception))
+                      .executeWith(taskExecutor);
+    }
+
+    private static List<BibEntry> getAvailableEntries(List<Supplier<BibEntry>> suppliers) {
+        List<BibEntry> entries = new ArrayList<>();
+        for (Supplier<BibEntry> supplier : suppliers) {
+            BibEntry entry = supplier.get();
+            if (entry != null) {
+                entries.add(entry);
+            }
+        }
+        return entries;
     }
 
     private static Supplier<BibEntry> wrapImporterToSupplier(Importer importer, Path filePath) {
@@ -71,5 +130,10 @@ public class PdfMergeDialog {
                 return null;
             }
         };
+    }
+
+    private static <T> Supplier<T> memoize(Supplier<T> supplier) {
+        com.google.common.base.Supplier<T> guavaSupplier = Suppliers.memoize(supplier::get);
+        return guavaSupplier::get;
     }
 }
