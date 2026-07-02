@@ -62,6 +62,8 @@ Both use GraalVM's unified [`reachability-metadata.json`](https://www.graalvm.or
 
 ## Adding metadata for a new command
 
+Adding or upgrading a dependency is covered in [Dependency management](dependency-management.md). If that makes the native build fail with a missing reachability entry, this page is where you fix it.
+
 picocli already generates metadata for `@Command` and `@Option` fields. Add only what the command reaches at runtime and static analysis cannot see: reflective library calls, JNI, and resource lookups.
 
 The loop:
