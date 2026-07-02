@@ -483,6 +483,22 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
 
+      # Save disk space
+      # Hint by https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
+      - name: Free disk space
+        if: startsWith(matrix.os, 'ubuntu')
+        background: true
+        run: sudo rm -rf /usr/local/lib/android/sdk /usr/local/.ghcup /usr/share/swift
+
+      - name: Install pigz and cache (Linux)
+        id: pigz
+        if: startsWith(matrix.os, 'ubuntu')
+        background: true
+        uses: awalsh128/cache-apt-pkgs-action@v1.6.3
+        with:
+          packages: pigz
+          version: 1.0
+
       - name: Setup SSH key
         if: ${{ needs.disk-space-check.outputs.available == 'true' }}
         run: |
@@ -546,13 +562,6 @@ jobs:
           which jlink
           jlink --version
 
-      # Save disk space
-      # Hint by https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
-      - name: Free disk space
-        if: startsWith(matrix.os, 'ubuntu')
-        background: true
-        run: sudo rm -rf /usr/local/lib/android/sdk /usr/local/.ghcup /usr/share/swift
-
       - name: Setup macOS key chain
         if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
         uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
@@ -568,15 +577,6 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: tEmPoRaRY-PaeSWD
-
-      - name: Install pigz and cache (Linux)
-        id: pigz
-        if: startsWith(matrix.os, 'ubuntu')
-        background: true
-        uses: awalsh128/cache-apt-pkgs-action@v1.6.3
-        with:
-          packages: pigz
-          version: 1.0
 
       - name: Workaround for jpackage issue
         run: |
