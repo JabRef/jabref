@@ -20,7 +20,7 @@ public class DateGroup extends AbstractGroup {
         this.date = date;
     }
 
-    static Optional<Date> extractDate(Field field, BibEntry entry) {
+    public static Optional<Date> extractDate(Field field, BibEntry entry) {
         boolean isCore =
                 (field == StandardField.DATE)
                         || (field == StandardField.YEAR)

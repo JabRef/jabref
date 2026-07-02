@@ -1,6 +1,7 @@
 package org.jabref.logic.search.inmemory;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -11,7 +12,10 @@ import org.jabref.logic.search.query.SearchFieldConstants;
 import org.jabref.logic.search.query.SearchQueryConversion;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.DateGroup;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
@@ -104,6 +108,12 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
 
         String fieldName = ctx.FIELD().getText().toLowerCase(Locale.ROOT);
         int operator = ctx.operator().getStart().getType();
+
+        if (operator == SearchParser.GT || operator == SearchParser.LT ||
+                operator == SearchParser.GTE || operator == SearchParser.LTE) {
+            return compareFieldValue(fieldName, term, operator);
+        }
+
         OperatorFlags flags = mapOperator(operator);
 
         // field = "" / field != "" — presence/absence
@@ -213,6 +223,76 @@ class BibEntryMatchVisitor extends SearchBaseVisitor<Boolean> {
             LOGGER.debug("Invalid regex pattern '{}': {}", pattern, e.getMessage());
             return false;
         }
+    }
+
+    private boolean compareFieldValue(String fieldName, String term, int operator) {
+        Field field = FieldFactory.parseField(fieldName);
+
+        if (field.getProperties().contains(FieldProperty.YEAR)) {
+            try {
+                int termYear = Integer.parseInt(term.strip());
+                // extractDate handles the date→year alias: an entry with only "date = 2022-11-05"
+                // is matched by "year >= 2020" because getFieldOrAlias resolves date to year
+                return DateGroup.extractDate(field, entry)
+                                .flatMap(d -> d.getYear())
+                                .map(entryYear -> compareInts(entryYear, termYear, operator))
+                                .orElse(false);
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+
+        if (field.getProperties().contains(FieldProperty.DATE)) {
+            int dashes = (int) term.chars().filter(c -> c == '-').count();
+            LocalDate termDate = parseTermDate(term.strip(), dashes);
+            if (termDate == null) {
+                return false;
+            }
+            return DateGroup.extractDate(field, entry)
+                            .map(BibEntryMatchVisitor::toLocalDate)
+                            .map(entryDate -> compareInts(entryDate.compareTo(termDate), 0, operator))
+                            .orElse(false);
+        }
+
+        return false;
+    }
+
+    private static LocalDate parseTermDate(String term, int dashes) {
+        try {
+            String[] parts = term.split("-");
+            return switch (dashes) {
+                case 0 ->
+                        LocalDate.of(Integer.parseInt(parts[0]), 1, 1);
+                case 1 ->
+                        LocalDate.of(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), 1);
+                default ->
+                        LocalDate.parse(term);
+            };
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static LocalDate toLocalDate(org.jabref.model.entry.Date d) {
+        return LocalDate.of(
+                d.getYear().orElse(0),
+                d.getMonth().map(org.jabref.model.entry.Month::getNumber).orElse(1),
+                d.getDay().orElse(1));
+    }
+
+    private static boolean compareInts(int a, int b, int operator) {
+        return switch (operator) {
+            case SearchParser.GT ->
+                    a > b;
+            case SearchParser.LT ->
+                    a < b;
+            case SearchParser.GTE ->
+                    a >= b;
+            case SearchParser.LTE ->
+                    a <= b;
+            default ->
+                    false;
+        };
     }
 
     /// @param matchKind one of [SearchFlags#INEXACT_MATCH], [SearchFlags#EXACT_MATCH], [SearchFlags#REGULAR_EXPRESSION]
