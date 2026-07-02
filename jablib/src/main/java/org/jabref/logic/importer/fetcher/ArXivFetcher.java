@@ -311,28 +311,42 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     /// @return A list of entries matching the complex query
     @Override
     public Page<BibEntry> performSearchPaged(BaseQueryNode queryNode, int pageNumber) throws FetcherException {
-
         Page<BibEntry> result = arXiv.performSearchPaged(queryNode, pageNumber);
         if (this.doiFetcher == null) {
             return result;
         }
+        return enrichPageWithDoi(result);
+    }
 
-        ExecutorService executor = Executors.newFixedThreadPool(getPageSize() * 2);
+    @Override
+    public Page<BibEntry> performRawSearchQueryPaged(String rawQuery, int pageNumber) throws FetcherException {
+        if (rawQuery.isBlank()) {
+            return new Page<>(rawQuery, pageNumber, List.of());
+        }
+        Page<BibEntry> result = arXiv.performRawSearchQueryPaged(rawQuery, pageNumber);
+        if (this.doiFetcher == null) {
+            return result;
+        }
+        return enrichPageWithDoi(result);
+    }
 
-        Collection<CompletableFuture<BibEntry>> futureSearchResult = result.getContent()
-                                                                           .stream()
-                                                                           .map(bibEntry ->
-                                                                                   CompletableFuture.supplyAsync(() -> {
-                                                                                       this.inplaceAsyncInfuseArXivWithDoi(bibEntry);
-                                                                                       return bibEntry;
-                                                                                   }, executor))
-                                                                           .toList();
+    private Page<BibEntry> enrichPageWithDoi(Page<BibEntry> result) {
+        try (ExecutorService executor = Executors.newFixedThreadPool(getPageSize() * 2)) {
+            Collection<CompletableFuture<BibEntry>> futureSearchResult = result.getContent()
+                                                                               .stream()
+                                                                               .map(bibEntry ->
+                                                                                       CompletableFuture.supplyAsync(() -> {
+                                                                                           this.inplaceAsyncInfuseArXivWithDoi(bibEntry);
+                                                                                           return bibEntry;
+                                                                                       }, executor))
+                                                                               .toList();
 
-        Collection<BibEntry> modifiedSearchResult = futureSearchResult.stream()
-                                                                      .map(CompletableFuture::join)
-                                                                      .collect(Collectors.toList());
+            Collection<BibEntry> modifiedSearchResult = futureSearchResult.stream()
+                                                                          .map(CompletableFuture::join)
+                                                                          .toList();
 
-        return new Page<>(result.getQuery(), result.getPageNumber(), modifiedSearchResult);
+            return new Page<>(result.getQuery(), result.getPageNumber(), modifiedSearchResult);
+        }
     }
 
     @Override
@@ -583,6 +597,18 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                     .collect(Collectors.toList());
 
             return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
+        }
+
+        @Override
+        public Page<BibEntry> performRawSearchQueryPaged(String rawQuery, int pageNumber) throws FetcherException {
+            if (rawQuery.isBlank()) {
+                return new Page<>(rawQuery, pageNumber, List.of());
+            }
+            List<BibEntry> searchResult = searchForEntries(rawQuery, pageNumber)
+                    .stream()
+                    .map(arXivEntry -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
+                    .toList();
+            return new Page<>(rawQuery, pageNumber, searchResult);
         }
 
         private List<BibEntry> filterYears(List<BibEntry> searchResult, ArXivQueryTransformer transformer) {
