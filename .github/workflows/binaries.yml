@@ -648,91 +648,90 @@ jobs:
         run:
           echo "pigz version: $(pigz --version)"
 
-      # Everything below is Gradle-free per-component post-processing
-      # (smoke test, archiving, renaming, uploads) - safe to run in parallel.
-      - parallel:
-        - uses: ./.github/actions/package
-          name: Package JabRef Language Server
-          id: jabls-cli
-          with:
-            component: jabls-cli
-            componentShort: jabls
-            binaryName: jabls
-            branchName: ${{ needs.pre-build.outputs.branch }}
-            AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
-            Major: ${{ needs.pre-build.outputs.Major }}
-            Minor: ${{ needs.pre-build.outputs.Minor }}
-            diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
-            os: ${{ matrix.os }}
-            displayName: ${{ matrix.displayName }}
-            archivePortable: ${{ matrix.archivePortableJabLS }}
-            archForDebianRepack: ${{ matrix.archForDebianRepack }}
-            suffix: ${{ matrix.suffix }}
-            shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
-            uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
-            subdir: "/tools"
-            secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
-        - uses: ./.github/actions/package
-          name: Package JabRef HTTP Server
-          with:
-            component: jabsrv-cli
-            componentShort: jabsrv
-            binaryName: jabsrv
-            branchName: ${{ needs.pre-build.outputs.branch }}
-            AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
-            Major: ${{ needs.pre-build.outputs.Major }}
-            Minor: ${{ needs.pre-build.outputs.Minor }}
-            diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
-            os: ${{ matrix.os }}
-            displayName: ${{ matrix.displayName }}
-            archivePortable: 'NONE'
-            archForDebianRepack: ${{ matrix.archForDebianRepack }}
-            suffix: ${{ matrix.suffix }}
-            shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
-            uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
-            subdir: "/tools"
-            secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
-        - uses: ./.github/actions/package
-          name: Package JabGUI
-          id: jabgui
-          with:
-            component: jabgui
-            componentShort: jabgui
-            binaryName: JabRef
-            branchName: ${{ needs.pre-build.outputs.branch }}
-            AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
-            Major: ${{ needs.pre-build.outputs.Major }}
-            Minor: ${{ needs.pre-build.outputs.Minor }}
-            diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
-            os: ${{ matrix.os }}
-            displayName: ${{ matrix.displayName }}
-            archivePortable: ${{ matrix.archivePortable }}
-            archForDebianRepack: ${{ matrix.archForDebianRepack }}
-            suffix: ${{ matrix.suffix }}
-            shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
-            uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
-            subdir: ""
-            secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
-        - uses: ./.github/actions/package
-          name: Package JabKit
-          with:
-            component: jabkit
-            componentShort: jabkit
-            binaryName: jabkit
-            branchName: ${{ needs.pre-build.outputs.branch }}
-            AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
-            Major: ${{ needs.pre-build.outputs.Major }}
-            Minor: ${{ needs.pre-build.outputs.Minor }}
-            diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
-            os: ${{ matrix.os }}
-            displayName: ${{ matrix.displayName }}
-            archivePortable: ${{ matrix.archivePortableJabKit }}
-            archForDebianRepack: ${{ matrix.archForDebianRepack }}
-            suffix: ${{ matrix.suffix }}
-            shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
-            uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
-            subdir: "/tools"
-            secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
+      # package all components, JabKit should be available the fastest - JabGui as last, because build requires the most time
+
+      - uses: ./.github/actions/package
+        name: Package JabKit
+        with:
+          component: jabkit
+          componentShort: jabkit
+          binaryName: jabkit
+          branchName: ${{ needs.pre-build.outputs.branch }}
+          AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          Major: ${{ needs.pre-build.outputs.Major }}
+          Minor: ${{ needs.pre-build.outputs.Minor }}
+          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+          os: ${{ matrix.os }}
+          displayName: ${{ matrix.displayName }}
+          archivePortable: ${{ matrix.archivePortableJabKit }}
+          archForDebianRepack: ${{ matrix.archForDebianRepack }}
+          suffix: ${{ matrix.suffix }}
+          shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
+          uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          subdir: "/tools"
+          secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
+      - uses: ./.github/actions/package
+        name: Package JabRef Language Server
+        id: jabls-cli
+        with:
+          component: jabls-cli
+          componentShort: jabls
+          binaryName: jabls
+          branchName: ${{ needs.pre-build.outputs.branch }}
+          AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          Major: ${{ needs.pre-build.outputs.Major }}
+          Minor: ${{ needs.pre-build.outputs.Minor }}
+          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+          os: ${{ matrix.os }}
+          displayName: ${{ matrix.displayName }}
+          archivePortable: ${{ matrix.archivePortableJabLS }}
+          archForDebianRepack: ${{ matrix.archForDebianRepack }}
+          suffix: ${{ matrix.suffix }}
+          shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
+          uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          subdir: "/tools"
+          secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
+      - uses: ./.github/actions/package
+        name: Package JabRef HTTP Server
+        with:
+          component: jabsrv-cli
+          componentShort: jabsrv
+          binaryName: jabsrv
+          branchName: ${{ needs.pre-build.outputs.branch }}
+          AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          Major: ${{ needs.pre-build.outputs.Major }}
+          Minor: ${{ needs.pre-build.outputs.Minor }}
+          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+          os: ${{ matrix.os }}
+          displayName: ${{ matrix.displayName }}
+          archivePortable: 'NONE'
+          archForDebianRepack: ${{ matrix.archForDebianRepack }}
+          suffix: ${{ matrix.suffix }}
+          shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
+          uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          subdir: "/tools"
+          secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
+      - uses: ./.github/actions/package
+        name: Package JabGUI
+        id: jabgui
+        with:
+          component: jabgui
+          componentShort: jabgui
+          binaryName: JabRef
+          branchName: ${{ needs.pre-build.outputs.branch }}
+          AssemblySemVer: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          Major: ${{ needs.pre-build.outputs.Major }}
+          Minor: ${{ needs.pre-build.outputs.Minor }}
+          diskSpaceAvailable: ${{ needs.disk-space-check.outputs.available }}
+          os: ${{ matrix.os }}
+          displayName: ${{ matrix.displayName }}
+          archivePortable: ${{ matrix.archivePortable }}
+          archForDebianRepack: ${{ matrix.archForDebianRepack }}
+          suffix: ${{ matrix.suffix }}
+          shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
+          uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
+          subdir: ""
+          secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
 
       - name: Upload jabgui and jabls-cli to GitHub workflow artifacts store for notarization (macOS)
         if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
