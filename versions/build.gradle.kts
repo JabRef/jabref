@@ -109,7 +109,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-text:1.15.0")
     api("org.apache.httpcomponents.core5:httpcore5:5.4.3")
     api("org.apache.httpcomponents.client5:httpclient5:5.6.2")
-    api("org.apache.logging.log4j:log4j-to-slf4j:2.26.0")
+    api("org.apache.logging.log4j:log4j-to-slf4j:2.26.1")
     api("org.apache.lucene:lucene-analysis-common:$lucene")
     api("org.apache.lucene:lucene-core:$lucene")
     api("org.apache.lucene:lucene-highlighter:$lucene")
