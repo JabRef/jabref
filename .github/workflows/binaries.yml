@@ -89,11 +89,6 @@ on:
         type: boolean
         required: false
         default: false
-      jbundle:
-        description: "Build jbundle binaries (Linux amd64 only)"
-        type: boolean
-        required: false
-        default: false
       upload:
         description: "Upload to builds.jabref.org"
         type: boolean
@@ -136,7 +131,6 @@ jobs:
       tagbuild: ${{ steps.binary.outputs.tagbuild }}
       # required to avoid obsolete builds in case of labels != "dev: binaries"
       should-build: ${{ steps.binary.outputs.should-build }}
-      should-jbundle: ${{ steps.binary.outputs.should-jbundle }}
       should-notarize: ${{ steps.binary.outputs.should-notarize }}
       jvmDistribution:  ${{ steps.binary.outputs.jvmDistribution }}
       useEaJdk:  ${{ steps.binary.outputs.useEaJdk }}
@@ -220,8 +214,6 @@ jobs:
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             echo "🏷️ tag build" >> $GITHUB_STEP_SUMMARY
             echo "tagbuild=true" >> "$GITHUB_OUTPUT"
-            echo "🧰 jbundle build" >> $GITHUB_STEP_SUMMARY
-            echo "should-jbundle=true" >> "$GITHUB_OUTPUT"
           else
             echo "⊘ no tag bulid" >> $GITHUB_STEP_SUMMARY
             echo "tagbuild=false" >> "$GITHUB_OUTPUT"
@@ -253,15 +245,11 @@ jobs:
               echo "☁️ Push to \`main\` – will upload"
               echo "☁️ Push to \`main\` – will upload" >> $GITHUB_STEP_SUMMARY
               echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
-              echo "🚫🧰 no jbundle build" >> $GITHUB_STEP_SUMMARY
-              echo "should-jbundle=false" >> "$GITHUB_OUTPUT"
               exit 0
             fi;
             echo "⊘ Push to some branch not main – skipping upload"
             echo "⊘ Push to some branch not main – skipping upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
-            echo "🚫🧰 no jbundle build" >> $GITHUB_STEP_SUMMARY
-            echo "should-jbundle=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi;
 
@@ -269,7 +257,6 @@ jobs:
             echo "☁️? Dispatch event – will upload: ${{ github.event.inputs.upload || 'false' }}"
             echo "☁️= Dispatch event – will upload: ${{ github.event.inputs.upload || 'false' }}" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=${{ github.event.inputs.upload || 'false' }}" >> "$GITHUB_OUTPUT"
-            echo "should-jbundle=${{ github.event.inputs.jbundle || 'false' }}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -279,14 +266,10 @@ jobs:
             echo "☁️ Label 'dev: binaries' found – will upload"
             echo "☁️ Label 'dev: binaries' found – will upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
-            echo "🧰 jbundle build" >> $GITHUB_STEP_SUMMARY
-            echo "should-jbundle=true" >> "$GITHUB_OUTPUT"
           else
             echo "⊘ Label 'dev: binaries' not found – skipping upload"
             echo "⊘ Label 'dev: binaries' not found – skipping upload" >> $GITHUB_STEP_SUMMARY
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
-            echo "🚫🧰 no jbundle build" >> $GITHUB_STEP_SUMMARY
-            echo "should-jbundle=false" >> "$GITHUB_OUTPUT"
           fi
 
   disk-space-check:
@@ -586,15 +569,6 @@ jobs:
           create-keychain: false
           keychain-password: tEmPoRaRY-PaeSWD
 
-      - name: Install jbundle
-        id: jbundle
-        background: true
-        if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
-        uses: baptiste0928/cargo-install@v3
-        with:
-          crate: jbundle
-          git: https://github.com/avelino/jbundle/
-          branch: main
       - name: Install pigz and cache (Linux)
         id: pigz
         if: startsWith(matrix.os, 'ubuntu')
@@ -631,40 +605,6 @@ jobs:
           OSXCERT: ${{ needs.conditions.outputs.secretspresent }}
 
 
-      - wait: jbundle
-      - # Version information passed as environment variables, because jbundle does not support gradle properties
-        # See https://github.com/avelino/jbundle/issues/59
-        # jbundle drives Gradle itself; each invocation reads a different subproject's build outputs
-        parallel:
-          - name: jabgui
-            if: (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true')
-            shell: bash
-            env:
-              VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
-              VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
-            run: jbundle build --no-appcds --input . --gradle-project jabgui --output ./build/jbundle/jabgui-${{ matrix.displayName }}
-          - name: jabkit
-            if: (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true')
-            shell: bash
-            env:
-              VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
-              VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
-            run: jbundle build --no-appcds --input . --gradle-project jabkit --output ./build/jbundle/jabkit-${{ matrix.displayName }}
-          - name: jabls-cli
-            if: (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true')
-            shell: bash
-            env:
-              VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
-              VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
-            run: jbundle build --no-appcds --input . --gradle-project jabls-cli --output ./build/jbundle/jabls-${{ matrix.displayName }}
-          - name: jabsrv-cli
-            if: (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true')
-            shell: bash
-            env:
-              VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
-              VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
-            run: jbundle build --no-appcds --input . --gradle-project jabsrv-cli --output ./build/jbundle/jabsrv-${{ matrix.displayName }}
-
       - name: Sync pigz
         wait: pigz
 
@@ -686,7 +626,6 @@ jobs:
           archivePortable: ${{ matrix.archivePortableJabKit }}
           archForDebianRepack: ${{ matrix.archForDebianRepack }}
           suffix: ${{ matrix.suffix }}
-          shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
           subdir: "/tools"
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
@@ -707,7 +646,6 @@ jobs:
           archivePortable: ${{ matrix.archivePortableJabLS }}
           archForDebianRepack: ${{ matrix.archForDebianRepack }}
           suffix: ${{ matrix.suffix }}
-          shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
           subdir: "/tools"
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
@@ -727,7 +665,6 @@ jobs:
           archivePortable: 'NONE'
           archForDebianRepack: ${{ matrix.archForDebianRepack }}
           suffix: ${{ matrix.suffix }}
-          shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
           subdir: "/tools"
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
@@ -748,7 +685,6 @@ jobs:
           archivePortable: ${{ matrix.archivePortable }}
           archForDebianRepack: ${{ matrix.archForDebianRepack }}
           suffix: ${{ matrix.suffix }}
-          shouldJbundle: ${{ needs.conditions.outputs.should-jbundle }}
           uploadAsArtifact: "${{ github.event.inputs.upload-as-artifact }}"
           subdir: ""
           secretsPresent: "${{ needs.conditions.outputs.secretspresent }}"
