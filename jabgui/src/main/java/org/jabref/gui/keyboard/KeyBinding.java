@@ -48,7 +48,7 @@ public enum KeyBinding {
     // We have to put Entry Editor Previous before, because otherwise the decrease font size is found first
     ENTRY_EDITOR_PREVIOUS_PANEL_2("Entry editor, previous panel 2", Localization.lang("Entry editor, previous panel 2"), "shortcut+MINUS", KeyBindingCategory.VIEW),
     DELETE_ENTRY("Delete entry", Localization.lang("Delete entry"), "DELETE", KeyBindingCategory.BIBTEX),
-    PERFORM_OCR("Perform OCR", Localization.lang("Perform OCR"), "", KeyBindingCategory.FILE),
+    PERFORM_OCR("Perform OCR", Localization.lang("Perform OCR"), "alt+r", KeyBindingCategory.FILE),
     DEFAULT_DIALOG_ACTION("Execute default action in dialog", Localization.lang("Execute default action in dialog"), "shortcut+ENTER", KeyBindingCategory.VIEW),
     DOWNLOAD_FULL_TEXT("Download full text documents", Localization.lang("Download full text documents"), "alt+F7", KeyBindingCategory.QUALITY),
     OPEN_CLOSE_ENTRY_EDITOR("Open / close entry editor", Localization.lang("Open / close entry editor"), "shortcut+E", KeyBindingCategory.VIEW),
