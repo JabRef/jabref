@@ -645,8 +645,6 @@ jobs:
       - name: Sync pigz
         if: startsWith(matrix.os, 'ubuntu')
         wait: pigz
-        run:
-          echo "pigz version: $(pigz --version)"
 
       # package all components, JabKit should be available the fastest - JabGui as last, because build requires the most time
 
