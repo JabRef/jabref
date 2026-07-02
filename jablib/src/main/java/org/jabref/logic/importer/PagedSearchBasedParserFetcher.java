@@ -61,4 +61,27 @@ public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher,
     default List<BibEntry> performRawSearchQuery(String rawQuery) throws FetcherException {
         return PagedSearchBasedFetcher.super.performRawSearchQuery(rawQuery);
     }
+
+    /// Default implementation: builds the URL via {@link #getURLForRawQuery(String, int)}, then downloads, parses, and post-cleans the result.
+    @Override
+    default Page<BibEntry> performRawSearchQueryPaged(String rawQuery, int pageNumber) throws FetcherException {
+        if (rawQuery.isBlank()) {
+            return new Page<>(rawQuery, pageNumber, List.of());
+        }
+        URL urlForQuery;
+        try {
+            urlForQuery = getURLForRawQuery(rawQuery, pageNumber);
+        } catch (URISyntaxException | MalformedURLException | FetcherException e) {
+            throw new FetcherException("Search URI crafted from raw search query is malformed: " + rawQuery, e);
+        }
+        return new Page<>(rawQuery, pageNumber, getBibEntries(urlForQuery));
+    }
+
+    /// Constructs a URL that sends the raw, catalog-native query verbatim to the catalog (bypassing the query transformer).
+    ///
+    /// @param rawQuery   catalog-native query string sent verbatim to the catalog
+    /// @param pageNumber requested page number indexed from 0
+    default URL getURLForRawQuery(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
+        throw new UnsupportedOperationException(getName() + " has not yet been migrated to performRawSearchQueryPaged");
+    }
 }
