@@ -592,9 +592,8 @@ jobs:
           crate: jbundle
           git: https://github.com/avelino/jbundle/
           branch: main
-      # pigz is first needed when archiving the application images (in the
-      # parallel block), long after the Gradle build - no need to wait for it
       - name: Install pigz and cache (Linux)
+        id: pigz
         if: startsWith(matrix.os, 'ubuntu')
         background: true
         uses: awalsh128/cache-apt-pkgs-action@v1.6.3
@@ -642,6 +641,12 @@ jobs:
           jbundle build --no-appcds --input . --gradle-project jabkit --output ./build/jbundle/jabkit-${{ matrix.displayName }}
           jbundle build --no-appcds --input . --gradle-project jabls-cli --output ./build/jbundle/jabls-${{ matrix.displayName }}
           jbundle build --no-appcds --input . --gradle-project jabsrv-cli --output ./build/jbundle/jabsrv-${{ matrix.displayName }}
+
+      - name: Sync pigz
+        if: startsWith(matrix.os, 'ubuntu')
+        wait: pigz
+        run:
+          echo "pigz version: $(pigz --version)"
 
       # Everything below is Gradle-free per-component post-processing
       # (smoke test, archiving, renaming, uploads) - safe to run in parallel.
