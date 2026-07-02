@@ -215,6 +215,10 @@ public class BrowserExtensionFulltextFetcher implements FulltextFetcher {
             return Optional.empty();
         }
         Path filePath = Path.of(parsed.path());
+        if (!filePath.isAbsolute()) {
+            LOGGER.debug("Provider {} returned a non-absolute path: {}", provider.name(), parsed.path());
+            return Optional.empty();
+        }
         if (!Files.isReadable(filePath)) {
             LOGGER.debug("Provider {} returned a path that is not readable: {}", provider.name(), parsed.path());
             return Optional.empty();

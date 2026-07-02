@@ -79,6 +79,23 @@ class BrowserExtensionFulltextFetcherTest {
     }
 
     @Test
+    void providerNonAbsolutePathIsIgnored(@TempDir Path tempDir) throws IOException {
+        Path tokenFile = writeTokenFile(tempDir, "secret");
+
+        MockWebServer server = startServer();
+        server.enqueue(new MockResponse.Builder()
+                .code(200)
+                .body("{\"id\":\"abc\",\"path\":\"relative/paper.pdf\"}")
+                .build());
+
+        BrowserExtensionFulltextFetcher fetcher = new BrowserExtensionFulltextFetcher(
+                providerFor(server, tokenFile), TEST_SOCKET_TIMEOUT);
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, EXAMPLE_DOI);
+
+        assertEquals(Optional.empty(), fetcher.findFullText(entry));
+    }
+
+    @Test
     void provider404ResponseIsTreatedAsSoftMiss(@TempDir Path tempDir) throws IOException {
         Path tokenFile = writeTokenFile(tempDir, "secret");
 

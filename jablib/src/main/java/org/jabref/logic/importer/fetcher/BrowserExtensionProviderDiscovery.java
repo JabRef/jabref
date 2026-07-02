@@ -121,11 +121,16 @@ public final class BrowserExtensionProviderDiscovery {
             LOGGER.warn("Skipping fulltext-provider {} declaring out-of-range port {}", parsed.name(), port);
             return Optional.empty();
         }
+        Path tokenFile = Path.of(parsed.tokenFile());
+        if (!tokenFile.isAbsolute()) {
+            LOGGER.warn("Skipping fulltext-provider {} declaring non-absolute tokenFile {}", parsed.name(), parsed.tokenFile());
+            return Optional.empty();
+        }
         return Optional.of(new BrowserExtensionProvider(
                 parsed.name(),
                 parsed.displayName(),
                 port,
-                Path.of(parsed.tokenFile()),
+                tokenFile,
                 parsed.protocolVersion()));
     }
 }

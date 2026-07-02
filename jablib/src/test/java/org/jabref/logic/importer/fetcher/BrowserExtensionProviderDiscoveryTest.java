@@ -13,15 +13,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BrowserExtensionProviderDiscoveryTest {
 
-    private static final String VALID_DISCOVERY = """
-            {
-              "name": "example",
-              "displayName": "Example Provider",
-              "port": 17893,
-              "tokenFile": "/etc/example/token",
-              "protocolVersion": 1
-            }
-            """;
+    /// Builds a discovery file whose `tokenFile` is absolute on the running OS.
+    private static String discoveryJson(Path tokenFile) {
+        return """
+                {
+                  "name": "example",
+                  "displayName": "Example Provider",
+                  "port": 17893,
+                  "tokenFile": "%s",
+                  "protocolVersion": 1
+                }
+                """.formatted(tokenFile.toString().replace("\\", "\\\\"));
+    }
 
     @Test
     void discoveryDirectoryEndsWithFulltextProviders() {
@@ -43,10 +46,11 @@ class BrowserExtensionProviderDiscoveryTest {
 
     @Test
     void discoverInWithValidFileReturnsProvider(@TempDir Path tempDir) throws IOException {
-        Files.writeString(tempDir.resolve("example.json"), VALID_DISCOVERY);
+        Path tokenFile = tempDir.resolve("token");
+        Files.writeString(tempDir.resolve("example.json"), discoveryJson(tokenFile));
 
         BrowserExtensionProvider expected = new BrowserExtensionProvider(
-                "example", "Example Provider", 17893, Path.of("/etc/example/token"), 1);
+                "example", "Example Provider", 17893, tokenFile, 1);
 
         assertEquals(List.of(expected), BrowserExtensionProviderDiscovery.discoverIn(tempDir));
     }
@@ -54,7 +58,7 @@ class BrowserExtensionProviderDiscoveryTest {
     @Test
     void discoverInSkipsMalformedJsonAndKeepsValidFiles(@TempDir Path tempDir) throws IOException {
         Files.writeString(tempDir.resolve("broken.json"), "not json");
-        Files.writeString(tempDir.resolve("good.json"), VALID_DISCOVERY);
+        Files.writeString(tempDir.resolve("good.json"), discoveryJson(tempDir.resolve("token")));
 
         List<BrowserExtensionProvider> providers = BrowserExtensionProviderDiscovery.discoverIn(tempDir);
         assertEquals(1, providers.size());
@@ -109,9 +113,25 @@ class BrowserExtensionProviderDiscoveryTest {
     }
 
     @Test
+    void discoverInSkipsNonAbsoluteTokenFile(@TempDir Path tempDir) throws IOException {
+        String relativeToken = """
+                {
+                  "name": "example",
+                  "displayName": "Example",
+                  "port": 17893,
+                  "tokenFile": "relative/token",
+                  "protocolVersion": 1
+                }
+                """;
+        Files.writeString(tempDir.resolve("relative.json"), relativeToken);
+
+        assertEquals(List.of(), BrowserExtensionProviderDiscovery.discoverIn(tempDir));
+    }
+
+    @Test
     void discoverInIgnoresNonJsonFiles(@TempDir Path tempDir) throws IOException {
         Files.writeString(tempDir.resolve("notes.txt"), "ignored");
-        Files.writeString(tempDir.resolve("good.json"), VALID_DISCOVERY);
+        Files.writeString(tempDir.resolve("good.json"), discoveryJson(tempDir.resolve("token")));
 
         assertEquals(1, BrowserExtensionProviderDiscovery.discoverIn(tempDir).size());
     }
