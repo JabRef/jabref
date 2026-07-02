@@ -57,7 +57,9 @@ runs:
         ls -la "$PACKAGE_DIR"
 
         MOUNT_DIR=$(mktemp -d)
-        hdiutil attach "$PACKAGE_DIR"/*.dmg -nobrowse -readonly -mountpoint "$MOUNT_DIR"
+        # "echo Y" agrees to the license (SLA) embedded in the dmg, which hdiutil
+        # otherwise prompts for and aborts in non-interactive mode
+        echo "Y" | hdiutil attach "$PACKAGE_DIR"/*.dmg -nobrowse -readonly -mountpoint "$MOUNT_DIR"
         codesign --verify --deep --strict --verbose=2 "$MOUNT_DIR/${{ inputs.binaryName }}.app"
         codesign --display --verbose=2 "$MOUNT_DIR/${{ inputs.binaryName }}.app" 2>&1 | grep "Authority=Developer ID Application"
         hdiutil detach "$MOUNT_DIR"
