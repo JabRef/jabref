@@ -1176,9 +1176,13 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-insets: 0;
 }
 
-#entryEditor .tool-bar .glyph-icon {
+#entryEditor .icon-button .glyph-icon,
+#entryEditor .icon-button .ikonli-font-icon,
+#entryEditor .icon-buttonNoSpaceBottom .glyph-icon,
+#entryEditor .icon-buttonNoSpaceBottom .ikonli-font-icon,
+#entryEditor .icon-buttonNoSpaceTop .glyph-icon,
+#entryEditor .icon-buttonNoSpaceTop .ikonli-font-icon {
     -glyph-size: 1.0em;
-    -fx-font-size: 2em;
     -fx-fill: -jr-theme;
     -fx-text-fill: -jr-theme;
 }
@@ -1658,6 +1662,13 @@ We want to have a look that matches our icons in the tool-bar */
 
 #preferencesDialog .code-area .context-menu .menu-item .label {
     -fx-padding: 2;
+}
+
+/* EntryEditorTab — tab list rows, matching the row density of the Entry table */
+.entry-editor-tab-cell {
+    -fx-padding: 0.3em 0.6em;
+    -fx-alignment: center-left;
+    -fx-spacing: 0.5em;
 }
 
 /* WebSearchTab */
@@ -2438,6 +2449,15 @@ journalInfo .grid-cell-b {
 
 .info-center-view .notification-view > .content > .text-container > .actions-box .button {
     -fx-background-color: -fx-default-button;
+}
+
+.linked-files-info {
+    -fx-padding: 0.5em 0 0.5em 0;
+}
+
+.delete-files-dialog {
+    -fx-padding: 10px;
+    -fx-background-color: -fx-background;
 }
 
 /* Note: stack-pane comes from GemsFX */

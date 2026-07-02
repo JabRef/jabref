@@ -44,15 +44,6 @@ public class LibraryPreferences {
         return new LibraryPreferences();
     }
 
-    public LibraryPreferences setAll(LibraryPreferences preferences) {
-        setDefaultBibDatabaseMode(preferences.getDefaultBibDatabaseMode());
-        setAlwaysReformatOnSave(preferences.shouldAlwaysReformatOnSave());
-        setAutoSave(preferences.shouldAutoSave());
-        setAddImportedEntries(preferences.shouldAddImportedEntries());
-        setAddImportedEntriesGroupName(preferences.getAddImportedEntriesGroupName());
-        return this;
-    }
-
     public BibDatabaseMode getDefaultBibDatabaseMode() {
         return defaultBibDatabaseMode.get();
     }

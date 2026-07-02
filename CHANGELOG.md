@@ -11,37 +11,49 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added auto-detection import for drag-and-dropped library files. [#15391](https://github.com/JabRef/jabref/issues/15391)
 - We added a preview style selection bar which shows the current preview style and allows to select a specific style without cycling through all of them. [#15820](https://github.com/JabRef/jabref/pull/15820)
 - We added the ability to view citation previews rendered using the selected style on hover in the "Citations" tab. [#15914](https://github.com/JabRef/jabref/pull/15914)
+- We extended the HTTP server with library query, groups listing, and group-assignment on import. [#15929](https://github.com/JabRef/jabref/pull/15929)
+- The HTTP import endpoint (`POST /libraries/{id}/entries`) now accepts any open library id, switching JabRef to that library before importing, instead of only the currently active one. [#15929](https://github.com/JabRef/jabref/pull/15929)
 - We added support for selecting answer engines and summarization algorithms, allowing users to change the underlying AI behavior. [#15688](https://github.com/JabRef/jabref/pull/15688)
 - The citation key generator also normalizes super and subscript characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
 - We added automatic source groups to SLR results and fixed group merging to preserve all source groups. [#12542](https://github.com/JabRef/jabref/issues/12542)
 - We enabled usage of relative or absolute file paths depending on your file directory settings. [#3590](https://github.com/JabRef/jabref/issues/3590)
 - We added the ability to import and focus an entry from the Citation tab by double click. [#15460](https://github.com/JabRef/jabref/issues/15460)
-- We extended the HTTP server with library query, groups listing, and group-assignment on import. [#15599](https://github.com/JabRef/jabref/pull/15599)
 - The `jabkit` subcommands now accept the input file as a positional argument (e.g. `jabkit check integrity references.bib`); the `--input` option remains available as an alias. [#15759](https://github.com/JabRef/jabref/pull/15759)
 - We grouped the `jabkit` consistency and integrity checks under a new `check` command (`jabkit check consistency`, `jabkit check integrity`). [#15759](https://github.com/JabRef/jabref/pull/15759)
 - The `jabkit check consistency` command now supports the `errorformat` output format (`file:line:column: message`), which is the default output format for both `check` subcommands. [#15759](https://github.com/JabRef/jabref/pull/15759)
 - The `jabkit check` subcommands now support a `github-actions` output format that emits findings as [GitHub Actions workflow commands](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#setting-an-error-message), so findings show up as annotations on pull requests. [#15789](https://github.com/JabRef/jabref/pull/15789)
 - The `jabkit check` command now runs both the consistency and integrity checks when given an input file without a subcommand (e.g. `jabkit check references.bib`). [#15759](https://github.com/JabRef/jabref/pull/15759)
+- We added an "arXiv DOI" cleanup that derives the [version-stable DOI](https://info.arxiv.org/help/doi.html) for arXiv entries and drops redundant eprint fields. [#16033](https://github.com/JabRef/jabref/pull/16033)
 - We added OCR feature using OCRmyPDF to extract text from scanned PDFs and create searchable PDFs including the extracted text. [#15712](https://github.com/JabRef/jabref/pull/15712)
 - We Added generic CSV export filter that exports all standard BibTeX fields. [#15711](https://github.com/JabRef/jabref/issues/15711)
 - We added support to the JabKit commands `get-cited-works` and `get-citing-works` to output to files in various export formats. [#15913](https://github.com/JabRef/jabref/pull/15913)
 - We added generic CSV export filter that exports all standard BibTeX fields. [#15711](https://github.com/JabRef/jabref/issues/15711)
+- We added OCR engine's executable path as the first OCR preference to let users specify the exact path of the engine they are using. [#15990](https://github.com/JabRef/jabref/pull/15990)
+- We added file notification to OCRed file to let users open the directory and show the new file. [#16082](https://github.com/JabRef/jabref/pull/16082)
 
 ### Changed
 
+- The `jabkit check` `github-actions` output now embeds the citation key and field name in each finding's message, so the plain workflow log lines are self-describing (not only the pull request annotations). [#16065](https://github.com/JabRef/jabref/pull/16065)
 - We extended the per-fetcher timeout for fulltext PDF lookups from 10 to 120 seconds so fetchers that bounce through an institutional sign-in or a slow publisher CDN have a chance to complete. [#15877](https://github.com/JabRef/jabref/pull/15877)
 - When an imported entry has an empty citation key, it is generated. [#15624](https://github.com/JabRef/jabref/pull/15624)
 - We made the `Move file to directory` operation for Linked Files show every configured JabRef directory as possible options. [#12287](https://github.com/JabRef/jabref/issues/12287)
+- We reworked the entry editor tab preferences into a single "Editor tabs" list where you can show, hide, add, and remove both built-in and custom tabs. [#15998](https://github.com/JabRef/jabref/pull/15998)
 - We extended library pseudonymization to also pseudonymize group names, not just the entries. [#14117](https://github.com/JabRef/jabref/issues/14117)
 - We introduced a leightweight search engine without fulltext search in linked files as default variant. [#15599](https://github.com/JabRef/jabref/pull/15599)
+- We moved arXiv handling out of the DOI cleanup into the dedicated "arXiv DOI" cleanup. [#16033](https://github.com/JabRef/jabref/pull/16033)
 - Resolving of Math Subject Classification (MSC) needs to be activated in the references now. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - We improved JabRef's startup performance by loading MSC codes only when activated. [#15883](https://github.com/JabRef/jabref/pull/15883)
+- Embedded postgres is no longer started with JabRef unless "Experimental search (Postgres)" is enabled in General preferences. [#12844](https://github.com/JabRef/jabref/issues/12844)
 
 ### Fixed
 
 - We fixed an issue where outdated search results could remain visible after quickly starting another search. [#15710](https://github.com/JabRef/jabref/issues/15710)
+- We fixed an issue where fetchers sent an empty API-key parameter (e.g. `api_key=`) to the remote service when no key was configured. [#16044](https://github.com/JabRef/jabref/pull/16044)
+- We fixed an issue where the global search dialog kept showing the previous entry preview when the search returned no results. [#15613](https://github.com/JabRef/jabref/issues/15613)
+- We fixed an issue where preferences referencing removed cleanup steps are now ignored instead of failing to load. [#15948](https://github.com/JabRef/jabref/pull/15948)
 - We fixed an issue where keyboard navigation shortcuts <kbd>Alt</kbd>+<kbd>Up</kbd>/<kbd>Alt</kbd>+<kbd>Down</kbd> in the entry editor did not preserve focus on the current field when switching between entries. [#14943](https://github.com/JabRef/jabref/issues/14943)
 - EndNote and Refer importers now respect the citation key preferences for unwanted characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
 - We hardened CAYW browser endpoint communication by validating custom `librarypath` access and adding an allow/disallow confirmation dialog for opening local files. [#15295](https://github.com/JabRef/jabref/issues/15295)
@@ -52,6 +64,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where non latin caseless author names being parsed as nameprefix instead of familyname. [#15813](https://github.com/JabRef/jabref/issues/15813)
 - We fixed an issue where `Quality-> Cleanup -> Rename PDF` together with `Moved linked files to file directory` would lead to an exception. [#15833](https://github.com/JabRef/jabref/issues/15833)
 - We fixed an issue where renaming a linked file with a very long title showed a misleading "file is being used by another process" error instead of renaming successfully. [#14771](https://github.com/JabRef/jabref/issues/14771)
+- We fixed an issue where JabRef would trigger `The libray has been changed` while still saving. [#4877](https://github.com/JabRef/jabref/issues/4877)
 
 ### Removed
 

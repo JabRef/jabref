@@ -1,11 +1,11 @@
-FROM maven:3.9.14-amazoncorretto-25-debian AS build
-
-# Is not debian-based
-# FROM amazoncorretto:26-jdk AS build
+FROM amazoncorretto:25-alpine AS build
 
 ARG VERSION="100.0.0"
 ARG VERSION_INFO="100.0.0"
 ARG TAG_BUILD="false"
+
+# bash required for jbang
+RUN apk add --no-cache bash
 
 WORKDIR /build
 
@@ -55,8 +55,8 @@ RUN mkdir /dist
 RUN mv jabsrv-cli/build/packages/*/* /dist
 
 
-# jpackage needs glibc; alpine does not work
-FROM debian:trixie-slim AS runtime
+# jpackage binaries needs glibc; plain alpine does not work
+FROM frolvlad/alpine-glibc:latest AS runtime
 
 LABEL org.opencontainers.image.title="jabsrv"
 LABEL org.opencontainers.image.description="JabRef's HTTP server"

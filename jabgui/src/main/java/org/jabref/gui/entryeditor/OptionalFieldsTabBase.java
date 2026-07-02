@@ -23,7 +23,7 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 
-public class OptionalFieldsTabBase extends FieldsEditorTab {
+public abstract class OptionalFieldsTabBase extends FieldsEditorTab {
     private final BibEntryTypesManager entryTypesManager;
     private final boolean isImportantOptionalFields;
 

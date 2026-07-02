@@ -23,6 +23,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
@@ -103,6 +104,17 @@ public class PreviewPanel extends VBox implements PreviewControls {
                 .install(previewLayoutComboBox);
         previewLayoutComboBox.setItems(previewPreferences.getLayoutCycle());
         previewLayoutComboBox.setValue(previewPreferences.getSelectedPreviewLayout());
+        previewLayoutComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(@Nullable PreviewLayout layout) {
+                return layout == null ? "" : layout.getDisplayName();
+            }
+
+            @Override
+            public @Nullable PreviewLayout fromString(String s) {
+                return null;
+            }
+        });
 
         BindingsHelper.bindBidirectional(
                 previewPreferences.layoutCyclePositionProperty(),

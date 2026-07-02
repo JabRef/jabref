@@ -44,7 +44,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
+import static org.jabref.model.search.PostgresConstants.ENTRY_ID;
 
 public class MainTableDataModel {
     private final Logger LOGGER = LoggerFactory.getLogger(MainTableDataModel.class);

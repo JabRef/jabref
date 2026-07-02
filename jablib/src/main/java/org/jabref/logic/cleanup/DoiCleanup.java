@@ -13,7 +13,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 
 /// Formats the DOI (e.g. removes http part) and also infers DOIs from the note, url, eprint or ee fields.
@@ -74,17 +73,6 @@ public class DoiCleanup implements CleanupJob {
                          change.ifPresent(changes::add);
                      }
                      removeFieldValue(entry, field, changes);
-                 });
-        }
-
-        if (!validDoiExistsInDoiField.get()) {
-            // Try to infer DOI from arXiv ID in eprint field and set it if DOI field is empty
-            entry.getField(StandardField.EPRINT)
-                 .flatMap(ArXivIdentifier::parse)
-                 .flatMap(ArXivIdentifier::inferDOI)
-                 .ifPresent(inferredDoi -> {
-                     Optional<FieldChange> change = entry.setField(StandardField.DOI, inferredDoi.asString());
-                     change.ifPresent(changes::add);
                  });
         }
 

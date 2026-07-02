@@ -34,7 +34,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
 public class CommentsTab extends FieldsEditorTab {
-    public static final String NAME = "Comments";
 
     private final String defaultOwner;
     private final UserSpecificCommentField userSpecificCommentField;
@@ -58,7 +57,7 @@ public class CommentsTab extends FieldsEditorTab {
                 stateManager,
                 previewPanel);
         this.defaultOwner = preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "-");
-        setText(Localization.lang("Comments"));
+        setText(EntryEditorTabModel.BuiltIn.COMMENTS.displayName());
         setGraphic(IconTheme.JabRefIcons.COMMENT.getGraphicNode());
 
         userSpecificCommentField = new UserSpecificCommentField(defaultOwner);

@@ -137,10 +137,6 @@ public class CitationsRelationsTabViewModel {
         }
     }
 
-    public boolean shouldShow() {
-        return preferences.getEntryEditorPreferences().shouldShowSciteTab();
-    }
-
     public void bindToEntry(@Nullable BibEntry entry) {
         // If a search is already running, cancel it
         cancelSearch();
