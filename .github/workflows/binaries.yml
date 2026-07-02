@@ -567,6 +567,7 @@ jobs:
       # Hint by https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
       - name: Free disk space
         if: startsWith(matrix.os, 'ubuntu')
+        background: true
         run: sudo rm -rf /usr/local/lib/android/sdk /usr/local/.ghcup /usr/share/swift
 
       - name: Setup macOS key chain
