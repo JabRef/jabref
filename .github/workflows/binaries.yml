@@ -565,15 +565,9 @@ jobs:
 
       # Save disk space
       # Hint by https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
-      - run: sudo rm -rf /usr/local/lib/android/sdk
-        background: true
+      - name: Free disk space
         if: startsWith(matrix.os, 'ubuntu')
-      - run: sudo rm -rf /usr/local/.ghcup
-        background: true
-        if: startsWith(matrix.os, 'ubuntu')
-      - run: sudo rm -rf /usr/share/swift
-        background: true
-        if: startsWith(matrix.os, 'ubuntu')
+        run: sudo rm -rf /usr/local/lib/android/sdk /usr/local/.ghcup /usr/share/swift
 
       - name: Setup macOS key chain
         if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
@@ -598,8 +592,11 @@ jobs:
           crate: jbundle
           git: https://github.com/avelino/jbundle/
           branch: main
+      # pigz is first needed when archiving the application images (in the
+      # parallel block), long after the Gradle build - no need to wait for it
       - name: Install pigz and cache (Linux)
         if: startsWith(matrix.os, 'ubuntu')
+        background: true
         uses: awalsh128/cache-apt-pkgs-action@v1.6.3
         with:
           packages: pigz
