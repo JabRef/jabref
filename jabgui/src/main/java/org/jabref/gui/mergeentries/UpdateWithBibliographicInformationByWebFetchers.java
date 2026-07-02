@@ -1,6 +1,9 @@
 package org.jabref.gui.mergeentries;
 
+import java.util.Optional;
 import java.util.Set;
+
+import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -21,15 +24,18 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
     private final GuiPreferences guiPreferences;
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
+    private final UndoManager undoManager;
 
     public UpdateWithBibliographicInformationByWebFetchers(DialogService dialogService,
                                                            GuiPreferences preferences,
                                                            StateManager stateManager,
-                                                           TaskExecutor taskExecutor) {
+                                                           TaskExecutor taskExecutor,
+                                                           UndoManager undoManager) {
         this.dialogService = dialogService;
         this.guiPreferences = preferences;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
+        this.undoManager = undoManager;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager));
     }
@@ -41,7 +47,7 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
         BibEntry originalEntry = stateManager.getSelectedEntries().getFirst();
 
         MultiMergeEntriesView mergedEntriesView = new MultiMergeEntriesView(guiPreferences, taskExecutor);
-        mergedEntriesView.addSource(Localization.lang("Original Entry"), () -> originalEntry);
+        mergedEntriesView.addSource(Localization.lang("Original Entry"), originalEntry);
 
         Set<EntryBasedFetcher> webFetchers = WebFetchers.getEntryBasedFetchers(
                 guiPreferences.getImporterPreferences(),
@@ -60,6 +66,9 @@ public class UpdateWithBibliographicInformationByWebFetchers extends SimpleComma
             });
         }
 
-        dialogService.showCustomDialogAndWait(mergedEntriesView);
+        Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(mergedEntriesView);
+
+        UpdateOriginalEntry updateOriginalEntry = new UpdateOriginalEntry(originalEntry, mergedEntry, Optional.empty(), dialogService, undoManager);
+        updateOriginalEntry.update();
     }
 }
