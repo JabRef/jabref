@@ -1,17 +1,23 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.ACMPortalParser;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.BaseQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
@@ -47,9 +53,33 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
     /// @return query URL
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
+        return buildSearchURL(createQueryString(queryNode));
+    }
+
+    /// Builds the ACM search URL, sending the given query as the `AllField` parameter.
+    private static URL buildSearchURL(String query) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
-        uriBuilder.addParameter("AllField", createQueryString(queryNode));
+        uriBuilder.addParameter("AllField", query);
         return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public List<BibEntry> performRawSearchQuery(String rawQuery) throws FetcherException {
+        if (rawQuery.isBlank()) {
+            return List.of();
+        }
+        try {
+            URL url = buildSearchURL(rawQuery);
+            try (InputStream stream = getUrlDownload(url).asInputStream()) {
+                return getParser().parseEntries(stream);
+            }
+        } catch (URISyntaxException e) {
+            throw new FetcherException("ACM raw search URL is malformed for query: " + rawQuery, e);
+        } catch (IOException e) {
+            throw new FetcherException(rawQuery, e);
+        } catch (ParseException e) {
+            throw new FetcherException("ACM raw search parse error for query: " + rawQuery, e);
+        }
     }
 
     /// Gets an instance of ACMPortalParser.
