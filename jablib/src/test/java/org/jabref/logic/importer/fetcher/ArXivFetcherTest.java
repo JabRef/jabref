@@ -582,9 +582,8 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
-    void performRawSearchQueryPagedWithNullDoiFetcherReturnsResults() throws FetcherException {
-        ArXivFetcher fetcherWithoutDoi = new ArXivFetcher(importFormatPreferences, null);
-        assertFalse(fetcherWithoutDoi.performRawSearchQueryPaged("machine learning", 0).getContent().isEmpty());
+    void performRawSearchQueryPagedReturnsResults() throws FetcherException {
+        assertFalse(fetcher.performRawSearchQueryPaged("machine learning", 0).getContent().isEmpty());
     }
 
     @Test
