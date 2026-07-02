@@ -113,7 +113,7 @@ See GraalVM's [Automatic Metadata Collection](https://www.graalvm.org/latest/ref
 
 ### Why not stock GraalVM
 
-GraalVM CE and Oracle GraalVM do not support the `java.desktop` module (AWT) ([oracle/graal#4124](https://github.com/oracle/graal/issues/4124)); Red Hat's Mandrel excludes it too. This matters because PDFBox initializes AWT eagerly in `PDDocument`'s static initializer: even operations that render nothing, such as embedding a `.bib` into a PDF, trigger it, and the CE binary dies with `UnsatisfiedLinkError: Can't load library: awt`.
+GraalVM CE and Oracle GraalVM do not support the `java.desktop` module (AWT) ([oracle/graal#4921](https://github.com/oracle/graal/issues/4921)); Red Hat's Mandrel excludes it too. This matters because PDFBox initializes AWT eagerly in `PDDocument`'s static initializer: even operations that render nothing, such as embedding a `.bib` into a PDF, trigger it, and the CE binary dies with `UnsatisfiedLinkError: Can't load library: awt`.
 
 [BellSoft Liberica NIK](https://bell-sw.com/liberica-native-image-kit/) is a GraalVM downstream that ships AWT support, so it compiles that path. It is FOSS and tracks GraalVM; the cost is an extra vendor dependency.
 
@@ -132,7 +132,7 @@ The build emits the `jabkit` binary plus companion `.so` files; native-image ext
 
 ### macOS is a known limitation
 
-Liberica NIK Full fixes the AWT path on **Linux**, verified end-to-end. On **macOS** it does not: the PDF-attachment command crashes loading `libawt_lwawt.dylib`, blocked by [oracle/graal#8602](https://github.com/oracle/graal/issues/8602). The upstream fix landed in GraalVM `master` in May 2026 but is not in any released GraalVM/NIK yet; it should arrive in a future release. Until then, native PDF support on macOS is unavailable, which is why the [PDF smoke test](#smoke-testing) runs on Linux only.
+Liberica NIK Full fixes the AWT path on **Linux**, verified end-to-end. On **macOS** it does not: the PDF-attachment command crashes loading `libawt_lwawt.dylib`, blocked by [oracle/graal#13272](https://github.com/oracle/graal/issues/13272) (runtime symptom: [oracle/graal#4124](https://github.com/oracle/graal/issues/4124)). The upstream fix landed in GraalVM `master` in May 2026 but is not in any released GraalVM/NIK yet; it should arrive in a future release. Until then, native PDF support on macOS is unavailable, which is why the [PDF smoke test](#smoke-testing) runs on Linux only.
 
 ## Smoke testing
 
