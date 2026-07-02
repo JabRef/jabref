@@ -1,7 +1,10 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -18,27 +21,47 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// A generic {@link UrlBasedFetcher} which creates a `@Misc` entry holding the provided URL.
+/// A generic [UrlBasedFetcher] which creates a `@Misc` entry holding the provided URL.
 ///
 /// As a best-effort enhancement, it tries to download the referenced page and extract its HTML `<title>` to use as
 /// the entry's title. If the page cannot be downloaded (for instance, because of a missing network connection), the
 /// resulting entry still contains the URL so that no information entered by the user is lost.
+@NullMarked
 public class GenericUrlBasedFetcher implements UrlBasedFetcher {
 
     public static final String NAME = "URL";
 
+    /// Only the leading portion of a page is read when looking for the `<title>`, which always resides in the
+    /// `<head>`. Reading a bounded number of bytes keeps memory usage in check even if the server streams a very
+    /// large (or effectively unbounded) body.
+    private static final int MAX_TITLE_LOOKUP_BYTES = 512 * 1024;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(GenericUrlBasedFetcher.class);
 
     private static final Pattern TITLE_TAG = Pattern.compile("<title[^>]*>(.*?)</title>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    private static final Pattern WHITESPACE = Pattern.compile("\\s+");
+
+    /// Seam used to obtain the (bounded) page content. Production code downloads it over the network; tests can
+    /// supply fixed content without any network access.
+    @FunctionalInterface
+    interface PageContentDownloader {
+        Optional<String> download(URL url) throws FetcherException;
+    }
 
     private final ImportFormatPreferences importFormatPreferences;
+    private final PageContentDownloader pageContentDownloader;
 
     public GenericUrlBasedFetcher(ImportFormatPreferences importFormatPreferences) {
+        this(importFormatPreferences, GenericUrlBasedFetcher::downloadBoundedContent);
+    }
+
+    GenericUrlBasedFetcher(ImportFormatPreferences importFormatPreferences, PageContentDownloader pageContentDownloader) {
         this.importFormatPreferences = importFormatPreferences;
+        this.pageContentDownloader = pageContentDownloader;
     }
 
     @Override
@@ -47,7 +70,7 @@ public class GenericUrlBasedFetcher implements UrlBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(@NonNull String url) throws FetcherException {
+    public List<BibEntry> performSearch(String url) throws FetcherException {
         if (StringUtil.isBlank(url)) {
             return List.of();
         }
@@ -64,15 +87,27 @@ public class GenericUrlBasedFetcher implements UrlBasedFetcher {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.URL, validatedUrl.toExternalForm());
 
-        // Best-effort: enrich the entry with the page title. Failures here must not discard the URL.
+        // Best-effort: enrich the entry with the page title. A failed download must not discard the URL.
         try {
-            String content = new URLDownload(validatedUrl).asString();
-            extractTitle(content).ifPresent(title -> entry.setField(StandardField.TITLE, title));
-        } catch (FetcherException | RuntimeException e) {
+            pageContentDownloader.download(validatedUrl)
+                                 .flatMap(GenericUrlBasedFetcher::extractTitle)
+                                 .ifPresent(title -> entry.setField(StandardField.TITLE, title));
+        } catch (FetcherException e) {
             LOGGER.debug("Could not download '{}' to extract a title; creating a bare @Misc entry.", validatedUrl, e);
         }
 
         return List.of(entry);
+    }
+
+    /// Reads at most [#MAX_TITLE_LOOKUP_BYTES] from the page, which is sufficient to locate the `<title>` in the
+    /// `<head>` while keeping memory usage bounded.
+    private static Optional<String> downloadBoundedContent(URL url) throws FetcherException {
+        try (InputStream stream = new URLDownload(url).asInputStream()) {
+            byte[] content = stream.readNBytes(MAX_TITLE_LOOKUP_BYTES);
+            return Optional.of(new String(content, StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new FetcherException(url, "Could not download the page to extract its title.", e);
+        }
     }
 
     private static Optional<String> extractTitle(String htmlContent) {
@@ -85,7 +120,7 @@ public class GenericUrlBasedFetcher implements UrlBasedFetcher {
             return Optional.empty();
         }
 
-        String title = matcher.group(1).replaceAll("\\s+", " ").trim();
+        String title = WHITESPACE.matcher(matcher.group(1)).replaceAll(" ").trim();
         return StringUtil.isBlank(title) ? Optional.empty() : Optional.of(title);
     }
 }

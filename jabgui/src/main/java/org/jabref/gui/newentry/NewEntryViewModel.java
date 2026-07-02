@@ -396,7 +396,7 @@ public class NewEntryViewModel {
                 return Optional.empty();
             }
 
-            final UrlBasedFetcher fetcher = WebFetchers.getUrlBasedFetchers(preferences.getImportFormatPreferences()).first();
+            final UrlBasedFetcher fetcher = WebFetchers.getUrlBasedFetchers(preferences.getImportFormatPreferences()).getFirst();
             final List<BibEntry> entries = fetcher.performSearch(text);
 
             if (entries.isEmpty()) {
