@@ -49,9 +49,20 @@ runs:
     - name: Validate Signature
       if: inputs.secretsPresent == 'true' && startsWith(inputs.os, 'macos') && inputs.component == 'jabgui'
       shell: bash
+      # jpackage signs the .app bundle inside the dmg and the pkg itself;
+      # the dmg container is never signed (it is only notarized and stapled later).
       run: |
-        ls -la ${{ inputs.component }}/build/packages/${{ inputs.os }}/
-        codesign --verify --verbose ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.dmg
+        set -e
+        PACKAGE_DIR="${{ inputs.component }}/build/packages/${{ inputs.os }}"
+        ls -la "$PACKAGE_DIR"
+
+        MOUNT_DIR=$(mktemp -d)
+        hdiutil attach "$PACKAGE_DIR"/*.dmg -nobrowse -readonly -mountpoint "$MOUNT_DIR"
+        codesign --verify --deep --strict --verbose=2 "$MOUNT_DIR/${{ inputs.binaryName }}.app"
+        codesign --display --verbose=2 "$MOUNT_DIR/${{ inputs.binaryName }}.app" 2>&1 | grep "Authority=Developer ID Application"
+        hdiutil detach "$MOUNT_DIR"
+
+        pkgutil --check-signature "$PACKAGE_DIR"/*.pkg
     - name: Smoke test ${{ inputs.component }}
       shell: bash
       run: |
