@@ -270,6 +270,7 @@ Both comments must not be added.
 
 #### Testing / JUnit
 
+- Name test classes `...Test` (singular), not `...Tests` — e.g. `JabSrvArchitectureTest`, not `JabSrvArchitectureTests`. This holds even for ArchUnit classes that bundle several `@ArchTest` rules.
 - In JabRef, we don't use `@DisplayName`, we typically just write method name as is. The method name itself should be comprehensive enough.
 - Instead of `Files.createTempDirectory` `@TempDir` JUnit5 annotation should be used.
 - If `@TempDir` is used, there is no need to clean it up
