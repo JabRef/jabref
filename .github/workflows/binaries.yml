@@ -587,6 +587,8 @@ jobs:
           keychain-password: tEmPoRaRY-PaeSWD
 
       - name: Install jbundle
+        id: jbundle
+        background: true
         if: ${{ (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true') }}
         uses: baptiste0928/cargo-install@v3
         with:
@@ -628,9 +630,11 @@ jobs:
           VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
           OSXCERT: ${{ needs.conditions.outputs.secretspresent }}
 
-      # jbundle drives Gradle itself; each invocation reads a different subproject's build outputs
+
+      - wait: jbundle
       - # Version information passed as environment variables, because jbundle does not support gradle properties
         # See https://github.com/avelino/jbundle/issues/59
+        # jbundle drives Gradle itself; each invocation reads a different subproject's build outputs
         parallel:
           - name: jabgui
             if: (matrix.os == 'ubuntu-22.04') && (needs.conditions.outputs.should-jbundle == 'true')
