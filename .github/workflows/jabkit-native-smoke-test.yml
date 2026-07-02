@@ -29,8 +29,16 @@ jobs:
           show-progress: 'false'
 
       - uses: ./.github/actions/setup-gradle
+
+      # In graalvm/setup-graalvm, distribution "liberica" means Liberica NIK.
+      # jdk+fx maps to the Full Liberica package, used here for the AWT/java.desktop path triggered by PDFBox.
+      - name: Set up Liberica NIK (native-image with AWT support)
+        uses: graalvm/setup-graalvm@v1
         with:
-          distribution: graalvm
+          distribution: 'liberica'
+          java-package: 'jdk+fx'
+          java-version: '25'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build JabKit native binary
         run: gradle :jabkit:nativeCompile
@@ -47,12 +55,17 @@ jobs:
       - name: Run JabKit offline smoke tests
         run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline.md
 
+      - name: Run JabKit PDF native smoke test (Linux only)
+        if: ${{ runner.os == 'Linux' }}
+        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline-pdf.md
+
       - name: Run JabKit online smoke tests
         if: ${{ inputs.run-online-tests }}
         run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-online.md
 
-      - name: Upload JabKit native binary
+      - name: Upload JabKit native image (binary + libraries)
         uses: actions/upload-artifact@v7
         with:
           name: jabkit-native-${{ matrix.os }}
-          path: jabkit/build/native/nativeCompile/jabkit
+          path: jabkit/build/native/nativeCompile/
+          if-no-files-found: error
