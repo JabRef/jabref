@@ -643,7 +643,6 @@ jobs:
           jbundle build --no-appcds --input . --gradle-project jabsrv-cli --output ./build/jbundle/jabsrv-${{ matrix.displayName }}
 
       - name: Sync pigz
-        if: startsWith(matrix.os, 'ubuntu')
         wait: pigz
 
       # package all components, JabKit should be available the fastest - JabGui as last, because build requires the most time
