@@ -319,10 +319,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getSearchDialogColumnPreferences();
         getNewEntryPreferences();
         getDonationPreferences();
+        getMrDlibPreferences();
 
         super.clear();
-
-        getMrDlibPreferences().setAll(MrDlibPreferences.getDefault());
     }
 
     @Override
@@ -346,11 +345,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getSearchDialogColumnPreferences();
         getNewEntryPreferences();
         getDonationPreferences();
+        getMrDlibPreferences();
 
         super.importPreferences(path);
-
-        // in case of incomplete or corrupt xml fall back to current preferences
-        getMrDlibPreferences().setAll(getMrDlibPreferencesFromBackingStore(getMrDlibPreferences()));
     }
 
     // region CopyToPreferences
@@ -1284,22 +1281,20 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return mrDlibPreferences;
         }
 
-        mrDlibPreferences = getMrDlibPreferencesFromBackingStore(MrDlibPreferences.getDefault());
+        MrDlibPreferences defaultValues = MrDlibPreferences.getDefault();
 
-        EasyBind.listen(mrDlibPreferences.acceptRecommendationsProperty(), (_, _, newValue) -> putBoolean(MRDLIB_ACCEPT_RECOMMENDATIONS, newValue));
-        EasyBind.listen(mrDlibPreferences.sendLanguageProperty(), (_, _, newValue) -> putBoolean(MRDLIB_SEND_LANGUAGE_DATA, newValue));
-        EasyBind.listen(mrDlibPreferences.sendOsProperty(), (_, _, newValue) -> putBoolean(MRDLIB_SEND_OS_DATA, newValue));
-        EasyBind.listen(mrDlibPreferences.sendTimezoneProperty(), (_, _, newValue) -> putBoolean(MRDLIB_SEND_TIMEZONE_DATA, newValue));
+        mrDlibPreferences = new MrDlibPreferences(
+                getBoolean(MRDLIB_ACCEPT_RECOMMENDATIONS, defaultValues.shouldAcceptRecommendations()),
+                getBoolean(MRDLIB_SEND_LANGUAGE_DATA, defaultValues.shouldSendLanguage()),
+                getBoolean(MRDLIB_SEND_OS_DATA, defaultValues.shouldSendOs()),
+                getBoolean(MRDLIB_SEND_TIMEZONE_DATA, defaultValues.shouldSendTimezone()));
+
+        bindBoolean(mrDlibPreferences.acceptRecommendationsProperty(), MRDLIB_ACCEPT_RECOMMENDATIONS, defaultValues.shouldAcceptRecommendations());
+        bindBoolean(mrDlibPreferences.sendLanguageProperty(), MRDLIB_SEND_LANGUAGE_DATA, defaultValues.shouldSendLanguage());
+        bindBoolean(mrDlibPreferences.sendOsProperty(), MRDLIB_SEND_OS_DATA, defaultValues.shouldSendOs());
+        bindBoolean(mrDlibPreferences.sendTimezoneProperty(), MRDLIB_SEND_TIMEZONE_DATA, defaultValues.shouldSendTimezone());
 
         return mrDlibPreferences;
-    }
-
-    private MrDlibPreferences getMrDlibPreferencesFromBackingStore(MrDlibPreferences defaults) {
-        return new MrDlibPreferences(
-                getBoolean(MRDLIB_ACCEPT_RECOMMENDATIONS, defaults.shouldAcceptRecommendations()),
-                getBoolean(MRDLIB_SEND_LANGUAGE_DATA, defaults.shouldSendLanguage()),
-                getBoolean(MRDLIB_SEND_OS_DATA, defaults.shouldSendOs()),
-                getBoolean(MRDLIB_SEND_TIMEZONE_DATA, defaults.shouldSendTimezone()));
     }
     // endregion
 
