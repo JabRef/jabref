@@ -18,6 +18,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ZoteroCitationMarkParserTest {
 
@@ -339,5 +340,70 @@ class ZoteroCitationMarkParserTest {
                         )
                 )
         );
+    }
+
+    @Test
+    void parseCslJsonItemsAcceptsBareItemObject() {
+        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslJsonItems("""
+                {
+                  "type": "paper-conference",
+                  "title": "Conference paper",
+                  "container-title": "Proceedings title"
+                }
+                """);
+
+        assertEquals(1, entries.size());
+        BibEntry entry = entries.getFirst();
+        assertEquals(StandardEntryType.InProceedings, entry.getType());
+        assertEquals(Optional.of("Conference paper"), entry.getField(StandardField.TITLE));
+        assertEquals(Optional.of("Proceedings title"), entry.getField(StandardField.BOOKTITLE));
+    }
+
+    @Test
+    void parseCslJsonItemsLeavesCitationKeyEmptyForImport() {
+        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslJsonItems("""
+                {"type": "article-journal", "title": "T"}
+                """);
+
+        assertEquals(Optional.empty(), entries.getFirst().getCitationKey());
+    }
+
+    @Test
+    void parseCslJsonItemsAcceptsArrayOfItems() {
+        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslJsonItems("""
+                [
+                  {"type": "book", "title": "A book"},
+                  {"type": "thesis", "title": "A thesis"}
+                ]
+                """);
+
+        assertEquals(2, entries.size());
+        assertEquals(StandardEntryType.Book, entries.get(0).getType());
+        assertEquals(StandardEntryType.Thesis, entries.get(1).getType());
+    }
+
+    @Test
+    void parseCslJsonItemsMapsFieldsPerType() {
+        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslJsonItems("""
+                {
+                  "type": "article-journal",
+                  "title": "An article",
+                  "container-title": "A journal",
+                  "author": [{"family": "Doe", "given": "Jane"}],
+                  "issued": {"date-parts": [["2021", 5]]}
+                }
+                """);
+
+        BibEntry entry = entries.getFirst();
+        assertEquals(StandardEntryType.Article, entry.getType());
+        assertEquals(Optional.of("A journal"), entry.getField(StandardField.JOURNALTITLE));
+        assertEquals(Optional.of("Doe, Jane"), entry.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("2021"), entry.getField(StandardField.YEAR));
+    }
+
+    @ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"", "   ", "not json", "{ broken"})
+    void parseCslJsonItemsReturnsEmptyForBlankOrInvalid(String input) {
+        assertTrue(ZoteroCitationMarkParser.parseCslJsonItems(input).isEmpty());
     }
 }

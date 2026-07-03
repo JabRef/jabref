@@ -20,6 +20,7 @@ import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.util.MediaTypes;
+import org.jabref.logic.openoffice.ZoteroCitationMarkParser;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -82,6 +83,47 @@ public class EntriesResource {
         uiMessageHandler.handleUiCommands(List.of(targetLibrary
                 .map(library -> new UiCommand.AppendBibTeXToLibrary(library, bibtex, group))
                 .orElseGet(() -> new UiCommand.AppendBibTeXToLibrary(bibtex, group))));
+    }
+
+    /// Parses CSL-JSON (a single CSL item or an array of them, as produced by a Zotero /
+    /// citation-js CSL-JSON export) into BibTeX entries and appends them to the selected library.
+    ///
+    /// The CSL item type and fields are mapped to Bib(La)TeX via the citation-js-based mapping
+    /// selected in [ADR 0064](docs/decisions/0064-use-citation-js-mapping.md), so a conference paper,
+    /// book chapter, thesis, report, etc. yields the correct entry type instead of a flat @article.
+    /// The produced entries carry no citation key; JabRef generates keys on import.
+    ///
+    /// @param group optional name of a group the imported entries are additionally assigned to.
+    @POST
+    @Consumes(MediaTypes.CITATIONSTYLES_JSON)
+    public void addCslJson(@PathParam("id") String id, @QueryParam("group") @Nullable String group, String cslJson) throws IOException {
+        if (StringUtil.isBlank(cslJson)) {
+            throw new BadRequestException("CSL-JSON data must not be empty.");
+        }
+        if (!uiMessageHandler.isGuiConnected()) {
+            throw new BadRequestException("Only possible in GUI mode.");
+        }
+        Optional<java.nio.file.Path> targetLibrary = resolveTargetLibrary(id);
+
+        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslJsonItems(cslJson);
+        if (entries.isEmpty()) {
+            throw new BadRequestException("Could not parse any CSL-JSON item from the given data.");
+        }
+
+        StringWriter rawEntries = new StringWriter();
+        BibWriter bibWriter = new BibWriter(rawEntries, "\n");
+        BibEntryWriter entryWriter = new BibEntryWriter(
+                new FieldWriter(preferences.getFieldPreferences()),
+                entryTypesManager);
+        for (BibEntry entry : entries) {
+            // Freshly built entries have no meaningful parsed serialization, so force a reformat
+            // instead of writing the (empty) original source back out.
+            entryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX, true);
+        }
+
+        uiMessageHandler.handleUiCommands(List.of(targetLibrary
+                .map(library -> new UiCommand.AppendBibTeXToLibrary(library, rawEntries.toString(), group))
+                .orElseGet(() -> new UiCommand.AppendBibTeXToLibrary(rawEntries.toString(), group))));
     }
 
     /// Parses a plain-text bibliography reference into a BibTeX entry and appends it to the
