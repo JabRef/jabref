@@ -1,7 +1,6 @@
 package org.jabref.gui.theme;
 
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
