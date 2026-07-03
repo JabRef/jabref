@@ -259,12 +259,22 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         }
 
         job.getJobSettings().setJobName(entry.getCitationKey().orElse("NO CITATION KEY"));
+        // printPage must run on the JavaFX thread while the node is attached to a scene;
+        // it only renders the page. The blocking spooling (endJob) happens in the background.
         boolean printed = job.printPage(previewView);
-        if (printed) {
-            job.endJob();
-        } else {
+        if (!printed) {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"));
+            job.cancelJob();
+            return;
         }
+        BackgroundTask.wrap(job::endJob)
+                      .onSuccess(success -> {
+                          if (!success) {
+                              dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"));
+                          }
+                      })
+                      .onFailure(e -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), e))
+                      .executeWith(taskExecutor);
     }
 
     public void copyPreviewHtmlToClipBoard() {
