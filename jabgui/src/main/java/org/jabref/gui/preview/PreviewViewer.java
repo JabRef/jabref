@@ -86,6 +86,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         this.bookCoverFetcher = new BookCoverFetcher(preferences.getExternalApplicationsPreferences());
 
         setFitToWidth(true);
+        setFitToHeight(true);
+        // WebView reported a fixed 800x600 preferred size. Keep that stable geometry so
+        // surrounding layouts (preview panel, dialogs) behave as before, instead of exposing
+        // the content-dependent preferred size of the rendered nodes.
+        setPrefSize(800, 600);
         previewView = new HtmlView();
         previewView.setOptions(HtmlRenderOptions.defaults().withLinkHandler(this::openLink));
         setContent(previewView);
@@ -304,13 +309,15 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void resizeForTooltipContent() {
-        setFitToWidth(false);
         setVbarPolicy(ScrollBarPolicy.NEVER);
         setHbarPolicy(ScrollBarPolicy.NEVER);
 
-        // Constrain the width; the height follows from the content's natural (preferred) height
-        previewView.setPrefWidth(750);
-        previewView.setMaxWidth(750);
+        // Tooltips size to the rendered content: fixed width, natural height
+        // (WebView needed a JavaScript measurement hack for this)
+        setPrefSize(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE);
+        setPrefViewportWidth(750);
+        previewView.layoutBoundsProperty().addListener((_, _, bounds) ->
+                setPrefViewportHeight(bounds.getHeight()));
     }
 
     @Override

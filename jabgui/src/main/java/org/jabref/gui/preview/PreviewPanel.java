@@ -21,6 +21,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
@@ -84,6 +85,8 @@ public class PreviewPanel extends VBox implements PreviewControls {
         HBox previewSelectionBar = constructPreviewSelectionBar(previewPreferences);
 
         this.getChildren().addAll(previewView, previewSelectionBar);
+        // The preview absorbs all extra vertical space, keeping the selection bar at the bottom
+        VBox.setVgrow(previewView, Priority.ALWAYS);
 
         createKeyBindings();
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
