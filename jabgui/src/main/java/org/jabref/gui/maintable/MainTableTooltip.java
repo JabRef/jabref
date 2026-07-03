@@ -18,15 +18,30 @@ public class MainTableTooltip extends Tooltip {
     private final GuiPreferences preferences;
     private final Label fieldValueLabel = new Label();
 
+    private boolean resizeScheduled;
+
     public MainTableTooltip(DialogService dialogService, GuiPreferences preferences, ThemeManager themeManager, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.preview = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
 
         preview.resizeForTooltipContent();
 
-        // Re-fit the tooltip once the rendered preview has its final size
-        preview.getContent().layoutBoundsProperty().addListener((_, _, _) ->
-                Platform.runLater(this::sizeToScene));
+        // Re-fit the tooltip once the rendered preview has its final size. Rendering touches the
+        // bounds several times, so re-fits are coalesced: at most one sizeToScene per pulse.
+        preview.getContent().layoutBoundsProperty().addListener((_, oldBounds, newBounds) -> {
+            if (Math.abs(newBounds.getHeight() - oldBounds.getHeight()) < 1
+                    && Math.abs(newBounds.getWidth() - oldBounds.getWidth()) < 1) {
+                return;
+            }
+            if (resizeScheduled) {
+                return;
+            }
+            resizeScheduled = true;
+            Platform.runLater(() -> {
+                resizeScheduled = false;
+                sizeToScene();
+            });
+        });
     }
 
     public Tooltip createTooltip(BibDatabaseContext databaseContext, BibEntry entry, String fieldValue) {

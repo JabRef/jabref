@@ -327,11 +327,15 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         setHbarPolicy(ScrollBarPolicy.NEVER);
 
         // Tooltips size to the rendered content: fixed width, natural height
-        // (WebView needed a JavaScript measurement hack for this)
+        // (WebView needed a JavaScript measurement hack for this). Only write the viewport
+        // height when it actually changed, so rendering does not queue redundant relayouts.
         setPrefSize(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE);
         setPrefViewportWidth(750);
-        previewView.layoutBoundsProperty().addListener((_, _, bounds) ->
-                setPrefViewportHeight(bounds.getHeight()));
+        previewView.layoutBoundsProperty().addListener((_, _, bounds) -> {
+            if (Math.abs(getPrefViewportHeight() - bounds.getHeight()) >= 1) {
+                setPrefViewportHeight(bounds.getHeight());
+            }
+        });
     }
 
     @Override
