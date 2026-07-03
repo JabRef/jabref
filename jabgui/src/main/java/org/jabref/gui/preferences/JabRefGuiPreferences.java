@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.prefs.BackingStoreException;
 import java.util.stream.Collectors;
 
@@ -1070,23 +1071,12 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 columnSortOrder.isEmpty() ? defaultValues.getColumnSortOrder() : columnSortOrder
         );
 
-        // The columns list is persisted across COLUMN_NAMES/COLUMN_WIDTHS/COLUMN_SORT_TYPES; registered before the sort
-        // order, so its import runs first and the sort order can resolve against the loaded columns.
-        bindCustomList(mainTableColumnPreferences.getColumns(), MAIN_TABLE_COLUMNS, defaultValues.getColumns(),
-                boundList -> {
-                    putStringList(COLUMN_NAMES, getColumnNamesAsStringList(mainTableColumnPreferences));
-                    putStringList(COLUMN_WIDTHS, getColumnWidthsAsStringList(mainTableColumnPreferences));
-                    putStringList(COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(mainTableColumnPreferences));
-                },
-                () -> {
-                    List<MainTableColumnModel> stored = getColumns(COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
-                    return stored.isEmpty() ? defaultValues.getColumns() : stored;
-                });
-        bindCustomList(mainTableColumnPreferences.getColumnSortOrder(), COLUMN_SORT_ORDER, defaultValues.getColumnSortOrder(),
-                boundList -> putStringList(COLUMN_SORT_ORDER, getColumnSortOrderAsStringList(mainTableColumnPreferences)),
-                () -> {
-                    List<MainTableColumnModel> stored = getColumnSortOrder(COLUMN_SORT_ORDER, mainTableColumnPreferences.getColumns());
-                    return stored.isEmpty() ? defaultValues.getColumnSortOrder() : stored;
+        // The columns list is persisted across COLUMN_NAMES/COLUMN_WIDTHS/COLUMN_SORT_TYPES.
+        bindColumnPreferences(mainTableColumnPreferences, MAIN_TABLE_COLUMNS, COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, COLUMN_SORT_ORDER,
+                columnPreferences -> {
+                    putStringList(COLUMN_NAMES, getColumnNamesAsStringList(columnPreferences));
+                    putStringList(COLUMN_WIDTHS, getColumnWidthsAsStringList(columnPreferences));
+                    putStringList(COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(columnPreferences));
                 });
 
         return mainTableColumnPreferences;
@@ -1108,25 +1098,37 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 columnSortOrder.isEmpty() ? defaultValues.getColumnSortOrder() : columnSortOrder
         );
 
-        // Column names are shared with the main table (COLUMN_NAMES) and owned there, so only widths and sort types are
-        // persisted here. Registered before the sort order, so its import runs first and the sort order can resolve.
-        bindCustomList(searchDialogColumnPreferences.getColumns(), SEARCH_DIALOG_COLUMNS, defaultValues.getColumns(),
-                boundList -> {
-                    putStringList(SEARCH_DIALOG_COLUMN_WIDTHS, getColumnWidthsAsStringList(searchDialogColumnPreferences));
-                    putStringList(SEARCH_DIALOG_COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(searchDialogColumnPreferences));
-                },
-                () -> {
-                    List<MainTableColumnModel> stored = getColumns(COLUMN_NAMES, SEARCH_DIALOG_COLUMN_WIDTHS, SEARCH_DIALOG_COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
-                    return stored.isEmpty() ? defaultValues.getColumns() : stored;
-                });
-        bindCustomList(searchDialogColumnPreferences.getColumnSortOrder(), SEARCH_DIALOG_COLUMN_SORT_ORDER, defaultValues.getColumnSortOrder(),
-                boundList -> putStringList(SEARCH_DIALOG_COLUMN_SORT_ORDER, getColumnSortOrderAsStringList(searchDialogColumnPreferences)),
-                () -> {
-                    List<MainTableColumnModel> stored = getColumnSortOrder(SEARCH_DIALOG_COLUMN_SORT_ORDER, searchDialogColumnPreferences.getColumns());
-                    return stored.isEmpty() ? defaultValues.getColumnSortOrder() : stored;
+        // Column names are shared with the main table (COLUMN_NAMES) and owned there, so only widths and sort types are persisted here.
+        bindColumnPreferences(searchDialogColumnPreferences, SEARCH_DIALOG_COLUMNS, COLUMN_NAMES, SEARCH_DIALOG_COLUMN_WIDTHS, SEARCH_DIALOG_COLUMN_SORT_TYPES, SEARCH_DIALOG_COLUMN_SORT_ORDER,
+                columnPreferences -> {
+                    putStringList(SEARCH_DIALOG_COLUMN_WIDTHS, getColumnWidthsAsStringList(columnPreferences));
+                    putStringList(SEARCH_DIALOG_COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(columnPreferences));
                 });
 
         return searchDialogColumnPreferences;
+    }
+
+    private void bindColumnPreferences(ColumnPreferences columnPreferences,
+                                       String columnsReportKey,
+                                       String namesKey,
+                                       String widthsKey,
+                                       String sortTypesKey,
+                                       String sortOrderKey,
+                                       Consumer<ColumnPreferences> persistColumns) {
+        ColumnPreferences defaultValues = ColumnPreferences.getDefault();
+
+        bindCustomList(columnPreferences.getColumns(), columnsReportKey, defaultValues.getColumns(),
+                _ -> persistColumns.accept(columnPreferences),
+                () -> {
+                    List<MainTableColumnModel> stored = getColumns(namesKey, widthsKey, sortTypesKey, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
+                    return stored.isEmpty() ? defaultValues.getColumns() : stored;
+                });
+        bindCustomList(columnPreferences.getColumnSortOrder(), sortOrderKey, defaultValues.getColumnSortOrder(),
+                _ -> putStringList(sortOrderKey, getColumnSortOrderAsStringList(columnPreferences)),
+                () -> {
+                    List<MainTableColumnModel> stored = getColumnSortOrder(sortOrderKey, columnPreferences.getColumns());
+                    return stored.isEmpty() ? defaultValues.getColumnSortOrder() : stored;
+                });
     }
     // endregion
 
