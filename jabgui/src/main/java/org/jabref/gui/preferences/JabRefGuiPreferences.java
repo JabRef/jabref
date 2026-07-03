@@ -305,11 +305,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getSidePanePreferences();
         getExternalApplicationsPreferences();
         getGroupsPreferences();
+        getSpecialFieldsPreferences();
 
         super.clear();
 
         getDonationPreferences().setAll(DonationPreferences.getDefault());
-        getSpecialFieldsPreferences().setAll(SpecialFieldsPreferences.getDefault());
         getMainTableColumnPreferences().setAll(ColumnPreferences.getDefault());
         getMainTablePreferences().setAll(MainTablePreferences.getDefault());
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
@@ -335,12 +335,12 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getSidePanePreferences();
         getExternalApplicationsPreferences();
         getGroupsPreferences();
+        getSpecialFieldsPreferences();
 
         super.importPreferences(path);
 
         // in case of incomplete or corrupt xml fall back to current preferences
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
-        getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
         getMainTableColumnPreferences().setAll(getMainTableColumnPreferencesFromBackingStore(getMainTableColumnPreferences()));
         getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
@@ -882,17 +882,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return specialFieldsPreferences;
         }
 
-        specialFieldsPreferences = getSpecialFieldsPreferencesFromBackingStore(SpecialFieldsPreferences.getDefault());
+        SpecialFieldsPreferences defaultValues = SpecialFieldsPreferences.getDefault();
 
-        EasyBind.listen(specialFieldsPreferences.specialFieldsEnabledProperty(), (_, _, newValue) -> putBoolean(SPECIALFIELDSENABLED, newValue));
+        specialFieldsPreferences = new SpecialFieldsPreferences(
+                getBoolean(SPECIALFIELDSENABLED, defaultValues.isSpecialFieldsEnabled())
+        );
+
+        bindBoolean(specialFieldsPreferences.specialFieldsEnabledProperty(), SPECIALFIELDSENABLED, defaultValues.isSpecialFieldsEnabled());
 
         return specialFieldsPreferences;
-    }
-
-    private SpecialFieldsPreferences getSpecialFieldsPreferencesFromBackingStore(SpecialFieldsPreferences defaults) {
-        return new SpecialFieldsPreferences(
-                getBoolean(SPECIALFIELDSENABLED, defaults.isSpecialFieldsEnabled())
-        );
     }
     // endregion
 
