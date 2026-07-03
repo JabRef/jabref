@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.TextInputControl;
-import javafx.scene.web.WebView;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
@@ -77,8 +76,8 @@ public class EditAction extends SimpleCommand {
                         throw new IllegalStateException(message);
                     }
                 }
-            } else if ((focusOwner instanceof CodeArea) || (focusOwner instanceof WebView)) {
-                LOGGER.debug("Ignoring request in CodeArea or WebView");
+            } else if (focusOwner instanceof CodeArea) {
+                LOGGER.debug("Ignoring request in CodeArea");
             } else {
                 LOGGER.debug("Else: {}", focusOwner.getClass().getSimpleName());
                 // Not sure what is selected -> copy/paste/cut selected entries except for Preview and CodeArea

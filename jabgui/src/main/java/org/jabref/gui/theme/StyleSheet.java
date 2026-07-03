@@ -19,13 +19,10 @@ import org.slf4j.LoggerFactory;
 abstract class StyleSheet {
 
     static final String DATA_URL_PREFIX = "data:text/css;charset=utf-8;base64,";
-    static final String EMPTY_WEBENGINE_CSS = DATA_URL_PREFIX;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StyleSheet.class);
 
     abstract URL getSceneStylesheet();
-
-    abstract String getWebEngineStylesheet();
 
     Path getWatchPath() {
         return null;
@@ -49,7 +46,7 @@ abstract class StyleSheet {
 
         if (styleSheetUrl.isEmpty()) {
             try {
-                return Optional.of(new StyleSheetDataUrl(new URI(EMPTY_WEBENGINE_CSS).toURL()));
+                return Optional.of(new StyleSheetDataUrl(new URI(DATA_URL_PREFIX).toURL()));
             } catch (URISyntaxException | MalformedURLException e) {
                 return Optional.empty();
             }

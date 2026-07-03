@@ -6,11 +6,8 @@ public class StyleSheetDataUrl extends StyleSheet {
 
     private final URL url;
 
-    private volatile String dataUrl;
-
     StyleSheetDataUrl(URL url) {
         this.url = url;
-        reload();
     }
 
     @Override
@@ -19,13 +16,8 @@ public class StyleSheetDataUrl extends StyleSheet {
     }
 
     @Override
-    public String getWebEngineStylesheet() {
-        return dataUrl;
-    }
-
-    @Override
     void reload() {
-        StyleSheetFile.getDataUrl(url).ifPresentOrElse(createdUrl -> dataUrl = createdUrl, () -> dataUrl = EMPTY_WEBENGINE_CSS);
+        // nothing to do
     }
 
     @Override
