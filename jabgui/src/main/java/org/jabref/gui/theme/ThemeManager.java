@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
@@ -39,7 +38,7 @@ import static java.util.function.Predicate.not;
 /// gracefully as possible: the additional stylesheet is embedded as a `data:` URL, so
 /// scenes keep their theme if the file becomes unavailable while the application is
 /// running. Large style sheets are not URL-encoded so as to protect memory usage
-/// (see {@link StyleSheetFile#MAX_IN_MEMORY_CSS_LENGTH}).
+/// (see [StyleSheetFile#MAX_IN_MEMORY_CSS_LENGTH]).
 ///
 /// @see <a href="https://docs.jabref.org/advanced/custom-themes">Custom themes</a> in
 /// the Jabref documentation.
