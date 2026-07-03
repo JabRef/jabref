@@ -690,6 +690,17 @@ public class JabRefCliPreferences implements CliPreferences {
                 () -> property.set(defaultValue));
     }
 
+    /// Binds a boolean persisted inverted: the backing store holds `!property`. Useful for legacy keys whose stored
+    /// meaning is the negation of the property (e.g. a `useDefault…` key backing a `useCustom…` property). The property
+    /// (not its stored form) is the binding's reporting value in [#getPreferences()] and [#getDefaults()]. Should not
+    /// be used for new preference options.
+    protected void bindBooleanInverted(BooleanProperty property, String key, boolean defaultValue) {
+        bindCustom(property, key, defaultValue,
+                (_, _, v) -> putBoolean(key, !v),
+                () -> property.set(!getBoolean(key, !defaultValue)),
+                () -> property.set(defaultValue));
+    }
+
     protected void bindInt(IntegerProperty property, String key, int defaultValue) {
         bindCustom(property, key, defaultValue,
                 (_, _, v) -> putInt(key, v),
@@ -1709,11 +1720,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 List.copyOf(FieldFactory.parseFieldList(get(NON_WRAPPABLE_FIELDS,
                         FieldFactory.serializeFieldsList(defaultValues.getNonWrappableFields())))));
 
-        // resolveStrings is persisted inverted as DO_NOT_RESOLVE_STRINGS, so it needs a custom binding.
-        bindCustom(fieldPreferences.resolveStringsProperty(), DO_NOT_RESOLVE_STRINGS, defaultValues.shouldResolveStrings(),
-                (_, _, newValue) -> putBoolean(DO_NOT_RESOLVE_STRINGS, !newValue),
-                () -> fieldPreferences.resolveStringsProperty().set(!getBoolean(DO_NOT_RESOLVE_STRINGS, !defaultValues.shouldResolveStrings())),
-                () -> fieldPreferences.resolveStringsProperty().set(defaultValues.shouldResolveStrings()));
+        bindBooleanInverted(fieldPreferences.resolveStringsProperty(), DO_NOT_RESOLVE_STRINGS, defaultValues.shouldResolveStrings());
         bindCustomList(fieldPreferences.getResolvableFields(), RESOLVE_STRINGS_FOR_FIELDS, List.copyOf(defaultValues.getResolvableFields()),
                 FieldFactory::serializeFieldsList, FieldFactory::parseFieldList);
         bindCustomList(fieldPreferences.getNonWrappableFields(), NON_WRAPPABLE_FIELDS, List.copyOf(defaultValues.getNonWrappableFields()),

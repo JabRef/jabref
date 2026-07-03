@@ -808,17 +808,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         bindString(externalApplicationsPreferences.eMailSubjectProperty(), EMAIL_SUBJECT, defaultValues.getEmailSubject());
         bindBoolean(externalApplicationsPreferences.autoOpenEmailAttachmentsFolderProperty(), OPEN_FOLDERS_OF_ATTACHED_FILES, defaultValues.shouldAutoOpenEmailAttachmentsFolder());
-        // useCustomTerminal is persisted inverted, under the legacy USE_DEFAULT_CONSOLE_APPLICATION key.
-        bindCustom(externalApplicationsPreferences.useCustomTerminalProperty(), USE_DEFAULT_CONSOLE_APPLICATION, defaultValues.useCustomTerminal(),
-                (_, _, newValue) -> putBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !newValue),
-                () -> externalApplicationsPreferences.useCustomTerminalProperty().set(!getBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !defaultValues.useCustomTerminal())),
-                () -> externalApplicationsPreferences.useCustomTerminalProperty().set(defaultValues.useCustomTerminal()));
+        bindBooleanInverted(externalApplicationsPreferences.useCustomTerminalProperty(), USE_DEFAULT_CONSOLE_APPLICATION, defaultValues.useCustomTerminal());
         bindString(externalApplicationsPreferences.customTerminalCommandProperty(), CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand());
-        // useCustomFileBrowser is persisted inverted, under the legacy USE_DEFAULT_FILE_BROWSER_APPLICATION key.
-        bindCustom(externalApplicationsPreferences.useCustomFileBrowserProperty(), USE_DEFAULT_FILE_BROWSER_APPLICATION, defaultValues.useCustomFileBrowser(),
-                (_, _, newValue) -> putBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !newValue),
-                () -> externalApplicationsPreferences.useCustomFileBrowserProperty().set(!getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !defaultValues.useCustomFileBrowser())),
-                () -> externalApplicationsPreferences.useCustomFileBrowserProperty().set(defaultValues.useCustomFileBrowser()));
+        bindBooleanInverted(externalApplicationsPreferences.useCustomFileBrowserProperty(), USE_DEFAULT_FILE_BROWSER_APPLICATION, defaultValues.useCustomFileBrowser());
         bindString(externalApplicationsPreferences.customFileBrowserCommandProperty(), FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand());
         bindString(externalApplicationsPreferences.kindleEmailProperty(), KINDLE_EMAIL, defaultValues.getKindleEmail());
         bindSet(externalApplicationsPreferences.getExternalFileTypes(), EXTERNAL_FILE_TYPES, defaultValues.getExternalFileTypes(),
