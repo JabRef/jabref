@@ -308,12 +308,12 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getSpecialFieldsPreferences();
         getPreviewPreferences();
         getNameDisplayPreferences();
+        getMainTablePreferences();
 
         super.clear();
 
         getDonationPreferences().setAll(DonationPreferences.getDefault());
         getMainTableColumnPreferences().setAll(ColumnPreferences.getDefault());
-        getMainTablePreferences().setAll(MainTablePreferences.getDefault());
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
         getSearchDialogColumnPreferences().setAll(ColumnPreferences.getDefault());
         getMrDlibPreferences().setAll(MrDlibPreferences.getDefault());
@@ -335,13 +335,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getSpecialFieldsPreferences();
         getPreviewPreferences();
         getNameDisplayPreferences();
+        getMainTablePreferences();
 
         super.importPreferences(path);
 
         // in case of incomplete or corrupt xml fall back to current preferences
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
         getMainTableColumnPreferences().setAll(getMainTableColumnPreferencesFromBackingStore(getMainTableColumnPreferences()));
-        getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
         getSearchDialogColumnPreferences().setAll(getSearchDialogColumnPreferencesFromBackingStore(getSearchDialogColumnPreferences()));
         getMrDlibPreferences().setAll(getMrDlibPreferencesFromBackingStore(getMrDlibPreferences()));
@@ -1037,22 +1037,18 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return mainTablePreferences;
         }
 
-        mainTablePreferences = getMainTablePreferencesFromBackingStore(MainTablePreferences.getDefault());
+        MainTablePreferences defaultValues = MainTablePreferences.getDefault();
 
-        EasyBind.listen(mainTablePreferences.resizeColumnsToFitProperty(),
-                (_, _, newValue) -> putBoolean(AUTO_RESIZE_MODE, newValue));
-        EasyBind.listen(mainTablePreferences.extraFileColumnsEnabledProperty(),
-                (_, _, newValue) -> putBoolean(EXTRA_FILE_COLUMNS, newValue));
+        mainTablePreferences = new MainTablePreferences(
+                getMainTableColumnPreferences(),
+                getBoolean(AUTO_RESIZE_MODE, defaultValues.getResizeColumnsToFit()),
+                getBoolean(EXTRA_FILE_COLUMNS, defaultValues.getExtraFileColumnsEnabled())
+        );
+
+        bindBoolean(mainTablePreferences.resizeColumnsToFitProperty(), AUTO_RESIZE_MODE, defaultValues.getResizeColumnsToFit());
+        bindBoolean(mainTablePreferences.extraFileColumnsEnabledProperty(), EXTRA_FILE_COLUMNS, defaultValues.getExtraFileColumnsEnabled());
 
         return mainTablePreferences;
-    }
-
-    private MainTablePreferences getMainTablePreferencesFromBackingStore(MainTablePreferences defaults) {
-        return new MainTablePreferences(
-                getMainTableColumnPreferences(),
-                getBoolean(AUTO_RESIZE_MODE, defaults.getResizeColumnsToFit()),
-                getBoolean(EXTRA_FILE_COLUMNS, defaults.getExtraFileColumnsEnabled())
-        );
     }
 
     public ColumnPreferences getMainTableColumnPreferences() {
