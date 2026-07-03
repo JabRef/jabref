@@ -133,6 +133,10 @@ public class PreviewPanel extends VBox implements PreviewControls {
     }
 
     private void onDragDetected(MouseEvent event) {
+        if (!previewView.isPressOnSelection()) {
+            // dragging over text extends the selection; only an existing selection is dragged out
+            return;
+        }
         previewView.startFullDrag();
 
         Dragboard dragboard = previewView.startDragAndDrop(TransferMode.COPY);

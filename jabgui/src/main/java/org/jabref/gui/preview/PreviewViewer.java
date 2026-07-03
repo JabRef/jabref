@@ -305,9 +305,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
 
-        // Text selection is not supported (yet) without WebView; copy the whole preview instead
+        // If nothing is selected, the whole preview is copied (matching WebView's old behavior closely enough)
         ClipboardContent content = new ClipboardContent();
-        content.putString(previewView.toPlainText());
+        content.putString(previewView.getSelectedText().orElseGet(previewView::toPlainText));
         content.putHtml(getSelectionHtmlContent());
         clipBoardManager.setContent(content);
     }
@@ -343,8 +343,15 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         update();
     }
 
+    /// @return whether the current mouse press started on an existing text selection
+    /// (only then a drag gesture should drag the content instead of extending the selection)
+    public boolean isPressOnSelection() {
+        return previewView.isPressOnSelection();
+    }
+
     public String getSelectionHtmlContent() {
-        // Text selection is not supported (yet) without WebView; return the whole preview instead
-        return layoutText == null ? "" : layoutText;
+        // The selection is plain text; only the whole-preview fallback carries markup
+        return previewView.getSelectedText()
+                          .orElseGet(() -> layoutText == null ? "" : layoutText);
     }
 }
