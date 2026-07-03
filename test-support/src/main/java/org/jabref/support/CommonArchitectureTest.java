@@ -72,6 +72,16 @@ public class CommonArchitectureTest {
     }
 
     @ArchTest
+    public void doNotUseJavaFXWeb(JavaClasses classes) {
+        // javafx.web (WebView/WebEngine) is intentionally not used: it bundles a full WebKit, bloating the
+        // distribution and blocking native-image. HTML is rendered via the html-to-node library instead.
+        ArchRuleDefinition.noClasses()
+                          .should().dependOnClassesThat().resideInAPackage("javafx.scene.web..")
+                          .because("html-to-node (plain JavaFX nodes) should be used instead of javafx.web")
+                          .check(classes);
+    }
+
+    @ArchTest
     public void doNotUseAssertJ(JavaClasses classes) {
         ArchRuleDefinition.noClasses().should().accessClassesThat().resideInAPackage("org.assertj..")
                           .check(classes);
