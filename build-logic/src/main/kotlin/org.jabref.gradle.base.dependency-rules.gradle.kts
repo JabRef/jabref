@@ -47,7 +47,7 @@ jvmDependencyConflicts {
 
 // Tell gradle which jar to use for which platform
 // Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L14-L22
-listOf("javafx-base", "javafx-controls", "javafx-fxml", "javafx-graphics", "javafx-swing", "javafx-media").forEach { jfxModule ->
+listOf("javafx-base", "javafx-controls", "javafx-fxml", "javafx-graphics", "javafx-swing", "javafx-media", "jfx-incubator-input", "jfx-incubator-richtext").forEach { jfxModule ->
     addJfxTarget(jfxModule, "", "none", "none") // matches the empty Jars: to get better errors
     addJfxTarget(jfxModule, "linux", OperatingSystemFamily.LINUX, MachineArchitecture.X86_64)
     addJfxTarget(jfxModule, "linux-aarch64", OperatingSystemFamily.LINUX, MachineArchitecture.ARM64)

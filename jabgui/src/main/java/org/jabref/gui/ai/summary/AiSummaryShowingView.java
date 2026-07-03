@@ -13,7 +13,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -24,7 +23,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.htmltonode.HtmlRenderOptions;
-import org.jabref.htmltonode.HtmlView;
+import org.jabref.htmltonode.rich.RichHtmlView;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
@@ -44,7 +43,7 @@ public class AiSummaryShowingView extends VBox {
     @FXML private CheckBox markdownCheckbox;
     @FXML private Text summaryInfoText;
 
-    private HtmlView htmlView;
+    private RichHtmlView htmlView;
 
     private AiSummaryShowingViewModel viewModel;
 
@@ -99,13 +98,12 @@ public class AiSummaryShowingView extends VBox {
     }
 
     private void initializeSummaryView() {
-        htmlView = new HtmlView();
+        // RichHtmlView scrolls itself - no surrounding ScrollPane
+        htmlView = new RichHtmlView();
         htmlView.setOptions(HtmlRenderOptions.defaults().withLinkHandler(this::openLink));
-        ScrollPane scrollPane = new ScrollPane(htmlView);
-        scrollPane.setFitToWidth(true);
-        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+        VBox.setVgrow(htmlView, Priority.ALWAYS);
 
-        getChildren().addFirst(scrollPane);
+        getChildren().addFirst(htmlView);
     }
 
     private void openLink(String href) {

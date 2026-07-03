@@ -38,6 +38,8 @@ dependencies.constraints {
     api("org.openjfx:javafx-fxml:$javafx")
     api("org.openjfx:javafx-graphics:$javafx")
     api("org.openjfx:javafx-swing:$javafx")
+    api("org.openjfx:jfx-incubator-input:$javafx")
+    api("org.openjfx:jfx-incubator-richtext:$javafx")
 
     api("cc.jilt:jilt:1.9.1")
 

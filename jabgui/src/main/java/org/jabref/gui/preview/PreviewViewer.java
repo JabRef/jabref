@@ -25,7 +25,7 @@ import org.jabref.gui.search.Highlighter;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.htmltonode.HtmlRenderOptions;
-import org.jabref.htmltonode.HtmlView;
+import org.jabref.htmltonode.rich.RichHtmlView;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.Number;
 import org.jabref.logic.preview.PreviewLayout;
@@ -37,6 +37,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
 
 import com.airhacks.afterburner.injection.Injector;
+import jfx.incubator.scene.control.richtext.RichTextArea;
+import jfx.incubator.scene.control.richtext.SelectionSegment;
+import jfx.incubator.scene.control.richtext.TextPos;
+import jfx.incubator.scene.control.richtext.model.StyledTextModel;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +57,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
-    private final HtmlView previewView;
+    private final RichHtmlView previewView;
     private final StringProperty searchQueryProperty;
     private final GuiPreferences preferences;
 
@@ -91,8 +95,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         // surrounding layouts (preview panel, dialogs) behave as before, instead of exposing
         // the content-dependent preferred size of the rendered nodes.
         setPrefSize(800, 600);
-        previewView = new HtmlView();
+        previewView = new RichHtmlView();
         previewView.setOptions(HtmlRenderOptions.defaults().withLinkHandler(this::openLink));
+        // The outer ScrollPane scrolls (scroll sync, tooltips); the area sizes to its content
+        previewView.getRichTextArea().setUseContentHeight(true);
         setContent(previewView);
     }
 
@@ -307,9 +313,46 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
         // If nothing is selected, the whole preview is copied (matching WebView's old behavior closely enough)
         ClipboardContent content = new ClipboardContent();
-        content.putString(previewView.getSelectedText().orElseGet(previewView::toPlainText));
+        content.putString(getSelectedText().orElseGet(previewView::toPlainText));
         content.putHtml(getSelectionHtmlContent());
         clipBoardManager.setContent(content);
+    }
+
+    /// @return the text selected in the preview, joined with line breaks at paragraph boundaries
+    private Optional<String> getSelectedText() {
+        RichTextArea area = previewView.getRichTextArea();
+        SelectionSegment selection = area.getSelection();
+        if ((selection == null) || selection.isCollapsed()) {
+            return Optional.empty();
+        }
+        StyledTextModel model = area.getModel();
+        TextPos min = selection.getMin();
+        TextPos max = selection.getMax();
+        StringBuilder result = new StringBuilder();
+        for (int i = min.index(); i <= max.index(); i++) {
+            String paragraph = model.getPlainText(i);
+            int from = (i == min.index()) ? Math.min(min.offset(), paragraph.length()) : 0;
+            int to = (i == max.index()) ? Math.min(max.offset(), paragraph.length()) : paragraph.length();
+            if (i > min.index()) {
+                result.append('\n');
+            }
+            result.append(paragraph, from, Math.max(from, to));
+        }
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.toString());
+    }
+
+    /// @return whether the given screen position lies on the current text selection
+    /// (only then a drag gesture should drag the content instead of extending the selection)
+    public boolean isPressOnSelection(double screenX, double screenY) {
+        RichTextArea area = previewView.getRichTextArea();
+        SelectionSegment selection = area.getSelection();
+        if ((selection == null) || selection.isCollapsed()) {
+            return false;
+        }
+        TextPos position = area.getTextPosition(screenX, screenY);
+        return (position != null)
+                && (selection.getMin().compareTo(position) <= 0)
+                && (position.compareTo(selection.getMax()) <= 0);
     }
 
     public void exportToClipBoard(StateManager stateManager) {
@@ -343,15 +386,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         update();
     }
 
-    /// @return whether the current mouse press started on an existing text selection
-    /// (only then a drag gesture should drag the content instead of extending the selection)
-    public boolean isPressOnSelection() {
-        return previewView.isPressOnSelection();
-    }
-
     public String getSelectionHtmlContent() {
         // The selection is plain text; only the whole-preview fallback carries markup
-        return previewView.getSelectedText()
-                          .orElseGet(() -> layoutText == null ? "" : layoutText);
+        return getSelectedText().orElseGet(() -> layoutText == null ? "" : layoutText);
     }
 }
