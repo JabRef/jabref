@@ -172,6 +172,7 @@ class LinkedFileHandlerTest {
     @ParameterizedTest(name = "{1} with {2} should be {0} for citation key 'asdf' (custom suffix preserved)")
     @CsvSource(textBlock = """
                 asdf-fig6.jpg, asdf-fig6.jpg, jpg
+                asdf-fig-6.jpg, asdf-fig-6.jpg, jpg
                 asdf-molecule.mol, asdf-molecule.mol, mol
                 asdf_extra.png, asdf_extra.png, png
                 asdf.pdf, asdf.pdf, pdf
