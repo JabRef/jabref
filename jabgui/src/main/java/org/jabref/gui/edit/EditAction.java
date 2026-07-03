@@ -82,11 +82,10 @@ public class EditAction extends SimpleCommand {
             } else if (focusOwner instanceof CodeArea) {
                 LOGGER.debug("Ignoring request in CodeArea");
             } else if (findEnclosingPreview(focusOwner) instanceof PreviewViewer previewViewer) {
-                // WebView handled the copy shortcut natively; the node-based preview gets it routed here.
-                // Everything else (cut/paste/delete would act on the selected entry) is ignored, as before.
                 if (action == StandardActions.COPY) {
                     previewViewer.copySelectionToClipBoard();
                 } else {
+                    // cut/paste/delete would act on the selected entry, not on the read-only preview
                     LOGGER.debug("Ignoring {} request inside the entry preview", action);
                 }
             } else {

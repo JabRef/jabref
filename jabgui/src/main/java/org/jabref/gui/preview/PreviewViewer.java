@@ -91,9 +91,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
         setFitToWidth(true);
         setFitToHeight(true);
-        // WebView reported a fixed 800x600 preferred size. Keep that stable geometry so
-        // surrounding layouts (preview panel, dialogs) behave as before, instead of exposing
-        // the content-dependent preferred size of the rendered nodes.
+        // Surrounding layouts (preview panel, dialogs) rely on a stable preferred size,
+        // not on the content-dependent one of the rendered nodes
         setPrefSize(800, 600);
         previewView = new RichHtmlView();
         previewView.setOptions(HtmlRenderOptions.defaults().withLinkHandler(this::openLink));
@@ -311,7 +310,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
 
-        // If nothing is selected, the whole preview is copied (matching WebView's old behavior closely enough)
         ClipboardContent content = new ClipboardContent();
         content.putString(getSelectedText().orElseGet(previewView::toPlainText));
         content.putHtml(getSelectionHtmlContent());
@@ -369,9 +367,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         setVbarPolicy(ScrollBarPolicy.NEVER);
         setHbarPolicy(ScrollBarPolicy.NEVER);
 
-        // Tooltips size to the rendered content: fixed width, natural height
-        // (WebView needed a JavaScript measurement hack for this). Only write the viewport
-        // height when it actually changed, so rendering does not queue redundant relayouts.
+        // Tooltips size to the rendered content: fixed width, natural height. Only write the
+        // viewport height when it actually changed, so rendering does not queue redundant relayouts.
         setPrefSize(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE);
         setPrefViewportWidth(750);
         previewView.layoutBoundsProperty().addListener((_, _, bounds) -> {
