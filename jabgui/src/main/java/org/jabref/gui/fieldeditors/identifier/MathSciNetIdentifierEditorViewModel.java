@@ -11,6 +11,9 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.MathSciNetId;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class MathSciNetIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<MathSciNetId> {
     public MathSciNetIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider,
                                                FieldCheckers fieldCheckers,
