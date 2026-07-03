@@ -96,7 +96,7 @@ dependencies.constraints {
     api("jakarta.inject:jakarta.inject-api:2.0.1")
     api("jakarta.validation:jakarta.validation-api:3.1.1")
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
-    api("net.bytebuddy:byte-buddy:1.18.10")
+    api("net.bytebuddy:byte-buddy:1.18.11")
     api("net.harawata:appdirs:1.5.0")
     api("net.java.dev.jna:jna-jpms:5.19.1")
     api("net.java.dev.jna:jna-platform:5.19.1")
