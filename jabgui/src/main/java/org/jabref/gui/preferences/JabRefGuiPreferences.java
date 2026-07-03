@@ -13,7 +13,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
-import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn;
 
 import org.jabref.gui.CoreGuiPreferences;
@@ -181,6 +180,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // region GroupsPreferences
     private static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
     private static final String DISPLAY_GROUP_COUNT = "displayGroupCount";
+    // The view mode spans the three GROUP_VIEW_* flags above; this synthetic key is never written to the backing store
+    // and only serves as the binding's reporting key in getPreferences()/getDefaults() (see bindMap/PUSH_APPLICATIONS_PATHS_KEY).
+    private static final String GROUP_VIEW_MODE = "groupViewMode";
     private static final String GROUP_VIEW_INTERSECTION = "groupIntersection";
     private static final String GROUP_VIEW_FILTER = "groupFilter";
     private static final String GROUP_VIEW_INVERT = "groupInvert";
@@ -302,11 +304,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getUnlinkedFilesDialogPreferences();
         getSidePanePreferences();
         getExternalApplicationsPreferences();
+        getGroupsPreferences();
 
         super.clear();
 
         getDonationPreferences().setAll(DonationPreferences.getDefault());
-        getGroupsPreferences().setAll(GroupsPreferences.getDefault());
         getSpecialFieldsPreferences().setAll(SpecialFieldsPreferences.getDefault());
         getMainTableColumnPreferences().setAll(ColumnPreferences.getDefault());
         getMainTablePreferences().setAll(MainTablePreferences.getDefault());
@@ -332,12 +334,12 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getUnlinkedFilesDialogPreferences();
         getSidePanePreferences();
         getExternalApplicationsPreferences();
+        getGroupsPreferences();
 
         super.importPreferences(path);
 
         // in case of incomplete or corrupt xml fall back to current preferences
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
-        getGroupsPreferences().setAll(getGroupsPreferencesFromBackingStore(getGroupsPreferences()));
         getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
         getMainTableColumnPreferences().setAll(getMainTableColumnPreferencesFromBackingStore(getMainTableColumnPreferences()));
         getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
@@ -827,33 +829,50 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return groupsPreferences;
         }
 
-        groupsPreferences = getGroupsPreferencesFromBackingStore(GroupsPreferences.getDefault());
+        GroupsPreferences defaultValues = GroupsPreferences.getDefault();
 
-        groupsPreferences.groupViewModeProperty().addListener((SetChangeListener<GroupViewMode>) _ -> {
-            putBoolean(GROUP_VIEW_INTERSECTION, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INTERSECTION));
-            putBoolean(GROUP_VIEW_FILTER, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.FILTER));
-            putBoolean(GROUP_VIEW_INVERT, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INVERT));
-        });
-        EasyBind.listen(groupsPreferences.autoAssignGroupProperty(), (_, _, newValue) -> putBoolean(AUTO_ASSIGN_GROUP, newValue));
-        EasyBind.listen(groupsPreferences.displayGroupCountProperty(), (_, _, newValue) -> putBoolean(DISPLAY_GROUP_COUNT, newValue));
-        EasyBind.listen(groupsPreferences.defaultHierarchicalContextProperty(), (_, _, newValue) -> put(DEFAULT_HIERARCHICAL_CONTEXT, newValue.name()));
-        EasyBind.listen(groupsPreferences.showAiChatButtonProperty(), (_, _, newValue) -> putBoolean(GROUP_SHOW_AI_CHAT, newValue));
+        groupsPreferences = new GroupsPreferences(
+                getBoolean(GROUP_VIEW_INTERSECTION, defaultValues.groupViewModeProperty().contains(GroupViewMode.INTERSECTION)),
+                getBoolean(GROUP_VIEW_FILTER, defaultValues.groupViewModeProperty().contains(GroupViewMode.FILTER)),
+                getBoolean(GROUP_VIEW_INVERT, defaultValues.groupViewModeProperty().contains(GroupViewMode.INVERT)),
+                getBoolean(AUTO_ASSIGN_GROUP, defaultValues.shouldAutoAssignGroup()),
+                getBoolean(DISPLAY_GROUP_COUNT, defaultValues.shouldDisplayGroupCount()),
+                GroupHierarchyType.valueOf(
+                        get(DEFAULT_HIERARCHICAL_CONTEXT, defaultValues.getDefaultHierarchicalContext().name())
+                ),
+                getBoolean(GROUP_SHOW_AI_CHAT, defaultValues.showAiChatButton())
+        );
+
+        bindSet(groupsPreferences.groupViewModeProperty(), GROUP_VIEW_MODE, defaultValues.groupViewModeProperty(),
+                this::storeGroupViewModes,
+                () -> getGroupViewModes(defaultValues));
+        bindBoolean(groupsPreferences.autoAssignGroupProperty(), AUTO_ASSIGN_GROUP, defaultValues.shouldAutoAssignGroup());
+        bindBoolean(groupsPreferences.displayGroupCountProperty(), DISPLAY_GROUP_COUNT, defaultValues.shouldDisplayGroupCount());
+        bindObject(groupsPreferences.defaultHierarchicalContextProperty(), DEFAULT_HIERARCHICAL_CONTEXT, defaultValues.getDefaultHierarchicalContext(),
+                GroupHierarchyType::name, GroupHierarchyType::valueOf);
+        bindBoolean(groupsPreferences.showAiChatButtonProperty(), GROUP_SHOW_AI_CHAT, defaultValues.showAiChatButton());
 
         return groupsPreferences;
     }
 
-    private GroupsPreferences getGroupsPreferencesFromBackingStore(GroupsPreferences defaults) {
-        return new GroupsPreferences(
-                getBoolean(GROUP_VIEW_INTERSECTION, defaults.groupViewModeProperty().contains(GroupViewMode.INTERSECTION)),
-                getBoolean(GROUP_VIEW_FILTER, defaults.groupViewModeProperty().contains(GroupViewMode.FILTER)),
-                getBoolean(GROUP_VIEW_INVERT, defaults.groupViewModeProperty().contains(GroupViewMode.INVERT)),
-                getBoolean(AUTO_ASSIGN_GROUP, defaults.shouldAutoAssignGroup()),
-                getBoolean(DISPLAY_GROUP_COUNT, defaults.shouldDisplayGroupCount()),
-                GroupHierarchyType.valueOf(
-                        get(DEFAULT_HIERARCHICAL_CONTEXT, defaults.getDefaultHierarchicalContext().name())
-                ),
-                getBoolean(GROUP_SHOW_AI_CHAT, defaults.showAiChatButton())
-        );
+    private Set<GroupViewMode> getGroupViewModes(GroupsPreferences defaults) {
+        Set<GroupViewMode> modes = new HashSet<>();
+        if (getBoolean(GROUP_VIEW_INTERSECTION, defaults.groupViewModeProperty().contains(GroupViewMode.INTERSECTION))) {
+            modes.add(GroupViewMode.INTERSECTION);
+        }
+        if (getBoolean(GROUP_VIEW_FILTER, defaults.groupViewModeProperty().contains(GroupViewMode.FILTER))) {
+            modes.add(GroupViewMode.FILTER);
+        }
+        if (getBoolean(GROUP_VIEW_INVERT, defaults.groupViewModeProperty().contains(GroupViewMode.INVERT))) {
+            modes.add(GroupViewMode.INVERT);
+        }
+        return modes;
+    }
+
+    private void storeGroupViewModes(Set<GroupViewMode> modes) {
+        putBoolean(GROUP_VIEW_INTERSECTION, modes.contains(GroupViewMode.INTERSECTION));
+        putBoolean(GROUP_VIEW_FILTER, modes.contains(GroupViewMode.FILTER));
+        putBoolean(GROUP_VIEW_INVERT, modes.contains(GroupViewMode.INVERT));
     }
     // endregion
 
