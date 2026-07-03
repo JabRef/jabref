@@ -133,7 +133,7 @@ All endpoints are prefixed `/v1`. Breaking changes go to `/v2`; providers MAY se
 ## Endpoint: GET /v1/health
 `req~bxf.health~1`
 
-`GET /v1/health` is a lightweight liveness probe. On success it returns HTTP `200` with:
+`GET /v1/health` is a minimal liveness probe. On success it returns HTTP `200` with:
 
 ```json
 { "ok": true, "name": "example-provider", "protocolVersion": 1 }
