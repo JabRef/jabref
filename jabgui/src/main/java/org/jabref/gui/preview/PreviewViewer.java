@@ -6,17 +6,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.concurrent.Worker;
 import javafx.print.PrinterJob;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -28,7 +24,8 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.Highlighter;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.gui.util.WebViewStore;
+import org.jabref.htmltonode.HtmlRenderOptions;
+import org.jabref.htmltonode.HtmlView;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.Number;
 import org.jabref.logic.preview.PreviewLayout;
@@ -43,46 +40,20 @@ import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.events.EventTarget;
-import org.w3c.dom.html.HTMLAnchorElement;
 
 /// Displays an BibEntry using the given layout format.
+///
+/// Rendering is done with the html-to-node library (plain JavaFX nodes, no `javafx.web`).
 public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
 
-    // https://stackoverflow.com/questions/5669448/get-selected-texts-html-in-div/5670825#5670825
-    private static final String JS_GET_SELECTION_HTML_SCRIPT = """
-            function getSelectionHtml() {
-                var html = "";
-                if (typeof window.getSelection != "undefined") {
-                    var sel = window.getSelection();
-                    if (sel.rangeCount) {
-                        var container = document.createElement("div");
-                        for (var i = 0, len = sel.rangeCount; i < len; ++i) {
-                            container.appendChild(sel.getRangeAt(i).cloneContents());
-                        }
-                        html = container.innerHTML;
-                    }
-                } else if (typeof document.selection != "undefined") {
-                    if (document.selection.type == "Text") {
-                        html = document.selection.createRange().htmlText;
-                    }
-                }
-                return html;
-            }
-            getSelectionHtml();
-            """;
-
     private static final String COVER_IMAGE_FORMAT_HTML = "<img style=\"border-width:1px; border-style:solid; border-color:auto; display:block; height:12rem;\" src=\"%s\"> <br>";
-    private static final int HEIGHT_BUFFER = 15; // Ensures that text is not cut off
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
-    private final WebView previewView;
+    private final HtmlView previewView;
     private final StringProperty searchQueryProperty;
     private final GuiPreferences preferences;
 
@@ -102,7 +73,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public PreviewViewer(DialogService dialogService,
                          GuiPreferences preferences,
-                         ThemeManager themeManager,
+                         ThemeManager themeManager, // kept for call-site compatibility; theming works via regular JavaFX CSS now
                          TaskExecutor taskExecutor,
                          StringProperty searchQueryProperty) {
         this.dialogService = dialogService;
@@ -114,46 +85,20 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
         this.bookCoverFetcher = new BookCoverFetcher(preferences.getExternalApplicationsPreferences());
 
-        setFitToHeight(true);
         setFitToWidth(true);
-        previewView = WebViewStore.get();
+        previewView = new HtmlView();
+        previewView.setOptions(HtmlRenderOptions.defaults().withLinkHandler(this::openLink));
         setContent(previewView);
-
-        configurePreviewView(themeManager);
     }
 
-    private void configurePreviewView(ThemeManager themeManager) {
-        previewView.setContextMenuEnabled(false);
-        previewView.getEngine().setJavaScriptEnabled(true);
-        themeManager.installCssOnWebEngine(previewView.getEngine());
-
-        previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newValue) -> {
-            if (newValue != Worker.State.SUCCEEDED) {
-                return;
-            }
-
-            // https://stackoverflow.com/questions/15555510/javafx-stop-opening-url-in-webview-open-in-browser-instead
-            NodeList anchorList = previewView.getEngine().getDocument().getElementsByTagName("a");
-            for (int i = 0; i < anchorList.getLength(); i++) {
-                Node node = anchorList.item(i);
-                EventTarget eventTarget = (EventTarget) node;
-                eventTarget.addEventListener("click", evt -> {
-                    EventTarget target = evt.getCurrentTarget();
-                    HTMLAnchorElement anchorElement = (HTMLAnchorElement) target;
-                    String href = anchorElement.getHref();
-                    if (href != null) {
-                        try {
-                            NativeDesktop.openBrowser(href, preferences.getExternalApplicationsPreferences());
-                        } catch (MalformedURLException exception) {
-                            LOGGER.error("Invalid URL", exception);
-                        } catch (IOException e) {
-                            LOGGER.error("Could not open URL: {}", href, e);
-                        }
-                    }
-                    evt.preventDefault();
-                }, false);
-            }
-        });
+    private void openLink(String href) {
+        try {
+            NativeDesktop.openBrowser(href, preferences.getExternalApplicationsPreferences());
+        } catch (MalformedURLException exception) {
+            LOGGER.error("Invalid URL", exception);
+        } catch (IOException e) {
+            LOGGER.error("Could not open URL: {}", href, e);
+        }
     }
 
     public void setLayout(PreviewLayout newLayout) {
@@ -250,9 +195,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void setPreviewText(String text) {
-        String baseURL = getBaseURL().orElse("");
         String coverIfAny = getCoverImageURL().map(COVER_IMAGE_FORMAT_HTML::formatted).orElse("");
-        layoutText = formatPreviewText(baseURL, coverIfAny, text);
+        layoutText = coverIfAny + text;
+        UiTaskExecutor.runInJavaFXThread(() ->
+                previewView.setOptions(previewView.getOptions().withBaseUri(getBaseURL().orElse(null))));
         highlightLayoutText();
         setHvalue(0);
     }
@@ -277,19 +223,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         return Optional.empty();
     }
 
-    private static String formatPreviewText(String baseUrl, String coverIfAny, String text) {
-        return """
-                <html>
-                    <head>
-                        <base href="%s">
-                    </head>
-                    <body id="previewBody">
-                        %s <div id="content"> %s </div>
-                    </body>
-                </html>
-                """.formatted(baseUrl, coverIfAny, text);
-    }
-
     private void highlightLayoutText() {
         if (layoutText == null) {
             return;
@@ -299,9 +232,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         if (StringUtil.isNotBlank(queryText)) {
             SearchQuery searchQuery = new SearchQuery(queryText);
             String highlighted = Highlighter.highlightHtml(layoutText, searchQuery);
-            UiTaskExecutor.runInJavaFXThread(() -> previewView.getEngine().loadContent(highlighted));
+            UiTaskExecutor.runInJavaFXThread(() -> previewView.setHtml(highlighted));
         } else {
-            UiTaskExecutor.runInJavaFXThread(() -> previewView.getEngine().loadContent(layoutText));
+            UiTaskExecutor.runInJavaFXThread(() -> previewView.setHtml(layoutText));
         }
     }
 
@@ -316,13 +249,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
 
-        BackgroundTask.wrap(() -> {
-                          job.getJobSettings().setJobName(entry.getCitationKey().orElse("NO CITATION KEY"));
-                          previewView.getEngine().print(job);
-                          job.endJob();
-                      })
-                      .onFailure(e -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), e))
-                      .executeWith(taskExecutor);
+        job.getJobSettings().setJobName(entry.getCitationKey().orElse("NO CITATION KEY"));
+        boolean printed = job.printPage(previewView);
+        if (printed) {
+            job.endJob();
+        } else {
+            dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"));
+        }
     }
 
     public void copyPreviewHtmlToClipBoard() {
@@ -342,9 +275,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
 
-        String plainText = (String) previewView.getEngine().executeScript("document.body.innerText");
         ClipboardContent content = new ClipboardContent();
-        content.putString(plainText);
+        content.putString(previewView.toPlainText());
         clipBoardManager.setContent(content);
     }
 
@@ -354,8 +286,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
 
+        // Text selection is not supported (yet) without WebView; copy the whole preview instead
         ClipboardContent content = new ClipboardContent();
-        content.putString((String) previewView.getEngine().executeScript("window.getSelection().toString()"));
+        content.putString(previewView.toPlainText());
         content.putHtml(getSelectionHtmlContent());
         clipBoardManager.setContent(content);
     }
@@ -371,36 +304,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void resizeForTooltipContent() {
-        setFitToHeight(false);
+        setFitToWidth(false);
         setVbarPolicy(ScrollBarPolicy.NEVER);
+        setHbarPolicy(ScrollBarPolicy.NEVER);
 
+        // Constrain the width; the height follows from the content's natural (preferred) height
         previewView.setPrefWidth(750);
         previewView.setMaxWidth(750);
-        previewView.setPrefHeight(10);
-        previewView.setMinHeight(10);
-
-        previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newState) -> {
-            if (newState == Worker.State.SUCCEEDED) {
-                Platform.runLater(() -> {
-                    Object result = previewView.getEngine().executeScript(
-                            "var content = document.getElementById('content');" +
-                                    "content ? content.getBoundingClientRect().height : document.body.scrollHeight;"
-                    );
-
-                    if (result instanceof java.lang.Number height) {
-                        double actualH = height.doubleValue() + HEIGHT_BUFFER;
-
-                        previewView.setPrefHeight(actualH);
-                        previewView.setMaxHeight(actualH);
-                        previewView.setMinHeight(actualH);
-                    }
-                });
-            }
-        });
-    }
-
-    public WebEngine getEngine() {
-        return previewView.getEngine();
     }
 
     @Override
@@ -409,6 +319,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public String getSelectionHtmlContent() {
-        return (String) previewView.getEngine().executeScript(JS_GET_SELECTION_HTML_SCRIPT);
+        // Text selection is not supported (yet) without WebView; return the whole preview instead
+        return layoutText == null ? "" : layoutText;
     }
 }

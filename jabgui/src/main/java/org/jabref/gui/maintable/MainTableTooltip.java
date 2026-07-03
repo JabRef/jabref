@@ -1,7 +1,6 @@
 package org.jabref.gui.maintable;
 
 import javafx.application.Platform;
-import javafx.concurrent.Worker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 
@@ -25,11 +24,9 @@ public class MainTableTooltip extends Tooltip {
 
         preview.resizeForTooltipContent();
 
-        preview.getEngine().getLoadWorker().stateProperty().addListener((_, _, newState) -> {
-            if (newState == Worker.State.SUCCEEDED) {
-                Platform.runLater(this::sizeToScene);
-            }
-        });
+        // Re-fit the tooltip once the rendered preview has its final size
+        preview.getContent().layoutBoundsProperty().addListener((_, _, _) ->
+                Platform.runLater(this::sizeToScene));
     }
 
     public Tooltip createTooltip(BibDatabaseContext databaseContext, BibEntry entry, String fieldValue) {

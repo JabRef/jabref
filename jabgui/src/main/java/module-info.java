@@ -19,6 +19,8 @@ open module org.jabref {
     requires javafx.graphics;
     requires javafx.web;
 
+    requires org.jabref.htmltonode;
+
     requires com.tobiasdiez.easybind;
 
     requires afterburner.fx;

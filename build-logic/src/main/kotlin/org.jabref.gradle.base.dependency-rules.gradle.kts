@@ -28,6 +28,11 @@ if (useLibericaJdkFull) {
     }
 }
 
+// Maps the module name of JabRef's own external libraries to their Maven coordinates
+javaModuleDependencies {
+    moduleNameToGA.put("org.jabref.htmltonode", "org.jabref:html-to-node")
+}
+
 jvmDependencyConflicts {
     consistentResolution {
         platform(":versions")
