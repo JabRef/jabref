@@ -318,10 +318,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getMainTablePreferences();
         getSearchDialogColumnPreferences();
         getNewEntryPreferences();
+        getDonationPreferences();
 
         super.clear();
 
-        getDonationPreferences().setAll(DonationPreferences.getDefault());
         getMrDlibPreferences().setAll(MrDlibPreferences.getDefault());
     }
 
@@ -345,11 +345,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getMainTablePreferences();
         getSearchDialogColumnPreferences();
         getNewEntryPreferences();
+        getDonationPreferences();
 
         super.importPreferences(path);
 
         // in case of incomplete or corrupt xml fall back to current preferences
-        getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
         getMrDlibPreferences().setAll(getMrDlibPreferencesFromBackingStore(getMrDlibPreferences()));
     }
 
@@ -1264,17 +1264,16 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return donationPreferences;
         }
 
-        donationPreferences = getDonationPreferencesFromBackingStore(DonationPreferences.getDefault());
+        DonationPreferences defaultValues = DonationPreferences.getDefault();
 
-        EasyBind.listen(donationPreferences.neverShowAgainProperty(), (_, _, newValue) -> putBoolean(DONATION_NEVER_SHOW, newValue));
-        EasyBind.listen(donationPreferences.lastShownEpochDayProperty(), (_, _, newValue) -> putInt(DONATION_LAST_SHOWN_EPOCH_DAY, newValue.intValue()));
+        donationPreferences = new DonationPreferences(
+                getBoolean(DONATION_NEVER_SHOW, defaultValues.isNeverShowAgain()),
+                getInt(DONATION_LAST_SHOWN_EPOCH_DAY, defaultValues.getLastShownEpochDay()));
+
+        bindBoolean(donationPreferences.neverShowAgainProperty(), DONATION_NEVER_SHOW, defaultValues.isNeverShowAgain());
+        bindInt(donationPreferences.lastShownEpochDayProperty(), DONATION_LAST_SHOWN_EPOCH_DAY, defaultValues.getLastShownEpochDay());
+
         return donationPreferences;
-    }
-
-    private DonationPreferences getDonationPreferencesFromBackingStore(DonationPreferences defaults) {
-        return new DonationPreferences(
-                getBoolean(DONATION_NEVER_SHOW, defaults.isNeverShowAgain()),
-                getInt(DONATION_LAST_SHOWN_EPOCH_DAY, defaults.getLastShownEpochDay()));
     }
     // endregion
 
