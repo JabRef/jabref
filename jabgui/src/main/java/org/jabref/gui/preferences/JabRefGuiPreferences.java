@@ -25,7 +25,6 @@ import org.jabref.gui.edit.CopyToPreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
-import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.frame.SidePanePreferences;
@@ -302,13 +301,13 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences();
         getUnlinkedFilesDialogPreferences();
         getSidePanePreferences();
+        getExternalApplicationsPreferences();
 
         super.clear();
 
         getDonationPreferences().setAll(DonationPreferences.getDefault());
         getGroupsPreferences().setAll(GroupsPreferences.getDefault());
         getSpecialFieldsPreferences().setAll(SpecialFieldsPreferences.getDefault());
-        getExternalApplicationsPreferences().setAll(ExternalApplicationsPreferences.getDefault());
         getMainTableColumnPreferences().setAll(ColumnPreferences.getDefault());
         getMainTablePreferences().setAll(MainTablePreferences.getDefault());
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
@@ -332,6 +331,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences();
         getUnlinkedFilesDialogPreferences();
         getSidePanePreferences();
+        getExternalApplicationsPreferences();
 
         super.importPreferences(path);
 
@@ -339,7 +339,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
         getGroupsPreferences().setAll(getGroupsPreferencesFromBackingStore(getGroupsPreferences()));
         getSpecialFieldsPreferences().setAll(getSpecialFieldsPreferencesFromBackingStore(getSpecialFieldsPreferences()));
-        getExternalApplicationsPreferences().setAll(getExternalApplicationsPreferencesFromBackingStore(getExternalApplicationsPreferences()));
         getMainTableColumnPreferences().setAll(getMainTableColumnPreferencesFromBackingStore(getMainTableColumnPreferences()));
         getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
@@ -794,39 +793,39 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return externalApplicationsPreferences;
         }
 
-        externalApplicationsPreferences = getExternalApplicationsPreferencesFromBackingStore(ExternalApplicationsPreferences.getDefault());
+        ExternalApplicationsPreferences defaultValues = ExternalApplicationsPreferences.getDefault();
 
-        EasyBind.listen(externalApplicationsPreferences.eMailSubjectProperty(),
-                (_, _, newValue) -> put(EMAIL_SUBJECT, newValue));
-        EasyBind.listen(externalApplicationsPreferences.autoOpenEmailAttachmentsFolderProperty(),
-                (_, _, newValue) -> putBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, newValue));
-        EasyBind.listen(externalApplicationsPreferences.useCustomTerminalProperty(),
-                (_, _, newValue) -> putBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !newValue)); // mind the !
-        externalApplicationsPreferences.getExternalFileTypes().addListener((SetChangeListener<ExternalFileType>) _ ->
-                put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(externalApplicationsPreferences.getExternalFileTypes())));
-        EasyBind.listen(externalApplicationsPreferences.customTerminalCommandProperty(),
-                (_, _, newValue) -> put(CONSOLE_COMMAND, newValue));
-        EasyBind.listen(externalApplicationsPreferences.useCustomFileBrowserProperty(),
-                (_, _, newValue) -> putBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !newValue)); // mind the !
-        EasyBind.listen(externalApplicationsPreferences.customFileBrowserCommandProperty(),
-                (_, _, newValue) -> put(FILE_BROWSER_COMMAND, newValue));
-        EasyBind.listen(externalApplicationsPreferences.kindleEmailProperty(),
-                (_, _, newValue) -> put(KINDLE_EMAIL, newValue));
+        externalApplicationsPreferences = new ExternalApplicationsPreferences(
+                get(EMAIL_SUBJECT, defaultValues.getEmailSubject()),
+                getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, defaultValues.shouldAutoOpenEmailAttachmentsFolder()),
+                ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(defaultValues.getExternalFileTypes()))),
+                !getBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !defaultValues.useCustomTerminal()), // mind the !
+                get(CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand()),
+                !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !defaultValues.useCustomFileBrowser()), // mind the !
+                get(FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand()),
+                get(KINDLE_EMAIL, defaultValues.getKindleEmail())
+        );
+
+        bindString(externalApplicationsPreferences.eMailSubjectProperty(), EMAIL_SUBJECT, defaultValues.getEmailSubject());
+        bindBoolean(externalApplicationsPreferences.autoOpenEmailAttachmentsFolderProperty(), OPEN_FOLDERS_OF_ATTACHED_FILES, defaultValues.shouldAutoOpenEmailAttachmentsFolder());
+        // useCustomTerminal is persisted inverted, under the legacy USE_DEFAULT_CONSOLE_APPLICATION key.
+        bindCustom(externalApplicationsPreferences.useCustomTerminalProperty(), USE_DEFAULT_CONSOLE_APPLICATION, defaultValues.useCustomTerminal(),
+                (_, _, newValue) -> putBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !newValue),
+                () -> externalApplicationsPreferences.useCustomTerminalProperty().set(!getBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !defaultValues.useCustomTerminal())),
+                () -> externalApplicationsPreferences.useCustomTerminalProperty().set(defaultValues.useCustomTerminal()));
+        bindString(externalApplicationsPreferences.customTerminalCommandProperty(), CONSOLE_COMMAND, defaultValues.getCustomTerminalCommand());
+        // useCustomFileBrowser is persisted inverted, under the legacy USE_DEFAULT_FILE_BROWSER_APPLICATION key.
+        bindCustom(externalApplicationsPreferences.useCustomFileBrowserProperty(), USE_DEFAULT_FILE_BROWSER_APPLICATION, defaultValues.useCustomFileBrowser(),
+                (_, _, newValue) -> putBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !newValue),
+                () -> externalApplicationsPreferences.useCustomFileBrowserProperty().set(!getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !defaultValues.useCustomFileBrowser())),
+                () -> externalApplicationsPreferences.useCustomFileBrowserProperty().set(defaultValues.useCustomFileBrowser()));
+        bindString(externalApplicationsPreferences.customFileBrowserCommandProperty(), FILE_BROWSER_COMMAND, defaultValues.getCustomFileBrowserCommand());
+        bindString(externalApplicationsPreferences.kindleEmailProperty(), KINDLE_EMAIL, defaultValues.getKindleEmail());
+        bindSet(externalApplicationsPreferences.getExternalFileTypes(), EXTERNAL_FILE_TYPES, defaultValues.getExternalFileTypes(),
+                set -> put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(set)),
+                () -> ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(defaultValues.getExternalFileTypes()))));
 
         return externalApplicationsPreferences;
-    }
-
-    private ExternalApplicationsPreferences getExternalApplicationsPreferencesFromBackingStore(ExternalApplicationsPreferences defaults) {
-        return new ExternalApplicationsPreferences(
-                get(EMAIL_SUBJECT, defaults.getEmailSubject()),
-                getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, defaults.shouldAutoOpenEmailAttachmentsFolder()),
-                ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(defaults.getExternalFileTypes()))),
-                !getBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !defaults.useCustomTerminal()), // mind the !
-                get(CONSOLE_COMMAND, defaults.getCustomTerminalCommand()),
-                !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !defaults.useCustomFileBrowser()), // mind the !
-                get(FILE_BROWSER_COMMAND, defaults.getCustomFileBrowserCommand()),
-                get(KINDLE_EMAIL, defaults.getKindleEmail())
-        );
     }
     // endregion
 
