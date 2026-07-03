@@ -187,6 +187,9 @@ class ArXivIdentifierTest {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse(url);
 
         assertEquals(Optional.of(new ArXivIdentifier(expectedId, expectedVersion, "")), parsed);
+        // ArXivIdentifier.equals() ignores the version, so assert asString() separately to guard version parsing.
+        String expectedNormalized = expectedId + (expectedVersion.isEmpty() ? "" : "v" + expectedVersion);
+        assertEquals(expectedNormalized, parsed.orElseThrow().asString());
     }
 
     @Test
