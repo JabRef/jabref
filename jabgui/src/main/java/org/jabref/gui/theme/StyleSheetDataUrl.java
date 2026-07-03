@@ -6,8 +6,11 @@ public class StyleSheetDataUrl extends StyleSheet {
 
     private final URL url;
 
+    private volatile String dataUrl;
+
     StyleSheetDataUrl(URL url) {
         this.url = url;
+        reload();
     }
 
     @Override
@@ -16,8 +19,13 @@ public class StyleSheetDataUrl extends StyleSheet {
     }
 
     @Override
+    String getSceneStylesheetLocation() {
+        return dataUrl;
+    }
+
+    @Override
     void reload() {
-        // nothing to do
+        StyleSheetFile.getDataUrl(url).ifPresentOrElse(createdUrl -> dataUrl = createdUrl, () -> dataUrl = DATA_URL_PREFIX);
     }
 
     @Override

@@ -24,6 +24,17 @@ abstract class StyleSheet {
 
     abstract URL getSceneStylesheet();
 
+    /// The location to put into `Scene#getStylesheets`. Typically a `data:` URL with the CSS
+    /// embedded — that way the theme survives removal of the CSS file while the application is
+    /// running, and JavaFX's stylesheet cache cannot serve stale content after a live reload
+    /// (the URL changes with the content). Large stylesheets fall back to the plain URL.
+    ///
+    /// @return the stylesheet location, or an empty string if unavailable
+    String getSceneStylesheetLocation() {
+        URL stylesheet = getSceneStylesheet();
+        return stylesheet == null ? "" : stylesheet.toExternalForm();
+    }
+
     Path getWatchPath() {
         return null;
     }

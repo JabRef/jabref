@@ -34,8 +34,10 @@ import org.slf4j.LoggerFactory;
 /// jabref-theme.css.
 ///
 /// For type Custom, Theme will protect against removal of the CSS file, degrading as
-/// gracefully as possible. If the file becomes unavailable while the application is
-/// running, some Scenes that have not yet had the CSS installed may not be themed.
+/// gracefully as possible: the additional stylesheet is embedded as a `data:` URL, so
+/// scenes keep their theme if the file becomes unavailable while the application is
+/// running. Large style sheets are not URL-encoded so as to protect memory usage
+/// (see {@link StyleSheetFile#MAX_IN_MEMORY_CSS_LENGTH}).
 ///
 /// @see <a href="https://docs.jabref.org/advanced/custom-themes">Custom themes</a> in
 /// the Jabref documentation.
@@ -85,10 +87,10 @@ public class ThemeManager {
     /// in a brief flash of the default JavaFX theme (Modena CSS) before the intended theme appears.
     public void installCssOnScene(Scene scene) {
         List<String> toAdd = new ArrayList<>(2);
-        toAdd.add(jabRefTheme.getSceneStylesheet().toExternalForm());
+        toAdd.add(jabRefTheme.getSceneStylesheetLocation());
         theme.getAdditionalStylesheet()
-             .map(StyleSheet::getSceneStylesheet)
-             .map(URL::toExternalForm)
+             .map(StyleSheet::getSceneStylesheetLocation)
+             .filter(location -> !location.isEmpty())
              .ifPresent(toAdd::add);
 
         scene.getStylesheets().setAll(toAdd);
