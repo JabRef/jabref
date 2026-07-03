@@ -307,6 +307,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getGroupsPreferences();
         getSpecialFieldsPreferences();
         getPreviewPreferences();
+        getNameDisplayPreferences();
 
         super.clear();
 
@@ -315,7 +316,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getMainTablePreferences().setAll(MainTablePreferences.getDefault());
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
         getSearchDialogColumnPreferences().setAll(ColumnPreferences.getDefault());
-        getNameDisplayPreferences().setAll(NameDisplayPreferences.getDefault());
         getMrDlibPreferences().setAll(MrDlibPreferences.getDefault());
     }
 
@@ -334,6 +334,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getGroupsPreferences();
         getSpecialFieldsPreferences();
         getPreviewPreferences();
+        getNameDisplayPreferences();
 
         super.importPreferences(path);
 
@@ -343,7 +344,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
         getSearchDialogColumnPreferences().setAll(getSearchDialogColumnPreferencesFromBackingStore(getSearchDialogColumnPreferences()));
-        getNameDisplayPreferences().setAll(getNameDisplayPreferencesFromBackingStore(getNameDisplayPreferences()));
         getMrDlibPreferences().setAll(getMrDlibPreferencesFromBackingStore(getMrDlibPreferences()));
     }
 
@@ -1006,59 +1006,28 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return nameDisplayPreferences;
         }
 
-        nameDisplayPreferences = getNameDisplayPreferencesFromBackingStore(NameDisplayPreferences.getDefault());
+        NameDisplayPreferences defaultValues = NameDisplayPreferences.getDefault();
 
-        EasyBind.listen(nameDisplayPreferences.displayStyleProperty(), (_, _, newValue) -> {
-            putBoolean(NAMES_NATBIB, newValue == NameDisplayPreferences.DisplayStyle.NATBIB);
-            putBoolean(NAMES_AS_IS, newValue == NameDisplayPreferences.DisplayStyle.AS_IS);
-            putBoolean(NAMES_FIRST_LAST, newValue == NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME);
-        });
-        EasyBind.listen(nameDisplayPreferences.abbreviationStyleProperty(), (_, _, newValue) -> {
-            putBoolean(ABBR_AUTHOR_NAMES, newValue == NameDisplayPreferences.AbbreviationStyle.FULL);
-            putBoolean(NAMES_LAST_ONLY, newValue == NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY);
-        });
+        nameDisplayPreferences = new NameDisplayPreferences(
+                readExclusiveFlags(defaultValues.getDisplayStyle(), NameDisplayPreferences.DisplayStyle.LASTNAME_FIRSTNAME,
+                        Map.entry(NAMES_NATBIB, NameDisplayPreferences.DisplayStyle.NATBIB),
+                        Map.entry(NAMES_AS_IS, NameDisplayPreferences.DisplayStyle.AS_IS),
+                        Map.entry(NAMES_FIRST_LAST, NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME)),
+                readExclusiveFlags(defaultValues.getAbbreviationStyle(), NameDisplayPreferences.AbbreviationStyle.NONE,
+                        Map.entry(ABBR_AUTHOR_NAMES, NameDisplayPreferences.AbbreviationStyle.FULL),
+                        Map.entry(NAMES_LAST_ONLY, NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY)));
+
+        // displayStyle: LASTNAME_FIRSTNAME is the implicit value (all flags stored false).
+        bindExclusiveFlags(nameDisplayPreferences.displayStyleProperty(), defaultValues.getDisplayStyle(), NameDisplayPreferences.DisplayStyle.LASTNAME_FIRSTNAME,
+                Map.entry(NAMES_NATBIB, NameDisplayPreferences.DisplayStyle.NATBIB),
+                Map.entry(NAMES_AS_IS, NameDisplayPreferences.DisplayStyle.AS_IS),
+                Map.entry(NAMES_FIRST_LAST, NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME));
+        // abbreviationStyle: NONE is the implicit value (all flags stored false).
+        bindExclusiveFlags(nameDisplayPreferences.abbreviationStyleProperty(), defaultValues.getAbbreviationStyle(), NameDisplayPreferences.AbbreviationStyle.NONE,
+                Map.entry(ABBR_AUTHOR_NAMES, NameDisplayPreferences.AbbreviationStyle.FULL),
+                Map.entry(NAMES_LAST_ONLY, NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY));
 
         return nameDisplayPreferences;
-    }
-
-    private NameDisplayPreferences getNameDisplayPreferencesFromBackingStore(NameDisplayPreferences defaults) {
-        return new NameDisplayPreferences(
-                getNameDisplayStyleFromBackingStore(defaults),
-                getNameAbbreviationStyleFromBackingStore(defaults)
-        );
-    }
-
-    private NameDisplayPreferences.DisplayStyle getNameDisplayStyleFromBackingStore(NameDisplayPreferences defaults) {
-        if (!hasKey(NAMES_NATBIB) && !hasKey(NAMES_AS_IS) && !hasKey(NAMES_FIRST_LAST)) {
-            return defaults.getDisplayStyle();
-        }
-
-        if (getBoolean(NAMES_NATBIB, false)) {
-            return NameDisplayPreferences.DisplayStyle.NATBIB;
-        }
-        if (getBoolean(NAMES_AS_IS, false)) {
-            return NameDisplayPreferences.DisplayStyle.AS_IS;
-        }
-        if (getBoolean(NAMES_FIRST_LAST, false)) {
-            return NameDisplayPreferences.DisplayStyle.FIRSTNAME_LASTNAME;
-        }
-
-        return NameDisplayPreferences.DisplayStyle.LASTNAME_FIRSTNAME;
-    }
-
-    private NameDisplayPreferences.AbbreviationStyle getNameAbbreviationStyleFromBackingStore(NameDisplayPreferences defaults) {
-        if (!hasKey(ABBR_AUTHOR_NAMES) && !hasKey(NAMES_LAST_ONLY)) {
-            return defaults.getAbbreviationStyle();
-        }
-
-        if (getBoolean(ABBR_AUTHOR_NAMES, false)) {
-            return NameDisplayPreferences.AbbreviationStyle.FULL;
-        }
-        if (getBoolean(NAMES_LAST_ONLY, false)) {
-            return NameDisplayPreferences.AbbreviationStyle.LASTNAME_ONLY;
-        }
-
-        return NameDisplayPreferences.AbbreviationStyle.NONE;
     }
     // endregion
 
