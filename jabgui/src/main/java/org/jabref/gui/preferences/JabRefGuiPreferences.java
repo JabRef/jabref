@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.stream.Collectors;
 
-import javafx.beans.InvalidationListener;
 import javafx.scene.control.TableColumn;
 
 import org.jabref.gui.CoreGuiPreferences;
@@ -96,6 +95,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public static final String COLUMN_WIDTHS = "mainTableColumnWidths";
     public static final String COLUMN_SORT_TYPES = "mainTableColumnSortTypes";
     public static final String COLUMN_SORT_ORDER = "mainTableColumnSortOrder";
+    // The column list spans the COLUMN_NAMES/COLUMN_WIDTHS/COLUMN_SORT_TYPES keys above; this synthetic key is never
+    // written to the backing store and only serves as the binding's reporting key in getPreferences()/getDefaults().
+    private static final String MAIN_TABLE_COLUMNS = "mainTableColumns";
     // endregion
 
     // region keybindings - public because needed for pref migration
@@ -137,6 +139,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String SEARCH_DIALOG_COLUMN_WIDTHS = "searchTableColumnWidths";
     private static final String SEARCH_DIALOG_COLUMN_SORT_TYPES = "searchDialogColumnSortTypes";
     private static final String SEARCH_DIALOG_COLUMN_SORT_ORDER = "searchDalogColumnSortOrder";
+    // The column list spans COLUMN_NAMES (shared with the main table) plus the SEARCH_DIALOG_COLUMN_WIDTHS/_SORT_TYPES
+    // keys; this synthetic key is never written to the backing store and only serves as the binding's reporting key.
+    private static final String SEARCH_DIALOG_COLUMNS = "searchDialogColumns";
     // endregion
 
     // region NameDisplayPreferences
@@ -308,14 +313,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getSpecialFieldsPreferences();
         getPreviewPreferences();
         getNameDisplayPreferences();
+        getMainTableColumnPreferences();
         getMainTablePreferences();
+        getSearchDialogColumnPreferences();
 
         super.clear();
 
         getDonationPreferences().setAll(DonationPreferences.getDefault());
-        getMainTableColumnPreferences().setAll(ColumnPreferences.getDefault());
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
-        getSearchDialogColumnPreferences().setAll(ColumnPreferences.getDefault());
         getMrDlibPreferences().setAll(MrDlibPreferences.getDefault());
     }
 
@@ -335,15 +340,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getSpecialFieldsPreferences();
         getPreviewPreferences();
         getNameDisplayPreferences();
+        getMainTableColumnPreferences();
         getMainTablePreferences();
+        getSearchDialogColumnPreferences();
 
         super.importPreferences(path);
 
         // in case of incomplete or corrupt xml fall back to current preferences
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
-        getMainTableColumnPreferences().setAll(getMainTableColumnPreferencesFromBackingStore(getMainTableColumnPreferences()));
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
-        getSearchDialogColumnPreferences().setAll(getSearchDialogColumnPreferencesFromBackingStore(getSearchDialogColumnPreferences()));
         getMrDlibPreferences().setAll(getMrDlibPreferencesFromBackingStore(getMrDlibPreferences()));
     }
 
@@ -949,8 +954,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         bindCustomList(previewPreferences.getBstPreviewLayoutPaths(), PREVIEW_BST_LAYOUT_PATHS, defaultValues.getBstPreviewLayoutPaths(),
                 this::storeBstPaths,
                 () -> hasKey(PREVIEW_BST_LAYOUT_PATHS)
-                        ? getStringList(PREVIEW_BST_LAYOUT_PATHS).stream().map(Path::of).toList()
-                        : defaultValues.getBstPreviewLayoutPaths());
+                      ? getStringList(PREVIEW_BST_LAYOUT_PATHS).stream().map(Path::of).toList()
+                      : defaultValues.getBstPreviewLayoutPaths());
         bindBoolean(previewPreferences.shouldDownloadCoversProperty(), PREVIEW_COVER_IMAGE_DOWNLOAD, defaultValues.shouldDownloadCovers());
 
         return this.previewPreferences;
@@ -1056,26 +1061,35 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return mainTableColumnPreferences;
         }
 
-        mainTableColumnPreferences = getMainTableColumnPreferencesFromBackingStore(ColumnPreferences.getDefault());
+        ColumnPreferences defaultValues = ColumnPreferences.getDefault();
 
-        mainTableColumnPreferences.getColumns().addListener((InvalidationListener) _ -> {
-            putStringList(COLUMN_NAMES, getColumnNamesAsStringList(mainTableColumnPreferences));
-            putStringList(COLUMN_WIDTHS, getColumnWidthsAsStringList(mainTableColumnPreferences));
-            putStringList(COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(mainTableColumnPreferences));
-        });
-        mainTableColumnPreferences.getColumnSortOrder().addListener((InvalidationListener) _ ->
-                putStringList(COLUMN_SORT_ORDER, getColumnSortOrderAsStringList(mainTableColumnPreferences)));
-
-        return mainTableColumnPreferences;
-    }
-
-    private ColumnPreferences getMainTableColumnPreferencesFromBackingStore(ColumnPreferences defaults) {
         List<MainTableColumnModel> columns = getColumns(COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
         List<MainTableColumnModel> columnSortOrder = getColumnSortOrder(COLUMN_SORT_ORDER, columns);
-        return new ColumnPreferences(
-                columns.isEmpty() ? defaults.getColumns() : columns,
-                columnSortOrder.isEmpty() ? defaults.getColumnSortOrder() : columnSortOrder
+        mainTableColumnPreferences = new ColumnPreferences(
+                columns.isEmpty() ? defaultValues.getColumns() : columns,
+                columnSortOrder.isEmpty() ? defaultValues.getColumnSortOrder() : columnSortOrder
         );
+
+        // The columns list is persisted across COLUMN_NAMES/COLUMN_WIDTHS/COLUMN_SORT_TYPES; registered before the sort
+        // order, so its import runs first and the sort order can resolve against the loaded columns.
+        bindCustomList(mainTableColumnPreferences.getColumns(), MAIN_TABLE_COLUMNS, defaultValues.getColumns(),
+                boundList -> {
+                    putStringList(COLUMN_NAMES, getColumnNamesAsStringList(mainTableColumnPreferences));
+                    putStringList(COLUMN_WIDTHS, getColumnWidthsAsStringList(mainTableColumnPreferences));
+                    putStringList(COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(mainTableColumnPreferences));
+                },
+                () -> {
+                    List<MainTableColumnModel> stored = getColumns(COLUMN_NAMES, COLUMN_WIDTHS, COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
+                    return stored.isEmpty() ? defaultValues.getColumns() : stored;
+                });
+        bindCustomList(mainTableColumnPreferences.getColumnSortOrder(), COLUMN_SORT_ORDER, defaultValues.getColumnSortOrder(),
+                boundList -> putStringList(COLUMN_SORT_ORDER, getColumnSortOrderAsStringList(mainTableColumnPreferences)),
+                () -> {
+                    List<MainTableColumnModel> stored = getColumnSortOrder(COLUMN_SORT_ORDER, mainTableColumnPreferences.getColumns());
+                    return stored.isEmpty() ? defaultValues.getColumnSortOrder() : stored;
+                });
+
+        return mainTableColumnPreferences;
     }
     // endregion
 
@@ -1085,27 +1099,34 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return searchDialogColumnPreferences;
         }
 
-        searchDialogColumnPreferences = getSearchDialogColumnPreferencesFromBackingStore(ColumnPreferences.getDefault());
+        ColumnPreferences defaultValues = ColumnPreferences.getDefault();
 
-        searchDialogColumnPreferences.getColumns().addListener((InvalidationListener) _ -> {
-            // MainTable and SearchResultTable use the same set of columnNames
-            // putStringList(SEARCH_DIALOG_COLUMN_NAMES, getColumnNamesAsStringList(columnPreferences));
-            putStringList(SEARCH_DIALOG_COLUMN_WIDTHS, getColumnWidthsAsStringList(searchDialogColumnPreferences));
-            putStringList(SEARCH_DIALOG_COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(searchDialogColumnPreferences));
-        });
-        searchDialogColumnPreferences.getColumnSortOrder().addListener((InvalidationListener) _ ->
-                putStringList(SEARCH_DIALOG_COLUMN_SORT_ORDER, getColumnSortOrderAsStringList(searchDialogColumnPreferences)));
-
-        return searchDialogColumnPreferences;
-    }
-
-    private ColumnPreferences getSearchDialogColumnPreferencesFromBackingStore(ColumnPreferences defaults) {
         List<MainTableColumnModel> columns = getColumns(COLUMN_NAMES, SEARCH_DIALOG_COLUMN_WIDTHS, SEARCH_DIALOG_COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
         List<MainTableColumnModel> columnSortOrder = getColumnSortOrder(SEARCH_DIALOG_COLUMN_SORT_ORDER, columns);
-        return new ColumnPreferences(
-                columns.isEmpty() ? defaults.getColumns() : columns,
-                columnSortOrder.isEmpty() ? defaults.getColumnSortOrder() : columnSortOrder
+        searchDialogColumnPreferences = new ColumnPreferences(
+                columns.isEmpty() ? defaultValues.getColumns() : columns,
+                columnSortOrder.isEmpty() ? defaultValues.getColumnSortOrder() : columnSortOrder
         );
+
+        // Column names are shared with the main table (COLUMN_NAMES) and owned there, so only widths and sort types are
+        // persisted here. Registered before the sort order, so its import runs first and the sort order can resolve.
+        bindCustomList(searchDialogColumnPreferences.getColumns(), SEARCH_DIALOG_COLUMNS, defaultValues.getColumns(),
+                boundList -> {
+                    putStringList(SEARCH_DIALOG_COLUMN_WIDTHS, getColumnWidthsAsStringList(searchDialogColumnPreferences));
+                    putStringList(SEARCH_DIALOG_COLUMN_SORT_TYPES, getColumnSortTypesAsStringList(searchDialogColumnPreferences));
+                },
+                () -> {
+                    List<MainTableColumnModel> stored = getColumns(COLUMN_NAMES, SEARCH_DIALOG_COLUMN_WIDTHS, SEARCH_DIALOG_COLUMN_SORT_TYPES, ColumnPreferences.DEFAULT_COLUMN_WIDTH);
+                    return stored.isEmpty() ? defaultValues.getColumns() : stored;
+                });
+        bindCustomList(searchDialogColumnPreferences.getColumnSortOrder(), SEARCH_DIALOG_COLUMN_SORT_ORDER, defaultValues.getColumnSortOrder(),
+                boundList -> putStringList(SEARCH_DIALOG_COLUMN_SORT_ORDER, getColumnSortOrderAsStringList(searchDialogColumnPreferences)),
+                () -> {
+                    List<MainTableColumnModel> stored = getColumnSortOrder(SEARCH_DIALOG_COLUMN_SORT_ORDER, searchDialogColumnPreferences.getColumns());
+                    return stored.isEmpty() ? defaultValues.getColumnSortOrder() : stored;
+                });
+
+        return searchDialogColumnPreferences;
     }
     // endregion
 
