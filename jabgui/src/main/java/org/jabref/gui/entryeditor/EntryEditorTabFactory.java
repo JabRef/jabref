@@ -161,8 +161,6 @@ public class EntryEditorTabFactory {
                             searchCitationsRelationsService);
             case COMMENTS ->
                     new CommentsTab(preferences, undoManager, undoAction, redoAction, journalAbbreviationRepository, stateManager, previewPanel);
-            case MATH_SCI_NET ->
-                    new MathSciNetTab();
             case SOURCE ->
                     new SourceTab(
                             undoManager,

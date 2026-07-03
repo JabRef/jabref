@@ -33,6 +33,7 @@ import static org.jabref.model.entry.field.StandardField.DOI;
 import static org.jabref.model.entry.field.StandardField.EPRINT;
 import static org.jabref.model.entry.field.StandardField.ISBN;
 import static org.jabref.model.entry.field.StandardField.ISSN;
+import static org.jabref.model.entry.field.StandardField.MR_NUMBER;
 
 public class IdentifierEditor extends HBox implements FieldEditorFX {
 
@@ -66,6 +67,8 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                     this.viewModel = new ISSNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
             case EPRINT ->
                     this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
+            case MR_NUMBER ->
+                    this.viewModel = new MathSciNetIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
 
             // TODO: Add support for PMID
             case null,
