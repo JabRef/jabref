@@ -107,6 +107,10 @@ public class CommonArchitectureTest {
         ArchRuleDefinition.noClasses().that().haveNameNotMatching(".*Test")
                           .and().areNotAnnotatedWith(AllowedToUseClassGetResource.class)
                           .and().areNotAssignableFrom("org.jabref.logic.importer.fileformat.ImporterTestEngine")
+                          // html-to-node is an external dependency sharing the org.jabref namespace; it needs a
+                          // stylesheet URL for JavaFX (Parent#getStylesheets()), which getResourceAsStream cannot
+                          // provide. It cannot use @AllowedToUseClassGetResource without depending back on JabRef.
+                          .and().resideOutsideOfPackages("org.jabref.htmltonode..")
                           .should()
                           .callMethod(Class.class, "getResource", String.class)
                           .because("getResourceAsStream(...) should be used instead")
