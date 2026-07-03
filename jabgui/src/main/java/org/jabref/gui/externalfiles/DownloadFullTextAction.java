@@ -1,8 +1,6 @@
 package org.jabref.gui.externalfiles;
 
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -14,16 +12,12 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.importer.FetcherResult;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -136,7 +130,7 @@ public class DownloadFullTextAction extends SimpleCommand {
         // A file: URL points at a PDF already on disk; attach it locally so it runs through the
         // same move-and-rename pipeline as an HTTP download. Online URLs use the download path below.
         if ("file".equalsIgnoreCase(source.getProtocol())) {
-            attachLocalFile(databaseContext, source, entry);
+            LocalFulltextAttacher.attach(source, entry, databaseContext, preferences, taskExecutor, dialogService);
             return;
         }
 
@@ -157,50 +151,4 @@ public class DownloadFullTextAction extends SimpleCommand {
         }
     }
 
-    private void attachLocalFile(BibDatabaseContext databaseContext, URL url, BibEntry entry) {
-        Path sourcePath;
-        try {
-            sourcePath = Path.of(url.toURI());
-        } catch (URISyntaxException | IllegalArgumentException e) {
-            LOGGER.warn("Could not interpret fetcher-returned file URL {}", url, e);
-            dialogService.notify(Localization.lang("No full text document found for entry %0.",
-                    entry.getCitationKey().orElse(Localization.lang("undefined"))));
-            return;
-        }
-
-        ExternalFileTypes.getExternalFileTypeByExt("pdf", preferences.getExternalApplicationsPreferences())
-                         .ifPresent(externalFileType ->
-                                 attachLocalPdf(databaseContext, sourcePath, externalFileType, entry));
-    }
-
-    private void attachLocalPdf(BibDatabaseContext databaseContext, Path sourcePath,
-                                ExternalFileType externalFileType, BibEntry entry) {
-        LinkedFile linkedFile = new LinkedFile("", sourcePath, externalFileType.getName());
-
-        if (entry.getFiles().contains(linkedFile)) {
-            dialogService.notify(Localization.lang("Full text document for entry %0 already linked.",
-                    entry.getCitationKey().orElse(Localization.lang("undefined"))));
-            return;
-        }
-
-        LinkedFileHandler handler = new LinkedFileHandler(
-                linkedFile, entry, databaseContext, preferences.getFilePreferences());
-
-        // copyOrMoveToDefaultDirectory does blocking filesystem I/O; run it
-        // off the JavaFX Application Thread. shouldMove=true,
-        // shouldRenameToFilenamePattern=true — same fate a successful HTTP
-        // download would have via DownloadLinkedFileAction.
-        BackgroundTask
-                .wrap(() -> {
-                    handler.copyOrMoveToDefaultDirectory(true, true);
-                    return linkedFile;
-                })
-                .onSuccess(entry::addFile)
-                .onFailure(e -> {
-                    LOGGER.warn("Could not move fetcher-returned file {} into the library directory",
-                            sourcePath, e);
-                    entry.addFile(linkedFile);
-                })
-                .executeWith(taskExecutor);
-    }
 }

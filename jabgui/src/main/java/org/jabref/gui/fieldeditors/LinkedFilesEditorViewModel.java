@@ -27,6 +27,7 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
+import org.jabref.gui.externalfiles.LocalFulltextAttacher;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
@@ -35,7 +36,6 @@ import org.jabref.gui.linkedfile.AttachFileFromURLAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.bibtex.FileFieldWriter;
-import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -272,7 +272,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         // A file: URL points at a PDF already on disk; attach it directly instead of downloading,
         // then move and rename it into the configured file directory like a completed HTTP download.
         if ("file".equalsIgnoreCase(url.getProtocol())) {
-            attachLocalFile(url);
+            LocalFulltextAttacher.attach(url, entry, databaseContext, preferences, taskExecutor, dialogService);
             return;
         }
         LinkedFileViewModel onlineFile = new LinkedFileViewModel(
@@ -284,52 +284,6 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 preferences);
         files.add(onlineFile);
         onlineFile.download(true, headers);
-    }
-
-    private void attachLocalFile(URL url) {
-        Path sourcePath;
-        try {
-            sourcePath = Path.of(url.toURI());
-        } catch (java.net.URISyntaxException | IllegalArgumentException e) {
-            LOGGER.warn("Could not interpret fetcher-returned file URL {}", url, e);
-            dialogService.notify(Localization.lang("No full text document found"));
-            return;
-        }
-
-        // The PDF external-file type is always present in JabRef's built-in
-        // type list; ifPresent keeps the contract explicit without an
-        // `orElse` fallback that would never fire.
-        ExternalFileTypes.getExternalFileTypeByExt("pdf",
-                                 preferences.getExternalApplicationsPreferences())
-                         .ifPresent(externalFileType ->
-                                 attachLocalPdf(sourcePath, externalFileType));
-    }
-
-    private void attachLocalPdf(Path sourcePath, ExternalFileType externalFileType) {
-        LinkedFile linkedFile = new LinkedFile("", sourcePath, externalFileType.getName());
-        LinkedFileHandler handler = new LinkedFileHandler(
-                linkedFile, entry, databaseContext, preferences.getFilePreferences());
-
-        // copyOrMoveToDefaultDirectory does blocking filesystem I/O; run it
-        // off the JavaFX Application Thread. shouldMove=true,
-        // shouldRenameToFilenamePattern=true — same behaviour as a drag-drop
-        // onto the main table. The bidirectional binding installed in the
-        // constructor pulls the new file into the editor's observable list
-        // (via parseToFileViewModel) once entry.addFile fires on the UI
-        // thread.
-        BackgroundTask
-                .wrap(() -> {
-                    handler.copyOrMoveToDefaultDirectory(true, true);
-                    return linkedFile;
-                })
-                .onSuccess(entry::addFile)
-                .onFailure(e -> {
-                    LOGGER.warn("Could not move fetcher-returned file {} into the library directory",
-                            sourcePath, e);
-                    // Keep the original path; the user can move/rename it manually.
-                    entry.addFile(linkedFile);
-                })
-                .executeWith(taskExecutor);
     }
 
     public void deleteFile(LinkedFileViewModel file) {
