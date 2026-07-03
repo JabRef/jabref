@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
@@ -20,6 +21,8 @@ import org.jabref.model.metadata.MetaData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -196,5 +199,73 @@ class RenamePdfCleanupTest {
                         new LinkedFile("", Path.of("Toot - test title.pdf"), "PDF"),
                         new LinkedFile("", Path.of("Toot.tmp"), "")))),
                 entry.getField(StandardField.FILE));
+    }
+
+    @Test
+    void cleanupPreserveCustomSuffixKeepsSuffix() throws IOException {
+        Path path = testFolder.resolve("Toot-fig6.jpg");
+        Files.createFile(path);
+        LinkedFile fileField = new LinkedFile("", Path.of("Toot-fig6.jpg"), "");
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
+
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        RenamePdfCleanup preserveSuffixCleanup = new RenamePdfCleanup(false, false, true, () -> context, filePreferences);
+        preserveSuffixCleanup.cleanup(entry);
+
+        // The "-fig6" suffix is kept instead of being collapsed onto the plain pattern, so nothing changes.
+        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(fileField)), entry.getField(StandardField.FILE));
+    }
+
+    @Test
+    void cleanupWithoutPreserveCustomSuffixCollapsesSuffix() throws IOException {
+        Path path = testFolder.resolve("Toot-fig6.jpg");
+        Files.createFile(path);
+        LinkedFile fileField = new LinkedFile("", Path.of("Toot-fig6.jpg"), "");
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
+
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        RenamePdfCleanup defaultCleanup = new RenamePdfCleanup(false, false, false, () -> context, filePreferences);
+        defaultCleanup.cleanup(entry);
+
+        // Default (historical) behavior: the file is renamed onto the plain pattern, dropping "-fig6".
+        LinkedFile newFileField = new LinkedFile("", Path.of("Toot.jpg"), "");
+        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField(StandardField.FILE));
+    }
+
+    @Test
+    void cleanupPreserveCustomSuffixUsesDetectedOriginalPatternWhenKeyChanged() throws IOException {
+        // The files were named with a previous pattern ("ogart"); the citation key (and thus the pattern) changed since.
+        Files.createFile(testFolder.resolve("ogart-teste1.jpg"));
+        Files.createFile(testFolder.resolve("ogart-teste2.pdf"));
+        LinkedFile file1 = new LinkedFile("", Path.of("ogart-teste1.jpg"), "");
+        LinkedFile file2 = new LinkedFile("", Path.of("ogart-teste2.pdf"), "PDF");
+        entry.setFiles(List.of(file1, file2));
+
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        RenamePdfCleanup preserveSuffixCleanup = new RenamePdfCleanup(false, false, true, () -> context, filePreferences);
+        preserveSuffixCleanup.cleanup(entry);
+
+        // The shared "ogart" prefix is detected as the original pattern, so each "-testeN" suffix survives onto the new key.
+        assertEquals(List.of("Toot-teste1.jpg", "Toot-teste2.pdf"),
+                entry.getFiles().stream().map(LinkedFile::getLink).toList());
+    }
+
+    @Test
+    void detectOriginalPatternSkipsSingleFileEntries() {
+        assertEquals(Optional.empty(),
+                RenamePdfCleanup.detectOriginalPattern(List.of(new LinkedFile("", "asdf-fig6.jpg", ""))));
+    }
+
+    @ParameterizedTest(name = "{0} -> \"{1}\"")
+    @CsvSource(delimiter = '|', textBlock = """
+                ogart-teste1;ogart-teste2 | ogart
+                key-fig6;key              | key
+                asdf-fig6;asdf_extra      | asdf
+                ogart-teste;ogart-teste   | ogart-teste
+                abc;xyz                   |
+            """)
+    void commonLeadingTokenPrefixDetectsSharedPattern(String namesJoinedBySemicolon, String expected) {
+        List<String> baseNames = Arrays.stream(namesJoinedBySemicolon.split(";")).toList();
+        assertEquals(expected == null ? "" : expected, RenamePdfCleanup.commonLeadingTokenPrefix(baseNames));
     }
 }

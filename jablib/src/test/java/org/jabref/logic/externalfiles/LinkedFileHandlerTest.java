@@ -169,6 +169,41 @@ class LinkedFileHandlerTest {
         assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName());
     }
 
+    @ParameterizedTest(name = "{1} with {2} should be {0} for citation key 'asdf' (custom suffix preserved)")
+    @CsvSource(textBlock = """
+                asdf-fig6.jpg, asdf-fig6.jpg, jpg
+                asdf-molecule.mol, asdf-molecule.mol, mol
+                asdf_extra.png, asdf_extra.png, png
+                asdf.pdf, asdf.pdf, pdf
+                asdf.pdf, file.pdf, pdf
+                asdf-fig6.jpg, asdf-fig6 (1).jpg, jpg
+                asdf.jpg, asdf (1).jpg, jpg
+            """)
+    void getSuggestedFileNamePreservesCustomSuffix(String expectedFileName, String link, String extension) {
+        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
+
+        final LinkedFile linkedFile = new LinkedFile("", link, "");
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entryWithCitationKeyAsdf, databaseContext, filePreferences, true);
+
+        assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension));
+    }
+
+    @ParameterizedTest(name = "{1} with {2} should collapse to {0} for citation key 'asdf' (suffix not preserved)")
+    @CsvSource(textBlock = """
+                asdf.jpg, asdf-fig6.jpg, jpg
+                asdf.mol, asdf-molecule.mol, mol
+                asdf.png, asdf_extra.png, png
+                asdf.pdf, asdf.pdf, pdf
+            """)
+    void getSuggestedFileNameDropsCustomSuffixByDefault(String expectedFileName, String link, String extension) {
+        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
+
+        final LinkedFile linkedFile = new LinkedFile("", link, "");
+        final LinkedFileHandler linkedFileHandler = new LinkedFileHandler(linkedFile, entryWithCitationKeyAsdf, databaseContext, filePreferences);
+
+        assertEquals(expectedFileName, linkedFileHandler.getSuggestedFileName(extension));
+    }
+
     @Test
     void getSuggestedFileNameInDirectory() {
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");

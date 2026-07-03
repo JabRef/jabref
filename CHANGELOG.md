@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a "Preserve suffix of modified files" option to the cleanup dialog, which keeps custom suffixes when renaming linked files instead of collapsing them onto the filename pattern. [#11358](https://github.com/JabRef/jabref/issues/11358)
 - We added a "Only rename PDF files" option to the cleanup dialog, so that renaming leaves supplementary (non-PDF) files and their custom names untouched. [#11358](https://github.com/JabRef/jabref/issues/11358)
 - We added auto-detection import for drag-and-dropped library files. [#15391](https://github.com/JabRef/jabref/issues/15391)
 - We added a preview style selection bar which shows the current preview style and allows to select a specific style without cycling through all of them. [#15820](https://github.com/JabRef/jabref/pull/15820)

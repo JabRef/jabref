@@ -71,16 +71,18 @@ public class CleanupWorker {
                 || renameOnlyRelativePaths
                 || renameOnlyPdfFiles;
 
+        boolean preserveCustomSuffix = preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_PRESERVE_SUFFIX);
+
         // Add active jobs from preset panel
         for (CleanupPreferences.CleanupStep action : preset.getActiveJobs()) {
-            if (isRenameStep(action)) {
+            if (isRenameStep(action) || action == CleanupPreferences.CleanupStep.RENAME_PDF_PRESERVE_SUFFIX) {
                 continue;
             }
             jobs.add(toJob(action));
         }
 
         if (renameActive) {
-            jobs.add(new RenamePdfCleanup(renameOnlyRelativePaths, renameOnlyPdfFiles, () -> databaseContext, filePreferences));
+            jobs.add(new RenamePdfCleanup(renameOnlyRelativePaths, renameOnlyPdfFiles, preserveCustomSuffix, () -> databaseContext, filePreferences));
         }
 
         if (preset.getFieldFormatterCleanups().isEnabled()) {
