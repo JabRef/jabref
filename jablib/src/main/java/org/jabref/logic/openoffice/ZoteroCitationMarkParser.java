@@ -71,20 +71,16 @@ public class ZoteroCitationMarkParser {
         try {
             JsonElement root = JsonParser.parseString(cslJson);
             List<ZoteroCitationData.ItemData> items = new ArrayList<>();
+            // The isJsonArray/isJsonObject guards ensure Gson returns a non-null result here.
             if (root.isJsonArray()) {
-                ZoteroCitationData.ItemData[] parsed = GSON.fromJson(root, ZoteroCitationData.ItemData[].class);
-                if (parsed != null) {
-                    Collections.addAll(items, parsed);
-                }
+                Collections.addAll(items, GSON.fromJson(root, ZoteroCitationData.ItemData[].class));
             } else if (root.isJsonObject()) {
                 items.add(GSON.fromJson(root, ZoteroCitationData.ItemData.class));
             }
 
             List<BibEntry> entries = new ArrayList<>();
             for (ZoteroCitationData.ItemData itemData : items) {
-                if (itemData != null) {
-                    toBibEntry(itemData).ifPresent(entries::add);
-                }
+                toBibEntry(itemData).ifPresent(entries::add);
             }
             return entries;
         } catch (JsonParseException | NumberFormatException | NoSuchElementException e) {
