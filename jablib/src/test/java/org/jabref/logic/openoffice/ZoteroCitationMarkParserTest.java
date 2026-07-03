@@ -15,7 +15,9 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -402,29 +404,29 @@ class ZoteroCitationMarkParserTest {
     }
 
     @ParameterizedTest
-    @org.junit.jupiter.params.provider.ValueSource(strings = {"", "   ", "not json", "{ broken"})
+    @ValueSource(strings = {"", "   ", "not json", "{ broken"})
     void parseCslJsonItemsReturnsEmptyForBlankOrInvalid(String input) {
         assertTrue(ZoteroCitationMarkParser.parseCslJsonItems(input).isEmpty());
     }
 
     /// CSL-JSON that explicitly sets optional composite properties to null must not throw
-    /// (Gson overwrites the field defaults with null on explicit "key": null).
+    /// (Gson overwrites the field defaults with null on explicit `"key": null`, and the immutable
+    /// CSL mapping tables reject a null key lookup). `|` is the column separator so the JSON commas
+    /// stay intact.
     @ParameterizedTest
-    @org.junit.jupiter.params.provider.ValueSource(strings = {
-            """
-            {"type": "article-journal", "title": "T", "author": null}""",
-            """
-            {"type": "article-journal", "title": "T", "issued": null}""",
-            """
-            {"type": "article-journal", "title": "T", "issued": {"date-parts": null}}""",
-            """
-            {"type": null, "title": "T"}"""
-    })
-    void parseCslJsonItemsHandlesExplicitNullFields(String input) {
-        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslJsonItems(input);
+    @CsvSource(delimiter = '|', textBlock = """
+            # CSL JSON                                                                | entry type
+            {"type": "article-journal", "title": "T", "author": null}                | Article
+            {"type": "article-journal", "title": "T", "issued": null}                | Article
+            {"type": "article-journal", "title": "T", "issued": {"date-parts": null}} | Article
+            {"type": null, "title": "T"}                                             | Misc
+            """)
+    void parseCslJsonItemsHandlesExplicitNullFields(String json, String expectedEntryType) {
+        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslJsonItems(json);
 
         assertEquals(1, entries.size());
         BibEntry entry = entries.getFirst();
+        assertEquals(expectedEntryType, entry.getType().getDisplayName());
         assertEquals(Optional.of("T"), entry.getField(StandardField.TITLE));
         assertEquals(Optional.empty(), entry.getField(StandardField.AUTHOR));
         assertEquals(Optional.empty(), entry.getField(StandardField.YEAR));
