@@ -45,7 +45,7 @@ class PdfUpdate implements Callable<Integer> {
     @Mixin
     private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
 
-    @Option(names = "--format", description = "Format to update (xmp, bibtex-attachment)", split = ",")
+    @Option(names = "--format", description = "Format to update (xmp, bibtex-attachment). Note: existing JabRef XMP metadata will be overwritten when using 'xmp'.", split = ",")
     private List<String> formats = List.of("xmp", "bibtex-attachment"); // ToDO: default value?
 
     @Option(names = {"-k", "--citation-key"}, description = "Citation keys", required = true)
@@ -107,6 +107,7 @@ class PdfUpdate implements Callable<Integer> {
                                            boolean embeddBibfile) {
         ParserResult pr = loaded.getLast();
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
+        pr.getPath().map(Path::toAbsolutePath).ifPresent(databaseContext::setDatabasePath);
 
         XmpPdfExporter xmpPdfExporter = new XmpPdfExporter(xmpPreferences);
         EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter = new EmbeddedBibFilePdfExporter(databaseMode, entryTypesManager, fieldPreferences);
