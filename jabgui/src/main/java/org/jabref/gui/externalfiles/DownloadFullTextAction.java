@@ -150,5 +150,4 @@ public class DownloadFullTextAction extends SimpleCommand {
                     entry.getCitationKey().orElse(Localization.lang("undefined"))));
         }
     }
-
 }

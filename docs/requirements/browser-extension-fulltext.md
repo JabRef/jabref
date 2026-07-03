@@ -89,13 +89,13 @@ Each discovery file contains a single JSON object with these fields:
 }
 ```
 
-| Field             | Type    | Required | Notes                                                                                                         |
-| ----------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------- |
-| `name`            | string  | yes      | machine identifier; `[a-z0-9-]+`; unique across providers; chosen by each provider implementation             |
-| `displayName`     | string  | yes      | shown in JabRef's preferences UI; chosen by each provider implementation                                      |
-| `port`            | integer | yes      | loopback TCP port; provider-chosen; may change between runs (provider rewrites the discovery file on startup) |
+| Field             | Type    | Required | Notes                                                                                                                        |
+| ----------------- | ------- | -------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `name`            | string  | yes      | machine identifier; `[a-z0-9-]+`; unique across providers; chosen by each provider implementation                            |
+| `displayName`     | string  | yes      | shown in JabRef's preferences UI; chosen by each provider implementation                                                     |
+| `port`            | integer | yes      | loopback TCP port; provider-chosen; may change between runs (provider rewrites the discovery file on startup)                |
 | `tokenFile`       | string  | yes      | absolute path to a file containing a single line: the bearer token; JabRef skips providers whose `tokenFile` is not absolute |
-| `protocolVersion` | integer | yes      | must be `1` for this revision                                                                                 |
+| `protocolVersion` | integer | yes      | must be `1` for this revision                                                                                                |
 
 The discovery file is provider-managed. The provider rewrites it whenever the port changes and removes it on uninstall. JabRef treats the values as authoritative; it does not cache them across sessions.
 
@@ -158,11 +158,11 @@ Success response (HTTP `200`):
 }
 ```
 
-| Field       | Type   | Required | Notes                                                     |
-| ----------- | ------ | -------- | --------------------------------------------------------- |
-| `id`        | string | yes      | opaque, provider-chosen; used by the optional DELETE call |
+| Field       | Type   | Required | Notes                                                                                                     |
+| ----------- | ------ | -------- | --------------------------------------------------------------------------------------------------------- |
+| `id`        | string | yes      | opaque, provider-chosen; used by the optional DELETE call                                                 |
 | `path`      | string | yes      | absolute path to a readable PDF file on local disk; JabRef ignores responses whose `path` is not absolute |
-| `sourceUrl` | string | no       | URL the PDF was fetched from; informational               |
+| `sourceUrl` | string | no       | URL the PDF was fetched from; informational                                                               |
 
 The file at `path` must be a readable PDF (not an HTML error page) when the response is sent. JabRef copies or moves it into the library's file directory via its existing attach pipeline.
 
