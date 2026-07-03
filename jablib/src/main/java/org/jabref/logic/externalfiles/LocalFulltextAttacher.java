@@ -1,17 +1,14 @@
-package org.jabref.gui.externalfiles;
+package org.jabref.logic.externalfiles;
 
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.Optional;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.externalfiles.LinkedFileHandler;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.NotificationService;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -33,38 +30,31 @@ public final class LocalFulltextAttacher {
     public static void attach(URL fileUrl,
                               BibEntry entry,
                               BibDatabaseContext databaseContext,
-                              GuiPreferences preferences,
+                              FilePreferences filePreferences,
                               TaskExecutor taskExecutor,
-                              DialogService dialogService) {
+                              NotificationService notificationService) {
         Path sourcePath;
         try {
             sourcePath = Path.of(fileUrl.toURI());
         } catch (URISyntaxException | IllegalArgumentException e) {
             LOGGER.warn("Could not interpret fetcher-returned file URL {}", fileUrl, e);
-            dialogService.notify(Localization.lang("No full text document found for entry %0.",
+            notificationService.notify(Localization.lang("No full text document found for entry %0.",
                     entry.getCitationKey().orElse(Localization.lang("undefined"))));
             return;
         }
 
-        Optional<ExternalFileType> pdfType = ExternalFileTypes.getExternalFileTypeByExt(
-                "pdf", preferences.getExternalApplicationsPreferences());
-        if (pdfType.isEmpty()) {
-            return;
-        }
-
-        LinkedFile linkedFile = new LinkedFile("", sourcePath, pdfType.get().getName());
+        LinkedFile linkedFile = new LinkedFile("", sourcePath, StandardFileType.PDF.getName());
         if (entry.getFiles().contains(linkedFile)) {
-            dialogService.notify(Localization.lang("Full text document for entry %0 already linked.",
+            notificationService.notify(Localization.lang("Full text document for entry %0 already linked.",
                     entry.getCitationKey().orElse(Localization.lang("undefined"))));
             return;
         }
 
-        LinkedFileHandler handler = new LinkedFileHandler(
-                linkedFile, entry, databaseContext, preferences.getFilePreferences());
+        LinkedFileHandler handler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
 
-        // copyOrMoveToDefaultDirectory does blocking filesystem I/O; run it off the JavaFX
-        // Application Thread. shouldMove=true, shouldRenameToFilenamePattern=true — same fate a
-        // successful HTTP download would have via DownloadLinkedFileAction.
+        // copyOrMoveToDefaultDirectory does blocking filesystem I/O; run it off the calling thread.
+        // shouldMove=true, shouldRenameToFilenamePattern=true — same fate a successful HTTP download
+        // would have via DownloadLinkedFileAction.
         BackgroundTask
                 .wrap(() -> {
                     handler.copyOrMoveToDefaultDirectory(true, true);

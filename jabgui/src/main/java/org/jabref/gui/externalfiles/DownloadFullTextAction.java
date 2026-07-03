@@ -15,6 +15,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.externalfiles.LocalFulltextAttacher;
 import org.jabref.logic.importer.FetcherResult;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
@@ -130,7 +131,7 @@ public class DownloadFullTextAction extends SimpleCommand {
         // A file: URL points at a PDF already on disk; attach it locally so it runs through the
         // same move-and-rename pipeline as an HTTP download. Online URLs use the download path below.
         if ("file".equalsIgnoreCase(source.getProtocol())) {
-            LocalFulltextAttacher.attach(source, entry, databaseContext, preferences, taskExecutor, dialogService);
+            LocalFulltextAttacher.attach(source, entry, databaseContext, preferences.getFilePreferences(), taskExecutor, dialogService);
             return;
         }
 

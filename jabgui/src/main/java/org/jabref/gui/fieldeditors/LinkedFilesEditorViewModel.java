@@ -27,7 +27,6 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
-import org.jabref.gui.externalfiles.LocalFulltextAttacher;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
@@ -36,6 +35,7 @@ import org.jabref.gui.linkedfile.AttachFileFromURLAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.bibtex.FileFieldWriter;
+import org.jabref.logic.externalfiles.LocalFulltextAttacher;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -272,7 +272,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         // A file: URL points at a PDF already on disk; attach it directly instead of downloading,
         // then move and rename it into the configured file directory like a completed HTTP download.
         if ("file".equalsIgnoreCase(url.getProtocol())) {
-            LocalFulltextAttacher.attach(url, entry, databaseContext, preferences, taskExecutor, dialogService);
+            LocalFulltextAttacher.attach(url, entry, databaseContext, preferences.getFilePreferences(), taskExecutor, dialogService);
             return;
         }
         LinkedFileViewModel onlineFile = new LinkedFileViewModel(
