@@ -1,5 +1,7 @@
 package org.jabref.gui.ai.summary;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -17,9 +19,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.htmltonode.HtmlRenderOptions;
 import org.jabref.htmltonode.HtmlView;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.l10n.Localization;
@@ -30,8 +34,13 @@ import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AiSummaryShowingView extends VBox {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiSummaryShowingView.class);
+
     @FXML private CheckBox markdownCheckbox;
     @FXML private Text summaryInfoText;
 
@@ -91,11 +100,22 @@ public class AiSummaryShowingView extends VBox {
 
     private void initializeSummaryView() {
         htmlView = new HtmlView();
+        htmlView.setOptions(HtmlRenderOptions.defaults().withLinkHandler(this::openLink));
         ScrollPane scrollPane = new ScrollPane(htmlView);
         scrollPane.setFitToWidth(true);
         VBox.setVgrow(scrollPane, Priority.ALWAYS);
 
         getChildren().addFirst(scrollPane);
+    }
+
+    private void openLink(String href) {
+        try {
+            NativeDesktop.openBrowser(href, preferences.getExternalApplicationsPreferences());
+        } catch (MalformedURLException exception) {
+            LOGGER.error("Invalid URL", exception);
+        } catch (IOException e) {
+            LOGGER.error("Could not open URL: {}", href, e);
+        }
     }
 
     private void setupBindings() {
