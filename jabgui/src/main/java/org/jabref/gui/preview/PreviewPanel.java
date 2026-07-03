@@ -36,7 +36,6 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferencesDialogView;
 import org.jabref.gui.preferences.preview.PreviewTab;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -65,7 +64,6 @@ public class PreviewPanel extends VBox implements PreviewControls {
     public PreviewPanel(DialogService dialogService,
                         KeyBindingRepository keyBindingRepository,
                         GuiPreferences preferences,
-                        ThemeManager themeManager,
                         TaskExecutor taskExecutor,
                         StateManager stateManager) {
         this.keyBindingRepository = keyBindingRepository;
@@ -75,7 +73,7 @@ public class PreviewPanel extends VBox implements PreviewControls {
         this.stateManager = stateManager;
 
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
-        previewView = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor, stateManager.searchQueryProperty());
+        previewView = new PreviewViewer(dialogService, preferences, taskExecutor, stateManager.searchQueryProperty());
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
         previewView.setContextMenu(createPopupMenu());
         previewView.setOnDragDetected(this::onDragDetected);

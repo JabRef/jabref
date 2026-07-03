@@ -22,7 +22,6 @@ import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.importer.BookCoverFetcher;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.Highlighter;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.htmltonode.HtmlRenderOptions;
 import org.jabref.htmltonode.rich.RichHtmlView;
@@ -66,14 +65,12 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public PreviewViewer(DialogService dialogService,
                          GuiPreferences preferences,
-                         ThemeManager themeManager,
                          TaskExecutor taskExecutor) {
-        this(dialogService, preferences, themeManager, taskExecutor, new SimpleStringProperty());
+        this(dialogService, preferences, taskExecutor, new SimpleStringProperty());
     }
 
     public PreviewViewer(DialogService dialogService,
                          GuiPreferences preferences,
-                         ThemeManager themeManager, // kept for call-site compatibility; theming works via regular JavaFX CSS now
                          TaskExecutor taskExecutor,
                          StringProperty searchQueryProperty) {
         this.dialogService = dialogService;

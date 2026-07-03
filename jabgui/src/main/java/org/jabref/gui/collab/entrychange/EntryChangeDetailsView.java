@@ -10,7 +10,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -25,7 +24,6 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
                                   BibEntry newEntry,
                                   BibDatabaseContext databaseContext,
                                   DialogService dialogService,
-                                  ThemeManager themeManager,
                                   GuiPreferences preferences,
                                   BibEntryTypesManager entryTypesManager,
                                   PreviewViewer previewViewer,
@@ -36,7 +34,7 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
         onDisk.getStyleClass().add("lib-change-header");
 
         // we need a copy here as we otherwise would set the same entry twice
-        PreviewViewer previewClone = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
+        PreviewViewer previewClone = new PreviewViewer(dialogService, preferences, taskExecutor);
         previewClone.setDatabaseContext(databaseContext);
 
         // PreviewViewer is a plain ScrollPane now, so its own scroll bars can be synchronized directly

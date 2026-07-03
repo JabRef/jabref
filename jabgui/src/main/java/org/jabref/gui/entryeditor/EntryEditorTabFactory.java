@@ -14,7 +14,6 @@ import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
@@ -42,7 +41,6 @@ public class EntryEditorTabFactory {
     private final TaskExecutor taskExecutor;
     private final GuiPreferences preferences;
     private final StateManager stateManager;
-    private final ThemeManager themeManager;
     private final FileUpdateMonitor fileMonitor;
     private final DirectoryMonitor directoryMonitor;
     private final CountingUndoManager undoManager;
@@ -59,7 +57,6 @@ public class EntryEditorTabFactory {
                                  TaskExecutor taskExecutor,
                                  GuiPreferences preferences,
                                  StateManager stateManager,
-                                 ThemeManager themeManager,
                                  FileUpdateMonitor fileMonitor,
                                  DirectoryMonitor directoryMonitor,
                                  CountingUndoManager undoManager,
@@ -75,7 +72,6 @@ public class EntryEditorTabFactory {
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
         this.stateManager = stateManager;
-        this.themeManager = themeManager;
         this.fileMonitor = fileMonitor;
         this.directoryMonitor = directoryMonitor;
         this.undoManager = undoManager;
@@ -156,7 +152,6 @@ public class EntryEditorTabFactory {
                             fileMonitor,
                             preferences,
                             taskExecutor,
-                            themeManager,
                             bibEntryTypesManager,
                             searchCitationsRelationsService);
             case COMMENTS ->

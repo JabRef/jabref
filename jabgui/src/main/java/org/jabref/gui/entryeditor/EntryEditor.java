@@ -33,7 +33,6 @@ import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewControls;
 import org.jabref.gui.preview.PreviewPanel;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
@@ -86,7 +85,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     @Inject private TaskExecutor taskExecutor;
     @Inject private GuiPreferences preferences;
     @Inject private StateManager stateManager;
-    @Inject private ThemeManager themeManager;
     @Inject private FileUpdateMonitor fileMonitor;
     @Inject private DirectoryMonitor directoryMonitor;
     @Inject private CountingUndoManager undoManager;
@@ -113,7 +111,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 dialogService,
                 preferences.getKeyBindingRepository(),
                 preferences,
-                themeManager,
                 taskExecutor,
                 stateManager);
 
@@ -126,7 +123,6 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 taskExecutor,
                 preferences,
                 stateManager,
-                themeManager,
                 fileMonitor,
                 directoryMonitor,
                 undoManager,
