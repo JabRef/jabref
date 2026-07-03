@@ -406,4 +406,27 @@ class ZoteroCitationMarkParserTest {
     void parseCslJsonItemsReturnsEmptyForBlankOrInvalid(String input) {
         assertTrue(ZoteroCitationMarkParser.parseCslJsonItems(input).isEmpty());
     }
+
+    /// CSL-JSON that explicitly sets optional composite properties to null must not throw
+    /// (Gson overwrites the field defaults with null on explicit "key": null).
+    @ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {
+            """
+            {"type": "article-journal", "title": "T", "author": null}""",
+            """
+            {"type": "article-journal", "title": "T", "issued": null}""",
+            """
+            {"type": "article-journal", "title": "T", "issued": {"date-parts": null}}""",
+            """
+            {"type": null, "title": "T"}"""
+    })
+    void parseCslJsonItemsHandlesExplicitNullFields(String input) {
+        List<BibEntry> entries = ZoteroCitationMarkParser.parseCslJsonItems(input);
+
+        assertEquals(1, entries.size());
+        BibEntry entry = entries.getFirst();
+        assertEquals(Optional.of("T"), entry.getField(StandardField.TITLE));
+        assertEquals(Optional.empty(), entry.getField(StandardField.AUTHOR));
+        assertEquals(Optional.empty(), entry.getField(StandardField.YEAR));
+    }
 }

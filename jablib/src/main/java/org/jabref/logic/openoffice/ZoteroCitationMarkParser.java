@@ -14,7 +14,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.EntryType;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -105,11 +104,17 @@ public class ZoteroCitationMarkParser {
     }
 
     private static Optional<BibEntry> toBibEntry(ZoteroCitationData.ItemData itemData) {
-        EntryType entryType = CSLItemTypeDefinitions.getEntryType(itemData.type);
-        BibEntry entry = new BibEntry(entryType);
-        setAuthors(itemData.author).ifPresent(authors -> entry.withField(StandardField.AUTHOR, authors));
-        setDate(entry, itemData.issued);
-        for (Map.Entry<String, Field> fieldMapping : CSLItemTypeDefinitions.getFieldMappings(itemData.type, itemData).entrySet()) {
+        // Gson replaces the field defaults with null when the JSON sets these keys explicitly to
+        // null (e.g. "type": null, "author": null, "issued": null), so normalise before use. The
+        // CSL mapping tables are immutable maps, which reject a null key lookup with an NPE.
+        String type = itemData.type == null ? "" : itemData.type;
+        BibEntry entry = new BibEntry(CSLItemTypeDefinitions.getEntryType(type));
+        List<ZoteroCitationData.AuthorData> authors = itemData.author == null ? List.of() : itemData.author;
+        setAuthors(authors).ifPresent(value -> entry.withField(StandardField.AUTHOR, value));
+        if (itemData.issued != null) {
+            setDate(entry, itemData.issued);
+        }
+        for (Map.Entry<String, Field> fieldMapping : CSLItemTypeDefinitions.getFieldMappings(type, itemData).entrySet()) {
             setField(entry, fieldMapping.getValue(), itemData.getFieldValue(fieldMapping.getKey()));
         }
 
@@ -131,7 +136,7 @@ public class ZoteroCitationMarkParser {
     }
 
     private static void setDate(BibEntry entry, ZoteroCitationData.IssuedData issuedData) {
-        if (issuedData.dateParts.isEmpty()) {
+        if ((issuedData.dateParts == null) || issuedData.dateParts.isEmpty()) {
             return;
         }
 
