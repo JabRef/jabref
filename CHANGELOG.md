@@ -11,7 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- The HTTP import endpoint (`POST /libraries/{id}/entries`) now accepts CSL-JSON (`application/vnd.citationstyles.csl+json`), mapping each item to the correct entry type (e.g. conference paper, book chapter, thesis) via the citation-js-based mapping. [#15875](https://github.com/JabRef/jabref/issues/15875)
+- The HTTP import endpoint (`POST /libraries/{id}/entries`) now accepts CSL-JSON (`application/vnd.citationstyles.csl+json`), mapping each item to the correct entry type (e.g. conference paper, book chapter, thesis) via the citation-js-based mapping. [#16151](https://github.com/JabRef/jabref/pull/16151)
 - We added auto-detection import for drag-and-dropped library files. [#15391](https://github.com/JabRef/jabref/issues/15391)
 - We added a preview style selection bar which shows the current preview style and allows to select a specific style without cycling through all of them. [#15820](https://github.com/JabRef/jabref/pull/15820)
 - We added the ability to view citation previews rendered using the selected style on hover in the "Citations" tab. [#15914](https://github.com/JabRef/jabref/pull/15914)
