@@ -2,6 +2,9 @@ package org.jabref.logic.importer;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -41,6 +44,30 @@ public class FulltextFetchers {
     private final Set<FulltextFetcher> fetchers;
 
     private final BiPredicate<String, Map<String, String>> isPDF = (url, headers) -> {
+        // Local file:// URLs (returned e.g. by a browser-extension companion
+        // fetcher that already wrote the PDF to disk) cannot go through
+        // URLDownload, which is HTTP-oriented. Verify the file is actually a
+        // PDF by reading the magic bytes.
+        if (url.startsWith("file:")) {
+            try {
+                Path path = Path.of(new java.net.URI(url));
+                if (!Files.isReadable(path)) {
+                    return false;
+                }
+                try (java.io.InputStream in = Files.newInputStream(path)) {
+                    byte[] magic = in.readNBytes(5);
+                    return magic.length == 5
+                            && magic[0] == '%'
+                            && magic[1] == 'P'
+                            && magic[2] == 'D'
+                            && magic[3] == 'F'
+                            && magic[4] == '-';
+                }
+            } catch (java.net.URISyntaxException | IllegalArgumentException | IOException e) {
+                LOGGER.debug("Could not verify PDF magic bytes for {}", url, e);
+                return false;
+            }
+        }
         try {
             URLDownload download = new URLDownload(url);
             headers.forEach(download::addHeader);
@@ -106,6 +133,7 @@ public class FulltextFetchers {
             try {
                 Map<String, String> headers = fetcher.getDownloadHeaders();
                 return fetcher.findFullText(entry)
+                              .filter(url -> isAllowedScheme(fetcher, url))
                               .filter(url -> isPDF.test(url.toString(), headers))
                               .map(url -> new FetcherResult(fetcher.getTrustLevel(), url, headers));
             } catch (IOException | FetcherException e) {
@@ -113,6 +141,17 @@ public class FulltextFetchers {
             }
             return Optional.empty();
         };
+    }
+
+    /// Rejects local `file:` URLs unless the fetcher is explicitly trusted via {@link FileSchemeFulltextFetcher}.
+    /// A `file:` result triggers a local file read and the GUI move/attach pipeline, so an untrusted
+    /// fetcher (e.g. one parsing remote HTML) must not be able to point JabRef at an arbitrary file.
+    private static boolean isAllowedScheme(FulltextFetcher fetcher, URL url) {
+        if ("file".equalsIgnoreCase(url.getProtocol()) && !(fetcher instanceof FileSchemeFulltextFetcher)) {
+            LOGGER.warn("Rejecting file: URL from fetcher {} that is not trusted for local files", fetcher.getClass().getSimpleName());
+            return false;
+        }
+        return true;
     }
 
     private List<Callable<Optional<FetcherResult>>> getCallables(BibEntry entry, Set<FulltextFetcher> fetchers) {

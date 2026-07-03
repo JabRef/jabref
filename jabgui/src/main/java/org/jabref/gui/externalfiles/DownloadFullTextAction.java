@@ -1,5 +1,6 @@
 package org.jabref.gui.externalfiles;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -125,7 +126,15 @@ public class DownloadFullTextAction extends SimpleCommand {
     /// @param result          the fetcher result containing the URL and any required download headers
     /// @param entry           the entry "value"
     private void addLinkedFileFromURL(BibDatabaseContext databaseContext, FetcherResult result, BibEntry entry) {
-        LinkedFile newLinkedFile = new LinkedFile(result.source(), "");
+        URL source = result.source();
+        // A file: URL points at a PDF already on disk; attach it locally so it runs through the
+        // same move-and-rename pipeline as an HTTP download. Online URLs use the download path below.
+        if ("file".equalsIgnoreCase(source.getProtocol())) {
+            LocalFulltextAttacher.attach(source, entry, databaseContext, preferences, taskExecutor, dialogService);
+            return;
+        }
+
+        LinkedFile newLinkedFile = new LinkedFile(source, "");
 
         if (!entry.getFiles().contains(newLinkedFile)) {
             LinkedFileViewModel onlineFile = new LinkedFileViewModel(
@@ -141,4 +150,5 @@ public class DownloadFullTextAction extends SimpleCommand {
                     entry.getCitationKey().orElse(Localization.lang("undefined"))));
         }
     }
+
 }
