@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.scene.Node;
 import javafx.scene.control.TextInputControl;
 
 import org.jabref.gui.LibraryTab;
@@ -11,8 +12,10 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.preview.PreviewViewer;
 
 import org.fxmisc.richtext.CodeArea;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +81,14 @@ public class EditAction extends SimpleCommand {
                 }
             } else if (focusOwner instanceof CodeArea) {
                 LOGGER.debug("Ignoring request in CodeArea");
+            } else if (findEnclosingPreview(focusOwner) instanceof PreviewViewer previewViewer) {
+                // WebView handled the copy shortcut natively; the node-based preview gets it routed here.
+                // Everything else (cut/paste/delete would act on the selected entry) is ignored, as before.
+                if (action == StandardActions.COPY) {
+                    previewViewer.copySelectionToClipBoard();
+                } else {
+                    LOGGER.debug("Ignoring {} request inside the entry preview", action);
+                }
             } else {
                 LOGGER.debug("Else: {}", focusOwner.getClass().getSimpleName());
                 // Not sure what is selected -> copy/paste/cut selected entries except for Preview and CodeArea
@@ -106,5 +117,14 @@ public class EditAction extends SimpleCommand {
                 }
             }
         });
+    }
+
+    private static @Nullable PreviewViewer findEnclosingPreview(Node node) {
+        for (Node current = node; current != null; current = current.getParent()) {
+            if (current instanceof PreviewViewer previewViewer) {
+                return previewViewer;
+            }
+        }
+        return null;
     }
 }
