@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
@@ -26,6 +27,8 @@ import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.function.Predicate.not;
 
 /// Installs and manages style files and provides live reloading. JabRef provides two
 /// inbuilt themes and a user customizable one: Light, Dark and Custom. The Light and Dark theme
@@ -89,7 +92,7 @@ public class ThemeManager {
         toAdd.add(jabRefTheme.getSceneStylesheetLocation());
         theme.getAdditionalStylesheet()
              .map(StyleSheet::getSceneStylesheetLocation)
-             .filter(location -> !location.isEmpty())
+             .filter(not(String::isEmpty))
              .ifPresent(toAdd::add);
 
         scene.getStylesheets().setAll(toAdd);
