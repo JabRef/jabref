@@ -306,6 +306,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getExternalApplicationsPreferences();
         getGroupsPreferences();
         getSpecialFieldsPreferences();
+        getPreviewPreferences();
 
         super.clear();
 
@@ -315,10 +316,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
         getSearchDialogColumnPreferences().setAll(ColumnPreferences.getDefault());
         getNameDisplayPreferences().setAll(NameDisplayPreferences.getDefault());
-        getPreviewPreferences().setAll(PreviewPreferences.getDefaultWithStyles(
-                getLayoutFormatterPreferences(),
-                Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
-                Injector.instantiateModelOrService(BibEntryTypesManager.class)));
         getMrDlibPreferences().setAll(MrDlibPreferences.getDefault());
     }
 
@@ -336,6 +333,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getExternalApplicationsPreferences();
         getGroupsPreferences();
         getSpecialFieldsPreferences();
+        getPreviewPreferences();
 
         super.importPreferences(path);
 
@@ -346,7 +344,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
         getSearchDialogColumnPreferences().setAll(getSearchDialogColumnPreferencesFromBackingStore(getSearchDialogColumnPreferences()));
         getNameDisplayPreferences().setAll(getNameDisplayPreferencesFromBackingStore(getNameDisplayPreferences()));
-        getPreviewPreferences().setAll(getPreviewPreferencesFromBackingStore(getPreviewPreferences()));
         getMrDlibPreferences().setAll(getMrDlibPreferencesFromBackingStore(getMrDlibPreferences()));
     }
 
@@ -900,43 +897,63 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return previewPreferences;
         }
 
-        this.previewPreferences = getPreviewPreferencesFromBackingStore(PreviewPreferences.getDefault());
+        // The layout cycle's default (and thus reset target) is the styled default; it needs the injected repositories.
+        PreviewPreferences defaultValues = PreviewPreferences.getDefaultWithStyles(
+                getLayoutFormatterPreferences(),
+                Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
+                Injector.instantiateModelOrService(BibEntryTypesManager.class));
 
-        previewPreferences.getLayoutCycle().addListener((InvalidationListener) _ -> putStringList(PREVIEW_CYCLE, previewLayoutsToStrings(previewPreferences.getLayoutCycle())));
-        EasyBind.listen(previewPreferences.layoutCyclePositionProperty(), (_, _, newValue) -> putInt(PREVIEW_CYCLE_POS, newValue));
-        // must be stored with __NEWLINE__ instead of \n so that our migration correctly triggers, in getText it will be replaced by \n
-        EasyBind.listen(previewPreferences.customPreviewLayoutProperty(), (_, _, newValue) -> put(PREVIEW_STYLE, newValue.replace("\n", "__NEWLINE__")));
-        EasyBind.listen(previewPreferences.showPreviewAsExtraTabProperty(), (_, _, newValue) -> putBoolean(PREVIEW_AS_TAB, newValue));
-        EasyBind.listen(previewPreferences.showPreviewEntryTableTooltip(), (_, _, newValue) -> putBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, newValue));
-        previewPreferences.getBstPreviewLayoutPaths().addListener((InvalidationListener) _ -> storeBstPaths(previewPreferences.getBstPreviewLayoutPaths()));
-        EasyBind.listen(previewPreferences.shouldDownloadCoversProperty(), (_, _, newValue) -> putBoolean(PREVIEW_COVER_IMAGE_DOWNLOAD, newValue));
-        return this.previewPreferences;
-    }
-
-    private PreviewPreferences getPreviewPreferencesFromBackingStore(PreviewPreferences defaults) {
         // Mutable lists required
-        String customPreviewLayout = get(PREVIEW_STYLE, defaults.getCustomPreviewLayout());
+        String customPreviewLayout = get(PREVIEW_STYLE, defaultValues.getCustomPreviewLayout());
         List<PreviewLayout> layouts = getPreviewLayouts(getStringList(PREVIEW_CYCLE), customPreviewLayout);
         if (layouts.isEmpty()) {
-            layouts = new ArrayList<>(defaults.getLayoutCycle());
+            layouts = new ArrayList<>(defaultValues.getLayoutCycle());
         }
 
         List<Path> bstPaths;
         if (hasKey(PREVIEW_BST_LAYOUT_PATHS)) {
             bstPaths = getStringList(PREVIEW_BST_LAYOUT_PATHS).stream().map(Path::of).collect(Collectors.toList());
         } else {
-            bstPaths = new ArrayList<>(defaults.getBstPreviewLayoutPaths());
+            bstPaths = new ArrayList<>(defaultValues.getBstPreviewLayoutPaths());
         }
 
-        return new PreviewPreferences(
+        this.previewPreferences = new PreviewPreferences(
                 layouts,
-                getPreviewCyclePosition(layouts, getInt(PREVIEW_CYCLE_POS, defaults.getLayoutCyclePosition())),
+                getPreviewCyclePosition(layouts, getInt(PREVIEW_CYCLE_POS, defaultValues.getLayoutCyclePosition())),
                 customPreviewLayout,
-                getBoolean(PREVIEW_AS_TAB, defaults.shouldShowPreviewAsExtraTab()),
-                getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaults.shouldShowPreviewEntryTableTooltip()),
+                getBoolean(PREVIEW_AS_TAB, defaultValues.shouldShowPreviewAsExtraTab()),
+                getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaultValues.shouldShowPreviewEntryTableTooltip()),
                 bstPaths,
-                getBoolean(PREVIEW_COVER_IMAGE_DOWNLOAD, defaults.shouldDownloadCovers())
+                getBoolean(PREVIEW_COVER_IMAGE_DOWNLOAD, defaultValues.shouldDownloadCovers())
         );
+
+        // Registered before layoutCyclePosition, so its import runs first and the position can be clamped against the loaded cycle.
+        bindCustomList(previewPreferences.getLayoutCycle(), PREVIEW_CYCLE, defaultValues.getLayoutCycle(),
+                boundList -> putStringList(PREVIEW_CYCLE, previewLayoutsToStrings(boundList)),
+                () -> {
+                    List<PreviewLayout> stored = getPreviewLayouts(getStringList(PREVIEW_CYCLE), get(PREVIEW_STYLE, defaultValues.getCustomPreviewLayout()));
+                    return stored.isEmpty() ? defaultValues.getLayoutCycle() : stored;
+                });
+        // layoutCyclePosition is clamped to the current cycle on load, so it needs a custom binding.
+        bindCustom(previewPreferences.layoutCyclePositionProperty(), PREVIEW_CYCLE_POS, defaultValues.getLayoutCyclePosition(),
+                (_, _, newValue) -> putInt(PREVIEW_CYCLE_POS, newValue.intValue()),
+                () -> previewPreferences.layoutCyclePositionProperty().set(getPreviewCyclePosition(previewPreferences.getLayoutCycle(), defaultValues.getLayoutCyclePosition())),
+                () -> previewPreferences.layoutCyclePositionProperty().set(defaultValues.getLayoutCyclePosition()));
+        // customPreviewLayout is stored with __NEWLINE__ instead of \n so that our migration correctly triggers; in getText it is replaced back by \n.
+        bindCustom(previewPreferences.customPreviewLayoutProperty(), PREVIEW_STYLE, defaultValues.getCustomPreviewLayout(),
+                (_, _, newValue) -> put(PREVIEW_STYLE, newValue.replace("\n", "__NEWLINE__")),
+                () -> previewPreferences.customPreviewLayoutProperty().set(get(PREVIEW_STYLE, defaultValues.getCustomPreviewLayout())),
+                () -> previewPreferences.customPreviewLayoutProperty().set(defaultValues.getCustomPreviewLayout()));
+        bindBoolean(previewPreferences.showPreviewAsExtraTabProperty(), PREVIEW_AS_TAB, defaultValues.shouldShowPreviewAsExtraTab());
+        bindBoolean(previewPreferences.showPreviewEntryTableTooltip(), PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaultValues.shouldShowPreviewEntryTableTooltip());
+        bindCustomList(previewPreferences.getBstPreviewLayoutPaths(), PREVIEW_BST_LAYOUT_PATHS, defaultValues.getBstPreviewLayoutPaths(),
+                this::storeBstPaths,
+                () -> hasKey(PREVIEW_BST_LAYOUT_PATHS)
+                        ? getStringList(PREVIEW_BST_LAYOUT_PATHS).stream().map(Path::of).toList()
+                        : defaultValues.getBstPreviewLayoutPaths());
+        bindBoolean(previewPreferences.shouldDownloadCoversProperty(), PREVIEW_COVER_IMAGE_DOWNLOAD, defaultValues.shouldDownloadCovers());
+
+        return this.previewPreferences;
     }
 
     private void storeBstPaths(List<Path> bstPaths) {
