@@ -134,6 +134,7 @@ Agents **must not**:
 
 - Do not add trivial comments just restating the code line in plain English.
 - When commenting, focus on the "why" and general idea.
+- To group members within a class, use IntelliJ region markers (`// region <label>` … `// endregion`), not ASCII box-drawing separators (`// ── helpers ──`).
 
 Example for trivial comments (to be avoided):
 

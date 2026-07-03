@@ -215,7 +215,7 @@ class BrowserExtensionFulltextFetcherTest {
         assertEquals(Optional.empty(), fetcher.findFullText(entry));
     }
 
-    // ── helpers ──────────────────────────────────────────────────────────
+    // region helpers
 
     private MockWebServer startServer() throws IOException {
         MockWebServer server = new MockWebServer();
@@ -245,4 +245,6 @@ class BrowserExtensionFulltextFetcherTest {
     private static String escapePath(Path path) {
         return path.toString().replace("\\", "\\\\");
     }
+
+    // endregion
 }
