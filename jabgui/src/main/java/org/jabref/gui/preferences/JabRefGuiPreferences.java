@@ -172,6 +172,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String WEB_SEARCH_VISIBLE = "webSearchVisible";
     private static final String OO_SHOW_PANEL = "showOOPanel";
     private static final String GROUP_SIDEPANE_VISIBLE = "groupSidepaneVisible";
+    // The visible panes span the three *_VISIBLE flags above and the preferred positions span the two
+    // SIDE_PANE_COMPONENT_* series; these synthetic keys are never written to the backing store and only serve as the
+    // respective bindings' reporting keys in getPreferences()/getDefaults() (see bindMap/PUSH_APPLICATIONS_PATHS_KEY).
+    private static final String SIDE_PANE_VISIBLE_PANES = "sidePaneVisiblePanes";
+    private static final String SIDE_PANE_PREFERRED_POSITIONS = "sidePanePreferredPositions";
     // endregion
 
     // region GroupsPreferences
@@ -296,6 +301,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getGuiPreferences();
         getWorkspacePreferences();
         getUnlinkedFilesDialogPreferences();
+        getSidePanePreferences();
 
         super.clear();
 
@@ -307,7 +313,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getMainTablePreferences().setAll(MainTablePreferences.getDefault());
         getNewEntryPreferences().setAll(NewEntryPreferences.getDefault());
         getSearchDialogColumnPreferences().setAll(ColumnPreferences.getDefault());
-        getSidePanePreferences().setAll(SidePanePreferences.getDefault());
         getNameDisplayPreferences().setAll(NameDisplayPreferences.getDefault());
         getPreviewPreferences().setAll(PreviewPreferences.getDefaultWithStyles(
                 getLayoutFormatterPreferences(),
@@ -326,6 +331,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getGuiPreferences();
         getWorkspacePreferences();
         getUnlinkedFilesDialogPreferences();
+        getSidePanePreferences();
 
         super.importPreferences(path);
 
@@ -338,7 +344,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getMainTablePreferences().setAll(getMainTablePreferencesFromBackingStore(getMainTablePreferences()));
         getNewEntryPreferences().setAll(getNewEntryPreferencesFromBackingStore(getNewEntryPreferences()));
         getSearchDialogColumnPreferences().setAll(getSearchDialogColumnPreferencesFromBackingStore(getSearchDialogColumnPreferences()));
-        getSidePanePreferences().setAll(getSidePanePreferencesFromBackingStore(getSidePanePreferences()));
         getNameDisplayPreferences().setAll(getNameDisplayPreferencesFromBackingStore(getNameDisplayPreferences()));
         getPreviewPreferences().setAll(getPreviewPreferencesFromBackingStore(getPreviewPreferences()));
         getMrDlibPreferences().setAll(getMrDlibPreferencesFromBackingStore(getMrDlibPreferences()));
@@ -701,25 +706,23 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return sidePanePreferences;
         }
 
-        sidePanePreferences = getSidePanePreferencesFromBackingStore(SidePanePreferences.getDefault());
+        SidePanePreferences defaultValues = SidePanePreferences.getDefault();
 
-        sidePanePreferences.visiblePanes().addListener((InvalidationListener) _ ->
-                storeVisibleSidePanes(sidePanePreferences.visiblePanes()));
-        sidePanePreferences.getPreferredPositions().addListener((InvalidationListener) _ ->
-                storeSidePanePreferredPositions(sidePanePreferences.getPreferredPositions()));
-        EasyBind.listen(sidePanePreferences.webSearchFetcherSelectedProperty(), (_, _, newValue) -> putInt(SELECTED_FETCHER_INDEX, newValue));
+        sidePanePreferences = new SidePanePreferences(
+                getVisibleSidePanes(defaultValues.visiblePanes()),
+                getSidePanePreferredPositions(defaultValues),
+                getInt(SELECTED_FETCHER_INDEX, defaultValues.getWebSearchFetcherSelected())
+        );
+
+        bindSet(sidePanePreferences.visiblePanes(), SIDE_PANE_VISIBLE_PANES, defaultValues.visiblePanes(),
+                this::storeVisibleSidePanes,
+                () -> getVisibleSidePanes(defaultValues.visiblePanes()));
+        bindMap(sidePanePreferences.getPreferredPositions(), SIDE_PANE_PREFERRED_POSITIONS, defaultValues.getPreferredPositions(),
+                _ -> storeSidePanePreferredPositions(sidePanePreferences.getPreferredPositions()),
+                _ -> getSidePanePreferredPositions(defaultValues));
+        bindInt(sidePanePreferences.webSearchFetcherSelectedProperty(), SELECTED_FETCHER_INDEX, defaultValues.getWebSearchFetcherSelected());
 
         return sidePanePreferences;
-    }
-
-    private SidePanePreferences getSidePanePreferencesFromBackingStore(SidePanePreferences defaults) {
-        Set<SidePaneType> backingStoreVisiblePanes = getVisibleSidePanes(defaults.visiblePanes());
-        Map<SidePaneType, Integer> backingStorePreferredPositions = getSidePanePreferredPositions(defaults);
-        return new SidePanePreferences(
-                backingStoreVisiblePanes,
-                backingStorePreferredPositions,
-                getInt(SELECTED_FETCHER_INDEX, defaults.getWebSearchFetcherSelected())
-        );
     }
 
     private Set<SidePaneType> getVisibleSidePanes(Set<SidePaneType> defaults) {

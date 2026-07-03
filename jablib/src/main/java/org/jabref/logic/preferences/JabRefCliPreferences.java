@@ -33,13 +33,13 @@ import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.MapProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 
 import org.jabref.logic.FilePreferences;
@@ -669,11 +669,11 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @param importFromStore loads the stored value (or the default) into the property
     /// @param resetToDefaults restores the property to its default value
     protected <T> void bindCustom(Property<T> property,
-                                String key,
-                                T defaultValue,
-                                ChangeListener<? super T> persistListener,
-                                Runnable importFromStore,
-                                Runnable resetToDefaults) {
+                                  String key,
+                                  T defaultValue,
+                                  ChangeListener<? super T> persistListener,
+                                  Runnable importFromStore,
+                                  Runnable resetToDefaults) {
         EasyBind.listen(property, persistListener);
         allBindings.add(new PreferenceBinding(
                 property,
@@ -716,10 +716,10 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @param serializer   converts a value to its stored String form
     /// @param deserializer reconstructs a value from its stored String form
     protected <T> void bindObject(ObjectProperty<T> property,
-                                String key,
-                                T defaultValue,
-                                Function<T, String> serializer,
-                                Function<String, T> deserializer) {
+                                  String key,
+                                  T defaultValue,
+                                  Function<T, String> serializer,
+                                  Function<String, T> deserializer) {
         bindCustom(property, key, defaultValue,
                 (_, _, v) -> put(key, serializer.apply(v)),
                 () -> property.set(deserializer.apply(get(key, serializer.apply(defaultValue)))),
@@ -789,12 +789,12 @@ public class JabRefCliPreferences implements CliPreferences {
     ///
     /// @param serializer   persists individual entry changes to the backing store
     /// @param deserializer reads the stored map, falling back to `defaultMap` for missing entries
-    private void bindMap(MapProperty<String, String> map,
-                         String key,
-                         Map<String, String> defaultMap,
-                         MapChangeListener<? super String, ? super String> serializer,
-                         Function<Map<String, String>, Map<String, String>> deserializer) {
-        Map<String, String> defaultCopy = Map.copyOf(defaultMap);
+    protected <K, V> void bindMap(ObservableMap<K, V> map,
+                                  String key,
+                                  Map<K, V> defaultMap,
+                                  MapChangeListener<? super K, ? super V> serializer,
+                                  Function<Map<K, V>, Map<K, V>> deserializer) {
+        Map<K, V> defaultCopy = Map.copyOf(defaultMap);
         map.addListener(serializer);
         allBindings.add(new PreferenceBinding(
                 map,
@@ -820,10 +820,10 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @param persist       rewrites the whole list to the backing store; receives the bound list, runs on every change
     /// @param loadFromStore reads the stored list, falling back to `defaultList` for absent entries
     protected <T> void bindCustomList(ObservableList<T> list,
-                                    String key,
-                                    List<T> defaultList,
-                                    Consumer<? super ObservableList<T>> persist,
-                                    Supplier<? extends Collection<? extends T>> loadFromStore) {
+                                      String key,
+                                      List<T> defaultList,
+                                      Consumer<? super ObservableList<T>> persist,
+                                      Supplier<? extends Collection<? extends T>> loadFromStore) {
         List<T> defaultCopy = List.copyOf(defaultList);
         list.addListener((InvalidationListener) _ -> persist.accept(list));
         allBindings.add(new PreferenceBinding(
@@ -869,10 +869,10 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @param serializer   rewrites the whole set to the backing store; receives the bound set, runs on every change
     /// @param deserializer reads the stored set, falling back to `defaultSet` for absent entries
     protected <T> void bindSet(ObservableSet<T> set,
-                             String key,
-                             Set<T> defaultSet,
-                             Consumer<? super ObservableSet<T>> serializer,
-                             Supplier<? extends Collection<? extends T>> deserializer) {
+                               String key,
+                               Set<T> defaultSet,
+                               Consumer<? super ObservableSet<T>> serializer,
+                               Supplier<? extends Collection<? extends T>> deserializer) {
         Set<T> defaultCopy = Set.copyOf(defaultSet);
         set.addListener((InvalidationListener) _ -> serializer.accept(set));
         allBindings.add(new PreferenceBinding(
@@ -985,8 +985,8 @@ public class JabRefCliPreferences implements CliPreferences {
             return observableList;
         } else if (observable instanceof ObservableSet<?> observableSet) {
             return observableSet;
-        } else if (observable instanceof MapProperty<?, ?> mapProperty) {
-            return mapProperty.get();
+        } else if (observable instanceof ObservableMap<?, ?> observableMap) {
+            return observableMap;
         } else if (observable instanceof ObjectProperty<?> objectProperty) {
             return objectProperty.get();
         }
@@ -1195,7 +1195,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 CitationCommandString::toString, CitationCommandString::from);
 
         // Command paths are persisted under per-application keys (see storePushToApplicationPath), not under a single preferences key
-        bindMap(pushToApplicationPreferences.getCommandPaths(), PUSH_APPLICATIONS_PATHS_KEY, defaultValues.getCommandPaths(),
+        this.<String, String>bindMap(pushToApplicationPreferences.getCommandPaths(), PUSH_APPLICATIONS_PATHS_KEY, defaultValues.getCommandPaths(),
                 this::storePushToApplicationPath, this::readPushToApplicationPath);
 
         return pushToApplicationPreferences;
