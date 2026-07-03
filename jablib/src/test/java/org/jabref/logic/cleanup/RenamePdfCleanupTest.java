@@ -32,6 +32,7 @@ class RenamePdfCleanupTest {
 
     private FilePreferences filePreferences;
     private RenamePdfCleanup cleanup;
+    private BibDatabaseContext context;
 
     // Ensure that the folder stays the same for all tests. By default @TempDir creates a new folder for each usage
     private Path testFolder;
@@ -41,7 +42,7 @@ class RenamePdfCleanupTest {
         this.testFolder = testFolder;
         Path path = testFolder.resolve("test.bib");
         MetaData metaData = new MetaData();
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData);
+        context = new BibDatabaseContext(new BibDatabase(), metaData);
         context.setDatabasePath(path);
 
         entry = new BibEntry();
@@ -143,5 +144,57 @@ class RenamePdfCleanupTest {
         });
 
         assertTrue(schedulerUsed.get());
+    }
+
+    @Test
+    void cleanupRenameOnlyPdfFilesSkipsNonPdfFile() throws IOException {
+        Path path = testFolder.resolve("Toot-fig6.jpg");
+        Files.createFile(path);
+        LinkedFile fileField = new LinkedFile("", Path.of("Toot-fig6.jpg"), "");
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
+
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        RenamePdfCleanup onlyPdfCleanup = new RenamePdfCleanup(false, true, () -> context, filePreferences);
+        onlyPdfCleanup.cleanup(entry);
+
+        // The non-PDF supplementary file keeps its original (custom) name.
+        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(fileField)), entry.getField(StandardField.FILE));
+    }
+
+    @Test
+    void cleanupRenameOnlyPdfFilesRenamesPdfFile() throws IOException {
+        Path path = testFolder.resolve("Toot.pdf");
+        Files.createFile(path);
+        LinkedFile fileField = new LinkedFile("", Path.of("Toot.pdf"), "PDF");
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
+        entry.setField(StandardField.TITLE, "test title");
+
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey] - [fulltitle]");
+        RenamePdfCleanup onlyPdfCleanup = new RenamePdfCleanup(false, true, () -> context, filePreferences);
+        onlyPdfCleanup.cleanup(entry);
+
+        LinkedFile newFileField = new LinkedFile("", Path.of("Toot - test title.pdf"), "PDF");
+        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField(StandardField.FILE));
+    }
+
+    @Test
+    void cleanupRenameOnlyRelativeAndOnlyPdfCombineAsIntersection() throws IOException {
+        Files.createFile(testFolder.resolve("Toot.pdf"));
+        Files.createFile(testFolder.resolve("Toot.tmp"));
+        LinkedFile relativePdf = new LinkedFile("", Path.of("Toot.pdf"), "PDF");
+        LinkedFile relativeNonPdf = new LinkedFile("", Path.of("Toot.tmp"), "");
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(Arrays.asList(relativePdf, relativeNonPdf)));
+        entry.setField(StandardField.TITLE, "test title");
+
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey] - [fulltitle]");
+        // Both modifiers active: only files that are both relative and PDF are renamed.
+        RenamePdfCleanup onlyRelativePdf = new RenamePdfCleanup(true, true, () -> context, filePreferences);
+        onlyRelativePdf.cleanup(entry);
+
+        // The relative PDF is renamed; the non-PDF file (although relative) is left untouched.
+        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(Arrays.asList(
+                        new LinkedFile("", Path.of("Toot - test title.pdf"), "PDF"),
+                        new LinkedFile("", Path.of("Toot.tmp"), "")))),
+                entry.getField(StandardField.FILE));
     }
 }

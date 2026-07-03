@@ -27,6 +27,7 @@ public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
     @FXML private CheckBox cleanupMakePathsRelative;
     @FXML private CheckBox cleanupRenamePdf;
     @FXML private CheckBox cleanupRenamePdfOnlyRelativePaths;
+    @FXML private CheckBox cleanupRenamePdfOnlyPdfFiles;
     @FXML private CheckBox cleanupDeletedFiles;
     @FXML private CheckBox cleanupUpgradeExternalLinks;
     @FXML private CheckBox cleanupRemoveXmpMetadata;
@@ -61,6 +62,7 @@ public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
         }
 
         cleanupRenamePdfOnlyRelativePaths.disableProperty().bind(cleanupRenamePdf.selectedProperty().not());
+        cleanupRenamePdfOnlyPdfFiles.disableProperty().bind(cleanupRenamePdf.selectedProperty().not());
 
         cleanupUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", StandardField.FILE.getName()));
 
@@ -75,6 +77,7 @@ public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
         cleanupMakePathsRelative.selectedProperty().bindBidirectional(viewModel.makePathsRelativeSelected);
         cleanupRenamePdf.selectedProperty().bindBidirectional(viewModel.renamePdfSelected);
         cleanupRenamePdfOnlyRelativePaths.selectedProperty().bindBidirectional(viewModel.renamePdfOnlyRelativeSelected);
+        cleanupRenamePdfOnlyPdfFiles.selectedProperty().bindBidirectional(viewModel.renamePdfOnlyPdfFilesSelected);
         cleanupDeletedFiles.selectedProperty().bindBidirectional(viewModel.deleteFilesSelected);
         cleanupUpgradeExternalLinks.selectedProperty().bindBidirectional(viewModel.upgradeLinksSelected);
         cleanupRemoveXmpMetadata.selectedProperty().bindBidirectional(viewModel.removeXmpMetadataSelected);

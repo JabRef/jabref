@@ -14,6 +14,7 @@ public class CleanupFileViewModel {
             CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE,
             CleanupPreferences.CleanupStep.RENAME_PDF,
             CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
+            CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_PDF_FILES,
             CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
             CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES,
             CleanupPreferences.CleanupStep.REMOVE_XMP_METADATA
@@ -23,6 +24,7 @@ public class CleanupFileViewModel {
     public final BooleanProperty makePathsRelativeSelected = new SimpleBooleanProperty();
     public final BooleanProperty renamePdfSelected = new SimpleBooleanProperty();
     public final BooleanProperty renamePdfOnlyRelativeSelected = new SimpleBooleanProperty();
+    public final BooleanProperty renamePdfOnlyPdfFilesSelected = new SimpleBooleanProperty();
     public final BooleanProperty upgradeLinksSelected = new SimpleBooleanProperty();
     public final BooleanProperty deleteFilesSelected = new SimpleBooleanProperty();
     public final BooleanProperty removeXmpMetadataSelected = new SimpleBooleanProperty();
@@ -34,6 +36,7 @@ public class CleanupFileViewModel {
         makePathsRelativeSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE));
         renamePdfSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.RENAME_PDF));
         renamePdfOnlyRelativeSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS));
+        renamePdfOnlyPdfFilesSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_PDF_FILES));
         upgradeLinksSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
         deleteFilesSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES));
         removeXmpMetadataSelected.set(preferences.isActive(CleanupPreferences.CleanupStep.REMOVE_XMP_METADATA));
@@ -41,6 +44,7 @@ public class CleanupFileViewModel {
         renamePdfSelected.addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
                 renamePdfOnlyRelativeSelected.set(false);
+                renamePdfOnlyPdfFilesSelected.set(false);
             }
         });
     }
@@ -54,9 +58,16 @@ public class CleanupFileViewModel {
             activeJobs.add(CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE);
         }
         if (renamePdfSelected.get()) {
+            boolean anyModifierSelected = false;
             if (renamePdfOnlyRelativeSelected.get()) {
                 activeJobs.add(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
-            } else {
+                anyModifierSelected = true;
+            }
+            if (renamePdfOnlyPdfFilesSelected.get()) {
+                activeJobs.add(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_PDF_FILES);
+                anyModifierSelected = true;
+            }
+            if (!anyModifierSelected) {
                 activeJobs.add(CleanupPreferences.CleanupStep.RENAME_PDF);
             }
         }

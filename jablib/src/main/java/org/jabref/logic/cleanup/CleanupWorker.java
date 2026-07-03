@@ -65,9 +65,22 @@ public class CleanupWorker {
     private List<CleanupJob> determineCleanupActions(CleanupPreferences preset) {
         List<CleanupJob> jobs = new ArrayList<>();
 
+        boolean renameOnlyRelativePaths = preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
+        boolean renameOnlyPdfFiles = preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_PDF_FILES);
+        boolean renameActive = preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF)
+                || renameOnlyRelativePaths
+                || renameOnlyPdfFiles;
+
         // Add active jobs from preset panel
         for (CleanupPreferences.CleanupStep action : preset.getActiveJobs()) {
+            if (isRenameStep(action)) {
+                continue;
+            }
             jobs.add(toJob(action));
+        }
+
+        if (renameActive) {
+            jobs.add(new RenamePdfCleanup(renameOnlyRelativePaths, renameOnlyPdfFiles, () -> databaseContext, filePreferences));
         }
 
         if (preset.getFieldFormatterCleanups().isEnabled()) {
@@ -75,6 +88,12 @@ public class CleanupWorker {
         }
 
         return jobs;
+    }
+
+    private static boolean isRenameStep(CleanupPreferences.CleanupStep action) {
+        return action == CleanupPreferences.CleanupStep.RENAME_PDF
+                || action == CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS
+                || action == CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_PDF_FILES;
     }
 
     private CleanupJob toJob(CleanupPreferences.CleanupStep action) {
@@ -89,10 +108,6 @@ public class CleanupWorker {
                     new URLCleanup();
             case MAKE_PATHS_RELATIVE ->
                     new RelativePathsCleanup(databaseContext, filePreferences);
-            case RENAME_PDF ->
-                    new RenamePdfCleanup(false, () -> databaseContext, filePreferences);
-            case RENAME_PDF_ONLY_RELATIVE_PATHS ->
-                    new RenamePdfCleanup(true, () -> databaseContext, filePreferences);
             case CLEAN_UP_UPGRADE_EXTERNAL_LINKS ->
                     new UpgradePdfPsToFileCleanup();
             case CLEAN_UP_DELETED_LINKED_FILES ->
