@@ -60,7 +60,7 @@ Requires JDK 25 or later to run Gradle. Gradle downloads the necessary JDK by it
 
 When adding or changing dependencies, follow [docs/code-howtos/dependency-management.md](docs/code-howtos/dependency-management.md).
 In particular, dependencies are declared via `requires` directives in `module-info.java` (versions live in `versions/build.gradle.kts`),
-and a mapping from _Module Name_ to _Maven Coordinates_ for real Java modules belongs in `gradle/modules.properties` —
+and a mapping from *Module Name* to *Maven Coordinates* for real Java modules belongs in `gradle/modules.properties` —
 not in ad-hoc blocks in `build-logic`.
 
 ---
