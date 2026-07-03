@@ -93,7 +93,8 @@ public class EntriesResource {
     /// book chapter, thesis, report, etc. yields the correct entry type instead of a flat @article.
     /// The produced entries carry no citation key; JabRef generates keys on import.
     ///
-    /// @param group optional name of a group the imported entries are additionally assigned to.
+    /// The optional `group` query parameter additionally files the imported entries under a
+    /// top-level group of that name, creating it if it does not exist.
     @POST
     @Consumes(MediaTypes.CITATIONSTYLES_JSON)
     public void addCslJson(@PathParam("id") String id, @QueryParam("group") @Nullable String group, String cslJson) throws IOException {
