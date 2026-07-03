@@ -202,8 +202,12 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private void setPreviewText(String text) {
         String coverIfAny = getCoverImageURL().map(COVER_IMAGE_FORMAT_HTML::formatted).orElse("");
         layoutText = coverIfAny + text;
-        UiTaskExecutor.runInJavaFXThread(() ->
-                previewView.setOptions(previewView.getOptions().withBaseUri(getBaseURL().orElse(null))));
+        UiTaskExecutor.runInJavaFXThread(() -> {
+            HtmlRenderOptions options = previewView.getOptions();
+            previewView.setOptions(getBaseURL()
+                    .map(options::withBaseUri)
+                    .orElseGet(options::withoutBaseUri));
+        });
         highlightLayoutText();
         setHvalue(0);
     }
