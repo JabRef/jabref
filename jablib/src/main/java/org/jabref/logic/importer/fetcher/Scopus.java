@@ -80,13 +80,13 @@ public class Scopus implements PagedSearchBasedParserFetcher, CustomizableKeyFet
         return new Page<>(transformedQuery, pageNumber, entries);
     }
 
+    /// Sends the raw, catalog-native query verbatim as Scopus's `query` parameter, bypassing [ScopusQueryTransformer].
+    /// The blank-query short-circuit, download, parse, and post-cleanup are handled by the shared default in
+    /// [PagedSearchBasedParserFetcher#performRawSearchQueryPaged(String, int)]. Year filtering lives in
+    /// [#performSearchPaged(BaseQueryNode, int)] and is therefore naturally skipped on the raw path.
     @Override
-    public Page<BibEntry> performRawSearchQueryPaged(String rawQuery, int pageNumber) throws FetcherException {
-        if (rawQuery.isBlank()) {
-            return new Page<>(rawQuery, pageNumber, List.of());
-        }
-        // raw path sends the query verbatim and bypasses year filtering
-        return new Page<>(rawQuery, pageNumber, fetchEntries(rawQuery, pageNumber));
+    public URL getURLForRawQuery(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+        return buildSearchURL(rawQuery, pageNumber);
     }
 
     /// Downloads and parses Scopus search results for an already built query string
