@@ -69,19 +69,19 @@ All in `jabgui/src/main/java/org/jabref/gui/entryeditor/` unless noted:
 
 ### Phase 1 — MVP: single tab listing required + set fields
 
-- [ ] **1. Model + prefs plumbing**: add `BuiltIn.ALL_FIELDS` ("Fields") to
+- [x] **1. Model + prefs plumbing**: add `BuiltIn.ALL_FIELDS` ("Fields") to
   `EntryEditorTabModel` (incl. `FIELD_SETS`, `displayName()`); add pref key
   `showAllFieldsTab` (default **true**) in `JabRefGuiPreferences.getEntryEditorTabs`/
   `storeTabConfigs` + `EntryEditorPreferences` defaults; place it as first field tab.
   Flip defaults of REQUIRED/IMPORTANT_OPTIONAL/DETAIL_OPTIONAL/DEPRECATED/OTHER/COMMENTS
   to **false** (classes stay; users can re-enable).
   *Check: `./gradlew :jabgui:compileJava` + existing prefs tests still compile.*
-- [ ] **2. `AllFieldsTab` skeleton** extending `FieldsEditorTab`:
+- [x] **2. `AllFieldsTab` skeleton** extending `FieldsEditorTab`:
   `determineFieldsToShow` = citation key + required + set fields (ordered as in Target UX,
   flat, no groups yet). Wire into `EntryEditorTabFactory`. Add l10n key(s).
   *Check: compile + start app (`./gradlew :jabgui:run`), open entry: new first tab shows all
   set + required fields.*
-- [ ] **3. Natural-height scroll layout**: refactor `FieldsEditorTab` minimally so a subclass
+- [x] **3. Natural-height scroll layout**: refactor `FieldsEditorTab` minimally so a subclass
   can opt out of stretch layout (e.g. make `initPanel` overridable / extract ScrollPane
   creation, keep SplitPane wrapper for preview). In `AllFieldsTab`: single column,
   label-above-editor or label-left rows with computed heights, ScrollPane
@@ -152,4 +152,13 @@ All in `jabgui/src/main/java/org/jabref/gui/entryeditor/` unless noted:
 ## Status log (update when stopping!)
 
 - 2026-07-05: Plan written. Architecture explored (files listed in Architecture notes).
-  No code changes yet. Next: step 1.
+- 2026-07-05: Steps 1+2 done (commit afa25ae626): `BuiltIn.ALL_FIELDS` + prefs plumbing
+  (`showAllFieldsTab`), old field tabs + Comments default-off, `AllFieldsTab` (flat list),
+  l10n key "Show all fields". Compile OK; `:jabgui:test --tests "org.jabref.gui.entryeditor.*"`
+  green.
+- 2026-07-05: Step 3 done: `FieldsEditorTab` got hooks `layoutEditors(labels, compressed)` +
+  `stretchContentToTabHeight()`; `AllFieldsTab` renders single-column natural-height rows
+  (TextAreas capped at 4 rows, weight>1 editors get 60px/weight), ScrollPane fitToHeight=false,
+  CSS `.all-fields-list` in jabref-theme.css. Compile OK.
+  NOTE: manual GUI smoke test (`./gradlew :jabgui:run`) still pending — headless session.
+  Next: step 4 (sections/grouping).

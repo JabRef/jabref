@@ -111,6 +111,12 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
                 .map(field -> createLabelAndEditor(bibDatabaseContext, entry, field))
                 .toList();
 
+        layoutEditors(labels, compressed);
+    }
+
+    /// Arranges the created labels and editors inside {@link #gridPane}. The default layout stretches the
+    /// editors to fill the tab height (one or two columns). Subclasses may override for other layouts.
+    protected void layoutEditors(List<Label> labels, boolean compressed) {
         ColumnConstraints columnExpand = new ColumnConstraints();
         columnExpand.setHgrow(Priority.ALWAYS);
 
@@ -191,6 +197,12 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         }
     }
 
+    /// `true` (default): content fills the tab height, rows share the space (classic category tabs).
+    /// `false`: content keeps its natural height and the tab scrolls vertically (single-list tab).
+    protected boolean stretchContentToTabHeight() {
+        return true;
+    }
+
     public void requestFocus(Field fieldName) {
         if (editors.containsKey(fieldName)) {
             editors.get(fieldName).focus();
@@ -222,7 +234,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
             scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
             scrollPane.setContent(gridPane);
             scrollPane.setFitToWidth(true);
-            scrollPane.setFitToHeight(true);
+            scrollPane.setFitToHeight(stretchContentToTabHeight());
 
             SplitPane container = new SplitPane(scrollPane);
             setContent(container);
