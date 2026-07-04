@@ -85,7 +85,7 @@ class ZbMATHTest {
         Mockito.doReturn(bibtexFileUrl).when(fetcher).getURLForQuery(any());
     }
 
-    private void mockUnirest(boolean isEmptySearch, Runnable testRunnable) {
+    private void mockUnirest(boolean isEmptySearch, org.junit.jupiter.api.function.Executable testRunnable) throws Exception {
         try (MockedStatic<Unirest> unirestMock = Mockito.mockStatic(Unirest.class)) {
             GetRequest getRequest = mock(GetRequest.class);
             unirestMock.when(() -> Unirest.get(anyString())).thenReturn(getRequest);
@@ -108,7 +108,14 @@ class ZbMATHTest {
             jsonObject.put("results", resultsArray);
             when(jsonNode.getObject()).thenReturn(jsonObject);
 
-            testRunnable.run();
+            try {
+                testRunnable.execute();
+            } catch (Throwable e) {
+                if (e instanceof Exception exception) {
+                    throw exception;
+                }
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -125,34 +132,26 @@ class ZbMATHTest {
     }
 
     @Test
-    void searchByEntryFindsEntry() throws FetcherException {
+    void searchByEntryFindsEntry() throws Exception {
         BibEntry searchEntry = new BibEntry();
         searchEntry.setField(StandardField.TITLE, "An application of gauge theory to four dimensional topology");
         searchEntry.setField(StandardField.AUTHOR, "S. K. {Donaldson}");
 
         mockUnirest(false, () -> {
-            try {
-                List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
-                assertEquals(List.of(donaldsonEntry), fetchedEntries);
-            } catch (FetcherException e) {
-                throw new RuntimeException(e);
-            }
+            List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
+            assertEquals(List.of(donaldsonEntry), fetchedEntries);
         });
     }
 
     @Test
-    void searchByNoneEntryFindsNothing() throws FetcherException {
+    void searchByNoneEntryFindsNothing() throws Exception {
         BibEntry searchEntry = new BibEntry();
         searchEntry.setField(StandardField.TITLE, "t");
         searchEntry.setField(StandardField.AUTHOR, "a");
 
         mockUnirest(true, () -> {
-            try {
-                List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
-                assertEquals(List.of(), fetchedEntries);
-            } catch (FetcherException e) {
-                throw new RuntimeException(e);
-            }
+            List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
+            assertEquals(List.of(), fetchedEntries);
         });
     }
 

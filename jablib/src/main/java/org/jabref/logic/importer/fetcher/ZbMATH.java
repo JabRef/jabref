@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,6 @@ import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /// Fetches data from the Zentralblatt Math (https://www.zbmath.org/)
 public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, EntryBasedParserFetcher {
@@ -55,7 +55,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
     }
 
     @Override
-    public @Nullable URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
         Optional<String> zblidInEntry = entry.getField(StandardField.ZBL_NUMBER);
         if (zblidInEntry.isPresent()) {
             // zbmath id is already present
@@ -91,20 +91,29 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         String urlString = uriBuilder.build().toString();
         HttpResponse<JsonNode> response = Unirest.get(urlString)
                                                  .asJson();
-        String zblid = "";
-        if (response.getStatus() == 200 && response.getBody() != null) {
-            JSONObject root = response.getBody().getObject();
-            if (root != null) {
-                JSONArray result = root.optJSONArray("results");
-                if (result != null && !result.isEmpty()) {
-                    zblid = result.getJSONObject(0)
-                                  .optString("zbl_id");
-                }
-            }
+        if (response.getStatus() != 200) {
+            throw new FetcherException("Error response from zbMATH: HTTP " + response.getStatus());
         }
+        if (response.getBody() == null) {
+            throw new FetcherException("Empty response body from zbMATH");
+        }
+        JSONObject root = response.getBody().getObject();
+        if (root == null) {
+            throw new FetcherException("Invalid JSON response from zbMATH");
+        }
+        JSONArray results = root.optJSONArray("results");
+        if (results == null) {
+            throw new FetcherException("Missing 'results' field in zbMATH response");
+        }
+
+        String zblid = "";
+        if (!results.isEmpty()) {
+            zblid = results.getJSONObject(0).optString("zbl_id");
+        }
+
         if (StringUtil.isBlank(zblid)) {
             // citation matching API found no matching entry
-            return null;
+            throw new ZbMathNoUrlException("No matching entry found in zbMATH");
         } else {
             return getUrlForIdentifier(zblid);
         }
@@ -140,5 +149,20 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         new MoveFieldCleanup(AMSField.FJOURNAL, StandardField.JOURNAL).cleanup(entry);
         new FieldFormatterCleanup(StandardField.JOURNAL, new RemoveEnclosingBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.TITLE, new RemoveEnclosingBracesFormatter()).cleanup(entry);
+    }
+
+    @Override
+    public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
+        try {
+            return EntryBasedParserFetcher.super.performSearch(entry);
+        } catch (ZbMathNoUrlException e) {
+            return List.of();
+        }
+    }
+
+    public static class ZbMathNoUrlException extends FetcherException {
+        public ZbMathNoUrlException(String errorMessage) {
+            super(errorMessage);
+        }
     }
 }

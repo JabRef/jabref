@@ -11,7 +11,6 @@ import java.util.List;
 import org.jabref.model.entry.BibEntry;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
 /// Provides a convenient interface for entry-based fetcher, which follow the usual three-step procedure:
@@ -23,7 +22,7 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher, ParserFetche
     /// Constructs a URL based on the {@link BibEntry}.
     ///
     /// @param entry the entry to look information for
-    @Nullable URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException;
+    URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException;
 
     /// Returns the parser used to convert the response to a list of {@link BibEntry}.
     Parser getParser();
