@@ -380,7 +380,7 @@ class ZoteroCitationMarkParserTest {
                 """);
 
         assertEquals(2, entries.size());
-        assertEquals(StandardEntryType.Book, entries.get(0).getType());
+        assertEquals(StandardEntryType.Book, entries.getFirst().getType());
         assertEquals(StandardEntryType.Thesis, entries.get(1).getType());
     }
 
