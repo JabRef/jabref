@@ -176,8 +176,6 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
             return JsonReader.toJsonObject(stream);
         } catch (ParseException e) {
             throw new FetcherException(url, "Invalid JSON response from zbMATH", e);
-        } catch (FetcherException e) {
-            throw e;
         } catch (java.io.IOException e) {
             throw new FetcherException(url, "Could not read response from zbMATH", e);
         }
