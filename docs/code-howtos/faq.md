@@ -123,6 +123,9 @@ What's strange (mostly an IntelliJ bug): Regardless of CLI or GUI, These changes
 
 For `abbrev.jabref.org`, `csl-styles`, `csl-locales`, and `ltwa`:
 
+**Note:** Before running the fix, ensure your fork is synced with upstream.
+See [Failing GitHub workflow "Sync fork with upstream"](#failing-github-workflow-sync-fork-with-upstream).
+
 ```bash
 git merge origin/main
 git checkout main -- jablib/src/main/abbrv.jabref.org
