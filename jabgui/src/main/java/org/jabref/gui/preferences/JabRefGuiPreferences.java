@@ -943,6 +943,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 () -> previewPreferences.layoutCyclePositionProperty().set(getPreviewCyclePosition(previewPreferences.getLayoutCycle(), defaultValues.getLayoutCyclePosition())),
                 () -> previewPreferences.layoutCyclePositionProperty().set(defaultValues.getLayoutCyclePosition()));
         // customPreviewLayout is stored with __NEWLINE__ instead of \n so that our migration correctly triggers; in getText it is replaced back by \n.
+        // FIXME: serializer/deserializer are not inverse: the persist listener encodes \n -> __NEWLINE__, but the load
+        //   does not decode __NEWLINE__ -> \n. The property therefore holds the encoded form after a load but the raw
+        //   \n form once the preview editor sets it, so PreferencesFilter reports a false deviation from the default.
+        //   Followup: pick one canonical in-memory form (decode on load, encode on persist, default in the same form).
         bindCustom(previewPreferences.customPreviewLayoutProperty(), PREVIEW_STYLE, defaultValues.getCustomPreviewLayout(),
                 (_, _, newValue) -> put(PREVIEW_STYLE, newValue.replace("\n", "__NEWLINE__")),
                 () -> previewPreferences.customPreviewLayoutProperty().set(get(PREVIEW_STYLE, defaultValues.getCustomPreviewLayout())),
