@@ -303,7 +303,17 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                     case PERFORM_OCR -> {
                         LinkedFileViewModel selectedFile = listView.getSelectionModel().getSelectedItem();
                         if (selectedFile != null) {
-                            new OcrLinkedFileAction(selectedFile.getFile(), selectedFile.getLinkedEntries(), databaseContext, dialogService, preferences, taskExecutor, fileUpdateMonitor, undoManager, stateManager).execute();
+                            new OcrLinkedFileAction(
+                                    selectedFile.getFile(),
+                                    selectedFile.getLinkedEntries(),
+                                    databaseContext,
+                                    dialogService,
+                                    preferences,
+                                    taskExecutor,
+                                    fileUpdateMonitor,
+                                    undoManager,
+                                    stateManager
+                            ).execute();
                             event.consume();
                         }
                     }
