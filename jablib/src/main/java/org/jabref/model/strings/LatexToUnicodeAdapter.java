@@ -4,12 +4,15 @@ import java.text.Normalizer;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.tomtung.latex2unicode.LaTeX2Unicode;
 import fastparse.Parsed;
 import org.jspecify.annotations.NonNull;
 
 /// Adapter class for the latex2unicode lib. This is an alternative to our LatexToUnicode class.
 public class LatexToUnicodeAdapter {
+    private static final int CACHE_SIZE = 50_000;
 
     private static final Pattern UNDERSCORE_MATCHER = Pattern.compile("_(?!\\{)");
 
@@ -20,12 +23,19 @@ public class LatexToUnicodeAdapter {
     private static final String REPLACEMENT_CHAR = "\uFFFD";
 
     private static final Pattern UNDERSCORE_PLACEHOLDER_MATCHER = Pattern.compile(REPLACEMENT_CHAR);
+    private static final Cache<String, String> FORMAT_CACHE = Caffeine.newBuilder()
+                                                                      .maximumSize(CACHE_SIZE)
+                                                                      .build();
 
     /// Attempts to resolve all LaTeX in the given string.
     ///
     /// @param inField a string containing LaTeX
     /// @return a string with LaTeX resolved into Unicode, or the original string if the LaTeX could not be parsed.
     public static String format(@NonNull String inField) {
+        return FORMAT_CACHE.get(inField, LatexToUnicodeAdapter::computeFormattedText);
+    }
+
+    private static String computeFormattedText(@NonNull String inField) {
         return parse(inField).orElse(Normalizer.normalize(inField, Normalizer.Form.NFC));
     }
 

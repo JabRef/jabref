@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.groups.GroupTreeView;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 
 public class SidePaneComponent extends BorderPane {
@@ -44,15 +45,15 @@ public class SidePaneComponent extends BorderPane {
     }
 
     private Node createHeaderView() {
-        Button closeButton = IconTheme.JabRefIcons.CLOSE.asButton();
+        Button closeButton = ControlHelper.iconButton(IconTheme.JabRefIcons.CLOSE);
         closeButton.setTooltip(new Tooltip(Localization.lang("Hide panel")));
         closeButton.setOnAction(e -> closeCommand.execute());
 
-        Button upButton = IconTheme.JabRefIcons.UP.asButton();
+        Button upButton = ControlHelper.iconButton(IconTheme.JabRefIcons.UP);
         upButton.setTooltip(new Tooltip(Localization.lang("Move panel up")));
         upButton.setOnAction(e -> moveUpCommand.execute());
 
-        Button downButton = IconTheme.JabRefIcons.DOWN.asButton();
+        Button downButton = ControlHelper.iconButton(IconTheme.JabRefIcons.DOWN);
         downButton.setTooltip(new Tooltip(Localization.lang("Move panel down")));
         downButton.setOnAction(e -> moveDownCommand.execute());
 

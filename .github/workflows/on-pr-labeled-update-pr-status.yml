@@ -30,7 +30,7 @@ jobs:
           else
             echo "continue=false" >> "$GITHUB_OUTPUT"
           fi
-      - uses: awalsh128/cache-apt-pkgs-action@latest
+      - uses: awalsh128/cache-apt-pkgs-action@v1.6.3
         with:
           packages: jq
           version: 1.0

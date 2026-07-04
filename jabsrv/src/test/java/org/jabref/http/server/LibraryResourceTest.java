@@ -18,6 +18,7 @@ class LibraryResourceTest extends ServerTest {
         addGuiBridgeToResourceConfig(resourceConfig);
         addPreferencesToResourceConfig(resourceConfig);
         addGsonToResourceConfig(resourceConfig);
+        addEntryTypesManagerToResourceConfig(resourceConfig);
         return resourceConfig.getApplication();
     }
 

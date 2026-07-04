@@ -26,6 +26,11 @@
             fx:id="privacyNotice"/>
 
     <UniversalStatusPaneView
+            fx:id="restartNeededPane"
+            title="%Restart needed"
+            description="%AI features were turned on/off. Please restart JabRef to apply the changes."/>
+
+    <UniversalStatusPaneView
             fx:id="noFilesErrorPane"
             title="%Unable to chat"
             description="%No files attached."/>

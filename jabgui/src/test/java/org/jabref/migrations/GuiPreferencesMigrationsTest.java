@@ -43,7 +43,7 @@ class GuiPreferencesMigrationsTest {
 
     @Test
     void oldStyleBibtexkeyPattern0() {
-        when(preferences.get(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN)).thenReturn(oldStylePatterns[0]);
+        when(preferences.get(eq(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN), any())).thenReturn(oldStylePatterns[0]);
         when(preferences.hasKey(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN)).thenReturn(true);
 
         PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences);
@@ -53,7 +53,7 @@ class GuiPreferencesMigrationsTest {
 
     @Test
     void oldStyleBibtexkeyPattern1() {
-        when(preferences.get(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN)).thenReturn(oldStylePatterns[1]);
+        when(preferences.get(eq(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN), any())).thenReturn(oldStylePatterns[1]);
         when(preferences.hasKey(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN)).thenReturn(true);
 
         PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences);
@@ -65,7 +65,7 @@ class GuiPreferencesMigrationsTest {
     void arbitraryBibtexkeyPattern() {
         String arbitraryPattern = "[anyUserPrividedString]";
 
-        when(preferences.get(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN)).thenReturn(arbitraryPattern);
+        when(preferences.get(eq(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN), any())).thenReturn(arbitraryPattern);
 
         PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences);
 
@@ -217,7 +217,7 @@ class GuiPreferencesMigrationsTest {
 
         when(preferences.getStringList("columnNames")).thenReturn(updatedNames);
 
-        when(preferences.get("mainFontSize")).thenReturn("11.2");
+        when(preferences.get(eq("mainFontSize"), any())).thenReturn("11.2");
 
         PreferencesMigrations.restoreVariablesForBackwardCompatibility(preferences);
 
@@ -252,10 +252,21 @@ class GuiPreferencesMigrationsTest {
     }
 
     @Test
+    void upgradeCleanupsRemovesRemovedIssnCleanupJob() {
+        when(preferences.hasKey(JabRefCliPreferences.CLEANUP_JOBS)).thenReturn(true);
+        when(preferences.getStringList(JabRefCliPreferences.CLEANUP_JOBS)).thenReturn(List.of("CLEAN_UP_DOI", "CLEAN_UP_ISSN", "RENAME_PDF"));
+        when(preferences.get(anyString(), anyString())).thenReturn("");
+
+        PreferencesMigrations.upgradeCleanups(preferences);
+
+        verify(preferences).putStringList(JabRefCliPreferences.CLEANUP_JOBS, List.of("CLEAN_UP_DOI", "RENAME_PDF"));
+    }
+
+    @Test
     void resolveBibTexStringsFields() {
         String oldPrefsValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon";
         String expectedValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon;monthfiled";
-        when(preferences.get(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS)).thenReturn(oldPrefsValue);
+        when(preferences.get(eq(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS), any())).thenReturn(oldPrefsValue);
 
         PreferencesMigrations.upgradeResolveBibTeXStringsFields(preferences);
         verify(preferences).put(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS, expectedValue);

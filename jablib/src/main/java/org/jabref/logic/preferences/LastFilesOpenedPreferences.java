@@ -42,12 +42,6 @@ public class LastFilesOpenedPreferences {
         return new LastFilesOpenedPreferences();
     }
 
-    public void setAll(LastFilesOpenedPreferences other) {
-        setLastFilesOpened(List.copyOf(other.getLastFilesOpened()));
-        setLastFocusedFile(other.getLastFocusedFile());
-        fileHistory.setAll(other.getFileHistory());
-    }
-
     public ObservableList<Path> getLastFilesOpened() {
         return lastFilesOpened;
     }

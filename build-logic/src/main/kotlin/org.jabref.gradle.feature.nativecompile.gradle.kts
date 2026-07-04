@@ -3,6 +3,9 @@ plugins {
 }
 
 graalvmNative {
+    metadataRepository {
+        enabled = true
+    }
     binaries {
         named("main") {
             buildArgs.addAll(
@@ -10,7 +13,8 @@ graalvmNative {
                 "-H:+ReportExceptionStackTraces",
                 "-H:IncludeLocales=en",
                 "--enable-all-security-services",
-                "--enable-native-access=ALL-UNNAMED"
+                "--enable-native-access=ALL-UNNAMED",
+                "--enable-url-protocols=http,https"
             )
         }
     }

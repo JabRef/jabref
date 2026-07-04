@@ -26,9 +26,9 @@ public class SqlBasedLibrarySearcher implements LibrarySearcher {
     public SqlBasedLibrarySearcher(BibDatabaseContext databaseContext,
                                    TaskExecutor taskExecutor,
                                    CliPreferences preferences,
-                                   PostgreServer postgreServer) throws IOException {
+                                   PostgresServer postgresServer) throws IOException {
         this.databaseContext = databaseContext;
-        this.indexManager = new IndexManager(databaseContext, taskExecutor, preferences, postgreServer);
+        this.indexManager = new IndexManager(databaseContext, taskExecutor, preferences, postgresServer);
     }
 
     @Override
