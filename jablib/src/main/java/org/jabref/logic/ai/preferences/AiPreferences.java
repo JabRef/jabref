@@ -252,48 +252,6 @@ public class AiPreferences {
         return new AiPreferences();
     }
 
-    public void setAll(AiPreferences preferences) {
-        this.aiFeaturesEnabledCurrently.set(preferences.getAiFeaturesEnabled());
-        this.autoGenerateEmbeddings.set(preferences.getAutoGenerateEmbeddings());
-        this.autoGenerateSummaries.set(preferences.getAutoGenerateSummaries());
-        this.aiProvider.set(preferences.getAiProvider());
-
-        this.openAiChatModel.set(preferences.getOpenAiChatModel());
-        this.mistralAiChatModel.set(preferences.getMistralAiChatModel());
-        this.geminiChatModel.set(preferences.getGeminiChatModel());
-        this.huggingFaceChatModel.set(preferences.getHuggingFaceChatModel());
-
-        this.customizeExpertSettings.set(preferences.getCustomizeExpertSettings());
-
-        this.openAiApiBaseUrl.set(preferences.getOpenAiApiBaseUrl());
-        this.mistralAiApiBaseUrl.set(preferences.getMistralAiApiBaseUrl());
-        this.geminiApiBaseUrl.set(preferences.getGeminiApiBaseUrl());
-        this.huggingFaceApiBaseUrl.set(preferences.getHuggingFaceApiBaseUrl());
-
-        this.summarizatorKind.set(preferences.getSummarizatorKind());
-        this.tokenEstimatorKind.set(preferences.getTokenEstimatorKind());
-        this.embeddingModel.set(preferences.getEmbeddingModel());
-        this.temperature.set(preferences.getTemperature());
-        this.contextWindowSize.set(preferences.getContextWindowSize());
-        this.documentSplitterKind.set(preferences.getDocumentSplitterKind());
-        this.documentSplitterChunkSize.set(preferences.getDocumentSplitterChunkSize());
-        this.documentSplitterOverlapSize.set(preferences.getDocumentSplitterOverlapSize());
-        this.answerEngineKind.set(preferences.getAnswerEngineKind());
-        this.ragMaxResultsCount.set(preferences.getRagMaxResultsCount());
-        this.ragMinScore.set(preferences.getRagMinScore());
-        this.chattingSystemMessageTemplate.set(preferences.getChattingSystemMessageTemplate());
-        this.chattingUserMessageTemplate.set(preferences.getChattingUserMessageTemplate());
-        this.summarizationChunkSystemMessageTemplate.set(preferences.getSummarizationChunkSystemMessageTemplate());
-        this.summarizationCombineSystemMessageTemplate.set(preferences.getSummarizationCombineSystemMessageTemplate());
-        this.summarizationFullDocumentSystemMessageTemplate.set(preferences.getSummarizationFullDocumentSystemMessageTemplate());
-        this.citationParsingSystemMessageTemplate.set(preferences.getCitationParsingSystemMessageTemplate());
-        this.markdownChatExportTemplate.set(preferences.getMarkdownChatExportTemplate());
-        this.generateFollowUpQuestions.set(preferences.getGenerateFollowUpQuestions());
-
-        this.followUpQuestionsCount.set(preferences.getFollowUpQuestionsCount());
-        this.followUpQuestionsTemplate.set(preferences.getFollowUpQuestionsTemplate());
-    }
-
     public String getApiKeyForAiProvider(AiProvider aiProvider) {
         try (final Keyring keyring = Keyring.create()) {
             return keyring.getPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());

@@ -26,11 +26,6 @@ public class NameFormatterPreferences {
         return new NameFormatterPreferences();
     }
 
-    public void setAll(NameFormatterPreferences preferences) {
-        this.nameFormatterKey.setAll(preferences.getNameFormatterKey());
-        this.nameFormatterValue.setAll(preferences.getNameFormatterValue());
-    }
-
     public ObservableList<String> getNameFormatterKey() {
         return nameFormatterKey;
     }
