@@ -60,17 +60,17 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
 
         Path baseDirectoryPath = JabRefBaseDirectoryLocator.getBaseDirectoryPath();
 
-        // The history may contain both absolute and base-directory-relative paths,
-        // depending on how the file was added previously. Remove all equivalent
-        // representations to ensure the entry is fully cleared from the history.
+        // Only attempt relativize if both paths share the same root
+        // (e.g. both on C:\). Different roots (e.g. C:\ vs H:\) cannot
+        // be relativized and should be silently skipped.
         if (file.isAbsolute()) {
-            try {
+
+            if (file.getRoot() != null && file.getRoot().equals(baseDirectoryPath.getRoot())) {
                 this.remove(baseDirectoryPath.relativize(file).normalize());
-            } catch (IllegalArgumentException e) {
-                LOGGER.warn("Could not relativize file path: {}", file, e);
-                return;
             }
+            
             return;
+
         }
 
         this.remove(baseDirectoryPath.resolve(file).normalize());
