@@ -49,8 +49,10 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.OrFields;
 
+import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.Nullable;
 
 /// The single scroll-list tab showing *all* fields of an entry (issue #12711):
@@ -79,6 +81,10 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// Sticky per tab instance: whether the secondary-optional chips are expanded.
     private boolean showSecondaryOptionalChips;
+
+    /// The entry whose event bus this tab is currently subscribed to (for live refresh
+    /// when fields are set/unset from outside, e.g. Source tab, fetchers, undo).
+    private @Nullable BibEntry subscribedEntry;
 
     public AllFieldsTab(UndoManager undoManager,
                         UndoAction undoAction,
@@ -142,6 +148,46 @@ public class AllFieldsTab extends FieldsEditorTab {
     @Override
     protected boolean stretchContentToTabHeight() {
         return false;
+    }
+
+    @Override
+    protected void bindToEntry(BibEntry entry) {
+        if (subscribedEntry != entry) {
+            if (subscribedEntry != null) {
+                subscribedEntry.unregisterListener(this);
+            }
+            entry.registerListener(this);
+            subscribedEntry = entry;
+        }
+        super.bindToEntry(entry);
+    }
+
+    /// Refreshes the list when a field is set or unset from outside this tab
+    /// (Source tab, fetchers, undo, …). Rebuilds only when the set of shown fields
+    /// actually changes, so typing inside a visible editor never rebuilds or steals focus.
+    @Subscribe
+    public void listen(FieldChangedEvent event) {
+        if (event.getBibEntry() != subscribedEntry) {
+            return;
+        }
+        Platform.runLater(() -> refreshShownFieldsIfNeeded(event));
+    }
+
+    private void refreshShownFieldsIfNeeded(FieldChangedEvent event) {
+        BibEntry entry = subscribedEntry;
+        if ((entry == null) || (getCurrentEntry() != entry)) {
+            return;
+        }
+        // A visible field that was just cleared stays visible while this entry is edited
+        // (otherwise deleting the last character would remove the editor mid-edit).
+        if (editors.containsKey(event.getField())
+                && ((event.getNewValue() == null) || event.getNewValue().isEmpty())) {
+            userAddedFields.add(event.getField());
+        }
+        SequencedSet<Field> target = determineFieldsToShow(entry);
+        if (!target.equals(editors.keySet())) {
+            rebuildPanel(activeDatabaseContext(), entry);
+        }
     }
 
     /// Single column of label/editor rows with natural heights (the tab scrolls instead of
@@ -282,6 +328,10 @@ public class AllFieldsTab extends FieldsEditorTab {
         return stateManager.getActiveDatabase()
                            .map(BibDatabaseContext::getMode)
                            .orElse(BibDatabaseMode.BIBLATEX);
+    }
+
+    private BibDatabaseContext activeDatabaseContext() {
+        return stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
     }
 
     private static void applyNaturalHeight(FieldEditorFX editor) {
