@@ -99,14 +99,14 @@ All in `jabgui/src/main/java/org/jabref/gui/entryeditor/` unless noted:
 
 ### Phase 3 — Adding fields
 
-- [ ] **5. Add-field chips**: bottom area with chips for unset important-optional fields;
+- [x] **5. Add-field chips**: bottom area with chips for unset important-optional fields;
   "Show more" toggle reveals secondary-optional chips. Transient `userAddedFields`
   (cleared on entry change) so empty added fields remain visible; clicking focuses editor.
-- [ ] **6. Free-form add**: editable ComboBox + "Add" button using `FieldFactory.parseField`;
+- [x] **6. Free-form add**: editable ComboBox + "Add" button using `FieldFactory.parseField`;
   reject/normalize invalid names; focus the new editor.
   *Check for 5+6: add optional field via chip, type value, value lands in entry (verify in
   Source tab); add arbitrary field name; unit tests for chip-list computation.*
-- [ ] **7. Live refresh**: rebuild the shown-field set when fields get set/unset from outside
+- [x] **7. Live refresh**: rebuild the shown-field set when fields get set/unset from outside
   (e.g. edits in Source tab, undo, fetchers). Listen to entry field changes (BibEntry event
   bus, cf. `SourceTab`); rebuild ONLY when the computed shown set differs from what is shown
   (typing the first char into a visible empty editor must NOT trigger rebuild/focus loss).
@@ -114,19 +114,26 @@ All in `jabgui/src/main/java/org/jabref/gui/entryeditor/` unless noted:
 
 ### Phase 4 — Integration & cleanup
 
-- [ ] **8. Focus & navigation**: `requestFocus(field)`, Jump-to-field dialog
-  (`JumpToFieldDialog`), `EntryEditorFocusUtils` traversal, ENTRY_EDITOR_NEXT/PREVIOUS_PANEL
-  keybindings work with the new tab; preview-in-tab (SplitPane) + divider persistence OK.
-- [ ] **9. Preferences migration**: users with stored prefs get the new tab
-  (set `showAllFieldsTab=true`, old field tabs off) — one-shot migration in
-  `PreferencesMigrations` (or accept old prefs and only change defaults — decide; document).
+- [x] **8. Focus & navigation** (verified at code level; manual keyboard test pending):
+  `JumpToFieldViewModel` + `EntryEditorFocusUtils` operate on `FieldsEditorTab
+  .getShownFields()`/`requestFocus(Field)`, which AllFieldsTab inherits; parent `setupPanel`
+  sets `fields` before calling the layout hook; preview-in-tab SplitPane untouched.
+- [x] **9. Preferences migration**: DECIDED defaults-only, no one-shot migration code:
+  `showAllFieldsTab` defaults to true → every user gets the new tab. Users who never
+  toggled old tab visibility have nothing stored → new defaults (off) apply cleanly.
+  Users who explicitly stored e.g. `showRequiredFields=true` keep those tabs *in
+  addition* — acceptable for a preview build; revisit before release.
 - [ ] **10. Remove MathSciNet tab** (`MathSciNetTab`, `BuiltIn.MATH_SCI_NET`, pref key,
-  l10n) — ONLY after confirming scope with Oliver.
-- [ ] **11. Polish & housekeeping**: CHANGELOG.md entry, l10n keys complete, remove
-  dead code paths if old tabs get dropped entirely (decision from step 9), screenshots
-  for the PR.
-- [ ] **12. Full verification**: `./gradlew :jabgui:test :jabgui:checkstyleMain`
-  (plus l10n consistency tests in jablib).
+  l10n) — ONLY after confirming scope with Oliver. **OPEN — not done.**
+- [x] **11. Polish & housekeeping**: CHANGELOG.md entry added. l10n keys complete
+  (all 9 used keys verified present exactly once). Screenshots for PR: **pending**
+  (needs GUI). Dead-code removal deferred (old tabs stay opt-in for now).
+- [ ] **12. Full verification**: done as far as headless env allows — compile ✓,
+  checkstyle main+test ✓, non-TestFX tests ✓ (incl. new FieldListSectionsTest 5/5).
+  **Still open on a machine with display**: TestFX tests (CommentsTabTest, SourceTabTest —
+  fail here with "Unable to open DISPLAY" in beforeEach, same as on main),
+  LocalizationConsistencyTest (also needs FX toolkit), and `./gradlew :jabgui:run`
+  manual smoke test.
 
 ## Open questions (ask Oliver / decide before the relevant step)
 
@@ -164,4 +171,20 @@ All in `jabgui/src/main/java/org/jabref/gui/entryeditor/` unless noted:
 - 2026-07-05: Step 4 done: `FieldListSections` (partition + `sectionOf`, explicit
   identifier/file/comment field sets) + section headers in `AllFieldsTab.layoutEditors`,
   CSS `.all-fields-section(-header)`, l10n keys "Identifiers"/"Files and links" added,
-  `FieldListSectionsTest` green. Next: steps 5+6 (add-field chips + free-form add).
+  `FieldListSectionsTest` green.
+- 2026-07-05: Steps 5+6 done (commit 553c4f13b5): add-chip FlowPane (important-optional),
+  "Show more"/"Show less" Hyperlink for secondary-optional chips, free-form editable
+  ComboBox + Add button (`FieldFactory.parseField(entry.getType(), name)`), transient
+  `userAddedFields`. `layoutEditors` hook signature extended to
+  `(BibDatabaseContext, BibEntry, boolean, List<Label>)`.
+- 2026-07-05: Step 7 done (commit e649f721bb): Guava `@Subscribe` on entry event bus,
+  rebuild only when computed shown set != editors.keySet(); cleared-but-visible fields
+  are kept via `userAddedFields`.
+- 2026-07-05: Steps 8, 9, 11 done (see checklist notes above); step 12 done to the
+  extent possible headless. Step 10 (MathSciNet) intentionally open.
+  IMPORTANT for resume: TestFX tests + LocalizationConsistencyTest CANNOT run in a
+  headless session ("Unable to open DISPLAY" in ApplicationExtension.beforeEach —
+  pre-existing, also fails on main here). Verify on CI or a machine with a display.
+  Remaining work: manual smoke test + screenshots, decide step 10, decide open
+  questions 1–5 (tab name currently "Fields"), possibly one-shot pref migration
+  before release, then PR.

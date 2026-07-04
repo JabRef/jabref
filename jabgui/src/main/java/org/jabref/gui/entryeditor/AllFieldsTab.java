@@ -45,11 +45,11 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.OrFields;
 
 import com.google.common.eventbus.Subscribe;
