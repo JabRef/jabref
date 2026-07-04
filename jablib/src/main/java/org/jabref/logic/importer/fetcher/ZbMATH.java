@@ -39,21 +39,18 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, EntryBasedParserFetcher {
 
-    private static final String CITATION_MATCHING_URL = "https://zbmath.org/citationmatching/match";
-    private static final String BIBTEX_OUTPUT_URL = "https://zbmath.org/bibtexoutput/";
+    // References for the zbMATH web endpoints used below:
+    // https://zbmath.org/citationmatching/match
+    // https://zbmath.org/bibtexoutput/
+    private static final String CITATION_MATCHING_URL =
+            "https://zbmath.org/citationmatching/match";
+    private static final String BIBTEX_OUTPUT_URL =
+            "https://zbmath.org/bibtexoutput/";
 
     private final ImportFormatPreferences preferences;
-    private final String citationMatchingUrl;
-    private final String bibtexOutputUrl;
 
     public ZbMATH(ImportFormatPreferences preferences) {
-        this(preferences, CITATION_MATCHING_URL, BIBTEX_OUTPUT_URL);
-    }
-
-    ZbMATH(ImportFormatPreferences preferences, String citationMatchingUrl, String bibtexOutputUrl) {
         this.preferences = preferences;
-        this.citationMatchingUrl = citationMatchingUrl;
-        this.bibtexOutputUrl = bibtexOutputUrl;
     }
 
     @Override
@@ -74,7 +71,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
             return getUrlForIdentifier(zblidInEntry.get());
         }
 
-        URIBuilder uriBuilder = new URIBuilder(citationMatchingUrl);
+        URIBuilder uriBuilder = new URIBuilder(CITATION_MATCHING_URL);
         uriBuilder.addParameter("n", "1"); // return only the best matching entry
         uriBuilder.addParameter("m", "5"); // return only entries with a score of at least 5
 
@@ -126,7 +123,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
 
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
-        URIBuilder uriBuilder = new URIBuilder(bibtexOutputUrl);
+        URIBuilder uriBuilder = new URIBuilder(BIBTEX_OUTPUT_URL);
         uriBuilder.addParameter("q", new ZbMathQueryTransformer().transformSearchQuery(queryNode).orElse("")); // search all fields
         uriBuilder.addParameter("start", "0"); // start index
         uriBuilder.addParameter("count", "200"); // should return up to 200 items (instead of default 100)
@@ -135,7 +132,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
 
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
-        URIBuilder uriBuilder = new URIBuilder(bibtexOutputUrl);
+        URIBuilder uriBuilder = new URIBuilder(BIBTEX_OUTPUT_URL);
         String query = "an:".concat(identifier); // use an: to search for a zbMATH identifier
         uriBuilder.addParameter("q", query);
         uriBuilder.addParameter("start", "0"); // start index
