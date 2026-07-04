@@ -130,6 +130,12 @@ jvmDependencyConflicts.patch {
         // no dependency in metadata, but 'requires org.libreoffice.unoloader' in module-info
         addRuntimeOnlyDependency("org.libreoffice:unoloader")
     }
+    module("io.zonky.test:embedded-postgres") {
+        removeDependency("io.zonky.test.postgres:embedded-postgres-binaries-windows-amd64")
+        removeDependency("io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64")
+        removeDependency("io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64")
+        removeDependency("io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64-alpine")
+    }
 }
 
 extraJavaModuleInfo {

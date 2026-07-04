@@ -1,3 +1,4 @@
+import org.gradlex.javamodule.packaging.tasks.Jpackage
 import org.jabref.gradle.useLibericaJdkFull
 
 plugins {
@@ -100,6 +101,22 @@ tasks.named<JavaExec>("run") {
     enableAssertions = true
 }
 
+val embeddedPostgresBinaryByTarget = mapOf(
+    "ubuntu-22.04" to "embedded.postgres.binaries.linux.amd64",
+    "ubuntu-22.04-arm" to "embedded.postgres.binaries.linux.arm64v8",
+    "macos-15-intel" to "embedded.postgres.binaries.darwin.amd64",
+    "macos-15" to "embedded.postgres.binaries.darwin.arm64v8",
+    "windows-latest" to "embedded.postgres.binaries.windows.amd64"
+)
+
+val embeddedPostgresDependencyByTarget = mapOf(
+    "ubuntu-22.04" to "io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64",
+    "ubuntu-22.04-arm" to "io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8",
+    "macos-15-intel" to "io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64",
+    "macos-15" to "io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8",
+    "windows-latest" to "io.zonky.test.postgres:embedded-postgres-binaries-windows-amd64"
+)
+
 // Below should eventually replace the 'jlink {}' and doLast-copy configurations above
 javaModulePackaging {
     verbose = true
@@ -198,6 +215,17 @@ javaModulePackaging {
             include("Resources/**")
         })
     }
+}
+
+dependencies {
+    embeddedPostgresDependencyByTarget.forEach { (target, dependency) ->
+        add("${target}RuntimeClasspath", dependency)
+    }
+}
+
+tasks.withType<Jpackage>().configureEach {
+    embeddedPostgresBinaryByTarget[name.removePrefix("jpackage").replaceFirstChar { it.lowercase() }]
+        ?.let { addModules.add(it) }
 }
 
 tasks.test {
