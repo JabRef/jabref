@@ -126,10 +126,10 @@ For `abbrev.jabref.org`, `csl-styles`, `csl-locales`, and `ltwa`:
 ```bash
 git fetch upstream --prune
 git merge upstream/main
-git checkout main -- jablib/src/main/abbrv.jabref.org
-git checkout main -- jablib/src/main/resources/csl-styles
-git checkout main -- jablib/src/main/resources/csl-locales
-git checkout main -- jablib/src/main/resources/ltwa
+git checkout upstream/main -- jablib/src/main/abbrv.jabref.org
+git checkout upstream/main -- jablib/src/main/resources/csl-styles
+git checkout upstream/main -- jablib/src/main/resources/csl-locales
+git checkout upstream/main -- jablib/src/main/resources/ltwa
 git commit -m "Fix submodules"
 git push
 ```
