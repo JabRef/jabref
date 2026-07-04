@@ -1,8 +1,10 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.SequencedSet;
 import java.util.Set;
@@ -13,12 +15,14 @@ import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
@@ -113,14 +117,13 @@ public class AllFieldsTab extends FieldsEditorTab {
     }
 
     /// Single column of label/editor rows with natural heights (the tab scrolls instead of
-    /// stretching the editors to the tab height).
+    /// stretching the editors to the tab height), grouped into sections
+    /// (main / identifiers / files & links / comments) with a header before each named section.
     @Override
     protected void layoutEditors(List<Label> labels, boolean compressed) {
         if (!gridPane.getStyleClass().contains("all-fields-list")) {
             gridPane.getStyleClass().add("all-fields-list");
         }
-        gridPane.addColumn(0, labels.toArray(Node[]::new));
-        gridPane.addColumn(1, editors.values().stream().map(FieldEditorFX::getNode).toArray(Node[]::new));
 
         ColumnConstraints labelColumn = new ColumnConstraints();
         labelColumn.setMinWidth(Region.USE_PREF_SIZE);
@@ -128,8 +131,40 @@ public class AllFieldsTab extends FieldsEditorTab {
         editorColumn.setHgrow(Priority.ALWAYS);
         gridPane.getColumnConstraints().addAll(labelColumn, editorColumn);
 
-        labels.forEach(label -> GridPane.setValignment(label, VPos.TOP));
+        // labels were created in editors-map iteration order (see FieldsEditorTab#setupPanel)
+        Map<Field, Label> labelForField = new LinkedHashMap<>();
+        int labelIndex = 0;
+        for (Field field : editors.keySet()) {
+            labelForField.put(field, labels.get(labelIndex));
+            labelIndex++;
+        }
+
+        int row = 0;
+        // editors is a LinkedHashMap; copy keeps the display order as a SequencedCollection
+        for (FieldListSections.Section section : FieldListSections.partition(List.copyOf(editors.keySet()))) {
+            Optional<String> header = section.type().header();
+            if (header.isPresent()) {
+                gridPane.add(createSectionHeader(header.get()), 0, row, 2, 1);
+                row++;
+            }
+            for (Field field : section.fields()) {
+                Label label = labelForField.get(field);
+                GridPane.setValignment(label, VPos.TOP);
+                gridPane.add(label, 0, row);
+                gridPane.add(editors.get(field).getNode(), 1, row);
+                row++;
+            }
+        }
+
         editors.values().forEach(AllFieldsTab::applyNaturalHeight);
+    }
+
+    private static Node createSectionHeader(String text) {
+        Label header = new Label(text);
+        header.getStyleClass().add("all-fields-section-header");
+        VBox box = new VBox(new Separator(), header);
+        box.getStyleClass().add("all-fields-section");
+        return box;
     }
 
     private static void applyNaturalHeight(FieldEditorFX editor) {
