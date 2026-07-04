@@ -216,6 +216,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String CUSTOM_TAB_NAME = "customTabName_";
     private static final String CUSTOM_TAB_FIELDS = "customTabFields_";
     private static final String AUTO_OPEN_FORM = "autoOpenForm";
+    private static final String SHOW_ALL_FIELDS_TAB = "showAllFieldsTab";
     private static final String SHOW_REQUIRED_FIELDS = "showRequiredFields";
     private static final String SHOW_IMPORTANT_OPTIONAL_FIELDS = "showImportantOptionalFields";
     private static final String SHOW_DETAIL_OPTIONAL_FIELDS = "showDetailOptionalFields";
@@ -406,6 +407,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         tabModels.add(new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.PREVIEW, true));
 
         tabModels.addAll(List.<EntryEditorTabModel>of(
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.ALL_FIELDS,
+                        getBoolean(SHOW_ALL_FIELDS_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.ALL_FIELDS))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.REQUIRED_FIELDS,
                         getBoolean(SHOW_REQUIRED_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.REQUIRED_FIELDS))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.IMPORTANT_OPTIONAL_FIELDS,
@@ -481,6 +484,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                     case PREVIEW -> {
                         // Preview-tab visibility is stored as showPreviewAsExtraTab in PreviewPreferences; nothing to persist here.
                     }
+                    case ALL_FIELDS ->
+                            putBoolean(SHOW_ALL_FIELDS_TAB, visible);
                     case REQUIRED_FIELDS ->
                             putBoolean(SHOW_REQUIRED_FIELDS, visible);
                     case IMPORTANT_OPTIONAL_FIELDS ->

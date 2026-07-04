@@ -110,17 +110,22 @@ public class EntryEditorPreferences {
         // Always-present leading tab
         tabModels.add(new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.PREVIEW, true));
 
+        // Since the single scroll-list tab (issue #12711), only ALL_FIELDS is shown by default;
+        // the classic category tabs stay available as opt-in via the preferences.
         Arrays.stream(EntryEditorTabModel.BuiltIn.values())
               .filter(EntryEditorTabModel.BuiltIn::isFieldSet)
-              .forEachOrdered(fieldSet -> tabModels.add(new EntryEditorTabModel.BuiltInTab(fieldSet, true)));
+              .forEachOrdered(fieldSet -> tabModels.add(new EntryEditorTabModel.BuiltInTab(fieldSet,
+                      fieldSet == EntryEditorTabModel.BuiltIn.ALL_FIELDS)));
 
         getDefaultEntryEditorTabs().forEach((name, fields) ->
                 tabModels.add(new EntryEditorTabModel.CustomizedFieldsTab(name, fields)));
 
-        // The leading Preview and the field-set tabs are already added above
+        // The leading Preview and the field-set tabs are already added above.
+        // COMMENTS is off by default: comment fields are part of the ALL_FIELDS scroll list.
         Arrays.stream(EntryEditorTabModel.BuiltIn.values())
               .filter(tab -> tab != EntryEditorTabModel.BuiltIn.PREVIEW && !tab.isFieldSet())
-              .forEachOrdered(tab -> tabModels.add(new EntryEditorTabModel.BuiltInTab(tab, true)));
+              .forEachOrdered(tab -> tabModels.add(new EntryEditorTabModel.BuiltInTab(tab,
+                      tab != EntryEditorTabModel.BuiltIn.COMMENTS)));
 
         return tabModels;
     }

@@ -128,6 +128,8 @@ public class EntryEditorTabFactory {
         return switch (type) {
             case PREVIEW ->
                     new PreviewTab(preferences, stateManager, previewPanel);
+            case ALL_FIELDS ->
+                    new AllFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel);
             case REQUIRED_FIELDS ->
                     new RequiredFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel);
             case IMPORTANT_OPTIONAL_FIELDS ->

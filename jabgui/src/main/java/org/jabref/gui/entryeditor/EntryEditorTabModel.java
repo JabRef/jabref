@@ -47,6 +47,9 @@ public sealed interface EntryEditorTabModel
         PREVIEW,
 
         // Built-in field-set tabs: fields computed dynamically from the entry type
+        // ALL_FIELDS is the single scroll-list tab replacing the category tabs (issue #12711);
+        // the category tabs below it remain available as opt-in.
+        ALL_FIELDS,
         REQUIRED_FIELDS,
         IMPORTANT_OPTIONAL_FIELDS,
         DETAIL_OPTIONAL_FIELDS,
@@ -66,13 +69,15 @@ public sealed interface EntryEditorTabModel
         FULLTEXT_SEARCH_RESULTS;
 
         private static final Set<BuiltIn> FIELD_SETS = Set.of(
-                REQUIRED_FIELDS, IMPORTANT_OPTIONAL_FIELDS, DETAIL_OPTIONAL_FIELDS, DEPRECATED_FIELDS, OTHER_FIELDS);
+                ALL_FIELDS, REQUIRED_FIELDS, IMPORTANT_OPTIONAL_FIELDS, DETAIL_OPTIONAL_FIELDS, DEPRECATED_FIELDS, OTHER_FIELDS);
 
         // Create displayName dynamically for language preference change
         public String displayName() {
             return switch (this) {
                 case PREVIEW ->
                         Localization.lang("Preview");
+                case ALL_FIELDS ->
+                        Localization.lang("Fields");
                 case REQUIRED_FIELDS ->
                         Localization.lang("Required fields");
                 case IMPORTANT_OPTIONAL_FIELDS ->
