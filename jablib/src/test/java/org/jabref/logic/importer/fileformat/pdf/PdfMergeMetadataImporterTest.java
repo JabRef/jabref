@@ -167,6 +167,29 @@ class PdfMergeMetadataImporterTest {
     }
 
     @Test
+    void extractCandidatesFindsDoiWithoutFetching() throws URISyntaxException, IOException {
+        // Extraction runs the PDF importers only (no identifier fetching), so it can run offline.
+        GrobidPreferences noGrobid = mock(GrobidPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(noGrobid.isGrobidEnabled()).thenReturn(false);
+
+        ImportFormatPreferences offlinePreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(offlinePreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
+        when(offlinePreferences.grobidPreferences()).thenReturn(noGrobid);
+
+        PdfMergeMetadataImporter offlineImporter = new PdfMergeMetadataImporter(offlinePreferences);
+
+        Path file = Path.of(PdfMergeMetadataImporterTest.class.getResource("2024_SPLC_Becker.pdf").toURI());
+        List<BibEntry> candidates = offlineImporter.extractCandidates(file);
+
+        // The DOI is contained in the PDF content and must be discoverable so that a "From DOI" column can be offered.
+        assertEquals(
+                Optional.of("10.1145/3646548.3672587"),
+                candidates.stream()
+                          .flatMap(candidate -> candidate.getField(StandardField.DOI).stream())
+                          .findFirst());
+    }
+
+    @Test
     void filenameLikeTitleFromXmpIsOverriddenByContentTitle() throws URISyntaxException {
         GrobidPreferences noGrobid = mock(GrobidPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(noGrobid.isGrobidEnabled()).thenReturn(false);

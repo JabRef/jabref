@@ -25,6 +25,7 @@ import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -118,6 +119,43 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         }
 
         return candidates;
+    }
+
+    /// Runs all configured {@link PdfImporter}s on the given file and returns the raw candidate entries,
+    /// **without** fetching additional metadata from identifiers (DOI, ISBN, arXiv).
+    ///
+    /// This is used by the GUI PDF merge dialog (`org.jabref.gui.externalfiles.PdfMergeDialog`) to discover
+    /// which identifiers are present in a PDF, so that identifier-based lookups can be offered as separate columns.
+    ///
+    /// @param filePath the PDF file to extract candidates from
+    /// @return the extracted candidates (possibly empty)
+    public List<BibEntry> extractCandidates(Path filePath) throws IOException {
+        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
+            return extractCandidatesFromPdf(filePath, document);
+        }
+    }
+
+    /// Fetches bibliographic metadata for the first of the given candidates that contains the requested identifier field.
+    ///
+    /// @param field      the identifier field to look up: one of {@link StandardField#DOI},
+    ///                   {@link StandardField#EPRINT} (interpreted as an arXiv id), or {@link StandardField#ISBN}
+    /// @param candidates the candidates to inspect for an identifier
+    /// @return the fetched entry, or {@link Optional#empty()} if none of the candidates contain the identifier
+    public Optional<BibEntry> fetchByIdentifier(StandardField field, List<BibEntry> candidates) throws FetcherException {
+        IdBasedFetcher fetcher = switch (field) {
+            case DOI -> doiFetcher;
+            case EPRINT -> arXivFetcher;
+            case ISBN -> isbnFetcher;
+            default -> throw new IllegalArgumentException("Unsupported identifier field: " + field);
+        };
+
+        for (BibEntry candidate : candidates) {
+            Optional<String> identifier = candidate.getField(field);
+            if (identifier.isPresent()) {
+                return fetcher.performSearchById(identifier.get());
+            }
+        }
+        return Optional.empty();
     }
 
     private List<BibEntry> fetchIdsOfCandidates(List<BibEntry> candidates) {
