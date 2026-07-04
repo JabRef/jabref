@@ -43,12 +43,6 @@ public class FieldPreferences {
         return new FieldPreferences();
     }
 
-    public void setAll(FieldPreferences preferences) {
-        setResolveStrings(preferences.shouldResolveStrings());
-        setResolvableFields(preferences.getResolvableFields());
-        setNonWrappableFields(preferences.getNonWrappableFields());
-    }
-
     public boolean shouldResolveStrings() {
         return resolveStrings.get();
     }

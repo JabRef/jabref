@@ -46,6 +46,7 @@ class EntriesResourceTest extends ServerTest {
         addGsonToResourceConfig(resourceConfig);
         addPreferencesToResourceConfig(resourceConfig);
         addGlobalExceptionMapperToResourceConfig(resourceConfig);
+        addEntryTypesManagerToResourceConfig(resourceConfig);
         resourceConfig.register(new AbstractBinder() {
             @Override
             protected void configure() {
