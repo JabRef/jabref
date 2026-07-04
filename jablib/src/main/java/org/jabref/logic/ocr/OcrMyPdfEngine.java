@@ -72,7 +72,15 @@ public class OcrMyPdfEngine implements OcrEngine {
         }
         Path outputPath = makeOutputFilePath(pdfPath);
         String outputFile = outputPath.toString();
-        String ocrCommand = ocrPreferences.getOcrCommand();
+        String ocrCommand;
+        switch (ocrPreferences.getPagesHaveText()) {
+            case SKIP ->
+                    ocrCommand = "--skip-text";
+            case FORCE ->
+                    ocrCommand = "--force-ocr";
+            default ->
+                    throw new IllegalStateException("Unexpected value: " + ocrPreferences.getPagesHaveText());
+        }
         // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
         ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
         command.add(ocrCommand);

@@ -7,7 +7,9 @@ import javafx.scene.control.TextField;
 
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.ocr.PagesWithTextHandling;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -15,7 +17,7 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> implement
     @FXML private TextField ocrEnginePath;
     @FXML private Button browseButton;
     @FXML private Button autoDetectButton;
-    @FXML private ComboBox<String> pagesHaveText = new ComboBox<>();
+    @FXML private ComboBox<PagesWithTextHandling> pagesHaveTextComboBox;
 
     public OcrTab() {
         ViewLoader.view(this)
@@ -31,9 +33,20 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> implement
     public void initialize() {
         this.viewModel = new OcrTabViewModel(dialogService, preferences.getFilePreferences(), preferences.getOcrPreferences(), taskExecutor);
 
+        initializeOcrEnginePath();
+        initializePagesHaveText();
+    }
+
+    private void initializeOcrEnginePath() {
         ocrEnginePath.textProperty().bindBidirectional(viewModel.ocrEnginePathProperty());
-        pagesHaveText.setItems(viewModel.getPagesHaveTextList());
-        pagesHaveText.valueProperty().bindBidirectional(viewModel.pagesHaveTextProperty());
+    }
+
+    private void initializePagesHaveText() {
+        new ViewModelListCellFactory<PagesWithTextHandling>()
+                .withText(PagesWithTextHandling::getDisplayName)
+                .install(pagesHaveTextComboBox);
+        pagesHaveTextComboBox.itemsProperty().bind(viewModel.pagesHaveTextOptions());
+        pagesHaveTextComboBox.valueProperty().bindBidirectional(viewModel.selectedPagesHaveTextProperty());
     }
 
     @FXML

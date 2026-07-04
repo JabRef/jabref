@@ -16,7 +16,7 @@
     <Label styleClass="sectionHeader" text="%Partially scanned PDFs"/>
     <HBox alignment="CENTER_LEFT" spacing="8.0">
         <Text text="%OCR for partially scanned PDFs"/>
-        <ComboBox fx:id="pagesHaveText" HBox.hgrow="ALWAYS"/>
+        <ComboBox fx:id="pagesHaveTextComboBox" HBox.hgrow="ALWAYS"/>
     </HBox>
     <Label styleClass="sectionHeader" text="%OCR engine path"/>
     <HBox alignment="CENTER_LEFT" spacing="8.0">
