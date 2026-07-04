@@ -70,14 +70,17 @@ class ZbMATHTest {
         citationMatchingResponse = DONALDSON_MATCH_RESPONSE;
 
         serverSocket = new ServerSocket();
-        serverSocket.bind(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0));
+        InetAddress loopbackAddress = InetAddress.getLoopbackAddress();
+        serverSocket.bind(new InetSocketAddress(loopbackAddress, 0));
         serverExecutor = Executors.newSingleThreadExecutor();
         serverExecutor.submit(this::handleRequests);
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
-        String baseUrl = "http://localhost:%d".formatted(serverSocket.getLocalPort());
+        String hostAddress = loopbackAddress.getHostAddress();
+        String urlHost = hostAddress.contains(":") ? "[%s]".formatted(hostAddress) : hostAddress;
+        String baseUrl = "http://%s:%d".formatted(urlHost, serverSocket.getLocalPort());
         fetcher = new ZbMATH(importFormatPreferences, baseUrl + "/citationmatching/match", baseUrl + "/bibtexoutput/");
 
         donaldsonEntry = new BibEntry(StandardEntryType.Article)
