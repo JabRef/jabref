@@ -33,9 +33,10 @@ import org.jabref.model.search.query.BaseQueryNode;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /// Fetches data from the Zentralblatt Math (https://www.zbmath.org/)
+@NullMarked
 public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, EntryBasedParserFetcher {
 
     private static final String CITATION_MATCHING_URL = "https://zbmath.org/citationmatching/match";
@@ -45,11 +46,11 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
     private final String citationMatchingUrl;
     private final String bibtexOutputUrl;
 
-    public ZbMATH(@NonNull ImportFormatPreferences preferences) {
+    public ZbMATH(ImportFormatPreferences preferences) {
         this(preferences, CITATION_MATCHING_URL, BIBTEX_OUTPUT_URL);
     }
 
-    ZbMATH(@NonNull ImportFormatPreferences preferences, String citationMatchingUrl, String bibtexOutputUrl) {
+    ZbMATH(ImportFormatPreferences preferences, String citationMatchingUrl, String bibtexOutputUrl) {
         this.preferences = preferences;
         this.citationMatchingUrl = citationMatchingUrl;
         this.bibtexOutputUrl = bibtexOutputUrl;
@@ -156,7 +157,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
     }
 
     @Override
-    public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
+    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         try {
             return EntryBasedParserFetcher.super.performSearch(entry);
         } catch (ZbMathNoUrlException e) {

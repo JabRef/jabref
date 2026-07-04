@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -96,9 +97,10 @@ class ZbMATHTest {
     }
 
     @AfterEach
-    void tearDown() throws IOException {
+    void tearDown() throws IOException, InterruptedException {
         serverSocket.close();
         serverExecutor.shutdownNow();
+        serverExecutor.awaitTermination(1, TimeUnit.SECONDS);
     }
 
     @Test

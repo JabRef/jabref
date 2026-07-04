@@ -46,6 +46,7 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher, ParserFetche
             return fetchedEntries;
         } catch (IOException e) {
             if (e.getCause() instanceof FetcherException fe) {
+                // URLDownload reports HTTP errors such as 401 as FetcherException; preserve that user-facing detail.
                 throw fe;
             }
             LoggerFactory.getLogger(EntryBasedParserFetcher.class).error("Could not fetch from URL {}", urlForEntry, e);
