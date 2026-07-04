@@ -223,9 +223,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             new FetchAiModelsBackgroundTask(aiModelService, newValue, currentApiBaseUrl.get(), currentApiKey.get())
                     .onSuccess(foundModels -> {
                         String current = currentChatModel.get();
-                        // Task returns both predefined models + latest, so it should always be non-empty.
-                        chatModelsList.setAll(foundModels.stream().sorted().toList());
-                        currentChatModel.set(current);
+                        if (newValue == selectedAiProvider.get()) {
+                            // Task returns both predefined models + latest, so it should always be non-empty.
+                            chatModelsList.setAll(foundModels.stream().sorted().toList());
+                            currentChatModel.set(current);
+                        }
                     })
                     .executeWith(taskExecutor);
         });
