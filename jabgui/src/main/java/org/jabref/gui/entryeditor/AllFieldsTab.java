@@ -11,15 +11,22 @@ import java.util.Set;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -39,12 +46,20 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
+
+import org.jspecify.annotations.Nullable;
 
 /// The single scroll-list tab showing *all* fields of an entry (issue #12711):
 /// the citation key, all required fields (even when unset), and every set field.
 /// Replaces the classic category tabs (required / optional / other / …) as the default view.
+///
+/// Fields are grouped Google-Contacts style ({@link FieldListSections}); below the list,
+/// unset optional fields can be added via one-click chips ("Show more" reveals the
+/// secondary-optional ones) or via a free-form field-name box.
 public class AllFieldsTab extends FieldsEditorTab {
 
     /// Preferred number of visible text rows for multiline editors in the scroll list
@@ -56,6 +71,14 @@ public class AllFieldsTab extends FieldsEditorTab {
     private static final double HEIGHT_PER_WEIGHT = 60;
 
     private final BibEntryTypesManager entryTypesManager;
+
+    /// Fields the user added via chip / free-form box that are still empty: they are not part
+    /// of {@link BibEntry#getFields()} yet, but must stay visible while this entry is edited.
+    private final Set<Field> userAddedFields = new LinkedHashSet<>();
+    private @Nullable BibEntry entryOfUserAddedFields;
+
+    /// Sticky per tab instance: whether the secondary-optional chips are expanded.
+    private boolean showSecondaryOptionalChips;
 
     public AllFieldsTab(UndoManager undoManager,
                         UndoAction undoAction,
@@ -84,11 +107,15 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// Order: citation key, required fields (entry-type order), set optional fields
     /// (important first, then detail; each in entry-type order), then all remaining set
-    /// fields sorted by name.
+    /// fields sorted by name, then still-empty user-added fields.
     @Override
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
-        BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
-                                           .orElse(BibDatabaseMode.BIBLATEX);
+        if (entry != entryOfUserAddedFields) {
+            userAddedFields.clear();
+            entryOfUserAddedFields = entry;
+        }
+
+        BibDatabaseMode mode = getDatabaseMode();
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
 
         Set<Field> setFields = entry.getFields();
@@ -108,6 +135,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         setFields.stream()
                  .sorted(Comparator.comparing(Field::getName))
                  .forEach(fields::add);
+        fields.addAll(userAddedFields);
         return fields;
     }
 
@@ -118,9 +146,10 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// Single column of label/editor rows with natural heights (the tab scrolls instead of
     /// stretching the editors to the tab height), grouped into sections
-    /// (main / identifiers / files & links / comments) with a header before each named section.
+    /// (main / identifiers / files & links / comments) with a header before each named section,
+    /// followed by the add-field controls.
     @Override
-    protected void layoutEditors(List<Label> labels, boolean compressed) {
+    protected void layoutEditors(BibDatabaseContext bibDatabaseContext, BibEntry entry, boolean compressed, List<Label> labels) {
         if (!gridPane.getStyleClass().contains("all-fields-list")) {
             gridPane.getStyleClass().add("all-fields-list");
         }
@@ -156,6 +185,8 @@ public class AllFieldsTab extends FieldsEditorTab {
             }
         }
 
+        gridPane.add(createAddFieldArea(bibDatabaseContext, entry), 0, row, 2, 1);
+
         editors.values().forEach(AllFieldsTab::applyNaturalHeight);
     }
 
@@ -165,6 +196,92 @@ public class AllFieldsTab extends FieldsEditorTab {
         VBox box = new VBox(new Separator(), header);
         box.getStyleClass().add("all-fields-section");
         return box;
+    }
+
+    // region add-field controls
+
+    private Node createAddFieldArea(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
+        BibDatabaseMode mode = getDatabaseMode();
+        Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
+
+        FlowPane chips = new FlowPane();
+        chips.getStyleClass().add("all-fields-add-chips");
+
+        if (entryType.isPresent()) {
+            List<Field> shown = List.copyOf(editors.keySet());
+            FieldListSections.subtract(entryType.get().getImportantOptionalFields(), shown)
+                             .forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));
+
+            SequencedSet<Field> secondary = FieldListSections.subtract(
+                    entryType.get().getDetailOptionalNotDeprecatedFields(mode), shown);
+            if (!secondary.isEmpty()) {
+                if (showSecondaryOptionalChips) {
+                    secondary.forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));
+                }
+                Hyperlink toggle = new Hyperlink(showSecondaryOptionalChips
+                                                 ? Localization.lang("Show less")
+                                                 : Localization.lang("Show more"));
+                toggle.setOnAction(_ -> {
+                    showSecondaryOptionalChips = !showSecondaryOptionalChips;
+                    rebuildPanel(bibDatabaseContext, entry);
+                });
+                chips.getChildren().add(toggle);
+            }
+        }
+
+        ComboBox<String> fieldNameBox = new ComboBox<>();
+        fieldNameBox.setEditable(true);
+        fieldNameBox.getItems().addAll(FieldFactory.getAllFieldsWithOutInternal().stream()
+                                                   .map(Field::getName)
+                                                   .sorted()
+                                                   .toList());
+        fieldNameBox.setPromptText(Localization.lang("Field name"));
+        Button addButton = new Button(Localization.lang("Add"));
+        Runnable addAction = () -> addFreeFormField(bibDatabaseContext, entry, fieldNameBox.getEditor().getText());
+        addButton.setOnAction(_ -> addAction.run());
+        fieldNameBox.getEditor().setOnAction(_ -> addAction.run());
+        HBox freeFormRow = new HBox(fieldNameBox, addButton);
+        freeFormRow.getStyleClass().add("all-fields-add-free-form");
+        freeFormRow.setAlignment(Pos.CENTER_LEFT);
+
+        VBox area = new VBox(new Separator(), chips, freeFormRow);
+        area.getStyleClass().add("all-fields-add-area");
+        return area;
+    }
+
+    private Button createAddChip(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
+        Button chip = new Button("+ " + FieldTextMapper.getDisplayName(field));
+        chip.getStyleClass().add("all-fields-add-chip");
+        chip.setOnAction(_ -> showFieldEditor(bibDatabaseContext, entry, field));
+        return chip;
+    }
+
+    private void addFreeFormField(BibDatabaseContext bibDatabaseContext, BibEntry entry, @Nullable String fieldName) {
+        String trimmed = fieldName == null ? "" : fieldName.trim();
+        if (trimmed.isEmpty()) {
+            return;
+        }
+        showFieldEditor(bibDatabaseContext, entry, FieldFactory.parseField(entry.getType(), trimmed));
+    }
+
+    /// Makes an editor for `field` visible in the list (adding it as still-empty user-added
+    /// field if necessary) and focuses it.
+    private void showFieldEditor(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
+        userAddedFields.add(field);
+        rebuildPanel(bibDatabaseContext, entry);
+        Platform.runLater(() -> requestFocus(field));
+    }
+
+    private void rebuildPanel(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
+        setupPanel(bibDatabaseContext, entry, false);
+    }
+
+    // endregion
+
+    private BibDatabaseMode getDatabaseMode() {
+        return stateManager.getActiveDatabase()
+                           .map(BibDatabaseContext::getMode)
+                           .orElse(BibDatabaseMode.BIBLATEX);
     }
 
     private static void applyNaturalHeight(FieldEditorFX editor) {

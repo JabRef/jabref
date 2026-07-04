@@ -111,12 +111,12 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
                 .map(field -> createLabelAndEditor(bibDatabaseContext, entry, field))
                 .toList();
 
-        layoutEditors(labels, compressed);
+        layoutEditors(bibDatabaseContext, entry, compressed, labels);
     }
 
     /// Arranges the created labels and editors inside {@link #gridPane}. The default layout stretches the
     /// editors to fill the tab height (one or two columns). Subclasses may override for other layouts.
-    protected void layoutEditors(List<Label> labels, boolean compressed) {
+    protected void layoutEditors(BibDatabaseContext bibDatabaseContext, BibEntry entry, boolean compressed, List<Label> labels) {
         ColumnConstraints columnExpand = new ColumnConstraints();
         columnExpand.setHgrow(Priority.ALWAYS);
 

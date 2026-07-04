@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -78,6 +79,14 @@ public final class FieldListSections {
             return SectionType.COMMENTS;
         }
         return SectionType.MAIN;
+    }
+
+    /// The candidates (in their given order) that are not part of `shown` — the fields
+    /// offered as add-chips below the list.
+    public static SequencedSet<Field> subtract(SequencedCollection<Field> candidates, Collection<Field> shown) {
+        SequencedSet<Field> result = new LinkedHashSet<>(candidates);
+        result.removeAll(shown);
+        return result;
     }
 
     /// Splits `orderedFields` into sections, keeping the given order within each section.

@@ -1133,6 +1133,25 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-weight: bold;
 }
 
+#entryEditor .all-fields-add-area {
+    -fx-padding: 12 0 4 0;
+    -fx-spacing: 8;
+}
+
+#entryEditor .all-fields-add-chips {
+    -fx-hgap: 6;
+    -fx-vgap: 6;
+}
+
+#entryEditor .all-fields-add-chip {
+    -fx-background-radius: 14;
+    -fx-padding: 3 12 3 12;
+}
+
+#entryEditor .all-fields-add-free-form {
+    -fx-spacing: 6;
+}
+
 #entryEditor Text {
     -fx-text-fill: -fx-text-base-color;
     -fx-fill: -fx-text-base-color;

@@ -58,6 +58,14 @@ class FieldListSectionsTest {
     }
 
     @Test
+    void subtractKeepsCandidateOrderAndRemovesShownFields() {
+        assertEquals(List.of(StandardField.EDITOR, StandardField.SERIES),
+                List.copyOf(FieldListSections.subtract(
+                        List.of(StandardField.EDITOR, StandardField.VOLUME, StandardField.SERIES),
+                        List.of(StandardField.VOLUME, StandardField.AUTHOR))));
+    }
+
+    @Test
     void urlAndUrlDateBelongToFilesAndLinksSection() {
         assertEquals(FieldListSections.SectionType.FILES_AND_LINKS,
                 FieldListSections.sectionOf(StandardField.URL));

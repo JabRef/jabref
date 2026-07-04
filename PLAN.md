@@ -91,7 +91,7 @@ All in `jabgui/src/main/java/org/jabref/gui/entryeditor/` unless noted:
 
 ### Phase 2 — Grouping
 
-- [ ] **4. Sections**: partition fields into Main / Identifiers / Files & Links / Comments
+- [x] **4. Sections**: partition fields into Main / Identifiers / Files & Links / Comments
   (explicit field sets, see Target UX). Extract partition logic into a plain-Java helper
   (e.g. `FieldListSections`) — testable without JavaFX.
   Render section headers (localized label + separator; optionally JabRefIcons).
@@ -161,4 +161,7 @@ All in `jabgui/src/main/java/org/jabref/gui/entryeditor/` unless noted:
   (TextAreas capped at 4 rows, weight>1 editors get 60px/weight), ScrollPane fitToHeight=false,
   CSS `.all-fields-list` in jabref-theme.css. Compile OK.
   NOTE: manual GUI smoke test (`./gradlew :jabgui:run`) still pending — headless session.
-  Next: step 4 (sections/grouping).
+- 2026-07-05: Step 4 done: `FieldListSections` (partition + `sectionOf`, explicit
+  identifier/file/comment field sets) + section headers in `AllFieldsTab.layoutEditors`,
+  CSS `.all-fields-section(-header)`, l10n keys "Identifiers"/"Files and links" added,
+  `FieldListSectionsTest` green. Next: steps 5+6 (add-field chips + free-form add).
