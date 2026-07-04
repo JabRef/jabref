@@ -77,6 +77,7 @@ class WebFetchersTest {
 
             // Some classes implement IdBasedFetcher, but are only accessible to other fetcher, so ignore them
             expected.removeAll(getIgnoredInaccessibleClasses());
+            expected.removeIf(clazz -> clazz.getName().contains("Test") || clazz.isAnonymousClass() || clazz.isLocalClass());
 
             expected.remove(AbstractIsbnFetcher.class);
             expected.remove(IdBasedParserFetcher.class);
@@ -109,6 +110,7 @@ class WebFetchersTest {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(EntryBasedFetcher.class.getCanonicalName());
             Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
 
+            expected.removeIf(clazz -> clazz.getName().contains("Test") || clazz.isAnonymousClass() || clazz.isLocalClass());
             expected.remove(EntryBasedParserFetcher.class);
             expected.remove(MrDLibFetcher.class);
             assertEquals(expected, getClasses(idFetchers));
@@ -126,6 +128,7 @@ class WebFetchersTest {
 
             // Some classes implement SearchBasedFetcher, but are only accessible to other fetcher, so ignore them
             expected.removeAll(getIgnoredInaccessibleClasses());
+            expected.removeIf(clazz -> clazz.getName().contains("Test") || clazz.isAnonymousClass() || clazz.isLocalClass());
 
             // Remove interfaces
             expected.remove(SearchBasedParserFetcher.class);
@@ -156,6 +159,7 @@ class WebFetchersTest {
 
             // Some classes implement FulltextFetcher, but are only accessible to other fetcher, so ignore them
             expected.removeAll(getIgnoredInaccessibleClasses());
+            expected.removeIf(clazz -> clazz.getName().contains("Test") || clazz.isAnonymousClass() || clazz.isLocalClass());
 
             // Remove the following, because they don't work atm
             expected.remove(JstorFetcher.class);
@@ -175,6 +179,7 @@ class WebFetchersTest {
 
             // Some classes implement IdFetcher, but are only accessible to other fetcher, so ignore them
             expected.removeAll(getIgnoredInaccessibleClasses());
+            expected.removeIf(clazz -> clazz.getName().contains("Test") || clazz.isAnonymousClass() || clazz.isLocalClass());
 
             expected.remove(IdParserFetcher.class);
             // Remove the following, because they don't work at the moment
