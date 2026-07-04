@@ -53,6 +53,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CSLStyleUtils;
+import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
@@ -400,6 +401,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // region OCR preferences
     private static final String OCR_ENGINE_PATH = "ocrEnginePath";
+    private static final String PAGES_WITH_TEXT = "pagesHaveText";
     // endregion
 
     // region Push to application preferences
@@ -2155,9 +2157,10 @@ public class JabRefCliPreferences implements CliPreferences {
         OcrPreferences defaultValues = OcrPreferences.getDefault();
 
         ocrPreferences = new OcrPreferences(
-                get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()));
+                get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()), get(PAGES_WITH_TEXT, defaultValues.getPagesHaveText()));
 
         bindString(ocrPreferences.ocrEnginePathProperty(), OCR_ENGINE_PATH, defaultValues.getOcrEnginePath());
+        bindString(ocrPreferences.pagesHaveTextProperty(), PAGES_WITH_TEXT, defaultValues.getPagesHaveText());
 
         return ocrPreferences;
     }

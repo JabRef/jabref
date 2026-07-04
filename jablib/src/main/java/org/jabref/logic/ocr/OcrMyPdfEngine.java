@@ -72,9 +72,10 @@ public class OcrMyPdfEngine implements OcrEngine {
         }
         Path outputPath = makeOutputFilePath(pdfPath);
         String outputFile = outputPath.toString();
+        String ocrCommand = ocrPreferences.getOcrCommand();
         // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
         ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
-        command.add("--skip-text");
+        command.add(ocrCommand);
         command.add(pdfPath.toString());
         command.add(outputFile);
         Process process = null;

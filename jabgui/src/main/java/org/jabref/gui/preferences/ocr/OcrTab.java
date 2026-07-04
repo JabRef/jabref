@@ -2,6 +2,7 @@ package org.jabref.gui.preferences.ocr;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
@@ -14,6 +15,7 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> implement
     @FXML private TextField ocrEnginePath;
     @FXML private Button browseButton;
     @FXML private Button autoDetectButton;
+    @FXML private ComboBox<String> pagesHaveText = new ComboBox<>();
 
     public OcrTab() {
         ViewLoader.view(this)
@@ -30,6 +32,8 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> implement
         this.viewModel = new OcrTabViewModel(dialogService, preferences.getFilePreferences(), preferences.getOcrPreferences(), taskExecutor);
 
         ocrEnginePath.textProperty().bindBidirectional(viewModel.ocrEnginePathProperty());
+        pagesHaveText.setItems(viewModel.getPagesHaveTextList());
+        pagesHaveText.valueProperty().bindBidirectional(viewModel.pagesHaveTextProperty());
     }
 
     @FXML

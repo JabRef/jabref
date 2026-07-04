@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
@@ -34,7 +36,13 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
             "py -m ocrmypdf",
             "python3 -m ocrmypdf"
     );
+    private static final List<String> OCR_OPTIONS = List.of(
+            Localization.lang("Skip pages with text"),
+            Localization.lang("Overwrite text")
+    );
     private final StringProperty ocrEnginePath = new SimpleStringProperty();
+    private final StringProperty pagesHaveText = new SimpleStringProperty();
+    private final ObservableList<String> pagesHaveTextList = FXCollections.observableArrayList();
 
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
@@ -54,15 +62,26 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         ocrEnginePath.setValue(ocrPreferences.getOcrEnginePath());
+        pagesHaveText.setValue(ocrPreferences.getPagesHaveText());
+        pagesHaveTextList.addAll(OCR_OPTIONS);
     }
 
     @Override
     public void storeSettings() {
         ocrPreferences.setOcrEnginePath(ocrEnginePath.getValue());
+        ocrPreferences.setPagesHaveText(pagesHaveText.getValue());
     }
 
     public StringProperty ocrEnginePathProperty() {
         return ocrEnginePath;
+    }
+
+    public StringProperty pagesHaveTextProperty() {
+        return pagesHaveText;
+    }
+
+    public ObservableList<String> getPagesHaveTextList() {
+        return pagesHaveTextList;
     }
 
     public void browseEnginePath() {
