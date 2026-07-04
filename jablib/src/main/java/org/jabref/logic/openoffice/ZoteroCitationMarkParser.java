@@ -61,7 +61,7 @@ public class ZoteroCitationMarkParser {
     /// citation-js CSL-JSON export), not a Zotero reference-mark wrapper. The produced entries have
     /// no citation key, so callers importing them let JabRef generate keys from its pattern.
     ///
-    /// Returns an empty list when the input is blank or not parseable CSL JSON.
+    /// @return the parsed list of entries or an empty list when the input is blank or not parsable CSL JSON.
     public static List<BibEntry> parseCslJsonItems(String cslJson) {
         if (StringUtil.isBlank(cslJson)) {
             return List.of();
