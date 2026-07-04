@@ -288,14 +288,14 @@ public class LinkedFileHandler {
 
     /// Builds the suggested file name (without extension) from the configured pattern.
     ///
-    /// When {@link #preserveCustomSuffix} is enabled, any custom suffix the user had added to the current file name is
+    /// When `preserveCustomSuffix` is enabled, any custom suffix the user had added to the current file name is
     /// re-appended. This preserves manually named supplementary files: if the pattern resolves to `key` and the
     /// current file is named `key-fig6`, the suggested base name becomes `key-fig6` instead of plain `key`, so the
     /// `-fig6` part is not lost during cleanup/renaming (see issue #11358). When disabled, the plain pattern result is
     /// returned (the historical behavior).
     ///
     /// The suffix is split off using the *original* pattern that was applied to the files (see
-    /// {@link #detectedOriginalPattern}), not the freshly generated one. Using the new pattern would lose the suffix
+    /// `detectedOriginalPattern`), not the freshly generated one. Using the new pattern would lose the suffix
     /// whenever the pattern changed (e.g. after the citation key was edited), because the current file name no longer
     /// starts with the new pattern. When no original pattern was detected (for instance a single-file entry), we fall
     /// back to the freshly generated pattern.

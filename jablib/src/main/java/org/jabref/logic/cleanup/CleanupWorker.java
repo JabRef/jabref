@@ -1,6 +1,7 @@
 package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -82,7 +83,17 @@ public class CleanupWorker {
         }
 
         if (renameActive) {
-            jobs.add(new RenamePdfCleanup(renameOnlyRelativePaths, renameOnlyPdfFiles, preserveCustomSuffix, () -> databaseContext, filePreferences));
+            EnumSet<RenamePdfCleanup.Option> renameOptions = EnumSet.noneOf(RenamePdfCleanup.Option.class);
+            if (renameOnlyRelativePaths) {
+                renameOptions.add(RenamePdfCleanup.Option.ONLY_RELATIVE_PATHS);
+            }
+            if (renameOnlyPdfFiles) {
+                renameOptions.add(RenamePdfCleanup.Option.ONLY_PDF_FILES);
+            }
+            if (preserveCustomSuffix) {
+                renameOptions.add(RenamePdfCleanup.Option.PRESERVE_CUSTOM_SUFFIX);
+            }
+            jobs.add(new RenamePdfCleanup(renameOptions, () -> databaseContext, filePreferences));
         }
 
         if (preset.getFieldFormatterCleanups().isEnabled()) {

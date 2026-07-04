@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
@@ -20,38 +22,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RenamePdfCleanup implements CleanupJob {
+    /// Toggles controlling which linked files are renamed and how the target name is derived.
+    public enum Option {
+        /// Rename only files that are stored with a relative path.
+        ONLY_RELATIVE_PATHS,
+
+        /// Rename only PDF files, leaving other file types untouched.
+        ONLY_PDF_FILES,
+
+        /// Re-append a user-added suffix (e.g. `-fig6`) so manually named supplementary files keep their suffix.
+        PRESERVE_CUSTOM_SUFFIX
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RenamePdfCleanup.class);
 
     private static final String PDF_EXTENSION = "pdf";
 
     private final Supplier<BibDatabaseContext> databaseContext;
-    private final boolean onlyRelativePaths;
-    private final boolean onlyPdfFiles;
-    private final boolean preserveCustomSuffix;
+    private final Set<Option> options;
     private final FilePreferences filePreferences;
 
-    public RenamePdfCleanup(boolean onlyRelativePaths,
-                            @NonNull Supplier<BibDatabaseContext> databaseContext,
-                            FilePreferences filePreferences) {
-        this(onlyRelativePaths, false, databaseContext, filePreferences);
-    }
-
-    public RenamePdfCleanup(boolean onlyRelativePaths,
-                            boolean onlyPdfFiles,
-                            @NonNull Supplier<BibDatabaseContext> databaseContext,
-                            FilePreferences filePreferences) {
-        this(onlyRelativePaths, onlyPdfFiles, false, databaseContext, filePreferences);
-    }
-
-    public RenamePdfCleanup(boolean onlyRelativePaths,
-                            boolean onlyPdfFiles,
-                            boolean preserveCustomSuffix,
+    public RenamePdfCleanup(@NonNull Set<Option> options,
                             @NonNull Supplier<BibDatabaseContext> databaseContext,
                             FilePreferences filePreferences) {
         this.databaseContext = databaseContext;
-        this.onlyRelativePaths = onlyRelativePaths;
-        this.onlyPdfFiles = onlyPdfFiles;
-        this.preserveCustomSuffix = preserveCustomSuffix;
+        this.options = Set.copyOf(options);
         this.filePreferences = filePreferences;
     }
 
@@ -59,17 +54,18 @@ public class RenamePdfCleanup implements CleanupJob {
     public List<FieldChange> cleanup(BibEntry entry, Consumer<Runnable> mutationScheduler) {
         List<LinkedFile> files = entry.getFiles();
 
+        boolean preserveCustomSuffix = options.contains(Option.PRESERVE_CUSTOM_SUFFIX);
         Optional<String> detectedOriginalPattern = preserveCustomSuffix
                                                    ? detectOriginalPattern(files)
                                                    : Optional.empty();
 
         boolean changed = false;
         for (LinkedFile file : files) {
-            if (onlyRelativePaths && Path.of(file.getLink()).isAbsolute()) {
+            if (options.contains(Option.ONLY_RELATIVE_PATHS) && Path.of(file.getLink()).isAbsolute()) {
                 continue;
             }
 
-            if (onlyPdfFiles && !isPdf(file)) {
+            if (options.contains(Option.ONLY_PDF_FILES) && !isPdf(file)) {
                 continue;
             }
 
@@ -98,8 +94,12 @@ public class RenamePdfCleanup implements CleanupJob {
         return cleanup(entry, Runnable::run);
     }
 
-    /// Determines whether the linked file is a PDF, based on its file extension.
+    /// Determines whether the linked file is a PDF, preferring JabRef's `fileType` classification and falling back
+    /// to the filename extension for legacy entries that have no `fileType` recorded.
     private static boolean isPdf(LinkedFile file) {
+        if (StandardFileType.PDF.getName().equalsIgnoreCase(file.getFileType())) {
+            return true;
+        }
         return FileUtil.getFileExtension(file.getLink())
                        .map(extension -> extension.equalsIgnoreCase(PDF_EXTENSION))
                        .orElse(false);
@@ -118,9 +118,16 @@ public class RenamePdfCleanup implements CleanupJob {
             return Optional.empty();
         }
 
+        // getFileName() safely handles empty links and URLs; only present, non-blank base names can be compared.
         List<String> baseNames = files.stream()
-                                      .map(file -> FileUtil.getBaseName(file.getLink()))
+                                      .map(LinkedFile::getFileName)
+                                      .flatMap(Optional::stream)
+                                      .map(FileUtil::getBaseName)
+                                      .filter(name -> !name.isBlank())
                                       .toList();
+        if (baseNames.size() < 2) {
+            return Optional.empty();
+        }
         return Optional.of(commonLeadingTokenPrefix(baseNames));
     }
 

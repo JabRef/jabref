@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -53,7 +54,7 @@ class RenamePdfCleanupTest {
 
         filePreferences = mock(FilePreferences.class);
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true); // Set Biblocation as Primary Directory, otherwise the tmp folders won't be cleaned up correctly
-        cleanup = new RenamePdfCleanup(false, () -> context, filePreferences);
+        cleanup = new RenamePdfCleanup(EnumSet.noneOf(RenamePdfCleanup.Option.class), () -> context, filePreferences);
     }
 
     /// Test for #466
@@ -154,10 +155,10 @@ class RenamePdfCleanupTest {
         Path path = testFolder.resolve("Toot-fig6.jpg");
         Files.createFile(path);
         LinkedFile fileField = new LinkedFile("", Path.of("Toot-fig6.jpg"), "");
-        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
+        entry.withField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
 
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        RenamePdfCleanup onlyPdfCleanup = new RenamePdfCleanup(false, true, () -> context, filePreferences);
+        RenamePdfCleanup onlyPdfCleanup = new RenamePdfCleanup(EnumSet.of(RenamePdfCleanup.Option.ONLY_PDF_FILES), () -> context, filePreferences);
         onlyPdfCleanup.cleanup(entry);
 
         // The non-PDF supplementary file keeps its original (custom) name.
@@ -169,11 +170,11 @@ class RenamePdfCleanupTest {
         Path path = testFolder.resolve("Toot.pdf");
         Files.createFile(path);
         LinkedFile fileField = new LinkedFile("", Path.of("Toot.pdf"), "PDF");
-        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
-        entry.setField(StandardField.TITLE, "test title");
+        entry.withField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField))
+             .withField(StandardField.TITLE, "test title");
 
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey] - [fulltitle]");
-        RenamePdfCleanup onlyPdfCleanup = new RenamePdfCleanup(false, true, () -> context, filePreferences);
+        RenamePdfCleanup onlyPdfCleanup = new RenamePdfCleanup(EnumSet.of(RenamePdfCleanup.Option.ONLY_PDF_FILES), () -> context, filePreferences);
         onlyPdfCleanup.cleanup(entry);
 
         LinkedFile newFileField = new LinkedFile("", Path.of("Toot - test title.pdf"), "PDF");
@@ -186,12 +187,12 @@ class RenamePdfCleanupTest {
         Files.createFile(testFolder.resolve("Toot.tmp"));
         LinkedFile relativePdf = new LinkedFile("", Path.of("Toot.pdf"), "PDF");
         LinkedFile relativeNonPdf = new LinkedFile("", Path.of("Toot.tmp"), "");
-        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(Arrays.asList(relativePdf, relativeNonPdf)));
-        entry.setField(StandardField.TITLE, "test title");
+        entry.withField(StandardField.FILE, FileFieldWriter.getStringRepresentation(Arrays.asList(relativePdf, relativeNonPdf)))
+             .withField(StandardField.TITLE, "test title");
 
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey] - [fulltitle]");
         // Both modifiers active: only files that are both relative and PDF are renamed.
-        RenamePdfCleanup onlyRelativePdf = new RenamePdfCleanup(true, true, () -> context, filePreferences);
+        RenamePdfCleanup onlyRelativePdf = new RenamePdfCleanup(EnumSet.of(RenamePdfCleanup.Option.ONLY_RELATIVE_PATHS, RenamePdfCleanup.Option.ONLY_PDF_FILES), () -> context, filePreferences);
         onlyRelativePdf.cleanup(entry);
 
         // The relative PDF is renamed; the non-PDF file (although relative) is left untouched.
@@ -206,10 +207,10 @@ class RenamePdfCleanupTest {
         Path path = testFolder.resolve("Toot-fig6.jpg");
         Files.createFile(path);
         LinkedFile fileField = new LinkedFile("", Path.of("Toot-fig6.jpg"), "");
-        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
+        entry.withField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
 
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        RenamePdfCleanup preserveSuffixCleanup = new RenamePdfCleanup(false, false, true, () -> context, filePreferences);
+        RenamePdfCleanup preserveSuffixCleanup = new RenamePdfCleanup(EnumSet.of(RenamePdfCleanup.Option.PRESERVE_CUSTOM_SUFFIX), () -> context, filePreferences);
         preserveSuffixCleanup.cleanup(entry);
 
         // The "-fig6" suffix is kept instead of being collapsed onto the plain pattern, so nothing changes.
@@ -221,10 +222,10 @@ class RenamePdfCleanupTest {
         Path path = testFolder.resolve("Toot-fig6.jpg");
         Files.createFile(path);
         LinkedFile fileField = new LinkedFile("", Path.of("Toot-fig6.jpg"), "");
-        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
+        entry.withField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
 
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        RenamePdfCleanup defaultCleanup = new RenamePdfCleanup(false, false, false, () -> context, filePreferences);
+        RenamePdfCleanup defaultCleanup = new RenamePdfCleanup(EnumSet.noneOf(RenamePdfCleanup.Option.class), () -> context, filePreferences);
         defaultCleanup.cleanup(entry);
 
         // Default (historical) behavior: the file is renamed onto the plain pattern, dropping "-fig6".
@@ -242,7 +243,7 @@ class RenamePdfCleanupTest {
         entry.setFiles(List.of(file1, file2));
 
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        RenamePdfCleanup preserveSuffixCleanup = new RenamePdfCleanup(false, false, true, () -> context, filePreferences);
+        RenamePdfCleanup preserveSuffixCleanup = new RenamePdfCleanup(EnumSet.of(RenamePdfCleanup.Option.PRESERVE_CUSTOM_SUFFIX), () -> context, filePreferences);
         preserveSuffixCleanup.cleanup(entry);
 
         // The shared "ogart" prefix is detected as the original pattern, so each "-testN" suffix survives onto the new key.
@@ -257,6 +258,15 @@ class RenamePdfCleanupTest {
     }
 
     @Test
+    void detectOriginalPatternHandlesEmptyLinksWithoutCrashing() {
+        // Empty links yield no usable base name, leaving fewer than two names to compare, so detection is skipped.
+        assertEquals(Optional.empty(),
+                RenamePdfCleanup.detectOriginalPattern(List.of(
+                        new LinkedFile("", "", ""),
+                        new LinkedFile("", "Toot-fig6.jpg", ""))));
+    }
+
+    @Test
     void cleanupPreserveCustomSuffixHandlesFileNamesWithMultipleDashes() throws IOException {
         // The shared pattern itself contains a dash ("paper-2020"); only the trailing "-figN"/"-tblN" is a custom suffix.
         Files.createFile(testFolder.resolve("paper-2020-fig6.jpg"));
@@ -266,7 +276,7 @@ class RenamePdfCleanupTest {
         entry.setFiles(List.of(file1, file2));
 
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        RenamePdfCleanup preserveSuffixCleanup = new RenamePdfCleanup(false, false, true, () -> context, filePreferences);
+        RenamePdfCleanup preserveSuffixCleanup = new RenamePdfCleanup(EnumSet.of(RenamePdfCleanup.Option.PRESERVE_CUSTOM_SUFFIX), () -> context, filePreferences);
         preserveSuffixCleanup.cleanup(entry);
 
         // Only the token after the shared "paper-2020" prefix is treated as the custom suffix and survives onto the new key.
@@ -284,7 +294,7 @@ class RenamePdfCleanupTest {
         entry.setFiles(List.of(file1, file2));
 
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        RenamePdfCleanup preserveSuffixCleanup = new RenamePdfCleanup(false, false, true, () -> context, filePreferences);
+        RenamePdfCleanup preserveSuffixCleanup = new RenamePdfCleanup(EnumSet.of(RenamePdfCleanup.Option.PRESERVE_CUSTOM_SUFFIX), () -> context, filePreferences);
         preserveSuffixCleanup.cleanup(entry);
 
         assertEquals(List.of("Toot-fig6.jpg", "Toot-fig8.jpg"),
@@ -301,7 +311,7 @@ class RenamePdfCleanupTest {
         entry.setFiles(List.of(file1, file2));
 
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        RenamePdfCleanup preserveSuffixCleanup = new RenamePdfCleanup(false, false, true, () -> context, filePreferences);
+        RenamePdfCleanup preserveSuffixCleanup = new RenamePdfCleanup(EnumSet.of(RenamePdfCleanup.Option.PRESERVE_CUSTOM_SUFFIX), () -> context, filePreferences);
         preserveSuffixCleanup.cleanup(entry);
 
         assertEquals(List.of("Toot.jpg", "Toot.pdf"),
@@ -318,7 +328,7 @@ class RenamePdfCleanupTest {
         entry.setFiles(List.of(nonPdf, pdf));
 
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        RenamePdfCleanup onlyPdfPreserveSuffix = new RenamePdfCleanup(false, true, true, () -> context, filePreferences);
+        RenamePdfCleanup onlyPdfPreserveSuffix = new RenamePdfCleanup(EnumSet.of(RenamePdfCleanup.Option.ONLY_PDF_FILES, RenamePdfCleanup.Option.PRESERVE_CUSTOM_SUFFIX), () -> context, filePreferences);
         onlyPdfPreserveSuffix.cleanup(entry);
 
         // The shared "paper" prefix is still detected across both files, but only the PDF is renamed (keeping its suffix).
