@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -15,10 +16,12 @@ import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.ZbMathQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -27,9 +30,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.search.query.BaseQueryNode;
 
-import kong.unirest.core.HttpResponse;
-import kong.unirest.core.JsonNode;
-import kong.unirest.core.Unirest;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
@@ -38,15 +38,21 @@ import org.jspecify.annotations.NonNull;
 /// Fetches data from the Zentralblatt Math (https://www.zbmath.org/)
 public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, EntryBasedParserFetcher {
 
+    private static final String CITATION_MATCHING_URL = "https://zbmath.org/citationmatching/match";
+    private static final String BIBTEX_OUTPUT_URL = "https://zbmath.org/bibtexoutput/";
+
     private final ImportFormatPreferences preferences;
+    private final String citationMatchingUrl;
+    private final String bibtexOutputUrl;
 
     public ZbMATH(@NonNull ImportFormatPreferences preferences) {
+        this(preferences, CITATION_MATCHING_URL, BIBTEX_OUTPUT_URL);
+    }
+
+    ZbMATH(@NonNull ImportFormatPreferences preferences, String citationMatchingUrl, String bibtexOutputUrl) {
         this.preferences = preferences;
-        try {
-            Class.forName("org.jabref.logic.net.URLDownload");
-        } catch (ClassNotFoundException e) {
-            // Should not happen
-        }
+        this.citationMatchingUrl = citationMatchingUrl;
+        this.bibtexOutputUrl = bibtexOutputUrl;
     }
 
     @Override
@@ -67,7 +73,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
             return getUrlForIdentifier(zblidInEntry.get());
         }
 
-        URIBuilder uriBuilder = new URIBuilder("https://zbmath.org/citationmatching/match");
+        URIBuilder uriBuilder = new URIBuilder(citationMatchingUrl);
         uriBuilder.addParameter("n", "1"); // return only the best matching entry
         uriBuilder.addParameter("m", "5"); // return only entries with a score of at least 5
 
@@ -93,40 +99,33 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         citation matching API to extract the zbl_id and then use getUrlForIdentifier
         to get the bibtex data.
          */
-        String urlString = uriBuilder.build().toString();
-        HttpResponse<JsonNode> response = Unirest.get(urlString)
-                                                 .asJson();
-        if (response.getStatus() != 200) {
-            throw new FetcherException("Error response from zbMATH: HTTP " + response.getStatus());
-        }
-        if (response.getBody() == null) {
-            throw new FetcherException("Empty response body from zbMATH");
-        }
-        JSONObject root = response.getBody().getObject();
-        if (root == null) {
-            throw new FetcherException("Invalid JSON response from zbMATH");
-        }
+        JSONObject root = getCitationMatchingResponse(uriBuilder.build().toURL());
         JSONArray results = root.optJSONArray("results");
         if (results == null) {
             throw new FetcherException("Missing 'results' field in zbMATH response");
         }
 
-        String zblid = "";
-        if (!results.isEmpty()) {
-            zblid = results.getJSONObject(0).optString("zbl_id");
-        }
-
-        if (StringUtil.isBlank(zblid)) {
+        if (results.isEmpty()) {
             // citation matching API found no matching entry
             throw new ZbMathNoUrlException("No matching entry found in zbMATH");
-        } else {
-            return getUrlForIdentifier(zblid);
         }
+
+        JSONObject bestResult = results.optJSONObject(0);
+        if (bestResult == null) {
+            throw new FetcherException("Invalid result in zbMATH response");
+        }
+
+        String zblid = bestResult.optString("zbl_id");
+        if (StringUtil.isBlank(zblid)) {
+            throw new FetcherException("Missing 'zbl_id' field in zbMATH response");
+        }
+
+        return getUrlForIdentifier(zblid);
     }
 
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
-        URIBuilder uriBuilder = new URIBuilder("https://zbmath.org/bibtexoutput/");
+        URIBuilder uriBuilder = new URIBuilder(bibtexOutputUrl);
         uriBuilder.addParameter("q", new ZbMathQueryTransformer().transformSearchQuery(queryNode).orElse("")); // search all fields
         uriBuilder.addParameter("start", "0"); // start index
         uriBuilder.addParameter("count", "200"); // should return up to 200 items (instead of default 100)
@@ -135,7 +134,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
 
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
-        URIBuilder uriBuilder = new URIBuilder("https://zbmath.org/bibtexoutput/");
+        URIBuilder uriBuilder = new URIBuilder(bibtexOutputUrl);
         String query = "an:".concat(identifier); // use an: to search for a zbMATH identifier
         uriBuilder.addParameter("q", query);
         uriBuilder.addParameter("start", "0"); // start index
@@ -168,6 +167,18 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
     public static class ZbMathNoUrlException extends FetcherException {
         public ZbMathNoUrlException(String errorMessage) {
             super(errorMessage);
+        }
+    }
+
+    private JSONObject getCitationMatchingResponse(URL url) throws FetcherException {
+        try (InputStream stream = getUrlDownload(url).asInputStream()) {
+            return JsonReader.toJsonObject(stream);
+        } catch (ParseException e) {
+            throw new FetcherException("Invalid JSON response from zbMATH", e);
+        } catch (FetcherException e) {
+            throw new FetcherException("Error response from zbMATH", e);
+        } catch (java.io.IOException e) {
+            throw new FetcherException("Could not read response from zbMATH", e);
         }
     }
 }

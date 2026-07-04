@@ -55,4 +55,3 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher, ParserFetche
         }
     }
 }
-
