@@ -101,12 +101,12 @@ tasks.named<JavaExec>("run") {
     enableAssertions = true
 }
 
-val embeddedPostgresBinaryByTarget = mapOf(
-    "ubuntu-22.04" to "embedded.postgres.binaries.linux.amd64",
-    "ubuntu-22.04-arm" to "embedded.postgres.binaries.linux.arm64v8",
-    "macos-15-intel" to "embedded.postgres.binaries.darwin.amd64",
-    "macos-15" to "embedded.postgres.binaries.darwin.arm64v8",
-    "windows-latest" to "embedded.postgres.binaries.windows.amd64"
+val embeddedPostgresBinaryByJpackageTask = mapOf(
+    "jpackageUbuntu-22.04" to "embedded.postgres.binaries.linux.amd64",
+    "jpackageUbuntu-22.04-arm" to "embedded.postgres.binaries.linux.arm64v8",
+    "jpackageMacos-15-intel" to "embedded.postgres.binaries.darwin.amd64",
+    "jpackageMacos-15" to "embedded.postgres.binaries.darwin.arm64v8",
+    "jpackageWindows-latest" to "embedded.postgres.binaries.windows.amd64"
 )
 
 val embeddedPostgresDependencyByTarget = mapOf(
@@ -223,9 +223,10 @@ dependencies {
     }
 }
 
-tasks.withType<Jpackage>().configureEach {
-    embeddedPostgresBinaryByTarget[name.removePrefix("jpackage").replaceFirstChar { it.lowercase() }]
-        ?.let { addModules.add(it) }
+embeddedPostgresBinaryByJpackageTask.forEach { (taskName, moduleName) ->
+    tasks.named<Jpackage>(taskName) {
+        addModules.add(moduleName)
+    }
 }
 
 tasks.test {
