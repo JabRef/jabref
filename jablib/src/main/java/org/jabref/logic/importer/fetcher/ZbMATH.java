@@ -42,6 +42,11 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
 
     public ZbMATH(@NonNull ImportFormatPreferences preferences) {
         this.preferences = preferences;
+        try {
+            Class.forName("org.jabref.logic.net.URLDownload");
+        } catch (ClassNotFoundException e) {
+            // Should not happen
+        }
     }
 
     @Override

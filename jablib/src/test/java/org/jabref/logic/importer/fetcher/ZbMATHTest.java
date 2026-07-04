@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -28,7 +29,6 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,26 +41,10 @@ class ZbMATHTest {
 
     @BeforeEach
     void setUp(@TempDir Path tempDir) throws Exception {
+        Class.forName(URLDownload.class.getName());
+
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
-
-        fetcher = Mockito.spy(new ZbMATH(importFormatPreferences));
-
-        donaldsonEntry = new BibEntry();
-        donaldsonEntry.setType(StandardEntryType.Article);
-        donaldsonEntry.setCitationKey("zbMATH03800580");
-        donaldsonEntry.setField(StandardField.AUTHOR, "Donaldson, S. K.");
-        donaldsonEntry.setField(StandardField.JOURNAL, "Journal of Differential Geometry");
-        donaldsonEntry.setField(StandardField.DOI, "10.4310/jdg/1214437665");
-        donaldsonEntry.setField(StandardField.ISSN, "0022-040X");
-        donaldsonEntry.setField(StandardField.LANGUAGE, "English");
-        donaldsonEntry.setField(StandardField.KEYWORDS, "57N13,57R10,53C05,58J99,57R65");
-        donaldsonEntry.setField(StandardField.PAGES, "279--315");
-        donaldsonEntry.setField(StandardField.TITLE, "An application of gauge theory to four dimensional topology");
-        donaldsonEntry.setField(StandardField.VOLUME, "18");
-        donaldsonEntry.setField(StandardField.YEAR, "1983");
-        donaldsonEntry.setField(StandardField.ZBL_NUMBER, "0507.57010");
-        donaldsonEntry.setField(new UnknownField("zbmath"), "3800580");
 
         Path bibtexFile = tempDir.resolve("zbmath_bibtex.bib");
         Files.writeString(bibtexFile, """
@@ -81,11 +65,41 @@ class ZbMATHTest {
                 """);
         bibtexFileUrl = bibtexFile.toUri().toURL();
 
-        Mockito.doReturn(bibtexFileUrl).when(fetcher).getUrlForIdentifier(anyString());
-        Mockito.doReturn(bibtexFileUrl).when(fetcher).getURLForQuery(any());
+        fetcher = new ZbMATH(importFormatPreferences) {
+            @Override
+            public URL getUrlForIdentifier(String identifier) {
+                return bibtexFileUrl;
+            }
+
+            @Override
+            public URL getURLForQuery(org.jabref.model.search.query.BaseQueryNode queryNode) {
+                return bibtexFileUrl;
+            }
+        };
+
+        donaldsonEntry = new BibEntry();
+        donaldsonEntry.setType(StandardEntryType.Article);
+        donaldsonEntry.setCitationKey("zbMATH03800580");
+        donaldsonEntry.setField(StandardField.AUTHOR, "Donaldson, S. K.");
+        donaldsonEntry.setField(StandardField.JOURNAL, "Journal of Differential Geometry");
+        donaldsonEntry.setField(StandardField.DOI, "10.4310/jdg/1214437665");
+        donaldsonEntry.setField(StandardField.ISSN, "0022-040X");
+        donaldsonEntry.setField(StandardField.LANGUAGE, "English");
+        donaldsonEntry.setField(StandardField.KEYWORDS, "57N13,57R10,53C05,58J99,57R65");
+        donaldsonEntry.setField(StandardField.PAGES, "279--315");
+        donaldsonEntry.setField(StandardField.TITLE, "An application of gauge theory to four dimensional topology");
+        donaldsonEntry.setField(StandardField.VOLUME, "18");
+        donaldsonEntry.setField(StandardField.YEAR, "1983");
+        donaldsonEntry.setField(StandardField.ZBL_NUMBER, "0507.57010");
+        donaldsonEntry.setField(new UnknownField("zbmath"), "3800580");
     }
 
-    private void mockUnirest(boolean isEmptySearch, org.junit.jupiter.api.function.Executable testRunnable) throws Exception {
+    @FunctionalInterface
+    interface FetchingTestRunnable {
+        void run() throws FetcherException;
+    }
+
+    private void mockUnirest(boolean isEmptySearch, FetchingTestRunnable testRunnable) throws FetcherException {
         try (MockedStatic<Unirest> unirestMock = Mockito.mockStatic(Unirest.class)) {
             GetRequest getRequest = mock(GetRequest.class);
             unirestMock.when(() -> Unirest.get(anyString())).thenReturn(getRequest);
@@ -108,14 +122,7 @@ class ZbMATHTest {
             jsonObject.put("results", resultsArray);
             when(jsonNode.getObject()).thenReturn(jsonObject);
 
-            try {
-                testRunnable.execute();
-            } catch (Throwable e) {
-                if (e instanceof Exception exception) {
-                    throw exception;
-                }
-                throw new RuntimeException(e);
-            }
+            testRunnable.run();
         }
     }
 
@@ -132,7 +139,7 @@ class ZbMATHTest {
     }
 
     @Test
-    void searchByEntryFindsEntry() throws Exception {
+    void searchByEntryFindsEntry() throws FetcherException {
         BibEntry searchEntry = new BibEntry();
         searchEntry.setField(StandardField.TITLE, "An application of gauge theory to four dimensional topology");
         searchEntry.setField(StandardField.AUTHOR, "S. K. {Donaldson}");
@@ -144,7 +151,7 @@ class ZbMATHTest {
     }
 
     @Test
-    void searchByNoneEntryFindsNothing() throws Exception {
+    void searchByNoneEntryFindsNothing() throws FetcherException {
         BibEntry searchEntry = new BibEntry();
         searchEntry.setField(StandardField.TITLE, "t");
         searchEntry.setField(StandardField.AUTHOR, "a");
