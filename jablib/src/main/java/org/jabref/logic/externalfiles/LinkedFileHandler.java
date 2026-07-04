@@ -38,9 +38,6 @@ public class LinkedFileHandler {
         this(linkedFile, entry, databaseContext, filePreferences, false);
     }
 
-    /// @param preserveCustomSuffix when {@code true}, a user-added suffix in the current file name (such as
-    ///                                                         `-fig6` in `key-fig6.jpg`) is re-appended to the pattern-generated name instead
-    ///                                                         of being collapsed onto the plain pattern (see issue #11358).
     public LinkedFileHandler(LinkedFile linkedFile,
                              BibEntry entry,
                              @NonNull BibDatabaseContext databaseContext,
@@ -49,13 +46,6 @@ public class LinkedFileHandler {
         this(linkedFile, entry, databaseContext, filePreferences, preserveCustomSuffix, Optional.empty());
     }
 
-    /// @param preserveCustomSuffix    when {@code true}, a user-added suffix in the current file name (such as
-    ///                                                               `-fig6` in `key-fig6.jpg`) is re-appended to the pattern-generated name instead
-    ///                                                               of being collapsed onto the plain pattern (see issue #11358).
-    /// @param detectedOriginalPattern the base name pattern that was originally applied to the entry's files, used to
-    ///                                                               locate the custom suffix even after the configured pattern changed (e.g. the
-    ///                                                               citation key was edited). When empty, the handler falls back to comparing the
-    ///                                                               current name against the freshly generated pattern.
     public LinkedFileHandler(LinkedFile linkedFile,
                              BibEntry entry,
                              @NonNull BibDatabaseContext databaseContext,
