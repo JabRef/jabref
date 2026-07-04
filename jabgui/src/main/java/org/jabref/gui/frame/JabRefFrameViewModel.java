@@ -134,10 +134,12 @@ public class JabRefFrameViewModel {
                                                  .map(LibraryTab::getBibDatabaseContext)
                                                  .map(BibDatabaseContext::getDatabasePath)
                                                  .flatMap(Optional::stream)
+                                                 .map(Path::toAbsolutePath)
                                                  .toList();
         Path focusedLibraries = Optional.ofNullable(tabContainer.getCurrentLibraryTab())
                                         .map(LibraryTab::getBibDatabaseContext)
                                         .flatMap(BibDatabaseContext::getDatabasePath)
+                                        .map(Path::toAbsolutePath)
                                         .orElse(null);
 
         // Then ask if the user really wants to close, if the library has not been saved since last save.
