@@ -1,10 +1,17 @@
 name: Package JabRef Component
-description: Package JabRef Component
+description: >
+  Post-processes and uploads a JabRef component: smoke test, archiving, renaming,
+  and uploads. This action is Gradle-free by design; all Gradle work (jpackage,
+  shadowJar) happens in the workflow in a single sequential invocation.
+  Thus, multiple instances of this action can safely run in parallel.
 
 inputs:
   component:
     required: true
   componentShort:
+    required: true
+  binaryName:
+    description: Name of the jpackage application image and its launcher (e.g., JabRef, jabkit)
     required: true
   branchName:
     required: true
@@ -14,8 +21,6 @@ inputs:
     required: true
   Minor:
     required: true
-  InformationalVersion:
-    required: true
   diskSpaceAvailable:
     required: true
   os:
@@ -23,8 +28,6 @@ inputs:
   displayName:
     required: true
   archivePortable:
-    required: true
-  shouldJbundle:
     required: true
   uploadAsArtifact:
     required: true
@@ -38,60 +41,58 @@ inputs:
   secretsPresent:
     required: true
 
-  # API keys
-  astrophysicsDataSystemApiKey:
-    required: true
-  biodiversityHeritageApiKey:
-    required: true
-  ieeeApiKey:
-    required: true
-  springerNatureApiKey:
-    required: true
-
 runs:
   using: composite
   steps:
-    - name: jpackage ${{ inputs.component }}
-      shell: bash
-      run: gradle -i :${{ inputs.component }}:jpackage
-      env:
-        VERSION: ${{ inputs.AssemblySemVer }}
-        VERSION_INFO: ${{ inputs.InformationalVersion }}
-        OSXCERT: ${{ inputs.secretsPresent }}
-        AstrophysicsDataSystemAPIKey: ${{ inputs.astrophysicsDataSystemApiKey }}
-        BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
-        IEEEAPIKey: ${{ inputs.ieeeApiKey }}
-        SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
     - name: Validate Signature
-      if: ${{ inputs.secretsPresent == 'true' && inputs.os == 'macos-latest' && inputs.component == 'jabgui' }}
+      if: inputs.secretsPresent == 'true' && startsWith(inputs.os, 'macos') && inputs.component == 'jabgui'
       shell: bash
+      # jpackage signs the .app bundle inside the dmg and the pkg itself;
+      # the dmg container is never signed (it is only notarized and stapled later).
       run: |
-        ls -la ${{ inputs.component }}/build/packages/${{ inputs.os }}/
-        codesign --verify --verbose ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.dmg
+        set -e
+        PACKAGE_DIR="${{ inputs.component }}/build/packages/${{ inputs.os }}"
+        ls -la "$PACKAGE_DIR"
+
+        MOUNT_DIR=$(mktemp -d)
+        # "echo Y" agrees to the license (SLA) embedded in the dmg, which hdiutil
+        # otherwise prompts for and aborts in non-interactive mode
+        echo "Y" | hdiutil attach "$PACKAGE_DIR"/*.dmg -nobrowse -readonly -mountpoint "$MOUNT_DIR"
+        codesign --verify --deep --strict --verbose=2 "$MOUNT_DIR/${{ inputs.binaryName }}.app"
+        codesign --display --verbose=2 "$MOUNT_DIR/${{ inputs.binaryName }}.app" 2>&1 | grep "Authority=Developer ID Application"
+        hdiutil detach "$MOUNT_DIR"
+
+        pkgutil --check-signature "$PACKAGE_DIR"/*.pkg
     - name: Smoke test ${{ inputs.component }}
       shell: bash
       run: |
-        gradle -i :${{ inputs.component }}:run --args="--help"
-      env:
-        VERSION: ${{ inputs.AssemblySemVer }}
-        VERSION_INFO: ${{ inputs.InformationalVersion }}
-        AstrophysicsDataSystemAPIKey: ${{ inputs.astrophysicsDataSystemApiKey }}
-        BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
-        IEEEAPIKey: ${{ inputs.ieeeApiKey }}
-        SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
+        set -e
+        PACKAGE_DIR="${{ inputs.component }}/build/packages/${{ inputs.os }}"
+        case "${{ inputs.os }}" in
+          windows*)
+            BINARY="$PACKAGE_DIR/${{ inputs.binaryName }}/${{ inputs.binaryName }}.exe"
+            ;;
+          macos*)
+            BINARY="$PACKAGE_DIR/${{ inputs.binaryName }}.app/Contents/MacOS/${{ inputs.binaryName }}"
+            ;;
+          *)
+            BINARY="$PACKAGE_DIR/${{ inputs.binaryName }}/bin/${{ inputs.binaryName }}"
+            ;;
+        esac
+        "$BINARY" --help
     - name: Package ${{ inputs.component }} application image
       shell: bash
-      if: ${{ inputs.archivePortable != 'NONE' }}
+      if: inputs.archivePortable != 'NONE'
       run: |
         set -e
         ${{ inputs.archivePortable }}
     - name: Rename files
       shell: pwsh
-      if: ${{ inputs.archivePortable != 'NONE' }}
+      if: inputs.archivePortable != 'NONE'
       run: |
         get-childitem -Path '${{ inputs.component }}/build/packages/*/*' | rename-item -NewName {$_.name -replace "${{ inputs.AssemblySemVer }}","${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}"}
     - name: Repack deb file for Debian
-      if: ${{ (startsWith(inputs.os, 'ubuntu')) && (inputs.component == 'jabgui') }}
+      if: (startsWith(inputs.os, 'ubuntu')) && (inputs.component == 'jabgui')
       shell: bash
       run: |
         cd ${{ inputs.component }}/build/packages/${{ inputs.os }}
@@ -105,7 +106,7 @@ runs:
         mv -f jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}${{ inputs.archForDebianRepack }}_repackaged.deb jabref_${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}.deb
     - name: Upload ${{ inputs.component }} packages to GitHub
       # background: true
-      if: ${{ inputs.uploadAsArtifact == 'true' && (inputs.archivePortable != 'NONE') }}
+      if: (inputs.uploadAsArtifact == 'true') && (inputs.archivePortable != 'NONE')
       uses: actions/upload-artifact@v7
       with:
         name: ${{ inputs.componentShort }} (${{ inputs.displayName }})
@@ -113,38 +114,28 @@ runs:
           ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.*
     - name: Upload ${{ inputs.component }} to builds.jabref.org (Linux, macOS)
       # background: true
-      if: ${{ (inputs.diskSpaceAvailable == 'true') && (startsWith(inputs.os, 'macos') || startsWith(inputs.os, 'ubuntu')) && (inputs.archivePortable != 'NONE') }}
+      if: (inputs.diskSpaceAvailable == 'true') && (startsWith(inputs.os, 'macos') || startsWith(inputs.os, 'ubuntu')) && (inputs.archivePortable != 'NONE')
       shell: bash
       run: |
         rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}${{ inputs.subdir }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}${{ inputs.subdir }}/
     - name: Upload ${{ inputs.component }} to builds.jabref.org (Windows)
       # background: true
       # jabsrv-cli doesn't have any installer and no archivePortable; thus we do not upload
-      if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'windows-latest') && (inputs.archivePortable != 'NONE') }}
+      if: (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'windows-latest') && (inputs.archivePortable != 'NONE')
       shell: cmd
       # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
       run: |
         rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}${{ inputs.subdir }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/packages/${{ inputs.os }}/*.* jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}${{ inputs.subdir }}/
 
-    - name: ShadowJar ${{ inputs.component }}
-      if: ${{ (inputs.os == 'ubuntu-22.04') }}
-      shell: bash
-      run: gradle -i :${{ inputs.component }}:shadowJar
-      env:
-        VERSION: ${{ inputs.AssemblySemVer }}
-        VERSION_INFO: ${{ inputs.InformationalVersion }}
-        AstrophysicsDataSystemAPIKey: ${{ inputs.astrophysicsDataSystemApiKey }}
-        BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
-        IEEEAPIKey: ${{ inputs.ieeeApiKey }}
-        SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
+    # The shadowJar itself is built in the workflow's single Gradle invocation
     - name: Rename ShadowJar
-      if: ${{ (inputs.os == 'ubuntu-22.04') }}
+      if: (inputs.os == 'ubuntu-22.04')
       shell: pwsh
       run: |
         get-childitem -Path '${{ inputs.component }}/build/libs/*-all.jar' | rename-item -NewName {$_.name -replace "${{ inputs.AssemblySemVer }}","${{ inputs.Major }}.${{ inputs.Minor }}${{ inputs.suffix }}"}
     - name: Upload ShadowJar to GitHub
       # background: true
-      if: ${{ (inputs.uploadAsArtifact == 'true') && (inputs.os == 'ubuntu-22.04') }}
+      if: (inputs.uploadAsArtifact == 'true') && (inputs.os == 'ubuntu-22.04')
       uses: actions/upload-artifact@v7
       with:
         name: ${{ inputs.componentShort }} (${{ inputs.displayName }}) (shadowJar)
@@ -152,50 +143,7 @@ runs:
           ${{ inputs.component }}/build/libs/*-all.jar
     - name: Upload ${{ inputs.componentShort }} ShadowJar to builds.jabref.org (Linux)
       # background: true
-      if: ${{ (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'ubuntu-22.04') }}
+      if: (inputs.diskSpaceAvailable == 'true') && (inputs.os == 'ubuntu-22.04')
       shell: bash
       run: |
         rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' ${{ inputs.component }}/build/libs/*-all.jar jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}${{ inputs.subdir }}/
-
-    - name: jbundle ${{ inputs.component }}
-      if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.shouldJbundle == 'true') }}
-      shell: bash
-      run: |
-        jbundle build --no-appcds --input . --gradle-project ${{ inputs.component }} --output ./build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }}
-      # Version information passed as environment variables, because jbundle does not support gradle properties
-      # See https://github.com/avelino/jbundle/issues/59
-      env:
-        VERSION: ${{ inputs.AssemblySemVer }}
-        VERSION_INFO: ${{ inputs.InformationalVersion }}
-        AstrophysicsDataSystemAPIKey: ${{ inputs.astrophysicsDataSystemApiKey }}
-        BiodiversityHeritageApiKey: ${{ inputs.biodiversityHeritageApiKey }}
-        IEEEAPIKey: ${{ inputs.ieeeApiKey }}
-        SpringerNatureAPIKey: ${{ inputs.springerNatureApiKey }}
-    - name: jbundle JabGui filename fix (Windows)
-      # if: ${{ inputs.os == 'windows-latest' }}
-      if: false
-      shell: bash
-      run: |
-        mv build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }} build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }}.exe
-    - name: Test jbundle binary (smoke test)
-      if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.shouldJbundle == 'true') }}
-      shell: bash
-      run: |
-        build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }} --help
-    - name: Upload jbundle artifact to GitHub
-      # background: true
-      if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.uploadAsArtifact == 'true') && (inputs.shouldJbundle == 'true') }}
-      uses: actions/upload-artifact@v7
-      with:
-        name: jbundle-${{ inputs.componentShort }}-${{ inputs.displayName }}
-        path: build/jbundle/${{ inputs.componentShort }}*
-    - name: Upload jbundle artifact to builds.jabref.org
-      # background: true
-      if: ${{ (inputs.os == 'ubuntu-22.04') && (inputs.diskSpaceAvailable == 'true') && (inputs.shouldJbundle == 'true') }}
-      shell: bash
-      run: |
-        rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats \
-          --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/jbundle && rsync" \
-          -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' \
-          build/jbundle/${{ inputs.componentShort }}-${{ inputs.displayName }}* \
-          jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ inputs.branchName }}/${{ inputs.displayName }}/jbundle/
