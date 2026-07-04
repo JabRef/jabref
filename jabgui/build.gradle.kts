@@ -225,7 +225,7 @@ dependencies {
 
 embeddedPostgresBinaryByJpackageTask.forEach { (taskName, moduleName) ->
     tasks.named<Jpackage>(taskName) {
-        addModules.add(moduleName)
+        addModules.addAll(moduleName, "jdk.incubator.vector")
     }
 }
 
