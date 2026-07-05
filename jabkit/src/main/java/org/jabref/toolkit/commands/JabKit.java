@@ -31,8 +31,10 @@ public class JabKit implements Runnable {
     protected final CliPreferences cliPreferences;
     protected final BibEntryTypesManager entryTypesManager;
 
+    /// Left uninitialized so picocli's factory supplies the same shared instance
+    /// used by every (sub)command in the tree; see JabKitLauncher.
     @Mixin
-    private SharedOptions sharedOptions = new SharedOptions();
+    private SharedOptions sharedOptions;
 
     @Option(names = {"-v", "--version"}, versionHelp = true, description = "display version info")
     private boolean versionInfoRequested;

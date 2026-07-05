@@ -79,7 +79,20 @@ public class JabKitLauncher {
             Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
 
             JabKit jabKit = new JabKit(preferences, entryTypesManager);
-            CommandLine commandLine = new CommandLine(jabKit);
+            // All (sub)commands mix in JabKit.SharedOptions to allow -p/-d/-h at any command depth.
+            // Resolving them through one shared instance (instead of picocli's default of one instance
+            // per mixin site) ensures e.g. `jabkit -p check consistency` and `jabkit check consistency -p`
+            // both enable porcelain output, instead of setting an unrelated, unread copy of the flag.
+            JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+            CommandLine commandLine = new CommandLine(jabKit, new CommandLine.IFactory() {
+                @Override
+                public <K> K create(Class<K> cls) throws Exception {
+                    if (cls == JabKit.SharedOptions.class) {
+                        return cls.cast(sharedOptions);
+                    }
+                    return CommandLine.defaultFactory().create(cls);
+                }
+            });
             commandLine.setExecutionExceptionHandler(new CliExceptionHandler(commandLine.getExecutionExceptionHandler()));
             // [impl->req~jabkit.cli.banner-shown~1]
             String usageHeader = BuildInfo.JABREF_BANNER.formatted(buildInfo.version) + "\n" + JABKIT_BRAND;
@@ -169,9 +182,9 @@ public class JabKitLauncher {
 
         // We must configure logging as soon as possible, which is why we cannot wait for the usual
         // argument parsing workflow to parse logging options e.g. --debug or --porcelain
-        boolean isPorcelain = Arrays.stream(args).anyMatch("--porcelain"::equalsIgnoreCase);
+        boolean isPorcelain = Arrays.stream(args).anyMatch(arg -> "--porcelain".equalsIgnoreCase(arg) || "-p".equalsIgnoreCase(arg));
         Level logLevel;
-        if (Arrays.stream(args).anyMatch("--debug"::equalsIgnoreCase)) {
+        if (Arrays.stream(args).anyMatch(arg -> "--debug".equalsIgnoreCase(arg) || "-d".equalsIgnoreCase(arg))) {
             logLevel = Level.DEBUG;
         } else {
             logLevel = Level.INFO;
