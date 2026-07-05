@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.prefs.BackingStoreException;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
@@ -42,7 +41,6 @@ import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
-import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.ExportPreferences;
@@ -88,6 +86,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     public static final String PREVIEW_COVER_IMAGE_DOWNLOAD = "coverDownload";
     // endregion
 
+    // region keybindings - public because needed for pref migration
+    public static final String BIND_NAMES = "bindNames";
+    public static final String BINDINGS = "bindings";
+    // endregion
+
     // region column names
     // public because of migration
     // Variable names have changed to ensure backward compatibility with pre 5.0 releases of JabRef
@@ -99,11 +102,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // The column list spans the COLUMN_NAMES/COLUMN_WIDTHS/COLUMN_SORT_TYPES keys above; this synthetic key is never
     // written to the backing store and only serves as the binding's reporting key in getPreferences()/getDefaults().
     private static final String MAIN_TABLE_COLUMNS = "mainTableColumns";
-    // endregion
-
-    // region keybindings - public because needed for pref migration
-    public static final String BIND_NAMES = "bindNames";
-    public static final String BINDINGS = "bindings";
     // endregion
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiPreferences.class);
@@ -299,8 +297,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     @Override
-    public void clear() throws BackingStoreException {
-        // ensure registration of bindings
+    protected void initializeAll() {
+        super.initializeAll();
         getCopyToPreferences();
         getEntryEditorPreferences();
         getMergeDialogPreferences();
@@ -320,34 +318,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getNewEntryPreferences();
         getDonationPreferences();
         getMrDlibPreferences();
-
-        super.clear();
-    }
-
-    @Override
-    public void importPreferences(Path path) throws JabRefException {
-        // ensure registration of bindings
-        getCopyToPreferences();
-        getEntryEditorPreferences();
-        getMergeDialogPreferences();
-        getAutoCompletePreferences();
-        getGuiPreferences();
-        getWorkspacePreferences();
-        getUnlinkedFilesDialogPreferences();
-        getSidePanePreferences();
-        getExternalApplicationsPreferences();
-        getGroupsPreferences();
-        getSpecialFieldsPreferences();
-        getPreviewPreferences();
-        getNameDisplayPreferences();
-        getMainTableColumnPreferences();
-        getMainTablePreferences();
-        getSearchDialogColumnPreferences();
-        getNewEntryPreferences();
-        getDonationPreferences();
-        getMrDlibPreferences();
-
-        super.importPreferences(path);
     }
 
     // region CopyToPreferences

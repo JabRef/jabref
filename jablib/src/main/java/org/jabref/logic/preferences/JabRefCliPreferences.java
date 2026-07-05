@@ -1065,35 +1065,7 @@ public class JabRefCliPreferences implements CliPreferences {
         PREFS_NODE.clear();
         new SharedDatabasePreferences().clear();
 
-        // ensure registration of bindings
-        getInternalPreferences();
-        getFieldPreferences();
-        getFilePreferences();
-        getProxyPreferences();
-        getLibraryPreferences();
-        getDOIPreferences();
-        getOwnerPreferences();
-        getTimestampPreferences();
-        getRemotePreferences();
-        getPushToApplicationPreferences();
-        getAbbreviationPreferences();
-        getGitPreferences();
-        getSSLPreferences();
-        getBibEntryPreferences();
-        getCitationKeyPatternPreferences();
-        getAutoLinkPreferences();
-        getExportPreferences();
-        getCleanupPreferences();
-        getLastFilesOpenedPreferences();
-        getAiPreferences();
-        getOcrPreferences();
-        getSearchPreferences();
-        getXmpPreferences();
-        getProtectedTermsPreferences();
-        getNameFormatterPreferences();
-        getImporterPreferences();
-        getGrobidPreferences();
-        getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences()));
+        initializeAll();
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
@@ -1106,7 +1078,14 @@ public class JabRefCliPreferences implements CliPreferences {
     public void importPreferences(Path path) throws JabRefException {
         importPreferencesToBackingStore(path);
 
-        // ensure registration of bindings
+        initializeAll();
+
+        allBindings.forEach(binding -> binding.importFromStore().run());
+    }
+
+    /// Instantiates every preference group so its bindings are registered in [#allBindings] before a bulk reset/import
+    /// runs. Overridden by subclasses to additionally register their own preference groups.
+    protected void initializeAll() {
         getInternalPreferences();
         getFieldPreferences();
         getFilePreferences();
@@ -1135,8 +1114,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getImporterPreferences();
         getGrobidPreferences();
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences()));
-
-        allBindings.forEach(binding -> binding.importFromStore().run());
     }
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
