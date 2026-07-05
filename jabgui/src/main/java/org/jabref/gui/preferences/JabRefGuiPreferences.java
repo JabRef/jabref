@@ -385,8 +385,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX, defaultValues.shouldAllowIntegerEditionBibtex()),
                 getBoolean(AUTOLINK_FILES_ENABLED, defaultValues.autoLinkFilesEnabled()),
                 EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP, defaultValues.shouldEnableJournalPopup().name())),
-                CitationFetcherType.valueOf(get(CITATION_FETCHER_TYPE, defaultValues.getCitationFetcherType().name())),
-                CitationCountFetcherType.valueOf(get(CITATION_COUNT_FETCHER_TYPE, defaultValues.getCitationCountFetcherType().name())),
+                CitationFetcherType.safeValueOf(get(CITATION_FETCHER_TYPE, defaultValues.getCitationFetcherType().name())),
+                CitationCountFetcherType.safeValueOf(get(CITATION_COUNT_FETCHER_TYPE, defaultValues.getCitationCountFetcherType().name())),
                 getBoolean(SHOW_USER_COMMENTS_FIELDS, defaultValues.shouldShowUserCommentsFields()),
                 getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaultValues.getPreviewWidthDividerPosition())
         );
@@ -402,10 +402,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 EntryEditorPreferences.JournalPopupEnabled::name, EntryEditorPreferences.JournalPopupEnabled::fromString);
         bindDouble(entryEditorPreferences.previewWidthDividerPositionProperty(), ENTRY_EDITOR_PREVIEW_DIVIDER_POS, defaultValues.getPreviewWidthDividerPosition());
         bindObject(entryEditorPreferences.citationFetcherTypeProperty(), CITATION_FETCHER_TYPE, defaultValues.getCitationFetcherType(),
-                CitationFetcherType::name, CitationFetcherType::valueOf);
+                CitationFetcherType::name, CitationFetcherType::safeValueOf);
         bindBoolean(entryEditorPreferences.showUserCommentsFieldsProperty(), SHOW_USER_COMMENTS_FIELDS, defaultValues.shouldShowUserCommentsFields());
         bindObject(entryEditorPreferences.citationCountFetcherTypeProperty(), CITATION_COUNT_FETCHER_TYPE, defaultValues.getCitationCountFetcherType(),
-                CitationCountFetcherType::name, CitationCountFetcherType::valueOf);
+                CitationCountFetcherType::name, CitationCountFetcherType::safeValueOf);
 
         return entryEditorPreferences;
     }
@@ -542,25 +542,25 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         MergeDialogPreferences defaultValues = MergeDialogPreferences.getDefault();
 
         mergeDialogPreferences = new MergeDialogPreferences(
-                DiffMode.valueOf(get(MERGE_ENTRIES_DIFF_MODE, defaultValues.getMergeDiffMode().name())),
+                DiffMode.parse(get(MERGE_ENTRIES_DIFF_MODE, defaultValues.getMergeDiffMode().name())),
                 getBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF, defaultValues.getMergeShouldShowDiff()),
                 getBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, defaultValues.getMergeShouldShowUnifiedDiff()),
                 getBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, defaultValues.getMergeHighlightWords()),
                 getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, defaultValues.shouldMergeShowChangedFieldsOnly()),
                 getBoolean(MERGE_APPLY_TO_ALL_ENTRIES, defaultValues.shouldMergeApplyToAllEntries()),
-                DuplicateResolverDialog.DuplicateResolverResult.valueOf(
+                DuplicateResolverDialog.DuplicateResolverResult.parse(
                         get(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, defaultValues.getAllEntriesDuplicateResolverDecision().name()))
         );
 
         bindObject(mergeDialogPreferences.mergeDiffModeProperty(), MERGE_ENTRIES_DIFF_MODE, defaultValues.getMergeDiffMode(),
-                DiffMode::name, DiffMode::valueOf);
+                DiffMode::name, DiffMode::parse);
         bindBoolean(mergeDialogPreferences.mergeShouldShowDiffProperty(), MERGE_ENTRIES_SHOULD_SHOW_DIFF, defaultValues.getMergeShouldShowDiff());
         bindBoolean(mergeDialogPreferences.mergeShouldShowUnifiedDiffProperty(), MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, defaultValues.getMergeShouldShowUnifiedDiff());
         bindBoolean(mergeDialogPreferences.mergeHighlightWordsProperty(), MERGE_ENTRIES_HIGHLIGHT_WORDS, defaultValues.getMergeHighlightWords());
         bindBoolean(mergeDialogPreferences.mergeShowChangedFieldOnlyProperty(), MERGE_SHOW_ONLY_CHANGED_FIELDS, defaultValues.shouldMergeShowChangedFieldsOnly());
         bindBoolean(mergeDialogPreferences.mergeApplyToAllEntriesProperty(), MERGE_APPLY_TO_ALL_ENTRIES, defaultValues.shouldMergeApplyToAllEntries());
         bindObject(mergeDialogPreferences.allEntriesDuplicateResolverDecisionProperty(), DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, defaultValues.getAllEntriesDuplicateResolverDecision(),
-                DuplicateResolverDialog.DuplicateResolverResult::name, DuplicateResolverDialog.DuplicateResolverResult::valueOf);
+                DuplicateResolverDialog.DuplicateResolverResult::name, DuplicateResolverDialog.DuplicateResolverResult::parse);
 
         return mergeDialogPreferences;
     }
@@ -837,9 +837,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(GROUP_VIEW_INVERT, defaultValues.groupViewModeProperty().contains(GroupViewMode.INVERT)),
                 getBoolean(AUTO_ASSIGN_GROUP, defaultValues.shouldAutoAssignGroup()),
                 getBoolean(DISPLAY_GROUP_COUNT, defaultValues.shouldDisplayGroupCount()),
-                GroupHierarchyType.valueOf(
-                        get(DEFAULT_HIERARCHICAL_CONTEXT, defaultValues.getDefaultHierarchicalContext().name())
-                ),
+                GroupHierarchyType.safeValueOf(get(DEFAULT_HIERARCHICAL_CONTEXT, defaultValues.getDefaultHierarchicalContext().name())),
                 getBoolean(GROUP_SHOW_AI_CHAT, defaultValues.showAiChatButton())
         );
 
@@ -849,7 +847,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         bindBoolean(groupsPreferences.autoAssignGroupProperty(), AUTO_ASSIGN_GROUP, defaultValues.shouldAutoAssignGroup());
         bindBoolean(groupsPreferences.displayGroupCountProperty(), DISPLAY_GROUP_COUNT, defaultValues.shouldDisplayGroupCount());
         bindObject(groupsPreferences.defaultHierarchicalContextProperty(), DEFAULT_HIERARCHICAL_CONTEXT, defaultValues.getDefaultHierarchicalContext(),
-                GroupHierarchyType::name, GroupHierarchyType::valueOf);
+                GroupHierarchyType::name, GroupHierarchyType::safeValueOf);
         bindBoolean(groupsPreferences.showAiChatButtonProperty(), GROUP_SHOW_AI_CHAT, defaultValues.showAiChatButton());
 
         return groupsPreferences;
@@ -1150,7 +1148,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         List<TableColumn.SortType> columnSortTypes = getStringList(sortTypeList)
                 .stream()
-                .map(TableColumn.SortType::valueOf).toList();
+                .map(sortType -> {
+                    // TableColumn.SortType is a JavaFX enum and has no safe parser; fall back to
+                    // ASCENDING on unknown/corrupted values so recovery operations (reset/import) do not fail.
+                    try {
+                        return TableColumn.SortType.valueOf(sortType);
+                    } catch (IllegalArgumentException e) {
+                        return TableColumn.SortType.ASCENDING;
+                    }
+                }).toList();
 
         List<MainTableColumnModel> columns = new ArrayList<>();
         for (int i = 0; i < columnNames.size(); i++) {
