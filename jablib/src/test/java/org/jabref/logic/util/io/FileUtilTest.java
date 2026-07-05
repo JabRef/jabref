@@ -551,6 +551,42 @@ class FileUtilTest {
     }
 
     @Test
+    void applyDirectoryMappingsSubstitutesMatchingPrefixWhenFileExists(@TempDir Path temp) throws IOException {
+        Path mappedDir = Files.createDirectories(temp.resolve("mapped"));
+        Path mappedFile = Files.createFile(mappedDir.resolve("paper.pdf"));
+
+        List<DirectoryMapping> mappings = List.of(new DirectoryMapping("/old/literature", mappedDir.toString()));
+
+        assertEquals(Optional.of(mappedFile), FileUtil.applyDirectoryMappings("/old/literature/paper.pdf", mappings));
+    }
+
+    @Test
+    void applyDirectoryMappingsReturnsEmptyWhenNoPrefixMatches() {
+        List<DirectoryMapping> mappings = List.of(new DirectoryMapping("/old/literature", "/new/literature"));
+
+        assertEquals(Optional.empty(), FileUtil.applyDirectoryMappings("/somewhere/else/paper.pdf", mappings));
+    }
+
+    @Test
+    void applyDirectoryMappingsReturnsEmptyWhenSubstitutedPathDoesNotExist() {
+        List<DirectoryMapping> mappings = List.of(new DirectoryMapping("/old/literature", "/does/not/exist"));
+
+        assertEquals(Optional.empty(), FileUtil.applyDirectoryMappings("/old/literature/paper.pdf", mappings));
+    }
+
+    @Test
+    void applyDirectoryMappingsTriesMappingsInOrderAndReturnsFirstExistingMatch(@TempDir Path temp) throws IOException {
+        Path secondMappedDir = Files.createDirectories(temp.resolve("second"));
+        Path secondMappedFile = Files.createFile(secondMappedDir.resolve("paper.pdf"));
+
+        List<DirectoryMapping> mappings = List.of(
+                new DirectoryMapping("/old/literature", "/does/not/exist"),
+                new DirectoryMapping("/old/literature", secondMappedDir.toString()));
+
+        assertEquals(Optional.of(secondMappedFile), FileUtil.applyDirectoryMappings("/old/literature/paper.pdf", mappings));
+    }
+
+    @Test
     public void cTemp() {
         String fileName = "c:\\temp.pdf";
         if (OS.WINDOWS) {

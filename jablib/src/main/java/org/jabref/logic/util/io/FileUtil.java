@@ -447,7 +447,42 @@ public class FileUtil {
     public static Optional<Path> find(@NonNull BibDatabaseContext databaseContext,
                                       @NonNull String fileName,
                                       @NonNull FilePreferences filePreferences) {
-        return find(fileName, databaseContext.getFileDirectories(filePreferences));
+        Optional<Path> found = find(fileName, databaseContext.getFileDirectories(filePreferences));
+        if (found.isPresent()) {
+            return found;
+        }
+        try {
+            if (!Path.of(fileName).isAbsolute()) {
+                return Optional.empty();
+            }
+        } catch (InvalidPathException ex) {
+            return Optional.empty();
+        }
+        return applyDirectoryMappings(fileName, filePreferences.getDirectoryMappings());
+    }
+
+    /// Tries to resolve an absolute path that does not exist as stored (e.g. because the `.bib` file was written on a
+    /// different machine) by substituting a configured directory prefix with its mapped counterpart.
+    ///
+    /// Matching is a plain string-prefix comparison on `absoluteLink` (not `Path`-aware), so a path string from a
+    /// foreign OS never has to be parsed by the current platform's filesystem. Backslashes are normalized to forward
+    /// slashes before comparing (mirroring how [LinkedFile] itself normalizes stored links), so a mapping's
+    /// `directory` may be entered using either separator style.
+    ///
+    /// @param absoluteLink the stored (absolute) link, as-is
+    /// @param mappings     the configured mappings, tried in order; the first substitution that exists on disk wins
+    public static Optional<Path> applyDirectoryMappings(String absoluteLink, List<DirectoryMapping> mappings) {
+        String normalizedLink = absoluteLink.replace('\\', '/');
+        for (DirectoryMapping mapping : mappings) {
+            String normalizedDirectory = mapping.directory().replace('\\', '/');
+            if (normalizedLink.startsWith(normalizedDirectory)) {
+                Path candidate = Path.of(mapping.mappedDirectory() + normalizedLink.substring(normalizedDirectory.length()));
+                if (Files.exists(candidate)) {
+                    return Optional.of(candidate);
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     /// Converts a relative filename to an absolute one, if necessary. Returns

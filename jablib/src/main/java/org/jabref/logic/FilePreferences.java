@@ -1,18 +1,23 @@
 package org.jabref.logic;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.Directories;
+import org.jabref.logic.util.io.DirectoryMapping;
 import org.jabref.model.metadata.UserHostInfo;
 
 import org.jspecify.annotations.NullMarked;
@@ -47,6 +52,8 @@ public class FilePreferences {
     private final BooleanProperty openFileExplorerInFileDirectory = new SimpleBooleanProperty();
     private final BooleanProperty openFileExplorerInLastUsedDirectory = new SimpleBooleanProperty();
 
+    private final ListProperty<DirectoryMapping> directoryMappings = new SimpleListProperty<>(FXCollections.observableArrayList());
+
     private FilePreferences() {
         this(
                 new SimpleObjectProperty<>(OS.getUserHostInfo()), // userAndHost (needs to be sourced from InternalPreferences)
@@ -68,7 +75,8 @@ public class FilePreferences {
                 true,                                // shouldKeepDownloadUrl
                 Path.of("/"),                        // lastUsedDirectory
                 true,                                // openFileExplorerInFileDirectory
-                false                                // openFileExplorerInLastUsedDirectory
+                false,                               // openFileExplorerInLastUsedDirectory
+                List.of()                            // directoryMappings
         );
     }
 
@@ -91,7 +99,8 @@ public class FilePreferences {
                            boolean shouldKeepDownloadUrl,
                            Path lastUsedDirectory,
                            boolean openFileExplorerInFileDirectory,
-                           boolean openFileExplorerInLastUsedDirectory) {
+                           boolean openFileExplorerInLastUsedDirectory,
+                           List<DirectoryMapping> directoryMappings) {
         this.userAndHost.bind(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
@@ -112,6 +121,7 @@ public class FilePreferences {
         this.lastUsedDirectory.setValue(lastUsedDirectory);
         this.openFileExplorerInFileDirectory.set(openFileExplorerInFileDirectory);
         this.openFileExplorerInLastUsedDirectory.set(openFileExplorerInLastUsedDirectory);
+        this.directoryMappings.setAll(directoryMappings);
     }
 
     public static FilePreferences getDefault() {
@@ -348,5 +358,17 @@ public class FilePreferences {
 
     public void setOpenFileExplorerInLastUsedDirectory(boolean value) {
         this.openFileExplorerInLastUsedDirectory.set(value);
+    }
+
+    public List<DirectoryMapping> getDirectoryMappings() {
+        return directoryMappings.get();
+    }
+
+    public ListProperty<DirectoryMapping> directoryMappingsProperty() {
+        return directoryMappings;
+    }
+
+    public void setDirectoryMappings(List<DirectoryMapping> directoryMappings) {
+        this.directoryMappings.setAll(directoryMappings);
     }
 }

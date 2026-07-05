@@ -6,15 +6,21 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.TextFieldTableCell;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
@@ -46,6 +52,11 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     @FXML private CheckBox adjustLinkedFilesOnTransfer;
     @FXML private CheckBox copyLinkedFilesOnTransfer;
     @FXML private CheckBox moveLinkedFilesOnTransfer;
+
+    @FXML private TableView<DirectoryMappingItem> directoryMappingTable;
+    @FXML private TableColumn<DirectoryMappingItem, String> directoryMappingDirectoryColumn;
+    @FXML private TableColumn<DirectoryMappingItem, String> directoryMappingMappedDirectoryColumn;
+    @FXML private TableColumn<DirectoryMappingItem, Boolean> directoryMappingDeleteColumn;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -99,9 +110,28 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.mainFileDirValidationStatus(), mainFileDirectory));
+
+        directoryMappingTable.setItems(viewModel.getDirectoryMappings());
+
+        directoryMappingDirectoryColumn.setCellValueFactory(data -> data.getValue().directoryProperty());
+        directoryMappingDirectoryColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        directoryMappingMappedDirectoryColumn.setCellValueFactory(data -> data.getValue().mappedDirectoryProperty());
+        directoryMappingMappedDirectoryColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+
+        directoryMappingDeleteColumn.setCellValueFactory(data -> BindingsHelper.constantOf(true));
+        new ValueTableCellFactory<DirectoryMappingItem, Boolean>()
+                .withGraphic(none -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withOnMouseClickedEvent((item, none) -> event -> viewModel.removeDirectoryMapping(item))
+                .install(directoryMappingDeleteColumn);
     }
 
     public void mainFileDirBrowse() {
         viewModel.mainFileDirBrowse();
+    }
+
+    @FXML
+    private void addDirectoryMapping() {
+        viewModel.addDirectoryMapping();
     }
 }
