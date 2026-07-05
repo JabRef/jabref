@@ -139,7 +139,7 @@ public final class FieldListSections {
         if (BIBLIOMETRY_FIELDS.contains(field)) {
             return SectionType.BIBLIOMETRY;
         }
-        if (StandardField.COMMENT.equals(field) || (field instanceof UserSpecificCommentField)) {
+        if (StandardField.COMMENT == field || (field instanceof UserSpecificCommentField)) {
             return SectionType.COMMENTS;
         }
         if (META_FIELDS.contains(field) || (field instanceof SpecialField)) {
