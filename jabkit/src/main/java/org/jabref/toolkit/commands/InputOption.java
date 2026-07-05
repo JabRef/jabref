@@ -49,9 +49,10 @@ class InputOption {
             try {
                 return new URLDownload(input).toTemporaryFile();
             } catch (FetcherException | MalformedURLException e) {
+                String redactedInput = FetcherException.getRedactedUrl(input);
                 throw new ImportServiceException(
-                        "Problem downloading from " + input + ": " + e.getLocalizedMessage(),
-                        Localization.lang("Problem downloading from %0: %1", input, e.getLocalizedMessage()),
+                        "Problem downloading from " + redactedInput + ": " + e.getLocalizedMessage(),
+                        Localization.lang("Problem downloading from %0: %1", redactedInput, e.getLocalizedMessage()),
                         e,
                         CommandLine.ExitCode.SOFTWARE);
             }

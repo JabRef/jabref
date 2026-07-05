@@ -22,6 +22,7 @@ import org.junit.jupiter.api.io.TempDir;
 import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /// Verifies that the `FILE`/`--input` argument shared by all `jabkit` commands (see [InputOption])
@@ -112,6 +113,21 @@ class InputOptionUrlTest extends AbstractJabKitTest {
 
         assertEquals(CommandLine.ExitCode.SOFTWARE, exitCode);
         assertTrue(commandLine.getErrorOutput().contains("Problem downloading"));
+    }
+
+    @Test
+    void failedDownloadRedactsUserInfoFromErrorOutput() {
+        server.enqueue(new MockResponse.Builder().code(404).build());
+        String urlWithCredentials = server.url("/missing.bib").toString().replaceFirst("://", "://user:secret@");
+
+        int exitCode = commandLine.executeToLog("convert",
+                "--input=" + urlWithCredentials,
+                "--input-format=bibtex",
+                "--output-format=bibtex");
+
+        assertEquals(CommandLine.ExitCode.SOFTWARE, exitCode);
+        assertTrue(commandLine.getErrorOutput().contains("Problem downloading"));
+        assertFalse(commandLine.getErrorOutput().contains("secret"));
     }
 
     /// Compares the downloaded-and-converted output against the entry encoded in [#BIBTEX_CONTENT],
