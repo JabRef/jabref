@@ -255,10 +255,10 @@ public class AllFieldsTab extends FieldsEditorTab {
 
         VBox container = (VBox) getEditorContent();
         container.getChildren().setAll(gridPane, createMainChipBar(bibDatabaseContext, entry));
-        for (FieldListSections.SectionType type : List.of(
-                FieldListSections.SectionType.IDENTIFIERS,
-                FieldListSections.SectionType.FILES_AND_LINKS,
-                FieldListSections.SectionType.COMMENTS)) {
+        for (FieldListSections.SectionType type : FieldListSections.SectionType.values()) {
+            if (type == FieldListSections.SectionType.MAIN) {
+                continue;
+            }
             container.getChildren().add(
                     createSectionPane(type, buckets.get(type), labelForField, bibDatabaseContext, entry));
         }

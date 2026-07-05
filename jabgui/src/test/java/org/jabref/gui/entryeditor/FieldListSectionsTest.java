@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
@@ -63,6 +64,26 @@ class FieldListSectionsTest {
                 List.copyOf(FieldListSections.subtract(
                         List.of(StandardField.EDITOR, StandardField.VOLUME, StandardField.SERIES),
                         List.of(StandardField.VOLUME, StandardField.AUTHOR))));
+    }
+
+    @Test
+    void bibliometricsAndMetaFieldsBelongToTheirSections() {
+        assertEquals(FieldListSections.SectionType.BIBLIOMETRY,
+                FieldListSections.sectionOf(StandardField.CITATIONCOUNT));
+        assertEquals(FieldListSections.SectionType.BIBLIOMETRY,
+                FieldListSections.sectionOf(StandardField.ICORERANKING));
+        assertEquals(FieldListSections.SectionType.META,
+                FieldListSections.sectionOf(StandardField.GROUPS));
+        assertEquals(FieldListSections.SectionType.META,
+                FieldListSections.sectionOf(StandardField.CROSSREF));
+        assertEquals(FieldListSections.SectionType.META,
+                FieldListSections.sectionOf(SpecialField.RANKING));
+    }
+
+    @Test
+    void metaChipsOfferOnlyManuallyEditedFields() {
+        assertEquals(List.of(StandardField.CROSSREF, StandardField.GROUPS, StandardField.OWNER),
+                List.copyOf(FieldListSections.fieldsOf(FieldListSections.SectionType.META)));
     }
 
     @Test

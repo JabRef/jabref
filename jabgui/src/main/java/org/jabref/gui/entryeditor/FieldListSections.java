@@ -12,6 +12,7 @@ import java.util.SequencedSet;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
@@ -26,7 +27,12 @@ public final class FieldListSections {
         MAIN,
         IDENTIFIERS,
         FILES_AND_LINKS,
-        COMMENTS;
+        /// External metrics about the paper (citation count, ICORE ranking).
+        BIBLIOMETRY,
+        COMMENTS,
+        /// Fields about the library entry itself rather than the paper: crossref, groups,
+        /// owner, timestamps, and the special fields (ranking, priority, read status, …).
+        META;
 
         /// The localized section heading; empty for {@link #MAIN}.
         public Optional<String> header() {
@@ -37,8 +43,12 @@ public final class FieldListSections {
                         Optional.of(Localization.lang("Identifiers"));
                 case FILES_AND_LINKS ->
                         Optional.of(Localization.lang("Files and links"));
+                case BIBLIOMETRY ->
+                        Optional.of(Localization.lang("Bibliometrics"));
                 case COMMENTS ->
                         Optional.of(Localization.lang("Comments"));
+                case META ->
+                        Optional.of(Localization.lang("Meta"));
             };
         }
     }
@@ -66,6 +76,27 @@ public final class FieldListSections {
             StandardField.URI,
             StandardField.URLDATE));
 
+    /// Order = chip/display order in the Bibliometrics section.
+    private static final SequencedSet<Field> BIBLIOMETRY_FIELDS = new LinkedHashSet<>(List.of(
+            StandardField.CITATIONCOUNT,
+            StandardField.ICORERANKING));
+
+    /// Membership of the Meta section; a superset of {@link #META_CHIP_FIELDS} because the
+    /// timestamp fields are managed automatically and the special fields are set via the
+    /// main table / menus, so they are shown when set but not offered as add-chips.
+    private static final SequencedSet<Field> META_FIELDS = new LinkedHashSet<>(List.of(
+            StandardField.CROSSREF,
+            StandardField.GROUPS,
+            StandardField.OWNER,
+            StandardField.TIMESTAMP,
+            StandardField.CREATIONDATE,
+            StandardField.MODIFICATIONDATE));
+
+    private static final SequencedSet<Field> META_CHIP_FIELDS = new LinkedHashSet<>(List.of(
+            StandardField.CROSSREF,
+            StandardField.GROUPS,
+            StandardField.OWNER));
+
     private FieldListSections() {
     }
 
@@ -79,6 +110,10 @@ public final class FieldListSections {
                     new LinkedHashSet<>(IDENTIFIER_FIELDS);
             case FILES_AND_LINKS ->
                     new LinkedHashSet<>(FILE_AND_LINK_FIELDS);
+            case BIBLIOMETRY ->
+                    new LinkedHashSet<>(BIBLIOMETRY_FIELDS);
+            case META ->
+                    new LinkedHashSet<>(META_CHIP_FIELDS);
             case MAIN, COMMENTS ->
                     new LinkedHashSet<>();
         };
@@ -91,8 +126,14 @@ public final class FieldListSections {
         if (FILE_AND_LINK_FIELDS.contains(field)) {
             return SectionType.FILES_AND_LINKS;
         }
+        if (BIBLIOMETRY_FIELDS.contains(field)) {
+            return SectionType.BIBLIOMETRY;
+        }
         if (StandardField.COMMENT.equals(field) || (field instanceof UserSpecificCommentField)) {
             return SectionType.COMMENTS;
+        }
+        if (META_FIELDS.contains(field) || (field instanceof SpecialField)) {
+            return SectionType.META;
         }
         return SectionType.MAIN;
     }

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SequencedMap;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -23,10 +22,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 
@@ -130,15 +126,12 @@ public class EntryEditorPreferences {
         return tabModels;
     }
 
+    /// Since the "Main" scroll-list tab (issue #12711) shows every field — including the
+    /// former "General" tab's fields (as the bibliometrics/meta sections) and the abstract —
+    /// there are no customized field-set tabs by default anymore. Users with stored
+    /// customized tabs keep them.
     public static SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
-        SequencedMap<String, Set<Field>> defaultTabsMap = new LinkedHashMap<>();
-        String defaultFields = getDefaultGeneralFields().stream()
-                                                        .map(Field::getName)
-                                                        .collect(Collectors.joining(JabRefCliPreferences.STRINGLIST_DELIMITER.toString()));
-        defaultTabsMap.put(Localization.lang("General"), FieldFactory.parseFieldList(defaultFields));
-        defaultTabsMap.put(Localization.lang("Abstract"), FieldFactory.parseFieldList(StandardField.ABSTRACT.getName()));
-
-        return defaultTabsMap;
+        return new LinkedHashMap<>();
     }
 
     public static List<Field> getDefaultGeneralFields() {

@@ -27,8 +27,16 @@ Branch: `new-entry-editor` (based on `main`).
   2. **Identifiers** (TitledPane): collects ALL identifier fields {DOI, ISBN, ISSN,
      EPRINT(+TYPE/+CLASS), ARCHIVEPREFIX, PMID, MR_NUMBER}; unset ones as chips
   3. **Files & Links** (TitledPane): {FILE, URL, URI, URLDATE}; unset ones as chips
-  4. **Comments** (TitledPane): COMMENT + user-specific comment fields; chips for COMMENT
+  4. **Bibliometrics** (TitledPane, added 2026-07-05 per Oliver): {CITATIONCOUNT,
+     ICORERANKING}
+  5. **Comments** (TitledPane): COMMENT + user-specific comment fields; chips for COMMENT
      and the current user's comment field (gated by shouldShowUserCommentsFields)
+  6. **Meta** (TitledPane, added 2026-07-05 per Oliver — "meta to the paper"): CROSSREF,
+     GROUPS, OWNER, TIMESTAMP/CREATIONDATE/MODIFICATIONDATE, SpecialFields; chips only
+     for the manually-edited ones {CROSSREF, GROUPS, OWNER}.
+     With these sections, the default customized tabs "General" and "Abstract" are gone
+     (`EntryEditorPreferences.getDefaultEntryEditorTabs()` returns an empty map; stored
+     user customizations are kept).
 - **Add fields** (bottom of the list, Google-style):
   - Chips/buttons for each *unset important-optional* field → click shows an empty editor
     in the list and focuses it.
