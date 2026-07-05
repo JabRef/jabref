@@ -68,7 +68,7 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
             if (file.getRoot() != null && file.getRoot().equals(baseDirectoryPath.getRoot())) {
                 this.remove(baseDirectoryPath.relativize(file).normalize());
             }
-            
+
             return;
 
         }
