@@ -2,9 +2,6 @@ package org.jabref.gui.entryeditor;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-
-import javafx.beans.property.SimpleBooleanProperty;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -24,7 +21,6 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileUpdateMonitor;
 
 /// Builds the {@link EntryEditorTab} controls shown in the {@link EntryEditor}.
@@ -97,9 +93,8 @@ public class EntryEditorTabFactory {
     }
 
     /// Maps a single {@link EntryEditorTabModel} to its concrete {@link EntryEditorTab} view, wiring in the
-    /// user-controlled visibility derived from the same model. Customized field-set tabs are always enabled
-    /// (toggled only by adding/removing them); the Preview tab's toggle lives in the preview preferences
-    /// ("show preview as a separate tab"), not in its tab model.
+    /// user-controlled visibility derived from the same model. The Preview tab's toggle lives in the preview
+    /// preferences ("show preview as a separate tab"), not in its tab model.
     public EntryEditorTab createTab(EntryEditorTabModel model) {
         EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
         return switch (model) {
@@ -113,14 +108,6 @@ public class EntryEditorTabFactory {
                                                   : entryEditorPreferences.tabVisibleProperty(type));
                 yield tab;
             }
-            case EntryEditorTabModel.CustomizedFieldsTab(
-                    String name,
-                    Set<Field> fields
-            ) -> {
-                EntryEditorTab tab = new UserDefinedFieldsTab(name, fields, undoManager, undoAction, redoAction, preferences, journalAbbreviationRepository, stateManager, previewPanel);
-                tab.setPreferenceDrivenVisibility(new SimpleBooleanProperty(true));
-                yield tab;
-            }
         };
     }
 
@@ -128,16 +115,8 @@ public class EntryEditorTabFactory {
         return switch (type) {
             case PREVIEW ->
                     new PreviewTab(preferences, stateManager, previewPanel);
-            case REQUIRED_FIELDS ->
-                    new RequiredFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel);
-            case IMPORTANT_OPTIONAL_FIELDS ->
-                    new ImportantOptionalFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel);
-            case DETAIL_OPTIONAL_FIELDS ->
-                    new DetailOptionalFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel);
-            case DEPRECATED_FIELDS ->
-                    new DeprecatedFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel);
-            case OTHER_FIELDS ->
-                    new OtherFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel);
+            case ALL_FIELDS ->
+                    new AllFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel);
             case RELATED_ARTICLES ->
                     new RelatedArticlesTab(buildInfo, preferences, dialogService, stateManager, taskExecutor);
             case AI_SUMMARY ->
@@ -159,8 +138,6 @@ public class EntryEditorTabFactory {
                             themeManager,
                             bibEntryTypesManager,
                             searchCitationsRelationsService);
-            case COMMENTS ->
-                    new CommentsTab(preferences, undoManager, undoAction, redoAction, journalAbbreviationRepository, stateManager, previewPanel);
             case MATH_SCI_NET ->
                     new MathSciNetTab();
             case SOURCE ->
