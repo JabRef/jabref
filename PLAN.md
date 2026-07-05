@@ -215,3 +215,10 @@ All in `jabgui/src/main/java/org/jabref/gui/entryeditor/` unless noted:
   `FieldListSections.fieldsOf(type)`. Verified live on DISPLAY=:10.0 (screenshots
   refreshed in build/screenshots/): collapsed-by-default on minimal entry, expand
   shows chips, chip click adds + focuses field. Tests + checkstyle green.
+- 2026-07-05 (even later): Added BIBLIOMETRY + META sections per Oliver ("General"
+  must not duplicate "Main"; ICORE/citation count = bibliometrics; rest = meta);
+  default custom tabs General/Abstract removed (empty default map, stored user tabs
+  kept; `getDefaultGeneralFields()` retained for PreferencesMigrations). Verified
+  live with fresh prefs: General/Abstract tabs gone, Bibliometrics (citationcount 42,
+  icore A), Meta (groups/owner/ranking + "+ Crossref" chip), Comments chip for the
+  current user's comment field. Tests + checkstyle green. Commit 4de3c603c3.
