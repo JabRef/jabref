@@ -103,20 +103,6 @@ public class EntryEditorPreferences {
         return new EntryEditorPreferences();
     }
 
-    public void setAll(EntryEditorPreferences preferences) {
-        tabModels.setAll(preferences.getTabModels());
-        this.shouldOpenOnNewEntry.set(preferences.shouldOpenOnNewEntry());
-        this.showSourceTabByDefault.set(preferences.showSourceTabByDefault());
-        this.enableValidation.set(preferences.shouldEnableValidation());
-        this.allowIntegerEditionBibtex.set(preferences.shouldAllowIntegerEditionBibtex());
-        this.autoLinkFiles.set(preferences.autoLinkFilesEnabled());
-        this.enablementStatus.set(preferences.shouldEnableJournalPopup());
-        this.citationFetcherType.set(preferences.getCitationFetcherType());
-        this.citationCountFetcherType.set(preferences.getCitationCountFetcherType());
-        this.showUserCommentsFields.set(preferences.shouldShowUserCommentsFields());
-        this.previewWidthDividerPosition.set(preferences.getPreviewWidthDividerPosition());
-    }
-
     public ObservableList<EntryEditorTabModel> getTabModels() {
         return tabModels;
     }
