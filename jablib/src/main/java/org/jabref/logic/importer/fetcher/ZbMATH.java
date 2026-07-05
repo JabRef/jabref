@@ -135,7 +135,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         entry.getFieldOrAlias(StandardField.AUTHOR)
              .map(AuthorList::parse)
              .ifPresent(authors -> authors.getAuthors()
-                                           .forEach(author -> addExactSearchTerm(searchQuery, "au", author.getNamePrefixAndFamilyName())));
+                                          .forEach(author -> addExactSearchTerm(searchQuery, "au", author.getNamePrefixAndFamilyName())));
         entry.getFieldOrAlias(StandardField.JOURNAL)
              .ifPresent(journal -> addExactSearchTerm(searchQuery, "so", journal));
         entry.getFieldOrAlias(StandardField.YEAR)
