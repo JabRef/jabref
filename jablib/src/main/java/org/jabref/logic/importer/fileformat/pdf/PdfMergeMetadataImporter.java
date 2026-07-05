@@ -22,6 +22,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
+import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
@@ -30,6 +31,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jspecify.annotations.NonNull;
@@ -137,25 +139,38 @@ public class PdfMergeMetadataImporter extends PdfImporter {
 
     /// Fetches bibliographic metadata for the first of the given candidates that contains the requested identifier field.
     ///
-    /// @param field      the identifier field to look up: one of {@link StandardField#DOI},
-    ///                   {@link StandardField#EPRINT} (interpreted as an arXiv id), or {@link StandardField#ISBN}
+    /// For [StandardField#EPRINT] only candidates whose eprint is arXiv-qualified (see [#hasArXivQualifiedEprint])
+    /// are considered, because `eprint` is a generic field and is not necessarily an arXiv id.
+    ///
+    /// @param field      the identifier field to look up: one of [StandardField#DOI],
+    ///                   [StandardField#EPRINT] (interpreted as an arXiv id), or [StandardField#ISBN]
     /// @param candidates the candidates to inspect for an identifier
-    /// @return the fetched entry, or {@link Optional#empty()} if none of the candidates contain the identifier
+    /// @return the fetched entry, or [Optional#empty()] if none of the candidates contain the identifier
     public Optional<BibEntry> fetchByIdentifier(StandardField field, List<BibEntry> candidates) throws FetcherException {
         IdBasedFetcher fetcher = switch (field) {
             case DOI -> doiFetcher;
             case EPRINT -> arXivFetcher;
             case ISBN -> isbnFetcher;
-            default -> throw new IllegalArgumentException("Unsupported identifier field: " + field);
+            default -> throw new FetcherException("Unsupported identifier field: " + field);
         };
 
-        for (BibEntry candidate : candidates) {
-            Optional<String> identifier = candidate.getField(field);
-            if (identifier.isPresent()) {
-                return fetcher.performSearchById(identifier.get());
-            }
+        Optional<String> identifier = candidates.stream()
+                                                .filter(candidate -> field != StandardField.EPRINT || hasArXivQualifiedEprint(candidate))
+                                                .flatMap(candidate -> candidate.getField(field).stream())
+                                                .findFirst();
+        if (identifier.isEmpty()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        return fetcher.performSearchById(identifier.get());
+    }
+
+    /// Checks whether the `eprint` of the given candidate is an arXiv identifier. This follows the same logic as
+    /// [org.jabref.logic.importer.util.IdentifierParser]: the eprint is arXiv-qualified when `archivePrefix` or
+    /// `eprintType` equals `arXiv` (case-insensitive) and the eprint parses as an [ArXivIdentifier].
+    public static boolean hasArXivQualifiedEprint(BibEntry candidate) {
+        return new IdentifierParser(candidate).parse(StandardField.EPRINT)
+                                              .filter(identifier -> identifier instanceof ArXivIdentifier)
+                                              .isPresent();
     }
 
     private List<BibEntry> fetchIdsOfCandidates(List<BibEntry> candidates) {

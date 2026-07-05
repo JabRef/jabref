@@ -3,6 +3,7 @@ package org.jabref.gui.externalfiles;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
@@ -90,10 +91,16 @@ public class PdfMergeDialog {
     }
 
     private static void addIdentifierSource(MultiMergeEntriesView dialog, PdfMergeMetadataImporter importer, List<BibEntry> candidates, StandardField field, String title) {
-        boolean identifierPresent = candidates.stream().anyMatch(candidate -> candidate.hasField(field));
-        if (!identifierPresent) {
+        // `eprint` is a generic field; it only refers to an arXiv preprint when it is arXiv-qualified.
+        Predicate<BibEntry> hasIdentifier = field == StandardField.EPRINT
+                ? PdfMergeMetadataImporter::hasArXivQualifiedEprint
+                : candidate -> candidate.hasField(field);
+        if (candidates.stream().noneMatch(hasIdentifier)) {
             return;
         }
+        // `MultiMergeEntriesView.addSource` accepts only a `Supplier<BibEntry>`, and its view model uses a `null`
+        // result to mark the source as failed (see MultiMergeEntriesViewModel#addSource). Returning `null` here is
+        // therefore the contract-compliant way to signal "no metadata could be fetched".
         dialog.addSource(title, () -> {
             try {
                 return importer.fetchByIdentifier(field, candidates).orElse(null);
