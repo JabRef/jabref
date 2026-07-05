@@ -83,7 +83,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     private final BibEntryTypesManager entryTypesManager;
     private final GuiPreferences guiPreferences;
 
-    /// The current user's personal comment field (cf. {@link CommentsTab}).
+    /// The current user's personal comment field (derived from the default-owner preference).
     private final UserSpecificCommentField userSpecificCommentField;
 
     /// Fields the user added via chip / free-form box that are still empty: they are not part

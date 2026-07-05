@@ -2,12 +2,8 @@ package org.jabref.migrations;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -15,23 +11,19 @@ import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
 
-import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.gui.theme.Theme;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
@@ -70,8 +62,6 @@ public class PreferencesMigrations {
         restoreVariablesForBackwardCompatibility(preferences);
         upgradeCleanups(preferences);
         moveApiKeysToKeyring(preferences);
-        removeCommentsFromCustomEditorTabs(preferences);
-        migrateGeneralTabDefaultFields(preferences);
         upgradeResolveBibTeXStringsFields(preferences);
         upgradeTheme(preferences);
         migrateFileAnnotationsTabVisibility(preferences);
@@ -550,63 +540,6 @@ public class PreferencesMigrations {
             } catch (Exception ex) {
                 LOGGER.error("Unable to open key store", ex);
             }
-        }
-    }
-
-    /// Migrates default fields of the "General" entry editor tab.
-    ///
-    /// This migration handles default configuration before and after v6.0-alpha.3.
-    /// If the user current configuration matched with one of with known default field sets, it gets updated to
-    /// current default defined by {@link EntryEditorPreferences#getDefaultGeneralFields()}.
-    ///
-    /// @param preferences the user's current GUI preferences
-    /// @implNote The default fields for the "General" tab are defined by {@link EntryEditorPreferences#getDefaultGeneralFields()}.
-    static void migrateGeneralTabDefaultFields(GuiPreferences preferences) {
-        Map<String, Set<Field>> entryEditorPrefs = preferences.getEntryEditorPreferences().getCustomizedFieldSets();
-        Set<Field> currentGeneralPrefs = entryEditorPrefs.get(Localization.lang("General"));
-        if (currentGeneralPrefs == null) {
-            return;
-        }
-        Set<Field> preV60alpha3Fields = Set.of(
-                StandardField.DOI,
-                StandardField.CROSSREF,
-                StandardField.KEYWORDS,
-                StandardField.EPRINT,
-                StandardField.URL,
-                StandardField.FILE,
-                StandardField.GROUPS,
-                StandardField.OWNER,
-                StandardField.TIMESTAMP,
-                SpecialField.PRINTED,
-                SpecialField.PRIORITY,
-                SpecialField.QUALITY,
-                SpecialField.RANKING,
-                SpecialField.READ_STATUS,
-                SpecialField.RELEVANCE
-        );
-        Set<Field> v60alpha3Fields = new HashSet<>(preV60alpha3Fields);
-        v60alpha3Fields.add(StandardField.ICORERANKING);
-        if (!currentGeneralPrefs.equals(preV60alpha3Fields)
-                && !currentGeneralPrefs.equals(v60alpha3Fields)) {
-            return;
-        }
-
-        entryEditorPrefs.put(
-                Localization.lang("General"),
-                new HashSet<>(EntryEditorPreferences.getDefaultGeneralFields())
-        );
-
-        preferences.getEntryEditorPreferences().setCustomizedFieldSets(entryEditorPrefs);
-    }
-
-    /// The tab "Comments" is hard coded using {@link org.jabref.gui.entryeditor.CommentsTab} since v5.10 (and thus
-    /// hard-wired in {@link org.jabref.gui.entryeditor.EntryEditorTabFactory#createTabs()}. Thus, the configuration in
-    /// the preferences is obsolete.
-    static void removeCommentsFromCustomEditorTabs(GuiPreferences preferences) {
-        EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
-        Map<String, Set<Field>> tabs = new LinkedHashMap<>(entryEditorPreferences.getCustomizedFieldSets());
-        if (tabs.remove("Comments") != null) {
-            entryEditorPreferences.setCustomizedFieldSets(tabs);
         }
     }
 

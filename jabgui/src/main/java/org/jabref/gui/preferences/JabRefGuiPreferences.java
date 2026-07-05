@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -64,7 +63,6 @@ import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -213,15 +211,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // endregion
 
     // region EntryEditorPreferences
-    private static final String CUSTOM_TAB_NAME = "customTabName_";
-    private static final String CUSTOM_TAB_FIELDS = "customTabFields_";
     private static final String AUTO_OPEN_FORM = "autoOpenForm";
     private static final String SHOW_ALL_FIELDS_TAB = "showAllFieldsTab";
-    private static final String SHOW_REQUIRED_FIELDS = "showRequiredFields";
-    private static final String SHOW_IMPORTANT_OPTIONAL_FIELDS = "showImportantOptionalFields";
-    private static final String SHOW_DETAIL_OPTIONAL_FIELDS = "showDetailOptionalFields";
-    private static final String SHOW_DEPRECATED_FIELDS = "showDeprecatedFields";
-    private static final String SHOW_OTHER_FIELDS = "showOtherFields";
     private static final String SHOW_RECOMMENDATIONS = "showRecommendations";
     private static final String SHOW_AI_SUMMARY = "showAiSummary";
     private static final String SHOW_AI_CHAT = "showAiChat";
@@ -234,7 +225,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String JOURNAL_POPUP = "journalPopup";
     private static final String SHOW_SCITE_TAB = "showSciteTab";
     private static final String SHOW_USER_COMMENTS_FIELDS = "showUserCommentsFields";
-    private static final String SHOW_COMMENTS_TAB = "showCommentsTab";
     private static final String SHOW_MATHSCINET_TAB = "showMathSciNetTab";
     private static final String SHOW_SOURCE_TAB = "showSourceTab";
     private static final String SHOW_FULLTEXT_SEARCH_TAB = "showFulltextSearchTab";
@@ -409,32 +399,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         tabModels.addAll(List.<EntryEditorTabModel>of(
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.ALL_FIELDS,
                         getBoolean(SHOW_ALL_FIELDS_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.ALL_FIELDS))),
-                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.REQUIRED_FIELDS,
-                        getBoolean(SHOW_REQUIRED_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.REQUIRED_FIELDS))),
-                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.IMPORTANT_OPTIONAL_FIELDS,
-                        getBoolean(SHOW_IMPORTANT_OPTIONAL_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.IMPORTANT_OPTIONAL_FIELDS))),
-                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.DETAIL_OPTIONAL_FIELDS,
-                        getBoolean(SHOW_DETAIL_OPTIONAL_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.DETAIL_OPTIONAL_FIELDS))),
-                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.DEPRECATED_FIELDS,
-                        getBoolean(SHOW_DEPRECATED_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.DEPRECATED_FIELDS))),
-                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.OTHER_FIELDS,
-                        getBoolean(SHOW_OTHER_FIELDS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.OTHER_FIELDS)))
-        ));
-
-        Map<String, Set<Field>> tabNamesToFields = new LinkedHashMap<>();
-        List<String> tabNames = getSeries(CUSTOM_TAB_NAME);
-        List<String> tabFields = getSeries(CUSTOM_TAB_FIELDS);
-        if (tabNames.isEmpty() || (tabNames.size() != tabFields.size())) {
-            tabNamesToFields = EntryEditorPreferences.getDefaultEntryEditorTabs();
-        } else {
-            for (int i = 0; i < tabNames.size(); i++) {
-                tabNamesToFields.put(tabNames.get(i), FieldFactory.parseFieldList(tabFields.get(i)));
-            }
-        }
-        tabNamesToFields.forEach((name, fields) ->
-                tabModels.add(new EntryEditorTabModel.CustomizedFieldsTab(name, fields)));
-
-        tabModels.addAll(List.<EntryEditorTabModel>of(
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.RELATED_ARTICLES,
                         getBoolean(SHOW_RECOMMENDATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.RELATED_ARTICLES))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.AI_SUMMARY,
@@ -447,8 +411,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                         getBoolean(SHOW_FILE_ANNOTATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FILE_ANNOTATIONS))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION,
                         getBoolean(SHOW_SCITE_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION))),
-                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.COMMENTS,
-                        getBoolean(SHOW_COMMENTS_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.COMMENTS))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.MATH_SCI_NET,
                         getBoolean(SHOW_MATHSCINET_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.MATH_SCI_NET))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.SOURCE,
@@ -461,20 +423,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     private void storeTabConfigs(List<EntryEditorTabModel> configs) {
-        List<EntryEditorTabModel.CustomizedFieldsTab> fieldSetTabs = configs.stream()
-                                                                            .filter(EntryEditorTabModel.CustomizedFieldsTab.class::isInstance)
-                                                                            .map(EntryEditorTabModel.CustomizedFieldsTab.class::cast)
-                                                                            .toList();
-
-        for (int i = 0; i < fieldSetTabs.size(); i++) {
-            put(CUSTOM_TAB_NAME + i, fieldSetTabs.get(i).name());
-            put(CUSTOM_TAB_FIELDS + i, fieldSetTabs.get(i).fields().stream()
-                                                   .map(Field::getName)
-                                                   .collect(Collectors.joining(STRINGLIST_DELIMITER.toString())));
-        }
-        purgeSeries(CUSTOM_TAB_NAME, fieldSetTabs.size());
-        purgeSeries(CUSTOM_TAB_FIELDS, fieldSetTabs.size());
-
         for (EntryEditorTabModel config : configs) {
             if (config instanceof EntryEditorTabModel.BuiltInTab(
                     EntryEditorTabModel.BuiltIn type,
@@ -486,16 +434,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                     }
                     case ALL_FIELDS ->
                             putBoolean(SHOW_ALL_FIELDS_TAB, visible);
-                    case REQUIRED_FIELDS ->
-                            putBoolean(SHOW_REQUIRED_FIELDS, visible);
-                    case IMPORTANT_OPTIONAL_FIELDS ->
-                            putBoolean(SHOW_IMPORTANT_OPTIONAL_FIELDS, visible);
-                    case DETAIL_OPTIONAL_FIELDS ->
-                            putBoolean(SHOW_DETAIL_OPTIONAL_FIELDS, visible);
-                    case DEPRECATED_FIELDS ->
-                            putBoolean(SHOW_DEPRECATED_FIELDS, visible);
-                    case OTHER_FIELDS ->
-                            putBoolean(SHOW_OTHER_FIELDS, visible);
                     case RELATED_ARTICLES ->
                             putBoolean(SHOW_RECOMMENDATIONS, visible);
                     case AI_SUMMARY ->
@@ -508,8 +446,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                             putBoolean(SHOW_LATEX_CITATIONS, visible);
                     case CITATION_INFORMATION ->
                             putBoolean(SHOW_SCITE_TAB, visible);
-                    case COMMENTS ->
-                            putBoolean(SHOW_COMMENTS_TAB, visible);
                     case MATH_SCI_NET ->
                             putBoolean(SHOW_MATHSCINET_TAB, visible);
                     case SOURCE ->

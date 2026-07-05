@@ -137,8 +137,7 @@ All in `jabgui/src/main/java/org/jabref/gui/entryeditor/` unless noted:
   toggled old tab visibility have nothing stored → new defaults (off) apply cleanly.
   Users who explicitly stored e.g. `showRequiredFields=true` keep those tabs *in
   addition* — acceptable for a preview build; revisit before release.
-- [ ] **10. Remove MathSciNet tab** (`MathSciNetTab`, `BuiltIn.MATH_SCI_NET`, pref key,
-  l10n) — ONLY after confirming scope with Oliver. **OPEN — not done.**
+- [x] **10. MathSciNet tab** → **RESOLVED 2026-07-05 by Oliver: KEEP it.** No removal.
 - [x] **11. Polish & housekeeping**: CHANGELOG.md entry added. l10n keys complete
   (all 9 used keys verified present exactly once). Screenshots for PR: **pending**
   (needs GUI). Dead-code removal deferred (old tabs stay opt-in for now).
@@ -161,8 +160,34 @@ All in `jabgui/src/main/java/org/jabref/gui/entryeditor/` unless noted:
 - [ ] **15. Polish: chip labels for special fields** show the raw field name
   ("qualityassured", "readstatus") — `FieldTextMapper.getDisplayName` has no nice names
   for SpecialFields; use their localized names (cf. special-field menu texts).
+
+### Phase 6 — Sunset of the old tabs (decisions 2026-07-05)
+
+- [x] **16. Delete the classic category tabs**: `RequiredFieldsTab`,
+  `OptionalFieldsTabBase`, `ImportantOptionalFieldsTab`, `DetailOptionalFieldsTab`,
+  `DeprecatedFieldsTab`, `OtherFieldsTab`, `CommentsTab` (+ `CommentsTabTest`), their
+  `BuiltIn` enum constants, factory cases, and `SHOW_*` pref keys. Old stored prefs
+  simply become dead keys — NO migration ("old tabs won't be shown as 404", Oliver).
+- [x] **17. Remove entry editor tab customization**: dropped
+  `EntryEditorTabModel.CustomizedFieldsTab`, `UserDefinedFieldsTab`,
+  `CUSTOM_TAB_NAME/FIELDS` pref plumbing, `get/setCustomizedFieldSets`,
+  `getDefaultEntryEditorTabs`, `getDefaultGeneralFields`; preferences page reduced to
+  visibility checkboxes; retired the two obsolete migrations
+  (`migrateGeneralTabDefaultFields`, `removeCommentsFromCustomEditorTabs`).
+- [x] **18. l10n + housekeeping after removal**: 16 obsolete keys removed
+  (LocalizationConsistencyTest findObsoleteLocalizationKeys green); CHANGELOG
+  "Removed" entries added. Verified live: prefs page shows visibility-only list
+  (screenshot preferences-editor-tabs-visibility-only.png).
 - 2026-07-05: Step from feedback DONE — Meta section now offers all SpecialFields as
   add-chips (commit 025a60ef44, verified live); ABSTRACT placement confirmed (main).
+- 2026-07-05 (sunset sweep): Steps 16–18 done. Deleted 8 tab classes + CommentsTabTest,
+  6 BuiltIn constants, custom-tab model/prefs/UI (prefs page = visibility checkboxes
+  only), 2 obsolete migrations, 16 obsolete l10n keys. Decisions recorded: MathSciNet
+  KEPT (step 10), "Bibliometrics" name confirmed, no pref migration needed (dead keys
+  simply ignored). Verified live with fresh prefs: editor tabs correct, prefs page
+  reduced (screenshots in build/screenshots/). PROCESS: when local steps finished →
+  push branch to github.com/koppor/jabref and open PR THERE (design may be
+  controversial); keep PLAN.md and all incremental commits (no squash).
 
 ## Open questions (ask Oliver / decide before the relevant step)
 

@@ -2,12 +2,8 @@ package org.jabref.gui.entryeditor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.SequencedMap;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -22,9 +18,6 @@ import javafx.collections.ObservableList;
 
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.SpecialField;
-import org.jabref.model.entry.field.StandardField;
 
 public class EntryEditorPreferences {
 
@@ -101,56 +94,9 @@ public class EntryEditorPreferences {
     }
 
     private static List<EntryEditorTabModel> getDefaultTabModels() {
-        List<EntryEditorTabModel> tabModels = new ArrayList<>();
-
-        // Always-present leading tab
-        tabModels.add(new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.PREVIEW, true));
-
-        // Since the single scroll-list tab (issue #12711), only ALL_FIELDS is shown by default;
-        // the classic category tabs stay available as opt-in via the preferences.
-        Arrays.stream(EntryEditorTabModel.BuiltIn.values())
-              .filter(EntryEditorTabModel.BuiltIn::isFieldSet)
-              .forEachOrdered(fieldSet -> tabModels.add(new EntryEditorTabModel.BuiltInTab(fieldSet,
-                      fieldSet == EntryEditorTabModel.BuiltIn.ALL_FIELDS)));
-
-        getDefaultEntryEditorTabs().forEach((name, fields) ->
-                tabModels.add(new EntryEditorTabModel.CustomizedFieldsTab(name, fields)));
-
-        // The leading Preview and the field-set tabs are already added above.
-        // COMMENTS is off by default: comment fields are part of the ALL_FIELDS scroll list.
-        Arrays.stream(EntryEditorTabModel.BuiltIn.values())
-              .filter(tab -> tab != EntryEditorTabModel.BuiltIn.PREVIEW && !tab.isFieldSet())
-              .forEachOrdered(tab -> tabModels.add(new EntryEditorTabModel.BuiltInTab(tab,
-                      tab != EntryEditorTabModel.BuiltIn.COMMENTS)));
-
-        return tabModels;
-    }
-
-    /// Since the "Main" scroll-list tab (issue #12711) shows every field — including the
-    /// former "General" tab's fields (as the bibliometrics/meta sections) and the abstract —
-    /// there are no customized field-set tabs by default anymore. Users with stored
-    /// customized tabs keep them.
-    public static SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
-        return new LinkedHashMap<>();
-    }
-
-    public static List<Field> getDefaultGeneralFields() {
-        List<Field> defaultGeneralFields = new ArrayList<>(List.of(
-                StandardField.DOI,
-                StandardField.ICORERANKING,
-                StandardField.CITATIONCOUNT,
-                StandardField.CROSSREF,
-                StandardField.KEYWORDS,
-                StandardField.EPRINT,
-                StandardField.EPRINTTYPE,
-                StandardField.URL,
-                StandardField.FILE,
-                StandardField.GROUPS,
-                StandardField.OWNER,
-                StandardField.TIMESTAMP
-        ));
-        defaultGeneralFields.addAll(EnumSet.allOf(SpecialField.class));
-        return defaultGeneralFields;
+        return Arrays.stream(EntryEditorTabModel.BuiltIn.values())
+                     .<EntryEditorTabModel>map(tab -> new EntryEditorTabModel.BuiltInTab(tab, true))
+                     .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public static EntryEditorPreferences getDefault() {
@@ -197,32 +143,6 @@ public class EntryEditorPreferences {
                 return;
             }
         }
-    }
-
-    public Map<String, Set<Field>> getCustomizedFieldSets() {
-        SequencedMap<String, Set<Field>> map = new LinkedHashMap<>();
-        for (EntryEditorTabModel model : tabModels) {
-            if (model instanceof EntryEditorTabModel.CustomizedFieldsTab(
-                    String name,
-                    Set<Field> fields
-            )) {
-                map.put(name, fields);
-            }
-        }
-        return map;
-    }
-
-    public void setCustomizedFieldSets(Map<String, Set<Field>> tabModels) {
-        List<EntryEditorTabModel> newFieldSet = tabModels.entrySet().stream()
-                                                         .<EntryEditorTabModel>map(model ->
-                                                                 new EntryEditorTabModel.CustomizedFieldsTab(
-                                                                         model.getKey(),
-                                                                         model.getValue()))
-                                                         .toList();
-        this.tabModels.removeIf(config -> config instanceof EntryEditorTabModel.CustomizedFieldsTab);
-
-        // Customized field-set tabs sit right after the built-in field-set tabs
-        this.tabModels.addAll(EntryEditorTabModel.indexAfterBuiltInFieldSets(this.tabModels), newFieldSet);
     }
 
     public boolean shouldOpenOnNewEntry() {
