@@ -1,10 +1,16 @@
 package org.jabref.toolkit.commands;
 
+import java.net.MalformedURLException;
 import java.nio.file.Path;
 
-import org.jabref.toolkit.converter.CygWinPathConverter;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.toolkit.exception.ImportServiceException;
 
 import io.github.adr.linked.ADR;
+import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -19,28 +25,48 @@ import picocli.CommandLine.Parameters;
 /// Exactly one of the two forms must be given; picocli enforces this at parse time via the
 /// required, mutually exclusive [ArgGroup].
 ///
-/// See ADR-0057 (which supersedes ADR-0045) for the rationale.
+/// Both forms also accept an `http://`, `https://`, or `ftp://` URL, which is downloaded to a
+/// local temporary file before being used as the input.
+///
+/// See ADR-0057 (which supersedes ADR-0045) and ADR-0065 for the rationale.
 class InputOption {
 
     @ArgGroup(exclusive = true, multiplicity = "1")
     private InputSource inputSource;
 
-    /// @return the resolved input file
-    Path getInputFile() {
-        return inputSource.positionalInput != null
-               ? inputSource.positionalInput
-               : inputSource.optionInput;
+    /// @return the resolved input file, downloading it to a temporary file first if a URL was supplied
+    /// @throws ImportServiceException if a URL was supplied and could not be downloaded
+    // [impl->req~jabkit.cli.input-url~1]
+    @ADR(65)
+    Path getInputFile() throws ImportServiceException {
+        String input = inputSource.positionalInput != null
+                       ? inputSource.positionalInput
+                       : inputSource.optionInput;
+
+        if (input.startsWith("http://") || input.startsWith("https://") || input.startsWith("ftp://")) {
+            try {
+                return new URLDownload(input).toTemporaryFile();
+            } catch (FetcherException | MalformedURLException e) {
+                throw new ImportServiceException(
+                        "Problem downloading from " + input + ": " + e.getLocalizedMessage(),
+                        Localization.lang("Problem downloading from %0: %1", input, e.getLocalizedMessage()),
+                        e,
+                        CommandLine.ExitCode.SOFTWARE);
+            }
+        }
+
+        return FileUtil.convertCygwinPathToWindows(input);
     }
 
     private static class InputSource {
         // [impl->req~jabkit.cli.input-flag~2]
-        @Parameters(index = "0", paramLabel = "FILE", converter = CygWinPathConverter.class,
-                description = "Input file. Alternatively, pass it via --input.")
-        private Path positionalInput;
+        @Parameters(index = "0", paramLabel = "FILE",
+                description = "Input file, or an http(s)/ftp URL. Alternatively, pass it via --input.")
+        private String positionalInput;
 
         @ADR(45)
-        @Option(names = {"--input"}, converter = CygWinPathConverter.class,
-                description = "Input file (alias for the positional FILE argument).")
-        private Path optionInput;
+        @Option(names = {"--input"},
+                description = "Input file, or an http(s)/ftp URL (alias for the positional FILE argument).")
+        private String optionInput;
     }
 }
