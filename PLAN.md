@@ -158,6 +158,11 @@ All in `jabgui/src/main/java/org/jabref/gui/entryeditor/` unless noted:
 - [ ] **14. Free-form add box only offers fields not already available above**: filter the
   ComboBox suggestions to exclude fields that are already shown as editors AND fields
   already offered as add-chips in any section/chip bar.
+- [ ] **15. Polish: chip labels for special fields** show the raw field name
+  ("qualityassured", "readstatus") — `FieldTextMapper.getDisplayName` has no nice names
+  for SpecialFields; use their localized names (cf. special-field menu texts).
+- 2026-07-05: Step from feedback DONE — Meta section now offers all SpecialFields as
+  add-chips (commit 025a60ef44, verified live); ABSTRACT placement confirmed (main).
 
 ## Open questions (ask Oliver / decide before the relevant step)
 
