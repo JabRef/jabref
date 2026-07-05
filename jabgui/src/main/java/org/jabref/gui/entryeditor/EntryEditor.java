@@ -252,11 +252,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                         event.consume();
                     }
                     case JUMP_TO_FIELD -> {
-                        if (getCurrentlyEditedEntry() != null) {
-                            JumpToFieldDialog dialog = new JumpToFieldDialog(this);
-                            dialog.initModality(Modality.NONE);
-                            dialog.show();
-                        }
+                        openJumpToFieldDialog();
                         event.consume();
                     }
                     case HELP -> {
@@ -292,6 +288,19 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     @FXML
     private void generateCiteKeyButton() {
         viewModel.generateCiteKey();
+    }
+
+    @FXML
+    private void jumpToFieldButton() {
+        openJumpToFieldDialog();
+    }
+
+    private void openJumpToFieldDialog() {
+        if (getCurrentlyEditedEntry() != null) {
+            JumpToFieldDialog dialog = new JumpToFieldDialog(this);
+            dialog.initModality(Modality.NONE);
+            dialog.show();
+        }
     }
 
     @FXML
