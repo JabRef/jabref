@@ -331,9 +331,10 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     }
 
     /// Enriches each entry in the page with additional metadata from ArXiv-issued and user-issued DOIs using parallel async requests.
-    /// The page size times two thread pool size matches the pattern used before extraction.
     private Page<BibEntry> enrichPageWithDoi(Page<BibEntry> result) {
-        try (ExecutorService executor = Executors.newFixedThreadPool(getPageSize() * 2)) {
+        try (ExecutorService executor = Executors.newFixedThreadPool(getPageSize())) {
+            // All futures must be submitted before any .join() is called, so that tasks run in parallel.
+            // Collecting to a list here forces full submission before the join step below.
             Collection<CompletableFuture<BibEntry>> futureSearchResult = result.getContent()
                                                                                .stream()
                                                                                .map(bibEntry ->
