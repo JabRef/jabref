@@ -180,8 +180,11 @@ jobs:
         shell: bash
         run: |
           echo "cache_key=jbang-madrlint-$(date +%Y-%m)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        uses: actions/cache/restore@v6
+      - name: Cache JBang
+        # Combined cache action: restores at start and saves ~/.jbang on a
+        # cache miss in the post-job step. A madrlint-specific key keeps this
+        # cache separate from the shared "jbang-" cache used by setup-gradle.
+        uses: actions/cache@v6
         with:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
