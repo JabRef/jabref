@@ -2,6 +2,7 @@ package org.jabref.gui.preferences;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -824,7 +825,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     private Set<GroupViewMode> getGroupViewModes(GroupsPreferences defaults) {
-        Set<GroupViewMode> modes = new HashSet<>();
+        Set<GroupViewMode> modes = EnumSet.noneOf(GroupViewMode.class);
         if (getBoolean(GROUP_VIEW_INTERSECTION, defaults.groupViewModeProperty().contains(GroupViewMode.INTERSECTION))) {
             modes.add(GroupViewMode.INTERSECTION);
         }
