@@ -34,7 +34,7 @@ Requires JDK 25+ for Gradle (the wrapper downloads a JDK itself):
 
 ## Conventions
 
-- **Terminology:** say "library", not "database" — prefer `Library*` over `Database*` in new identifiers.
+- **Terminology:** say "library", not "database" — prefer `Library*` over `Database*` in new identifiers (see the [glossary](https://github.com/JabRef/jabref/tree/main/docs/glossary), in particular [library](https://github.com/JabRef/jabref/blob/main/docs/glossary/library.md)).
 - **Tests:** plain JUnit 5 assertions only (see ADR-0009); do not introduce Hamcrest or AssertJ. Mock `*Preferences` classes and stub only the getters the test needs.
 - **Minimal diffs:** no reformatting of existing code, no speculative refactoring, no drive-by cleanups.
 - **Dependencies:** do not add new ones without justification.
