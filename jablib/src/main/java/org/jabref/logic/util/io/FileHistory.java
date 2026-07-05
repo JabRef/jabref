@@ -70,7 +70,6 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
             }
 
             return;
-
         }
 
         this.remove(baseDirectoryPath.resolve(file).normalize());
