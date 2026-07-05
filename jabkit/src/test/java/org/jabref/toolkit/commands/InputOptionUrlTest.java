@@ -1,9 +1,15 @@
 package org.jabref.toolkit.commands;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
+import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.support.BibEntryAssert;
 import org.jabref.toolkit.exception.CliExceptionHandler;
 
 import mockwebserver3.MockResponse;
@@ -59,7 +65,7 @@ class InputOptionUrlTest extends AbstractJabKitTest {
                 "--output=" + outputPath);
 
         assertEquals(CommandLine.ExitCode.OK, exitCode);
-        assertTrue(Files.readString(outputPath).contains("Darwin1888"));
+        assertDarwin1888Entry(outputPath);
     }
 
     @Test
@@ -75,7 +81,7 @@ class InputOptionUrlTest extends AbstractJabKitTest {
                 "--output=" + outputPath);
 
         assertEquals(CommandLine.ExitCode.OK, exitCode);
-        assertTrue(Files.readString(outputPath).contains("Darwin1888"));
+        assertDarwin1888Entry(outputPath);
     }
 
     @Test
@@ -90,5 +96,18 @@ class InputOptionUrlTest extends AbstractJabKitTest {
 
         assertEquals(CommandLine.ExitCode.SOFTWARE, exitCode);
         assertTrue(commandLine.getErrorOutput().contains("Problem downloading"));
+    }
+
+    /// Compares the downloaded-and-converted output against the entry encoded in [#BIBTEX_CONTENT],
+    /// instead of doing a substring check on the raw file content.
+    private void assertDarwin1888Entry(Path outputPath) throws IOException {
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Darwin1888")
+                .withField(StandardField.AUTHOR, "Darwin, Charles")
+                .withField(StandardField.TITLE, "Origin of Species")
+                .withField(StandardField.YEAR, "1888");
+
+        BibtexImporter bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
+        BibEntryAssert.assertEquals(List.of(expectedEntry), outputPath, bibtexImporter);
     }
 }
