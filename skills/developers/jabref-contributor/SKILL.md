@@ -8,7 +8,7 @@ license: MIT
 
 Conventions for working on the [JabRef](https://github.com/JabRef/jabref) codebase.
 
-> **AI policy — read first.** JabRef does not accept fully AI-generated pull requests. AI tools may only assist; a human must understand and take responsibility for every change. See `CONTRIBUTING.md` and `AGENTS.md` in the repository root.
+> **AI policy — read first.** JabRef does not accept fully AI-generated pull requests. AI tools may only assist; a human must understand and take responsibility for every change. See [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) and [AGENTS.md](https://github.com/JabRef/jabref/blob/main/AGENTS.md) in the repository root — when working in a JabRef checkout, read both files before making changes.
 
 ## Modules
 
@@ -51,7 +51,8 @@ Work through every point of `CHECKLIST.md` in the repository root — it is the 
 
 ## Further reading
 
-- `AGENTS.md` — rules for automated agents in this repository
-- `CONTRIBUTING.md` — full contribution guide, including the AI usage policy
+- [AGENTS.md](https://github.com/JabRef/jabref/blob/main/AGENTS.md) — rules for automated agents in this repository
+- [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) — full contribution guide, including the AI usage policy
+- [CHECKLIST.md](https://github.com/JabRef/jabref/blob/main/CHECKLIST.md) — the mandatory pre-PR quality gate
 - <https://devdocs.jabref.org/> — developer documentation
 - <https://deepwiki.com/JabRef/jabref> — architecture Q&A
