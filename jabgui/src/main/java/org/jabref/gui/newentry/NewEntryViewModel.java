@@ -41,6 +41,7 @@ import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.format.DOIStrip;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.TransferInformation;
 import org.jabref.model.TransferMode;
@@ -155,8 +156,8 @@ public class NewEntryViewModel {
         urlText = new SimpleStringProperty();
         urlTextValidator = new FunctionBasedValidator<>(
                 urlText,
-                StringUtil::isNotBlank,
-                ValidationMessage.error(Localization.lang("You must specify a URL.")));
+                url -> StringUtil.isNotBlank(url) && URLUtil.isValidHttpUrl(url),
+                ValidationMessage.error(Localization.lang("You must specify a valid URL.")));
         urlWorker = null;
 
         bibtexText = new SimpleStringProperty();
@@ -410,10 +411,11 @@ public class NewEntryViewModel {
         executing.setValue(true);
 
         cancel();
-        urlWorker = new WorkerEnterUrl();
+        final WorkerEnterUrl worker = new WorkerEnterUrl();
+        urlWorker = worker;
 
-        urlWorker.setOnFailed(_ -> {
-            final Throwable exception = urlWorker.getException();
+        worker.setOnFailed(_ -> {
+            final Throwable exception = worker.getException();
             final String exceptionMessage = exception.getMessage();
             final String urlString = urlText.getValue();
 
@@ -443,8 +445,8 @@ public class NewEntryViewModel {
             executing.set(false);
         });
 
-        urlWorker.setOnSucceeded(_ -> {
-            final Optional<List<BibEntry>> result = urlWorker.getValue();
+        worker.setOnSucceeded(_ -> {
+            final Optional<List<BibEntry>> result = worker.getValue();
 
             if (result.isEmpty()) {
                 dialogService.showWarningDialogAndWait(
@@ -471,7 +473,7 @@ public class NewEntryViewModel {
             executing.set(false);
         });
 
-        taskExecutor.execute(urlWorker);
+        taskExecutor.execute(worker);
     }
 
     private class WorkerInterpretCitations extends Task<Optional<List<BibEntry>>> {
