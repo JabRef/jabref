@@ -10,8 +10,20 @@ Maintain BibTeX/biblatex libraries (`.bib` files) from the command line using `j
 
 ## Setup
 
+`jabkit` runs via [JBang](https://www.jbang.dev/) — no JDK setup needed. Install JBang if missing:
+
 ```bash
-jbang app install --fresh --force jabkit@jabref   # requires JBang: https://www.jbang.dev/download/
+curl -Ls https://sh.jbang.dev | bash -s - app setup   # Linux/macOS
+```
+
+```powershell
+iex "& { $(iwr -useb https://ps.jbang.dev) } app setup"   # Windows
+```
+
+Then install `jabkit` on the PATH (the same command also updates it):
+
+```bash
+jbang app install --fresh --force jabkit@jabref
 ```
 
 Global flags (place before the subcommand): `-p`/`--porcelain` for script-friendly output, `-d`/`--debug` for verbose logging.

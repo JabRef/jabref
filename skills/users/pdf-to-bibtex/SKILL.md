@@ -10,13 +10,23 @@ Extract bibliographic data from PDF files and produce BibTeX entries using `jabk
 
 ## Setup
 
-`jabkit` runs via [JBang](https://www.jbang.dev/download/) — no JDK setup needed:
+`jabkit` runs via [JBang](https://www.jbang.dev/) — no JDK setup needed. Install JBang if missing:
 
 ```bash
-jbang app install --fresh --force jabkit@jabref   # install permanently as `jabkit`
+curl -Ls https://sh.jbang.dev | bash -s - app setup   # Linux/macOS
 ```
 
-Or run once without installing:
+```powershell
+iex "& { $(iwr -useb https://ps.jbang.dev) } app setup"   # Windows
+```
+
+Then install `jabkit` on the PATH (the same command also updates it):
+
+```bash
+jbang app install --fresh --force jabkit@jabref
+```
+
+One-off run without installation:
 
 ```bash
 jbang --fresh jabkit@jabref --help

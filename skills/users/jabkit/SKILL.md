@@ -10,10 +10,20 @@ license: MIT
 
 ## Installation
 
-Via [JBang](https://www.jbang.dev/download/) (`brew install jbangdev/tap/jbang` or `choco install jbang`):
+`jabkit` runs via [JBang](https://www.jbang.dev/) — no JDK setup needed. Install JBang if missing:
 
 ```bash
-jbang app install --fresh --force jabkit@jabref   # installs `jabkit` on PATH; also updates it
+curl -Ls https://sh.jbang.dev | bash -s - app setup   # Linux/macOS
+```
+
+```powershell
+iex "& { $(iwr -useb https://ps.jbang.dev) } app setup"   # Windows
+```
+
+Then install `jabkit` on the PATH (the same command also updates it):
+
+```bash
+jbang app install --fresh --force jabkit@jabref
 ```
 
 One-off run without installation:
