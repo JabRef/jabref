@@ -130,6 +130,18 @@ class InputOptionUrlTest extends AbstractJabKitTest {
         assertFalse(commandLine.getErrorOutput().contains("secret"));
     }
 
+    @Test
+    void invalidLocalPathExitsWithUsageError() {
+        // The NUL character is rejected by java.nio.file.Path on every platform.
+        int exitCode = commandLine.executeToLog("convert",
+                "--input=invalid\u0000path",
+                "--input-format=bibtex",
+                "--output-format=bibtex");
+
+        assertEquals(CommandLine.ExitCode.USAGE, exitCode);
+        assertTrue(commandLine.getErrorOutput().contains("Invalid input path"));
+    }
+
     /// Compares the downloaded-and-converted output against the entry encoded in [#BIBTEX_CONTENT],
     /// instead of doing a substring check on the raw file content.
     private void assertDarwin1888Entry(Path outputPath) throws IOException {

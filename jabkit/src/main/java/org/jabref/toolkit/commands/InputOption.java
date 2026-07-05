@@ -1,6 +1,7 @@
 package org.jabref.toolkit.commands;
 
 import java.net.MalformedURLException;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Locale;
 
@@ -58,7 +59,15 @@ class InputOption {
             }
         }
 
-        return FileUtil.convertCygwinPathToWindows(input);
+        try {
+            return FileUtil.convertCygwinPathToWindows(input);
+        } catch (InvalidPathException e) {
+            throw new ImportServiceException(
+                    "Invalid input path '" + input + "': " + e.getLocalizedMessage(),
+                    Localization.lang("Invalid input path '%0'.", input),
+                    e,
+                    CommandLine.ExitCode.USAGE);
+        }
     }
 
     private static class InputSource {
