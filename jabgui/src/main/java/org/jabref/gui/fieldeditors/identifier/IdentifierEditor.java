@@ -7,6 +7,7 @@ import javax.swing.undo.UndoManager;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
@@ -42,6 +43,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @FXML private Button shortenDOIButton;
     @FXML private Button fetchInformationByIdentifierButton;
     @FXML private Button lookupIdentifierButton;
+    @FXML private ToggleButton syncWithBrowserToggle;
 
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
@@ -84,6 +86,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
         textField.setId(field.getName());
         textField.textProperty().bindBidirectional(viewModel.textProperty());
+        syncWithBrowserToggle.setSelected(viewModel.getSyncWithBrowser());
 
         fetchInformationByIdentifierButton.setTooltip(
                 new Tooltip(Localization.lang("Get bibliographic data from %0", FieldTextMapper.getDisplayName(field))));
@@ -132,5 +135,10 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @FXML
     private void shortenID() {
         viewModel.shortenID();
+    }
+
+    @FXML
+    private void toggleSyncWithBrowser() {
+        viewModel.setSyncWithBrowser(syncWithBrowserToggle.isSelected());
     }
 }

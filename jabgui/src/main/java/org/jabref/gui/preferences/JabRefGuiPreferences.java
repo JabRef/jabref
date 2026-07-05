@@ -24,6 +24,7 @@ import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.fieldeditors.identifier.MathSciNetPreferences;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.groups.GroupViewMode;
@@ -246,6 +247,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String CITATION_COUNT_FETCHER_TYPE = "citationCountFetcherType";
     // endregion
 
+    // region MathSciNetPreferences
+    private static final String MATHSCINET_SYNC_WITH_BROWSER = "mathSciNetSyncWithBrowser";
+    // endregion
+
     // region MrDlibPreferences
     private static final String MRDLIB_ACCEPT_RECOMMENDATIONS = "acceptRecommendations";
     private static final String MRDLIB_SEND_LANGUAGE_DATA = "sendLanguageData";
@@ -275,6 +280,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private NewEntryPreferences newEntryPreferences;
     private DonationPreferences donationPreferences;
     private MrDlibPreferences mrDlibPreferences;
+    private MathSciNetPreferences mathSciNetPreferences;
 
     /// @deprecated Never ever add a call to this method. There should be only one caller.
     /// All other usages should get the preferences passed (or injected).
@@ -309,6 +315,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getNewEntryPreferences();
         getDonationPreferences();
         getMrDlibPreferences();
+        getMathSciNetPreferences();
     }
 
     // region CopyToPreferences
@@ -327,6 +334,23 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         bindBoolean(copyToPreferences.shouldIncludeCrossReferencesProperty(), INCLUDE_CROSS_REFERENCES, defaultValues.getShouldIncludeCrossReferences());
 
         return copyToPreferences;
+    }
+    // endregion
+
+    // region MathSciNetPreferences
+    public MathSciNetPreferences getMathSciNetPreferences() {
+        if (mathSciNetPreferences != null) {
+            return mathSciNetPreferences;
+        }
+
+        MathSciNetPreferences defaultValues = MathSciNetPreferences.getDefault();
+
+        mathSciNetPreferences = new MathSciNetPreferences(
+                getBoolean(MATHSCINET_SYNC_WITH_BROWSER, defaultValues.getSyncWithBrowser()));
+
+        bindBoolean(mathSciNetPreferences.syncWithBrowserProperty(), MATHSCINET_SYNC_WITH_BROWSER, defaultValues.getSyncWithBrowser());
+
+        return mathSciNetPreferences;
     }
     // endregion
 
