@@ -436,7 +436,13 @@ public class GroupNodeViewModel {
 
     public boolean hasAllSuggestedGroups() {
         return hasSimilarSearchGroup(GroupsFactory.createWithoutFilesGroup())
-                && hasSimilarSearchGroup(GroupsFactory.createWithoutGroupsGroup());
+                && hasSimilarSearchGroup(GroupsFactory.createWithoutGroupsGroup())
+                && hasSimilarSearchGroup(GroupsFactory.createRankParentGroup())
+                && hasSimilarSearchGroup(GroupsFactory.createRelevanceParentGroup())
+                && hasSimilarSearchGroup(GroupsFactory.createQualityParentGroup())
+                && hasSimilarSearchGroup(GroupsFactory.createPrintedParentGroup())
+                && hasSimilarSearchGroup(GroupsFactory.createPriorityParentGroup())
+                && hasSimilarSearchGroup(GroupsFactory.createReadStatusParentGroup());
     }
 
     public boolean canAddEntriesIn() {

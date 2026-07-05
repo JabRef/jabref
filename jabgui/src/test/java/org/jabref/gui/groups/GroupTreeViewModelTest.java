@@ -186,7 +186,7 @@ class GroupTreeViewModelTest {
 
         model.addSuggestedGroups(rootGroup);
 
-        assertEquals(2, rootGroup.getChildren().size());
+        assertEquals(8, rootGroup.getChildren().size());
         assertTrue(rootGroup.hasAllSuggestedGroups());
     }
 
@@ -199,7 +199,7 @@ class GroupTreeViewModelTest {
 
         model.addSuggestedGroups(rootGroup);
 
-        assertEquals(2, rootGroup.getChildren().size());
+        assertEquals(8, rootGroup.getChildren().size());
         assertTrue(rootGroup.hasAllSuggestedGroups());
     }
 
@@ -209,11 +209,17 @@ class GroupTreeViewModelTest {
         GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
         rootGroup.getGroupNode().addSubgroup(GroupsFactory.createWithoutFilesGroup());
         rootGroup.getGroupNode().addSubgroup(GroupsFactory.createWithoutGroupsGroup());
-        assertEquals(2, rootGroup.getChildren().size());
+        rootGroup.getGroupNode().addSubgroup(GroupsFactory.createRankParentGroup());
+        rootGroup.getGroupNode().addSubgroup(GroupsFactory.createRelevanceParentGroup());
+        rootGroup.getGroupNode().addSubgroup(GroupsFactory.createQualityParentGroup());
+        rootGroup.getGroupNode().addSubgroup(GroupsFactory.createPrintedParentGroup());
+        rootGroup.getGroupNode().addSubgroup(GroupsFactory.createPriorityParentGroup());
+        rootGroup.getGroupNode().addSubgroup(GroupsFactory.createReadStatusParentGroup());
+        assertEquals(8, rootGroup.getChildren().size());
 
         model.addSuggestedGroups(rootGroup);
 
-        assertEquals(2, rootGroup.getChildren().size());
+        assertEquals(8, rootGroup.getChildren().size());
         assertTrue(rootGroup.hasAllSuggestedGroups());
     }
 

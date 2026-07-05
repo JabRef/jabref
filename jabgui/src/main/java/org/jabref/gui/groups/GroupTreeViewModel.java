@@ -241,6 +241,60 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 newSuggestedSubgroups.add(subGroup);
             }
 
+            SearchGroup rankParentGroup = GroupsFactory.createRankParentGroup();
+            if (!parent.hasSimilarSearchGroup(rankParentGroup)) {
+                GroupTreeNode rankParentNode = rootNode.addSubgroup(rankParentGroup);
+                for (SearchGroup subRank : GroupsFactory.createRankSubgroups()) {
+                    rankParentNode.addSubgroup(subRank);
+                }
+                newSuggestedSubgroups.add(rankParentNode);
+            }
+
+            SearchGroup relevanceParentGroup = GroupsFactory.createRelevanceParentGroup();
+            if (!parent.hasSimilarSearchGroup(relevanceParentGroup)) {
+                GroupTreeNode relevanceParentNode = rootNode.addSubgroup(relevanceParentGroup);
+                for (SearchGroup subRelevance : GroupsFactory.createRelevanceSubgroups()) {
+                    relevanceParentNode.addSubgroup(subRelevance);
+                }
+                newSuggestedSubgroups.add(relevanceParentNode);
+            }
+
+            SearchGroup qualityParentGroup = GroupsFactory.createQualityParentGroup();
+            if (!parent.hasSimilarSearchGroup(qualityParentGroup)) {
+                GroupTreeNode qualityParentNode = rootNode.addSubgroup(qualityParentGroup);
+                for (SearchGroup subQuality : GroupsFactory.createQualitySubgroups()) {
+                    qualityParentNode.addSubgroup(subQuality);
+                }
+                newSuggestedSubgroups.add(qualityParentNode);
+            }
+
+            SearchGroup printedParentGroup = GroupsFactory.createPrintedParentGroup();
+            if (!parent.hasSimilarSearchGroup(printedParentGroup)) {
+                GroupTreeNode printedParentNode = rootNode.addSubgroup(printedParentGroup);
+                for (SearchGroup subPrinted : GroupsFactory.createPrintedSubgroups()) {
+                    printedParentNode.addSubgroup(subPrinted);
+                }
+                newSuggestedSubgroups.add(printedParentNode);
+            }
+
+            SearchGroup priorityParentGroup = GroupsFactory.createPriorityParentGroup();
+            if (!parent.hasSimilarSearchGroup(priorityParentGroup)) {
+                GroupTreeNode priorityParentNode = rootNode.addSubgroup(priorityParentGroup);
+                for (SearchGroup subPriority : GroupsFactory.createPrioritySubgroups()) {
+                    priorityParentNode.addSubgroup(subPriority);
+                }
+                newSuggestedSubgroups.add(priorityParentNode);
+            }
+
+            SearchGroup readStatusParentGroup = GroupsFactory.createReadStatusParentGroup();
+            if (!parent.hasSimilarSearchGroup(readStatusParentGroup)) {
+                GroupTreeNode readStatusParentNode = rootNode.addSubgroup(readStatusParentGroup);
+                for (SearchGroup subReadStatus : GroupsFactory.createReadStatusSubgroups()) {
+                    readStatusParentNode.addSubgroup(subReadStatus);
+                }
+                newSuggestedSubgroups.add(readStatusParentNode);
+            }
+
             selectedGroups.setAll(newSuggestedSubgroups
                     .stream()
                     .map(newSubGroup -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
