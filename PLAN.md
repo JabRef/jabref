@@ -9,12 +9,13 @@ Branch: `new-entry-editor` (based on `main`).
 
 ## Target UX
 
-- **One field tab** (working name: **"Fields"** — see open questions) replaces the tabs
+- **One field tab** (named **"Main"**, decided by Oliver 2026-07-05) replaces the tabs
   "Required fields", "Optional fields", "Optional fields 2", "Deprecated fields",
   "Other fields", "Comments". Non-field tabs (Source, LaTeX citations, AI, Related articles,
   File annotations, Citations, Fulltext search, custom user tabs) stay unchanged.
-  Preview: ignore here — will become a separate pane (separate work). MathSciNet: to be removed
-  (separate step at the end).
+  Preview: **stays as-is** (in-tab side-by-side SplitPane) — Oliver confirmed 2026-07-05
+  that with this design the preview can be kept. MathSciNet: to be removed
+  (separate step at the end, still unconfirmed).
 - Content = **all set fields** + **all required fields (even when empty)**, in one **vertically
   scrolling list** (natural heights, NOT the current stretch-to-tab-height GridPane).
 - **Grouping** within the list (section header + thin separator, Google-Contacts style):
@@ -128,17 +129,15 @@ All in `jabgui/src/main/java/org/jabref/gui/entryeditor/` unless noted:
 - [x] **11. Polish & housekeeping**: CHANGELOG.md entry added. l10n keys complete
   (all 9 used keys verified present exactly once). Screenshots for PR: **pending**
   (needs GUI). Dead-code removal deferred (old tabs stay opt-in for now).
-- [ ] **12. Full verification**: done as far as headless env allows — compile ✓,
-  checkstyle main+test ✓, non-TestFX tests ✓ (incl. new FieldListSectionsTest 5/5).
-  **Still open on a machine with display**: TestFX tests (CommentsTabTest, SourceTabTest —
-  fail here with "Unable to open DISPLAY" in beforeEach, same as on main),
-  LocalizationConsistencyTest (also needs FX toolkit), and `./gradlew :jabgui:run`
-  manual smoke test.
+- [x] **12. Full verification** (DISPLAY=:10.0 provided by Oliver): entryeditor test
+  package incl. TestFX ✓, LocalizationConsistencyTest ✓, checkstyle ✓, and a real GUI
+  smoke test with screenshots (see `build/screenshots/`): sections render, scrolling
+  works, chips add+focus fields and disappear, entry switching recomputes the list,
+  preview pane coexists.
 
 ## Open questions (ask Oliver / decide before the relevant step)
 
-1. Tab display name: "Fields"? ("BibTeX" per issue title, but wrong in biblatex mode;
-   "Entry"?) — needed in step 1/2. → **Interim: "Fields"**.
+1. Tab display name → **RESOLVED 2026-07-05 by Oliver: "Main"** (was interim "Fields").
 2. Do the old category tabs stay as opt-in (visibility=false) or get deleted?
    → **Interim: keep classes, default-off** (step 1), delete later in a follow-up PR.
 3. Exact group membership (identifiers list; does ABSTRACT belong to Comments group or main?)
@@ -182,9 +181,16 @@ All in `jabgui/src/main/java/org/jabref/gui/entryeditor/` unless noted:
   are kept via `userAddedFields`.
 - 2026-07-05: Steps 8, 9, 11 done (see checklist notes above); step 12 done to the
   extent possible headless. Step 10 (MathSciNet) intentionally open.
-  IMPORTANT for resume: TestFX tests + LocalizationConsistencyTest CANNOT run in a
-  headless session ("Unable to open DISPLAY" in ApplicationExtension.beforeEach —
-  pre-existing, also fails on main here). Verify on CI or a machine with a display.
-  Remaining work: manual smoke test + screenshots, decide step 10, decide open
-  questions 1–5 (tab name currently "Fields"), possibly one-shot pref migration
-  before release, then PR.
+  IMPORTANT for resume: TestFX tests + LocalizationConsistencyTest need a display —
+  Oliver's session has one at DISPLAY=:10.0 (pass it to gradlew; restart the daemon
+  once so forked JVMs inherit it).
+- 2026-07-05 (later): GUI smoke test on DISPLAY=:10.0 found and fixed a layout bug:
+  `FieldNameLabel` and `EditorTextField` set `prefHeight(POSITIVE_INFINITY)` (to fill
+  the old stretch layout's percent rows), which collapsed the natural-height grid into
+  uniform tiny rows. Fix: AllFieldsTab resets label pref heights and normalizes text
+  inputs (`normalizeInputHeights`). Decisions from Oliver applied: tab renamed
+  **"Main"** (l10n key added), **preview stays** in-tab. Screenshots in
+  `build/screenshots/`. All checks green with display.
+  Remaining work: decide step 10 (MathSciNet), remaining open questions 3–5,
+  possibly one-shot pref migration before release, keywords-editor height polish,
+  then PR.

@@ -22,6 +22,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
@@ -224,6 +225,10 @@ public class AllFieldsTab extends FieldsEditorTab {
             }
             for (Field field : section.fields()) {
                 Label label = labelForField.get(field);
+                // FieldNameLabel sets prefHeight to infinity to fill the stretch layout's
+                // percent-height rows; in the natural-height list that would blow up every
+                // row's preferred height, so reset it to the computed size.
+                label.setPrefHeight(Region.USE_COMPUTED_SIZE);
                 GridPane.setValignment(label, VPos.TOP);
                 gridPane.add(label, 0, row);
                 gridPane.add(editors.get(field).getNode(), 1, row);
@@ -335,17 +340,24 @@ public class AllFieldsTab extends FieldsEditorTab {
     }
 
     private static void applyNaturalHeight(FieldEditorFX editor) {
-        limitTextAreaRows(editor.getNode());
+        normalizeInputHeights(editor.getNode());
         if ((editor.getWeight() > 1) && (editor.getNode() instanceof Region region)) {
             region.setPrefHeight(editor.getWeight() * HEIGHT_PER_WEIGHT);
         }
     }
 
-    private static void limitTextAreaRows(Node node) {
+    /// The classic stretch layout lets text inputs fill their percent-height rows by setting
+    /// an infinite pref height ({@link org.jabref.gui.fieldeditors.EditorTextField}); in the
+    /// natural-height list that blows up the rows' preferred heights, so reset text fields to
+    /// their computed size and cap text areas at a few visible rows.
+    private static void normalizeInputHeights(Node node) {
         if (node instanceof TextArea textArea) {
             textArea.setPrefRowCount(MULTILINE_ROWS);
+            textArea.setPrefHeight(Region.USE_COMPUTED_SIZE);
+        } else if (node instanceof TextField textField) {
+            textField.setPrefHeight(Region.USE_COMPUTED_SIZE);
         } else if (node instanceof Parent parent) {
-            parent.getChildrenUnmodifiable().forEach(AllFieldsTab::limitTextAreaRows);
+            parent.getChildrenUnmodifiable().forEach(AllFieldsTab::normalizeInputHeights);
         }
     }
 }

@@ -77,7 +77,7 @@ public sealed interface EntryEditorTabModel
                 case PREVIEW ->
                         Localization.lang("Preview");
                 case ALL_FIELDS ->
-                        Localization.lang("Fields");
+                        Localization.lang("Main");
                 case REQUIRED_FIELDS ->
                         Localization.lang("Required fields");
                 case IMPORTANT_OPTIONAL_FIELDS ->
