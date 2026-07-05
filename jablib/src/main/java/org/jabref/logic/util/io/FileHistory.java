@@ -8,11 +8,7 @@ import javafx.collections.ModifiableObservableListBase;
 
 import org.jabref.logic.util.JabRefBaseDirectoryLocator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class FileHistory extends ModifiableObservableListBase<Path> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileHistory.class);
 
     private static final int HISTORY_SIZE = 8;
 
@@ -64,7 +60,6 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
         // (e.g. both on C:\). Different roots (e.g. C:\ vs H:\) cannot
         // be relativized and should be silently skipped.
         if (file.isAbsolute()) {
-
             if (file.getRoot() != null && file.getRoot().equals(baseDirectoryPath.getRoot())) {
                 this.remove(baseDirectoryPath.relativize(file).normalize());
             }
