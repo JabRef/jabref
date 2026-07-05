@@ -123,7 +123,8 @@ public final class FieldListSections {
                     new LinkedHashSet<>(BIBLIOMETRY_FIELDS);
             case META ->
                     new LinkedHashSet<>(META_CHIP_FIELDS);
-            case MAIN, COMMENTS ->
+            case MAIN,
+                 COMMENTS ->
                     new LinkedHashSet<>();
         };
     }
