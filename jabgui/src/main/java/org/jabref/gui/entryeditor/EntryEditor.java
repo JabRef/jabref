@@ -61,7 +61,7 @@ import org.jspecify.annotations.Nullable;
 /// GUI component that allows editing of the fields of a BibEntry (i.e. the one that shows up, when you double click on
 /// an entry in the table)
 ///
-/// It hosts the tabs (required, general, optional) and the buttons to the left.
+/// It hosts the tabs (Main, LaTeX citations, Source, …) and the buttons to the left.
 ///
 /// EntryEditor also registers itself to the event bus, receiving events whenever a field of the entry changes, enabling
 /// the text fields to update themselves if the change is made from somewhere else.
