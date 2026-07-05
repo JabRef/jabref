@@ -53,7 +53,7 @@ class ZbMATHTest {
 
         String expectedUrl = "https://api.zbmath.org/v1/document/_search"
                 + "?search_string=ti%3A%22An%20application%20of%20gauge%20theory"
-                + "%20to%20four%20dimensional%20topology%22%20au%3A%22Donaldson%22"
+                + "%20to%20four%20dimensional%20topology%22%20%26%20au%3ADonaldson"
                 + "&page=0&results_per_page=1";
         assertEquals(expectedUrl, urlForEntry.toString());
     }

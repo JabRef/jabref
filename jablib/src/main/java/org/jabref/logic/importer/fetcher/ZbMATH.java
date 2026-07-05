@@ -7,7 +7,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.StringJoiner;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
@@ -30,6 +29,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.BaseQueryNode;
+import org.jabref.model.search.query.OperatorNode;
+import org.jabref.model.search.query.SearchQueryNode;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
@@ -129,29 +130,28 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
     }
 
     private String buildSearchQuery(BibEntry entry) {
-        StringJoiner searchQuery = new StringJoiner(" ");
+        List<BaseQueryNode> searchNodes = new ArrayList<>();
         entry.getFieldOrAlias(StandardField.TITLE)
-             .ifPresent(title -> addExactSearchTerm(searchQuery, "ti", title));
+             .ifPresent(title -> addSearchNode(searchNodes, StandardField.TITLE, title));
         entry.getFieldOrAlias(StandardField.AUTHOR)
              .map(AuthorList::parse)
              .ifPresent(authors -> authors.getAuthors()
-                                          .forEach(author -> addExactSearchTerm(searchQuery, "au", author.getNamePrefixAndFamilyName())));
+                                          .forEach(author -> addSearchNode(searchNodes, StandardField.AUTHOR, author.getNamePrefixAndFamilyName())));
         entry.getFieldOrAlias(StandardField.JOURNAL)
-             .ifPresent(journal -> addExactSearchTerm(searchQuery, "so", journal));
+             .ifPresent(journal -> addSearchNode(searchNodes, StandardField.JOURNAL, journal));
         entry.getFieldOrAlias(StandardField.YEAR)
-             .ifPresent(year -> addSearchTerm(searchQuery, "py", year));
-        return searchQuery.toString();
-    }
-
-    private void addExactSearchTerm(StringJoiner searchQuery, String field, String value) {
-        if (!StringUtil.isBlank(value)) {
-            addSearchTerm(searchQuery, field, "\"%s\"".formatted(value.replace("\"", "\\\"")));
+             .ifPresent(year -> addSearchNode(searchNodes, StandardField.YEAR, year));
+        if (searchNodes.isEmpty()) {
+            return "";
         }
+        return new ZbMathQueryTransformer()
+                .transformSearchQuery(new OperatorNode(OperatorNode.Operator.AND, searchNodes))
+                .orElse("");
     }
 
-    private void addSearchTerm(StringJoiner searchQuery, String field, String value) {
+    private void addSearchNode(List<BaseQueryNode> searchNodes, StandardField field, String value) {
         if (!StringUtil.isBlank(value)) {
-            searchQuery.add("%s:%s".formatted(field, value));
+            searchNodes.add(new SearchQueryNode(Optional.of(field), value));
         }
     }
 
