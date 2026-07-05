@@ -82,8 +82,8 @@ public final class FieldListSections {
             StandardField.ICORERANKING));
 
     /// Membership of the Meta section; a superset of {@link #META_CHIP_FIELDS} because the
-    /// timestamp fields are managed automatically and the special fields are set via the
-    /// main table / menus, so they are shown when set but not offered as add-chips.
+    /// timestamp fields are managed automatically, so they are shown when set but not
+    /// offered as add-chips.
     private static final SequencedSet<Field> META_FIELDS = new LinkedHashSet<>(List.of(
             StandardField.CROSSREF,
             StandardField.GROUPS,
@@ -92,12 +92,18 @@ public final class FieldListSections {
             StandardField.CREATIONDATE,
             StandardField.MODIFICATIONDATE));
 
-    private static final SequencedSet<Field> META_CHIP_FIELDS = new LinkedHashSet<>(List.of(
-            StandardField.CROSSREF,
-            StandardField.GROUPS,
-            StandardField.OWNER));
+    private static final SequencedSet<Field> META_CHIP_FIELDS = buildMetaChipFields();
 
     private FieldListSections() {
+    }
+
+    private static SequencedSet<Field> buildMetaChipFields() {
+        SequencedSet<Field> fields = new LinkedHashSet<>(List.of(
+                StandardField.CROSSREF,
+                StandardField.GROUPS,
+                StandardField.OWNER));
+        fields.addAll(List.of(SpecialField.values()));
+        return fields;
     }
 
     /// All fields belonging to the given section (in display order) — the basis for the

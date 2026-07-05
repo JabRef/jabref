@@ -32,8 +32,9 @@ Branch: `new-entry-editor` (based on `main`).
   5. **Comments** (TitledPane): COMMENT + user-specific comment fields; chips for COMMENT
      and the current user's comment field (gated by shouldShowUserCommentsFields)
   6. **Meta** (TitledPane, added 2026-07-05 per Oliver — "meta to the paper"): CROSSREF,
-     GROUPS, OWNER, TIMESTAMP/CREATIONDATE/MODIFICATIONDATE, SpecialFields; chips only
-     for the manually-edited ones {CROSSREF, GROUPS, OWNER}.
+     GROUPS, OWNER, TIMESTAMP/CREATIONDATE/MODIFICATIONDATE, SpecialFields; chips for
+     {CROSSREF, GROUPS, OWNER} + all SpecialFields (priority, read status, …);
+     only the auto-managed timestamp fields have no chip.
      With these sections, the default customized tabs "General" and "Abstract" are gone
      (`EntryEditorPreferences.getDefaultEntryEditorTabs()` returns an empty map; stored
      user customizations are kept).
@@ -147,13 +148,25 @@ All in `jabgui/src/main/java/org/jabref/gui/entryeditor/` unless noted:
   works, chips add+focus fields and disappear, entry switching recomputes the list,
   preview pane coexists.
 
+### Phase 5 — Refinements requested 2026-07-05 (after live review)
+
+- [ ] **13. Highlight add-chips of missing required fields**: if a required field of the
+  current entry type is not set and lives in a section (conceivable future: DOI required),
+  its "+" chip gets a visual highlight (e.g. warning accent) and its section is expanded
+  by default. (Today required fields always render as empty editors, so this mainly
+  future-proofs OrFields alternatives + possible required identifiers.)
+- [ ] **14. Free-form add box only offers fields not already available above**: filter the
+  ComboBox suggestions to exclude fields that are already shown as editors AND fields
+  already offered as add-chips in any section/chip bar.
+
 ## Open questions (ask Oliver / decide before the relevant step)
 
 1. Tab display name → **RESOLVED 2026-07-05 by Oliver: "Main"** (was interim "Fields").
 2. Do the old category tabs stay as opt-in (visibility=false) or get deleted?
    → **Interim: keep classes, default-off** (step 1), delete later in a follow-up PR.
-3. Exact group membership (identifiers list; does ABSTRACT belong to Comments group or main?)
-   → **Interim: ABSTRACT stays in main group.**
+3. Exact group membership (does ABSTRACT belong to Comments group or main?)
+   → **RESOLVED 2026-07-05 by Oliver: ABSTRACT stays in the main group ("abstract is
+   nice as you did now").**
 4. Custom user-defined tabs: their fields also appear in the new tab (no exclusion) — OK?
    → **Interim: yes, show everything.**
 5. MathSciNet removal in this PR or separate? (step 10)

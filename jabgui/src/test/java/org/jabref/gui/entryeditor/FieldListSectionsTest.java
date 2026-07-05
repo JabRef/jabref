@@ -81,9 +81,12 @@ class FieldListSectionsTest {
     }
 
     @Test
-    void metaChipsOfferOnlyManuallyEditedFields() {
+    void metaChipsOfferManualFieldsAndSpecialFieldsButNoTimestamps() {
+        List<Field> metaChips = List.copyOf(FieldListSections.fieldsOf(FieldListSections.SectionType.META));
+
         assertEquals(List.of(StandardField.CROSSREF, StandardField.GROUPS, StandardField.OWNER),
-                List.copyOf(FieldListSections.fieldsOf(FieldListSections.SectionType.META)));
+                metaChips.subList(0, 3));
+        assertEquals(List.of(SpecialField.values()), metaChips.subList(3, metaChips.size()));
     }
 
     @Test
