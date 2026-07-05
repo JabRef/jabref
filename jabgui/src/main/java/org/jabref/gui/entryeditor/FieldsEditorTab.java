@@ -203,6 +203,13 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         return true;
     }
 
+    /// The node placed inside the tab's ScrollPane. By default the field grid itself;
+    /// subclasses may wrap {@link #gridPane} in a larger structure (e.g. with collapsible
+    /// sections) and return that instead. Called once from {@code initPanel()}.
+    protected Node getEditorContent() {
+        return gridPane;
+    }
+
     public void requestFocus(Field fieldName) {
         if (editors.containsKey(fieldName)) {
             editors.get(fieldName).focus();
@@ -232,7 +239,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
             ScrollPane scrollPane = new ScrollPane();
             scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
             scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-            scrollPane.setContent(gridPane);
+            scrollPane.setContent(getEditorContent());
             scrollPane.setFitToWidth(true);
             scrollPane.setFitToHeight(stretchContentToTabHeight());
 

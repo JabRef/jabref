@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.SequencedCollection;
 import java.util.SequencedSet;
-import java.util.Set;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
@@ -48,24 +47,41 @@ public final class FieldListSections {
     }
 
     /// `FieldProperty.IDENTIFIER` only marks DOI/EPRINT/PMID, therefore an explicit list.
-    private static final Set<Field> IDENTIFIER_FIELDS = Set.of(
+    /// Order = chip/display order in the Identifiers section.
+    private static final SequencedSet<Field> IDENTIFIER_FIELDS = new LinkedHashSet<>(List.of(
             StandardField.DOI,
             StandardField.ISBN,
             StandardField.ISSN,
             StandardField.EPRINT,
-            StandardField.EPRINTCLASS,
             StandardField.EPRINTTYPE,
+            StandardField.EPRINTCLASS,
             StandardField.ARCHIVEPREFIX,
             StandardField.PMID,
-            StandardField.MR_NUMBER);
+            StandardField.MR_NUMBER));
 
-    private static final Set<Field> FILE_AND_LINK_FIELDS = Set.of(
+    /// Order = chip/display order in the Files and links section.
+    private static final SequencedSet<Field> FILE_AND_LINK_FIELDS = new LinkedHashSet<>(List.of(
             StandardField.FILE,
             StandardField.URL,
             StandardField.URI,
-            StandardField.URLDATE);
+            StandardField.URLDATE));
 
     private FieldListSections() {
+    }
+
+    /// All fields belonging to the given section (in display order) — the basis for the
+    /// section's add-chips. Empty for {@link SectionType#MAIN} (its add-chips come from the
+    /// entry type's optional fields) and {@link SectionType#COMMENTS} (user-specific comment
+    /// fields are dynamic).
+    public static SequencedSet<Field> fieldsOf(SectionType type) {
+        return switch (type) {
+            case IDENTIFIERS ->
+                    new LinkedHashSet<>(IDENTIFIER_FIELDS);
+            case FILES_AND_LINKS ->
+                    new LinkedHashSet<>(FILE_AND_LINK_FIELDS);
+            case MAIN, COMMENTS ->
+                    new LinkedHashSet<>();
+        };
     }
 
     public static SectionType sectionOf(Field field) {

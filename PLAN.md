@@ -18,13 +18,17 @@ Branch: `new-entry-editor` (based on `main`).
   (separate step at the end, still unconfirmed).
 - Content = **all set fields** + **all required fields (even when empty)**, in one **vertically
   scrolling list** (natural heights, NOT the current stretch-to-tab-height GridPane).
-- **Grouping** within the list (section header + thin separator, Google-Contacts style):
+- **Grouping** within the list (refined by Oliver 2026-07-05: always-present COLLAPSIBLE
+  sections — collapsed when empty, expanded when a member field is set; each section has
+  its own add-chips for unset member fields; main optional chips sit ABOVE the sections):
   1. *(no header — main)*: citation key, then required fields (entry-type order), then set
-     optional fields (important → detail order), then remaining set fields (incl. deprecated)
-  2. **Identifiers**: set ∩ {DOI, ISBN, ISSN, EPRINT(+CLASS/TYPE), PMID, MR_NUMBER, …}
-     (explicit list; `FieldProperty.IDENTIFIER` only marks DOI/EPRINT, so don't rely on it alone)
-  3. **Files & Links**: set ∩ {FILE, URL, URLDATE}
-  4. **Comments**: COMMENT + set `UserSpecificCommentField`s
+     optional fields (important → detail order), then remaining set fields (incl. deprecated);
+     directly followed by the main add-chips (+ Number, + Month, … / "Show more")
+  2. **Identifiers** (TitledPane): collects ALL identifier fields {DOI, ISBN, ISSN,
+     EPRINT(+TYPE/+CLASS), ARCHIVEPREFIX, PMID, MR_NUMBER}; unset ones as chips
+  3. **Files & Links** (TitledPane): {FILE, URL, URI, URLDATE}; unset ones as chips
+  4. **Comments** (TitledPane): COMMENT + user-specific comment fields; chips for COMMENT
+     and the current user's comment field (gated by shouldShowUserCommentsFields)
 - **Add fields** (bottom of the list, Google-style):
   - Chips/buttons for each *unset important-optional* field → click shows an empty editor
     in the list and focuses it.
@@ -194,3 +198,12 @@ All in `jabgui/src/main/java/org/jabref/gui/entryeditor/` unless noted:
   Remaining work: decide step 10 (MathSciNet), remaining open questions 3–5,
   possibly one-shot pref migration before release, keywords-editor height polish,
   then PR.
+- 2026-07-05 (later still): Section redesign per Oliver's feedback: Identifiers /
+  Files and links / Comments are now always-present collapsible TitledPanes (collapsed
+  iff empty; manual toggle survives rebuilds per entry via `sectionExpandOverrides`),
+  each with its own add-chips (Identifiers collects ALL identifier fields); main
+  optional chips moved directly under the main fields (above Identifiers); free-form
+  add row stays at the bottom. New hooks: `FieldsEditorTab.getEditorContent()`;
+  `FieldListSections.fieldsOf(type)`. Verified live on DISPLAY=:10.0 (screenshots
+  refreshed in build/screenshots/): collapsed-by-default on minimal entry, expand
+  shows chips, chip click adds + focuses field. Tests + checkstyle green.

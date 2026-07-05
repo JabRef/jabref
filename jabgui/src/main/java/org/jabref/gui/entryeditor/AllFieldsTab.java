@@ -1,11 +1,14 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.SequencedCollection;
 import java.util.SequencedSet;
 import java.util.Set;
 
@@ -20,9 +23,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
@@ -52,17 +55,21 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UserSpecificCommentField;
 
 import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.Nullable;
 
-/// The single scroll-list tab showing *all* fields of an entry (issue #12711):
+/// The single scroll-list tab ("Main") showing *all* fields of an entry (issue #12711):
 /// the citation key, all required fields (even when unset), and every set field.
 /// Replaces the classic category tabs (required / optional / other / …) as the default view.
 ///
-/// Fields are grouped Google-Contacts style ({@link FieldListSections}); below the list,
-/// unset optional fields can be added via one-click chips ("Show more" reveals the
-/// secondary-optional ones) or via a free-form field-name box.
+/// Below the main fields sits a chip bar for adding unset optional fields ("Show more"
+/// reveals the secondary-optional ones). The identifiers, files & links, and comments
+/// groups are always-present collapsible sections — collapsed when empty — each with its
+/// own add-chips for its unset member fields. A free-form field-name box at the bottom
+/// adds arbitrary fields.
 public class AllFieldsTab extends FieldsEditorTab {
 
     /// Preferred number of visible text rows for multiline editors in the scroll list
@@ -74,11 +81,21 @@ public class AllFieldsTab extends FieldsEditorTab {
     private static final double HEIGHT_PER_WEIGHT = 60;
 
     private final BibEntryTypesManager entryTypesManager;
+    private final GuiPreferences guiPreferences;
+
+    /// The current user's personal comment field (cf. {@link CommentsTab}).
+    private final UserSpecificCommentField userSpecificCommentField;
 
     /// Fields the user added via chip / free-form box that are still empty: they are not part
     /// of {@link BibEntry#getFields()} yet, but must stay visible while this entry is edited.
     private final Set<Field> userAddedFields = new LinkedHashSet<>();
     private @Nullable BibEntry entryOfUserAddedFields;
+
+    /// Manual expand/collapse decisions per section, kept across rebuilds for the current
+    /// entry (cleared on entry switch). Without an override, a section is expanded iff it
+    /// contains at least one shown field.
+    private final Map<FieldListSections.SectionType, Boolean> sectionExpandOverrides =
+            new EnumMap<>(FieldListSections.SectionType.class);
 
     /// Sticky per tab instance: whether the secondary-optional chips are expanded.
     private boolean showSecondaryOptionalChips;
@@ -86,6 +103,9 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// The entry whose event bus this tab is currently subscribed to (for live refresh
     /// when fields are set/unset from outside, e.g. Source tab, fetchers, undo).
     private @Nullable BibEntry subscribedEntry;
+
+    /// Scroll content: main grid + chip bar + section panes + free-form add row.
+    private @Nullable VBox listContainer;
 
     public AllFieldsTab(UndoManager undoManager,
                         UndoAction undoAction,
@@ -107,6 +127,11 @@ public class AllFieldsTab extends FieldsEditorTab {
         );
 
         this.entryTypesManager = entryTypesManager;
+        this.guiPreferences = preferences;
+        String defaultOwner = preferences.getOwnerPreferences().getDefaultOwner()
+                                         .toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "-");
+        this.userSpecificCommentField = new UserSpecificCommentField(defaultOwner);
+
         setText(EntryEditorTabModel.BuiltIn.ALL_FIELDS.displayName());
         setTooltip(new Tooltip(Localization.lang("Show all fields")));
         setGraphic(IconTheme.JabRefIcons.REQUIRED.getGraphicNode());
@@ -119,6 +144,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         if (entry != entryOfUserAddedFields) {
             userAddedFields.clear();
+            sectionExpandOverrides.clear();
             entryOfUserAddedFields = entry;
         }
 
@@ -149,6 +175,15 @@ public class AllFieldsTab extends FieldsEditorTab {
     @Override
     protected boolean stretchContentToTabHeight() {
         return false;
+    }
+
+    @Override
+    protected Node getEditorContent() {
+        if (listContainer == null) {
+            listContainer = new VBox();
+            listContainer.getStyleClass().add("all-fields-container");
+        }
+        return listContainer;
     }
 
     @Override
@@ -191,22 +226,12 @@ public class AllFieldsTab extends FieldsEditorTab {
         }
     }
 
-    /// Single column of label/editor rows with natural heights (the tab scrolls instead of
-    /// stretching the editors to the tab height), grouped into sections
-    /// (main / identifiers / files & links / comments) with a header before each named section,
-    /// followed by the add-field controls.
+    /// Main fields as a grid with natural row heights, then the optional-field chip bar,
+    /// then the always-present collapsible sections (identifiers / files & links / comments,
+    /// collapsed when empty) each with its own add-chips, then the free-form add row.
+    /// The whole column scrolls instead of stretching to the tab height.
     @Override
     protected void layoutEditors(BibDatabaseContext bibDatabaseContext, BibEntry entry, boolean compressed, List<Label> labels) {
-        if (!gridPane.getStyleClass().contains("all-fields-list")) {
-            gridPane.getStyleClass().add("all-fields-list");
-        }
-
-        ColumnConstraints labelColumn = new ColumnConstraints();
-        labelColumn.setMinWidth(Region.USE_PREF_SIZE);
-        ColumnConstraints editorColumn = new ColumnConstraints();
-        editorColumn.setHgrow(Priority.ALWAYS);
-        gridPane.getColumnConstraints().addAll(labelColumn, editorColumn);
-
         // labels were created in editors-map iteration order (see FieldsEditorTab#setupPanel)
         Map<Field, Label> labelForField = new LinkedHashMap<>();
         int labelIndex = 0;
@@ -215,43 +240,115 @@ public class AllFieldsTab extends FieldsEditorTab {
             labelIndex++;
         }
 
-        int row = 0;
-        // editors is a LinkedHashMap; copy keeps the display order as a SequencedCollection
-        for (FieldListSections.Section section : FieldListSections.partition(List.copyOf(editors.keySet()))) {
-            Optional<String> header = section.type().header();
-            if (header.isPresent()) {
-                gridPane.add(createSectionHeader(header.get()), 0, row, 2, 1);
-                row++;
-            }
-            for (Field field : section.fields()) {
-                Label label = labelForField.get(field);
-                // FieldNameLabel sets prefHeight to infinity to fill the stretch layout's
-                // percent-height rows; in the natural-height list that would blow up every
-                // row's preferred height, so reset it to the computed size.
-                label.setPrefHeight(Region.USE_COMPUTED_SIZE);
-                GridPane.setValignment(label, VPos.TOP);
-                gridPane.add(label, 0, row);
-                gridPane.add(editors.get(field).getNode(), 1, row);
-                row++;
-            }
+        Map<FieldListSections.SectionType, SequencedSet<Field>> buckets =
+                new EnumMap<>(FieldListSections.SectionType.class);
+        for (FieldListSections.SectionType type : FieldListSections.SectionType.values()) {
+            buckets.put(type, new LinkedHashSet<>());
         }
+        editors.keySet().forEach(field -> buckets.get(FieldListSections.sectionOf(field)).add(field));
 
-        gridPane.add(createAddFieldArea(bibDatabaseContext, entry), 0, row, 2, 1);
+        // Main section rows go into the (already cleared) inherited gridPane
+        if (!gridPane.getStyleClass().contains("all-fields-list")) {
+            gridPane.getStyleClass().add("all-fields-list");
+        }
+        addFieldRows(gridPane, buckets.get(FieldListSections.SectionType.MAIN), labelForField);
+
+        VBox container = (VBox) getEditorContent();
+        container.getChildren().setAll(gridPane, createMainChipBar(bibDatabaseContext, entry));
+        for (FieldListSections.SectionType type : List.of(
+                FieldListSections.SectionType.IDENTIFIERS,
+                FieldListSections.SectionType.FILES_AND_LINKS,
+                FieldListSections.SectionType.COMMENTS)) {
+            container.getChildren().add(
+                    createSectionPane(type, buckets.get(type), labelForField, bibDatabaseContext, entry));
+        }
+        container.getChildren().add(createFreeFormAddRow(bibDatabaseContext, entry));
 
         editors.values().forEach(AllFieldsTab::applyNaturalHeight);
     }
 
-    private static Node createSectionHeader(String text) {
-        Label header = new Label(text);
-        header.getStyleClass().add("all-fields-section-header");
-        VBox box = new VBox(new Separator(), header);
-        box.getStyleClass().add("all-fields-section");
-        return box;
+    /// Label/editor rows with natural heights, label column as narrow as its content.
+    private void addFieldRows(GridPane grid, SequencedCollection<Field> fields, Map<Field, Label> labelForField) {
+        ColumnConstraints labelColumn = new ColumnConstraints();
+        labelColumn.setMinWidth(Region.USE_PREF_SIZE);
+        ColumnConstraints editorColumn = new ColumnConstraints();
+        editorColumn.setHgrow(Priority.ALWAYS);
+        grid.getColumnConstraints().setAll(labelColumn, editorColumn);
+
+        int row = 0;
+        for (Field field : fields) {
+            Label label = labelForField.get(field);
+            // FieldNameLabel sets prefHeight to infinity to fill the stretch layout's
+            // percent-height rows; in the natural-height list that would blow up every
+            // row's preferred height, so reset it to the computed size.
+            label.setPrefHeight(Region.USE_COMPUTED_SIZE);
+            GridPane.setValignment(label, VPos.TOP);
+            grid.add(label, 0, row);
+            grid.add(editors.get(field).getNode(), 1, row);
+            row++;
+        }
     }
+
+    // region sections
+
+    /// An always-present collapsible section: its shown fields as rows plus add-chips for
+    /// its unset member fields. Collapsed by default when it contains no field; a manual
+    /// expand/collapse survives rebuilds until another entry is opened.
+    private TitledPane createSectionPane(FieldListSections.SectionType type,
+                                         SequencedSet<Field> shownFields,
+                                         Map<Field, Label> labelForField,
+                                         BibDatabaseContext bibDatabaseContext,
+                                         BibEntry entry) {
+        VBox content = new VBox();
+        content.getStyleClass().add("all-fields-section-content");
+
+        if (!shownFields.isEmpty()) {
+            GridPane sectionGrid = new GridPane();
+            sectionGrid.setHgap(10);
+            sectionGrid.setVgap(8);
+            addFieldRows(sectionGrid, shownFields, labelForField);
+            content.getChildren().add(sectionGrid);
+        }
+
+        SequencedSet<Field> chipFields = FieldListSections.subtract(sectionMemberFields(type), editors.keySet());
+        if (!chipFields.isEmpty()) {
+            FlowPane chips = new FlowPane();
+            chips.getStyleClass().add("all-fields-add-chips");
+            chipFields.forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));
+            content.getChildren().add(chips);
+        }
+
+        TitledPane pane = new TitledPane(type.header().orElse(""), content);
+        pane.getStyleClass().add("all-fields-section-pane");
+        pane.setCollapsible(true);
+        pane.setAnimated(false);
+        pane.setExpanded(sectionExpandOverrides.getOrDefault(type, !shownFields.isEmpty()));
+        pane.expandedProperty().addListener((_, _, expanded) -> sectionExpandOverrides.put(type, expanded));
+        return pane;
+    }
+
+    /// All member fields of a section offered as add-chips; the comments section offers the
+    /// general comment plus the current user's personal comment field (if enabled).
+    private SequencedSet<Field> sectionMemberFields(FieldListSections.SectionType type) {
+        if (type == FieldListSections.SectionType.COMMENTS) {
+            SequencedSet<Field> commentFields = new LinkedHashSet<>();
+            commentFields.add(StandardField.COMMENT);
+            if (guiPreferences.getEntryEditorPreferences().shouldShowUserCommentsFields()) {
+                commentFields.add(userSpecificCommentField);
+            }
+            return commentFields;
+        }
+        return FieldListSections.fieldsOf(type);
+    }
+
+    // endregion
 
     // region add-field controls
 
-    private Node createAddFieldArea(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
+    /// Chips for the entry type's unset optional fields that belong to the main section
+    /// (identifier/file/comment fields get their chips inside their own section);
+    /// "Show more" reveals the secondary-optional ones.
+    private Node createMainChipBar(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
         BibDatabaseMode mode = getDatabaseMode();
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
 
@@ -260,11 +357,14 @@ public class AllFieldsTab extends FieldsEditorTab {
 
         if (entryType.isPresent()) {
             List<Field> shown = List.copyOf(editors.keySet());
-            FieldListSections.subtract(entryType.get().getImportantOptionalFields(), shown)
+            FieldListSections.subtract(entryType.get().getImportantOptionalFields(), shown).stream()
+                             .filter(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.MAIN)
                              .forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));
 
-            SequencedSet<Field> secondary = FieldListSections.subtract(
-                    entryType.get().getDetailOptionalNotDeprecatedFields(mode), shown);
+            List<Field> secondary = FieldListSections.subtract(
+                                                             entryType.get().getDetailOptionalNotDeprecatedFields(mode), shown).stream()
+                                                     .filter(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.MAIN)
+                                                     .toList();
             if (!secondary.isEmpty()) {
                 if (showSecondaryOptionalChips) {
                     secondary.forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));
@@ -280,6 +380,10 @@ public class AllFieldsTab extends FieldsEditorTab {
             }
         }
 
+        return chips;
+    }
+
+    private Node createFreeFormAddRow(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
         ComboBox<String> fieldNameBox = new ComboBox<>();
         fieldNameBox.setEditable(true);
         fieldNameBox.getItems().addAll(FieldFactory.getAllFieldsWithOutInternal().stream()
@@ -294,10 +398,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         HBox freeFormRow = new HBox(fieldNameBox, addButton);
         freeFormRow.getStyleClass().add("all-fields-add-free-form");
         freeFormRow.setAlignment(Pos.CENTER_LEFT);
-
-        VBox area = new VBox(new Separator(), chips, freeFormRow);
-        area.getStyleClass().add("all-fields-add-area");
-        return area;
+        return freeFormRow;
     }
 
     private Button createAddChip(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {

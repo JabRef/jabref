@@ -66,6 +66,15 @@ class FieldListSectionsTest {
     }
 
     @Test
+    void fieldsOfIdentifiersStartsWithDoiAndCollectsAllIdentifierFields() {
+        List<Field> identifierFields = List.copyOf(
+                FieldListSections.fieldsOf(FieldListSections.SectionType.IDENTIFIERS));
+
+        assertEquals(StandardField.DOI, identifierFields.getFirst());
+        assertEquals(9, identifierFields.size());
+    }
+
+    @Test
     void urlAndUrlDateBelongToFilesAndLinksSection() {
         assertEquals(FieldListSections.SectionType.FILES_AND_LINKS,
                 FieldListSections.sectionOf(StandardField.URL));
