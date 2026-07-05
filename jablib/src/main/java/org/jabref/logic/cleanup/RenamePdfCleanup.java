@@ -101,7 +101,7 @@ public class RenamePdfCleanup implements CleanupJob {
             return true;
         }
         return FileUtil.getFileExtension(file.getLink())
-                       .map(extension -> extension.equalsIgnoreCase(PDF_EXTENSION))
+                       .map(extension -> PDF_EXTENSION.equalsIgnoreCase(extension))
                        .orElse(false);
     }
 
