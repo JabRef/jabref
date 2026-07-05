@@ -184,11 +184,17 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     }
 
     private static boolean isEmptyRow(EventTarget target) {
-        Node node = target instanceof Node eventNode ? eventNode : null;
-        while (node != null && !(node instanceof ListCell<?>)) {
-            node = node.getParent();
+        Optional<ListCell<?>> enclosingCell = target instanceof Node node
+                ? findEnclosingListCell(node)
+                : Optional.empty();
+        return enclosingCell.map(ListCell::isEmpty).orElse(false);
+    }
+
+    private static Optional<ListCell<?>> findEnclosingListCell(Node node) {
+        if (node instanceof ListCell<?> cell) {
+            return Optional.of(cell);
         }
-        return (node instanceof ListCell<?> cell) && cell.isEmpty();
+        return Optional.ofNullable(node.getParent()).flatMap(LinkedFilesEditor::findEnclosingListCell);
     }
 
     private void handleOnDragOver(LinkedFileViewModel originalItem, DragEvent event) {
