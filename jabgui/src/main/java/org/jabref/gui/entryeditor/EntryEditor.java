@@ -37,6 +37,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.logic.ai.AiService;
@@ -74,6 +75,8 @@ public class EntryEditor extends BorderPane implements PreviewControls {
 
     private final EntryEditorViewModel viewModel;
     private final EntryEditorFocusUtils focusUtils;
+
+    private @Nullable JumpToFieldDialog jumpToFieldDialog;
 
     @FXML private TabPane tabbed;
 
@@ -296,11 +299,17 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     }
 
     private void openJumpToFieldDialog() {
-        if (getCurrentlyEditedEntry() != null) {
-            JumpToFieldDialog dialog = new JumpToFieldDialog(this);
-            dialog.initModality(Modality.NONE);
-            dialog.show();
+        if (jumpToFieldDialog != null && jumpToFieldDialog.isShowing()) {
+            BaseDialog.bringToFront(jumpToFieldDialog);
+            return;
         }
+
+        Optional.ofNullable(getCurrentlyEditedEntry()).ifPresent(_ -> {
+            jumpToFieldDialog = new JumpToFieldDialog(this);
+            jumpToFieldDialog.initModality(Modality.NONE);
+            jumpToFieldDialog.setOnHidden(_ -> jumpToFieldDialog = null);
+            jumpToFieldDialog.show();
+        });
     }
 
     @FXML
