@@ -8,12 +8,14 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
+import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ProgressBar;
@@ -48,7 +50,6 @@ import org.jabref.gui.linkedfile.LinkedFileEditDialog;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -66,6 +67,8 @@ import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 import jakarta.inject.Inject;
 
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
+
+    private static final double DEFAULT_ROW_HEIGHT = 30.0;
 
     @FXML
     private ListView<LinkedFileViewModel> listView;
@@ -116,8 +119,12 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
-        UiThreadObservableList<LinkedFileViewModel> decoratedModelList = new UiThreadObservableList<>(viewModel.filesProperty());
-        Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);
+        // Bind directly to the view model's own list (not a wrapper): JavaFX's bindContentBidirectional
+        // dispatches change events by identity of the lists it was given, so wrapping one side (e.g. in
+        // UiThreadObservableList) makes every Change#getList() report the wrapped delegate instead of the
+        // list JavaFX is tracking, silently breaking the live sync (a Change#getList() identity mismatch).
+        // filesProperty() is only ever mutated on the FX Application Thread, so no extra marshaling is needed.
+        Bindings.bindContentBidirectional(listView.itemsProperty().get(), viewModel.filesProperty());
     }
 
     @FXML
@@ -156,10 +163,32 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 .install(listView);
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+        // Size the control to exactly (number of files + 1) rows, so it ends right after the content instead of leaving blank space.
+        listView.setFixedCellSize(DEFAULT_ROW_HEIGHT);
+        listView.prefHeightProperty().bind(
+                Bindings.size(listView.getItems())
+                        .add(1)
+                        .multiply(DEFAULT_ROW_HEIGHT));
+
         fulltextFetcher.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty().not());
         progressIndicator.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty());
 
         setUpKeyBindings();
+
+        // Double-clicking the empty row below the files (the "+1" row) adds a new file, same as the add button.
+        listView.setOnMouseClicked(event -> {
+            if ((event.getButton() == MouseButton.PRIMARY) && (event.getClickCount() == 2) && isEmptyRow(event.getTarget())) {
+                addNewFile();
+            }
+        });
+    }
+
+    private static boolean isEmptyRow(EventTarget target) {
+        Node node = target instanceof Node eventNode ? eventNode : null;
+        while (node != null && !(node instanceof ListCell<?>)) {
+            node = node.getParent();
+        }
+        return (node instanceof ListCell<?> cell) && cell.isEmpty();
     }
 
     private void handleOnDragOver(LinkedFileViewModel originalItem, DragEvent event) {
