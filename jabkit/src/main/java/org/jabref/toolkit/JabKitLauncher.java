@@ -79,20 +79,7 @@ public class JabKitLauncher {
             Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
 
             JabKit jabKit = new JabKit(preferences, entryTypesManager);
-            // All (sub)commands mix in JabKit.SharedOptions to allow -p/-d/-h at any command depth.
-            // Resolving them through one shared instance (instead of picocli's default of one instance
-            // per mixin site) ensures e.g. `jabkit -p check consistency` and `jabkit check consistency -p`
-            // both enable porcelain output, instead of setting an unrelated, unread copy of the flag.
-            JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
-            CommandLine commandLine = new CommandLine(jabKit, new CommandLine.IFactory() {
-                @Override
-                public <K> K create(Class<K> cls) throws Exception {
-                    if (cls == JabKit.SharedOptions.class) {
-                        return cls.cast(sharedOptions);
-                    }
-                    return CommandLine.defaultFactory().create(cls);
-                }
-            });
+            CommandLine commandLine = new CommandLine(jabKit, JabKit.createFactory());
             commandLine.setExecutionExceptionHandler(new CliExceptionHandler(commandLine.getExecutionExceptionHandler()));
             // [impl->req~jabkit.cli.banner-shown~1]
             String usageHeader = BuildInfo.JABREF_BANNER.formatted(buildInfo.version) + "\n" + JABKIT_BRAND;
