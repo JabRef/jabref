@@ -85,6 +85,22 @@ class InputOptionUrlTest extends AbstractJabKitTest {
     }
 
     @Test
+    void inputOptionDownloadsBibtexFromUppercaseSchemeUrl(@TempDir Path tempDir) throws IOException {
+        server.enqueue(new MockResponse.Builder().code(200).body(BIBTEX_CONTENT).build());
+        String url = server.url("/references.bib").toString().replaceFirst("^http://", "HTTP://");
+        Path outputPath = tempDir.resolve("output");
+
+        int exitCode = commandLine.executeToLog("convert",
+                "--input=" + url,
+                "--input-format=bibtex",
+                "--output-format=bibtex",
+                "--output=" + outputPath);
+
+        assertEquals(CommandLine.ExitCode.OK, exitCode);
+        assertDarwin1888Entry(outputPath);
+    }
+
+    @Test
     void failedDownloadExitsWithSoftwareError() {
         server.enqueue(new MockResponse.Builder().code(404).build());
         HttpUrl url = server.url("/missing.bib");

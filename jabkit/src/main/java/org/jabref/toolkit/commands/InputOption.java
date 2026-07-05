@@ -2,6 +2,7 @@ package org.jabref.toolkit.commands;
 
 import java.net.MalformedURLException;
 import java.nio.file.Path;
+import java.util.Locale;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.l10n.Localization;
@@ -43,7 +44,8 @@ class InputOption {
                        ? inputSource.positionalInput
                        : inputSource.optionInput;
 
-        if (input.startsWith("http://") || input.startsWith("https://") || input.startsWith("ftp://")) {
+        String lowerCaseInput = input.toLowerCase(Locale.ROOT);
+        if (lowerCaseInput.startsWith("http://") || lowerCaseInput.startsWith("https://") || lowerCaseInput.startsWith("ftp://")) {
             try {
                 return new URLDownload(input).toTemporaryFile();
             } catch (FetcherException | MalformedURLException e) {
