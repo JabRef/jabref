@@ -209,6 +209,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         Platform.runLater(() -> refreshShownFieldsIfNeeded(event));
     }
 
+    // [impl->req~entry-editor.main-tab.live-refresh~1]
     private void refreshShownFieldsIfNeeded(FieldChangedEvent event) {
         BibEntry entry = event.getBibEntry();
         if (getCurrentEntry() != entry) {
@@ -293,6 +294,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// An always-present collapsible section: its shown fields as rows plus add-chips for
     /// its unset member fields. Collapsed by default when it contains no field; a manual
     /// expand/collapse survives rebuilds until another entry is opened.
+    // [impl->req~entry-editor.main-tab.sections~1]
     private TitledPane createSectionPane(FieldListSections.SectionType type,
                                          SequencedSet<Field> shownFields,
                                          Map<Field, Label> labelForField,
@@ -328,6 +330,7 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// All member fields of a section offered as add-chips; the comments section offers the
     /// general comment plus the current user's personal comment field (if enabled).
+    // [impl->req~entry-editor.main-tab.section-chips~1]
     private SequencedSet<Field> sectionMemberFields(FieldListSections.SectionType type) {
         if (type == FieldListSections.SectionType.COMMENTS) {
             SequencedSet<Field> commentFields = new LinkedHashSet<>();
@@ -381,6 +384,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         return chips;
     }
 
+    // [impl->req~entry-editor.main-tab.free-form-add~1]
     private Node createFreeFormAddRow(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
         ComboBox<String> fieldNameBox = new ComboBox<>();
         fieldNameBox.setEditable(true);
