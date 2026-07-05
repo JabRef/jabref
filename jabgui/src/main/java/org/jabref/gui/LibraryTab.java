@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.swing.undo.UndoManager;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
@@ -18,12 +19,12 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.ObservableBooleanValue;
-import javafx.collections.ListChangeListener;
 import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -152,6 +153,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private SuggestionProviders suggestionProviders;
 
+    private final Label entryCountBadge = createEntryCountBadge();
+
     @SuppressWarnings({"FieldCanBeLocal"})
     private Subscription dividerPositionSubscription;
 
@@ -263,10 +266,13 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         aiService.setupDatabase(bibDatabaseContext, isDummyContext);
 
+        bindEntryCountBadge();
+        setGraphic(entryCountBadge);
+
+        updateTabTitle(changedProperty.getValue());
+
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
-            stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ ->
-                    updateTabTitle(changedProperty.getValue()));
         });
     }
 
@@ -387,9 +393,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         Optional<BibDatabaseContext> foundExistingBibDatabase = stateManager.getOpenDatabases().stream().filter(databaseContext -> databaseContext.equals(this.bibDatabaseContext)).findFirst();
         foundExistingBibDatabase.ifPresent(databaseContext -> stateManager.getOpenDatabases().remove(databaseContext));
 
+        entryCountBadge.textProperty().unbind();
+
         this.bibDatabaseContext = bibDatabaseContext;
 
         stateManager.getOpenDatabases().add(bibDatabaseContext);
+        updateTabTitle(changedProperty.getValue());
 
         initializeComponentsAndListeners(false);
 
@@ -486,6 +495,17 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             textProperty().setValue(tabTitle.toString());
             setTooltip(new Tooltip(toolTipText.toString()));
         });
+    }
+
+    private void bindEntryCountBadge() {
+        entryCountBadge.textProperty().unbind();
+        entryCountBadge.textProperty().bind(Bindings.size(this.bibDatabaseContext.getDatabase().getEntries()).asString());
+    }
+
+    static Label createEntryCountBadge() {
+        Label badge = new Label();
+        badge.getStyleClass().add("library-tab-entry-count");
+        return badge;
     }
 
     @Subscribe
@@ -744,6 +764,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         } catch (RuntimeException e) {
             LOGGER.error("Problem when closing search context", e);
         }
+
+        entryCountBadge.textProperty().unbind();
 
         try {
             AutosaveManager.shutdown(bibDatabaseContext);

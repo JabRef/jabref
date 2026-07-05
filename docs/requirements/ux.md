@@ -32,4 +32,11 @@ Since some data fetchers take time, we need to open the dialog and wait until al
 
 Needs: impl
 
+## Library tab shows entry count badge
+`req~ux.library-tab-entry-count-badge~1`
+
+The library tab shows a badge with the total number of entries in the open library. The badge updates when entries are added or removed.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
