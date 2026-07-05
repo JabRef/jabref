@@ -23,10 +23,13 @@ import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONElement;
+import kong.unirest.core.json.JSONObject;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CiteSeer.class);
@@ -56,37 +59,57 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
     public List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
         // ADR-0014
         try {
-            JSONElement payload = getPayloadJSON(queryNode);
-            HttpResponse<JsonNode> httpResponse = Unirest.post(API_URL)
-                                                         .header("authority", BASE_URL)
-                                                         .header("accept", "application/json, text/plain, */*")
-                                                         .header("content-type", "application/json;charset=UTF-8")
-                                                         .header("origin", "https://" + BASE_URL)
-                                                         .body(payload)
-                                                         .asJson();
-            if (!httpResponse.isSuccess()) {
-                LOGGER.debug("No success");
-                // TODO: body needs to be added to the exception, but we currently only have JSON available, but the error is most probably simple text (or HTML)
-                SimpleHttpResponse simpleHttpResponse = new SimpleHttpResponse(httpResponse.getStatus(), httpResponse.getStatusText(), "");
-                throw new FetcherException(API_URL, simpleHttpResponse);
-            }
-
-            JsonNode requestResponse = httpResponse.getBody();
-            Optional<JSONArray> jsonResponse = Optional.ofNullable(requestResponse)
-                                                       .map(JsonNode::getObject)
-                                                       .map(response -> response.optJSONArray("response"));
-
-            if (jsonResponse.isEmpty()) {
-                LOGGER.debug("No entries found for query: {}", queryNode);
-                return List.of();
-            }
-
-            CiteSeerParser parser = new CiteSeerParser();
-            List<BibEntry> fetchedEntries = parser.parseCiteSeerResponse(jsonResponse.orElse(new JSONArray()));
-            return fetchedEntries;
+            return sendSearchRequest(getPayloadJSON(queryNode));
         } catch (ParseException ex) {
             throw new FetcherException("An internal parser error occurred while parsing CiteSeer entries", ex);
         }
+    }
+
+    @Override
+    public List<BibEntry> performRawSearchQuery(String rawQuery) throws FetcherException {
+        if (rawQuery.isBlank()) {
+            return List.of();
+        }
+        try {
+            JSONObject payload = new JSONObject();
+            payload.put("page", 1);
+            payload.put("pageSize", 20);
+            payload.put("must_have_pdf", "false");
+            payload.put("sortBy", "relevance");
+            payload.put("queryString", rawQuery);
+            return sendSearchRequest(payload);
+        } catch (ParseException ex) {
+            throw new FetcherException("An internal parser error occurred while parsing CiteSeer entries", ex);
+        }
+    }
+
+    private List<BibEntry> sendSearchRequest(JSONElement payload) throws FetcherException, ParseException {
+        HttpResponse<JsonNode> httpResponse = Unirest.post(API_URL)
+                                                     .header("authority", BASE_URL)
+                                                     .header("accept", "application/json, text/plain, */*")
+                                                     .header("content-type", "application/json;charset=UTF-8")
+                                                     .header("origin", "https://" + BASE_URL)
+                                                     .body(payload)
+                                                     .asJson();
+        if (!httpResponse.isSuccess()) {
+            LOGGER.debug("No success");
+            // TODO: body needs to be added to the exception, but we currently only have JSON available, but the error is most probably simple text (or HTML)
+            SimpleHttpResponse simpleHttpResponse = new SimpleHttpResponse(httpResponse.getStatus(), httpResponse.getStatusText(), "");
+            throw new FetcherException(API_URL, simpleHttpResponse);
+        }
+
+        JsonNode requestResponse = httpResponse.getBody();
+        Optional<JSONArray> jsonResponse = Optional.ofNullable(requestResponse)
+                                                   .map(JsonNode::getObject)
+                                                   .map(response -> response.optJSONArray("response"));
+
+        if (jsonResponse.isEmpty()) {
+            LOGGER.debug("No entries found for payload: {}", payload);
+            return List.of();
+        }
+
+        CiteSeerParser parser = new CiteSeerParser();
+        return parser.parseCiteSeerResponse(jsonResponse.orElse(new JSONArray()));
     }
 
     private JSONElement getPayloadJSON(BaseQueryNode searchQueryList) throws ParseException {
