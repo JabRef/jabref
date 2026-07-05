@@ -7,8 +7,8 @@ import org.jabref.logic.l10n.Localization;
 /// Model of the tabs that appear in the entry editor.
 ///
 /// Since the single scroll-list "Main" tab (issue #12711) replaced the classic category
-/// tabs and the user-customizable field-set tabs, every tab is a fixed {@link BuiltInTab}
-/// identified by a {@link BuiltIn} constant; users only toggle visibility.
+/// tabs and the user-customizable field-set tabs, every tab is a fixed [BuiltInTab]
+/// identified by a [BuiltIn] constant; users only toggle visibility.
 public sealed interface EntryEditorTabModel
         permits EntryEditorTabModel.BuiltInTab {
 

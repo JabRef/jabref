@@ -34,7 +34,7 @@ class FieldListSectionsTest {
                         FieldListSections.SectionType.COMMENTS),
                 sections.stream().map(FieldListSections.Section::type).toList());
         assertEquals(List.of(InternalField.KEY_FIELD, StandardField.AUTHOR, StandardField.TITLE),
-                List.copyOf(sections.get(0).fields()));
+                List.copyOf(sections.getFirst().fields()));
         assertEquals(List.of(StandardField.DOI, StandardField.ISBN),
                 List.copyOf(sections.get(1).fields()));
         assertEquals(List.of(StandardField.FILE),

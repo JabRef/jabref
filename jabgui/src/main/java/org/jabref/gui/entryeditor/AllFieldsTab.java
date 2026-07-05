@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.SequencedCollection;
 import java.util.SequencedSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.swing.undo.UndoManager;
 
@@ -44,10 +45,10 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
@@ -59,17 +60,19 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
 import com.google.common.eventbus.Subscribe;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /// The single scroll-list tab ("Main") showing *all* fields of an entry (issue #12711):
 /// the citation key, all required fields (even when unset), and every set field.
-/// Replaces the classic category tabs (required / optional / other / …) as the default view.
+/// Replaces the classic category tabs (required / optional / other / …).
 ///
 /// Below the main fields sits a chip bar for adding unset optional fields ("Show more"
-/// reveals the secondary-optional ones). The identifiers, files & links, and comments
-/// groups are always-present collapsible sections — collapsed when empty — each with its
-/// own add-chips for its unset member fields. A free-form field-name box at the bottom
-/// adds arbitrary fields.
+/// reveals the secondary-optional ones). The identifiers, files & links, bibliometrics,
+/// comments, and meta groups are always-present collapsible sections — collapsed when
+/// empty — each with its own add-chips for its unset member fields. A free-form
+/// field-name box at the bottom adds arbitrary fields.
+@NullMarked
 public class AllFieldsTab extends FieldsEditorTab {
 
     /// Preferred number of visible text rows for multiline editors in the scroll list
@@ -80,6 +83,9 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// (e.g. the linked-files list), since percent-height rows do not exist in the scroll list.
     private static final double HEIGHT_PER_WEIGHT = 60;
 
+    /// Characters not allowed in the user-specific comment field name.
+    private static final Pattern NON_ALPHANUMERIC = Pattern.compile("[^a-z0-9]");
+
     private final BibEntryTypesManager entryTypesManager;
     private final GuiPreferences guiPreferences;
 
@@ -87,7 +93,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     private final UserSpecificCommentField userSpecificCommentField;
 
     /// Fields the user added via chip / free-form box that are still empty: they are not part
-    /// of {@link BibEntry#getFields()} yet, but must stay visible while this entry is edited.
+    /// of [BibEntry#getFields()] yet, but must stay visible while this entry is edited.
     private final Set<Field> userAddedFields = new LinkedHashSet<>();
     private @Nullable BibEntry entryOfUserAddedFields;
 
@@ -102,10 +108,10 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// The entry whose event bus this tab is currently subscribed to (for live refresh
     /// when fields are set/unset from outside, e.g. Source tab, fetchers, undo).
-    private @Nullable BibEntry subscribedEntry;
+    private Optional<BibEntry> subscribedEntry = Optional.empty();
 
     /// Scroll content: main grid + chip bar + section panes + free-form add row.
-    private @Nullable VBox listContainer;
+    private final VBox listContainer = new VBox();
 
     public AllFieldsTab(UndoManager undoManager,
                         UndoAction undoAction,
@@ -128,9 +134,10 @@ public class AllFieldsTab extends FieldsEditorTab {
 
         this.entryTypesManager = entryTypesManager;
         this.guiPreferences = preferences;
-        String defaultOwner = preferences.getOwnerPreferences().getDefaultOwner()
-                                         .toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "-");
+        String defaultOwner = NON_ALPHANUMERIC.matcher(
+                preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT)).replaceAll("-");
         this.userSpecificCommentField = new UserSpecificCommentField(defaultOwner);
+        this.listContainer.getStyleClass().add("all-fields-container");
 
         setText(EntryEditorTabModel.BuiltIn.ALL_FIELDS.displayName());
         setTooltip(new Tooltip(Localization.lang("Show all fields")));
@@ -140,6 +147,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// Order: citation key, required fields (entry-type order), set optional fields
     /// (important first, then detail; each in entry-type order), then all remaining set
     /// fields sorted by name, then still-empty user-added fields.
+    // [impl->req~entry-editor.main-tab.single-list~1]
     @Override
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         if (entry != entryOfUserAddedFields) {
@@ -149,22 +157,20 @@ public class AllFieldsTab extends FieldsEditorTab {
         }
 
         BibDatabaseMode mode = getDatabaseMode();
-        Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
-
         Set<Field> setFields = entry.getFields();
         SequencedSet<Field> fields = new LinkedHashSet<>();
         fields.add(InternalField.KEY_FIELD);
-        if (entryType.isPresent()) {
-            for (OrFields orFields : entryType.get().getRequiredFields()) {
+        entryTypesManager.enrich(entry.getType(), mode).ifPresent(entryType -> {
+            for (OrFields orFields : entryType.getRequiredFields()) {
                 fields.addAll(orFields.getFields());
             }
-            entryType.get().getImportantOptionalFields().stream()
+            entryType.getImportantOptionalFields().stream()
                      .filter(setFields::contains)
                      .forEach(fields::add);
-            entryType.get().getDetailOptionalNotDeprecatedFields(mode).stream()
+            entryType.getDetailOptionalNotDeprecatedFields(mode).stream()
                      .filter(setFields::contains)
                      .forEach(fields::add);
-        }
+        });
         setFields.stream()
                  .sorted(Comparator.comparing(Field::getName))
                  .forEach(fields::add);
@@ -179,21 +185,15 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     @Override
     protected Node getEditorContent() {
-        if (listContainer == null) {
-            listContainer = new VBox();
-            listContainer.getStyleClass().add("all-fields-container");
-        }
         return listContainer;
     }
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        if (subscribedEntry != entry) {
-            if (subscribedEntry != null) {
-                subscribedEntry.unregisterListener(this);
-            }
+        if (subscribedEntry.filter(current -> current == entry).isEmpty()) {
+            subscribedEntry.ifPresent(previous -> previous.unregisterListener(this));
             entry.registerListener(this);
-            subscribedEntry = entry;
+            subscribedEntry = Optional.of(entry);
         }
         super.bindToEntry(entry);
     }
@@ -203,21 +203,20 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// actually changes, so typing inside a visible editor never rebuilds or steals focus.
     @Subscribe
     public void listen(FieldChangedEvent event) {
-        if (event.getBibEntry() != subscribedEntry) {
+        if (subscribedEntry.filter(current -> current == event.getBibEntry()).isEmpty()) {
             return;
         }
         Platform.runLater(() -> refreshShownFieldsIfNeeded(event));
     }
 
     private void refreshShownFieldsIfNeeded(FieldChangedEvent event) {
-        BibEntry entry = subscribedEntry;
-        if ((entry == null) || (getCurrentEntry() != entry)) {
+        BibEntry entry = event.getBibEntry();
+        if (getCurrentEntry() != entry) {
             return;
         }
         // A visible field that was just cleared stays visible while this entry is edited
         // (otherwise deleting the last character would remove the editor mid-edit).
-        if (editors.containsKey(event.getField())
-                && ((event.getNewValue() == null) || event.getNewValue().isEmpty())) {
+        if (editors.containsKey(event.getField()) && StringUtil.isBlank(event.getNewValue())) {
             userAddedFields.add(event.getField());
         }
         SequencedSet<Field> target = determineFieldsToShow(entry);
@@ -227,9 +226,10 @@ public class AllFieldsTab extends FieldsEditorTab {
     }
 
     /// Main fields as a grid with natural row heights, then the optional-field chip bar,
-    /// then the always-present collapsible sections (identifiers / files & links / comments,
-    /// collapsed when empty) each with its own add-chips, then the free-form add row.
-    /// The whole column scrolls instead of stretching to the tab height.
+    /// then the always-present collapsible sections (identifiers / files & links /
+    /// bibliometrics / comments / meta, collapsed when empty) each with its own add-chips,
+    /// then the free-form add row. The whole column scrolls instead of stretching to the
+    /// tab height.
     @Override
     protected void layoutEditors(BibDatabaseContext bibDatabaseContext, BibEntry entry, boolean compressed, List<Label> labels) {
         // labels were created in editors-map iteration order (see FieldsEditorTab#setupPanel)
@@ -253,16 +253,15 @@ public class AllFieldsTab extends FieldsEditorTab {
         }
         addFieldRows(gridPane, buckets.get(FieldListSections.SectionType.MAIN), labelForField);
 
-        VBox container = (VBox) getEditorContent();
-        container.getChildren().setAll(gridPane, createMainChipBar(bibDatabaseContext, entry));
+        listContainer.getChildren().setAll(gridPane, createMainChipBar(bibDatabaseContext, entry));
         for (FieldListSections.SectionType type : FieldListSections.SectionType.values()) {
             if (type == FieldListSections.SectionType.MAIN) {
                 continue;
             }
-            container.getChildren().add(
+            listContainer.getChildren().add(
                     createSectionPane(type, buckets.get(type), labelForField, bibDatabaseContext, entry));
         }
-        container.getChildren().add(createFreeFormAddRow(bibDatabaseContext, entry));
+        listContainer.getChildren().add(createFreeFormAddRow(bibDatabaseContext, entry));
 
         editors.values().forEach(AllFieldsTab::applyNaturalHeight);
     }
@@ -318,7 +317,7 @@ public class AllFieldsTab extends FieldsEditorTab {
             content.getChildren().add(chips);
         }
 
-        TitledPane pane = new TitledPane(type.header().orElse(""), content);
+        TitledPane pane = new TitledPane(type.header().orElseThrow(), content);
         pane.getStyleClass().add("all-fields-section-pane");
         pane.setCollapsible(true);
         pane.setAnimated(false);
@@ -350,19 +349,18 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// "Show more" reveals the secondary-optional ones.
     private Node createMainChipBar(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
         BibDatabaseMode mode = getDatabaseMode();
-        Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
 
         FlowPane chips = new FlowPane();
         chips.getStyleClass().add("all-fields-add-chips");
 
-        if (entryType.isPresent()) {
+        entryTypesManager.enrich(entry.getType(), mode).ifPresent(entryType -> {
             List<Field> shown = List.copyOf(editors.keySet());
-            FieldListSections.subtract(entryType.get().getImportantOptionalFields(), shown).stream()
+            FieldListSections.subtract(entryType.getImportantOptionalFields(), shown).stream()
                              .filter(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.MAIN)
                              .forEach(field -> chips.getChildren().add(createAddChip(bibDatabaseContext, entry, field)));
 
             List<Field> secondary = FieldListSections.subtract(
-                                                             entryType.get().getDetailOptionalNotDeprecatedFields(mode), shown).stream()
+                                                             entryType.getDetailOptionalNotDeprecatedFields(mode), shown).stream()
                                                      .filter(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.MAIN)
                                                      .toList();
             if (!secondary.isEmpty()) {
@@ -378,7 +376,7 @@ public class AllFieldsTab extends FieldsEditorTab {
                 });
                 chips.getChildren().add(toggle);
             }
-        }
+        });
 
         return chips;
     }
@@ -409,15 +407,15 @@ public class AllFieldsTab extends FieldsEditorTab {
     }
 
     private void addFreeFormField(BibDatabaseContext bibDatabaseContext, BibEntry entry, @Nullable String fieldName) {
-        String trimmed = fieldName == null ? "" : fieldName.trim();
-        if (trimmed.isEmpty()) {
+        if (StringUtil.isBlank(fieldName)) {
             return;
         }
-        showFieldEditor(bibDatabaseContext, entry, FieldFactory.parseField(entry.getType(), trimmed));
+        showFieldEditor(bibDatabaseContext, entry, FieldFactory.parseField(entry.getType(), fieldName.trim()));
     }
 
     /// Makes an editor for `field` visible in the list (adding it as still-empty user-added
     /// field if necessary) and focuses it.
+    // [impl->req~entry-editor.main-tab.add-chips~1]
     private void showFieldEditor(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         userAddedFields.add(field);
         rebuildPanel(bibDatabaseContext, entry);
@@ -448,7 +446,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     }
 
     /// The classic stretch layout lets text inputs fill their percent-height rows by setting
-    /// an infinite pref height ({@link org.jabref.gui.fieldeditors.EditorTextField}); in the
+    /// an infinite pref height ([org.jabref.gui.fieldeditors.EditorTextField]); in the
     /// natural-height list that blows up the rows' preferred heights, so reset text fields to
     /// their computed size and cap text areas at a few visible rows.
     private static void normalizeInputHeights(Node node) {

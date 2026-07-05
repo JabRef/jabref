@@ -1,9 +1,9 @@
 # Plan: Re-implement the entry editor as a single scrollable field list
 
-Issue: https://github.com/JabRef/jabref/issues/12711
-Design reference: https://github.com/JabRef/jabref/issues/12711#issuecomment-2717427364
+Issue: <https://github.com/JabRef/jabref/issues/12711>
+Design reference: <https://github.com/JabRef/jabref/issues/12711#issuecomment-2717427364>
 (Google-Contacts-style edit view: one long scrollable form; fields grouped with a small
-icon/heading per group; "+ add <x>" buttons inline; "Show more" reveals rarely-used fields.)
+icon/heading per group; `+ add <x>` buttons inline; "Show more" reveals rarely-used fields.)
 
 Branch: `new-entry-editor` (based on `main`).
 
@@ -203,7 +203,7 @@ All in `jabgui/src/main/java/org/jabref/gui/entryeditor/` unless noted:
 
 ## Build / verify commands
 
-```
+```bash
 ./gradlew :jabgui:compileJava          # fast compile check
 ./gradlew :jabgui:run                  # manual smoke test
 ./gradlew :jabgui:test --tests "org.jabref.gui.entryeditor.*"

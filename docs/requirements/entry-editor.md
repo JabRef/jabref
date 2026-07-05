@@ -19,4 +19,18 @@ When the user hovers over a citation entry inside the Entry Editor's "Citations"
 
 Needs: impl
 
+## Main tab shows all fields in one scrollable list
+`req~entry-editor.main-tab.single-list~1`
+
+The "Main" tab shows the citation key, all required fields (even when unset), and every set field of the entry in a single vertically scrolling list with natural row heights. Identifier, file/link, bibliometrics, comment, and meta fields are grouped into always-present collapsible sections that are collapsed when they contain no field.
+
+Needs: impl
+
+## Main tab offers one-click adding of fields
+`req~entry-editor.main-tab.add-chips~1`
+
+Unset optional fields of the entry type are offered as one-click chips below the main fields ("Show more" reveals the secondary-optional ones); each section offers chips for its unset member fields. A free-form field-name box adds arbitrary fields. A field added this way shows an empty, focused editor and stays visible until another entry is opened.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->

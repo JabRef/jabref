@@ -16,9 +16,12 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 
-/// Partitions the ordered field list of the {@link AllFieldsTab} into display sections
+import org.jspecify.annotations.NullMarked;
+
+/// Partitions the ordered field list of the [AllFieldsTab] into display sections
 /// (Google-Contacts-style grouping, issue #12711). Plain Java (no JavaFX) so the
 /// partition logic is unit-testable.
+@NullMarked
 public final class FieldListSections {
 
     /// Declaration order == display order in the scroll list.
@@ -34,7 +37,7 @@ public final class FieldListSections {
         /// owner, timestamps, and the special fields (ranking, priority, read status, …).
         META;
 
-        /// The localized section heading; empty for {@link #MAIN}.
+        /// The localized section heading; empty for [#MAIN].
         public Optional<String> header() {
             return switch (this) {
                 case MAIN ->
@@ -81,7 +84,7 @@ public final class FieldListSections {
             StandardField.CITATIONCOUNT,
             StandardField.ICORERANKING));
 
-    /// Membership of the Meta section; a superset of {@link #META_CHIP_FIELDS} because the
+    /// Membership of the Meta section; a superset of [#META_CHIP_FIELDS] because the
     /// timestamp fields are managed automatically, so they are shown when set but not
     /// offered as add-chips.
     private static final SequencedSet<Field> META_FIELDS = new LinkedHashSet<>(List.of(
@@ -107,8 +110,8 @@ public final class FieldListSections {
     }
 
     /// All fields belonging to the given section (in display order) — the basis for the
-    /// section's add-chips. Empty for {@link SectionType#MAIN} (its add-chips come from the
-    /// entry type's optional fields) and {@link SectionType#COMMENTS} (user-specific comment
+    /// section's add-chips. Empty for [SectionType#MAIN] (its add-chips come from the
+    /// entry type's optional fields) and [SectionType#COMMENTS] (user-specific comment
     /// fields are dynamic).
     public static SequencedSet<Field> fieldsOf(SectionType type) {
         return switch (type) {
@@ -153,7 +156,7 @@ public final class FieldListSections {
     }
 
     /// Splits `orderedFields` into sections, keeping the given order within each section.
-    /// Empty sections are omitted; section order follows {@link SectionType} declaration order.
+    /// Empty sections are omitted; section order follows [SectionType] declaration order.
     public static List<Section> partition(SequencedCollection<Field> orderedFields) {
         Map<SectionType, SequencedSet<Field>> buckets = new EnumMap<>(SectionType.class);
         for (SectionType type : SectionType.values()) {

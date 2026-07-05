@@ -114,7 +114,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         layoutEditors(bibDatabaseContext, entry, compressed, labels);
     }
 
-    /// Arranges the created labels and editors inside {@link #gridPane}. The default layout stretches the
+    /// Arranges the created labels and editors inside [#gridPane]. The default layout stretches the
     /// editors to fill the tab height (one or two columns). Subclasses may override for other layouts.
     protected void layoutEditors(BibDatabaseContext bibDatabaseContext, BibEntry entry, boolean compressed, List<Label> labels) {
         ColumnConstraints columnExpand = new ColumnConstraints();
@@ -204,8 +204,8 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     }
 
     /// The node placed inside the tab's ScrollPane. By default the field grid itself;
-    /// subclasses may wrap {@link #gridPane} in a larger structure (e.g. with collapsible
-    /// sections) and return that instead. Called once from {@code initPanel()}.
+    /// subclasses may wrap [#gridPane] in a larger structure (e.g. with collapsible
+    /// sections) and return that instead. Called once from `initPanel()`.
     protected Node getEditorContent() {
         return gridPane;
     }
