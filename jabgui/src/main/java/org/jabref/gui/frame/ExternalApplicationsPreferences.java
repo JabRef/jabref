@@ -66,22 +66,6 @@ public class ExternalApplicationsPreferences {
         return new ExternalApplicationsPreferences();
     }
 
-    public void setAll(ExternalApplicationsPreferences preferences) {
-        this.eMailSubject.set(preferences.getEmailSubject());
-        this.shouldAutoOpenEmailAttachmentsFolder.set(preferences.shouldAutoOpenEmailAttachmentsFolder());
-
-        this.useCustomTerminal.set(preferences.useCustomTerminal());
-        this.customTerminalCommand.set(preferences.getCustomTerminalCommand());
-
-        this.useCustomFileBrowser.set(preferences.useCustomFileBrowser());
-        this.customFileBrowserCommand.set(preferences.getCustomFileBrowserCommand());
-
-        this.kindleEmail.set(preferences.getKindleEmail());
-
-        this.externalFileTypes.clear();
-        this.externalFileTypes.addAll(preferences.getExternalFileTypes());
-    }
-
     public String getEmailSubject() {
         return eMailSubject.get();
     }
