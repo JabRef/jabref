@@ -165,6 +165,50 @@ jobs:
             *.md
             docs/**/*.md
 
+  madr:
+    name: MADR ADRs
+    # JBang needs a JDK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v7
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-madrlint-$(date +%Y-%m)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-madrlint-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      - name: Trust madrlint source
+        run: jbang trust add https://github.com/adr/
+      - name: Lint ADRs
+        run: |
+          report="$(mktemp)"
+          # Each ADR file is checked against the per-file rules; the docs/decisions directory itself
+          # is checked against the directory rules (numbering, naming, collisions). Non-ADR files
+          # (adr-template.md, index.md) are excluded via .madrlintignore.
+          # -n11 disables the external-link check (MADR11); JabRef verifies external links elsewhere.
+          for target in docs/decisions/*.md docs/decisions; do
+            jbang madrlint@adr/madrlint -n11 --quiet --output-format github-actions "$target"
+          done | tee "$report"
+
+          error_count=$(grep -c '^::error' "$report" || true)
+          if [ "$error_count" -ne 0 ]; then
+            echo "❌ madrlint reported $error_count MADR violation(s). See the annotations above."
+            exit 1
+          fi
+          echo "✅ No MADR violations."
+
   changelog:
     name: CHANGELOG.md
     # JBang needs a JDK
