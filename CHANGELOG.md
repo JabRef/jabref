@@ -33,6 +33,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added generic CSV export filter that exports all standard BibTeX fields. [#15711](https://github.com/JabRef/jabref/issues/15711)
 - We added OCR engine's executable path as the first OCR preference to let users specify the exact path of the engine they are using. [#15990](https://github.com/JabRef/jabref/pull/15990)
 - We added file notification to OCRed file to let users open the directory and show the new file. [#16082](https://github.com/JabRef/jabref/pull/16082)
+- The `jabkit` `--input` option (and positional input argument) now accepts http(s)/ftp URLs, downloading the file before processing. [#16165](https://github.com/JabRef/jabref/pull/16165)
 
 ### Changed
 
