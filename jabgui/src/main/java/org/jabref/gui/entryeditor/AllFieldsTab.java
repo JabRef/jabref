@@ -358,9 +358,14 @@ public class AllFieldsTab extends FieldsEditorTab {
             if (index < 0) {
                 return Optional.empty();
             }
-            StackPane overlay = new StackPane(input, button);
+            StackPane overlay = new StackPane();
             HBox.setHgrow(overlay, HBox.getHgrow(input));
+            // Put the (empty) overlay in the input's slot first: this detaches `input` from `parent`,
+            // so it can then be re-parented into the overlay. Building `new StackPane(input, button)`
+            // up front would detach `input` immediately and leave `index` pointing past the now-shorter
+            // parent list (IndexOutOfBounds on set).
             parent.getChildren().set(index, overlay);
+            overlay.getChildren().addAll(input, button);
             return Optional.of(overlay);
         });
     }
