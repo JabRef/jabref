@@ -1,5 +1,6 @@
 package org.jabref.toolkit.commands;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -16,6 +17,8 @@ import org.mockito.ArgumentCaptor;
 import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -73,6 +76,21 @@ class PdfExtractReferencesTest extends AbstractJabKitTest {
         verify(mockExportService, times(2))
                 .exportParserResultToFile(results.capture(), files.capture(), eq("bibtex"));
         assertEquals(List.of(outputDir.resolve("ieee-paper.bib"), outputDir.resolve("ieee-paper-2.bib")), files.getAllValues());
+    }
+
+    @Test
+    void missingOutputDirIsCreated() throws Exception {
+        Path nestedOutputDir = outputDir.resolve("nested/sub");
+
+        int exitCode = commandLine.executeToLog(
+                "pdf", "extract-references",
+                "--output-dir", nestedOutputDir.toString(),
+                pdfPath("ieee-paper.pdf"));
+
+        assertEquals(CommandLine.ExitCode.OK, exitCode);
+        assertTrue(Files.isDirectory(nestedOutputDir));
+        verify(mockExportService).exportParserResultToFile(
+                any(), eq(nestedOutputDir.resolve("ieee-paper.bib")), eq("bibtex"));
     }
 
     @Test
