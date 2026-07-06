@@ -1,11 +1,14 @@
 package org.jabref.gui.validation;
 
+import java.util.stream.Stream;
+
 import javafx.scene.control.Label;
 
 import org.jabref.gui.icon.IconTheme;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.testfx.framework.junit5.ApplicationExtension;
 
@@ -14,11 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(ApplicationExtension.class)
 class ValidationVisualizerTest {
 
-    static Object[][] iconTestData() {
-        return new Object[][] {
-                {Severity.ERROR, IconTheme.JabRefIcons.ERROR.getGraphicNode().toString()},
-                {Severity.WARNING, IconTheme.JabRefIcons.WARNING.getGraphicNode().toString()}
-        };
+    static Stream<Arguments> iconTestData() {
+        return Stream.of(
+                Arguments.of(Severity.ERROR, IconTheme.JabRefIcons.ERROR.getGraphicNode().toString()),
+                Arguments.of(Severity.WARNING, IconTheme.JabRefIcons.WARNING.getGraphicNode().toString())
+        );
     }
 
     @ParameterizedTest
