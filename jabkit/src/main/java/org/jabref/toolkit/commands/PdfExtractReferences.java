@@ -33,6 +33,8 @@ class PdfExtractReferences implements Callable<Integer> {
     @ParentCommand
     protected Pdf pdf;
 
+    protected ExportService exportService;
+
     @Mixin
     private JabKit.SharedOptions sharedOptions;
 
@@ -54,8 +56,6 @@ class PdfExtractReferences implements Callable<Integer> {
 
     @Option(names = "--output-format", description = "Output format (e.g. bibtex)", defaultValue = "bibtex")
     private String outputFormat;
-
-    protected ExportService exportService;
 
     void initFields() {
         exportService = ExportService.create(pdf.argumentProcessor.cliPreferences, sharedOptions.porcelain);
@@ -121,8 +121,7 @@ class PdfExtractReferences implements Callable<Integer> {
     }
 
     private static Path siblingBibFile(Path inputFile) {
-        Path parent = inputFile.toAbsolutePath().getParent();
-        return parent == null ? Path.of(bibFileName(inputFile)) : parent.resolve(bibFileName(inputFile));
+        return inputFile.toAbsolutePath().getParent().resolve(bibFileName(inputFile));
     }
 
     private static String bibFileName(Path inputFile) {

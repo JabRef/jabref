@@ -16,9 +16,15 @@ import org.mockito.ArgumentCaptor;
 import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 class PdfExtractReferencesTest extends AbstractJabKitTest {
+
+    @TempDir
+    Path outputDir;
 
     private ExportService mockExportService;
 
@@ -49,7 +55,7 @@ class PdfExtractReferencesTest extends AbstractJabKitTest {
         int exitCode = commandLine.executeToLog("pdf", "extract-references", pdfPath("ieee-paper.pdf"));
 
         assertEquals(CommandLine.ExitCode.OK, exitCode);
-        org.mockito.Mockito.verify(mockExportService).printDatabaseContextToStdOut(captor.capture());
+        verify(mockExportService).printDatabaseContextToStdOut(captor.capture());
         assertEquals(5, captor.getValue().getEntries().size());
     }
 
@@ -64,8 +70,8 @@ class PdfExtractReferencesTest extends AbstractJabKitTest {
                 pdfPath("ieee-paper.pdf"), pdfPath("ieee-paper-2.pdf"));
 
         assertEquals(CommandLine.ExitCode.OK, exitCode);
-        org.mockito.Mockito.verify(mockExportService, org.mockito.Mockito.times(2))
-                           .exportParserResultToFile(results.capture(), files.capture(), org.mockito.Mockito.eq("bibtex"));
+        verify(mockExportService, times(2))
+                .exportParserResultToFile(results.capture(), files.capture(), eq("bibtex"));
         assertEquals(List.of(outputDir.resolve("ieee-paper.bib"), outputDir.resolve("ieee-paper-2.bib")), files.getAllValues());
     }
 
@@ -86,7 +92,4 @@ class PdfExtractReferencesTest extends AbstractJabKitTest {
 
         assertEquals(CommandLine.ExitCode.USAGE, exitCode);
     }
-
-    @TempDir
-    Path outputDir;
 }

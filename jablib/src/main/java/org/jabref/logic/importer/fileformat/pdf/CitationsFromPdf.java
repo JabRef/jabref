@@ -26,14 +26,18 @@ public class CitationsFromPdf {
         return importer.importDatabase(path);
     }
 
-    /// Same as {@link #extractCitationsUsingGrobid(CliPreferences, Path)}, but overrides the configured Grobid server URL for this single call.
+    /// Same as [#extractCitationsUsingGrobid(CliPreferences, Path)], but overrides the configured Grobid server URL for this single call.
     public static ParserResult extractCitationsUsingGrobid(CliPreferences preferences, Path path, String grobidUrlOverride) {
-        ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
+        PdfGrobidImporter importer = new PdfGrobidImporter(withOverriddenGrobidUrl(preferences.getImportFormatPreferences(), grobidUrlOverride));
+        return importer.importDatabase(path);
+    }
+
+    static ImportFormatPreferences withOverriddenGrobidUrl(ImportFormatPreferences importFormatPreferences, String grobidUrlOverride) {
         GrobidPreferences overriddenGrobidPreferences = new GrobidPreferences(
                 true,
                 importFormatPreferences.grobidPreferences().isGrobidUseAsked(),
                 grobidUrlOverride);
-        ImportFormatPreferences overriddenPreferences = new ImportFormatPreferences(
+        return new ImportFormatPreferences(
                 importFormatPreferences.bibEntryPreferences(),
                 importFormatPreferences.citationKeyPatternPreferences(),
                 importFormatPreferences.fieldPreferences(),
@@ -41,8 +45,6 @@ public class CitationsFromPdf {
                 importFormatPreferences.doiPreferences(),
                 overriddenGrobidPreferences,
                 importFormatPreferences.filePreferences());
-        PdfGrobidImporter importer = new PdfGrobidImporter(overriddenPreferences);
-        return importer.importDatabase(path);
     }
 
     public static ParserResult extractCitationsUsingLLM(CliPreferences preferences, NotificationService notificationService, Path path) {
