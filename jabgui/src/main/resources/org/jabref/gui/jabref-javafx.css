@@ -510,6 +510,16 @@ TextFlow > .tooltip-text-monospaced {
     -fx-pref-height: 3em;
 }
 
+.tab-pane > .tab-header-area > .headers-region > .tab:hover {
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: -jr-hover;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected:hover {
+    -fx-background-color: -fx-control-inner-background;
+}
+
 .tab-pane > .tab-header-area > .headers-region > .tab .tab-label {
     -fx-text-fill: -fx-mid-text-color;
 }
