@@ -2521,3 +2521,29 @@ journalInfo .grid-cell-b {
     -fx-background-insets: 0, 0;
     -fx-padding: 0;
 }
+
+/* Preview (PreviewViewer): match the entry editor's white content background instead of the
+   transparent one .scroll-pane/.stack-pane get by default (jabref-javafx.css). */
+.preview-viewer,
+.preview-viewer > .viewport {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.preview-viewer-content {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+/* JavaFX incubator RichTextArea (entry preview, AI summary).
+   Modena styles it from -fx-accent, which JabRef deliberately sets to red
+   as an "unthemed control" canary - so map it to the JabRef palette here. */
+.rich-text-area .selection-highlight {
+    -fx-fill: derive(-jr-accent, 20%);
+}
+
+.rich-text-area .caret {
+    -fx-stroke: -fx-text-background-color;
+}
+
+.rich-text-area .caret-line {
+    -fx-fill: transparent;
+}
