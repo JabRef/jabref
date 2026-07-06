@@ -12,10 +12,11 @@ Field validation used ControlsFX's `Decorator` overlay (via mvvmfx-validation's 
 
 * Keep ControlsFX's `Decorator`, only work around its `GridPane`/performance issues
 * `org.jfxcore:validation`, with a JabRef-owned `Popup`-based decorator
+* [ValidatorFX](https://github.com/effad/ValidatorFX), with its built-in `GraphicDecoration`
 
 ## Decision Outcome
 
-Chosen option: "`org.jfxcore:validation`, with a JabRef-owned `Popup`-based decorator", because it replaces the always-on, sibling-node-inserting overlay with a `Popup` that never touches the control's parent and only tracks position while a message is actually showing.
+Chosen option: "`org.jfxcore:validation`, with a JabRef-owned `Popup`-based decorator", because it replaces the always-on, sibling-node-inserting overlay with a `Popup` that never touches the control's parent and only tracks position while a message is actually showing. ValidatorFX's `GraphicDecoration` was checked briefly and rejected: it replaces the scene's root node with a wrapper `StackPane` (`scene.setRoot(stack)`) and tracks `stack.needsLayoutProperty()`, which fires on every layout pass anywhere in the scene — more invasive and broader-scoped than what we were trying to avoid.
 
 ### Consequences
 
@@ -26,5 +27,3 @@ Chosen option: "`org.jfxcore:validation`, with a JabRef-owned `Popup`-based deco
 ### More Information
 
 Implementation PR: [#16174](https://github.com/JabRef/jabref/pull/16174)
-
-[ValidatorFX](https://github.com/effad/ValidatorFX) is a known alternative validation library that was not evaluated as part of this decision.
