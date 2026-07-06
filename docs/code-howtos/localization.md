@@ -80,7 +80,7 @@ If the language is a variant of a language `zh_CN` or `pt_BR` it is necessary to
 
 For installing the Crowdin CLI, follow the official installation instructions at <https://crowdin.github.io/crowdin-cli/installation>.
 
-Keep the project configuration in [`crowdin.yml`](/Users/christophs/workspace/jabref/crowdin.yml), but put your personal access token into the user-specific file `~/.crowdin.yml` and not into the repository file.
+Keep the project configuration in [`crowdin.yml`](../../crowdin.yml), but put your personal access token into the user-specific file `~/.crowdin.yml` and not into the repository file.
 
 ## Background information
 
