@@ -37,9 +37,9 @@ public class AbstractEditorViewModel extends AbstractViewModel {
         this.undoManager = undoManager;
 
         List<Constraint<? super String, ValidationMessage>> constraints = fieldCheckers.getForField(field).stream()
-                .<Constraint<? super String, ValidationMessage>>map(checker -> ValidationConstraints.function(value ->
-                        checker.checkValue(value).map(ValidationMessage::warning)))
-                .toList();
+                                                                                       .<Constraint<? super String, ValidationMessage>>map(checker -> ValidationConstraints.function(value ->
+                                                                                               checker.checkValue(value).map(ValidationMessage::warning)))
+                                                                                       .toList();
         this.text = new SimpleConstrainedStringProperty<>("", constraints.toArray(new Constraint[0]));
     }
 

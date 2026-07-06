@@ -162,17 +162,17 @@ public class GroupDialogViewModel {
                                 ))),
                 ValidationConstraints.predicate(
                         name -> currentDatabase.getMetaData().getGroups()
-                                             .map(rootGroup -> {
-                                                 boolean groupsExistWithSameName = !rootGroup.findChildrenSatisfying(group -> group.getName().equals(name)).isEmpty();
-                                                 if ((editedGroup == null) && groupsExistWithSameName) {
-                                                     // New group but there is already one group with the same name
-                                                     return false;
-                                                 }
+                                               .map(rootGroup -> {
+                                                   boolean groupsExistWithSameName = !rootGroup.findChildrenSatisfying(group -> group.getName().equals(name)).isEmpty();
+                                                   if ((editedGroup == null) && groupsExistWithSameName) {
+                                                       // New group but there is already one group with the same name
+                                                       return false;
+                                                   }
 
-                                                 // Edit group, changed name to something that is already present
-                                                 return (editedGroup == null) || editedGroup.getName().equals(name) || !groupsExistWithSameName;
-                                             })
-                                             .orElse(true),
+                                                   // Edit group, changed name to something that is already present
+                                                   return (editedGroup == null) || editedGroup.getName().equals(name) || !groupsExistWithSameName;
+                                               })
+                                               .orElse(true),
                         ValidationMessage.warning(
                                 Localization.lang("There already exists a group with the same name.\nIf you use it, it will inherit all entries from this other group.")
                         )));
@@ -230,10 +230,10 @@ public class GroupDialogViewModel {
     /// membership (add/remove based on the type radio buttons), without the risk of the two getting out of sync.
     public BooleanBinding validProperty() {
         return Bindings.createBooleanBinding(() ->
-                nameProperty.isValid()
-                        && (!typeSearchProperty.get() || searchGroupSearchTermProperty.isValid())
-                        && (!typeKeywordsProperty.get() || (keywordGroupSearchFieldProperty.isValid() && keywordGroupSearchTermProperty.isValid()))
-                        && (!typeTexProperty.get() || texGroupFilePathProperty.isValid()),
+                        nameProperty.isValid()
+                                && (!typeSearchProperty.get() || searchGroupSearchTermProperty.isValid())
+                                && (!typeKeywordsProperty.get() || (keywordGroupSearchFieldProperty.isValid() && keywordGroupSearchTermProperty.isValid()))
+                                && (!typeTexProperty.get() || texGroupFilePathProperty.isValid()),
                 nameProperty.validProperty(), typeSearchProperty, searchGroupSearchTermProperty.validProperty(),
                 typeKeywordsProperty, keywordGroupSearchFieldProperty.validProperty(), keywordGroupSearchTermProperty.validProperty(),
                 typeTexProperty, texGroupFilePathProperty.validProperty());
@@ -255,8 +255,8 @@ public class GroupDialogViewModel {
         }
 
         List<ValidationMessage> invalidMessages = relevantProperties.stream()
-                                                                     .flatMap(property -> property.getDiagnostics().invalidSubList().stream())
-                                                                     .toList();
+                                                                    .flatMap(property -> property.getDiagnostics().invalidSubList().stream())
+                                                                    .toList();
         return invalidMessages.stream().filter(message -> message.severity() == Severity.ERROR).findFirst()
                               .or(() -> invalidMessages.stream().findFirst());
     }

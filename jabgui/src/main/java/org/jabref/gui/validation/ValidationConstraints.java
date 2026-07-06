@@ -51,8 +51,8 @@ public final class ValidationConstraints {
             BiFunction<T, P1, Optional<ValidationMessage>> function, ObservableValue<P1> dependency) {
         return Constraints.validate(
                 (T value, P1 dep) -> function.apply(value, dep)
-                        .map(ValidationResult::<ValidationMessage>invalid)
-                        .orElseGet(ValidationResult::valid),
+                                             .map(ValidationResult::<ValidationMessage>invalid)
+                                             .orElseGet(ValidationResult::valid),
                 dependency);
     }
 }

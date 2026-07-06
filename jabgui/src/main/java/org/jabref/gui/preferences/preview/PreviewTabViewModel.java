@@ -82,11 +82,11 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             FXCollections.observableArrayList(),
             Constraints.forList(Constraints.validate((List<PreviewLayout> list) ->
                     list.isEmpty()
-                            ? ValidationResult.invalid(ValidationMessage.error("%s > %s %n %n %s".formatted(
-                                    Localization.lang("Entry preview"),
-                                    Localization.lang("Selected"),
-                                    Localization.lang("Selected Layouts can not be empty"))))
-                            : ValidationResult.valid())));
+                    ? ValidationResult.invalid(ValidationMessage.error("%s > %s %n %n %s".formatted(
+                            Localization.lang("Entry preview"),
+                            Localization.lang("Selected"),
+                            Localization.lang("Selected Layouts can not be empty"))))
+                    : ValidationResult.valid())));
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
 
     private final ListProperty<Path> bstStylesPaths = new SimpleListProperty<>(FXCollections.observableArrayList());

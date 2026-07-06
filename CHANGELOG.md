@@ -48,6 +48,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Resolving of Math Subject Classification (MSC) needs to be activated in the references now. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - We improved JabRef's startup performance by loading MSC codes only when activated. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - Embedded postgres is no longer started with JabRef unless "Experimental search (Postgres)" is enabled in General preferences. [#12844](https://github.com/JabRef/jabref/issues/12844)
+- We improved the responsiveness of the error and warning icons shown next to invalid input fields (e.g. in the entry editor, the shared database dialog, and the group dialog). [#16174](https://github.com/JabRef/jabref/pull/16174)
 
 ### Fixed
 
@@ -68,10 +69,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where `Quality-> Cleanup -> Rename PDF` together with `Moved linked files to file directory` would lead to an exception. [#15833](https://github.com/JabRef/jabref/issues/15833)
 - We fixed an issue where renaming a linked file with a very long title showed a misleading "file is being used by another process" error instead of renaming successfully. [#14771](https://github.com/JabRef/jabref/issues/14771)
 - We fixed an issue where JabRef would trigger `The libray has been changed` while still saving. [#4877](https://github.com/JabRef/jabref/issues/4877)
-
-### Changed
-
-- We improved the responsiveness of the error and warning icons shown next to invalid input fields (e.g. in the entry editor, the shared database dialog, and the group dialog). [#16174](https://github.com/JabRef/jabref/pull/16174)
 
 ### Removed
 

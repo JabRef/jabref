@@ -60,11 +60,11 @@ public class TableTabViewModel implements PreferenceTabViewModel {
             FXCollections.observableArrayList(),
             Constraints.forList(Constraints.validate((List<MainTableColumnModel> list) ->
                     list.isEmpty()
-                            ? ValidationResult.invalid(ValidationMessage.error("%s > %s %n %n %s".formatted(
-                                    Localization.lang("Entry table columns"),
-                                    Localization.lang("Columns"),
-                                    Localization.lang("List must not be empty."))))
-                            : ValidationResult.valid())));
+                    ? ValidationResult.invalid(ValidationMessage.error("%s > %s %n %n %s".formatted(
+                            Localization.lang("Entry table columns"),
+                            Localization.lang("Columns"),
+                            Localization.lang("List must not be empty."))))
+                    : ValidationResult.valid())));
     private final ObjectProperty<SelectionModel<MainTableColumnModel>> selectedColumnModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
     private final ListProperty<MainTableColumnModel> availableColumnsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MainTableColumnModel> addColumnProperty = new SimpleObjectProperty<>();
