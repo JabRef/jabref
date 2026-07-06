@@ -1,0 +1,134 @@
+package org.jabref.toolkit.commands;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.pdf.CitationsFromPdf;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.toolkit.converter.ExtractionModeConverter;
+import org.jabref.toolkit.exception.ExportServiceException;
+import org.jabref.toolkit.exception.ImportServiceException;
+import org.jabref.toolkit.service.ExportService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
+
+import static picocli.CommandLine.Command;
+import static picocli.CommandLine.Mixin;
+import static picocli.CommandLine.Option;
+import static picocli.CommandLine.Parameters;
+import static picocli.CommandLine.ParentCommand;
+
+@Command(name = "extract-references", description = "Extract references from the \"References\" section of one or more PDFs and output them as BibTeX.")
+class PdfExtractReferences implements Callable<Integer> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PdfExtractReferences.class);
+
+    @ParentCommand
+    protected Pdf pdf;
+
+    @Mixin
+    private JabKit.SharedOptions sharedOptions;
+
+    @Parameters(paramLabel = "FILE", description = "PDF(s) to extract references from.", arity = "1..*")
+    private List<Path> inputFiles;
+
+    @Option(names = "--mode", converter = ExtractionModeConverter.class,
+            description = "Extraction mode: ${COMPLETION-CANDIDATES} (LLM is experimental). Defaults to GROBID if Grobid is enabled in preferences, otherwise RULE_BASED.")
+    private ExtractionMode mode;
+
+    @Option(names = "--grobid-url", description = "Override the configured Grobid server URL for this call (only valid with --mode=GROBID).")
+    private String grobidUrl;
+
+    @Option(names = "--output", description = "Write output to this file. Only valid when a single input file is given (e.g. --output=out.bib).")
+    private Path outputFile;
+
+    @Option(names = "--output-dir", description = "Directory to write one .bib file per input PDF into (default: alongside each source PDF).")
+    private Path outputDir;
+
+    @Option(names = "--output-format", description = "Output format (e.g. bibtex)", defaultValue = "bibtex")
+    private String outputFormat;
+
+    protected ExportService exportService;
+
+    void initFields() {
+        exportService = ExportService.create(pdf.argumentProcessor.cliPreferences, sharedOptions.porcelain);
+    }
+
+    @Override
+    public Integer call() throws ImportServiceException, ExportServiceException {
+        initFields();
+
+        if (outputFile != null && inputFiles.size() > 1) {
+            System.err.println(Localization.lang("--output can only be used with a single input file; use --output-dir for multiple files."));
+            return CommandLine.ExitCode.USAGE;
+        }
+
+        CliPreferences preferences = pdf.argumentProcessor.cliPreferences;
+        ExtractionMode effectiveMode = mode != null
+                ? mode
+                : (preferences.getGrobidPreferences().isGrobidEnabled() ? ExtractionMode.GROBID : ExtractionMode.RULE_BASED);
+
+        if (grobidUrl != null && effectiveMode != ExtractionMode.GROBID) {
+            System.err.println(Localization.lang("--grobid-url can only be used with --mode=GROBID."));
+            return CommandLine.ExitCode.USAGE;
+        }
+
+        List<Path> failed = new ArrayList<>();
+        for (Path inputFile : inputFiles) {
+            if (!Files.exists(inputFile)) {
+                LOGGER.error("Skipped - PDF {} does not exist", inputFile);
+                failed.add(inputFile);
+                continue;
+            }
+
+            if (!sharedOptions.porcelain) {
+                System.out.println(Localization.lang("Extracting references from %0 (mode: %1).", inputFile, effectiveMode));
+            }
+
+            ParserResult result = switch (effectiveMode) {
+                case RULE_BASED -> CitationsFromPdf.extractCitationsUsingRuleBasedAlgorithm(preferences, inputFile);
+                case GROBID -> grobidUrl != null
+                        ? CitationsFromPdf.extractCitationsUsingGrobid(preferences, inputFile, grobidUrl)
+                        : CitationsFromPdf.extractCitationsUsingGrobid(preferences, inputFile);
+                case LLM -> CitationsFromPdf.extractCitationsUsingLLM(preferences, LOGGER::info, inputFile);
+            };
+
+            if (result.isInvalid()) {
+                LOGGER.error("Could not extract references from '{}': {}", inputFile, result.getErrorMessage());
+                failed.add(inputFile);
+                continue;
+            }
+
+            if (outputFile != null) {
+                exportService.exportParserResultToFile(result, outputFile, outputFormat);
+            } else if (outputDir != null) {
+                exportService.exportParserResultToFile(result, outputDir.resolve(bibFileName(inputFile)), outputFormat);
+            } else if (inputFiles.size() == 1) {
+                exportService.printDatabaseContextToStdOut(result.getDatabaseContext());
+            } else {
+                exportService.exportParserResultToFile(result, siblingBibFile(inputFile), outputFormat);
+            }
+        }
+
+        return failed.isEmpty() ? CommandLine.ExitCode.OK : CommandLine.ExitCode.SOFTWARE;
+    }
+
+    private static Path siblingBibFile(Path inputFile) {
+        Path parent = inputFile.toAbsolutePath().getParent();
+        return parent == null ? Path.of(bibFileName(inputFile)) : parent.resolve(bibFileName(inputFile));
+    }
+
+    private static String bibFileName(Path inputFile) {
+        String fileName = inputFile.getFileName().toString();
+        int dotIndex = fileName.lastIndexOf('.');
+        String baseName = dotIndex > 0 ? fileName.substring(0, dotIndex) : fileName;
+        return baseName + ".bib";
+    }
+}
