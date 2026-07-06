@@ -71,7 +71,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- We replaced the ControlsFX/mvvmfx-validation-based field validation with a lightweight implementation on top of `org.jfxcore:validation`, using a `Popup`-based validation decoration instead of ControlsFX's `Decorator` overlay, to avoid the continuous bounds-tracking and `GridPane`-incompatible sibling-node insertion of the previous mechanism. [#16174](https://github.com/JabRef/jabref/pull/16174)
+- We improved the responsiveness of the error and warning icons shown next to invalid input fields (e.g. in the entry editor, the shared database dialog, and the group dialog). [#16174](https://github.com/JabRef/jabref/pull/16174)
 
 ### Removed
 
