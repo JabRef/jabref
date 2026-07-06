@@ -154,6 +154,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.ai.summarization.exporters;
     exports org.jabref.logic.ai.summarization.util;
     exports org.jabref.logic.msc;
+    exports org.jabref.logic.ai.models;
     // endregion
 
     requires java.base;
