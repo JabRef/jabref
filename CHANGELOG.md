@@ -61,7 +61,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the global search dialog kept showing the previous entry preview when the search returned no results. [#15613](https://github.com/JabRef/jabref/issues/15613)
 - We fixed an issue where preferences referencing removed cleanup steps are now ignored instead of failing to load. [#15948](https://github.com/JabRef/jabref/pull/15948)
 - We fixed an issue where keyboard navigation shortcuts <kbd>Alt</kbd>+<kbd>Up</kbd>/<kbd>Alt</kbd>+<kbd>Down</kbd> in the entry editor did not preserve focus on the current field when switching between entries. [#14943](https://github.com/JabRef/jabref/issues/14943)
-- We fixed an issue where the expand/collapse triangle of the entry editor "Main" tab's collapsible sections (e.g. "Identifiers") sat flush against the section title text. [#16183](https://github.com/JabRef/jabref/pull/16183)
+- We fixed an issue where the expand/collapse triangle of the entry editor "Main" tab's collapsible sections (e.g. "Identifiers") sat flush against the section title text. [#TODO](https://github.com/JabRef/jabref/pull/TODO)
 - EndNote and Refer importers now respect the citation key preferences for unwanted characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
 - We hardened CAYW browser endpoint communication by validating custom `librarypath` access and adding an allow/disallow confirmation dialog for opening local files. [#15295](https://github.com/JabRef/jabref/issues/15295)
 - We fixed the Hayagriva YAML exporter to correctly nest DOI, ISBN, and ISSN under `serial-number` as required by the Hayagriva file format specification. [#15713](https://github.com/JabRef/jabref/issues/15713)
