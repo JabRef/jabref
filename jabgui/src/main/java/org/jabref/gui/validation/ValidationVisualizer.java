@@ -32,6 +32,9 @@ import org.jspecify.annotations.NullMarked;
 /// children of a `GridPane` (inserting a wrapper node would break `GridPane.rowIndex`/`columnIndex`
 /// attachments). This visualizer instead uses an owned [Popup], which never touches the control's parent, and
 /// only tracks position while a message is actually showing (i.e., while the control is invalid).
+///
+/// See `docs/decisions/0065-use-jfxcore-validation.md` for the decision to replace ControlsFX/mvvmfx-validation
+/// with `org.jfxcore:validation`.
 @NullMarked
 public class ValidationVisualizer {
 
