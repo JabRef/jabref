@@ -1236,6 +1236,16 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -jr-theme;
 }
 
+#entryEditor .field-remove-button {
+    -fx-background-color: transparent;
+}
+
+#entryEditor .field-remove-button .glyph-icon,
+#entryEditor .field-remove-button .ikonli-font-icon {
+    -fx-fill: -jr-gray-2;
+    -fx-text-fill: -jr-gray-2;
+}
+
 #entryEditor .warning-icon {
     -fx-fill: -jr-warn;
 }

@@ -16,6 +16,8 @@ import java.util.regex.Pattern;
 import javax.swing.undo.UndoManager;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
@@ -34,6 +36,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.StateManager;
@@ -96,6 +99,10 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// of [BibEntry#getFields()] yet, but must stay visible while this entry is edited.
     private final Set<Field> userAddedFields = new LinkedHashSet<>();
     private @Nullable BibEntry entryOfUserAddedFields;
+
+    /// Required fields of the current entry's type, refreshed on every [#determineFieldsToShow];
+    /// used to keep the remove-field button (see [#wrapWithRemoveButton]) off required rows.
+    private final Set<Field> requiredFields = new LinkedHashSet<>();
 
     /// Manual expand/collapse decisions per section, kept across rebuilds for the current
     /// entry (cleared on entry switch). Without an override, a section is expanded iff it
@@ -160,9 +167,11 @@ public class AllFieldsTab extends FieldsEditorTab {
         Set<Field> setFields = entry.getFields();
         SequencedSet<Field> fields = new LinkedHashSet<>();
         fields.add(InternalField.KEY_FIELD);
+        requiredFields.clear();
         entryTypesManager.enrich(entry.getType(), mode).ifPresent(entryType -> {
             for (OrFields orFields : entryType.getRequiredFields()) {
                 fields.addAll(orFields.getFields());
+                requiredFields.addAll(orFields.getFields());
             }
             entryType.getImportantOptionalFields().stream()
                      .filter(setFields::contains)
@@ -252,7 +261,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         if (!gridPane.getStyleClass().contains("all-fields-list")) {
             gridPane.getStyleClass().add("all-fields-list");
         }
-        addFieldRows(gridPane, buckets.get(FieldListSections.SectionType.MAIN), labelForField);
+        addFieldRows(gridPane, buckets.get(FieldListSections.SectionType.MAIN), labelForField, bibDatabaseContext, entry);
 
         listContainer.getChildren().setAll(gridPane, createMainChipBar(bibDatabaseContext, entry));
         for (FieldListSections.SectionType type : FieldListSections.SectionType.values()) {
@@ -268,7 +277,8 @@ public class AllFieldsTab extends FieldsEditorTab {
     }
 
     /// Label/editor rows with natural heights, label column as narrow as its content.
-    private void addFieldRows(GridPane grid, SequencedCollection<Field> fields, Map<Field, Label> labelForField) {
+    private void addFieldRows(GridPane grid, SequencedCollection<Field> fields, Map<Field, Label> labelForField,
+                              BibDatabaseContext bibDatabaseContext, BibEntry entry) {
         ColumnConstraints labelColumn = new ColumnConstraints();
         labelColumn.setMinWidth(Region.USE_PREF_SIZE);
         ColumnConstraints editorColumn = new ColumnConstraints();
@@ -284,9 +294,47 @@ public class AllFieldsTab extends FieldsEditorTab {
             label.setPrefHeight(Region.USE_COMPUTED_SIZE);
             GridPane.setValignment(label, VPos.TOP);
             grid.add(label, 0, row);
-            grid.add(editors.get(field).getNode(), 1, row);
+            grid.add(wrapWithRemoveButton(bibDatabaseContext, entry, field), 1, row);
             row++;
         }
+    }
+
+    /// Wraps a field's editor node with a gray "remove field" icon button pinned to the
+    /// top-right corner, shown only while the editor is focused *and* currently blank
+    /// (never for the citation key or a required field of the current entry type — those
+    /// can never be removed this way).
+    private Node wrapWithRemoveButton(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
+        Node editorNode = editors.get(field).getNode();
+        if (field.equals(InternalField.KEY_FIELD) || requiredFields.contains(field)) {
+            return editorNode;
+        }
+
+        ObservableValue<Optional<String>> fieldValue = entry.getFieldBinding(field);
+        Button removeButton = new Button();
+        removeButton.setGraphic(IconTheme.JabRefIcons.CLOSE.getGraphicNode());
+        removeButton.getStyleClass().addAll("icon-button", "narrow", "field-remove-button");
+        removeButton.setTooltip(new Tooltip(Localization.lang("Remove field")));
+        removeButton.setFocusTraversable(false);
+        removeButton.visibleProperty().bind(editorNode.focusWithinProperty().and(
+                Bindings.createBooleanBinding(
+                        () -> fieldValue.getValue().map(StringUtil::isBlank).orElse(true),
+                        fieldValue)));
+        removeButton.managedProperty().bind(removeButton.visibleProperty());
+        removeButton.setOnAction(_ -> removeFieldRow(bibDatabaseContext, entry, field));
+
+        StackPane wrapper = new StackPane(editorNode, removeButton);
+        StackPane.setAlignment(removeButton, Pos.TOP_RIGHT);
+        return wrapper;
+    }
+
+    /// Hides a still-empty, user-added field row again (reachable only for non-required,
+    /// currently blank fields; see [#wrapWithRemoveButton]).
+    private void removeFieldRow(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
+        userAddedFields.remove(field);
+        if (entry.hasField(field)) {
+            entry.clearField(field);
+        }
+        rebuildPanel(bibDatabaseContext, entry);
     }
 
     // region sections
@@ -307,7 +355,7 @@ public class AllFieldsTab extends FieldsEditorTab {
             GridPane sectionGrid = new GridPane();
             sectionGrid.setHgap(10);
             sectionGrid.setVgap(8);
-            addFieldRows(sectionGrid, shownFields, labelForField);
+            addFieldRows(sectionGrid, shownFields, labelForField, bibDatabaseContext, entry);
             content.getChildren().add(sectionGrid);
         }
 
