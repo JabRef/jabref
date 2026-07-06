@@ -309,7 +309,8 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// Overlays a gray "remove field" icon button on the top-right corner *inside* the field's
     /// text input, shown only while the editor is focused *and* currently blank (never for the
     /// citation key or a required field of the current entry type — those can never be removed
-    /// this way).
+    /// this way). Overlaying inside the input keeps it left of any trailing option buttons the
+    /// editor draws itself (identifier/URL fetch icons, ICORE lookup, …), so it never collides.
     // [impl->req~entry-editor.main-tab.remove-field~1]
     private Node wrapWithRemoveButton(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         Node editorNode = editors.get(field).getNode();
