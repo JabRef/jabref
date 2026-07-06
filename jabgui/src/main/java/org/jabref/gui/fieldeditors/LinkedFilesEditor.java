@@ -68,7 +68,9 @@ import jakarta.inject.Inject;
 
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
-    private static final double DEFAULT_ROW_HEIGHT = 30.0;
+    // Upper bound on how many rows the ListView grows to before it starts scrolling internally,
+    // so entries with many linked files cannot expand the entry editor layout indefinitely.
+    private static final int MAX_VISIBLE_ROWS = 5;
 
     @FXML
     private ListView<LinkedFileViewModel> listView;
@@ -163,12 +165,14 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 .install(listView);
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        // Size the control to exactly (number of files + 1) rows, so it ends right after the content instead of leaving blank space.
-        listView.setFixedCellSize(DEFAULT_ROW_HEIGHT);
-        listView.prefHeightProperty().bind(
-                Bindings.size(listView.getItems())
-                        .add(1)
-                        .multiply(DEFAULT_ROW_HEIGHT));
+        // Size the control to (number of files + 1) rows, so it ends right after the content instead of leaving blank
+        // space, but cap it at MAX_VISIBLE_ROWS so large file lists scroll internally rather than growing the layout.
+        // The row height comes from the CSS-driven fixed cell size, so theming and font scaling adjust it naturally.
+        listView.prefHeightProperty().bind(Bindings.createDoubleBinding(
+                () -> Math.min(listView.getItems().size() + 1, MAX_VISIBLE_ROWS) * listView.getFixedCellSize(),
+                listView.getItems(),
+                listView.fixedCellSizeProperty()));
+        listView.maxHeightProperty().bind(listView.fixedCellSizeProperty().multiply(MAX_VISIBLE_ROWS));
 
         fulltextFetcher.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty().not());
         progressIndicator.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty());

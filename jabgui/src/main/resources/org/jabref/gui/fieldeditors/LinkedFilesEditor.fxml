@@ -39,5 +39,5 @@
             </tooltip>
         </Button>
     </VBox>
-    <ListView fx:id="listView" HBox.hgrow="ALWAYS" />
+    <ListView fx:id="listView" styleClass="linked-files-list" HBox.hgrow="ALWAYS" />
 </fx:root>
