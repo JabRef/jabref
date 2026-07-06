@@ -44,6 +44,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
+import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
@@ -552,6 +553,10 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     private static void applyNaturalHeight(FieldEditorFX editor) {
         normalizeInputHeights(editor.getNode());
+        if (editor instanceof LinkedFilesEditor) {
+            // Sizes itself to (file count + 1) rows; a fixed weight-based height would override that.
+            return;
+        }
         if ((editor.getWeight() > 1) && (editor.getNode() instanceof Region region)) {
             region.setPrefHeight(editor.getWeight() * HEIGHT_PER_WEIGHT);
         }

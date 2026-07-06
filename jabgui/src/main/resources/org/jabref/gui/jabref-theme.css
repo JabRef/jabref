@@ -2514,6 +2514,12 @@ journalInfo .grid-cell-b {
     -fx-padding: 0.5em 0 0.5em 0;
 }
 
+/* Row height for the linked-files ListView. Expressed in em so theming and font scaling adjust it;
+   LinkedFilesEditor binds the ListView pref/max height to this fixed cell size. */
+.linked-files-list {
+    -fx-fixed-cell-size: 2.3em;
+}
+
 .delete-files-dialog {
     -fx-padding: 10px;
     -fx-background-color: -fx-background;
