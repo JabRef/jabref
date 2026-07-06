@@ -36,6 +36,7 @@ import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.logic.ai.AiService;
@@ -73,6 +74,8 @@ public class EntryEditor extends BorderPane implements PreviewControls {
 
     private final EntryEditorViewModel viewModel;
     private final EntryEditorFocusUtils focusUtils;
+
+    private @Nullable JumpToFieldDialog jumpToFieldDialog;
 
     @FXML private TabPane tabbed;
 
@@ -248,11 +251,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                         event.consume();
                     }
                     case JUMP_TO_FIELD -> {
-                        if (getCurrentlyEditedEntry() != null) {
-                            JumpToFieldDialog dialog = new JumpToFieldDialog(this);
-                            dialog.initModality(Modality.NONE);
-                            dialog.show();
-                        }
+                        openJumpToFieldDialog();
                         event.consume();
                     }
                     case HELP -> {
@@ -288,6 +287,25 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     @FXML
     private void generateCiteKeyButton() {
         viewModel.generateCiteKey();
+    }
+
+    @FXML
+    private void jumpToFieldButton() {
+        openJumpToFieldDialog();
+    }
+
+    private void openJumpToFieldDialog() {
+        if (jumpToFieldDialog != null && jumpToFieldDialog.isShowing()) {
+            BaseDialog.bringToFront(jumpToFieldDialog);
+            return;
+        }
+
+        Optional.ofNullable(getCurrentlyEditedEntry()).ifPresent(_ -> {
+            jumpToFieldDialog = new JumpToFieldDialog(this);
+            jumpToFieldDialog.initModality(Modality.NONE);
+            jumpToFieldDialog.setOnHidden(_ -> jumpToFieldDialog = null);
+            jumpToFieldDialog.show();
+        });
     }
 
     @FXML

@@ -34,6 +34,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added generic CSV export filter that exports all standard BibTeX fields. [#15711](https://github.com/JabRef/jabref/issues/15711)
 - We added OCR engine's executable path as the first OCR preference to let users specify the exact path of the engine they are using. [#15990](https://github.com/JabRef/jabref/pull/15990)
 - We added file notification to OCRed file to let users open the directory and show the new file. [#16082](https://github.com/JabRef/jabref/pull/16082)
+- We added a "Jump to field" button to the entry editor toolbar, triggering the same action as the <kbd>Ctrl</kbd>+<kbd>J</kbd> shortcut. [#16169](https://github.com/JabRef/jabref/pull/16169)
+- The `jabkit` `--input` option (and positional input argument) now accepts http(s)/ftp URLs, downloading the file before processing. [#16165](https://github.com/JabRef/jabref/pull/16165)
 
 ### Changed
 
@@ -53,6 +55,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue in the new entry editor's file field editor where files added via the add button did not appear until switching to another entry and back, and cleaned up the layout so the add/fetch-fulltext/download-URL buttons sit to the left of the file list and the list no longer leaves blank space below the last file. [#16172](https://github.com/JabRef/jabref/pull/16172)
 - We fixed an issue where `jabkit`'s `-p`/`--porcelain` and `-d`/`--debug` flags only took effect when placed at the exact command level where they were parsed, so e.g. `jabkit -p check consistency file.bib` silently ran without porcelain output. [#16164](https://github.com/JabRef/jabref/pull/16164)
 - We fixed an issue where no raw preferences values were visible anymore in the preferences filter. [#16161](https://github.com/JabRef/jabref/pull/16161)
 - We fixed an issue where cleanup did not detect an arXiv entry when its `url` field ended with a fragment anchor (e.g. `https://arxiv.org/html/2510.26275v2#bib`). [#16150](https://github.com/JabRef/jabref/pull/16150)
