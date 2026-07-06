@@ -1,7 +1,7 @@
 package org.jabref.gui.preferences.externalfiletypes;
 
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;

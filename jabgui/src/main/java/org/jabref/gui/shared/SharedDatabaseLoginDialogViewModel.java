@@ -11,8 +11,8 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -36,7 +36,6 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.gui.validation.ValidationConstraints;
 import org.jabref.gui.validation.ValidationMessage;
-import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -50,6 +49,7 @@ import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -72,19 +72,19 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     private final ConstrainedStringProperty<ValidationMessage> database = new SimpleConstrainedStringProperty<>("",
             ValidationConstraints.predicate(
-                    input -> (input != null) && !input.isBlank(),
+                    input -> !StringUtil.isBlank(input),
                     ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Library")))));
     private final ConstrainedStringProperty<ValidationMessage> host = new SimpleConstrainedStringProperty<>("",
             ValidationConstraints.predicate(
-                    input -> (input != null) && !input.isBlank(),
+                    input -> !StringUtil.isBlank(input),
                     ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Host")))));
     private final ConstrainedStringProperty<ValidationMessage> port = new SimpleConstrainedStringProperty<>("",
             ValidationConstraints.predicate(
-                    input -> (input != null) && !input.isBlank(),
+                    input -> !StringUtil.isBlank(input),
                     ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Port")))));
     private final ConstrainedStringProperty<ValidationMessage> user = new SimpleConstrainedStringProperty<>("",
             ValidationConstraints.predicate(
-                    input -> (input != null) && !input.isBlank(),
+                    input -> !StringUtil.isBlank(input),
                     ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("User")))));
     private final StringProperty password = new SimpleStringProperty("");
     private final ConstrainedStringProperty<ValidationMessage> folder = new SimpleConstrainedStringProperty<>("",
@@ -92,16 +92,16 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     (String input, Boolean autosaveEnabled) -> {
                         if (!autosaveEnabled) {
                             return true;
-                        } else if (input != null) {
-                            try {
-                                Path p = Path.of(input.trim());
-                                p = p.getParent();
-                                return (p != null) && Files.isDirectory(p);
-                            } catch (InvalidPathException e) {
-                                return false;
-                            }
                         }
-                        return false;
+                        if (StringUtil.isBlank(input)) {
+                            return false;
+                        }
+                        try {
+                            Path parent = Path.of(input.trim()).getParent();
+                            return (parent != null) && Files.isDirectory(parent);
+                        } catch (InvalidPathException e) {
+                            return false;
+                        }
                     },
                     ValidationMessage.error(Localization.lang("Please enter a valid file path.")),
                     autosave));
@@ -110,7 +110,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final ConstrainedStringProperty<ValidationMessage> keystore = new SimpleConstrainedStringProperty<>("",
             ValidationConstraints.predicate(
                     (String input, Boolean useSSLEnabled) ->
-                            !useSSLEnabled || ((input != null) && !input.isBlank() && Files.exists(Path.of(input))),
+                            !useSSLEnabled || (!StringUtil.isBlank(input) && Files.exists(Path.of(input))),
                     ValidationMessage.error(Localization.lang("Please enter a valid file path.")),
                     useSSL));
     private final StringProperty keyStorePasswordProperty = new SimpleStringProperty("");

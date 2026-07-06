@@ -3,12 +3,13 @@ package org.jabref.gui.libraryproperties.constants;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 
 import org.jabref.gui.validation.ValidationConstraints;
 import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 
 import org.jfxcore.validation.property.ConstrainedStringProperty;
 import org.jfxcore.validation.property.SimpleConstrainedStringProperty;
@@ -64,7 +65,7 @@ public class ConstantsItemModel {
     }
 
     private static Optional<ValidationMessage> validateContent(String input) {
-        if (input == null || input.isBlank()) {
+        if (StringUtil.isBlank(input)) {
             return Optional.of(ValidationMessage.error(Localization.lang("Must not be empty!")));
         } else {
             return Optional.empty(); // everything is ok

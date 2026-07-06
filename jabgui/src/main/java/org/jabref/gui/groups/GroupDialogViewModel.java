@@ -10,12 +10,11 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -162,20 +161,18 @@ public class GroupDialogViewModel {
                                         Character.toString(preferences.getBibEntryPreferences().getKeywordSeparator())
                                 ))),
                 ValidationConstraints.predicate(
-                        name -> {
-                            Optional<GroupTreeNode> rootGroup = currentDatabase.getMetaData().getGroups();
-                            if (rootGroup.isPresent()) {
-                                boolean groupsExistWithSameName = !rootGroup.get().findChildrenSatisfying(group -> group.getName().equals(name)).isEmpty();
-                                if ((editedGroup == null) && groupsExistWithSameName) {
-                                    // New group but there is already one group with the same name
-                                    return false;
-                                }
+                        name -> currentDatabase.getMetaData().getGroups()
+                                             .map(rootGroup -> {
+                                                 boolean groupsExistWithSameName = !rootGroup.findChildrenSatisfying(group -> group.getName().equals(name)).isEmpty();
+                                                 if ((editedGroup == null) && groupsExistWithSameName) {
+                                                     // New group but there is already one group with the same name
+                                                     return false;
+                                                 }
 
-                                // Edit group, changed name to something that is already present
-                                return (editedGroup == null) || editedGroup.getName().equals(name) || !groupsExistWithSameName;
-                            }
-                            return true;
-                        },
+                                                 // Edit group, changed name to something that is already present
+                                                 return (editedGroup == null) || editedGroup.getName().equals(name) || !groupsExistWithSameName;
+                                             })
+                                             .orElse(true),
                         ValidationMessage.warning(
                                 Localization.lang("There already exists a group with the same name.\nIf you use it, it will inherit all entries from this other group.")
                         )));

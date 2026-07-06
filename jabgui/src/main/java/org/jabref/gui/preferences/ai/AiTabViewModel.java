@@ -36,7 +36,6 @@ import org.jabref.model.ai.pipeline.AnswerEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
-import org.jfxcore.validation.Constraints;
 import org.jfxcore.validation.property.ConstrainedIntegerProperty;
 import org.jfxcore.validation.property.ConstrainedObjectProperty;
 import org.jfxcore.validation.property.ConstrainedStringProperty;
@@ -280,7 +279,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                         huggingFaceApiBaseUrl.set(newValue);
             }
         });
-
     }
 
     @Override

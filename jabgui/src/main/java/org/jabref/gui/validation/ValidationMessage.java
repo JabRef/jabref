@@ -1,9 +1,11 @@
 package org.jabref.gui.validation;
 
-/// The diagnostic type attached to jfxcore {@code Constraint}/{@code ValidationResult} instances throughout
-/// JabRef's GUI validation, replacing ControlsFX's/mvvmfx-validation's class of the same name.
-public record ValidationMessage(Severity severity, String message) {
+import org.jspecify.annotations.NullMarked;
 
+/// The diagnostic type attached to jfxcore `Constraint`/`ValidationResult` instances throughout
+/// JabRef's GUI validation, replacing ControlsFX's/mvvmfx-validation's class of the same name.
+@NullMarked
+public record ValidationMessage(Severity severity, String message) {
     public static ValidationMessage error(String message) {
         return new ValidationMessage(Severity.ERROR, message);
     }

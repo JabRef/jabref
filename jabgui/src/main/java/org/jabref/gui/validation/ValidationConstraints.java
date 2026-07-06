@@ -11,15 +11,17 @@ import javafx.beans.value.ObservableValue;
 import org.jfxcore.validation.Constraint;
 import org.jfxcore.validation.Constraints;
 import org.jfxcore.validation.ValidationResult;
+import org.jspecify.annotations.NullMarked;
 
 /// Adapts JabRef's existing validation-logic shapes ("does this value satisfy a predicate", "does this value
-/// map to an error message") into jfxcore {@link Constraint}s carrying a {@link ValidationMessage} diagnostic,
-/// so call sites don't need to hand-write {@link Constraints#validate} lambdas everywhere.
+/// map to an error message") into jfxcore [Constraint]s carrying a [ValidationMessage] diagnostic,
+/// so call sites don't need to hand-write `Constraints.validate` lambdas everywhere.
 ///
 /// The `dependency`-taking overloads exist for genuine cross-field rules: unlike mvvmfx-validation's
 /// `FunctionBasedValidator`, which only reactively re-runs when its own source property changes (any other
 /// property read inside the predicate/function is read imperatively, not reactively), these re-evaluate
 /// automatically whenever `dependency` changes too.
+@NullMarked
 public final class ValidationConstraints {
 
     private ValidationConstraints() {
@@ -30,7 +32,7 @@ public final class ValidationConstraints {
                 predicate.test(value) ? ValidationResult.valid() : ValidationResult.invalid(message));
     }
 
-    /// The message is derived from the value itself; an empty {@link Optional} means the value is valid.
+    /// The message is derived from the value itself; an empty `Optional` means the value is valid.
     public static <T> Constraint<T, ValidationMessage> function(Function<T, Optional<ValidationMessage>> function) {
         return Constraints.validate(value ->
                 function.apply(value)

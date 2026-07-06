@@ -69,6 +69,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where renaming a linked file with a very long title showed a misleading "file is being used by another process" error instead of renaming successfully. [#14771](https://github.com/JabRef/jabref/issues/14771)
 - We fixed an issue where JabRef would trigger `The libray has been changed` while still saving. [#4877](https://github.com/JabRef/jabref/issues/4877)
 
+### Changed
+
+- We replaced the ControlsFX/mvvmfx-validation-based field validation with a lightweight implementation on top of `org.jfxcore:validation`, using a `Popup`-based validation decoration instead of ControlsFX's `Decorator` overlay, to avoid the continuous bounds-tracking and `GridPane`-incompatible sibling-node insertion of the previous mechanism. [#TODO](https://github.com/JabRef/jabref/pull/TODO)
+
 ### Removed
 
 - We removed the entry editor tabs "Required fields", "Optional fields", "Optional fields 2", "Deprecated fields", "Other fields", and "Comments"; their content is part of the new "Main" tab. [#12711](https://github.com/JabRef/jabref/issues/12711)

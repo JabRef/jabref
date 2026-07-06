@@ -75,14 +75,14 @@ public class WebSearchPaneView extends VBox {
     private void addQueryValidationHints(TextField query) {
         EasyBind.subscribe(viewModel.queryProperty().validProperty(),
                 valid -> {
-                    Optional<ValidationMessage> highestMessage = ValidationVisualizer.highestMessage(viewModel.queryProperty());
-                    if (!valid && highestMessage.isPresent()) {
-                        query.setTooltip(new Tooltip(highestMessage.get().message()));
+                    Optional<ValidationMessage> highestMessage = valid ? Optional.empty() : ValidationVisualizer.highestMessage(viewModel.queryProperty());
+                    highestMessage.ifPresentOrElse(message -> {
+                        query.setTooltip(new Tooltip(message.message()));
                         query.pseudoClassStateChanged(QUERY_INVALID, true);
-                    } else {
+                    }, () -> {
                         query.setTooltip(null);
                         query.pseudoClassStateChanged(QUERY_INVALID, false);
-                    }
+                    });
                 });
     }
 

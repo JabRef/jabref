@@ -20,6 +20,7 @@ import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -49,7 +50,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         this.commitMessage = new SimpleConstrainedStringProperty<>(
                 "",
                 ValidationConstraints.predicate(
-                        message -> message != null && !message.isBlank(),
+                        message -> !StringUtil.isBlank(message),
                         ValidationMessage.error(Localization.lang("Commit message cannot be empty"))));
     }
 

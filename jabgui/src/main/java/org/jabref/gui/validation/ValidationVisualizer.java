@@ -19,8 +19,9 @@ import org.jabref.gui.icon.IconTheme;
 
 import org.jfxcore.validation.ValidationState;
 import org.jfxcore.validation.property.ReadOnlyConstrainedProperty;
+import org.jspecify.annotations.NullMarked;
 
-/// Shows the highest-severity {@link ValidationMessage} of a {@link ReadOnlyConstrainedProperty} as a small
+/// Shows the highest-severity [ValidationMessage] of a [ReadOnlyConstrainedProperty] as a small
 /// icon anchored next to a control, replacing ControlsFX's `Decorator`-based validation decoration
 /// (`ControlsFxVisualizer` + JabRef's old `IconValidationDecorator`).
 ///
@@ -30,6 +31,7 @@ import org.jfxcore.validation.property.ReadOnlyConstrainedProperty;
 /// children of a `GridPane` (inserting a wrapper node would break `GridPane.rowIndex`/`columnIndex`
 /// attachments). This visualizer instead uses an owned [Popup], which never touches the control's parent, and
 /// only tracks position while a message is actually showing (i.e., while the control is invalid).
+@NullMarked
 public class ValidationVisualizer {
 
     private final Pos position;

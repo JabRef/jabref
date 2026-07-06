@@ -110,7 +110,6 @@ public class TableTabViewModel implements PreferenceTabViewModel {
                 removeExtraFileColumns();
             }
         });
-
     }
 
     @Override
