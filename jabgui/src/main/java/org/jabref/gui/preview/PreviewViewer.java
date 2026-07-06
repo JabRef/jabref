@@ -107,9 +107,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         workspacePreferences.mainFontSizeProperty().addListener((_, _, _) -> updateBaseFontSize());
     }
 
-    /// @return the configured base font size in points, or a non-positive value to fall back to the system default
+    /// @return the base font size in points, matching whatever [org.jabref.gui.theme.ThemeManager]
+    /// applies to the rest of the UI via the scene root's "-fx-font-size" (the preview cannot rely on that
+    /// CSS cascade itself, since its text nodes get an explicit `Font` instead of an inherited one)
     private double resolveBaseFontSize() {
-        return workspacePreferences.shouldOverrideDefaultFontSize() ? workspacePreferences.getMainFontSize() : -1;
+        return workspacePreferences.shouldOverrideDefaultFontSize()
+                ? workspacePreferences.getMainFontSize()
+                : WorkspacePreferences.getDefault().getMainFontSize();
     }
 
     private void updateBaseFontSize() {
