@@ -18,6 +18,7 @@ import javax.swing.undo.UndoManager;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
@@ -28,12 +29,14 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -303,10 +306,10 @@ public class AllFieldsTab extends FieldsEditorTab {
         }
     }
 
-    /// Wraps a field's editor node with a gray "remove field" icon button pinned to the
-    /// top-right corner, shown only while the editor is focused *and* currently blank
-    /// (never for the citation key or a required field of the current entry type — those
-    /// can never be removed this way).
+    /// Overlays a gray "remove field" icon button on the top-right corner *inside* the field's
+    /// text input, shown only while the editor is focused *and* currently blank (never for the
+    /// citation key or a required field of the current entry type — those can never be removed
+    /// this way).
     // [impl->req~entry-editor.main-tab.remove-field~1]
     private Node wrapWithRemoveButton(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         Node editorNode = editors.get(field).getNode();
@@ -321,18 +324,61 @@ public class AllFieldsTab extends FieldsEditorTab {
         removeButton.setTooltip(new Tooltip(Localization.lang("Remove field")));
         removeButton.setFocusTraversable(false);
         removeButton.setOnAction(_ -> removeFieldRow(bibDatabaseContext, entry, field));
-
-        StackPane wrapper = new StackPane(editorNode, removeButton);
         StackPane.setAlignment(removeButton, Pos.TOP_RIGHT);
+        StackPane.setMargin(removeButton, new Insets(1));
 
-        // Bound to the wrapper's (not editorNode's) focus-within: editorNode and removeButton are
-        // siblings, so focus moving from one to the other must not be read as "focus left the row".
-        removeButton.visibleProperty().bind(wrapper.focusWithinProperty().and(
+        // Overlay the button on the text input itself (a StackPane wrapping just the input, kept
+        // in the editor's own layout) so it sits inside the field box — not after the editor's
+        // trailing option buttons (e.g. the ICORE lookup / external-link icons). Editors without
+        // a plain text input (e.g. linked-files) fall back to stacking the whole editor node.
+        StackPane focusScope = overlayInsideTextInput(editorNode, removeButton)
+                .orElseGet(() -> new StackPane(editorNode, removeButton));
+        Node rowNode = (focusScope.getChildren().contains(editorNode)) ? focusScope : editorNode;
+
+        // Bound to the overlay's (not editorNode's) focus-within: the input and removeButton are
+        // siblings there, so focus moving from one to the other must not read as "focus left the row".
+        removeButton.visibleProperty().bind(focusScope.focusWithinProperty().and(
                 Bindings.createBooleanBinding(
                         () -> fieldValue.getValue().map(StringUtil::isBlank).orElse(true),
                         fieldValue)));
         removeButton.managedProperty().bind(removeButton.visibleProperty());
-        return wrapper;
+        return rowNode;
+    }
+
+    /// Re-parents the editor's primary text input into a [StackPane] (in the input's own parent,
+    /// preserving its HBox grow priority) and overlays `button` on it. Returns the new overlay
+    /// pane, or empty if the editor exposes no plain text input to overlay onto.
+    private static Optional<StackPane> overlayInsideTextInput(Node editorNode, Button button) {
+        return findPrimaryTextInput(editorNode).flatMap(input -> {
+            if (!(input.getParent() instanceof Pane parent)) {
+                return Optional.empty();
+            }
+            int index = parent.getChildren().indexOf(input);
+            if (index < 0) {
+                return Optional.empty();
+            }
+            StackPane overlay = new StackPane(input, button);
+            HBox.setHgrow(overlay, HBox.getHgrow(input));
+            parent.getChildren().set(index, overlay);
+            return Optional.of(overlay);
+        });
+    }
+
+    /// First [TextInputControl] in the editor node's subtree (the row-filling text field/area),
+    /// or empty for composite editors that have none.
+    private static Optional<TextInputControl> findPrimaryTextInput(Node node) {
+        if (node instanceof TextInputControl textInput) {
+            return Optional.of(textInput);
+        }
+        if (node instanceof Parent parent) {
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                Optional<TextInputControl> found = findPrimaryTextInput(child);
+                if (found.isPresent()) {
+                    return found;
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     /// Hides a still-empty, user-added field row again (reachable only for non-required,
