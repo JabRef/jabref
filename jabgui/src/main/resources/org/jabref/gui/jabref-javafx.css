@@ -289,38 +289,55 @@ TextFlow > .tooltip-text-monospaced {
     -fx-padding: 0.5em 1em 0.5em 1em;
 }
 
+/* Keep the flat rectangular shape of the base .button rule on interaction;
+   without pinning insets/radius here, Modena's own :hover/:focused/:pressed
+   rules win over the plain .button rule and reshape the background. */
 .button:hover {
     -fx-background-color: rgba(0, 0, 0, 0.12);
+    -fx-background-insets: 0;
+    -fx-background-radius: 0.25em;
 }
 
 .button:focused,
 .button:pressed {
     -fx-background-color: rgba(0, 0, 0, 0.3);
+    -fx-background-insets: 0;
+    -fx-background-radius: 0.25em;
 }
 
 .button:default {
     -fx-background-color: -fx-default-button;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0.25em;
 }
 
 .button:default:hover {
     -fx-background-color: derive(-fx-default-button, -10%);
+    -fx-background-insets: 0;
+    -fx-background-radius: 0.25em;
 }
 
 .button:default:focused,
 .button:default:pressed {
     -fx-background-color: derive(-fx-default-button, -20%);
+    -fx-background-insets: 0;
+    -fx-background-radius: 0.25em;
 }
 
 /* JavaFX ToggleButton */
 .toggle-button:hover,
 .toggle-button:selected:hover {
     -fx-background-color: -jr-icon-background-active;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0.25em;
 }
 
 .toggle-button:selected {
     -fx-background-color: -jr-icon-background-active;
     -fx-text-fill: -jr-selected;
     -fx-fill: -jr-selected;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0.25em;
 }
 
 /* JavaFX CheckBox */
