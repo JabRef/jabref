@@ -95,7 +95,7 @@
 
     <Label styleClass="sectionHeader" text="%Directory mapping"/>
     <Label text="%When a linked file's absolute path cannot be found, try substituting a mapped directory for a matching prefix." wrapText="true"/>
-    <TableView fx:id="directoryMappingTable" editable="true" VBox.vgrow="ALWAYS">
+    <TableView fx:id="directoryMappingTable" editable="true">
         <columns>
             <TableColumn fx:id="directoryMappingDirectoryColumn" text="%Directory" editable="true"/>
             <TableColumn fx:id="directoryMappingMappedDirectoryColumn" text="%Mapped directory" editable="true"/>
