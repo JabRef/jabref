@@ -64,6 +64,7 @@ dependencies.constraints {
     api("com.knuddels:jtokkit:1.1.0")
     api("com.konghq:unirest-java-core:4.10.0")
     api("com.konghq:unirest-modules-gson:4.10.0")
+    api("com.squareup.okhttp3:mockwebserver3:5.4.0")
     api("com.squareup.okhttp3:okhttp:5.4.0")
     api("com.squareup.okio:okio-jvm:3.17.0")
     api("com.squareup.retrofit2:retrofit:3.0.0")
