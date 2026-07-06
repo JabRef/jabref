@@ -2,12 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.SequencedMap;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
@@ -23,12 +18,6 @@ import javafx.collections.ObservableList;
 
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherType;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.JabRefCliPreferences;
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.SpecialField;
-import org.jabref.model.entry.field.StandardField;
 
 public class EntryEditorPreferences {
 
@@ -105,72 +94,13 @@ public class EntryEditorPreferences {
     }
 
     private static List<EntryEditorTabModel> getDefaultTabModels() {
-        List<EntryEditorTabModel> tabModels = new ArrayList<>();
-
-        // Always-present leading tab
-        tabModels.add(new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.PREVIEW, true));
-
-        Arrays.stream(EntryEditorTabModel.BuiltIn.values())
-              .filter(EntryEditorTabModel.BuiltIn::isFieldSet)
-              .forEachOrdered(fieldSet -> tabModels.add(new EntryEditorTabModel.BuiltInTab(fieldSet, true)));
-
-        getDefaultEntryEditorTabs().forEach((name, fields) ->
-                tabModels.add(new EntryEditorTabModel.CustomizedFieldsTab(name, fields)));
-
-        // The leading Preview and the field-set tabs are already added above
-        Arrays.stream(EntryEditorTabModel.BuiltIn.values())
-              .filter(tab -> tab != EntryEditorTabModel.BuiltIn.PREVIEW && !tab.isFieldSet())
-              .forEachOrdered(tab -> tabModels.add(new EntryEditorTabModel.BuiltInTab(tab, true)));
-
-        return tabModels;
-    }
-
-    public static SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
-        SequencedMap<String, Set<Field>> defaultTabsMap = new LinkedHashMap<>();
-        String defaultFields = getDefaultGeneralFields().stream()
-                                                        .map(Field::getName)
-                                                        .collect(Collectors.joining(JabRefCliPreferences.STRINGLIST_DELIMITER.toString()));
-        defaultTabsMap.put(Localization.lang("General"), FieldFactory.parseFieldList(defaultFields));
-        defaultTabsMap.put(Localization.lang("Abstract"), FieldFactory.parseFieldList(StandardField.ABSTRACT.getName()));
-
-        return defaultTabsMap;
-    }
-
-    public static List<Field> getDefaultGeneralFields() {
-        List<Field> defaultGeneralFields = new ArrayList<>(List.of(
-                StandardField.DOI,
-                StandardField.ICORERANKING,
-                StandardField.CITATIONCOUNT,
-                StandardField.CROSSREF,
-                StandardField.KEYWORDS,
-                StandardField.EPRINT,
-                StandardField.EPRINTTYPE,
-                StandardField.URL,
-                StandardField.FILE,
-                StandardField.GROUPS,
-                StandardField.OWNER,
-                StandardField.TIMESTAMP
-        ));
-        defaultGeneralFields.addAll(EnumSet.allOf(SpecialField.class));
-        return defaultGeneralFields;
+        return Arrays.stream(EntryEditorTabModel.BuiltIn.values())
+                     .<EntryEditorTabModel>map(tab -> new EntryEditorTabModel.BuiltInTab(tab, true))
+                     .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public static EntryEditorPreferences getDefault() {
         return new EntryEditorPreferences();
-    }
-
-    public void setAll(EntryEditorPreferences preferences) {
-        tabModels.setAll(preferences.getTabModels());
-        this.shouldOpenOnNewEntry.set(preferences.shouldOpenOnNewEntry());
-        this.showSourceTabByDefault.set(preferences.showSourceTabByDefault());
-        this.enableValidation.set(preferences.shouldEnableValidation());
-        this.allowIntegerEditionBibtex.set(preferences.shouldAllowIntegerEditionBibtex());
-        this.autoLinkFiles.set(preferences.autoLinkFilesEnabled());
-        this.enablementStatus.set(preferences.shouldEnableJournalPopup());
-        this.citationFetcherType.set(preferences.getCitationFetcherType());
-        this.citationCountFetcherType.set(preferences.getCitationCountFetcherType());
-        this.showUserCommentsFields.set(preferences.shouldShowUserCommentsFields());
-        this.previewWidthDividerPosition.set(preferences.getPreviewWidthDividerPosition());
     }
 
     public ObservableList<EntryEditorTabModel> getTabModels() {
@@ -199,32 +129,6 @@ public class EntryEditorPreferences {
                 return;
             }
         }
-    }
-
-    public Map<String, Set<Field>> getCustomizedFieldSets() {
-        SequencedMap<String, Set<Field>> map = new LinkedHashMap<>();
-        for (EntryEditorTabModel model : tabModels) {
-            if (model instanceof EntryEditorTabModel.CustomizedFieldsTab(
-                    String name,
-                    Set<Field> fields
-            )) {
-                map.put(name, fields);
-            }
-        }
-        return map;
-    }
-
-    public void setCustomizedFieldSets(Map<String, Set<Field>> tabModels) {
-        List<EntryEditorTabModel> newFieldSet = tabModels.entrySet().stream()
-                                                         .<EntryEditorTabModel>map(model ->
-                                                                 new EntryEditorTabModel.CustomizedFieldsTab(
-                                                                         model.getKey(),
-                                                                         model.getValue()))
-                                                         .toList();
-        this.tabModels.removeIf(config -> config instanceof EntryEditorTabModel.CustomizedFieldsTab);
-
-        // Customized field-set tabs sit right after the built-in field-set tabs
-        this.tabModels.addAll(EntryEditorTabModel.indexAfterBuiltInFieldSets(this.tabModels), newFieldSet);
     }
 
     public boolean shouldOpenOnNewEntry() {
