@@ -45,6 +45,7 @@ import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.linkedfile.LinkedFileEditDialog;
+import org.jabref.gui.linkedfile.OcrLinkedFileAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -296,6 +297,23 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                         LinkedFileViewModel selectedFile = listView.getSelectionModel().getSelectedItem();
                         if (selectedFile != null) {
                             new ContextAction(StandardActions.OPEN_FILE, selectedFile, databaseContext, bibEntry, preferences, viewModel).execute();
+                            event.consume();
+                        }
+                    }
+                    case PERFORM_OCR -> {
+                        LinkedFileViewModel selectedFile = listView.getSelectionModel().getSelectedItem();
+                        if (selectedFile != null) {
+                            new OcrLinkedFileAction(
+                                    selectedFile.getFile(),
+                                    selectedFile.getLinkedEntries(),
+                                    databaseContext,
+                                    dialogService,
+                                    preferences,
+                                    taskExecutor,
+                                    fileUpdateMonitor,
+                                    undoManager,
+                                    stateManager
+                            ).execute();
                             event.consume();
                         }
                     }
