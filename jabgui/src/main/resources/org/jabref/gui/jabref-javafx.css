@@ -676,12 +676,23 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 /*
+ * Default (left-side) arrow: give it a bit more breathing room
+ * before the title text, e.g. the entry editor's collapsible
+ * field sections (which aren't hosted in an .accordion).
+ */
+.titled-pane > .title > .arrow-button {
+    -fx-padding: 0.0em 0.6em 0.0em 0.0em;
+}
+
+/*
  * The arrow button has some right padding that's added
  * by "modena.css". This simply puts the padding on the
  * left since the arrow is positioned on the right.
+ * Only .accordion sets -fx-arrow-side to "right" (see rule
+ * above), so this more specific selector only wins there.
  */
-.titled-pane > .title > .arrow-button {
-    -fx-padding: 0.0em 0.0em 0.0em 0.583em;
+.accordion .titled-pane > .title > .arrow-button {
+    -fx-padding: 0.0em 0.0em 0.0em 1.0em;
 }
 
 /* JavaFX ScrollBar / ScrollPane */
