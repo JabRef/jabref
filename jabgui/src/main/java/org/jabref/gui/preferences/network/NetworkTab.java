@@ -3,7 +3,6 @@ package org.jabref.gui.preferences.network;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -20,14 +19,13 @@ import javafx.scene.input.MouseEvent;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.EnhancedPasswordField;
 import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 import static javafx.beans.binding.Bindings.not;
 
@@ -71,7 +69,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
     @FXML private TableColumn<CustomCertificateViewModel, String> actionsColumn;
     // endregion
 
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+    private final ValidationVisualizer validationVisualizer = new ValidationVisualizer();
 
     public NetworkTab() {
         ViewLoader.view(this)
@@ -122,13 +120,10 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
             proxyPassword.setShowPassword(!proxyPassword.isShowPassword());
         });
 
-        validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> {
-            validationVisualizer.initVisualization(viewModel.proxyHostnameValidationStatus(), proxyHostname);
-            validationVisualizer.initVisualization(viewModel.proxyPortValidationStatus(), proxyPort);
-            validationVisualizer.initVisualization(viewModel.proxyUsernameValidationStatus(), proxyUsername);
-            validationVisualizer.initVisualization(viewModel.proxyPasswordValidationStatus(), proxyPassword);
-        });
+        validationVisualizer.initVisualization(viewModel.proxyHostnameProperty(), proxyHostname);
+        validationVisualizer.initVisualization(viewModel.proxyPortProperty(), proxyPort);
+        validationVisualizer.initVisualization(viewModel.proxyUsernameProperty(), proxyUsername);
+        validationVisualizer.initVisualization(viewModel.proxyPasswordProperty(), proxyPassword);
 
         gitUsername.textProperty().bindBidirectional(viewModel.gitUsernameProperty());
         gitPat.textProperty().bindBidirectional(viewModel.gitPatProperty());

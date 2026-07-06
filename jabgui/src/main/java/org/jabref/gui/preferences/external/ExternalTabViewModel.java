@@ -1,5 +1,8 @@
 package org.jabref.gui.preferences.external;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -21,16 +24,16 @@ import org.jabref.gui.push.GuiPushToApplicationSettings;
 import org.jabref.gui.push.GuiPushToApplications;
 import org.jabref.gui.push.GuiPushToEmacs;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 
-import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jfxcore.validation.property.ConstrainedStringProperty;
+import org.jfxcore.validation.property.ReadOnlyConstrainedProperty;
+import org.jfxcore.validation.property.SimpleConstrainedStringProperty;
 
 public class ExternalTabViewModel implements PreferenceTabViewModel {
 
@@ -38,16 +41,34 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty autoOpenAttachedFoldersProperty = new SimpleBooleanProperty();
     private final ListProperty<GuiPushToApplication> pushToApplicationsListProperty = new SimpleListProperty<>();
     private final ObjectProperty<GuiPushToApplication> selectedPushToApplicationProperty = new SimpleObjectProperty<>();
-    private final StringProperty citeCommandProperty = new SimpleStringProperty("");
+    private final ConstrainedStringProperty<ValidationMessage> citeCommandProperty = new SimpleConstrainedStringProperty<>(
+            "",
+            ValidationConstraints.predicate(
+                    input -> {
+                        int indexKey1 = input.indexOf(CitationCommandString.CITE_KEY1);
+                        int indexKey2 = input.indexOf(CitationCommandString.CITE_KEY2);
+                        return indexKey1 >= 0 && indexKey2 >= 0 && indexKey2 >= (indexKey1 + CitationCommandString.CITE_KEY1.length());
+                    },
+                    ValidationMessage.warning(Localization.lang("The cite command should contain '%0' and '%1'.", CitationCommandString.CITE_KEY1, CitationCommandString.CITE_KEY2))));
     private final BooleanProperty useCustomTerminalProperty = new SimpleBooleanProperty();
-    private final StringProperty customTerminalCommandProperty = new SimpleStringProperty("");
+    private final ConstrainedStringProperty<ValidationMessage> customTerminalCommandProperty = new SimpleConstrainedStringProperty<>(
+            "",
+            ValidationConstraints.predicate(
+                    input -> !StringUtil.isNullOrEmpty(input),
+                    ValidationMessage.error("%s > %s %n %n %s".formatted(
+                            Localization.lang("External programs"),
+                            Localization.lang("Custom applications"),
+                            Localization.lang("Please specify a terminal application.")))));
     private final BooleanProperty useCustomFileBrowserProperty = new SimpleBooleanProperty();
-    private final StringProperty customFileBrowserCommandProperty = new SimpleStringProperty("");
+    private final ConstrainedStringProperty<ValidationMessage> customFileBrowserCommandProperty = new SimpleConstrainedStringProperty<>(
+            "",
+            ValidationConstraints.predicate(
+                    input -> !StringUtil.isNullOrEmpty(input),
+                    ValidationMessage.error("%s > %s %n %n %s".formatted(
+                            Localization.lang("External programs"),
+                            Localization.lang("Custom applications"),
+                            Localization.lang("Please specify a file browser.")))));
     private final StringProperty kindleEmailProperty = new SimpleStringProperty("");
-
-    private final Validator terminalCommandValidator;
-    private final Validator fileBrowserCommandValidator;
-    private final Validator citeCommandValidator;
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
@@ -65,31 +86,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         this.initialPushToApplicationPreferences = preferences.getPushToApplicationPreferences();
         this.workingPushToApplicationPreferences = PushToApplicationPreferences.getDefault();
         copyPushPreferences(workingPushToApplicationPreferences, initialPushToApplicationPreferences);
-
-        terminalCommandValidator = new FunctionBasedValidator<>(
-                customTerminalCommandProperty,
-                input -> !StringUtil.isNullOrEmpty(input),
-                ValidationMessage.error("%s > %s %n %n %s".formatted(
-                        Localization.lang("External programs"),
-                        Localization.lang("Custom applications"),
-                        Localization.lang("Please specify a terminal application."))));
-
-        fileBrowserCommandValidator = new FunctionBasedValidator<>(
-                customFileBrowserCommandProperty,
-                input -> !StringUtil.isNullOrEmpty(input),
-                ValidationMessage.error("%s > %s %n %n %s".formatted(
-                        Localization.lang("External programs"),
-                        Localization.lang("Custom applications"),
-                        Localization.lang("Please specify a file browser."))));
-
-        citeCommandValidator = new FunctionBasedValidator<>(
-                citeCommandProperty,
-                input -> {
-                    int indexKey1 = input.indexOf(CitationCommandString.CITE_KEY1);
-                    int indexKey2 = input.indexOf(CitationCommandString.CITE_KEY2);
-                    return indexKey1 >= 0 && indexKey2 >= 0 && indexKey2 >= (indexKey1 + CitationCommandString.CITE_KEY1.length());
-                },
-                ValidationMessage.warning(Localization.lang("The cite command should contain '%0' and '%1'.", CitationCommandString.CITE_KEY1, CitationCommandString.CITE_KEY2)));
     }
 
     @Override
@@ -142,37 +138,25 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         target.setCiteCommand(source.getCiteCommand());
     }
 
-    public ValidationStatus terminalCommandValidationStatus() {
-        return terminalCommandValidator.getValidationStatus();
-    }
-
-    public ValidationStatus fileBrowserCommandValidationStatus() {
-        return fileBrowserCommandValidator.getValidationStatus();
-    }
-
-    public ValidationStatus citeCommandValidationStatus() {
-        return citeCommandValidator.getValidationStatus();
-    }
-
     @Override
     public boolean validateSettings() {
-        CompositeValidator validator = new CompositeValidator();
+        List<ReadOnlyConstrainedProperty<?, ValidationMessage>> fieldsToCheck = new ArrayList<>();
 
         if (useCustomTerminalProperty.getValue()) {
-            validator.addValidators(terminalCommandValidator);
+            fieldsToCheck.add(customTerminalCommandProperty);
         }
 
         if (useCustomFileBrowserProperty.getValue()) {
-            validator.addValidators(fileBrowserCommandValidator);
+            fieldsToCheck.add(customFileBrowserCommandProperty);
         }
 
-        validator.addValidators(citeCommandValidator);
+        fieldsToCheck.add(citeCommandProperty);
 
-        ValidationStatus validationStatus = validator.getValidationStatus();
-        if (!validationStatus.isValid()) {
-            validationStatus.getHighestMessage().ifPresent(message ->
-                    dialogService.showErrorDialogAndWait(message.getMessage()));
-            return false;
+        for (ReadOnlyConstrainedProperty<?, ValidationMessage> field : fieldsToCheck) {
+            if (field.isInvalid()) {
+                dialogService.showErrorDialogAndWait(field.getDiagnostics().invalidSubList().getFirst().message());
+                return false;
+            }
         }
         return true;
     }
@@ -234,7 +218,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         return this.selectedPushToApplicationProperty;
     }
 
-    public StringProperty citeCommandProperty() {
+    public ConstrainedStringProperty<ValidationMessage> citeCommandProperty() {
         return this.citeCommandProperty;
     }
 
@@ -242,7 +226,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         return this.useCustomTerminalProperty;
     }
 
-    public StringProperty customTerminalCommandProperty() {
+    public ConstrainedStringProperty<ValidationMessage> customTerminalCommandProperty() {
         return this.customTerminalCommandProperty;
     }
 
@@ -252,7 +236,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         return this.useCustomFileBrowserProperty;
     }
 
-    public StringProperty customFileBrowserCommandProperty() {
+    public ConstrainedStringProperty<ValidationMessage> customFileBrowserCommandProperty() {
         return this.customFileBrowserCommandProperty;
     }
 

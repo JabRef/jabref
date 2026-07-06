@@ -2,7 +2,9 @@ package org.jabref.gui.edit.automaticfiededitor.copyormovecontent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -17,26 +19,24 @@ import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
 import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jfxcore.validation.property.ConstrainedObjectProperty;
+import org.jfxcore.validation.property.SimpleConstrainedObjectProperty;
 
 public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEditorTabViewModel {
     private final ObjectProperty<Field> fromField = new SimpleObjectProperty<>(StandardField.ABSTRACT);
 
-    private final ObjectProperty<Field> toField = new SimpleObjectProperty<>(StandardField.AUTHOR);
+    private final ConstrainedObjectProperty<Field, ValidationMessage> toField;
 
     private final BooleanProperty overwriteFieldContent = new SimpleBooleanProperty(false);
     private final List<BibEntry> selectedEntries;
-
-    private final Validator toFieldValidator;
 
     private final BooleanBinding canMove;
 
@@ -55,24 +55,19 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
                    .findFirst()
                    .ifPresent(fromField::set);
 
-        toFieldValidator = new FunctionBasedValidator<>(toField, field -> {
-            if (StringUtil.isBlank(field.getName())) {
-                return ValidationMessage.error("Field name cannot be empty");
-            } else if (StringUtil.containsWhitespace(field.getName())) {
-                return ValidationMessage.error("Field name cannot have whitespace characters");
-            }
-            return null;
-        });
+        toField = new SimpleConstrainedObjectProperty<Field, ValidationMessage>(StandardField.AUTHOR,
+                ValidationConstraints.function(field -> {
+                    if (StringUtil.isBlank(field.getName())) {
+                        return Optional.of(ValidationMessage.error("Field name cannot be empty"));
+                    } else if (StringUtil.containsWhitespace(field.getName())) {
+                        return Optional.of(ValidationMessage.error("Field name cannot have whitespace characters"));
+                    }
+                    return Optional.empty();
+                }));
 
-        canMove = BooleanBinding.booleanExpression(toFieldValidationStatus().validProperty())
-                                .and(overwriteFieldContentProperty());
+        canMove = Bindings.and(toField.validProperty(), overwriteFieldContentProperty());
 
-        canSwap = BooleanBinding.booleanExpression(toFieldValidationStatus().validProperty())
-                                .and(overwriteFieldContentProperty());
-    }
-
-    public ValidationStatus toFieldValidationStatus() {
-        return toFieldValidator.getValidationStatus();
+        canSwap = Bindings.and(toField.validProperty(), overwriteFieldContentProperty());
     }
 
     public BooleanBinding canMoveProperty() {
@@ -95,7 +90,7 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
         return toField.get();
     }
 
-    public ObjectProperty<Field> toFieldProperty() {
+    public ConstrainedObjectProperty<Field, ValidationMessage> toFieldProperty() {
         return toField;
     }
 

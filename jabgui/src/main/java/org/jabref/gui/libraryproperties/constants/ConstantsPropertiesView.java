@@ -56,7 +56,7 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
 
         labelColumn.setCellValueFactory(cellData -> cellData.getValue().labelProperty());
         new ViewModelTextFieldTableCellVisualizationFactory<ConstantsItemModel, String>()
-                .withValidation(ConstantsItemModel::labelValidation)
+                .withValidation(ConstantsItemModel::labelProperty)
                 .install(labelColumn, new DefaultStringConverter());
         labelColumn.setOnEditCommit((TableColumn.CellEditEvent<ConstantsItemModel, String> cellEvent) -> {
 
@@ -88,7 +88,7 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
         contentColumn.setReorderable(false);
         contentColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
         new ViewModelTextFieldTableCellVisualizationFactory<ConstantsItemModel, String>()
-                .withValidation(ConstantsItemModel::contentValidation)
+                .withValidation(ConstantsItemModel::contentProperty)
                 .install(contentColumn, new DefaultStringConverter());
         contentColumn.setOnEditCommit((TableColumn.CellEditEvent<ConstantsItemModel, String> cell) ->
                 cell.getRowValue().setContent(cell.getNewValue()));

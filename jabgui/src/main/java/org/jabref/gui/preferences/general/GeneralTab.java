@@ -2,7 +2,6 @@ package org.jabref.gui.preferences.general;
 
 import java.util.regex.Pattern;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -20,8 +19,8 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.theme.ThemeTypes;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.http.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiMessageHandler;
@@ -33,7 +32,6 @@ import org.jabref.model.database.BibDatabaseMode;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 import org.controlsfx.control.SearchableComboBox;
 
@@ -75,7 +73,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private TextField languageServerPort;
     @FXML private Button remoteHelp;
 
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+    private final ValidationVisualizer validationVisualizer = new ValidationVisualizer();
 
     // The fontSizeFormatter formats the input given to the fontSize spinner so that non valid values cannot be entered.
     private final TextFormatter<Integer> fontSizeFormatter = new TextFormatter<>(new IntegerStringConverter(), 9,
@@ -136,8 +134,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
             customThemeBrowse.disableProperty().set(!isCustomTheme);
         });
 
-        validationVisualizer.setDecoration(new IconValidationDecorator());
-
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         showAdvancedHints.selectedProperty().bindBidirectional(viewModel.showAdvancedHintsProperty());
         confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
@@ -163,14 +159,12 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
         usePostgresSearch.selectedProperty().bindBidirectional(viewModel.usePostgresSearchProperty());
 
-        Platform.runLater(() -> {
-            validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);
-            validationVisualizer.initVisualization(viewModel.httpPortValidationStatus(), httpServerPort);
-            validationVisualizer.initVisualization(viewModel.languageServerPortValidationStatus(), languageServerPort);
-            validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);
-            validationVisualizer.initVisualization(viewModel.customPathToThemeValidationStatus(), customThemePath);
-            validationVisualizer.initVisualization(viewModel.themeValidationStatus(), theme);
-        });
+        validationVisualizer.initVisualization(viewModel.remotePortProperty(), remotePort);
+        validationVisualizer.initVisualization(viewModel.httpPortProperty(), httpServerPort);
+        validationVisualizer.initVisualization(viewModel.languageServerPortProperty(), languageServerPort);
+        validationVisualizer.initVisualization(viewModel.fontSizeProperty(), fontSize);
+        validationVisualizer.initVisualization(viewModel.customPathToThemeProperty(), customThemePath);
+        validationVisualizer.initVisualization(viewModel.selectedThemeProperty(), theme);
 
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
         remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());

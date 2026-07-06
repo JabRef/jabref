@@ -17,7 +17,9 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.input.ClipboardContent;
@@ -33,6 +35,8 @@ import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.NoSelectionModel;
+import org.jabref.gui.validation.ValidationMessage;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -45,12 +49,12 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.injection.Injector;
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
+import org.jfxcore.validation.Constraints;
+import org.jfxcore.validation.ValidationResult;
+import org.jfxcore.validation.property.ConstrainedListProperty;
+import org.jfxcore.validation.property.SimpleConstrainedListProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +78,15 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<PreviewLayout> availableListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
     private final FilteredList<PreviewLayout> filteredAvailableLayouts = new FilteredList<>(this.availableListProperty());
-    private final ListProperty<PreviewLayout> chosenListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ConstrainedListProperty<PreviewLayout, ValidationMessage> chosenListProperty = new SimpleConstrainedListProperty<>(
+            FXCollections.observableArrayList(),
+            Constraints.forList(Constraints.validate((List<PreviewLayout> list) ->
+                    list.isEmpty()
+                            ? ValidationResult.invalid(ValidationMessage.error("%s > %s %n %n %s".formatted(
+                                    Localization.lang("Entry preview"),
+                                    Localization.lang("Selected"),
+                                    Localization.lang("Selected Layouts can not be empty"))))
+                            : ValidationResult.valid())));
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
 
     private final ListProperty<Path> bstStylesPaths = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -88,10 +100,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
 
-    private final Validator chosenListValidator;
-
     private final CustomLocalDragboard localDragboard;
-    private ListProperty<PreviewLayout> dragSourceList = null;
+    private ObservableValue<ObservableList<PreviewLayout>> dragSourceList = null;
     private ObjectProperty<MultipleSelectionModel<PreviewLayout>> dragSourceSelectionModel = null;
 
     public PreviewTabViewModel(DialogService dialogService,
@@ -110,17 +120,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                 layout.setText(sourceTextProperty.getValue());
             }
         });
-
-        chosenListValidator = new FunctionBasedValidator<>(
-                chosenListProperty,
-                _ -> !chosenListProperty.getValue().isEmpty(),
-                ValidationMessage.error("%s > %s %n %n %s".formatted(
-                                Localization.lang("Entry preview"),
-                                Localization.lang("Selected"),
-                                Localization.lang("Selected Layouts can not be empty")
-                        )
-                )
-        );
     }
 
     @Override
@@ -236,18 +235,11 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         previewPreferences.setShouldDownloadCovers(shouldDownloadCovers.getValue());
     }
 
-    public ValidationStatus chosenListValidationStatus() {
-        return chosenListValidator.getValidationStatus();
-    }
-
     @Override
     public boolean validateSettings() {
-        ValidationStatus validationStatus = chosenListValidationStatus();
-        if (!validationStatus.isValid()) {
-            if (validationStatus.getHighestMessage().isPresent()) {
-                validationStatus.getHighestMessage().ifPresent(message ->
-                        dialogService.showErrorDialogAndWait(message.getMessage()));
-            }
+        if (!chosenListProperty.isValid()) {
+            ValidationVisualizer.highestMessage(chosenListProperty).ifPresent(message ->
+                    dialogService.showErrorDialogAndWait(message.message()));
             return false;
         }
         return true;
@@ -388,7 +380,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         }
     }
 
-    public void dragDetected(ListProperty<PreviewLayout> sourceList, ObjectProperty<MultipleSelectionModel<PreviewLayout>> sourceSelectionModel, List<PreviewLayout> selectedLayouts, Dragboard dragboard) {
+    public void dragDetected(ObservableValue<ObservableList<PreviewLayout>> sourceList, ObjectProperty<MultipleSelectionModel<PreviewLayout>> sourceSelectionModel, List<PreviewLayout> selectedLayouts, Dragboard dragboard) {
         ClipboardContent content = new ClipboardContent();
         content.put(DragAndDropDataFormats.PREVIEWLAYOUTS, "");
         dragboard.setContent(content);
@@ -401,7 +393,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     ///
     /// @param targetList either availableListView or chosenListView
 
-    public boolean dragDropped(ListProperty<PreviewLayout> targetList, Dragboard dragboard) {
+    public boolean dragDropped(ObservableValue<ObservableList<PreviewLayout>> targetList, Dragboard dragboard) {
         boolean success = false;
 
         if (dragboard.hasContent(DragAndDropDataFormats.PREVIEWLAYOUTS)) {
@@ -492,7 +484,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return availableSelectionModelProperty;
     }
 
-    public ListProperty<PreviewLayout> chosenListProperty() {
+    public ConstrainedListProperty<PreviewLayout, ValidationMessage> chosenListProperty() {
         return chosenListProperty;
     }
 

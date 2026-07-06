@@ -24,22 +24,20 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
 
 public class SearchConfigurationPage extends WizardPane {
 
     private final UnlinkedFilesDialogViewModel viewModel;
-    private final ControlsFxVisualizer validationVisualizer;
 
     private final BooleanProperty invalidProperty = new SimpleBooleanProperty(false);
 
@@ -53,7 +51,6 @@ public class SearchConfigurationPage extends WizardPane {
                                    BibDatabaseContext bibDatabaseContext,
                                    GuiPreferences preferences) {
         this.viewModel = viewModel;
-        this.validationVisualizer = new ControlsFxVisualizer();
 
         setHeaderText(Localization.lang("Configure search"));
         setupUI(bibDatabaseContext, preferences);
@@ -201,15 +198,9 @@ public class SearchConfigurationPage extends WizardPane {
     }
 
     private void setupValidation() {
-        validationVisualizer.setDecoration(new IconValidationDecorator());
+        new ValidationVisualizer().initVisualization(viewModel.directoryPathProperty(), directoryPathField);
 
-        Platform.runLater(() -> {
-            validationVisualizer.initVisualization(
-                    viewModel.directoryPathValidationStatus(),
-                    directoryPathField);
-        });
-
-        invalidProperty().bind(viewModel.directoryPathValidationStatus().validProperty().not());
+        invalidProperty().bind(viewModel.directoryPathProperty().validProperty().not());
     }
 
     private void loadConfiguration(BibDatabaseContext bibDatabaseContext, GuiPreferences preferences) {

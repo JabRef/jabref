@@ -20,27 +20,26 @@ import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorUndoableEdit;
 import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jfxcore.validation.property.ConstrainedObjectProperty;
+import org.jfxcore.validation.property.SimpleConstrainedObjectProperty;
 
 public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabViewModel {
     private final List<BibEntry> selectedEntries;
 
     private final StringProperty fieldValue = new SimpleStringProperty("");
 
-    private final ObjectProperty<Field> selectedField = new SimpleObjectProperty<>(StandardField.AUTHOR);
+    private final ConstrainedObjectProperty<Field, ValidationMessage> selectedField;
 
     private final BooleanProperty overwriteFieldContent = new SimpleBooleanProperty(Boolean.FALSE);
 
-    private final Validator fieldValidator;
     private final BooleanBinding canAppend;
 
     public EditFieldContentViewModel(BibDatabase database,
@@ -51,23 +50,19 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
         super(database, compoundEdit, dialogService, stateManager);
         this.selectedEntries = new ArrayList<>(selectedEntries);
 
+        selectedField = new SimpleConstrainedObjectProperty<Field, ValidationMessage>(StandardField.AUTHOR,
+                ValidationConstraints.function(field -> {
+                    if (StringUtil.isBlank(field.getName())) {
+                        return Optional.of(ValidationMessage.error("Field name cannot be empty"));
+                    } else if (StringUtil.containsWhitespace(field.getName())) {
+                        return Optional.of(ValidationMessage.error("Field name cannot have whitespace characters"));
+                    }
+                    return Optional.empty();
+                }));
         FieldHelper.getSetFieldsOnly(selectedEntries, getAllFields())
                    .stream().findFirst().ifPresent(selectedField::set);
 
-        fieldValidator = new FunctionBasedValidator<>(selectedField, field -> {
-            if (StringUtil.isBlank(field.getName())) {
-                return ValidationMessage.error("Field name cannot be empty");
-            } else if (StringUtil.containsWhitespace(field.getName())) {
-                return ValidationMessage.error("Field name cannot have whitespace characters");
-            }
-            return null;
-        });
-
-        canAppend = Bindings.and(overwriteFieldContentProperty(), fieldValidationStatus().validProperty());
-    }
-
-    public ValidationStatus fieldValidationStatus() {
-        return fieldValidator.getValidationStatus();
+        canAppend = Bindings.and(overwriteFieldContentProperty(), selectedField.validProperty());
     }
 
     public BooleanBinding canAppendProperty() {
@@ -123,7 +118,7 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
         addEdit(edits);
     }
 
-    public ObjectProperty<Field> selectedFieldProperty() {
+    public ConstrainedObjectProperty<Field, ValidationMessage> selectedFieldProperty() {
         return selectedField;
     }
 

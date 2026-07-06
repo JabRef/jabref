@@ -1,6 +1,5 @@
 package org.jabref.gui.preferences.external;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -12,13 +11,12 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.push.GuiPushToApplication;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.SearchableComboBox;
 
 public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel> implements PreferencesTab {
@@ -37,7 +35,7 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     @FXML private Button customFileBrowserBrowse;
     @FXML private TextField kindleEmail;
 
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+    private final ValidationVisualizer validationVisualizer = new ValidationVisualizer();
 
     public ExternalTab() {
         ViewLoader.view(this)
@@ -77,12 +75,9 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
 
         kindleEmail.textProperty().bindBidirectional(viewModel.kindleEmailProperty());
 
-        validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> {
-            validationVisualizer.initVisualization(viewModel.terminalCommandValidationStatus(), customTerminalCommand);
-            validationVisualizer.initVisualization(viewModel.fileBrowserCommandValidationStatus(), customFileBrowserCommand);
-            validationVisualizer.initVisualization(viewModel.citeCommandValidationStatus(), citeCommand);
-        });
+        validationVisualizer.initVisualization(viewModel.customTerminalCommandProperty(), customTerminalCommand);
+        validationVisualizer.initVisualization(viewModel.customFileBrowserCommandProperty(), customFileBrowserCommand);
+        validationVisualizer.initVisualization(viewModel.citeCommandProperty(), citeCommand);
 
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP_PUSH_TO_APPLICATION, new HelpAction(HelpFile.PUSH_TO_APPLICATION, dialogService, preferences.getExternalApplicationsPreferences()), autolinkExternalHelp);

@@ -1,6 +1,5 @@
 package org.jabref.gui.preferences.ai;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -24,6 +23,7 @@ import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -36,13 +36,10 @@ import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.EnhancedPasswordField;
 import com.dlsc.unitfx.IntegerInputField;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.SearchableComboBox;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
     private static final String HUGGING_FACE_CHAT_MODEL_PROMPT = "TinyLlama/TinyLlama_v1.1 (or any other model name)";
-
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     @FXML private CheckBox enableAi;
     // [impl->req~ai.ingestion.automatic-trigger~1]
@@ -165,20 +162,16 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     }
 
     private void initializeValidations() {
-        Platform.runLater(() -> {
-            visualizer.initVisualization(viewModel.getApiTokenValidationStatus(), apiKeyTextField);
-            visualizer.initVisualization(viewModel.getChatModelValidationStatus(), chatModelComboBox);
-            visualizer.initVisualization(viewModel.getApiBaseUrlValidationStatus(), apiBaseUrlTextField);
-            visualizer.initVisualization(viewModel.getEmbeddingModelValidationStatus(), embeddingModelComboBox);
-            visualizer.initVisualization(viewModel.getTemperatureTypeValidationStatus(), temperatureTextField);
-            visualizer.initVisualization(viewModel.getTemperatureRangeValidationStatus(), temperatureTextField);
-            visualizer.initVisualization(viewModel.getMessageWindowSizeValidationStatus(), contextWindowSizeTextField);
-            visualizer.initVisualization(viewModel.getDocumentSplitterChunkSizeValidationStatus(), documentSplitterChunkSizeTextField);
-            visualizer.initVisualization(viewModel.getDocumentSplitterOverlapSizeValidationStatus(), documentSplitterOverlapSizeTextField);
-            visualizer.initVisualization(viewModel.getRagMaxResultsCountValidationStatus(), ragMaxResultsCountTextField);
-            visualizer.initVisualization(viewModel.getRagMinScoreTypeValidationStatus(), ragMinScoreTextField);
-            visualizer.initVisualization(viewModel.getRagMinScoreRangeValidationStatus(), ragMinScoreTextField);
-        });
+        new ValidationVisualizer().initVisualization(viewModel.apiKeyProperty(), apiKeyTextField);
+        new ValidationVisualizer().initVisualization(viewModel.selectedChatModelProperty(), chatModelComboBox);
+        new ValidationVisualizer().initVisualization(viewModel.apiBaseUrlProperty(), apiBaseUrlTextField);
+        new ValidationVisualizer().initVisualization(viewModel.selectedEmbeddingModelProperty(), embeddingModelComboBox);
+        new ValidationVisualizer().initVisualization(viewModel.temperatureProperty(), temperatureTextField);
+        new ValidationVisualizer().initVisualization(viewModel.contextWindowSizeProperty(), contextWindowSizeTextField);
+        new ValidationVisualizer().initVisualization(viewModel.documentSplitterChunkSizeProperty(), documentSplitterChunkSizeTextField);
+        new ValidationVisualizer().initVisualization(viewModel.documentSplitterOverlapSizeProperty(), documentSplitterOverlapSizeTextField);
+        new ValidationVisualizer().initVisualization(viewModel.ragMaxResultsCountProperty(), ragMaxResultsCountTextField);
+        new ValidationVisualizer().initVisualization(viewModel.ragMinScoreProperty(), ragMinScoreTextField);
     }
 
     private void initializeExpertSettings() {

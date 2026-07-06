@@ -41,7 +41,7 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
         textField.setId(field.getName());
         establishBinding(textField, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
         textField.initContextMenu(EditorMenus.getNameMenu(textField), keyBindingRepository);
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
+        new EditorValidator(preferences).configureValidation(viewModel.textProperty(), textField);
     }
 
     public OwnerEditorViewModel getViewModel() {

@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.xmp;
 
 import java.util.Comparator;
+import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -12,40 +13,38 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldTextMapper;
 
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jfxcore.validation.Constraints;
+import org.jfxcore.validation.property.ConstrainedListProperty;
+import org.jfxcore.validation.property.SimpleConstrainedListProperty;
 
 public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty xmpFilterEnabledProperty = new SimpleBooleanProperty();
-    private final ListProperty<Field> xmpFilterListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ConstrainedListProperty<Field, ValidationMessage> xmpFilterListProperty = new SimpleConstrainedListProperty<>(
+            FXCollections.observableArrayList(),
+            Constraints.forList(ValidationConstraints.<List<Field>>predicate(
+                    input -> !input.isEmpty(),
+                    ValidationMessage.error("%s > %s %n %n %s".formatted(
+                            Localization.lang("XMP metadata"),
+                            Localization.lang("Filter List"),
+                            Localization.lang("List must not be empty."))))));
     private final ListProperty<Field> availableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<Field> addFieldProperty = new SimpleObjectProperty<>();
 
     private final DialogService dialogService;
     private final XmpPreferences xmpPreferences;
 
-    private final Validator xmpFilterListValidator;
-
     XmpPrivacyTabViewModel(DialogService dialogService, XmpPreferences xmpPreferences) {
         this.dialogService = dialogService;
         this.xmpPreferences = xmpPreferences;
-
-        xmpFilterListValidator = new FunctionBasedValidator<>(
-                xmpFilterListProperty,
-                input -> !input.isEmpty(),
-                ValidationMessage.error("%s > %s %n %n %s".formatted(
-                        Localization.lang("XMP metadata"),
-                        Localization.lang("Filter List"),
-                        Localization.lang("List must not be empty."))));
     }
 
     @Override
@@ -82,16 +81,10 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
         xmpFilterListProperty.remove(filter);
     }
 
-    public ValidationStatus xmpFilterListValidationStatus() {
-        return xmpFilterListValidator.getValidationStatus();
-    }
-
     @Override
     public boolean validateSettings() {
-        ValidationStatus validationStatus = xmpFilterListValidationStatus();
-        if (xmpFilterEnabledProperty.getValue() && !validationStatus.isValid()) {
-            validationStatus.getHighestMessage().ifPresent(message ->
-                    dialogService.showErrorDialogAndWait(message.getMessage()));
+        if (xmpFilterEnabledProperty.getValue() && xmpFilterListProperty.isInvalid()) {
+            dialogService.showErrorDialogAndWait(xmpFilterListProperty.getDiagnostics().invalidSubList().getFirst().message());
             return false;
         }
         return true;
@@ -101,7 +94,7 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
         return xmpFilterEnabledProperty;
     }
 
-    public ListProperty<Field> filterListProperty() {
+    public ConstrainedListProperty<Field, ValidationMessage> filterListProperty() {
         return xmpFilterListProperty;
     }
 

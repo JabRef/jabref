@@ -1,56 +1,49 @@
 package org.jabref.gui.fieldeditors;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.swing.undo.UndoManager;
-
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.integrity.FieldCheckers;
-import org.jabref.logic.integrity.ValueChecker;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 import com.tobiasdiez.easybind.EasyObservableValue;
-import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.jfxcore.validation.Constraint;
+import org.jfxcore.validation.property.ConstrainedStringProperty;
+import org.jfxcore.validation.property.SimpleConstrainedStringProperty;
 
 public class AbstractEditorViewModel extends AbstractViewModel {
     protected final Field field;
-    protected StringProperty text = new SimpleStringProperty("");
+    protected final ConstrainedStringProperty<ValidationMessage> text;
     protected BibEntry entry;
     protected final UndoManager undoManager;
 
     private final SuggestionProvider<?> suggestionProvider;
-    private final CompositeValidator fieldValidator;
     private EasyObservableValue<String> fieldBinding;
 
+    @SuppressWarnings("unchecked")
     public AbstractEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, UndoManager undoManager) {
         this.field = field;
         this.suggestionProvider = suggestionProvider;
         this.undoManager = undoManager;
 
-        this.fieldValidator = new CompositeValidator();
-        for (ValueChecker checker : fieldCheckers.getForField(field)) {
-            FunctionBasedValidator<String> validator = new FunctionBasedValidator<>(text, value ->
-                    checker.checkValue(value).map(ValidationMessage::warning).orElse(null));
-            fieldValidator.addValidators(validator);
-        }
+        List<Constraint<? super String, ValidationMessage>> constraints = fieldCheckers.getForField(field).stream()
+                .<Constraint<? super String, ValidationMessage>>map(checker -> ValidationConstraints.function(value ->
+                        checker.checkValue(value).map(ValidationMessage::warning)))
+                .toList();
+        this.text = new SimpleConstrainedStringProperty<>("", constraints.toArray(new Constraint[0]));
     }
 
-    public Validator getFieldValidator() {
-        return fieldValidator;
-    }
-
-    public StringProperty textProperty() {
+    public ConstrainedStringProperty<ValidationMessage> textProperty() {
         return text;
     }
 

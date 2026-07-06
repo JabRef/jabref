@@ -20,6 +20,8 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
 import org.jabref.logic.ai.preferences.AiDefaultExpertSettings;
 import org.jabref.logic.ai.preferences.AiDefaultTemplates;
@@ -34,10 +36,13 @@ import org.jabref.model.ai.pipeline.AnswerEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jfxcore.validation.Constraints;
+import org.jfxcore.validation.property.ConstrainedIntegerProperty;
+import org.jfxcore.validation.property.ConstrainedObjectProperty;
+import org.jfxcore.validation.property.ConstrainedStringProperty;
+import org.jfxcore.validation.property.SimpleConstrainedIntegerProperty;
+import org.jfxcore.validation.property.SimpleConstrainedObjectProperty;
+import org.jfxcore.validation.property.SimpleConstrainedStringProperty;
 
 public class AiTabViewModel implements PreferenceTabViewModel {
     protected static SpinnerValueFactory<Integer> followUpQuestionsCountValueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 5, 3);
@@ -57,14 +62,18 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<String> chatModelsList =
             new SimpleListProperty<>(FXCollections.observableArrayList());
 
-    private final StringProperty currentChatModel = new SimpleStringProperty();
+    private final ConstrainedStringProperty<ValidationMessage> currentChatModel = new SimpleConstrainedStringProperty<>("",
+            ValidationConstraints.predicate(chatModel -> !StringUtil.isBlank(chatModel),
+                    ValidationMessage.error(Localization.lang("Chat model has to be provided"))));
 
     private final StringProperty openAiChatModel = new SimpleStringProperty();
     private final StringProperty mistralAiChatModel = new SimpleStringProperty();
     private final StringProperty geminiChatModel = new SimpleStringProperty();
     private final StringProperty huggingFaceChatModel = new SimpleStringProperty();
 
-    private final StringProperty currentApiKey = new SimpleStringProperty();
+    private final ConstrainedStringProperty<ValidationMessage> currentApiKey = new SimpleConstrainedStringProperty<>("",
+            ValidationConstraints.predicate(token -> !StringUtil.isBlank(token),
+                    ValidationMessage.error(Localization.lang("An API key has to be provided"))));
 
     private final StringProperty openAiApiKey = new SimpleStringProperty();
     private final StringProperty mistralAiApiKey = new SimpleStringProperty();
@@ -75,9 +84,13 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     private final ListProperty<PredefinedEmbeddingModel> embeddingModelsList =
             new SimpleListProperty<>(FXCollections.observableArrayList(PredefinedEmbeddingModel.values()));
-    private final ObjectProperty<PredefinedEmbeddingModel> selectedEmbeddingModel = new SimpleObjectProperty<>();
+    private final ConstrainedObjectProperty<PredefinedEmbeddingModel, ValidationMessage> selectedEmbeddingModel = new SimpleConstrainedObjectProperty<PredefinedEmbeddingModel, ValidationMessage>(
+            ValidationConstraints.predicate(Objects::nonNull,
+                    ValidationMessage.error(Localization.lang("Embedding model has to be provided"))));
 
-    private final StringProperty currentApiBaseUrl = new SimpleStringProperty();
+    private final ConstrainedStringProperty<ValidationMessage> currentApiBaseUrl = new SimpleConstrainedStringProperty<>("",
+            ValidationConstraints.predicate(token -> !StringUtil.isBlank(token),
+                    ValidationMessage.error(Localization.lang("API base URL has to be provided"))));
     private final BooleanProperty disableApiBaseUrl = new SimpleBooleanProperty(true); // {@link HuggingFaceChatModel} and {@link GoogleAiGeminiChatModel} doesn't support setting API base URL
 
     private final StringProperty openAiApiBaseUrl = new SimpleStringProperty();
@@ -109,30 +122,43 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<TokenEstimatorKind> tokenEstimationAlgorithmsProperty =
             new SimpleListProperty<>(FXCollections.observableArrayList(TokenEstimatorKind.values()));
 
-    private final StringProperty temperature = new SimpleStringProperty();
-    private final IntegerProperty contextWindowSize = new SimpleIntegerProperty();
-    private final IntegerProperty documentSplitterChunkSize = new SimpleIntegerProperty();
-    private final IntegerProperty documentSplitterOverlapSize = new SimpleIntegerProperty();
-    private final IntegerProperty ragMaxResultsCount = new SimpleIntegerProperty();
-    private final StringProperty ragMinScore = new SimpleStringProperty();
+    private final ConstrainedStringProperty<ValidationMessage> temperature = new SimpleConstrainedStringProperty<>(
+            ValidationConstraints.predicate(
+                    temp -> LocalizedNumbersUtils.stringToDouble(temp).isPresent(),
+                    ValidationMessage.error(Localization.lang("Temperature must be a number"))),
+            // Source: https://platform.openai.com/docs/api-reference/chat/create#chat-create-temperature
+            ValidationConstraints.predicate(
+                    temp -> LocalizedNumbersUtils.stringToDouble(temp).map(t -> t >= 0 && t <= 2).orElse(false),
+                    ValidationMessage.error(Localization.lang("Temperature must be between 0 and 2"))));
+    private final ConstrainedIntegerProperty<ValidationMessage> contextWindowSize = new SimpleConstrainedIntegerProperty<>(
+            ValidationConstraints.predicate(
+                    size -> size.intValue() > 0,
+                    ValidationMessage.error(Localization.lang("Context window size must be greater than 0"))));
+    private final ConstrainedIntegerProperty<ValidationMessage> documentSplitterChunkSize = new SimpleConstrainedIntegerProperty<>(
+            ValidationConstraints.predicate(
+                    size -> size.intValue() > 0,
+                    ValidationMessage.error(Localization.lang("Document splitter chunk size must be greater than 0"))));
+    private final ConstrainedIntegerProperty<ValidationMessage> documentSplitterOverlapSize = new SimpleConstrainedIntegerProperty<>(
+            ValidationConstraints.predicate(
+                    (Number size, Number chunkSize) -> (size.intValue() > 0) && (size.intValue() < chunkSize.intValue()),
+                    ValidationMessage.error(Localization.lang("Document splitter overlap size must be greater than 0 and less than chunk size")),
+                    documentSplitterChunkSize));
+    private final ConstrainedIntegerProperty<ValidationMessage> ragMaxResultsCount = new SimpleConstrainedIntegerProperty<>(
+            ValidationConstraints.predicate(
+                    count -> count.intValue() > 0,
+                    ValidationMessage.error(Localization.lang("RAG max results count must be greater than 0"))));
+    private final ConstrainedStringProperty<ValidationMessage> ragMinScore = new SimpleConstrainedStringProperty<>(
+            ValidationConstraints.predicate(
+                    minScore -> LocalizedNumbersUtils.stringToDouble(minScore).isPresent(),
+                    ValidationMessage.error(Localization.lang("RAG minimum score must be a number"))),
+            ValidationConstraints.predicate(
+                    minScore -> LocalizedNumbersUtils.stringToDouble(minScore).map(s -> s > 0 && s < 1).orElse(false),
+                    ValidationMessage.error(Localization.lang("RAG minimum score must be greater than 0 and less than 1"))));
 
     private final BooleanProperty disableBasicSettings = new SimpleBooleanProperty(true);
     private final BooleanProperty disableExpertSettings = new SimpleBooleanProperty(true);
 
     private final AiPreferences aiPreferences;
-
-    private final Validator apiKeyValidator;
-    private final Validator chatModelValidator;
-    private final Validator apiBaseUrlValidator;
-    private final Validator embeddingModelValidator;
-    private final Validator temperatureTypeValidator;
-    private final Validator temperatureRangeValidator;
-    private final Validator contextWindowSizeValidator;
-    private final Validator documentSplitterChunkSizeValidator;
-    private final Validator documentSplitterOverlapSizeValidator;
-    private final Validator ragMaxResultsCountValidator;
-    private final Validator ragMinScoreTypeValidator;
-    private final Validator ragMinScoreRangeValidator;
 
     private final List<String> restartWarnings = new ArrayList<>();
 
@@ -255,66 +281,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             }
         });
 
-        this.apiKeyValidator = new FunctionBasedValidator<>(
-                currentApiKey,
-                token -> !StringUtil.isBlank(token),
-                ValidationMessage.error(Localization.lang("An API key has to be provided")));
-
-        this.chatModelValidator = new FunctionBasedValidator<>(
-                currentChatModel,
-                chatModel -> !StringUtil.isBlank(chatModel),
-                ValidationMessage.error(Localization.lang("Chat model has to be provided")));
-
-        this.apiBaseUrlValidator = new FunctionBasedValidator<>(
-                currentApiBaseUrl,
-                token -> !StringUtil.isBlank(token),
-                ValidationMessage.error(Localization.lang("API base URL has to be provided")));
-
-        this.embeddingModelValidator = new FunctionBasedValidator<>(
-                selectedEmbeddingModel,
-                Objects::nonNull,
-                ValidationMessage.error(Localization.lang("Embedding model has to be provided")));
-
-        this.temperatureTypeValidator = new FunctionBasedValidator<>(
-                temperature,
-                temp -> LocalizedNumbersUtils.stringToDouble(temp).isPresent(),
-                ValidationMessage.error(Localization.lang("Temperature must be a number")));
-
-        // Source: https://platform.openai.com/docs/api-reference/chat/create#chat-create-temperature
-        this.temperatureRangeValidator = new FunctionBasedValidator<>(
-                temperature,
-                temp -> LocalizedNumbersUtils.stringToDouble(temp).map(t -> t >= 0 && t <= 2).orElse(false),
-                ValidationMessage.error(Localization.lang("Temperature must be between 0 and 2")));
-
-        this.contextWindowSizeValidator = new FunctionBasedValidator<>(
-                contextWindowSize,
-                size -> size.intValue() > 0,
-                ValidationMessage.error(Localization.lang("Context window size must be greater than 0")));
-
-        this.documentSplitterChunkSizeValidator = new FunctionBasedValidator<>(
-                documentSplitterChunkSize,
-                size -> size.intValue() > 0,
-                ValidationMessage.error(Localization.lang("Document splitter chunk size must be greater than 0")));
-
-        this.documentSplitterOverlapSizeValidator = new FunctionBasedValidator<>(
-                documentSplitterOverlapSize,
-                size -> size.intValue() > 0 && size.intValue() < documentSplitterChunkSize.get(),
-                ValidationMessage.error(Localization.lang("Document splitter overlap size must be greater than 0 and less than chunk size")));
-
-        this.ragMaxResultsCountValidator = new FunctionBasedValidator<>(
-                ragMaxResultsCount,
-                count -> count.intValue() > 0,
-                ValidationMessage.error(Localization.lang("RAG max results count must be greater than 0")));
-
-        this.ragMinScoreTypeValidator = new FunctionBasedValidator<>(
-                ragMinScore,
-                minScore -> LocalizedNumbersUtils.stringToDouble(minScore).isPresent(),
-                ValidationMessage.error(Localization.lang("RAG minimum score must be a number")));
-
-        this.ragMinScoreRangeValidator = new FunctionBasedValidator<>(
-                ragMinScore,
-                minScore -> LocalizedNumbersUtils.stringToDouble(minScore).map(s -> s > 0 && s < 1).orElse(false),
-                ValidationMessage.error(Localization.lang("RAG minimum score must be greater than 0 and less than 1")));
     }
 
     @Override
@@ -505,29 +471,19 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     }
 
     public boolean validateBasicSettings() {
-        List<Validator> validators = List.of(
-                chatModelValidator
-                // apiKeyValidator -- skipped, it will generate warning, but the preferences should be able to save.
-        );
-
-        return validators.stream().map(Validator::getValidationStatus).allMatch(ValidationStatus::isValid);
+        // apiKey validity is skipped, it will generate warning, but the preferences should be able to save.
+        return currentChatModel.isValid();
     }
 
     public boolean validateExpertSettings() {
-        List<Validator> validators = List.of(
-                apiBaseUrlValidator,
-                embeddingModelValidator,
-                temperatureTypeValidator,
-                temperatureRangeValidator,
-                contextWindowSizeValidator,
-                documentSplitterChunkSizeValidator,
-                documentSplitterOverlapSizeValidator,
-                ragMaxResultsCountValidator,
-                ragMinScoreTypeValidator,
-                ragMinScoreRangeValidator
-        );
-
-        return validators.stream().map(Validator::getValidationStatus).allMatch(ValidationStatus::isValid);
+        return currentApiBaseUrl.isValid()
+                && selectedEmbeddingModel.isValid()
+                && temperature.isValid()
+                && contextWindowSize.isValid()
+                && documentSplitterChunkSize.isValid()
+                && documentSplitterOverlapSize.isValid()
+                && ragMaxResultsCount.isValid()
+                && ragMinScore.isValid();
     }
 
     @Override
@@ -567,11 +523,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return chatModelsList;
     }
 
-    public StringProperty selectedChatModelProperty() {
+    public ConstrainedStringProperty<ValidationMessage> selectedChatModelProperty() {
         return currentChatModel;
     }
 
-    public StringProperty apiKeyProperty() {
+    public ConstrainedStringProperty<ValidationMessage> apiKeyProperty() {
         return currentApiKey;
     }
 
@@ -583,11 +539,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return embeddingModelsList;
     }
 
-    public ObjectProperty<PredefinedEmbeddingModel> selectedEmbeddingModelProperty() {
+    public ConstrainedObjectProperty<PredefinedEmbeddingModel, ValidationMessage> selectedEmbeddingModelProperty() {
         return selectedEmbeddingModel;
     }
 
-    public StringProperty apiBaseUrlProperty() {
+    public ConstrainedStringProperty<ValidationMessage> apiBaseUrlProperty() {
         return currentApiBaseUrl;
     }
 
@@ -643,27 +599,27 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return tokenEstimationAlgorithmProperty;
     }
 
-    public StringProperty temperatureProperty() {
+    public ConstrainedStringProperty<ValidationMessage> temperatureProperty() {
         return temperature;
     }
 
-    public IntegerProperty contextWindowSizeProperty() {
+    public ConstrainedIntegerProperty<ValidationMessage> contextWindowSizeProperty() {
         return contextWindowSize;
     }
 
-    public IntegerProperty documentSplitterChunkSizeProperty() {
+    public ConstrainedIntegerProperty<ValidationMessage> documentSplitterChunkSizeProperty() {
         return documentSplitterChunkSize;
     }
 
-    public IntegerProperty documentSplitterOverlapSizeProperty() {
+    public ConstrainedIntegerProperty<ValidationMessage> documentSplitterOverlapSizeProperty() {
         return documentSplitterOverlapSize;
     }
 
-    public IntegerProperty ragMaxResultsCountProperty() {
+    public ConstrainedIntegerProperty<ValidationMessage> ragMaxResultsCountProperty() {
         return ragMaxResultsCount;
     }
 
-    public StringProperty ragMinScoreProperty() {
+    public ConstrainedStringProperty<ValidationMessage> ragMinScoreProperty() {
         return ragMinScore;
     }
 
@@ -673,54 +629,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty disableExpertSettingsProperty() {
         return disableExpertSettings;
-    }
-
-    public ValidationStatus getApiTokenValidationStatus() {
-        return apiKeyValidator.getValidationStatus();
-    }
-
-    public ValidationStatus getChatModelValidationStatus() {
-        return chatModelValidator.getValidationStatus();
-    }
-
-    public ValidationStatus getApiBaseUrlValidationStatus() {
-        return apiBaseUrlValidator.getValidationStatus();
-    }
-
-    public ValidationStatus getEmbeddingModelValidationStatus() {
-        return embeddingModelValidator.getValidationStatus();
-    }
-
-    public ValidationStatus getTemperatureTypeValidationStatus() {
-        return temperatureTypeValidator.getValidationStatus();
-    }
-
-    public ValidationStatus getTemperatureRangeValidationStatus() {
-        return temperatureRangeValidator.getValidationStatus();
-    }
-
-    public ValidationStatus getMessageWindowSizeValidationStatus() {
-        return contextWindowSizeValidator.getValidationStatus();
-    }
-
-    public ValidationStatus getDocumentSplitterChunkSizeValidationStatus() {
-        return documentSplitterChunkSizeValidator.getValidationStatus();
-    }
-
-    public ValidationStatus getDocumentSplitterOverlapSizeValidationStatus() {
-        return documentSplitterOverlapSizeValidator.getValidationStatus();
-    }
-
-    public ValidationStatus getRagMaxResultsCountValidationStatus() {
-        return ragMaxResultsCountValidator.getValidationStatus();
-    }
-
-    public ValidationStatus getRagMinScoreTypeValidationStatus() {
-        return ragMinScoreTypeValidator.getValidationStatus();
-    }
-
-    public ValidationStatus getRagMinScoreRangeValidationStatus() {
-        return ragMinScoreRangeValidator.getValidationStatus();
     }
 
     public BooleanProperty generateFollowUpQuestionsProperty() {

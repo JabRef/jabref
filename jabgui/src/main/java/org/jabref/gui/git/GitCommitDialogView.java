@@ -1,6 +1,5 @@
 package org.jabref.gui.git;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
@@ -8,13 +7,12 @@ import javafx.scene.control.TextArea;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 
 public class GitCommitDialogView extends BaseDialog<Void> {
@@ -34,8 +32,6 @@ public class GitCommitDialogView extends BaseDialog<Void> {
     private TaskExecutor taskExecutor;
     @Inject
     private GitHandlerRegistry gitHandlerRegistry;
-
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public GitCommitDialogView() {
         ViewLoader.view(this)
@@ -58,9 +54,6 @@ public class GitCommitDialogView extends BaseDialog<Void> {
             return null;
         });
 
-        Platform.runLater(() -> {
-            visualizer.setDecoration(new IconValidationDecorator());
-            visualizer.initVisualization(viewModel.commitMessageValidation(), commitMessage, true);
-        });
+        new ValidationVisualizer().initVisualization(viewModel.commitMessageProperty(), commitMessage);
     }
 }

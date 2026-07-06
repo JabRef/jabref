@@ -1,6 +1,5 @@
 package org.jabref.gui.preferences.table;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -18,14 +17,13 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> implements PreferencesTab {
 
@@ -45,8 +43,6 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> imple
     @FXML private RadioButton abbreviationDisabled;
     @FXML private RadioButton abbreviationEnabled;
     @FXML private RadioButton abbreviationLastNameOnly;
-
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public TableTab() {
         ViewLoader.view(this)
@@ -110,8 +106,7 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> imple
             }
         });
 
-        validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.columnsListValidationStatus(), columnsList));
+        new ValidationVisualizer().initVisualization(viewModel.columnsListProperty(), columnsList);
     }
 
     private void setupBindings() {

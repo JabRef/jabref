@@ -3,7 +3,6 @@ package org.jabref.gui.libraryproperties.constants;
 import java.util.List;
 
 import javafx.beans.property.ListProperty;
-import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
@@ -11,6 +10,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibtexString;
 
+import org.jfxcore.validation.property.ConstrainedStringProperty;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,7 +36,7 @@ class ConstantsPropertiesViewModelTest {
 
         List<String> actual = model.stringsListProperty().stream()
                                    .map(ConstantsItemModel::labelProperty)
-                                   .map(StringProperty::getValue)
+                                   .map(ConstrainedStringProperty::getValue)
                                    .toList();
 
         assertEquals(expected, actual);
@@ -58,7 +58,7 @@ class ConstantsPropertiesViewModelTest {
 
         List<String> actual = model.stringsListProperty().stream()
                                    .map(ConstantsItemModel::labelProperty)
-                                   .map(StringProperty::getValue)
+                                   .map(ConstrainedStringProperty::getValue)
                                    .toList();
 
         assertEquals(expected, actual);

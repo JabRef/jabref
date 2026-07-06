@@ -3,7 +3,6 @@ package org.jabref.gui.edit.automaticfiededitor.renamefield;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -15,6 +14,7 @@ import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabVi
 import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorTab;
 import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
 import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -22,7 +22,6 @@ import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 
@@ -32,7 +31,6 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
     private final List<BibEntry> selectedEntries;
     private final BibDatabase database;
     private final StateManager stateManager;
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
     @FXML
     private Button renameButton;
     @FXML
@@ -75,7 +73,7 @@ public class RenameFieldTabView extends AbstractAutomaticFieldEditorTabView impl
 
         newFieldNameTextField.textProperty().bindBidirectional(viewModel.newFieldNameProperty());
 
-        Platform.runLater(() -> visualizer.initVisualization(viewModel.fieldNameValidationStatus(), newFieldNameTextField, true));
+        new ValidationVisualizer().initVisualization(viewModel.newFieldNameProperty(), newFieldNameTextField);
     }
 
     @Override

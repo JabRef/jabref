@@ -57,7 +57,7 @@ public class UrlEditor extends HBox implements FieldEditorFX {
         // init paste handler for UrlEditor to format pasted url link in textArea
         textField.setAdditionalPasteActionHandler(() -> textField.setText(new CleanupUrlFormatter().format(new TrimWhitespaceFormatter().format(textField.getText()))));
 
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
+        new EditorValidator(preferences).configureValidation(viewModel.textProperty(), textField);
     }
 
     public UrlEditorViewModel getViewModel() {

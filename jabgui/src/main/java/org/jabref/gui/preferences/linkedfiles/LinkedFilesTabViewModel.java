@@ -3,6 +3,7 @@ package org.jabref.gui.preferences.linkedfiles;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -15,19 +16,35 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jfxcore.validation.property.ConstrainedStringProperty;
+import org.jfxcore.validation.property.SimpleConstrainedStringProperty;
 
 public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
-    private final StringProperty mainFileDirectoryProperty = new SimpleStringProperty("");
+    private final ConstrainedStringProperty<ValidationMessage> mainFileDirectoryProperty = new SimpleConstrainedStringProperty<>(
+            "",
+            ValidationConstraints.function(mainDirectoryPath -> {
+                ValidationMessage error = ValidationMessage.error(
+                        Localization.lang("Main file directory '%0' not found.\nCheck the tab \"Linked files\".", mainDirectoryPath)
+                );
+                try {
+                    Path path = Path.of(mainDirectoryPath);
+                    if (!(Files.exists(path) && Files.isDirectory(path))) {
+                        return Optional.of(error);
+                    }
+                } catch (InvalidPathException ex) {
+                    return Optional.of(error);
+                }
+                // main directory is valid
+                return Optional.empty();
+            }));
     private final BooleanProperty useMainFileDirectoryProperty = new SimpleBooleanProperty();
     private final BooleanProperty useBibLocationAsPrimaryProperty = new SimpleBooleanProperty();
     private final BooleanProperty autolinkFileStartsBibtexProperty = new SimpleBooleanProperty();
@@ -50,8 +67,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty openFileExplorerInFilesDirectory = new SimpleBooleanProperty();
     private final BooleanProperty openFileExplorerInLastDirectory = new SimpleBooleanProperty();
 
-    private final Validator mainFileDirValidator;
-
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
     private final AutoLinkPreferences autoLinkPreferences;
@@ -60,25 +75,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         this.dialogService = dialogService;
         this.filePreferences = preferences.getFilePreferences();
         this.autoLinkPreferences = preferences.getAutoLinkPreferences();
-
-        mainFileDirValidator = new FunctionBasedValidator<>(
-                mainFileDirectoryProperty,
-                mainDirectoryPath -> {
-                    ValidationMessage error = ValidationMessage.error(
-                            Localization.lang("Main file directory '%0' not found.\nCheck the tab \"Linked files\".", mainDirectoryPath)
-                    );
-                    try {
-                        Path path = Path.of(mainDirectoryPath);
-                        if (!(Files.exists(path) && Files.isDirectory(path))) {
-                            return error;
-                        }
-                    } catch (InvalidPathException ex) {
-                        return error;
-                    }
-                    // main directory is valid
-                    return null;
-                }
-        );
     }
 
     @Override
@@ -145,16 +141,10 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.setMoveLinkedFilesOnTransfer(moveFilesOnTransferProperty.getValue());
     }
 
-    ValidationStatus mainFileDirValidationStatus() {
-        return mainFileDirValidator.getValidationStatus();
-    }
-
     @Override
     public boolean validateSettings() {
-        ValidationStatus validationStatus = mainFileDirValidationStatus();
-        if (!validationStatus.isValid() && useMainFileDirectoryProperty().get()) {
-            validationStatus.getHighestMessage().ifPresent(message ->
-                    dialogService.showErrorDialogAndWait(message.getMessage()));
+        if (useMainFileDirectoryProperty().get() && mainFileDirectoryProperty.isInvalid()) {
+            dialogService.showErrorDialogAndWait(mainFileDirectoryProperty.getDiagnostics().invalidSubList().getFirst().message());
             return false;
         }
         return true;
@@ -168,7 +158,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     }
 
     // External file links
-    public StringProperty mainFileDirectoryProperty() {
+    public ConstrainedStringProperty<ValidationMessage> mainFileDirectoryProperty() {
         return mainFileDirectoryProperty;
     }
 

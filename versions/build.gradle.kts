@@ -56,7 +56,6 @@ dependencies.constraints {
     api("com.github.javakeyring:java-keyring:1.0.4")
     api("com.github.javaparser:javaparser-core:3.28.2")
     api("com.github.javaparser:javaparser-symbol-solver-core:3.28.2")
-    api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
     api("com.github.tomtung:latex2unicode_2.13:0.3.2")
     api("com.google.errorprone:error_prone_core:2.50.0")
     api("com.google.guava:guava:33.6.0-jre")
@@ -136,6 +135,7 @@ dependencies.constraints {
     api("org.jabref:mslinks:1.2")
     api("org.jetbrains:annotations:26.1.0")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.0")
+    api("org.jfxcore:validation:0.1.0")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.22.2")
     api("org.jspecify:jspecify:1.0.0")
