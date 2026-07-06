@@ -31,6 +31,8 @@ The need for an [exporter](https://github.com/JabRef/jabref/issues/10661) to [CF
 
 ## Decision Outcome
 
+Chosen option: export with a dummy topmost `software` element and all other entries as `references` (with per-type variations), because this keeps exported files compatible with official CFF tools while keeping the export behavior predictable for users.
+
 The decision outcome is the following.
 
 * When exporting, JabRef will have a different behavior depending on entries type.

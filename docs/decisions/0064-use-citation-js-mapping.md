@@ -93,7 +93,7 @@ Zotero provides mappings from Zotero item type to BibTeX/BibLaTeX entry type. Ho
 * Good, because citation-js also supports other mappings, such as BibLaTeX to RIS.
 * Bad, because JabRef needs to track citation-js's updates, or import it as a submodule.
 
-### More information
+## More information
 
 * Implementation PR: [#15946](https://github.com/JabRef/jabref/pull/15946)
 * Implemented mapping can be found via [CSLItemTypeDefinitions.java](https://github.com/JabRef/jabref/blob/main/jablib/src/main/java/org/jabref/logic/openoffice/CSLItemTypeDefinitions.java)
