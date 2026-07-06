@@ -3,8 +3,8 @@ package org.jabref.gui.validation;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Bounds;
@@ -39,6 +39,8 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class ValidationVisualizer {
 
+    private static final double INSET = 2;
+
     private final Pos position;
 
     public ValidationVisualizer() {
@@ -59,22 +61,23 @@ public class ValidationVisualizer {
 
         ValidationState.setSource(control, validation);
 
-        // Tracks the window whose x/y listeners are currently registered, so hide() can clean them up even
-        // after the control has already been detached from its scene (control.getScene() would be null by then).
-        Window[] attachedWindow = new Window[1];
-
-        InvalidationListener reposition = observable -> reposition(control, popup, icon);
+        // Repositions every pulse while the popup is showing, instead of listening to control.boundsInLocal/
+        // localToSceneTransform: those don't reliably invalidate when an ancestor ScrollPane scrolls (it
+        // translates its content internally), which left the icon stuck in place while the field scrolled
+        // underneath it.
+        AnimationTimer repositionTimer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                reposition(control, popup, icon);
+            }
+        };
 
         Runnable show = () -> {
             if (popup.isShowing() || control.getScene() == null || control.getScene().getWindow() == null) {
                 return;
             }
             popup.show(control, 0, 0);
-            control.boundsInLocalProperty().addListener(reposition);
-            control.localToSceneTransformProperty().addListener(reposition);
-            attachedWindow[0] = control.getScene().getWindow();
-            attachedWindow[0].xProperty().addListener(reposition);
-            attachedWindow[0].yProperty().addListener(reposition);
+            repositionTimer.start();
             reposition(control, popup, icon);
         };
 
@@ -82,13 +85,7 @@ public class ValidationVisualizer {
             if (!popup.isShowing()) {
                 return;
             }
-            control.boundsInLocalProperty().removeListener(reposition);
-            control.localToSceneTransformProperty().removeListener(reposition);
-            if (attachedWindow[0] != null) {
-                attachedWindow[0].xProperty().removeListener(reposition);
-                attachedWindow[0].yProperty().removeListener(reposition);
-                attachedWindow[0] = null;
-            }
+            repositionTimer.stop();
             popup.hide();
         };
 
@@ -174,22 +171,24 @@ public class ValidationVisualizer {
         }
         double width = icon.prefWidth(-1);
         double height = icon.prefHeight(-1);
+        // LEFT/RIGHT place the icon just outside the control (beside it, not over its content);
+        // CENTER/TOP/BOTTOM still anchor inside, inset off the border so they don't straddle it.
         double x = switch (position.getHpos()) {
             case LEFT ->
-                    bounds.getMinX();
+                    bounds.getMinX() - width - INSET;
             case CENTER ->
                     bounds.getMinX() + (bounds.getWidth() - width) / 2;
             case RIGHT ->
-                    bounds.getMaxX() - width;
+                    bounds.getMaxX() + INSET;
         };
         double y = switch (position.getVpos()) {
             case TOP ->
-                    bounds.getMinY();
+                    bounds.getMinY() + INSET;
             case CENTER,
                  BASELINE ->
                     bounds.getMinY() + (bounds.getHeight() - height) / 2;
             case BOTTOM ->
-                    bounds.getMaxY() - height;
+                    bounds.getMaxY() - height - INSET;
         };
         popup.setX(x);
         popup.setY(y);
