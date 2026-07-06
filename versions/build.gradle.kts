@@ -24,7 +24,7 @@ val pdfbox = "3.0.7"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.17.1"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.17.2"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.4.0"))
     api(platform("org.junit:junit-bom:6.1.1"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
@@ -65,6 +65,7 @@ dependencies.constraints {
     api("com.knuddels:jtokkit:1.1.0")
     api("com.konghq:unirest-java-core:4.10.0")
     api("com.konghq:unirest-modules-gson:4.10.0")
+    api("com.squareup.okhttp3:mockwebserver3:5.4.0")
     api("com.squareup.okhttp3:okhttp:5.4.0")
     api("com.squareup.okio:okio-jvm:3.17.0")
     api("com.squareup.retrofit2:retrofit:3.0.0")
@@ -129,7 +130,7 @@ dependencies.constraints {
     api("org.glassfish.hk2:hk2-utils:4.0.1")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.9")
     api("org.hamcrest:hamcrest:3.0")
-    api("org.hibernate.validator:hibernate-validator:9.1.1.Final")
+    api("org.hibernate.validator:hibernate-validator:9.1.2.Final")
     api("org.hisp.dhis:json-tree:1.9.4")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")

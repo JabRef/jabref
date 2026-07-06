@@ -25,11 +25,6 @@ public class DonationPreferences {
         return new DonationPreferences();
     }
 
-    public void setAll(DonationPreferences preferences) {
-        this.neverShowAgain.set(preferences.isNeverShowAgain());
-        this.lastShownEpochDay.set(preferences.getLastShownEpochDay());
-    }
-
     public boolean isNeverShowAgain() {
         return neverShowAgain.get();
     }
