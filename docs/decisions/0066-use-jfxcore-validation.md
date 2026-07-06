@@ -6,7 +6,7 @@ nav_order: 66
 
 ## Context and Problem Statement
 
-Field validation used ControlsFX's `Decorator` overlay (via mvvmfx-validation's `ControlsFxVisualizer`), which inserts an overlay node as a sibling of the decorated control and tracks its position via bounds listeners for every decorated control, regardless of validity. This was a suspected UI performance issue and is unsafe for controls that are direct `GridPane` children, since inserting a sibling node breaks `GridPane.rowIndex`/`columnIndex` attachments. Which validation library and decoration mechanism should replace it?
+JabRef needs to show users, next to the relevant form field, when that field's value fails validation. The existing mechanism for this — ControlsFX's `Decorator` overlay, used via mvvmfx-validation's `ControlsFxVisualizer` — inserts an overlay node as a sibling of the decorated control and tracks its position via bounds listeners for every decorated control, regardless of validity. This was a suspected UI performance issue and is unsafe for controls that are direct `GridPane` children, since inserting a sibling node breaks `GridPane.rowIndex`/`columnIndex` attachments. Which validation library and decoration mechanism should replace it?
 
 ## Considered Options
 

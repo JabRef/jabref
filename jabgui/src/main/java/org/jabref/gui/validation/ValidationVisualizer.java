@@ -8,6 +8,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -59,34 +60,69 @@ public class ValidationVisualizer {
         icon.setMaxHeight(Control.USE_PREF_SIZE);
         popup.getContent().setAll(icon);
 
+        // Created once and reused across updates instead of allocating a new graphic/Tooltip on every
+        // validation change (e.g. on every keystroke) — only their text/style class need to change.
+        Node errorGraphic = IconTheme.JabRefIcons.ERROR.getGraphicNode();
+        errorGraphic.getStyleClass().add("error-icon");
+        Node warningGraphic = IconTheme.JabRefIcons.WARNING.getGraphicNode();
+        warningGraphic.getStyleClass().add("warning-icon");
+        Tooltip tooltip = new Tooltip();
+        icon.setTooltip(tooltip);
+
         ValidationState.setSource(control, validation);
 
-        // Repositions every pulse while the popup is showing, instead of listening to control.boundsInLocal/
+        // Tracks whether the decoration is meant to be visible (i.e. show() has run and hide() hasn't), which
+        // may be true even before the popup is actually showing: popup.show() is deferred, inside the timer
+        // below, until the control's on-screen bounds can actually be resolved.
+        boolean[] active = {false};
+
+        // Repositions every pulse while active, instead of listening to control.boundsInLocal/
         // localToSceneTransform: those don't reliably invalidate when an ancestor ScrollPane scrolls (it
         // translates its content internally), which left the icon stuck in place while the field scrolled
-        // underneath it.
+        // underneath it. Also responsible for showing the popup in the first place, once bounds are
+        // resolvable, and for hiding it again if bounds become unresolvable while it is showing (rather than
+        // leaving it at stale coordinates).
         AnimationTimer repositionTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                reposition(control, popup, icon);
+                computeLocation(control, icon).ifPresentOrElse(
+                        location -> {
+                            if (popup.isShowing()) {
+                                popup.setX(location.getX());
+                                popup.setY(location.getY());
+                            } else {
+                                popup.show(control, location.getX(), location.getY());
+                            }
+                        },
+                        () -> {
+                            if (popup.isShowing()) {
+                                popup.hide();
+                            }
+                        });
             }
         };
 
         Runnable show = () -> {
-            if (popup.isShowing() || control.getScene() == null || control.getScene().getWindow() == null) {
+            if (active[0]) {
                 return;
             }
-            popup.show(control, 0, 0);
+            Window window = control.getScene() == null ? null : control.getScene().getWindow();
+            if (window == null || !window.isShowing()) {
+                return;
+            }
+            active[0] = true;
             repositionTimer.start();
-            reposition(control, popup, icon);
         };
 
         Runnable hide = () -> {
-            if (!popup.isShowing()) {
+            if (!active[0]) {
                 return;
             }
+            active[0] = false;
             repositionTimer.stop();
-            popup.hide();
+            if (popup.isShowing()) {
+                popup.hide();
+            }
         };
 
         Runnable update = () -> {
@@ -97,7 +133,7 @@ public class ValidationVisualizer {
                 return;
             }
             highestMessage(validation).ifPresentOrElse(message -> {
-                applyIcon(icon, message);
+                applyIcon(icon, errorGraphic, warningGraphic, tooltip, message);
                 show.run();
             }, hide);
         };
@@ -113,7 +149,12 @@ public class ValidationVisualizer {
         // the popup and its position listeners — once the control's window closes, so the View can be
         // collected like any other closed dialog/tab.
         ChangeListener<Boolean> windowShowingListener = (observable, wasShowing, isShowing) -> {
-            if (!isShowing) {
+            if (isShowing) {
+                // The control may have been attached to a Window before that window was actually shown (e.g.
+                // a dialog's initialize() runs before the dialog itself is displayed) — re-run update() now
+                // that show() can actually succeed.
+                update.run();
+            } else {
                 hide.run();
                 validation.getDiagnostics().removeListener(diagnosticsListener);
             }
@@ -161,13 +202,16 @@ public class ValidationVisualizer {
         update.run();
     }
 
-    private void reposition(Control control, Popup popup, Node icon) {
+    /// Computes the screen location the decoration should be shown at, or [Optional#empty] if the control's
+    /// bounds cannot currently be resolved to screen coordinates (e.g. mid-layout, or not yet attached to a
+    /// showing window).
+    private Optional<Point2D> computeLocation(Control control, Node icon) {
         if (control.getScene() == null || control.getScene().getWindow() == null) {
-            return;
+            return Optional.empty();
         }
         Bounds bounds = control.localToScreen(control.getBoundsInLocal());
         if (bounds == null) {
-            return;
+            return Optional.empty();
         }
         double width = icon.prefWidth(-1);
         double height = icon.prefHeight(-1);
@@ -190,20 +234,16 @@ public class ValidationVisualizer {
             case BOTTOM ->
                     bounds.getMaxY() - height - INSET;
         };
-        popup.setX(x);
-        popup.setY(y);
+        return Optional.of(new Point2D(x, y));
     }
 
-    void applyIcon(Label icon, ValidationMessage message) {
+    void applyIcon(Label icon, Node errorGraphic, Node warningGraphic, Tooltip tooltip, ValidationMessage message) {
         boolean error = message.severity() == Severity.ERROR;
-        Node graphic = error ? IconTheme.JabRefIcons.ERROR.getGraphicNode() : IconTheme.JabRefIcons.WARNING.getGraphicNode();
-        graphic.getStyleClass().add(error ? "error-icon" : "warning-icon");
+        icon.setGraphic(error ? errorGraphic : warningGraphic);
 
-        Tooltip tooltip = new Tooltip(message.message());
+        tooltip.setText(message.message());
+        tooltip.getStyleClass().removeAll("tooltip-error", "tooltip-warning");
         tooltip.getStyleClass().add(error ? "tooltip-error" : "tooltip-warning");
-
-        icon.setGraphic(graphic);
-        icon.setTooltip(tooltip);
     }
 
     public static Optional<ValidationMessage> highestMessage(ReadOnlyConstrainedProperty<?, ValidationMessage> validation) {

@@ -49,9 +49,7 @@ public class ConstantsItemModel {
     }
 
     private static Optional<ValidationMessage> validateLabel(String input) {
-        if (input == null) {
-            return Optional.of(ValidationMessage.error("May not be null"));
-        } else if (input.isBlank()) {
+        if (input == null || input.isBlank()) {
             return Optional.of(ValidationMessage.error(Localization.lang("Please enter the string's label")));
         } else if (IS_NUMBER.matcher(input).matches()) {
             return Optional.of(ValidationMessage.error(Localization.lang("The label of the string cannot be a number.")));

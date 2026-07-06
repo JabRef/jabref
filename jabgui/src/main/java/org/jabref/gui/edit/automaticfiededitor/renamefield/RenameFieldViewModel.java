@@ -16,6 +16,7 @@ import org.jabref.gui.edit.automaticfiededitor.MoveFieldValueAction;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.validation.ValidationConstraints;
 import org.jabref.gui.validation.ValidationMessage;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -45,16 +46,14 @@ public class RenameFieldViewModel extends AbstractAutomaticFieldEditorTabViewMod
 
         selectedField = new SimpleConstrainedObjectProperty<Field, ValidationMessage>(StandardField.AUTHOR,
                 ValidationConstraints.predicate(field -> StringUtil.isNotBlank(field.getName()),
-                        ValidationMessage.error("Field cannot be empty")));
+                        ValidationMessage.error(Localization.lang("Field cannot be empty"))));
         FieldHelper.getSetFieldsOnly(selectedEntries, getAllFields())
                    .stream().findFirst().ifPresent(selectedField::set);
 
         newFieldName = new SimpleConstrainedStringProperty<>("",
                 ValidationConstraints.function(fieldName -> {
-                    if (StringUtil.isBlank(fieldName)) {
-                        return Optional.of(ValidationMessage.error("Field name cannot be empty"));
-                    } else if (StringUtil.containsWhitespace(fieldName)) {
-                        return Optional.of(ValidationMessage.error("Field name cannot have whitespace characters"));
+                    if (StringUtil.isBlank(fieldName) || StringUtil.containsWhitespace(fieldName)) {
+                        return Optional.of(ValidationMessage.error(Localization.lang("Field cannot be empty and must not contain spaces.")));
                     }
                     return Optional.empty();
                 }));

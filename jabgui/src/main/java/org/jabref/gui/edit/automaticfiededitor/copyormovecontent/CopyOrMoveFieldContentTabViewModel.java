@@ -21,6 +21,7 @@ import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.validation.ValidationConstraints;
 import org.jabref.gui.validation.ValidationMessage;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -57,10 +58,8 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
 
         toField = new SimpleConstrainedObjectProperty<Field, ValidationMessage>(StandardField.AUTHOR,
                 ValidationConstraints.function(field -> {
-                    if (StringUtil.isBlank(field.getName())) {
-                        return Optional.of(ValidationMessage.error("Field name cannot be empty"));
-                    } else if (StringUtil.containsWhitespace(field.getName())) {
-                        return Optional.of(ValidationMessage.error("Field name cannot have whitespace characters"));
+                    if (StringUtil.isBlank(field.getName()) || StringUtil.containsWhitespace(field.getName())) {
+                        return Optional.of(ValidationMessage.error(Localization.lang("Field cannot be empty and must not contain spaces.")));
                     }
                     return Optional.empty();
                 }));
