@@ -185,8 +185,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     private static boolean isEmptyRow(EventTarget target) {
         Optional<ListCell<?>> enclosingCell = target instanceof Node node
-                ? findEnclosingListCell(node)
-                : Optional.empty();
+                                              ? findEnclosingListCell(node)
+                                              : Optional.empty();
         return enclosingCell.map(ListCell::isEmpty).orElse(false);
     }
 
