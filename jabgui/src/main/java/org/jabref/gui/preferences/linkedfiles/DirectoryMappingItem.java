@@ -3,6 +3,9 @@ package org.jabref.gui.preferences.linkedfiles;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class DirectoryMappingItem {
     private final StringProperty directory;
     private final StringProperty mappedDirectory;

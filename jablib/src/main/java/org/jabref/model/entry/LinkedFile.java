@@ -243,19 +243,10 @@ public class LinkedFile implements Serializable {
 
     public Optional<Path> findIn(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         List<Path> dirs = databaseContext.getFileDirectories(filePreferences);
-        Optional<Path> found = findIn(dirs);
-        if (found.isPresent()) {
-            return found;
-        }
-
-        try {
-            if (!Path.of(link.get()).isAbsolute()) {
-                return Optional.empty();
-            }
-        } catch (InvalidPathException ex) {
-            return Optional.empty();
-        }
-        return FileUtil.applyDirectoryMappings(link.get(), filePreferences.getDirectoryMappings());
+        return findIn(dirs)
+                .or(() -> FileUtil.isAbsoluteLike(link.get())
+                        ? FileUtil.applyDirectoryMappings(link.get(), filePreferences.getDirectoryMappings())
+                        : Optional.empty());
     }
 
     /// Tries to locate the file.
