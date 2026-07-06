@@ -192,7 +192,10 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         Optional<ListCell<?>> enclosingCell = target instanceof Node node
                                               ? findEnclosingListCell(node)
                                               : Optional.empty();
-        return enclosingCell.map(ListCell::isEmpty).orElse(false);
+        // No enclosing cell means the click landed on the empty area of the ListView
+        // (e.g. the blank space below the files, or the whole control when no files exist yet),
+        // which should behave the same as double-clicking the trailing empty "+1" row.
+        return enclosingCell.map(ListCell::isEmpty).orElse(true);
     }
 
     private static Optional<ListCell<?>> findEnclosingListCell(Node node) {
@@ -406,7 +409,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     }
 
     @FXML
-    private void addNewFile() {
+    public void addNewFile() {
         dialogService.showCustomDialogAndWait(new LinkedFileEditDialog()).filter(file -> !file.isEmpty()).ifPresent(newLinkedFile -> viewModel.addNewLinkedFile(newLinkedFile));
     }
 

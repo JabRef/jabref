@@ -424,7 +424,14 @@ public class AllFieldsTab extends FieldsEditorTab {
     private void showFieldEditor(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         userAddedFields.add(field);
         rebuildPanel(bibDatabaseContext, entry);
-        Platform.runLater(() -> requestFocus(field));
+        Platform.runLater(() -> {
+            requestFocus(field);
+            // Adding the File field via its "+" chip should immediately open the add-file dialog,
+            // since an empty File editor has no other purpose than to receive a file.
+            if ((StandardField.FILE == field) && (editors.get(field) instanceof LinkedFilesEditor linkedFilesEditor)) {
+                linkedFilesEditor.addNewFile();
+            }
+        });
     }
 
     private void rebuildPanel(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
