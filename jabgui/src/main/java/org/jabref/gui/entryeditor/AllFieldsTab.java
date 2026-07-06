@@ -236,7 +236,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         // An entry-type change can leave the shown field set unchanged while still changing which
         // of those fields are required, so the rows must be rebuilt to re-evaluate the remove
         // button even when the set comparison below would otherwise skip the rebuild.
-        boolean entryTypeChanged = InternalField.TYPE_HEADER.equals(event.getField());
+        boolean entryTypeChanged = InternalField.TYPE_HEADER == event.getField();
         if (entryTypeChanged || !target.equals(editors.keySet())) {
             rebuildPanel(activeDatabaseContext(), entry);
         }
