@@ -76,6 +76,12 @@ The tests in `org.jabref.logic.l10n.LocalizationConsistencyTest` check whether t
 
 If the language is a variant of a language `zh_CN` or `pt_BR` it is necessary to add a language mapping for Crowdin to the crowdin.yml file in the root. Of course the properties file also has to be named according to the language code and locale.
 
+## Crowdin CLI
+
+For installing the Crowdin CLI, follow the official installation instructions at <https://crowdin.github.io/crowdin-cli/installation>.
+
+Keep the project configuration in [`crowdin.yml`](/Users/christophs/workspace/jabref/crowdin.yml), but put your personal access token into the user-specific file `~/.crowdin.yml` and not into the repository file.
+
 ## Background information
 
 The localization is tested via the class [LocalizationConsistencyTest](https://github.com/JabRef/jabref/blob/main/jablib/src/test/java/org/jabref/logic/l10n/LocalizationConsistencyTest.java).
