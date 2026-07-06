@@ -16,6 +16,7 @@ import javafx.scene.input.ClipboardContent;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.exporter.ExportToClipboardAction;
@@ -55,6 +56,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private final RichHtmlView previewView;
     private final StringProperty searchQueryProperty;
     private final GuiPreferences preferences;
+    private final WorkspacePreferences workspacePreferences;
 
     private final BookCoverFetcher bookCoverFetcher;
 
@@ -77,21 +79,41 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         this.clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
+        this.workspacePreferences = preferences.getWorkspacePreferences();
         this.searchQueryProperty = searchQueryProperty;
         this.searchQueryProperty.addListener((_, _, _) -> highlightLayoutText());
 
         this.bookCoverFetcher = new BookCoverFetcher(preferences.getExternalApplicationsPreferences());
 
+        getStyleClass().add("preview-viewer");
         setFitToWidth(true);
         setFitToHeight(true);
         // Surrounding layouts (preview panel, dialogs) rely on a stable preferred size,
         // not on the content-dependent one of the rendered nodes
         setPrefSize(800, 600);
         previewView = new RichHtmlView();
-        previewView.setOptions(HtmlRenderOptions.defaults().withLinkHandler(this::openLink));
+        previewView.getStyleClass().add("preview-viewer-content");
+        previewView.setOptions(HtmlRenderOptions.defaults()
+                                                 .withLinkHandler(this::openLink)
+                                                 .withBaseFontSize(resolveBaseFontSize()));
         // The outer ScrollPane scrolls (scroll sync, tooltips); the area sizes to its content
         previewView.setUseContentHeight(true);
         setContent(previewView);
+
+        // The preview is rendered with explicit Font objects (not CSS), so the "Override default font size"
+        // preference (which otherwise cascades via "-fx-font-size" on the scene root, see ThemeManager) has to be
+        // applied here explicitly whenever it changes.
+        workspacePreferences.shouldOverrideDefaultFontSizeProperty().addListener((_, _, _) -> updateBaseFontSize());
+        workspacePreferences.mainFontSizeProperty().addListener((_, _, _) -> updateBaseFontSize());
+    }
+
+    /// @return the configured base font size in points, or a non-positive value to fall back to the system default
+    private double resolveBaseFontSize() {
+        return workspacePreferences.shouldOverrideDefaultFontSize() ? workspacePreferences.getMainFontSize() : -1;
+    }
+
+    private void updateBaseFontSize() {
+        previewView.setOptions(previewView.getOptions().withBaseFontSize(resolveBaseFontSize()));
     }
 
     private void openLink(String href) {
