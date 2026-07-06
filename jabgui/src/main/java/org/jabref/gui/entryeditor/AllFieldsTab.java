@@ -23,6 +23,7 @@ import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -305,12 +306,13 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// Wraps a field's editor node with a gray "remove field" icon button pinned to the
     /// top-right corner, shown only while the editor is focused *and* currently blank
-    /// (never for the citation key or a required field of the current entry type — those
-    /// can never be removed this way).
+    /// (never for the citation key, a required field of the current entry type, or a field
+    /// whose editor already draws its own trailing buttons in that corner — e.g. identifier
+    /// or URL editors — since overlaying there would collide with those buttons).
     // [impl->req~entry-editor.main-tab.remove-field~1]
     private Node wrapWithRemoveButton(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         Node editorNode = editors.get(field).getNode();
-        if (field.equals(InternalField.KEY_FIELD) || requiredFields.contains(field)) {
+        if (field.equals(InternalField.KEY_FIELD) || requiredFields.contains(field) || hasOwnTrailingButtons(editorNode)) {
             return editorNode;
         }
 
@@ -333,6 +335,14 @@ public class AllFieldsTab extends FieldsEditorTab {
                         fieldValue)));
         removeButton.managedProperty().bind(removeButton.visibleProperty());
         return wrapper;
+    }
+
+    /// Whether the editor already lays out one or more of its own buttons (identifier editors'
+    /// fetch/shorten actions, the URL editor's open button, …) — overlaying a remove button on
+    /// top of those would sit in the same corner and visually collide with them.
+    private static boolean hasOwnTrailingButtons(Node editorNode) {
+        return editorNode instanceof Parent parent
+                && parent.getChildrenUnmodifiable().stream().anyMatch(ButtonBase.class::isInstance);
     }
 
     /// Hides a still-empty, user-added field row again (reachable only for non-required,
