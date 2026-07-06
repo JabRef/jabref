@@ -4,7 +4,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.ai.chatting.ChatMessage;
 import org.jabref.model.ai.embeddings.EmbeddingSimilarityMetric;
 import org.jabref.model.ai.llm.AiProvider;
-import org.jabref.model.ai.pipeline.AnswerEngineKind;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.pipeline.DocumentSplitterKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
@@ -27,7 +27,7 @@ public final class AiNamingUtils {
         };
     }
 
-    public static String getDisplayName(AnswerEngineKind kind) {
+    public static String getDisplayName(ResponseEngineKind kind) {
         return switch (kind) {
             case EMBEDDINGS_SEARCH ->
                     Localization.lang("Embeddings Search");

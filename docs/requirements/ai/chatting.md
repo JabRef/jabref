@@ -115,7 +115,7 @@ Needs: impl
 
 Covers: `feat~ai.chat.general~1`, `feat~ai.expert-settings~1`
 
-### Ensure that an answer engine is used in AI chat
+### Ensure that a response engine is used in AI chat
 `req~ai.chat.uses-answer-engine~1`
 
 Rationale: this requirement ensures that the AI has context to answer a question

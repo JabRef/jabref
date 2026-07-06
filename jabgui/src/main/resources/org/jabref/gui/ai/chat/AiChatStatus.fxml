@@ -43,7 +43,7 @@
               alignment="CENTER_LEFT">
             <Label text="%Answer engine"/>
             <ComboBox
-                    fx:id="answerEngineComboBox"
+                    fx:id="responseEngineComboBox"
                     prefWidth="200"/>
         </HBox>
 

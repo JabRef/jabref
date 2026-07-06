@@ -31,7 +31,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
-import org.jabref.model.ai.pipeline.AnswerEngineKind;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
@@ -61,7 +61,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private TextField apiBaseUrlTextField;
     @FXML private SearchableComboBox<PredefinedEmbeddingModel> embeddingModelComboBox;
     // [impl->req~ai.answer-engines.default~1]
-    @FXML private ComboBox<AnswerEngineKind> answerEngineComboBox;
+    @FXML private ComboBox<ResponseEngineKind> responseEngineComboBox;
     // [impl->req~ai.summarization.algorithm.default~1]
     @FXML private ComboBox<SummarizatorKind> summarizationAlgorithmComboBox;
     @FXML private ComboBox<TokenEstimatorKind> tokenEstimationAlgorithmComboBox;
@@ -223,12 +223,12 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
         contextWindowSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
-        new ViewModelListCellFactory<AnswerEngineKind>()
+        new ViewModelListCellFactory<ResponseEngineKind>()
                 .withText(AiNamingUtils::getDisplayName)
-                .install(answerEngineComboBox);
-        answerEngineComboBox.setItems(viewModel.answerEngineKindsProperty());
-        answerEngineComboBox.valueProperty().bindBidirectional(viewModel.answerEngineProperty());
-        answerEngineComboBox.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+                .install(responseEngineComboBox);
+        responseEngineComboBox.setItems(viewModel.responseEngineKindsProperty());
+        responseEngineComboBox.valueProperty().bindBidirectional(viewModel.responseEngineProperty());
+        responseEngineComboBox.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         new ViewModelListCellFactory<SummarizatorKind>()
                 .withText(AiNamingUtils::getDisplayName)
