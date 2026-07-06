@@ -18,6 +18,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.dataformat.yaml.YAMLMapper;
 
@@ -129,38 +130,62 @@ public class HayagrivaImporter extends Importer {
     }
 
     public static class HayagrivaSerialNumber {
+        @Nullable
         public String doi;
+
+        @Nullable
         public String isbn;
+
+        @Nullable
         public String issn;
     }
 
     public static class HayagrivaParent {
+        @Nullable
         public String type;
+
+        @Nullable
         public String title;
     }
 
     public static class HayagrivaEntry {
         @JsonProperty("type")
+        @Nullable
         public String type;
+
         @JsonProperty("title")
+        @Nullable
         public String title;
+
         @JsonProperty("url")
+        @Nullable
         public String url;
+
         @JsonProperty("author")
+        @Nullable
         public List<String> authors;
+
         @JsonProperty("date")
+        @Nullable
         public String date;
+
         @JsonProperty("parent")
+        @Nullable
         public HayagrivaParent parent;
+
         @JsonProperty("serial-number")
+        @Nullable
         public HayagrivaSerialNumber serialNumber;
     }
 
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
-        input.mark(Integer.MAX_VALUE);
+        input.mark(10_000_000);
         try {
-            YAMLMapper mapper = new YAMLMapper();
+            YAMLMapper mapper = YAMLMapper.builder()
+                                          .disable(tools.jackson.core.StreamReadFeature.AUTO_CLOSE_SOURCE)
+                                          .build();
+
             Map<String, HayagrivaEntry> entries = mapper.readValue(
                     input,
                     new TypeReference<Map<String, HayagrivaEntry>>() { }
