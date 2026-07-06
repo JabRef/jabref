@@ -1,6 +1,7 @@
 ---
 name: jabkit
-description: Command-line reference for jabkit, JabRef's CLI for BibTeX and biblatex bibliographies. Use for any reference-management task from the terminal - fetching entries from online providers, converting DOIs to BibTeX, extracting references from PDF papers, checking libraries, generating citation keys, writing XMP metadata into PDFs, and searching .bib files.
+category: users
+description: JabRef's Swiss Army knife CLI for BibTeX/biblatex - fetches entries online, converts DOIs to BibTeX, extracts references from PDFs, checks libraries, generates citation keys, writes XMP metadata, and searches .bib files.
 license: MIT
 ---
 

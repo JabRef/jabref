@@ -1,6 +1,7 @@
 ---
 name: pdf-to-bibtex
-description: Extract BibTeX entries from PDF papers using JabRef's jabkit CLI. Use when the user wants to import academic papers (PDFs) into a BibTeX or biblatex library, generate .bib entries from PDF metadata (XMP, embedded BibTeX, GROBID, text heuristics), or turn a folder of papers into a bibliography.
+category: users
+description: Turns PDF papers into BibTeX entries with JabRef's jabkit CLI, pulling metadata from XMP, embedded BibTeX, GROBID, or text heuristics - builds a bibliography from a whole folder of papers.
 license: MIT
 ---
 
