@@ -10,7 +10,7 @@
 "project_id": "294858"
 "base_path": "."
 "base_url": "https://api.crowdin.com"
-# API KEY/TOLEN belongs to ~./crowdin.yml in your home folder
+# API KEY/TOKEN belongs to `crowdin.yml` in your home folder and is picked up by crowdin cli automatically
 #
 # Defines whether to preserve the original directory structure in the Crowdin project
 # Recommended to set to true
