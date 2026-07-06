@@ -3,8 +3,8 @@ package org.jabref.gui.preferences.preview;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.application.Platform;
-import javafx.beans.property.ListProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -31,8 +31,8 @@ import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.BstPreviewLayout;
@@ -43,7 +43,6 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.fxmisc.richtext.CodeArea;
@@ -74,8 +73,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
     private long lastKeyPressTime;
     private String listSearchTerm;
-
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public PreviewTab() {
         ViewLoader.view(this)
@@ -223,8 +220,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         contextMenu.getItems().get(2).disableProperty().bind(viewModel.selectedIsEditableProperty().not());
         editArea.editableProperty().bind(viewModel.selectedIsEditableProperty());
 
-        validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.chosenListValidationStatus(), chosenListView));
+        new ValidationVisualizer().initVisualization(viewModel.chosenListProperty(), chosenListView);
     }
 
     /// This is called, if a user starts typing some characters into the keyboard with focus on one ListView. The
@@ -272,7 +268,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         event.consume();
     }
 
-    private void dragDropped(ListProperty<PreviewLayout> targetList, DragEvent event) {
+    private void dragDropped(ObservableValue<ObservableList<PreviewLayout>> targetList, DragEvent event) {
         boolean success = viewModel.dragDropped(targetList, event.getDragboard());
         event.setDropCompleted(success);
         event.consume();

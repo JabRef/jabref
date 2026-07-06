@@ -1,6 +1,5 @@
 package org.jabref.gui.git;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -14,13 +13,12 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 
 public class GitShareToGitHubDialogView extends BaseDialog<Void> {
@@ -55,8 +53,6 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
 
     @Inject
     private GuiPreferences preferences;
-
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public GitShareToGitHubDialogView() {
         ViewLoader.view(this)
@@ -117,13 +113,9 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
 
         viewModel.setValues();
 
-        Platform.runLater(() -> {
-            visualizer.setDecoration(new IconValidationDecorator());
-
-            visualizer.initVisualization(viewModel.repositoryUrlValidation(), repositoryUrl, true);
-            visualizer.initVisualization(viewModel.githubUsernameValidation(), username, true);
-            visualizer.initVisualization(viewModel.githubPatValidation(), personalAccessToken, true);
-        });
+        new ValidationVisualizer().initVisualization(viewModel.repositoryUrlProperty(), repositoryUrl);
+        new ValidationVisualizer().initVisualization(viewModel.usernameProperty(), username);
+        new ValidationVisualizer().initVisualization(viewModel.patProperty(), personalAccessToken);
     }
 
     @FXML

@@ -3,7 +3,6 @@ package org.jabref.gui.edit.automaticfiededitor.editfieldcontent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -15,6 +14,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabView;
 import org.jabref.gui.edit.automaticfiededitor.FieldHelper;
 import org.jabref.gui.undo.NamedCompoundEdit;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -22,7 +22,6 @@ import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 
@@ -34,7 +33,6 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
     private final List<BibEntry> selectedEntries;
     private final BibDatabase database;
     private final StateManager stateManager;
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
     @FXML
     private CheckBox showOnlySetFieldsCheckBox;
     @FXML
@@ -86,10 +84,10 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
         overwriteFieldContentCheckBox.selectedProperty().bindBidirectional(viewModel.overwriteFieldContentProperty());
 
         appendValueButton.disableProperty().bind(viewModel.canAppendProperty().not());
-        setValueButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not());
-        overwriteFieldContentCheckBox.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not());
+        setValueButton.disableProperty().bind(viewModel.selectedFieldProperty().validProperty().not());
+        overwriteFieldContentCheckBox.disableProperty().bind(viewModel.selectedFieldProperty().validProperty().not());
 
-        Platform.runLater(() -> visualizer.initVisualization(viewModel.fieldValidationStatus(), fieldComboBox, true));
+        new ValidationVisualizer().initVisualization(viewModel.selectedFieldProperty(), fieldComboBox);
     }
 
     @Override

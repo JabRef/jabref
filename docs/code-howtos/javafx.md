@@ -16,7 +16,7 @@ JavaFX is used on JabRef for the user interface.
 * [ControlsFX](http://fxexperience.com/controlsfx/features/) amazing collection of controls
 * [CSS Reference](http://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html)
 * [mvvm framework](https://github.com/sialcasa/mvvmFX/wiki)
-* [Validation framework](https://github.com/sialcasa/mvvmFX/wiki/Validation)
+* [Validation framework](https://github.com/jfxcore/validation)
 * [additional bindings](https://github.com/lestard/advanced-bindings) or [EasyBind](https://github.com/TomasMikula/EasyBind)
 * [Undo manager](https://github.com/FXMisc/UndoFX)
 * [Docking manager](https://github.com/alexbodogit/AnchorFX) or [DockFX](https://github.com/RobertBColton/DockFX)

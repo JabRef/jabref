@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
@@ -33,6 +32,7 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -46,7 +46,6 @@ import org.jabref.model.entry.types.EntryType;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.control.textfield.TextFields;
@@ -69,7 +68,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     @Inject private StateManager stateManager;
 
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
+    private final ValidationVisualizer visualizer = new ValidationVisualizer();
 
     private CustomLocalDragboard localDragboard;
 
@@ -104,15 +103,13 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         addNewField.setOnAction(event -> addNewField());
         addNewField.textProperty().addListener((observable, oldValue, newValue) -> updateAddNewFieldButtonText());
 
-        addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeValidationStatus().validProperty().not());
-        addNewFieldButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));
+        addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeToAddProperty().validProperty().not());
+        addNewFieldButton.disableProperty().bind(viewModel.newFieldToAddProperty().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));
 
         viewModel.newFieldToAddProperty().bindBidirectional(addNewField.textProperty());
 
-        Platform.runLater(() -> {
-            visualizer.initVisualization(viewModel.entryTypeValidationStatus(), addNewEntryType, true);
-            visualizer.initVisualization(viewModel.fieldValidationStatus(), addNewField, true);
-        });
+        visualizer.initVisualization(viewModel.entryTypeToAddProperty(), addNewEntryType);
+        visualizer.initVisualization(viewModel.newFieldToAddProperty(), addNewField);
     }
 
     private void setupFieldPropertyCheckComboBox() {
@@ -374,7 +371,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     @FXML
     void addEntryType() {
-        if (!viewModel.entryTypeValidationStatus().isValid()) {
+        if (!viewModel.entryTypeToAddProperty().isValid()) {
             return;
         }
 
@@ -394,7 +391,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
     @FXML
     void addNewField() {
-        if (!viewModel.fieldValidationStatus().isValid()) {
+        if (!viewModel.newFieldToAddProperty().isValid()) {
             return;
         }
 

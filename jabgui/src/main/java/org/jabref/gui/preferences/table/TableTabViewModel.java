@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.table;
 
 import java.util.EnumSet;
+import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -24,16 +25,18 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.NoSelectionModel;
+import org.jabref.gui.validation.ValidationMessage;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jfxcore.validation.Constraints;
+import org.jfxcore.validation.ValidationResult;
+import org.jfxcore.validation.property.ConstrainedListProperty;
+import org.jfxcore.validation.property.SimpleConstrainedListProperty;
 
 public class TableTabViewModel implements PreferenceTabViewModel {
 
@@ -53,7 +56,15 @@ public class TableTabViewModel implements PreferenceTabViewModel {
         }
     };
 
-    private final ListProperty<MainTableColumnModel> columnsListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ConstrainedListProperty<MainTableColumnModel, ValidationMessage> columnsListProperty = new SimpleConstrainedListProperty<>(
+            FXCollections.observableArrayList(),
+            Constraints.forList(Constraints.validate((List<MainTableColumnModel> list) ->
+                    list.isEmpty()
+                    ? ValidationResult.invalid(ValidationMessage.error("%s > %s %n %n %s".formatted(
+                            Localization.lang("Entry table columns"),
+                            Localization.lang("Columns"),
+                            Localization.lang("List must not be empty."))))
+                    : ValidationResult.valid())));
     private final ObjectProperty<SelectionModel<MainTableColumnModel>> selectedColumnModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
     private final ListProperty<MainTableColumnModel> availableColumnsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MainTableColumnModel> addColumnProperty = new SimpleObjectProperty<>();
@@ -68,8 +79,6 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty abbreviationDisabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty abbreviationEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty abbreviationLastNameOnlyProperty = new SimpleBooleanProperty();
-
-    private final Validator columnsNotEmptyValidator;
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
@@ -101,14 +110,6 @@ public class TableTabViewModel implements PreferenceTabViewModel {
                 removeExtraFileColumns();
             }
         });
-
-        columnsNotEmptyValidator = new FunctionBasedValidator<>(
-                columnsListProperty,
-                list -> !list.isEmpty(),
-                ValidationMessage.error("%s > %s %n %n %s".formatted(
-                        Localization.lang("Entry table columns"),
-                        Localization.lang("Columns"),
-                        Localization.lang("List must not be empty."))));
     }
 
     @Override
@@ -266,22 +267,17 @@ public class TableTabViewModel implements PreferenceTabViewModel {
         }
     }
 
-    ValidationStatus columnsListValidationStatus() {
-        return columnsNotEmptyValidator.getValidationStatus();
-    }
-
     @Override
     public boolean validateSettings() {
-        ValidationStatus validationStatus = columnsListValidationStatus();
-        if (!validationStatus.isValid()) {
-            validationStatus.getHighestMessage().ifPresent(message ->
-                    dialogService.showErrorDialogAndWait(message.getMessage()));
+        if (!columnsListProperty.isValid()) {
+            ValidationVisualizer.highestMessage(columnsListProperty).ifPresent(message ->
+                    dialogService.showErrorDialogAndWait(message.message()));
             return false;
         }
         return true;
     }
 
-    public ListProperty<MainTableColumnModel> columnsListProperty() {
+    public ConstrainedListProperty<MainTableColumnModel, ValidationMessage> columnsListProperty() {
         return this.columnsListProperty;
     }
 

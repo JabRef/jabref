@@ -5,21 +5,24 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.gui.validation.Severity;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
@@ -28,10 +31,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.metadata.MetaData;
 
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jfxcore.validation.property.ConstrainedStringProperty;
+import org.jfxcore.validation.property.SimpleConstrainedStringProperty;
 
 public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
@@ -40,13 +41,9 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final ObjectProperty<Charset> selectedEncodingProperty = new SimpleObjectProperty<>(OS.ENCODINGS.getFirst());
     private final ListProperty<BibDatabaseMode> databaseModesProperty = new SimpleListProperty<>(FXCollections.observableArrayList(BibDatabaseMode.values()));
     private final SimpleObjectProperty<BibDatabaseMode> selectedDatabaseModeProperty = new SimpleObjectProperty<>(BibDatabaseMode.BIBLATEX);
-    private final StringProperty librarySpecificDirectoryProperty = new SimpleStringProperty("");
-    private final StringProperty userSpecificFileDirectoryProperty = new SimpleStringProperty("");
-    private final StringProperty laTexFileDirectoryProperty = new SimpleStringProperty("");
-
-    private final Validator librarySpecificFileDirectoryValidator;
-    private final Validator userSpecificFileDirectoryValidator;
-    private final Validator laTexFileDirectoryValidator;
+    private final ConstrainedStringProperty<ValidationMessage> librarySpecificDirectoryProperty;
+    private final ConstrainedStringProperty<ValidationMessage> userSpecificFileDirectoryProperty;
+    private final ConstrainedStringProperty<ValidationMessage> laTexFileDirectoryProperty;
 
     private final DialogService dialogService;
     private final CliPreferences preferences;
@@ -60,19 +57,19 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         this.databaseContext = databaseContext;
         this.metaData = databaseContext.getMetaData();
 
-        librarySpecificFileDirectoryValidator = new FunctionBasedValidator<>(
-                librarySpecificDirectoryProperty,
-                mainDirectoryPath -> validateDirectory(mainDirectoryPath, "Library-specific")
+        librarySpecificDirectoryProperty = new SimpleConstrainedStringProperty<>(
+                "",
+                ValidationConstraints.function(mainDirectoryPath -> validateDirectory(mainDirectoryPath, "Library-specific"))
         );
 
-        userSpecificFileDirectoryValidator = new FunctionBasedValidator<>(
-                userSpecificFileDirectoryProperty,
-                mainDirectoryPath -> validateDirectory(mainDirectoryPath, "User-specific")
+        userSpecificFileDirectoryProperty = new SimpleConstrainedStringProperty<>(
+                "",
+                ValidationConstraints.function(mainDirectoryPath -> validateDirectory(mainDirectoryPath, "User-specific"))
         );
 
-        laTexFileDirectoryValidator = new FunctionBasedValidator<>(
-                laTexFileDirectoryProperty,
-                mainDirectoryPath -> validateDirectory(mainDirectoryPath, "LaTeX")
+        laTexFileDirectoryProperty = new SimpleConstrainedStringProperty<>(
+                "",
+                ValidationConstraints.function(mainDirectoryPath -> validateDirectory(mainDirectoryPath, "LaTeX"))
         );
     }
 
@@ -98,48 +95,32 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         String librarySpecificFileDirectory = librarySpecificDirectoryProperty.getValue().trim();
         if (librarySpecificFileDirectory.isEmpty()) {
             newMetaData.clearLibrarySpecificFileDirectory();
-        } else if (librarySpecificFileDirectoryStatus().isValid()) {
+        } else if (librarySpecificDirectoryProperty.isValid()) {
             newMetaData.setLibrarySpecificFileDirectory(librarySpecificFileDirectory);
         }
 
         String userSpecificFileDirectory = userSpecificFileDirectoryProperty.getValue();
         if (userSpecificFileDirectory.isEmpty()) {
             newMetaData.clearUserFileDirectory(preferences.getFilePreferences().getUserAndHost());
-        } else if (userSpecificFileDirectoryStatus().isValid()) {
+        } else if (userSpecificFileDirectoryProperty.isValid()) {
             newMetaData.setUserFileDirectory(preferences.getFilePreferences().getUserAndHost(), userSpecificFileDirectory);
         }
 
         String latexFileDirectory = laTexFileDirectoryProperty.getValue();
         if (latexFileDirectory.isEmpty()) {
             newMetaData.clearLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
-        } else if (laTexFileDirectoryStatus().isValid()) {
+        } else if (laTexFileDirectoryProperty.isValid()) {
             newMetaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), latexFileDirectory);
         }
 
         databaseContext.setMetaData(newMetaData);
     }
 
-    ValidationStatus librarySpecificFileDirectoryStatus() {
-        return librarySpecificFileDirectoryValidator.getValidationStatus();
-    }
-
-    ValidationStatus userSpecificFileDirectoryStatus() {
-        return userSpecificFileDirectoryValidator.getValidationStatus();
-    }
-
-    ValidationStatus laTexFileDirectoryStatus() {
-        return laTexFileDirectoryValidator.getValidationStatus();
-    }
-
     @Override
     public boolean validateSettings() {
-        ValidationStatus librarySpecificFileDirectoryStatus = librarySpecificFileDirectoryStatus();
-        ValidationStatus userSpecificFileDirectoryStatus = userSpecificFileDirectoryStatus();
-        ValidationStatus laTexFileDirectoryStatus = laTexFileDirectoryStatus();
-
-        return promptUserToConfirmAction(librarySpecificFileDirectoryStatus) &&
-                promptUserToConfirmAction(userSpecificFileDirectoryStatus) &&
-                promptUserToConfirmAction(laTexFileDirectoryStatus);
+        return promptUserToConfirmAction(librarySpecificDirectoryProperty) &&
+                promptUserToConfirmAction(userSpecificFileDirectoryProperty) &&
+                promptUserToConfirmAction(laTexFileDirectoryProperty);
     }
 
     public void browseLibrarySpecificDir() {
@@ -183,15 +164,15 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         return selectedDatabaseModeProperty;
     }
 
-    public StringProperty librarySpecificDirectoryProperty() {
+    public ConstrainedStringProperty<ValidationMessage> librarySpecificDirectoryProperty() {
         return this.librarySpecificDirectoryProperty;
     }
 
-    public StringProperty userSpecificFileDirectoryProperty() {
+    public ConstrainedStringProperty<ValidationMessage> userSpecificFileDirectoryProperty() {
         return this.userSpecificFileDirectoryProperty;
     }
 
-    public StringProperty laTexFileDirectoryProperty() {
+    public ConstrainedStringProperty<ValidationMessage> laTexFileDirectoryProperty() {
         return this.laTexFileDirectoryProperty;
     }
 
@@ -218,58 +199,60 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         return configuredPath;
     }
 
-    private ValidationMessage validateDirectory(String directoryPath, String messageKey) {
+    private Optional<ValidationMessage> validateDirectory(String directoryPath, String messageKey) {
         Optional<Path> libPath = this.databaseContext.getDatabasePath();
         Path potentialAbsolutePath = Path.of(directoryPath);
 
         // check absolute path separately in case of unsaved libraries
         if (libPath.isEmpty() && Files.isDirectory(potentialAbsolutePath)) {
-            return null;
+            return Optional.empty();
         }
         try {
             if (!libPath.map(p -> p.getParent().resolve(directoryPath).normalize())
                         .map(Files::isDirectory)
                         .orElse(false)) {
-                return ValidationMessage.error(
+                return Optional.of(ValidationMessage.error(
                         Localization.lang("The file directory '%0' for the %1 file path is not found or is inaccessible.", directoryPath, messageKey)
-                );
+                ));
             }
         } catch (InvalidPathException ex) {
-            return ValidationMessage.error(
+            return Optional.of(ValidationMessage.error(
                     Localization.lang("Invalid path: '%0'.\nCheck \"%1\".", directoryPath, messageKey)
-            );
+            ));
         }
         // Directory is valid
-        return null;
+        return Optional.empty();
     }
 
-    private boolean promptUserToConfirmAction(ValidationStatus status) {
-        if (!status.isValid()) {
-            return status.getHighestMessage()
-                         .map(message -> dialogService.showConfirmationDialogAndWait(
-                                 Localization.lang("Action required: override default file directories"),
-                                 message.getMessage() + "\n" + Localization.lang("Would you like to save your other preferences?"),
-                                 Localization.lang("Save"),
-                                 Localization.lang("Return to Properties")))
-                         .orElse(false);
+    private boolean promptUserToConfirmAction(ConstrainedStringProperty<ValidationMessage> property) {
+        if (!property.isValid()) {
+            List<ValidationMessage> invalid = property.getDiagnostics().invalidSubList();
+            return invalid.stream().filter(message -> message.severity() == Severity.ERROR).findFirst()
+                          .or(() -> invalid.stream().findFirst())
+                          .map(message -> dialogService.showConfirmationDialogAndWait(
+                                  Localization.lang("Action required: override default file directories"),
+                                  message.message() + "\n" + Localization.lang("Would you like to save your other preferences?"),
+                                  Localization.lang("Save"),
+                                  Localization.lang("Return to Properties")))
+                          .orElse(false);
         }
         return true;
     }
 
-    public void togglePath(StringProperty fileDirectory) {
+    public void togglePath(Property<String> fileDirectory) {
         Optional<Path> libPath = this.databaseContext.getDatabasePath();
 
-        if (libPath.isEmpty() || fileDirectory.get().isEmpty()) {
+        if (libPath.isEmpty() || fileDirectory.getValue().isEmpty()) {
             return;
         }
 
         try {
             Path parentPath = libPath.get().getParent();
-            Path currPath = Path.of(fileDirectory.get());
+            Path currPath = Path.of(fileDirectory.getValue());
             String newPath;
 
             if (!currPath.isAbsolute()) {
-                newPath = parentPath.resolve(fileDirectory.get()).toAbsolutePath().toString();
+                newPath = parentPath.resolve(fileDirectory.getValue()).toAbsolutePath().toString();
             } else if (currPath.isAbsolute()) {
                 Path rel = parentPath.relativize(currPath);
                 newPath = rel.toString().isEmpty() ? "." : rel.toString();
@@ -288,7 +271,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     ///
     /// @param fileDirectory   file directory to be updated (lib/user/laTex)
     /// @param selectedDirPath path of directory (selected by user)
-    private void setDirectory(StringProperty fileDirectory, Path selectedDirPath) {
+    private void setDirectory(Property<String> fileDirectory, Path selectedDirPath) {
         Optional<Path> libPath = this.databaseContext.getDatabasePath();
 
         if (libPath.isEmpty() || !selectedDirPath.startsWith(libPath.get().getParent())) {

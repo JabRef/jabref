@@ -1,56 +1,42 @@
 package org.jabref.gui.libraryproperties.constants;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.strings.StringUtil;
 
-import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jfxcore.validation.property.ConstrainedStringProperty;
+import org.jfxcore.validation.property.SimpleConstrainedStringProperty;
 
 public class ConstantsItemModel {
 
     private final static Pattern IS_NUMBER = Pattern.compile("-?\\d+(\\.\\d+)?");
 
-    private final StringProperty labelProperty = new SimpleStringProperty();
-    private final StringProperty contentProperty = new SimpleStringProperty();
-
-    private final Validator labelValidator;
-    private final Validator contentValidator;
-    private final CompositeValidator combinedValidator;
+    private final ConstrainedStringProperty<ValidationMessage> labelProperty;
+    private final ConstrainedStringProperty<ValidationMessage> contentProperty;
 
     public ConstantsItemModel(String label, String content) {
-        this.labelProperty.setValue(label);
-        this.contentProperty.setValue(content);
-
-        labelValidator = new FunctionBasedValidator<>(this.labelProperty, ConstantsItemModel::validateLabel);
-        contentValidator = new FunctionBasedValidator<>(this.contentProperty, ConstantsItemModel::validateContent);
-        combinedValidator = new CompositeValidator(labelValidator, contentValidator);
+        labelProperty = new SimpleConstrainedStringProperty<>(label,
+                ValidationConstraints.function(ConstantsItemModel::validateLabel));
+        contentProperty = new SimpleConstrainedStringProperty<>(content,
+                ValidationConstraints.function(ConstantsItemModel::validateContent));
     }
 
-    public ValidationStatus labelValidation() {
-        return labelValidator.getValidationStatus();
+    public BooleanBinding combinedValidationValidProperty() {
+        return Bindings.and(labelProperty.validProperty(), contentProperty.validProperty());
     }
 
-    public ValidationStatus contentValidation() {
-        return contentValidator.getValidationStatus();
-    }
-
-    public ReadOnlyBooleanProperty combinedValidationValidProperty() {
-        return combinedValidator.getValidationStatus().validProperty();
-    }
-
-    public StringProperty labelProperty() {
+    public ConstrainedStringProperty<ValidationMessage> labelProperty() {
         return this.labelProperty;
     }
 
-    public StringProperty contentProperty() {
+    public ConstrainedStringProperty<ValidationMessage> contentProperty() {
         return this.contentProperty;
     }
 
@@ -62,29 +48,25 @@ public class ConstantsItemModel {
         this.contentProperty.setValue(content);
     }
 
-    private static ValidationMessage validateLabel(String input) {
-        if (input == null) {
-            return ValidationMessage.error("May not be null");
-        } else if (input.isBlank()) {
-            return ValidationMessage.error(Localization.lang("Please enter the string's label"));
+    private static Optional<ValidationMessage> validateLabel(String input) {
+        if (input == null || input.isBlank()) {
+            return Optional.of(ValidationMessage.error(Localization.lang("Please enter the string's label")));
         } else if (IS_NUMBER.matcher(input).matches()) {
-            return ValidationMessage.error(Localization.lang("The label of the string cannot be a number."));
+            return Optional.of(ValidationMessage.error(Localization.lang("The label of the string cannot be a number.")));
         } else if (input.contains("#")) {
-            return ValidationMessage.error(Localization.lang("The label of the string cannot contain the '#' character."));
+            return Optional.of(ValidationMessage.error(Localization.lang("The label of the string cannot contain the '#' character.")));
         } else if (input.contains(" ")) {
-            return ValidationMessage.error(Localization.lang("The label of the string cannot contain spaces."));
+            return Optional.of(ValidationMessage.error(Localization.lang("The label of the string cannot contain spaces.")));
         } else {
-            return null; // everything is ok
+            return Optional.empty(); // everything is ok
         }
     }
 
-    private static ValidationMessage validateContent(String input) {
-        if (input == null) {
-            return ValidationMessage.error(Localization.lang("Must not be empty!"));
-        } else if (input.isBlank()) {
-            return ValidationMessage.error(Localization.lang("Must not be empty!"));
+    private static Optional<ValidationMessage> validateContent(String input) {
+        if (StringUtil.isBlank(input)) {
+            return Optional.of(ValidationMessage.error(Localization.lang("Must not be empty!")));
         } else {
-            return null; // everything is ok
+            return Optional.empty(); // everything is ok
         }
     }
 }

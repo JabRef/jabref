@@ -13,9 +13,9 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.FileNodeViewModel;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.ViewModelTreeCellFactory;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
@@ -24,14 +24,12 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 import org.controlsfx.control.CheckTreeView;
 
 public class ParseLatexDialogView extends BaseDialog<Void> {
 
     private final BibDatabaseContext databaseContext;
-    private final ControlsFxVisualizer validationVisualizer;
     @FXML private TextField latexDirectoryField;
     @FXML private Button browseButton;
     @FXML private Button searchButton;
@@ -48,7 +46,6 @@ public class ParseLatexDialogView extends BaseDialog<Void> {
 
     public ParseLatexDialogView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
-        this.validationVisualizer = new ControlsFxVisualizer();
 
         setTitle(Localization.lang("Search for citations in LaTeX files..."));
 
@@ -80,10 +77,9 @@ public class ParseLatexDialogView extends BaseDialog<Void> {
         });
 
         latexDirectoryField.textProperty().bindBidirectional(viewModel.latexFileDirectoryProperty());
-        validationVisualizer.setDecoration(new IconValidationDecorator());
-        validationVisualizer.initVisualization(viewModel.latexDirectoryValidation(), latexDirectoryField);
+        new ValidationVisualizer().initVisualization(viewModel.latexFileDirectoryProperty(), latexDirectoryField);
         browseButton.disableProperty().bindBidirectional(viewModel.searchInProgressProperty());
-        searchButton.disableProperty().bind(viewModel.latexDirectoryValidation().validProperty().not());
+        searchButton.disableProperty().bind(viewModel.latexFileDirectoryProperty().validProperty().not());
         selectAllButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());
         unselectAllButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());
         progressIndicator.visibleProperty().bindBidirectional(viewModel.searchInProgressProperty());

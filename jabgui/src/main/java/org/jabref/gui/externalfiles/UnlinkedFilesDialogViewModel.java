@@ -38,6 +38,8 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileNodeViewModel;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.l10n.Localization;
@@ -49,9 +51,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import org.jfxcore.validation.property.ConstrainedStringProperty;
+import org.jfxcore.validation.property.SimpleConstrainedStringProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,7 @@ public class UnlinkedFilesDialogViewModel {
 
     private final ImportHandler importHandler;
     private final Map<Path, BibEntry> fileToSelectedEntryMap = new HashMap<>();
-    private final StringProperty directoryPath = new SimpleStringProperty("");
+    private final ConstrainedStringProperty<ValidationMessage> directoryPath;
     private final ObjectProperty<FileExtensionViewModel> selectedExtension = new SimpleObjectProperty<>();
     private final ObjectProperty<DateRange> selectedDate = new SimpleObjectProperty<>();
     private final ObjectProperty<ExternalFileSorter> selectedSort = new SimpleObjectProperty<>();
@@ -85,8 +86,6 @@ public class UnlinkedFilesDialogViewModel {
 
     private final BibDatabaseContext bibDatabase;
     private final TaskExecutor taskExecutor;
-
-    private final FunctionBasedValidator<String> scanDirectoryValidator;
 
     public UnlinkedFilesDialogViewModel(DialogService dialogService,
                                         UndoManager undoManager,
@@ -118,8 +117,9 @@ public class UnlinkedFilesDialogViewModel {
         this.fileSortList = FXCollections.observableArrayList(ExternalFileSorter.values());
 
         Predicate<String> isDirectory = path -> Files.isDirectory(Path.of(path));
-        scanDirectoryValidator = new FunctionBasedValidator<>(directoryPath, isDirectory,
-                ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
+        this.directoryPath = new SimpleConstrainedStringProperty<>(
+                "",
+                ValidationConstraints.predicate(isDirectory, ValidationMessage.error(Localization.lang("Please enter a valid file path."))));
 
         treeRootProperty.setValue(Optional.empty());
     }
@@ -304,12 +304,8 @@ public class UnlinkedFilesDialogViewModel {
         return this.selectedSort;
     }
 
-    public StringProperty directoryPathProperty() {
+    public ConstrainedStringProperty<ValidationMessage> directoryPathProperty() {
         return this.directoryPath;
-    }
-
-    public ValidationStatus directoryPathValidationStatus() {
-        return this.scanDirectoryValidator.getValidationStatus();
     }
 
     public DoubleProperty progressValueProperty() {

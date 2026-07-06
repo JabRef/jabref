@@ -7,12 +7,12 @@ import java.util.function.Predicate;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.preferences.GitPreferences;
@@ -28,11 +28,9 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.jfxcore.validation.property.ConstrainedStringProperty;
+import org.jfxcore.validation.property.SimpleConstrainedStringProperty;
 
 /// "Preferences" dialog for sharing library to GitHub.
 /// We do not put it into the JabRef preferences dialog because we want these settings to be close to the user.
@@ -47,20 +45,16 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
     private final GitPreferences gitPreferences;
 
     // The preferences of this dialog
-    private final StringProperty usernameProperty = new SimpleStringProperty("");
-    private final StringProperty patProperty = new SimpleStringProperty("");
+    private final ConstrainedStringProperty<ValidationMessage> usernameProperty;
+    private final ConstrainedStringProperty<ValidationMessage> patProperty;
 
     // TODO: This should be a library preference -> the library is connected to repository; not all JabRef libraries to the same one
     //       Reason: One could have https://github.com/JabRef/JabRef-exmple-libraries as one repo and https://github.com/myexampleuser/demolibs as another repository
     //               Both share the same secrets, but are different URLs.
     //       Also think of having two .bib files in the same folder - they will have the same repository URL -- should make no issues, but let's see...
-    private final StringProperty repositoryUrlProperty = new SimpleStringProperty("");
+    private final ConstrainedStringProperty<ValidationMessage> repositoryUrlProperty;
 
     private final BooleanProperty rememberPatProperty = new SimpleBooleanProperty();
-
-    private final Validator repositoryUrlValidator;
-    private final Validator githubUsernameValidator;
-    private final Validator githubPatValidator;
 
     public GitShareToGitHubDialogViewModel(
             GitPreferences gitPreferences,
@@ -74,21 +68,21 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
         this.gitHandlerRegistry = gitHandlerRegistry;
 
-        repositoryUrlValidator = new FunctionBasedValidator<>(
-                repositoryUrlProperty,
-                githubHttpsUrlValidator(),
-                ValidationMessage.error(Localization.lang("Please enter a valid HTTPS GitHub repository URL"))
-        );
-        githubUsernameValidator = new FunctionBasedValidator<>(
-                usernameProperty,
-                notEmptyValidator(),
-                ValidationMessage.error(Localization.lang("GitHub username is required"))
-        );
-        githubPatValidator = new FunctionBasedValidator<>(
-                patProperty,
-                notEmptyValidator(),
-                ValidationMessage.error(Localization.lang("Personal Access Token is required"))
-        );
+        repositoryUrlProperty = new SimpleConstrainedStringProperty<>(
+                "",
+                ValidationConstraints.predicate(
+                        githubHttpsUrlValidator(),
+                        ValidationMessage.error(Localization.lang("Please enter a valid HTTPS GitHub repository URL"))));
+        usernameProperty = new SimpleConstrainedStringProperty<>(
+                "",
+                ValidationConstraints.predicate(
+                        notEmptyValidator(),
+                        ValidationMessage.error(Localization.lang("GitHub username is required"))));
+        patProperty = new SimpleConstrainedStringProperty<>(
+                "",
+                ValidationConstraints.predicate(
+                        notEmptyValidator(),
+                        ValidationMessage.error(Localization.lang("Personal Access Token is required"))));
     }
 
     /// @implNote `close` Is a runnable to make testing easier
@@ -162,18 +156,6 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         gitPreferences.setPat(patProperty.get().trim());
     }
 
-    public ValidationStatus repositoryUrlValidation() {
-        return repositoryUrlValidator.getValidationStatus();
-    }
-
-    public ValidationStatus githubUsernameValidation() {
-        return githubUsernameValidator.getValidationStatus();
-    }
-
-    public ValidationStatus githubPatValidation() {
-        return githubPatValidator.getValidationStatus();
-    }
-
     private Predicate<String> notEmptyValidator() {
         return StringUtil::isNotBlank;
     }
@@ -182,15 +164,15 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         return input -> StringUtil.isNotBlank(input) && URLUtil.isURL(input.trim());
     }
 
-    public StringProperty usernameProperty() {
+    public ConstrainedStringProperty<ValidationMessage> usernameProperty() {
         return usernameProperty;
     }
 
-    public StringProperty patProperty() {
+    public ConstrainedStringProperty<ValidationMessage> patProperty() {
         return patProperty;
     }
 
-    public StringProperty repositoryUrlProperty() {
+    public ConstrainedStringProperty<ValidationMessage> repositoryUrlProperty() {
         return repositoryUrlProperty;
     }
 

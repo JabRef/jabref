@@ -50,6 +50,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Resolving of Math Subject Classification (MSC) needs to be activated in the references now. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - We improved JabRef's startup performance by loading MSC codes only when activated. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - Embedded postgres is no longer started with JabRef unless "Experimental search (Postgres)" is enabled in General preferences. [#12844](https://github.com/JabRef/jabref/issues/12844)
+- We improved the responsiveness of the error and warning icons shown next to invalid input fields (e.g. in the entry editor, the shared database dialog, and the group dialog). [#16174](https://github.com/JabRef/jabref/pull/16174)
 
 ### Fixed
 

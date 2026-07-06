@@ -2,6 +2,7 @@ package org.jabref.gui.preferences.network;
 
 import java.net.MalformedURLException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -20,6 +21,8 @@ import javafx.stage.FileChooser;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.validation.ValidationConstraints;
+import org.jabref.gui.validation.ValidationMessage;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -33,29 +36,50 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.strings.StringUtil;
 
-import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
 import kong.unirest.core.UnirestException;
+import org.jfxcore.validation.property.ConstrainedStringProperty;
+import org.jfxcore.validation.property.ReadOnlyConstrainedProperty;
+import org.jfxcore.validation.property.SimpleConstrainedStringProperty;
 
 public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty versionCheckProperty = new SimpleBooleanProperty();
     private final BooleanProperty proxyUseProperty = new SimpleBooleanProperty();
-    private final StringProperty proxyHostnameProperty = new SimpleStringProperty("");
-    private final StringProperty proxyPortProperty = new SimpleStringProperty("");
+    private final ConstrainedStringProperty<ValidationMessage> proxyHostnameProperty = new SimpleConstrainedStringProperty<>(
+            "",
+            ValidationConstraints.predicate(
+                    input -> !StringUtil.isNullOrEmpty(input),
+                    ValidationMessage.error("%s > %s %n %n %s".formatted(
+                            Localization.lang("Network"),
+                            Localization.lang("Proxy configuration"),
+                            Localization.lang("Please specify a hostname")))));
+    private final ConstrainedStringProperty<ValidationMessage> proxyPortProperty = new SimpleConstrainedStringProperty<>(
+            "",
+            ValidationConstraints.predicate(
+                    input -> getPortAsInt(input).isPresent(),
+                    ValidationMessage.error("%s > %s %n %n %s".formatted(
+                            Localization.lang("Network"),
+                            Localization.lang("Proxy configuration"),
+                            Localization.lang("Please specify a port")))));
     private final BooleanProperty proxyUseAuthenticationProperty = new SimpleBooleanProperty();
-    private final StringProperty proxyUsernameProperty = new SimpleStringProperty("");
-    private final StringProperty proxyPasswordProperty = new SimpleStringProperty("");
+    private final ConstrainedStringProperty<ValidationMessage> proxyUsernameProperty = new SimpleConstrainedStringProperty<>(
+            "",
+            ValidationConstraints.predicate(
+                    input -> !StringUtil.isNullOrEmpty(input),
+                    ValidationMessage.error("%s > %s %n %n %s".formatted(
+                            Localization.lang("Network"),
+                            Localization.lang("Proxy configuration"),
+                            Localization.lang("Please specify a username")))));
+    private final ConstrainedStringProperty<ValidationMessage> proxyPasswordProperty = new SimpleConstrainedStringProperty<>(
+            "",
+            ValidationConstraints.predicate(
+                    input -> !input.isBlank(),
+                    ValidationMessage.error("%s > %s %n %n %s".formatted(
+                            Localization.lang("Network"),
+                            Localization.lang("Proxy configuration"),
+                            Localization.lang("Please specify a password")))));
     private final BooleanProperty proxyPersistPasswordProperty = new SimpleBooleanProperty();
     private final BooleanProperty passwordPersistAvailable = new SimpleBooleanProperty();
     private final ListProperty<CustomCertificateViewModel> customCertificateListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-
-    private final Validator proxyHostnameValidator;
-    private final Validator proxyPortValidator;
-    private final Validator proxyUsernameValidator;
-    private final Validator proxyPasswordValidator;
 
     private final StringProperty gitUsernameProperty = new SimpleStringProperty("");
     private final StringProperty gitPatProperty = new SimpleStringProperty("");
@@ -90,38 +114,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                 proxyPreferences.getUsername(),
                 proxyPreferences.getPassword(),
                 proxyPreferences.shouldPersistPassword());
-
-        proxyHostnameValidator = new FunctionBasedValidator<>(
-                proxyHostnameProperty,
-                input -> !StringUtil.isNullOrEmpty(input),
-                ValidationMessage.error("%s > %s %n %n %s".formatted(
-                        Localization.lang("Network"),
-                        Localization.lang("Proxy configuration"),
-                        Localization.lang("Please specify a hostname"))));
-
-        proxyPortValidator = new FunctionBasedValidator<>(
-                proxyPortProperty,
-                input -> getPortAsInt(input).isPresent(),
-                ValidationMessage.error("%s > %s %n %n %s".formatted(
-                        Localization.lang("Network"),
-                        Localization.lang("Proxy configuration"),
-                        Localization.lang("Please specify a port"))));
-
-        proxyUsernameValidator = new FunctionBasedValidator<>(
-                proxyUsernameProperty,
-                input -> !StringUtil.isNullOrEmpty(input),
-                ValidationMessage.error("%s > %s %n %n %s".formatted(
-                        Localization.lang("Network"),
-                        Localization.lang("Proxy configuration"),
-                        Localization.lang("Please specify a username"))));
-
-        proxyPasswordValidator = new FunctionBasedValidator<>(
-                proxyPasswordProperty,
-                input -> !input.isBlank(),
-                ValidationMessage.error("%s > %s %n %n %s".formatted(
-                        Localization.lang("Network"),
-                        Localization.lang("Proxy configuration"),
-                        Localization.lang("Please specify a password"))));
 
         this.trustStoreManager = new TrustStoreManager(preferences.getSSLPreferences().getTruststorePath());
     }
@@ -197,41 +189,25 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         }
     }
 
-    public ValidationStatus proxyHostnameValidationStatus() {
-        return proxyHostnameValidator.getValidationStatus();
-    }
-
-    public ValidationStatus proxyPortValidationStatus() {
-        return proxyPortValidator.getValidationStatus();
-    }
-
-    public ValidationStatus proxyUsernameValidationStatus() {
-        return proxyUsernameValidator.getValidationStatus();
-    }
-
-    public ValidationStatus proxyPasswordValidationStatus() {
-        return proxyPasswordValidator.getValidationStatus();
-    }
-
     @Override
     public boolean validateSettings() {
-        CompositeValidator validator = new CompositeValidator();
+        List<ReadOnlyConstrainedProperty<?, ValidationMessage>> fieldsToCheck = new ArrayList<>();
 
         if (proxyUseProperty.getValue()) {
-            validator.addValidators(proxyHostnameValidator);
-            validator.addValidators(proxyPortValidator);
+            fieldsToCheck.add(proxyHostnameProperty);
+            fieldsToCheck.add(proxyPortProperty);
 
             if (proxyUseAuthenticationProperty.getValue()) {
-                validator.addValidators(proxyUsernameValidator);
-                validator.addValidators(proxyPasswordValidator);
+                fieldsToCheck.add(proxyUsernameProperty);
+                fieldsToCheck.add(proxyPasswordProperty);
             }
         }
 
-        ValidationStatus validationStatus = validator.getValidationStatus();
-        if (!validationStatus.isValid()) {
-            validationStatus.getHighestMessage().ifPresent(message ->
-                    dialogService.showErrorDialogAndWait(message.getMessage()));
-            return false;
+        for (ReadOnlyConstrainedProperty<?, ValidationMessage> field : fieldsToCheck) {
+            if (field.isInvalid()) {
+                dialogService.showErrorDialogAndWait(field.getDiagnostics().invalidSubList().getFirst().message());
+                return false;
+            }
         }
         return true;
     }
@@ -290,11 +266,11 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         return proxyUseProperty;
     }
 
-    public StringProperty proxyHostnameProperty() {
+    public ConstrainedStringProperty<ValidationMessage> proxyHostnameProperty() {
         return proxyHostnameProperty;
     }
 
-    public StringProperty proxyPortProperty() {
+    public ConstrainedStringProperty<ValidationMessage> proxyPortProperty() {
         return proxyPortProperty;
     }
 
@@ -302,11 +278,11 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         return proxyUseAuthenticationProperty;
     }
 
-    public StringProperty proxyUsernameProperty() {
+    public ConstrainedStringProperty<ValidationMessage> proxyUsernameProperty() {
         return proxyUsernameProperty;
     }
 
-    public StringProperty proxyPasswordProperty() {
+    public ConstrainedStringProperty<ValidationMessage> proxyPasswordProperty() {
         return proxyPasswordProperty;
     }
 

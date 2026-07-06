@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javafx.application.Platform;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.Property;
 import javafx.scene.Parent;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyEvent;
@@ -27,7 +27,7 @@ public interface FieldEditorFX {
     void bindToEntry(BibEntry entry);
 
     /// @implNote Decided to add undoAction and redoAction as parameter instead of passing a tabSupplier, {@link org.jabref.gui.DialogService} and {@link org.jabref.gui.StateManager} to the method.
-    default void establishBinding(TextInputControl textInputControl, StringProperty viewModelTextProperty, KeyBindingRepository keyBindingRepository, UndoAction undoAction, RedoAction redoAction) {
+    default void establishBinding(TextInputControl textInputControl, Property<String> viewModelTextProperty, KeyBindingRepository keyBindingRepository, UndoAction undoAction, RedoAction redoAction) {
         Logger logger = LoggerFactory.getLogger(FieldEditorFX.class);
 
         // We need to use the "global" UndoManager instead of JavaFX TextInputControls's native undo/redo handling.
@@ -67,7 +67,7 @@ public interface FieldEditorFX {
                 UiTaskExecutor.runInJavaFXThread(() -> setTextAndUpdateCaretPosition(textInputControl, newText, logger));
             }
         });
-        EasyBind.subscribe(textInputControl.textProperty(), viewModelTextProperty::set);
+        EasyBind.subscribe(textInputControl.textProperty(), viewModelTextProperty::setValue);
     }
 
     private void setTextAndUpdateCaretPosition(TextInputControl textInputControl, String newText, Logger logger) {

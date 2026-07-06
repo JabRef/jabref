@@ -1,5 +1,7 @@
 package org.jabref.gui.importer.fetcher;
 
+import java.util.Optional;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.value.ObservableBooleanValue;
@@ -23,6 +25,8 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.validation.ValidationMessage;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 
@@ -69,15 +73,16 @@ public class WebSearchPaneView extends VBox {
     }
 
     private void addQueryValidationHints(TextField query) {
-        EasyBind.subscribe(viewModel.queryValidationStatus().validProperty(),
+        EasyBind.subscribe(viewModel.queryProperty().validProperty(),
                 valid -> {
-                    if (!valid && viewModel.queryValidationStatus().getHighestMessage().isPresent()) {
-                        query.setTooltip(new Tooltip(viewModel.queryValidationStatus().getHighestMessage().get().getMessage()));
+                    Optional<ValidationMessage> highestMessage = valid ? Optional.empty() : ValidationVisualizer.highestMessage(viewModel.queryProperty());
+                    highestMessage.ifPresentOrElse(message -> {
+                        query.setTooltip(new Tooltip(message.message()));
                         query.pseudoClassStateChanged(QUERY_INVALID, true);
-                    } else {
+                    }, () -> {
                         query.setTooltip(null);
                         query.pseudoClassStateChanged(QUERY_INVALID, false);
-                    }
+                    });
                 });
     }
 

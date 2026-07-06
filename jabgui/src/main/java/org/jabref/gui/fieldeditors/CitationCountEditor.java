@@ -79,7 +79,7 @@ public class CitationCountEditor extends HBox implements FieldEditorFX {
         fetcherComboBox.valueProperty().bindBidirectional(
                 preferences.getEntryEditorPreferences().citationCountFetcherTypeProperty()
         );
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
+        new EditorValidator(preferences).configureValidation(viewModel.textProperty(), textField);
     }
 
     @FXML

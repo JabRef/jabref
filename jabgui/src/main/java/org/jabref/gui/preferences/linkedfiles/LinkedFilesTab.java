@@ -1,6 +1,5 @@
 package org.jabref.gui.preferences.linkedfiles;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -14,13 +13,12 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.validation.ValidationVisualizer;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabViewModel> implements PreferencesTab {
 
@@ -47,7 +45,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     @FXML private CheckBox copyLinkedFilesOnTransfer;
     @FXML private CheckBox moveLinkedFilesOnTransfer;
 
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+    private final ValidationVisualizer validationVisualizer = new ValidationVisualizer();
 
     public LinkedFilesTab() {
         ViewLoader.view(this)
@@ -97,8 +95,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH, dialogService, preferences.getExternalApplicationsPreferences()), autolinkRegexHelp);
 
-        validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.mainFileDirValidationStatus(), mainFileDirectory));
+        validationVisualizer.initVisualization(viewModel.mainFileDirectoryProperty(), mainFileDirectory);
     }
 
     public void mainFileDirBrowse() {
