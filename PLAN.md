@@ -24,7 +24,7 @@ Working plan for `req~mathscinet.sync.*~1` (see `docs/requirements/mathscinet.md
 
 ## Architecture recap
 
-```
+```text
 JabRef (jabgui)  --HTTP+bearer-->  jabext-experimental (bridge/JabExtBridge.java)  --native messaging-->  extension background --> tab
 ```
 
@@ -47,6 +47,7 @@ Branch: `mathscinet-browser-open`, based on `origin/add-fulltext-bridge`.
 Mirrors `fulltextBridge.js`'s structure. State: single module-level `let trackedTabId = null;`.
 
 On `{ type: "openMathSciNet", requestId, mrNumber }`:
+
 1. Build `target = "https://www.ams.org/mathscinet-getitem?mr=" + encodeURIComponent(mrNumber)` (must match `MathSciNetId#getExternalURI` in the jabref repo exactly).
 2. If `trackedTabId` is set, try `browser.tabs.get(trackedTabId)`:
    - success → `browser.tabs.update(trackedTabId, {url: target, active: true})`, then `browser.windows.update(tab.windowId, {focused: true})`. Reply `{requestId, action: "focused", tabId: trackedTabId}`.

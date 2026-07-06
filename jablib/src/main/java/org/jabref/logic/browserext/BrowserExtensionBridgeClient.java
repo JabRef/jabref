@@ -42,8 +42,8 @@ public class BrowserExtensionBridgeClient {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final HttpClient httpClient = HttpClient.newBuilder()
-                                                     .connectTimeout(REQUEST_TIMEOUT)
-                                                     .build();
+                                                    .connectTimeout(REQUEST_TIMEOUT)
+                                                    .build();
     private final Path discoveryDirectory;
 
     /// Result of a successful `/v1/mathscinet/open` call.
@@ -141,8 +141,8 @@ public class BrowserExtensionBridgeClient {
         if (OS.WINDOWS) {
             String appData = System.getenv("APPDATA");
             Path base = StringUtil.isBlank(appData)
-                    ? Path.of(System.getProperty("user.home"), "AppData", "Roaming")
-                    : Path.of(appData);
+                        ? Path.of(System.getProperty("user.home"), "AppData", "Roaming")
+                        : Path.of(appData);
             return base.resolve("JabRef");
         }
         if (OS.OS_X) {
@@ -150,8 +150,8 @@ public class BrowserExtensionBridgeClient {
         }
         String xdgConfigHome = System.getenv("XDG_CONFIG_HOME");
         Path base = StringUtil.isBlank(xdgConfigHome)
-                ? Path.of(System.getProperty("user.home"), ".config")
-                : Path.of(xdgConfigHome);
+                    ? Path.of(System.getProperty("user.home"), ".config")
+                    : Path.of(xdgConfigHome);
         return base.resolve("jabref");
     }
 }
