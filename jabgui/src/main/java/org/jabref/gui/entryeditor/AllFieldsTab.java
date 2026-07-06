@@ -303,6 +303,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// top-right corner, shown only while the editor is focused *and* currently blank
     /// (never for the citation key or a required field of the current entry type — those
     /// can never be removed this way).
+    // [impl->req~entry-editor.main-tab.remove-field~1]
     private Node wrapWithRemoveButton(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         Node editorNode = editors.get(field).getNode();
         if (field.equals(InternalField.KEY_FIELD) || requiredFields.contains(field)) {
