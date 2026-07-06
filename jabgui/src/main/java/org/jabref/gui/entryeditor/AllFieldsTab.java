@@ -230,7 +230,11 @@ public class AllFieldsTab extends FieldsEditorTab {
             userAddedFields.add(event.getField());
         }
         SequencedSet<Field> target = determineFieldsToShow(entry);
-        if (!target.equals(editors.keySet())) {
+        // An entry-type change can leave the shown field set unchanged while still changing which
+        // of those fields are required, so the rows must be rebuilt to re-evaluate the remove
+        // button even when the set comparison below would otherwise skip the rebuild.
+        boolean entryTypeChanged = InternalField.TYPE_HEADER.equals(event.getField());
+        if (entryTypeChanged || !target.equals(editors.keySet())) {
             rebuildPanel(activeDatabaseContext(), entry);
         }
     }
@@ -316,15 +320,18 @@ public class AllFieldsTab extends FieldsEditorTab {
         removeButton.getStyleClass().addAll("icon-button", "narrow", "field-remove-button");
         removeButton.setTooltip(new Tooltip(Localization.lang("Remove field")));
         removeButton.setFocusTraversable(false);
-        removeButton.visibleProperty().bind(editorNode.focusWithinProperty().and(
-                Bindings.createBooleanBinding(
-                        () -> fieldValue.getValue().map(StringUtil::isBlank).orElse(true),
-                        fieldValue)));
-        removeButton.managedProperty().bind(removeButton.visibleProperty());
         removeButton.setOnAction(_ -> removeFieldRow(bibDatabaseContext, entry, field));
 
         StackPane wrapper = new StackPane(editorNode, removeButton);
         StackPane.setAlignment(removeButton, Pos.TOP_RIGHT);
+
+        // Bound to the wrapper's (not editorNode's) focus-within: editorNode and removeButton are
+        // siblings, so focus moving from one to the other must not be read as "focus left the row".
+        removeButton.visibleProperty().bind(wrapper.focusWithinProperty().and(
+                Bindings.createBooleanBinding(
+                        () -> fieldValue.getValue().map(StringUtil::isBlank).orElse(true),
+                        fieldValue)));
+        removeButton.managedProperty().bind(removeButton.visibleProperty());
         return wrapper;
     }
 
