@@ -35,11 +35,11 @@ files: [
     #
     "translation": "/jablib/src/main/resources/l10n/JabRef_%two_letters_code%.properties",
     "languages_mapping": {
-         "two_letters_code": {
-           "pt-BR": "pt_BR",
-           "zh-CN": "zh_CN",
-           "zh-TW": "zh_TW"
-         }
+      "two_letters_code": {
+        "pt-BR": "pt_BR",
+        "zh-CN": "zh_CN",
+        "zh-TW": "zh_TW"
       }
+    }
   }
 ]
