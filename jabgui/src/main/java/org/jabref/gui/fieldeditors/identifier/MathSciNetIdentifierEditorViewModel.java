@@ -10,6 +10,7 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.browserext.BrowserExtensionBridgeClient;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
@@ -73,9 +74,15 @@ public class MathSciNetIdentifierEditorViewModel extends BaseIdentifierEditorVie
                 BackgroundTask.<Optional<BrowserExtensionBridgeClient.MathSciNetOpenResult>>wrap(
                                       () -> bridgeClient.openMathSciNet(mathSciNetId.asString()))
                               .onSuccess(result -> result.ifPresentOrElse(
-                                      opened -> LOGGER.debug("MathSciNet browser sync: {} tab {}", opened.action(), opened.tabId()),
-                                      () -> LOGGER.debug("MathSciNet browser sync unavailable")))
-                              .onFailure(ex -> LOGGER.warn("MathSciNet browser sync failed", ex))
+                                      opened -> LOGGER.info("MathSciNet browser sync: {} tab {}", opened.action(), opened.tabId()),
+                                      () -> {
+                                          LOGGER.info("MathSciNet browser sync unavailable: no response from the browser extension bridge");
+                                          dialogService.notify(Localization.lang("Could not reach the browser extension for MathSciNet sync"));
+                                      }))
+                              .onFailure(ex -> {
+                                  LOGGER.warn("MathSciNet browser sync failed", ex);
+                                  dialogService.notify(Localization.lang("Could not reach the browser extension for MathSciNet sync"));
+                              })
                               .executeWith(taskExecutor));
     }
 }
