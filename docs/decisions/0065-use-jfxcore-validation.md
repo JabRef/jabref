@@ -26,3 +26,5 @@ Chosen option: "`org.jfxcore:validation`, with a JabRef-owned `Popup`-based deco
 ### More Information
 
 Implementation PR: [#16174](https://github.com/JabRef/jabref/pull/16174)
+
+[ValidatorFX](https://github.com/effad/ValidatorFX) is a known alternative validation library that was not evaluated as part of this decision.
