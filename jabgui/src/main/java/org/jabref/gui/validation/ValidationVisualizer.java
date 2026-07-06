@@ -14,6 +14,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Popup;
 import javafx.stage.Window;
@@ -210,7 +211,7 @@ public class ValidationVisualizer {
             return Optional.empty();
         }
         Bounds bounds = control.localToScreen(control.getBoundsInLocal());
-        if (bounds == null) {
+        if (bounds == null || !isWithinScrollableViewport(control, bounds)) {
             return Optional.empty();
         }
         double width = icon.prefWidth(-1);
@@ -235,6 +236,20 @@ public class ValidationVisualizer {
                     bounds.getMaxY() - height - INSET;
         };
         return Optional.of(new Point2D(x, y));
+    }
+
+    /// Whether `control`'s on-screen bounds are (at least partially) inside the visible viewport of its
+    /// nearest ancestor [ScrollPane], if any. A scrolled-out control is still attached and its bounds still
+    /// resolve via [Control#localToScreen], so without this check the decoration would keep following it off
+    /// into unrelated UI (e.g. the entry editor's tab bar) instead of hiding while it is scrolled out of view.
+    private boolean isWithinScrollableViewport(Control control, Bounds controlScreenBounds) {
+        for (Node parent = control.getParent(); parent != null; parent = parent.getParent()) {
+            if (parent instanceof ScrollPane scrollPane) {
+                Bounds viewportScreenBounds = scrollPane.localToScreen(scrollPane.getBoundsInLocal());
+                return viewportScreenBounds != null && viewportScreenBounds.intersects(controlScreenBounds);
+            }
+        }
+        return true;
     }
 
     void applyIcon(Label icon, Node errorGraphic, Node warningGraphic, Tooltip tooltip, ValidationMessage message) {
