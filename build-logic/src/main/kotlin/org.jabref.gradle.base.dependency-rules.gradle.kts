@@ -206,6 +206,9 @@ extraJavaModuleInfo {
         uses("kong.unirest.core.json.JsonEngine")
     }
     module("com.konghq:unirest-modules-gson", "unirest.modules.gson")
+    module("com.squareup.okhttp3:mockwebserver3", "mockwebserver3") {
+        preserveExisting()
+    }
     module("com.squareup.okhttp3:okhttp", "okhttp3")
     module("com.squareup.okhttp3:okhttp-jvm-sse", "okhttp3.sse")
     module("com.squareup.okio:okio", "okio")
