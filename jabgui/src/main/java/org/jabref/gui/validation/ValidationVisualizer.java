@@ -3,6 +3,7 @@ package org.jabref.gui.validation;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
@@ -104,7 +105,10 @@ public class ValidationVisualizer {
             }, hide);
         };
 
-        ListChangeListener<ValidationMessage> diagnosticsListener = change -> update.run();
+        // The constrained property backing validation may be mutated off the FX thread (e.g. a background save
+        // action touching the same view-model property), so the diagnostics listener below can fire off-thread
+        // too — marshal it back before touching the popup/icon.
+        ListChangeListener<ValidationMessage> diagnosticsListener = change -> runOnFxThread(update);
         validation.getDiagnostics().addListener(diagnosticsListener);
 
         // validation is typically a property owned by a ViewModel that outlives this View, so the listener
@@ -207,5 +211,13 @@ public class ValidationVisualizer {
         List<ValidationMessage> invalid = validation.getDiagnostics().invalidSubList();
         return invalid.stream().filter(message -> message.severity() == Severity.ERROR).findFirst()
                       .or(() -> invalid.stream().findFirst());
+    }
+
+    private static void runOnFxThread(Runnable action) {
+        if (Platform.isFxApplicationThread()) {
+            action.run();
+        } else {
+            Platform.runLater(action);
+        }
     }
 }
