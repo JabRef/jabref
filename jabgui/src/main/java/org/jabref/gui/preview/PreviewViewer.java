@@ -94,8 +94,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         previewView = new RichHtmlView();
         previewView.getStyleClass().add("preview-viewer-content");
         previewView.setOptions(HtmlRenderOptions.defaults()
-                                                 .withLinkHandler(this::openLink)
-                                                 .withBaseFontSize(resolveBaseFontSize()));
+                                                .withLinkHandler(this::openLink)
+                                                .withBaseFontSize(resolveBaseFontSize()));
         // The outer ScrollPane scrolls (scroll sync, tooltips); the area sizes to its content
         previewView.setUseContentHeight(true);
         setContent(previewView);
@@ -112,8 +112,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     /// CSS cascade itself, since its text nodes get an explicit `Font` instead of an inherited one)
     private double resolveBaseFontSize() {
         return workspacePreferences.shouldOverrideDefaultFontSize()
-                ? workspacePreferences.getMainFontSize()
-                : WorkspacePreferences.getDefault().getMainFontSize();
+               ? workspacePreferences.getMainFontSize()
+               : WorkspacePreferences.getDefault().getMainFontSize();
     }
 
     private void updateBaseFontSize() {
