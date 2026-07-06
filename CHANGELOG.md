@@ -39,6 +39,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- The AI summary tab now renders Markdown directly as JavaFX nodes instead of converting it to HTML and displaying it in a `WebView`, matching how AI chat messages are rendered. [#16189](https://github.com/JabRef/jabref/pull/16189)
 - The `jabkit check` `github-actions` output now embeds the citation key and field name in each finding's message, so the plain workflow log lines are self-describing (not only the pull request annotations). [#16065](https://github.com/JabRef/jabref/pull/16065)
 - We extended the per-fetcher timeout for fulltext PDF lookups from 10 to 120 seconds so fetchers that bounce through an institutional sign-in or a slow publisher CDN have a chance to complete. [#15877](https://github.com/JabRef/jabref/pull/15877)
 - When an imported entry has an empty citation key, it is generated. [#15624](https://github.com/JabRef/jabref/pull/15624)

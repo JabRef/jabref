@@ -75,6 +75,18 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         renderer.render(parser.parse(markdownText));
     }
 
+    /// Displays the given text as-is, without interpreting any Markdown syntax.
+    public void setPlainText(@NonNull String text) {
+        super.clearSelection();
+        getChildren().clear();
+
+        if (text.isBlank()) {
+            return;
+        }
+
+        addTextNode(text, parser.parse(text));
+    }
+
     private void addTextNode(@Nullable String content, Node astNode, String... styleClasses) {
         if (content == null || content.isEmpty()) {
             return;

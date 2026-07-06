@@ -11,16 +11,17 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.scene.web.WebView;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.gui.util.WebViewStore;
+import org.jabref.gui.util.component.MarkdownTextFlow;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
@@ -35,7 +36,8 @@ public class AiSummaryShowingView extends VBox {
     @FXML private CheckBox markdownCheckbox;
     @FXML private Text summaryInfoText;
 
-    private WebView webView;
+    private StackPane summaryContentPane;
+    private MarkdownTextFlow markdownTextFlow;
 
     private AiSummaryShowingViewModel viewModel;
 
@@ -83,17 +85,22 @@ public class AiSummaryShowingView extends VBox {
                 entryTypesManager,
                 dialogService
         );
-        initializeWebView();
+        initializeMarkdownTextFlow();
 
         setupBindings();
         setupListeners();
     }
 
-    private void initializeWebView() {
-        webView = WebViewStore.get();
-        VBox.setVgrow(webView, Priority.ALWAYS);
+    private void initializeMarkdownTextFlow() {
+        summaryContentPane = new StackPane();
+        markdownTextFlow = new MarkdownTextFlow(summaryContentPane);
+        summaryContentPane.getChildren().add(markdownTextFlow);
 
-        getChildren().addFirst(webView);
+        ScrollPane scrollPane = new ScrollPane(summaryContentPane);
+        scrollPane.setFitToWidth(true);
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
+        getChildren().addFirst(scrollPane);
     }
 
     private void setupBindings() {
@@ -103,11 +110,19 @@ public class AiSummaryShowingView extends VBox {
     }
 
     private void setupListeners() {
-        BindingsHelper.listen(
-                viewModel.webViewSourceProperty(),
-                value -> UiTaskExecutor.runInJavaFXThread(() ->
-                        webView.getEngine().loadContent(StringUtil.makeSafe(value)))
-        );
+        BindingsHelper.listen(viewModel.summaryContentProperty(), _ -> updateContent());
+        BindingsHelper.listen(viewModel.isMarkdownProperty(), _ -> updateContent());
+    }
+
+    private void updateContent() {
+        String content = StringUtil.makeSafe(viewModel.summaryContentProperty().get());
+        UiTaskExecutor.runInJavaFXThread(() -> {
+            if (viewModel.isMarkdownProperty().get()) {
+                markdownTextFlow.setMarkdown(content);
+            } else {
+                markdownTextFlow.setPlainText(content);
+            }
+        });
     }
 
     public ObjectProperty<EventHandler<ActionEvent>> onRegenerateProperty() {

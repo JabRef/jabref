@@ -23,7 +23,6 @@ import org.jabref.logic.ai.summarization.exporters.AiSummaryJsonExporter;
 import org.jabref.logic.ai.summarization.exporters.AiSummaryMarkdownExporter;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.format.MarkdownFormatter;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.ai.AiMetadata;
@@ -37,19 +36,11 @@ import org.slf4j.LoggerFactory;
 public class AiSummaryShowingViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiSummaryShowingViewModel.class);
 
-    private static final String HTML_TEMPLATE = """
-            <body style="margin: 0; padding: 5px; width: 100vw">
-                <div style="white-space: pre-wrap; word-wrap: break-word; width: 100vw">%s</div>
-            </body>
-            """;
-
-    private static final MarkdownFormatter MARKDOWN_FORMATTER = new MarkdownFormatter();
-
     private final ObjectProperty<AiSummary> summary = new SimpleObjectProperty<>();
     private final ObjectProperty<FullBibEntry> entry = new SimpleObjectProperty<>();
     private final BooleanProperty isMarkdown = new SimpleBooleanProperty(true);
 
-    private final StringProperty webViewSource = new SimpleStringProperty("");
+    private final StringProperty summaryContent = new SimpleStringProperty("");
 
     private final ObjectProperty<EventHandler<ActionEvent>> onRegenerate = new SimpleObjectProperty<>();
     private final ObjectProperty<EventHandler<ActionEvent>> onRegenerateCustom = new SimpleObjectProperty<>();
@@ -74,24 +65,18 @@ public class AiSummaryShowingViewModel extends AbstractViewModel {
     }
 
     private void setupBindings() {
-        webViewSource.bind(Bindings.createObjectBinding(
-                this::generateWebSource,
-                summary, isMarkdown
+        summaryContent.bind(Bindings.createObjectBinding(
+                this::generateSummaryContent,
+                summary
         ));
     }
 
-    private String generateWebSource() {
+    private String generateSummaryContent() {
         if (summary.get() == null) {
             return "";
         }
 
-        String content = summary.get().content();
-
-        if (isMarkdown.get()) {
-            return MARKDOWN_FORMATTER.format(content);
-        } else {
-            return HTML_TEMPLATE.formatted(content);
-        }
+        return summary.get().content();
     }
 
     public void regenerate() {
@@ -174,8 +159,8 @@ public class AiSummaryShowingViewModel extends AbstractViewModel {
         return isMarkdown;
     }
 
-    public StringProperty webViewSourceProperty() {
-        return webViewSource;
+    public StringProperty summaryContentProperty() {
+        return summaryContent;
     }
 
     public ObjectProperty<EventHandler<ActionEvent>> onRegenerateProperty() {
