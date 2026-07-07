@@ -1236,6 +1236,16 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -jr-theme;
 }
 
+#entryEditor .field-remove-button {
+    -fx-background-color: transparent;
+}
+
+#entryEditor .field-remove-button .glyph-icon,
+#entryEditor .field-remove-button .ikonli-font-icon {
+    -fx-fill: -jr-gray-2;
+    -fx-text-fill: -jr-gray-2;
+}
+
 #entryEditor .warning-icon {
     -fx-fill: -jr-warn;
 }
@@ -2520,4 +2530,30 @@ journalInfo .grid-cell-b {
     -fx-background-color: transparent;
     -fx-background-insets: 0, 0;
     -fx-padding: 0;
+}
+
+/* Preview (PreviewViewer): match the entry editor's white content background instead of the
+   transparent one .scroll-pane/.stack-pane get by default (jabref-javafx.css). */
+.preview-viewer,
+.preview-viewer > .viewport {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.preview-viewer-content {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+/* JavaFX incubator RichTextArea (entry preview, AI summary).
+   Modena styles it from -fx-accent, which JabRef deliberately sets to red
+   as an "unthemed control" canary - so map it to the JabRef palette here. */
+.rich-text-area .selection-highlight {
+    -fx-fill: derive(-jr-accent, 20%);
+}
+
+.rich-text-area .caret {
+    -fx-stroke: -fx-text-background-color;
+}
+
+.rich-text-area .caret-line {
+    -fx-fill: transparent;
 }

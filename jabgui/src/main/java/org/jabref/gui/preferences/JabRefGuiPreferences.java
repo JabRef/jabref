@@ -24,6 +24,7 @@ import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.fieldeditors.identifier.MathSciNetPreferences;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.groups.GroupViewMode;
@@ -239,12 +240,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String JOURNAL_POPUP = "journalPopup";
     private static final String SHOW_SCITE_TAB = "showSciteTab";
     private static final String SHOW_USER_COMMENTS_FIELDS = "showUserCommentsFields";
-    private static final String SHOW_MATHSCINET_TAB = "showMathSciNetTab";
     private static final String SHOW_SOURCE_TAB = "showSourceTab";
     private static final String SHOW_FULLTEXT_SEARCH_TAB = "showFulltextSearchTab";
     private static final String ENTRY_EDITOR_PREVIEW_DIVIDER_POS = "entryEditorPreviewDividerPos";
     private static final String CITATION_FETCHER_TYPE = "citationFetcherType";
     private static final String CITATION_COUNT_FETCHER_TYPE = "citationCountFetcherType";
+    // endregion
+
+    // region MathSciNetPreferences
+    private static final String MATHSCINET_SYNC_WITH_BROWSER = "mathSciNetSyncWithBrowser";
     // endregion
 
     // region MrDlibPreferences
@@ -276,6 +280,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private NewEntryPreferences newEntryPreferences;
     private DonationPreferences donationPreferences;
     private MrDlibPreferences mrDlibPreferences;
+    private MathSciNetPreferences mathSciNetPreferences;
 
     /// @deprecated Never ever add a call to this method. There should be only one caller.
     /// All other usages should get the preferences passed (or injected).
@@ -310,6 +315,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getNewEntryPreferences();
         getDonationPreferences();
         getMrDlibPreferences();
+        getMathSciNetPreferences();
     }
 
     // region CopyToPreferences
@@ -328,6 +334,23 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         bindBoolean(copyToPreferences.shouldIncludeCrossReferencesProperty(), INCLUDE_CROSS_REFERENCES, defaultValues.getShouldIncludeCrossReferences());
 
         return copyToPreferences;
+    }
+    // endregion
+
+    // region MathSciNetPreferences
+    public MathSciNetPreferences getMathSciNetPreferences() {
+        if (mathSciNetPreferences != null) {
+            return mathSciNetPreferences;
+        }
+
+        MathSciNetPreferences defaultValues = MathSciNetPreferences.getDefault();
+
+        mathSciNetPreferences = new MathSciNetPreferences(
+                getBoolean(MATHSCINET_SYNC_WITH_BROWSER, defaultValues.getSyncWithBrowser()));
+
+        bindBoolean(mathSciNetPreferences.syncWithBrowserProperty(), MATHSCINET_SYNC_WITH_BROWSER, defaultValues.getSyncWithBrowser());
+
+        return mathSciNetPreferences;
     }
     // endregion
 
@@ -397,8 +420,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                         getBoolean(SHOW_FILE_ANNOTATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FILE_ANNOTATIONS))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION,
                         getBoolean(SHOW_SCITE_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION))),
-                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.MATH_SCI_NET,
-                        getBoolean(SHOW_MATHSCINET_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.MATH_SCI_NET))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.SOURCE,
                         getBoolean(SHOW_SOURCE_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.SOURCE))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.FULLTEXT_SEARCH_RESULTS,
@@ -432,8 +453,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                             putBoolean(SHOW_LATEX_CITATIONS, visible);
                     case CITATION_INFORMATION ->
                             putBoolean(SHOW_SCITE_TAB, visible);
-                    case MATH_SCI_NET ->
-                            putBoolean(SHOW_MATHSCINET_TAB, visible);
                     case SOURCE ->
                             putBoolean(SHOW_SOURCE_TAB, visible);
                     case FULLTEXT_SEARCH_RESULTS ->

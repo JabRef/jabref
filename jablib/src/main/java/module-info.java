@@ -16,6 +16,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.preferences;
     exports org.jabref.logic.importer;
     exports org.jabref.logic.bibtex;
+    exports org.jabref.logic.browserext;
     exports org.jabref.logic.citationkeypattern;
     exports org.jabref.logic.exporter;
     exports org.jabref.logic.importer.fileformat;
@@ -192,6 +193,9 @@ open module org.jabref.jablib {
     requires static jakarta.annotation;
     requires transitive jakarta.inject;
     // endregion
+
+    // Test-only: BrowserExtensionBridgeClientTest fakes the bridge with a real loopback HttpServer.
+    requires static jdk.httpserver;
 
     // region: data mapping
     requires jdk.xml.dom;
