@@ -13,7 +13,8 @@ class FetcherExceptionTest {
             "https://api.springernature.com/meta/v1/json?q=anything&API_KEY=abc, https://api.springernature.com/meta/v1/json?q=anything&API_KEY=[REDACTED]",
             "https://api.springernature.com/meta/v1/json?q=anything&apikey=abc123ABC, https://api.springernature.com/meta/v1/json?q=anything&apikey=[REDACTED]",
             "https://api.springernature.com/meta/v1/json?q=anything, https://api.springernature.com/meta/v1/json?q=anything",
-            "https://api.springernature.com/meta/v1/json, https://api.springernature.com/meta/v1/json"
+            "https://api.springernature.com/meta/v1/json, https://api.springernature.com/meta/v1/json",
+            "https://user:pass@example.com/references.bib, https://example.com/references.bib"
     })
     void getRedactedUrl(String url, String redactedUrl) {
         assertEquals(redactedUrl, FetcherException.getRedactedUrl(url));

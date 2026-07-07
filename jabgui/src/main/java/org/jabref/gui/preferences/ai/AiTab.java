@@ -25,8 +25,10 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.ai.AiNamingUtils;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
 import org.jabref.model.ai.pipeline.AnswerEngineKind;
@@ -37,6 +39,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.EnhancedPasswordField;
 import com.dlsc.unitfx.IntegerInputField;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 import org.controlsfx.control.SearchableComboBox;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
@@ -103,6 +106,9 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private CheckBox generateFollowUpQuestions;
     @FXML private Spinner<Integer> followUpQuestionsCountSpinner;
 
+    @Inject private TaskExecutor taskExecutor;
+    @Inject private AiService aiService;
+
     public AiTab() {
         ViewLoader.view(this)
                   .root(this)
@@ -110,7 +116,11 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     }
 
     public void initialize() {
-        this.viewModel = new AiTabViewModel(preferences);
+        this.viewModel = new AiTabViewModel(
+                preferences,
+                aiService.getModelService(),
+                taskExecutor
+        );
 
         initializeEnableAi();
         initializeAiProvider();

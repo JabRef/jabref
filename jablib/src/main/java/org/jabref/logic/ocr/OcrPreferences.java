@@ -29,8 +29,4 @@ public class OcrPreferences {
     public static OcrPreferences getDefault() {
         return new OcrPreferences();
     }
-
-    public void setAll(OcrPreferences preferences) {
-        this.ocrEnginePath.set(preferences.getOcrEnginePath());
-    }
 }
