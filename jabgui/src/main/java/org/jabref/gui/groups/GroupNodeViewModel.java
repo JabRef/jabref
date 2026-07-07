@@ -27,6 +27,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.groups.GroupsFactory;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.BackgroundTask;
@@ -99,7 +100,10 @@ public class GroupNodeViewModel {
         this.localDragBoard = localDragBoard;
         this.preferences = preferences;
 
-        displayName = new SimpleObjectProperty<>(new LatexToUnicodeFormatter().format(groupNode.getName()));
+        String rawName = groupNode.getGroup() instanceof WithoutKeywordGroup withoutGroup
+                ? Localization.lang("without %0", withoutGroup.getField().getName())
+                : groupNode.getName();
+        displayName = new SimpleObjectProperty<>(new LatexToUnicodeFormatter().format(rawName));
         isRoot = groupNode.isRoot();
         if (groupNode.getGroup() instanceof AutomaticGroup automaticGroup) {
             children = automaticGroup.createSubgroups(this.databaseContext.getDatabase().getEntries())
