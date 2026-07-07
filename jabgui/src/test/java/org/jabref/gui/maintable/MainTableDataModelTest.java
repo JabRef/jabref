@@ -236,7 +236,7 @@ class MainTableDataModelTest {
 
         executeTask(submittedTasks.get(1));
 
-        executeTask(submittedTasks.get(0));
+        executeTask(submittedTasks.getFirst());
 
         assertFalse(quantumViewModel.isMatchedBySearch().get());
         assertTrue(organicViewModel.isMatchedBySearch().get());
