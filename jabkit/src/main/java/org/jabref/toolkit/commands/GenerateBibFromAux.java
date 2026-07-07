@@ -33,7 +33,7 @@ class GenerateBibFromAux implements Callable<Integer> {
     private JabKit argumentProcessor;
 
     @Mixin
-    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+    private JabKit.SharedOptions sharedOptions;
 
     @Option(names = "--aux", required = true)
     private Path auxFile;

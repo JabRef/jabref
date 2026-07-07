@@ -1118,6 +1118,55 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 5 5 5 15;
 }
 
+/* Single scroll-list field tab "Main" (issue #12711) */
+#entryEditor .all-fields-container {
+    -fx-padding: 10 15 10 15;
+    -fx-spacing: 8;
+    -fx-background-color: -fx-control-inner-background;
+}
+
+#entryEditor .editorPane.all-fields-list {
+    -fx-vgap: 8;
+    -fx-padding: 0;
+}
+
+/* Collapsible sections: flat look instead of the default TitledPane box */
+#entryEditor .all-fields-section-pane {
+    -fx-box-border: transparent;
+}
+
+#entryEditor .all-fields-section-pane > .title {
+    -fx-background-color: transparent;
+    -fx-font-weight: bold;
+    -fx-padding: 6 0 4 0;
+    -fx-border-color: transparent transparent -fx-outer-border transparent;
+}
+
+#entryEditor .all-fields-section-pane > *.content {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 6 0 4 16;
+}
+
+#entryEditor .all-fields-section-content {
+    -fx-spacing: 8;
+}
+
+#entryEditor .all-fields-add-chips {
+    -fx-hgap: 6;
+    -fx-vgap: 6;
+}
+
+#entryEditor .all-fields-add-chip {
+    -fx-background-radius: 14;
+    -fx-padding: 3 12 3 12;
+}
+
+#entryEditor .all-fields-add-free-form {
+    -fx-spacing: 6;
+    -fx-padding: 4 0 0 0;
+}
+
 #entryEditor Text {
     -fx-text-fill: -fx-text-base-color;
     -fx-fill: -fx-text-base-color;
@@ -1185,6 +1234,16 @@ We want to have a look that matches our icons in the tool-bar */
     -glyph-size: 1.0em;
     -fx-fill: -jr-theme;
     -fx-text-fill: -jr-theme;
+}
+
+#entryEditor .field-remove-button {
+    -fx-background-color: transparent;
+}
+
+#entryEditor .field-remove-button .glyph-icon,
+#entryEditor .field-remove-button .ikonli-font-icon {
+    -fx-fill: -jr-gray-2;
+    -fx-text-fill: -jr-gray-2;
 }
 
 #entryEditor .warning-icon {
@@ -2455,6 +2514,12 @@ journalInfo .grid-cell-b {
     -fx-padding: 0.5em 0 0.5em 0;
 }
 
+/* Row height for the linked-files ListView. Expressed in em so theming and font scaling adjust it;
+   LinkedFilesEditor binds the ListView pref/max height to this fixed cell size. */
+.linked-files-list {
+    -fx-fixed-cell-size: 2.3em;
+}
+
 .delete-files-dialog {
     -fx-padding: 10px;
     -fx-background-color: -fx-background;
@@ -2465,4 +2530,30 @@ journalInfo .grid-cell-b {
     -fx-background-color: transparent;
     -fx-background-insets: 0, 0;
     -fx-padding: 0;
+}
+
+/* Preview (PreviewViewer): match the entry editor's white content background instead of the
+   transparent one .scroll-pane/.stack-pane get by default (jabref-javafx.css). */
+.preview-viewer,
+.preview-viewer > .viewport {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.preview-viewer-content {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+/* JavaFX incubator RichTextArea (entry preview, AI summary).
+   Modena styles it from -fx-accent, which JabRef deliberately sets to red
+   as an "unthemed control" canary - so map it to the JabRef palette here. */
+.rich-text-area .selection-highlight {
+    -fx-fill: derive(-jr-accent, 20%);
+}
+
+.rich-text-area .caret {
+    -fx-stroke: -fx-text-background-color;
+}
+
+.rich-text-area .caret-line {
+    -fx-fill: transparent;
 }
