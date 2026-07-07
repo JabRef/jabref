@@ -1,10 +1,12 @@
 package org.jabref.gui.preview;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -24,16 +26,22 @@ import org.jabref.gui.importer.BookCoverFetcher;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.Highlighter;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.gui.util.WebViewStore;
+
 import org.jabref.htmltonode.HtmlRenderOptions;
 import org.jabref.htmltonode.rich.RichHtmlView;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.format.Number;
+import org.jabref.logic.pdf.EntryAnnotationImporter;
+import org.jabref.logic.pdf.FileAnnotationPreview;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.search.query.SearchQuery;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -59,6 +67,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private final WorkspacePreferences workspacePreferences;
 
     private final BookCoverFetcher bookCoverFetcher;
+
+    private final AtomicLong latestRequestId = new AtomicLong(0);
+    private final DelayTaskThrottler previewThrottler = new DelayTaskThrottler(400);
 
     private @Nullable BibDatabaseContext databaseContext;
     private @Nullable BibEntry entry;
@@ -181,22 +192,45 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     databaseContext == null ? "null" : databaseContext,
                     entry == null ? "null" : entry,
                     layout == null ? "null" : layout);
+            previewThrottler.cancel();
+            latestRequestId.incrementAndGet();
             setPreviewText("");
             return;
         }
 
-        Number.serialExportNumber = 1;
-        BibEntry currentEntry = entry;
+        previewThrottler.schedule(() -> {
+            long requestId = latestRequestId.incrementAndGet();
+            BibEntry currentEntry = this.entry;
+            BibDatabaseContext currentDatabaseContext = this.databaseContext;
+            PreviewLayout currentLayout = this.layout;
+            var filePreferences = preferences.getFilePreferences();
 
-        BackgroundTask.wrap(() -> layout.generatePreview(currentEntry, databaseContext))
-                      .onSuccess(previewText -> {
-                          setPreviewText(previewText);
-                          if (preferences.getPreviewPreferences().shouldDownloadCovers()) {
-                              downloadCoverAndRefresh(currentEntry, previewText);
-                          }
-                      })
-                      .onFailure(e -> setPreviewText(formatError(currentEntry, e)))
-                      .executeWith(taskExecutor);
+            BackgroundTask.wrap(() -> generatePreviewWithAnnotations(currentEntry, filePreferences))
+                          .onSuccess(htmlComplete -> {
+                              if (requestId == latestRequestId.get()
+                                      && Objects.equals(currentEntry, this.entry)
+                                      && Objects.equals(currentDatabaseContext, this.databaseContext)
+                                      && (currentLayout == null || Objects.equals(currentLayout, this.layout))) {
+                                  setPreviewText(htmlComplete);
+
+                                  if (preferences.getPreviewPreferences().shouldDownloadCovers()) {
+                                      downloadCoverAndRefresh(currentEntry, htmlComplete);
+                                  }
+                              } else {
+                                  LOGGER.debug("Stale preview task discarded for entry: {}",
+                                          currentEntry != null ? currentEntry.getCitationKey().orElse("") : "");
+                              }
+                          })
+                          .onFailure(exception -> {
+                              if (requestId == latestRequestId.get() && currentEntry != null) {
+                                  String errorHtml = formatError(currentEntry, exception);
+                                  setPreviewText(errorHtml);
+                              } else {
+                                  LOGGER.error("Error generating preview text", exception);
+                              }
+                          })
+                          .executeWith(taskExecutor);
+        });
     }
 
     private void downloadCoverAndRefresh(BibEntry entry, String previewText) {
@@ -374,5 +408,37 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     public String getSelectionHtmlContent() {
         // The selection is plain text; only the whole-preview fallback carries markup
         return previewView.getSelectedText().orElseGet(() -> layoutText == null ? "" : layoutText);
+    }
+
+    private String generatePreviewWithAnnotations(BibEntry currentEntry, FilePreferences filePreferences) {
+        if (currentEntry == null || databaseContext == null || layout == null) {
+            return "";
+        }
+
+        try {
+            Field field = org.jabref.logic.layout.format.Number.class.getDeclaredField("serialExportNumber");
+            field.setAccessible(true);
+            field.setInt(null, 1);
+        } catch (Exception e) {
+            LOGGER.warn("Could not reset Number.serialExportNumber", e);
+        }
+
+        StringBuilder previewHtml = new StringBuilder(layout.generatePreview(currentEntry, databaseContext));
+
+        try {
+            EntryAnnotationImporter entryAnnotationImporter = new EntryAnnotationImporter(currentEntry);
+            java.util.Map<java.nio.file.Path, List<FileAnnotation>> annotationsMap =
+                    entryAnnotationImporter.importAnnotationsFromFiles(databaseContext, filePreferences);
+
+            if (annotationsMap != null && !annotationsMap.isEmpty()) {
+                String annotationsHtml = FileAnnotationPreview.render(annotationsMap);
+                previewHtml.append(annotationsHtml);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Failed to read PDF annotations for preview", e);
+            throw new RuntimeException("Error loading PDF annotations", e);
+        }
+
+        return previewHtml.toString();
     }
 }
