@@ -25,7 +25,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.support.BibEntryAssert;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -130,7 +129,7 @@ class HayagrivaImporterTest {
     @MethodSource("roundTripEntries")
     void roundTripPreservesAllFields(String caseName, BibEntry original, @TempDir Path tempDir) throws Exception {
         BibEntry imported = roundTrip(original, tempDir);
-        BibEntryAssert.assertEquals(original, imported);
+        assertEquals(original, imported);
     }
 
     @Test
