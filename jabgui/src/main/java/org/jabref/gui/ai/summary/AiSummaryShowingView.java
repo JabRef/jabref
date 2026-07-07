@@ -110,12 +110,12 @@ public class AiSummaryShowingView extends VBox {
     }
 
     private void setupListeners() {
-        BindingsHelper.listen(viewModel.summaryContentProperty(), _ -> updateContent());
+        BindingsHelper.listen(viewModel.summaryProperty(), _ -> updateContent());
         BindingsHelper.listen(viewModel.isMarkdownProperty(), _ -> updateContent());
     }
 
     private void updateContent() {
-        String content = StringUtil.makeSafe(viewModel.summaryContentProperty().get());
+        String content = StringUtil.makeSafe(viewModel.summaryProperty().map(AiSummary::content).getValue());
         UiTaskExecutor.runInJavaFXThread(() -> {
             if (viewModel.isMarkdownProperty().get()) {
                 markdownTextFlow.setMarkdown(content);

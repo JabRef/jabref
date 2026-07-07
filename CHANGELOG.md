@@ -40,7 +40,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- The AI summary tab now renders Markdown directly as JavaFX nodes instead of converting it to HTML and displaying it in a `WebView`, matching how AI chat messages are rendered. [#16189](https://github.com/JabRef/jabref/pull/16189)
+- AI summaries now render with regular JavaFX components instead of an embedded browser, matching how AI chat messages are rendered. [#16189](https://github.com/JabRef/jabref/pull/16189)
 - We increased the size of arrow buttons in the Entry Preview preferences tab to improve visibility. [#16028](https://github.com/JabRef/jabref/issues/16028)
 - We now render the entry preview with regular JavaFX components instead of an embedded browser. Text in the preview can be selected with mouse and keyboard and copied; without a selection, "Copy selection" copies the whole preview. [#16145](https://github.com/JabRef/jabref/pull/16145)
 - We replaced the "MathSciNet Review" entry editor tab by identifier support for the "MR Number" field: a button next to the field opens the MathSciNet page in the web browser. [#16145](https://github.com/JabRef/jabref/pull/16145)

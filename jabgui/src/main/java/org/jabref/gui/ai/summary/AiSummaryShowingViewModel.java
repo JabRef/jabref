@@ -4,13 +4,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
@@ -40,8 +37,6 @@ public class AiSummaryShowingViewModel extends AbstractViewModel {
     private final ObjectProperty<FullBibEntry> entry = new SimpleObjectProperty<>();
     private final BooleanProperty isMarkdown = new SimpleBooleanProperty(true);
 
-    private final StringProperty summaryContent = new SimpleStringProperty("");
-
     private final ObjectProperty<EventHandler<ActionEvent>> onRegenerate = new SimpleObjectProperty<>();
     private final ObjectProperty<EventHandler<ActionEvent>> onRegenerateCustom = new SimpleObjectProperty<>();
 
@@ -60,23 +55,6 @@ public class AiSummaryShowingViewModel extends AbstractViewModel {
         this.fieldPreferences = fieldPreferences;
         this.entryTypesManager = entryTypesManager;
         this.dialogService = dialogService;
-
-        setupBindings();
-    }
-
-    private void setupBindings() {
-        summaryContent.bind(Bindings.createObjectBinding(
-                this::generateSummaryContent,
-                summary
-        ));
-    }
-
-    private String generateSummaryContent() {
-        if (summary.get() == null) {
-            return "";
-        }
-
-        return summary.get().content();
     }
 
     public void regenerate() {
@@ -157,10 +135,6 @@ public class AiSummaryShowingViewModel extends AbstractViewModel {
 
     public BooleanProperty isMarkdownProperty() {
         return isMarkdown;
-    }
-
-    public StringProperty summaryContentProperty() {
-        return summaryContent;
     }
 
     public ObjectProperty<EventHandler<ActionEvent>> onRegenerateProperty() {

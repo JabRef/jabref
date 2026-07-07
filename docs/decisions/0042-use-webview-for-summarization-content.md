@@ -1,11 +1,14 @@
 ---
 nav_order: 0042
 parent: Decision Records
+status: "superseded by ADR-0066"
 ---
 
-# Use `WebView` for Chat Message Content
+# Use `WebView` for Summarization Content
 
-> **Superseded**: `SelectableTextFlow` (see [ADR-0036](./0036-use-markdown-for-chat-content.md)) now supports text selection and copying, removing the reason this ADR gave for treating summaries differently from chat messages. The AI summary tab was migrated from `WebView` to `MarkdownTextFlow`, the same component used for chat messages.
+> [!NOTE]
+> This decision is **superseded by [ADR-0066](0066-use-markdowntextflow-for-summarization-content.md)**.
+> `SelectableTextFlow` (see [ADR-0036](0036-use-markdown-for-chat-content.md)) now supports text selection and copying, removing the reason this ADR gave for rendering summaries with a `WebView` rather than reusing the chat message component. The AI summary tab now renders Markdown with `MarkdownTextFlow`, the same component used for chat messages.
 
 ## Context and Problem Statement
 
