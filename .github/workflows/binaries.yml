@@ -610,10 +610,6 @@ jobs:
         run: |
           set -euo pipefail
 
-          find_runtime_java() {
-            find "$1" -path "*/bin/java" -type f -print -quit
-          }
-
           case "${{ matrix.os }}" in
             ubuntu-22.04)
               expected="embedded.postgres.binaries.linux.amd64"
@@ -641,8 +637,8 @@ jobs:
               ;;
           esac
 
-          runtime_java="$(find_runtime_java "jabgui/build/packages/${{ matrix.os }}/JabRef")"
-          if [[ -z "$runtime_java" ]]; then
+          runtime_java="jabgui/build/packages/${{ matrix.os }}/JabRef/lib/runtime/bin/java"
+          if [[ ! -x "$runtime_java" ]]; then
             echo "Could not find packaged Java runtime in JabRef app image."
             exit 1
           fi
@@ -663,8 +659,8 @@ jobs:
             "jabkit/build/packages/${{ matrix.os }}/jabkit" \
             "jabls-cli/build/packages/${{ matrix.os }}/jabls" \
             "jabsrv-cli/build/packages/${{ matrix.os }}/jabsrv"; do
-            runtime_java="$(find_runtime_java "$image")"
-            if [[ -z "$runtime_java" ]]; then
+            runtime_java="$image/lib/runtime/bin/java"
+            if [[ ! -x "$runtime_java" ]]; then
               echo "Could not find packaged Java runtime in $image."
               exit 1
             fi
