@@ -20,13 +20,15 @@ import static picocli.CommandLine.Option;
                 Convert.class,
                 DoiToBibtex.class,
                 Fetch.class,
+                FetchByIdentifier.class,
                 GenerateBibFromAux.class,
                 GetCitedWorks.class,
                 GetCitingWorks.class,
                 Pdf.class,
                 Preferences.class,
                 Pseudonymize.class,
-                Search.class
+                Search.class,
+                UpdateByIdentifier.class
         })
 public class JabKit implements Runnable {
 
