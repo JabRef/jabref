@@ -5,11 +5,14 @@ import java.util.Objects;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
+import org.jspecify.annotations.NullMarked;
+
 /// Matches entries that have no (non-blank) value in a given field.
 ///
-/// This group is generated dynamically as a subgroup of an {@link AutomaticKeywordGroup} to collect
+/// This group is generated dynamically as a subgroup of an [AutomaticKeywordGroup] to collect
 /// the entries that do not fall into any of the keyword subgroups (e.g. entries without a ranking).
-/// It is never persisted on its own: the parent {@link AutomaticKeywordGroup} recreates it on the fly.
+/// It is never persisted on its own: the parent [AutomaticKeywordGroup] recreates it on the fly.
+@NullMarked
 public class WithoutKeywordGroup extends AbstractGroup {
 
     private final Field field;
@@ -26,8 +29,7 @@ public class WithoutKeywordGroup extends AbstractGroup {
     @Override
     public boolean contains(BibEntry entry) {
         return entry.getField(field)
-                    .map(String::strip)
-                    .map(String::isEmpty)
+                    .map(String::isBlank)
                     .orElse(true);
     }
 
