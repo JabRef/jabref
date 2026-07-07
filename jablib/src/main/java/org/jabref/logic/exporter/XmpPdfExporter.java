@@ -27,10 +27,12 @@ public class XmpPdfExporter extends Exporter {
     private static final Logger LOGGER = LoggerFactory.getLogger(XmpPdfExporter.class);
 
     private final XmpPreferences xmpPreferences;
+    private final XmpUtilWriter xmpUtilWriter;
 
     public XmpPdfExporter(XmpPreferences xmpPreferences) {
         super("pdf", Localization.lang("XMP-annotated PDF"), StandardFileType.PDF);
         this.xmpPreferences = xmpPreferences;
+        this.xmpUtilWriter = new XmpUtilWriter(xmpPreferences);
     }
 
     @Override
@@ -58,7 +60,7 @@ public class XmpPdfExporter extends Exporter {
             }
         }
         if (!entries.isEmpty()) {
-            new XmpUtilWriter(xmpPreferences).writeXmp(filePath, entries, databaseContext.getDatabase());
+            xmpUtilWriter.writeXmp(filePath, entries, databaseContext.getDatabase());
         }
     }
 }
