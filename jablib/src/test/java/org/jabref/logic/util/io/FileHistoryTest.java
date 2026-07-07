@@ -125,4 +125,15 @@ class FileHistoryTest {
 
         assertFalse(history.contains(outside));
     }
+
+    @Test
+    void removeItemHandlesPathWithDifferentRoot() {
+        Path differentRoot = Path.of("H:\\somefile.lnk");
+
+        history.newFile(differentRoot);
+
+        history.removeItem(differentRoot);
+
+        assertFalse(history.contains(differentRoot));
+    }
 }
