@@ -101,6 +101,10 @@ tasks.named<JavaExec>("run") {
     enableAssertions = true
 }
 
+// These modules need to be present in every jpackage runtime image. Keeping them named separately
+// avoids mixing shared image requirements with target-specific embedded Postgres binaries.
+val sharedJpackageImageModules = listOf("jdk.incubator.vector")
+
 val embeddedPostgresBinaryByJpackageTask = mapOf(
     "jpackageUbuntu-22.04" to "embedded.postgres.binaries.linux.amd64",
     "jpackageUbuntu-22.04-arm" to "embedded.postgres.binaries.linux.arm64v8",
@@ -125,7 +129,7 @@ javaModulePackaging {
     applicationDescription = "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX."
     vendor = "JabRef e.V."
 
-    addModules.add("jdk.incubator.vector")
+    addModules.addAll(sharedJpackageImageModules)
 
     // general jLinkOptions are set in org.jabref.gradle.base.targets.gradle.kts
     jlinkOptions.addAll("--launcher", "JabRef=org.jabref/org.jabref.Launcher")
@@ -225,7 +229,8 @@ dependencies {
 
 embeddedPostgresBinaryByJpackageTask.forEach { (taskName, moduleName) ->
     tasks.named<Jpackage>(taskName) {
-        addModules.addAll(moduleName, "jdk.incubator.vector")
+        addModules.add(moduleName)
+        addModules.addAll(sharedJpackageImageModules)
     }
 }
 
