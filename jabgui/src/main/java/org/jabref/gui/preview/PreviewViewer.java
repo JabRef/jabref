@@ -107,13 +107,16 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         workspacePreferences.mainFontSizeProperty().addListener((_, _, _) -> updateBaseFontSize());
     }
 
-    /// @return the base font size in points, matching whatever [org.jabref.gui.theme.ThemeManager]
-    /// applies to the rest of the UI via the scene root's "-fx-font-size" (the preview cannot rely on that
-    /// CSS cascade itself, since its text nodes get an explicit `Font` instead of an inherited one)
+    /// @return the base font size in CSS pixels (JavaFX user units), matching whatever
+    /// [org.jabref.gui.theme.ThemeManager] applies to the rest of the UI via the scene root's
+    /// "-fx-font-size". ThemeManager expresses the size in CSS `pt` (`-fx-font-size: Xpt`), but
+    /// `Font.font(size)` in the JavaFX Font API takes CSS pixels (user units), not typographic
+    /// points — so the stored pt value must be converted (1pt = 96/72 px).
     private double resolveBaseFontSize() {
-        return workspacePreferences.shouldOverrideDefaultFontSize()
-               ? workspacePreferences.getMainFontSize()
-               : WorkspacePreferences.getDefault().getMainFontSize();
+        double pt = workspacePreferences.shouldOverrideDefaultFontSize()
+                    ? workspacePreferences.getMainFontSize()
+                    : WorkspacePreferences.getDefault().getMainFontSize();
+        return pt * 96.0 / 72.0;
     }
 
     private void updateBaseFontSize() {
