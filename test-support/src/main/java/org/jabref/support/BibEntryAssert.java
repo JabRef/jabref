@@ -25,6 +25,17 @@ import static org.mockito.Mockito.mock;
 /// TODO: Make this a "public" class to enable jablib consumers benefitting from it, too.
 public class BibEntryAssert {
 
+    /// Compares two BibEntry objects directly, field by field (via BibEntry#equals).
+    ///
+    /// @param expected the entry you expect
+    /// @param actual   the entry to compare with
+    public static void assertEquals(BibEntry expected, BibEntry actual) {
+        assertNotNull(expected);
+        assertNotNull(actual);
+        // explicit reference of Assertions is needed here to disambiguate from the methods defined by this class
+        Assertions.assertEquals(expected, actual);
+    }
+
     /// Reads a single entry from the resource using `getResourceAsStream` from the given class. The resource has to
     /// contain a single entry
     ///

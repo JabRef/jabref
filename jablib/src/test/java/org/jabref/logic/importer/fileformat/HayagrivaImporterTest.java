@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -24,10 +25,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.support.BibEntryAssert;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 import tools.jackson.databind.exc.MismatchedInputException;
 
@@ -53,7 +58,6 @@ class HayagrivaImporterTest {
                 mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 SaveOrder.getDefaultSaveOrder(),
                 BlankLineBehaviour.DELETE_BLANKS);
-
         hayagrivaImporter = new HayagrivaImporter();
         databaseContext = new BibDatabaseContext();
     }
@@ -61,7 +65,6 @@ class HayagrivaImporterTest {
     private BibEntry roundTrip(BibEntry entry, Path tempDir) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         Path file = tempDir.resolve("roundtrip.yml");
         Files.createFile(file);
-
         hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
 
         try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
@@ -72,95 +75,62 @@ class HayagrivaImporterTest {
         }
     }
 
-    @Test
-    void roundTripPreservesBasicFields(@TempDir Path tempDir) throws Exception {
-        BibEntry original = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("test")
-                .withField(StandardField.AUTHOR, "Test Author")
-                .withField(StandardField.TITLE, "Test Title")
-                .withField(StandardField.URL, "http://example.com")
-                .withField(StandardField.DATE, "2020-10-14");
-
-        BibEntry imported = roundTrip(original, tempDir);
-
-        assertEquals(original.getField(StandardField.TITLE), imported.getField(StandardField.TITLE));
-        assertEquals(original.getField(StandardField.AUTHOR), imported.getField(StandardField.AUTHOR));
-        assertEquals(original.getField(StandardField.URL), imported.getField(StandardField.URL));
-        assertEquals(original.getField(StandardField.DATE), imported.getField(StandardField.DATE));
+    private static Stream<Arguments> roundTripEntries() {
+        return Stream.of(
+                Arguments.of("basicFields",
+                        new BibEntry(StandardEntryType.Article)
+                                .withCitationKey("test")
+                                .withField(StandardField.AUTHOR, "Test Author")
+                                .withField(StandardField.TITLE, "Test Title")
+                                .withField(StandardField.URL, "http://example.com")
+                                .withField(StandardField.DATE, "2020-10-14")),
+                Arguments.of("multipleAuthors",
+                        new BibEntry(StandardEntryType.Article)
+                                .withCitationKey("test")
+                                .withField(StandardField.AUTHOR, "Test Author and Other One")
+                                .withField(StandardField.TITLE, "Test Title")
+                                .withField(StandardField.URL, "http://example.com")
+                                .withField(StandardField.DATE, "2020-10-14")),
+                Arguments.of("doi",
+                        new BibEntry(StandardEntryType.Article)
+                                .withCitationKey("test")
+                                .withField(StandardField.AUTHOR, "Test Author")
+                                .withField(StandardField.TITLE, "Test Title")
+                                .withField(StandardField.URL, "http://example.com")
+                                .withField(StandardField.DATE, "2020-10-14")
+                                .withField(StandardField.DOI, "10.1109/EDOC.2018.00030")),
+                Arguments.of("isbn",
+                        new BibEntry(StandardEntryType.Book)
+                                .withCitationKey("test")
+                                .withField(StandardField.AUTHOR, "Test Author")
+                                .withField(StandardField.TITLE, "Test Book")
+                                .withField(StandardField.URL, "http://example.com")
+                                .withField(StandardField.DATE, "2020-10-14")
+                                .withField(StandardField.ISBN, "978-3-16-148410-0")),
+                Arguments.of("issn",
+                        new BibEntry(StandardEntryType.Article)
+                                .withCitationKey("test")
+                                .withField(StandardField.AUTHOR, "Test Author")
+                                .withField(StandardField.TITLE, "Test Article")
+                                .withField(StandardField.URL, "http://example.com")
+                                .withField(StandardField.DATE, "2020-10-14")
+                                .withField(StandardField.ISSN, "0896-3207")),
+                Arguments.of("journalAsParentTitle",
+                        new BibEntry(StandardEntryType.Article)
+                                .withCitationKey("test")
+                                .withField(StandardField.AUTHOR, "Test Author")
+                                .withField(StandardField.TITLE, "Test Title")
+                                .withField(StandardField.JOURNAL, "Test Publisher")
+                                .withField(StandardField.URL, "http://example.com")
+                                .withField(StandardField.DATE, "2020-10-14"))
+        );
     }
 
-    @Test
-    void roundTripPreservesMultipleAuthors(@TempDir Path tempDir) throws Exception {
-        BibEntry original = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("test")
-                .withField(StandardField.AUTHOR, "Test Author and Other One")
-                .withField(StandardField.TITLE, "Test Title")
-                .withField(StandardField.URL, "http://example.com")
-                .withField(StandardField.DATE, "2020-10-14");
-
+    @ParameterizedTest(name = "roundTripPreserves[{0}]")
+    @MethodSource("roundTripEntries")
+    void roundTripPreservesAllFields(String caseName, BibEntry original, @TempDir Path tempDir) throws Exception {
         BibEntry imported = roundTrip(original, tempDir);
-
-        assertEquals(original.getField(StandardField.AUTHOR), imported.getField(StandardField.AUTHOR));
-    }
-
-    @Test
-    void roundTripPreservesDoi(@TempDir Path tempDir) throws Exception {
-        BibEntry original = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("test")
-                .withField(StandardField.AUTHOR, "Test Author")
-                .withField(StandardField.TITLE, "Test Title")
-                .withField(StandardField.URL, "http://example.com")
-                .withField(StandardField.DATE, "2020-10-14")
-                .withField(StandardField.DOI, "10.1109/EDOC.2018.00030");
-
-        BibEntry imported = roundTrip(original, tempDir);
-
-        assertEquals(original.getField(StandardField.DOI), imported.getField(StandardField.DOI));
-    }
-
-    @Test
-    void roundTripPreservesIsbn(@TempDir Path tempDir) throws Exception {
-        BibEntry original = new BibEntry(StandardEntryType.Book)
-                .withCitationKey("test")
-                .withField(StandardField.AUTHOR, "Test Author")
-                .withField(StandardField.TITLE, "Test Book")
-                .withField(StandardField.URL, "http://example.com")
-                .withField(StandardField.DATE, "2020-10-14")
-                .withField(StandardField.ISBN, "978-3-16-148410-0");
-
-        BibEntry imported = roundTrip(original, tempDir);
-
-        assertEquals(original.getField(StandardField.ISBN), imported.getField(StandardField.ISBN));
-    }
-
-    @Test
-    void roundTripPreservesIssn(@TempDir Path tempDir) throws Exception {
-        BibEntry original = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("test")
-                .withField(StandardField.AUTHOR, "Test Author")
-                .withField(StandardField.TITLE, "Test Article")
-                .withField(StandardField.URL, "http://example.com")
-                .withField(StandardField.DATE, "2020-10-14")
-                .withField(StandardField.ISSN, "0896-3207");
-
-        BibEntry imported = roundTrip(original, tempDir);
-
-        assertEquals(original.getField(StandardField.ISSN), imported.getField(StandardField.ISSN));
-    }
-
-    @Test
-    void roundTripPreservesJournalAsParentTitle(@TempDir Path tempDir) throws Exception {
-        BibEntry original = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("test")
-                .withField(StandardField.AUTHOR, "Test Author")
-                .withField(StandardField.TITLE, "Test Title")
-                .withField(StandardField.JOURNAL, "Test Publisher")
-                .withField(StandardField.URL, "http://example.com")
-                .withField(StandardField.DATE, "2020-10-14");
-
-        BibEntry imported = roundTrip(original, tempDir);
-
-        assertEquals(original.getField(StandardField.JOURNAL), imported.getField(StandardField.JOURNAL));
+        BibEntryAssert.assertEquals(original, imported);
     }
 
     @Test
@@ -171,7 +141,6 @@ class HayagrivaImporterTest {
                 .withField(StandardField.TITLE, "Test Title")
                 .withField(StandardField.URL, "http://example.com")
                 .withField(StandardField.DATE, "2020-10-14");
-
         Path file = tempDir.resolve("valid.yml");
         Files.createFile(file);
         hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
