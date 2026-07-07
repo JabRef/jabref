@@ -226,24 +226,18 @@ class MainTableDataModelTest {
         BibEntryTableViewModel organicViewModel =
                 model.getViewModelByCitationKey("organic").orElseThrow();
 
-        // First search request.
         searchQueryProperty.setValue(
                 Optional.of(new SearchQuery("title=Quantum")));
 
-        // Second, newer search request.
         searchQueryProperty.setValue(
                 Optional.of(new SearchQuery("title=Organic")));
 
         assertEquals(2, submittedTasks.size());
 
-        // Simulate out-of-order completion:
-        // the newer search finishes first...
         executeTask(submittedTasks.get(1));
 
-        // ...then the older search finishes late.
         executeTask(submittedTasks.get(0));
 
-        // The latest query must still win.
         assertFalse(quantumViewModel.isMatchedBySearch().get());
         assertTrue(organicViewModel.isMatchedBySearch().get());
         assertEquals(1, resultSize.get());
