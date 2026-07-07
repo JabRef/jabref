@@ -266,6 +266,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         aiService.setupDatabase(bibDatabaseContext, isDummyContext);
 
+        // [impl->req~ux.library-tab-entry-count-badge~1]
         bindEntryCountBadge();
         setGraphic(entryCountBadge);
 
