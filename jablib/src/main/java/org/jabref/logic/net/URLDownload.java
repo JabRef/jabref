@@ -70,7 +70,7 @@ import org.slf4j.LoggerFactory;
 /// Nothing is cached.
 public class URLDownload {
 
-    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:130.0) Gecko/20100101 Firefox/130.0";
+    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0";
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownload.class);
     private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(30);
     private static final int MAX_RETRIES = 3;
@@ -83,7 +83,8 @@ public class URLDownload {
 
     private String postData = "";
     private Duration connectTimeout = DEFAULT_CONNECT_TIMEOUT;
-    private SSLContext sslContext;
+    // Can be null if SSL is not supported. If null, then ignore.
+    private @Nullable SSLContext sslContext;
 
     static {
         Unirest.config()
@@ -255,8 +256,15 @@ public class URLDownload {
 
     /// Uses the web resource as source and creates a monitored input stream.
     public ProgressInputStream asInputStream() throws FetcherException {
-        HttpURLConnection urlConnection = (HttpURLConnection) this.openConnection();
-        return asInputStream(urlConnection);
+        URLConnection connection = this.openConnection();
+        if (connection instanceof HttpURLConnection httpURLConnection) {
+            return asInputStream(httpURLConnection);
+        }
+        try {
+            return new ProgressInputStream(new BufferedInputStream(connection.getInputStream()), connection.getContentLengthLong());
+        } catch (IOException e) {
+            throw new FetcherException("Error getting input stream", e);
+        }
     }
 
     /// Uses the web resource as source and creates a monitored input stream.

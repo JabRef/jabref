@@ -38,7 +38,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
-import com.google.common.base.Joiner;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -559,7 +558,7 @@ public class ModsImporter extends Importer implements Parser {
                 // we have to check if forename and family name are not empty in case it's the first author
                 if (!foreName.isEmpty() && !familyName.isEmpty()) {
                     // now set and add the old author
-                    author = familyName + ", " + Joiner.on(" ").join(foreName);
+                    author = familyName + ", " + String.join(" ", foreName);
                     authors.add(author);
                     // remove old forenames
                     foreName.clear();
@@ -574,7 +573,7 @@ public class ModsImporter extends Importer implements Parser {
 
         // last author is not added, so do it here
         if (!foreName.isEmpty() && !familyName.isEmpty()) {
-            author = familyName + ", " + Joiner.on(" ").join(foreName);
+            author = familyName + ", " + String.join(" ", foreName);
             authors.add(author.trim());
             foreName.clear();
         } else if (foreName.isEmpty() && !familyName.isEmpty()) {

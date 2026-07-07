@@ -58,7 +58,7 @@ public class MergeLibraryAction extends SimpleCommand {
                                                   .orElse(preferences.getImporterPreferences().getImportWorkingDirectory());
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                    .addExtensionFilter(FileFilterConverter.toExtensionFilter(Localization.lang("BibTeX"), StandardFileType.BIBTEX_DB))
+                    .addExtensionFilter(FileFilterConverter.toExtensionFilter("BibTeX", StandardFileType.BIBTEX_DB))
                     .withDefaultExtension(StandardFileType.BIBTEX_DB)
                     .withInitialDirectory(initialDirectory)
                     .build();

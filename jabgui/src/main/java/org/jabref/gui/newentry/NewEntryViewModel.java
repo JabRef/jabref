@@ -66,8 +66,8 @@ public class NewEntryViewModel {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final UiTaskExecutor taskExecutor;
-    private final AiService aiService;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final AiService aiService;
 
     private final BookCoverFetcher bookCoverFetcher;
 
@@ -99,15 +99,15 @@ public class NewEntryViewModel {
                              DialogService dialogService,
                              StateManager stateManager,
                              UiTaskExecutor taskExecutor,
-                             AiService aiService,
-                             FileUpdateMonitor fileUpdateMonitor) {
+                             FileUpdateMonitor fileUpdateMonitor,
+                             AiService aiService) {
         this.preferences = preferences;
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
-        this.aiService = aiService;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.aiService = aiService;
 
         this.bookCoverFetcher = new BookCoverFetcher(preferences.getExternalApplicationsPreferences());
 
@@ -141,6 +141,9 @@ public class NewEntryViewModel {
                 ValidationMessage.error(Localization.lang("You must specify one (or more) citations.")));
         interpretParsers = new SimpleListProperty<>(FXCollections.observableArrayList());
         interpretParsers.addAll(PlainCitationParserChoice.values());
+        if (!preferences.getAiPreferences().getAiFeaturesEnabled()) {
+            interpretParsers.remove(PlainCitationParserChoice.LLM);
+        }
         interpretParser = new SimpleObjectProperty<>();
         interpretWorker = null;
 
@@ -374,7 +377,19 @@ public class NewEntryViewModel {
                 return Optional.empty();
             }
 
-            final PlainCitationParser parser = PlainCitationParserFactory.getPlainCitationParser(parserChoice, preferences.getCitationKeyPatternPreferences(), preferences.getGrobidPreferences(), preferences.getImportFormatPreferences(), aiService);
+            final PlainCitationParser parser;
+            if (parserChoice == PlainCitationParserChoice.LLM) {
+                parser = PlainCitationParserFactory.getLlmPlainCitationParser(
+                        preferences.getImportFormatPreferences(),
+                        preferences.getAiPreferences(),
+                        aiService.getCurrentChatModel());
+            } else {
+                parser = PlainCitationParserFactory.getPlainCitationParser(
+                        parserChoice,
+                        preferences.getCitationKeyPatternPreferences(),
+                        preferences.getGrobidPreferences(),
+                        preferences.getImportFormatPreferences());
+            }
 
             final List<BibEntry> entries = parser.parseMultiplePlainCitations(text);
 

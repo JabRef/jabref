@@ -79,16 +79,6 @@ public class PreviewPreferences {
         return defaults;
     }
 
-    public void setAll(PreviewPreferences previewPreferences) {
-        this.layoutCycle.setAll(previewPreferences.layoutCycle);
-        this.layoutCyclePosition.setValue(previewPreferences.layoutCyclePosition.getValue());
-        this.customPreviewLayout.setValue(previewPreferences.customPreviewLayout.getValue());
-        this.showPreviewAsExtraTab.setValue(previewPreferences.showPreviewAsExtraTab.getValue());
-        this.showPreviewEntryTableTooltip.setValue(previewPreferences.showPreviewEntryTableTooltip.getValue());
-        this.bstPreviewLayoutPaths.setAll(previewPreferences.bstPreviewLayoutPaths);
-        this.shouldDownloadCovers.setValue(previewPreferences.shouldDownloadCovers.getValue());
-    }
-
     public ObservableList<PreviewLayout> getLayoutCycle() {
         return layoutCycle;
     }
@@ -105,11 +95,8 @@ public class PreviewPreferences {
         if (layoutCycle.isEmpty()) {
             this.layoutCyclePosition.setValue(0);
         } else {
-            int previewCyclePosition = position;
-            while (previewCyclePosition < 0) {
-                previewCyclePosition += layoutCycle.size();
-            }
-            this.layoutCyclePosition.setValue(previewCyclePosition % layoutCycle.size());
+            int newPosition = Math.floorMod(position, layoutCycle.size());
+            this.layoutCyclePosition.setValue(newPosition);
         }
     }
 

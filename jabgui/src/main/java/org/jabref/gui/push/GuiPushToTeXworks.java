@@ -18,7 +18,7 @@ public class GuiPushToTeXworks extends PushToTeXworks implements GuiPushToApplic
 
     @Override
     public JabRefIcon getApplicationIcon() {
-        return IconTheme.JabRefIcons.APPLICATION_TEXWORS;
+        return IconTheme.JabRefIcons.APPLICATION_TEXWORKS;
     }
 
     @Override

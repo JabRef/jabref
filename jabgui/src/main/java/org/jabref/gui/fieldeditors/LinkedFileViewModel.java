@@ -319,7 +319,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             // Display an error dialog if file is locked or inaccessible
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Rename failed"),
-                    Localization.lang("JabRef cannot access the file because it is being used by another process."));
+                    Localization.lang("Could not rename the file. The filename may be too long for your operating system, or the file is in use by another process."));
         }
     }
 
@@ -519,6 +519,16 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public LinkedFile getFile() {
         return linkedFile;
+    }
+
+    public List<BibEntry> getLinkedEntries() {
+        List<BibEntry> entries = new ArrayList<>();
+        for (BibEntry entry : databaseContext.getEntries()) {
+            if (entry.hasFile(linkedFile)) {
+                entries.add(entry);
+            }
+        }
+        return entries;
     }
 
     public ValidationStatus fileExistsValidationStatus() {

@@ -4,6 +4,8 @@ import javafx.collections.FXCollections;
 
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.ServerTest;
+import org.jabref.http.server.TestBibFile;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import jakarta.ws.rs.core.Application;
@@ -16,20 +18,27 @@ import org.mockito.Mockito;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CAYWResourceTest extends ServerTest {
+
+    private SrvStateManager mockSrv;
+
     @Override
     protected Application configure() {
         ResourceConfig resourceConfig = new ResourceConfig(CAYWResource.class);
-        addFilesToServeToResourceConfig(resourceConfig);
         addPreferencesToResourceConfig(resourceConfig);
         addGsonToResourceConfig(resourceConfig);
         addFormatterServiceToResourceConfig(resourceConfig);
 
+        BibDatabaseContext servedContext = new BibDatabaseContext();
+        servedContext.setDatabasePath(TestBibFile.GENERAL_SERVER_TEST.path);
+
+        mockSrv = Mockito.mock(SrvStateManager.class);
+        BibEntry bibEntry = new BibEntry().withCitationKey("Author2023test");
+        Mockito.when(mockSrv.getSelectedEntries()).thenReturn(FXCollections.observableArrayList(bibEntry));
+        Mockito.when(mockSrv.getOpenDatabases()).thenReturn(FXCollections.observableArrayList(servedContext));
+
         resourceConfig.register(new AbstractBinder() {
             @Override
             protected void configure() {
-                SrvStateManager mockSrv = Mockito.mock(SrvStateManager.class);
-                BibEntry bibEntry = new BibEntry().withCitationKey("Author2023test");
-                Mockito.when(mockSrv.getSelectedEntries()).thenReturn(FXCollections.observableArrayList(bibEntry));
                 bind(mockSrv).to(SrvStateManager.class);
             }
         });
@@ -59,6 +68,8 @@ class CAYWResourceTest extends ServerTest {
         assertEquals(200, response.getStatus());
         assertEquals("\\autocite{Author2023test}", response.readEntity(String.class));
         assertEquals("text/plain", response.getHeaderString("Content-Type"));
+        assertEquals("nosniff", response.getHeaderString("X-Content-Type-Options"));
+        assertEquals("default-src 'none'; frame-ancestors 'none'; base-uri 'none'", response.getHeaderString("Content-Security-Policy"));
     }
 
     @Test
@@ -73,5 +84,44 @@ class CAYWResourceTest extends ServerTest {
 
         assertEquals(400, response.getStatus());
         assertEquals("The 'command' parameter contains invalid characters. Only letters (A–Z, a–z) and '*' are allowed.", response.readEntity(String.class));
+    }
+
+    @Test
+    void servedLibraryPathIsAccepted() {
+        Response response = target("/better-bibtex/cayw")
+                .queryParam("format", "biblatex")
+                .queryParam("selected", "1")
+                .queryParam("librarypath", TestBibFile.GENERAL_SERVER_TEST.path.toString())
+                .request()
+                .get();
+
+        assertEquals(200, response.getStatus());
+        assertEquals("\\autocite{Author2023test}", response.readEntity(String.class));
+    }
+
+    @Test
+    void unknownLibraryPathReturnsBadRequest() {
+        Response response = target("/better-bibtex/cayw")
+                .queryParam("format", "biblatex")
+                .queryParam("selected", "1")
+                .queryParam("librarypath", "/tmp/not-served-library.bib")
+                .request()
+                .get();
+
+        assertEquals(400, response.getStatus());
+    }
+
+    @Test
+    void emptyOpenDatabasesDoesNotCrash() {
+        Mockito.when(mockSrv.getOpenDatabases()).thenReturn(FXCollections.observableArrayList());
+
+        Response response = target("/better-bibtex/cayw")
+                .queryParam("format", "biblatex")
+                .queryParam("selected", "1")
+                .queryParam("librarypath", "/tmp/not-served-library.bib")
+                .request()
+                .get();
+
+        assertEquals(400, response.getStatus());
     }
 }

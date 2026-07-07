@@ -35,7 +35,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.gui.util.WebViewStore;
 import org.jabref.http.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiCommand;
@@ -51,7 +50,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.search.sqlbased.IndexManager;
-import org.jabref.logic.search.sqlbased.PostgreServer;
+import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -163,7 +162,14 @@ public class JabRefGUI extends Application {
     }
 
     public void initialize() {
-        WebViewStore.init();
+        JabRefGUI.stateManager = new JabRefGuiStateManager();
+        Injector.setModelOrService(StateManager.class, stateManager);
+
+        // our Default task executor is the UITaskExecutor which can use the fx thread
+        JabRefGUI.taskExecutor = new UiTaskExecutor();
+        Injector.setModelOrService(TaskExecutor.class, taskExecutor);
+
+        journalAbbreviationRepository = JournalAbbreviationLoader.loadRepositoryInBackground(preferences.getAbbreviationPreferences(), taskExecutor);
 
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefGUI.fileUpdateMonitor = fileUpdateMonitor;
@@ -177,7 +183,6 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(GitHandlerRegistry.class, gitHandlerRegistry);
 
         BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
-        journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
         Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);
         Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
@@ -193,9 +198,6 @@ public class JabRefGUI extends Application {
         JabRefGUI.languageServerController = new LanguageServerController(preferences, journalAbbreviationRepository, entryTypesManager);
         Injector.setModelOrService(LanguageServerController.class, JabRefGUI.languageServerController);
 
-        JabRefGUI.stateManager = new JabRefGuiStateManager();
-        Injector.setModelOrService(StateManager.class, stateManager);
-
         Injector.setModelOrService(KeyBindingRepository.class, preferences.getKeyBindingRepository());
 
         JabRefGUI.themeManager = new ThemeManager(
@@ -207,10 +209,6 @@ public class JabRefGUI extends Application {
         JabRefGUI.countingUndoManager = new CountingUndoManager();
         Injector.setModelOrService(UndoManager.class, countingUndoManager);
         Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);
-
-        // our Default task executor is the UITaskExecutor which can use the fx thread
-        JabRefGUI.taskExecutor = new UiTaskExecutor();
-        Injector.setModelOrService(TaskExecutor.class, taskExecutor);
 
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);
@@ -231,7 +229,6 @@ public class JabRefGUI extends Application {
         JabRefGUI.aiService = new AiService(
                 preferences.getAiPreferences(),
                 preferences.getFilePreferences(),
-                preferences.getCitationKeyPatternPreferences(),
                 dialogService,
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
@@ -244,7 +241,8 @@ public class JabRefGUI extends Application {
                 preferences.getEntryEditorPreferences().citationCountFetcherTypeProperty(),
                 preferences.getCitationKeyPatternPreferences(),
                 preferences.getGrobidPreferences(),
-                JabRefGUI.aiService,
+                preferences.getAiPreferences(),
+                aiService.getCurrentChatModel(),
                 entryTypesManager,
                 dialogService
         );
@@ -338,7 +336,7 @@ public class JabRefGUI extends Application {
         });
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
-        mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
+        mainStage.getIcons().addAll(IconTheme.getLogoSet());
         mainStage.setScene(scene);
         mainStage.setOnShowing(this::onShowing);
         mainStage.setOnCloseRequest(this::onCloseRequest);
@@ -559,10 +557,12 @@ public class JabRefGUI extends Application {
             });
 
             executor.submit(() -> {
-                LOGGER.trace("Shutting down postgreServer");
-                PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
-                postgreServer.close();
-                LOGGER.trace("PostgreServer shut down");
+                if (preferences.getSearchPreferences().shouldUsePostgresSearch()) {
+                    LOGGER.trace("Shutting down postgreServer");
+                    PostgresServer postgresServer = Injector.instantiateModelOrService(PostgresServer.class);
+                    postgresServer.close();
+                    LOGGER.trace("PostgreServer shut down");
+                }
             });
 
             executor.submit(() -> {

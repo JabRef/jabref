@@ -9,7 +9,8 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  pull-requests: write
+  contents: read
+  pull-requests: read
 
 jobs:
   # This ensures that no git merge conflict markers (<<<, ...) are contained
@@ -28,7 +29,7 @@ jobs:
       )
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           show-progress: 'false'
       - name: Merge Conflict finder
@@ -49,7 +50,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Check force push
@@ -59,7 +60,11 @@ jobs:
             echo "✅ New PR created."
             exit 0
           fi
-          if git cat-file -e ${{ github.event.before }} 2>/dev/null; then
+          # A regular push leaves `before` as an ancestor of the new head;
+          # a rebase/amend force-push does not. Checking ancestry (instead of
+          # mere object existence via `git cat-file -e`) is reliable even when
+          # the orphaned `before` commit is still fetched locally.
+          if git merge-base --is-ancestor "${{ github.event.before }}" HEAD 2>/dev/null; then
             echo "✅ Regular push detected."
             exit 0
           else
@@ -117,4 +122,3 @@ jobs:
         with:
           name: pr_number
           path: pr_number.txt
-

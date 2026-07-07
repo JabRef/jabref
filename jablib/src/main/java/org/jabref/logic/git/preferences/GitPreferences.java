@@ -24,6 +24,20 @@ public class GitPreferences {
         this.rememberPat = new SimpleBooleanProperty(rememberPat);
     }
 
+    // Creates object with default preference values
+    private GitPreferences() {
+        this(
+                "",     // username: GitHub username
+                "",     // pat: GitHub personal access token (stored in keyring when rememberPat is enabled)
+                "",     // repositoryUrl: URL of the remote repository
+                false   // rememberPat: Whether the PAT should be persisted in the keyring
+        );
+    }
+
+    public static GitPreferences getDefault() {
+        return new GitPreferences();
+    }
+
     public void setUsername(String username) {
         this.username.set(username);
     }
