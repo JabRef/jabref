@@ -78,7 +78,7 @@ application {
 
     applicationDefaultJvmArgs = useLibericaJdkFullJvmArgs + listOf(
         "--add-modules", "jdk.incubator.vector",
-        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain",
+        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,org.apache.lucene.core,jkeychain",
 
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
         // https://github.com/uncomplicate/neanderthal/issues/55
@@ -238,7 +238,7 @@ tasks.test {
 
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
-        "--enable-native-access=javafx.graphics,javafx.web,com.sun.jna"
+        "--enable-native-access=javafx.graphics,com.sun.jna"
 
         // "--add-reads", "org.mockito=java.prefs",
         // "--add-reads", "org.jabref=wiremock"

@@ -16,6 +16,9 @@ import java.util.regex.Pattern;
 import javax.swing.undo.UndoManager;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
@@ -26,14 +29,17 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.StateManager;
@@ -98,6 +104,10 @@ public class AllFieldsTab extends FieldsEditorTab {
     private final Set<Field> userAddedFields = new LinkedHashSet<>();
     private @Nullable BibEntry entryOfUserAddedFields;
 
+    /// Required fields of the current entry's type, refreshed on every [#determineFieldsToShow];
+    /// used to keep the remove-field button (see [#wrapWithRemoveButton]) off required rows.
+    private final Set<Field> requiredFields = new LinkedHashSet<>();
+
     /// Manual expand/collapse decisions per section, kept across rebuilds for the current
     /// entry (cleared on entry switch). Without an override, a section is expanded iff it
     /// contains at least one shown field.
@@ -161,9 +171,11 @@ public class AllFieldsTab extends FieldsEditorTab {
         Set<Field> setFields = entry.getFields();
         SequencedSet<Field> fields = new LinkedHashSet<>();
         fields.add(InternalField.KEY_FIELD);
+        requiredFields.clear();
         entryTypesManager.enrich(entry.getType(), mode).ifPresent(entryType -> {
             for (OrFields orFields : entryType.getRequiredFields()) {
                 fields.addAll(orFields.getFields());
+                requiredFields.addAll(orFields.getFields());
             }
             entryType.getImportantOptionalFields().stream()
                      .filter(setFields::contains)
@@ -222,7 +234,11 @@ public class AllFieldsTab extends FieldsEditorTab {
             userAddedFields.add(event.getField());
         }
         SequencedSet<Field> target = determineFieldsToShow(entry);
-        if (!target.equals(editors.keySet())) {
+        // An entry-type change can leave the shown field set unchanged while still changing which
+        // of those fields are required, so the rows must be rebuilt to re-evaluate the remove
+        // button even when the set comparison below would otherwise skip the rebuild.
+        boolean entryTypeChanged = InternalField.TYPE_HEADER == event.getField();
+        if (entryTypeChanged || !target.equals(editors.keySet())) {
             rebuildPanel(activeDatabaseContext(), entry);
         }
     }
@@ -253,7 +269,7 @@ public class AllFieldsTab extends FieldsEditorTab {
         if (!gridPane.getStyleClass().contains("all-fields-list")) {
             gridPane.getStyleClass().add("all-fields-list");
         }
-        addFieldRows(gridPane, buckets.get(FieldListSections.SectionType.MAIN), labelForField);
+        addFieldRows(gridPane, buckets.get(FieldListSections.SectionType.MAIN), labelForField, bibDatabaseContext, entry);
 
         listContainer.getChildren().setAll(gridPane, createMainChipBar(bibDatabaseContext, entry));
         for (FieldListSections.SectionType type : FieldListSections.SectionType.values()) {
@@ -269,7 +285,8 @@ public class AllFieldsTab extends FieldsEditorTab {
     }
 
     /// Label/editor rows with natural heights, label column as narrow as its content.
-    private void addFieldRows(GridPane grid, SequencedCollection<Field> fields, Map<Field, Label> labelForField) {
+    private void addFieldRows(GridPane grid, SequencedCollection<Field> fields, Map<Field, Label> labelForField,
+                              BibDatabaseContext bibDatabaseContext, BibEntry entry) {
         ColumnConstraints labelColumn = new ColumnConstraints();
         labelColumn.setMinWidth(Region.USE_PREF_SIZE);
         ColumnConstraints editorColumn = new ColumnConstraints();
@@ -285,9 +302,100 @@ public class AllFieldsTab extends FieldsEditorTab {
             label.setPrefHeight(Region.USE_COMPUTED_SIZE);
             GridPane.setValignment(label, VPos.TOP);
             grid.add(label, 0, row);
-            grid.add(editors.get(field).getNode(), 1, row);
+            grid.add(wrapWithRemoveButton(bibDatabaseContext, entry, field), 1, row);
             row++;
         }
+    }
+
+    /// Overlays a gray "remove field" icon button on the top-right corner *inside* the field's
+    /// text input, shown only while the editor is focused *and* currently blank (never for the
+    /// citation key or a required field of the current entry type — those can never be removed
+    /// this way). Overlaying inside the input keeps it left of any trailing option buttons the
+    /// editor draws itself (identifier/URL fetch icons, ICORE lookup, …), so it never collides.
+    // [impl->req~entry-editor.main-tab.remove-field~1]
+    private Node wrapWithRemoveButton(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
+        Node editorNode = editors.get(field).getNode();
+        if (field.equals(InternalField.KEY_FIELD) || requiredFields.contains(field)) {
+            return editorNode;
+        }
+
+        ObservableValue<Optional<String>> fieldValue = entry.getFieldBinding(field);
+        Button removeButton = new Button();
+        removeButton.setGraphic(IconTheme.JabRefIcons.CLOSE.getGraphicNode());
+        removeButton.getStyleClass().addAll("icon-button", "narrow", "field-remove-button");
+        removeButton.setTooltip(new Tooltip(Localization.lang("Remove field")));
+        removeButton.setFocusTraversable(false);
+        removeButton.setOnAction(_ -> removeFieldRow(bibDatabaseContext, entry, field));
+        StackPane.setAlignment(removeButton, Pos.TOP_RIGHT);
+        StackPane.setMargin(removeButton, new Insets(1));
+
+        // Overlay the button on the text input itself (a StackPane wrapping just the input, kept
+        // in the editor's own layout) so it sits inside the field box — not after the editor's
+        // trailing option buttons (e.g. the ICORE lookup / external-link icons). Editors without
+        // a plain text input (e.g. linked-files) fall back to stacking the whole editor node.
+        StackPane focusScope = overlayInsideTextInput(editorNode, removeButton)
+                .orElseGet(() -> new StackPane(editorNode, removeButton));
+        Node rowNode = (focusScope.getChildren().contains(editorNode)) ? focusScope : editorNode;
+
+        // Bound to the overlay's (not editorNode's) focus-within: the input and removeButton are
+        // siblings there, so focus moving from one to the other must not read as "focus left the row".
+        removeButton.visibleProperty().bind(focusScope.focusWithinProperty().and(
+                Bindings.createBooleanBinding(
+                        () -> fieldValue.getValue().map(StringUtil::isBlank).orElse(true),
+                        fieldValue)));
+        removeButton.managedProperty().bind(removeButton.visibleProperty());
+        return rowNode;
+    }
+
+    /// Re-parents the editor's primary text input into a [StackPane] (in the input's own parent,
+    /// preserving its HBox grow priority) and overlays `button` on it. Returns the new overlay
+    /// pane, or empty if the editor exposes no plain text input to overlay onto.
+    private static Optional<StackPane> overlayInsideTextInput(Node editorNode, Button button) {
+        return findPrimaryTextInput(editorNode).flatMap(input -> {
+            if (!(input.getParent() instanceof Pane parent)) {
+                return Optional.empty();
+            }
+            int index = parent.getChildren().indexOf(input);
+            if (index < 0) {
+                return Optional.empty();
+            }
+            StackPane overlay = new StackPane();
+            HBox.setHgrow(overlay, HBox.getHgrow(input));
+            // Put the (empty) overlay in the input's slot first: this detaches `input` from `parent`,
+            // so it can then be re-parented into the overlay. Building `new StackPane(input, button)`
+            // up front would detach `input` immediately and leave `index` pointing past the now-shorter
+            // parent list (IndexOutOfBounds on set).
+            parent.getChildren().set(index, overlay);
+            overlay.getChildren().addAll(input, button);
+            return Optional.of(overlay);
+        });
+    }
+
+    /// First [TextInputControl] in the editor node's subtree (the row-filling text field/area),
+    /// or empty for composite editors that have none.
+    private static Optional<TextInputControl> findPrimaryTextInput(Node node) {
+        if (node instanceof TextInputControl textInput) {
+            return Optional.of(textInput);
+        }
+        if (node instanceof Parent parent) {
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                Optional<TextInputControl> found = findPrimaryTextInput(child);
+                if (found.isPresent()) {
+                    return found;
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    /// Hides a still-empty, user-added field row again (reachable only for non-required,
+    /// currently blank fields; see [#wrapWithRemoveButton]).
+    private void removeFieldRow(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
+        userAddedFields.remove(field);
+        if (entry.hasField(field)) {
+            entry.clearField(field);
+        }
+        rebuildPanel(bibDatabaseContext, entry);
     }
 
     // region sections
@@ -308,7 +416,7 @@ public class AllFieldsTab extends FieldsEditorTab {
             GridPane sectionGrid = new GridPane();
             sectionGrid.setHgap(10);
             sectionGrid.setVgap(8);
-            addFieldRows(sectionGrid, shownFields, labelForField);
+            addFieldRows(sectionGrid, shownFields, labelForField, bibDatabaseContext, entry);
             content.getChildren().add(sectionGrid);
         }
 

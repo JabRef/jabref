@@ -47,7 +47,7 @@ jvmDependencyConflicts {
 
 // Tell gradle which jar to use for which platform
 // Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L14-L22
-listOf("javafx-base", "javafx-controls", "javafx-fxml", "javafx-graphics", "javafx-swing", "javafx-web", "javafx-media", "jdk-jsobject").forEach { jfxModule ->
+listOf("javafx-base", "javafx-controls", "javafx-fxml", "javafx-graphics", "javafx-swing", "javafx-media", "jfx-incubator-input", "jfx-incubator-richtext").forEach { jfxModule ->
     addJfxTarget(jfxModule, "", "none", "none") // matches the empty Jars: to get better errors
     addJfxTarget(jfxModule, "linux", OperatingSystemFamily.LINUX, MachineArchitecture.X86_64)
     addJfxTarget(jfxModule, "linux-aarch64", OperatingSystemFamily.LINUX, MachineArchitecture.ARM64)
@@ -57,19 +57,8 @@ listOf("javafx-base", "javafx-controls", "javafx-fxml", "javafx-graphics", "java
 }
 
 fun addJfxTarget(jfxModule: String, name: String, os: String, arch: String) {
-    if (jfxModule == "javafx-web" && name.isNotEmpty()) {
-        // Special treatment of 'javafx-web' for the time being due to https://bugs.openjdk.org/browse/JDK-8342623.
-        // Can be remove once Java 26 is the minimum version JabRef is built with.
-        dependencies.components.withModule<JDKjsobjectDependencyMetadataRule>("org.openjfx:$jfxModule") {
-            params(name, os, arch, 11)
-        }
-        dependencies.components.withModule<JDKjsobjectDependencyMetadataRule>("org.openjfx:$jfxModule") {
-            params(name, os, arch, 26)
-        }
-    } else {
-        jvmDependencyConflicts.patch.module("org.openjfx:$jfxModule") {
-            addTargetPlatformVariant(name, os, arch)
-        }
+    jvmDependencyConflicts.patch.module("org.openjfx:$jfxModule") {
+        addTargetPlatformVariant(name, os, arch)
     }
 }
 
@@ -121,6 +110,9 @@ jvmDependencyConflicts.patch {
         removeDependency("org.openjfx:javafx-controls")
         removeDependency("org.openjfx:javafx-fxml")
         removeDependency("org.openjfx:javafx-swing")
+        // javafx-web (WebView/WebEngine) is intentionally NOT wanted: it bundles a full WebKit, bloating the
+        // distribution and blocking native-image. HTML rendering is done via the html-to-node library instead.
+        // Keep it removed here and do not add it as a dependency anywhere. Enforced by CommonArchitectureTest.doNotUseJavaFXWeb.
         removeDependency("org.openjfx:javafx-web")
         // metadata decared these as runtime only, but they are 'requires transitive' in module-info
         addApiDependency("org.openjfx:javafx-fxml")
