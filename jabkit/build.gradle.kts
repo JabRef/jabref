@@ -16,11 +16,11 @@ mainModuleInfo {
 }
 
 testModuleInfo {
-    requires("org.jabref.testsupport")
-    requires("org.junit.jupiter.api")
-    requires("org.junit.jupiter.params")
-    requires("org.mockito")
-    requires("org.apache.pdfbox")
+        requires("org.apache.pdfbox")
+        requires("org.jabref.testsupport")
+        requires("org.junit.jupiter.api")
+        requires("org.junit.jupiter.params")
+        requires("org.mockito")
 }
 
 tasks.withType<Test>().configureEach {
