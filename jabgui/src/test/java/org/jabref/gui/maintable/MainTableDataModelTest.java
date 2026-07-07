@@ -26,8 +26,11 @@ import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.query.SearchQuery;
 
@@ -141,5 +144,57 @@ class MainTableDataModelTest {
         assertFalse(vmA.isVisibleBySearch().get());
         assertFalse(vmB.isVisibleBySearch().get());
         assertEquals(0, resultSize.get());
+    }
+
+    @Test
+    void selectingGroupUpdatesMatchesAndVisibility() {
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+
+        BibEntry bibEntryA = new BibEntry()
+                .withCitationKey("A")
+                .withField(StandardField.AUTHOR, "Alice");
+
+        BibEntry bibEntryB = new BibEntry()
+                .withCitationKey("B")
+                .withField(StandardField.AUTHOR, "Bob");
+
+        bibDatabaseContext.getDatabase().insertEntries(List.of(bibEntryA, bibEntryB));
+
+        GuiPreferences preferences = mock(GuiPreferences.class);
+        when(preferences.getGroupsPreferences()).thenReturn(GroupsPreferences.getDefault());
+        when(preferences.getSearchPreferences()).thenReturn(
+                new SearchPreferences(SearchDisplayMode.FILTER, false, false, false, false, false, false, 0, 0, 0));
+        when(preferences.getNameDisplayPreferences()).thenReturn(NameDisplayPreferences.getDefault());
+
+        CurrentThreadTaskExecutor taskExecutor = new CurrentThreadTaskExecutor();
+
+        SimpleListProperty<GroupTreeNode> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
+        OptionalObjectProperty<SearchQuery> searchQueryProperty = OptionalObjectProperty.empty();
+        IntegerProperty resultSize = new SimpleIntegerProperty();
+
+        MainTableDataModel model = new MainTableDataModel(
+                bibDatabaseContext,
+                preferences,
+                taskExecutor,
+                null,
+                selectedGroups,
+                searchQueryProperty,
+                resultSize);
+
+        BibEntryTableViewModel vmA = model.getViewModelByCitationKey("A").orElseThrow();
+        BibEntryTableViewModel vmB = model.getViewModelByCitationKey("B").orElseThrow();
+
+        selectedGroups.set(FXCollections.observableArrayList(getKeywordGroup(StandardField.AUTHOR, "Alice")));
+
+        assertTrue(vmA.isMatchedByGroup().get());
+        assertTrue(vmA.isVisibleByGroup().get());
+        assertEquals(1, resultSize.get());
+
+        assertFalse(vmB.isMatchedByGroup().get());
+        assertFalse(vmB.isVisibleByGroup().get());
+    }
+
+    private static GroupTreeNode getKeywordGroup(Field field, String searchExpression) {
+        return GroupTreeNode.fromGroup(new WordKeywordGroup(searchExpression, GroupHierarchyType.INDEPENDENT, field, searchExpression, true, ',', false));
     }
 }

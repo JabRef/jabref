@@ -38,7 +38,7 @@ testModuleInfo {
 // javafx.fxml, javafx.graphics, javafx.controls) are then lost and must be re-applied as JVM args here.
 // Qualified opens keep their original target module; unqualified opens/exports are reproduced for the
 // JabRef application module plus ALL-UNNAMED. If a runtime InaccessibleObjectException names another reader
-// module, append it (comma-separated) to the corresponding entry. (Flag: org.jabref.gradle.JavaFxBundling)
+// module, append it (comma-separated) to the corresponding entry. (Flag: org.jabref.gradle.Toolchains)
 val useLibericaJdkFullJvmArgs = if (useLibericaJdkFull) listOf(
     // javafx.base
     "--add-exports", "javafx.base/com.sun.javafx.event=org.jabref,ALL-UNNAMED",
@@ -77,7 +77,7 @@ application {
 
     applicationDefaultJvmArgs = useLibericaJdkFullJvmArgs + listOf(
         "--add-modules", "jdk.incubator.vector",
-        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain",
+        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,org.apache.lucene.core,jkeychain",
 
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
         // https://github.com/uncomplicate/neanderthal/issues/55
@@ -209,7 +209,7 @@ tasks.test {
 
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
-        "--enable-native-access=javafx.graphics,javafx.web,com.sun.jna"
+        "--enable-native-access=javafx.graphics,com.sun.jna"
 
         // "--add-reads", "org.mockito=java.prefs",
         // "--add-reads", "org.jabref=wiremock"

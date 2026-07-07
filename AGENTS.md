@@ -16,7 +16,10 @@ This document defines rules and expectations for **automated agents** (AI tools,
 
 JabRef is an open-source, research-grade reference manager with high standards for correctness, reproducibility, and maintainability.
 
-This file is guidance to follow *while* developing. After the work is finished, go through each point of `CHECKLIST.md` as a final quality check and ensure that all points are fulfilled. If not, fix the code until all points are fulfilled. Do not skip any point of the checklist.
+This file is guidance to follow *while* developing.
+
+> [!IMPORTANT]
+> **Final step — do not skip.** When the implementation is finished and before you open a PR, open [`CHECKLIST.md`](./CHECKLIST.md) and work through **every** point. Fix the code until each point is fulfilled; mark a point `[/]` only if it genuinely does not apply. The checklist is the mandatory quality gate for the finished result.
 
 ---
 
@@ -54,6 +57,11 @@ Requires JDK 25 or later to run Gradle. Gradle downloads the necessary JDK by it
 ./gradlew :jabgui:run        # Build and launch the GUI
 ./gradlew :jabgui:jpackage   # Package as installer
 ```
+
+When adding or changing dependencies, follow [docs/code-howtos/dependency-management.md](docs/code-howtos/dependency-management.md).
+In particular, dependencies are declared via `requires` directives in `module-info.java` (versions live in `versions/build.gradle.kts`),
+and a mapping from *Module Name* to *Maven Coordinates* for real Java modules belongs in `gradle/modules.properties` —
+not in ad-hoc blocks in `build-logic`.
 
 ---
 
@@ -267,6 +275,7 @@ Both comments must not be added.
 
 #### Testing / JUnit
 
+- Name test classes `...Test` (singular), not `...Tests` — e.g. `JabSrvArchitectureTest`, not `JabSrvArchitectureTests`. This holds even for ArchUnit classes that bundle several `@ArchTest` rules.
 - In JabRef, we don't use `@DisplayName`, we typically just write method name as is. The method name itself should be comprehensive enough.
 - Instead of `Files.createTempDirectory` `@TempDir` JUnit5 annotation should be used.
 - If `@TempDir` is used, there is no need to clean it up

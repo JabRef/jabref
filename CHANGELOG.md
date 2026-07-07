@@ -12,15 +12,17 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added support for displaying linked PDF annotations in the entry preview. [#4257](https://github.com/JabRef/jabref/issues/4257)
+- We added a new "Main" tab to the entry editor showing all fields of an entry in a single scrollable list, with one-click chips for adding optional fields and a free-form box for adding arbitrary fields. Identifiers, files and links, bibliometrics, comments, and meta fields (groups, owner, timestamps, special fields) live in collapsible sections — collapsed when empty — each offering chips for its unset fields. [#12711](https://github.com/JabRef/jabref/issues/12711)
 - We added auto-detection import for drag-and-dropped library files. [#15391](https://github.com/JabRef/jabref/issues/15391)
 - We added a preview style selection bar which shows the current preview style and allows to select a specific style without cycling through all of them. [#15820](https://github.com/JabRef/jabref/pull/15820)
 - We added the ability to view citation previews rendered using the selected style on hover in the "Citations" tab. [#15914](https://github.com/JabRef/jabref/pull/15914)
+- We extended the HTTP server with library query, groups listing, and group-assignment on import. [#15929](https://github.com/JabRef/jabref/pull/15929)
+- The HTTP import endpoint (`POST /libraries/{id}/entries`) now accepts any open library id, switching JabRef to that library before importing, instead of only the currently active one. [#15929](https://github.com/JabRef/jabref/pull/15929)
 - We added support for selecting answer engines and summarization algorithms, allowing users to change the underlying AI behavior. [#15688](https://github.com/JabRef/jabref/pull/15688)
 - The citation key generator also normalizes super and subscript characters. [#15743](https://github.com/JabRef/jabref/pull/15743)
 - We added automatic source groups to SLR results and fixed group merging to preserve all source groups. [#12542](https://github.com/JabRef/jabref/issues/12542)
 - We enabled usage of relative or absolute file paths depending on your file directory settings. [#3590](https://github.com/JabRef/jabref/issues/3590)
 - We added the ability to import and focus an entry from the Citation tab by double click. [#15460](https://github.com/JabRef/jabref/issues/15460)
-- We extended the HTTP server with library query, groups listing, and group-assignment on import. [#15599](https://github.com/JabRef/jabref/pull/15599)
 - The `jabkit` subcommands now accept the input file as a positional argument (e.g. `jabkit check integrity references.bib`); the `--input` option remains available as an alias. [#15759](https://github.com/JabRef/jabref/pull/15759)
 - We grouped the `jabkit` consistency and integrity checks under a new `check` command (`jabkit check consistency`, `jabkit check integrity`). [#15759](https://github.com/JabRef/jabref/pull/15759)
 - The `jabkit check consistency` command now supports the `errorformat` output format (`file:line:column: message`), which is the default output format for both `check` subcommands. [#15759](https://github.com/JabRef/jabref/pull/15759)
@@ -32,9 +34,15 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support to the JabKit commands `get-cited-works` and `get-citing-works` to output to files in various export formats. [#15913](https://github.com/JabRef/jabref/pull/15913)
 - We added generic CSV export filter that exports all standard BibTeX fields. [#15711](https://github.com/JabRef/jabref/issues/15711)
 - We added OCR engine's executable path as the first OCR preference to let users specify the exact path of the engine they are using. [#15990](https://github.com/JabRef/jabref/pull/15990)
+- We added file notification to OCRed file to let users open the directory and show the new file. [#16082](https://github.com/JabRef/jabref/pull/16082)
+- We added a "Jump to field" button to the entry editor toolbar, triggering the same action as the <kbd>Ctrl</kbd>+<kbd>J</kbd> shortcut. [#16169](https://github.com/JabRef/jabref/pull/16169)
+- The `jabkit` `--input` option (and positional input argument) now accepts http(s)/ftp URLs, downloading the file before processing. [#16165](https://github.com/JabRef/jabref/pull/16165)
 
 ### Changed
 
+- We now render the entry preview with regular JavaFX components instead of an embedded browser. Text in the preview can be selected with mouse and keyboard and copied; without a selection, "Copy selection" copies the whole preview. [#16145](https://github.com/JabRef/jabref/pull/16145)
+- We replaced the "MathSciNet Review" entry editor tab by identifier support for the "MR Number" field: a button next to the field opens the MathSciNet page in the web browser. [#16145](https://github.com/JabRef/jabref/pull/16145)
+- The `jabkit check` `github-actions` output now embeds the citation key and field name in each finding's message, so the plain workflow log lines are self-describing (not only the pull request annotations). [#16065](https://github.com/JabRef/jabref/pull/16065)
 - We extended the per-fetcher timeout for fulltext PDF lookups from 10 to 120 seconds so fetchers that bounce through an institutional sign-in or a slow publisher CDN have a chance to complete. [#15877](https://github.com/JabRef/jabref/pull/15877)
 - When an imported entry has an empty citation key, it is generated. [#15624](https://github.com/JabRef/jabref/pull/15624)
 - We made the `Move file to directory` operation for Linked Files show every configured JabRef directory as possible options. [#12287](https://github.com/JabRef/jabref/issues/12287)
@@ -44,9 +52,14 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We moved arXiv handling out of the DOI cleanup into the dedicated "arXiv DOI" cleanup. [#16033](https://github.com/JabRef/jabref/pull/16033)
 - Resolving of Math Subject Classification (MSC) needs to be activated in the references now. [#15883](https://github.com/JabRef/jabref/pull/15883)
 - We improved JabRef's startup performance by loading MSC codes only when activated. [#15883](https://github.com/JabRef/jabref/pull/15883)
+- Embedded postgres is no longer started with JabRef unless "Experimental search (Postgres)" is enabled in General preferences. [#12844](https://github.com/JabRef/jabref/issues/12844)
 
 ### Fixed
 
+- We fixed an issue in the new entry editor's file field editor where files added via the add button did not appear until switching to another entry and back, and cleaned up the layout so the add/fetch-fulltext/download-URL buttons sit to the left of the file list and the list no longer leaves blank space below the last file. [#16172](https://github.com/JabRef/jabref/pull/16172)
+- We fixed an issue where `jabkit`'s `-p`/`--porcelain` and `-d`/`--debug` flags only took effect when placed at the exact command level where they were parsed, so e.g. `jabkit -p check consistency file.bib` silently ran without porcelain output. [#16164](https://github.com/JabRef/jabref/pull/16164)
+- We fixed an issue where no raw preferences values were visible anymore in the preferences filter. [#16161](https://github.com/JabRef/jabref/pull/16161)
+- We fixed an issue where cleanup did not detect an arXiv entry when its `url` field ended with a fragment anchor (e.g. `https://arxiv.org/html/2510.26275v2#bib`). [#16150](https://github.com/JabRef/jabref/pull/16150)
 - We fixed an issue where fetchers sent an empty API-key parameter (e.g. `api_key=`) to the remote service when no key was configured. [#16044](https://github.com/JabRef/jabref/pull/16044)
 - We fixed an issue where the global search dialog kept showing the previous entry preview when the search returned no results. [#15613](https://github.com/JabRef/jabref/issues/15613)
 - We fixed an issue where preferences referencing removed cleanup steps are now ignored instead of failing to load. [#15948](https://github.com/JabRef/jabref/pull/15948)
@@ -64,6 +77,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Removed
 
+- We removed the entry editor tabs "Required fields", "Optional fields", "Optional fields 2", "Deprecated fields", "Other fields", and "Comments"; their content is part of the new "Main" tab. [#12711](https://github.com/JabRef/jabref/issues/12711)
+- We removed the ability to define custom entry editor tabs (including the default "General" and "Abstract" tabs); the entry editor tab preferences now only toggle the visibility of the built-in tabs. [#12711](https://github.com/JabRef/jabref/issues/12711)
 - The citation key integrity check now includes the generated citation key in its warning message. [#15776](https://github.com/JabRef/jabref/pull/15776)
 
 ## [6.0-alpha.6] – 2026-05-14
