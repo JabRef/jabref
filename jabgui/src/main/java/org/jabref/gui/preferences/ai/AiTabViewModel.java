@@ -21,12 +21,15 @@ import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
+import org.jabref.logic.ai.models.AiModelService;
+import org.jabref.logic.ai.models.FetchAiModelsBackgroundTask;
 import org.jabref.logic.ai.preferences.AiDefaultExpertSettings;
 import org.jabref.logic.ai.preferences.AiDefaultTemplates;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.LocalizedNumbersUtils;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
@@ -120,6 +123,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty disableExpertSettings = new SimpleBooleanProperty(true);
 
     private final AiPreferences aiPreferences;
+    private final AiModelService aiModelService;
+    private final TaskExecutor taskExecutor;
 
     private final Validator apiKeyValidator;
     private final Validator chatModelValidator;
@@ -136,10 +141,16 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     private final List<String> restartWarnings = new ArrayList<>();
 
-    public AiTabViewModel(CliPreferences preferences) {
+    public AiTabViewModel(
+            CliPreferences preferences,
+            AiModelService aiModelService,
+            TaskExecutor taskExecutor
+    ) {
         this.oldLocale = Locale.getDefault();
 
         this.aiPreferences = preferences.getAiPreferences();
+        this.aiModelService = aiModelService;
+        this.taskExecutor = taskExecutor;
 
         this.enableAi.addListener((_, _, newValue) -> {
             disableBasicSettings.set(!newValue);
@@ -156,8 +167,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             disableApiBaseUrl.set(newValue == AiProvider.HUGGING_FACE || newValue == AiProvider.GEMINI);
 
             // When we setAll on Hugging Face, models are empty, and currentChatModel become null.
-            // It becomes null because currentChatModel is bound to combobox, and this combobox becomes empty.
-            // For some reason, custom edited value in the combobox will be erased, so we need to store the old value.
+            // It becomes null because `currentChatModel` is bound to combobox, and this combobox becomes empty.
+            // For some reason, the custom-edited value in the combobox will be erased, so we need to store the old value.
             String oldChatModel = currentChatModel.get();
             chatModelsList.setAll(models);
 
@@ -208,6 +219,17 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                     currentApiBaseUrl.set(huggingFaceApiBaseUrl.get());
                 }
             }
+
+            new FetchAiModelsBackgroundTask(aiModelService, newValue, currentApiBaseUrl.get(), currentApiKey.get())
+                    .onSuccess(foundModels -> {
+                        String current = currentChatModel.get();
+                        if (newValue == selectedAiProvider.get()) {
+                            // Task returns both predefined models + latest, so it should always be non-empty.
+                            chatModelsList.setAll(foundModels.stream().sorted().toList());
+                            currentChatModel.set(current);
+                        }
+                    })
+                    .executeWith(taskExecutor);
         });
 
         this.currentChatModel.addListener((_, _, newValue) -> {

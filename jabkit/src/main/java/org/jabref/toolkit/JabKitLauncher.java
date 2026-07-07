@@ -79,7 +79,7 @@ public class JabKitLauncher {
             Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
 
             JabKit jabKit = new JabKit(preferences, entryTypesManager);
-            CommandLine commandLine = new CommandLine(jabKit);
+            CommandLine commandLine = new CommandLine(jabKit, JabKit.createFactory());
             commandLine.setExecutionExceptionHandler(new CliExceptionHandler(commandLine.getExecutionExceptionHandler()));
             // [impl->req~jabkit.cli.banner-shown~1]
             String usageHeader = BuildInfo.JABREF_BANNER.formatted(buildInfo.version) + "\n" + JABKIT_BRAND;
@@ -169,9 +169,9 @@ public class JabKitLauncher {
 
         // We must configure logging as soon as possible, which is why we cannot wait for the usual
         // argument parsing workflow to parse logging options e.g. --debug or --porcelain
-        boolean isPorcelain = Arrays.stream(args).anyMatch("--porcelain"::equalsIgnoreCase);
+        boolean isPorcelain = Arrays.stream(args).anyMatch(arg -> "--porcelain".equalsIgnoreCase(arg) || "-p".equalsIgnoreCase(arg));
         Level logLevel;
-        if (Arrays.stream(args).anyMatch("--debug"::equalsIgnoreCase)) {
+        if (Arrays.stream(args).anyMatch(arg -> "--debug".equalsIgnoreCase(arg) || "-d".equalsIgnoreCase(arg))) {
             logLevel = Level.DEBUG;
         } else {
             logLevel = Level.INFO;

@@ -83,7 +83,8 @@ public class URLDownload {
 
     private String postData = "";
     private Duration connectTimeout = DEFAULT_CONNECT_TIMEOUT;
-    private SSLContext sslContext;
+    // Can be null if SSL is not supported. If null, then ignore.
+    private @Nullable SSLContext sslContext;
 
     static {
         Unirest.config()

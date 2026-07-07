@@ -16,6 +16,8 @@ mainModuleInfo {
 }
 
 testModuleInfo {
+        requires("mockwebserver3")
+        requires("okhttp3")
         requires("org.apache.pdfbox")
         requires("org.jabref.testsupport")
         requires("org.junit.jupiter.api")
