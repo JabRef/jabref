@@ -19,6 +19,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
+import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.dataformat.yaml.YAMLMapper;
 
@@ -202,7 +203,7 @@ public class HayagrivaImporter extends Importer {
             }
 
             return false;
-        } catch (Exception e) {
+        } catch (JacksonException e) {
             return false;
         } finally {
             input.reset();
