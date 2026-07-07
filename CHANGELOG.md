@@ -55,6 +55,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where the "AI summary" and "AI chat" entry editor tabs stayed visible when AI features were disabled in preferences; they are now hidden immediately, without requiring a restart. [#15410](https://github.com/JabRef/jabref/issues/15410)
+- We fixed an issue where hovering over a row in the main table changed the text color in addition to the background, which caused noticeable lag in libraries with many entries. [#15410](https://github.com/JabRef/jabref/issues/15410)
 - We fixed an issue in the new entry editor's file field editor where files added via the add button did not appear until switching to another entry and back, and cleaned up the layout so the add/fetch-fulltext/download-URL buttons sit to the left of the file list and the list no longer leaves blank space below the last file. [#16172](https://github.com/JabRef/jabref/pull/16172)
 - We fixed an issue where `jabkit`'s `-p`/`--porcelain` and `-d`/`--debug` flags only took effect when placed at the exact command level where they were parsed, so e.g. `jabkit -p check consistency file.bib` silently ran without porcelain output. [#16164](https://github.com/JabRef/jabref/pull/16164)
 - We fixed an issue where no raw preferences values were visible anymore in the preferences filter. [#16161](https://github.com/JabRef/jabref/pull/16161)
@@ -119,10 +121,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We replaced the unlinked files dialog with a wizard-based interface for searching and importing files. [#12709](https://github.com/JabRef/jabref/issues/12709)
 - We replaced the various notifications for file changes, tasks and popup toasts with a new info center. [#14762](https://github.com/JabRef/jabref/issues/14762)
 - We upgraded to Lucene 10.4 for the fulltext search.
-    Thus, the now created search index cannot be read from older versions of JabRef anylonger.
-    ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
-    Moreover, switching back and forth JabRef versions and meanwhile adding PDFs also requires rebuilding the index now and then.
-    [#15220](https://github.com/JabRef/jabref/pull/15220)
+  Thus, the now created search index cannot be read from older versions of JabRef anylonger.
+  ⚠️ JabRef will recreate the index in a new folder for new files and this will take a long time for a huge library.
+  Moreover, switching back and forth JabRef versions and meanwhile adding PDFs also requires rebuilding the index now and then.
+  [#15220](https://github.com/JabRef/jabref/pull/15220)
 - We enabled drag and drop of Windows shortcut (`.lnk`) files to open libraries. [#15036](https://github.com/JabRef/jabref/issues/15036)
 - We refined the "Select files to import" page in "Search for unlinked local files" dialog to give the users the choice of linking the file to a related entry or import it to a new entry. [#13689](https://github.com/JabRef/jabref/issues/13689)
 - The "Make/Sync bibliography" button in OO/LO panel now refreshes citations before generating bibliographies. [#14387](https://github.com/JabRef/jabref/issues/14387)
@@ -1932,10 +1934,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where some importers used the field `pubstatus` instead of the standard BibTeX field `pubstate`.
 - We changed the latex command removal for docbook exporter. [#3838](https://github.com/JabRef/jabref/issues/3838)
 - We changed the location of some fields in the entry editor (you might need to reset your preferences for these changes to come into effect)
-  - Journal/Year/Month in biblatex mode -> Deprecated (if filled)
-  - DOI/URL: General -> Optional
-  - Internal fields like ranking, read status and priority: Other -> General
-  - Moreover, empty deprecated fields are no longer shown
+    - Journal/Year/Month in biblatex mode -> Deprecated (if filled)
+    - DOI/URL: General -> Optional
+    - Internal fields like ranking, read status and priority: Other -> General
+    - Moreover, empty deprecated fields are no longer shown
 - Added server timezone parameter when connecting to a shared database.
 - We updated the dialog for setting up general fields.
 - URL field formatting is updated. All whitespace chars, located at the beginning/ending of the URL, are trimmed automatically
@@ -2067,12 +2069,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed the coloring of cells in the main table according to whether the field is optional/required.
 - We removed the feature to find and resolve duplicate BibTeX keys (as this use case is already covered by the integrity check).
 - We removed a few commands from the right-click menu that are not needed often and thus don't need to be placed that prominently:
-  - Print entry preview: available through entry preview
-  - All commands related to marking: marking is not yet reimplemented
-  - Set/clear/append/rename fields: available through Edit menu
-  - Manage keywords: available through the Edit menu
-  - Copy linked files to folder: available through File menu
-  - Add/move/remove from group: removed completely (functionality still available through group interface)
+    - Print entry preview: available through entry preview
+    - All commands related to marking: marking is not yet reimplemented
+    - Set/clear/append/rename fields: available through Edit menu
+    - Manage keywords: available through the Edit menu
+    - Copy linked files to folder: available through File menu
+    - Add/move/remove from group: removed completely (functionality still available through group interface)
 - We removed the option to change the column widths in the preferences dialog. [#4546](https://github.com/JabRef/jabref/issues/4546)
 
 ## Older versions

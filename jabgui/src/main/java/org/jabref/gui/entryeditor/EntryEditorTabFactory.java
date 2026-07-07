@@ -3,6 +3,8 @@ package org.jabref.gui.entryeditor;
 import java.util.LinkedList;
 import java.util.List;
 
+import javafx.beans.value.ObservableValue;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.citationrelationtab.CitationRelationsTab;
@@ -21,6 +23,9 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.tobiasdiez.easybind.EasyBind;
 
 /// Builds the {@link EntryEditorTab} controls shown in the {@link EntryEditor}.
 ///
@@ -99,12 +104,27 @@ public class EntryEditorTabFactory {
                     boolean _
             ) -> {
                 EntryEditorTab tab = createBuiltInTab(type);
-                tab.setPreferenceDrivenVisibility(type == EntryEditorTabModel.BuiltIn.PREVIEW
-                                                  ? preferences.getPreviewPreferences().showPreviewAsExtraTabProperty()
-                                                  : entryEditorPreferences.tabVisibleProperty(type));
+                tab.setPreferenceDrivenVisibility(preferenceDrivenVisibilityFor(type, entryEditorPreferences));
                 yield tab;
             }
         };
+    }
+
+    /// Determines the preference-driven visibility gate for a built-in tab. Most tabs simply follow the user's
+    /// Entry Editor tab-visibility checkbox; the Preview tab uses its own preference instead, and the AI tabs
+    /// are additionally hidden whenever AI features are currently disabled, so they disappear immediately
+    /// (no restart needed) alongside the "AI turned off" state already shown by {@link AiSummaryTab} and
+    /// {@link AiChatTab}.
+    @VisibleForTesting
+    ObservableValue<Boolean> preferenceDrivenVisibilityFor(EntryEditorTabModel.BuiltIn type, EntryEditorPreferences entryEditorPreferences) {
+        ObservableValue<Boolean> userVisibility = type == EntryEditorTabModel.BuiltIn.PREVIEW
+                                                  ? preferences.getPreviewPreferences().showPreviewAsExtraTabProperty()
+                                                  : entryEditorPreferences.tabVisibleProperty(type);
+        if (type == EntryEditorTabModel.BuiltIn.AI_SUMMARY || type == EntryEditorTabModel.BuiltIn.AI_CHAT) {
+            return EasyBind.combine(userVisibility, preferences.getAiPreferences().aiFeaturesEnabledCurrentlyProperty(),
+                    (visible, aiEnabled) -> visible && aiEnabled);
+        }
+        return userVisibility;
     }
 
     private EntryEditorTab createBuiltInTab(EntryEditorTabModel.BuiltIn type) {
