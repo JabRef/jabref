@@ -54,12 +54,12 @@ sequenceDiagram
     E->>T: scripting.executeScript(adapter)
     T-->>E: PDF URL
     E->>P: downloads.download(pdfUrl)
-    P-->>E: PDF bytes -> downloads/&lt;provider&gt;/&lt;id&gt;.pdf
+    P-->>E: PDF bytes -> downloads/[provider]/[id].pdf
     E->>T: tabs.remove
     E-->>H: {requestId, id, path, sourceUrl}
     H-->>F: 200 {id, path, sourceUrl}
 
-    F-->>J: Optional&lt;URL&gt; (file:// path)
+    F-->>J: Optional[URL] (file:// path)
     J->>J: copy/move into library dir,<br/>rename per pattern
     J-->>User: PDF linked to entry
 ```
