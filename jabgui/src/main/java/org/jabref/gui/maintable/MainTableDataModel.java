@@ -103,16 +103,6 @@ public class MainTableDataModel {
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
 
-    //    private void updateSearchMatches(Optional<SearchQuery> query) {
-    //        BackgroundTask.wrap(() -> {
-    //            if (query.isPresent()) {
-    //                setSearchMatches(searchContext.search(query.get()));
-    //            } else {
-    //                clearSearchMatches();
-    //            }
-    //        }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
-    //    }
-
     private void updateSearchMatches(Optional<SearchQuery> query) {
         long updateSequence = searchUpdateSequence.incrementAndGet();
 
