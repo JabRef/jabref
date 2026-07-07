@@ -29,6 +29,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -174,6 +175,38 @@ class HayagrivaImporterTest {
 
         try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
             assertTrue(hayagrivaImporter.isRecognizedFormat(reader));
+        }
+    }
+    
+    @Test
+    void importsUpstreamBasicYmlFixtureWithoutCrashing() throws Exception {
+        try (BufferedReader reader = Files.newBufferedReader(
+                Path.of("src/test/resources/org/jabref/logic/importer/fileformat/basic.yml"),
+                StandardCharsets.UTF_8)) {
+
+            ParserResult result = hayagrivaImporter.importDatabase(reader);
+            assertNotNull(result);
+        }
+    }
+
+    @Test
+    void importsSimpleEntryFromUpstreamBasicYmlFixture() throws Exception {
+        try (BufferedReader reader = Files.newBufferedReader(
+                Path.of("src/test/resources/org/jabref/logic/importer/fileformat/basic.yml"),
+                StandardCharsets.UTF_8)) {
+
+            ParserResult result = hayagrivaImporter.importDatabase(reader);
+            List<BibEntry> entries = result.getDatabase().getEntries();
+
+            BibEntry kinetics = entries.stream()
+                                       .filter(e -> "kinetics".equals(e.getCitationKey().orElse("")))
+                                       .findFirst()
+                                       .orElseThrow(() -> new AssertionError("Expected 'kinetics' entry to be imported"));
+
+            assertEquals("Kinetics and luminescence of the excitations of a nonequilibrium polariton condensate",
+                    kinetics.getField(StandardField.TITLE).orElse(null));
+            assertEquals("10.1103/PhysRevB.102.165126", kinetics.getField(StandardField.DOI).orElse(null));
+            assertEquals("2020-10-14", kinetics.getField(StandardField.DATE).orElse(null));
         }
     }
 }

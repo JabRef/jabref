@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,11 +19,13 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.dataformat.yaml.YAMLMapper;
 
+@NullMarked
 public class HayagrivaImporter extends Importer {
 
     private static final Map<String, EntryType> TYPES_MAP = Map.of(
@@ -55,7 +58,12 @@ public class HayagrivaImporter extends Importer {
             String citationKey = entryMap.getKey();
             HayagrivaEntry hData = entryMap.getValue();
 
-            EntryType entryType = TYPES_MAP.getOrDefault(hData.type, StandardEntryType.Misc);
+            if (hData == null) {
+                continue;
+            }
+
+            String type = hData.type == null ? "" : hData.type;
+            EntryType entryType = TYPES_MAP.getOrDefault(type, StandardEntryType.Misc);
             BibEntry bibEntry = new BibEntry(entryType);
             bibEntry.setCitationKey(citationKey);
 
@@ -208,5 +216,10 @@ public class HayagrivaImporter extends Importer {
         } finally {
             input.reset();
         }
+    }
+
+    @Override
+    public boolean isRecognizedFormat(Reader input) throws IOException {
+        return isRecognizedFormat(new BufferedReader(input));
     }
 }
