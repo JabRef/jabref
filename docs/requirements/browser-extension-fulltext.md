@@ -6,7 +6,7 @@ parent: Requirements
 
 A loopback HTTP protocol by which JabRef requests fulltext PDFs from a locally-running browser-extension companion. The companion uses the user's already-authenticated browser session to obtain a PDF that JabRef cannot reach directly (paywall, anti-bot, 418, institutional SSO).
 
-The protocol is **provider-agnostic**. Any browser-extension companion that implements it can serve JabRef. JabRef itself ships a single, vendor-neutral consumer (`BrowserExtensionFulltextFetcher`).
+The protocol is **provider-agnostic**. Any companion that implements it can serve JabRef. The motivating implementation is a browser-extension companion that reuses the user's already-authenticated browser session, but the protocol assumes neither a browser nor any particular backend: a provider MAY obtain the PDF by any means — an institutional proxy, a credentialed headless HTTP client, or a library-server API. Such a non-browser backend need not be local either, so a future cross-host revision (see [Non-goals](#non-goals-informational)) could serve the same protocol from a remote HTTP server; version 1 still pins providers to a loopback bind for the [security model](#loopback-binding). JabRef itself ships a single, vendor-neutral consumer (`BrowserExtensionFulltextFetcher`).
 
 The requirement identifiers use the `bxf` (browser-extension-fulltext) prefix and are intentionally **protocol-scoped, not repository-scoped**: every implementor traces its own implementation against the same `req~bxf.*~N` identifiers. Each implementor runs its own OpenFastTrace pipeline; the identifier space is shared, tracing is per-repo. A revision bump (e.g. `~1` → `~2`) is a protocol-version event affecting every implementor.
 
@@ -26,12 +26,20 @@ All request and response bodies are UTF-8 encoded JSON. Clients and providers MU
 ```mermaid
 sequenceDiagram
     actor User
-    participant J as JabRef
-    participant F as BrowserExtensionFulltextFetcher
+
+    box rgba(59,130,246,0.25) JabRef
+        participant J as JabGui
+        participant F as BrowserExtensionFulltextFetcher
+    end
+
     participant D as Discovery dir<br/>(filesystem)
-    participant H as Provider HTTP server<br/>(loopback)
-    participant E as Browser extension
-    participant T as Browser tab
+
+    box rgba(234,179,8,0.35) Provider — browser-extension companion
+        participant H as Loopback HTTP server
+        participant E as Browser extension
+        participant T as Browser tab
+    end
+
     participant P as Publisher site
 
     User->>J: Get fulltext for entry
