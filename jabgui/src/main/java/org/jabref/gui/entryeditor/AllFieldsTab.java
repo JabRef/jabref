@@ -425,6 +425,12 @@ public class AllFieldsTab extends FieldsEditorTab {
         userAddedFields.add(field);
         rebuildPanel(bibDatabaseContext, entry);
         Platform.runLater(() -> {
+            // The tab may have been rebound to a different entry before this deferred block runs;
+            // the editors map would then belong to that other entry, so focusing/adding here would
+            // act on the wrong entry. Bail out unless we are still showing the entry we started with.
+            if (getCurrentEntry() != entry) {
+                return;
+            }
             requestFocus(field);
             // Adding the File field via its "+" chip should immediately open the add-file dialog,
             // since an empty File editor has no other purpose than to receive a file.
