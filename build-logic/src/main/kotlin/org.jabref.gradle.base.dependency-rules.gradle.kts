@@ -138,6 +138,7 @@ extraJavaModuleInfo {
 
     knownModule("com.github.hypfvieh:dbus-java-core", "org.freedesktop.dbus")
     knownModule("com.github.hypfvieh:dbus-java-transport-native-unixsocket", "org.freedesktop.dbus.transport.jre")
+    knownModule("org.checkerframework:checker-qual", "org.checkerframework.checker.qual")
 
     module("ai.djl.huggingface:tokenizers", "ai.djl.tokenizers") {
         exportAllPackages()
