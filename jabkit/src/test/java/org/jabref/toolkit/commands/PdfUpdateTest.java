@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.when;
 
 class PdfUpdateTest extends AbstractJabKitTest {
@@ -56,7 +55,7 @@ class PdfUpdateTest extends AbstractJabKitTest {
         assertEquals(0, exitCode);
 
         List<BibEntry> writtenEntries = new XmpUtilReader().readXmp(pdfFile, xmpPreferences);
-        assertFalse(writtenEntries.isEmpty(), "No XMP metadata found in PDF after update");
+        assertEquals(1, writtenEntries.size(), "No XMP metadata found in PDF after update");
         assertEquals("Test Author", writtenEntries.getFirst().getField(StandardField.AUTHOR).orElse(""),
                 "Author field in XMP metadata does not match the bib entry");
     }
