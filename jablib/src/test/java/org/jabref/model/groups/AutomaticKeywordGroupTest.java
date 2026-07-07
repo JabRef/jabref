@@ -32,6 +32,28 @@ class AutomaticKeywordGroupTest {
         assertEquals(expected, keywordsGroup.createSubgroups(entry));
     }
 
+    @Test
+    void createSubgroupsForEntryWithoutKeywordsCreatesWithoutSubgroup() {
+        AutomaticKeywordGroup keywordsGroup = new AutomaticKeywordGroup("Keywords", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ',', '>');
+        BibEntry entry = new BibEntry();
+
+        Set<GroupTreeNode> expected = Set.of(GroupTreeNode.fromGroup(
+                new WithoutKeywordGroup("without keywords", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS)));
+
+        assertEquals(expected, keywordsGroup.createSubgroups(entry));
+    }
+
+    @Test
+    void createSubgroupsForBlankKeywordFieldCreatesWithoutSubgroup() {
+        AutomaticKeywordGroup keywordsGroup = new AutomaticKeywordGroup("Keywords", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ',', '>');
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "  ");
+
+        Set<GroupTreeNode> expected = Set.of(GroupTreeNode.fromGroup(
+                new WithoutKeywordGroup("without keywords", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS)));
+
+        assertEquals(expected, keywordsGroup.createSubgroups(entry));
+    }
+
     private Set<GroupTreeNode> createIncludingKeywordsSubgroup() {
         Set<GroupTreeNode> expectedKeywordsSubgroup = new HashSet<>();
         expectedKeywordsSubgroup.add(GroupTreeNode.fromGroup(new WordKeywordGroup("A", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "A", true, ',', true)));

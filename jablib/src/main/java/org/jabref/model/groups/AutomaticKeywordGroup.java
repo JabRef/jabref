@@ -63,10 +63,26 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
     @Override
     public Set<GroupTreeNode> createSubgroups(BibEntry entry) {
         KeywordList keywordList = entry.getFieldAsKeywords(field, keywordDelimiter);
-        return keywordList.stream()
-                          .filter(keyword -> StringUtil.isNotBlank(keyword.get()))
-                          .map(this::createGroup)
-                          .collect(Collectors.toSet());
+        Set<GroupTreeNode> subgroups = keywordList.stream()
+                                                  .filter(keyword -> StringUtil.isNotBlank(keyword.get()))
+                                                  .map(this::createGroup)
+                                                  .collect(Collectors.toSet());
+
+        // Entries without any value in the grouping field would otherwise appear in no subgroup at all.
+        // Collect them into a dedicated "without <field>" subgroup so they remain easy to find.
+        if (subgroups.isEmpty()) {
+            subgroups.add(createWithoutFieldGroup());
+        }
+
+        return subgroups;
+    }
+
+    private GroupTreeNode createWithoutFieldGroup() {
+        WithoutKeywordGroup withoutGroup = new WithoutKeywordGroup(
+                "without " + field.getName(),
+                GroupHierarchyType.INDEPENDENT,
+                field);
+        return new GroupTreeNode(withoutGroup);
     }
 
     private GroupTreeNode createGroup(Keyword keywordChain) {
