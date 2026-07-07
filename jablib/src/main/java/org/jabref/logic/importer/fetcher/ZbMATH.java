@@ -77,13 +77,15 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         if (StringUtil.isBlank(searchQuery)) {
             throw new ZbMathNoUrlException("No searchable fields found for zbMATH");
         }
-        return getURLForDocumentSearch(searchQuery, "1");
+        return getURLForSearchQuery(searchQuery, "1");
     }
 
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
-        String searchQuery = new ZbMathQueryTransformer().transformSearchQuery(queryNode).orElse("");
-        return getURLForDocumentSearch(searchQuery, "200");
+        String searchQuery = new ZbMathQueryTransformer()
+                .transformSearchQuery(queryNode)
+                .orElseThrow(() -> new URISyntaxException(String.valueOf(queryNode), "Cannot transform query for zbMATH"));
+        return getURLForSearchQuery(searchQuery, "200");
     }
 
     @Override
@@ -120,7 +122,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         }
     }
 
-    private URL getURLForDocumentSearch(String searchQuery, String resultCount)
+    private URL getURLForSearchQuery(String searchQuery, String resultCount)
             throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(DOCUMENT_SEARCH_URL);
         uriBuilder.addParameter("search_string", searchQuery);
@@ -161,44 +163,44 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         if (result instanceof JSONArray results) {
             List<BibEntry> entries = new ArrayList<>();
             for (int i = 0; i < results.length(); i++) {
-                JSONObject document = results.optJSONObject(i);
-                if (document != null) {
-                    entries.add(toBibEntry(document));
+                JSONObject entryJson = results.optJSONObject(i);
+                if (entryJson != null) {
+                    entries.add(toBibEntry(entryJson));
                 }
             }
             return entries;
-        } else if (result instanceof JSONObject document) {
-            return List.of(toBibEntry(document));
+        } else if (result instanceof JSONObject entryJson) {
+            return List.of(toBibEntry(entryJson));
         }
         return List.of();
     }
 
-    private BibEntry toBibEntry(JSONObject document) {
-        BibEntry entry = new BibEntry(toEntryType(document));
+    private BibEntry toBibEntry(JSONObject entryJson) {
+        BibEntry entry = new BibEntry(toEntryType(entryJson));
 
-        putString(entry, StandardField.TITLE, document.optJSONObject("title"), "title");
-        putString(entry, StandardField.YEAR, document, "year");
-        putString(entry, StandardField.ZBL_NUMBER, document, "identifier");
-        putInteger(entry, new UnknownField("zbmath"), document, "id");
-        putAuthors(entry, document);
-        putLanguage(entry, document);
-        putSource(entry, document);
-        putDoi(entry, document);
-        putMscCodes(entry, document);
+        putString(entry, StandardField.TITLE, entryJson.optJSONObject("title"), "title");
+        putString(entry, StandardField.YEAR, entryJson, "year");
+        putString(entry, StandardField.ZBL_NUMBER, entryJson, "identifier");
+        putInteger(entry, new UnknownField("zbmath"), entryJson, "id");
+        putAuthors(entry, entryJson);
+        putLanguage(entry, entryJson);
+        putSource(entry, entryJson);
+        putDoi(entry, entryJson);
+        putMscCodes(entry, entryJson);
 
         return entry;
     }
 
-    private StandardEntryType toEntryType(JSONObject document) {
-        JSONObject documentType = document.optJSONObject("document_type");
+    private StandardEntryType toEntryType(JSONObject entryJson) {
+        JSONObject documentType = entryJson.optJSONObject("document_type");
         if (documentType != null && "j".equals(documentType.optString("code"))) {
             return StandardEntryType.Article;
         }
         return StandardEntryType.Misc;
     }
 
-    private void putAuthors(BibEntry entry, JSONObject document) {
-        Optional.ofNullable(document.optJSONObject("contributors"))
+    private void putAuthors(BibEntry entry, JSONObject entryJson) {
+        Optional.ofNullable(entryJson.optJSONObject("contributors"))
                 .map(contributors -> contributors.optJSONArray("authors"))
                 .map(authors -> {
                     List<String> authorNames = new ArrayList<>();
@@ -214,8 +216,8 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
                 .ifPresent(author -> entry.setField(StandardField.AUTHOR, author));
     }
 
-    private void putSource(BibEntry entry, JSONObject document) {
-        Optional.ofNullable(document.optJSONObject("source"))
+    private void putSource(BibEntry entry, JSONObject entryJson) {
+        Optional.ofNullable(entryJson.optJSONObject("source"))
                 .ifPresent(source -> {
                     putPages(entry, source);
                     JSONArray series = source.optJSONArray("series");
@@ -257,8 +259,8 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         }
     }
 
-    private void putLanguage(BibEntry entry, JSONObject document) {
-        Optional.ofNullable(document.optJSONObject("language"))
+    private void putLanguage(BibEntry entry, JSONObject entryJson) {
+        Optional.ofNullable(entryJson.optJSONObject("language"))
                 .map(language -> language.optJSONArray("languages"))
                 .filter(languages -> !languages.isEmpty())
                 .map(languages -> languages.optString(0))
@@ -266,8 +268,8 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
                 .ifPresent(language -> entry.setField(StandardField.LANGUAGE, language));
     }
 
-    private void putDoi(BibEntry entry, JSONObject document) {
-        JSONArray links = document.optJSONArray("links");
+    private void putDoi(BibEntry entry, JSONObject entryJson) {
+        JSONArray links = entryJson.optJSONArray("links");
         if (links == null) {
             return;
         }
@@ -281,8 +283,8 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         }
     }
 
-    private void putMscCodes(BibEntry entry, JSONObject document) {
-        JSONArray mscEntries = document.optJSONArray("msc");
+    private void putMscCodes(BibEntry entry, JSONObject entryJson) {
+        JSONArray mscEntries = entryJson.optJSONArray("msc");
         if (mscEntries == null) {
             return;
         }
