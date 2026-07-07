@@ -19,7 +19,7 @@ The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **
 ## Message format
 `req~bxf.message-format~1`
 
-All request and response bodies are UTF-8 encoded JSON. Clients and providers MUST set `Content-Type: application/json` on every request and response that carries a body. A provider MUST reject a request whose body is not well-formed JSON, or whose body exceeds 64 KiB, with `400 bad-request`. Unknown JSON fields are ignored per [Versioning](#versioning), so that backwards-compatible additions do not break existing peers.
+All request and response bodies are UTF-8 encoded JSON. Clients and providers MUST set `Content-Type: application/json` on every request and response that carries a body. A provider MUST reject a request whose body is not well-formed JSON with `400 bad-request`. Unknown JSON fields are ignored per [Versioning](#versioning), so that backwards-compatible additions do not break existing peers.
 
 ## Happy-path flow
 
