@@ -2,6 +2,7 @@ package org.jabref.gui.maintable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
@@ -57,6 +58,7 @@ public class MainTableDataModel {
     private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
     private final TaskExecutor taskExecutor;
+    private final AtomicLong searchUpdateSequence = new AtomicLong();
     private final Subscription searchQuerySubscription;
     private final Subscription searchDisplayModeSubscription;
     private final Subscription selectedGroupsSubscription;
@@ -101,14 +103,34 @@ public class MainTableDataModel {
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
 
+    //    private void updateSearchMatches(Optional<SearchQuery> query) {
+    //        BackgroundTask.wrap(() -> {
+    //            if (query.isPresent()) {
+    //                setSearchMatches(searchContext.search(query.get()));
+    //            } else {
+    //                clearSearchMatches();
+    //            }
+    //        }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+    //    }
+
     private void updateSearchMatches(Optional<SearchQuery> query) {
+        long updateSequence = searchUpdateSequence.incrementAndGet();
+
         BackgroundTask.wrap(() -> {
             if (query.isPresent()) {
-                setSearchMatches(searchContext.search(query.get()));
-            } else {
-                clearSearchMatches();
+                return Optional.of(searchContext.search(query.get()));
             }
-        }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+            return Optional.<SearchResults>empty();
+        }).onSuccess(results -> {
+            if (updateSequence != searchUpdateSequence.get()) {
+                return;
+            }
+            results.ifPresentOrElse(
+                    this::setSearchMatches,
+                    this::clearSearchMatches
+            );
+            FilteredListProxy.refilterListReflection(entriesFiltered);
+        }).executeWith(taskExecutor);
     }
 
     /// Refresh the current search
