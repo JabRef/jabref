@@ -1,7 +1,10 @@
 package org.jabref.logic.layout.format;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
@@ -20,17 +23,47 @@ public class HTMLChars implements ParamLayoutFormatter {
     /// - `&Hey` **Matched**
     private static final Pattern HTML_ENTITY_PATTERN = Pattern.compile("&(?!(?:[a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});)");
 
+    /// Delimited TeX math spans, longer delimiters first so `$$…$$` wins over `$…$`. Used only in
+    /// `preserveMath` mode to lift math out before the LaTeX→HTML conversion (which would otherwise
+    /// consume the `\commands` inside) and splice it back verbatim for a downstream math renderer.
+    private static final Pattern MATH_SPAN = Pattern.compile(
+            "(?<!\\\\)\\$\\$.+?\\$\\$"           // $$ … $$
+                    + "|\\\\\\[.+?\\\\\\]"       // \[ … \]
+                    + "|\\\\\\(.+?\\\\\\)"       // \( … \)
+                    + "|(?<!\\\\)\\$[^$]+?\\$",  // $ … $ (opening not an escaped \$)
+            Pattern.DOTALL);
+
+    /// Private-use sentinel bounding a span placeholder: neither a LaTeX command, brace, nor an
+    /// HTML-special character, so it passes through the conversion untouched.
+    private static final char MATH_SENTINEL = '\uE000';
+
     private boolean keepCurlyBraces = false;
+    private boolean preserveMath = false;
 
     @Override
     public void setArgument(String arg) {
-        if ("keepCurlyBraces".equalsIgnoreCase(arg)) {
-            this.keepCurlyBraces = true;
+        // The layout engine passes the whole parenthesised argument as one string, so several flags
+        // can be combined, e.g. HTMLChars(keepCurlyBraces,preserveMath).
+        for (String flag : arg.split(",")) {
+            String trimmed = flag.trim();
+            if ("keepCurlyBraces".equalsIgnoreCase(trimmed)) {
+                this.keepCurlyBraces = true;
+            } else if ("preserveMath".equalsIgnoreCase(trimmed)) {
+                this.preserveMath = true;
+            }
         }
     }
 
     @Override
     public String format(String inField) {
+        if (preserveMath) {
+            return formatPreservingMath(inField);
+        }
+        return convertToHtml(inField);
+    }
+
+    /// Escapes HTML and converts LaTeX character commands to their HTML/Unicode equivalents.
+    private String convertToHtml(String inField) {
         String field = normalizedField(inField);
 
         StringBuilder sb = new StringBuilder();
@@ -183,6 +216,38 @@ public class HTMLChars implements ParamLayoutFormatter {
                                   .replace("\n", "<br>") // Replace single line breaks with <br>
                                   .replace("\\$", "&dollar;") // Replace \$ with &dollar;
                                   .replaceAll("\\$([^$]*)\\$", this.keepCurlyBraces ? "\\\\{$1\\\\}" : "$1}");
+    }
+
+    /// Converts to HTML while keeping TeX math spans intact for a downstream math renderer.
+    ///
+    /// The spans are lifted out (replaced by sentinel placeholders that pass through
+    /// [#convertToHtml] unchanged), the surrounding text is converted normally, then the spans are
+    /// spliced back verbatim — only `<`, `>` and `&` escaped so the HTML parser keeps them as text.
+    /// Delimiters and TeX bodies are left untouched; whether a span is really math (versus, say, a
+    /// currency amount) is left to the renderer's own heuristics.
+    private String formatPreservingMath(String inField) {
+        List<String> spans = new ArrayList<>();
+        Matcher matcher = MATH_SPAN.matcher(inField);
+        StringBuilder protectedField = new StringBuilder();
+        while (matcher.find()) {
+            matcher.appendReplacement(protectedField, Matcher.quoteReplacement(placeholder(spans.size())));
+            spans.add(matcher.group());
+        }
+        matcher.appendTail(protectedField);
+
+        String converted = convertToHtml(protectedField.toString());
+        for (int i = 0; i < spans.size(); i++) {
+            converted = converted.replace(placeholder(i), escapeHtmlSpecials(spans.get(i)));
+        }
+        return converted;
+    }
+
+    private static String placeholder(int index) {
+        return MATH_SENTINEL + Integer.toString(index) + MATH_SENTINEL;
+    }
+
+    private static String escapeHtmlSpecials(String span) {
+        return span.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     private String getHTMLTag(String latexCommand) {

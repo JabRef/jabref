@@ -96,6 +96,41 @@ class HTMLCharsTest {
         assertEquals(expected, layout.format(input));
     }
 
+    private static Stream<Arguments> providePreserveMathData() {
+        return Stream.of(
+                // TeX spans (including their \commands) survive verbatim for a downstream renderer,
+                // instead of being stripped/mangled as in the default equations() cases above
+                Arguments.of("$E=mc^2$", "$E=mc^2$"),
+                Arguments.of("$\\sigma$", "$\\sigma$"),
+                Arguments.of("$\\frac{a}{b}$", "$\\frac{a}{b}$"),
+                Arguments.of("$$\\int_0^1 x\\,dx$$", "$$\\int_0^1 x\\,dx$$"),
+                Arguments.of("\\(a+b\\)", "\\(a+b\\)"),
+                // only HTML-special characters inside the span are escaped
+                Arguments.of("$a&lt;b$", "$a<b$"),
+                // text around the span is still converted (LaTeX accent -> HTML entity)
+                Arguments.of("M&ouml;nch $x$", "M\\\"onch $x$"),
+                // an escaped \$ is a literal dollar (not a delimiter) and does not corrupt real math
+                Arguments.of("cost &dollar;5 and $x=5$", "cost \\$5 and $x=5$"),
+                Arguments.of("no math here", "no math here")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("providePreserveMathData")
+    void preserveMath(String expected, String input) {
+        ParamLayoutFormatter preserving = new HTMLChars();
+        preserving.setArgument("preserveMath");
+        assertEquals(expected, preserving.format(input));
+    }
+
+    @Test
+    void combinedArgumentEnablesBothFlags() {
+        // The layout engine passes "keepCurlyBraces,preserveMath" as a single argument
+        ParamLayoutFormatter combined = new HTMLChars();
+        combined.setArgument("keepCurlyBraces,preserveMath");
+        assertEquals("{x} $\\sigma$", combined.format("{x} $\\sigma$"));
+    }
+
     private static Stream<Arguments> provideNewLineTestData() {
         return Stream.of(
                 Arguments.of("a<br>b", "a\nb"),

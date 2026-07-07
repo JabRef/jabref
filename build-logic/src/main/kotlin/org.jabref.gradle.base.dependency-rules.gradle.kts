@@ -313,6 +313,16 @@ extraJavaModuleInfo {
     module("org.javassist:javassist", "org.javassist")
     module("org.jbibtex:jbibtex", "jbibtex")
     module("org.scala-lang:scala-library", "scala.library")
+    // JLaTeXMath renders TeX math in the entry preview (via org.jabref:html-to-node). It ships no
+    // module descriptor and splits its optional fonts into resource-only companion jars, so merge
+    // them into one module; jdeps reports it uses java.desktop (Java2D) and java.xml.
+    module("org.scilab.forge:jlatexmath", "jlatexmath") {
+        exportAllPackages()
+        requires("java.desktop")
+        requires("java.xml")
+        mergeJar("org.scilab.forge:jlatexmath-font-greek")
+        mergeJar("org.scilab.forge:jlatexmath-font-cyrillic")
+    }
     module("pt.davidafsilva.apple:jkeychain", "jkeychain")
 
     module("org.testfx:testfx-core", "org.testfx") {

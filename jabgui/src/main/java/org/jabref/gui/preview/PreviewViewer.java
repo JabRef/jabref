@@ -95,7 +95,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         previewView.getStyleClass().add("preview-viewer-content");
         previewView.setOptions(HtmlRenderOptions.defaults()
                                                 .withLinkHandler(this::openLink)
-                                                .withBaseFontSize(resolveBaseFontSize()));
+                                                .withBaseFontSize(resolveBaseFontSize())
+                                                // TeX math ($…$, $$…$$) in fields such as the abstract is preserved
+                                                // through the layout (HTMLChars(preserveMath)) and typeset here
+                                                .withRenderMath(true));
         // The outer ScrollPane scrolls (scroll sync, tooltips); the area sizes to its content
         previewView.setUseContentHeight(true);
         setContent(previewView);
