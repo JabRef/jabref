@@ -40,7 +40,8 @@ public class HayagrivaImporter extends Importer {
 
         Map<String, HayagrivaEntry> hayagrivaEntries = mapper.readValue(
                 input,
-                new TypeReference<Map<String, HayagrivaEntry>>() { }
+                new TypeReference<Map<String, HayagrivaEntry>>() {
+                }
         );
 
         List<BibEntry> bibEntries = new ArrayList<>();
@@ -98,7 +99,6 @@ public class HayagrivaImporter extends Importer {
         return new ParserResult(bibEntries);
     }
 
-    /// Converte "Sobrenome, Nome" (formato Hayagriva) para "Nome Sobrenome" (formato JabRef)
     private String formatAuthorName(String hayagrivaAuthor) {
         String[] partes = hayagrivaAuthor.split(",", 2);
         if (partes.length == 2) {
@@ -187,8 +187,8 @@ public class HayagrivaImporter extends Importer {
                                           .build();
 
             Map<String, HayagrivaEntry> entries = mapper.readValue(
-                    input,
-                    new TypeReference<Map<String, HayagrivaEntry>>() { }
+                    input, new TypeReference<Map<String, HayagrivaEntry>>() {
+                    }
             );
 
             if (entries == null) {
