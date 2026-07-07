@@ -52,6 +52,7 @@ import org.jabref.model.groups.LastNameGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
+import org.jabref.model.groups.WithoutKeywordGroup;
 import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexClosedEvent;
 import org.jabref.model.search.event.IndexRemovedEvent;
@@ -469,6 +470,8 @@ public class GroupNodeViewModel {
             return false;
         } else if (group instanceof EntryTypeGroup) {
             return false;
+        } else if (group instanceof WithoutKeywordGroup) {
+            return false;
         } else {
             throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
         }
@@ -496,6 +499,8 @@ public class GroupNodeViewModel {
                                      !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                              .orElse(false);
 
+            case WithoutKeywordGroup _ ->
+                    false;
             case null ->
                     throw new IllegalArgumentException("Group cannot be null");
             default ->
@@ -524,6 +529,8 @@ public class GroupNodeViewModel {
                              .map(GroupTreeNode::getGroup)
                              .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                              .orElse(false);
+            case WithoutKeywordGroup _ ->
+                    false;
             case null ->
                     throw new IllegalArgumentException("Group cannot be null");
             default ->
@@ -552,6 +559,8 @@ public class GroupNodeViewModel {
                              .map(GroupTreeNode::getGroup)
                              .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                              .orElse(false);
+            case WithoutKeywordGroup _ ->
+                    false;
             case null ->
                     throw new IllegalArgumentException("Group cannot be null");
             default ->
@@ -581,6 +590,8 @@ public class GroupNodeViewModel {
                              .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                              .orElse(false);
 
+            case WithoutKeywordGroup _ ->
+                    false;
             case null ->
                     throw new IllegalArgumentException("Group cannot be null");
             default ->
