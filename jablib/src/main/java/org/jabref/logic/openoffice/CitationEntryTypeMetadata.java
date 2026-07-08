@@ -102,74 +102,18 @@ public class CitationEntryTypeMetadata {
         List<BibEntry> entries = new ArrayList<>();
         for (String referenceMarkName : referenceMarkNames) {
             if (ReferenceMark.isZoteroReferenceMarkName(referenceMarkName)) {
-                entries.addAll(parseZoteroEntries(referenceMarkName, entryTypesInMetaData));
+                // If citation key is in metadata, then use the entry type in metadata
+                for (BibEntry entry : ZoteroCitationMarkParser.parse(referenceMarkName)) {
+                    entry.getCitationKey()
+                         .map(entryTypesInMetaData::get)
+                         .filter(value -> !StringUtil.isBlank(value))
+                         .map(EntryTypeFactory::parse)
+                         .ifPresent(entry::setType);
+                    entries.add(entry);
+                }
             }
         }
         return entries;
-    }
-
-    private static List<BibEntry> parseZoteroEntries(String referenceMarkName, Map<String, String> entryTypesInMetaData) {
-        Optional<List<String>> citationKeys = readZoteroCitationKeys(referenceMarkName);
-        if (citationKeys.isEmpty()) {
-            return ZoteroCitationMarkParser.parse(referenceMarkName);
-        }
-
-        List<BibEntry> entries = new ArrayList<>();
-        List<String> missingCitationKeys = new ArrayList<>();
-        for (String citationKey : citationKeys.get()) {
-            Optional<String> entryType = Optional.ofNullable(entryTypesInMetaData.get(citationKey))
-                                                 .filter(value -> !StringUtil.isBlank(value));
-            entryType.ifPresentOrElse(
-                    value -> entries.add(new BibEntry(EntryTypeFactory.parse(value)).withCitationKey(citationKey)),
-                    () -> missingCitationKeys.add(citationKey));
-        }
-
-        // All citation keys are in metadata
-        if (missingCitationKeys.isEmpty()) {
-            return entries;
-        }
-
-        // None of the citation keys are in metadata
-        if (entries.isEmpty()) {
-            return ZoteroCitationMarkParser.parse(referenceMarkName);
-        }
-
-        // Part of the citation keys are in metadata
-        for (BibEntry entry : ZoteroCitationMarkParser.parse(referenceMarkName)) {
-            entry.getCitationKey()
-                 .filter(missingCitationKeys::contains)
-                 .ifPresent(_ -> entries.add(entry));
-        }
-
-        return entries;
-    }
-
-    private static Optional<List<String>> readZoteroCitationKeys(String referenceMarkName) {
-        Optional<String> cslJson = extractCSLJSON(referenceMarkName);
-        if (cslJson.isEmpty()) {
-            return Optional.empty();
-        }
-
-        try {
-            return Optional.of(GSON.fromJson(cslJson.orElseThrow(), ZoteroCitationData.class))
-                           .map(citationData -> Optional.ofNullable(citationData.citationItems)
-                                                        .orElseGet(List::of)
-                                                        .stream()
-                                                        .map(citationItem -> "Zotero-" + citationItem.id)
-                                                        .toList());
-        } catch (JsonParseException e) {
-            LOGGER.debug("Could not parse Zotero citation entry type metadata", e);
-            return Optional.empty();
-        }
-    }
-
-    private static Optional<String> extractCSLJSON(String referenceMarkName) {
-        int jsonStart = referenceMarkName.indexOf('{');
-        int jsonEnd = referenceMarkName.lastIndexOf('}');
-        if ((jsonStart < 0) || (jsonEnd < jsonStart)) {
-            return Optional.empty();
-        }
-        return Optional.of(referenceMarkName.substring(jsonStart, jsonEnd + 1));
     }
 
     private static Optional<EntryTypeMetadata> parseMetadata(String metadata) {
