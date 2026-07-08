@@ -308,7 +308,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             }
 
             automaticDoi = ArXivFetcher.getAutomaticDoi(arXivBibEntry.get());
-            automaticDoiBibEntryFuture = automaticDoi.map(arXiv::asyncPerformSearchById);
+            automaticDoiBibEntryFuture = automaticDoi.map(doiFetcher::asyncPerformSearchById);
         }
 
         manualDoi = ArXivFetcher.getManualDoi(arXivBibEntry.get());
@@ -410,6 +410,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     protected static class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
 
         private static final Logger LOGGER = LoggerFactory.getLogger(ArXiv.class);
+        private static final com.google.common.util.concurrent.RateLimiter ARXIV_API_RATE_LIMITER = com.google.common.util.concurrent.RateLimiter.create(3.0);
 
         private static final String API_URL = "https://export.arxiv.org/api/query";
 
@@ -569,6 +570,9 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             }
 
             try {
+                double waitingTime = ARXIV_API_RATE_LIMITER.acquire();
+                LOGGER.trace("Thread {}, searching arXiv API '{}', waited {} because of API rate limiter",
+                        Thread.currentThread().threadId(), url, waitingTime);
                 DocumentBuilder builder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
