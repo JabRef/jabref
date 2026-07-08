@@ -1,8 +1,8 @@
 package org.jabref.logic.ai.preferences;
 
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
-import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.pipeline.DocumentSplitterKind;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
