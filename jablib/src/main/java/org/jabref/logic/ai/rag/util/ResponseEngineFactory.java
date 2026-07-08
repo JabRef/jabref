@@ -10,10 +10,11 @@ import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public final class ResponseEngineFactory {
     private ResponseEngineFactory() {
-        throw new UnsupportedOperationException("cannot instantiate a utility class");
     }
 
     public static ResponseEngine create(
@@ -54,4 +55,3 @@ public final class ResponseEngineFactory {
         );
     }
 }
-
