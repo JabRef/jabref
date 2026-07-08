@@ -416,11 +416,11 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         List<BibEntry> broaderSearchResult = fetcher.performSearch("taxonomy distributed");
 
         assertFalse(resultWithPhraseSearch.isEmpty());
-        List<String> broaderSearchIdentifiers = broaderSearchResult.stream()
-                                                                   .map(entry -> entry.getField(StandardField.EPRINT).orElse(""))
-                                                                   .toList();
+        List<Optional<String>> broaderSearchIdentifiers = broaderSearchResult.stream()
+                                                                             .map(entry -> entry.getField(StandardField.EPRINT))
+                                                                             .toList();
         assertTrue(resultWithPhraseSearch.stream()
-                                         .map(entry -> entry.getField(StandardField.EPRINT).orElse(""))
+                                         .map(entry -> entry.getField(StandardField.EPRINT))
                                          .allMatch(broaderSearchIdentifiers::contains));
     }
 
