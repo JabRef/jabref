@@ -4,14 +4,13 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.ai.chatting.ChatMessage;
 import org.jabref.model.ai.embeddings.EmbeddingSimilarityMetric;
 import org.jabref.model.ai.llm.AiProvider;
-import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.pipeline.DocumentSplitterKind;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
 public final class AiNamingUtils {
     private AiNamingUtils() {
-        throw new UnsupportedOperationException("cannot instantiate a utility class");
     }
 
     public static String getDisplayName(AiProvider provider) {
