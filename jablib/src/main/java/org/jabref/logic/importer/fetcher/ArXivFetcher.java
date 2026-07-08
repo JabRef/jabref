@@ -628,7 +628,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                     .collect(Collectors.toList());
 
             if (searchResult.isEmpty()) {
-                searchResult = fallbackToBroadTitleQuery(queryNode);
+                searchResult = fallbackToBroadTitleQuery(queryNode, pageNumber);
             }
 
             return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
@@ -646,7 +646,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             return new Page<>(rawQuery, pageNumber, searchResult);
         }
 
-        private List<BibEntry> fallbackToBroadTitleQuery(BaseQueryNode queryNode) throws FetcherException {
+        private List<BibEntry> fallbackToBroadTitleQuery(BaseQueryNode queryNode, int pageNumber) throws FetcherException {
             if (!(queryNode instanceof SearchQueryNode(
                     Optional<Field> field,
                     String requestedTitle
@@ -660,13 +660,13 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             }
 
             String normalizedRequestedTitle = normalizeForTitleMatching(requestedTitle);
-            return queryApi(broadQuery, List.of(), 0, 100).stream()
-                                                          .filter(arXivEntry -> arXivEntry.title()
-                                                                                          .map(ArXiv::normalizeForTitleMatching)
-                                                                                          .filter(normalizedTitle -> normalizedTitle.contains(normalizedRequestedTitle))
-                                                                                          .isPresent())
-                                                          .map(arXivEntry -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
-                                                          .toList();
+            return queryApi(broadQuery, List.of(), getPageSize() * pageNumber, getPageSize()).stream()
+                                                                                             .filter(arXivEntry -> arXivEntry.title()
+                                                                                                                             .map(ArXiv::normalizeForTitleMatching)
+                                                                                                                             .filter(normalizedTitle -> normalizedTitle.contains(normalizedRequestedTitle))
+                                                                                                                             .isPresent())
+                                                                                             .map(arXivEntry -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
+                                                                                             .toList();
         }
 
         private static String buildBroadTitleQuery(String title) {
