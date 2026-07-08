@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -46,6 +47,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.BaseQueryNode;
+import org.jabref.model.search.query.SearchQueryNode;
 import org.jabref.model.util.OptionalUtil;
 
 import org.apache.hc.core5.net.URIBuilder;
@@ -71,6 +73,10 @@ import org.xml.sax.SAXException;
 public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArXivFetcher.class);
+    private static final Pattern LUCENE_STYLE_FIELD_QUERY = Pattern.compile("\\b(author|title|journal|doi|year|year-range)\\s*:\\s*");
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
+    private static final Pattern LEADING_OR_TRAILING_NON_ALNUM_PATTERN = Pattern.compile("^[^\\p{Alnum}]+|[^\\p{Alnum}]+$");
+    private static final Pattern NON_ALNUM_OR_SPACE_PATTERN = Pattern.compile("[^\\p{Alnum}\\s]+");
 
     // See https://blog.arxiv.org/2022/02/17/new-arxiv-articles-are-now-automatically-assigned-dois/
     private static final String DOI_PREFIX = "10.48550/arXiv.";
@@ -113,6 +119,16 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     @Override
     public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException {
         return arXiv.findFullText(entry);
+    }
+
+    @Override
+    public List<BibEntry> performSearch(String searchQuery) throws FetcherException {
+        return PagedSearchBasedFetcher.super.performSearch(normalizeSearchQuery(searchQuery));
+    }
+
+    @Override
+    public Page<BibEntry> performSearchPaged(String searchQuery, int pageNumber) throws FetcherException {
+        return PagedSearchBasedFetcher.super.performSearchPaged(normalizeSearchQuery(searchQuery), pageNumber);
     }
 
     @Override
@@ -346,12 +362,23 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
     @Override
     public Optional<ArXivIdentifier> findIdentifier(BibEntry entry) throws FetcherException {
+        Optional<ArXivIdentifier> arXivIdentifier = entry.getField(StandardField.DOI)
+                                                         .filter(doi -> !isManualDoi(doi))
+                                                         .map(doi -> doi.substring(DOI_PREFIX.length()))
+                                                         .flatMap(ArXivIdentifier::parse);
+        if (arXivIdentifier.isPresent()) {
+            return arXivIdentifier;
+        }
         return arXiv.findIdentifier(entry);
     }
 
     @Override
     public String getIdentifierName() {
         return arXiv.getIdentifierName();
+    }
+
+    private static String normalizeSearchQuery(String searchQuery) {
+        return LUCENE_STYLE_FIELD_QUERY.matcher(searchQuery).replaceAll("$1=");
     }
 
     /// Fetcher for the arXiv.
@@ -448,9 +475,12 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             if (doiString.isPresent() && ArXivFetcher.isManualDoi(doiString.get())) {
                 query = "doi:" + doiString.get();
             } else {
-                // TODO: Use org.jabref.logic.importer.fetcher.transformers.ArXivQueryTransformer
-                Optional<String> authorQuery = entry.getField(StandardField.AUTHOR).map(author -> "au:" + author);
-                Optional<String> titleQuery = entry.getField(StandardField.TITLE).map(title -> "ti:" + StringUtil.ignoreCurlyBracket(title));
+                // Keep fielded queries aligned with the arXiv query transformer so multi-word values stay scoped to the field.
+                Optional<String> authorQuery = entry.getField(StandardField.AUTHOR)
+                                                   .map(author -> "au:" + StringUtil.quoteStringIfSpaceIsContained(author));
+                Optional<String> titleQuery = entry.getField(StandardField.TITLE)
+                                                  .map(StringUtil::ignoreCurlyBracket)
+                                                  .map(title -> "ti:" + StringUtil.quoteStringIfSpaceIsContained(title));
                 query = String.join("+AND+", OptionalUtil.toList(authorQuery, titleQuery));
             }
 
@@ -582,7 +612,55 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                     .map(arXivEntry -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
                     .collect(Collectors.toList());
 
+            if (searchResult.isEmpty()) {
+                searchResult = fallbackToBroadTitleQuery(queryNode);
+            }
+
             return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
+        }
+
+        private List<BibEntry> fallbackToBroadTitleQuery(BaseQueryNode queryNode) throws FetcherException {
+            if (!(queryNode instanceof SearchQueryNode searchQueryNode) || searchQueryNode.field().isEmpty() || !StandardField.TITLE.equals(searchQueryNode.field().get())) {
+                return List.of();
+            }
+
+            String requestedTitle = searchQueryNode.term();
+            String broadQuery = buildBroadTitleQuery(requestedTitle);
+            if (broadQuery.isBlank()) {
+                return List.of();
+            }
+
+            String normalizedRequestedTitle = normalizeForTitleMatching(requestedTitle);
+            return queryApi(broadQuery, List.of(), 0, 100).stream()
+                    .filter(arXivEntry -> arXivEntry.title()
+                                                  .map(ArXiv::normalizeForTitleMatching)
+                                                  .filter(normalizedTitle -> normalizedTitle.contains(normalizedRequestedTitle))
+                                                  .isPresent())
+                    .map(arXivEntry -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
+                    .toList();
+        }
+
+        private static String buildBroadTitleQuery(String title) {
+            String[] rawTerms = WHITESPACE_PATTERN.split(title);
+            List<String> queryTerms = new ArrayList<>();
+            for (String rawTerm : rawTerms) {
+                String sanitizedTerm = LEADING_OR_TRAILING_NON_ALNUM_PATTERN.matcher(rawTerm).replaceAll("");
+                if (sanitizedTerm.length() < 4) {
+                    continue;
+                }
+                if (!sanitizedTerm.equals(StringUtil.stripAccents(sanitizedTerm))) {
+                    continue;
+                }
+                queryTerms.add("all:" + sanitizedTerm);
+            }
+            return String.join(" AND ", queryTerms);
+        }
+
+        private static String normalizeForTitleMatching(String title) {
+            String normalizedTitle = StringUtil.stripAccents(title);
+            normalizedTitle = NON_ALNUM_OR_SPACE_PATTERN.matcher(normalizedTitle).replaceAll(" ");
+            normalizedTitle = WHITESPACE_PATTERN.matcher(normalizedTitle).replaceAll(" ");
+            return normalizedTitle.trim().toLowerCase();
         }
 
         private List<BibEntry> filterYears(List<BibEntry> searchResult, ArXivQueryTransformer transformer) {
@@ -625,6 +703,10 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         }
 
         private static class ArXivEntry {
+            private static final Pattern SINGLE_LINE_BREAK_PATTERN = Pattern.compile("\\n(?!\\s*\\n)");
+            private static final Pattern SURROUNDING_LINE_BREAK_WHITESPACE_PATTERN = Pattern.compile("\\s*\\n\\s*");
+            private static final Pattern MULTIPLE_SPACES_PATTERN = Pattern.compile(" {2,}");
+            private static final Pattern LEADING_OR_TRAILING_WHITESPACE_PATTERN = Pattern.compile("(^\\s*|\\s+$)");
 
             private final Optional<String> title;
             private final Optional<String> urlAbstractPage;
@@ -696,10 +778,15 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                                          .flatMap(node -> XMLUtil.getAttributeContent(node, "term"));
             }
 
+            public Optional<String> title() {
+                return title;
+            }
+
             public static String correctLineBreaks(String s) {
-                String result = s.replaceAll("\\n(?!\\s*\\n)", " ");
-                result = result.replaceAll("\\s*\\n\\s*", "\n");
-                return result.replaceAll(" {2,}", " ").replaceAll("(^\\s*|\\s+$)", "");
+                String result = SINGLE_LINE_BREAK_PATTERN.matcher(s).replaceAll(" ");
+                result = SURROUNDING_LINE_BREAK_WHITESPACE_PATTERN.matcher(result).replaceAll("\n");
+                result = MULTIPLE_SPACES_PATTERN.matcher(result).replaceAll(" ");
+                return LEADING_OR_TRAILING_WHITESPACE_PATTERN.matcher(result).replaceAll("");
             }
 
             /// Returns the url of the linked pdf
