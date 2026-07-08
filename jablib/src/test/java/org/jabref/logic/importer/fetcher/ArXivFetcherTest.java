@@ -377,6 +377,14 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
+    void searchIdentifierForSlicePaperByDoiUrl() throws FetcherException {
+        sliceTheoremPaper.clearField(StandardField.EPRINT);
+        sliceTheoremPaper.setField(StandardField.DOI, "https://doi.org/10.48550/arXiv.1405.2249");
+
+        assertEquals(ArXivIdentifier.parse("1405.2249"), fetcher.findIdentifier(sliceTheoremPaper));
+    }
+
+    @Test
     void searchEmptyId() throws FetcherException {
         assertEquals(Optional.empty(), fetcher.performSearchById(""));
     }

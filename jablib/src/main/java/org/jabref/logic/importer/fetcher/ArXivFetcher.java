@@ -208,7 +208,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
     /// Check if a specific DOI is user-assigned.
     private static boolean isManualDoi(String doi) {
-        return !doi.toLowerCase().contains(DOI_PREFIX.toLowerCase());
+        return !doi.regionMatches(true, 0, DOI_PREFIX, 0, DOI_PREFIX.length());
     }
 
     /// Get user-issued DOI from ArXiv Bibtex entry, if any
@@ -380,7 +380,9 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     @Override
     public Optional<ArXivIdentifier> findIdentifier(BibEntry entry) throws FetcherException {
         Optional<ArXivIdentifier> arXivIdentifier = entry.getField(StandardField.DOI)
-                                                         .filter(doi -> !isManualDoi(doi))
+                                                         .flatMap(DOI::parse)
+                                                         .map(DOI::asString)
+                                                         .filter(doi -> doi.regionMatches(true, 0, DOI_PREFIX, 0, DOI_PREFIX.length()))
                                                          .map(doi -> doi.substring(DOI_PREFIX.length()))
                                                          .flatMap(ArXivIdentifier::parse);
         if (arXivIdentifier.isPresent()) {
