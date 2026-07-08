@@ -68,7 +68,7 @@ public class CitationEntryTypeMetadata {
                 .flatMap(CitationEntryTypeMetadata::parseMetadata)
                 .orElseGet(EntryTypeMetadata::new);
 
-        Map<String, CitationEntryType> citationTypeMap = getCitationTypeMap(metadata);
+        Map<String, @Nullable CitationEntryType> citationTypeMap = getCitationTypeMap(metadata);
         metadata.schemaVersion = SCHEMA_VERSION;
 
         for (BibEntry entry : entries) {
@@ -89,8 +89,8 @@ public class CitationEntryTypeMetadata {
 
         EntryTypeMetadata entryTypeMetadata = parsedMetadata.get();
         Map<String, String> result = new LinkedHashMap<>();
-        for (Map.Entry<String, CitationEntryType> entry : getCitationTypeMap(entryTypeMetadata).entrySet()) {
-            Optional.of(entry.getValue())
+        for (Map.Entry<String, @Nullable CitationEntryType> entry : getCitationTypeMap(entryTypeMetadata).entrySet()) {
+            Optional.ofNullable(entry.getValue())
                     .map(citationEntryType -> citationEntryType.jabrefEntryType)
                     .filter(value -> !StringUtil.isBlank(value))
                     .ifPresent(value -> result.put(entry.getKey(), value));
@@ -122,23 +122,23 @@ public class CitationEntryTypeMetadata {
         }
 
         try {
-            return Optional.of(GSON.fromJson(metadata, EntryTypeMetadata.class));
+            return Optional.ofNullable(GSON.fromJson(metadata, EntryTypeMetadata.class));
         } catch (JsonParseException e) {
             LOGGER.debug("Could not parse citation entry type metadata", e);
             return Optional.empty();
         }
     }
 
-    private static Map<String, CitationEntryType> getCitationTypeMap(EntryTypeMetadata metadata) {
-        Map<String, CitationEntryType> citationTypeMap = Optional.ofNullable(metadata.citationTypeMap)
-                                                                 .orElseGet(LinkedHashMap::new);
+    private static Map<String, @Nullable CitationEntryType> getCitationTypeMap(EntryTypeMetadata metadata) {
+        Map<String, @Nullable CitationEntryType> citationTypeMap = Optional.ofNullable(metadata.citationTypeMap)
+                                                                           .orElseGet(LinkedHashMap::new);
         metadata.citationTypeMap = citationTypeMap;
         return citationTypeMap;
     }
 
     private static class EntryTypeMetadata {
         int schemaVersion = SCHEMA_VERSION;
-        @Nullable Map<String, CitationEntryType> citationTypeMap = new LinkedHashMap<>();
+        @Nullable Map<String, @Nullable CitationEntryType> citationTypeMap = new LinkedHashMap<>();
     }
 
     private static class CitationEntryType {
