@@ -106,21 +106,18 @@ public class MainTableDataModel {
     private void updateSearchMatches(Optional<SearchQuery> query) {
         long updateSequence = searchUpdateSequence.incrementAndGet();
 
-        BackgroundTask.wrap(() -> {
-            if (query.isPresent()) {
-                return Optional.of(searchContext.search(query.get()));
-            }
-            return Optional.<SearchResults>empty();
-        }).onSuccess(results -> {
-            if (updateSequence != searchUpdateSequence.get()) {
-                return;
-            }
-            results.ifPresentOrElse(
-                    this::setSearchMatches,
-                    this::clearSearchMatches
-            );
-            FilteredListProxy.refilterListReflection(entriesFiltered);
-        }).executeWith(taskExecutor);
+        BackgroundTask.wrap(() ->
+                              query.map(searchQuery -> searchContext.search(searchQuery)))
+                      .onSuccess(results -> {
+                          if (updateSequence != searchUpdateSequence.get()) {
+                              return;
+                          }
+                          results.ifPresentOrElse(
+                                  this::setSearchMatches,
+                                  this::clearSearchMatches
+                          );
+                          FilteredListProxy.refilterListReflection(entriesFiltered);
+                      }).executeWith(taskExecutor);
     }
 
     /// Refresh the current search
