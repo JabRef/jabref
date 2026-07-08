@@ -70,6 +70,11 @@ class LatexToUnicodeFormatterTest {
     }
 
     @Test
+    void literalUnderscoreParenthesesRemainLiteral() {
+        assertEquals("name_(a) and x_(1)", formatter.format("name_(a) and x_(1)"));
+    }
+
+    @Test
     void formatExample() {
         assertEquals("Mönch", formatter.format(formatter.getExampleInput()));
     }

@@ -6,11 +6,11 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.tomtung.latex2unicode.LaTeX2Unicode;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import fastparse.Parsed;
 import org.jspecify.annotations.NonNull;
 
@@ -78,8 +78,9 @@ public class LatexToUnicodeAdapter {
         if (parsingResult instanceof Parsed.Success) {
             String text = parsingResult.get().value();
             toFormat = Normalizer.normalize(text, Normalizer.Form.NFC);
+            toFormat = makeFallbackScriptsReadable(toFormat);
             toFormat = UNDERSCORE_PLACEHOLDER_MATCHER.matcher(toFormat).replaceAll("_");
-            return Optional.of(makeFallbackScriptsReadable(toFormat));
+            return Optional.of(toFormat);
         }
         return Optional.empty();
     }
