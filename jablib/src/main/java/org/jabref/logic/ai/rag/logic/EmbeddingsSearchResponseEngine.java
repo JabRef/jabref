@@ -8,8 +8,8 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.ingestion.logic.EmbeddingsCleaner;
 import org.jabref.logic.ai.ingestion.util.FileHasher;
 import org.jabref.model.ai.identifiers.FullBibEntry;
-import org.jabref.model.ai.pipeline.AnswerEngineKind;
 import org.jabref.model.ai.pipeline.RelevantInformation;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.ListUtil;
@@ -25,9 +25,9 @@ import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// [impl->feat~ai.answer-engines.embeddings-search~1]
-public class EmbeddingsSearchAnswerEngine implements AnswerEngine {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddingsSearchAnswerEngine.class);
+// [impl->feat~ai.response-engines.embeddings-search~1]
+public class EmbeddingsSearchResponseEngine implements ResponseEngine {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddingsSearchResponseEngine.class);
 
     private final FilePreferences filePreferences;
     private final EmbeddingModel embeddingModel;
@@ -35,7 +35,7 @@ public class EmbeddingsSearchAnswerEngine implements AnswerEngine {
     private final double minimumScore;
     private final int maximumResultsCount;
 
-    public EmbeddingsSearchAnswerEngine(
+    public EmbeddingsSearchResponseEngine(
             FilePreferences filePreferences,
             EmbeddingModel embeddingModel,
             EmbeddingStore<TextSegment> embeddingStore,
@@ -137,7 +137,9 @@ public class EmbeddingsSearchAnswerEngine implements AnswerEngine {
     }
 
     @Override
-    public AnswerEngineKind getKind() {
-        return AnswerEngineKind.EMBEDDINGS_SEARCH;
+    public ResponseEngineKind getKind() {
+        return ResponseEngineKind.EMBEDDINGS_SEARCH;
     }
 }
+
+
