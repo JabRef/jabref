@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.jspecify.annotations.NullMarked;
@@ -22,7 +23,8 @@ class CitationEntryTypeMetadataTest {
                   "id": 587,
                   "itemData": {
                     "type": "article-journal",
-                    "title": "Test article"
+                    "title": "Test article",
+                    "container-title": "Journal of Test"
                   }
                 }
               ]
@@ -88,8 +90,9 @@ class CitationEntryTypeMetadataTest {
 
     @Test
     void parseZoteroEntriesUsesCslToJabRefMapping() {
-        // [utest->req~openoffice.citation-entrytype-metadata~1]
-        List<BibEntry> entries = CitationEntryTypeMetadata.parseZoteroEntries(List.of("JR_cite_1_Keen2020", ZOTERO_JOURNAL_ARTICLE));
+        List<BibEntry> entries = CitationEntryTypeMetadata.parseZoteroEntries(
+                List.of("JR_cite_1_Keen2020", ZOTERO_JOURNAL_ARTICLE),
+                Map.of());
 
         assertEquals(1, entries.size());
         BibEntry entry = entries.getFirst();
@@ -107,5 +110,7 @@ class CitationEntryTypeMetadataTest {
         BibEntry entry = entries.getFirst();
         assertEquals(StandardEntryType.Book, entry.getType());
         assertEquals(Optional.of("Zotero-587"), entry.getCitationKey());
+        assertEquals(Optional.of("Test article"), entry.getField(StandardField.TITLE));
+        assertEquals(Optional.of("Journal of Test"), entry.getField(StandardField.JOURNALTITLE));
     }
 }
