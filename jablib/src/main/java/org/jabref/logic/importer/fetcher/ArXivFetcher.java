@@ -493,13 +493,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             if (doiString.isPresent() && ArXivFetcher.isManualDoi(doiString.get())) {
                 query = "doi:" + doiString.get();
             } else {
-                // Keep fielded queries aligned with the arXiv query transformer so multi-word values stay scoped to the field.
-                Optional<String> authorQuery = entry.getField(StandardField.AUTHOR)
-                                                    .map(author -> "au:" + StringUtil.quoteStringIfSpaceIsContained(author));
-                Optional<String> titleQuery = entry.getField(StandardField.TITLE)
-                                                   .map(StringUtil::ignoreCurlyBracket)
-                                                   .map(title -> "ti:" + StringUtil.quoteStringIfSpaceIsContained(title));
-                query = String.join("+AND+", OptionalUtil.toList(authorQuery, titleQuery));
+                query = new ArXivQueryTransformer().entryToQuery(entry).orElse("");
             }
 
             Optional<ArXivEntry> arxivEntry = searchForEntry(query);
