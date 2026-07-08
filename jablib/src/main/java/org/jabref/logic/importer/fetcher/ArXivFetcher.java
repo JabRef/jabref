@@ -494,10 +494,10 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             } else {
                 // Keep fielded queries aligned with the arXiv query transformer so multi-word values stay scoped to the field.
                 Optional<String> authorQuery = entry.getField(StandardField.AUTHOR)
-                                                   .map(author -> "au:" + StringUtil.quoteStringIfSpaceIsContained(author));
+                                                    .map(author -> "au:" + StringUtil.quoteStringIfSpaceIsContained(author));
                 Optional<String> titleQuery = entry.getField(StandardField.TITLE)
-                                                  .map(StringUtil::ignoreCurlyBracket)
-                                                  .map(title -> "ti:" + StringUtil.quoteStringIfSpaceIsContained(title));
+                                                   .map(StringUtil::ignoreCurlyBracket)
+                                                   .map(title -> "ti:" + StringUtil.quoteStringIfSpaceIsContained(title));
                 query = String.join("+AND+", OptionalUtil.toList(authorQuery, titleQuery));
             }
 
@@ -649,11 +649,13 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         }
 
         private List<BibEntry> fallbackToBroadTitleQuery(BaseQueryNode queryNode) throws FetcherException {
-            if (!(queryNode instanceof SearchQueryNode searchQueryNode) || searchQueryNode.field().isEmpty() || !StandardField.TITLE.equals(searchQueryNode.field().get())) {
+            if (!(queryNode instanceof SearchQueryNode(
+                    Optional<Field> field,
+                    String requestedTitle
+            )) || field.isEmpty() || !StandardField.TITLE.equals(field.get())) {
                 return List.of();
             }
 
-            String requestedTitle = searchQueryNode.term();
             String broadQuery = buildBroadTitleQuery(requestedTitle);
             if (broadQuery.isBlank()) {
                 return List.of();
@@ -661,12 +663,12 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
             String normalizedRequestedTitle = normalizeForTitleMatching(requestedTitle);
             return queryApi(broadQuery, List.of(), 0, 100).stream()
-                    .filter(arXivEntry -> arXivEntry.title()
-                                                  .map(ArXiv::normalizeForTitleMatching)
-                                                  .filter(normalizedTitle -> normalizedTitle.contains(normalizedRequestedTitle))
-                                                  .isPresent())
-                    .map(arXivEntry -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
-                    .toList();
+                                                          .filter(arXivEntry -> arXivEntry.title()
+                                                                                          .map(ArXiv::normalizeForTitleMatching)
+                                                                                          .filter(normalizedTitle -> normalizedTitle.contains(normalizedRequestedTitle))
+                                                                                          .isPresent())
+                                                          .map(arXivEntry -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
+                                                          .toList();
         }
 
         private static String buildBroadTitleQuery(String title) {
