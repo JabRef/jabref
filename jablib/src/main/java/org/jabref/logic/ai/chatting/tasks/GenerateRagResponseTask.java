@@ -85,7 +85,7 @@ public class GenerateRagResponseTask extends BackgroundTask<ChatMessage> {
         if (chatHistoryForLlm.getLast().role() != ChatMessage.Role.SYSTEM) {
             chatHistoryForLlm.removeLast();
         }
-        // [impl->req~ai.chat.uses-answer-engine~1]
+        // [impl->req~ai.chat.uses-response-engine~1]
         chatHistoryForLlm.add(injectedMessage);
 
         List<dev.langchain4j.data.message.ChatMessage> chatMessages = chatHistoryForLlm

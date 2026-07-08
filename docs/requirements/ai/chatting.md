@@ -116,13 +116,13 @@ Needs: impl
 Covers: `feat~ai.chat.general~1`, `feat~ai.expert-settings~1`
 
 ### Ensure that a response engine is used in AI chat
-`req~ai.chat.uses-answer-engine~1`
+`req~ai.chat.uses-response-engine~1`
 
 Rationale: this requirement ensures that the AI has context to answer a question
 
 Needs: impl
 
-Covers: `feat~ai-answer-engines~1`
+Covers: `feat~ai.response-engines~1`
 
 ## AI chat with entries
 `feat~ai.chatting.entries~1`

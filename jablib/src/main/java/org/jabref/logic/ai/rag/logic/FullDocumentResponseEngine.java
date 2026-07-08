@@ -9,7 +9,7 @@ import org.jabref.model.ai.pipeline.RelevantInformation;
 import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.entry.BibEntry;
 
-// [impl->feat~ai.answer-engines.full-document~1]
+// [impl->feat~ai.response-engines.full-document~1]
 public class FullDocumentResponseEngine implements ResponseEngine {
     private final FilePreferences filePreferences;
 

@@ -25,7 +25,7 @@ import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// [impl->feat~ai.answer-engines.embeddings-search~1]
+// [impl->feat~ai.response-engines.embeddings-search~1]
 public class EmbeddingsSearchResponseEngine implements ResponseEngine {
     private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddingsSearchResponseEngine.class);
 
