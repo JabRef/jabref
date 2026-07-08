@@ -34,8 +34,8 @@ import org.jabref.logic.ai.embedding.EmbeddingModelCache;
 import org.jabref.logic.ai.embedding.EmbeddingModelFactory;
 import org.jabref.logic.ai.ingestion.tasks.generateembeddings.GenerateEmbeddingsTask;
 import org.jabref.logic.ai.preferences.AiPreferences;
-import org.jabref.logic.ai.rag.logic.AnswerEngine;
-import org.jabref.logic.ai.rag.util.AnswerEngineFactory;
+import org.jabref.logic.ai.rag.logic.ResponseEngine;
+import org.jabref.logic.ai.rag.util.ResponseEngineFactory;
 import org.jabref.logic.ai.util.TrackedBackgroundTask;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -45,7 +45,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.ai.AiMetadata;
 import org.jabref.model.ai.chatting.ChatMessage;
 import org.jabref.model.ai.identifiers.FullBibEntry;
-import org.jabref.model.ai.pipeline.AnswerEngineKind;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -84,10 +84,10 @@ public class AiChatStatusViewModel extends AbstractViewModel {
             new Observable[] {row.statusProperty(), row.errorProperty()}
     );
 
-    private final ListProperty<AnswerEngineKind> answerEngineKinds = new SimpleListProperty<>(FXCollections.observableArrayList(AnswerEngineKind.values()));
-    private final ObjectProperty<AnswerEngineKind> selectedAnswerEngineKind = new SimpleObjectProperty<>();
+    private final ListProperty<ResponseEngineKind> responseEngineKinds = new SimpleListProperty<>(FXCollections.observableArrayList(ResponseEngineKind.values()));
+    private final ObjectProperty<ResponseEngineKind> selectedResponseEngineKind = new SimpleObjectProperty<>();
 
-    private final ObjectProperty<AnswerEngine> answerEngine = new SimpleObjectProperty<>();
+    private final ObjectProperty<ResponseEngine> responseEngine = new SimpleObjectProperty<>();
     private final ObjectProperty<ChatModel> chatModel = new SimpleObjectProperty<>();
     private final ObjectProperty<AsyncEmbeddingModel> embeddingModel = new SimpleObjectProperty<>();
 
@@ -124,7 +124,7 @@ public class AiChatStatusViewModel extends AbstractViewModel {
     }
 
     private void setupValues() {
-        selectedAnswerEngineKind.set(aiPreferences.getAnswerEngineKind());
+        selectedResponseEngineKind.set(aiPreferences.getResponseEngineKind());
     }
 
     private void setupBindings() {
@@ -138,9 +138,9 @@ public class AiChatStatusViewModel extends AbstractViewModel {
                 aiPreferences.getEmbeddingsProperties()
         ));
 
-        this.answerEngine.bind(ObservablesHelper.createObjectBinding(
-                () -> AnswerEngineFactory.create(
-                        selectedAnswerEngineKind.get(),
+        this.responseEngine.bind(ObservablesHelper.createObjectBinding(
+                () -> ResponseEngineFactory.create(
+                        selectedResponseEngineKind.get(),
                         filePreferences,
                         embeddingModel.get(),
                         embeddingStore,
@@ -148,8 +148,8 @@ public class AiChatStatusViewModel extends AbstractViewModel {
                         aiPreferences.getRagMaxResultsCount()
                 ),
                 Stream.concat(
-                        aiPreferences.getAnswerEngineProperties().stream(),
-                        Stream.of(selectedAnswerEngineKind)
+                        aiPreferences.getResponseEngineProperties().stream(),
+                        Stream.of(selectedResponseEngineKind)
                 ).toList()
         ));
     }
@@ -273,8 +273,8 @@ public class AiChatStatusViewModel extends AbstractViewModel {
                      });
     }
 
-    public void setAnswerEngine(AnswerEngine answerEngine) {
-        selectedAnswerEngineKind.set(answerEngine.getKind());
+    public void setResponseEngine(ResponseEngine responseEngine) {
+        selectedResponseEngineKind.set(responseEngine.getKind());
     }
 
     public void clearChatHistory() {
@@ -322,16 +322,16 @@ public class AiChatStatusViewModel extends AbstractViewModel {
         return entries;
     }
 
-    public ObjectProperty<AnswerEngine> answerEngineProperty() {
-        return answerEngine;
+    public ObjectProperty<ResponseEngine> responseEngineProperty() {
+        return responseEngine;
     }
 
-    public ListProperty<AnswerEngineKind> answerEngineKindsProperty() {
-        return answerEngineKinds;
+    public ListProperty<ResponseEngineKind> responseEngineKindsProperty() {
+        return responseEngineKinds;
     }
 
-    public ObjectProperty<AnswerEngineKind> selectedAnswerEngineKindProperty() {
-        return selectedAnswerEngineKind;
+    public ObjectProperty<ResponseEngineKind> selectedResponseEngineKindProperty() {
+        return selectedResponseEngineKind;
     }
 
     public ObjectProperty<ChatModel> chatModelProperty() {
