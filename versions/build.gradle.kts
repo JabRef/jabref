@@ -14,9 +14,7 @@ val arch = DefaultNativePlatform.getCurrentArchitecture()
 
 val javafxDefault = "26.0.1"
 // The JavaFX version can be overridden via the gradle property `javafxVersion`.
-// Only the non-web modules follow the override; javafx-web always stays on the default version.
 val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
-val javafxWeb = javafxDefault
 
 val lucene = "10.5.0"
 
@@ -40,8 +38,8 @@ dependencies.constraints {
     api("org.openjfx:javafx-fxml:$javafx")
     api("org.openjfx:javafx-graphics:$javafx")
     api("org.openjfx:javafx-swing:$javafx")
-    api("org.openjfx:javafx-web:$javafxWeb")
-    api("org.openjfx:jdk-jsobject:$javafx")
+    api("org.openjfx:jfx-incubator-input:$javafx")
+    api("org.openjfx:jfx-incubator-richtext:$javafx")
 
     api("cc.jilt:jilt:1.9.1")
 
@@ -134,6 +132,7 @@ dependencies.constraints {
     api("org.hisp.dhis:json-tree:1.9.4")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
+    api("org.jabref:html-to-node:0.1.0-SNAPSHOT")
     api("org.jabref:mslinks:1.2")
     api("org.jetbrains:annotations:26.1.0")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.0")
@@ -147,7 +146,7 @@ dependencies.constraints {
     api("org.libreoffice:unoloader:26.2.2")
     api("org.mockito:mockito-core:5.23.0")
     api("org.ow2.asm:asm:9.10.1")
-    api("org.postgresql:postgresql:42.7.12")
+    api("org.postgresql:postgresql:42.7.13")
     api("org.slf4j:jul-to-slf4j:2.0.18")
     api("org.slf4j:slf4j-api:2.0.18")
     api("org.testfx:testfx-core:4.0.18")

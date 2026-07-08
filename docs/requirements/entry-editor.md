@@ -61,4 +61,11 @@ When fields of the shown entry are set or unset outside the Main tab (source tab
 
 Needs: impl
 
+## A focused, empty, non-required field can be removed from the list
+`req~entry-editor.main-tab.remove-field~1`
+
+A field's row shows a small gray "remove field" icon button pinned to its top-right corner while the field's editor is focused and the field is currently blank. Clicking it hides the row again. The citation key and the entry type's required fields never show this button, so they cannot be removed this way.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
