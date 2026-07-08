@@ -318,6 +318,13 @@ extraJavaModuleInfo {
     }
     module("org.javassist:javassist", "org.javassist")
     module("org.jbibtex:jbibtex", "jbibtex")
+    module("org.scilab.forge:jlatexmath", "jlatexmath") {
+        exportAllPackages()
+        mergeJar("org.scilab.forge:jlatexmath-font-greek")
+        mergeJar("org.scilab.forge:jlatexmath-font-cyrillic")
+        requiresTransitive("java.desktop")
+        requiresTransitive("java.xml")
+    }
     module("org.scala-lang:scala-library", "scala.library")
     module("pt.davidafsilva.apple:jkeychain", "jkeychain")
 
