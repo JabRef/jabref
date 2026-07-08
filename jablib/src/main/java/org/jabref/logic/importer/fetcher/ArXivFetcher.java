@@ -652,7 +652,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             if (!(queryNode instanceof SearchQueryNode(
                     Optional<Field> field,
                     String requestedTitle
-            )) || field.isEmpty() || !StandardField.TITLE.equals(field.get())) {
+            )) || field.isEmpty() || StandardField.TITLE != field.get()) {
                 return List.of();
             }
 
