@@ -20,6 +20,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
@@ -189,17 +190,28 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     }
 
     private static boolean isEmptyRow(EventTarget target) {
-        Optional<ListCell<?>> enclosingCell = target instanceof Node node
-                                              ? findEnclosingListCell(node)
-                                              : Optional.empty();
-        return enclosingCell.map(ListCell::isEmpty).orElse(false);
-    }
-
-    private static Optional<ListCell<?>> findEnclosingListCell(Node node) {
-        if (node instanceof ListCell<?> cell) {
-            return Optional.of(cell);
+        if (!(target instanceof Node node)) {
+            return false;
         }
-        return Optional.ofNullable(node.getParent()).flatMap(LinkedFilesEditor::findEnclosingListCell);
+        // Walk up from the clicked node to the ListView. The handler sits on the ListView, so
+        // events from scrollbars and other skin sub-controls bubble up here too; only clicks on
+        // the list's content background (no enclosing cell, no scrollbar crossed) count as the
+        // empty area and behave like double-clicking the trailing empty "+1" row.
+        for (Node current = node; current != null; current = current.getParent()) {
+            if (current instanceof ListCell<?> cell) {
+                return cell.isEmpty();
+            }
+            if (current instanceof ScrollBar) {
+                return false;
+            }
+            if (current instanceof ListView) {
+                // Reached the list itself without crossing a cell or a scrollbar: the click
+                // landed on the content background (the blank space below the files, or the
+                // whole control when no files exist yet).
+                return true;
+            }
+        }
+        return false;
     }
 
     private void handleOnDragOver(LinkedFileViewModel originalItem, DragEvent event) {
@@ -406,7 +418,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     }
 
     @FXML
-    private void addNewFile() {
+    public void addNewFile() {
         dialogService.showCustomDialogAndWait(new LinkedFileEditDialog()).filter(file -> !file.isEmpty()).ifPresent(newLinkedFile -> viewModel.addNewLinkedFile(newLinkedFile));
     }
 
