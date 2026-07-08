@@ -79,8 +79,11 @@ class KeyBindingsTabModelTest {
 
     @Test
     void randomNewKeyKeyBindingInRepository() {
+        boolean controlDown = !OS.OS_X;
+        boolean metaDown = OS.OS_X;
+
         setKeyBindingViewModel(KeyBinding.CLEANUP);
-        KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "K", "K", KeyCode.K, true, true, true, false);
+        KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "K", "K", KeyCode.K, true, controlDown, true, metaDown);
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLEANUP, shortcutKeyEvent));
         model.setNewBindingForCurrent(shortcutKeyEvent);
 
