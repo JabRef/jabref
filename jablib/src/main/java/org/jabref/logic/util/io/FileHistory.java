@@ -3,6 +3,7 @@ package org.jabref.logic.util.io;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javafx.collections.ModifiableObservableListBase;
 
@@ -64,6 +65,11 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
         // depending on how the file was added previously. Remove all equivalent
         // representations to ensure the entry is fully cleared from the history.
         if (file.isAbsolute()) {
+            if (!Objects.equals(file.getRoot(), baseDirectoryPath.getRoot())) {
+                // file is on a different drive/root than the base directory (e.g. H:\ vs C:\ on Windows),
+                // so it cannot be relativized against baseDirectoryPath.
+                return;
+            }
             try {
                 this.remove(baseDirectoryPath.relativize(file).normalize());
             } catch (IllegalArgumentException e) {
