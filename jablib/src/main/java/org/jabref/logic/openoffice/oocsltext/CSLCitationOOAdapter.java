@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
+import org.jabref.logic.openoffice.CitationEntryTypeMetadata;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.model.database.BibDatabase;
@@ -220,6 +221,7 @@ public class CSLCitationOOAdapter {
             }
         }
         markManager.insertReferenceIntoOO(entries, document, cursor, ooText, !preceedingSpaceExists, openOfficePreferences.getAddSpaceAfter(), citationType);
+        CitationEntryTypeMetadata.storeEntryTypes(document, entries);
         markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
         markManager.readAndUpdateExistingMarks();
         this.citationType = markManager.getCitationType();
@@ -269,6 +271,7 @@ public class CSLCitationOOAdapter {
                                                .flatMap(db -> db.getEntries().stream())
                                                .filter(this::isCitedEntry)
                                                .toList();
+        CitationEntryTypeMetadata.storeEntryTypes(document, citedEntries);
 
         BibDatabase unifiedDatabase = new BibDatabase(citedEntries);
         BibDatabaseContext unifiedBibDatabaseContext = new BibDatabaseContext(unifiedDatabase);
