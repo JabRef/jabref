@@ -6,7 +6,7 @@ parent: Decision Records
 
 ## Context and Problem Statement
 
-We are implementing compatibility with Zotero. Zotero uses its item types, while JabRef uses BibTeX/BibLaTeX entry types. We need a suitable mapping strategy that preserves as much information as possible in both directions, from JabRef to Zotero and from Zotero to JabRef.
+We are implementing compatibility with Zotero. Zotero uses its [item types](https://www.zotero.org/support/kb/item_types_and_fields), while JabRef uses BibTeX/BibLaTeX entry types. We need a suitable mapping strategy that preserves as much information as possible in both directions, from JabRef to Zotero and from Zotero to JabRef.
 
 Which mapping should JabRef use to convert between entry types and Zotero's item types?
 
