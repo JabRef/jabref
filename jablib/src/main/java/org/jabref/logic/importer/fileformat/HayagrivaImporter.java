@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -109,11 +110,11 @@ public class HayagrivaImporter extends Importer {
     }
 
     private String formatAuthorName(String hayagrivaAuthor) {
-        String[] partes = hayagrivaAuthor.split(",", 2);
-        if (partes.length == 2) {
-            String sobrenome = partes[0].trim();
-            String nome = partes[1].trim();
-            return nome + " " + sobrenome;
+        String[] parts = hayagrivaAuthor.split(",", 2);
+        if (parts.length == 2) {
+            String lastname = parts[0].trim();
+            String name = parts[1].trim();
+            return name + " " + lastname;
         }
         return hayagrivaAuthor.trim();
     }
@@ -195,17 +196,17 @@ public class HayagrivaImporter extends Importer {
                                           .disable(tools.jackson.core.StreamReadFeature.AUTO_CLOSE_SOURCE)
                                           .build();
 
-            Map<String, HayagrivaEntry> entries = mapper.readValue(
-                    input, new TypeReference<Map<String, HayagrivaEntry>>() {
-                    }
-            );
+            Map<String, Object> raw = mapper.readValue(input, new TypeReference<Map<String, Object>>() {
+            });
 
-            if (entries == null) {
+            if (raw == null || raw.isEmpty()) {
                 return false;
             }
 
-            for (HayagrivaEntry entry : entries.values()) {
-                if (entry.type != null && (entry.title != null || entry.authors != null)) {
+            for (Object value : raw.values()) {
+                if (value instanceof Map<?, ?> entry
+                        && entry.get("type") instanceof String type
+                        && TYPES_MAP.containsKey(type.toLowerCase(Locale.ROOT))) {
                     return true;
                 }
             }
