@@ -2,14 +2,16 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import org.jabref.gui.fieldeditors.EditorTextField?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
+         alignment="CENTER_LEFT"
          fx:controller="org.jabref.gui.fieldeditors.identifier.IdentifierEditor">
-    <EditorTextField fx:id="textField" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
+    <EditorTextField fx:id="textField" HBox.hgrow="ALWAYS"/>
 
     <Button fx:id="shortenDOIButton"
             onAction="#shortenID"
@@ -58,4 +60,17 @@
             <JabRefIconView glyph="FETCH_BY_IDENTIFIER"/>
         </graphic>
     </Button>
+
+    <ToggleButton fx:id="syncWithBrowserToggle"
+                  onAction="#toggleSyncWithBrowser"
+                  styleClass="icon-button"
+                  managed="${controller.viewModel.canSyncWithBrowser}"
+                  visible="${controller.viewModel.canSyncWithBrowser}">
+        <graphic>
+            <JabRefIconView glyph="WWW"/>
+        </graphic>
+        <tooltip>
+            <Tooltip text="%Sync with browser"/>
+        </tooltip>
+    </ToggleButton>
 </fx:root>

@@ -42,6 +42,14 @@
                     <Tooltip text="%Change entry type"/>
                 </tooltip>
             </Button>
+            <Button styleClass="icon-button,narrow" onAction="#jumpToFieldButton">
+                <graphic>
+                    <JabRefIconView glyph="SEARCH"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%Jump to field"/>
+                </tooltip>
+            </Button>
             <Button styleClass="icon-button,narrow" onAction="#generateCiteKeyButton">
                 <graphic>
                     <JabRefIconView glyph="MAKE_KEY"/>
