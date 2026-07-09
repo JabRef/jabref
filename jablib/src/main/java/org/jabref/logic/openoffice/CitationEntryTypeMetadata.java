@@ -88,8 +88,9 @@ public class CitationEntryTypeMetadata {
         }
 
         EntryTypeMetadata entryTypeMetadata = parsedMetadata.get();
-        Map<String, String> result = new LinkedHashMap<>();
-        for (Map.Entry<String, @Nullable CitationEntryType> entry : getCitationTypeMap(entryTypeMetadata).entrySet()) {
+        Map<String, @Nullable CitationEntryType> citationTypeMap = getCitationTypeMap(entryTypeMetadata);
+        Map<String, String> result = new LinkedHashMap<>(citationTypeMap.size());
+        for (Map.Entry<String, @Nullable CitationEntryType> entry : citationTypeMap.entrySet()) {
             Optional.ofNullable(entry.getValue())
                     .map(citationEntryType -> citationEntryType.jabrefEntryType)
                     .filter(value -> !StringUtil.isBlank(value))
