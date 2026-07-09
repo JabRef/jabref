@@ -31,7 +31,7 @@ Chosen option: "Use transparent handling of Zotero Reference Marks", because Jab
 * Good, because JabRef reads and maps Zotero's reference mark automatically, which does not disturb users.
 * Good, because user does not need to enable anything to use this feature.
 * Good, because it avoids the risk Zotero's reference mark being ignored if user forgets to enable the compatibility mode.
-* Bad, because user may not be aware of the problems it may bring (information loss), unless they read the release page or user documentation.
+* Bad, because user may not be aware of the problems it may bring (information loss), unless they read the release page or user documentation. One example of information loss is that mapped JabRef entry type may not support all fields contained in the Zotero item type. For example, Zoter item type `map` has a field named `scale`, while the mapped JabRef entry type `misc` does not have a corresponding field for `scale`.
 
 ## Pros and Cons of the Options
 
