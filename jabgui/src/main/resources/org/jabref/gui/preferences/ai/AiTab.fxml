@@ -402,9 +402,9 @@
     <HBox alignment="CENTER_LEFT"
           spacing="10.0">
         <Label alignment="BASELINE_CENTER"
-               text="%Default answer engine"/>
+               text="%Default response engine"/>
         <ComboBox
-                fx:id="answerEngineComboBox"
+                fx:id="responseEngineComboBox"
                 maxWidth="200"/>
     </HBox>
 

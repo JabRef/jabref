@@ -14,9 +14,7 @@ val arch = DefaultNativePlatform.getCurrentArchitecture()
 
 val javafxDefault = "26.0.1"
 // The JavaFX version can be overridden via the gradle property `javafxVersion`.
-// Only the non-web modules follow the override; javafx-web always stays on the default version.
 val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
-val javafxWeb = javafxDefault
 
 val lucene = "10.5.0"
 
@@ -24,7 +22,7 @@ val pdfbox = "3.0.7"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.17.1"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.17.2"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.4.0"))
     api(platform("org.junit:junit-bom:6.1.1"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
@@ -40,8 +38,8 @@ dependencies.constraints {
     api("org.openjfx:javafx-fxml:$javafx")
     api("org.openjfx:javafx-graphics:$javafx")
     api("org.openjfx:javafx-swing:$javafx")
-    api("org.openjfx:javafx-web:$javafxWeb")
-    api("org.openjfx:jdk-jsobject:$javafx")
+    api("org.openjfx:jfx-incubator-input:$javafx")
+    api("org.openjfx:jfx-incubator-richtext:$javafx")
 
     api("cc.jilt:jilt:1.9.1")
 
@@ -65,6 +63,7 @@ dependencies.constraints {
     api("com.knuddels:jtokkit:1.1.0")
     api("com.konghq:unirest-java-core:4.10.0")
     api("com.konghq:unirest-modules-gson:4.10.0")
+    api("com.squareup.okhttp3:mockwebserver3:5.4.0")
     api("com.squareup.okhttp3:okhttp:5.4.0")
     api("com.squareup.okio:okio-jvm:3.17.0")
     api("com.squareup.retrofit2:retrofit:3.0.0")
@@ -96,7 +95,7 @@ dependencies.constraints {
     api("jakarta.inject:jakarta.inject-api:2.0.1")
     api("jakarta.validation:jakarta.validation-api:3.1.1")
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
-    api("net.bytebuddy:byte-buddy:1.18.10")
+    api("net.bytebuddy:byte-buddy:1.18.11")
     api("net.harawata:appdirs:1.5.0")
     api("net.java.dev.jna:jna-jpms:5.19.1")
     api("net.java.dev.jna:jna-platform:5.19.1")
@@ -109,7 +108,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-text:1.15.0")
     api("org.apache.httpcomponents.core5:httpcore5:5.4.3")
     api("org.apache.httpcomponents.client5:httpclient5:5.6.2")
-    api("org.apache.logging.log4j:log4j-to-slf4j:2.26.0")
+    api("org.apache.logging.log4j:log4j-to-slf4j:2.26.1")
     api("org.apache.lucene:lucene-analysis-common:$lucene")
     api("org.apache.lucene:lucene-core:$lucene")
     api("org.apache.lucene:lucene-highlighter:$lucene")
@@ -129,10 +128,11 @@ dependencies.constraints {
     api("org.glassfish.hk2:hk2-utils:4.0.1")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.9")
     api("org.hamcrest:hamcrest:3.0")
-    api("org.hibernate.validator:hibernate-validator:9.1.1.Final")
+    api("org.hibernate.validator:hibernate-validator:9.1.2.Final")
     api("org.hisp.dhis:json-tree:1.9.4")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
+    api("org.jabref:html-to-node:0.1.0-SNAPSHOT")
     api("org.jabref:mslinks:1.2")
     api("org.jetbrains:annotations:26.1.0")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.0")
@@ -146,7 +146,7 @@ dependencies.constraints {
     api("org.libreoffice:unoloader:26.2.2")
     api("org.mockito:mockito-core:5.23.0")
     api("org.ow2.asm:asm:9.10.1")
-    api("org.postgresql:postgresql:42.7.11")
+    api("org.postgresql:postgresql:42.7.13")
     api("org.slf4j:jul-to-slf4j:2.0.18")
     api("org.slf4j:slf4j-api:2.0.18")
     api("org.testfx:testfx-core:4.0.18")
