@@ -93,11 +93,12 @@ class CitationEntryTypeMetadataTest {
         List<BibEntry> entries = CitationEntryTypeMetadata.parseZoteroEntries(
                 List.of("JR_cite_1_Keen2020", ZOTERO_JOURNAL_ARTICLE),
                 Map.of());
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Zotero-587")
+                .withField(StandardField.TITLE, "Test article")
+                .withField(StandardField.JOURNALTITLE, "Journal of Test");
 
-        assertEquals(1, entries.size());
-        BibEntry entry = entries.getFirst();
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("Zotero-587"), entry.getCitationKey());
+        assertEquals(List.of(expectedEntry), entries);
     }
 
     @Test
@@ -105,12 +106,11 @@ class CitationEntryTypeMetadataTest {
         List<BibEntry> entries = CitationEntryTypeMetadata.parseZoteroEntries(
                 List.of(ZOTERO_JOURNAL_ARTICLE),
                 Map.of("Zotero-587", "book"));
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Book)
+                .withCitationKey("Zotero-587")
+                .withField(StandardField.TITLE, "Test article")
+                .withField(StandardField.JOURNALTITLE, "Journal of Test");
 
-        assertEquals(1, entries.size());
-        BibEntry entry = entries.getFirst();
-        assertEquals(StandardEntryType.Book, entry.getType());
-        assertEquals(Optional.of("Zotero-587"), entry.getCitationKey());
-        assertEquals(Optional.of("Test article"), entry.getField(StandardField.TITLE));
-        assertEquals(Optional.of("Journal of Test"), entry.getField(StandardField.JOURNALTITLE));
+        assertEquals(List.of(expectedEntry), entries);
     }
 }
