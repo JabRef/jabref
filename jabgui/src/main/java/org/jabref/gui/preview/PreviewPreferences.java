@@ -8,8 +8,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -23,7 +21,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 public class PreviewPreferences {
     private final ObservableList<PreviewLayout> layoutCycle;
     private final IntegerProperty layoutCyclePosition;
-    private final StringProperty customPreviewLayout;
+    private final ObservableList<TextBasedPreviewLayout> customPreviewLayouts;
     private final BooleanProperty showPreviewAsExtraTab;
     private final BooleanProperty showPreviewEntryTableTooltip;
     private final ObservableList<Path> bstPreviewLayoutPaths;
@@ -32,14 +30,14 @@ public class PreviewPreferences {
 
     public PreviewPreferences(List<PreviewLayout> layoutCycle,
                               int layoutCyclePosition,
-                              String customPreviewLayout,
+                              List<TextBasedPreviewLayout> customPreviewLayouts,
                               boolean showPreviewAsExtraTab,
                               boolean showPreviewEntryTableTooltip,
                               List<Path> bstPreviewLayoutPaths,
                               boolean shouldDownloadCovers) {
         this.layoutCycle = FXCollections.observableArrayList(layoutCycle);
         this.layoutCyclePosition = new SimpleIntegerProperty(layoutCyclePosition);
-        this.customPreviewLayout = new SimpleStringProperty(customPreviewLayout);
+        this.customPreviewLayouts = FXCollections.observableArrayList(customPreviewLayouts);
         this.showPreviewAsExtraTab = new SimpleBooleanProperty(showPreviewAsExtraTab);
         this.showPreviewEntryTableTooltip = new SimpleBooleanProperty(showPreviewEntryTableTooltip);
         this.bstPreviewLayoutPaths = FXCollections.observableList(bstPreviewLayoutPaths);
@@ -50,7 +48,7 @@ public class PreviewPreferences {
         this(
                 List.of(),  // Layout cycle - empty by default, see JabRefPreferences::getPreviewPreferencesFromBackingStore
                 0,          // Layout cycle position
-                TextBasedPreviewLayout.DEFAULT,
+                List.of(),                      // Custom preview layouts - empty by default, same reasoning as layoutCycle above
                 false,      // Show preview as an extra tab
                 false,      // Show the preview entry table tooltip
                 List.of(),  // BST-Paths
@@ -105,8 +103,9 @@ public class PreviewPreferences {
                 || layoutCyclePosition.getValue() < 0
                 || layoutCyclePosition.getValue() >= layoutCycle.size()) {
             // Fallback dummy layout
+            String fallbackText = customPreviewLayouts.isEmpty() ? "" : customPreviewLayouts.getFirst().getText();
             return new TextBasedPreviewLayout(
-                    getCustomPreviewLayout(),
+                    fallbackText,
                     LayoutFormatterPreferences.getDefault(),
                     new JournalAbbreviationRepository());
         } else {
@@ -114,16 +113,12 @@ public class PreviewPreferences {
         }
     }
 
-    public String getCustomPreviewLayout() {
-        return customPreviewLayout.getValue();
+    public void setCustomPreviewLayouts(List<TextBasedPreviewLayout> customPreviewLayouts) {
+        this.customPreviewLayouts.setAll(customPreviewLayouts);
     }
 
-    public StringProperty customPreviewLayoutProperty() {
-        return customPreviewLayout;
-    }
-
-    public void setCustomPreviewLayout(String customPreviewLayout) {
-        this.customPreviewLayout.set(customPreviewLayout);
+    public ObservableList<TextBasedPreviewLayout> getCustomPreviewLayouts() {
+        return customPreviewLayouts;
     }
 
     public boolean shouldShowPreviewAsExtraTab() {
