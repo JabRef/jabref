@@ -20,11 +20,11 @@ Do we need a preference for the compatibility mode?
 ## Considered Options
 
 * Use a preference for the compatibility mode
-* Use transparent Handling of Zotero Reference Marks
+* Use transparent handling of Zotero Reference Marks
 
 ## Decision Outcome
 
-Chosen option: "Do not use a preference", because JabRef already uses [citation-js's mapping logic](https://github.com/JabRef/jabref/blob/07e475dcf8e2f00447667ebd1814a09176293948/jablib/src/main/java/org/jabref/logic/openoffice/CSLItemTypeDefinitions.java#L23-L84) as the fallback strategy. Adding a preference is unnecessary. It also brings some additional benefits, such as not disturbing users when connecting to a document.
+Chosen option: "Use transparent handling of Zotero Reference Marks", because JabRef already uses [citation-js's mapping logic](https://github.com/JabRef/jabref/blob/07e475dcf8e2f00447667ebd1814a09176293948/jablib/src/main/java/org/jabref/logic/openoffice/CSLItemTypeDefinitions.java#L23-L84) as the fallback strategy. Adding a preference is unnecessary. It also brings some additional benefits, such as not disturbing users when connecting to a document.
 
 ### Consequences
 
