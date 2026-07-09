@@ -43,12 +43,15 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
     private static final Logger LOGGER = LoggerFactory.getLogger(TextBasedPreviewLayout.class);
     private Layout layout;
     private String text;
+    private String name;
     private LayoutFormatterPreferences layoutFormatterPreferences;
     private JournalAbbreviationRepository abbreviationRepository;
 
-    public TextBasedPreviewLayout(String text,
+    public TextBasedPreviewLayout(String name,
+                                  String text,
                                   @NonNull LayoutFormatterPreferences layoutFormatterPreferences,
                                   @NonNull JournalAbbreviationRepository abbreviationRepository) {
+        this.name = name;
         this.layoutFormatterPreferences = layoutFormatterPreferences;
         this.abbreviationRepository = abbreviationRepository;
         setText(text);
@@ -57,6 +60,12 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
     public TextBasedPreviewLayout(Layout layout) {
         this.layout = layout;
         this.text = layout.getText();
+    }
+
+    public TextBasedPreviewLayout(String text,
+                                @NonNull LayoutFormatterPreferences layoutFormatterPreferences,
+                                @NonNull JournalAbbreviationRepository abbreviationRepository) {
+        this(Localization.lang("Customized preview style"), text, layoutFormatterPreferences, abbreviationRepository);
     }
 
     public void setText(String text) {
@@ -85,19 +94,35 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
 
     @Override
     public String getName() {
-        return NAME;
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getShortTitle() {
-        return NAME;
+        return name;
     }
 
     @Override
     public String getDisplayName() {
-        return Localization.lang("Customized preview style");
+        return name;
     }
 
-    public static TextBasedPreviewLayout of(@NonNull String style,
+    public static TextBasedPreviewLayout of(@NonNull String name,
+                                            @NonNull String style,
+                                            @NonNull LayoutFormatterPreferences layoutFormatterPreferences,
+                                            @NonNull JournalAbbreviationRepository abbreviationRepository) {
+        return new TextBasedPreviewLayout(
+                name,
+                style,
+                layoutFormatterPreferences,
+                abbreviationRepository);
+    }
+
+    public static TextBasedPreviewLayout of(
+                                            @NonNull String style,
                                             @NonNull LayoutFormatterPreferences layoutFormatterPreferences,
                                             @NonNull JournalAbbreviationRepository abbreviationRepository) {
         return new TextBasedPreviewLayout(
