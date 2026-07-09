@@ -123,7 +123,7 @@ public class CitationEntryTypeMetadata {
         }
 
         try {
-            return Optional.ofNullable(GSON.fromJson(metadata, EntryTypeMetadata.class));
+            return Optional.of(GSON.fromJson(metadata, EntryTypeMetadata.class));
         } catch (JsonParseException e) {
             LOGGER.debug("Could not parse citation entry type metadata", e);
             return Optional.empty();
