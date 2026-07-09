@@ -19,7 +19,7 @@ Do we need a preference for the compatibility mode?
 
 ## Considered Options
 
-* Use a preference for the compatibility mode.
+* Use a preference for the compatibility mode
 * Use transparent Handling of Zotero Reference Marks
 
 ## Decision Outcome
