@@ -36,9 +36,9 @@ class CitationEntryTypeMetadataTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Keen2020");
 
-        String metadata = CitationEntryTypeMetadata.mergeEntryTypes(Optional.empty(), List.of(entry));
+        String metadata = CitationEntryTypeMetadataManager.mergeEntryTypes(Optional.empty(), List.of(entry));
 
-        assertEquals(Map.of("Keen2020", "article"), CitationEntryTypeMetadata.readEntryTypes(metadata));
+        assertEquals(Map.of("Keen2020", "article"), CitationEntryTypeMetadataManager.readEntryTypes(metadata));
     }
 
     @Test
@@ -56,11 +56,11 @@ class CitationEntryTypeMetadataTest {
                 }
                 """;
 
-        String metadata = CitationEntryTypeMetadata.mergeEntryTypes(Optional.of(existingMetadata), List.of(entry));
+        String metadata = CitationEntryTypeMetadataManager.mergeEntryTypes(Optional.of(existingMetadata), List.of(entry));
 
         assertEquals(Map.of(
                 "Keen2020", "article",
-                "Smith2021", "inproceedings"), CitationEntryTypeMetadata.readEntryTypes(metadata));
+                "Smith2021", "inproceedings"), CitationEntryTypeMetadataManager.readEntryTypes(metadata));
     }
 
     @Test
@@ -78,19 +78,19 @@ class CitationEntryTypeMetadataTest {
                 }
                 """;
 
-        String metadata = CitationEntryTypeMetadata.mergeEntryTypes(Optional.of(existingMetadata), List.of(entry));
+        String metadata = CitationEntryTypeMetadataManager.mergeEntryTypes(Optional.of(existingMetadata), List.of(entry));
 
-        assertEquals(Map.of("Keen2020", "book"), CitationEntryTypeMetadata.readEntryTypes(metadata));
+        assertEquals(Map.of("Keen2020", "book"), CitationEntryTypeMetadataManager.readEntryTypes(metadata));
     }
 
     @Test
     void readEntryTypesReturnsEmptyMapForInvalidMetadata() {
-        assertEquals(Map.of(), CitationEntryTypeMetadata.readEntryTypes("not json"));
+        assertEquals(Map.of(), CitationEntryTypeMetadataManager.readEntryTypes("not json"));
     }
 
     @Test
     void parseZoteroEntriesUsesCslToJabRefMapping() {
-        List<BibEntry> entries = CitationEntryTypeMetadata.parseZoteroEntries(
+        List<BibEntry> entries = CitationEntryTypeMetadataManager.parseZoteroEntries(
                 List.of("JR_cite_1_Keen2020", ZOTERO_JOURNAL_ARTICLE),
                 Map.of());
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Article)
@@ -103,7 +103,7 @@ class CitationEntryTypeMetadataTest {
 
     @Test
     void parseZoteroEntriesUsesStoredEntryTypeMetadata() {
-        List<BibEntry> entries = CitationEntryTypeMetadata.parseZoteroEntries(
+        List<BibEntry> entries = CitationEntryTypeMetadataManager.parseZoteroEntries(
                 List.of(ZOTERO_JOURNAL_ARTICLE),
                 Map.of("Zotero-587", "book"));
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Book)

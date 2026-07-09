@@ -15,7 +15,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.openoffice.CitationEntryTypeMetadata;
+import org.jabref.logic.openoffice.CitationEntryTypeMetadataManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.EditInsert;
 import org.jabref.logic.openoffice.action.EditMerge;
@@ -105,7 +105,7 @@ public class OOBibBase {
 
     private void storeZoteroEntryTypes(XTextDocument doc) {
         try {
-            CitationEntryTypeMetadata.storeZoteroEntryTypes(doc);
+            CitationEntryTypeMetadataManager.storeZoteroEntryTypes(doc);
         } catch (IllegalTypeException | NoDocumentException | PropertyVetoException | WrappedTargetException e) {
             LOGGER.warn("Could not store Zotero citation entry type metadata", e);
         }
