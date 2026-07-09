@@ -2555,6 +2555,27 @@ journalInfo .grid-cell-b {
     -fx-font-size: 0.75em;
 }
 
+/* Keybinding preferences */
+.keybindings-search-box {
+    -fx-control-inner-background: transparent;
+}
+
+/* GroupTreeView Fonts */
+.group-tree-font-1 {
+    -fx-font-size: 0.25em;
+}
+
+.group-tree-font-2 {
+    -fx-font-size: 0.35em;
+}
+
+.group-tree-font-3 {
+    -fx-font-size: 0.55em;
+}
+
+.group-tree-font-4 {
+    -fx-font-size: 0.75em;
+
 /* Preview (PreviewViewer): match the entry editor's white content background instead of the
    transparent one .scroll-pane/.stack-pane get by default (jabref-javafx.css). */
 .preview-viewer,
