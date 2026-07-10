@@ -10,8 +10,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 
 import org.apache.pdfbox.Loader;
@@ -48,8 +48,8 @@ public class PdfMetadataExtractor {
         cancelCurrent();
 
         BackgroundTask<String> task = BackgroundTask.wrap(() -> extract(filePath))
-                .onSuccess(result -> UiTaskExecutor.runNowOrInJavaFXThread(() -> onSuccess.accept(result)))
-                .onFailure(exception -> UiTaskExecutor.runNowOrInJavaFXThread(() -> onFailure.accept(exception)));
+                                                    .onSuccess(result -> UiTaskExecutor.runNowOrInJavaFXThread(() -> onSuccess.accept(result)))
+                                                    .onFailure(exception -> UiTaskExecutor.runNowOrInJavaFXThread(() -> onFailure.accept(exception)));
 
         currentTask = task;
         task.executeWith(taskExecutor);
@@ -115,7 +115,7 @@ public class PdfMetadataExtractor {
         char unitPrefix = "KMGT".charAt(exponent - 1);
         double value = bytes / Math.pow(1024, exponent);
 
-        return String.format("%.1f %sB", value, unitPrefix);
+        return "%.1f %sB".formatted(value, unitPrefix);
     }
 
     /// Formats a date as a human-readable string.
