@@ -45,6 +45,7 @@ import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
@@ -241,18 +242,37 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 newSuggestedSubgroups.add(subGroup);
             }
 
-            addParentWithSubgroupsIfMissing(parent, rootNode, newSuggestedSubgroups,
-                    GroupsFactory.createRankParentGroup(), GroupsFactory.createRankSubgroups());
-            addParentWithSubgroupsIfMissing(parent, rootNode, newSuggestedSubgroups,
-                    GroupsFactory.createRelevanceParentGroup(), GroupsFactory.createRelevanceSubgroups());
-            addParentWithSubgroupsIfMissing(parent, rootNode, newSuggestedSubgroups,
-                    GroupsFactory.createQualityParentGroup(), GroupsFactory.createQualitySubgroups());
-            addParentWithSubgroupsIfMissing(parent, rootNode, newSuggestedSubgroups,
-                    GroupsFactory.createPrintedParentGroup(), GroupsFactory.createPrintedSubgroups());
-            addParentWithSubgroupsIfMissing(parent, rootNode, newSuggestedSubgroups,
-                    GroupsFactory.createPriorityParentGroup(), GroupsFactory.createPrioritySubgroups());
-            addParentWithSubgroupsIfMissing(parent, rootNode, newSuggestedSubgroups,
-                    GroupsFactory.createReadStatusParentGroup(), GroupsFactory.createReadStatusSubgroups());
+            Optional<GroupTreeNode> markingNodeOpt = rootNode.findGroupByName(Localization.lang("Marking and Grading"));
+            if (markingNodeOpt.isEmpty()) {
+                GroupTreeNode markingNode = rootNode.addSubgroup(
+                        new ExplicitGroup(Localization.lang("Marking and Grading"),
+                                GroupHierarchyType.INCLUDING,
+                                preferences.getBibEntryPreferences().getKeywordSeparator()));
+
+                GroupTreeNode rankParentNode = markingNode.addSubgroup(GroupsFactory.createRankParentGroup());
+                GroupsFactory.createRankSubgroups().forEach(rankParentNode::addSubgroup);
+                newSuggestedSubgroups.add(rankParentNode);
+
+                GroupTreeNode relevanceParentNode = markingNode.addSubgroup(GroupsFactory.createRelevanceParentGroup());
+                GroupsFactory.createRelevanceSubgroups().forEach(relevanceParentNode::addSubgroup);
+                newSuggestedSubgroups.add(relevanceParentNode);
+
+                GroupTreeNode qualityParentNode = markingNode.addSubgroup(GroupsFactory.createQualityParentGroup());
+                GroupsFactory.createQualitySubgroups().forEach(qualityParentNode::addSubgroup);
+                newSuggestedSubgroups.add(qualityParentNode);
+
+                GroupTreeNode printedParentNode = markingNode.addSubgroup(GroupsFactory.createPrintedParentGroup());
+                GroupsFactory.createPrintedSubgroups().forEach(printedParentNode::addSubgroup);
+                newSuggestedSubgroups.add(printedParentNode);
+
+                GroupTreeNode priorityParentNode = markingNode.addSubgroup(GroupsFactory.createPriorityParentGroup());
+                GroupsFactory.createPrioritySubgroups().forEach(priorityParentNode::addSubgroup);
+                newSuggestedSubgroups.add(priorityParentNode);
+
+                GroupTreeNode readStatusParentNode = markingNode.addSubgroup(GroupsFactory.createReadStatusParentGroup());
+                GroupsFactory.createReadStatusSubgroups().forEach(readStatusParentNode::addSubgroup);
+                newSuggestedSubgroups.add(readStatusParentNode);
+            }
 
             selectedGroups.setAll(newSuggestedSubgroups
                     .stream()
@@ -263,25 +283,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             dialogService.notify(Localization.lang("Created %0 suggested groups.", String.valueOf(newSuggestedSubgroups.size())));
         });
-    }
-
-    /// Adds a parent group and its subgroups under `rootNode` if no similar group already exists under `parent`.
-    ///
-    /// @param parent                the "All Entries" node used to check for duplicates
-    /// @param rootNode              the node to attach new groups to
-    /// @param newSuggestedSubgroups accumulator for newly created top-level nodes
-    /// @param parentGroup           the parent [SearchGroup] to conditionally add
-    /// @param subgroups             the child [SearchGroup]s to nest under the parent
-    private void addParentWithSubgroupsIfMissing(GroupNodeViewModel parent,
-                                                 GroupTreeNode rootNode,
-                                                 List<GroupTreeNode> newSuggestedSubgroups,
-                                                 SearchGroup parentGroup,
-                                                 List<SearchGroup> subgroups) {
-        if (!parent.hasSimilarSearchGroup(parentGroup)) {
-            GroupTreeNode parentNode = rootNode.addSubgroup(parentGroup);
-            subgroups.forEach(parentNode::addSubgroup);
-            newSuggestedSubgroups.add(parentNode);
-        }
     }
 
     /// Check if it is necessary to show a group modified, reassign entry dialog <br>

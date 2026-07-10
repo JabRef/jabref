@@ -3,6 +3,7 @@ package org.jabref.logic.groups;
 import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.SearchGroup;
 
@@ -18,11 +19,10 @@ class GroupsFactoryTest {
 
     @Test
     void createRankParentGroupHasCorrectProperties() {
-        SearchGroup group = GroupsFactory.createRankParentGroup();
+        ExplicitGroup group = GroupsFactory.createRankParentGroup();
         assertEquals(Localization.lang("Rank"), group.getName());
         assertEquals(GroupHierarchyType.INCLUDING, group.getHierarchicalContext());
         assertEquals(GroupsFactory.RANKING_ICON, group.getIconName().orElseThrow());
-        assertEquals("ranking =~ .*", group.getSearchExpression());
     }
 
     @Test
@@ -53,7 +53,7 @@ class GroupsFactoryTest {
 
     @Test
     void createRelevanceParentGroupHasCorrectProperties() {
-        SearchGroup group = GroupsFactory.createRelevanceParentGroup();
+        ExplicitGroup group = GroupsFactory.createRelevanceParentGroup();
         assertEquals(Localization.lang("Relevance"), group.getName());
         assertEquals(GroupHierarchyType.INCLUDING, group.getHierarchicalContext());
     }
@@ -65,7 +65,7 @@ class GroupsFactoryTest {
 
     @Test
     void createQualityParentGroupHasCorrectProperties() {
-        SearchGroup group = GroupsFactory.createQualityParentGroup();
+        ExplicitGroup group = GroupsFactory.createQualityParentGroup();
         assertEquals(Localization.lang("Quality"), group.getName());
         assertEquals(GroupHierarchyType.INCLUDING, group.getHierarchicalContext());
     }
@@ -77,7 +77,7 @@ class GroupsFactoryTest {
 
     @Test
     void createPrintedParentGroupHasCorrectProperties() {
-        SearchGroup group = GroupsFactory.createPrintedParentGroup();
+        ExplicitGroup group = GroupsFactory.createPrintedParentGroup();
         assertEquals(Localization.lang("Printed"), group.getName());
         assertEquals(GroupHierarchyType.INCLUDING, group.getHierarchicalContext());
     }
@@ -89,7 +89,7 @@ class GroupsFactoryTest {
 
     @Test
     void createPriorityParentGroupHasCorrectProperties() {
-        SearchGroup group = GroupsFactory.createPriorityParentGroup();
+        ExplicitGroup group = GroupsFactory.createPriorityParentGroup();
         assertEquals(Localization.lang("Priority"), group.getName());
         assertEquals(GroupHierarchyType.INCLUDING, group.getHierarchicalContext());
     }
@@ -111,7 +111,7 @@ class GroupsFactoryTest {
 
     @Test
     void createReadStatusParentGroupHasCorrectProperties() {
-        SearchGroup group = GroupsFactory.createReadStatusParentGroup();
+        ExplicitGroup group = GroupsFactory.createReadStatusParentGroup();
         assertEquals(Localization.lang("Read status"), group.getName());
         assertEquals(GroupHierarchyType.INCLUDING, group.getHierarchicalContext());
     }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.search.SearchFlags;
@@ -54,12 +55,11 @@ public class GroupsFactory {
                 EnumSet.noneOf(SearchFlags.class));
     }
 
-    public static SearchGroup createRankParentGroup() {
-        SearchGroup group = new SearchGroup(
+    public static ExplicitGroup createRankParentGroup() {
+        ExplicitGroup group = new ExplicitGroup(
                 Localization.lang("Rank"),
                 GroupHierarchyType.INCLUDING,
-                "ranking =~ .*",
-                EnumSet.noneOf(SearchFlags.class));
+                ',');
         group.setIconName(RANKING_ICON);
         return group;
     }
@@ -83,12 +83,11 @@ public class GroupsFactory {
         return List.of(rank1, rank2, rank3, rank4, rank5);
     }
 
-    public static SearchGroup createRelevanceParentGroup() {
-        SearchGroup group = new SearchGroup(
+    public static ExplicitGroup createRelevanceParentGroup() {
+        ExplicitGroup group = new ExplicitGroup(
                 Localization.lang("Relevance"),
                 GroupHierarchyType.INCLUDING,
-                "relevance =~ .*",
-                EnumSet.noneOf(SearchFlags.class));
+                ',');
         group.setIconName(RELEVANCE_ICON);
         return group;
     }
@@ -109,12 +108,11 @@ public class GroupsFactory {
         return List.of(relevant, notRelevant);
     }
 
-    public static SearchGroup createQualityParentGroup() {
-        SearchGroup group = new SearchGroup(
+    public static ExplicitGroup createQualityParentGroup() {
+        ExplicitGroup group = new ExplicitGroup(
                 Localization.lang("Quality"),
                 GroupHierarchyType.INCLUDING,
-                "qualityassured =~ .*",
-                EnumSet.noneOf(SearchFlags.class));
+                ',');
         group.setIconName(QUALITY_ICON);
         return group;
     }
@@ -135,12 +133,11 @@ public class GroupsFactory {
         return List.of(assured, notAssured);
     }
 
-    public static SearchGroup createPrintedParentGroup() {
-        SearchGroup group = new SearchGroup(
+    public static ExplicitGroup createPrintedParentGroup() {
+        ExplicitGroup group = new ExplicitGroup(
                 Localization.lang("Printed"),
                 GroupHierarchyType.INCLUDING,
-                "printed =~ .*",
-                EnumSet.noneOf(SearchFlags.class));
+                ',');
         group.setIconName(PRINTED_ICON);
         return group;
     }
@@ -161,12 +158,11 @@ public class GroupsFactory {
         return List.of(printed, notPrinted);
     }
 
-    public static SearchGroup createPriorityParentGroup() {
-        SearchGroup group = new SearchGroup(
+    public static ExplicitGroup createPriorityParentGroup() {
+        ExplicitGroup group = new ExplicitGroup(
                 Localization.lang("Priority"),
                 GroupHierarchyType.INCLUDING,
-                "priority =~ .*",
-                EnumSet.noneOf(SearchFlags.class));
+                ',');
         group.setIconName(PRIORITY_ICON);
         return group;
     }
@@ -196,12 +192,11 @@ public class GroupsFactory {
         return List.of(high, medium, low);
     }
 
-    public static SearchGroup createReadStatusParentGroup() {
-        SearchGroup group = new SearchGroup(
+    public static ExplicitGroup createReadStatusParentGroup() {
+        ExplicitGroup group = new ExplicitGroup(
                 Localization.lang("Read status"),
                 GroupHierarchyType.INCLUDING,
-                "readstatus =~ .*",
-                EnumSet.noneOf(SearchFlags.class));
+                ',');
         group.setIconName(READ_STATUS_ICON);
         return group;
     }

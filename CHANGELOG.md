@@ -37,7 +37,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added file notification to OCRed file to let users open the directory and show the new file. [#16082](https://github.com/JabRef/jabref/pull/16082)
 - We added a "Jump to field" button to the entry editor toolbar, triggering the same action as the <kbd>Ctrl</kbd>+<kbd>J</kbd> shortcut. [#16169](https://github.com/JabRef/jabref/pull/16169)
 - The `jabkit` `--input` option (and positional input argument) now accepts http(s)/ftp URLs, downloading the file before processing. [#16165](https://github.com/JabRef/jabref/pull/16165)
-- We added suggested groups for rank, relevance, quality, printed, priority, and read status when clicking "Add JabRef suggested groups". [#16222](https://github.com/JabRef/jabref/pull/16222)
+- We added suggested groups for special fields nested under a new "Marking and Grading" group when clicking "Add JabRef suggested groups". [#16222](https://github.com/JabRef/jabref/pull/16222)
 
 ### Changed
 
