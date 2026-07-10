@@ -8,13 +8,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-import javafx.concurrent.Task;
-
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -33,30 +31,28 @@ public class PdfMetadataExtractor {
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfMetadataExtractor.class);
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    private final ExecutorService executor = Executors.newSingleThreadExecutor(runnable -> {
-        Thread thread = new Thread(runnable, "pdf-metadata-preview");
-        thread.setDaemon(true);
-        return thread;
-    });
+    private final TaskExecutor taskExecutor;
 
-    private @Nullable Task<String> currentTask;
+    private @Nullable BackgroundTask<String> currentTask;
+
+    public PdfMetadataExtractor() {
+        this(new UiTaskExecutor());
+    }
+
+    PdfMetadataExtractor(TaskExecutor taskExecutor) {
+        this.taskExecutor = taskExecutor;
+    }
 
     /// Cancels any in-flight extraction and starts a new one.
     public void extractAsync(Path filePath, Consumer<String> onSuccess, Consumer<Throwable> onFailure) {
         cancelCurrent();
 
-        Task<String> task = new Task<>() {
-            @Override
-            protected String call() {
-                return extract(filePath);
-            }
-        };
-
-        task.setOnSucceeded(event -> UiTaskExecutor.runNowOrInJavaFXThread(() -> onSuccess.accept(task.getValue())));
-        task.setOnFailed(event -> UiTaskExecutor.runNowOrInJavaFXThread(() -> onFailure.accept(task.getException())));
+        BackgroundTask<String> task = BackgroundTask.wrap(() -> extract(filePath))
+                .onSuccess(result -> UiTaskExecutor.runNowOrInJavaFXThread(() -> onSuccess.accept(result)))
+                .onFailure(exception -> UiTaskExecutor.runNowOrInJavaFXThread(() -> onFailure.accept(exception)));
 
         currentTask = task;
-        executor.execute(task);
+        task.executeWith(taskExecutor);
     }
 
     /// Cancels the currently running extraction, if any.
