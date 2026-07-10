@@ -30,9 +30,9 @@ class GroupsFactoryTest {
         List<SearchGroup> subgroups = GroupsFactory.createRankSubgroups();
         assertEquals(5, subgroups.size());
 
-        assertEquals(GroupHierarchyType.INDEPENDENT, subgroups.get(0).getHierarchicalContext());
-        assertEquals(GroupsFactory.RANK_1_ICON, subgroups.get(0).getIconName().orElseThrow());
-        assertEquals("ranking = rank1", subgroups.get(0).getSearchExpression());
+        assertEquals(GroupHierarchyType.INDEPENDENT, subgroups.getFirst().getHierarchicalContext());
+        assertEquals(GroupsFactory.RANK_1_ICON, subgroups.getFirst().getIconName().orElseThrow());
+        assertEquals("ranking = rank1", subgroups.getFirst().getSearchExpression());
 
         assertEquals(GroupHierarchyType.INDEPENDENT, subgroups.get(1).getHierarchicalContext());
         assertEquals(GroupsFactory.RANK_2_ICON, subgroups.get(1).getIconName().orElseThrow());
@@ -99,8 +99,8 @@ class GroupsFactoryTest {
         List<SearchGroup> subgroups = GroupsFactory.createPrioritySubgroups();
         assertEquals(3, subgroups.size());
 
-        assertEquals(GroupsFactory.PRIORITY_HIGH_ICON, subgroups.get(0).getIconName().orElseThrow());
-        assertEquals("priority = prio1", subgroups.get(0).getSearchExpression());
+        assertEquals(GroupsFactory.PRIORITY_HIGH_ICON, subgroups.getFirst().getIconName().orElseThrow());
+        assertEquals("priority = prio1", subgroups.getFirst().getSearchExpression());
 
         assertEquals(GroupsFactory.PRIORITY_MEDIUM_ICON, subgroups.get(1).getIconName().orElseThrow());
         assertEquals("priority = prio2", subgroups.get(1).getSearchExpression());
@@ -121,8 +121,8 @@ class GroupsFactoryTest {
         List<SearchGroup> subgroups = GroupsFactory.createReadStatusSubgroups();
         assertEquals(2, subgroups.size());
 
-        assertEquals(GroupsFactory.READ_STATUS_READ_ICON, subgroups.get(0).getIconName().orElseThrow());
-        assertEquals("readstatus = read", subgroups.get(0).getSearchExpression());
+        assertEquals(GroupsFactory.READ_STATUS_READ_ICON, subgroups.getFirst().getIconName().orElseThrow());
+        assertEquals("readstatus = read", subgroups.getFirst().getSearchExpression());
 
         assertEquals(GroupsFactory.READ_STATUS_SKIMMED_ICON, subgroups.get(1).getIconName().orElseThrow());
         assertEquals("readstatus = skimmed", subgroups.get(1).getSearchExpression());
