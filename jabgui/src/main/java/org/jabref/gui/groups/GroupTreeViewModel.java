@@ -241,59 +241,18 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 newSuggestedSubgroups.add(subGroup);
             }
 
-            SearchGroup rankParentGroup = GroupsFactory.createRankParentGroup();
-            if (!parent.hasSimilarSearchGroup(rankParentGroup)) {
-                GroupTreeNode rankParentNode = rootNode.addSubgroup(rankParentGroup);
-                for (SearchGroup subRank : GroupsFactory.createRankSubgroups()) {
-                    rankParentNode.addSubgroup(subRank);
-                }
-                newSuggestedSubgroups.add(rankParentNode);
-            }
-
-            SearchGroup relevanceParentGroup = GroupsFactory.createRelevanceParentGroup();
-            if (!parent.hasSimilarSearchGroup(relevanceParentGroup)) {
-                GroupTreeNode relevanceParentNode = rootNode.addSubgroup(relevanceParentGroup);
-                for (SearchGroup subRelevance : GroupsFactory.createRelevanceSubgroups()) {
-                    relevanceParentNode.addSubgroup(subRelevance);
-                }
-                newSuggestedSubgroups.add(relevanceParentNode);
-            }
-
-            SearchGroup qualityParentGroup = GroupsFactory.createQualityParentGroup();
-            if (!parent.hasSimilarSearchGroup(qualityParentGroup)) {
-                GroupTreeNode qualityParentNode = rootNode.addSubgroup(qualityParentGroup);
-                for (SearchGroup subQuality : GroupsFactory.createQualitySubgroups()) {
-                    qualityParentNode.addSubgroup(subQuality);
-                }
-                newSuggestedSubgroups.add(qualityParentNode);
-            }
-
-            SearchGroup printedParentGroup = GroupsFactory.createPrintedParentGroup();
-            if (!parent.hasSimilarSearchGroup(printedParentGroup)) {
-                GroupTreeNode printedParentNode = rootNode.addSubgroup(printedParentGroup);
-                for (SearchGroup subPrinted : GroupsFactory.createPrintedSubgroups()) {
-                    printedParentNode.addSubgroup(subPrinted);
-                }
-                newSuggestedSubgroups.add(printedParentNode);
-            }
-
-            SearchGroup priorityParentGroup = GroupsFactory.createPriorityParentGroup();
-            if (!parent.hasSimilarSearchGroup(priorityParentGroup)) {
-                GroupTreeNode priorityParentNode = rootNode.addSubgroup(priorityParentGroup);
-                for (SearchGroup subPriority : GroupsFactory.createPrioritySubgroups()) {
-                    priorityParentNode.addSubgroup(subPriority);
-                }
-                newSuggestedSubgroups.add(priorityParentNode);
-            }
-
-            SearchGroup readStatusParentGroup = GroupsFactory.createReadStatusParentGroup();
-            if (!parent.hasSimilarSearchGroup(readStatusParentGroup)) {
-                GroupTreeNode readStatusParentNode = rootNode.addSubgroup(readStatusParentGroup);
-                for (SearchGroup subReadStatus : GroupsFactory.createReadStatusSubgroups()) {
-                    readStatusParentNode.addSubgroup(subReadStatus);
-                }
-                newSuggestedSubgroups.add(readStatusParentNode);
-            }
+            addParentWithSubgroupsIfMissing(parent, rootNode, newSuggestedSubgroups,
+                    GroupsFactory.createRankParentGroup(), GroupsFactory.createRankSubgroups());
+            addParentWithSubgroupsIfMissing(parent, rootNode, newSuggestedSubgroups,
+                    GroupsFactory.createRelevanceParentGroup(), GroupsFactory.createRelevanceSubgroups());
+            addParentWithSubgroupsIfMissing(parent, rootNode, newSuggestedSubgroups,
+                    GroupsFactory.createQualityParentGroup(), GroupsFactory.createQualitySubgroups());
+            addParentWithSubgroupsIfMissing(parent, rootNode, newSuggestedSubgroups,
+                    GroupsFactory.createPrintedParentGroup(), GroupsFactory.createPrintedSubgroups());
+            addParentWithSubgroupsIfMissing(parent, rootNode, newSuggestedSubgroups,
+                    GroupsFactory.createPriorityParentGroup(), GroupsFactory.createPrioritySubgroups());
+            addParentWithSubgroupsIfMissing(parent, rootNode, newSuggestedSubgroups,
+                    GroupsFactory.createReadStatusParentGroup(), GroupsFactory.createReadStatusSubgroups());
 
             selectedGroups.setAll(newSuggestedSubgroups
                     .stream()
@@ -304,6 +263,25 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             dialogService.notify(Localization.lang("Created %0 suggested groups.", String.valueOf(newSuggestedSubgroups.size())));
         });
+    }
+
+    /// Adds a parent group and its subgroups under `rootNode` if no similar group already exists under `parent`.
+    ///
+    /// @param parent                the "All Entries" node used to check for duplicates
+    /// @param rootNode              the node to attach new groups to
+    /// @param newSuggestedSubgroups accumulator for newly created top-level nodes
+    /// @param parentGroup           the parent [SearchGroup] to conditionally add
+    /// @param subgroups             the child [SearchGroup]s to nest under the parent
+    private void addParentWithSubgroupsIfMissing(GroupNodeViewModel parent,
+                                                  GroupTreeNode rootNode,
+                                                  List<GroupTreeNode> newSuggestedSubgroups,
+                                                  SearchGroup parentGroup,
+                                                  List<SearchGroup> subgroups) {
+        if (!parent.hasSimilarSearchGroup(parentGroup)) {
+            GroupTreeNode parentNode = rootNode.addSubgroup(parentGroup);
+            subgroups.forEach(parentNode::addSubgroup);
+            newSuggestedSubgroups.add(parentNode);
+        }
     }
 
     /// Check if it is necessary to show a group modified, reassign entry dialog <br>
