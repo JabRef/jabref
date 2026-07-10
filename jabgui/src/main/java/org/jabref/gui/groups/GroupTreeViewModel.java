@@ -273,10 +273,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /// @param parentGroup           the parent [SearchGroup] to conditionally add
     /// @param subgroups             the child [SearchGroup]s to nest under the parent
     private void addParentWithSubgroupsIfMissing(GroupNodeViewModel parent,
-            GroupTreeNode rootNode,
-            List<GroupTreeNode> newSuggestedSubgroups,
-            SearchGroup parentGroup,
-            List<SearchGroup> subgroups) {
+                                                 GroupTreeNode rootNode,
+                                                 List<GroupTreeNode> newSuggestedSubgroups,
+                                                 SearchGroup parentGroup,
+                                                 List<SearchGroup> subgroups) {
         if (!parent.hasSimilarSearchGroup(parentGroup)) {
             GroupTreeNode parentNode = rootNode.addSubgroup(parentGroup);
             subgroups.forEach(parentNode::addSubgroup);
