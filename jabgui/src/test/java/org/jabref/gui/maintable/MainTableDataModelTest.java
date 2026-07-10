@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
@@ -37,6 +41,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.search.query.SearchResults;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.junit.jupiter.api.Test;
@@ -152,7 +157,7 @@ class MainTableDataModelTest {
     }
 
     @Test
-    void outOfOrderSearchCompletionKeepsLatestResults() throws Exception {
+    void overlappingSearchCompletionKeepsLatestResults() throws Exception {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
 
         BibEntry quantumEntry = new BibEntry()
@@ -184,6 +189,9 @@ class MainTableDataModelTest {
         when(preferences.getNameDisplayPreferences())
                 .thenReturn(NameDisplayPreferences.getDefault());
 
+        CompletableFuture<Void> firstSearchInProgress = new CompletableFuture<>();
+        CompletableFuture<Void> allowFirstSearchToFinish = new CompletableFuture<>();
+
         SimpleBooleanProperty usePostgres = new SimpleBooleanProperty(false);
         SearchContext searchContext = new SearchContext(
                 usePostgres,
@@ -192,15 +200,32 @@ class MainTableDataModelTest {
                         new BibEntryPreferences(',')),
                 () -> new InMemorySearchBackend(
                         bibDatabaseContext,
-                        new BibEntryPreferences(',')));
+                        new BibEntryPreferences(','))) {
+            @Override
+            public SearchResults search(SearchQuery query) {
+                SearchResults results = super.search(query);
 
-        List<BackgroundTask<?>> submittedTasks = new ArrayList<>();
+                if (query.getSearchExpression().contains("Quantum")) {
+                    firstSearchInProgress.complete(null);
+                    allowFirstSearchToFinish.join();
+                }
+
+                return results;
+            }
+        };
+
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        List<Future<?>> submittedTasks = new ArrayList<>();
         TaskExecutor taskExecutor = mock(TaskExecutor.class);
 
         when(taskExecutor.execute(any())).thenAnswer(invocation -> {
             BackgroundTask<?> task = invocation.getArgument(0);
-            submittedTasks.add(task);
-            return CompletableFuture.completedFuture(null);
+            Future<?> future = executorService.submit(() -> {
+                executeTask(task);
+                return null;
+            });
+            submittedTasks.add(future);
+            return future;
         });
 
         SimpleListProperty<GroupTreeNode> selectedGroups =
@@ -226,21 +251,34 @@ class MainTableDataModelTest {
         BibEntryTableViewModel organicViewModel =
                 model.getViewModelByCitationKey("organic").orElseThrow();
 
-        searchQueryProperty.setValue(
-                Optional.of(new SearchQuery("title=Quantum")));
+        try {
+            searchQueryProperty.setValue(
+                    Optional.of(new SearchQuery("title=Quantum")));
 
-        searchQueryProperty.setValue(
-                Optional.of(new SearchQuery("title=Organic")));
+            firstSearchInProgress.get(5, TimeUnit.SECONDS);
 
-        assertEquals(2, submittedTasks.size());
+            searchQueryProperty.setValue(
+                    Optional.of(new SearchQuery("title=Organic")));
 
-        executeTask(submittedTasks.get(1));
+            assertEquals(2, submittedTasks.size());
 
-        executeTask(submittedTasks.getFirst());
+            submittedTasks.getLast().get(5, TimeUnit.SECONDS);
 
-        assertFalse(quantumViewModel.isMatchedBySearch().get());
-        assertTrue(organicViewModel.isMatchedBySearch().get());
-        assertEquals(1, resultSize.get());
+            assertFalse(submittedTasks.getFirst().isDone());
+            assertFalse(quantumViewModel.isMatchedBySearch().get());
+            assertTrue(organicViewModel.isMatchedBySearch().get());
+            assertEquals(1, resultSize.get());
+
+            allowFirstSearchToFinish.complete(null);
+            submittedTasks.getFirst().get(5, TimeUnit.SECONDS);
+
+            assertFalse(quantumViewModel.isMatchedBySearch().get());
+            assertTrue(organicViewModel.isMatchedBySearch().get());
+            assertEquals(1, resultSize.get());
+        } finally {
+            allowFirstSearchToFinish.complete(null);
+            executorService.shutdownNow();
+        }
     }
 
     @Test
