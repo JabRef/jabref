@@ -228,15 +228,14 @@ public class FileSelectionPage extends WizardPane {
         cancelPreviewTask();
 
         BackgroundTask<Void> previewTask = BackgroundTask.<Void>wrap(() -> {
-            try (var inputStream = Files.newInputStream(selectedPath)) {
-                // File I/O validated on background thread
-                return null;
-            }
-        }).onSuccess(unused -> UiTaskExecutor.runNowOrInJavaFXThread(() -> pdfPreview.show(selectedPath)))
-          .onFailure(exception -> {
-              LOGGER.warn("Could not load PDF preview for {}", selectedPath, exception);
-              UiTaskExecutor.runNowOrInJavaFXThread(() -> pdfPreview.show(null));
-          });
+                                                             try (var inputStream = Files.newInputStream(selectedPath)) {
+                                                                 return null;
+                                                             }
+                                                         }).onSuccess(unused -> UiTaskExecutor.runNowOrInJavaFXThread(() -> pdfPreview.show(selectedPath)))
+                                                         .onFailure(exception -> {
+                                                             LOGGER.warn("Could not load PDF preview for {}", selectedPath, exception);
+                                                             UiTaskExecutor.runNowOrInJavaFXThread(() -> pdfPreview.show(null));
+                                                         });
 
         currentPreviewTask = previewTask;
         previewTask.executeWith(taskExecutor);
