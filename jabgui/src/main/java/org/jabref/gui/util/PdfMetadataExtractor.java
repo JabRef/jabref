@@ -20,11 +20,14 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Extracts and formats PDF metadata (page count, file size, title, author, dates,
 /// keywords) for preview purposes.
+@NullMarked
 public class PdfMetadataExtractor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfMetadataExtractor.class);
@@ -36,7 +39,7 @@ public class PdfMetadataExtractor {
         return thread;
     });
 
-    private Task<String> currentTask;
+    private @Nullable Task<String> currentTask;
 
     /// Cancels any in-flight extraction and starts a new one.
     public void extractAsync(Path filePath, Consumer<String> onSuccess, Consumer<Throwable> onFailure) {
@@ -94,7 +97,7 @@ public class PdfMetadataExtractor {
         }
     }
 
-    private void addLine(List<String> lines, String label, String value) {
+    private void addLine(List<String> lines, String label, @Nullable String value) {
         if ((value != null) && !value.isBlank()) {
             lines.add(Localization.lang("%0: %1", label, value));
         }
@@ -120,7 +123,7 @@ public class PdfMetadataExtractor {
     }
 
     /// Formats a date as a human-readable string.
-    private String formatDate(Calendar calendar) {
+    private @Nullable String formatDate(@Nullable Calendar calendar) {
         if (calendar == null) {
             return null;
         }
