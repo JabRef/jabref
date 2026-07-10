@@ -35,16 +35,13 @@ import org.jabref.gui.documentviewer.PdfDocumentViewer;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.PdfMetadataExtractor;
 import org.jabref.gui.util.RecursiveTreeItem;
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.io.FileUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckTreeView;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,8 +54,6 @@ public class FileSelectionPage extends WizardPane {
     private final BooleanProperty invalidProperty = new SimpleBooleanProperty(false);
 
     private final PdfMetadataExtractor metadataExtractor = new PdfMetadataExtractor();
-    private final UiTaskExecutor taskExecutor = new UiTaskExecutor();
-    private @Nullable BackgroundTask<Void> currentPreviewTask;
 
     private CheckTreeView<FileNodeViewModel> unlinkedFilesList;
     private ProgressIndicator progressIndicator;
@@ -225,20 +220,7 @@ public class FileSelectionPage extends WizardPane {
             return;
         }
 
-        cancelPreviewTask();
-
-        BackgroundTask<Void> previewTask = BackgroundTask.<Void>wrap(() -> {
-                                                             try (var inputStream = Files.newInputStream(selectedPath)) {
-                                                                 return null;
-                                                             }
-                                                         }).onSuccess(unused -> UiTaskExecutor.runNowOrInJavaFXThread(() -> pdfPreview.show(selectedPath)))
-                                                         .onFailure(exception -> {
-                                                             LOGGER.warn("Could not load PDF preview for {}", selectedPath, exception);
-                                                             UiTaskExecutor.runNowOrInJavaFXThread(() -> pdfPreview.show(null));
-                                                         });
-
-        currentPreviewTask = previewTask;
-        previewTask.executeWith(taskExecutor);
+        pdfPreview.show(selectedPath);
 
         metadataPreview.setText(Localization.lang("Loading metadata..."));
         metadataExtractor.extractAsync(
@@ -259,15 +241,7 @@ public class FileSelectionPage extends WizardPane {
         return true;
     }
 
-    private void cancelPreviewTask() {
-        if (currentPreviewTask != null) {
-            currentPreviewTask.cancel();
-            currentPreviewTask = null;
-        }
-    }
-
     private void showPreviewDisabledState(String metadataText) {
-        cancelPreviewTask();
         metadataExtractor.cancelCurrent();
         pdfPreview.show(null);
         metadataPreview.setText(metadataText);
