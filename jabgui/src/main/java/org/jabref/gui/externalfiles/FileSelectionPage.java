@@ -243,6 +243,7 @@ public class FileSelectionPage extends WizardPane {
 
     private void showPreviewDisabledState(String metadataText) {
         metadataExtractor.cancelCurrent();
+        pdfPreview.cancelCurrent();
         pdfPreview.show(null);
         metadataPreview.setText(metadataText);
     }
