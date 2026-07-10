@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.Importer;
@@ -23,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import tools.jackson.core.JacksonException;
+import tools.jackson.core.StreamReadFeature;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.dataformat.yaml.YAMLMapper;
 
@@ -38,6 +41,10 @@ public class HayagrivaImporter extends Importer {
             "report", StandardEntryType.TechReport,
             "web", StandardEntryType.Online
     );
+
+    private static final int MAX_LOOKAHEAD_CHARS = 65_536;
+    private static final int MAX_LOOKAHEAD_LINES = 1_000;
+    private static final Pattern TYPE_LINE_PATTERN = Pattern.compile("^\\s*type:\\s*\"?'?([A-Za-z-]+)\"?'?\\s*$");
 
     @Override
     public ParserResult importDatabase(BufferedReader input) throws IOException {
@@ -188,39 +195,68 @@ public class HayagrivaImporter extends Importer {
         public HayagrivaSerialNumber serialNumber;
     }
 
+    /// Lightweight recognition for the {@link BufferedReader} overload, which must reset the
+    /// reader afterwards. Instead of doing a full YAML parse (which could read past the marked
+    /// read-ahead limit and make {@code reset()} throw), this scans at most
+    /// {@link #MAX_LOOKAHEAD_LINES} lines / {@link #MAX_LOOKAHEAD_CHARS} characters for a
+    /// top-level {@code type:} key matching a known Hayagriva entry type.
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
-        input.mark(10_000_000);
+        input.mark(MAX_LOOKAHEAD_CHARS);
         try {
-            YAMLMapper mapper = YAMLMapper.builder()
-                                          .disable(tools.jackson.core.StreamReadFeature.AUTO_CLOSE_SOURCE)
-                                          .build();
+            int charsConsumed = 0;
+            int linesRead = 0;
+            String line;
 
-            Map<String, Object> raw = mapper.readValue(input, new TypeReference<Map<String, Object>>() {
-            });
+            while (linesRead < MAX_LOOKAHEAD_LINES && (line = input.readLine()) != null) {
+                linesRead++;
+                charsConsumed += line.length() + 1;
+                if (charsConsumed >= MAX_LOOKAHEAD_CHARS) {
+                    break;
+                }
 
-            if (raw == null || raw.isEmpty()) {
-                return false;
-            }
-
-            for (Object value : raw.values()) {
-                if (value instanceof Map<?, ?> entry
-                        && entry.get("type") instanceof String type
-                        && TYPES_MAP.containsKey(type.toLowerCase(Locale.ROOT))) {
+                Matcher matcher = TYPE_LINE_PATTERN.matcher(line);
+                if (matcher.matches() && TYPES_MAP.containsKey(matcher.group(1).toLowerCase(Locale.ROOT))) {
                     return true;
                 }
             }
 
-            return false;
-        } catch (JacksonException e) {
             return false;
         } finally {
             input.reset();
         }
     }
 
+    /// Full recognition for the {@link Reader} overload, which has no reset requirement, so a
+    /// complete (but loosely-typed) YAML parse is safe here.
     @Override
     public boolean isRecognizedFormat(Reader input) throws IOException {
-        return isRecognizedFormat(new BufferedReader(input));
+        BufferedReader bufferedReader = input instanceof BufferedReader br ? br : new BufferedReader(input);
+
+        YAMLMapper mapper = YAMLMapper.builder()
+                                      .disable(StreamReadFeature.AUTO_CLOSE_SOURCE)
+                                      .build();
+
+        Map<String, Object> raw;
+        try {
+            raw = mapper.readValue(bufferedReader, new TypeReference<Map<String, Object>>() {
+            });
+        } catch (JacksonException e) {
+            return false;
+        }
+
+        if (raw == null || raw.isEmpty()) {
+            return false;
+        }
+
+        for (Object value : raw.values()) {
+            if (value instanceof Map<?, ?> entry
+                    && entry.get("type") instanceof String type
+                    && TYPES_MAP.containsKey(type.toLowerCase(Locale.ROOT))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
