@@ -23,10 +23,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Extracts and formats PDF metadata (page count, file size, title, author, dates,
- * keywords) for preview purposes.
- */
+/// Extracts and formats PDF metadata (page count, file size, title, author, dates,
+/// keywords) for preview purposes.
 public class PdfMetadataExtractor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfMetadataExtractor.class);
@@ -40,9 +38,7 @@ public class PdfMetadataExtractor {
 
     private Task<String> currentTask;
 
-    /**
-     * Cancels any in-flight extraction and starts a new one.
-     */
+    /// Cancels any in-flight extraction and starts a new one.
     public void extractAsync(Path filePath, Consumer<String> onSuccess, Consumer<Throwable> onFailure) {
         cancelCurrent();
 
@@ -60,9 +56,7 @@ public class PdfMetadataExtractor {
         executor.execute(task);
     }
 
-    /**
-     * Cancels the currently running extraction, if any.
-     */
+    /// Cancels the currently running extraction, if any.
     public void cancelCurrent() {
         if (currentTask != null) {
             currentTask.cancel();
@@ -106,9 +100,7 @@ public class PdfMetadataExtractor {
         }
     }
 
-    /**
-     * Formats a byte count as a human-readable size.
-     */
+    /// Formats a byte count as a human-readable size.
     private String formatFileSize(long bytes) {
         return getString(bytes);
     }
@@ -127,6 +119,7 @@ public class PdfMetadataExtractor {
         return String.format("%.1f %sB", value, unitPrefix);
     }
 
+    /// Formats a date as a human-readable string.
     private String formatDate(Calendar calendar) {
         if (calendar == null) {
             return null;
