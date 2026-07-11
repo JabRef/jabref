@@ -9,8 +9,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ## [Unreleased]
 
-
-
 ### Added
 
 - The HTTP import endpoint (`POST /libraries/{id}/entries`) now accepts CSL-JSON (`application/vnd.citationstyles.csl+json`), mapping each item to the correct entry type (e.g. conference paper, book chapter, thesis) via the citation-js-based mapping. [#16151](https://github.com/JabRef/jabref/pull/16151)
