@@ -1,6 +1,7 @@
 package org.jabref.logic.openoffice;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -13,10 +14,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.EntryType;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +54,40 @@ public class ZoteroCitationMarkParser {
         }
     }
 
+    /// Parses a bare CSL-JSON payload (a single CSL item object, or an array of them) into
+    /// [BibEntry] instances, reusing the citation-js-based CSL item-type/field mapping (ADR 0064).
+    ///
+    /// Unlike [#parse(String)] this expects the CSL items directly (as produced by a Zotero /
+    /// citation-js CSL-JSON export), not a Zotero reference-mark wrapper. The produced entries have
+    /// no citation key, so callers importing them let JabRef generate keys from its pattern.
+    ///
+    /// @return the parsed list of entries or an empty list when the input is blank or not parsable CSL JSON.
+    public static List<BibEntry> parseCslJsonItems(String cslJson) {
+        if (StringUtil.isBlank(cslJson)) {
+            return List.of();
+        }
+
+        try {
+            JsonElement root = JsonParser.parseString(cslJson);
+            List<ZoteroCitationData.ItemData> items = new ArrayList<>();
+            // The isJsonArray/isJsonObject guards ensure Gson returns a non-null result here.
+            if (root.isJsonArray()) {
+                Collections.addAll(items, GSON.fromJson(root, ZoteroCitationData.ItemData[].class));
+            } else if (root.isJsonObject()) {
+                items.add(GSON.fromJson(root, ZoteroCitationData.ItemData.class));
+            }
+
+            List<BibEntry> entries = new ArrayList<>();
+            for (ZoteroCitationData.ItemData itemData : items) {
+                toBibEntry(itemData).ifPresent(entries::add);
+            }
+            return entries;
+        } catch (JsonParseException | NumberFormatException | NoSuchElementException e) {
+            LOGGER.debug("Could not parse CSL JSON items", e);
+            return List.of();
+        }
+    }
+
     private static Optional<String> extractCSLJSON(String referenceMarkName) {
         int jsonStart = referenceMarkName.indexOf('{');
         int jsonEnd = referenceMarkName.lastIndexOf('}');
@@ -63,14 +99,22 @@ public class ZoteroCitationMarkParser {
     }
 
     private static Optional<BibEntry> toBibEntry(ZoteroCitationData.CitationItemData citationItem) {
-        ZoteroCitationData.ItemData itemData = citationItem.itemData;
+        return toBibEntry(citationItem.itemData)
+                .map(entry -> entry.withCitationKey("Zotero-" + citationItem.id));
+    }
 
-        EntryType entryType = CSLItemTypeDefinitions.getEntryType(itemData.type);
-        BibEntry entry = new BibEntry(entryType);
-        entry.withCitationKey("Zotero-" + (citationItem.id));
-        setAuthors(itemData.author).ifPresent(authors -> entry.withField(StandardField.AUTHOR, authors));
-        setDate(entry, itemData.issued);
-        for (Map.Entry<String, Field> fieldMapping : CSLItemTypeDefinitions.getFieldMappings(itemData.type, itemData).entrySet()) {
+    private static Optional<BibEntry> toBibEntry(ZoteroCitationData.ItemData itemData) {
+        // Gson replaces the field defaults with null when the JSON sets these keys explicitly to
+        // null (e.g. "type": null, "author": null, "issued": null), so normalise before use. The
+        // CSL mapping tables are immutable maps, which reject a null key lookup with an NPE.
+        String type = itemData.type == null ? "" : itemData.type;
+        BibEntry entry = new BibEntry(CSLItemTypeDefinitions.getEntryType(type));
+        List<ZoteroCitationData.AuthorData> authors = itemData.author == null ? List.of() : itemData.author;
+        setAuthors(authors).ifPresent(value -> entry.withField(StandardField.AUTHOR, value));
+        if (itemData.issued != null) {
+            setDate(entry, itemData.issued);
+        }
+        for (Map.Entry<String, Field> fieldMapping : CSLItemTypeDefinitions.getFieldMappings(type, itemData).entrySet()) {
             setField(entry, fieldMapping.getValue(), itemData.getFieldValue(fieldMapping.getKey()));
         }
 
@@ -92,7 +136,7 @@ public class ZoteroCitationMarkParser {
     }
 
     private static void setDate(BibEntry entry, ZoteroCitationData.IssuedData issuedData) {
-        if (issuedData.dateParts.isEmpty()) {
+        if ((issuedData.dateParts == null) || issuedData.dateParts.isEmpty()) {
             return;
         }
 

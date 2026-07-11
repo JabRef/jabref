@@ -56,10 +56,10 @@ public class ImporterPreferences {
                 Set.of(),                                      // Custom importers
                 Set.of(),                                      // API keys
                 false,                                         // Persist custom keys
-                List.of(ACMPortalFetcher.FETCHER_NAME,         // Catalogs
-                        SpringerNatureWebFetcher.FETCHER_NAME,
+                List.of(ACMPortalFetcher.FETCHER_NAME,         // Alphabetically sorted list of Catalogs
                         DBLPFetcher.FETCHER_NAME,
-                        IEEE.FETCHER_NAME),
+                        IEEE.FETCHER_NAME,
+                        SpringerNatureWebFetcher.FETCHER_NAME),
                 PlainCitationParserChoice.RULE_BASED_GENERAL,  // Default plain citation parser
                 30,                                            // Citations relations store TTL
                 Map.of()                                       // Search engine URL templates
