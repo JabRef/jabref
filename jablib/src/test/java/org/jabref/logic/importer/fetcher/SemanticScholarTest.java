@@ -137,8 +137,9 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
 
     @Test
     void getURLForRawQuery() throws MalformedURLException, URISyntaxException, FetcherException {
-        URL url = fetcher.getURLForRawQuery("Software engineering", 0);
-        assertEquals("https://api.semanticscholar.org/graph/v1/paper/search?query=Software%20engineering&offset=0&limit=20&fields=paperId%2CexternalIds%2Curl%2Ctitle%2Cabstract%2Cvenue%2Cyear%2Cauthors", url.toString());
+        String expected = "https://api.semanticscholar.org/graph/v1/paper/search?query=Software%20engineering&offset=0&limit=20&fields=paperId%2CexternalIds%2Curl%2Ctitle%2Cabstract%2Cvenue%2Cyear%2Cauthors";
+        String actual = fetcher.getURLForRawQuery("Software engineering", 0).toString();
+        assertEquals(expected, actual);
     }
 
     @Test
