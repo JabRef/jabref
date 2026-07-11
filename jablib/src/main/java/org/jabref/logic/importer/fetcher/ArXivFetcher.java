@@ -344,7 +344,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                                                                                        }, executor))
                                                                                .toList();
 
-            Collection<BibEntry> modifiedSearchResult = futureSearchResult.stream()
+            List<BibEntry> modifiedSearchResult = futureSearchResult.stream()
                                                                           .map(CompletableFuture::join)
                                                                           .toList();
 
