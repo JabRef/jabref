@@ -1,8 +1,11 @@
 package org.jabref.logic.groups;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.SpecialFieldValue;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.SearchGroup;
@@ -10,6 +13,9 @@ import org.jabref.model.groups.SearchGroup;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -17,38 +23,38 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ResourceLock("Localization.lang")
 class GroupsFactoryTest {
 
+    private static String searchExpression(SpecialField field, SpecialFieldValue value) {
+        return field.getName() + " = " + value.getFieldValue().orElseThrow();
+    }
+
     @Test
     void createRankParentGroupHasCorrectProperties() {
         ExplicitGroup group = GroupsFactory.createRankParentGroup();
         assertEquals(Localization.lang("Rank"), group.getName());
         assertEquals(GroupHierarchyType.INCLUDING, group.getHierarchicalContext());
-        assertEquals(GroupsFactory.RANKING_ICON, group.getIconName().orElseThrow());
+        assertEquals(GroupsFactory.GroupIcon.RANKING.name(), group.getIconName().orElseThrow());
     }
 
-    @Test
-    void createRankSubgroupsReturnsFiveEntries() {
+    static Stream<Arguments> provideRankSubgroups() {
+        return Stream.of(
+                Arguments.of(0, GroupHierarchyType.INDEPENDENT, GroupsFactory.GroupIcon.RANK1.name(), searchExpression(SpecialField.RANKING, SpecialFieldValue.RANK_1)),
+                Arguments.of(1, GroupHierarchyType.INDEPENDENT, GroupsFactory.GroupIcon.RANK2.name(), searchExpression(SpecialField.RANKING, SpecialFieldValue.RANK_2)),
+                Arguments.of(2, GroupHierarchyType.INDEPENDENT, GroupsFactory.GroupIcon.RANK3.name(), searchExpression(SpecialField.RANKING, SpecialFieldValue.RANK_3)),
+                Arguments.of(3, GroupHierarchyType.INDEPENDENT, GroupsFactory.GroupIcon.RANK4.name(), searchExpression(SpecialField.RANKING, SpecialFieldValue.RANK_4)),
+                Arguments.of(4, GroupHierarchyType.INDEPENDENT, GroupsFactory.GroupIcon.RANK5.name(), searchExpression(SpecialField.RANKING, SpecialFieldValue.RANK_5))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideRankSubgroups")
+    void createRankSubgroupsReturnsCorrectProperties(int index, GroupHierarchyType hierarchyContext, String iconName, String searchExpression) {
         List<SearchGroup> subgroups = GroupsFactory.createRankSubgroups();
         assertEquals(5, subgroups.size());
 
-        assertEquals(GroupHierarchyType.INDEPENDENT, subgroups.getFirst().getHierarchicalContext());
-        assertEquals(GroupsFactory.RANK_1_ICON, subgroups.getFirst().getIconName().orElseThrow());
-        assertEquals("ranking = rank1", subgroups.getFirst().getSearchExpression());
-
-        assertEquals(GroupHierarchyType.INDEPENDENT, subgroups.get(1).getHierarchicalContext());
-        assertEquals(GroupsFactory.RANK_2_ICON, subgroups.get(1).getIconName().orElseThrow());
-        assertEquals("ranking = rank2", subgroups.get(1).getSearchExpression());
-
-        assertEquals(GroupHierarchyType.INDEPENDENT, subgroups.get(2).getHierarchicalContext());
-        assertEquals(GroupsFactory.RANK_3_ICON, subgroups.get(2).getIconName().orElseThrow());
-        assertEquals("ranking = rank3", subgroups.get(2).getSearchExpression());
-
-        assertEquals(GroupHierarchyType.INDEPENDENT, subgroups.get(3).getHierarchicalContext());
-        assertEquals(GroupsFactory.RANK_4_ICON, subgroups.get(3).getIconName().orElseThrow());
-        assertEquals("ranking = rank4", subgroups.get(3).getSearchExpression());
-
-        assertEquals(GroupHierarchyType.INDEPENDENT, subgroups.get(4).getHierarchicalContext());
-        assertEquals(GroupsFactory.RANK_5_ICON, subgroups.get(4).getIconName().orElseThrow());
-        assertEquals("ranking = rank5", subgroups.get(4).getSearchExpression());
+        SearchGroup subgroup = subgroups.get(index);
+        assertEquals(hierarchyContext, subgroup.getHierarchicalContext());
+        assertEquals(iconName, subgroup.getIconName().orElseThrow());
+        assertEquals(searchExpression, subgroup.getSearchExpression());
     }
 
     @Test
@@ -94,19 +100,23 @@ class GroupsFactoryTest {
         assertEquals(GroupHierarchyType.INCLUDING, group.getHierarchicalContext());
     }
 
-    @Test
-    void createPrioritySubgroupsReturnsThreeEntries() {
+    static Stream<Arguments> providePrioritySubgroups() {
+        return Stream.of(
+                Arguments.of(0, GroupsFactory.GroupIcon.PRIORITY_HIGH.name(), searchExpression(SpecialField.PRIORITY, SpecialFieldValue.PRIORITY_HIGH)),
+                Arguments.of(1, GroupsFactory.GroupIcon.PRIORITY_MEDIUM.name(), searchExpression(SpecialField.PRIORITY, SpecialFieldValue.PRIORITY_MEDIUM)),
+                Arguments.of(2, GroupsFactory.GroupIcon.PRIORITY_LOW.name(), searchExpression(SpecialField.PRIORITY, SpecialFieldValue.PRIORITY_LOW))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("providePrioritySubgroups")
+    void createPrioritySubgroupsReturnsCorrectProperties(int index, String iconName, String searchExpression) {
         List<SearchGroup> subgroups = GroupsFactory.createPrioritySubgroups();
         assertEquals(3, subgroups.size());
 
-        assertEquals(GroupsFactory.PRIORITY_HIGH_ICON, subgroups.getFirst().getIconName().orElseThrow());
-        assertEquals("priority = prio1", subgroups.getFirst().getSearchExpression());
-
-        assertEquals(GroupsFactory.PRIORITY_MEDIUM_ICON, subgroups.get(1).getIconName().orElseThrow());
-        assertEquals("priority = prio2", subgroups.get(1).getSearchExpression());
-
-        assertEquals(GroupsFactory.PRIORITY_LOW_ICON, subgroups.get(2).getIconName().orElseThrow());
-        assertEquals("priority = prio3", subgroups.get(2).getSearchExpression());
+        SearchGroup subgroup = subgroups.get(index);
+        assertEquals(iconName, subgroup.getIconName().orElseThrow());
+        assertEquals(searchExpression, subgroup.getSearchExpression());
     }
 
     @Test
@@ -116,15 +126,21 @@ class GroupsFactoryTest {
         assertEquals(GroupHierarchyType.INCLUDING, group.getHierarchicalContext());
     }
 
-    @Test
-    void createReadStatusSubgroupsReturnsTwoEntries() {
+    static Stream<Arguments> provideReadStatusSubgroups() {
+        return Stream.of(
+                Arguments.of(0, GroupsFactory.GroupIcon.READ_STATUS_READ.name(), searchExpression(SpecialField.READ_STATUS, SpecialFieldValue.READ)),
+                Arguments.of(1, GroupsFactory.GroupIcon.READ_STATUS_SKIMMED.name(), searchExpression(SpecialField.READ_STATUS, SpecialFieldValue.SKIMMED))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideReadStatusSubgroups")
+    void createReadStatusSubgroupsReturnsCorrectProperties(int index, String iconName, String searchExpression) {
         List<SearchGroup> subgroups = GroupsFactory.createReadStatusSubgroups();
         assertEquals(2, subgroups.size());
 
-        assertEquals(GroupsFactory.READ_STATUS_READ_ICON, subgroups.getFirst().getIconName().orElseThrow());
-        assertEquals("readstatus = read", subgroups.getFirst().getSearchExpression());
-
-        assertEquals(GroupsFactory.READ_STATUS_SKIMMED_ICON, subgroups.get(1).getIconName().orElseThrow());
-        assertEquals("readstatus = skimmed", subgroups.get(1).getSearchExpression());
+        SearchGroup subgroup = subgroups.get(index);
+        assertEquals(iconName, subgroup.getIconName().orElseThrow());
+        assertEquals(searchExpression, subgroup.getSearchExpression());
     }
 }

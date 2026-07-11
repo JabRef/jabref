@@ -249,29 +249,12 @@ public class GroupTreeViewModel extends AbstractViewModel {
                                 GroupHierarchyType.INCLUDING,
                                 preferences.getBibEntryPreferences().getKeywordSeparator()));
 
-                GroupTreeNode rankParentNode = markingNode.addSubgroup(GroupsFactory.createRankParentGroup());
-                GroupsFactory.createRankSubgroups().forEach(rankParentNode::addSubgroup);
-                newSuggestedSubgroups.add(rankParentNode);
-
-                GroupTreeNode relevanceParentNode = markingNode.addSubgroup(GroupsFactory.createRelevanceParentGroup());
-                GroupsFactory.createRelevanceSubgroups().forEach(relevanceParentNode::addSubgroup);
-                newSuggestedSubgroups.add(relevanceParentNode);
-
-                GroupTreeNode qualityParentNode = markingNode.addSubgroup(GroupsFactory.createQualityParentGroup());
-                GroupsFactory.createQualitySubgroups().forEach(qualityParentNode::addSubgroup);
-                newSuggestedSubgroups.add(qualityParentNode);
-
-                GroupTreeNode printedParentNode = markingNode.addSubgroup(GroupsFactory.createPrintedParentGroup());
-                GroupsFactory.createPrintedSubgroups().forEach(printedParentNode::addSubgroup);
-                newSuggestedSubgroups.add(printedParentNode);
-
-                GroupTreeNode priorityParentNode = markingNode.addSubgroup(GroupsFactory.createPriorityParentGroup());
-                GroupsFactory.createPrioritySubgroups().forEach(priorityParentNode::addSubgroup);
-                newSuggestedSubgroups.add(priorityParentNode);
-
-                GroupTreeNode readStatusParentNode = markingNode.addSubgroup(GroupsFactory.createReadStatusParentGroup());
-                GroupsFactory.createReadStatusSubgroups().forEach(readStatusParentNode::addSubgroup);
-                newSuggestedSubgroups.add(readStatusParentNode);
+                addSuggestedSubgroup(markingNode, GroupsFactory.createRankParentGroup(), GroupsFactory.createRankSubgroups(), newSuggestedSubgroups);
+                addSuggestedSubgroup(markingNode, GroupsFactory.createRelevanceParentGroup(), GroupsFactory.createRelevanceSubgroups(), newSuggestedSubgroups);
+                addSuggestedSubgroup(markingNode, GroupsFactory.createQualityParentGroup(), GroupsFactory.createQualitySubgroups(), newSuggestedSubgroups);
+                addSuggestedSubgroup(markingNode, GroupsFactory.createPrintedParentGroup(), GroupsFactory.createPrintedSubgroups(), newSuggestedSubgroups);
+                addSuggestedSubgroup(markingNode, GroupsFactory.createPriorityParentGroup(), GroupsFactory.createPrioritySubgroups(), newSuggestedSubgroups);
+                addSuggestedSubgroup(markingNode, GroupsFactory.createReadStatusParentGroup(), GroupsFactory.createReadStatusSubgroups(), newSuggestedSubgroups);
             }
 
             selectedGroups.setAll(newSuggestedSubgroups
@@ -283,6 +266,12 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             dialogService.notify(Localization.lang("Created %0 suggested groups.", String.valueOf(newSuggestedSubgroups.size())));
         });
+    }
+
+    private void addSuggestedSubgroup(GroupTreeNode parentNode, AbstractGroup parentGroup, List<SearchGroup> subgroups, List<GroupTreeNode> newSuggestedSubgroups) {
+        GroupTreeNode childNode = parentNode.addSubgroup(parentGroup);
+        subgroups.forEach(childNode::addSubgroup);
+        newSuggestedSubgroups.add(childNode);
     }
 
     /// Check if it is necessary to show a group modified, reassign entry dialog <br>
