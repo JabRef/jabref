@@ -4,7 +4,8 @@ import org.jabref.logic.l10n.Localization;
 
 public enum PagesWithTextHandling {
     SKIP(Localization.lang("Skip pages with text")),
-    FORCE(Localization.lang("Overwrite text in pages contain text"));
+    FORCE(Localization.lang("Overwrite text in pages contain text")),
+    REDO(Localization.lang("Redo text in pages contain OCRed text"));
 
     private final String displayName;
 

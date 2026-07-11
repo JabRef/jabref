@@ -78,8 +78,10 @@ public class OcrMyPdfEngine implements OcrEngine {
                     ocrCommand = "--skip-text";
             case FORCE ->
                     ocrCommand = "--force-ocr";
+            case REDO ->
+                    ocrCommand = "--redo-ocr";
             default ->
-                    throw new IllegalStateException("Unexpected value: " + ocrPreferences.getPagesHaveText());
+                    ocrCommand = "";
         }
         // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
         ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
