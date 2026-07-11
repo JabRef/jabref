@@ -53,7 +53,6 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CSLStyleUtils;
-import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
 import org.jabref.logic.cleanup.FieldFormatterCleanupMapper;
