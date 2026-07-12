@@ -51,6 +51,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private static final String COVER_IMAGE_FORMAT_HTML = "<img style=\"border-width:1px; border-style:solid; border-color:auto; display:block; height:12rem;\" src=\"%s\"> <br>";
 
+    private boolean viewportResetScheduled = false;
+    private double latestContentHeight = 0.0;
+
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
@@ -376,9 +379,19 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             if (Math.abs(getPrefViewportHeight() - contentHeight) >= 1) {
                 setPrefViewportHeight(contentHeight);
 
+                this.latestContentHeight = contentHeight;
+
                 // Asynchronously reset to USE_COMPUTED_SIZE on the next JavaFX layout pulse
                 // updating the viewport height.
-                Platform.runLater(() -> setPrefViewportHeight(USE_COMPUTED_SIZE));
+                if (!viewportResetScheduled) {
+                    viewportResetScheduled = true;
+                    Platform.runLater(() -> {
+                        viewportResetScheduled = false;
+                        if (Math.abs(getPrefViewportHeight() - latestContentHeight) < 1 && getPrefViewportHeight() != USE_COMPUTED_SIZE) {
+                            setPrefViewportHeight(USE_COMPUTED_SIZE);
+                        }
+                    });
+                }
             }
         });
     }
