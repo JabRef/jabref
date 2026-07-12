@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
@@ -367,8 +368,17 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         setPrefSize(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE);
         setPrefViewportWidth(750);
         previewView.layoutBoundsProperty().addListener((_, _, bounds) -> {
-            if (bounds.getHeight() > 0 && Math.abs(getPrefViewportHeight() - bounds.getHeight()) >= 1) {
-                setPrefViewportHeight(bounds.getHeight());
+            double contentHeight = bounds.getHeight();
+            if (contentHeight == 0 && getPrefViewportHeight() == USE_COMPUTED_SIZE) {
+                return;
+            }
+
+            if (Math.abs(getPrefViewportHeight() - contentHeight) >= 1) {
+                setPrefViewportHeight(contentHeight);
+
+                // Asynchronously reset to USE_COMPUTED_SIZE on the next JavaFX layout pulse
+                // updating the viewport height.
+                Platform.runLater(() -> setPrefViewportHeight(USE_COMPUTED_SIZE));
             }
         });
     }
