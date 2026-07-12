@@ -17,22 +17,25 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @FetcherTest
 class ISIDOREFetcherTest {
 
+    @TempDir
+    static Path tempDir;
+
     private ISIDOREFetcher fetcher;
 
-    /// Fetcher tests run without going through {@code Launcher}/{@code JabKitLauncher}, so the merged
+    /// Fetcher tests run without going through `Launcher`/`JabKitLauncher`, so the merged
     /// JRE + JabRef trust manager (which contains CA roots not yet present in every JVM's cacerts, e.g.
     /// HARICA TLS ECC Root CA 2021, used by isidore.science) is never installed. Install it here so
-    /// {@link org.jabref.logic.net.URLDownload} sees the same trust configuration as the packaged app.
+    /// [URLDownload] sees the same trust configuration as the packaged app.
     @BeforeAll
     static void configureTrustStore() throws IOException {
-        Path tempTrustStore = Files.createTempDirectory("jabref-test-truststore").resolve("truststore.jks");
-        TrustStoreManager.createTruststoreFileIfNotExist(tempTrustStore);
+        TrustStoreManager.createTruststoreFileIfNotExist(tempDir.resolve("truststore.jks"));
     }
 
     @BeforeEach
