@@ -358,12 +358,16 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         setVbarPolicy(ScrollBarPolicy.NEVER);
         setHbarPolicy(ScrollBarPolicy.NEVER);
 
+        // Disable fitToHeight to prevent the ScrollPane from forcing
+        // the content to 0px height during initial layout calculation
+        setFitToHeight(false);
+
         // Tooltips size to the rendered content: fixed width, natural height. Only write the
         // viewport height when it actually changed, so rendering does not queue redundant relayouts.
         setPrefSize(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE);
         setPrefViewportWidth(750);
         previewView.layoutBoundsProperty().addListener((_, _, bounds) -> {
-            if (Math.abs(getPrefViewportHeight() - bounds.getHeight()) >= 1) {
+            if (bounds.getHeight() > 0 && Math.abs(getPrefViewportHeight() - bounds.getHeight()) >= 1) {
                 setPrefViewportHeight(bounds.getHeight());
             }
         });
