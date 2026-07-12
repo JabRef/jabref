@@ -1,18 +1,23 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.paging.Page;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -21,7 +26,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @FetcherTest
 class ISIDOREFetcherTest {
 
+    @TempDir
+    static Path tempDir;
+
     private ISIDOREFetcher fetcher;
+
+    /// Fetcher tests run without going through `Launcher`/`JabKitLauncher`, so the merged
+    /// JRE + JabRef trust manager (which contains CA roots not yet present in every JVM's cacerts, e.g.
+    /// HARICA TLS ECC Root CA 2021, used by isidore.science) is never installed. Install it here so
+    /// [URLDownload] sees the same trust configuration as the packaged app.
+    @BeforeAll
+    static void configureTrustStore() throws IOException {
+        TrustStoreManager.createTruststoreFileIfNotExist(tempDir.resolve("truststore.jks"));
+    }
 
     @BeforeEach
     void setup() {
