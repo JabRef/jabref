@@ -134,12 +134,13 @@ class FileHistoryTest {
     @EnabledOnOs(OS.WINDOWS)
     void removeItemHandlesFileOnDifferentDriveRoot() {
         String baseDrive = baseDir.getRoot().toString().substring(0, 1).toUpperCase(Locale.ROOT);
-        String otherDrive = baseDrive.equals("H") ? "C" : "H";
+        String otherDrive = "H".equals(baseDrive) ? "C" : "H";
         Path differentRoot = Path.of(otherDrive + ":\\somefile.pdf");
 
         history.newFile(differentRoot);
 
         assertDoesNotThrow(() -> history.removeItem(differentRoot));
+
         assertFalse(history.contains(differentRoot));
     }
 }

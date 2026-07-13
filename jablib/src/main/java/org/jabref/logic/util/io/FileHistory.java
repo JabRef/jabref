@@ -9,11 +9,7 @@ import javafx.collections.ModifiableObservableListBase;
 
 import org.jabref.logic.util.JabRefBaseDirectoryLocator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class FileHistory extends ModifiableObservableListBase<Path> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileHistory.class);
 
     private static final int HISTORY_SIZE = 8;
 
@@ -61,9 +57,9 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
 
         Path baseDirectoryPath = JabRefBaseDirectoryLocator.getBaseDirectoryPath();
 
-        // The history may contain both absolute and base-directory-relative paths,
-        // depending on how the file was added previously. Remove all equivalent
-        // representations to ensure the entry is fully cleared from the history.
+        // Only attempt relativize if both paths share the same root
+        // (e.g. both on C:\). Different roots (e.g. C:\ vs H:\) cannot
+        // be relativized and should be silently skipped.
         if (file.isAbsolute()) {
             if (!Objects.equals(file.getRoot(), baseDirectoryPath.getRoot())) {
                 // file is on a different drive/root than the base directory (e.g. H:\ vs C:\ on Windows),
@@ -72,10 +68,8 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
             }
             try {
                 this.remove(baseDirectoryPath.relativize(file).normalize());
-            } catch (IllegalArgumentException e) {
-                LOGGER.warn("Could not relativize file path: {}", file, e);
-                return;
             }
+
             return;
         }
 

@@ -33,7 +33,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
-import org.jabref.model.ai.pipeline.AnswerEngineKind;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
@@ -100,9 +100,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty generateFollowUpQuestions = new SimpleBooleanProperty();
     private final IntegerProperty followUpQuestionsCount = new SimpleIntegerProperty();
 
-    private final ListProperty<AnswerEngineKind> answerEnginesList =
-            new SimpleListProperty<>(FXCollections.observableArrayList(AnswerEngineKind.values()));
-    private final ObjectProperty<AnswerEngineKind> answerEngineProperty = new SimpleObjectProperty<>();
+    private final ListProperty<ResponseEngineKind> responseEnginesList =
+            new SimpleListProperty<>(FXCollections.observableArrayList(ResponseEngineKind.values()));
+    private final ObjectProperty<ResponseEngineKind> responseEngineProperty = new SimpleObjectProperty<>();
 
     private final ListProperty<SummarizatorKind> summarizationAlgorithmsList =
             new SimpleListProperty<>(FXCollections.observableArrayList(SummarizatorKind.values()));
@@ -378,7 +378,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         followUpQuestionsCount.set(aiPreferences.getFollowUpQuestionsCount());
         followUpQuestionsTemplate.set(aiPreferences.getFollowUpQuestionsTemplate());
 
-        answerEngineProperty.set(aiPreferences.getAnswerEngineKind());
+        responseEngineProperty.set(aiPreferences.getResponseEngineKind());
         summarizationAlgorithmProperty.setValue(aiPreferences.getSummarizatorKind());
         tokenEstimationAlgorithmProperty.setValue(aiPreferences.getTokenEstimatorKind());
 
@@ -434,7 +434,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setFollowUpQuestionsCount(followUpQuestionsCount.get());
         aiPreferences.setFollowUpQuestionsTemplate(followUpQuestionsTemplate.get());
 
-        aiPreferences.setAnswerEngineKind(answerEngineProperty.get());
+        aiPreferences.setResponseEngineKind(responseEngineProperty.get());
         aiPreferences.setSummarizatorKind(summarizationAlgorithmProperty.get());
         aiPreferences.setTokenEstimatorKind(tokenEstimationAlgorithmProperty.get());
 
@@ -453,7 +453,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         contextWindowSize.set(PredefinedChatModelUtil.getContextWindowSize(selectedAiProvider.get(), currentChatModel.get()));
 
-        answerEngineProperty.set(AiDefaultExpertSettings.ANSWER_ENGINE_KIND);
+        responseEngineProperty.set(AiDefaultExpertSettings.RESPONSE_ENGINE_KIND);
         summarizationAlgorithmProperty.set(AiDefaultExpertSettings.SUMMARIZATOR_KIND);
         tokenEstimationAlgorithmProperty.set(AiDefaultExpertSettings.TOKEN_ESTIMATOR_KIND);
 
@@ -641,12 +641,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return citationParsingSystemMessageTemplate;
     }
 
-    public ListProperty<AnswerEngineKind> answerEngineKindsProperty() {
-        return answerEnginesList;
+    public ListProperty<ResponseEngineKind> responseEngineKindsProperty() {
+        return responseEnginesList;
     }
 
-    public ObjectProperty<AnswerEngineKind> answerEngineProperty() {
-        return answerEngineProperty;
+    public ObjectProperty<ResponseEngineKind> responseEngineProperty() {
+        return responseEngineProperty;
     }
 
     public ListProperty<SummarizatorKind> summarizationAlgorithmsProperty() {
