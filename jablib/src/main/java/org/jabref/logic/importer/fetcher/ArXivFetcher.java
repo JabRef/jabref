@@ -392,7 +392,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     /// the entry is simply left with whatever citation key (if any) it already had.
     ///
     /// @param entry The fetched arXiv entry to infuse, modified in place. Its EPRINT field
-    ///                           (already normalized by [ArXiv#performSearchById]) is used for the lookup.
+    ///                                        (already normalized by [ArXiv#performSearchById]) is used for the lookup.
     private void infuseWithInspireCitationKeyIfMissing(BibEntry entry) {
         if (entry.getCitationKey().filter(key -> !isUrlShaped(key)).isPresent()) {
             return;
