@@ -101,6 +101,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.shared.event;
     exports org.jabref.logic.citation;
     exports org.jabref.logic.crawler;
+    exports org.jabref.logic.directorylibrary;
     exports org.jabref.logic.pseudonymization;
     exports org.jabref.logic.citation.repository;
     exports org.jabref.model.paging;

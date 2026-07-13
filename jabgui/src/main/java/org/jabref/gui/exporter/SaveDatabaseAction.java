@@ -145,6 +145,9 @@ public class SaveDatabaseAction {
             // Save all properties dependent on the ID. This makes it possible to restore them.
             new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID())
                     .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
+        } else if (context.getLocation() == DatabaseLocation.DIRECTORY) {
+            // "Save as" snapshots a directory library into a regular .bib library
+            context.convertToLocalDatabase();
         }
 
         boolean saveResult = save(file, mode);

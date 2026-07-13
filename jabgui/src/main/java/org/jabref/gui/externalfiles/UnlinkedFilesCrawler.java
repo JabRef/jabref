@@ -17,6 +17,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.io.GitIgnoreFileFilter;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.slf4j.Logger;

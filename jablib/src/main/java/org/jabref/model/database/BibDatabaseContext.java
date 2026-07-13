@@ -68,6 +68,11 @@ public class BibDatabaseContext {
     @Nullable
     private CoarseChangeFilter dbmsListener;
 
+    /// The root of a [DatabaseLocation#DIRECTORY] library; unrelated to [#path], which stays
+    /// empty for directory libraries.
+    @Nullable
+    private Path directoryLibraryRoot;
+
     private DatabaseLocation location;
 
     public BibDatabaseContext() {
@@ -269,6 +274,15 @@ public class BibDatabaseContext {
         this.location = DatabaseLocation.SHARED;
     }
 
+    public void convertToDirectoryLibrary(Path root) {
+        this.directoryLibraryRoot = root;
+        this.location = DatabaseLocation.DIRECTORY;
+    }
+
+    public Optional<Path> getDirectoryLibraryRoot() {
+        return Optional.ofNullable(directoryLibraryRoot);
+    }
+
     public void convertToLocalDatabase() {
         if (dbmsListener != null && (location == DatabaseLocation.SHARED)) {
             if (dbmsSynchronizer != null) {
@@ -277,6 +291,7 @@ public class BibDatabaseContext {
             dbmsListener.shutdown();
         }
 
+        this.directoryLibraryRoot = null;
         this.location = DatabaseLocation.LOCAL;
     }
 

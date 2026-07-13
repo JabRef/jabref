@@ -1,4 +1,4 @@
-package org.jabref.gui.externalfiles;
+package org.jabref.logic.util.io;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;

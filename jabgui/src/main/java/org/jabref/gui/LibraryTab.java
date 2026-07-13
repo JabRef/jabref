@@ -472,12 +472,21 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 } else {
                     tabTitle.append(Localization.lang("untitled"));
                 }
+            } else if (databaseLocation == DatabaseLocation.DIRECTORY) {
+                if (isChanged) {
+                    tabTitle.append('*');
+                }
+                bibDatabaseContext.getDirectoryLibraryRoot().ifPresent(root -> {
+                    tabTitle.append(root.getFileName().toString());
+                    toolTipText.append(root.toAbsolutePath());
+                });
             } else {
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
             }
             addModeInfo(toolTipText, bibDatabaseContext);
-            if ((databaseLocation == DatabaseLocation.LOCAL) && bibDatabaseContext.getDatabase().hasEntries()) {
+            if ((databaseLocation == DatabaseLocation.LOCAL || databaseLocation == DatabaseLocation.DIRECTORY)
+                    && bibDatabaseContext.getDatabase().hasEntries()) {
                 addChangedInformation(toolTipText);
             }
         }
@@ -647,7 +656,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public boolean requestClose() {
-        if (bibDatabaseContext.getLocation() == DatabaseLocation.LOCAL) {
+        // DIRECTORY prompts as well: until file write-back exists, edits are in-memory only
+        if (bibDatabaseContext.getLocation() == DatabaseLocation.LOCAL
+                || bibDatabaseContext.getLocation() == DatabaseLocation.DIRECTORY) {
             if (isModified()) {
                 return confirmClose();
             }
@@ -669,6 +680,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         String filename = getBibDatabaseContext()
                 .getDatabasePath()
+                .or(() -> getBibDatabaseContext().getDirectoryLibraryRoot())
                 .map(Path::toAbsolutePath)
                 .map(Path::toString)
                 .orElse(Localization.lang("untitled"));
