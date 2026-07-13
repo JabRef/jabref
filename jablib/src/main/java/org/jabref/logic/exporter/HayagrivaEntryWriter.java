@@ -88,8 +88,8 @@ public class HayagrivaEntryWriter {
 
     private void mergeType(ObjectNode node, BibEntry entry) {
         @Nullable EntryType currentType = HayagrivaMapping.scalarText(node.get("type"))
-                .map(type -> HayagrivaMapping.TYPE_TO_ENTRY_TYPE.getOrDefault(type.toLowerCase(Locale.ROOT), StandardEntryType.Misc))
-                .orElse(null);
+                                                          .map(type -> HayagrivaMapping.TYPE_TO_ENTRY_TYPE.getOrDefault(type.toLowerCase(Locale.ROOT), StandardEntryType.Misc))
+                                                          .orElse(null);
         // An equivalent existing type string (e.g. `post`, importing as Misc) is kept as-is
         if (!entry.getType().equals(currentType)) {
             node.put("type", HayagrivaMapping.ENTRY_TYPE_TO_TYPE.getOrDefault(entry.getType(), "misc"));

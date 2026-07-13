@@ -143,8 +143,8 @@ public class HayagrivaImporter extends Importer {
 
         for (JsonNode entryNode : root.values()) {
             if (entryNode.isObject() && HayagrivaMapping.scalarText(entryNode.get("type"))
-                    .map(type -> RECOGNIZED_TYPES.contains(type.toLowerCase(Locale.ROOT)))
-                    .orElse(false)) {
+                                                        .map(type -> RECOGNIZED_TYPES.contains(type.toLowerCase(Locale.ROOT)))
+                                                        .orElse(false)) {
                 return true;
             }
         }
