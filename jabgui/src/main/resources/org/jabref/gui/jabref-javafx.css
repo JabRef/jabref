@@ -567,9 +567,23 @@ TextFlow > .tooltip-text-monospaced {
     -fx-text-fill: -fx-mid-text-color;
 }
 
+.tab-pane > .tab-header-area > .headers-region > .tab .library-tab-entry-count {
+    -fx-background-color: -jr-theme;
+    -fx-background-radius: 1em;
+    -fx-padding: 0.1em 0.55em 0.1em 0.55em;
+    -fx-text-fill: white;
+    -fx-font-size: 0.85em;
+    -fx-font-weight: bold;
+}
+
 .tab-pane > .tab-header-area > .headers-region > .tab:selected .glyph-icon {
     -fx-fill: -jr-theme;
     -fx-text-fill: -jr-theme;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .library-tab-entry-count {
+    -fx-background-color: -jr-theme;
+    -fx-text-fill: white;
 }
 
 .tab-pane > .tab-header-area {
