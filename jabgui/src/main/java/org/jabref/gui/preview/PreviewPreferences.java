@@ -2,7 +2,6 @@ package org.jabref.gui.preview;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -64,16 +63,22 @@ public class PreviewPreferences {
     public static PreviewPreferences getDefaultWithStyles(LayoutFormatterPreferences layoutFormatterPreferences,
                                                           JournalAbbreviationRepository abbreviationRepository,
                                                           BibEntryTypesManager entryTypesManager) {
+        // This will retrieve the "Customized preview style" name from within the delegation constructor
         PreviewPreferences defaults = getDefault();
-        defaults.getLayoutCycle().addAll(Stream.of(TextBasedPreviewLayout.NAME, CSLStyleLoader.DEFAULT_STYLE).map(layout ->
-                                                       PreviewLayout.of(
-                                                               layout,
-                                                               TextBasedPreviewLayout.DEFAULT,
-                                                               List.of(),
-                                                               layoutFormatterPreferences,
-                                                               abbreviationRepository,
-                                                               entryTypesManager))
-                                               .toList());
+        TextBasedPreviewLayout defaultCustomLayout = TextBasedPreviewLayout.of(
+                TextBasedPreviewLayout.DEFAULT,
+                layoutFormatterPreferences,
+                abbreviationRepository);
+
+        PreviewLayout defaultCslLayout = PreviewLayout.of(
+                CSLStyleLoader.DEFAULT_STYLE,
+                defaults.getCustomPreviewLayouts(),
+                List.of(),
+                layoutFormatterPreferences,
+                abbreviationRepository,
+                entryTypesManager);
+
+        defaults.getLayoutCycle().addAll(defaultCustomLayout, defaultCslLayout);
         return defaults;
     }
 
