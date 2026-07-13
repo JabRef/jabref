@@ -41,7 +41,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
-- The Hayagriva YAML exporter is now implemented programmatically instead of via a layout template: re-exporting an imported Hayagriva file preserves structured data JabRef cannot represent (short titles, person aliases, additional identifiers), `misc` entries export with a lowercase type, and journal details are written into the periodical parent. The `HayagrivaType` custom-layout formatter was removed. [TODO]
+- The Hayagriva YAML exporter is now implemented programmatically instead of via a layout template: re-exporting an imported Hayagriva file preserves structured data JabRef cannot represent (short titles, person aliases, additional identifiers), `misc` entries export with a lowercase type, and journal details are written into the periodical parent. The `HayagrivaType` custom-layout formatter was removed. [koppor#736](https://github.com/JabRef/jabref-koppor/pull/736)
 - The Hayagriva YAML exporter now writes all fields the new Hayagriva importer reads. [#16190](https://github.com/JabRef/jabref/pull/16190)
 - We increased the size of arrow buttons in the Entry Preview preferences tab to improve visibility. [#16028](https://github.com/JabRef/jabref/issues/16028)
 - We now render the entry preview with regular JavaFX components instead of an embedded browser. Text in the preview can be selected with mouse and keyboard and copied; without a selection, "Copy selection" copies the whole preview. [#16145](https://github.com/JabRef/jabref/pull/16145)
