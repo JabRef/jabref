@@ -285,6 +285,20 @@ class HayagrivaImporterTest {
     }
 
     @Test
+    void keepsApproximateDateMarker() throws Exception {
+        String yaml = """
+                test:
+                    type: Book
+                    date: ~2003-06-21
+                """;
+        try (BufferedReader reader = new BufferedReader(Reader.of(yaml))) {
+            ParserResult result = hayagrivaImporter.importDatabase(reader);
+            assertEquals(Optional.of("~2003-06-21"),
+                    result.getDatabase().getEntryByCitationKey("test").flatMap(entry -> entry.getField(StandardField.DATE)));
+        }
+    }
+
+    @Test
     void importDatabaseReturnsErrorResultForMalformedYaml() throws Exception {
         try (BufferedReader reader = new BufferedReader(Reader.of("a: [unclosed"))) {
             ParserResult result = hayagrivaImporter.importDatabase(reader);

@@ -57,8 +57,10 @@ public class HayagrivaImporter extends Importer {
             Map.entry("web", StandardEntryType.Online)
     );
 
-    /// All entry types of the Hayagriva specification; used for format recognition. Types without
-    /// a BibTeX equivalent in [#TYPES_MAP] are imported as [StandardEntryType#Misc].
+    /// All entry types of the Hayagriva specification
+    /// (<https://github.com/typst/hayagriva/blob/main/docs/file-format.md#entry-type>); used for
+    /// format recognition. Types without a BibTeX equivalent in [#TYPES_MAP] are imported as
+    /// [StandardEntryType#Misc].
     private static final Set<String> RECOGNIZED_TYPES = Set.of(
             "anthology", "anthos", "article", "artwork", "audio", "blog", "book", "case",
             "chapter", "conference", "entry", "exhibition", "legislation", "manuscript", "misc",
@@ -111,8 +113,9 @@ public class HayagrivaImporter extends Importer {
 
         formattedText(entryNode.get("title")).ifPresent(title -> bibEntry.setField(StandardField.TITLE, title));
         formattedText(entryNode.get("url")).ifPresent(url -> bibEntry.setField(StandardField.URL, url));
-        scalarText(entryNode.get("date")).map(HayagrivaImporter::stripApproximateDateMarker)
-                                         .ifPresent(date -> bibEntry.setField(StandardField.DATE, date));
+        // A leading `~` (Hayagriva's approximate-date marker) is kept: JabRef stores the raw
+        // string even when it cannot parse it into a structured date, so nothing is lost.
+        scalarText(entryNode.get("date")).ifPresent(date -> bibEntry.setField(StandardField.DATE, date));
         persons(entryNode.get("author")).ifPresent(authors -> bibEntry.setField(StandardField.AUTHOR, authors));
         persons(entryNode.get("editor")).ifPresent(editors -> bibEntry.setField(StandardField.EDITOR, editors));
         scalarText(entryNode.get("volume")).ifPresent(volume -> bibEntry.setField(StandardField.VOLUME, volume));
@@ -260,12 +263,6 @@ public class HayagrivaImporter extends Importer {
         return scalarText(node);
     }
 
-    /// A leading `~` marks an approximate date in Hayagriva; JabRef's date field cannot express
-    /// approximation, so the marker is dropped.
-    private static String stripApproximateDateMarker(String date) {
-        return date.startsWith("~") ? date.substring(1) : date;
-    }
-
     @Override
     public String getId() {
         return "hayagrivayaml";
@@ -278,7 +275,7 @@ public class HayagrivaImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Importer for the Hayagriva YAML format, used by Typst, for bibliographic entries.");
+        return Localization.lang("Importer for the Hayagriva YAML format.");
     }
 
     @Override
