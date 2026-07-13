@@ -27,7 +27,7 @@ dependencies {
     api(platform("org.junit:junit-bom:6.1.1"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
-    api(platform("tools.jackson:jackson-bom:3.2.0"))
+    api(platform("tools.jackson:jackson-bom:3.2.1"))
 }
 
 dependencies.constraints {
