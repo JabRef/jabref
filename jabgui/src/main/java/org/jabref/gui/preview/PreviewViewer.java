@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
@@ -49,6 +50,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
 
     private static final String COVER_IMAGE_FORMAT_HTML = "<img style=\"border-width:1px; border-style:solid; border-color:auto; display:block; height:12rem;\" src=\"%s\"> <br>";
+
+    private boolean viewportResetScheduled = false;
+    private double latestContentHeight = 0.0;
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
@@ -358,13 +362,36 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         setVbarPolicy(ScrollBarPolicy.NEVER);
         setHbarPolicy(ScrollBarPolicy.NEVER);
 
+        // Disable fitToHeight to prevent the ScrollPane from forcing
+        // the content to 0px height during initial layout calculation
+        setFitToHeight(false);
+
         // Tooltips size to the rendered content: fixed width, natural height. Only write the
         // viewport height when it actually changed, so rendering does not queue redundant relayouts.
         setPrefSize(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE);
         setPrefViewportWidth(750);
         previewView.layoutBoundsProperty().addListener((_, _, bounds) -> {
-            if (Math.abs(getPrefViewportHeight() - bounds.getHeight()) >= 1) {
-                setPrefViewportHeight(bounds.getHeight());
+            double contentHeight = bounds.getHeight();
+            if (contentHeight == 0 && getPrefViewportHeight() == USE_COMPUTED_SIZE) {
+                return;
+            }
+
+            if (Math.abs(getPrefViewportHeight() - contentHeight) >= 1) {
+                setPrefViewportHeight(contentHeight);
+
+                this.latestContentHeight = contentHeight;
+
+                // Asynchronously reset to USE_COMPUTED_SIZE on the next JavaFX layout pulse
+                // updating the viewport height.
+                if (!viewportResetScheduled) {
+                    viewportResetScheduled = true;
+                    Platform.runLater(() -> {
+                        viewportResetScheduled = false;
+                        if (Math.abs(getPrefViewportHeight() - latestContentHeight) < 1 && getPrefViewportHeight() != USE_COMPUTED_SIZE) {
+                            setPrefViewportHeight(USE_COMPUTED_SIZE);
+                        }
+                    });
+                }
             }
         });
     }

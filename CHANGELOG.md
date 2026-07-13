@@ -51,6 +51,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where searching ISIDORE failed with a security connection error. [#16054](https://github.com/JabRef/jabref/issues/16054)
+- We fixed an issue in the new entry editor's file field editor where files added via the add button did not appear until switching to another entry and back, and cleaned up the layout so the add/fetch-fulltext/download-URL buttons sit to the left of the file list and the list no longer leaves blank space below the last file. [#16172](https://github.com/JabRef/jabref/pull/16172)
+- We fixed an issue where `jabkit`'s `-p`/`--porcelain` and `-d`/`--debug` flags only took effect when placed at the exact command level where they were parsed, so e.g. `jabkit -p check consistency file.bib` silently ran without porcelain output. [#16164](https://github.com/JabRef/jabref/pull/16164)
+- We fixed an issue where no raw preferences values were visible anymore in the preferences filter. [#16161](https://github.com/JabRef/jabref/pull/16161)
+- We fixed an issue where cleanup did not detect an arXiv entry when its `url` field ended with a fragment anchor (e.g. `https://arxiv.org/html/2510.26275v2#bib`). [#16150](https://github.com/JabRef/jabref/pull/16150)
 - We fixed an issue where fetchers sent an empty API-key parameter (e.g. `api_key=`) to the remote service when no key was configured. [#16044](https://github.com/JabRef/jabref/pull/16044)
 - We fixed an issue where the global search dialog kept showing the previous entry preview when the search returned no results. [#15613](https://github.com/JabRef/jabref/issues/15613)
 - We fixed an issue where preferences referencing removed cleanup steps are now ignored instead of failing to load. [#15948](https://github.com/JabRef/jabref/pull/15948)
@@ -65,6 +70,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where `Quality-> Cleanup -> Rename PDF` together with `Moved linked files to file directory` would lead to an exception. [#15833](https://github.com/JabRef/jabref/issues/15833)
 - We fixed an issue where renaming a linked file with a very long title showed a misleading "file is being used by another process" error instead of renaming successfully. [#14771](https://github.com/JabRef/jabref/issues/14771)
 - We fixed an issue where JabRef would trigger `The libray has been changed` while still saving. [#4877](https://github.com/JabRef/jabref/issues/4877)
+- We fixed preview tooltip height calculation in the main table. [#16219](https://github.com/JabRef/jabref/issues/16219)
 
 ### Removed
 
