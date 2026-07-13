@@ -135,8 +135,22 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
 
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
+        String transformedQuery = new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse("");
+        return buildSearchURL(transformedQuery, pageNumber);
+    }
+
+    @Override
+    public URL getURLForRawQuery(String rawQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+        return buildSearchURL(rawQuery, pageNumber);
+    }
+
+    /// Builds the search URL for the given query string
+    ///
+    /// The query is sent as the `query` parameter, so raw queries
+    /// bypass [DefaultQueryTransformer] and are passed unchanged to the catalog
+    private URL buildSearchURL(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);
-        uriBuilder.addParameter("query", new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse(""));
+        uriBuilder.addParameter("query", query);
         uriBuilder.addParameter("offset", String.valueOf(pageNumber * getPageSize()));
         uriBuilder.addParameter("limit", String.valueOf(Math.min(getPageSize(), 10000 - pageNumber * getPageSize())));
         // All fields need to be specified
