@@ -37,9 +37,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added file notification to OCRed file to let users open the directory and show the new file. [#16082](https://github.com/JabRef/jabref/pull/16082)
 - We added a "Jump to field" button to the entry editor toolbar, triggering the same action as the <kbd>Ctrl</kbd>+<kbd>J</kbd> shortcut. [#16169](https://github.com/JabRef/jabref/pull/16169)
 - The `jabkit` `--input` option (and positional input argument) now accepts http(s)/ftp URLs, downloading the file before processing. [#16165](https://github.com/JabRef/jabref/pull/16165)
+- We added a `HayagrivaImporter`, allowing users to import bibliographic entries from Hayagriva YAML files (used by Typst). [#15714](https://github.com/JabRef/jabref/issues/15714)
 
 ### Changed
 
+- The Hayagriva YAML exporter now writes all fields the new Hayagriva importer reads. [#16190](https://github.com/JabRef/jabref/pull/16190)
 - We increased the size of arrow buttons in the Entry Preview preferences tab to improve visibility. [#16028](https://github.com/JabRef/jabref/issues/16028)
 - We now render the entry preview with regular JavaFX components instead of an embedded browser. Text in the preview can be selected with mouse and keyboard and copied; without a selection, "Copy selection" copies the whole preview. [#16145](https://github.com/JabRef/jabref/pull/16145)
 - We replaced the "MathSciNet Review" entry editor tab by identifier support for the "MR Number" field: a button next to the field opens the MathSciNet page in the web browser. [#16145](https://github.com/JabRef/jabref/pull/16145)
@@ -78,6 +80,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where JabRef would trigger `The libray has been changed` while still saving. [#4877](https://github.com/JabRef/jabref/issues/4877)
 - We fixed preview tooltip height calculation in the main table. [#16219](https://github.com/JabRef/jabref/issues/16219)
 - We fixed an issue where stale main table search results could remain visible after consecutive searches. [#15710](https://github.com/JabRef/jabref/issues/15710)
+- We fixed an issue where the button shape changed when hovering over it. [#16188](https://github.com/JabRef/jabref/issues/16188)
 
 ### Removed
 
