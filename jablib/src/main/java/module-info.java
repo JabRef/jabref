@@ -230,7 +230,7 @@ open module org.jabref.jablib {
     requires transitive com.google.common;
     requires java.string.similarity;
     requires transitive org.apache.commons.csv;
-    requires org.apache.commons.io;
+    requires transitive org.apache.commons.io;
     requires org.apache.commons.lang3;
     requires org.apache.commons.text;
     // endregion
