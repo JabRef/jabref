@@ -25,6 +25,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.SaveOrder;
 
@@ -207,6 +208,7 @@ class HayagrivaImporterTest {
                 .withField(StandardField.TITLE, "Kinetics and luminescence of the excitations of a nonequilibrium polariton condensate")
                 .withField(StandardField.DATE, "2020-10-14")
                 .withField(StandardField.PAGES, "165126-165139")
+                .withField(StandardField.PAGETOTAL, "13")
                 .withField(StandardField.DOI, "10.1103/PhysRevB.102.165126")
                 .withField(StandardField.JOURNAL, "Physical Review B")
                 .withField(StandardField.VOLUME, "102")
@@ -220,6 +222,7 @@ class HayagrivaImporterTest {
         BibEntry expected = new BibEntry(StandardEntryType.InBook)
                 .withCitationKey("harry")
                 .withField(StandardField.PAGES, "135-139")
+                .withField(StandardField.NUMBER, "3")
                 .withField(StandardField.BOOKTITLE, "Harry Potter and the Order of the Phoenix");
         assertEquals(Optional.of(expected), importBasicYml().getDatabase().getEntryByCitationKey("harry"));
     }
@@ -232,6 +235,7 @@ class HayagrivaImporterTest {
                 .withField(StandardField.TITLE, "Tokenization of + and - with scientific notation")
                 .withField(StandardField.URL, "https://github.com/typst/typstc/issues/3")
                 .withField(StandardField.DATE, "2020-07-18")
+                .withField(StandardField.NUMBER, "3")
                 .withField(StandardField.BOOKTITLE, "Typst");
         assertEquals(Optional.of(expected), importBasicYml().getDatabase().getEntryByCitationKey("science-e-issue"));
     }
@@ -241,6 +245,27 @@ class HayagrivaImporterTest {
         ParserResult result = importBasicYml();
         assertEquals(Optional.of(StandardEntryType.Book), result.getDatabase().getEntryByCitationKey("donne").map(BibEntry::getType));
         assertEquals(Optional.of(StandardEntryType.Misc), result.getDatabase().getEntryByCitationKey("georgia").map(BibEntry::getType));
+    }
+
+    @Test
+    void importsAffiliatedPersonsAndRuntimeAsCustomFields() throws Exception {
+        BibEntry expected = new BibEntry(StandardEntryType.Misc)
+                .withCitationKey("terminator-2")
+                .withField(StandardField.TITLE, "Terminator 2: Judgment Day")
+                .withField(StandardField.PUBLISHER, "Carolco Pictures; Pacific Western Productions; Lightstorm Entertainment; Le Studio Canal+ S.A.")
+                .withField(StandardField.DATE, "1991-07-01")
+                .withField(new UnknownField("director"), "James Cameron")
+                .withField(new UnknownField("cast-member"), "Arnold Schwarzenegger and Linda Hamilton and Robert Patrick")
+                .withField(new UnknownField("composer"), "Brad Fiedel")
+                .withField(new UnknownField("runtime"), "137:00")
+                .withField(new UnknownField("time-range"), "17:05-17:48");
+        assertEquals(Optional.of(expected), importBasicYml().getDatabase().getEntryByCitationKey("terminator-2"));
+    }
+
+    @Test
+    void importsVolumeTotalAsVolumes() throws Exception {
+        assertEquals(Optional.of("5"),
+                importBasicYml().getDatabase().getEntryByCitationKey("wire").flatMap(entry -> entry.getField(StandardField.VOLUMES)));
     }
 
     @Test

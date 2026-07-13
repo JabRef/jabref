@@ -19,7 +19,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -124,12 +126,28 @@ public class HayagrivaImporter extends Importer {
         scalarText(entryNode.get("note")).ifPresent(note -> bibEntry.setField(StandardField.NOTE, note));
         scalarText(entryNode.get("abstract")).ifPresent(abstractText -> bibEntry.setField(StandardField.ABSTRACT, abstractText));
         scalarText(entryNode.get("language")).ifPresent(language -> bibEntry.setField(StandardField.LANGUAGE, language));
+        scalarText(entryNode.get("page-total")).ifPresent(pageTotal -> bibEntry.setField(StandardField.PAGETOTAL, pageTotal));
+        scalarText(entryNode.get("volume-total")).ifPresent(volumeTotal -> bibEntry.setField(StandardField.VOLUMES, volumeTotal));
+        scalarText(entryNode.get("runtime")).ifPresent(runtime -> bibEntry.setField(new UnknownField("runtime"), runtime));
+        scalarText(entryNode.get("time-range")).ifPresent(timeRange -> bibEntry.setField(new UnknownField("time-range"), timeRange));
+
+        applyAffiliated(bibEntry, entryNode.get("affiliated"));
 
         JsonNode serialNumber = entryNode.get("serial-number");
         if (serialNumber != null && serialNumber.isObject()) {
             scalarText(serialNumber.get("doi")).ifPresent(doi -> bibEntry.setField(StandardField.DOI, doi));
             scalarText(serialNumber.get("isbn")).ifPresent(isbn -> bibEntry.setField(StandardField.ISBN, isbn));
             scalarText(serialNumber.get("issn")).ifPresent(issn -> bibEntry.setField(StandardField.ISSN, issn));
+            scalarText(serialNumber.get("pmid")).ifPresent(pmid -> bibEntry.setField(StandardField.PMID, pmid));
+            scalarText(serialNumber.get("arxiv")).ifPresent(arxiv -> {
+                bibEntry.setField(StandardField.EPRINT, arxiv);
+                bibEntry.setField(StandardField.EPRINTTYPE, "arxiv");
+            });
+            scalarText(serialNumber.get("serial")).ifPresent(serial -> setIfAbsent(bibEntry, StandardField.NUMBER, serial));
+        } else {
+            // A bare serial number (an RFC number, a court docket, a version string, ...) has no
+            // dedicated BibTeX field; number is the closest match, but an explicit issue wins
+            scalarText(serialNumber).ifPresent(serial -> setIfAbsent(bibEntry, StandardField.NUMBER, serial));
         }
 
         applyParents(bibEntry, entryNode.get("parent"));
@@ -172,6 +190,23 @@ public class HayagrivaImporter extends Importer {
                 scalarText(parent.get("issue")).ifPresent(issue -> setIfAbsent(bibEntry, StandardField.NUMBER, issue));
                 scalarText(parent.get("publisher")).ifPresent(publisher -> setIfAbsent(bibEntry, StandardField.PUBLISHER, publisher));
             }
+        }
+    }
+
+    /// `affiliated` lists further people by their role (director, translator, ...). Roles with a
+    /// matching BibTeX field (e.g. translator) land there; the rest are kept as custom fields
+    /// named after the role, so no contributor information is lost on import.
+    private void applyAffiliated(BibEntry bibEntry, @Nullable JsonNode affiliatedNode) {
+        if (affiliatedNode == null || !affiliatedNode.isArray()) {
+            return;
+        }
+        for (JsonNode affiliation : affiliatedNode.values()) {
+            if (!affiliation.isObject()) {
+                continue;
+            }
+            scalarText(affiliation.get("role")).ifPresent(role ->
+                    persons(affiliation.get("names")).ifPresent(names ->
+                            bibEntry.setField(FieldFactory.parseField(role.toLowerCase(Locale.ROOT)), names)));
         }
     }
 
