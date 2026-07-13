@@ -7,7 +7,7 @@ JabKit is JabRef's command-line toolkit.
 
 It is currently shipped through `jpackage` (installer and portable build, both bundling a JDK) and [JBang](https://github.com/JabRef/jabref/tree/main/.jbang#running-jabkit) (which downloads a JRE plus `jablib`). For a command-line tool, **JVM start-up is the bottleneck**.
 
-[GraalVM Native Image](https://www.graalvm.org/latest/reference-manual/native-image/) turns JabKit into a self-contained executable that starts in milliseconds. JabKit is the first target because it is headless; the JabLS, JabSrv and JabGui come later.
+[GraalVM Native Image](https://www.graalvm.org/latest/reference-manual/native-image/) turns JabKit into a self-contained executable with a reduced startup time.
 
 The catch is the closed-world assumption: Native Image must know every class, method, and resource the program can use. Anything reached only through **reflection, resources, serialization, dynamic proxies, or JNI** must be declared as **reachability metadata**. Producing that metadata correctly, minimally, and with clear ownership is what most of this page is about.
 
@@ -31,13 +31,11 @@ The metadata comes from three places:
 ./gradlew :jabkit:nativeCompile
 ```
 
-The executable is written to `jabkit/build/native/nativeCompile/jabkit`. The image name is configured in `jabkit/build.gradle.kts`, and the entry point is `org.jabref.toolkit.JabKitLauncher`.
-
-On Linux, ship the whole `nativeCompile` directory, because the executable is accompanied by `.so` libraries.
+The executable is written to `jabkit/build/native/nativeCompile/jabkit`.
 
 ### Toolchain
 
-The build uses Liberica NIK Full because JabKit reaches `java.desktop`/AWT through PDFBox. See [Liberica NIK](#liberica-nik).
+The build uses [Liberica NIK Full](#liberica-nik). "Full", because JabKit reaches `java.desktop`/AWT through PDFBox, which requires AWT.
 
 ### Platform support
 
@@ -72,7 +70,7 @@ The loop:
 2. **Run the command's real code path.** `--help` covers startup and is enough for baseline metadata; a new command's data path needs the real invocation with real arguments. Reachability gaps only show up on the code path that uses them.
 3. **Read the failure.** Missing entries surface as `ClassNotFoundException`, `NoSuchMethodException`, a missing-resource error, or `UnsatisfiedLinkError`.
 4. **Add the minimal entry** to the owning module's `reachability-metadata.json`.
-5. **Rebuild and rerun** until the command works.
+5. Try steps 1 and 2 again. If green continue, else go to 3.
 6. **Lock it in** with a clitest case.
 
 ### Two ways to find what is missing
