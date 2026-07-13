@@ -4,10 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -33,10 +35,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
-import tools.jackson.databind.exc.MismatchedInputException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -150,10 +151,115 @@ class HayagrivaImporterTest {
     }
 
     @Test
-    void upstreamBasicYmlFixtureFailsDueToKnownPolymorphismLimitation() throws Exception {
-        try (InputStream is = getClass().getResourceAsStream("/org/jabref/logic/importer/fileformat/basic.yml");
-             BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-            assertThrows(MismatchedInputException.class, () -> hayagrivaImporter.importDatabase(reader));
+    void isRecognizedFormatReturnsTrueForUpstreamBasicYml() throws Exception {
+        try (Reader reader = new InputStreamReader(openBasicYml(), StandardCharsets.UTF_8)) {
+            assertTrue(hayagrivaImporter.isRecognizedFormat(reader));
         }
+    }
+
+    @Test
+    void isRecognizedFormatReturnsFalseForOtherYaml() throws Exception {
+        String cff = """
+                cff-version: 1.2.0
+                message: If you use this software, please cite it as below.
+                title: Some software
+                """;
+        assertFalse(hayagrivaImporter.isRecognizedFormat(cff));
+        try (Reader reader = Reader.of(cff)) {
+            assertFalse(hayagrivaImporter.isRecognizedFormat(reader));
+        }
+    }
+
+    @Test
+    void recognitionResetsReaderSoImportStillWorks() throws Exception {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(openBasicYml(), StandardCharsets.UTF_8))) {
+            assertTrue(hayagrivaImporter.isRecognizedFormat(reader));
+            ParserResult result = hayagrivaImporter.importDatabase(reader);
+            assertEquals(38, result.getDatabase().getEntryCount());
+        }
+    }
+
+    @Test
+    void importsAllEntriesOfUpstreamBasicYml() throws Exception {
+        ParserResult result = importBasicYml();
+        assertFalse(result.isInvalid());
+        assertEquals(38, result.getDatabase().getEntryCount());
+    }
+
+    @Test
+    void importsArticleWithFormattableTitleAndProceedingsParent() throws Exception {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("zygos")
+                .withField(StandardField.AUTHOR, "George Prekas and Marios Kogias and Edouard Bugnion")
+                .withField(StandardField.TITLE, "ZygOS: Achieving Low Tail Latency for Microsecond-Scale Networked Tasks")
+                .withField(StandardField.DATE, "2017")
+                .withField(StandardField.PAGES, "325-341")
+                .withField(StandardField.DOI, "10.1145/3132747.3132780")
+                .withField(StandardField.BOOKTITLE, "Proceedings of the 26th Symposium on Operating Systems Principles");
+        assertEquals(Optional.of(expected), importBasicYml().getDatabase().getEntryByCitationKey("zygos"));
+    }
+
+    @Test
+    void importsArticleWithUntypedPeriodicalParent() throws Exception {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("kinetics")
+                .withField(StandardField.AUTHOR, "T. D. Doan and D. B. Tran Thoai and Hartmut Haug")
+                .withField(StandardField.TITLE, "Kinetics and luminescence of the excitations of a nonequilibrium polariton condensate")
+                .withField(StandardField.DATE, "2020-10-14")
+                .withField(StandardField.PAGES, "165126-165139")
+                .withField(StandardField.DOI, "10.1103/PhysRevB.102.165126")
+                .withField(StandardField.JOURNAL, "Physical Review B")
+                .withField(StandardField.VOLUME, "102")
+                .withField(StandardField.NUMBER, "16")
+                .withField(StandardField.PUBLISHER, "American Physical Society");
+        assertEquals(Optional.of(expected), importBasicYml().getDatabase().getEntryByCitationKey("kinetics"));
+    }
+
+    @Test
+    void importsChapterWithBookParent() throws Exception {
+        BibEntry expected = new BibEntry(StandardEntryType.InBook)
+                .withCitationKey("harry")
+                .withField(StandardField.PAGES, "135-139")
+                .withField(StandardField.BOOKTITLE, "Harry Potter and the Order of the Phoenix");
+        assertEquals(Optional.of(expected), importBasicYml().getDatabase().getEntryByCitationKey("harry"));
+    }
+
+    @Test
+    void importsWebEntryWithStructuredAuthor() throws Exception {
+        BibEntry expected = new BibEntry(StandardEntryType.Online)
+                .withCitationKey("science-e-issue")
+                .withField(StandardField.AUTHOR, "Laurenz Mädje")
+                .withField(StandardField.TITLE, "Tokenization of + and - with scientific notation")
+                .withField(StandardField.URL, "https://github.com/typst/typstc/issues/3")
+                .withField(StandardField.DATE, "2020-07-18")
+                .withField(StandardField.BOOKTITLE, "Typst");
+        assertEquals(Optional.of(expected), importBasicYml().getDatabase().getEntryByCitationKey("science-e-issue"));
+    }
+
+    @Test
+    void importsCapitalizedAndUnknownTypes() throws Exception {
+        ParserResult result = importBasicYml();
+        assertEquals(Optional.of(StandardEntryType.Book), result.getDatabase().getEntryByCitationKey("donne").map(BibEntry::getType));
+        assertEquals(Optional.of(StandardEntryType.Misc), result.getDatabase().getEntryByCitationKey("georgia").map(BibEntry::getType));
+    }
+
+    @Test
+    void importDatabaseReturnsErrorResultForMalformedYaml() throws Exception {
+        try (BufferedReader reader = new BufferedReader(Reader.of("a: [unclosed"))) {
+            ParserResult result = hayagrivaImporter.importDatabase(reader);
+            assertTrue(result.isInvalid());
+            assertEquals(List.of(), result.getDatabase().getEntries());
+        }
+    }
+
+    private ParserResult importBasicYml() throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(openBasicYml(), StandardCharsets.UTF_8))) {
+            return hayagrivaImporter.importDatabase(reader);
+        }
+    }
+
+    private InputStream openBasicYml() {
+        // Resolved relative to this class' package: src/test/resources/org/jabref/logic/importer/fileformat/basic.yml
+        return getClass().getResourceAsStream("basic.yml");
     }
 }
