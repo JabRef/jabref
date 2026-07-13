@@ -12,22 +12,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import org.jabref.logic.exporter.BlankLineBehaviour;
-import org.jabref.logic.exporter.Exporter;
-import org.jabref.logic.exporter.SaveException;
-import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.exporter.HayagrivaExporter;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.metadata.SaveOrder;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -35,35 +26,25 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
 class HayagrivaImporterTest {
 
-    private static Exporter hayagrivaYamlExporter;
+    private static HayagrivaExporter hayagrivaYamlExporter;
     private static HayagrivaImporter hayagrivaImporter;
     private static BibDatabaseContext databaseContext;
 
     @BeforeAll
     static void setUp() {
-        hayagrivaYamlExporter = new TemplateExporter(
-                "Hayagriva YAML",
-                "hayagrivayaml",
-                "hayagrivayaml",
-                null,
-                StandardFileType.YAML,
-                mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                SaveOrder.getDefaultSaveOrder(),
-                BlankLineBehaviour.DELETE_BLANKS);
+        hayagrivaYamlExporter = new HayagrivaExporter();
         hayagrivaImporter = new HayagrivaImporter();
         databaseContext = new BibDatabaseContext();
     }
 
-    private BibEntry roundTrip(BibEntry entry, Path tempDir) throws IOException, SaveException, ParserConfigurationException, TransformerException {
+    private BibEntry roundTrip(BibEntry entry, Path tempDir) throws IOException {
         Path file = tempDir.resolve("roundtrip.yml");
         Files.createFile(file);
         hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
