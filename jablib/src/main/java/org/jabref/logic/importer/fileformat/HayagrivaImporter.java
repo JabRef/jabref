@@ -72,8 +72,9 @@ public class HayagrivaImporter extends Importer {
     private static final Set<String> BOOKTITLE_PARENT_TYPES = Set.of("proceedings", "anthology", "conference");
     private static final Set<EntryType> BOOK_PART_TYPES = Set.of(StandardEntryType.InBook, StandardEntryType.InCollection, StandardEntryType.InProceedings);
 
-    private static final int MAX_LOOKAHEAD_CHARS = 65_536;
-    private static final int MAX_LOOKAHEAD_LINES = 1_000;
+    /// Generous room for leading comments plus the first entry, whose `type` key conventionally
+    /// appears within its first few lines.
+    private static final int MAX_LOOKAHEAD_CHARS = 3_000;
     private static final Pattern TYPE_LINE_PATTERN = Pattern.compile("^\\s*type:\\s*\"?'?([A-Za-z-]+)\"?'?\\s*$");
 
     private static final YAMLMapper MAPPER = YAMLMapper.builder()
@@ -285,31 +286,25 @@ public class HayagrivaImporter extends Importer {
 
     /// Lightweight recognition for the [BufferedReader] overload, which must reset the reader
     /// afterwards. Instead of doing a full YAML parse (which could read past the marked
-    /// read-ahead limit and make `reset()` throw), this scans at most [#MAX_LOOKAHEAD_LINES]
-    /// lines / [#MAX_LOOKAHEAD_CHARS] characters for a `type:` key matching a known Hayagriva
-    /// entry type.
+    /// read-ahead limit and make `reset()` throw), this scans the first [#MAX_LOOKAHEAD_CHARS]
+    /// characters for a `type:` line matching a known Hayagriva entry type. The block read never
+    /// exceeds the marked limit, so `reset()` is always possible (a line-based read could exceed
+    /// it on a single overlong line).
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
         input.mark(MAX_LOOKAHEAD_CHARS);
         try {
-            int charsConsumed = 0;
-            int linesRead = 0;
-            String line;
-
-            while (linesRead < MAX_LOOKAHEAD_LINES && (line = input.readLine()) != null) {
-                linesRead++;
-                charsConsumed += line.length() + 1;
-                if (charsConsumed >= MAX_LOOKAHEAD_CHARS) {
-                    break;
-                }
-
-                Matcher matcher = TYPE_LINE_PATTERN.matcher(line);
-                if (matcher.matches() && RECOGNIZED_TYPES.contains(matcher.group(1).toLowerCase(Locale.ROOT))) {
-                    return true;
-                }
+            char[] lookahead = new char[MAX_LOOKAHEAD_CHARS];
+            int filled = 0;
+            int charsRead;
+            while (filled < MAX_LOOKAHEAD_CHARS && (charsRead = input.read(lookahead, filled, MAX_LOOKAHEAD_CHARS - filled)) != -1) {
+                filled += charsRead;
             }
 
-            return false;
+            return new String(lookahead, 0, filled).lines().anyMatch(line -> {
+                Matcher matcher = TYPE_LINE_PATTERN.matcher(line);
+                return matcher.matches() && RECOGNIZED_TYPES.contains(matcher.group(1).toLowerCase(Locale.ROOT));
+            });
         } finally {
             input.reset();
         }

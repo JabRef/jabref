@@ -285,6 +285,17 @@ class HayagrivaImporterTest {
     }
 
     @Test
+    void recognitionHandlesLinesLongerThanTheLookaheadBudget() throws Exception {
+        String yaml = "# " + "x".repeat(10_000) + "\ntest:\n    type: Book\n";
+        try (BufferedReader reader = new BufferedReader(Reader.of(yaml))) {
+            assertFalse(hayagrivaImporter.isRecognizedFormat(reader));
+            // The reader must have been reset despite the overlong line, so importing still works
+            ParserResult result = hayagrivaImporter.importDatabase(reader);
+            assertEquals(1, result.getDatabase().getEntryCount());
+        }
+    }
+
+    @Test
     void keepsApproximateDateMarker() throws Exception {
         String yaml = """
                 test:
