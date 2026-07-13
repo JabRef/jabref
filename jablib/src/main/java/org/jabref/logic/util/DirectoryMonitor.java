@@ -1,4 +1,4 @@
-package org.jabref.gui.util;
+package org.jabref.logic.util;
 
 import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationMonitor;

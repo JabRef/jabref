@@ -20,6 +20,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.crawler.StudyRepository;
+import org.jabref.logic.directorylibrary.DirectoryLibrarySynchronizer;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -72,6 +73,9 @@ public class BibDatabaseContext {
     /// empty for directory libraries.
     @Nullable
     private Path directoryLibraryRoot;
+
+    @Nullable
+    private DirectoryLibrarySynchronizer directorySynchronizer;
 
     private DatabaseLocation location;
 
@@ -283,12 +287,24 @@ public class BibDatabaseContext {
         return Optional.ofNullable(directoryLibraryRoot);
     }
 
+    public void attachDirectorySynchronizer(DirectoryLibrarySynchronizer directorySynchronizer) {
+        this.directorySynchronizer = directorySynchronizer;
+    }
+
+    public @Nullable DirectoryLibrarySynchronizer getDirectorySynchronizer() {
+        return directorySynchronizer;
+    }
+
     public void convertToLocalDatabase() {
         if (dbmsListener != null && (location == DatabaseLocation.SHARED)) {
             if (dbmsSynchronizer != null) {
                 dbmsListener.unregisterListener(dbmsSynchronizer);
             }
             dbmsListener.shutdown();
+        }
+        if (directorySynchronizer != null) {
+            directorySynchronizer.shutdown();
+            directorySynchronizer = null;
         }
 
         this.directoryLibraryRoot = null;

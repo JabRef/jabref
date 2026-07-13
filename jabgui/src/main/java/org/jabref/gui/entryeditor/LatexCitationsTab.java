@@ -20,8 +20,8 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.texparser.CitationsDisplay;
-import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.DirectoryMonitor;
 import org.jabref.model.entry.BibEntry;
 
 import com.tobiasdiez.easybind.EasyBind;

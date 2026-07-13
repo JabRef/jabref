@@ -739,6 +739,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (dataLoadingTask != null) {
             dataLoadingTask.cancel();
         }
+        if (bibDatabaseContext.getLocation() == DatabaseLocation.DIRECTORY) {
+            // Stops the directory watcher and shuts the synchronizer down
+            bibDatabaseContext.convertToLocalDatabase();
+        }
         if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
             bibDatabaseContext.convertToLocalDatabase();
             bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
