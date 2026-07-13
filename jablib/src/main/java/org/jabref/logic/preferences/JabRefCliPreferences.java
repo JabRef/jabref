@@ -79,6 +79,7 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.ocr.OcrPreferences;
+import org.jabref.logic.ocr.PagesWithTextHandling;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
@@ -401,6 +402,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // region OCR preferences
     private static final String OCR_ENGINE_PATH = "ocrEnginePath";
+    private static final String PAGES_WITH_TEXT = "pagesHaveText";
     // endregion
 
     // region Push to application preferences
@@ -2147,9 +2149,11 @@ public class JabRefCliPreferences implements CliPreferences {
         OcrPreferences defaultValues = OcrPreferences.getDefault();
 
         ocrPreferences = new OcrPreferences(
-                get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()));
+                get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()),
+                PagesWithTextHandling.safeValueOf(get(PAGES_WITH_TEXT, defaultValues.getPagesHaveText().name())));
 
         bindString(ocrPreferences.ocrEnginePathProperty(), OCR_ENGINE_PATH, defaultValues.getOcrEnginePath());
+        bindObject(ocrPreferences.pagesHaveTextProperty(), PAGES_WITH_TEXT, defaultValues.getPagesHaveText(), PagesWithTextHandling::name, PagesWithTextHandling::safeValueOf);
 
         return ocrPreferences;
     }
@@ -2523,7 +2527,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return openOfficePreferences;
     }
 
-    /// Reconstructs the persisted [OOStyle] from its stored path: a CSL style file becomes a [CitationStyle], otherwise
+    /// Reconstructs the persisted [OOStyle] from its stored path: a CSL style file becomes a [org.jabref.logic.citationstyle.CitationStyle], otherwise
     /// it is treated as a [JStyle] (requiring `journalAbbreviationRepository`). Falls back to `defaultStyle` when the
     /// path is absent, the repository is missing, or the JStyle cannot be created.
     private OOStyle getCurrentOOStyle(OOStyle defaultStyle, JournalAbbreviationRepository journalAbbreviationRepository) {
