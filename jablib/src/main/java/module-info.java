@@ -200,7 +200,7 @@ open module org.jabref.jablib {
     // region: data mapping
     requires jdk.xml.dom;
     requires com.google.gson;
-    requires tools.jackson.databind;
+    requires transitive tools.jackson.databind;
     requires tools.jackson.dataformat.yaml;
     requires tools.jackson.core;
     requires transitive com.fasterxml.jackson.annotation;
