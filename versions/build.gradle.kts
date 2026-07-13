@@ -18,16 +18,16 @@ val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
 
 val lucene = "10.5.0"
 
-val pdfbox = "3.0.7"
+val pdfbox = "3.0.8"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
     api(platform("dev.langchain4j:langchain4j-bom:1.17.2"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.4.0"))
-    api(platform("org.junit:junit-bom:6.1.1"))
+    api(platform("org.junit:junit-bom:6.1.2"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
-    api(platform("tools.jackson:jackson-bom:3.2.0"))
+    api(platform("tools.jackson:jackson-bom:3.2.1"))
 }
 
 dependencies.constraints {
@@ -118,7 +118,7 @@ dependencies.constraints {
     api("org.apache.pdfbox:pdfbox:$pdfbox")
     api("org.apache.pdfbox:xmpbox:$pdfbox")
     api("org.apache.velocity:velocity-engine-core:2.4.1")
-    api("org.bouncycastle:bcprov-jdk18on:1.84")
+    api("org.bouncycastle:bcprov-jdk18on:1.85")
     api("org.controlsfx:controlsfx:11.2.3")
     api("org.eclipse.jgit:org.eclipse.jgit:7.7.0.202606012155-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
