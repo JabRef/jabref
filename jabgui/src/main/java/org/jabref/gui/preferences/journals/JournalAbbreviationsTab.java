@@ -157,6 +157,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         if (!searchBox.getText().isEmpty()) {
             searchBox.pseudoClassStateChanged(INVALID, true);
             invalidateSearch.playFromStart();
+            addAbbreviationActions();
         } else {
             addAbbreviationActions();
         }
