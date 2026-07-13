@@ -18,7 +18,7 @@ val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
 
 val lucene = "10.5.0"
 
-val pdfbox = "3.0.7"
+val pdfbox = "3.0.8"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
