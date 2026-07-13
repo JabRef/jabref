@@ -54,8 +54,8 @@ Chosen option: "Open a merge dialog with all candidates if a single PDF is impor
 
 Explanation:
 
-- If a single PDF is imported, then open a merge dialog.
-- If several PDFs are imported, merge candidates for each PDF automatically.
+* If a single PDF is imported, then open a merge dialog.
+* If several PDFs are imported, merge candidates for each PDF automatically.
 
 Outcomes:
 

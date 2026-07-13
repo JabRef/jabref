@@ -60,6 +60,18 @@ class ACMPortalFetcherTest {
     }
 
     @Test
+    void performRawSearchQueryFindsEntry() throws FetcherException {
+        List<BibEntry> fetchedEntries = fetcher.performRawSearchQuery("The relationship of code churn and architectural violations in the open source software JabRef");
+        assertEquals(Optional.of("10.1145/3129790.3129810"),
+                fetchedEntries.stream().findFirst().flatMap(entry -> entry.getField(StandardField.DOI)));
+    }
+
+    @Test
+    void performRawSearchQueryReturnsEmptyForBlankQuery() throws FetcherException {
+        assertEquals(List.of(), fetcher.performRawSearchQuery("  "));
+    }
+
+    @Test
     void getURLForQuery() throws MalformedURLException, URISyntaxException {
         String testQuery = "test query url";
         SearchQuery searchQueryObject = new SearchQuery(testQuery);

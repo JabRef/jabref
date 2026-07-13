@@ -19,13 +19,21 @@ import org.slf4j.LoggerFactory;
 abstract class StyleSheet {
 
     static final String DATA_URL_PREFIX = "data:text/css;charset=utf-8;base64,";
-    static final String EMPTY_WEBENGINE_CSS = DATA_URL_PREFIX;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StyleSheet.class);
 
     abstract URL getSceneStylesheet();
 
-    abstract String getWebEngineStylesheet();
+    /// The location to put into `Scene#getStylesheets`. Typically a `data:` URL with the CSS
+    /// embedded — that way the theme survives removal of the CSS file while the application is
+    /// running, and JavaFX's stylesheet cache cannot serve stale content after a live reload
+    /// (the URL changes with the content). Large stylesheets fall back to the plain URL.
+    ///
+    /// @return the stylesheet location, or an empty string if unavailable
+    String getSceneStylesheetLocation() {
+        URL stylesheet = getSceneStylesheet();
+        return stylesheet == null ? "" : stylesheet.toExternalForm();
+    }
 
     Path getWatchPath() {
         return null;
@@ -49,7 +57,7 @@ abstract class StyleSheet {
 
         if (styleSheetUrl.isEmpty()) {
             try {
-                return Optional.of(new StyleSheetDataUrl(new URI(EMPTY_WEBENGINE_CSS).toURL()));
+                return Optional.of(new StyleSheetDataUrl(new URI(DATA_URL_PREFIX).toURL()));
             } catch (URISyntaxException | MalformedURLException e) {
                 return Optional.empty();
             }

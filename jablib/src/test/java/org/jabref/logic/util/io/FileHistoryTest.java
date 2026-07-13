@@ -8,7 +8,10 @@ import org.jabref.logic.util.JabRefBaseDirectoryLocator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -124,5 +127,17 @@ class FileHistoryTest {
         history.removeItem(outside);
 
         assertFalse(history.contains(outside));
+    }
+
+    @Test
+    @EnabledOnOs(OS.WINDOWS)
+    void removeItemHandlesPathWithDifferentRoot() {
+        Path differentRoot = Path.of("H:\\somefile.lnk");
+
+        history.newFile(differentRoot);
+
+        assertDoesNotThrow(() -> history.removeItem(differentRoot));
+
+        assertFalse(history.contains(differentRoot));
     }
 }

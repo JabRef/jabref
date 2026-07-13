@@ -23,8 +23,8 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
 import org.jabref.model.ai.llm.PredefinedChatModel;
-import org.jabref.model.ai.pipeline.AnswerEngineKind;
 import org.jabref.model.ai.pipeline.DocumentSplitterKind;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
@@ -87,7 +87,7 @@ public class AiPreferences {
     private final IntegerProperty documentSplitterChunkSize;
     private final IntegerProperty documentSplitterOverlapSize;
 
-    private final ObjectProperty<AnswerEngineKind> answerEngineKind;
+    private final ObjectProperty<ResponseEngineKind> responseEngineKind;
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
@@ -132,7 +132,7 @@ public class AiPreferences {
                 AiDefaultExpertSettings.DOCUMENT_SPLITTER_KIND,                              // Document splitter kind
                 AiDefaultExpertSettings.DOCUMENT_SPLITTER_CHUNK_SIZE,                        // Document splitter chunk size
                 AiDefaultExpertSettings.DOCUMENT_SPLITTER_OVERLAP_SIZE,                      // Document splitter overlap size
-                AiDefaultExpertSettings.ANSWER_ENGINE_KIND,                                  // Answer engine kind
+                AiDefaultExpertSettings.RESPONSE_ENGINE_KIND,                                // Response engine kind
                 AiDefaultExpertSettings.RAG_MAX_RESULTS_COUNT,                               // RAG max results count
                 AiDefaultExpertSettings.RAG_MIN_SCORE,                                       // RAG min score
 
@@ -172,7 +172,7 @@ public class AiPreferences {
             DocumentSplitterKind documentSplitterKind,
             int documentSplitterChunkSize,
             int documentSplitterOverlapSize,
-            AnswerEngineKind answerEngineKind,
+            ResponseEngineKind responseEngineKind,
             int ragMaxResultsCount,
             double ragMinScore,
             String chattingSystemMessageTemplate,
@@ -215,7 +215,7 @@ public class AiPreferences {
         this.documentSplitterChunkSize = new SimpleIntegerProperty(documentSplitterChunkSize);
         this.documentSplitterOverlapSize = new SimpleIntegerProperty(documentSplitterOverlapSize);
 
-        this.answerEngineKind = new SimpleObjectProperty<>(answerEngineKind);
+        this.responseEngineKind = new SimpleObjectProperty<>(responseEngineKind);
         this.ragMaxResultsCount = new SimpleIntegerProperty(ragMaxResultsCount);
         this.ragMinScore = new SimpleDoubleProperty(ragMinScore);
 
@@ -574,16 +574,16 @@ public class AiPreferences {
         this.documentSplitterOverlapSize.set(documentSplitterOverlapSize);
     }
 
-    public ObjectProperty<AnswerEngineKind> answerEngineKindProperty() {
-        return answerEngineKind;
+    public ObjectProperty<ResponseEngineKind> responseEngineKindProperty() {
+        return responseEngineKind;
     }
 
-    public AnswerEngineKind getAnswerEngineKind() {
-        return answerEngineKind.get();
+    public ResponseEngineKind getResponseEngineKind() {
+        return responseEngineKind.get();
     }
 
-    public void setAnswerEngineKind(AnswerEngineKind answerEngineKind) {
-        this.answerEngineKind.set(answerEngineKind);
+    public void setResponseEngineKind(ResponseEngineKind responseEngineKind) {
+        this.responseEngineKind.set(responseEngineKind);
     }
 
     public IntegerProperty ragMaxResultsCountProperty() {
@@ -650,12 +650,12 @@ public class AiPreferences {
         ).flatMap(List::stream).toList();
     }
 
-    public List<? extends Property<?>> getAnswerEngineProperties() {
+    public List<? extends Property<?>> getResponseEngineProperties() {
         return List.of(
                 aiFeaturesEnabledCurrently,
                 embeddingModel,
                 customizeExpertSettings,
-                answerEngineKind,
+                responseEngineKind,
                 ragMaxResultsCount,
                 ragMinScore
         );

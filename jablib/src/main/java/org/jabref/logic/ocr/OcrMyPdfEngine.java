@@ -72,9 +72,17 @@ public class OcrMyPdfEngine implements OcrEngine {
         }
         Path outputPath = makeOutputFilePath(pdfPath);
         String outputFile = outputPath.toString();
+        String ocrCommand = switch (ocrPreferences.getPagesHaveText()) {
+            case SKIP ->
+                    "--skip-text";
+            case FORCE ->
+                    "--force-ocr";
+            case REDO ->
+                    "--redo-ocr";
+        };
         // although a list of Strings, it represents a single command as that is how the ProcessBuilder expects it.
         ArrayList<String> command = StringUtil.splitRespectingEscapedWhitespace(ocrPreferences.getOcrEnginePath());
-        command.add("--skip-text");
+        command.add(ocrCommand);
         command.add(pdfPath.toString());
         command.add(outputFile);
         Process process = null;
@@ -117,7 +125,6 @@ public class OcrMyPdfEngine implements OcrEngine {
     /// @return the output path of the searchable OCRed PDF.
     private Path makeOutputFilePath(Path inputPath) {
         String baseName = FileUtil.getBaseName(inputPath.toString());
-        Path outputPath = inputPath.resolveSibling(baseName + OCR_PDF_PREFIX);
-        return outputPath;
+        return inputPath.resolveSibling(baseName + OCR_PDF_PREFIX);
     }
 }

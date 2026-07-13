@@ -6,6 +6,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +41,12 @@ class ScholarArchiveFetcherTest {
         List<BibEntry> fetchedEntries = fetcher.performSearch("bpelscript");
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         assertTrue(fetchedEntries.contains(bibEntry), "Found the following entries " + fetchedEntries);
+    }
+
+    @Test
+    void performRawSearchQueryPagedWithBlankQueryReturnsEmptyPage() throws FetcherException {
+        Page<BibEntry> result = fetcher.performRawSearchQueryPaged("", 0);
+        assertTrue(result.getContent().isEmpty());
     }
 }
 

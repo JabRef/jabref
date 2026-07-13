@@ -109,6 +109,20 @@ class LayoutTest {
                 layoutText);
     }
 
+    @Test
+    void previewAbstractCanRenderLatexMathAsUnicodeBeforeHtmlEscaping() throws IOException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.ABSTRACT, "Much progress has been made in classifying when the weak Lefschetz property holds for $A=\\mathbb{F}[x,y,z]/I$ where $\\text{char}(\\mathbb{F})=0$ and $I=(x^{d_{1}},y^{d_{2}},z^{d_{3}},x^{a_{1}}y^{a_{2}}z^{a_{3}})$.");
+
+        String layoutText = layout(
+                "<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b>\\format[LatexToUnicode,HTMLChars]{\\abstract}\\end{abstract}</font>",
+                entry);
+
+        assertEquals(
+                "<font face=\"arial\"><BR><BR><b>Abstract: </b>Much progress has been made in classifying when the weak Lefschetz property holds for A=𝔽[x,y,z]/I where char(𝔽)=0 and I=(xᵈ₁,yᵈ₂,zᵈ₃,xᵃ₁yᵃ₂zᵃ₃).</font>",
+                layoutText);
+    }
+
     @ParameterizedTest
     @CsvSource(
             delimiterString = "->",

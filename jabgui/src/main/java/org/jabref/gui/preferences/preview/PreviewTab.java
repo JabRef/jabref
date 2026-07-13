@@ -28,7 +28,6 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.preview.PreviewViewer;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -67,7 +66,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     @FXML private CheckBox bookCoverDownload;
 
     @Inject private StateManager stateManager;
-    @Inject private ThemeManager themeManager;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
 
     private final ContextMenu contextMenu = new ContextMenu();
@@ -183,7 +181,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         sortUpButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
         sortDownButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
 
-        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
+        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor);
         previewViewer.setDatabaseContext(new BibDatabaseContext());
         previewViewer.setEntry(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.selectedLayoutProperty(), previewViewer::setLayout);

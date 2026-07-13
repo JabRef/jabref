@@ -3,12 +3,16 @@ package org.jabref.logic.ai.rag.logic;
 import java.util.List;
 
 import org.jabref.model.ai.identifiers.FullBibEntry;
-import org.jabref.model.ai.pipeline.AnswerEngineKind;
 import org.jabref.model.ai.pipeline.RelevantInformation;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 
-// [impl->feat~ai.answer-engines~1]
-public interface AnswerEngine {
+import org.jspecify.annotations.NullMarked;
+
+// [impl->feat~ai.response-engines~1]
+@NullMarked
+public interface ResponseEngine {
     List<RelevantInformation> process(String query, List<FullBibEntry> entriesFilter);
 
-    AnswerEngineKind getKind();
+    ResponseEngineKind getKind();
 }
+

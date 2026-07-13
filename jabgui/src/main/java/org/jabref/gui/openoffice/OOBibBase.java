@@ -15,6 +15,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.openoffice.CitationEntryTypeMetadataManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.EditInsert;
 import org.jabref.logic.openoffice.action.EditMerge;
@@ -47,6 +48,8 @@ import org.jabref.model.openoffice.util.OOResult;
 import org.jabref.model.openoffice.util.OOVoidResult;
 
 import com.airhacks.afterburner.injection.Injector;
+import com.sun.star.beans.IllegalTypeException;
+import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
@@ -92,9 +95,19 @@ public class OOBibBase {
         testDialog(connection.selectDocument(autoSelectForSingle));
 
         if (isConnectedToDocument()) {
-            initializeCitationAdapter(this.getXTextDocument().get());
+            XTextDocument doc = this.getXTextDocument().get();
+            initializeCitationAdapter(doc);
+            storeZoteroEntryTypes(doc);
             dialogService.notify(Localization.lang("Connected to document") + ": "
                     + this.getCurrentDocumentTitle().orElse(""));
+        }
+    }
+
+    private void storeZoteroEntryTypes(XTextDocument doc) {
+        try {
+            CitationEntryTypeMetadataManager.storeZoteroEntryTypes(doc);
+        } catch (IllegalTypeException | NoDocumentException | PropertyVetoException | WrappedTargetException e) {
+            LOGGER.warn("Could not store Zotero citation entry type metadata", e);
         }
     }
 

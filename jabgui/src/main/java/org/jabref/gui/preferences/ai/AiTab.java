@@ -25,11 +25,13 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.ai.AiNamingUtils;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
-import org.jabref.model.ai.pipeline.AnswerEngineKind;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
@@ -37,6 +39,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.EnhancedPasswordField;
 import com.dlsc.unitfx.IntegerInputField;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 import org.controlsfx.control.SearchableComboBox;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
@@ -57,8 +60,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private VBox expertSettingsPane;
     @FXML private TextField apiBaseUrlTextField;
     @FXML private SearchableComboBox<PredefinedEmbeddingModel> embeddingModelComboBox;
-    // [impl->req~ai.answer-engines.default~1]
-    @FXML private ComboBox<AnswerEngineKind> answerEngineComboBox;
+    // [impl->req~ai.response-engines.default~1]
+    @FXML private ComboBox<ResponseEngineKind> responseEngineComboBox;
     // [impl->req~ai.summarization.algorithm.default~1]
     @FXML private ComboBox<SummarizatorKind> summarizationAlgorithmComboBox;
     @FXML private ComboBox<TokenEstimatorKind> tokenEstimationAlgorithmComboBox;
@@ -82,8 +85,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private Tab followUpQuestionsTemplateTab;
     // [impl->req~ai.chat.customize-system-prompt~1]
     @FXML private TextArea systemMessageTextArea;
-    // [impl->req~ai.answer-engines.embeddings-search.prompt~1]
-    // [impl->req~ai.answer-engines.full-document.prompt~1]
+    // [impl->req~ai.response-engines.embeddings-search.prompt~1]
+    // [impl->req~ai.response-engines.full-document.prompt~1]
     @FXML private TextArea userMessageTextArea;
     // [impl->req~ai.summarization.algorithms.chunked.system-prompt-chunk~1]
     @FXML private TextArea summarizationChunkSystemMessageTextArea;
@@ -103,6 +106,9 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private CheckBox generateFollowUpQuestions;
     @FXML private Spinner<Integer> followUpQuestionsCountSpinner;
 
+    @Inject private TaskExecutor taskExecutor;
+    @Inject private AiService aiService;
+
     public AiTab() {
         ViewLoader.view(this)
                   .root(this)
@@ -110,7 +116,11 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     }
 
     public void initialize() {
-        this.viewModel = new AiTabViewModel(preferences);
+        this.viewModel = new AiTabViewModel(
+                preferences,
+                aiService.getModelService(),
+                taskExecutor
+        );
 
         initializeEnableAi();
         initializeAiProvider();
@@ -213,12 +223,12 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
         contextWindowSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
-        new ViewModelListCellFactory<AnswerEngineKind>()
+        new ViewModelListCellFactory<ResponseEngineKind>()
                 .withText(AiNamingUtils::getDisplayName)
-                .install(answerEngineComboBox);
-        answerEngineComboBox.setItems(viewModel.answerEngineKindsProperty());
-        answerEngineComboBox.valueProperty().bindBidirectional(viewModel.answerEngineProperty());
-        answerEngineComboBox.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+                .install(responseEngineComboBox);
+        responseEngineComboBox.setItems(viewModel.responseEngineKindsProperty());
+        responseEngineComboBox.valueProperty().bindBidirectional(viewModel.responseEngineProperty());
+        responseEngineComboBox.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         new ViewModelListCellFactory<SummarizatorKind>()
                 .withText(AiNamingUtils::getDisplayName)

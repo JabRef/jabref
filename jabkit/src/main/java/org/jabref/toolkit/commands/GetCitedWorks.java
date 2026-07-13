@@ -32,7 +32,7 @@ class GetCitedWorks implements Callable<Integer> {
     private JabKit argumentProcessor;
 
     @CommandLine.Mixin
-    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+    private JabKit.SharedOptions sharedOptions;
 
     @CommandLine.Option(
             names = "--output",

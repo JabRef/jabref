@@ -43,7 +43,7 @@ class PdfUpdate implements Callable<Integer> {
     protected Pdf pdf;
 
     @Mixin
-    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+    private JabKit.SharedOptions sharedOptions;
 
     @Option(names = "--format", description = "Format to update (xmp, bibtex-attachment)", split = ",")
     private List<String> formats = List.of("xmp", "bibtex-attachment"); // ToDO: default value?

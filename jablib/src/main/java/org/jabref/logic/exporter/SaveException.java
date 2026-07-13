@@ -1,7 +1,11 @@
 package org.jabref.logic.exporter;
 
+import java.util.Optional;
+
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
+
+import org.jspecify.annotations.Nullable;
 
 /// Exception thrown if saving goes wrong. If caused by a specific
 /// entry, keeps track of which entry caused the problem.
@@ -13,7 +17,7 @@ public class SaveException extends Exception {
     public static final SaveException BACKUP_CREATION = new SaveException("Unable to create backup",
             Localization.lang("Unable to create backup"));
 
-    private BibEntry entry;
+    @Nullable private BibEntry entry;
     private int status;
     private String localizedMessage;
 
@@ -39,12 +43,12 @@ public class SaveException extends Exception {
         this.status = status;
     }
 
-    public SaveException(String message, BibEntry entry) {
+    public SaveException(String message, @Nullable BibEntry entry) {
         super(message);
         this.entry = entry;
     }
 
-    public SaveException(String message, String localizedMessage, BibEntry entry, Throwable base) {
+    public SaveException(String message, String localizedMessage, @Nullable BibEntry entry, Throwable base) {
         super(message, base);
         this.localizedMessage = localizedMessage;
         this.entry = entry;
@@ -62,8 +66,8 @@ public class SaveException extends Exception {
         return status;
     }
 
-    public BibEntry getEntry() {
-        return entry;
+    public Optional<BibEntry> getEntry() {
+        return Optional.ofNullable(entry);
     }
 
     public boolean specificEntry() {

@@ -10,7 +10,6 @@
 <?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
          fx:controller="org.jabref.gui.fieldeditors.LinkedFilesEditor">
-    <ListView fx:id="listView" prefHeight="0" HBox.hgrow="ALWAYS" maxHeight="100" />
     <VBox>
         <Button onAction="#addNewFile" styleClass="icon-button">
             <graphic>
@@ -40,4 +39,5 @@
             </tooltip>
         </Button>
     </VBox>
+    <ListView fx:id="listView" styleClass="linked-files-list" HBox.hgrow="ALWAYS" />
 </fx:root>

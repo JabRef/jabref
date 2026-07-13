@@ -40,6 +40,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     protected final BooleanProperty identifierLookupInProgress = new SimpleBooleanProperty(false);
     protected final BooleanProperty canLookupIdentifier = new SimpleBooleanProperty(true);
     protected final BooleanProperty canFetchBibliographyInformationById = new SimpleBooleanProperty(false);
+    protected final BooleanProperty canSyncWithBrowser = new SimpleBooleanProperty(false);
     protected IdentifierParser identifierParser;
     protected final ObjectProperty<Optional<T>> identifier = new SimpleObjectProperty<>(Optional.empty());
     protected DialogService dialogService;
@@ -68,9 +69,16 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     ///
     /// **NOTE: This method MUST be called by all the implementation view models in their principal constructor**
     protected final void configure(boolean canFetchBibliographyInformationById, boolean canLookupIdentifier, boolean canShortenIdentifier) {
+        configure(canFetchBibliographyInformationById, canLookupIdentifier, canShortenIdentifier, false);
+    }
+
+    /// Overload adding `canSyncWithBrowser`, currently only used by the MathSciNet editor. Kept separate from the
+    /// 3-arg overload so the far more common call sites don't all need a trailing `false`.
+    protected final void configure(boolean canFetchBibliographyInformationById, boolean canLookupIdentifier, boolean canShortenIdentifier, boolean canSyncWithBrowser) {
         this.canFetchBibliographyInformationById.set(canFetchBibliographyInformationById);
         this.canLookupIdentifier.set(canLookupIdentifier);
         this.canShortenIdentifier.set(canShortenIdentifier);
+        this.canSyncWithBrowser.set(canSyncWithBrowser);
     }
 
     protected Optional<T> updateIdentifier() {
@@ -109,6 +117,24 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
 
     public boolean getCanFetchBibliographyInformationById() {
         return canFetchBibliographyInformationById.get();
+    }
+
+    public BooleanProperty canSyncWithBrowserProperty() {
+        return canSyncWithBrowser;
+    }
+
+    public boolean getCanSyncWithBrowser() {
+        return canSyncWithBrowser.get();
+    }
+
+    /// Whether this identifier should currently be synced to the browser extension. Only meaningful when
+    /// {@link #getCanSyncWithBrowser()} is true; overridden by the (currently only) editor that supports it.
+    public boolean getSyncWithBrowser() {
+        return false;
+    }
+
+    public void setSyncWithBrowser(boolean syncWithBrowser) {
+        // No-op: only the MathSciNet editor currently supports browser sync.
     }
 
     public BooleanProperty canLookupIdentifierProperty() {

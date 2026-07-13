@@ -11,16 +11,16 @@ Synchronize the data in a library to a remote database, while handling conflicts
 
 ## Decision Drivers
 
-- Updates from the remote should be pulled in
-- No updates should get lost
-- Easy to implement
-- Easy to maintain
+* Updates from the remote should be pulled in
+* No updates should get lost
+* Easy to implement
+* Easy to maintain
 
 ## Considered Options
 
-- "Optimistic offline lock" with hashes for local file support
-- Algorithm based on "optimistic offline lock"
-- Use CRDTs
+* "Optimistic offline lock" with hashes for local file support
+* Algorithm based on "optimistic offline lock"
+* Use CRDTs
 
 ## Decision Outcome
 
@@ -48,12 +48,12 @@ Implementation details are found at <https://www.baeldung.com/cs/offline-concurr
 
 This is implemented for the SQL database synchronization, which is described at [Remote SQL Storage](../code-howtos/remote-storage-sql.md).
 
-- Good, because this algorithm is already in place since 2016 for JabRef synchronizing with a PostgreSQL backend and a MySQL backend.
-- Bad, because it assumes the client to be online 100% and does not have handlings of cases where the client disconnects and alters data in other ways.
+* Good, because this algorithm is already in place since 2016 for JabRef synchronizing with a PostgreSQL backend and a MySQL backend.
+* Bad, because it assumes the client to be online 100% and does not have handlings of cases where the client disconnects and alters data in other ways.
 
 ### Use CRDTs
 
 See <https://automerge.org/blog/automerge-2/> for details.
 
-- Bad, because one needs to locally store a lot more metadata (e.g. for operational CRDTs you essentially need to have the full history of all edits). So you would need another file next to the bib file to store these.
-- Bad, because CRDTs are mainly used when you need low latency and high frequency of edits (e.g. multi-user chat or text editing). Not really something we care about.
+* Bad, because one needs to locally store a lot more metadata (e.g. for operational CRDTs you essentially need to have the full history of all edits). So you would need another file next to the bib file to store these.
+* Bad, because CRDTs are mainly used when you need low latency and high frequency of edits (e.g. multi-user chat or text editing). Not really something we care about.

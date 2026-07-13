@@ -144,7 +144,7 @@ jobs:
 
           # "brute force" remove assignee - it might happen that the contributor was unassinged, but the PR closed later; therefore we need " || true" to ignore any error
           gh issue edit "$ISSUE_NUMBER" --remove-assignee "$PR_USER" || true
-      - uses: awalsh128/cache-apt-pkgs-action@v1.6.1
+      - uses: awalsh128/cache-apt-pkgs-action@v1.6.3
         with:
           packages: jq
           version: 1.0

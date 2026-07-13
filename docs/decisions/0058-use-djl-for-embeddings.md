@@ -4,7 +4,7 @@ parent: Decision Records
 ---
 # Use Deep Java Library for embeddings in AI features
 
-<!-- dsn->feat~ai.answer-engines.embeddings-search~1 -->
+<!-- dsn->feat~ai.response-engines.embeddings-search~1 -->
 
 ## Context and Problem Statement
 

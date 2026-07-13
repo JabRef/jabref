@@ -2,22 +2,23 @@ package org.jabref.logic.ai.rag.util;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.preferences.AiPreferences;
-import org.jabref.logic.ai.rag.logic.AnswerEngine;
-import org.jabref.logic.ai.rag.logic.EmbeddingsSearchAnswerEngine;
-import org.jabref.logic.ai.rag.logic.FullDocumentAnswerEngine;
-import org.jabref.model.ai.pipeline.AnswerEngineKind;
+import org.jabref.logic.ai.rag.logic.EmbeddingsSearchResponseEngine;
+import org.jabref.logic.ai.rag.logic.FullDocumentResponseEngine;
+import org.jabref.logic.ai.rag.logic.ResponseEngine;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
+import org.jspecify.annotations.NullMarked;
 
-public final class AnswerEngineFactory {
-    private AnswerEngineFactory() {
-        throw new UnsupportedOperationException("cannot instantiate a utility class");
+@NullMarked
+public final class ResponseEngineFactory {
+    private ResponseEngineFactory() {
     }
 
-    public static AnswerEngine create(
-            AnswerEngineKind kind,
+    public static ResponseEngine create(
+            ResponseEngineKind kind,
             FilePreferences filePreferences,
             EmbeddingModel embeddingModel,
             EmbeddingStore<TextSegment> embeddingStore,
@@ -26,9 +27,9 @@ public final class AnswerEngineFactory {
     ) {
         return switch (kind) {
             case FULL_DOCUMENT ->
-                    new FullDocumentAnswerEngine(filePreferences);
+                    new FullDocumentResponseEngine(filePreferences);
             case EMBEDDINGS_SEARCH ->
-                    new EmbeddingsSearchAnswerEngine(
+                    new EmbeddingsSearchResponseEngine(
                             filePreferences,
                             embeddingModel,
                             embeddingStore,
@@ -38,14 +39,14 @@ public final class AnswerEngineFactory {
         };
     }
 
-    public static AnswerEngine create(
+    public static ResponseEngine create(
             AiPreferences aiPreferences,
             FilePreferences filePreferences,
             EmbeddingModel embeddingModel,
             EmbeddingStore<TextSegment> embeddingStore
     ) {
         return create(
-                aiPreferences.getAnswerEngineKind(),
+                aiPreferences.getResponseEngineKind(),
                 filePreferences,
                 embeddingModel,
                 embeddingStore,

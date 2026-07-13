@@ -38,7 +38,7 @@ class GenerateCitationKeys implements Callable<Integer> {
     private CitationKeys parentCommand;
 
     @Mixin
-    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+    private JabKit.SharedOptions sharedOptions;
 
     @Mixin
     private InputOption inputOption = new InputOption();

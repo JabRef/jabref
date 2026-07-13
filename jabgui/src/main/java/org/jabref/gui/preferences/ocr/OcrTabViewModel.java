@@ -7,8 +7,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyListProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
@@ -16,6 +22,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.OcrPreferences;
+import org.jabref.logic.ocr.PagesWithTextHandling;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
@@ -35,6 +42,9 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
             "python3 -m ocrmypdf"
     );
     private final StringProperty ocrEnginePath = new SimpleStringProperty();
+    private final ObjectProperty<PagesWithTextHandling> selectedPagesHaveText = new SimpleObjectProperty<>(PagesWithTextHandling.SKIP);
+    private final ListProperty<PagesWithTextHandling> pagesHaveTextOptions =
+            new SimpleListProperty<>(FXCollections.observableArrayList(PagesWithTextHandling.values()));
 
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
@@ -54,15 +64,25 @@ public class OcrTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         ocrEnginePath.setValue(ocrPreferences.getOcrEnginePath());
+        selectedPagesHaveText.setValue(ocrPreferences.getPagesHaveText());
     }
 
     @Override
     public void storeSettings() {
         ocrPreferences.setOcrEnginePath(ocrEnginePath.getValue());
+        ocrPreferences.setPagesHaveText(selectedPagesHaveText.getValue());
     }
 
     public StringProperty ocrEnginePathProperty() {
         return ocrEnginePath;
+    }
+
+    public ObjectProperty<PagesWithTextHandling> selectedPagesHaveTextProperty() {
+        return selectedPagesHaveText;
+    }
+
+    public ReadOnlyListProperty<PagesWithTextHandling> pagesHaveTextOptions() {
+        return pagesHaveTextOptions;
     }
 
     public void browseEnginePath() {

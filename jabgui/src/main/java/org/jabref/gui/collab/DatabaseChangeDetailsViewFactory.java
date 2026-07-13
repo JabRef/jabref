@@ -22,7 +22,6 @@ import org.jabref.gui.collab.stringrename.BibTexStringRename;
 import org.jabref.gui.collab.stringrename.BibTexStringRenameDetailsView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -30,7 +29,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 public class DatabaseChangeDetailsViewFactory {
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
-    private final ThemeManager themeManager;
     private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final PreviewViewer previewViewer;
@@ -38,14 +36,12 @@ public class DatabaseChangeDetailsViewFactory {
 
     public DatabaseChangeDetailsViewFactory(BibDatabaseContext databaseContext,
                                             DialogService dialogService,
-                                            ThemeManager themeManager,
                                             GuiPreferences preferences,
                                             BibEntryTypesManager entryTypesManager,
                                             PreviewViewer previewViewer,
                                             TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
-        this.themeManager = themeManager;
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
         this.previewViewer = previewViewer;
@@ -60,7 +56,6 @@ public class DatabaseChangeDetailsViewFactory {
                             entryChange.getNewEntry(),
                             databaseContext,
                             dialogService,
-                            themeManager,
                             preferences,
                             entryTypesManager,
                             previewViewer,

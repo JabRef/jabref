@@ -62,6 +62,12 @@ class EntriesResourceTest extends ServerTest {
                 .post(Entity.entity(bibtex, MediaTypes.APPLICATION_BIBTEX));
     }
 
+    private Response postCslJson(String id, String cslJson) {
+        return target("/libraries/" + id + "/entries")
+                .request()
+                .post(Entity.entity(cslJson, MediaTypes.CITATIONSTYLES_JSON));
+    }
+
     /// Rebinds the standalone null object ([UiMessageHandler#NONE], not GUI-connected) and restarts
     /// the test container so the resource sees it. Mirrors {@link ServerTest#setAvailableLibraries}.
     private void useStandaloneMode() throws Exception {
@@ -115,9 +121,41 @@ class EntriesResourceTest extends ServerTest {
         Mockito.verifyNoInteractions(uiMessageHandler);
     }
 
+    /// CSL-JSON is mapped to the correct entry type (paper-conference -> @InProceedings) and container
+    /// field (container-title -> booktitle) before being appended as BibTeX.
+    @Test
+    void importCslJsonConvertsEntryType() {
+        Response response = postCslJson(TestBibFile.GENERAL_SERVER_TEST.id, """
+                {"type":"paper-conference","title":"A paper","container-title":"Proc. of Test"}
+                """);
+
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        UiCommand.AppendBibTeXToLibrary command = (UiCommand.AppendBibTeXToLibrary) captureSingleCommand();
+        assertEquals(java.util.Optional.of(TestBibFile.GENERAL_SERVER_TEST.path), command.library());
+        assertTrue(command.bibtex().toLowerCase(java.util.Locale.ROOT).contains("@inproceedings"), command.bibtex());
+        assertTrue(command.bibtex().contains("Proc. of Test"), command.bibtex());
+    }
+
+    @Test
+    void importEmptyCslJsonReturns400() {
+        Response response = postCslJson(TestBibFile.GENERAL_SERVER_TEST.id, "   ");
+
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Mockito.verifyNoInteractions(uiMessageHandler);
+    }
+
+    @Test
+    void importUnparseableCslJsonReturns400() {
+        Response response = postCslJson(TestBibFile.GENERAL_SERVER_TEST.id, "not json");
+
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Mockito.verify(uiMessageHandler, Mockito.never()).handleUiCommands(Mockito.any());
+    }
+
     static Stream<Arguments> standaloneEndpoints() {
         return Stream.of(
                 Arguments.of(MediaTypes.APPLICATION_BIBTEX, "@article{a, title={t}}"),
+                Arguments.of(MediaTypes.CITATIONSTYLES_JSON, "{\"type\":\"book\",\"title\":\"t\"}"),
                 Arguments.of(MediaType.TEXT_PLAIN, "Smith, J. (2020). A title."),
                 Arguments.of(MediaType.APPLICATION_OCTET_STREAM, "some data"));
     }

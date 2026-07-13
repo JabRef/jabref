@@ -17,7 +17,8 @@ open module org.jabref {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.graphics;
-    requires javafx.web;
+    requires org.jabref.htmltonode;
+    requires /*runtime*/ jfx.incubator.richtext;
 
     requires com.tobiasdiez.easybind;
 
@@ -83,7 +84,6 @@ open module org.jabref {
     // endregion
 
     // region: data mapping
-    requires jdk.xml.dom;
     // requires com.google.gson;
     requires tools.jackson.core;
     requires tools.jackson.databind;

@@ -76,13 +76,6 @@ public class GroupsPreferences {
         return new GroupsPreferences();
     }
 
-    public void setAll(GroupsPreferences preferences) {
-        this.groupViewMode.set(preferences.groupViewMode);
-        this.shouldAutoAssignGroup.set(preferences.shouldAutoAssignGroup());
-        this.shouldDisplayGroupCount.set(preferences.shouldDisplayGroupCount());
-        this.defaultHierarchicalContext.set(preferences.getDefaultHierarchicalContext());
-    }
-
     public EnumSet<GroupViewMode> getGroupViewMode() {
         if (groupViewMode.isEmpty()) {
             return EnumSet.noneOf(GroupViewMode.class);
