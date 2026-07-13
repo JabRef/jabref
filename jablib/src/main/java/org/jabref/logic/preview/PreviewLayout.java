@@ -32,7 +32,7 @@ public sealed interface PreviewLayout permits BstPreviewLayout, CitationStylePre
 
     @Nullable
     static PreviewLayout of(String layout,
-                            String customPreviewLayout,
+                            List<TextBasedPreviewLayout> customPreviewLayouts,
                             List<Path> bstLayoutPaths,
                             LayoutFormatterPreferences preferences,
                             JournalAbbreviationRepository abbreviationRepository,
@@ -48,13 +48,11 @@ public sealed interface PreviewLayout permits BstPreviewLayout, CitationStylePre
                                  .map(BstPreviewLayout::new)
                                  .findFirst()
                                  .orElse(null);
-        } else if (TextBasedPreviewLayout.NAME.equals(layout)) {
-            return TextBasedPreviewLayout.of(
-                    customPreviewLayout,
-                    preferences,
-                    abbreviationRepository);
+        } else {
+            return customPreviewLayouts.stream()
+                                   .filter(customLayout -> customLayout.getName().equals(layout))
+                                   .findFirst()
+                                   .orElse(null);
         }
-
-        return null;
     }
 }
