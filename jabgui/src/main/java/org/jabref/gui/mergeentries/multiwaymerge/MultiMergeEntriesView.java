@@ -44,6 +44,7 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -346,6 +347,17 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
     public void addSource(String title, Supplier<BibEntry> supplier) {
         viewModel.addSource(new MultiMergeEntriesViewModel.EntrySource(title, supplier, taskExecutor));
+    }
+
+    public void addFetchedColumn(String title, IdBasedFetcher fetcher, String id) {
+        addSource(title, () -> {
+            try {
+                return fetcher.performSearchById(id).orElse(null);
+            } catch (FetcherException e) {
+                LOGGER.warn("Failed to fetch BibEntry for {} using {}", id, title, e);
+                return null;
+            }
+        });
     }
 
     private class FieldRow {
