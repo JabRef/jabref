@@ -20,11 +20,11 @@ class Pdf implements Callable<Integer> {
     protected JabKit argumentProcessor;
 
     @Mixin
-    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+    private JabKit.SharedOptions sharedOptions;
 
     @Override
     public Integer call() {
-        System.err.println(Localization.lang("Specify a subcommand (write-xmp, update)."));
+        System.err.println(Localization.lang("Specify a subcommand (update)."));
         return 2;
     }
 }

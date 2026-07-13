@@ -8,16 +8,19 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
+import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
@@ -45,9 +48,10 @@ import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.linkedfile.LinkedFileEditDialog;
+import org.jabref.gui.linkedfile.OcrLinkedFileAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -65,6 +69,10 @@ import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 import jakarta.inject.Inject;
 
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
+
+    // Upper bound on how many rows the ListView grows to before it starts scrolling internally,
+    // so entries with many linked files cannot expand the entry editor layout indefinitely.
+    private static final int MAX_VISIBLE_ROWS = 5;
 
     @FXML
     private ListView<LinkedFileViewModel> listView;
@@ -115,8 +123,12 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
-        UiThreadObservableList<LinkedFileViewModel> decoratedModelList = new UiThreadObservableList<>(viewModel.filesProperty());
-        Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);
+        // Bind directly to the view model's own list (not a wrapper): JavaFX's bindContentBidirectional
+        // dispatches change events by identity of the lists it was given, so wrapping one side (e.g. in
+        // UiThreadObservableList) makes every Change#getList() report the wrapped delegate instead of the
+        // list JavaFX is tracking, silently breaking the live sync (a Change#getList() identity mismatch).
+        // filesProperty() is only ever mutated on the FX Application Thread, so no extra marshaling is needed.
+        Bindings.bindContentBidirectional(listView.itemsProperty().get(), viewModel.filesProperty());
     }
 
     @FXML
@@ -155,10 +167,51 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 .install(listView);
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+        // Size the control to (number of files + 1) rows, so it ends right after the content instead of leaving blank
+        // space, but cap it at MAX_VISIBLE_ROWS so large file lists scroll internally rather than growing the layout.
+        // The row height comes from the CSS-driven fixed cell size, so theming and font scaling adjust it naturally.
+        listView.prefHeightProperty().bind(Bindings.createDoubleBinding(
+                () -> Math.min(listView.getItems().size() + 1, MAX_VISIBLE_ROWS) * listView.getFixedCellSize(),
+                listView.getItems(),
+                listView.fixedCellSizeProperty()));
+        listView.maxHeightProperty().bind(listView.fixedCellSizeProperty().multiply(MAX_VISIBLE_ROWS));
+
         fulltextFetcher.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty().not());
         progressIndicator.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty());
 
         setUpKeyBindings();
+
+        // Double-clicking the empty row below the files (the "+1" row) adds a new file, same as the add button.
+        listView.setOnMouseClicked(event -> {
+            if ((event.getButton() == MouseButton.PRIMARY) && (event.getClickCount() == 2) && isEmptyRow(event.getTarget())) {
+                addNewFile();
+            }
+        });
+    }
+
+    private static boolean isEmptyRow(EventTarget target) {
+        if (!(target instanceof Node node)) {
+            return false;
+        }
+        // Walk up from the clicked node to the ListView. The handler sits on the ListView, so
+        // events from scrollbars and other skin sub-controls bubble up here too; only clicks on
+        // the list's content background (no enclosing cell, no scrollbar crossed) count as the
+        // empty area and behave like double-clicking the trailing empty "+1" row.
+        for (Node current = node; current != null; current = current.getParent()) {
+            if (current instanceof ListCell<?> cell) {
+                return cell.isEmpty();
+            }
+            if (current instanceof ScrollBar) {
+                return false;
+            }
+            if (current instanceof ListView) {
+                // Reached the list itself without crossing a cell or a scrollbar: the click
+                // landed on the content background (the blank space below the files, or the
+                // whole control when no files exist yet).
+                return true;
+            }
+        }
+        return false;
     }
 
     private void handleOnDragOver(LinkedFileViewModel originalItem, DragEvent event) {
@@ -234,17 +287,17 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         HBox info = new HBox(8);
         HBox.setHgrow(info, Priority.ALWAYS);
-        info.setStyle("-fx-padding: 0.5em 0 0.5em 0;"); // To align with buttons below which also have 0.5em padding
+        info.getStyleClass().add("linked-files-info"); // To align with buttons below which also have 0.5em padding
         info.getChildren().setAll(label, progressIndicator);
 
-        Button acceptAutoLinkedFile = IconTheme.JabRefIcons.AUTO_LINKED_FILE.asButton();
+        Button acceptAutoLinkedFile = ControlHelper.iconButton(IconTheme.JabRefIcons.AUTO_LINKED_FILE);
         acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang("This file was found automatically. Do you want to link it to this entry?")));
         acceptAutoLinkedFile.visibleProperty().bind(linkedFile.isAutomaticallyFoundProperty());
         acceptAutoLinkedFile.managedProperty().bind(linkedFile.isAutomaticallyFoundProperty());
         acceptAutoLinkedFile.setOnAction(_ -> linkedFile.acceptAsLinked());
         acceptAutoLinkedFile.getStyleClass().setAll("icon-button");
 
-        Button writeMetadataToPdf = IconTheme.JabRefIcons.PDF_METADATA_WRITE.asButton();
+        Button writeMetadataToPdf = ControlHelper.iconButton(IconTheme.JabRefIcons.PDF_METADATA_WRITE);
         writeMetadataToPdf.setTooltip(new Tooltip(Localization.lang("Write BibTeX to PDF (XMP and embedded)")));
         writeMetadataToPdf.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
         writeMetadataToPdf.getStyleClass().setAll("icon-button");
@@ -258,7 +311,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         writeMetadataToPdf.disableProperty().bind(writeMetadataToSinglePdfAction.executableProperty().not());
         writeMetadataToPdf.setOnAction(_ -> writeMetadataToSinglePdfAction.execute());
 
-        Button parsePdfMetadata = IconTheme.JabRefIcons.PDF_METADATA_READ.asButton();
+        Button parsePdfMetadata = ControlHelper.iconButton(IconTheme.JabRefIcons.PDF_METADATA_READ);
         parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));
         parsePdfMetadata.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
         parsePdfMetadata.setOnAction(_ -> {
@@ -295,6 +348,23 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                         LinkedFileViewModel selectedFile = listView.getSelectionModel().getSelectedItem();
                         if (selectedFile != null) {
                             new ContextAction(StandardActions.OPEN_FILE, selectedFile, databaseContext, bibEntry, preferences, viewModel).execute();
+                            event.consume();
+                        }
+                    }
+                    case PERFORM_OCR -> {
+                        LinkedFileViewModel selectedFile = listView.getSelectionModel().getSelectedItem();
+                        if (selectedFile != null) {
+                            new OcrLinkedFileAction(
+                                    selectedFile.getFile(),
+                                    selectedFile.getLinkedEntries(),
+                                    databaseContext,
+                                    dialogService,
+                                    preferences,
+                                    taskExecutor,
+                                    fileUpdateMonitor,
+                                    undoManager,
+                                    stateManager
+                            ).execute();
                             event.consume();
                         }
                     }
@@ -348,7 +418,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     }
 
     @FXML
-    private void addNewFile() {
+    public void addNewFile() {
         dialogService.showCustomDialogAndWait(new LinkedFileEditDialog()).filter(file -> !file.isEmpty()).ifPresent(newLinkedFile -> viewModel.addNewLinkedFile(newLinkedFile));
     }
 

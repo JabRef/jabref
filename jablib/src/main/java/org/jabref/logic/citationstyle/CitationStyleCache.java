@@ -10,6 +10,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// Caches the generated Citations for quicker access
 /// {@link CitationStyleGenerator} generates the citation with JavaScript which may take some time
@@ -17,8 +18,10 @@ public class CitationStyleCache {
 
     private static final int CACHE_SIZE = 1024;
 
-    private PreviewLayout citationStyle;
     private final LoadingCache<BibEntry, String> citationStyleCache;
+
+    // In case null, return empty preview.
+    @Nullable private PreviewLayout citationStyle;
 
     public CitationStyleCache(BibDatabaseContext databaseContext) {
         citationStyleCache = Caffeine.newBuilder().maximumSize(CACHE_SIZE).build(entry -> {
@@ -40,7 +43,7 @@ public class CitationStyleCache {
     ///
     /// @param citationStyle The new citation style
     public void setCitationStyle(@NonNull PreviewLayout citationStyle) {
-        if (!this.citationStyle.equals(citationStyle)) {
+        if (!citationStyle.equals(this.citationStyle)) {
             this.citationStyle = citationStyle;
             this.citationStyleCache.invalidateAll();
         }

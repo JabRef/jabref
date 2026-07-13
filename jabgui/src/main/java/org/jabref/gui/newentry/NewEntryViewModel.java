@@ -141,7 +141,7 @@ public class NewEntryViewModel {
                 ValidationMessage.error(Localization.lang("You must specify one (or more) citations.")));
         interpretParsers = new SimpleListProperty<>(FXCollections.observableArrayList());
         interpretParsers.addAll(PlainCitationParserChoice.values());
-        if (!preferences.getAiPreferences().getEnableAi()) {
+        if (!preferences.getAiPreferences().getAiFeaturesEnabled()) {
             interpretParsers.remove(PlainCitationParserChoice.LLM);
         }
         interpretParser = new SimpleObjectProperty<>();
@@ -377,14 +377,19 @@ public class NewEntryViewModel {
                 return Optional.empty();
             }
 
-            final PlainCitationParser parser = PlainCitationParserFactory.getPlainCitationParser(
-                    parserChoice,
-                    preferences.getCitationKeyPatternPreferences(),
-                    preferences.getGrobidPreferences(),
-                    preferences.getImportFormatPreferences(),
-                    preferences.getAiPreferences(),
-                    aiService.getCurrentChatModel()
-            );
+            final PlainCitationParser parser;
+            if (parserChoice == PlainCitationParserChoice.LLM) {
+                parser = PlainCitationParserFactory.getLlmPlainCitationParser(
+                        preferences.getImportFormatPreferences(),
+                        preferences.getAiPreferences(),
+                        aiService.getCurrentChatModel());
+            } else {
+                parser = PlainCitationParserFactory.getPlainCitationParser(
+                        parserChoice,
+                        preferences.getCitationKeyPatternPreferences(),
+                        preferences.getGrobidPreferences(),
+                        preferences.getImportFormatPreferences());
+            }
 
             final List<BibEntry> entries = parser.parseMultiplePlainCitations(text);
 

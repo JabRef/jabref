@@ -37,6 +37,7 @@ import jakarta.inject.Inject;
 // [impl->feat~ai.chatting~1]
 public class AiChatView extends StackPane {
     @FXML private AiPrivacyNoticeView privacyNotice;
+    @FXML private UniversalStatusPaneView restartNeededPane;
     @FXML private UniversalStatusPaneView noFilesErrorPane;
     @FXML private BorderPane mainContainer;
 
@@ -95,6 +96,7 @@ public class AiChatView extends StackPane {
 
         // [pp->req~ai.ingestion.trigger-on-demand~1]
         privacyNotice.managedProperty().bind(privacyNotice.visibleProperty());
+        restartNeededPane.managedProperty().bind(restartNeededPane.visibleProperty());
         noFilesErrorPane.managedProperty().bind(noFilesErrorPane.visibleProperty());
         mainContainer.managedProperty().bind(mainContainer.visibleProperty());
         loadingIndicator.managedProperty().bind(loadingIndicator.visibleProperty());
@@ -107,14 +109,18 @@ public class AiChatView extends StackPane {
         followUpQuestionsArea.managedProperty().bind(followUpQuestionsArea.visibleProperty());
 
         BooleanBinding isAiTurnedOff = viewModel.stateProperty().isEqualTo(AiChatViewModel.State.AI_TURNED_OFF);
+        BooleanBinding isRestartNeeded = viewModel.stateProperty().isEqualTo(AiChatViewModel.State.RESTART_NEEDED);
         BooleanBinding isNoFiles = viewModel.stateProperty().isEqualTo(AiChatViewModel.State.NO_FILES);
         BooleanBinding isWaiting = viewModel.stateProperty().isEqualTo(AiChatViewModel.State.WAITING_FOR_MESSAGE);
         BooleanBinding isError = viewModel.stateProperty().isEqualTo(AiChatViewModel.State.ERROR);
         BooleanBinding isIdle = viewModel.stateProperty().isEqualTo(AiChatViewModel.State.IDLE);
 
         privacyNotice.visibleProperty().bind(isAiTurnedOff);
+        restartNeededPane.visibleProperty().bind(isRestartNeeded);
         noFilesErrorPane.visibleProperty().bind(isNoFiles);
-        mainContainer.visibleProperty().bind(isAiTurnedOff.not().and(isNoFiles.not()));
+        mainContainer.visibleProperty().bind(isAiTurnedOff.not()
+                                                          .and(isNoFiles.not())
+                                                          .and(isRestartNeeded.not()));
 
         loadingIndicator.visibleProperty().bind(isWaiting);
         transparentPane.visibleProperty().bind(isWaiting);

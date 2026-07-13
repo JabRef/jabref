@@ -220,17 +220,12 @@ public class SourceTab extends EntryEditorTab {
         sourceValidator.addRule(validationMessage);
 
         codeArea.focusedProperty().addListener((_, _, onFocus) -> {
-            if (!onFocus && (currentEntry != null)) {
-                storeSource(currentEntry, codeArea.textProperty().getValue());
+            if (!onFocus && (getCurrentEntry() != null)) {
+                storeSource(getCurrentEntry(), codeArea.textProperty().getValue());
             }
         });
         VirtualizedScrollPane<CodeArea> scrollableCodeArea = new VirtualizedScrollPane<>(codeArea);
         this.setContent(scrollableCodeArea);
-    }
-
-    @Override
-    public boolean shouldShow(BibEntry entry) {
-        return true;
     }
 
     private void updateCodeArea() {
@@ -244,7 +239,7 @@ public class SourceTab extends EntryEditorTab {
 
             codeArea.clear();
             try {
-                codeArea.appendText(getSourceString(currentEntry, mode, fieldPreferences));
+                codeArea.appendText(getSourceString(getCurrentEntry(), mode, fieldPreferences));
                 codeArea.setEditable(true);
                 Platform.runLater(this::highlightSearchPattern);
             } catch (IOException ex) {
@@ -265,8 +260,8 @@ public class SourceTab extends EntryEditorTab {
 
         updateCodeArea();
 
-        entry.typeProperty().addListener(listener -> updateCodeArea());
-        entry.getFieldsObservable().addListener((InvalidationListener) listener -> updateCodeArea());
+        entry.typeProperty().addListener(_ -> updateCodeArea());
+        entry.getFieldsObservable().addListener((InvalidationListener) _ -> updateCodeArea());
     }
 
     private void storeSource(BibEntry outOfFocusEntry, String text) {
@@ -379,7 +374,7 @@ public class SourceTab extends EntryEditorTab {
                 case SAVE_LIBRARY,
                      SAVE_ALL,
                      SAVE_LIBRARY_AS ->
-                        storeSource(currentEntry, codeArea.textProperty().getValue());
+                        storeSource(getCurrentEntry(), codeArea.textProperty().getValue());
             }
         });
     }

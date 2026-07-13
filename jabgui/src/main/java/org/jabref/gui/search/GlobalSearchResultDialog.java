@@ -18,7 +18,6 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -43,7 +42,6 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     @Inject private GuiPreferences preferences;
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
-    @Inject private ThemeManager themeManager;
     @Inject private TaskExecutor taskExecutor;
 
     public GlobalSearchResultDialog(UndoManager undoManager, LibraryTabContainer libraryTabContainer) {
@@ -65,7 +63,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         searchBarContainer.getChildren().addFirst(searchBar);
         HBox.setHgrow(searchBar, Priority.ALWAYS);
 
-        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor, stateManager.searchQueryProperty());
+        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor, stateManager.searchQueryProperty());
         previewViewer.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
         previewViewer.setDatabaseContext(viewModel.getSearchDatabaseContext());
 
@@ -78,30 +76,13 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
             if (newValue != null) {
                 previewViewer.setEntry(newValue.getEntry());
             } else {
-                previewViewer.setEntry(oldValue.getEntry());
+                previewViewer.clearEntry();
             }
         });
 
         Stage stage = (Stage) getDialogPane().getScene().getWindow();
 
-        resultsTable.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                BibEntryTableViewModel selectedEntry = resultsTable.getSelectionModel().getSelectedItem();
-                if (selectedEntry == null) {
-                    return;
-                }
-                libraryTabContainer.getLibraryTabs().stream()
-                                   .filter(tab -> tab.getBibDatabaseContext().equals(selectedEntry.getBibDatabaseContext()))
-                                   .findFirst()
-                                   .ifPresent(libraryTabContainer::showLibraryTab);
-
-                stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).set(stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).get());
-                stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(selectedEntry.getEntry()));
-                if (!keepOnTop.isSelected()) {
-                    stage.hide();
-                }
-            }
-        });
+        setupTableDoubleClickHandler(resultsTable, stage);
 
         container.getItems().addAll(resultsTable, previewViewer);
 
@@ -125,6 +106,27 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
             preferences.getSearchPreferences().setSearchWindowHeight(getHeight());
             preferences.getSearchPreferences().setSearchWindowWidth(getWidth());
             preferences.getSearchPreferences().setSearchWindowDividerPosition(container.getDividers().getFirst().getPosition());
+        });
+    }
+
+    private void setupTableDoubleClickHandler(SearchResultsTable resultsTable, Stage stage) {
+        resultsTable.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                BibEntryTableViewModel selectedEntry = resultsTable.getSelectionModel().getSelectedItem();
+                if (selectedEntry == null) {
+                    return;
+                }
+                libraryTabContainer.getLibraryTabs().stream()
+                                   .filter(tab -> tab.getBibDatabaseContext().equals(selectedEntry.getBibDatabaseContext()))
+                                   .findFirst()
+                                   .ifPresent(libraryTabContainer::showLibraryTab);
+
+                stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).set(stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).get());
+                stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(selectedEntry.getEntry()));
+                if (!keepOnTop.isSelected()) {
+                    stage.hide();
+                }
+            }
         });
     }
 }

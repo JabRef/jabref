@@ -398,6 +398,27 @@ class FileUtilTest {
     }
 
     @Test
+    void validFilenameShouldBeTruncatedWhenNameAloneFitsButNamePlusExtensionExceeds255() {
+        String longerThanLimitWithExtension = "1".repeat(252) + ".pdf";
+        String expectedTruncated = "1".repeat(251) + ".pdf";
+        assertEquals(255, expectedTruncated.length());
+        assertEquals(256, longerThanLimitWithExtension.length());
+        assertEquals(expectedTruncated, FileUtil.getValidFileName(longerThanLimitWithExtension));
+    }
+
+    @Test
+    void getValidFileNameDoesNotThrowForInvalidPathCharacters() {
+        String result = FileUtil.getValidFileName("a:b.pdf");
+        assertFalse(result.isEmpty());
+    }
+
+    @Test
+    void getValidFileNameDoesNotDuplicateExtensionForInvalidPath() {
+        String result = FileUtil.getValidFileName("invalid<>path.pdf");
+        assertFalse(result.endsWith(".pdf.pdf"));
+    }
+
+    @Test
     void getLinkedDirNameDefaultFullTitle() {
         String fileDirPattern = "PDF/[year]/[auth]/[citationkey] - [fulltitle]";
         BibEntry entry = new BibEntry();

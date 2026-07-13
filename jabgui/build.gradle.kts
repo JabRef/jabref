@@ -1,3 +1,5 @@
+import org.jabref.gradle.useLibericaJdkFull
+
 plugins {
     id("org.jabref.gradle.module")
     id("org.jabref.gradle.feature.shadowjar")
@@ -31,12 +33,51 @@ testModuleInfo {
     runtimeOnly("com.tngtech.archunit.junit5.engine")
 }
 
+// Opt-in (-PuseLibericaJdkFull=true): JavaFX comes from the JDK (e.g. Liberica Full), not from patched Maven jars.
+// The per-module opens/exports declared in org.jabref.gradle.base.dependency-rules.gradle.kts (javafx.base,
+// javafx.fxml, javafx.graphics, javafx.controls) are then lost and must be re-applied as JVM args here.
+// Qualified opens keep their original target module; unqualified opens/exports are reproduced for the
+// JabRef application module plus ALL-UNNAMED. If a runtime InaccessibleObjectException names another reader
+// module, append it (comma-separated) to the corresponding entry. (Flag: org.jabref.gradle.Toolchains)
+val useLibericaJdkFullJvmArgs = if (useLibericaJdkFull) listOf(
+    // javafx.base
+    "--add-exports", "javafx.base/com.sun.javafx.event=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.base/javafx.collections=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.base/javafx.collections.transformation=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.base/com.sun.javafx.beans=net.bytebuddy",
+    // javafx.fxml
+    "--add-opens", "javafx.fxml/javafx.fxml=org.jabref.jablib",
+    // javafx.graphics
+    "--add-exports", "javafx.graphics/com.sun.javafx.scene=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.graphics/javafx.scene=org.controlsfx.controls",
+    // javafx.controls
+    "--add-opens", "javafx.controls/javafx.scene.control=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.controls/javafx.scene.control.cell=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.controls/javafx.scene.control.skin=org.jabref,ALL-UNNAMED",
+    "--add-exports", "javafx.controls/com.sun.javafx.scene.control=org.jabref,ALL-UNNAMED",
+    "--add-opens", "javafx.controls/com.sun.javafx.scene.control=org.jabref,ALL-UNNAMED"
+) else emptyList()
+
+// Compile-time counterpart of the JavaFX --add-exports above. When JavaFX is patched Maven jars, those
+// internal com.sun.javafx.* packages are exported via the metadata patches in dependency-rules; when JavaFX
+// comes from the JDK those patches are inert, so javac needs the exports too. Only the exports are required
+// at compile time (--add-opens is reflection-only and applies at runtime via the JVM args above).
+val useLibericaJdkFullCompilerArgs = if (useLibericaJdkFull) listOf(
+    "--add-exports", "javafx.base/com.sun.javafx.event=org.jabref",
+    "--add-exports", "javafx.graphics/com.sun.javafx.scene=org.jabref",
+    "--add-exports", "javafx.controls/com.sun.javafx.scene.control=org.jabref"
+) else emptyList()
+
+tasks.named<JavaCompile>("compileJava") {
+    options.compilerArgs.addAll(useLibericaJdkFullCompilerArgs)
+}
+
 application {
     mainClass= "org.jabref.Launcher"
 
-    applicationDefaultJvmArgs = listOf(
+    applicationDefaultJvmArgs = useLibericaJdkFullJvmArgs + listOf(
         "--add-modules", "jdk.incubator.vector",
-        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,jkeychain",
+        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,org.apache.lucene.core,jkeychain",
 
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
         // https://github.com/uncomplicate/neanderthal/issues/55
@@ -168,11 +209,11 @@ tasks.test {
 
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
-        "--enable-native-access=javafx.graphics,javafx.web,com.sun.jna"
+        "--enable-native-access=javafx.graphics,com.sun.jna"
 
         // "--add-reads", "org.mockito=java.prefs",
         // "--add-reads", "org.jabref=wiremock"
-    )
+    ) + useLibericaJdkFullJvmArgs
 
     maxParallelForks = 1
 }

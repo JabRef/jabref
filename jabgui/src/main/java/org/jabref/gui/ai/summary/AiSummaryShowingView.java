@@ -1,5 +1,7 @@
 package org.jabref.gui.ai.summary;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -14,13 +16,14 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.scene.web.WebView;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.gui.util.WebViewStore;
+import org.jabref.htmltonode.HtmlRenderOptions;
+import org.jabref.htmltonode.rich.RichHtmlView;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
@@ -30,12 +33,17 @@ import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AiSummaryShowingView extends VBox {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiSummaryShowingView.class);
+
     @FXML private CheckBox markdownCheckbox;
     @FXML private Text summaryInfoText;
 
-    private WebView webView;
+    private RichHtmlView htmlView;
 
     private AiSummaryShowingViewModel viewModel;
 
@@ -83,17 +91,29 @@ public class AiSummaryShowingView extends VBox {
                 entryTypesManager,
                 dialogService
         );
-        initializeWebView();
+        initializeSummaryView();
 
         setupBindings();
         setupListeners();
     }
 
-    private void initializeWebView() {
-        webView = WebViewStore.get();
-        VBox.setVgrow(webView, Priority.ALWAYS);
+    private void initializeSummaryView() {
+        // RichHtmlView scrolls itself - no surrounding ScrollPane
+        htmlView = new RichHtmlView();
+        htmlView.setOptions(HtmlRenderOptions.defaults().withLinkHandler(this::openLink));
+        VBox.setVgrow(htmlView, Priority.ALWAYS);
 
-        getChildren().addFirst(webView);
+        getChildren().addFirst(htmlView);
+    }
+
+    private void openLink(String href) {
+        try {
+            NativeDesktop.openBrowser(href, preferences.getExternalApplicationsPreferences());
+        } catch (MalformedURLException exception) {
+            LOGGER.error("Invalid URL", exception);
+        } catch (IOException e) {
+            LOGGER.error("Could not open URL: {}", href, e);
+        }
     }
 
     private void setupBindings() {
@@ -106,7 +126,7 @@ public class AiSummaryShowingView extends VBox {
         BindingsHelper.listen(
                 viewModel.webViewSourceProperty(),
                 value -> UiTaskExecutor.runInJavaFXThread(() ->
-                        webView.getEngine().loadContent(StringUtil.makeSafe(value)))
+                        htmlView.setHtml(StringUtil.makeSafe(value)))
         );
     }
 

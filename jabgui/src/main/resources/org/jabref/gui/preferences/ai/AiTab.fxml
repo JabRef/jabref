@@ -182,7 +182,7 @@
         <HBox>
             <Region HBox.hgrow="ALWAYS"/>
             <Label text="%The size of the embedding model could be smaller than written in the list."
-                   style="-fx-font-style: italic;"/>
+                   styleClass="italic"/>
         </HBox>
 
         <Spacer/>
@@ -402,9 +402,9 @@
     <HBox alignment="CENTER_LEFT"
           spacing="10.0">
         <Label alignment="BASELINE_CENTER"
-               text="%Default answer engine"/>
+               text="%Default response engine"/>
         <ComboBox
-                fx:id="answerEngineComboBox"
+                fx:id="responseEngineComboBox"
                 maxWidth="200"/>
     </HBox>
 

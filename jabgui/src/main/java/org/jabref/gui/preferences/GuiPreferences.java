@@ -6,6 +6,7 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.edit.CopyToPreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
+import org.jabref.gui.fieldeditors.identifier.MathSciNetPreferences;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.groups.GroupsPreferences;
@@ -17,6 +18,7 @@ import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.newentry.NewEntryPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
+import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.push.PushToApplicationPreferences;
 
@@ -60,4 +62,8 @@ public interface GuiPreferences extends CliPreferences {
     NewEntryPreferences getNewEntryPreferences();
 
     DonationPreferences getDonationPreferences();
+
+    MrDlibPreferences getMrDlibPreferences();
+
+    MathSciNetPreferences getMathSciNetPreferences();
 }
