@@ -9,7 +9,11 @@ import javafx.collections.ModifiableObservableListBase;
 
 import org.jabref.logic.util.JabRefBaseDirectoryLocator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class FileHistory extends ModifiableObservableListBase<Path> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileHistory.class);
 
     private static final int HISTORY_SIZE = 8;
 
@@ -68,6 +72,9 @@ public class FileHistory extends ModifiableObservableListBase<Path> {
             }
             try {
                 this.remove(baseDirectoryPath.relativize(file).normalize());
+            } catch (IllegalArgumentException e) {
+                LOGGER.warn("Could not relativize file path: {}", file, e);
+                return;
             }
 
             return;
