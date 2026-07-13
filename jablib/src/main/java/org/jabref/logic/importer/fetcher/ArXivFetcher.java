@@ -383,7 +383,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     /// standard literature database for high-energy physics) and adopt its curated texkey instead.
     ///
     /// A "real" key means anything other than absent or URL-shaped: when no manually-assigned
-    /// (journal) DOI is found to provide a "nicer" key (see {@link #CHOSEN_MANUAL_DOI_FIELDS}),
+    /// (journal) DOI is found to provide a "nicer" key (see [#CHOSEN_MANUAL_DOI_FIELDS]),
     /// [BibEntry#mergeWith] still copies over whatever citation key the *automatically*-assigned
     /// arXiv DOI's metadata suggests — which for arXiv-only preprints is typically just that DOI's
     /// URL, e.g. `https://doi.org/10.48550/arxiv.1405.2249`. That is treated the same as no key at all.
@@ -392,7 +392,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     /// the entry is simply left with whatever citation key (if any) it already had.
     ///
     /// @param entry The fetched arXiv entry to infuse, modified in place. Its EPRINT field
-    ///              (already normalized by {@link ArXiv#performSearchById}) is used for the lookup.
+    ///              (already normalized by [ArXiv#performSearchById]) is used for the lookup.
     private void infuseWithInspireCitationKeyIfMissing(BibEntry entry) {
         if (entry.getCitationKey().filter(key -> !isUrlShaped(key)).isPresent()) {
             return;
