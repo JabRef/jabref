@@ -235,10 +235,7 @@ open module org.jabref.jablib {
     requires com.github.benmanes.caffeine;
     // endregion
 
-    // region: latex2unicode
-    requires com.github.tomtung.latex2unicode;
-    requires fastparse;
-    // endregion
+    requires org.jabref.latexconv;
 
     requires jbibtex;
     requires transitive citeproc.java;
