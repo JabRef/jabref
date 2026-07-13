@@ -1,3 +1,6 @@
+# Taken from the Hayagriva test suite: https://github.com/typst/hayagriva/blob/main/tests/data/basic.yml
+# Copyright (c) the Hayagriva contributors, licensed under MIT OR Apache-2.0.
+# See external-libraries.md in the repository root.
 zygos:
     type: Article
     author:
