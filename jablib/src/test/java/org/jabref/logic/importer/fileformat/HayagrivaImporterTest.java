@@ -81,21 +81,21 @@ class HayagrivaImporterTest {
                 Arguments.of("basicFields",
                         new BibEntry(StandardEntryType.Article)
                                 .withCitationKey("test")
-                                .withField(StandardField.AUTHOR, "Test Author")
+                                .withField(StandardField.AUTHOR, "Author, Test")
                                 .withField(StandardField.TITLE, "Test Title")
                                 .withField(StandardField.URL, "http://example.com")
                                 .withField(StandardField.DATE, "2020-10-14")),
                 Arguments.of("multipleAuthors",
                         new BibEntry(StandardEntryType.Article)
                                 .withCitationKey("test")
-                                .withField(StandardField.AUTHOR, "Test Author and Other One")
+                                .withField(StandardField.AUTHOR, "Author, Test and One, Other")
                                 .withField(StandardField.TITLE, "Test Title")
                                 .withField(StandardField.URL, "http://example.com")
                                 .withField(StandardField.DATE, "2020-10-14")),
                 Arguments.of("doi",
                         new BibEntry(StandardEntryType.Article)
                                 .withCitationKey("test")
-                                .withField(StandardField.AUTHOR, "Test Author")
+                                .withField(StandardField.AUTHOR, "Author, Test")
                                 .withField(StandardField.TITLE, "Test Title")
                                 .withField(StandardField.URL, "http://example.com")
                                 .withField(StandardField.DATE, "2020-10-14")
@@ -103,7 +103,7 @@ class HayagrivaImporterTest {
                 Arguments.of("isbn",
                         new BibEntry(StandardEntryType.Book)
                                 .withCitationKey("test")
-                                .withField(StandardField.AUTHOR, "Test Author")
+                                .withField(StandardField.AUTHOR, "Author, Test")
                                 .withField(StandardField.TITLE, "Test Book")
                                 .withField(StandardField.URL, "http://example.com")
                                 .withField(StandardField.DATE, "2020-10-14")
@@ -111,7 +111,7 @@ class HayagrivaImporterTest {
                 Arguments.of("issn",
                         new BibEntry(StandardEntryType.Article)
                                 .withCitationKey("test")
-                                .withField(StandardField.AUTHOR, "Test Author")
+                                .withField(StandardField.AUTHOR, "Author, Test")
                                 .withField(StandardField.TITLE, "Test Article")
                                 .withField(StandardField.URL, "http://example.com")
                                 .withField(StandardField.DATE, "2020-10-14")
@@ -119,11 +119,27 @@ class HayagrivaImporterTest {
                 Arguments.of("journalAsParentTitle",
                         new BibEntry(StandardEntryType.Article)
                                 .withCitationKey("test")
-                                .withField(StandardField.AUTHOR, "Test Author")
+                                .withField(StandardField.AUTHOR, "Author, Test")
                                 .withField(StandardField.TITLE, "Test Title")
                                 .withField(StandardField.JOURNAL, "Test Publisher")
                                 .withField(StandardField.URL, "http://example.com")
-                                .withField(StandardField.DATE, "2020-10-14"))
+                                .withField(StandardField.DATE, "2020-10-14")),
+                Arguments.of("affiliatedRuntimeAndTotals",
+                        new BibEntry(StandardEntryType.Misc)
+                                .withCitationKey("test")
+                                .withField(StandardField.TITLE, "Test Film")
+                                .withField(StandardField.DATE, "1991-07-01")
+                                .withField(StandardField.VOLUME, "4")
+                                .withField(StandardField.CHAPTER, "3")
+                                .withField(StandardField.LANGUAGE, "de-DE")
+                                .withField(StandardField.PAGETOTAL, "137")
+                                .withField(StandardField.VOLUMES, "5")
+                                .withField(StandardField.PMID, "12345678")
+                                .withField(StandardField.TRANSLATOR, "Translator, Test")
+                                .withField(new UnknownField("director"), "Cameron, James")
+                                .withField(new UnknownField("cast-member"), "Schwarzenegger, Arnold and Hamilton, Linda")
+                                .withField(new UnknownField("runtime"), "137:00")
+                                .withField(new UnknownField("time-range"), "17:05-17:48"))
         );
     }
 
@@ -138,7 +154,7 @@ class HayagrivaImporterTest {
     void isRecognizedFormatReturnsTrueForValidHayagrivaYaml(@TempDir Path tempDir) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
-                .withField(StandardField.AUTHOR, "Test Author")
+                .withField(StandardField.AUTHOR, "Author, Test")
                 .withField(StandardField.TITLE, "Test Title")
                 .withField(StandardField.URL, "http://example.com")
                 .withField(StandardField.DATE, "2020-10-14");
@@ -191,7 +207,7 @@ class HayagrivaImporterTest {
     void importsArticleWithFormattableTitleAndProceedingsParent() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("zygos")
-                .withField(StandardField.AUTHOR, "George Prekas and Marios Kogias and Edouard Bugnion")
+                .withField(StandardField.AUTHOR, "Prekas, George and Kogias, Marios and Bugnion, Edouard")
                 .withField(StandardField.TITLE, "ZygOS: Achieving Low Tail Latency for Microsecond-Scale Networked Tasks")
                 .withField(StandardField.DATE, "2017")
                 .withField(StandardField.PAGES, "325-341")
@@ -204,7 +220,7 @@ class HayagrivaImporterTest {
     void importsArticleWithUntypedPeriodicalParent() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("kinetics")
-                .withField(StandardField.AUTHOR, "T. D. Doan and D. B. Tran Thoai and Hartmut Haug")
+                .withField(StandardField.AUTHOR, "Doan, T. D. and Tran Thoai, D. B. and Haug, Hartmut")
                 .withField(StandardField.TITLE, "Kinetics and luminescence of the excitations of a nonequilibrium polariton condensate")
                 .withField(StandardField.DATE, "2020-10-14")
                 .withField(StandardField.PAGES, "165126-165139")
@@ -231,7 +247,7 @@ class HayagrivaImporterTest {
     void importsWebEntryWithStructuredAuthor() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Online)
                 .withCitationKey("science-e-issue")
-                .withField(StandardField.AUTHOR, "Laurenz Mädje")
+                .withField(StandardField.AUTHOR, "Mädje, Laurenz")
                 .withField(StandardField.TITLE, "Tokenization of + and - with scientific notation")
                 .withField(StandardField.URL, "https://github.com/typst/typstc/issues/3")
                 .withField(StandardField.DATE, "2020-07-18")
@@ -254,9 +270,9 @@ class HayagrivaImporterTest {
                 .withField(StandardField.TITLE, "Terminator 2: Judgment Day")
                 .withField(StandardField.PUBLISHER, "Carolco Pictures; Pacific Western Productions; Lightstorm Entertainment; Le Studio Canal+ S.A.")
                 .withField(StandardField.DATE, "1991-07-01")
-                .withField(new UnknownField("director"), "James Cameron")
-                .withField(new UnknownField("cast-member"), "Arnold Schwarzenegger and Linda Hamilton and Robert Patrick")
-                .withField(new UnknownField("composer"), "Brad Fiedel")
+                .withField(new UnknownField("director"), "Cameron, James")
+                .withField(new UnknownField("cast-member"), "Schwarzenegger, Arnold and Hamilton, Linda and Patrick, Robert")
+                .withField(new UnknownField("composer"), "Fiedel, Brad")
                 .withField(new UnknownField("runtime"), "137:00")
                 .withField(new UnknownField("time-range"), "17:05-17:48");
         assertEquals(Optional.of(expected), importBasicYml().getDatabase().getEntryByCitationKey("terminator-2"));

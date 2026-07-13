@@ -58,7 +58,7 @@ public class HayagrivaImporter extends Importer {
     );
 
     /// All entry types of the Hayagriva specification; used for format recognition. Types without
-    /// a BibTeX equivalent in {@link #TYPES_MAP} are imported as {@link StandardEntryType#Misc}.
+    /// a BibTeX equivalent in [#TYPES_MAP] are imported as [StandardEntryType#Misc].
     private static final Set<String> RECOGNIZED_TYPES = Set.of(
             "anthology", "anthos", "article", "artwork", "audio", "blog", "book", "case",
             "chapter", "conference", "entry", "exhibition", "legislation", "manuscript", "misc",
@@ -229,24 +229,17 @@ public class HayagrivaImporter extends Importer {
         return formatted.isEmpty() ? Optional.empty() : Optional.of(formatted);
     }
 
+    /// Hayagriva person strings already use BibTeX's structured "Family, Given" form and are kept
+    /// verbatim; the structured map form is converted to it.
     private Optional<String> formatPerson(JsonNode personNode) {
         if (personNode.isObject()) {
             // Structured form: `name` is the family name, next to optional `given-name`, `prefix`, `suffix`, `alias`
             return scalarText(personNode.get("name"))
                     .map(name -> scalarText(personNode.get("given-name"))
-                            .map(givenName -> givenName + " " + name)
+                            .map(givenName -> name + ", " + givenName)
                             .orElse(name));
         }
-        return scalarText(personNode).map(HayagrivaImporter::formatPersonName);
-    }
-
-    /// Hayagriva person strings use "Family, Given"; convert to the "Given Family" form.
-    private static String formatPersonName(String hayagrivaName) {
-        String[] parts = hayagrivaName.split(",", 2);
-        if (parts.length == 2) {
-            return parts[1].trim() + " " + parts[0].trim();
-        }
-        return hayagrivaName.trim();
+        return scalarText(personNode);
     }
 
     /// Returns the text of a scalar node (string, number, boolean); empty for containers and null.
@@ -293,11 +286,11 @@ public class HayagrivaImporter extends Importer {
         return StandardFileType.YAML;
     }
 
-    /// Lightweight recognition for the {@link BufferedReader} overload, which must reset the
-    /// reader afterwards. Instead of doing a full YAML parse (which could read past the marked
-    /// read-ahead limit and make {@code reset()} throw), this scans at most
-    /// {@link #MAX_LOOKAHEAD_LINES} lines / {@link #MAX_LOOKAHEAD_CHARS} characters for a
-    /// {@code type:} key matching a known Hayagriva entry type.
+    /// Lightweight recognition for the [BufferedReader] overload, which must reset the reader
+    /// afterwards. Instead of doing a full YAML parse (which could read past the marked
+    /// read-ahead limit and make `reset()` throw), this scans at most [#MAX_LOOKAHEAD_LINES]
+    /// lines / [#MAX_LOOKAHEAD_CHARS] characters for a `type:` key matching a known Hayagriva
+    /// entry type.
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
         input.mark(MAX_LOOKAHEAD_CHARS);
@@ -325,8 +318,8 @@ public class HayagrivaImporter extends Importer {
         }
     }
 
-    /// Full recognition for the {@link Reader} overload, which has no reset requirement, so a
-    /// complete (but untyped) YAML parse is safe here.
+    /// Full recognition for the [Reader] overload, which has no reset requirement, so a complete
+    /// (but untyped) YAML parse is safe here.
     @Override
     public boolean isRecognizedFormat(Reader input) throws IOException {
         JsonNode root;

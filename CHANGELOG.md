@@ -41,6 +41,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- The Hayagriva YAML exporter now also writes chapter, volume, page/volume totals, language, runtime, time range, PMID, and affiliated persons (director, translator, ...), matching what the new importer reads. [#15714](https://github.com/JabRef/jabref/issues/15714)
 - We increased the size of arrow buttons in the Entry Preview preferences tab to improve visibility. [#16028](https://github.com/JabRef/jabref/issues/16028)
 - We now render the entry preview with regular JavaFX components instead of an embedded browser. Text in the preview can be selected with mouse and keyboard and copied; without a selection, "Copy selection" copies the whole preview. [#16145](https://github.com/JabRef/jabref/pull/16145)
 - We replaced the "MathSciNet Review" entry editor tab by identifier support for the "MR Number" field: a button next to the field opens the MathSciNet page in the web browser. [#16145](https://github.com/JabRef/jabref/pull/16145)
