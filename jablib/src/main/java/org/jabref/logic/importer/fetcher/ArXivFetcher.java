@@ -374,7 +374,49 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         if (this.doiFetcher != null) {
             inplaceAsyncInfuseArXivWithDoi(arXivBibEntryPromise, ArXivIdentifier.parse(identifier));
         }
-        return arXivBibEntryPromise.join();
+        Optional<BibEntry> result = arXivBibEntryPromise.join();
+        result.ifPresent(this::infuseWithInspireCitationKeyIfMissing);
+        return result;
+    }
+
+    /// If the entry has no "real" citation key yet, try to look up the paper on INSPIRE (the
+    /// standard literature database for high-energy physics) and adopt its curated texkey instead.
+    ///
+    /// A "real" key means anything other than absent or URL-shaped: when no manually-assigned
+    /// (journal) DOI is found to provide a "nicer" key (see {@link #CHOSEN_MANUAL_DOI_FIELDS}),
+    /// [BibEntry#mergeWith] still copies over whatever citation key the *automatically*-assigned
+    /// arXiv DOI's metadata suggests — which for arXiv-only preprints is typically just that DOI's
+    /// URL, e.g. `https://doi.org/10.48550/arxiv.1405.2249`. That is treated the same as no key at all.
+    ///
+    /// Most arXiv categories aren't indexed by INSPIRE, so a miss here is expected, not an error —
+    /// the entry is simply left with whatever citation key (if any) it already had.
+    ///
+    /// @param entry The fetched arXiv entry to infuse, modified in place. Its EPRINT field
+    ///              (already normalized by {@link ArXiv#performSearchById}) is used for the lookup.
+    private void infuseWithInspireCitationKeyIfMissing(BibEntry entry) {
+        if (entry.getCitationKey().filter(key -> !isUrlShaped(key)).isPresent()) {
+            return;
+        }
+        Optional<String> eprint = entry.getField(StandardField.EPRINT);
+        if (eprint.isEmpty()) {
+            return;
+        }
+        try {
+            // INSPIREFetcher only recognizes the lowercase "arxiv" value for this field
+            BibEntry inspireQuery = new BibEntry()
+                    .withField(StandardField.ARCHIVEPREFIX, "arxiv")
+                    .withField(StandardField.EPRINT, eprint.get());
+            new INSPIREFetcher(importFormatPreferences).performSearch(inspireQuery).stream()
+                                                        .findFirst()
+                                                        .flatMap(BibEntry::getCitationKey)
+                                                        .ifPresent(entry::setCitationKey);
+        } catch (FetcherException e) {
+            LOGGER.debug("Could not look up an INSPIRE texkey for arXiv ID '{}' (paper may not be indexed by INSPIRE)", eprint.get(), e);
+        }
+    }
+
+    private static boolean isUrlShaped(String key) {
+        return key.startsWith("http://") || key.startsWith("https://");
     }
 
     @Override

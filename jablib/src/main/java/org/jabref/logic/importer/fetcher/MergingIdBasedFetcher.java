@@ -101,11 +101,28 @@ public class MergingIdBasedFetcher {
         entryFromLibrary.getFields().forEach(field ->
                 entryFromLibrary.getField(field)
                                 .ifPresent(value -> mergedEntry.setField(field, value)));
+        entryFromLibrary.getCitationKey().ifPresent(mergedEntry::setCitationKey);
 
         Set<Field> updatedFields = updateFieldsFromSource(fetchedEntry, mergedEntry);
+        boolean citationKeyUpdated = updateCitationKeyFromSource(fetchedEntry, mergedEntry);
 
         return new FetcherResult(entryFromLibrary, mergedEntry,
-                !updatedFields.isEmpty(), updatedFields);
+                !updatedFields.isEmpty() || citationKeyUpdated, updatedFields);
+    }
+
+    /// Carries the fetcher-provided citation key (e.g. an INSPIRE texkey) onto the merged entry,
+    /// but only if the library entry didn't already have one — an existing key is never overwritten here.
+    private boolean updateCitationKeyFromSource(BibEntry sourceEntry, BibEntry targetEntry) {
+        if (targetEntry.getCitationKey().isPresent()) {
+            return false;
+        }
+        return sourceEntry.getCitationKey()
+                          .filter(key -> !key.isBlank())
+                          .map(key -> {
+                              targetEntry.setCitationKey(key);
+                              return true;
+                          })
+                          .orElse(false);
     }
 
     private Set<Field> updateFieldsFromSource(BibEntry sourceEntry,
