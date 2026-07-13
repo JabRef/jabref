@@ -63,8 +63,8 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
     }
 
     public TextBasedPreviewLayout(String text,
-                                @NonNull LayoutFormatterPreferences layoutFormatterPreferences,
-                                @NonNull JournalAbbreviationRepository abbreviationRepository) {
+                                  @NonNull LayoutFormatterPreferences layoutFormatterPreferences,
+                                  @NonNull JournalAbbreviationRepository abbreviationRepository) {
         this(Localization.lang("Customized preview style"), text, layoutFormatterPreferences, abbreviationRepository);
     }
 

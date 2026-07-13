@@ -39,20 +39,20 @@ public sealed interface PreviewLayout permits BstPreviewLayout, CitationStylePre
                             BibEntryTypesManager entryTypesManager) {
         if (CSLStyleUtils.isCitationStyleFile(layout)) {
             return CSLStyleUtils.createCitationStyleFromFile(layout)
-                    .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file, entryTypesManager))
-                    .orElse(null);
+                                .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file, entryTypesManager))
+                                .orElse(null);
         }
         if (BstPreviewLayout.isBstStyleFile(layout)) {
             return bstLayoutPaths.stream()
-                    .filter(path -> path.endsWith(layout))
-                    .map(BstPreviewLayout::new)
-                    .findFirst()
-                    .orElse(null);
+                                 .filter(path -> path.endsWith(layout))
+                                 .map(BstPreviewLayout::new)
+                                 .findFirst()
+                                 .orElse(null);
         } else {
             return customPreviewLayouts.stream()
-                    .filter(customLayout -> customLayout.getName().equals(layout))
-                    .findFirst()
-                    .orElse(null);
+                                       .filter(customLayout -> customLayout.getName().equals(layout))
+                                       .findFirst()
+                                       .orElse(null);
         }
     }
 }
