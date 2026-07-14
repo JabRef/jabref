@@ -74,7 +74,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
 
         String searchQuery = buildSearchQuery(entry);
         if (StringUtil.isBlank(searchQuery)) {
-            throw new ZbMathNoUrlException("No searchable fields found for zbMATH");
+            throw new FetcherException("No searchable fields found for zbMATH");
         }
         return getURLForSearchQuery(searchQuery, "1");
     }
@@ -108,17 +108,10 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
 
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
-        try {
-            return EntryBasedParserFetcher.super.performSearch(entry);
-        } catch (ZbMathNoUrlException e) {
+        if (entry.getField(StandardField.ZBL_NUMBER).isEmpty() && StringUtil.isBlank(buildSearchQuery(entry))) {
             return List.of();
         }
-    }
-
-    public static class ZbMathNoUrlException extends FetcherException {
-        public ZbMathNoUrlException(String errorMessage) {
-            super(errorMessage);
-        }
+        return EntryBasedParserFetcher.super.performSearch(entry);
     }
 
     private URL getURLForSearchQuery(String searchQuery, String resultCount)
@@ -199,10 +192,16 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
 
     private StandardEntryType toEntryType(JSONObject entryJson) {
         JSONObject documentType = entryJson.optJSONObject("document_type");
-        if (documentType != null && "j".equals(documentType.optString("code"))) {
-            return StandardEntryType.Article;
+        if (documentType == null) {
+            return StandardEntryType.Misc;
         }
-        return StandardEntryType.Misc;
+        return switch (documentType.optString("code")) {
+            case "j" -> StandardEntryType.Article;
+            case "a" -> StandardEntryType.InCollection;
+            case "b" -> StandardEntryType.Book;
+            case "p" -> StandardEntryType.Unpublished;
+            default -> StandardEntryType.Misc;
+        };
     }
 
     private void putAuthors(BibEntry entry, JSONObject entryJson) {
@@ -226,6 +225,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         Optional.ofNullable(entryJson.optJSONObject("source"))
                 .ifPresent(source -> {
                     putPages(entry, source);
+                    putBookSource(entry, source);
                     JSONArray series = source.optJSONArray("series");
                     if (series != null && !series.isEmpty()) {
                         JSONObject firstSeries = series.optJSONObject(0);
@@ -240,6 +240,35 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
                         }
                     }
                 });
+    }
+
+    private void putBookSource(BibEntry entry, JSONObject source) {
+        JSONArray books = source.optJSONArray("book");
+        if (books == null || books.isEmpty()) {
+            return;
+        }
+
+        JSONObject firstBook = books.optJSONObject(0);
+        if (firstBook == null) {
+            return;
+        }
+
+        if (entry.getType() == StandardEntryType.InCollection) {
+            Optional.of(source.optString("source"))
+                    .filter(value -> !StringUtil.isBlank(value))
+                    .ifPresent(value -> entry.withField(StandardField.BOOKTITLE, value));
+        }
+
+        Optional.ofNullable(firstBook.optJSONArray("isbn"))
+                .filter(isbnEntries -> !isbnEntries.isEmpty())
+                .map(isbnEntries -> isbnEntries.optJSONObject(0))
+                .ifPresent(firstIsbn -> Optional.of(firstIsbn.optString("number"))
+                        .filter(value -> !StringUtil.isBlank(value))
+                        .ifPresent(value -> entry.withField(StandardField.ISBN, value)));
+
+        Optional.of(firstBook.optString("publisher"))
+                .filter(value -> !StringUtil.isBlank(value))
+                .ifPresent(value -> entry.withField(StandardField.PUBLISHER, value));
     }
 
     private void putPages(BibEntry entry, JSONObject source) {
