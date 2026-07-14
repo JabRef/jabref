@@ -94,7 +94,7 @@ class ZbMATHTest {
         String expectedUrl = "https://api.zbmath.org/v1/document/_search"
                 + "?search_string=ti%3A%22An%20application%20of%20gauge%20theory"
                 + "%20to%20four%20dimensional%20topology%22%20%26%20au%3ADonaldson"
-                + "&page=0&results_per_page=1";
+                + "&page=0&results_per_page=5";
         assertEquals(expectedUrl, urlForEntry.toString());
     }
 
@@ -225,6 +225,38 @@ class ZbMATHTest {
                 .withField(StandardField.PUBLISHER, "Cheltenham: Edward Elgar Publishing")
                 .withField(StandardField.ISBN, "978-1-84720-148-5")
                 .withField(new UnknownField("zbmath"), "7088115");
+        assertEquals(List.of(expected), entries);
+    }
+
+    @Test
+    void parserIgnoresUnsupportedIdType() throws ParseException {
+        String response = """
+                {
+                  "result": {
+                    "document_type": {"code": "j", "description": "journal article"},
+                    "id": {"unexpected": 1},
+                    "identifier": "0507.57010",
+                    "year": "1983",
+                    "contributors": {
+                      "authors": [
+                        {"name": "Donaldson, S. K."}
+                      ]
+                    },
+                    "language": {"languages": ["English"]},
+                    "title": {"title": "An application of gauge theory to four dimensional topology"}
+                  },
+                  "status": {"status_code": 200}
+                }
+                """;
+
+        List<BibEntry> entries = fetcher.getParser().parseEntries(new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8)));
+
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Donaldson, S. K.")
+                .withField(StandardField.TITLE, "An application of gauge theory to four dimensional topology")
+                .withField(StandardField.YEAR, "1983")
+                .withField(StandardField.ZBL_NUMBER, "0507.57010")
+                .withField(StandardField.LANGUAGE, "English");
         assertEquals(List.of(expected), entries);
     }
 

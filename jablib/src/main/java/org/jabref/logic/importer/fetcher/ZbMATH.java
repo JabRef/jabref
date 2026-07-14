@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -7,6 +8,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
@@ -21,6 +25,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.ZbMathQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
+import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -40,6 +45,13 @@ import org.jspecify.annotations.NullMarked;
 /// Fetches data from the Zentralblatt Math (https://www.zbmath.org/)
 @NullMarked
 public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, EntryBasedParserFetcher {
+    private static final Pattern NON_ALNUM_OR_SPACE_PATTERN = Pattern.compile("[^\\p{IsAlphabetic}\\p{IsDigit}\\s]");
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
+    private static final int ENTRY_SEARCH_RESULT_COUNT = 5;
+    private static final double MIN_CONFIDENCE = 0.75;
+    private static final double MIN_TITLE_SIMILARITY = 0.85;
+    private static final double MIN_AUTHOR_OVERLAP = 0.5;
+    private static final double AMBIGUITY_DELTA = 0.05;
 
     // The zbMATH REST document API is documented at:
     // https://github.com/zbMATHOpen/zbRestApiClient/blob/master/docs/DocumentApi.md
@@ -76,7 +88,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         if (StringUtil.isBlank(searchQuery)) {
             throw new FetcherException("No searchable fields found for zbMATH");
         }
-        return getURLForSearchQuery(searchQuery, "1");
+        return getURLForSearchQuery(searchQuery, String.valueOf(ENTRY_SEARCH_RESULT_COUNT));
     }
 
     @Override
@@ -108,10 +120,26 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
 
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
-        if (entry.getField(StandardField.ZBL_NUMBER).isEmpty() && StringUtil.isBlank(buildSearchQuery(entry))) {
+        if (entry.getField(StandardField.ZBL_NUMBER).isPresent()) {
+            return EntryBasedParserFetcher.super.performSearch(entry);
+        }
+
+        String searchQuery = buildSearchQuery(entry);
+        if (StringUtil.isBlank(searchQuery)) {
             return List.of();
         }
-        return EntryBasedParserFetcher.super.performSearch(entry);
+
+        URL urlForQuery;
+        try {
+            urlForQuery = getURLForSearchQuery(searchQuery, String.valueOf(ENTRY_SEARCH_RESULT_COUNT));
+        } catch (URISyntaxException | MalformedURLException e) {
+            throw new FetcherException("Search URI is malformed", e);
+        }
+
+        List<BibEntry> candidates = getBibEntries(urlForQuery);
+        return findBestMatchingEntry(entry, candidates)
+                .map(List::of)
+                .orElse(List.of());
     }
 
     private URL getURLForSearchQuery(String searchQuery, String resultCount)
@@ -180,8 +208,12 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         Optional.of(entryJson.optString("identifier"))
                 .filter(value -> !StringUtil.isBlank(value))
                 .ifPresent(value -> entry.withField(StandardField.ZBL_NUMBER, value));
-        if (entryJson.has("id")) {
-            entry.withField(new UnknownField("zbmath"), String.valueOf(entryJson.getInt("id")));
+        Object idValue = entryJson.opt("id");
+        if (idValue instanceof Number || idValue instanceof String) {
+            String zbmathId = String.valueOf(idValue);
+            if (!StringUtil.isBlank(zbmathId)) {
+                entry.withField(new UnknownField("zbmath"), zbmathId);
+            }
         }
 
         Optional.ofNullable(entryJson.optJSONObject("contributors"))
@@ -320,5 +352,124 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
                 }
             }
         }
+    }
+
+    private List<BibEntry> getBibEntries(URL urlForQuery) throws FetcherException {
+        try (InputStream stream = getUrlDownload(urlForQuery).asInputStream()) {
+            List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
+            fetchedEntries.forEach(this::doPostCleanup);
+            return fetchedEntries;
+        } catch (IOException e) {
+            if (e.getCause() instanceof FetcherException fetcherException) {
+                throw fetcherException;
+            }
+            throw new FetcherException(urlForQuery, "A network error occurred", e);
+        } catch (ParseException e) {
+            throw new FetcherException(urlForQuery, "An internal parser error occurred while fetching", e);
+        }
+    }
+
+    private Optional<BibEntry> findBestMatchingEntry(BibEntry inputEntry, List<BibEntry> candidates) {
+        if (candidates.isEmpty()) {
+            return Optional.empty();
+        }
+
+        List<ScoredEntry> scoredEntries = candidates.stream()
+                                                    .map(candidate -> new ScoredEntry(candidate, scoreCandidate(inputEntry, candidate)))
+                                                    .filter(scoredEntry -> scoredEntry.score >= MIN_CONFIDENCE)
+                                                    .sorted((left, right) -> Double.compare(right.score, left.score))
+                                                    .toList();
+        if (scoredEntries.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if (scoredEntries.size() > 1 && Math.abs(scoredEntries.get(0).score - scoredEntries.get(1).score) < AMBIGUITY_DELTA) {
+            return Optional.empty();
+        }
+
+        return Optional.of(scoredEntries.get(0).entry);
+    }
+
+    private double scoreCandidate(BibEntry inputEntry, BibEntry candidate) {
+        double score = 0.0;
+
+        Optional<String> inputTitle = inputEntry.getFieldOrAlias(StandardField.TITLE)
+                                                .filter(value -> !StringUtil.isBlank(value));
+        if (inputTitle.isPresent()) {
+            Optional<String> candidateTitle = candidate.getField(StandardField.TITLE)
+                                                       .filter(value -> !StringUtil.isBlank(value));
+            if (candidateTitle.isEmpty()) {
+                return 0.0;
+            }
+
+            double titleSimilarity = new StringSimilarity().similarity(
+                    normalizeForTitleMatching(inputTitle.get()),
+                    normalizeForTitleMatching(candidateTitle.get())
+            );
+            if (titleSimilarity < MIN_TITLE_SIMILARITY) {
+                return 0.0;
+            }
+            score += 0.7 * titleSimilarity;
+        }
+
+        Optional<String> inputYear = inputEntry.getFieldOrAlias(StandardField.YEAR)
+                                               .filter(value -> !StringUtil.isBlank(value));
+        if (inputYear.isPresent()) {
+            Optional<String> candidateYear = candidate.getField(StandardField.YEAR)
+                                                      .filter(value -> !StringUtil.isBlank(value));
+            if (candidateYear.isEmpty() || !inputYear.get().equals(candidateYear.get())) {
+                return 0.0;
+            }
+            score += 0.15;
+        }
+
+        Optional<String> inputAuthor = inputEntry.getFieldOrAlias(StandardField.AUTHOR)
+                                                 .filter(value -> !StringUtil.isBlank(value));
+        if (inputAuthor.isPresent()) {
+            Optional<String> candidateAuthor = candidate.getField(StandardField.AUTHOR)
+                                                        .filter(value -> !StringUtil.isBlank(value));
+            if (candidateAuthor.isEmpty()) {
+                return 0.0;
+            }
+
+            double authorOverlap = familyNameOverlap(inputAuthor.get(), candidateAuthor.get());
+            if (authorOverlap < MIN_AUTHOR_OVERLAP) {
+                return 0.0;
+            }
+            score += 0.15 * authorOverlap;
+        }
+
+        return score;
+    }
+
+    private double familyNameOverlap(String inputAuthors, String candidateAuthors) {
+        Set<String> inputFamilyNames = AuthorList.parse(inputAuthors).getAuthors().stream()
+                                                 .map(author -> author.getFamilyName().orElse(""))
+                                                 .map(ZbMATH::normalizeForTitleMatching)
+                                                 .filter(value -> !StringUtil.isBlank(value))
+                                                 .collect(Collectors.toSet());
+        if (inputFamilyNames.isEmpty()) {
+            return 0.0;
+        }
+
+        Set<String> candidateFamilyNames = AuthorList.parse(candidateAuthors).getAuthors().stream()
+                                                     .map(author -> author.getFamilyName().orElse(""))
+                                                     .map(ZbMATH::normalizeForTitleMatching)
+                                                     .filter(value -> !StringUtil.isBlank(value))
+                                                     .collect(Collectors.toSet());
+        long overlap = inputFamilyNames.stream()
+                                       .filter(candidateFamilyNames::contains)
+                                       .count();
+        return (double) overlap / inputFamilyNames.size();
+    }
+
+    private static String normalizeForTitleMatching(String title) {
+        String normalizedTitle = StringUtil.stripAccents(title);
+        normalizedTitle = NON_ALNUM_OR_SPACE_PATTERN.matcher(normalizedTitle).replaceAll(" ");
+        normalizedTitle = WHITESPACE_PATTERN.matcher(normalizedTitle).replaceAll(" ");
+        return normalizedTitle.trim().toLowerCase();
+    }
+
+    private record ScoredEntry(BibEntry entry, double score) {
     }
 }
