@@ -567,7 +567,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     private static void applyNaturalHeight(FieldEditorFX editor) {
         normalizeInputHeights(editor.getNode());
         if (editor instanceof LinkedFilesEditor) {
-            // Sizes itself to (file count + 1) rows; a fixed weight-based height would override that.
+            // Sizes itself to the file rows plus the trailing button row; a fixed weight-based height would override that.
             return;
         }
         if ((editor.getWeight() > 1) && (editor.getNode() instanceof Region region)) {

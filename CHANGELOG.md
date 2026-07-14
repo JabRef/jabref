@@ -41,6 +41,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We replaced the LaTeX-to-Unicode and Unicode-to-LaTeX conversion engine (the unmaintained Scala latex2unicode library plus hand-maintained maps) with the new SnuggleTeX-based [latex-conv](https://github.com/JabRef/latex-conv) library. Formulas keep their brackets and spacing, `\text{...}` and `\operatorname{...}` render as their content, bases carrying both a sub- and a superscript convert, and `--`/`---` render as typographic dashes. [#6155](https://github.com/JabRef/jabref/pull/6155)
+- The "Unicode to LaTeX" cleanup emits accent commands with a single brace group (`{\aa}` instead of `{{\aa}}`). [#6155](https://github.com/JabRef/jabref/pull/6155)
 - The Hayagriva YAML exporter now writes all fields the new Hayagriva importer reads. [#16190](https://github.com/JabRef/jabref/pull/16190)
 - We increased the size of arrow buttons in the Entry Preview preferences tab to improve visibility. [#16028](https://github.com/JabRef/jabref/issues/16028)
 - We now render the entry preview with regular JavaFX components instead of an embedded browser. Text in the preview can be selected with mouse and keyboard and copied; without a selection, "Copy selection" copies the whole preview. [#16145](https://github.com/JabRef/jabref/pull/16145)
@@ -59,6 +61,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where exported dates displayed month names in the system language—regardless of locale settings—instead of in English. [#16224](https://github.com/JabRef/jabref/issues/16224)
+- We fixed an issue where converting a field to Unicode and back to LaTeX destroyed `\textsuperscript{...}`/`\textsubscript{...}`: runs of Unicode super-/subscript characters now merge back into a single command. [#3644](https://github.com/JabRef/jabref/issues/3644)
 - We reduced the size of Linux packages by removing embedded Postgres binaries for unused architectures. [#16143](https://github.com/JabRef/jabref/issues/16143)
 - We fixed an issue where searching ISIDORE failed with a security connection error. [#16054](https://github.com/JabRef/jabref/issues/16054)
 - We fixed an issue in the new entry editor's file field editor where files added via the add button did not appear until switching to another entry and back, and cleaned up the layout so the add/fetch-fulltext/download-URL buttons sit to the left of the file list and the list no longer leaves blank space below the last file. [#16172](https://github.com/JabRef/jabref/pull/16172)
@@ -80,6 +84,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where renaming a linked file with a very long title showed a misleading "file is being used by another process" error instead of renaming successfully. [#14771](https://github.com/JabRef/jabref/issues/14771)
 - We fixed an issue where JabRef would trigger `The libray has been changed` while still saving. [#4877](https://github.com/JabRef/jabref/issues/4877)
 - We fixed preview tooltip height calculation in the main table. [#16219](https://github.com/JabRef/jabref/issues/16219)
+- We fixed an issue where stale main table search results could remain visible after consecutive searches. [#15710](https://github.com/JabRef/jabref/issues/15710)
 - We fixed an issue where the button shape changed when hovering over it. [#16188](https://github.com/JabRef/jabref/issues/16188)
 
 ### Removed
