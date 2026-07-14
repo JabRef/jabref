@@ -31,16 +31,24 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
         run: |
-          branch=$(gh pr view "${{ inputs.pr }}" --repo "${{ github.repository }}" --json headRefName -q .headRefName)
-          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+          gh pr view "${{ inputs.pr }}" --repo "${{ github.repository }}" --json headRefName,headRepositoryOwner,headRepository \
+            --jq '"branch=\(.headRefName)\nrepo=\(.headRepositoryOwner.login)/\(.headRepository.name)"' >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
+          repository: ${{ steps.resolve.outputs.repo || github.repository }}
           submodules: 'true'
           fetch-depth: 0
           ref: ${{ steps.resolve.outputs.branch || github.head_ref }}
           token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
+
+      # The PR may live in a fork ("repository" above); always merge main of JabRef/jabref
+      - name: Fetch upstream main
+        run: |
+          set -ex
+          git remote add upstream "https://github.com/JabRef/jabref.git" || true
+          git fetch upstream main
 
       - name: Merge main
         uses: maven-flow/merge@1a008472b7a881f9fa6779c53e0118cdaf66da22 # v1
@@ -48,5 +56,5 @@ jobs:
           changelog-file: CHANGELOG.md
           changelog-rebase: true
           pom-file: 'match-nothing.txt'
-          source-branch: 'origin/main'
+          source-branch: 'upstream/main'
           target-branch: ${{ steps.resolve.outputs.branch || github.head_ref }}

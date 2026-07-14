@@ -17,28 +17,30 @@ jobs:
     name: Conflicts with target branch
     runs-on: ubuntu-slim
     permissions:
-      actions: write
       contents: write
+      issues: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           show-progress: 'false'
       - name: Get PR info
         id: pr_info
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
         run: |
           set -ex
-          INFO=$(gh pr view "$PR_NUMBER" --json headRefName,headRepositoryOwner,headRepository)
-          HEAD_REF=$(echo "$INFO" | jq -r .headRefName)
-          HEAD_REPO=$(echo "$INFO" | jq -r '"\(.headRepositoryOwner.login)/\(.headRepository.name)"')
-          echo "head_ref=$HEAD_REF" >> $GITHUB_OUTPUT
-          echo "head_repo=$HEAD_REPO" >> $GITHUB_OUTPUT
+          gh pr view "$PR_NUMBER" --json headRefName,headRepositoryOwner,headRepository,maintainerCanModify \
+            --jq '"head_ref=\(.headRefName)\nhead_repo=\(.headRepositoryOwner.login)/\(.headRepository.name)\nmaintainer_can_modify=\(.maintainerCanModify)"' \
+            >> $GITHUB_OUTPUT
       - name: Check PR mergeability
         id: check_mergeable
-        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
         run: |
           set -ex
 
@@ -57,40 +59,108 @@ jobs:
           echo "Result: $MERGEABLE" >> $GITHUB_STEP_SUMMARY
           echo "mergeable=$MERGEABLE" >> $GITHUB_OUTPUT
 
-          if [ "$MERGEABLE" == "CONFLICTING" ]; then
-            echo "❌ Merge conflicts"
-            echo "❌ Merge conflicts" >> $GITHUB_STEP_SUMMARY
-            gh issue edit $PR_NUMBER --remove-label "status: ready-for-review,status: no-bot-comments" --add-label "status: changes-required"
+          if [ "$MERGEABLE" != "CONFLICTING" ]; then
+            echo "✅ No merge conflicts"
+            echo "✅ No merge conflicts" >> $GITHUB_STEP_SUMMARY
+          fi
 
-            # "workflow dispatch" does not trigger subsequent "on completion" runs.
-            # Therefore, we emulate ghprcomment here
-            if [ "$EVENT" = "workflow_dispatch" ]; then
-              HAS_CONFLICT_COMMENT=$(
-                gh api graphql -f query="
-                  query {
-                    repository(owner: \"JabRef\", name: \"JabRef\") {
-                      pullRequest(number: $PR_NUMBER) {
-                        comments(last: 20) {
-                          nodes { body }
-                        }
+      # In case of a conflict, try to resolve it automatically by merging main:
+      # maven-flow/merge resolves conflicts in CHANGELOG.md semantically and lets "git merge"
+      # fail on any other conflict - then, nothing is pushed.
+      # Thus, a merge commit is pushed if and only if CHANGELOG.md is the only conflicting file.
+      # Pushing is possible for branches in JabRef/jabref and for forks allowing maintainer edits.
+      # All steps use continue-on-error; if anything fails, the conflict is reported as before.
+      - name: Checkout PR head branch
+        id: checkout_pr
+        if: steps.check_mergeable.outputs.mergeable == 'CONFLICTING' && (steps.pr_info.outputs.head_repo == 'JabRef/jabref' || steps.pr_info.outputs.maintainer_can_modify == 'true')
+        continue-on-error: true
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ steps.pr_info.outputs.head_repo }}
+          ref: ${{ steps.pr_info.outputs.head_ref }}
+          submodules: 'true'
+          fetch-depth: 0
+          show-progress: 'false'
+          token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
+      - name: Fetch upstream main
+        id: fetch_upstream
+        if: steps.checkout_pr.outcome == 'success'
+        continue-on-error: true
+        run: |
+          set -ex
+          git remote add upstream "https://github.com/JabRef/jabref.git" || true
+          git fetch upstream main
+      # ubuntu-slim does not provide Java, which is required by the changelog merge driver
+      - name: Setup Java
+        id: setup_java
+        if: steps.fetch_upstream.outcome == 'success'
+        continue-on-error: true
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+      - name: Merge main into PR branch
+        id: automerge
+        if: steps.setup_java.outcome == 'success'
+        continue-on-error: true
+        uses: maven-flow/merge@1a008472b7a881f9fa6779c53e0118cdaf66da22 # v1
+        with:
+          changelog-file: CHANGELOG.md
+          changelog-rebase: true
+          pom-file: 'match-nothing.txt'
+          source-branch: 'upstream/main'
+          target-branch: ${{ steps.pr_info.outputs.head_ref }}
+
+      - name: Handle merge conflict
+        if: steps.check_mergeable.outputs.mergeable == 'CONFLICTING'
+        env:
+          AUTOMERGE_OUTCOME: ${{ steps.automerge.outcome }}
+          EVENT: ${{ github.event_name }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+        run: |
+          set -ex
+
+          if [ "$AUTOMERGE_OUTCOME" = "success" ]; then
+            # CHANGELOG.md was the only conflicting file - main was merged and pushed.
+            # No comment, no label: the push triggers a new run, which then reports no conflicts.
+            echo "✅ Conflict in CHANGELOG.md only - resolved by merging main" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          echo "❌ Merge conflicts"
+          echo "❌ Merge conflicts" >> $GITHUB_STEP_SUMMARY
+          gh issue edit $PR_NUMBER --remove-label "status: ready-for-review,status: no-bot-comments" --add-label "status: changes-required"
+
+          # "workflow dispatch" does not trigger subsequent "on completion" runs.
+          # Therefore, we emulate ghprcomment here
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            HAS_CONFLICT_COMMENT=$(
+              gh api graphql -f query="
+                query {
+                  repository(owner: \"JabRef\", name: \"JabRef\") {
+                    pullRequest(number: $PR_NUMBER) {
+                      comments(last: 20) {
+                        nodes { body }
                       }
                     }
                   }
-                " \
-                | jq -r '.data.repository.pullRequest.comments.nodes[].body' \
-                | grep -q "Conflicts with target branch" \
-                  && echo "true" \
-                  || echo "false"
-              )
+                }
+              " --jq '.data.repository.pullRequest.comments.nodes[].body' \
+              | grep -q "Conflicts with target branch" \
+                && echo "true" \
+                || echo "false"
+            )
 
-              if [ "$HAS_CONFLICT_COMMENT" = "true" ]; then
-                echo "Already commented about conflicts."
-                # When triggered by another workflow, success is also if there is a merge conflict
-                exit 0;
-              fi
+            if [ "$HAS_CONFLICT_COMMENT" = "true" ]; then
+              echo "Already commented about conflicts."
+              # When triggered by another workflow, success is also if there is a merge conflict
+              exit 0;
+            fi
 
-              echo "Commenting on PR..."
-              cat > body.txt <<EOF
+            echo "Commenting on PR..."
+            cat > body.txt <<EOF
           Your pull request conflicts with the target branch.
 
           Please [merge `upstream/main`](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-command-line) with your code. For a step-by-step guide to resolve merge conflicts, see <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line>.
@@ -100,41 +170,11 @@ jobs:
           Conflicts with target branch
           -->
           EOF
-              gh issue comment "$PR_NUMBER" --body-file body.txt
-              echo "Commented on PR" >> $GITHUB_STEP_SUMMARY
+            gh issue comment "$PR_NUMBER" --body-file body.txt
+            echo "Commented on PR" >> $GITHUB_STEP_SUMMARY
 
-              # When triggered by another workflow, success is also if there is a merge conflict
-              exit 0;
-            fi;
+            # When triggered by another workflow, success is also if there is a merge conflict
+            exit 0;
+          fi;
 
-            exit 1
-          fi
-          echo "✅ No merge conflicts"
-          echo "✅ No merge conflicts" >> $GITHUB_STEP_SUMMARY
-        env:
-          EVENT: ${{ github.event_name }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
-
-      - name: Checkout PR head branch
-        if: steps.check_mergeable.outputs.mergeable == 'CONFLICTING' && steps.pr_info.outputs.head_repo == 'JabRef/jabref'
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ steps.pr_info.outputs.head_ref }}
-          submodules: 'true'
-          fetch-depth: 0
-          token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
-
-      - name: Merge main into PR branch
-        if: steps.check_mergeable.outputs.mergeable == 'CONFLICTING' && steps.pr_info.outputs.head_repo == 'JabRef/jabref'
-        uses: maven-flow/merge@1a008472b7a881f9fa6779c53e0118cdaf66da22
-        with:
-          changelog-file: CHANGELOG.md
-          changelog-rebase: true
-          pom-file: 'match-nothing.txt'
-          source-branch: 'origin/main'
-          target-branch: ${{ steps.pr_info.outputs.head_ref }}
-
-      - name: Propagate conflict failure
-        if: steps.check_mergeable.outputs.mergeable == 'CONFLICTING' && github.event_name != 'workflow_dispatch'
-        run: exit 1
+          exit 1
