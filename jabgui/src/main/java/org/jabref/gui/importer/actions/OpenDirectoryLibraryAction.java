@@ -16,6 +16,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.directorylibrary.DirectoryLibraryScanner;
 import org.jabref.logic.directorylibrary.DirectoryLibrarySynchronizer;
+import org.jabref.logic.directorylibrary.PdfEnrichmentTask;
 import org.jabref.logic.directorylibrary.PdfEntryFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -114,6 +115,12 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
                 databaseContext, scanResult.catalog(), pdfEntryFactory, UiTaskExecutor::runInJavaFXThread);
         databaseContext.attachDirectorySynchronizer(synchronizer);
         synchronizer.startWatching(Injector.instantiateModelOrService(DirectoryMonitor.class));
+
+        if (!scanResult.pendingPdfImports().isEmpty()) {
+            new PdfEnrichmentTask(scanResult.pendingPdfImports(), pdfEntryFactory, databaseContext,
+                    UiTaskExecutor::runInJavaFXThread)
+                    .executeWith(taskExecutor);
+        }
 
         if (!scanResult.warnings().isEmpty()) {
             dialogService.showWarningDialogAndWait(

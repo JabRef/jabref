@@ -35,14 +35,20 @@ import org.slf4j.LoggerFactory;
 /// resulting [BibDatabaseContext] has [org.jabref.logic.shared.DatabaseLocation#DIRECTORY] and
 /// no database path; linked files are stored relative to the root, which is registered as the
 /// library-specific file directory.
-// [impl->req~directory-library.scan~2]
+// [impl->req~directory-library.scan~3]
 @NullMarked
 public class DirectoryLibraryScanner {
 
     /// Everything a directory scan produces: the ready-to-open context, the entry-to-file
-    /// catalog (consumed by the file synchronization in later steps), and user-facing warnings
-    /// about files that looked like Hayagriva but could not be parsed.
-    public record ScanResult(BibDatabaseContext databaseContext, DirectoryLibraryCatalog catalog, List<String> warnings) {
+    /// catalog (consumed by the file synchronization in later steps), user-facing warnings
+    /// about files that looked like Hayagriva but could not be parsed, and the sidecar-less
+    /// PDFs whose stub entries still await metadata extraction (see [PdfEnrichmentTask]).
+    public record ScanResult(BibDatabaseContext databaseContext, DirectoryLibraryCatalog catalog, List<String> warnings,
+                             List<PendingPdfImport> pendingPdfImports) {
+    }
+
+    /// A stub entry created for a sidecar-less PDF, awaiting asynchronous metadata extraction.
+    public record PendingPdfImport(BibEntry entry, Path pdfFile) {
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryLibraryScanner.class);
@@ -92,21 +98,20 @@ public class DirectoryLibraryScanner {
             entries.addAll(fileEntries);
         }
 
-        List<BibEntry> pdfEntries = new ArrayList<>();
+        List<PendingPdfImport> pendingPdfImports = new ArrayList<>();
         for (Path pdf : pdfFiles) {
             if (pairedPdfs.contains(pdf)) {
                 continue;
             }
-            // Metadata comes from the PDF itself; a sidecar is still only written once the
-            // user edits the entry
-            pdfEntries.add(pdfEntryFactory.createEntry(pdf, root, databaseContext));
+            // Only a quick stub here: metadata extraction happens asynchronously after the
+            // library is shown, and a sidecar is still only written once the user edits
+            BibEntry stub = pdfEntryFactory.createStub(pdf, root);
+            pendingPdfImports.add(new PendingPdfImport(stub, pdf));
+            entries.add(stub);
         }
-        entries.addAll(pdfEntries);
 
         databaseContext.getDatabase().insertEntries(entries);
-        // After insertion, so the uniqueness check sees all scanned entries
-        pdfEntries.forEach(entry -> pdfEntryFactory.generateCitationKeyIfMissing(entry, databaseContext));
-        return new ScanResult(databaseContext, catalog, warnings);
+        return new ScanResult(databaseContext, catalog, warnings, List.copyOf(pendingPdfImports));
     }
 
     private void collectFiles(Path root, List<Path> yamlFiles, List<Path> pdfFiles) throws IOException {

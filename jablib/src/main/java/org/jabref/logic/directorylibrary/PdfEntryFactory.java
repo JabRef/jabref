@@ -16,6 +16,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -56,7 +57,7 @@ public class PdfEntryFactory {
     }
 
     public BibEntry createEntry(Path pdf, Path root, BibDatabaseContext databaseContext) {
-        BibEntry entry = importPdfMetadata(pdf, databaseContext)
+        BibEntry entry = extractMetadata(pdf, databaseContext)
                 .orElseGet(() -> new BibEntry(StandardEntryType.Misc));
         if (entry.getField(StandardField.TITLE).isEmpty()) {
             entry.setField(StandardField.TITLE, FileUtil.getBaseName(pdf));
@@ -67,7 +68,29 @@ public class PdfEntryFactory {
         return entry;
     }
 
-    private Optional<BibEntry> importPdfMetadata(Path pdf, BibDatabaseContext databaseContext) {
+    /// The immediately available placeholder for a PDF: title from the file name, PDF linked.
+    /// Metadata extraction happens asynchronously afterwards (see [PdfEnrichmentTask]).
+    public BibEntry createStub(Path pdf, Path root) {
+        BibEntry stub = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.TITLE, FileUtil.getBaseName(pdf));
+        stub.addFile(new LinkedFile("", root.relativize(pdf), StandardFileType.PDF.getName()));
+        return stub;
+    }
+
+    /// Applies extracted metadata onto the live stub entry (same instance, so table selection
+    /// survives). Mutations carry [EntriesEventSource#SHARED]: enrichment is system-initiated,
+    /// not a user edit. The stub's file link is preserved.
+    public void applyExtractedMetadata(BibEntry extracted, BibEntry stub) {
+        if (!stub.getType().equals(extracted.getType())) {
+            stub.setType(extracted.getType(), EntriesEventSource.SHARED);
+        }
+        extracted.getFields().stream()
+                 .filter(field -> StandardField.FILE != field)
+                 .forEach(field -> extracted.getField(field).ifPresent(
+                         value -> stub.setField(field, value, EntriesEventSource.SHARED)));
+    }
+
+    public Optional<BibEntry> extractMetadata(Path pdf, BibDatabaseContext databaseContext) {
         try {
             // The context overload relativizes the file link the importer attaches
             ParserResult parserResult = importer.importDatabase(pdf, databaseContext, filePreferences);
