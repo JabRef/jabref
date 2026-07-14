@@ -45,6 +45,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -379,10 +380,10 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         if (entry == null) {
             return;
         }
-        viewModel.findNewFetchableDoi(entry).ifPresent(doi -> {
-            DoiFetcher doiFetcher = new DoiFetcher(preferences.getImportFormatPreferences());
-            addFetchedColumn(Localization.lang("From DOI"), doiFetcher, doi);
-        });
+        viewModel.findNewFetchableIdentifiers(entry).forEach((field, value) ->
+                WebFetchers.getIdBasedFetcherForField(field, preferences.getImportFormatPreferences())
+                           .ifPresent(fetcher -> addFetchedColumn(
+                                   Localization.lang("From %0", FieldTextMapper.getDisplayName(field)), fetcher, value)));
     }
 
     private class FieldRow {

@@ -1,5 +1,6 @@
 package org.jabref.gui.mergeentries.multiwaymerge;
 
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
@@ -13,7 +14,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MultiMergeEntriesViewModelTest {
 
@@ -69,57 +69,101 @@ class MultiMergeEntriesViewModelTest {
     }
 
     @Test
-    void findNewFetchableDoiReturnsDoiOnce() {
+    void findNewFetchableIdentifiersReturnsDoiOnce() {
         BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1000/182");
-        assertEquals("10.1000/182", viewModel.findNewFetchableDoi(entry).orElse(""));
+        assertEquals(Map.of(StandardField.DOI, "10.1000/182"), viewModel.findNewFetchableIdentifiers(entry));
     }
 
     @Test
-    void findNewFetchableDoiDedupesRepeatedCall() {
+    void findNewFetchableIdentifiersDedupesRepeatedCall() {
         BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1000/182");
-        viewModel.findNewFetchableDoi(entry);
-        assertTrue(viewModel.findNewFetchableDoi(entry).isEmpty());
+        viewModel.findNewFetchableIdentifiers(entry);
+        assertEquals(Map.of(), viewModel.findNewFetchableIdentifiers(entry));
     }
 
     @Test
-    void findNewFetchableDoiDedupesCaseAndWhitespaceVariants() {
+    void findNewFetchableIdentifiersDedupesCaseAndWhitespaceVariants() {
         BibEntry first = new BibEntry().withField(StandardField.DOI, "10.1000/182");
         BibEntry second = new BibEntry().withField(StandardField.DOI, "  10.1000/182  ");
-        viewModel.findNewFetchableDoi(first);
-        assertTrue(viewModel.findNewFetchableDoi(second).isEmpty());
+        viewModel.findNewFetchableIdentifiers(first);
+        assertEquals(Map.of(), viewModel.findNewFetchableIdentifiers(second));
     }
 
     @Test
-    void findNewFetchableDoiIgnoresBlankValue() {
+    void findNewFetchableIdentifiersIgnoresBlankValue() {
         BibEntry entry = new BibEntry().withField(StandardField.DOI, "   ");
-        assertTrue(viewModel.findNewFetchableDoi(entry).isEmpty());
+        assertEquals(Map.of(), viewModel.findNewFetchableIdentifiers(entry));
     }
 
     @Test
-    void findNewFetchableDoiReturnsEmptyWhenNoDoi() {
+    void findNewFetchableIdentifiersIgnoresUnsupportedFields() {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "Some Title");
-        assertTrue(viewModel.findNewFetchableDoi(entry).isEmpty());
+        assertEquals(Map.of(), viewModel.findNewFetchableIdentifiers(entry));
     }
 
     @Test
-    void findNewFetchableDoiDedupesUrlAndPlainFormOfSameDoi() {
+    void findNewFetchableIdentifiersDedupesUrlAndPlainFormOfSameDoi() {
         BibEntry plain = new BibEntry().withField(StandardField.DOI, "10.1145/3651640.3651646");
         BibEntry url = new BibEntry().withField(StandardField.DOI, "https://doi.org/10.1145/3651640.3651646");
-        viewModel.findNewFetchableDoi(plain);
-        assertTrue(viewModel.findNewFetchableDoi(url).isEmpty());
+        viewModel.findNewFetchableIdentifiers(plain);
+        assertEquals(Map.of(), viewModel.findNewFetchableIdentifiers(url));
     }
 
     @Test
-    void findNewFetchableDoiIgnoresInvalidDoi() {
+    void findNewFetchableIdentifiersIgnoresInvalidDoi() {
         BibEntry entry = new BibEntry().withField(StandardField.DOI, "not-a-doi");
-        assertTrue(viewModel.findNewFetchableDoi(entry).isEmpty());
+        assertEquals(Map.of(), viewModel.findNewFetchableIdentifiers(entry));
     }
 
     @Test
-    void findNewFetchableDoiIgnoresUnsupportedInfoDoiScheme() {
+    void findNewFetchableIdentifiersIgnoresUnsupportedInfoDoiScheme() {
         // XMP metadata sometimes stores DOIs using the "info:doi/" URI scheme, which DOI.parse does not
         // recognize. Must be filtered out rather than passed to the fetcher as-is, where it would fail.
         BibEntry entry = new BibEntry().withField(StandardField.DOI, "info:doi/10.1145/3651640.3651646");
-        assertTrue(viewModel.findNewFetchableDoi(entry).isEmpty());
+        assertEquals(Map.of(), viewModel.findNewFetchableIdentifiers(entry));
+    }
+
+    @Test
+    void findNewFetchableIdentifiersReturnsMultipleSupportedFields() {
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.ISBN, "978-3-16-148410-0")
+                .withField(StandardField.EPRINT, "2101.00001");
+        assertEquals(
+                Map.of(StandardField.ISBN, "9783161484100", StandardField.EPRINT, "2101.00001"),
+                viewModel.findNewFetchableIdentifiers(entry));
+    }
+
+    @Test
+    void findNewFetchableIdentifiersNormalizesIsbnDashes() {
+        BibEntry hyphenated = new BibEntry().withField(StandardField.ISBN, "978-3-16-148410-0");
+        BibEntry plain = new BibEntry().withField(StandardField.ISBN, "9783161484100");
+        viewModel.findNewFetchableIdentifiers(hyphenated);
+        assertEquals(Map.of(), viewModel.findNewFetchableIdentifiers(plain));
+    }
+
+    @Test
+    void findNewFetchableIdentifiersIgnoresInvalidIsbnChecksum() {
+        BibEntry entry = new BibEntry().withField(StandardField.ISBN, "9783161484101");
+        assertEquals(Map.of(), viewModel.findNewFetchableIdentifiers(entry));
+    }
+
+    @Test
+    void findNewFetchableIdentifiersIgnoresInvalidEprint() {
+        BibEntry entry = new BibEntry().withField(StandardField.EPRINT, "not-an-arxiv-id");
+        assertEquals(Map.of(), viewModel.findNewFetchableIdentifiers(entry));
+    }
+
+    @Test
+    void findNewFetchableIdentifiersNormalizesIssnDashes() {
+        BibEntry hyphenated = new BibEntry().withField(StandardField.ISSN, "0378-5955");
+        BibEntry plain = new BibEntry().withField(StandardField.ISSN, "03785955");
+        viewModel.findNewFetchableIdentifiers(hyphenated);
+        assertEquals(Map.of(), viewModel.findNewFetchableIdentifiers(plain));
+    }
+
+    @Test
+    void findNewFetchableIdentifiersIgnoresInvalidIssnChecksum() {
+        BibEntry entry = new BibEntry().withField(StandardField.ISSN, "0378-5954");
+        assertEquals(Map.of(), viewModel.findNewFetchableIdentifiers(entry));
     }
 }
