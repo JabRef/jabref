@@ -142,14 +142,22 @@ class DirectoryLibraryScannerTest {
         assertEquals(Optional.of("interesting-paper"), entry.getField(StandardField.TITLE));
         assertEquals(List.of(new LinkedFile("", Path.of("interesting-paper.pdf"), "PDF")), entry.getFiles());
         assertEquals(Optional.empty(), result.catalog().sourceOf(entry));
+        assertEquals(List.of(new DirectoryLibraryScanner.PendingPdfImport(entry, root.resolve("interesting-paper.pdf"))),
+                result.pendingPdfImports());
     }
 
     @Test
-    void barePdfMetadataIsExtractedFromTheDocument() throws IOException, URISyntaxException {
+    void enrichmentExtractsPdfMetadataIntoTheStubEntry() throws IOException, URISyntaxException {
         Path fixture = Path.of(getClass().getResource("/pdfs/PdfContentImporter/Kriha2018.pdf").toURI());
         Files.copy(fixture, root.resolve("kriha2018.pdf"));
 
-        BibEntry entry = singleEntry(scan());
+        ScanResult result = scan();
+        BibEntry entry = singleEntry(result);
+        // Scanning is instant: only the stub exists until the enrichment task ran
+        assertEquals(Optional.of("kriha2018"), entry.getField(StandardField.TITLE));
+
+        new PdfEnrichmentTask(result.pendingPdfImports(), offlinePdfEntryFactory(),
+                result.databaseContext(), Runnable::run).call();
 
         assertEquals(Optional.of("On How We Can Teach – Exploring New Ways in Professional Software Development for Students"),
                 entry.getField(StandardField.TITLE));

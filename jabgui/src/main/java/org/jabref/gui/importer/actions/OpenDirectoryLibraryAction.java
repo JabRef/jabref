@@ -12,8 +12,10 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.directorylibrary.DirectoryLibraryScanner;
+import org.jabref.logic.directorylibrary.PdfEnrichmentTask;
 import org.jabref.logic.directorylibrary.PdfEntryFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -97,6 +99,15 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
                 clipBoardManager,
                 taskExecutor);
         tabContainer.addTab(libraryTab, true);
+        if (!scanResult.pendingPdfImports().isEmpty()) {
+            PdfEntryFactory pdfEntryFactory = new PdfEntryFactory(
+                    preferences.getImportFormatPreferences(), preferences.getFilePreferences(),
+                    preferences.getCitationKeyPatternPreferences());
+            new PdfEnrichmentTask(scanResult.pendingPdfImports(), pdfEntryFactory, scanResult.databaseContext(),
+                    UiTaskExecutor::runInJavaFXThread)
+                    .executeWith(taskExecutor);
+        }
+
         if (!scanResult.warnings().isEmpty()) {
             dialogService.showWarningDialogAndWait(
                     Localization.lang("Open folder as library"),
