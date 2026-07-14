@@ -41,15 +41,15 @@ class PdfVerbatimBibtexImporterTest {
     void entryIsFoundWhenPrecededAndFollowedByPageText(@TempDir Path tempDir) throws IOException {
         Path file = tempDir.resolve("bibtexWithSurroundingText.pdf");
         writePdf(file, List.of(
-                "Applying IoT Patterns to Smart Factory Systems",
+                "Some Paper Title",
                 "Jane Doe and John Doe",
-                "[lastname]@iaas.uni-stuttgart.de",
+                "[lastname]@example.org",
                 "[firstname].[lastname]@example.com",
                 "@inproceedings{Doe2017,",
                 "author = {Doe, Jane and Doe, John},",
-                "booktitle = {Proceedings of the Advanced Summer School on Service Oriented Computing},",
+                "booktitle = {Proceedings of Some Conference},",
                 "pages = {1--10},",
-                "title = {{Applying IoT Patterns to Smart Factory Systems}},",
+                "title = {{Some Paper Title}},",
                 "year = {2017}",
                 "}",
                 "The full version of this publication has been presented as a poster."));
@@ -59,9 +59,9 @@ class PdfVerbatimBibtexImporterTest {
         BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
                 .withCitationKey("Doe2017")
                 .withField(StandardField.AUTHOR, "Doe, Jane and Doe, John")
-                .withField(StandardField.BOOKTITLE, "Proceedings of the Advanced Summer School on Service Oriented Computing")
+                .withField(StandardField.BOOKTITLE, "Proceedings of Some Conference")
                 .withField(StandardField.PAGES, "1--10")
-                .withField(StandardField.TITLE, "{Applying IoT Patterns to Smart Factory Systems}")
+                .withField(StandardField.TITLE, "{Some Paper Title}")
                 .withField(StandardField.YEAR, "2017");
 
         assertEquals(List.of(expected), result);
@@ -71,9 +71,9 @@ class PdfVerbatimBibtexImporterTest {
     void pageWithoutBibtexReturnsNoEntries(@TempDir Path tempDir) throws IOException {
         Path file = tempDir.resolve("noBibtex.pdf");
         writePdf(file, List.of(
-                "Applying IoT Patterns to Smart Factory Systems",
+                "Some Paper Title",
                 "Jane Doe and John Doe",
-                "[lastname]@iaas.uni-stuttgart.de"));
+                "[lastname]@example.org"));
 
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
 
