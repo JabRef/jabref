@@ -135,7 +135,7 @@ dependencies.constraints {
     api("org.jabref:latex-conv:0.1.0-SNAPSHOT")
     api("org.jabref:mslinks:1.2")
     api("org.jetbrains:annotations:26.1.0")
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.0")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.10")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.22.2")
     api("org.jspecify:jspecify:1.0.0")
