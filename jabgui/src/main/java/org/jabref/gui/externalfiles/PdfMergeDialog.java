@@ -2,8 +2,12 @@ package org.jabref.gui.externalfiles;
 
 import java.io.IOException;
 import java.nio.file.Path;
+<<<<<<< HEAD
 import java.util.List;
 import java.util.function.Predicate;
+=======
+import java.util.Optional;
+>>>>>>> main
 import java.util.function.Supplier;
 
 import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
@@ -11,6 +15,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibFileImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
@@ -18,10 +23,17 @@ import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibtexImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
+<<<<<<< HEAD
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+=======
+import org.jabref.logic.util.PdfUtils;
+import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.identifier.DOI;
+>>>>>>> main
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +80,7 @@ public class PdfMergeDialog {
         }
         dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
         dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentImporter(), filePath));
+<<<<<<< HEAD
         addIdentifierSources(dialog, filePath, preferences, taskExecutor);
     }
 
@@ -109,6 +122,9 @@ public class PdfMergeDialog {
                 return null;
             }
         });
+=======
+        dialog.addSource(Localization.lang("From DOI"), wrapDoiLookupToSupplier(filePath, preferences));
+>>>>>>> main
     }
 
     private static Supplier<BibEntry> wrapImporterToSupplier(Importer importer, Path filePath) {
@@ -120,6 +136,32 @@ public class PdfMergeDialog {
                 }
                 return parserResult.getDatabase().getEntries().getFirst();
             } catch (IOException e) {
+                return null;
+            }
+        };
+    }
+
+    /// Extracts a DOI from the PDF (if present) and fetches the corresponding bibliographic data.
+    /// This surfaces DOI-based metadata as its own column in the merge dialog. Returns {@code null}
+    /// (i.e. no column) when the PDF contains no DOI or the lookup fails.
+    private static Supplier<BibEntry> wrapDoiLookupToSupplier(Path filePath, GuiPreferences preferences) {
+        return () -> {
+            Optional<DOI> doi;
+            try {
+                doi = PdfUtils.getFirstDoi(filePath);
+            } catch (IOException e) {
+                LOGGER.warn("Could not extract DOI from PDF {}", filePath, e);
+                return null;
+            }
+            if (doi.isEmpty()) {
+                return null;
+            }
+            try {
+                return new DoiFetcher(preferences.getImportFormatPreferences())
+                        .performSearchById(doi.get().asString())
+                        .orElse(null);
+            } catch (FetcherException e) {
+                LOGGER.warn("Could not fetch bibliographic data for DOI {} extracted from {}", doi.get().asString(), filePath, e);
                 return null;
             }
         };
