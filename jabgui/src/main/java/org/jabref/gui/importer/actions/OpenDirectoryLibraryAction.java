@@ -76,7 +76,8 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
     private void openDirectory(Path root) {
         preferences.getFilePreferences().setWorkingDirectory(root);
         PdfEntryFactory pdfEntryFactory = new PdfEntryFactory(
-                preferences.getImportFormatPreferences(), preferences.getFilePreferences());
+                preferences.getImportFormatPreferences(), preferences.getFilePreferences(),
+                preferences.getCitationKeyPatternPreferences());
         BackgroundTask.wrap(() -> new DirectoryLibraryScanner(pdfEntryFactory).scan(root))
                       .onSuccess(this::showLibraryTab)
                       .onFailure(exception -> dialogService.showErrorDialogAndWait(

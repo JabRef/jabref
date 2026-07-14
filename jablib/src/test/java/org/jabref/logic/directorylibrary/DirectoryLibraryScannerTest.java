@@ -7,9 +7,12 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.directorylibrary.DirectoryLibraryScanner.ScanResult;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.util.GrobidPreferences;
@@ -23,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
+import static org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -51,7 +55,22 @@ class DirectoryLibraryScannerTest {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
         when(importFormatPreferences.grobidPreferences()).thenReturn(noGrobid);
-        return new PdfEntryFactory(importFormatPreferences, mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS));
+        return new PdfEntryFactory(importFormatPreferences, mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS),
+                authYearPatternPreferences());
+    }
+
+    static CitationKeyPatternPreferences authYearPatternPreferences() {
+        return new CitationKeyPatternPreferences(
+                false,
+                false,
+                false,
+                false,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                "",
+                "",
+                DEFAULT_UNWANTED_CHARACTERS,
+                GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
+                new SimpleObjectProperty<>(','));
     }
 
     private ScanResult scan() throws IOException {
