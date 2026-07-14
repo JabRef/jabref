@@ -36,7 +36,6 @@ import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 /// Fetches data from the Zentralblatt Math (https://www.zbmath.org/)
 @NullMarked
@@ -178,9 +177,16 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
     private BibEntry toBibEntry(JSONObject entryJson) {
         BibEntry entry = new BibEntry(toEntryType(entryJson));
 
-        putString(entry, StandardField.TITLE, entryJson.optJSONObject("title"), "title");
-        putString(entry, StandardField.YEAR, entryJson, "year");
-        putString(entry, StandardField.ZBL_NUMBER, entryJson, "identifier");
+        Optional.ofNullable(entryJson.optJSONObject("title"))
+                .map(title -> title.optString("title"))
+                .filter(value -> !StringUtil.isBlank(value))
+                .ifPresent(value -> entry.withField(StandardField.TITLE, value));
+        Optional.of(entryJson.optString("year"))
+                .filter(value -> !StringUtil.isBlank(value))
+                .ifPresent(value -> entry.withField(StandardField.YEAR, value));
+        Optional.of(entryJson.optString("identifier"))
+                .filter(value -> !StringUtil.isBlank(value))
+                .ifPresent(value -> entry.withField(StandardField.ZBL_NUMBER, value));
         putInteger(entry, new UnknownField("zbmath"), entryJson, "id");
         putAuthors(entry, entryJson);
         putLanguage(entry, entryJson);
@@ -224,8 +230,12 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
                     if (series != null && !series.isEmpty()) {
                         JSONObject firstSeries = series.optJSONObject(0);
                         if (firstSeries != null) {
-                            putString(entry, StandardField.JOURNAL, firstSeries, "title");
-                            putString(entry, StandardField.VOLUME, firstSeries, "volume");
+                            Optional.of(firstSeries.optString("title"))
+                                    .filter(value -> !StringUtil.isBlank(value))
+                                    .ifPresent(value -> entry.withField(StandardField.JOURNAL, value));
+                            Optional.of(firstSeries.optString("volume"))
+                                    .filter(value -> !StringUtil.isBlank(value))
+                                    .ifPresent(value -> entry.withField(StandardField.VOLUME, value));
                             putIssn(entry, firstSeries);
                         }
                     }
@@ -248,14 +258,18 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         for (int i = 0; i < issnEntries.length(); i++) {
             JSONObject issn = issnEntries.optJSONObject(i);
             if (issn != null && "print".equals(issn.optString("type"))) {
-                putString(entry, StandardField.ISSN, issn, "number");
+                Optional.of(issn.optString("number"))
+                        .filter(value -> !StringUtil.isBlank(value))
+                        .ifPresent(value -> entry.withField(StandardField.ISSN, value));
                 return;
             }
         }
 
         JSONObject firstIssn = issnEntries.optJSONObject(0);
         if (firstIssn != null) {
-            putString(entry, StandardField.ISSN, firstIssn, "number");
+            Optional.of(firstIssn.optString("number"))
+                    .filter(value -> !StringUtil.isBlank(value))
+                    .ifPresent(value -> entry.withField(StandardField.ISSN, value));
         }
     }
 
@@ -277,7 +291,9 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         for (int i = 0; i < links.length(); i++) {
             JSONObject link = links.optJSONObject(i);
             if (link != null && "doi".equals(link.optString("type"))) {
-                putString(entry, StandardField.DOI, link, "identifier");
+                Optional.of(link.optString("identifier"))
+                        .filter(value -> !StringUtil.isBlank(value))
+                        .ifPresent(value -> entry.withField(StandardField.DOI, value));
                 return;
             }
         }
@@ -299,17 +315,6 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         if (!mscCodes.isEmpty()) {
             String separator = preferences.bibEntryPreferences().getKeywordSeparator() + "";
             entry.setField(StandardField.KEYWORDS, String.join(separator, mscCodes));
-        }
-    }
-
-    private void putString(BibEntry entry, StandardField field, @Nullable JSONObject source, String key) {
-        if (source == null) {
-            return;
-        }
-
-        String value = source.optString(key);
-        if (!StringUtil.isBlank(value)) {
-            entry.setField(field, value);
         }
     }
 
