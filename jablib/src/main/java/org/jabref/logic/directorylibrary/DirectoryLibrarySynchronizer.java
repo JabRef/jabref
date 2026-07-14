@@ -370,8 +370,8 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
                 modelUpdateMarshaller.accept(() -> {
                     List<LinkedFile> updated = entry.getFiles().stream()
                                                     .map(linkedFile -> oldLink.equals(linkedFile.getLink())
-                                                            ? new LinkedFile(linkedFile.getDescription(), newLink, linkedFile.getFileType())
-                                                            : linkedFile)
+                                                                       ? new LinkedFile(linkedFile.getDescription(), newLink, linkedFile.getFileType())
+                                                                       : linkedFile)
                                                     .toList();
                     entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(updated), EntriesEventSource.SHARED);
                 });
