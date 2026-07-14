@@ -246,11 +246,16 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
             return StandardEntryType.Misc;
         }
         return switch (documentType.optString("code")) {
-            case "j" -> StandardEntryType.Article;
-            case "a" -> StandardEntryType.InCollection;
-            case "b" -> StandardEntryType.Book;
-            case "p" -> StandardEntryType.Unpublished;
-            default -> StandardEntryType.Misc;
+            case "j" ->
+                    StandardEntryType.Article;
+            case "a" ->
+                    StandardEntryType.InCollection;
+            case "b" ->
+                    StandardEntryType.Book;
+            case "p" ->
+                    StandardEntryType.Unpublished;
+            default ->
+                    StandardEntryType.Misc;
         };
     }
 
@@ -274,8 +279,8 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
                         .filter(isbnEntries -> !isbnEntries.isEmpty())
                         .map(isbnEntries -> isbnEntries.optJSONObject(0))
                         .ifPresent(firstIsbn -> Optional.of(firstIsbn.optString("number"))
-                                .filter(value -> !StringUtil.isBlank(value))
-                                .ifPresent(value -> entry.withField(StandardField.ISBN, value)));
+                                                        .filter(value -> !StringUtil.isBlank(value))
+                                                        .ifPresent(value -> entry.withField(StandardField.ISBN, value)));
 
                 Optional.of(firstBook.optString("publisher"))
                         .filter(value -> !StringUtil.isBlank(value))
