@@ -2,6 +2,7 @@ package org.jabref.logic.search.sqlbased;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.search.LibrarySearcher;
@@ -25,9 +26,9 @@ public class SqlBasedLibrarySearcher implements LibrarySearcher {
     public SqlBasedLibrarySearcher(BibDatabaseContext databaseContext,
                                    TaskExecutor taskExecutor,
                                    CliPreferences preferences,
-                                   PostgreServer postgreServer) throws IOException {
+                                   PostgresServer postgresServer) throws IOException {
         this.databaseContext = databaseContext;
-        this.indexManager = new IndexManager(databaseContext, taskExecutor, preferences, postgreServer);
+        this.indexManager = new IndexManager(databaseContext, taskExecutor, preferences, postgresServer);
     }
 
     @Override
@@ -43,6 +44,7 @@ public class SqlBasedLibrarySearcher implements LibrarySearcher {
                                                   .getMatchedEntries()
                                                   .stream()
                                                   .map(entryId -> databaseContext.getDatabase().getEntryById(entryId))
+                                                  .flatMap(Optional::stream)
                                                   .toList();
         indexManager.closeAndWait();
         return BibDatabases.purgeEmptyEntries(matchEntries);

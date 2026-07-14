@@ -41,7 +41,7 @@ Chosen option: ""References cited in {citationkey}" and "References that cite {c
 
 ## Pros and Cons of the Options
 
-## "References cited in {citationkey}" and "References that cite {citationkey}"
+### "References cited in {citationkey}" and "References that cite {citationkey}"
 
 {citationkey} - if not available, use "this entry".
 
@@ -54,7 +54,7 @@ Regarding "cited in {citationkey}" or "cited by {citationkey}", either would do,
 * Good, because no confusion regarding "References" and "Citations".
 * Good, because left and right cite are different on purpose to create contrast.
 
-## "backward (cites)" and "forward (cited by)"
+### "backward (cites)" and "forward (cited by)"
 
 Tooltip: outgoing citations - works that are cited by this work. "Backward", because looking back in time.
 
@@ -64,7 +64,7 @@ Tooltip: incoming citations - works that cite this work. "Forward", because look
 * Good, because combines two concepts in the heading
 * Bad, because uses braces
 
-## "Backward Citations" and "Forward Citations"
+### "Backward Citations" and "Forward Citations"
 
 Backward citations
 
@@ -80,7 +80,7 @@ Technical words should be defined in the tooltip explicitly. Forward and backwar
 * Bad, because "backward" and forward" sound too technical
 * Bad, because too abstract for the average user and does not have clear semantics
 
-## "References (cites)" and "Citations (cited by)"
+### "References (cites)" and "Citations (cited by)"
 
 References (cites)
 Tooltip: Works cited by the work at hand
@@ -92,7 +92,7 @@ Tooltip: Works citing the work at hand
 * Good, because combines two concepts in the heading
 * Bad, because the braces in the heading are unusual
 
-## "References" and "Cited by"
+### "References" and "Cited by"
 
 Example: <https://dblp.org/rec/conf/zeus/VoigtKW21.html>
 
@@ -101,7 +101,7 @@ Example: <https://dblp.org/rec/conf/zeus/VoigtKW21.html>
 * Good, because "Cited by" is also used by Google Scholar
 * Bad, because mix of noun and verb
 
-## "Cites" and "Cited by"
+### "Cites" and "Cited by"
 
 * Good, because verbs
 * Bad, because too close to each other

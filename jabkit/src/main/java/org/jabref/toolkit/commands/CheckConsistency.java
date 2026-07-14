@@ -11,9 +11,12 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCsvWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultErrorFormatWriter;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultGitHubActionsWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.toolkit.exception.ImportServiceException;
+import org.jabref.toolkit.service.ImportService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,16 +33,16 @@ class CheckConsistency implements Callable<Integer> {
     private Check check;
 
     @Mixin
-    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+    private JabKit.SharedOptions sharedOptions;
 
     @Mixin
     private InputOption inputOption = new InputOption();
 
-    @Option(names = {"--output-format"}, description = "Output format: errorformat, txt or csv", defaultValue = Check.FORMAT_ERRORFORMAT)
+    @Option(names = {"--output-format"}, description = "Output format: csv, errorformat, github-actions or txt", defaultValue = Check.FORMAT_ERRORFORMAT)
     private String outputFormat;
 
     @Override
-    public Integer call() {
+    public Integer call() throws ImportServiceException {
         return execute(inputOption.getInputFile(), outputFormat, sharedOptions.porcelain, check.jabKit);
     }
 
@@ -48,12 +51,9 @@ class CheckConsistency implements Callable<Integer> {
     /// Shared with the parent `check` command, which runs both checks at once.
     ///
     /// @return the exit code (0 = consistent, 1 = inconsistencies found, 2/3 = error)
-    static int execute(Path inputFile, String outputFormat, boolean porcelain, JabKit jabKit) {
-        JabKit.ImportOutcome importOutcome = JabKit.importBibtexLibrary(inputFile, jabKit.cliPreferences, porcelain);
-        ParserResult parserResult = importOutcome.parserResult();
-        if (parserResult == null) {
-            return importOutcome.exitCode();
-        }
+    static int execute(Path inputFile, String outputFormat, boolean porcelain, JabKit jabKit) throws ImportServiceException {
+
+        ParserResult parserResult = ImportService.importBibTexFile(inputFile, jabKit.cliPreferences, porcelain);
 
         if (!porcelain) {
             System.out.println(Localization.lang("Checking consistency of '%0'.", inputFile));
@@ -84,6 +84,15 @@ class CheckConsistency implements Callable<Integer> {
 
         if (Check.FORMAT_ERRORFORMAT.equalsIgnoreCase(outputFormat)) {
             checkResultWriter = new BibliographyConsistencyCheckResultErrorFormatWriter(
+                    result,
+                    writer,
+                    porcelain,
+                    jabKit.entryTypesManager,
+                    databaseContext.getMode(),
+                    parserResult,
+                    inputFile);
+        } else if (Check.FORMAT_GITHUB_ACTIONS.equalsIgnoreCase(outputFormat)) {
+            checkResultWriter = new BibliographyConsistencyCheckResultGitHubActionsWriter(
                     result,
                     writer,
                     porcelain,

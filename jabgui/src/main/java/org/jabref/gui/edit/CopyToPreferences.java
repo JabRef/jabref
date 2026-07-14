@@ -23,11 +23,6 @@ public class CopyToPreferences {
         return new CopyToPreferences();
     }
 
-    public void setAll(CopyToPreferences other) {
-        this.shouldIncludeCrossReferences.set(other.getShouldIncludeCrossReferences());
-        this.shouldAskForIncludingCrossReferences.set(other.getShouldAskForIncludingCrossReferences());
-    }
-
     public boolean getShouldIncludeCrossReferences() {
         return shouldIncludeCrossReferences.get();
     }

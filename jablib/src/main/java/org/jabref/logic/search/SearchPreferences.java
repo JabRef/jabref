@@ -27,6 +27,21 @@ public class SearchPreferences {
     private final BooleanProperty keepSearchString;
     private final ObjectProperty<SearchDisplayMode> searchDisplayMode;
 
+    private SearchPreferences() {
+        this(
+                SearchDisplayMode.FILTER,  // Search display mode
+                false,                     // Regular expression
+                false,                     // Case sensitive
+                false,                     // Fulltext
+                false,                     // Use postgres search
+                false,                     // Keep search string
+                true,                      // Keep window on top
+                176.0,                     // Search window height
+                600.0,                     // Search window width
+                0.5                        // Search window divider position
+        );
+    }
+
     public SearchPreferences(SearchDisplayMode searchDisplayMode,
                              boolean isRegularExpression,
                              boolean isCaseSensitive,
@@ -60,6 +75,10 @@ public class SearchPreferences {
         this.searchWindowWidth = new SimpleDoubleProperty(searchWindowWidth);
         this.searchWindowDividerPosition = new SimpleDoubleProperty(searchWindowDividerPosition);
         this.keepSearchString = new SimpleBooleanProperty(keepSearchString);
+    }
+
+    public static SearchPreferences getDefault() {
+        return new SearchPreferences();
     }
 
     public EnumSet<SearchFlags> getSearchFlags() {

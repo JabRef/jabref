@@ -5,6 +5,7 @@ import java.util.concurrent.Callable;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.toolkit.converter.CygWinPathConverter;
+import org.jabref.toolkit.exception.ImportServiceException;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
@@ -21,15 +22,16 @@ class Check implements Callable<Integer> {
 
     /// Output formats accepted by `--output-format`. Kept lowercase so they can also serve as
     /// `case` labels for a switch over `outputFormat.toLowerCase(...)`.
-    static final String FORMAT_ERRORFORMAT = "errorformat";
-    static final String FORMAT_TXT = "txt";
     static final String FORMAT_CSV = "csv";
+    static final String FORMAT_ERRORFORMAT = "errorformat";
+    static final String FORMAT_GITHUB_ACTIONS = "github-actions";
+    static final String FORMAT_TXT = "txt";
 
     @ParentCommand
     protected JabKit jabKit;
 
     @Mixin
-    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+    private JabKit.SharedOptions sharedOptions;
 
     /// Optional positional input file. When supplied directly to `check` (without a
     /// `consistency` or `integrity` subcommand), both checks run against it.
@@ -37,7 +39,7 @@ class Check implements Callable<Integer> {
             description = "Input file. When given without a subcommand, both the consistency and integrity checks run.")
     private Path inputFile;
 
-    @Option(names = {"--output-format"}, description = "Output format: errorformat, txt or csv", defaultValue = FORMAT_ERRORFORMAT)
+    @Option(names = {"--output-format"}, description = "Output format: csv, errorformat, github-actions or txt", defaultValue = FORMAT_ERRORFORMAT)
     private String outputFormat;
 
     @Override
@@ -47,10 +49,28 @@ class Check implements Callable<Integer> {
             return 2;
         }
 
-        int consistencyExit = CheckConsistency.execute(inputFile, outputFormat, sharedOptions.porcelain, jabKit);
-        int integrityExit = CheckIntegrity.execute(inputFile, outputFormat, true, sharedOptions.porcelain, jabKit);
+        int consistencyExit = checkConsistency();
+        int integrityExit = checkIntegrity();
 
         // Report the worst exit code: 0 = clean, 1 = findings, 2/3 = error.
         return Math.max(consistencyExit, integrityExit);
+    }
+
+    private int checkIntegrity() {
+        try {
+            return CheckIntegrity.execute(inputFile, outputFormat, true, sharedOptions.porcelain, jabKit);
+        } catch (ImportServiceException e) {
+            System.err.println(e.getLocalizedMessage());
+            return e.getExitCode();
+        }
+    }
+
+    private int checkConsistency() {
+        try {
+            return CheckConsistency.execute(inputFile, outputFormat, sharedOptions.porcelain, jabKit);
+        } catch (ImportServiceException e) {
+            System.err.println(e.getLocalizedMessage());
+            return e.getExitCode();
+        }
     }
 }

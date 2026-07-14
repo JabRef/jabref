@@ -5,21 +5,19 @@ import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
 
+import org.jspecify.annotations.Nullable;
+
 public class ParsedEntryLink {
 
+    private final BibDatabase database;
+
     private String key;
-    private Optional<BibEntry> linkedEntry;
-    private BibDatabase database;
+    @Nullable private BibEntry linkedEntry;
 
     public ParsedEntryLink(String key, BibDatabase database) {
         this.key = key;
-        this.linkedEntry = database.getEntryByCitationKey(this.key);
+        this.linkedEntry = database.getEntryByCitationKey(this.key).orElse(null);
         this.database = database;
-    }
-
-    public ParsedEntryLink(BibEntry bibEntry) {
-        this.key = bibEntry.getCitationKey().orElse("");
-        this.linkedEntry = Optional.of(bibEntry);
     }
 
     public String getKey() {
@@ -27,12 +25,12 @@ public class ParsedEntryLink {
     }
 
     public Optional<BibEntry> getLinkedEntry() {
-        return linkedEntry;
+        return Optional.ofNullable(linkedEntry);
     }
 
     public void setKey(String newKey) {
         this.key = newKey;
-        this.linkedEntry = getDatabase().getEntryByCitationKey(this.key);
+        this.linkedEntry = getDatabase().getEntryByCitationKey(this.key).orElse(null);
     }
 
     @Override

@@ -91,6 +91,16 @@ public class MetaDataSerializerTest {
     }
 
     @Test
+    void serializeAiLibraryId() {
+        metaData.setAiLibraryId("test-ai-library-id");
+
+        Map<String, String> expectedSerialization = new TreeMap<>();
+        expectedSerialization.put(MetaData.AI_LIBRARY_ID, "test-ai-library-id;");
+
+        assertEquals(expectedSerialization, MetaDataSerializer.getSerializedStringMap(metaData, pattern));
+    }
+
+    @Test
     void parsingEmptyOrFieldsReturnsEmptyCollections() {
         String serialized = MetaDataSerializer.serializeCustomEntryTypes(newCustomType);
         Optional<BibEntryType> type = MetaDataParser.parseCustomEntryType(serialized);

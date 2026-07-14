@@ -15,6 +15,17 @@ Needs: impl
 
 <!-- markdownlint-disable-file MD022 -->
 
+## Input file argument accepts an http(s)/ftp URL
+`req~jabkit.cli.input-url~1`
+
+The positional `FILE` argument and its `--input` alias additionally accept an `http://`,
+`https://`, or `ftp://` URL wherever a `jabkit` command reads a single file.
+The URL is downloaded to a local temporary file before use; a download failure is reported
+as a regular CLI error (exit code `SOFTWARE`) rather than a "file not found" usage error.
+See [ADR 65](../decisions/0065-download-url-input-files.md) for more details.
+
+Needs: impl
+
 ## Banner shown only at `--help`
 `req~jabkit.cli.banner-shown~1`
 
@@ -33,5 +44,18 @@ The `jabkit check` subcommands emit their findings in a line-oriented
 
 Entry-level findings (for example, on the citation key itself) carry only the citation key.
 Field-level findings additionally carry the affected field name.
+
+Needs: impl
+
+## GitHub Actions output of the `check` commands
+`req~jabkit.cli.check-github-actions-output~1`
+
+The `jabkit check` subcommands support an additional `github-actions` output format
+that emits each finding as a [GitHub Actions workflow command](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#setting-an-error-message)
+of the shape `::error file=<file>,line=<line>,col=<col>,title=<title>::<message>`.
+
+The `file`, `line`, `col`, and `title` property values are URL-encoded so that
+Windows-style paths (containing `:`) and titles (containing `:` between citation key and field name)
+are parsed correctly by the GitHub Actions runner.
 
 Needs: impl
