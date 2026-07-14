@@ -84,6 +84,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where renaming a linked file with a very long title showed a misleading "file is being used by another process" error instead of renaming successfully. [#14771](https://github.com/JabRef/jabref/issues/14771)
 - We fixed an issue where JabRef would trigger `The libray has been changed` while still saving. [#4877](https://github.com/JabRef/jabref/issues/4877)
 - We fixed preview tooltip height calculation in the main table. [#16219](https://github.com/JabRef/jabref/issues/16219)
+- We fixed an issue where stale main table search results could remain visible after consecutive searches. [#15710](https://github.com/JabRef/jabref/issues/15710)
 - We fixed an issue where the button shape changed when hovering over it. [#16188](https://github.com/JabRef/jabref/issues/16188)
 
 ### Removed
