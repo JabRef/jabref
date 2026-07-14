@@ -8,8 +8,11 @@ import java.util.Optional;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fetcher.CrossRef;
+import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
@@ -18,6 +21,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.jspecify.annotations.NullMarked;
@@ -38,13 +42,26 @@ public class PdfEntryFactory {
     private final PdfMergeMetadataImporter importer;
     private final FilePreferences filePreferences;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+    private final CrossRef crossRef;
+    private final DoiFetcher doiFetcher;
 
     public PdfEntryFactory(ImportFormatPreferences importFormatPreferences,
                            FilePreferences filePreferences,
                            CitationKeyPatternPreferences citationKeyPatternPreferences) {
+        this(importFormatPreferences, filePreferences, citationKeyPatternPreferences,
+                new CrossRef(), new DoiFetcher(importFormatPreferences));
+    }
+
+    PdfEntryFactory(ImportFormatPreferences importFormatPreferences,
+                    FilePreferences filePreferences,
+                    CitationKeyPatternPreferences citationKeyPatternPreferences,
+                    CrossRef crossRef,
+                    DoiFetcher doiFetcher) {
         this.importer = new PdfMergeMetadataImporter(importFormatPreferences);
         this.filePreferences = filePreferences;
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
+        this.crossRef = crossRef;
+        this.doiFetcher = doiFetcher;
     }
 
     /// Generates a citation key for the entry if it has none. Call after the entry has been
@@ -98,10 +115,32 @@ public class PdfEntryFactory {
             if (parserResult.isInvalid() || entries.isEmpty()) {
                 return Optional.empty();
             }
-            return Optional.of(entries.getFirst());
+            BibEntry entry = entries.getFirst();
+            completeWithMissingDoiMetadata(entry);
+            return Optional.of(entry);
         } catch (IOException e) {
             LOGGER.warn("Could not extract metadata from {}", pdf, e);
             return Optional.empty();
+        }
+    }
+
+    /// When the PDF itself yielded no DOI, the DOI is looked up (the same reverse search as the
+    /// magnifier button next to the DOI field) and the metadata behind it fills the fields the
+    /// PDF did not provide — extracted values are never overwritten. PDFs that already carried a
+    /// DOI were enriched by [PdfMergeMetadataImporter] itself.
+    private void completeWithMissingDoiMetadata(BibEntry entry) {
+        if (entry.getField(StandardField.DOI).isPresent()) {
+            return;
+        }
+        try {
+            Optional<DOI> doi = crossRef.findIdentifier(entry);
+            if (doi.isEmpty()) {
+                return;
+            }
+            entry.setField(StandardField.DOI, doi.get().asString());
+            doiFetcher.performSearchById(doi.get().asString()).ifPresent(entry::mergeWith);
+        } catch (FetcherException e) {
+            LOGGER.debug("DOI lookup failed for {}", entry.getAuthorTitleYear(80), e);
         }
     }
 }
