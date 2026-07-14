@@ -110,6 +110,9 @@ jobs:
           pom-file: 'match-nothing.txt'
           source-branch: 'upstream/main'
           target-branch: ${{ steps.pr_info.outputs.head_ref }}
+          # Push the resolved merge back to the PR branch. This is the whole point:
+          # the push triggers a fresh run that then reports no conflicts (no comment).
+          push-changes: true
 
       - name: Handle merge conflict
         if: steps.check_mergeable.outputs.mergeable == 'CONFLICTING'

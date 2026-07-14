@@ -58,3 +58,5 @@ jobs:
           pom-file: 'match-nothing.txt'
           source-branch: 'upstream/main'
           target-branch: ${{ steps.resolve.outputs.branch || github.head_ref }}
+          # Push the merge commit back to the PR branch (the reason this workflow exists).
+          push-changes: true
