@@ -180,12 +180,62 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         Optional.of(entryJson.optString("identifier"))
                 .filter(value -> !StringUtil.isBlank(value))
                 .ifPresent(value -> entry.withField(StandardField.ZBL_NUMBER, value));
-        putInteger(entry, new UnknownField("zbmath"), entryJson, "id");
-        putAuthors(entry, entryJson);
-        putLanguage(entry, entryJson);
-        putSource(entry, entryJson);
-        putDoi(entry, entryJson);
-        putMscCodes(entry, entryJson);
+        if (entryJson.has("id")) {
+            entry.withField(new UnknownField("zbmath"), String.valueOf(entryJson.getInt("id")));
+        }
+
+        Optional.ofNullable(entryJson.optJSONObject("contributors"))
+                .map(contributors -> contributors.optJSONArray("authors"))
+                .map(authors -> {
+                    List<String> authorNames = new ArrayList<>();
+                    for (int i = 0; i < authors.length(); i++) {
+                        JSONObject author = authors.optJSONObject(i);
+                        if (author != null && !StringUtil.isBlank(author.optString("name"))) {
+                            authorNames.add(author.optString("name"));
+                        }
+                    }
+                    return AuthorList.parse(String.join(" and ", authorNames)).getAsLastFirstNamesWithAnd(false);
+                })
+                .filter(author -> !StringUtil.isBlank(author))
+                .ifPresent(author -> entry.setField(StandardField.AUTHOR, author));
+
+        Optional.ofNullable(entryJson.optJSONObject("language"))
+                .map(language -> language.optJSONArray("languages"))
+                .filter(languages -> !languages.isEmpty())
+                .map(languages -> languages.optString(0))
+                .filter(language -> !StringUtil.isBlank(language))
+                .ifPresent(language -> entry.setField(StandardField.LANGUAGE, language));
+
+        Optional.ofNullable(entryJson.optJSONObject("source"))
+                .ifPresent(source -> parseSource(entry, source));
+
+        JSONArray links = entryJson.optJSONArray("links");
+        if (links != null) {
+            for (int i = 0; i < links.length(); i++) {
+                JSONObject link = links.optJSONObject(i);
+                if (link != null && "doi".equals(link.optString("type"))) {
+                    Optional.of(link.optString("identifier"))
+                            .filter(value -> !StringUtil.isBlank(value))
+                            .ifPresent(value -> entry.withField(StandardField.DOI, value));
+                    break;
+                }
+            }
+        }
+
+        JSONArray mscEntries = entryJson.optJSONArray("msc");
+        if (mscEntries != null) {
+            List<String> mscCodes = new ArrayList<>();
+            for (int i = 0; i < mscEntries.length(); i++) {
+                JSONObject msc = mscEntries.optJSONObject(i);
+                if (msc != null && !StringUtil.isBlank(msc.optString("code"))) {
+                    mscCodes.add(msc.optString("code"));
+                }
+            }
+            if (!mscCodes.isEmpty()) {
+                String separator = preferences.bibEntryPreferences().getKeywordSeparator() + "";
+                entry.setField(StandardField.KEYWORDS, String.join(separator, mscCodes));
+            }
+        }
 
         return entry;
     }
@@ -204,152 +254,66 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         };
     }
 
-    private void putAuthors(BibEntry entry, JSONObject entryJson) {
-        Optional.ofNullable(entryJson.optJSONObject("contributors"))
-                .map(contributors -> contributors.optJSONArray("authors"))
-                .map(authors -> {
-                    List<String> authorNames = new ArrayList<>();
-                    for (int i = 0; i < authors.length(); i++) {
-                        JSONObject author = authors.optJSONObject(i);
-                        if (author != null && !StringUtil.isBlank(author.optString("name"))) {
-                            authorNames.add(author.optString("name"));
-                        }
-                    }
-                    return String.join(" and ", authorNames);
-                })
-                .filter(author -> !StringUtil.isBlank(author))
-                .ifPresent(author -> entry.setField(StandardField.AUTHOR, author));
-    }
-
-    private void putSource(BibEntry entry, JSONObject entryJson) {
-        Optional.ofNullable(entryJson.optJSONObject("source"))
-                .ifPresent(source -> {
-                    putPages(entry, source);
-                    putBookSource(entry, source);
-                    JSONArray series = source.optJSONArray("series");
-                    if (series != null && !series.isEmpty()) {
-                        JSONObject firstSeries = series.optJSONObject(0);
-                        if (firstSeries != null) {
-                            Optional.of(firstSeries.optString("title"))
-                                    .filter(value -> !StringUtil.isBlank(value))
-                                    .ifPresent(value -> entry.withField(StandardField.JOURNAL, value));
-                            Optional.of(firstSeries.optString("volume"))
-                                    .filter(value -> !StringUtil.isBlank(value))
-                                    .ifPresent(value -> entry.withField(StandardField.VOLUME, value));
-                            putIssn(entry, firstSeries);
-                        }
-                    }
-                });
-    }
-
-    private void putBookSource(BibEntry entry, JSONObject source) {
-        JSONArray books = source.optJSONArray("book");
-        if (books == null || books.isEmpty()) {
-            return;
-        }
-
-        JSONObject firstBook = books.optJSONObject(0);
-        if (firstBook == null) {
-            return;
-        }
-
-        if (entry.getType() == StandardEntryType.InCollection) {
-            Optional.of(source.optString("source"))
-                    .filter(value -> !StringUtil.isBlank(value))
-                    .ifPresent(value -> entry.withField(StandardField.BOOKTITLE, value));
-        }
-
-        Optional.ofNullable(firstBook.optJSONArray("isbn"))
-                .filter(isbnEntries -> !isbnEntries.isEmpty())
-                .map(isbnEntries -> isbnEntries.optJSONObject(0))
-                .ifPresent(firstIsbn -> Optional.of(firstIsbn.optString("number"))
-                        .filter(value -> !StringUtil.isBlank(value))
-                        .ifPresent(value -> entry.withField(StandardField.ISBN, value)));
-
-        Optional.of(firstBook.optString("publisher"))
-                .filter(value -> !StringUtil.isBlank(value))
-                .ifPresent(value -> entry.withField(StandardField.PUBLISHER, value));
-    }
-
-    private void putPages(BibEntry entry, JSONObject source) {
+    private void parseSource(BibEntry entry, JSONObject source) {
         String pages = source.optString("pages");
         if (!StringUtil.isBlank(pages)) {
             entry.setField(StandardField.PAGES, pages.replace("-", "--"));
         }
-    }
 
-    private void putIssn(BibEntry entry, JSONObject series) {
-        JSONArray issnEntries = series.optJSONArray("issn");
-        if (issnEntries == null || issnEntries.isEmpty()) {
-            return;
-        }
+        JSONArray books = source.optJSONArray("book");
+        if (books != null && !books.isEmpty()) {
+            JSONObject firstBook = books.optJSONObject(0);
+            if (firstBook != null) {
+                if (entry.getType() == StandardEntryType.InCollection) {
+                    Optional.of(source.optString("source"))
+                            .filter(value -> !StringUtil.isBlank(value))
+                            .ifPresent(value -> entry.withField(StandardField.BOOKTITLE, value));
+                }
 
-        for (int i = 0; i < issnEntries.length(); i++) {
-            JSONObject issn = issnEntries.optJSONObject(i);
-            if (issn != null && "print".equals(issn.optString("type"))) {
-                Optional.of(issn.optString("number"))
+                Optional.ofNullable(firstBook.optJSONArray("isbn"))
+                        .filter(isbnEntries -> !isbnEntries.isEmpty())
+                        .map(isbnEntries -> isbnEntries.optJSONObject(0))
+                        .ifPresent(firstIsbn -> Optional.of(firstIsbn.optString("number"))
+                                .filter(value -> !StringUtil.isBlank(value))
+                                .ifPresent(value -> entry.withField(StandardField.ISBN, value)));
+
+                Optional.of(firstBook.optString("publisher"))
                         .filter(value -> !StringUtil.isBlank(value))
-                        .ifPresent(value -> entry.withField(StandardField.ISSN, value));
-                return;
+                        .ifPresent(value -> entry.withField(StandardField.PUBLISHER, value));
             }
         }
 
-        JSONObject firstIssn = issnEntries.optJSONObject(0);
-        if (firstIssn != null) {
-            Optional.of(firstIssn.optString("number"))
-                    .filter(value -> !StringUtil.isBlank(value))
-                    .ifPresent(value -> entry.withField(StandardField.ISSN, value));
-        }
-    }
-
-    private void putLanguage(BibEntry entry, JSONObject entryJson) {
-        Optional.ofNullable(entryJson.optJSONObject("language"))
-                .map(language -> language.optJSONArray("languages"))
-                .filter(languages -> !languages.isEmpty())
-                .map(languages -> languages.optString(0))
-                .filter(language -> !StringUtil.isBlank(language))
-                .ifPresent(language -> entry.setField(StandardField.LANGUAGE, language));
-    }
-
-    private void putDoi(BibEntry entry, JSONObject entryJson) {
-        JSONArray links = entryJson.optJSONArray("links");
-        if (links == null) {
-            return;
-        }
-
-        for (int i = 0; i < links.length(); i++) {
-            JSONObject link = links.optJSONObject(i);
-            if (link != null && "doi".equals(link.optString("type"))) {
-                Optional.of(link.optString("identifier"))
+        JSONArray series = source.optJSONArray("series");
+        if (series != null && !series.isEmpty()) {
+            JSONObject firstSeries = series.optJSONObject(0);
+            if (firstSeries != null) {
+                Optional.of(firstSeries.optString("title"))
                         .filter(value -> !StringUtil.isBlank(value))
-                        .ifPresent(value -> entry.withField(StandardField.DOI, value));
-                return;
+                        .ifPresent(value -> entry.withField(StandardField.JOURNAL, value));
+                Optional.of(firstSeries.optString("volume"))
+                        .filter(value -> !StringUtil.isBlank(value))
+                        .ifPresent(value -> entry.withField(StandardField.VOLUME, value));
+
+                JSONArray issnEntries = firstSeries.optJSONArray("issn");
+                if (issnEntries != null && !issnEntries.isEmpty()) {
+                    for (int i = 0; i < issnEntries.length(); i++) {
+                        JSONObject issn = issnEntries.optJSONObject(i);
+                        if (issn != null && "print".equals(issn.optString("type"))) {
+                            Optional.of(issn.optString("number"))
+                                    .filter(value -> !StringUtil.isBlank(value))
+                                    .ifPresent(value -> entry.withField(StandardField.ISSN, value));
+                            return;
+                        }
+                    }
+
+                    JSONObject firstIssn = issnEntries.optJSONObject(0);
+                    if (firstIssn != null) {
+                        Optional.of(firstIssn.optString("number"))
+                                .filter(value -> !StringUtil.isBlank(value))
+                                .ifPresent(value -> entry.withField(StandardField.ISSN, value));
+                    }
+                }
             }
-        }
-    }
-
-    private void putMscCodes(BibEntry entry, JSONObject entryJson) {
-        JSONArray mscEntries = entryJson.optJSONArray("msc");
-        if (mscEntries == null) {
-            return;
-        }
-
-        List<String> mscCodes = new ArrayList<>();
-        for (int i = 0; i < mscEntries.length(); i++) {
-            JSONObject msc = mscEntries.optJSONObject(i);
-            if (msc != null && !StringUtil.isBlank(msc.optString("code"))) {
-                mscCodes.add(msc.optString("code"));
-            }
-        }
-        if (!mscCodes.isEmpty()) {
-            String separator = preferences.bibEntryPreferences().getKeywordSeparator() + "";
-            entry.setField(StandardField.KEYWORDS, String.join(separator, mscCodes));
-        }
-    }
-
-    private void putInteger(BibEntry entry, UnknownField field, JSONObject source, String key) {
-        if (source.has(key)) {
-            entry.setField(field, String.valueOf(source.getInt(key)));
         }
     }
 }
