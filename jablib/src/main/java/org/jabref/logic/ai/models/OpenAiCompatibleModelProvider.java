@@ -3,6 +3,7 @@ package org.jabref.logic.ai.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.ai.llm.AiProvider;
 
 import kong.unirest.core.HttpResponse;
@@ -35,6 +36,7 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
         try {
             String modelsEndpoint = buildModelsEndpoint(apiBaseUrl);
+            URLDownload.ensureUnirestConfigured();
             HttpResponse<JsonNode> response = Unirest.get(modelsEndpoint)
                                                      .header("Authorization", "Bearer " + apiKey)
                                                      .header("accept", "application/json")

@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -50,6 +51,7 @@ public class OpenAccessDoi implements FulltextFetcher {
     }
 
     public Optional<URL> findFullText(DOI doi) throws UnirestException {
+        URLDownload.ensureUnirestConfigured();
         HttpResponse<JsonNode> request = Unirest.get(API_URL + doi.asString() + "?email=developers@jabref.org")
                                                 .header("accept", "application/json")
                                                 .asJson();

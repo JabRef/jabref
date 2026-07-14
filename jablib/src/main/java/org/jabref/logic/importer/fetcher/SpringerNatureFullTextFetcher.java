@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -51,6 +52,7 @@ public class SpringerNatureFullTextFetcher implements FulltextFetcher, Customiza
         }
         // Available in catalog?
         try {
+            URLDownload.ensureUnirestConfigured();
             HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL)
                                                          .queryString("api_key", importerPreferences.getApiKey(getName()).orElse(""))
                                                          .queryString("q", "doi:%s".formatted(doi.get().asString()))

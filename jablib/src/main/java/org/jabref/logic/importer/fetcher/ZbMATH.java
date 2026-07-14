@@ -18,6 +18,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.ZbMathQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.AMSField;
@@ -86,6 +87,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         to get the bibtex data.
          */
         String urlString = uriBuilder.build().toString();
+        URLDownload.ensureUnirestConfigured();
         HttpResponse<JsonNode> response = Unirest.get(urlString)
                                                  .asJson();
         String zblid = null;

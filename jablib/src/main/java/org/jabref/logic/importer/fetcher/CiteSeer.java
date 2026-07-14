@@ -12,6 +12,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.transformers.CiteSeerQueryTransformer;
 import org.jabref.logic.importer.fileformat.CiteSeerParser;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -57,6 +58,7 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
         // ADR-0014
         try {
             JSONElement payload = getPayloadJSON(queryNode);
+            URLDownload.ensureUnirestConfigured();
             HttpResponse<JsonNode> httpResponse = Unirest.post(API_URL)
                                                          .header("authority", BASE_URL)
                                                          .header("accept", "application/json, text/plain, */*")

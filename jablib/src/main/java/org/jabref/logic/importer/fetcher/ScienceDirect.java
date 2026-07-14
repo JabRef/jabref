@@ -157,6 +157,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
         String pdfLink = "";
         try {
             String request = API_URL + doi;
+            URLDownload.ensureUnirestConfigured();
             HttpResponse<JsonNode> jsonResponse = Unirest.get(request)
                                                          // Shares the same key as Scopus, because both are offered by Elsevier (https://devdocs.jabref.org/code-howtos/fetchers.html#fetchers)
                                                          .header("X-ELS-APIKey", importerPreferences.getApiKey(Scopus.FETCHER_NAME).orElse(""))

@@ -14,6 +14,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.journals.JournalInformation;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.identifier.ISSN;
 
 import kong.unirest.core.HttpResponse;
@@ -51,6 +52,7 @@ public class JournalInformationFetcher implements WebFetcher {
         Optional<JournalInformation> journalInformationOptional = Optional.empty();
 
         JSONObject postData = buildPostData(cleanedISSN, journalName);
+        URLDownload.ensureUnirestConfigured();
 
         HttpResponse<JsonNode> httpResponse = Unirest.post(API_URL)
                                                      .header("Content-Type", "application/json")
