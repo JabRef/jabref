@@ -78,8 +78,8 @@ public class HayagrivaEntryWriter {
         ObjectNode result = MAPPER.createObjectNode();
         for (KeyedEntry keyedEntry : entries) {
             ObjectNode entryNode = existingRoot.get(keyedEntry.previousKey()) instanceof ObjectNode existing
-                    ? existing
-                    : MAPPER.createObjectNode();
+                                   ? existing
+                                   : MAPPER.createObjectNode();
             result.set(keyedEntry.targetKey(), mergeIntoNode(keyedEntry.entry(), entryNode));
         }
         return MAPPER.writeValueAsString(result);
