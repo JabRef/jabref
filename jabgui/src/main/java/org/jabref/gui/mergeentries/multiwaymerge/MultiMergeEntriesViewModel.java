@@ -1,6 +1,10 @@
 package org.jabref.gui.mergeentries.multiwaymerge;
 
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import javafx.beans.property.BooleanProperty;
@@ -21,6 +25,8 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
 
 public class MultiMergeEntriesViewModel extends AbstractViewModel {
 
@@ -29,6 +35,8 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
     private final ObjectProperty<BibEntry> mergedEntry = new SimpleObjectProperty<>(new BibEntry());
 
     private final ListProperty<String> failedSuppliers = new SimpleListProperty<>(FXCollections.observableArrayList());
+
+    private final Set<String> autoFetchedDois = new HashSet<>();
 
     public void addSource(EntrySource entrySource) {
         if (!entrySource.isLoading.getValue()) {
@@ -68,6 +76,13 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
                         });
             }
         }
+    }
+
+    public Optional<String> findNewFetchableDoi(BibEntry entry) {
+        return entry.getField(StandardField.DOI)
+                     .flatMap(DOI::parse)
+                     .map(DOI::asString)
+                     .filter(value -> autoFetchedDois.add(value.toLowerCase(Locale.ROOT)));
     }
 
     public BibEntry resultConverter(ButtonType button) {

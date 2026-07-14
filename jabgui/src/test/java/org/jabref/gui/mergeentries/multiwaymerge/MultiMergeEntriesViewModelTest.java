@@ -13,6 +13,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MultiMergeEntriesViewModelTest {
 
@@ -65,5 +66,60 @@ class MultiMergeEntriesViewModelTest {
         viewModel.updateFields(rightEntry);
 
         assertEquals(expected, viewModel.mergedEntryProperty().get().getField(field).orElse(""));
+    }
+
+    @Test
+    void findNewFetchableDoiReturnsDoiOnce() {
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1000/182");
+        assertEquals("10.1000/182", viewModel.findNewFetchableDoi(entry).orElse(""));
+    }
+
+    @Test
+    void findNewFetchableDoiDedupesRepeatedCall() {
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1000/182");
+        viewModel.findNewFetchableDoi(entry);
+        assertTrue(viewModel.findNewFetchableDoi(entry).isEmpty());
+    }
+
+    @Test
+    void findNewFetchableDoiDedupesCaseAndWhitespaceVariants() {
+        BibEntry first = new BibEntry().withField(StandardField.DOI, "10.1000/182");
+        BibEntry second = new BibEntry().withField(StandardField.DOI, "  10.1000/182  ");
+        viewModel.findNewFetchableDoi(first);
+        assertTrue(viewModel.findNewFetchableDoi(second).isEmpty());
+    }
+
+    @Test
+    void findNewFetchableDoiIgnoresBlankValue() {
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, "   ");
+        assertTrue(viewModel.findNewFetchableDoi(entry).isEmpty());
+    }
+
+    @Test
+    void findNewFetchableDoiReturnsEmptyWhenNoDoi() {
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "Some Title");
+        assertTrue(viewModel.findNewFetchableDoi(entry).isEmpty());
+    }
+
+    @Test
+    void findNewFetchableDoiDedupesUrlAndPlainFormOfSameDoi() {
+        BibEntry plain = new BibEntry().withField(StandardField.DOI, "10.1145/3651640.3651646");
+        BibEntry url = new BibEntry().withField(StandardField.DOI, "https://doi.org/10.1145/3651640.3651646");
+        viewModel.findNewFetchableDoi(plain);
+        assertTrue(viewModel.findNewFetchableDoi(url).isEmpty());
+    }
+
+    @Test
+    void findNewFetchableDoiIgnoresInvalidDoi() {
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, "not-a-doi");
+        assertTrue(viewModel.findNewFetchableDoi(entry).isEmpty());
+    }
+
+    @Test
+    void findNewFetchableDoiIgnoresUnsupportedInfoDoiScheme() {
+        // XMP metadata sometimes stores DOIs using the "info:doi/" URI scheme, which DOI.parse does not
+        // recognize. Must be filtered out rather than passed to the fetcher as-is, where it would fail.
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, "info:doi/10.1145/3651640.3651646");
+        assertTrue(viewModel.findNewFetchableDoi(entry).isEmpty());
     }
 }

@@ -360,6 +360,31 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         });
     }
 
+    public void enableAutomaticIdentifierFetching() {
+        for (MultiMergeEntriesViewModel.EntrySource entrySourceColumn : List.copyOf(viewModel.entriesProperty())) {
+            if (!entrySourceColumn.isLoadingProperty().getValue()) {
+                triggerAutomaticIdentifierFetch(entrySourceColumn);
+            } else {
+                entrySourceColumn.isLoadingProperty().addListener((_, _, isLoading) -> {
+                    if (!isLoading) {
+                        triggerAutomaticIdentifierFetch(entrySourceColumn);
+                    }
+                });
+            }
+        }
+    }
+
+    private void triggerAutomaticIdentifierFetch(MultiMergeEntriesViewModel.EntrySource entrySourceColumn) {
+        BibEntry entry = entrySourceColumn.entryProperty().get();
+        if (entry == null) {
+            return;
+        }
+        viewModel.findNewFetchableDoi(entry).ifPresent(doi -> {
+            DoiFetcher doiFetcher = new DoiFetcher(preferences.getImportFormatPreferences());
+            addFetchedColumn(Localization.lang("From DOI"), doiFetcher, doi);
+        });
+    }
+
     private class FieldRow {
 
         public final ToggleGroup toggleGroup = new ToggleGroup();
