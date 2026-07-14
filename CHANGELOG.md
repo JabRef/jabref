@@ -61,6 +61,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where importing a PDF could set the author to the person stored in the PDF's document properties (typically the account name of whoever exported the file, e.g. from Microsoft Word) instead of the authors of the work: author candidates are now cross-checked against the text of the PDF's first pages. [TODO]
+- We fixed an issue where importing a PDF could extract an implausible year (e.g. from a postal code or a link printed on the first page). [TODO]
 - We fixed an issue where converting a field to Unicode and back to LaTeX destroyed `\textsuperscript{...}`/`\textsubscript{...}`: runs of Unicode super-/subscript characters now merge back into a single command. [#3644](https://github.com/JabRef/jabref/issues/3644)
 - We reduced the size of Linux packages by removing embedded Postgres binaries for unused architectures. [#16143](https://github.com/JabRef/jabref/issues/16143)
 - We fixed an issue where searching ISIDORE failed with a security connection error. [#16054](https://github.com/JabRef/jabref/issues/16054)

@@ -76,7 +76,7 @@ class PdfContentPartialImporterTest {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "Link to record in KAR and http://kar.kent.ac.uk/51043/  and Document Version and UNSPECIFIED  and Master of Research (MRes) thesis and University of Kent")
                 .withField(StandardField.TITLE, "Kent Academic Repository Full text document (pdf) Citation for published version Smith, Lucy Anna (2014) Mortality in the Ornamental Fish Retail Sector: an Analysis of Stock Losses and Stakeholder Opinions. DOI")
-                .withField(StandardField.YEAR, "5104");
+                .withField(StandardField.YEAR, "2014");
 
         String firstPageContents = """
                 Kent Academic Repository Full text document (pdf)
@@ -90,6 +90,39 @@ class PdfContentPartialImporterTest {
                 Document Version
                 UNSPECIFIED
                 Master of Research (MRes) thesis, University of Kent,.""";
+
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
+    }
+
+    @Test
+    void yearNotExtractedFromLongerDigitRun() {
+        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Alice Sample")
+                .withField(StandardField.TITLE, "Some Title of a Paper");
+
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                Universitaetsstr. 38, 70569 Stuttgart, Germany""";
+
+        assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
+    }
+
+    @Test
+    void implausibleFourDigitNumberSkippedInFavorOfActualYear() {
+        BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Alice Sample")
+                .withField(StandardField.TITLE, "Some Title of a Paper")
+                .withField(StandardField.YEAR, "2018");
+
+        String firstPageContents = """
+                Some Title of a Paper
+
+                Alice Sample
+
+                CH-8092 Zurich, 2018""";
 
         assertEquals(Optional.of(entry), importer.getEntryFromPDFContent(firstPageContents, "\n", Optional.empty()));
     }
