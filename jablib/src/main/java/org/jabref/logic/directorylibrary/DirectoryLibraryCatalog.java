@@ -36,6 +36,27 @@ public class DirectoryLibraryCatalog {
         return Optional.ofNullable(sourceByEntryId.get(entry.getId()));
     }
 
+    public void removeEntry(BibEntry entry) {
+        EntrySource source = sourceByEntryId.remove(entry.getId());
+        if (source != null) {
+            List<String> ids = entryIdsByFile.get(source.yamlFile());
+            if (ids != null) {
+                ids.remove(entry.getId());
+                if (ids.isEmpty()) {
+                    entryIdsByFile.remove(source.yamlFile());
+                }
+            }
+        }
+    }
+
+    /// Records the Hayagriva key the entry was last written under (after a citation-key edit).
+    public void updateHayagrivaKey(BibEntry entry, String hayagrivaKey) {
+        EntrySource source = sourceByEntryId.get(entry.getId());
+        if (source != null) {
+            sourceByEntryId.put(entry.getId(), new EntrySource(source.yamlFile(), hayagrivaKey));
+        }
+    }
+
     /// Entry ids of all entries read from the given file, in file order.
     public List<String> entryIdsIn(Path yamlFile) {
         return List.copyOf(entryIdsByFile.getOrDefault(yamlFile, List.of()));

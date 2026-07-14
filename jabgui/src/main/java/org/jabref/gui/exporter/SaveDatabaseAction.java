@@ -27,6 +27,7 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.directorylibrary.DirectoryLibrarySynchronizer;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
@@ -199,6 +200,17 @@ public class SaveDatabaseAction {
     }
 
     private boolean save(BibDatabaseContext bibDatabaseContext, SaveDatabaseMode mode) {
+        if (bibDatabaseContext.getLocation() == DatabaseLocation.DIRECTORY) {
+            // A directory library persists into its sidecar files; saving means flushing the
+            // debounced writes, never writing a .bib ("Save as" remains the explicit snapshot)
+            // [impl->req~directory-library.write-back~1]
+            DirectoryLibrarySynchronizer synchronizer = bibDatabaseContext.getDirectorySynchronizer();
+            if (synchronizer != null) {
+                synchronizer.flush();
+            }
+            dialogService.notify(Localization.lang("Library saved"));
+            return true;
+        }
         Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
         if (databasePath.isEmpty()) {
             Optional<Path> savePath = askForSavePath();

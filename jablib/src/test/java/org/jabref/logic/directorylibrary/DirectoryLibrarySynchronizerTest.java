@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -72,6 +74,8 @@ class DirectoryLibrarySynchronizerTest {
 
     private final SteppingClock clock = new SteppingClock();
 
+    private final List<Path> disposedFiles = new ArrayList<>();
+
     private BibDatabaseContext context;
     private DirectoryLibrarySynchronizer synchronizer;
 
@@ -79,7 +83,8 @@ class DirectoryLibrarySynchronizerTest {
         PdfEntryFactory pdfEntryFactory = offlinePdfEntryFactory();
         DirectoryLibraryScanner.ScanResult scanResult = new DirectoryLibraryScanner(pdfEntryFactory).scan(root);
         context = scanResult.databaseContext();
-        synchronizer = new DirectoryLibrarySynchronizer(context, scanResult.catalog(), pdfEntryFactory, Runnable::run, clock);
+        synchronizer = new DirectoryLibrarySynchronizer(context, scanResult.catalog(), pdfEntryFactory,
+                disposedFiles::add, Runnable::run, clock);
     }
 
     /// GROBID off and no identifiers in the fixtures, so no network is touched
@@ -263,5 +268,122 @@ class DirectoryLibrarySynchronizerTest {
         synchronizer.handleFileDeleted(root.resolve("smith2020.pdf"));
         assertEquals(1, entries().size());
         assertTrue(entries().getFirst().getFiles().isEmpty());
+    }
+
+    @Test
+    void localEditRewritesSidecarPreservingUnknownContent() throws IOException {
+        Path sidecar = root.resolve("smith2020.yml");
+        Files.writeString(sidecar, ARTICLE_YAML + "    tongus: 2\n");
+        openLibrary();
+        BibEntry entry = entries().getFirst();
+
+        entry.setField(StandardField.NOTE, "rewritten by JabRef");
+        synchronizer.handleLocalChange(entry);
+        synchronizer.flush();
+
+        String written = Files.readString(sidecar);
+        assertTrue(written.contains("rewritten by JabRef"));
+        assertTrue(written.contains("tongus"));
+    }
+
+    @Test
+    void firstEditOfStubEntryCreatesSidecarNextToPdf() throws IOException {
+        Files.createFile(root.resolve("loose.pdf"));
+        openLibrary();
+        BibEntry stub = entries().getFirst();
+
+        stub.setField(StandardField.AUTHOR, "Doe, John");
+        synchronizer.handleLocalChange(stub);
+        synchronizer.flush();
+
+        Path sidecar = root.resolve("loose.yml");
+        assertTrue(Files.exists(sidecar));
+        assertTrue(Files.readString(sidecar).contains("Doe, John"));
+    }
+
+    @Test
+    void newEntryWithoutFileGetsCitationKeyNamedSidecar() throws IOException {
+        openLibrary();
+        BibEntry entry = new BibEntry(org.jabref.model.entry.types.StandardEntryType.Article)
+                .withCitationKey("fresh2026")
+                .withField(StandardField.TITLE, "Fresh Entry");
+        context.getDatabase().insertEntry(entry);
+
+        synchronizer.handleLocalChange(entry);
+        synchronizer.flush();
+
+        assertTrue(Files.exists(root.resolve("fresh2026.yml")));
+    }
+
+    @Test
+    void citationKeyEditRenamesYamlKey() throws IOException {
+        Path sidecar = root.resolve("smith2020.yml");
+        Files.writeString(sidecar, ARTICLE_YAML);
+        openLibrary();
+        BibEntry entry = entries().getFirst();
+
+        entry.setCitationKey("smith2021");
+        synchronizer.handleLocalChange(entry);
+        synchronizer.flush();
+
+        String written = Files.readString(sidecar);
+        assertTrue(written.contains("smith2021:"));
+        assertFalse(written.contains("smith2020:"));
+    }
+
+    @Test
+    void deletingLastEntryDisposesSidecarOnly() throws IOException {
+        Path sidecar = root.resolve("smith2020.yml");
+        Files.writeString(sidecar, ARTICLE_YAML);
+        Files.createFile(root.resolve("smith2020.pdf"));
+        openLibrary();
+        BibEntry entry = entries().getFirst();
+
+        context.getDatabase().removeEntries(List.of(entry));
+        synchronizer.handleLocalRemoval(List.of(entry));
+        synchronizer.flush();
+
+        assertEquals(List.of(sidecar), disposedFiles);
+        assertTrue(Files.exists(root.resolve("smith2020.pdf")));
+    }
+
+    @Test
+    void deletingOneEntryOfMultiEntryFileRewritesRemainder() throws IOException {
+        Path file = root.resolve("collection.yml");
+        Files.writeString(file, """
+                first:
+                    type: article
+                    title: First
+                second:
+                    type: article
+                    title: Second
+                """);
+        openLibrary();
+        BibEntry first = entries().getFirst();
+
+        context.getDatabase().removeEntries(List.of(first));
+        synchronizer.handleLocalRemoval(List.of(first));
+        synchronizer.flush();
+
+        String written = Files.readString(file);
+        assertFalse(written.contains("first:"));
+        assertTrue(written.contains("second:"));
+        assertEquals(List.of(), disposedFiles);
+    }
+
+    @Test
+    void ownSidecarWritesAreNotReimported() throws IOException {
+        Path sidecar = root.resolve("smith2020.yml");
+        Files.writeString(sidecar, ARTICLE_YAML);
+        openLibrary();
+        BibEntry entry = entries().getFirst();
+
+        entry.setField(StandardField.NOTE, "written back");
+        synchronizer.handleLocalChange(entry);
+        synchronizer.flush();
+        synchronizer.handleFileChanged(sidecar);
+
+        assertEquals(1, entries().size());
+        assertEquals(Optional.of("written back"), entry.getField(StandardField.NOTE));
     }
 }

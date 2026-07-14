@@ -77,6 +77,9 @@ public class BibDatabaseContext {
     @Nullable
     private DirectoryLibrarySynchronizer directorySynchronizer;
 
+    @Nullable
+    private CoarseChangeFilter directoryListener;
+
     private DatabaseLocation location;
 
     public BibDatabaseContext() {
@@ -289,6 +292,10 @@ public class BibDatabaseContext {
 
     public void attachDirectorySynchronizer(DirectoryLibrarySynchronizer directorySynchronizer) {
         this.directorySynchronizer = directorySynchronizer;
+        // Relays entry events keystroke-filtered to the synchronizer's write-back direction,
+        // mirroring convertToSharedDatabase
+        this.directoryListener = new CoarseChangeFilter(this);
+        directoryListener.registerListener(directorySynchronizer);
     }
 
     public @Nullable DirectoryLibrarySynchronizer getDirectorySynchronizer() {
@@ -301,6 +308,18 @@ public class BibDatabaseContext {
                 dbmsListener.unregisterListener(dbmsSynchronizer);
             }
             dbmsListener.shutdown();
+        }
+        if (directoryListener != null) {
+            if (directorySynchronizer != null) {
+                directoryListener.unregisterListener(directorySynchronizer);
+            }
+            directoryListener.shutdown();
+            this.directoryListener = null;
+        }
+        if (directorySynchronizer != null) {
+            // Flushes pending sidecar writes and stops the directory watcher
+            directorySynchronizer.shutdown();
+            this.directorySynchronizer = null;
         }
         if (directorySynchronizer != null) {
             directorySynchronizer.shutdown();

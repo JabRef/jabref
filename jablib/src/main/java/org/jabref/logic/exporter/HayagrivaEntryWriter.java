@@ -20,6 +20,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
@@ -48,6 +49,41 @@ public class HayagrivaEntryWriter {
                                                                        .disable(YAMLWriteFeature.WRITE_DOC_START_MARKER)
                                                                        .enable(YAMLWriteFeature.MINIMIZE_QUOTES)
                                                                        .build());
+
+    /// One entry of a directory-library sidecar during write-back: `previousKey` locates the
+    /// entry's existing YAML node (empty or unknown for new entries), `targetKey` is the key to
+    /// write (differs from `previousKey` after a citation-key edit).
+    public record KeyedEntry(String previousKey, String targetKey, BibEntry entry) {
+    }
+
+    /// Merges the given entries into an existing Hayagriva document (read-modify-write, see
+    /// class doc). The result contains exactly the given entries in the given order — top-level
+    /// keys without a corresponding entry are dropped, because their entries no longer belong
+    /// to this file — while inside each kept entry everything JabRef does not own survives.
+    public String mergeIntoDocument(@Nullable String existingDocument, List<KeyedEntry> entries) {
+        ObjectNode existingRoot;
+        if (existingDocument == null || existingDocument.isBlank()) {
+            existingRoot = MAPPER.createObjectNode();
+        } else {
+            JsonNode parsed;
+            try {
+                parsed = MAPPER.readTree(existingDocument);
+            } catch (JacksonException e) {
+                // Write-back only touches files it imported, so this is unexpected; rebuilding
+                // from scratch keeps the user's current entries authoritative
+                parsed = null;
+            }
+            existingRoot = parsed instanceof ObjectNode objectNode ? objectNode : MAPPER.createObjectNode();
+        }
+        ObjectNode result = MAPPER.createObjectNode();
+        for (KeyedEntry keyedEntry : entries) {
+            ObjectNode entryNode = existingRoot.get(keyedEntry.previousKey()) instanceof ObjectNode existing
+                    ? existing
+                    : MAPPER.createObjectNode();
+            result.set(keyedEntry.targetKey(), mergeIntoNode(keyedEntry.entry(), entryNode));
+        }
+        return MAPPER.writeValueAsString(result);
+    }
 
     public String serialize(SequencedMap<String, BibEntry> keyedEntries) {
         ObjectNode root = MAPPER.createObjectNode();

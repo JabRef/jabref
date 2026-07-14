@@ -20,6 +20,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -65,12 +66,17 @@ public class PdfEntryFactory {
     }
 
     /// Generates a citation key for the entry if it has none. Call after the entry has been
-    /// inserted into the database, so the uniqueness check sees the whole library.
+    /// inserted into the database, so the uniqueness check sees the whole library. The key is
+    /// set with [EntriesEventSource#SHARED]: it is system-initiated and must not count as a
+    /// user edit (a user edit is what materializes a sidecar).
     public void generateCitationKeyIfMissing(BibEntry entry, BibDatabaseContext databaseContext) {
         if (entry.getCitationKey().isPresent()) {
             return;
         }
-        new CitationKeyGenerator(databaseContext, citationKeyPatternPreferences).generateAndSetKey(entry);
+        String key = new CitationKeyGenerator(databaseContext, citationKeyPatternPreferences).generateKey(entry);
+        if (!key.isBlank()) {
+            entry.setField(InternalField.KEY_FIELD, key, EntriesEventSource.SHARED);
+        }
     }
 
     public BibEntry createEntry(Path pdf, Path root, BibDatabaseContext databaseContext) {

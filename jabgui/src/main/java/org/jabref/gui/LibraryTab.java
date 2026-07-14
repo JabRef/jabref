@@ -473,9 +473,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                     tabTitle.append(Localization.lang("untitled"));
                 }
             } else if (databaseLocation == DatabaseLocation.DIRECTORY) {
-                if (isChanged) {
-                    tabTitle.append('*');
-                }
+                // No modification marker: changes are written back to the sidecars continuously
                 bibDatabaseContext.getDirectoryLibraryRoot().ifPresent(root -> {
                     tabTitle.append(root.getFileName().toString());
                     toolTipText.append(root.toAbsolutePath());
@@ -485,8 +483,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
             }
             addModeInfo(toolTipText, bibDatabaseContext);
-            if ((databaseLocation == DatabaseLocation.LOCAL || databaseLocation == DatabaseLocation.DIRECTORY)
-                    && bibDatabaseContext.getDatabase().hasEntries()) {
+            if ((databaseLocation == DatabaseLocation.LOCAL) && bibDatabaseContext.getDatabase().hasEntries()) {
                 addChangedInformation(toolTipText);
             }
         }
@@ -656,9 +653,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public boolean requestClose() {
-        // DIRECTORY prompts as well: until file write-back exists, edits are in-memory only
-        if (bibDatabaseContext.getLocation() == DatabaseLocation.LOCAL
-                || bibDatabaseContext.getLocation() == DatabaseLocation.DIRECTORY) {
+        // DIRECTORY needs no prompt: edits are persisted into the sidecar files; pending
+        // debounced writes are flushed by the synchronizer teardown on close
+        if (bibDatabaseContext.getLocation() == DatabaseLocation.LOCAL) {
             if (isModified()) {
                 return confirmClose();
             }

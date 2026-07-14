@@ -28,6 +28,21 @@ the last-opened list and routed back through the directory-library opener.
 
 Needs: impl
 
+## User changes are written back into the sidecar files
+`req~directory-library.write-back~1`
+
+A directory library persists into its Hayagriva sidecar files: user edits rewrite the entry's
+file read-modify-write (content JabRef does not understand survives), the first user edit of an
+entry without a sidecar creates one (next to its PDF, sharing the base name, or named after the
+citation key), a citation-key edit renames the YAML map key, and deleting an entry removes it
+from its file — the file itself is trashed/deleted once its last entry is gone, the paired PDF
+is never touched. Writes are debounced per file; Save (Ctrl+S) flushes them and must never
+write a `.bib` file ("Save as" remains the explicit `.bib` snapshot). Closing needs no save
+prompt. System-initiated changes (background enrichment, generated citation keys, inbound
+synchronization) do not create or rewrite sidecars.
+
+Needs: impl
+
 ## External file changes appear live in an open directory library
 `req~directory-library.inbound-sync~1`
 
