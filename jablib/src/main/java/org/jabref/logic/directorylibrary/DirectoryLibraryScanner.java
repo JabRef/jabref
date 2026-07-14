@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 /// resulting [BibDatabaseContext] has [org.jabref.logic.shared.DatabaseLocation#DIRECTORY] and
 /// no database path; linked files are stored relative to the root, which is registered as the
 /// library-specific file directory.
-// [impl->req~directory-library.scan~3]
+// [impl->req~directory-library.scan~4]
 @NullMarked
 public class DirectoryLibraryScanner {
 

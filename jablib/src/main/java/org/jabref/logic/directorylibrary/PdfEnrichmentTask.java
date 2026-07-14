@@ -18,7 +18,7 @@ import org.jspecify.annotations.NullMarked;
 ///
 /// Extraction runs on the background thread; entry mutations (and progress updates, which drive
 /// JavaFX properties) go through the injected marshaller.
-// [impl->req~directory-library.scan~3]
+// [impl->req~directory-library.scan~4]
 @NullMarked
 public class PdfEnrichmentTask extends BackgroundTask<Void> {
 

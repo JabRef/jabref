@@ -15,6 +15,8 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.directorylibrary.DirectoryLibraryScanner.ScanResult;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fetcher.CrossRef;
+import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
@@ -56,7 +58,7 @@ class DirectoryLibraryScannerTest {
         when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
         when(importFormatPreferences.grobidPreferences()).thenReturn(noGrobid);
         return new PdfEntryFactory(importFormatPreferences, mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS),
-                authYearPatternPreferences());
+                authYearPatternPreferences(), mock(CrossRef.class), mock(DoiFetcher.class));
     }
 
     static CitationKeyPatternPreferences authYearPatternPreferences() {
