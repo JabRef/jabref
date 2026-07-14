@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
@@ -34,10 +36,23 @@ public class PdfEntryFactory {
 
     private final PdfMergeMetadataImporter importer;
     private final FilePreferences filePreferences;
+    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
 
-    public PdfEntryFactory(ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences) {
+    public PdfEntryFactory(ImportFormatPreferences importFormatPreferences,
+                           FilePreferences filePreferences,
+                           CitationKeyPatternPreferences citationKeyPatternPreferences) {
         this.importer = new PdfMergeMetadataImporter(importFormatPreferences);
         this.filePreferences = filePreferences;
+        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
+    }
+
+    /// Generates a citation key for the entry if it has none. Call after the entry has been
+    /// inserted into the database, so the uniqueness check sees the whole library.
+    public void generateCitationKeyIfMissing(BibEntry entry, BibDatabaseContext databaseContext) {
+        if (entry.getCitationKey().isPresent()) {
+            return;
+        }
+        new CitationKeyGenerator(databaseContext, citationKeyPatternPreferences).generateAndSetKey(entry);
     }
 
     public BibEntry createEntry(Path pdf, Path root, BibDatabaseContext databaseContext) {

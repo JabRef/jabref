@@ -92,16 +92,20 @@ public class DirectoryLibraryScanner {
             entries.addAll(fileEntries);
         }
 
+        List<BibEntry> pdfEntries = new ArrayList<>();
         for (Path pdf : pdfFiles) {
             if (pairedPdfs.contains(pdf)) {
                 continue;
             }
             // Metadata comes from the PDF itself; a sidecar is still only written once the
             // user edits the entry
-            entries.add(pdfEntryFactory.createEntry(pdf, root, databaseContext));
+            pdfEntries.add(pdfEntryFactory.createEntry(pdf, root, databaseContext));
         }
+        entries.addAll(pdfEntries);
 
         databaseContext.getDatabase().insertEntries(entries);
+        // After insertion, so the uniqueness check sees all scanned entries
+        pdfEntries.forEach(entry -> pdfEntryFactory.generateCitationKeyIfMissing(entry, databaseContext));
         return new ScanResult(databaseContext, catalog, warnings);
     }
 
