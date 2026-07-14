@@ -16,6 +16,8 @@ import javafx.collections.FXCollections;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fetcher.CrossRef;
+import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -88,7 +90,7 @@ class DirectoryLibrarySynchronizerTest {
         when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
         when(importFormatPreferences.grobidPreferences()).thenReturn(noGrobid);
         return new PdfEntryFactory(importFormatPreferences, mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS),
-                DirectoryLibraryScannerTest.authYearPatternPreferences());
+                DirectoryLibraryScannerTest.authYearPatternPreferences(), mock(CrossRef.class), mock(DoiFetcher.class));
     }
 
     private List<BibEntry> entries() {
