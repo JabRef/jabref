@@ -220,6 +220,18 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
         assertEquals(0, page5.getSize(), "fetcher doesnt return empty pages for invalid author");
     }
 
+    @Test
+    void performRawSearchQueryPagedWithBlankQueryReturnsEmptyPage() throws FetcherException {
+        Page<BibEntry> result = fetcher.performRawSearchQueryPaged("", 0);
+        assertTrue(result.getContent().isEmpty());
+    }
+
+    @Test
+    void performRawSearchQueryPagedFindsEntry() throws FetcherException {
+        Page<BibEntry> page = fetcher.performRawSearchQueryPaged("bibcode:2000JGR...10520297L", 0);
+        assertFalse(page.getContent().isEmpty());
+    }
+
     @Override
     public PagedSearchBasedFetcher getPagedFetcher() {
         return fetcher;
