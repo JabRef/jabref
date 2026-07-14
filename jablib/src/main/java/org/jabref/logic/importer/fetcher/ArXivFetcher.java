@@ -388,6 +388,9 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     /// [BibEntry#mergeWith] still copies over whatever citation key the *automatically*-assigned
     /// arXiv DOI's metadata suggests — which for arXiv-only preprints is typically just that DOI's
     /// URL, e.g. `https://doi.org/10.48550/arxiv.1405.2249`. That is treated the same as no key at all.
+    /// Without this distinction, a plain "is a key present?" check would already be satisfied by
+    /// that URL and skip the INSPIRE lookup below entirely — leaving exactly the entries this
+    /// method exists to fix stuck with a DOI URL as their citation key.
     ///
     /// Most arXiv categories aren't indexed by INSPIRE, so a miss here is expected, not an error —
     /// the entry is simply left with whatever citation key (if any) it already had.
