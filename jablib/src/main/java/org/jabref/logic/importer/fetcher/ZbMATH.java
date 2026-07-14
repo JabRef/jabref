@@ -42,7 +42,7 @@ import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
 import org.jspecify.annotations.NullMarked;
 
-/// Fetches data from the Zentralblatt Math (https://www.zbmath.org/)
+/// Fetches data from the Zentralblatt Math ([zbmath.org](https://www.zbmath.org/))
 @NullMarked
 public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, EntryBasedParserFetcher {
     private static final Pattern NON_ALNUM_OR_SPACE_PATTERN = Pattern.compile("[^\\p{IsAlphabetic}\\p{IsDigit}\\s]");
