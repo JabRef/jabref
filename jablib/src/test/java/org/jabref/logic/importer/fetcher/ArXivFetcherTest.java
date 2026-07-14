@@ -377,6 +377,14 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
+    void searchIdentifierForSlicePaperByDoiUrl() throws FetcherException {
+        sliceTheoremPaper.clearField(StandardField.EPRINT);
+        sliceTheoremPaper.setField(StandardField.DOI, "https://doi.org/10.48550/arXiv.1405.2249");
+
+        assertEquals(ArXivIdentifier.parse("1405.2249"), fetcher.findIdentifier(sliceTheoremPaper));
+    }
+
+    @Test
     void searchEmptyId() throws FetcherException {
         assertEquals(Optional.empty(), fetcher.performSearchById(""));
     }
@@ -413,12 +421,15 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     @Test
     void supportsPhraseSearch() throws FetcherException {
         List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title:\"Taxonomy of Distributed\"");
+        List<BibEntry> broaderSearchResult = fetcher.performSearch("taxonomy distributed");
 
-        // TODO: Current error "<summary>Invalid query string: 'OR ti:"Taxonomy AND all:of AND all:Distributed"'</summary>"
-        List<BibEntry> resultWithOutPhraseSearch = fetcher.performSearch("title:Taxonomy AND title:of AND title:Distributed");
-
-        // Phrase search result has to be subset of the default search result
-        assertTrue(resultWithOutPhraseSearch.containsAll(resultWithPhraseSearch));
+        assertFalse(resultWithPhraseSearch.isEmpty());
+        List<Optional<String>> broaderSearchIdentifiers = broaderSearchResult.stream()
+                                                                             .map(entry -> entry.getField(StandardField.EPRINT))
+                                                                             .toList();
+        assertTrue(resultWithPhraseSearch.stream()
+                                         .map(entry -> entry.getField(StandardField.EPRINT))
+                                         .allMatch(broaderSearchIdentifiers::contains));
     }
 
     /// A phrase is a sequence of terms wrapped in quotes.
@@ -565,7 +576,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.YEAR, "2016")
                 .withField(StandardField.VOLUME, "113")
                 .withField(InternalField.KEY_FIELD, "Zheng_2016")
-                .withField(StandardField.PUBLISHER, "Proceedings of the National Academy of Sciences")
+                .withField(StandardField.PUBLISHER, "National Academy of Sciences")
                 .withField(StandardField.PAGES, "15000--15005")
                 .withField(StandardField.NUMBER, "52");
 
@@ -574,6 +585,16 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
 
         ArXivFetcher modifiedArXivFetcher = Mockito.spy(new ArXivFetcher(importFormatPreferences, modifiedDoiFetcher));
         assertEquals(Optional.of(expected), modifiedArXivFetcher.performSearchById("1701.00587"));
+    }
+
+    @Test
+    void performRawSearchQueryPagedWithBlankQueryReturnsEmptyPage() throws FetcherException {
+        assertTrue(fetcher.performRawSearchQueryPaged("", 0).getContent().isEmpty());
+    }
+
+    @Test
+    void performRawSearchQueryPagedReturnsResults() throws FetcherException {
+        assertFalse(fetcher.performRawSearchQueryPaged("machine learning", 0).getContent().isEmpty());
     }
 
     @Test

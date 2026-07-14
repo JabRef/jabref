@@ -23,9 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -83,7 +81,8 @@ public class URLDownload {
 
     private String postData = "";
     private Duration connectTimeout = DEFAULT_CONNECT_TIMEOUT;
-    private SSLContext sslContext;
+    // Can be null if SSL is not supported. If null, then ignore.
+    private @Nullable SSLContext sslContext;
 
     private static volatile boolean unirestConfigured = false;
     private static final Object UNIREST_CONFIG_LOCK = new Object();
@@ -119,10 +118,12 @@ public class URLDownload {
         this.addHeader("User-Agent", URLDownload.USER_AGENT);
 
         try {
-            sslContext = SSLContext.getInstance("TLSv1.2");
-            sslContext.init(null, null, new SecureRandom());
-            // Note: SSL certificates are installed at {@link TrustStoreManager#configureTrustStore(Path)}
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            // Use the JVM-wide default context, which reflects the merged JRE + JabRef
+            // trust managers installed by TrustStoreManager#configureTrustStore(Path).
+            // Building a fresh context with init(null, null, ...) here would silently
+            // fall back to the plain JRE cacerts and ignore that configuration.
+            sslContext = SSLContext.getDefault();
+        } catch (NoSuchAlgorithmException e) {
             LOGGER.error("Could not initialize SSL context", e);
             sslContext = null;
         }

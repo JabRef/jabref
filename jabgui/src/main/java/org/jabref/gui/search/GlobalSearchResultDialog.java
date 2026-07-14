@@ -18,7 +18,6 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -43,7 +42,6 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     @Inject private GuiPreferences preferences;
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
-    @Inject private ThemeManager themeManager;
     @Inject private TaskExecutor taskExecutor;
 
     public GlobalSearchResultDialog(UndoManager undoManager, LibraryTabContainer libraryTabContainer) {
@@ -65,7 +63,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         searchBarContainer.getChildren().addFirst(searchBar);
         HBox.setHgrow(searchBar, Priority.ALWAYS);
 
-        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor, stateManager.searchQueryProperty());
+        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferences, taskExecutor, stateManager.searchQueryProperty());
         previewViewer.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
         previewViewer.setDatabaseContext(viewModel.getSearchDatabaseContext());
 

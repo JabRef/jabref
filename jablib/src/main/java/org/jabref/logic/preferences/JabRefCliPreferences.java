@@ -33,13 +33,13 @@ import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.MapProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 
 import org.jabref.logic.FilePreferences;
@@ -79,6 +79,7 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.ocr.OcrPreferences;
+import org.jabref.logic.ocr.PagesWithTextHandling;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
@@ -98,8 +99,8 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
-import org.jabref.model.ai.pipeline.AnswerEngineKind;
 import org.jabref.model.ai.pipeline.DocumentSplitterKind;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 import org.jabref.model.database.BibDatabaseMode;
@@ -386,6 +387,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String AI_DOCUMENT_SPLITTER_CHUNK_SIZE = "aiDocumentSplitterChunkSize";
     private static final String AI_DOCUMENT_SPLITTER_OVERLAP_SIZE = "aiDocumentSplitterOverlapSize";
     private static final String AI_ANSWER_ENGINE_KIND = "aiAnswerEngineKind";
+    private static final String AI_RESPONSE_ENGINE_KIND = "aiResponseEngineKind";
     private static final String AI_RAG_MAX_RESULTS_COUNT = "aiRagMaxResultsCount";
     private static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
 
@@ -400,6 +402,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // region OCR preferences
     private static final String OCR_ENGINE_PATH = "ocrEnginePath";
+    private static final String PAGES_WITH_TEXT = "pagesHaveText";
     // endregion
 
     // region Push to application preferences
@@ -668,12 +671,12 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @param persistListener writes value changes to the backing store
     /// @param importFromStore loads the stored value (or the default) into the property
     /// @param resetToDefaults restores the property to its default value
-    private <T> void bindCustom(Property<T> property,
-                                String key,
-                                T defaultValue,
-                                ChangeListener<? super T> persistListener,
-                                Runnable importFromStore,
-                                Runnable resetToDefaults) {
+    protected <T> void bindCustom(Property<T> property,
+                                  String key,
+                                  T defaultValue,
+                                  ChangeListener<? super T> persistListener,
+                                  Runnable importFromStore,
+                                  Runnable resetToDefaults) {
         EasyBind.listen(property, persistListener);
         allBindings.add(new PreferenceBinding(
                 property,
@@ -683,28 +686,39 @@ public class JabRefCliPreferences implements CliPreferences {
                 resetToDefaults));
     }
 
-    private void bindBoolean(BooleanProperty property, String key, boolean defaultValue) {
+    protected void bindBoolean(BooleanProperty property, String key, boolean defaultValue) {
         bindCustom(property, key, defaultValue,
                 (_, _, v) -> putBoolean(key, v),
                 () -> property.set(getBoolean(key, defaultValue)),
                 () -> property.set(defaultValue));
     }
 
-    private void bindInt(IntegerProperty property, String key, int defaultValue) {
+    /// Binds a boolean persisted inverted: the backing store holds `!property`. Useful for legacy keys whose stored
+    /// meaning is the negation of the property (e.g. a `useDefault…` key backing a `useCustom…` property). The property
+    /// (not its stored form) is the binding's reporting value in [#getPreferences()] and [#getDefaults()]. Should not
+    /// be used for new preference options.
+    protected void bindBooleanInverted(BooleanProperty property, String key, boolean defaultValue) {
+        bindCustom(property, key, defaultValue,
+                (_, _, v) -> putBoolean(key, !v),
+                () -> property.set(!getBoolean(key, !defaultValue)),
+                () -> property.set(defaultValue));
+    }
+
+    protected void bindInt(IntegerProperty property, String key, int defaultValue) {
         bindCustom(property, key, defaultValue,
                 (_, _, v) -> putInt(key, v),
                 () -> property.set(getInt(key, defaultValue)),
                 () -> property.set(defaultValue));
     }
 
-    private void bindDouble(DoubleProperty property, String key, double defaultValue) {
+    protected void bindDouble(DoubleProperty property, String key, double defaultValue) {
         bindCustom(property, key, defaultValue,
                 (_, _, v) -> putDouble(key, v.doubleValue()),
                 () -> property.set(getDouble(key, defaultValue)),
                 () -> property.set(defaultValue));
     }
 
-    private void bindString(StringProperty property, String key, String defaultValue) {
+    protected void bindString(StringProperty property, String key, String defaultValue) {
         bindCustom(property, key, defaultValue,
                 (_, _, v) -> put(key, v),
                 () -> property.set(get(key, defaultValue)),
@@ -715,11 +729,11 @@ public class JabRefCliPreferences implements CliPreferences {
     ///
     /// @param serializer   converts a value to its stored String form
     /// @param deserializer reconstructs a value from its stored String form
-    private <T> void bindObject(ObjectProperty<T> property,
-                                String key,
-                                T defaultValue,
-                                Function<T, String> serializer,
-                                Function<String, T> deserializer) {
+    protected <T> void bindObject(ObjectProperty<T> property,
+                                  String key,
+                                  T defaultValue,
+                                  Function<T, String> serializer,
+                                  Function<String, T> deserializer) {
         bindCustom(property, key, defaultValue,
                 (_, _, v) -> put(key, serializer.apply(v)),
                 () -> property.set(deserializer.apply(get(key, serializer.apply(defaultValue)))),
@@ -789,12 +803,12 @@ public class JabRefCliPreferences implements CliPreferences {
     ///
     /// @param serializer   persists individual entry changes to the backing store
     /// @param deserializer reads the stored map, falling back to `defaultMap` for missing entries
-    private void bindMap(MapProperty<String, String> map,
-                         String key,
-                         Map<String, String> defaultMap,
-                         MapChangeListener<? super String, ? super String> serializer,
-                         Function<Map<String, String>, Map<String, String>> deserializer) {
-        Map<String, String> defaultCopy = Map.copyOf(defaultMap);
+    protected <K, V> void bindMap(ObservableMap<K, V> map,
+                                  String key,
+                                  Map<K, V> defaultMap,
+                                  MapChangeListener<? super K, ? super V> serializer,
+                                  Function<Map<K, V>, Map<K, V>> deserializer) {
+        Map<K, V> defaultCopy = Map.copyOf(defaultMap);
         map.addListener(serializer);
         allBindings.add(new PreferenceBinding(
                 map,
@@ -819,11 +833,11 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @param defaultList   restored on reset and reported as the default
     /// @param persist       rewrites the whole list to the backing store; receives the bound list, runs on every change
     /// @param loadFromStore reads the stored list, falling back to `defaultList` for absent entries
-    private <T> void bindCustomList(ObservableList<T> list,
-                                    String key,
-                                    List<T> defaultList,
-                                    Consumer<? super ObservableList<T>> persist,
-                                    Supplier<? extends Collection<? extends T>> loadFromStore) {
+    protected <T> void bindCustomList(ObservableList<T> list,
+                                      String key,
+                                      List<T> defaultList,
+                                      Consumer<? super ObservableList<T>> persist,
+                                      Supplier<? extends Collection<? extends T>> loadFromStore) {
         List<T> defaultCopy = List.copyOf(defaultList);
         list.addListener((InvalidationListener) _ -> persist.accept(list));
         allBindings.add(new PreferenceBinding(
@@ -868,11 +882,11 @@ public class JabRefCliPreferences implements CliPreferences {
     /// @param defaultSet   restored on reset and reported as the default
     /// @param serializer   rewrites the whole set to the backing store; receives the bound set, runs on every change
     /// @param deserializer reads the stored set, falling back to `defaultSet` for absent entries
-    private <T> void bindSet(ObservableSet<T> set,
-                             String key,
-                             Set<T> defaultSet,
-                             Consumer<? super ObservableSet<T>> serializer,
-                             Supplier<? extends Collection<? extends T>> deserializer) {
+    protected <T> void bindSet(ObservableSet<T> set,
+                               String key,
+                               Set<T> defaultSet,
+                               Consumer<? super ObservableSet<T>> serializer,
+                               Supplier<? extends Collection<? extends T>> deserializer) {
         Set<T> defaultCopy = Set.copyOf(defaultSet);
         set.addListener((InvalidationListener) _ -> serializer.accept(set));
         allBindings.add(new PreferenceBinding(
@@ -985,8 +999,8 @@ public class JabRefCliPreferences implements CliPreferences {
             return observableList;
         } else if (observable instanceof ObservableSet<?> observableSet) {
             return observableSet;
-        } else if (observable instanceof MapProperty<?, ?> mapProperty) {
-            return mapProperty.get();
+        } else if (observable instanceof ObservableMap<?, ?> observableMap) {
+            return observableMap;
         } else if (observable instanceof ObjectProperty<?> objectProperty) {
             return objectProperty.get();
         }
@@ -1054,35 +1068,7 @@ public class JabRefCliPreferences implements CliPreferences {
         PREFS_NODE.clear();
         new SharedDatabasePreferences().clear();
 
-        // ensure registration of bindings
-        getInternalPreferences();
-        getFieldPreferences();
-        getFilePreferences();
-        getProxyPreferences();
-        getLibraryPreferences();
-        getDOIPreferences();
-        getOwnerPreferences();
-        getTimestampPreferences();
-        getRemotePreferences();
-        getPushToApplicationPreferences();
-        getAbbreviationPreferences();
-        getGitPreferences();
-        getSSLPreferences();
-        getBibEntryPreferences();
-        getCitationKeyPatternPreferences();
-        getAutoLinkPreferences();
-        getExportPreferences();
-        getCleanupPreferences();
-        getLastFilesOpenedPreferences();
-        getAiPreferences();
-        getOcrPreferences();
-        getSearchPreferences();
-        getXmpPreferences();
-        getProtectedTermsPreferences();
-        getNameFormatterPreferences();
-        getImporterPreferences();
-        getGrobidPreferences();
-        getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences()));
+        initializeAll();
 
         allBindings.forEach(binding -> binding.resetToDefaults().run());
     }
@@ -1095,7 +1081,14 @@ public class JabRefCliPreferences implements CliPreferences {
     public void importPreferences(Path path) throws JabRefException {
         importPreferencesToBackingStore(path);
 
-        // ensure registration of bindings
+        initializeAll();
+
+        allBindings.forEach(binding -> binding.importFromStore().run());
+    }
+
+    /// Instantiates every preference group so its bindings are registered in [#allBindings] before a bulk reset/import
+    /// runs. Overridden by subclasses to additionally register their own preference groups.
+    protected void initializeAll() {
         getInternalPreferences();
         getFieldPreferences();
         getFilePreferences();
@@ -1124,8 +1117,6 @@ public class JabRefCliPreferences implements CliPreferences {
         getImporterPreferences();
         getGrobidPreferences();
         getOpenOfficePreferences(JournalAbbreviationLoader.loadRepository(getAbbreviationPreferences()));
-
-        allBindings.forEach(binding -> binding.importFromStore().run());
     }
 
     private static void importPreferencesToBackingStore(Path path) throws JabRefException {
@@ -1195,7 +1186,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 CitationCommandString::toString, CitationCommandString::from);
 
         // Command paths are persisted under per-application keys (see storePushToApplicationPath), not under a single preferences key
-        bindMap(pushToApplicationPreferences.getCommandPaths(), PUSH_APPLICATIONS_PATHS_KEY, defaultValues.getCommandPaths(),
+        this.<String, String>bindMap(pushToApplicationPreferences.getCommandPaths(), PUSH_APPLICATIONS_PATHS_KEY, defaultValues.getCommandPaths(),
                 this::storePushToApplicationPath, this::readPushToApplicationPath);
 
         return pushToApplicationPreferences;
@@ -1709,11 +1700,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 List.copyOf(FieldFactory.parseFieldList(get(NON_WRAPPABLE_FIELDS,
                         FieldFactory.serializeFieldsList(defaultValues.getNonWrappableFields())))));
 
-        // resolveStrings is persisted inverted as DO_NOT_RESOLVE_STRINGS, so it needs a custom binding.
-        bindCustom(fieldPreferences.resolveStringsProperty(), DO_NOT_RESOLVE_STRINGS, defaultValues.shouldResolveStrings(),
-                (_, _, newValue) -> putBoolean(DO_NOT_RESOLVE_STRINGS, !newValue),
-                () -> fieldPreferences.resolveStringsProperty().set(!getBoolean(DO_NOT_RESOLVE_STRINGS, !defaultValues.shouldResolveStrings())),
-                () -> fieldPreferences.resolveStringsProperty().set(defaultValues.shouldResolveStrings()));
+        bindBooleanInverted(fieldPreferences.resolveStringsProperty(), DO_NOT_RESOLVE_STRINGS, defaultValues.shouldResolveStrings());
         bindCustomList(fieldPreferences.getResolvableFields(), RESOLVE_STRINGS_FOR_FIELDS, List.copyOf(defaultValues.getResolvableFields()),
                 FieldFactory::serializeFieldsList, FieldFactory::parseFieldList);
         bindCustomList(fieldPreferences.getNonWrappableFields(), NON_WRAPPABLE_FIELDS, List.copyOf(defaultValues.getNonWrappableFields()),
@@ -2061,6 +2048,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         AiPreferences defaultValues = AiPreferences.getDefault();
+        migrateLegacyAiResponseEngineKind(defaultValues);
 
         aiPreferences = new AiPreferences(
                 getBoolean(AI_ENABLED, defaultValues.getAiFeaturesEnabled()),
@@ -2084,7 +2072,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 DocumentSplitterKind.safeValueOf(get(AI_DOCUMENT_SPLITTER_KIND, defaultValues.getDocumentSplitterKind().name())),
                 getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, defaultValues.documentSplitterChunkSizeProperty().get()),
                 getInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, defaultValues.documentSplitterOverlapSizeProperty().get()),
-                AnswerEngineKind.safeValueOf(get(AI_ANSWER_ENGINE_KIND, defaultValues.getAnswerEngineKind().name())),
+                ResponseEngineKind.safeValueOf(get(AI_RESPONSE_ENGINE_KIND, defaultValues.getResponseEngineKind().name())),
                 getInt(AI_RAG_MAX_RESULTS_COUNT, defaultValues.ragMaxResultsCountProperty().get()),
                 getDouble(AI_RAG_MIN_SCORE, defaultValues.ragMinScoreProperty().get()),
                 get(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE, defaultValues.getChattingSystemMessageTemplate()),
@@ -2126,7 +2114,7 @@ public class JabRefCliPreferences implements CliPreferences {
         bindInt(aiPreferences.documentSplitterChunkSizeProperty(), AI_DOCUMENT_SPLITTER_CHUNK_SIZE, defaultValues.documentSplitterChunkSizeProperty().get());
         bindInt(aiPreferences.documentSplitterOverlapSizeProperty(), AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, defaultValues.documentSplitterOverlapSizeProperty().get());
 
-        bindObject(aiPreferences.answerEngineKindProperty(), AI_ANSWER_ENGINE_KIND, defaultValues.getAnswerEngineKind(), AnswerEngineKind::name, AnswerEngineKind::safeValueOf);
+        bindObject(aiPreferences.responseEngineKindProperty(), AI_RESPONSE_ENGINE_KIND, defaultValues.getResponseEngineKind(), ResponseEngineKind::name, ResponseEngineKind::safeValueOf);
         bindInt(aiPreferences.ragMaxResultsCountProperty(), AI_RAG_MAX_RESULTS_COUNT, defaultValues.ragMaxResultsCountProperty().get());
         bindDouble(aiPreferences.ragMinScoreProperty(), AI_RAG_MIN_SCORE, defaultValues.ragMinScoreProperty().get());
 
@@ -2144,6 +2132,12 @@ public class JabRefCliPreferences implements CliPreferences {
 
         return aiPreferences;
     }
+
+    private void migrateLegacyAiResponseEngineKind(AiPreferences defaultValues) {
+        if (!hasKey(AI_RESPONSE_ENGINE_KIND) && hasKey(AI_ANSWER_ENGINE_KIND)) {
+            put(AI_RESPONSE_ENGINE_KIND, get(AI_ANSWER_ENGINE_KIND, defaultValues.getResponseEngineKind().name()));
+        }
+    }
     // endregion
 
     // region OCR preferences
@@ -2155,9 +2149,11 @@ public class JabRefCliPreferences implements CliPreferences {
         OcrPreferences defaultValues = OcrPreferences.getDefault();
 
         ocrPreferences = new OcrPreferences(
-                get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()));
+                get(OCR_ENGINE_PATH, defaultValues.getOcrEnginePath()),
+                PagesWithTextHandling.safeValueOf(get(PAGES_WITH_TEXT, defaultValues.getPagesHaveText().name())));
 
         bindString(ocrPreferences.ocrEnginePathProperty(), OCR_ENGINE_PATH, defaultValues.getOcrEnginePath());
+        bindObject(ocrPreferences.pagesHaveTextProperty(), PAGES_WITH_TEXT, defaultValues.getPagesHaveText(), PagesWithTextHandling::name, PagesWithTextHandling::safeValueOf);
 
         return ocrPreferences;
     }
@@ -2531,7 +2527,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return openOfficePreferences;
     }
 
-    /// Reconstructs the persisted [OOStyle] from its stored path: a CSL style file becomes a [CitationStyle], otherwise
+    /// Reconstructs the persisted [OOStyle] from its stored path: a CSL style file becomes a [org.jabref.logic.citationstyle.CitationStyle], otherwise
     /// it is treated as a [JStyle] (requiring `journalAbbreviationRepository`). Falls back to `defaultStyle` when the
     /// path is absent, the repository is missing, or the JStyle cannot be created.
     private OOStyle getCurrentOOStyle(OOStyle defaultStyle, JournalAbbreviationRepository journalAbbreviationRepository) {

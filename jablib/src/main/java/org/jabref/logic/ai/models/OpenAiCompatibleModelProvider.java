@@ -44,9 +44,9 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
             if (response.getStatus() == 200) {
                 models = parseModelsFromResponse(response.getBody());
-                LOGGER.info("Successfully fetched {} models from {}", models.size(), aiProvider.name());
+                LOGGER.debug("Successfully fetched {} models from {}", models.size(), aiProvider.name());
             } else {
-                LOGGER.info("Failed to fetch models from {} (status: {})", aiProvider.name(), response.getStatus());
+                LOGGER.error("Failed to fetch models from {} (status: {})", aiProvider.name(), response.getStatus());
             }
         } catch (UnirestException e) {
             LOGGER.error("Failed to fetch models from {}", aiProvider.name(), e);
@@ -57,8 +57,7 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
     @Override
     public boolean supports(AiProvider aiProvider) {
-        return aiProvider == AiProvider.OPEN_AI
-                || aiProvider == AiProvider.MISTRAL_AI;
+        return aiProvider == AiProvider.OPEN_AI || aiProvider == AiProvider.MISTRAL_AI;
     }
 
     /// Builds the URL for the models endpoint from the given API base URL.
