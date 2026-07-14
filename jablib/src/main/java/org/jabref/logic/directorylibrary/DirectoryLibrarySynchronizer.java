@@ -450,6 +450,7 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
         if (movedFrom.isPresent()) {
             stagedDeletions.remove(movedFrom.get());
             catalog.relocateFile(movedFrom.get(), file);
+            modelUpdateMarshaller.accept(this::refreshGroupsView);
             LOGGER.debug("Detected move {} -> {}", movedFrom.get(), file);
             return;
         }
@@ -458,8 +459,10 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
         // Safe without event source: the entry is not yet inserted, so no listeners see this
         findPairedPdf(file).ifPresent(pdf -> newEntries.getFirst()
                                                        .addFile(new LinkedFile("", root.relativize(pdf), StandardFileType.PDF.getName())));
-        modelUpdateMarshaller.accept(() ->
-                databaseContext.getDatabase().insertEntries(newEntries, EntriesEventSource.SHARED));
+        modelUpdateMarshaller.accept(() -> {
+            databaseContext.getDatabase().insertEntries(newEntries, EntriesEventSource.SHARED);
+            refreshGroupsView();
+        });
     }
 
     private void applyChangedFile(Path file, List<BibEntry> knownEntries, List<BibEntry> parsedEntries) {
@@ -560,8 +563,16 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
 
     private void removeEntries(List<BibEntry> entries, Path file) {
         catalog.removeFile(file);
-        modelUpdateMarshaller.accept(() ->
-                databaseContext.getDatabase().removeEntries(entries, EntriesEventSource.SHARED));
+        modelUpdateMarshaller.accept(() -> {
+            databaseContext.getDatabase().removeEntries(entries, EntriesEventSource.SHARED);
+            refreshGroupsView();
+        });
+    }
+
+    /// The directory-structure group materializes its subgroups from the entries; after
+    /// structural changes the groups panel must recompute (TexGroup precedent).
+    private void refreshGroupsView() {
+        databaseContext.getMetaData().groupsBinding().invalidate();
     }
 
     private List<BibEntry> entriesOf(Path file) {

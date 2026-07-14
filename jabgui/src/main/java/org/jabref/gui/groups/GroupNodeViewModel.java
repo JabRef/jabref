@@ -43,6 +43,8 @@ import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.DateGroup;
+import org.jabref.model.groups.DirectoryPathGroup;
+import org.jabref.model.groups.DirectoryStructureGroup;
 import org.jabref.model.groups.EntryTypeGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupEntryChanger;
@@ -469,6 +471,8 @@ public class GroupNodeViewModel {
             return false;
         } else if (group instanceof EntryTypeGroup) {
             return false;
+        } else if (group instanceof DirectoryStructureGroup || group instanceof DirectoryPathGroup) {
+            return false;
         } else {
             throw new UnsupportedOperationException("canAddEntriesIn method not yet implemented in group: " + group.getClass().getName());
         }
@@ -477,7 +481,9 @@ public class GroupNodeViewModel {
     public boolean canBeDragged() {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
-            case AllEntriesGroup _ ->
+            case AllEntriesGroup _,
+                 DirectoryStructureGroup _,
+                 DirectoryPathGroup _ ->
                     false;
             case ExplicitGroup _,
                  SearchGroup _,
@@ -516,7 +522,9 @@ public class GroupNodeViewModel {
                  AutomaticDateGroup _,
                  DateGroup _,
                  AutomaticEntryTypeGroup _,
-                 EntryTypeGroup _ ->
+                 EntryTypeGroup _,
+                 DirectoryStructureGroup _,
+                 DirectoryPathGroup _ ->
                     false;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
@@ -534,7 +542,8 @@ public class GroupNodeViewModel {
     public boolean canRemove() {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
-            case AllEntriesGroup _ ->
+            case AllEntriesGroup _,
+                 DirectoryPathGroup _ ->
                     false;
             case ExplicitGroup _,
                  SearchGroup _,
@@ -544,7 +553,8 @@ public class GroupNodeViewModel {
                  AutomaticEntryTypeGroup _,
                  DateGroup _,
                  EntryTypeGroup _,
-                 TexGroup _ ->
+                 TexGroup _,
+                 DirectoryStructureGroup _ ->
                     true;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
@@ -564,7 +574,9 @@ public class GroupNodeViewModel {
         return switch (group) {
             case AllEntriesGroup _,
                  DateGroup _,
-                 EntryTypeGroup _ ->
+                 EntryTypeGroup _,
+                 DirectoryStructureGroup _,
+                 DirectoryPathGroup _ ->
                     false;
             case ExplicitGroup _,
                  SearchGroup _,

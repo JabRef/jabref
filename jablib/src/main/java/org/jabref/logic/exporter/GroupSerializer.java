@@ -13,6 +13,7 @@ import org.jabref.model.groups.AutomaticEntryTypeGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
+import org.jabref.model.groups.DirectoryStructureGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
@@ -127,6 +128,8 @@ public class GroupSerializer {
                     serializeAutomaticPersonsGroup(personsGroup);
             case AutomaticDateGroup dateGroup ->
                     serializeAutomaticDateGroup(dateGroup);
+            case DirectoryStructureGroup directoryStructureGroup ->
+                    serializeDirectoryStructureGroup(directoryStructureGroup);
             case AutomaticEntryTypeGroup entryTypeGroup ->
                     serializeAutomaticEntryTypeGroup(entryTypeGroup);
             case TexGroup texGroup ->
@@ -171,6 +174,14 @@ public class GroupSerializer {
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(StringUtil.quote(group.getGranularity().name(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        appendGroupDetails(sb, group);
+        return sb.toString();
+    }
+
+    private String serializeDirectoryStructureGroup(DirectoryStructureGroup group) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(MetadataSerializationConfiguration.DIRECTORY_STRUCTURE_GROUP_ID);
+        appendAutomaticGroupDetails(sb, group);
         appendGroupDetails(sb, group);
         return sb.toString();
     }

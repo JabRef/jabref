@@ -56,4 +56,16 @@ them.
 
 Needs: impl
 
+## The groups panel mirrors the directory structure
+`req~directory-library.groups~1`
+
+An open directory library installs an automatic group that mirrors the folder tree
+([#10930](https://github.com/JabRef/jabref/issues/10930)): each subdirectory containing
+entries appears as a subgroup, an entry is contained in the group of its source file's
+directory (and transitively in the parent directories' groups), and the tree follows
+inbound synchronization and write-back live. The directory groups are read-only: no
+entries or subgroups can be added to them, they cannot be dragged or edited.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->

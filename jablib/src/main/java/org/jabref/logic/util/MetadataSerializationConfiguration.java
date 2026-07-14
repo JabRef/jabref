@@ -41,6 +41,9 @@ public class MetadataSerializationConfiguration {
     /// Identifier for [org.jabref.model.groups.AutomaticDateGroup].
     public static final String AUTOMATIC_DATE_GROUP_ID = "AutomaticDateGroup:";
 
+    /// Identifier for [org.jabref.model.groups.DirectoryStructureGroup]
+    public static final String DIRECTORY_STRUCTURE_GROUP_ID = "DirectoryStructureGroup:";
+
     private MetadataSerializationConfiguration() {
     }
 }

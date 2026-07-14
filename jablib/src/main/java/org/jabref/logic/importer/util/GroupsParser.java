@@ -5,6 +5,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.GroupsFactory;
@@ -22,6 +23,7 @@ import org.jabref.model.groups.AutomaticEntryTypeGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.DateGranularity;
+import org.jabref.model.groups.DirectoryStructureGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -136,6 +138,9 @@ public class GroupsParser {
         if (input.startsWith(MetadataSerializationConfiguration.AUTOMATIC_DATE_GROUP_ID)) {
             return automaticDateGroupFromString(input);
         }
+        if (input.startsWith(MetadataSerializationConfiguration.DIRECTORY_STRUCTURE_GROUP_ID)) {
+            return directoryStructureGroupFromString(input);
+        }
         if (input.startsWith(MetadataSerializationConfiguration.TEX_GROUP_ID)) {
             return texGroupFromString(input, fileMonitor, metaData, userAndHost);
         }
@@ -182,6 +187,22 @@ public class GroupsParser {
         AutomaticPersonsGroup newGroup = new AutomaticPersonsGroup(name, context, field);
         addGroupDetails(token, newGroup);
         return newGroup;
+    }
+
+    /// The directory-structure group only lives meaningfully inside an open directory library,
+    /// where it is created in code with a working source-file lookup. When it surfaces in a
+    /// `.bib` (after "Save as"), the lookup resolves nothing and the group stays empty.
+    private static AbstractGroup directoryStructureGroupFromString(String input) {
+        assert input.startsWith(MetadataSerializationConfiguration.DIRECTORY_STRUCTURE_GROUP_ID);
+
+        QuotedStringTokenizer token = new QuotedStringTokenizer(input.substring(MetadataSerializationConfiguration.DIRECTORY_STRUCTURE_GROUP_ID
+                .length()), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+
+        String name = StringUtil.unquote(token.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+        GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(token.nextToken()));
+        DirectoryStructureGroup group = new DirectoryStructureGroup(name, context, entry -> Optional.empty());
+        addGroupDetails(token, group);
+        return group;
     }
 
     private static AbstractGroup automaticDateGroupFromString(String input) {

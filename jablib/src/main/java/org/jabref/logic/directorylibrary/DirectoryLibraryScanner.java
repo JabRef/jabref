@@ -13,7 +13,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
+import org.jabref.logic.groups.GroupsFactory;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.HayagrivaImporter;
 import org.jabref.logic.l10n.Localization;
@@ -23,6 +25,9 @@ import org.jabref.logic.util.io.GitIgnoreFileFilter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.groups.DirectoryStructureGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -111,7 +116,33 @@ public class DirectoryLibraryScanner {
         }
 
         databaseContext.getDatabase().insertEntries(entries);
+        installDirectoryGroups(databaseContext, catalog, root);
         return new ScanResult(databaseContext, catalog, warnings, List.copyOf(pendingPdfImports));
+    }
+
+    /// The groups panel mirrors the folder structure (#10930): a [DirectoryStructureGroup]
+    /// materializes one subgroup per subdirectory from the entries' source files. The lookup
+    /// reads the live catalog, so groups follow inbound synchronization and write-back.
+    // [impl->req~directory-library.groups~1]
+    private void installDirectoryGroups(BibDatabaseContext databaseContext, DirectoryLibraryCatalog catalog, Path root) {
+        Function<BibEntry, Optional<Path>> sourceFileLookup = sourceFileLookup(catalog, root);
+        GroupTreeNode groupsRoot = new GroupTreeNode(GroupsFactory.createAllEntriesGroup());
+        groupsRoot.addSubgroup(new DirectoryStructureGroup(
+                root.getFileName().toString(), GroupHierarchyType.INDEPENDENT, sourceFileLookup));
+        databaseContext.getMetaData().setGroups(groupsRoot);
+    }
+
+    /// Resolves an entry to its source file relative to the root: the sidecar from the catalog,
+    /// or the linked PDF for entries without a sidecar yet.
+    private static Function<BibEntry, Optional<Path>> sourceFileLookup(DirectoryLibraryCatalog catalog, Path root) {
+        Path absoluteRoot = root.toAbsolutePath();
+        return entry -> catalog.sourceOf(entry)
+                               .map(source -> absoluteRoot.relativize(source.yamlFile().toAbsolutePath()))
+                               .or(() -> entry.getFiles().stream()
+                                              .filter(linkedFile -> !linkedFile.isOnlineLink())
+                                              .findFirst()
+                                              .map(linkedFile -> Path.of(linkedFile.getLink()))
+                                              .filter(path -> !path.isAbsolute()));
     }
 
     private void collectFiles(Path root, List<Path> yamlFiles, List<Path> pdfFiles) throws IOException {
