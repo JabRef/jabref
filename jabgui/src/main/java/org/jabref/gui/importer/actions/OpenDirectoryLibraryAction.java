@@ -74,7 +74,9 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
                      .ifPresent(this::openDirectory);
     }
 
-    private void openDirectory(Path root) {
+    /// Opens the directory as a library without showing the chooser (used by the session
+    /// restore and internal routing).
+    public void openDirectory(Path root) {
         preferences.getFilePreferences().setWorkingDirectory(root);
         PdfEntryFactory pdfEntryFactory = new PdfEntryFactory(
                 preferences.getImportFormatPreferences(), preferences.getFilePreferences(),

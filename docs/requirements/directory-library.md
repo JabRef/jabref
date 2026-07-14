@@ -19,6 +19,15 @@ See [ADR 66](../decisions/0066-directory-as-library-with-hayagriva-sidecars.md) 
 
 Needs: impl
 
+## Directory libraries are part of the restored session
+`req~directory-library.session-restore~1`
+
+When "Open last edited libraries" is enabled, a directory library that was open on shutdown is
+reopened on the next start, exactly like `.bib` libraries: its root directory is remembered in
+the last-opened list and routed back through the directory-library opener.
+
+Needs: impl
+
 ## External file changes appear live in an open directory library
 `req~directory-library.inbound-sync~1`
 
