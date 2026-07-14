@@ -53,7 +53,6 @@ import org.jabref.logic.layout.format.FormatPagesForXML;
 import org.jabref.logic.layout.format.GetOpenOfficeType;
 import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.logic.layout.format.HTMLParagraphs;
-import org.jabref.logic.layout.format.HayagrivaType;
 import org.jabref.logic.layout.format.IfPlural;
 import org.jabref.logic.layout.format.Iso690FormatDate;
 import org.jabref.logic.layout.format.Iso690NamesAuthors;
@@ -561,8 +560,6 @@ class LayoutEntry {
                     new ShortMonthFormatter();
             case "ReplaceWithEscapedDoubleQuotes" ->
                     new ReplaceWithEscapedDoubleQuotes();
-            case "HayagrivaType" ->
-                    new HayagrivaType();
             default ->
                     null;
         };
