@@ -9,9 +9,13 @@ import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
 import org.jabref.logic.util.strings.StringUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /// Implementation of the {@link OcrEngine} interface using OCRmyPDF.
 public class OcrMyPdfEngine implements OcrEngine {
 
+    public static final Logger LOGGER = LoggerFactory.getLogger(OcrMyPdfEngine.class);
     private final OcrPreferences ocrPreferences;
 
     public OcrMyPdfEngine(OcrPreferences ocrPreferences) {
@@ -31,19 +35,19 @@ public class OcrMyPdfEngine implements OcrEngine {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
-            boolean finished = process.waitFor(OcrEngineUtils.CHECKING_TIMEOUT, TimeUnit.SECONDS);
+            boolean finished = process.waitFor(OcrUtils.CHECKING_TIMEOUT, TimeUnit.SECONDS);
             if (!finished) {
                 process.destroyForcibly();
-                OcrEngineUtils.LOGGER.debug("Checking OCRmyPDF availability timed out");
+                LOGGER.debug("Checking OCRmyPDF availability timed out");
                 return false;
             }
             return process.exitValue() == 0;
         } catch (IOException e) {
-            OcrEngineUtils.LOGGER.error("OCRmyPDF is not available at {}: IOException occurred", ocrPreferences.getOcrEnginePath(), e);
+            LOGGER.error("OCRmyPDF is not available at {}: IOException occurred", ocrPreferences.getOcrEnginePath(), e);
             return false;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            OcrEngineUtils.LOGGER.error("Checking OCRmyPDF availability was interrupted", e);
+            LOGGER.error("Checking OCRmyPDF availability was interrupted", e);
             return false;
         }
     }
@@ -60,7 +64,7 @@ public class OcrMyPdfEngine implements OcrEngine {
         if (!isAvailable()) {
             return OcrResult.failure(OcrFailureReason.NOT_AVAILABLE);
         }
-        Path outputPath = OcrEngineUtils.makeOutputFilePath(pdfPath);
+        Path outputPath = OcrUtils.makeOutputFilePath(pdfPath);
         String outputFile = outputPath.toString();
         String ocrCommand = switch (ocrPreferences.getPagesHaveText()) {
             case SKIP ->
@@ -82,10 +86,10 @@ public class OcrMyPdfEngine implements OcrEngine {
             process = processBuilder.start();
 
             // Get the output and the errors of the process
-            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), OcrEngineUtils.LOGGER::debug);
+            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
             HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
 
-            boolean finished = process.waitFor(OcrEngineUtils.TIMEOUT_MINS, TimeUnit.MINUTES);
+            boolean finished = process.waitFor(OcrUtils.TIMEOUT_MINS, TimeUnit.MINUTES);
             if (!finished) {
                 process.destroyForcibly();
                 return OcrResult.failure(OcrFailureReason.TIMEOUT);
@@ -97,12 +101,12 @@ public class OcrMyPdfEngine implements OcrEngine {
                 return OcrResult.failure(OcrFailureReason.NON_ZERO_EXIT);
             }
         } catch (IOException e) {
-            OcrEngineUtils.LOGGER.error("Error while running OCRmyPDF.", e);
+            LOGGER.error("Error while running OCRmyPDF.", e);
             return OcrResult.failure(OcrFailureReason.IO_ERROR);
         } catch (InterruptedException e) {
             process.destroyForcibly();
             Thread.currentThread().interrupt();
-            OcrEngineUtils.LOGGER.error("OCRmyPDF process was interrupted.", e);
+            LOGGER.error("OCRmyPDF process was interrupted.", e);
             return OcrResult.failure(OcrFailureReason.INTERRUPTED);
         }
     }
