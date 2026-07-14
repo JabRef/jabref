@@ -90,12 +90,8 @@ class ZbMATHTest {
     }
 
     @Test
-    void searchByNoneEntryFindsNothing() throws FetcherException {
-        BibEntry searchEntry = new BibEntry()
-                .withField(StandardField.TITLE, "t")
-                .withField(StandardField.AUTHOR, "a");
-
-        List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
+    void searchByEmptyEntryFindsNothing() throws FetcherException {
+        List<BibEntry> fetchedEntries = fetcher.performSearch(new BibEntry());
         assertEquals(List.of(), fetchedEntries);
     }
 
