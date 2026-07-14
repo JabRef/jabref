@@ -383,11 +383,11 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
             return Optional.empty();
         }
 
-        if (scoredEntries.size() > 1 && Math.abs(scoredEntries.get(0).score - scoredEntries.get(1).score) < AMBIGUITY_DELTA) {
+        if (scoredEntries.size() > 1 && Math.abs(scoredEntries.getFirst().score - scoredEntries.get(1).score) < AMBIGUITY_DELTA) {
             return Optional.empty();
         }
 
-        return Optional.of(scoredEntries.get(0).entry);
+        return Optional.of(scoredEntries.getFirst().entry);
     }
 
     private double scoreCandidate(BibEntry inputEntry, BibEntry candidate) {
