@@ -61,7 +61,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+<<<<<<< pdf-title-kerning
 - We fixed an issue where the title detected when importing a PDF could contain a spurious space inside a word (e.g. "T opology") and could pick up unrelated text from the second page. [#16246](https://github.com/JabRef/jabref/pull/16246)
+=======
+- We fixed an issue where exported dates displayed month names in the system language—regardless of locale settings—instead of in English. [#16224](https://github.com/JabRef/jabref/issues/16224)
+>>>>>>> main
 - We fixed an issue where converting a field to Unicode and back to LaTeX destroyed `\textsuperscript{...}`/`\textsubscript{...}`: runs of Unicode super-/subscript characters now merge back into a single command. [#3644](https://github.com/JabRef/jabref/issues/3644)
 - We reduced the size of Linux packages by removing embedded Postgres binaries for unused architectures. [#16143](https://github.com/JabRef/jabref/issues/16143)
 - We fixed an issue where searching ISIDORE failed with a security connection error. [#16054](https://github.com/JabRef/jabref/issues/16054)
