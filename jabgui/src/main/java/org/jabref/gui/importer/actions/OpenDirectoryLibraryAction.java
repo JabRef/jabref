@@ -3,6 +3,8 @@ package org.jabref.gui.importer.actions;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
+import java.util.function.Function;
 
 import javax.swing.undo.UndoManager;
 
@@ -25,7 +27,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.DirectoryMonitor;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -134,8 +138,10 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
         PdfEntryFactory pdfEntryFactory = new PdfEntryFactory(
                 preferences.getImportFormatPreferences(), preferences.getFilePreferences(),
                 preferences.getCitationKeyPatternPreferences());
+        Function<BibEntry, Optional<String>> fileNameGenerator = entry -> FileUtil.createFileNameFromPattern(
+                databaseContext.getDatabase(), entry, preferences.getFilePreferences().getFileNamePattern());
         DirectoryLibrarySynchronizer synchronizer = new DirectoryLibrarySynchronizer(
-                databaseContext, scanResult.catalog(), pdfEntryFactory, this::disposeFile,
+                databaseContext, scanResult.catalog(), pdfEntryFactory, this::disposeFile, fileNameGenerator,
                 UiTaskExecutor::runInJavaFXThread);
         databaseContext.attachDirectorySynchronizer(synchronizer);
         synchronizer.startWatching(Injector.instantiateModelOrService(DirectoryMonitor.class));

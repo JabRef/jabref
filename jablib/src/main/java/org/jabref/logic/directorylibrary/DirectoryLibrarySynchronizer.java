@@ -28,6 +28,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.exporter.HayagrivaEntryWriter;
@@ -57,6 +58,8 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.function.Predicate.not;
 
 /// Keeps an open directory library in sync with external file changes (inbound direction:
 /// file system to [BibDatabaseContext]). Registered as a [FileAlterationListener] with the
@@ -114,6 +117,7 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
     private final HayagrivaEntryWriter entryWriter = new HayagrivaEntryWriter();
     private final Set<Path> dirtyFiles = new LinkedHashSet<>();
     private final Consumer<Path> fileDisposer;
+    private final Function<BibEntry, Optional<String>> fileNameGenerator;
     private boolean writeScheduled;
 
     private @Nullable FileAlterationObserver observer;
@@ -126,20 +130,23 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
                                         DirectoryLibraryCatalog catalog,
                                         PdfEntryFactory pdfEntryFactory,
                                         Consumer<Path> fileDisposer,
+                                        Function<BibEntry, Optional<String>> fileNameGenerator,
                                         Consumer<Runnable> modelUpdateMarshaller) {
-        this(databaseContext, catalog, pdfEntryFactory, fileDisposer, modelUpdateMarshaller, Clock.systemUTC());
+        this(databaseContext, catalog, pdfEntryFactory, fileDisposer, fileNameGenerator, modelUpdateMarshaller, Clock.systemUTC());
     }
 
     DirectoryLibrarySynchronizer(BibDatabaseContext databaseContext,
                                  DirectoryLibraryCatalog catalog,
                                  PdfEntryFactory pdfEntryFactory,
                                  Consumer<Path> fileDisposer,
+                                 Function<BibEntry, Optional<String>> fileNameGenerator,
                                  Consumer<Runnable> modelUpdateMarshaller,
                                  Clock clock) {
         this.databaseContext = databaseContext;
         this.catalog = catalog;
         this.pdfEntryFactory = pdfEntryFactory;
         this.fileDisposer = fileDisposer;
+        this.fileNameGenerator = fileNameGenerator;
         this.root = databaseContext.getDirectoryLibraryRoot().orElseThrow(
                 () -> new IllegalArgumentException("Context is not a directory library"));
         this.modelUpdateMarshaller = modelUpdateMarshaller;
@@ -329,10 +336,63 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
         files.forEach(this::writeFile);
     }
 
+    /// Renames the sidecar (and its equally named PDF) to the base name the filename pattern
+    /// generates for the entry — kept in sync as a pair, per the pairing convention. Occupied
+    /// target names and pattern failures leave the current name untouched. Never touches other
+    /// files.
+    // [impl->req~directory-library.pattern-rename~1]
+    private Path applyFileNamePattern(Path file, BibEntry entry) {
+        Optional<String> generated = fileNameGenerator.apply(entry).map(String::trim).filter(not(String::isEmpty));
+        if (generated.isEmpty() || generated.get().equals(FileUtil.getBaseName(file))) {
+            return file;
+        }
+        Path directory = file.getParent();
+        if (directory == null) {
+            return file;
+        }
+        String oldBaseName = FileUtil.getBaseName(file);
+        String extension = FileUtil.getFileExtension(file).orElse("yml");
+        Path newSidecar = directory.resolve(generated.get() + "." + extension);
+        Path oldPdf = directory.resolve(oldBaseName + ".pdf");
+        Path newPdf = directory.resolve(generated.get() + ".pdf");
+        if (Files.exists(newSidecar) || (Files.exists(oldPdf) && Files.exists(newPdf))) {
+            return file;
+        }
+        try {
+            if (Files.exists(file)) {
+                Files.move(file, newSidecar);
+            }
+            catalog.relocateFile(file, newSidecar);
+            if (Files.exists(oldPdf)) {
+                Files.move(oldPdf, newPdf);
+                String newLink = root.relativize(newPdf).toString();
+                String oldLink = root.relativize(oldPdf).toString();
+                modelUpdateMarshaller.accept(() -> {
+                    List<LinkedFile> updated = entry.getFiles().stream()
+                                                    .map(linkedFile -> oldLink.equals(linkedFile.getLink())
+                                                            ? new LinkedFile(linkedFile.getDescription(), newLink, linkedFile.getFileType())
+                                                            : linkedFile)
+                                                    .toList();
+                    entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(updated), EntriesEventSource.SHARED);
+                });
+            }
+            return newSidecar;
+        } catch (IOException e) {
+            LOGGER.warn("Could not rename {} to the configured pattern", file, e);
+            return file;
+        }
+    }
+
     private void writeFile(Path file) {
         List<BibEntry> entries = entriesOf(file);
         if (entries.isEmpty()) {
             return;
+        }
+        if (entries.size() == 1) {
+            // The user's rename rule: a single-entry sidecar and its paired PDF share the base
+            // name generated by the configured filename pattern; multi-entry files have no
+            // single generating entry and keep their name
+            file = applyFileNamePattern(file, entries.getFirst());
         }
         List<HayagrivaEntryWriter.KeyedEntry> keyedEntries = new ArrayList<>();
         Set<String> usedKeys = new HashSet<>();

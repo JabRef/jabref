@@ -68,4 +68,16 @@ entries or subgroups can be added to them, they cannot be dragged or edited.
 
 Needs: impl
 
+## The sidecar and its PDF follow the configured filename pattern
+`req~directory-library.pattern-rename~1`
+
+When write-back touches a single-entry sidecar, the sidecar and its equally named PDF are
+renamed together to the base name the configured filename pattern (Linked files preferences)
+generates for the entry, keeping the pair in sync. Multi-entry files have no single generating
+entry and keep their name; occupied target names and pattern failures leave the current name
+untouched. Entry file links and the catalog follow the rename; the watcher does not re-import
+the renamed files.
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->
