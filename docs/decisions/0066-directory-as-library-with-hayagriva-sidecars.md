@@ -46,8 +46,9 @@ Key points of the chosen design:
 * Pairing is by convention — `X.yml`/`X.yaml` next to `X.pdf` — because Hayagriva has no
   file-path field; nothing JabRef-specific is written into the YAML for the association.
 * Non-Hayagriva `.yml` files (CI configs, ...) are ignored via format recognition, not reported
-  as errors. PDFs without a sidecar become stub entries; a sidecar is only written once the user
-  edits the entry (scanning never writes files).
+  as errors. PDFs without a sidecar become entries with metadata extracted from the PDF itself (the
+  standard PDF import pipeline, falling back to a stub titled after the file); a sidecar is
+  only written once the user edits the entry (scanning never writes files).
 * Later synchronization mirrors the shared-SQL seam (`convertToSharedDatabase` /
   `DBMSSynchronizer`): a directory synchronizer subscribes to entry events through a
   `CoarseChangeFilter` for write-back and applies inbound file changes with a non-local

@@ -14,6 +14,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.directorylibrary.DirectoryLibraryScanner;
+import org.jabref.logic.directorylibrary.PdfEntryFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -68,7 +69,9 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
 
     private void openDirectory(Path root) {
         preferences.getFilePreferences().setWorkingDirectory(root);
-        BackgroundTask.wrap(() -> new DirectoryLibraryScanner().scan(root))
+        PdfEntryFactory pdfEntryFactory = new PdfEntryFactory(
+                preferences.getImportFormatPreferences(), preferences.getFilePreferences());
+        BackgroundTask.wrap(() -> new DirectoryLibraryScanner(pdfEntryFactory).scan(root))
                       .onSuccess(this::showLibraryTab)
                       .onFailure(exception -> dialogService.showErrorDialogAndWait(
                               Localization.lang("Open folder as library"),
