@@ -87,7 +87,8 @@ class DirectoryLibrarySynchronizerTest {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
         when(importFormatPreferences.grobidPreferences()).thenReturn(noGrobid);
-        return new PdfEntryFactory(importFormatPreferences, mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS));
+        return new PdfEntryFactory(importFormatPreferences, mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS),
+                DirectoryLibraryScannerTest.authYearPatternPreferences());
     }
 
     private List<BibEntry> entries() {

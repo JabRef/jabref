@@ -358,8 +358,10 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
             return;
         }
         BibEntry entry = pdfEntryFactory.createEntry(pdf, root, databaseContext);
-        modelUpdateMarshaller.accept(() ->
-                databaseContext.getDatabase().insertEntries(List.of(entry), EntriesEventSource.SHARED));
+        modelUpdateMarshaller.accept(() -> {
+            databaseContext.getDatabase().insertEntries(List.of(entry), EntriesEventSource.SHARED);
+            pdfEntryFactory.generateCitationKeyIfMissing(entry, databaseContext);
+        });
     }
 
     private void handlePdfDeleted(Path pdf) {

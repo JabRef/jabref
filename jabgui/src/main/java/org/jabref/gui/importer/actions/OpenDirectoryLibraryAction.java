@@ -108,7 +108,8 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
 
         BibDatabaseContext databaseContext = scanResult.databaseContext();
         PdfEntryFactory pdfEntryFactory = new PdfEntryFactory(
-                preferences.getImportFormatPreferences(), preferences.getFilePreferences());
+                preferences.getImportFormatPreferences(), preferences.getFilePreferences(),
+                preferences.getCitationKeyPatternPreferences());
         DirectoryLibrarySynchronizer synchronizer = new DirectoryLibrarySynchronizer(
                 databaseContext, scanResult.catalog(), pdfEntryFactory, UiTaskExecutor::runInJavaFXThread);
         databaseContext.attachDirectorySynchronizer(synchronizer);
