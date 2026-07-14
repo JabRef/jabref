@@ -24,6 +24,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.cleanup.EprintCleanup;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
@@ -398,21 +399,24 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         if (entry.getCitationKey().filter(key -> !isUrlShaped(key)).isPresent()) {
             return;
         }
-        Optional<String> eprint = entry.getField(StandardField.EPRINT);
-        if (eprint.isEmpty()) {
-            return;
-        }
+        entry.getField(StandardField.EPRINT).ifPresent(eprint -> lookUpInspireCitationKey(entry, eprint));
+    }
+
+    private void lookUpInspireCitationKey(BibEntry entry, String eprint) {
         try {
             // INSPIREFetcher only recognizes the lowercase "arxiv" value for this field
             BibEntry inspireQuery = new BibEntry()
                     .withField(StandardField.ARCHIVEPREFIX, "arxiv")
-                    .withField(StandardField.EPRINT, eprint.get());
+                    .withField(StandardField.EPRINT, eprint);
             new INSPIREFetcher(importFormatPreferences).performSearch(inspireQuery).stream()
                                                        .findFirst()
                                                        .flatMap(BibEntry::getCitationKey)
                                                        .ifPresent(entry::setCitationKey);
+        } catch (FetcherClientException e) {
+            // Most arXiv categories aren't indexed by INSPIRE, so a 404 here is an expected miss, not an error
+            LOGGER.trace("No INSPIRE entry found for arXiv ID '{}'", eprint);
         } catch (FetcherException e) {
-            LOGGER.debug("Could not look up an INSPIRE texkey for arXiv ID '{}' (paper may not be indexed by INSPIRE)", eprint.get(), e);
+            LOGGER.debug("Could not look up an INSPIRE texkey for arXiv ID '{}'", eprint, e);
         }
     }
 
