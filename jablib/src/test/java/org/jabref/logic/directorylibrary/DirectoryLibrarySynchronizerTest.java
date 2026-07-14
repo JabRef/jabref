@@ -12,16 +12,24 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class DirectoryLibrarySynchronizerTest {
 
@@ -66,9 +74,20 @@ class DirectoryLibrarySynchronizerTest {
     private DirectoryLibrarySynchronizer synchronizer;
 
     private void openLibrary() throws IOException {
-        DirectoryLibraryScanner.ScanResult scanResult = new DirectoryLibraryScanner().scan(root);
+        PdfEntryFactory pdfEntryFactory = offlinePdfEntryFactory();
+        DirectoryLibraryScanner.ScanResult scanResult = new DirectoryLibraryScanner(pdfEntryFactory).scan(root);
         context = scanResult.databaseContext();
-        synchronizer = new DirectoryLibrarySynchronizer(context, scanResult.catalog(), Runnable::run, clock);
+        synchronizer = new DirectoryLibrarySynchronizer(context, scanResult.catalog(), pdfEntryFactory, Runnable::run, clock);
+    }
+
+    /// GROBID off and no identifiers in the fixtures, so no network is touched
+    private static PdfEntryFactory offlinePdfEntryFactory() {
+        GrobidPreferences noGrobid = mock(GrobidPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(noGrobid.isGrobidEnabled()).thenReturn(false);
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
+        when(importFormatPreferences.grobidPreferences()).thenReturn(noGrobid);
+        return new PdfEntryFactory(importFormatPreferences, mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     private List<BibEntry> entries() {

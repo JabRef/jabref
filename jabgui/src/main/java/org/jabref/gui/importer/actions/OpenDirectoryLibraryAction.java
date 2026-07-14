@@ -16,6 +16,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.directorylibrary.DirectoryLibraryScanner;
 import org.jabref.logic.directorylibrary.DirectoryLibrarySynchronizer;
+import org.jabref.logic.directorylibrary.PdfEntryFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.DirectoryMonitor;
@@ -74,7 +75,9 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
 
     private void openDirectory(Path root) {
         preferences.getFilePreferences().setWorkingDirectory(root);
-        BackgroundTask.wrap(() -> new DirectoryLibraryScanner().scan(root))
+        PdfEntryFactory pdfEntryFactory = new PdfEntryFactory(
+                preferences.getImportFormatPreferences(), preferences.getFilePreferences());
+        BackgroundTask.wrap(() -> new DirectoryLibraryScanner(pdfEntryFactory).scan(root))
                       .onSuccess(this::showLibraryTab)
                       .onFailure(exception -> dialogService.showErrorDialogAndWait(
                               Localization.lang("Open folder as library"),
@@ -103,8 +106,10 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
         libraryTab.updateTabTitle(false);
 
         BibDatabaseContext databaseContext = scanResult.databaseContext();
+        PdfEntryFactory pdfEntryFactory = new PdfEntryFactory(
+                preferences.getImportFormatPreferences(), preferences.getFilePreferences());
         DirectoryLibrarySynchronizer synchronizer = new DirectoryLibrarySynchronizer(
-                databaseContext, scanResult.catalog(), UiTaskExecutor::runInJavaFXThread);
+                databaseContext, scanResult.catalog(), pdfEntryFactory, UiTaskExecutor::runInJavaFXThread);
         databaseContext.attachDirectorySynchronizer(synchronizer);
         synchronizer.startWatching(Injector.instantiateModelOrService(DirectoryMonitor.class));
 

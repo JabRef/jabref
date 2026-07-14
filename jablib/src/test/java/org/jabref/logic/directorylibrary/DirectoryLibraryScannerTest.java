@@ -1,12 +1,18 @@
 package org.jabref.logic.directorylibrary;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.directorylibrary.DirectoryLibraryScanner.ScanResult;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -15,9 +21,12 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class DirectoryLibraryScannerTest {
 
@@ -33,7 +42,17 @@ class DirectoryLibraryScannerTest {
     @TempDir
     Path root;
 
-    private final DirectoryLibraryScanner scanner = new DirectoryLibraryScanner();
+    private final DirectoryLibraryScanner scanner = new DirectoryLibraryScanner(offlinePdfEntryFactory());
+
+    /// GROBID off and no identifiers in the fixtures, so no network is touched
+    private static PdfEntryFactory offlinePdfEntryFactory() {
+        GrobidPreferences noGrobid = mock(GrobidPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(noGrobid.isGrobidEnabled()).thenReturn(false);
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
+        when(importFormatPreferences.grobidPreferences()).thenReturn(noGrobid);
+        return new PdfEntryFactory(importFormatPreferences, mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS));
+    }
 
     private ScanResult scan() throws IOException {
         return scanner.scan(root);
@@ -104,6 +123,18 @@ class DirectoryLibraryScannerTest {
         assertEquals(Optional.of("interesting-paper"), entry.getField(StandardField.TITLE));
         assertEquals(List.of(new LinkedFile("", Path.of("interesting-paper.pdf"), "PDF")), entry.getFiles());
         assertEquals(Optional.empty(), result.catalog().sourceOf(entry));
+    }
+
+    @Test
+    void barePdfMetadataIsExtractedFromTheDocument() throws IOException, URISyntaxException {
+        Path fixture = Path.of(getClass().getResource("/pdfs/PdfContentImporter/Kriha2018.pdf").toURI());
+        Files.copy(fixture, root.resolve("kriha2018.pdf"));
+
+        BibEntry entry = singleEntry(scan());
+
+        assertEquals(Optional.of("On How We Can Teach – Exploring New Ways in Professional Software Development for Students"),
+                entry.getField(StandardField.TITLE));
+        assertEquals(List.of(new LinkedFile("", Path.of("kriha2018.pdf"), "PDF")), entry.getFiles());
     }
 
     @Test

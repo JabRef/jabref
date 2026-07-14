@@ -37,7 +37,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.StandardEntryType;
 
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -80,6 +79,7 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
 
     private final BibDatabaseContext databaseContext;
     private final DirectoryLibraryCatalog catalog;
+    private final PdfEntryFactory pdfEntryFactory;
     private final Path root;
     private final Consumer<Runnable> modelUpdateMarshaller;
     private final Clock clock;
@@ -97,16 +97,19 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
 
     public DirectoryLibrarySynchronizer(BibDatabaseContext databaseContext,
                                         DirectoryLibraryCatalog catalog,
+                                        PdfEntryFactory pdfEntryFactory,
                                         Consumer<Runnable> modelUpdateMarshaller) {
-        this(databaseContext, catalog, modelUpdateMarshaller, Clock.systemUTC());
+        this(databaseContext, catalog, pdfEntryFactory, modelUpdateMarshaller, Clock.systemUTC());
     }
 
     DirectoryLibrarySynchronizer(BibDatabaseContext databaseContext,
                                  DirectoryLibraryCatalog catalog,
+                                 PdfEntryFactory pdfEntryFactory,
                                  Consumer<Runnable> modelUpdateMarshaller,
                                  Clock clock) {
         this.databaseContext = databaseContext;
         this.catalog = catalog;
+        this.pdfEntryFactory = pdfEntryFactory;
         this.root = databaseContext.getDirectoryLibraryRoot().orElseThrow(
                 () -> new IllegalArgumentException("Context is not a directory library"));
         this.modelUpdateMarshaller = modelUpdateMarshaller;
@@ -354,11 +357,9 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
             }
             return;
         }
-        BibEntry stub = new BibEntry(StandardEntryType.Misc)
-                .withField(StandardField.TITLE, FileUtil.getBaseName(pdf));
-        stub.addFile(new LinkedFile("", root.relativize(pdf), StandardFileType.PDF.getName()));
+        BibEntry entry = pdfEntryFactory.createEntry(pdf, root, databaseContext);
         modelUpdateMarshaller.accept(() ->
-                databaseContext.getDatabase().insertEntries(List.of(stub), EntriesEventSource.SHARED));
+                databaseContext.getDatabase().insertEntries(List.of(entry), EntriesEventSource.SHARED));
     }
 
     private void handlePdfDeleted(Path pdf) {

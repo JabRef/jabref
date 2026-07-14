@@ -23,8 +23,6 @@ import org.jabref.logic.util.io.GitIgnoreFileFilter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.StandardEntryType;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -32,11 +30,12 @@ import org.slf4j.LoggerFactory;
 
 /// Builds an in-memory library from a directory tree: each Hayagriva `.yml`/`.yaml` file
 /// contributes its entries, a PDF next to a sidecar of the same base name is linked to the
-/// sidecar's (first) entry, and PDFs without a sidecar become stub entries titled after the
-/// file. The directory itself is the library — the resulting [BibDatabaseContext] has
-/// [org.jabref.logic.shared.DatabaseLocation#DIRECTORY] and no database path; linked files are
-/// stored relative to the root, which is registered as the library-specific file directory.
-// [impl->req~directory-library.scan~1]
+/// sidecar's (first) entry, and PDFs without a sidecar become entries with metadata extracted
+/// from the PDF itself (see [PdfEntryFactory]). The directory itself is the library — the
+/// resulting [BibDatabaseContext] has [org.jabref.logic.shared.DatabaseLocation#DIRECTORY] and
+/// no database path; linked files are stored relative to the root, which is registered as the
+/// library-specific file directory.
+// [impl->req~directory-library.scan~2]
 @NullMarked
 public class DirectoryLibraryScanner {
 
@@ -52,6 +51,11 @@ public class DirectoryLibraryScanner {
     private static final String PDF_EXTENSION = "pdf";
 
     private final HayagrivaImporter importer = new HayagrivaImporter();
+    private final PdfEntryFactory pdfEntryFactory;
+
+    public DirectoryLibraryScanner(PdfEntryFactory pdfEntryFactory) {
+        this.pdfEntryFactory = pdfEntryFactory;
+    }
 
     public ScanResult scan(Path root) throws IOException {
         BibDatabaseContext databaseContext = new BibDatabaseContext();
@@ -92,12 +96,9 @@ public class DirectoryLibraryScanner {
             if (pairedPdfs.contains(pdf)) {
                 continue;
             }
-            // No metadata extraction here: the stub only makes the PDF visible; a sidecar is
-            // written once the user edits the entry
-            BibEntry stub = new BibEntry(StandardEntryType.Misc)
-                    .withField(StandardField.TITLE, FileUtil.getBaseName(pdf));
-            linkPdf(stub, root, pdf);
-            entries.add(stub);
+            // Metadata comes from the PDF itself; a sidecar is still only written once the
+            // user edits the entry
+            entries.add(pdfEntryFactory.createEntry(pdf, root, databaseContext));
         }
 
         databaseContext.getDatabase().insertEntries(entries);
