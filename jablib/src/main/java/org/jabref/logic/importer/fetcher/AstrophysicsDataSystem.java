@@ -278,7 +278,7 @@ public class AstrophysicsDataSystem
         }
         // This is currently just interpreting the complex query as a default string query
         List<String> bibCodes = fetchBibcodes(urlForQuery);
-        Collection<BibEntry> results = performSearchByIds(bibCodes);
+        List<BibEntry> results = performSearchByIds(bibCodes);
         return new Page<>(queryList.toString(), pageNumber, results);
     }
 

@@ -3,6 +3,7 @@ package org.jabref.logic.util.io;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.jabref.logic.util.JabRefBaseDirectoryLocator;
 
@@ -131,8 +132,10 @@ class FileHistoryTest {
 
     @Test
     @EnabledOnOs(OS.WINDOWS)
-    void removeItemHandlesPathWithDifferentRoot() {
-        Path differentRoot = Path.of("H:\\somefile.lnk");
+    void removeItemHandlesFileOnDifferentDriveRoot() {
+        String baseDrive = baseDir.getRoot().toString().substring(0, 1).toUpperCase(Locale.ROOT);
+        String otherDrive = "H".equals(baseDrive) ? "C" : "H";
+        Path differentRoot = Path.of(otherDrive + ":\\somefile.pdf");
 
         history.newFile(differentRoot);
 
