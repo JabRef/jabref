@@ -32,10 +32,12 @@ class KeyBindingViewModelTest {
         when(preferences.getKeyBindingRepository()).thenReturn(keyBindingRepository);
         Injector.setModelOrService(CliPreferences.class, preferences);
 
-        KeyBindingsTabViewModel keyBindingsTabViewModel = new KeyBindingsTabViewModel(keyBindingRepository, mock(DialogService.class), preferences);
+        KeyBindingsTabViewModel keyBindingsTabViewModel = new KeyBindingsTabViewModel(keyBindingRepository,
+                mock(DialogService.class), preferences);
         KeyBinding binding = KeyBinding.MERGE_ENTRIES;
 
-        KeyBindingViewModel viewModel = new KeyBindingViewModel(keyBindingRepository, binding, binding.getDefaultKeyBinding());
+        KeyBindingViewModel viewModel = new KeyBindingViewModel(keyBindingRepository, binding,
+                binding.getDefaultKeyBinding());
         keyBindingsTabViewModel.selectedKeyBindingProperty().set(Optional.of(viewModel));
 
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "F1", "F1", KeyCode.F1, true, false, false,
@@ -63,8 +65,7 @@ class KeyBindingViewModelTest {
 
         when(preferences.getKeyBindingRepository()).thenReturn(prefsRepo);
 
-        KeyBindingsTabViewModel viewModel =
-                new KeyBindingsTabViewModel(uiRepo, mock(DialogService.class), preferences);
+        KeyBindingsTabViewModel viewModel = new KeyBindingsTabViewModel(uiRepo, mock(DialogService.class), preferences);
 
         KeyBinding binding = KeyBinding.CLOSE_DATABASE;
 
@@ -76,10 +77,10 @@ class KeyBindingViewModelTest {
                 "L",
                 "L",
                 KeyCode.L,
-                true,
-                false,
-                false,
-                true
+                true, // Shift
+                true, // Ctrl
+                false, // Alt
+                false // Meta
         );
 
         viewModel.setNewBindingForCurrent(event);
