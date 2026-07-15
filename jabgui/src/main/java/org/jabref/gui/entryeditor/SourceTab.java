@@ -17,6 +17,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.InputMethodRequests;
 import javafx.scene.input.KeyEvent;
@@ -57,8 +58,8 @@ import org.jabref.model.util.Range;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.CodeArea;
+import jfx.incubator.scene.control.richtext.CodeArea;
+import jfx.incubator.scene.control.richtext.TextPos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,38 +111,33 @@ public class SourceTab extends EntryEditorTab {
                 this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
             }
         });
-        stateManager.searchQueryProperty().addListener((_, _, _) -> Platform.runLater(this::highlightSearchPattern));
+        // stateManager.searchQueryProperty().addListener((_, _, _) -> Platform.runLater(this::highlightSearchPattern));
     }
 
     private void highlightSearchPattern() {
+        /*
         if (codeArea == null) {
             return;
         }
-
-        codeArea.setStyleClass(0, codeArea.getLength(), TEXT_STYLE);
-        if (StringUtil.isBlank(stateManager.searchQueryProperty().get())) {
-            return;
-        }
-
-        SearchQuery searchQuery = new SearchQuery(stateManager.searchQueryProperty().get());
-        Map<Optional<Field>, List<String>> searchTermsMap = Highlighter.groupTermsByField(searchQuery);
-        searchTermsMap.forEach(this::buildPatternAndHighlightField);
+        */
     }
 
     private void buildPatternAndHighlightField(Optional<Field> optionalField, List<String> terms) {
+        /*
         Highlighter.buildSearchPattern(terms).ifPresent(
                 searchPattern -> {
                     if (optionalField.isPresent()) {
                         highlightField(optionalField.get(), searchPattern);
                     } else {
-                        // User did not specify any field, thus we need to go through all fields
                         fieldPositions.keySet().forEach(field -> highlightField(field, searchPattern));
                     }
                 }
         );
+        */
     }
 
     private void highlightField(Field field, String searchPattern) {
+        /*
         Range fieldPosition = fieldPositions.get(field);
         if (fieldPosition == null) {
             return;
@@ -154,6 +150,7 @@ public class SourceTab extends EntryEditorTab {
         for (Range range : matchedPositions) {
             codeArea.setStyleClass(start + range.start() - 1, start + range.end(), SEARCH_STYLE);
         }
+        */
     }
 
     /// Method similar to [BibEntry#getStringRepresentation(BibEntry, BibDatabaseMode, BibEntryTypesManager, FieldPreferences)]. This method additionally updates [#fieldPositions].
@@ -193,16 +190,17 @@ public class SourceTab extends EntryEditorTab {
 
     private void setupSourceEditor() {
         codeArea = new CodeArea();
-        codeArea.setWrapText(true);
+        //codeArea.setWrapText(true);
         codeArea.setInputMethodRequests(new InputMethodRequestsObject());
         codeArea.setOnInputMethodTextChanged(event -> {
             String committed = event.getCommitted();
             if (!committed.isEmpty()) {
-                codeArea.insertText(codeArea.getCaretPosition(), committed);
+                TextPos caretPos = codeArea.getCaretPosition();
+                codeArea.getModel().replace(null, caretPos, caretPos, committed);
             }
         });
         codeArea.setId("bibtexSourceCodeArea");
-        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
+        // codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
 
         ActionFactory factory = new ActionFactory();
@@ -221,10 +219,12 @@ public class SourceTab extends EntryEditorTab {
 
         codeArea.focusedProperty().addListener((_, _, onFocus) -> {
             if (!onFocus && (getCurrentEntry() != null)) {
-                storeSource(getCurrentEntry(), codeArea.textProperty().getValue());
+                storeSource(getCurrentEntry(), codeArea.getText());
             }
         });
-        VirtualizedScrollPane<CodeArea> scrollableCodeArea = new VirtualizedScrollPane<>(codeArea);
+        ScrollPane scrollableCodeArea = new ScrollPane(codeArea);
+        scrollableCodeArea.setFitToWidth(true);
+        scrollableCodeArea.setFitToHeight(true);
         this.setContent(scrollableCodeArea);
     }
 
@@ -237,15 +237,16 @@ public class SourceTab extends EntryEditorTab {
             BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
                                                .orElse(BibDatabaseMode.BIBLATEX);
 
-            codeArea.clear();
             try {
-                codeArea.appendText(getSourceString(getCurrentEntry(), mode, fieldPreferences));
+                String source = getSourceString(getCurrentEntry(), mode, fieldPreferences);
+                codeArea.setText(source);
                 codeArea.setEditable(true);
-                Platform.runLater(this::highlightSearchPattern);
+                // Platform.runLater(this::highlightSearchPattern);
             } catch (IOException ex) {
                 codeArea.setEditable(false);
-                codeArea.appendText(ex.getMessage() + "\n\n" +
-                        Localization.lang("Correct the entry, and reopen editor to display/edit source."));
+                String errorMsg = ex.getMessage() + "\n\n" +
+                        Localization.lang("Correct the entry, and reopen editor to display/edit source.");
+                codeArea.setText(errorMsg);
                 LOGGER.debug("Incorrect entry", ex);
             }
         });
@@ -254,7 +255,7 @@ public class SourceTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         if ((previousEntry != null) && (codeArea != null)) {
-            storeSource(previousEntry, codeArea.textProperty().getValue());
+            storeSource(previousEntry, codeArea.getText());
         }
         this.previousEntry = entry;
 
@@ -374,7 +375,7 @@ public class SourceTab extends EntryEditorTab {
                 case SAVE_LIBRARY,
                      SAVE_ALL,
                      SAVE_LIBRARY_AS ->
-                        storeSource(getCurrentEntry(), codeArea.textProperty().getValue());
+                        storeSource(getCurrentEntry(), codeArea.getText());
             }
         });
     }

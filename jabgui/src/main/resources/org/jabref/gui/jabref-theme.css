@@ -1294,6 +1294,8 @@ We want to have a look that matches our icons in the tool-bar */
 #entryEditor #bibtexSourceCodeArea {
     -fx-padding: 4 4 4 4;
     -fx-background-color: -fx-control-inner-background;
+    -fx-font-family: "Monospaced", "Courier New", monospace !important;
+    -fx-font-size: 1.083em !important;
 }
 
 #entryEditor #bibtexSourceCodeArea .search {

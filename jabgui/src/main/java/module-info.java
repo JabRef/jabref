@@ -18,7 +18,7 @@ open module org.jabref {
     requires javafx.fxml;
     requires javafx.graphics;
     requires org.jabref.htmltonode;
-    requires /*runtime*/ jfx.incubator.richtext;
+    requires jfx.incubator.richtext;
 
     requires com.tobiasdiez.easybind;
 
