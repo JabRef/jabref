@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
@@ -49,6 +50,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
 
     private static final String COVER_IMAGE_FORMAT_HTML = "<img style=\"border-width:1px; border-style:solid; border-color:auto; display:block; height:12rem;\" src=\"%s\"> <br>";
+
+    private boolean viewportResetScheduled = false;
+    private double latestContentHeight = 0.0;
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
@@ -107,13 +111,16 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         workspacePreferences.mainFontSizeProperty().addListener((_, _, _) -> updateBaseFontSize());
     }
 
-    /// @return the base font size in points, matching whatever [org.jabref.gui.theme.ThemeManager]
-    /// applies to the rest of the UI via the scene root's "-fx-font-size" (the preview cannot rely on that
-    /// CSS cascade itself, since its text nodes get an explicit `Font` instead of an inherited one)
+    /// @return the base font size in CSS pixels (JavaFX user units), matching whatever
+    /// [org.jabref.gui.theme.ThemeManager] applies to the rest of the UI via the scene root's
+    /// "-fx-font-size". ThemeManager expresses the size in CSS `pt` (`-fx-font-size: Xpt`), but
+    /// `Font.font(size)` in the JavaFX Font API takes CSS pixels (user units), not typographic
+    /// points — so the stored pt value must be converted (1pt = 96/72 px).
     private double resolveBaseFontSize() {
-        return workspacePreferences.shouldOverrideDefaultFontSize()
-               ? workspacePreferences.getMainFontSize()
-               : WorkspacePreferences.getDefault().getMainFontSize();
+        double pt = workspacePreferences.shouldOverrideDefaultFontSize()
+                    ? workspacePreferences.getMainFontSize()
+                    : WorkspacePreferences.getDefault().getMainFontSize();
+        return pt * 96.0 / 72.0;
     }
 
     private void updateBaseFontSize() {
@@ -355,13 +362,36 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         setVbarPolicy(ScrollBarPolicy.NEVER);
         setHbarPolicy(ScrollBarPolicy.NEVER);
 
+        // Disable fitToHeight to prevent the ScrollPane from forcing
+        // the content to 0px height during initial layout calculation
+        setFitToHeight(false);
+
         // Tooltips size to the rendered content: fixed width, natural height. Only write the
         // viewport height when it actually changed, so rendering does not queue redundant relayouts.
         setPrefSize(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE);
         setPrefViewportWidth(750);
         previewView.layoutBoundsProperty().addListener((_, _, bounds) -> {
-            if (Math.abs(getPrefViewportHeight() - bounds.getHeight()) >= 1) {
-                setPrefViewportHeight(bounds.getHeight());
+            double contentHeight = bounds.getHeight();
+            if (contentHeight == 0 && getPrefViewportHeight() == USE_COMPUTED_SIZE) {
+                return;
+            }
+
+            if (Math.abs(getPrefViewportHeight() - contentHeight) >= 1) {
+                setPrefViewportHeight(contentHeight);
+
+                this.latestContentHeight = contentHeight;
+
+                // Asynchronously reset to USE_COMPUTED_SIZE on the next JavaFX layout pulse
+                // updating the viewport height.
+                if (!viewportResetScheduled) {
+                    viewportResetScheduled = true;
+                    Platform.runLater(() -> {
+                        viewportResetScheduled = false;
+                        if (Math.abs(getPrefViewportHeight() - latestContentHeight) < 1 && getPrefViewportHeight() != USE_COMPUTED_SIZE) {
+                            setPrefViewportHeight(USE_COMPUTED_SIZE);
+                        }
+                    });
+                }
             }
         });
     }

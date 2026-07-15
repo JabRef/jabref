@@ -122,6 +122,12 @@ jvmDependencyConflicts.patch {
         // no dependency in metadata, but 'requires org.libreoffice.unoloader' in module-info
         addRuntimeOnlyDependency("org.libreoffice:unoloader")
     }
+    module("io.zonky.test:embedded-postgres") {
+        removeDependency("io.zonky.test.postgres:embedded-postgres-binaries-windows-amd64")
+        removeDependency("io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64")
+        removeDependency("io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64")
+        removeDependency("io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64-alpine")
+    }
 }
 
 extraJavaModuleInfo {
@@ -166,29 +172,6 @@ extraJavaModuleInfo {
     }
 
     module("com.github.javakeyring:java-keyring", "java.keyring")
-
-    module("com.github.tomtung:latex2unicode_2.13", "com.github.tomtung.latex2unicode") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-    }
-    module("com.lihaoyi:fastparse_2.13", "fastparse") {
-        overrideModuleName() // fastparse_2.13 is not a valid name
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("scala.library")
-    }
-    module("com.lihaoyi:sourcecode_2.13", "com.lihaoyi.sourcecode") {
-        overrideModuleName() // sourcecode_2.13 is not a valid name
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("scala.library")
-    }
-    module("com.lihaoyi:geny_2.13", "com.lihaoyi.geny") {
-        overrideModuleName() // geny_2.13 is not a valid name
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("scala.library")
-    }
 
     module("com.h2database:h2-mvstore", "com.h2database.mvstore")
     module("com.ibm.icu:icu4j", "com.ibm.icu")
@@ -312,7 +295,13 @@ extraJavaModuleInfo {
     }
     module("org.javassist:javassist", "org.javassist")
     module("org.jbibtex:jbibtex", "jbibtex")
-    module("org.scala-lang:scala-library", "scala.library")
+    module("org.scilab.forge:jlatexmath", "jlatexmath") {
+        exportAllPackages()
+        mergeJar("org.scilab.forge:jlatexmath-font-greek")
+        mergeJar("org.scilab.forge:jlatexmath-font-cyrillic")
+        requiresTransitive("java.desktop")
+        requiresTransitive("java.xml")
+    }
     module("pt.davidafsilva.apple:jkeychain", "jkeychain")
 
     module("org.testfx:testfx-core", "org.testfx") {

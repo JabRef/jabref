@@ -5,17 +5,17 @@ import java.util.List;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.ingestion.logic.parsing.UniversalContentParser;
 import org.jabref.model.ai.identifiers.FullBibEntry;
-import org.jabref.model.ai.pipeline.AnswerEngineKind;
 import org.jabref.model.ai.pipeline.RelevantInformation;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.entry.BibEntry;
 
-// [impl->feat~ai.answer-engines.full-document~1]
-public class FullDocumentAnswerEngine implements AnswerEngine {
+// [impl->feat~ai.response-engines.full-document~1]
+public class FullDocumentResponseEngine implements ResponseEngine {
     private final FilePreferences filePreferences;
 
     private final UniversalContentParser universalContentParser = new UniversalContentParser();
 
-    public FullDocumentAnswerEngine(FilePreferences filePreferences) {
+    public FullDocumentResponseEngine(FilePreferences filePreferences) {
         this.filePreferences = filePreferences;
     }
 
@@ -43,7 +43,9 @@ public class FullDocumentAnswerEngine implements AnswerEngine {
     }
 
     @Override
-    public AnswerEngineKind getKind() {
-        return AnswerEngineKind.FULL_DOCUMENT;
+    public ResponseEngineKind getKind() {
+        return ResponseEngineKind.FULL_DOCUMENT;
     }
 }
+
+
