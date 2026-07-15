@@ -76,8 +76,8 @@ class PdfExtractReferences implements Callable<Integer> {
 
         CliPreferences preferences = pdf.argumentProcessor.cliPreferences;
         ExtractionMode effectiveMode = mode != null
-                ? mode
-                : (preferences.getGrobidPreferences().isGrobidEnabled() ? ExtractionMode.GROBID : ExtractionMode.RULE_BASED);
+                                       ? mode
+                                       : (preferences.getGrobidPreferences().isGrobidEnabled() ? ExtractionMode.GROBID : ExtractionMode.RULE_BASED);
 
         if (grobidUrl != null && effectiveMode != ExtractionMode.GROBID) {
             System.err.println(Localization.lang("--grobid-url can only be used with --mode=GROBID."));
