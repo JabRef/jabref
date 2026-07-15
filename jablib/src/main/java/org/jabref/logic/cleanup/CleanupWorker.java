@@ -1,6 +1,7 @@
 package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -65,9 +66,34 @@ public class CleanupWorker {
     private List<CleanupJob> determineCleanupActions(CleanupPreferences preset) {
         List<CleanupJob> jobs = new ArrayList<>();
 
+        boolean renameOnlyRelativePaths = preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
+        boolean renameOnlyPdfFiles = preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_PDF_FILES);
+        boolean renameActive = preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF)
+                || renameOnlyRelativePaths
+                || renameOnlyPdfFiles;
+
+        boolean preserveCustomSuffix = preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_PRESERVE_SUFFIX);
+
         // Add active jobs from preset panel
         for (CleanupPreferences.CleanupStep action : preset.getActiveJobs()) {
+            if (isRenameStep(action) || action == CleanupPreferences.CleanupStep.RENAME_PDF_PRESERVE_SUFFIX) {
+                continue;
+            }
             jobs.add(toJob(action));
+        }
+
+        if (renameActive) {
+            EnumSet<RenamePdfCleanup.Option> renameOptions = EnumSet.noneOf(RenamePdfCleanup.Option.class);
+            if (renameOnlyRelativePaths) {
+                renameOptions.add(RenamePdfCleanup.Option.ONLY_RELATIVE_PATHS);
+            }
+            if (renameOnlyPdfFiles) {
+                renameOptions.add(RenamePdfCleanup.Option.ONLY_PDF_FILES);
+            }
+            if (preserveCustomSuffix) {
+                renameOptions.add(RenamePdfCleanup.Option.PRESERVE_CUSTOM_SUFFIX);
+            }
+            jobs.add(new RenamePdfCleanup(renameOptions, () -> databaseContext, filePreferences));
         }
 
         if (preset.getFieldFormatterCleanups().isEnabled()) {
@@ -75,6 +101,12 @@ public class CleanupWorker {
         }
 
         return jobs;
+    }
+
+    private static boolean isRenameStep(CleanupPreferences.CleanupStep action) {
+        return action == CleanupPreferences.CleanupStep.RENAME_PDF
+                || action == CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS
+                || action == CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_PDF_FILES;
     }
 
     private CleanupJob toJob(CleanupPreferences.CleanupStep action) {
@@ -89,10 +121,6 @@ public class CleanupWorker {
                     new URLCleanup();
             case MAKE_PATHS_RELATIVE ->
                     new RelativePathsCleanup(databaseContext, filePreferences);
-            case RENAME_PDF ->
-                    new RenamePdfCleanup(false, () -> databaseContext, filePreferences);
-            case RENAME_PDF_ONLY_RELATIVE_PATHS ->
-                    new RenamePdfCleanup(true, () -> databaseContext, filePreferences);
             case CLEAN_UP_UPGRADE_EXTERNAL_LINKS ->
                     new UpgradePdfPsToFileCleanup();
             case CLEAN_UP_DELETED_LINKED_FILES ->

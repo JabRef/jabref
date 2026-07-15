@@ -1,5 +1,7 @@
 package org.jabref.gui.externalfiles;
 
+import java.util.EnumSet;
+
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.model.database.BibDatabaseContext;
@@ -19,7 +21,7 @@ public class AutoRenameFileOnEntryChange {
 
     public AutoRenameFileOnEntryChange(BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
         this.filePreferences = filePreferences;
-        renamePdfCleanup = new RenamePdfCleanup(false, () -> bibDatabaseContext, filePreferences);
+        renamePdfCleanup = new RenamePdfCleanup(EnumSet.noneOf(RenamePdfCleanup.Option.class), () -> bibDatabaseContext, filePreferences);
     }
 
     @Subscribe

@@ -28,15 +28,36 @@ public class LinkedFileHandler {
     private final BibEntry entry;
 
     private final LinkedFile linkedFile;
+    private final boolean preserveCustomSuffix;
+    private final Optional<String> detectedOriginalPattern;
 
     public LinkedFileHandler(LinkedFile linkedFile,
                              BibEntry entry,
                              @NonNull BibDatabaseContext databaseContext,
                              @NonNull FilePreferences filePreferences) {
+        this(linkedFile, entry, databaseContext, filePreferences, false);
+    }
+
+    public LinkedFileHandler(LinkedFile linkedFile,
+                             BibEntry entry,
+                             @NonNull BibDatabaseContext databaseContext,
+                             @NonNull FilePreferences filePreferences,
+                             boolean preserveCustomSuffix) {
+        this(linkedFile, entry, databaseContext, filePreferences, preserveCustomSuffix, Optional.empty());
+    }
+
+    public LinkedFileHandler(LinkedFile linkedFile,
+                             BibEntry entry,
+                             @NonNull BibDatabaseContext databaseContext,
+                             @NonNull FilePreferences filePreferences,
+                             boolean preserveCustomSuffix,
+                             @NonNull Optional<String> detectedOriginalPattern) {
         this.linkedFile = linkedFile;
         this.entry = entry;
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
+        this.preserveCustomSuffix = preserveCustomSuffix;
+        this.detectedOriginalPattern = detectedOriginalPattern;
     }
 
     public boolean moveToDefaultDirectory() throws IOException {
@@ -248,8 +269,7 @@ public class LinkedFileHandler {
     /// @return the suggested filename, including extension
     public String getSuggestedFileName() {
         String filename = linkedFile.getFileName().orElse("file");
-        final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern())
-                                              .orElse(FileUtil.getBaseName(filename));
+        final String targetFileName = getSuggestedBaseName();
 
         return FileUtil.getValidFileName(FileUtil.getFileExtension(filename).map(ext -> targetFileName + "." + ext).orElse(targetFileName));
     }
@@ -261,11 +281,55 @@ public class LinkedFileHandler {
     /// @return the suggested filename, including extension
     public String getSuggestedFileName(@NonNull String extension) {
         assert !StringUtil.isBlank(extension);
-        String filename = linkedFile.getFileName().orElse("file");
-        final String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern())
-                                              .orElse(FileUtil.getBaseName(filename));
+        final String targetFileName = getSuggestedBaseName();
 
         return FileUtil.getValidFileName(targetFileName + "." + extension);
+    }
+
+    /// Builds the suggested file name (without extension) from the configured pattern.
+    ///
+    /// When `preserveCustomSuffix` is enabled, any custom suffix the user had added to the current file name is
+    /// re-appended. This preserves manually named supplementary files: if the pattern resolves to `key` and the
+    /// current file is named `key-fig6`, the suggested base name becomes `key-fig6` instead of plain `key`, so the
+    /// `-fig6` part is not lost during cleanup/renaming (see issue #11358). When disabled, the plain pattern result is
+    /// returned (the historical behavior).
+    ///
+    /// The suffix is split off using the *original* pattern that was applied to the files (see
+    /// `detectedOriginalPattern`), not the freshly generated one. Using the new pattern would lose the suffix
+    /// whenever the pattern changed (e.g. after the citation key was edited), because the current file name no longer
+    /// starts with the new pattern. When no original pattern was detected (for instance a single-file entry), we fall
+    /// back to the freshly generated pattern.
+    private String getSuggestedBaseName() {
+        String currentBaseName = FileUtil.getBaseName(linkedFile.getFileName().orElse("file"));
+        String patternBaseName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern())
+                                         .orElse(currentBaseName);
+
+        if (!preserveCustomSuffix) {
+            return patternBaseName;
+        }
+
+        String originalBaseName = detectedOriginalPattern.orElse(patternBaseName);
+        return patternBaseName + extractCustomSuffix(currentBaseName, originalBaseName);
+    }
+
+    /// Returns the user-added suffix that follows the original base name pattern in the current file name, or an
+    /// empty string when there is none.
+    ///
+    /// Example: for `currentBaseName = "key-fig6"` and `originalBaseName = "key"`, this returns `"-fig6"`.
+    ///
+    /// JabRef's own uniqueness marks (such as ` (1)`) are stripped first, so they are never mistaken for an
+    /// intentional suffix and are not re-appended.
+    private static String extractCustomSuffix(String currentBaseName, String originalBaseName) {
+        if (originalBaseName.isEmpty()) {
+            return "";
+        }
+
+        String currentWithoutDuplicateMark = FileNameUniqueness.eraseDuplicateMarks(currentBaseName);
+        if (currentWithoutDuplicateMark.equals(originalBaseName) || !currentWithoutDuplicateMark.startsWith(originalBaseName)) {
+            return "";
+        }
+
+        return currentWithoutDuplicateMark.substring(originalBaseName.length());
     }
 
     /// Check to see if a file already exists in the target directory.  Search is not case sensitive.

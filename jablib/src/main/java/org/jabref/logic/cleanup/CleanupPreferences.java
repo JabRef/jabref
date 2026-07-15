@@ -104,6 +104,8 @@ public class CleanupPreferences {
         MAKE_PATHS_RELATIVE,
         RENAME_PDF,
         RENAME_PDF_ONLY_RELATIVE_PATHS,
+        RENAME_PDF_ONLY_PDF_FILES,
+        RENAME_PDF_PRESERVE_SUFFIX,
         MOVE_PDF,
         FIX_FILE_LINKS,
         CLEAN_UP_DELETED_LINKED_FILES,
