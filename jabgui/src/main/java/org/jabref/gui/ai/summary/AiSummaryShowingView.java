@@ -41,6 +41,14 @@ public class AiSummaryShowingView extends VBox {
 
     private AiSummaryShowingViewModel viewModel;
 
+    /// Monotonically increasing stamp identifying the most recently scheduled content update.
+    ///
+    /// Each [#updateContent()] call increments this counter and captures its own value before
+    /// scheduling the UI mutation on the JavaFX thread. When the scheduled callback runs, it compares
+    /// the captured value against the current counter and skips the mutation if a newer update has been
+    /// scheduled in the meantime, preventing a stale summary from overwriting a newer one.
+    private int updateVersion;
+
     @Inject private GuiPreferences preferences;
     @Inject private DialogService dialogService;
     @Inject private BibEntryTypesManager entryTypesManager;
@@ -115,8 +123,12 @@ public class AiSummaryShowingView extends VBox {
     }
 
     private void updateContent() {
-        String content = StringUtil.makeSafe(viewModel.summaryProperty().map(AiSummary::content).getValue());
+        int requestVersion = ++updateVersion;
         UiTaskExecutor.runInJavaFXThread(() -> {
+            if (requestVersion != updateVersion) {
+                return;
+            }
+            String content = StringUtil.makeSafe(viewModel.summaryProperty().map(AiSummary::content).getValue());
             if (viewModel.isMarkdownProperty().get()) {
                 markdownTextFlow.setMarkdown(content);
             } else {
