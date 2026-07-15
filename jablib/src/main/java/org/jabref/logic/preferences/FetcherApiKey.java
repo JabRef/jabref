@@ -13,7 +13,7 @@ public class FetcherApiKey {
     public FetcherApiKey(String name, boolean use, String key) {
         this.name = new SimpleStringProperty(name);
         this.use = new SimpleBooleanProperty(use);
-        this.key = new SimpleStringProperty(key != null ? key: "");
+        this.key = new SimpleStringProperty(key != null ? key : "");
     }
 
     public String getName() {
