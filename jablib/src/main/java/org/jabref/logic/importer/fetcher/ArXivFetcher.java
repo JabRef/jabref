@@ -24,6 +24,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.cleanup.EprintCleanup;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
@@ -374,7 +375,56 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         if (this.doiFetcher != null) {
             inplaceAsyncInfuseArXivWithDoi(arXivBibEntryPromise, ArXivIdentifier.parse(identifier));
         }
-        return arXivBibEntryPromise.join();
+        Optional<BibEntry> result = arXivBibEntryPromise.join();
+        result.ifPresent(this::infuseWithInspireCitationKeyIfMissing);
+        return result;
+    }
+
+    /// If the entry has no "real" citation key yet, try to look up the paper on INSPIRE (the
+    /// standard literature database for high-energy physics) and adopt its curated texkey instead.
+    ///
+    /// A "real" key means anything other than absent or URL-shaped: when no manually-assigned
+    /// (journal) DOI is found to provide a "nicer" key (see [#CHOSEN_MANUAL_DOI_FIELDS]),
+    /// [BibEntry#mergeWith] still copies over whatever citation key the *automatically*-assigned
+    /// arXiv DOI's metadata suggests — which for arXiv-only preprints is typically just that DOI's
+    /// URL, e.g. `https://doi.org/10.48550/arxiv.1405.2249`. That is treated the same as no key at all.
+    /// Without this distinction, a plain "is a key present?" check would already be satisfied by
+    /// that URL and skip the INSPIRE lookup below entirely — leaving exactly the entries this
+    /// method exists to fix stuck with a DOI URL as their citation key.
+    ///
+    /// Most arXiv categories aren't indexed by INSPIRE, so a miss here is expected, not an error —
+    /// the entry is simply left with whatever citation key (if any) it already had.
+    ///
+    /// The entry's EPRINT field is expected to already be normalized by [ArXiv#performSearchById].
+    ///
+    /// @param entry The fetched arXiv entry to infuse, modified in place.
+    private void infuseWithInspireCitationKeyIfMissing(BibEntry entry) {
+        if (entry.getCitationKey().filter(key -> !isUrlShaped(key)).isPresent()) {
+            return;
+        }
+        entry.getField(StandardField.EPRINT).ifPresent(eprint -> lookUpInspireCitationKey(entry, eprint));
+    }
+
+    private void lookUpInspireCitationKey(BibEntry entry, String eprint) {
+        try {
+            // INSPIREFetcher only recognizes the lowercase "arxiv" value for this field
+            BibEntry inspireQuery = new BibEntry()
+                    .withField(StandardField.ARCHIVEPREFIX, "arxiv")
+                    .withField(StandardField.EPRINT, eprint);
+            new INSPIREFetcher(importFormatPreferences).performSearch(inspireQuery).stream()
+                                                       .findFirst()
+                                                       .flatMap(BibEntry::getCitationKey)
+                                                       .ifPresent(entry::setCitationKey);
+        } catch (FetcherClientException e) {
+            // Most arXiv categories aren't indexed by INSPIRE, so a 404 here is an expected miss, not an error
+            LOGGER.trace("No INSPIRE entry found for arXiv ID '{}'", eprint);
+        } catch (FetcherException e) {
+            LOGGER.debug("Could not look up an INSPIRE texkey for arXiv ID '{}'", eprint, e);
+        }
+    }
+
+    private static boolean isUrlShaped(String key) {
+        return key.startsWith("http://") || key.startsWith("https://");
     }
 
     @Override
