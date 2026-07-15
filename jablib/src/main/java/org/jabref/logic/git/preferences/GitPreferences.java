@@ -38,13 +38,6 @@ public class GitPreferences {
         return new GitPreferences();
     }
 
-    public void setAll(GitPreferences preferences) {
-        this.username.set(preferences.getUsername());
-        this.repositoryUrl.set(preferences.getRepositoryUrl());
-        this.rememberPat.set(preferences.getPersistPat());
-        this.pat.set(preferences.getPat());
-    }
-
     public void setUsername(String username) {
         this.username.set(username);
     }

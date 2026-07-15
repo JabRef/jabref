@@ -5,6 +5,7 @@
 //DEPS info.debatty:java-string-similarity:2.0.0
 //DEPS org.antlr:antlr4-runtime:4.13.2
 //DEPS org.apache.commons:commons-csv:1.14.1
+//DEPS org.jabref:easybind:2.3.0
 //DEPS org.jooq:jool:0.9.15
 //DEPS org.jspecify:jspecify:1.0.0
 //DEPS org.openjfx:javafx-base:26.0.1
@@ -21,6 +22,11 @@
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/ltwa/LtwaRepository.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/ltwa/NormalizeUtils.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/ltwa/PrefixTree.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/BackgroundTask.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/DelayTaskThrottler.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/FallbackExceptionHandler.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/HeadlessExecutorService.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/TaskExecutor.java
 //SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/strings/StringSimilarity.java
 
 //SOURCES ../../../../jablib/build/generated-src/antlr/main/org/jabref/logic/journals/ltwa/*.java
