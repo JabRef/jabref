@@ -25,22 +25,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Resolve PR branch
-        if: github.event_name == 'workflow_dispatch'
+      # Resolve the PR head repo and branch for BOTH triggers. On pull_request the PR may
+      # come from a fork, so we must check out the head repo, not github.repository (the base) -
+      # otherwise the head branch does not exist in the checked-out repo and checkout fails.
+      - name: Resolve PR head repo and branch
         id: resolve
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
+          EVENT: ${{ github.event_name }}
+          PR_NUMBER: ${{ inputs.pr }}
+          PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
-          gh pr view "${{ inputs.pr }}" --repo "${{ github.repository }}" --json headRefName,headRepositoryOwner,headRepository \
-            --jq '"branch=\(.headRefName)\nrepo=\(.headRepositoryOwner.login)/\(.headRepository.name)"' >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            gh pr view "$PR_NUMBER" --repo "${{ github.repository }}" --json headRefName,headRepositoryOwner,headRepository \
+              --jq '"branch=\(.headRefName)\nrepo=\(.headRepositoryOwner.login)/\(.headRepository.name)"' >> "$GITHUB_OUTPUT"
+          else
+            echo "branch=$PR_HEAD_REF" >> "$GITHUB_OUTPUT"
+            echo "repo=$PR_HEAD_REPO" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          repository: ${{ steps.resolve.outputs.repo || github.repository }}
+          repository: ${{ steps.resolve.outputs.repo }}
           submodules: 'true'
           fetch-depth: 0
-          ref: ${{ steps.resolve.outputs.branch || github.head_ref }}
+          ref: ${{ steps.resolve.outputs.branch }}
           token: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE || github.token }}
 
       # The PR may live in a fork ("repository" above); always merge main of JabRef/jabref
@@ -57,6 +69,6 @@ jobs:
           changelog-rebase: true
           pom-file: 'match-nothing.txt'
           source-branch: 'upstream/main'
-          target-branch: ${{ steps.resolve.outputs.branch || github.head_ref }}
+          target-branch: ${{ steps.resolve.outputs.branch }}
           # Push the merge commit back to the PR branch (the reason this workflow exists).
           push-changes: true
