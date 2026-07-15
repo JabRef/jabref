@@ -1,7 +1,7 @@
 ---
-nav_order: 0066
+nav_order: 0042
 parent: Decision Records
-status: "accepted; supersedes ADR-0042"
+status: "accepted"
 ---
 
 # Use `MarkdownTextFlow` for Summarization Content
@@ -10,7 +10,7 @@ status: "accepted; supersedes ADR-0042"
 
 This decision record concerns the UI component that is used for rendering the content of AI summaries.
 
-[ADR-0042](0042-use-webview-for-summarization-content.md) chose a `WebView` for this purpose.
+This ADR previously chose a `WebView` for this purpose.
 At that time, a `WebView` was the only considered option that could both render Markdown and let the user select and copy text.
 Chat messages, in contrast, are rendered with a Markdown parser whose AST is turned into JavaFX `TextFlow` nodes ([ADR-0036](0036-use-markdown-for-chat-content.md)).
 
@@ -37,10 +37,10 @@ Same as in [ADR-0036](0036-use-markdown-for-chat-content.md).
 
 ## Decision Outcome
 
-Chosen option: "Use `MarkdownTextFlow`", the same Markdown-to-`TextFlow` component already used for chat messages.
+Chosen option: "Use `MarkdownTextFlow`", because it renders summaries through the same Markdown-to-`TextFlow` component already used for chat messages, giving both surfaces a single code path.
 
-`SelectableTextFlow` now supports selecting and copying text, which was the sole reason [ADR-0042](0042-use-webview-for-summarization-content.md) preferred a `WebView` over the chat rendering approach.
-With that gap closed, reusing `MarkdownTextFlow` renders summaries and chat messages through a single code path, giving identical formatting and selection behavior across both surfaces and removing the summary-specific HTML rendering path.
+`SelectableTextFlow` now supports selecting and copying text, which was the sole reason this ADR originally preferred a `WebView` over the chat rendering approach.
+With that gap closed, reusing `MarkdownTextFlow` gives identical formatting and selection behavior across summaries and chat messages and removes the summary-specific HTML rendering path.
 
 The performance argument that [ADR-0036](0036-use-markdown-for-chat-content.md) raised against `WebView` never applied to summaries: there is only one summary content pane in the UI, and switching entries rebinds that single pane instead of adding components. A single `MarkdownTextFlow` is therefore unproblematic here as well.
 
@@ -56,4 +56,4 @@ Same as in [ADR-0036](0036-use-markdown-for-chat-content.md).
 
 ## More Information
 
-This ADR supersedes [ADR-0042](0042-use-webview-for-summarization-content.md) and is highly linked to [ADR-0036](0036-use-markdown-for-chat-content.md).
+This ADR is highly linked to [ADR-0036](0036-use-markdown-for-chat-content.md).
