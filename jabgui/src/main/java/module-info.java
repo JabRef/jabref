@@ -118,12 +118,6 @@ open module org.jabref {
     // requires org.apache.commons.logging;
     // endregion
 
-    // region: latex2unicode
-    // requires com.github.tomtung.latex2unicode;
-    // requires fastparse;
-    // requires scala.library;
-    // endregion
-
     // requires jbibtex;
     // requires citeproc.java;
 

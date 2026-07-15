@@ -5,6 +5,8 @@ import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -30,6 +32,7 @@ import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
@@ -200,23 +203,26 @@ public class PdfContentImporter extends PdfImporter {
 
     private static class TitleExtractorByFontSize extends PDFTextStripper {
 
-        private final List<TextPosition> textPositionsList;
+        private final List<List<TextPosition>> textPositionsPerPage;
 
         public TitleExtractorByFontSize() {
             super();
-            this.textPositionsList = new ArrayList<>();
+            this.textPositionsPerPage = new ArrayList<>();
         }
 
         public Optional<String> getTitle(PDDocument document) throws IOException {
             this.setStartPage(1);
             this.setEndPage(2);
             this.writeText(document, new StringWriter());
-            return findLargestFontText(textPositionsList);
+            return findLargestFontText();
         }
 
         @Override
         protected void writeString(String text, List<TextPosition> textPositions) {
-            textPositionsList.addAll(textPositions);
+            while (textPositionsPerPage.size() < getCurrentPageNo()) {
+                textPositionsPerPage.add(new ArrayList<>());
+            }
+            textPositionsPerPage.get(getCurrentPageNo() - 1).addAll(textPositions);
         }
 
         private boolean isFarAway(TextPosition previous, TextPosition current) {
@@ -249,9 +255,31 @@ public class PdfContentImporter extends PdfImporter {
             return lastPositionMap.containsKey(fontSize) && isFarAway(lastPositionMap.get(fontSize), textPosition);
         }
 
-        private Optional<String> findLargestFontText(List<TextPosition> textPositions) {
+        @NullMarked
+        private record TitleCandidate(float fontSize, int pageIndex, String text) {
+        }
+
+        private Optional<String> findLargestFontText() {
+            List<TitleCandidate> candidates = new ArrayList<>();
+            for (int pageIndex = 0; pageIndex < textPositionsPerPage.size(); pageIndex++) {
+                collectCandidates(textPositionsPerPage.get(pageIndex), pageIndex, candidates);
+            }
+            // Candidates from all scanned pages compete on font size, so the real title on the page
+            // after a publisher/repository cover sheet still wins. Ties (e.g. figure labels that
+            // happen to use the title's font size) go to the earlier page instead of being
+            // concatenated across pages.
+            candidates.sort(Comparator.comparing(TitleCandidate::fontSize, Comparator.reverseOrder())
+                                      .thenComparing(TitleCandidate::pageIndex));
+            return candidates.stream()
+                             .map(TitleCandidate::text)
+                             .filter(this::isLegalTitle)
+                             .findFirst()
+                             .or(() -> candidates.stream().map(TitleCandidate::text).findFirst());
+        }
+
+        private void collectCandidates(List<TextPosition> textPositions, int pageIndex, List<TitleCandidate> candidates) {
             Map<Float, StringBuilder> fontSizeTextMap = new TreeMap<>(Collections.reverseOrder());
-            Map<Float, TextPosition> lastPositionMap = new TreeMap<>(Collections.reverseOrder());
+            Map<Float, TextPosition> lastPositionMap = new HashMap<>();
             TextPosition previousTextPosition = null;
             for (TextPosition textPosition : textPositions) {
                 float fontSize = textPosition.getFontSizeInPt();
@@ -268,12 +296,8 @@ public class PdfContentImporter extends PdfImporter {
                 previousTextPosition = textPosition;
             }
             for (Map.Entry<Float, StringBuilder> entry : fontSizeTextMap.entrySet()) {
-                String candidateText = entry.getValue().toString().trim();
-                if (isLegalTitle(candidateText)) {
-                    return Optional.of(candidateText);
-                }
+                candidates.add(new TitleCandidate(entry.getKey(), pageIndex, entry.getValue().toString().trim()));
             }
-            return fontSizeTextMap.values().stream().findFirst().map(StringBuilder::toString).map(String::trim);
         }
 
         private boolean isLegalTitle(String candidateText) {
@@ -282,11 +306,25 @@ public class PdfContentImporter extends PdfImporter {
         }
 
         private boolean isThereSpace(TextPosition previous, TextPosition current) {
-            float XspaceThreshold = 1F;
-            float YspaceThreshold = previous.getFontSizeInPt();
-            float Xgap = current.getXDirAdj() - (previous.getXDirAdj() + previous.getWidthDirAdj());
-            float Ygap = current.getYDirAdj() - (previous.getYDirAdj() - previous.getHeightDir());
-            return Math.abs(Xgap) > XspaceThreshold || Math.abs(Ygap) > YspaceThreshold;
+            float widthOfSpace = previous.getWidthOfSpace();
+            // The word-break threshold must scale with the rendered text: kerning adjustments
+            // exceed a fixed 1pt at title font sizes. A quarter of a space-glyph advance sits well
+            // between observed intra-word gaps (rounding and tracking stay below 0.02 space widths)
+            // and real word gaps (which shrink to 0.38 space widths in tightly set titles). The
+            // font size is only a fallback basis, because text drawn at "Tf 1" and blown up via
+            // the text matrix reports a bogus font size in pt.
+            float xSpaceThreshold = Float.isFinite(widthOfSpace) && widthOfSpace > 0
+                                    ? 0.25F * widthOfSpace
+                                    : 0.15F * previous.getFontSizeInPt();
+            float ySpaceThreshold = previous.getFontSizeInPt();
+            float xGap = current.getXDirAdj() - (previous.getXDirAdj() + previous.getWidthDirAdj());
+            float yGap = current.getYDirAdj() - (previous.getYDirAdj() - previous.getHeightDir());
+            // A small negative X gap is a kerning adjustment — the glyph is drawn tighter than the
+            // previous glyph's advance width (e.g. "T" and "o" in TeX output), never a word
+            // boundary. Only a jump of several space widths back toward the margin (further than
+            // any kern or composed accent reaches) is a line break.
+            boolean isLineBreak = xGap < -12 * xSpaceThreshold;
+            return xGap > xSpaceThreshold || isLineBreak || Math.abs(yGap) > ySpaceThreshold;
         }
     }
 
@@ -313,8 +351,8 @@ public class PdfContentImporter extends PdfImporter {
     /// @param firstpageContents The raw content of the PDF's first page, which may contain metadata and main content.
     /// @param lineSeparator     The line separator used to format and unify line breaks in the text content.
     /// @param titleByFontSize   An optional title string determined by font size; if provided, this overrides the default title parsing.
-    /// @return An {@link Optional} containing a {@link BibEntry} with the parsed bibliographic data if extraction
-    /// is successful. Otherwise, an empty {@link Optional}.
+    /// @return An [Optional] containing a [BibEntry] with the parsed bibliographic data if extraction
+    /// is successful. Otherwise, an empty [Optional].
     @VisibleForTesting
     Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator, Optional<String> titleByFontSize) {
         String firstpageContentsUnifiedLineBreaks = StringUtil.unifyLineBreaks(firstpageContents, lineSeparator);
