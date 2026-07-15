@@ -2,7 +2,9 @@ package org.jabref.model.study;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.Nullable;
 
 public class StudyCatalog {
     @JsonProperty("name")
@@ -13,6 +15,10 @@ public class StudyCatalog {
 
     @JsonProperty("reason")
     private String reason;
+
+    @JsonProperty("max-results")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer maxResults;
 
     public StudyCatalog(String name, boolean enabled, String reason) {
         this.name = name;
@@ -55,6 +61,14 @@ public class StudyCatalog {
         this.reason = reason;
     }
 
+    public @Nullable Integer getMaxResults() {
+        return maxResults;
+    }
+
+    public void setMaxResults(Integer maxResults) {
+        this.maxResults = maxResults;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -72,12 +86,15 @@ public class StudyCatalog {
         if (!Objects.equals(getName(), that.getName())) {
             return false;
         }
-        return Objects.equals(getReason(), that.getReason());
+        if (!Objects.equals(getReason(), that.getReason())) {
+            return false;
+        }
+        return Objects.equals(getMaxResults(), that.getMaxResults());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, enabled, reason);
+        return Objects.hash(name, enabled, reason, maxResults);
     }
 
     @Override
@@ -86,6 +103,7 @@ public class StudyCatalog {
                 "name='" + name + '\'' +
                 ", enabled=" + enabled +
                 ", reason='" + reason + '\'' +
+                ", maxResults=" + maxResults +
                 '}';
     }
 }

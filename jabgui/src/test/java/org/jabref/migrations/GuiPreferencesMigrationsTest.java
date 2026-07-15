@@ -2,7 +2,6 @@ package org.jabref.migrations;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
@@ -44,7 +43,7 @@ class GuiPreferencesMigrationsTest {
 
     @Test
     void oldStyleBibtexkeyPattern0() {
-        when(preferences.get(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN)).thenReturn(oldStylePatterns[0]);
+        when(preferences.get(eq(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN), any())).thenReturn(oldStylePatterns[0]);
         when(preferences.hasKey(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN)).thenReturn(true);
 
         PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences);
@@ -54,7 +53,7 @@ class GuiPreferencesMigrationsTest {
 
     @Test
     void oldStyleBibtexkeyPattern1() {
-        when(preferences.get(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN)).thenReturn(oldStylePatterns[1]);
+        when(preferences.get(eq(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN), any())).thenReturn(oldStylePatterns[1]);
         when(preferences.hasKey(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN)).thenReturn(true);
 
         PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences);
@@ -66,7 +65,7 @@ class GuiPreferencesMigrationsTest {
     void arbitraryBibtexkeyPattern() {
         String arbitraryPattern = "[anyUserPrividedString]";
 
-        when(preferences.get(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN)).thenReturn(arbitraryPattern);
+        when(preferences.get(eq(PreferencesMigrations.V4_0_IMPORT_FILENAME_PATTERN), any())).thenReturn(arbitraryPattern);
 
         PreferencesMigrations.upgradeImportFileAndDirePatterns(preferences);
 
@@ -93,7 +92,7 @@ class GuiPreferencesMigrationsTest {
                 \\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__\
                 \\begin{doi}<BR>doi <a href="https://doi.org/\\format[DOIStrip]{\\doi}">\\format[DOIStrip]{\\doi}</a>\\end{doi}__NEWLINE__\
                 \\begin{url}<BR>URL <a href="\\url">\\url</a>\\end{url}__NEWLINE__\
-                \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__""";
+                \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[LatexToUnicode,HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__""";
 
         when(preferences.get(eq(JabRefGuiPreferences.PREVIEW_STYLE), anyString())).thenReturn(oldPreviewStyle);
 
@@ -103,8 +102,8 @@ class GuiPreferencesMigrationsTest {
     }
 
     @Test
-    void previewStyleUnchangedWhenMigrationPatternIsMissing() {
-        String unchangedPreviewStyle = """
+    void previewStyleAbstractFormatterMigratesWhenOtherPatternsAreMissing() {
+        String oldPreviewStyle = """
                 <font face="sans-serif">__NEWLINE__\
                 Custom preview style with no migration patterns.__NEWLINE__\
                 \\begin{title}<BR><b>\\format[HTMLChars]{\\title}</b>\\end{title}__NEWLINE__\
@@ -113,11 +112,20 @@ class GuiPreferencesMigrationsTest {
                 \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__\
                 </font>__NEWLINE__""";
 
-        when(preferences.get(eq(JabRefGuiPreferences.PREVIEW_STYLE), anyString())).thenReturn(unchangedPreviewStyle);
+        String migratedPreviewStyle = """
+                <font face="sans-serif">__NEWLINE__\
+                Custom preview style with no migration patterns.__NEWLINE__\
+                \\begin{title}<BR><b>\\format[HTMLChars]{\\title}</b>\\end{title}__NEWLINE__\
+                \\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__\
+                \\begin{note}<BR>\\format[HTMLChars]{\\note}\\end{note}__NEWLINE__\
+                \\begin{abstract}<BR><BR><b>Abstract: </b>\\format[LatexToUnicode,HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__\
+                </font>__NEWLINE__""";
+
+        when(preferences.get(eq(JabRefGuiPreferences.PREVIEW_STYLE), anyString())).thenReturn(oldPreviewStyle);
 
         PreferencesMigrations.upgradePreviewStyle(preferences);
 
-        verify(preferences).put(JabRefGuiPreferences.PREVIEW_STYLE, unchangedPreviewStyle);
+        verify(preferences).put(JabRefGuiPreferences.PREVIEW_STYLE, migratedPreviewStyle);
     }
 
     @Test
@@ -218,7 +226,7 @@ class GuiPreferencesMigrationsTest {
 
         when(preferences.getStringList("columnNames")).thenReturn(updatedNames);
 
-        when(preferences.get("mainFontSize")).thenReturn("11.2");
+        when(preferences.get(eq("mainFontSize"), any())).thenReturn("11.2");
 
         PreferencesMigrations.restoreVariablesForBackwardCompatibility(preferences);
 
@@ -256,7 +264,6 @@ class GuiPreferencesMigrationsTest {
     void upgradeCleanupsRemovesRemovedIssnCleanupJob() {
         when(preferences.hasKey(JabRefCliPreferences.CLEANUP_JOBS)).thenReturn(true);
         when(preferences.getStringList(JabRefCliPreferences.CLEANUP_JOBS)).thenReturn(List.of("CLEAN_UP_DOI", "CLEAN_UP_ISSN", "RENAME_PDF"));
-        when(preferences.getAsOptional(anyString())).thenReturn(Optional.empty());
         when(preferences.get(anyString(), anyString())).thenReturn("");
 
         PreferencesMigrations.upgradeCleanups(preferences);
@@ -268,7 +275,7 @@ class GuiPreferencesMigrationsTest {
     void resolveBibTexStringsFields() {
         String oldPrefsValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon";
         String expectedValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon;monthfiled";
-        when(preferences.get(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS)).thenReturn(oldPrefsValue);
+        when(preferences.get(eq(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS), any())).thenReturn(oldPrefsValue);
 
         PreferencesMigrations.upgradeResolveBibTeXStringsFields(preferences);
         verify(preferences).put(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS, expectedValue);

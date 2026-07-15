@@ -7,18 +7,16 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.http.SrvStateManager;
+import org.jabref.http.dto.UncheckedFetcherException;
 import org.jabref.http.server.services.CitationCacheService;
+import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.UiMessageHandler;
-import org.jabref.logic.ai.chatting.ChatModel;
-import org.jabref.logic.ai.chatting.util.ChatModelFactory;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
-import org.jabref.logic.importer.plaincitation.PlainCitationParserFactory;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -26,6 +24,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
+import com.google.gson.annotations.SerializedName;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ClientErrorException;
@@ -38,6 +37,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /// Cached plain-citation lookup + later add.
@@ -55,6 +55,7 @@ import org.jspecify.annotations.Nullable;
 ///    token. Returns 410 Gone when the token expired so the client can fall
 ///    back to `POST /libraries/current/entries` and pay for the parse again.
 @Path("libraries/{id}/citations")
+@NullMarked
 public class CitationsResource {
 
     @Inject
@@ -64,25 +65,49 @@ public class CitationsResource {
     SrvStateManager srvStateManager;
 
     @Inject
-    @Nullable
     UiMessageHandler uiMessageHandler;
 
     @Inject
     CitationCacheService citationCacheService;
 
+    @Inject
+    BibEntryTypesManager entryTypesManager;
+
     public record LookupMatch(String libraryId, String entryId, boolean inActiveLibrary) {
     }
 
-    /// matchScope is derived from `matches`:
-    ///   "active" — at least one match is in the currently-active library
-    ///              (the library Ctrl+J would add to — so duplicate);
-    ///   "other"  — match(es) exist only in *other* open libraries
-    ///              (related, but Ctrl+J would still add to the active one);
-    ///   "none"   — no match in any open library.
-    /// Clients use this to colour the hover badge without having to walk the
-    /// matches array themselves (mint vs olive vs grey).
-    public record LookupResponse(List<LookupMatch> matches, String matchScope,
-                                 String parserCacheKey, String parsedEntryType) {
+    /// Categorisation of a [LookupResponse]'s `matches` list. Surfaced as a
+    /// dedicated field so clients can colour the hover badge without walking
+    /// the array themselves.
+    ///
+    /// `@SerializedName` pins the wire format because Gson (this module's
+    /// JSON writer, see `GsonMessageBodyWriter`) otherwise emits the upper-
+    /// case enum constant name. Jackson's `@JsonValue` would be ignored here.
+    public enum MatchScope {
+        /// At least one match in the currently-active library — Ctrl+J would
+        /// create a duplicate. Mint badge.
+        @SerializedName("active") ACTIVE,
+        /// Match(es) only in *other* open libraries — Ctrl+J would still
+        /// create a new entry in the active library. Olive badge.
+        @SerializedName("other") OTHER,
+        /// No match in any open library. Gray badge.
+        @SerializedName("none") NONE
+    }
+
+    /// Result of a single plain-citation lookup.
+    ///
+    /// @param matches         duplicate hits across every open library. Empty list when no library contains the parsed entry, or when the parse itself failed (batch-lookup blank-slot / parser-failure rows).
+    /// @param matchScope      categorisation of `matches` — see [MatchScope].
+    /// @param parserCacheKey  opaque token redeemable at `POST /libraries/{id}/citations/{parserCacheKey}` to append the already-parsed `BibEntry` without paying for the LLM parse again. Null when no entry was parsed.
+    /// @param parsedEntryType BibTeX entry-type name of the parsed entry (e.g. `"article"`, `"inproceedings"`) — lets the client preview the type before redeeming the cache key. Null when no entry was parsed.
+    public record LookupResponse(List<LookupMatch> matches, MatchScope matchScope,
+                                 @Nullable String parserCacheKey, @Nullable String parsedEntryType) {
+
+        /// Convenience constructor for blank-slot and parser-failure rows in
+        /// batch lookup — no entry was parsed, so neither key nor type apply.
+        public LookupResponse(List<LookupMatch> matches, MatchScope matchScope) {
+            this(matches, matchScope, null, null);
+        }
     }
 
     public record AlreadyExistsResponse(String status, String entryId) {
@@ -95,41 +120,125 @@ public class CitationsResource {
     @Path("lookup")
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.APPLICATION_JSON)
-    public LookupResponse lookup(@PathParam("id") String id, String citationText) throws FetcherException {
-        if (!"current".equals(id)) {
-            throw new BadRequestException("Only currently selected library possible");
-        }
+    public LookupResponse lookup(@PathParam("id") String id, String citationText) {
         if (StringUtil.isBlank(citationText)) {
             throw new BadRequestException("Citation text must not be empty.");
         }
+        // The target library is the one Ctrl+J would add to: "current" -> active
+        // library, any other id -> that open library (404 if unknown/closed).
+        BibDatabaseContext targetContext = resolveTargetContext(id);
+        return doLookup(
+                citationText,
+                targetContext,
+                srvStateManager.getOpenDatabases(),
+                new DuplicateCheck(entryTypesManager));
+    }
 
-        PlainCitationParserChoice choice = preferences.getImporterPreferences().getDefaultPlainCitationParser();
-        BibEntry parsed = parsePlainCitation(choice, citationText)
-                .orElseThrow(() -> new BadRequestException("Could not parse a bibliography entry from the given text."));
+    /// Wrapper for the batched lookup payload. Plain `List<String>` would work
+    /// too, but a named record makes the JSON self-describing and leaves room
+    /// to add per-request options (e.g. include-snippets) without breaking the
+    /// schema.
+    public record BatchLookupRequest(List<String> citations) {
+    }
+
+    /// Aligned-by-index with the request: `results[i]` corresponds to
+    /// `citations[i]`. Blank input slots yield an empty `LookupResponse`
+    /// (matches=[], matchScope="none") rather than failing the whole batch.
+    public record BatchLookupResponse(List<LookupResponse> results) {
+    }
+
+    /// Batched variant of [#lookup] for the SumatraPDF page-scan flow: when
+    /// the reader lands on a new page we extract every citation link's
+    /// extracted bibliography text in one shot, fire one POST, and paint the
+    /// returned per-citation `matchScope` as in-PDF dots. Single round-trip
+    /// + JabRef-side [CitationCacheService#getByText] hits mean repeat
+    /// scans of the same page are O(1) per citation with no LLM cost.
+    @POST
+    @Path("lookup:batch")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public BatchLookupResponse lookupBatch(@PathParam("id") String id, BatchLookupRequest request) {
+        if (request == null || request.citations() == null || request.citations().isEmpty()) {
+            throw new BadRequestException("Citations list must not be empty.");
+        }
+        BibDatabaseContext targetContext = resolveTargetContext(id);
+        List<BibDatabaseContext> openDatabases = srvStateManager.getOpenDatabases();
+        DuplicateCheck duplicateCheck = new DuplicateCheck(entryTypesManager);
+
+        List<LookupResponse> results = new ArrayList<>(request.citations().size());
+        for (String citationText : request.citations()) {
+            if (StringUtil.isBlank(citationText)) {
+                // Empty slot — return a "none" response so client indexing
+                // stays aligned. Skipping would shift downstream results.
+                results.add(new LookupResponse(List.of(), MatchScope.NONE));
+                continue;
+            }
+            try {
+                results.add(doLookup(citationText, targetContext, openDatabases, duplicateCheck));
+            } catch (UncheckedFetcherException | BadRequestException e) {
+                // One citation failing — fetcher error (UncheckedFetcherException) or
+                // parser-returned-empty (BadRequestException) — must not fail the batch.
+                // Surface as a "no match" slot so the client paints a gray ring there;
+                // the rest of the batch still resolves.
+                results.add(new LookupResponse(List.of(), MatchScope.NONE));
+            }
+        }
+        return new BatchLookupResponse(results);
+    }
+
+    /// Shared body of single + batched lookup. Resolves the citation text to
+    /// a `BibEntry` (via the text-hash cache when possible, else the
+    /// LLM/fetcher), walks every open library for duplicates, mints a fresh
+    /// token for the add-from-cache flow, and assembles the response.
+    private LookupResponse doLookup(String citationText,
+                                    BibDatabaseContext targetContext,
+                                    List<BibDatabaseContext> openDatabases,
+                                    DuplicateCheck duplicateCheck) {
+        BibEntry parsed = citationCacheService.getByText(citationText)
+                                              .map(CitationCacheService.CachedCitation::parsed)
+                                              .orElseGet(() -> parseAndCache(citationText));
 
         // Cross-library lookup: walk every open library so we can tell the
-        // client whether the citation is in the *active* library (Ctrl+J
+        // client whether the citation is in the *target* library (Ctrl+J
         // would create a duplicate → mint) vs an *other* open library (still
         // worth surfacing — the user may want to switch libraries or copy
         // across → olive, AnchorHub's related-match colour).
-        BibDatabaseContext activeContext = srvStateManager.getActiveDatabase()
-                                                          .orElseThrow(() -> new BadRequestException("No active library"));
-        DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         List<LookupMatch> matches = new ArrayList<>();
-        for (BibDatabaseContext ctx : srvStateManager.getOpenDatabases()) {
-            boolean isActive = ctx == activeContext;
+        for (BibDatabaseContext ctx : openDatabases) {
+            boolean isActive = ctx == targetContext;
             duplicateCheck.containsDuplicate(ctx.getDatabase(), parsed, ctx.getMode())
                           .ifPresent(existing -> matches.add(new LookupMatch(
                                   libraryIdFor(ctx),
                                   existing.getCitationKey().orElse(""),
                                   isActive)));
         }
-        String matchScope = matches.stream()
-                                   .anyMatch(LookupMatch::inActiveLibrary) ? "active"
-                                                                           : matches.isEmpty() ? "none" : "other";
+        MatchScope matchScope = matches.stream()
+                                       .anyMatch(LookupMatch::inActiveLibrary) ? MatchScope.ACTIVE
+                                                                               : matches.isEmpty() ? MatchScope.NONE : MatchScope.OTHER;
 
         String cacheKey = citationCacheService.put(parsed, citationText);
         return new LookupResponse(matches, matchScope, cacheKey, parsed.getType().getName());
+    }
+
+    /// Cache miss → invoke the configured plain-citation parser and stash the
+    /// result by text-hash. `FetcherException` is wrapped in
+    /// [UncheckedFetcherException] so this method fits an `Optional.orElseGet`
+    /// supplier; `lookupBatch` unwraps it per-citation to surface "no match"
+    /// for the failing slot, and `GlobalExceptionMapper` translates uncaught
+    /// occurrences back to the original fetch failure response.
+    ///
+    /// @throws BadRequestException       if the parser returns an empty result (the citation text could not be parsed into a BibEntry).
+    /// @throws UncheckedFetcherException if the parser itself failed (network, LLM, or backend error). The cause is the original `FetcherException`.
+    private BibEntry parseAndCache(String citationText) {
+        BibEntry parsed;
+        try {
+            parsed = ServerUtils.parsePlainCitation(preferences, citationText)
+                                .orElseThrow(() -> new BadRequestException("Could not parse a bibliography entry from the given text."));
+        } catch (FetcherException e) {
+            throw new UncheckedFetcherException(e);
+        }
+        citationCacheService.putByText(parsed, citationText);
+        return parsed;
     }
 
     /// Stable-ish library identifier for response bodies. Saved libraries use
@@ -147,12 +256,11 @@ public class CitationsResource {
     public Response addFromCache(@PathParam("id") String id,
                                  @PathParam("parserCacheKey") String parserCacheKey,
                                  @QueryParam("group") @Nullable String group) {
-        if (uiMessageHandler == null) {
+        if (!uiMessageHandler.isGuiConnected()) {
             throw new BadRequestException("Only possible in GUI mode.");
         }
-        if (!"current".equals(id)) {
-            throw new BadRequestException("Only currently selected library possible");
-        }
+        BibDatabaseContext context = resolveTargetContext(id);
+        Optional<java.nio.file.Path> targetLibrary = targetLibrary(id);
 
         Optional<CitationCacheService.CachedCitation> cached = citationCacheService.get(parserCacheKey);
         if (cached.isEmpty()) {
@@ -171,13 +279,11 @@ public class CitationsResource {
         // citation. Returns 200 with `{"status":"already-exists"}` instead
         // of 201 so the client can show a "Citation is already in library"
         // notification without treating it as a hard error.
-        BibDatabaseContext context = srvStateManager.getActiveDatabase()
-                                                    .orElseThrow(() -> new BadRequestException("No active library"));
         BibDatabaseMode mode = context.getMode();
-        DuplicateCheck duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
+        DuplicateCheck duplicateCheck = new DuplicateCheck(entryTypesManager);
         return duplicateCheck.containsDuplicate(context.getDatabase(), parsed, mode)
                              .map(existingEntry -> alreadyExistsResponse(parserCacheKey, existingEntry))
-                             .orElseGet(() -> appendParsedAndRespond(parsed, group, parserCacheKey));
+                             .orElseGet(() -> appendParsedAndRespond(parsed, targetLibrary, group, parserCacheKey));
     }
 
     /// Returns a 200 OK `{"status":"already-exists","entryId":"…"}` body and
@@ -196,12 +302,12 @@ public class CitationsResource {
 
     /// Writes the parsed entry as BibTeX, forwards it to the UI for append,
     /// evicts the cache token, and returns 201 Created.
-    private Response appendParsedAndRespond(BibEntry parsed, @Nullable String group, String parserCacheKey) {
+    private Response appendParsedAndRespond(BibEntry parsed, Optional<java.nio.file.Path> targetLibrary, @Nullable String group, String parserCacheKey) {
         StringWriter rawEntry = new StringWriter();
         BibWriter bibWriter = new BibWriter(rawEntry, "\n");
         BibEntryWriter entryWriter = new BibEntryWriter(
                 new FieldWriter(preferences.getFieldPreferences()),
-                new BibEntryTypesManager());
+                entryTypesManager);
         try {
             entryWriter.write(parsed, bibWriter, BibDatabaseMode.BIBTEX);
         } catch (IOException e) {
@@ -209,9 +315,9 @@ public class CitationsResource {
         }
 
         // uiMessageHandler is null-checked at the top of addFromCache; safe here.
-        uiMessageHandler.handleUiCommands(List.of(group == null
-                                                  ? new UiCommand.AppendBibTeXToCurrentLibrary(rawEntry.toString())
-                                                  : new UiCommand.AppendBibTeXToCurrentLibrary(rawEntry.toString(), group)));
+        uiMessageHandler.handleUiCommands(List.of(targetLibrary
+                .map(library -> new UiCommand.AppendBibTeXToLibrary(library, rawEntry.toString(), group))
+                .orElseGet(() -> new UiCommand.AppendBibTeXToLibrary(rawEntry.toString(), group))));
 
         // Evict so the same token can't add a second copy. The client
         // already has confirmation it landed; re-tries fall through to
@@ -220,22 +326,29 @@ public class CitationsResource {
         return Response.status(Response.Status.CREATED).build();
     }
 
-    /// Mirrors `EntriesResource.parsePlainCitation` — kept in sync by hand for
-    /// now; pulling it into a shared helper is a follow-up refactor.
-    private Optional<BibEntry> parsePlainCitation(PlainCitationParserChoice choice, String citationText) throws FetcherException {
-        if (choice == PlainCitationParserChoice.LLM) {
-            try (ChatModel chatModel = ChatModelFactory.create(preferences.getAiPreferences())) {
-                return PlainCitationParserFactory.getLlmPlainCitationParser(
-                                                         preferences.getImportFormatPreferences(),
-                                                         preferences.getAiPreferences(),
-                                                         chatModel)
-                                                 .parsePlainCitation(citationText);
-            }
+    /// Resolves the path-segment library id to the library this request operates on.
+    /// "current" -> active library; any other id -> that open library (404 if unknown or
+    /// closed). Same id semantics as {@link EntriesResource}.
+    private BibDatabaseContext resolveTargetContext(String id) {
+        try {
+            return ServerUtils.getBibDatabaseContext(id, srvStateManager, preferences.getImportFormatPreferences());
+        } catch (IOException e) {
+            throw new InternalServerErrorException("Could not load library " + id, e);
         }
-        return PlainCitationParserFactory.getPlainCitationParser(
-                choice,
-                preferences.getCitationKeyPatternPreferences(),
-                preferences.getGrobidPreferences(),
-                preferences.getImportFormatPreferences()).parsePlainCitation(citationText);
+    }
+
+    /// The append target for the resolved library: empty for "current" (append to the active
+    /// tab without switching), otherwise the open library's on-disk path so the GUI switches to it
+    /// first. Mirrors {@link EntriesResource#resolveTargetLibrary}.
+    ///
+    /// Non-"current" ids are resolved against the *open* libraries via [ServerUtils#getLibraryPath]
+    /// rather than the resolved context's path. This rejects path-less contexts such as the bundled
+    /// "demo" library with 404 instead of silently falling back to an empty Optional (which
+    /// [UiCommand.AppendBibTeXToLibrary] would interpret as "append to the active library").
+    private Optional<java.nio.file.Path> targetLibrary(String id) {
+        if ("current".equals(id)) {
+            return Optional.empty();
+        }
+        return Optional.of(ServerUtils.getLibraryPath(id, srvStateManager));
     }
 }

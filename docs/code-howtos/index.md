@@ -46,6 +46,33 @@ Setting `javafxVersion` enables `mavenLocal()` implicitly, so a JavaFX build pub
 
 The override applies only to the non-web JavaFX modules; `javafx-web` always stays on the default version defined in `versions/build.gradle.kts`.
 
+## Selecting the JDK vendor and version
+
+The Gradle [toolchain](https://docs.gradle.org/current/userguide/toolchains.html) vendor and Java language version are defined in `build-logic/src/main/kotlin/org/jabref/gradle/Toolchains.kt` (consumed by `org.jabref.gradle.feature.compile`).
+The defaults match `.github/workflows/binaries.yml`: Java 25, vendor Amazon Corretto (or BellSoft Liberica when `-PuseLibericaJdkFull` is set).
+
+Override them via gradle properties:
+
+* JDK vendor: `./gradlew :jabgui:run -Pjdk=<name>`. Accepts friendly names (`corretto`, `liberica`, `temurin`, `oracle`, `openj9`, `graalvm`, `microsoft`, `zulu`, `sap`) or a raw [`JvmVendorSpec`](https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html) enum name.
+* Java language version: `./gradlew :jabgui:run -PjavaVersion=26` (e.g. to test an early-access JDK).
+
+Gradle resolves the toolchain from the JDKs installed locally; if none matches, [foojay auto-provisioning](https://github.com/gradle/foojay-toolchains) downloads one.
+To play with [Eclipse OpenJ9](https://eclipse.dev/openj9/) (shipped as IBM Semeru), point Gradle at a locally installed Semeru JDK and select the IBM vendor. For example, with [mise](https://mise.jdx.dev/):
+
+```shell
+mise exec java@semeru-openj9-25.0.3.0 -- ./gradlew :jabgui:run -Pjdk=openj9
+```
+
+Do not combine `-Pjdk=openj9` (or any non–Liberica-Full vendor) with `-PuseLibericaJdkFull`: those JDKs do not bundle JavaFX, so JabRef must keep resolving JavaFX from Maven.
+
+Conversely, to consume the JavaFX bundled inside a BellSoft Liberica **Full** JDK (instead of Maven), install a Liberica Full JDK 25 and set `-PuseLibericaJdkFull` (which selects vendor BellSoft automatically). With [mise](https://mise.jdx.dev/):
+
+```shell
+mise exec java@liberica-javafx-25.0.3+11 -- ./gradlew :jabgui:run -PuseLibericaJdkFull
+```
+
+Find the exact id with `mise ls-remote java | grep liberica`. It must be a **Full** build (the `liberica-javafx-*` ids; they bundle JavaFX); a Liberica *Standard* JDK fails later with `module javafx.* not found`, because Gradle's toolchain query cannot tell Full and Standard apart. Avoid having a Liberica Standard 25 installed alongside, or point Gradle at the Full JDK via `org.gradle.java.installations.paths`.
+
 ## Cleanup and Formatters
 
 We try to build a cleanup mechanism based on formatters. The idea is that we can register these actions in arbitrary places, e.g., onSave, onImport, onExport, cleanup, etc. and apply them to different fields. The formatters themselves are independent of any logic and therefore easy to test.

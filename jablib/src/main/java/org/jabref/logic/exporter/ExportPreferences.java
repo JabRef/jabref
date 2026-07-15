@@ -53,13 +53,6 @@ public class ExportPreferences {
         return new ExportPreferences();
     }
 
-    public void setAll(ExportPreferences preferences) {
-        this.lastExportExtension.set(preferences.getLastExportExtension());
-        this.exportWorkingDirectory.set(preferences.getExportWorkingDirectory());
-        this.exportSaveOrder.set(preferences.getExportSaveOrder());
-        this.customExporters.setAll(preferences.getCustomExporters());
-    }
-
     public String getLastExportExtension() {
         return lastExportExtension.get();
     }

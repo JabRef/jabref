@@ -23,6 +23,7 @@ import org.jabref.logic.ai.ingestion.logic.documentsplitting.DocumentSplitter;
 import org.jabref.logic.ai.ingestion.repositories.IngestedDocumentsRepository;
 import org.jabref.logic.ai.ingestion.repositories.MVStoreIngestedDocumentsRepository;
 import org.jabref.logic.ai.ingestion.util.DocumentSplitterFactory;
+import org.jabref.logic.ai.models.AiModelService;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.ai.summarization.InMemorySummaryCache;
 import org.jabref.logic.ai.summarization.SummarizationTaskAggregator;
@@ -60,6 +61,7 @@ public class AiService implements AutoCloseable {
     private final MVStoreChatHistoryRepository mvStoreChatHistoryRepository;
     private final InMemoryChatHistoryCache inMemoryChatHistoryCache;
     private final ObjectProperty<ChatModel> currentChatModel = new SimpleObjectProperty<>();
+    private final AiModelService modelService;
 
     // Ingestion components
     private final EmbeddingModelCache embeddingModelCache;
@@ -98,6 +100,7 @@ public class AiService implements AutoCloseable {
                 () -> ChatModelFactory.create(aiPreferences),
                 aiPreferences.getChatProperties()
         ));
+        this.modelService = new AiModelService();
 
         // Ingestion components
         this.embeddingModelCache = new EmbeddingModelCache(aiPreferences, notificationService, taskExecutor);
@@ -199,6 +202,10 @@ public class AiService implements AutoCloseable {
 
     public ChatModel getCurrentChatModel() {
         return currentChatModel.get();
+    }
+
+    public AiModelService getModelService() {
+        return modelService;
     }
 
     public EmbeddingModelCache getEmbeddingModelCache() {

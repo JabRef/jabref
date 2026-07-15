@@ -32,6 +32,7 @@ import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
+import org.jabref.logic.util.strings.StringUtil;
 
 public class ImporterPreferences {
     private final BooleanProperty importerEnabled;
@@ -55,10 +56,10 @@ public class ImporterPreferences {
                 Set.of(),                                      // Custom importers
                 Set.of(),                                      // API keys
                 false,                                         // Persist custom keys
-                List.of(ACMPortalFetcher.FETCHER_NAME,         // Catalogs
-                        SpringerNatureWebFetcher.FETCHER_NAME,
+                List.of(ACMPortalFetcher.FETCHER_NAME,         // Alphabetically sorted list of Catalogs
                         DBLPFetcher.FETCHER_NAME,
-                        IEEE.FETCHER_NAME),
+                        IEEE.FETCHER_NAME,
+                        SpringerNatureWebFetcher.FETCHER_NAME),
                 PlainCitationParserChoice.RULE_BASED_GENERAL,  // Default plain citation parser
                 30,                                            // Citations relations store TTL
                 Map.of()                                       // Search engine URL templates
@@ -113,20 +114,6 @@ public class ImporterPreferences {
                 SpringerNatureWebFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey,
                 WileyFetcher.FETCHER_NAME, buildInfo.wileyTdmApiKey
         );
-    }
-
-    public void setAll(ImporterPreferences preferences) {
-        this.importerEnabled.set(preferences.areImporterEnabled());
-        this.generateNewKeyOnImport.set(preferences.shouldGenerateNewKeyOnImport());
-        this.importWorkingDirectory.set(preferences.getImportWorkingDirectory());
-        this.warnAboutDuplicatesOnImport.set(preferences.shouldWarnAboutDuplicatesOnImport());
-        setCustomImporters(preferences.getCustomImporters());
-        this.persistCustomKeys.set(preferences.shouldPersistCustomKeys()); // Before getApiKeys to avoid stale keys in keyring
-        setApiKeys(preferences.getApiKeys());
-        this.catalogs.setAll(preferences.getCatalogs());
-        this.defaultPlainCitationParser.set(preferences.getDefaultPlainCitationParser());
-        this.citationsRelationsStoreTTL.set(preferences.getCitationsRelationsStoreTTL());
-        setSearchEngineUrlTemplates(preferences.getSearchEngineUrlTemplates());
     }
 
     public boolean areImporterEnabled() {
@@ -208,7 +195,7 @@ public class ImporterPreferences {
     }
 
     /// @param name of the fetcher
-    /// @return either a customized API key if configured or the default key
+    /// @return the configured or default API key; a blank key is treated as absent.
     /// @implNote See `fetchers.md` for general information on fetchers.
     public Optional<String> getApiKey(String name) {
         return apiKeys.stream()
@@ -216,7 +203,8 @@ public class ImporterPreferences {
                       .filter(FetcherApiKey::shouldUse)
                       .findFirst()
                       .map(FetcherApiKey::getKey)
-                      .or(() -> Optional.ofNullable(getDefaultFetcherKeys().get(name)));
+                      .or(() -> Optional.ofNullable(getDefaultFetcherKeys().get(name)))
+                      .filter(StringUtil::isNotBlank);
     }
 
     public void setCatalogs(List<String> catalogs) {

@@ -65,7 +65,6 @@ import org.jabref.gui.maintable.MainTableTooltip;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
@@ -137,7 +136,6 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 FileUpdateMonitor fileUpdateMonitor,
                                 GuiPreferences preferences,
                                 TaskExecutor taskExecutor,
-                                ThemeManager themeManager,
                                 BibEntryTypesManager bibEntryTypesManager,
                                 SearchCitationsRelationsService searchCitationsRelationsService) {
         this.dialogService = dialogService;
@@ -174,7 +172,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
 
-        this.previewTooltip = new MainTableTooltip(dialogService, preferences, themeManager, taskExecutor);
+        this.previewTooltip = new MainTableTooltip(dialogService, preferences, taskExecutor);
     }
 
     private void setSciteResultsPane() {
