@@ -532,7 +532,20 @@ public class AllFieldsTab extends FieldsEditorTab {
     private void showFieldEditor(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
         userAddedFields.add(field);
         rebuildPanel(bibDatabaseContext, entry);
-        Platform.runLater(() -> requestFocus(field));
+        Platform.runLater(() -> {
+            // The tab may have been rebound to a different entry before this deferred block runs;
+            // the editors map would then belong to that other entry, so focusing/adding here would
+            // act on the wrong entry. Bail out unless we are still showing the entry we started with.
+            if (getCurrentEntry() != entry) {
+                return;
+            }
+            requestFocus(field);
+            // Adding the File field via its "+" chip should immediately open the add-file dialog,
+            // since an empty File editor has no other purpose than to receive a file.
+            if ((StandardField.FILE == field) && (editors.get(field) instanceof LinkedFilesEditor linkedFilesEditor)) {
+                linkedFilesEditor.addNewFile();
+            }
+        });
     }
 
     private void rebuildPanel(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
@@ -554,7 +567,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     private static void applyNaturalHeight(FieldEditorFX editor) {
         normalizeInputHeights(editor.getNode());
         if (editor instanceof LinkedFilesEditor) {
-            // Sizes itself to (file count + 1) rows; a fixed weight-based height would override that.
+            // Sizes itself to the file rows plus the trailing button row; a fixed weight-based height would override that.
             return;
         }
         if ((editor.getWeight() > 1) && (editor.getNode() instanceof Region region)) {
