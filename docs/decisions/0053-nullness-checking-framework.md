@@ -27,7 +27,7 @@ Null pointer exceptions are a pervasive source of bugs in Java. To alleviate thi
 
 Chosen option: "Error Prone + NullAway" because it comes out best (see below).
 
-## Consequences
+### Consequences
 
 * We will annotate public APIs (interfaces, service endpoints, widely used modules) using JSpecify `@Nullable` / `@NonNull` (or `@NullMarked` scoping) progressively.
 * We enable NullAway in CI builds; thus violations break the build.

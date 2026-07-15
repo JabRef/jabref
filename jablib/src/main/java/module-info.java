@@ -16,6 +16,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.preferences;
     exports org.jabref.logic.importer;
     exports org.jabref.logic.bibtex;
+    exports org.jabref.logic.browserext;
     exports org.jabref.logic.citationkeypattern;
     exports org.jabref.logic.exporter;
     exports org.jabref.logic.importer.fileformat;
@@ -193,6 +194,9 @@ open module org.jabref.jablib {
     requires transitive jakarta.inject;
     // endregion
 
+    // Test-only: BrowserExtensionBridgeClientTest fakes the bridge with a real loopback HttpServer.
+    requires static jdk.httpserver;
+
     // region: data mapping
     requires jdk.xml.dom;
     requires com.google.gson;
@@ -213,9 +217,6 @@ open module org.jabref.jablib {
 
     // region: SQL databases
     requires embedded.postgres;
-    // For arm, we explicitly need to add these as well
-    requires /*runtime*/ embedded.postgres.binaries.darwin.arm64v8;
-    requires /*runtime*/ embedded.postgres.binaries.linux.arm64v8;
 
     requires /*runtime*/ org.tukaani.xz;
     requires org.postgresql.jdbc;
@@ -234,10 +235,7 @@ open module org.jabref.jablib {
     requires com.github.benmanes.caffeine;
     // endregion
 
-    // region: latex2unicode
-    requires com.github.tomtung.latex2unicode;
-    requires fastparse;
-    // endregion
+    requires org.jabref.latexconv;
 
     requires jbibtex;
     requires transitive citeproc.java;

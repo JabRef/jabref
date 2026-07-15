@@ -29,6 +29,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
@@ -49,7 +50,6 @@ import org.jabref.gui.linkedfile.OcrLinkedFileAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -66,10 +66,16 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 import jakarta.inject.Inject;
 
-public class LinkedFilesEditor extends HBox implements FieldEditorFX {
+public class LinkedFilesEditor extends VBox implements FieldEditorFX {
+
+    // Upper bound on how many rows the ListView grows to before it starts scrolling internally,
+    // so entries with many linked files cannot expand the entry editor layout indefinitely.
+    private static final int MAX_VISIBLE_ROWS = 5;
 
     @FXML
     private ListView<LinkedFileViewModel> listView;
+    @FXML
+    private HBox buttonRow;
     @FXML
     private JabRefIconView fulltextFetcher;
     @FXML
@@ -117,8 +123,12 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
-        UiThreadObservableList<LinkedFileViewModel> decoratedModelList = new UiThreadObservableList<>(viewModel.filesProperty());
-        Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);
+        // Bind directly to the view model's own list (not a wrapper): JavaFX's bindContentBidirectional
+        // dispatches change events by identity of the lists it was given, so wrapping one side (e.g. in
+        // UiThreadObservableList) makes every Change#getList() report the wrapped delegate instead of the
+        // list JavaFX is tracking, silently breaking the live sync (a Change#getList() identity mismatch).
+        // filesProperty() is only ever mutated on the FX Application Thread, so no extra marshaling is needed.
+        Bindings.bindContentBidirectional(listView.itemsProperty().get(), viewModel.filesProperty());
     }
 
     @FXML
@@ -156,6 +166,21 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 .withValidation(LinkedFileViewModel::fileExistsValidationStatus)
                 .install(listView);
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        // Size the list to exactly the number of files, so it ends right after the content instead of leaving blank
+        // space, but cap it at MAX_VISIBLE_ROWS so large file lists scroll internally rather than growing the layout.
+        // The row height comes from the CSS-driven fixed cell size, so theming and font scaling adjust it naturally.
+        listView.prefHeightProperty().bind(Bindings.createDoubleBinding(
+                () -> Math.min(listView.getItems().size(), MAX_VISIBLE_ROWS) * listView.getFixedCellSize(),
+                listView.getItems(),
+                listView.fixedCellSizeProperty()));
+        listView.maxHeightProperty().bind(listView.fixedCellSizeProperty().multiply(MAX_VISIBLE_ROWS));
+        // Allow the list to collapse completely when there are no files; the button row below stays visible.
+        listView.setMinHeight(0);
+
+        // The button row acts as the list's trailing row: same height as a list row, buttons only.
+        buttonRow.prefHeightProperty().bind(listView.fixedCellSizeProperty());
+        buttonRow.minHeightProperty().bind(listView.fixedCellSizeProperty());
 
         fulltextFetcher.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty().not());
         progressIndicator.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty());
@@ -367,7 +392,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     }
 
     @FXML
-    private void addNewFile() {
+    public void addNewFile() {
         dialogService.showCustomDialogAndWait(new LinkedFileEditDialog()).filter(file -> !file.isEmpty()).ifPresent(newLinkedFile -> viewModel.addNewLinkedFile(newLinkedFile));
     }
 
