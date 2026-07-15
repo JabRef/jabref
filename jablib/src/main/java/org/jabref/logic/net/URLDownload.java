@@ -73,6 +73,9 @@ public class URLDownload {
     private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(30);
     private static final int MAX_RETRIES = 3;
 
+    private static volatile boolean unirestConfigured = false;
+    private static final Object UNIREST_CONFIG_LOCK = new Object();
+
     private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
 
@@ -83,28 +86,6 @@ public class URLDownload {
     private Duration connectTimeout = DEFAULT_CONNECT_TIMEOUT;
     // Can be null if SSL is not supported. If null, then ignore.
     private @Nullable SSLContext sslContext;
-
-    private static volatile boolean unirestConfigured = false;
-    private static final Object UNIREST_CONFIG_LOCK = new Object();
-
-    public static void ensureUnirestConfigured() {
-        if (unirestConfigured) {
-            return;
-        }
-
-        synchronized (UNIREST_CONFIG_LOCK) {
-            if (unirestConfigured) {
-                return;
-            }
-
-            Unirest.config()
-                   .followRedirects(true)
-                   .enableCookieManagement(true)
-                   .setDefaultHeader("User-Agent", USER_AGENT);
-
-            unirestConfigured = true;
-        }
-    }
 
     /// @param source the URL to download from
     /// @throws MalformedURLException if no protocol is specified in the source, or an unknown protocol is found
@@ -132,6 +113,25 @@ public class URLDownload {
     public URLDownload(@NonNull ImporterPreferences importerPreferences, @NonNull URL citationsUrl) {
         this(citationsUrl);
         this.importerPreferences = importerPreferences;
+    }
+
+    public static void ensureUnirestConfigured() {
+        if (unirestConfigured) {
+            return;
+        }
+
+        synchronized (UNIREST_CONFIG_LOCK) {
+            if (unirestConfigured) {
+                return;
+            }
+
+            Unirest.config()
+                   .followRedirects(true)
+                   .enableCookieManagement(true)
+                   .setDefaultHeader("User-Agent", USER_AGENT);
+
+            unirestConfigured = true;
+        }
     }
 
     public URL getSource() {
