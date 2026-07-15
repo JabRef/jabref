@@ -143,15 +143,19 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     /// are considered, because `eprint` is a generic field and is not necessarily an arXiv id.
     ///
     /// @param field      the identifier field to look up: one of [StandardField#DOI],
-    ///                   [StandardField#EPRINT] (interpreted as an arXiv id), or [StandardField#ISBN]
+    ///                                     [StandardField#EPRINT] (interpreted as an arXiv id), or [StandardField#ISBN]
     /// @param candidates the candidates to inspect for an identifier
     /// @return the fetched entry, or [Optional#empty()] if none of the candidates contain the identifier
     public Optional<BibEntry> fetchByIdentifier(StandardField field, List<BibEntry> candidates) throws FetcherException {
         IdBasedFetcher fetcher = switch (field) {
-            case DOI -> doiFetcher;
-            case EPRINT -> arXivFetcher;
-            case ISBN -> isbnFetcher;
-            default -> throw new FetcherException("Unsupported identifier field: " + field);
+            case DOI ->
+                    doiFetcher;
+            case EPRINT ->
+                    arXivFetcher;
+            case ISBN ->
+                    isbnFetcher;
+            default ->
+                    throw new FetcherException("Unsupported identifier field: " + field);
         };
 
         Optional<String> identifier = candidates.stream()

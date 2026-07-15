@@ -93,8 +93,8 @@ public class PdfMergeDialog {
     private static void addIdentifierSource(MultiMergeEntriesView dialog, PdfMergeMetadataImporter importer, List<BibEntry> candidates, StandardField field, String title) {
         // `eprint` is a generic field; it only refers to an arXiv preprint when it is arXiv-qualified.
         Predicate<BibEntry> hasIdentifier = field == StandardField.EPRINT
-                ? PdfMergeMetadataImporter::hasArXivQualifiedEprint
-                : candidate -> candidate.hasField(field);
+                                            ? PdfMergeMetadataImporter::hasArXivQualifiedEprint
+                                            : candidate -> candidate.hasField(field);
         if (candidates.stream().noneMatch(hasIdentifier)) {
             return;
         }
