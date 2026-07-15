@@ -3,6 +3,8 @@ package org.jabref.logic.ocr.Docling;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.jabref.logic.ocr.OcrEngine;
@@ -13,7 +15,15 @@ import org.jabref.logic.ocr.OcrUtils;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.apache.pdfbox.pdmodel.graphics.state.RenderingMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,7 +118,49 @@ public class DoclingEngine implements OcrEngine {
     }
 
     private OcrResult embedText(Path jsonOutputPath, Path originalPdf) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        DoclingDocument doclingDocument = mapper.readValue(jsonOutputPath.toFile(), DoclingDocument.class);
+        JsonMapper jsonMapper = new JsonMapper();
+        DoclingDocument doclingDocument = jsonMapper.readValue(jsonOutputPath.toFile(), DoclingDocument.class);
+
+        Map<Integer, ArrayList<DoclingText>> pageTextMap = new HashMap<>();
+        for (DoclingText doclingText : doclingDocument.texts()) {
+            // Docling outputs the pages number 1 indexed, while PDFBox uses 0 indexed pages
+            int pageNo = doclingText.prov().getFirst().pageNo() - 1;
+            pageTextMap.computeIfAbsent(pageNo, _ -> new ArrayList<>()).add(doclingText);
+        }
+
+        Path outputPdf = OcrUtils.makeOutputFilePath(originalPdf);
+
+        try (PDDocument pdfWithText = Loader.loadPDF(originalPdf.toFile())) {
+            PDFont font = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+            float fontSize = 12f;
+            for (Map.Entry<Integer, ArrayList<DoclingText>> entry : pageTextMap.entrySet()) {
+                int pageNo = entry.getKey();
+                PDPage pdPage = pdfWithText.getPage(pageNo);
+
+                try (PDPageContentStream contentStream = new PDPageContentStream(
+                        pdfWithText, pdPage, PDPageContentStream.AppendMode.APPEND, true)) {
+
+                    for (DoclingText doclingText : entry.getValue()) {
+                        DoclingBBox bbox = doclingText.prov().getFirst().bbox();
+                        String text = doclingText.text();
+                        try {
+                            contentStream.beginText();
+                            contentStream.setRenderingMode(RenderingMode.NEITHER);
+                            contentStream.setFont(font, fontSize);
+                            contentStream.newLineAtOffset((float) bbox.left(), (float) bbox.bottom());
+                            contentStream.showText(text);
+                            contentStream.endText();
+                        } catch (IllegalArgumentException e) {
+                            contentStream.endText();
+                            LOGGER.debug("Skipping unsupported text span: {}", text, e);
+                        }
+                    }
+                }
+            }
+
+            pdfWithText.save(outputPdf.toFile());
+        }
+
+        return OcrResult.success(outputPdf);
     }
 }
