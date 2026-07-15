@@ -198,7 +198,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         if (!item.getApiKey().isEmpty()) {
             Node keyIcon = IconTheme.JabRefIcons.SUCCESS.getGraphicNode();
             Tooltip.install(keyIcon, new Tooltip(Localization.lang("API Key is saved")));
-            container.getChildren().add(keyIcon); // Icon add kar diya
+            container.getChildren().add(keyIcon);
         }
 
         container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton);
