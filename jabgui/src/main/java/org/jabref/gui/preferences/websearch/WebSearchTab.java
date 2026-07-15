@@ -17,12 +17,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -192,6 +194,12 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         configureButton.getStyleClass().add("configure-button");
         configureButton.setOnAction(_ -> showApiKeyDialog(item));
         configureButton.setVisible(item.isCustomizable());
+
+        if (!item.getApiKey().isEmpty()) {
+            Node keyIcon = IconTheme.JabRefIcons.SUCCESS.getGraphicNode();
+            Tooltip.install(keyIcon, new Tooltip(Localization.lang("API Key is saved")));
+            container.getChildren().add(keyIcon); // Icon add kar diya
+        }
 
         container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton);
         return container;
