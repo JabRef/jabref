@@ -80,7 +80,7 @@ updates:
   - package-ecosystem: "gitsubmodule"
     directory: "/"
     cooldown:
-      default-days: 0
+      default-days: 1
     schedule:
       interval: weekly
       day: wednesday
