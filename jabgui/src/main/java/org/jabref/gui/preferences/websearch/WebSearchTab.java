@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
@@ -195,13 +196,13 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         configureButton.setOnAction(_ -> showApiKeyDialog(item));
         configureButton.setVisible(item.isCustomizable());
 
-        if (StringUtil.isNotBlank(item.getApiKey())) {
-            Node keyIcon = IconTheme.JabRefIcons.SUCCESS.getGraphicNode();
-            Tooltip.install(keyIcon, new Tooltip(Localization.lang("API key is saved")));
-            container.getChildren().add(keyIcon);
-        }
+        Node keyIcon = IconTheme.JabRefIcons.SUCCESS.getGraphicNode();
+        Tooltip.install(keyIcon, new Tooltip(Localization.lang("API key is saved")));
 
-        container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton);
+        BooleanBinding isKeyPresent = Bindings.createBooleanBinding(() -> StringUtil.isNotBlank(item.apiKeyProperty().get()), item.apiKeyProperty());
+        keyIcon.visibleProperty().bind(isKeyPresent);
+        keyIcon.managedProperty().bind(isKeyPresent);
+        container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton, keyIcon);
         return container;
     }
 
