@@ -15,7 +15,7 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.ocr.DoclingEngine;
+import org.jabref.logic.ocr.Docling.DoclingEngine;
 import org.jabref.logic.ocr.OcrEngine;
 import org.jabref.logic.ocr.OcrResult;
 import org.jabref.logic.util.BackgroundTask;

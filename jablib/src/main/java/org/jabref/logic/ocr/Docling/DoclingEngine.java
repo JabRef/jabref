@@ -1,13 +1,19 @@
-package org.jabref.logic.ocr;
+package org.jabref.logic.ocr.Docling;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.logic.ocr.OcrEngine;
+import org.jabref.logic.ocr.OcrFailureReason;
+import org.jabref.logic.ocr.OcrPreferences;
+import org.jabref.logic.ocr.OcrResult;
+import org.jabref.logic.ocr.OcrUtils;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +92,7 @@ public class DoclingEngine implements OcrEngine {
                 String fileName = pdfPath.getFileName().toString();
                 String baseName = fileName.contains(".") ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName;
                 Path jsonOutputPath = outputDir.resolve(baseName + ".json");
-                return embedText(jsonOutputPath);
+                return embedText(jsonOutputPath, pdfPath);
             } else {
                 return OcrResult.failure(OcrFailureReason.NON_ZERO_EXIT);
             }
@@ -101,9 +107,8 @@ public class DoclingEngine implements OcrEngine {
         }
     }
 
-    private OcrResult embedText(Path jsonOutputPath) {
-        // Here you would implement the logic to read the JSON output and embed the text into the original PDF.
-        // For now, we will just return a success result with the path to the JSON output.
-        return OcrResult.success(jsonOutputPath);
+    private OcrResult embedText(Path jsonOutputPath, Path originalPdf) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        DoclingDocument doclingDocument = mapper.readValue(jsonOutputPath.toFile(), DoclingDocument.class);
     }
 }
