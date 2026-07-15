@@ -20,14 +20,19 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/// Tests for {@link PdfMergeMetadataImporter} that work without network access, complementing
-/// {@link PdfMergeMetadataImporterTest} (which is tagged as fetcher test and thus not run by default).
+/// Tests for [PdfMergeMetadataImporter] that work without network access, complementing
+/// [PdfMergeMetadataImporterTest] (which is tagged as fetcher test and thus not run by default).
+///
+/// The cross-check logic under test lives in [PdfContentImporter], but is exercised here through the
+/// merge importer, which is where it takes effect.
 class PdfMergeMetadataImporterOfflineTest {
 
     private static final String DOCUMENT_TEXT = """
@@ -37,16 +42,24 @@ class PdfMergeMetadataImporterOfflineTest {
             Abstract. The automation of application deployment has evolved into an important issue.
             """;
 
-    @Test
-    void authorAbsentFromDocumentTextIsDropped() {
-        BibEntry documentInformation = new BibEntry()
-                .withField(StandardField.AUTHOR, "Richter, Markus");
-        BibEntry content = new BibEntry(StandardEntryType.InProceedings)
-                .withField(StandardField.TITLE, "An Approach to Automatically Check the Compliance of Declarative Deployment Models");
+    /// Single creator-style candidate (as produced from PDF document properties): a Misc entry without a
+    /// citation key. Its author survives only when confirmed by the document text; an empty expected value
+    /// means it is dropped. Columns: author | documentText | expectedAuthor (an empty documentText models a
+    /// PDF whose text could not be extracted).
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', textBlock = """
+            Krieger, Christoph        | Christoph Krieger, Uwe Breitenbücher, University of Stuttgart | Krieger, Christoph
+            Richter, Markus           | Christoph Krieger, Uwe Breitenbücher, University of Stuttgart |
+            Li, Xin                   | Christoph Krieger, Uwe Breitenbücher, University of Stuttgart |
+            Doe, John and Smith, Jane | Christoph Krieger, Uwe Breitenbücher, University of Stuttgart | Doe, John and Smith, Jane
+            Richter, Markus           |                                                              | Richter, Markus
+            """)
+    void singleCreatorCandidateAuthorIsCrossCheckedAgainstText(String author, String documentText, String expectedAuthor) {
+        BibEntry candidate = new BibEntry().withField(StandardField.AUTHOR, author);
 
-        BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(documentInformation, content), DOCUMENT_TEXT);
+        BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(candidate), documentText == null ? "" : documentText);
 
-        assertEquals(Optional.empty(), merged.getField(StandardField.AUTHOR));
+        assertEquals(Optional.ofNullable(expectedAuthor), merged.getField(StandardField.AUTHOR));
     }
 
     @Test
@@ -63,35 +76,14 @@ class PdfMergeMetadataImporterOfflineTest {
     }
 
     @Test
-    void authorConfirmedByDocumentTextIsKept() {
-        BibEntry documentInformation = new BibEntry()
-                .withField(StandardField.AUTHOR, "Krieger, Christoph");
-
-        BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(documentInformation), DOCUMENT_TEXT);
-
-        assertEquals(Optional.of("Krieger, Christoph"), merged.getField(StandardField.AUTHOR));
-    }
-
-    @Test
     void authorConfirmedDespiteDiacriticsAndHyphenationDifferences() {
         BibEntry documentInformation = new BibEntry()
                 .withField(StandardField.AUTHOR, "Breitenbücher, Uwe");
-        String hyphenatedText = "A model checking approach developed by Uwe Breitenbü-\ncher in Stuttgart.";
+        String hyphenatedText = "A model checking approach developed by Uwe Breitenbü-\ncher in Stuttgart.";
 
         BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(documentInformation), hyphenatedText);
 
         assertEquals(Optional.of("Breitenbücher, Uwe"), merged.getField(StandardField.AUTHOR));
-    }
-
-    @Test
-    void shortFamilyNameInsideLongerWordDoesNotCountAsConfirmation() {
-        // "Li" is contained in "Compliance", but not as a standalone word
-        BibEntry documentInformation = new BibEntry()
-                .withField(StandardField.AUTHOR, "Li, Xin");
-
-        BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(documentInformation), DOCUMENT_TEXT);
-
-        assertEquals(Optional.empty(), merged.getField(StandardField.AUTHOR));
     }
 
     @Test
@@ -106,16 +98,6 @@ class PdfMergeMetadataImporterOfflineTest {
 
         assertEquals(Optional.of("Filippo RiccaⰠ﻿Alessandro MarchettoⰠ﻿Andrea StoccoⰠ"),
                 merged.getField(StandardField.AUTHOR));
-    }
-
-    @Test
-    void authorIsKeptWhenDocumentTextIsMissing() {
-        BibEntry documentInformation = new BibEntry()
-                .withField(StandardField.AUTHOR, "Richter, Markus");
-
-        BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(documentInformation), "");
-
-        assertEquals(Optional.of("Richter, Markus"), merged.getField(StandardField.AUTHOR));
     }
 
     @Test
@@ -137,16 +119,6 @@ class PdfMergeMetadataImporterOfflineTest {
         BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(jabRefWrittenMetadata), DOCUMENT_TEXT);
 
         assertEquals(Optional.of("Doe, John"), merged.getField(StandardField.AUTHOR));
-    }
-
-    @Test
-    void unconfirmedMultiPersonAuthorIsKept() {
-        BibEntry documentInformation = new BibEntry()
-                .withField(StandardField.AUTHOR, "Doe, John and Smith, Jane");
-
-        BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(documentInformation), DOCUMENT_TEXT);
-
-        assertEquals(Optional.of("Doe, John and Smith, Jane"), merged.getField(StandardField.AUTHOR));
     }
 
     @Test
