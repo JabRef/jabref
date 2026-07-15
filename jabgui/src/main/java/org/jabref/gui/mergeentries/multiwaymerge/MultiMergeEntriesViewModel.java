@@ -90,7 +90,7 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
             entry.getField(field)
                  .flatMap(rawValue -> normalizeIdentifier(field, rawValue))
                  .filter(value -> autoFetchedIdentifiers.computeIfAbsent(field, _ -> new HashSet<>())
-                                                         .add(value.toLowerCase(Locale.ROOT)))
+                                                        .add(value.toLowerCase(Locale.ROOT)))
                  .ifPresent(value -> result.put(field, value));
         }
         return result;
@@ -98,11 +98,16 @@ public class MultiMergeEntriesViewModel extends AbstractViewModel {
 
     private static Optional<String> normalizeIdentifier(Field field, String rawValue) {
         return switch (field) {
-            case StandardField.DOI -> DOI.parse(rawValue).map(DOI::asString);
-            case StandardField.ISBN -> ISBN.parse(rawValue).map(ISBN::asString);
-            case StandardField.EPRINT -> ArXivIdentifier.parse(rawValue).map(ArXivIdentifier::asString);
-            case StandardField.ISSN -> normalizeIssn(rawValue);
-            default -> Optional.empty();
+            case StandardField.DOI ->
+                    DOI.parse(rawValue).map(DOI::asString);
+            case StandardField.ISBN ->
+                    ISBN.parse(rawValue).map(ISBN::asString);
+            case StandardField.EPRINT ->
+                    ArXivIdentifier.parse(rawValue).map(ArXivIdentifier::asString);
+            case StandardField.ISSN ->
+                    normalizeIssn(rawValue);
+            default ->
+                    Optional.empty();
         };
     }
 
