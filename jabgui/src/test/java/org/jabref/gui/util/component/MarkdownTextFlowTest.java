@@ -2,9 +2,13 @@ package org.jabref.gui.util.component;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.Clipboard;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -13,6 +17,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.clipboard.ClipBoardManager;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,23 +33,23 @@ import static org.mockito.Mockito.mock;
 
 @ExtendWith(ApplicationExtension.class)
 class MarkdownTextFlowTest {
-    private ClipBoardManager clipBoardManager;
-
     private StackPane rootPane;
+    private RecordingClipBoardManager clipBoardManager;
 
     @Start
     void start(Stage stage) {
-        clipBoardManager = new ClipBoardManager(
-                mock(StateManager.class),
-                Clipboard.getSystemClipboard(),
-                mock(java.awt.datatransfer.Clipboard.class)
-        );
+        clipBoardManager = new RecordingClipBoardManager();
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
 
         rootPane = new StackPane();
         rootPane.setPrefSize(400, 200);
         stage.setScene(new Scene(rootPane, 400, 200));
         stage.show();
+    }
+
+    @BeforeEach
+    void resetMocks() {
+        clipBoardManager.clear();
     }
 
     private MarkdownTextFlow markdownTextFlow(FxRobot robot) {
@@ -167,12 +172,14 @@ class MarkdownTextFlowTest {
             textFlow.applyCss();
             textFlow.autosize();
             textFlow.layout();
-            textFlow.selectAll();
+        });
+        dragAcrossText(robot, textFlow);
+        robot.interact(() -> {
             assertTrue(textFlow.isSelectionActive());
             textFlow.copySelectedText();
         });
 
-        assertEquals("**bold**", clipboardContents(robot));
+        assertEquals("**bold**", clipBoardManager.stringContent.get());
     }
 
     @Test
@@ -186,13 +193,15 @@ class MarkdownTextFlowTest {
             textFlow.applyCss();
             textFlow.autosize();
             textFlow.layout();
-            textFlow.selectAll();
+        });
+        dragAcrossText(robot, textFlow);
+        robot.interact(() -> {
             assertTrue(textFlow.isSelectionActive());
             textFlow.copySelectedText();
         });
 
-        assertEquals("**bold**", clipboardContents(robot));
-        assertTrue(clipboardHtmlContents(robot).contains("<strong>bold</strong>"));
+        assertEquals("**bold**", clipBoardManager.stringContent.get());
+        assertTrue(clipBoardManager.htmlContent.get().contains("<strong>bold</strong>"));
     }
 
     private static int childCount(FxRobot robot, MarkdownTextFlow textFlow) {
@@ -213,15 +222,52 @@ class MarkdownTextFlowTest {
         return hasChildWithStyleClassReference.get();
     }
 
-    private static String clipboardContents(FxRobot robot) {
-        AtomicReference<String> clipboardContentsReference = new AtomicReference<>();
-        robot.interact(() -> clipboardContentsReference.set(ClipBoardManager.getContents()));
-        return clipboardContentsReference.get();
+    private static void dragAcrossText(FxRobot robot, MarkdownTextFlow textFlow) {
+        Bounds bounds = firstTextBounds(robot, textFlow);
+        double centerY = bounds.getMinY() + (bounds.getHeight() / 2);
+
+        robot.moveTo(bounds.getMinX() + 1, centerY)
+             .press(MouseButton.PRIMARY)
+             .moveTo(bounds.getMaxX() - 1, centerY)
+             .release(MouseButton.PRIMARY);
     }
 
-    private static String clipboardHtmlContents(FxRobot robot) {
-        AtomicReference<String> clipboardHtmlContentsReference = new AtomicReference<>();
-        robot.interact(() -> clipboardHtmlContentsReference.set(ClipBoardManager.getHtmlContents()));
-        return clipboardHtmlContentsReference.get();
+    private static Bounds firstTextBounds(FxRobot robot, MarkdownTextFlow textFlow) {
+        AtomicReference<Bounds> boundsReference = new AtomicReference<>();
+        robot.interact(() -> {
+            for (Node child : textFlow.getChildren()) {
+                Bounds childBounds = child.localToScreen(child.getBoundsInLocal());
+                if (childBounds != null && childBounds.getWidth() > 2) {
+                    boundsReference.set(childBounds);
+                    return;
+                }
+            }
+        });
+        return boundsReference.get() == null ? new BoundingBox(0, 0, 0, 0) : boundsReference.get();
+    }
+
+    private static class RecordingClipBoardManager extends ClipBoardManager {
+        private final AtomicReference<String> stringContent = new AtomicReference<>("");
+        private final AtomicReference<String> htmlContent = new AtomicReference<>("");
+
+        RecordingClipBoardManager() {
+            super(mock(StateManager.class), mock(Clipboard.class), mock(java.awt.datatransfer.Clipboard.class));
+        }
+
+        @Override
+        public void setContent(String string) {
+            stringContent.set(string);
+        }
+
+        @Override
+        public void setHtmlContent(String html, String fallbackPlain) {
+            htmlContent.set(html);
+            stringContent.set(fallbackPlain);
+        }
+
+        void clear() {
+            stringContent.set("");
+            htmlContent.set("");
+        }
     }
 }
