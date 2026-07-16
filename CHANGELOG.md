@@ -93,6 +93,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where stale main table search results could remain visible after consecutive searches. [#15710](https://github.com/JabRef/jabref/issues/15710)
 - We fixed an issue where the button shape changed when hovering over it. [#16188](https://github.com/JabRef/jabref/issues/16188)
 - We fixed handling of `exit` in the LSP server. [#16268](https://github.com/JabRef/jabref/pull/16268)
+- We fixed an issue where keywords separated by semicolons were parsed as a single block instead of individual tags. [#16250](https://github.com/JabRef/jabref/issues/16250)
 
 ### Removed
 
