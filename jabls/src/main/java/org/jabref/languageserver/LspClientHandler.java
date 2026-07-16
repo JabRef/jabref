@@ -77,11 +77,13 @@ public class LspClientHandler implements LanguageServer, LanguageClientAware {
         return CompletableFuture.completedFuture(null);
     }
 
-    /// currently not implemented because it comes from the LanguageServer interface and is documented like here
-    /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#exit
-    /// we have to decide how to implement this so jabls gets stopped only when started before by a lsp client
+    /// When running in JabGUI: NOOP, because the JabGui has the lifecycle control
+    /// When running standalone: immediately exits
     @Override
     public void exit() {
+        if (standalone) {
+            System.exit(0);
+        }
     }
 
     @Override
