@@ -881,8 +881,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         bindCustomList(previewPreferences.getBstPreviewLayoutPaths(), PREVIEW_BST_LAYOUT_PATHS, defaultValues.getBstPreviewLayoutPaths(),
                 this::storeBstPaths,
                 () -> hasKey(PREVIEW_BST_LAYOUT_PATHS)
-                      ? getStringList(PREVIEW_BST_LAYOUT_PATHS).stream().map(Path::of).toList()
-                      : defaultValues.getBstPreviewLayoutPaths());
+                        ? getStringList(PREVIEW_BST_LAYOUT_PATHS).stream().map(Path::of).toList()
+                        : defaultValues.getBstPreviewLayoutPaths());
         bindBoolean(previewPreferences.shouldDownloadCoversProperty(), PREVIEW_COVER_IMAGE_DOWNLOAD, defaultValues.shouldDownloadCovers());
 
         return this.previewPreferences;
@@ -930,26 +930,26 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         }
 
         return cycle.stream()
-                    .map(layout -> PreviewLayout.of(
-                            layout,
-                            customPreviewLayouts,
-                            getStringList(PREVIEW_BST_LAYOUT_PATHS).stream().map(Path::of).toList(),
-                            getLayoutFormatterPreferences(),
-                            Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
-                            Injector.instantiateModelOrService(BibEntryTypesManager.class))
-                    ).filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+                .map(layout -> PreviewLayout.of(
+                        layout,
+                        customPreviewLayouts,
+                        getStringList(PREVIEW_BST_LAYOUT_PATHS).stream().map(Path::of).toList(),
+                        getLayoutFormatterPreferences(),
+                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
+                        Injector.instantiateModelOrService(BibEntryTypesManager.class))
+                ).filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     private List<String> previewLayoutsToStrings(List<PreviewLayout> previewCycle) {
         return previewCycle.stream()
-                           .map(layout -> {
-                               if (layout instanceof CitationStylePreviewLayout citationStyleLayout) {
-                                   return citationStyleLayout.getFilePath();
-                               } else {
-                                   return layout.getName();
-                               }
-                           }).toList();
+                .map(layout -> {
+                    if (layout instanceof CitationStylePreviewLayout citationStyleLayout) {
+                        return citationStyleLayout.getFilePath();
+                    } else {
+                        return layout.getName();
+                    }
+                }).toList();
     }
 
     private int getPreviewCyclePosition(List<PreviewLayout> layouts, int defaultPosition) {
