@@ -1,4 +1,4 @@
-package org.jabref.logic.ocr.Docling;
+package org.jabref.logic.ocr.docling;
 
 import java.util.List;
 
