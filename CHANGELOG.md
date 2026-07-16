@@ -352,6 +352,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where reordering linked files via drag and drop was no longer possible. [#14627](https://github.com/JabRef/jabref/pull/14627)
 - `JabRef.bat` is present again. [#14636](https://github.com/JabRef/jabref/issues/14636)
 - We fixed an issue where the warning dialog is mixed Chinese/English after switching to zh_CN. [#14654](https://github.com/JabRef/jabref/issues/14654)
+- We fixed an issue where keywords separated by semicolons were parsed as a single block instead of individual tags. [#16250](https://github.com/JabRef/jabref/issues/16250)
 
 ### Removed
 
