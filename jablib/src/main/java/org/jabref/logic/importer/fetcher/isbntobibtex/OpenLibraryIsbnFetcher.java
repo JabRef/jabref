@@ -154,7 +154,6 @@ public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
     }
 
     private Stream<Author> fromWorkToAuthors(String link) {
-        URLDownload.ensureUnirestConfigured();
         JsonNode body = Unirest.get(link).asJson().getBody();
         JSONArray authors = body.getObject().optJSONArray("authors");
         if (authors == null) {

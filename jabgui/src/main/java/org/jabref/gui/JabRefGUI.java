@@ -56,6 +56,7 @@ import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -162,6 +163,9 @@ public class JabRefGUI extends Application {
     }
 
     public void initialize() {
+        // Configure Unirest once during application startup.
+        // See #16059.
+        URLDownload.ensureUnirestConfigured();
         JabRefGUI.stateManager = new JabRefGuiStateManager();
         Injector.setModelOrService(StateManager.class, stateManager);
 

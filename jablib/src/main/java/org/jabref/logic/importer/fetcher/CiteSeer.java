@@ -58,7 +58,6 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
         // ADR-0014
         try {
             JSONElement payload = getPayloadJSON(queryNode);
-            URLDownload.ensureUnirestConfigured();
             HttpResponse<JsonNode> httpResponse = Unirest.post(API_URL)
                                                          .header("authority", BASE_URL)
                                                          .header("accept", "application/json, text/plain, */*")

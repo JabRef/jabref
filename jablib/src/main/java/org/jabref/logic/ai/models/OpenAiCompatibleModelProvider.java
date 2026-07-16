@@ -36,7 +36,6 @@ public class OpenAiCompatibleModelProvider implements AiModelProvider {
 
         try {
             String modelsEndpoint = buildModelsEndpoint(apiBaseUrl);
-            URLDownload.ensureUnirestConfigured();
             HttpResponse<JsonNode> response = Unirest.get(modelsEndpoint)
                                                      .header("Authorization", "Bearer " + apiKey)
                                                      .header("accept", "application/json")

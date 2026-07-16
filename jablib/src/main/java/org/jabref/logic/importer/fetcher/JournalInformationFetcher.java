@@ -52,7 +52,6 @@ public class JournalInformationFetcher implements WebFetcher {
         Optional<JournalInformation> journalInformationOptional = Optional.empty();
 
         JSONObject postData = buildPostData(cleanedISSN, journalName);
-        URLDownload.ensureUnirestConfigured();
 
         HttpResponse<JsonNode> httpResponse = Unirest.post(API_URL)
                                                      .header("Content-Type", "application/json")

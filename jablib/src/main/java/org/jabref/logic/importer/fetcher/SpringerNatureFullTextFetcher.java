@@ -52,7 +52,6 @@ public class SpringerNatureFullTextFetcher implements FulltextFetcher, Customiza
         }
         // Available in catalog?
         try {
-            URLDownload.ensureUnirestConfigured();
             HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL)
                                                          .queryString("api_key", importerPreferences.getApiKey(getName()).orElse(""))
                                                          .queryString("q", "doi:%s".formatted(doi.get().asString()))
