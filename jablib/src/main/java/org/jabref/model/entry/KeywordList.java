@@ -70,7 +70,7 @@ public class KeywordList implements Iterable<Keyword> {
             } else if (currentChar == Keyword.DEFAULT_HIERARCHICAL_DELIMITER) {
                 hierarchy.add(currentToken.toString().trim());
                 currentToken.setLength(0);
-            } else if (currentChar == delimiter) {
+            } else if (currentChar == delimiter || currentChar == ';') {
                 hierarchy.add(currentToken.toString().trim());
                 keywordList.add(Keyword.of(hierarchy));
                 hierarchy.clear();

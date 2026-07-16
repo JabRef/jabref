@@ -175,4 +175,16 @@ class KeywordListTest {
         String secondSerialize = KeywordList.serialize(parsed.stream().toList(), delimiter);
         assertEquals(expected, secondSerialize);
     }
+
+    @Test
+    void parseKeywordsWithSemicolonSeparator() {
+        String keywordsWithSemicolon = "Structural Balance ; Signed Graphs ; Graph Partitioning";
+        KeywordList parsed = KeywordList.parse(keywordsWithSemicolon, ',');
+
+        // This asserts that the 1 giant string was successfully split into 3 distinct items
+        assertEquals(3, parsed.size());
+        assertEquals(new Keyword("Structural Balance"), parsed.get(0));
+        assertEquals(new Keyword("Signed Graphs"), parsed.get(1));
+        assertEquals(new Keyword("Graph Partitioning"), parsed.get(2));
+    }
 }
