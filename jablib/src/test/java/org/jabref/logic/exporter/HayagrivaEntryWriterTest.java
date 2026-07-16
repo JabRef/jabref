@@ -3,6 +3,7 @@ package org.jabref.logic.exporter;
 import org.jabref.logic.importer.fileformat.HayagrivaMapping;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UserSpecificCommentField;
 
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.node.ObjectNode;
@@ -157,6 +158,71 @@ class HayagrivaEntryWriterTest {
         writer.mergeIntoNode(entry, node);
 
         assertFalse(node.has("serial-number"));
+    }
+
+    @Test
+    void mergeWritesCommentAndPerUserComment() {
+        ObjectNode node = parseEntryNode("""
+                key:
+                    type: article
+                    title: Some Title
+                """);
+        BibEntry entry = HayagrivaMapping.toBibEntry("key", node);
+        entry.setField(StandardField.COMMENT, "shared comment");
+        entry.setField(new UserSpecificCommentField("koppor"), "per-user comment");
+
+        writer.mergeIntoNode(entry, node);
+
+        assertEquals("shared comment", node.get("comment").asString());
+        assertEquals("per-user comment", node.get("comment-koppor").asString());
+    }
+
+    @Test
+    void mergeRemovesClearedComments() {
+        ObjectNode node = parseEntryNode("""
+                key:
+                    type: article
+                    title: Some Title
+                    comment: to be removed
+                    comment-koppor: also to be removed
+                """);
+        BibEntry entry = HayagrivaMapping.toBibEntry("key", node);
+        entry.clearField(StandardField.COMMENT);
+        entry.clearField(new UserSpecificCommentField("koppor"));
+
+        writer.mergeIntoNode(entry, node);
+
+        assertFalse(node.has("comment"));
+        assertFalse(node.has("comment-koppor"));
+    }
+
+    @Test
+    void freshWriteSynthesizesDateFromYearAndMonth() {
+        BibEntry entry = new BibEntry(org.jabref.model.entry.types.StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Some Title")
+                .withField(StandardField.YEAR, "1020")
+                .withField(StandardField.MONTH, "may");
+
+        ObjectNode node = writer.toEntryNode(entry);
+
+        assertEquals("1020-05", node.get("date").asString());
+    }
+
+    @Test
+    void mergeKeepsDateWhenYearAliasIsUnchanged() {
+        ObjectNode node = parseEntryNode("""
+                key:
+                    type: article
+                    title: Some Title
+                    date: 2020
+                """);
+        BibEntry entry = new BibEntry(org.jabref.model.entry.types.StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Some Title")
+                .withField(StandardField.YEAR, "2020");
+
+        writer.mergeIntoNode(entry, node);
+
+        assertEquals("2020", node.get("date").asString());
     }
 
     @Test

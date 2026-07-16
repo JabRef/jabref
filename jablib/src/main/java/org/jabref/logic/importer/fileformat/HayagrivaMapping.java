@@ -57,9 +57,18 @@ public final class HayagrivaMapping {
     public static final Field RUNTIME_FIELD = new UnknownField("runtime");
     public static final Field TIME_RANGE_FIELD = new UnknownField("time-range");
 
+    /// Prefix of JabRef's per-user comment fields
+    /// ([org.jabref.model.entry.field.UserSpecificCommentField]), mapped to equally named
+    /// extension keys (see [#SCALAR_FIELDS] on extension keys).
+    public static final String USER_COMMENT_PREFIX = "comment-";
+
     /// Hayagriva keys holding a plain scalar, with their BibEntry field, in canonical write
     /// order. `title` and `url` are "formattable strings" (scalar or map with a `value` key) and
     /// are handled separately, as are the person lists and `serial-number`.
+    ///
+    /// `comment` (like the per-user `comment-<name>` keys, see [#USER_COMMENT_PREFIX]) is not
+    /// part of the Hayagriva specification but a JabRef extension key: the Hayagriva parser
+    /// silently ignores keys it does not know, so such files stay loadable by Typst.
     public static final SequencedMap<String, Field> SCALAR_FIELDS;
 
     /// `serial-number` sub-keys with a dedicated BibEntry field. `arxiv` is handled separately
@@ -101,6 +110,7 @@ public final class HayagrivaMapping {
         scalars.put("time-range", TIME_RANGE_FIELD);
         scalars.put("note", StandardField.NOTE);
         scalars.put("abstract", StandardField.ABSTRACT);
+        scalars.put("comment", StandardField.COMMENT);
         SCALAR_FIELDS = Collections.unmodifiableSequencedMap(scalars);
 
         SequencedMap<String, Field> serialNumbers = new LinkedHashMap<>();
@@ -131,6 +141,7 @@ public final class HayagrivaMapping {
         SCALAR_FIELDS.forEach((key, field) ->
                 scalarText(entryNode.get(key)).ifPresent(value -> bibEntry.setField(field, value)));
 
+        applyUserComments(bibEntry, entryNode);
         applyAffiliated(bibEntry, entryNode.get("affiliated"));
         applySerialNumber(bibEntry, entryNode.get("serial-number"));
         applyParents(bibEntry, entryNode.get("parent"));
@@ -188,6 +199,17 @@ public final class HayagrivaMapping {
                 scalarText(parent.get("volume")).ifPresent(volume -> setIfAbsent(bibEntry, StandardField.VOLUME, volume));
                 scalarText(parent.get("issue")).ifPresent(issue -> setIfAbsent(bibEntry, StandardField.NUMBER, issue));
                 scalarText(parent.get("publisher")).ifPresent(publisher -> setIfAbsent(bibEntry, StandardField.PUBLISHER, publisher));
+            }
+        }
+    }
+
+    /// Per-user comment extension keys (`comment-<name>`, see [#SCALAR_FIELDS]) map to the
+    /// equally named [org.jabref.model.entry.field.UserSpecificCommentField]s.
+    static void applyUserComments(BibEntry bibEntry, JsonNode entryNode) {
+        for (Map.Entry<String, JsonNode> property : entryNode.properties()) {
+            if (property.getKey().startsWith(USER_COMMENT_PREFIX)) {
+                scalarText(property.getValue()).ifPresent(value ->
+                        bibEntry.setField(FieldFactory.parseField(property.getKey()), value));
             }
         }
     }

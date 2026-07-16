@@ -5,8 +5,10 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.SequencedMap;
+import java.util.SequencedSet;
 import java.util.Set;
 
 import org.jabref.logic.importer.fileformat.HayagrivaMapping;
@@ -78,6 +80,7 @@ public class HayagrivaEntryWriter {
             }
         });
 
+        mergeUserComments(node, entry, current);
         mergeFormattable(node, "url", StandardField.URL, entry, current);
         mergeSerialNumber(node, entry, current);
         removeStaleSerialFallback(node, entry, current);
@@ -97,11 +100,33 @@ public class HayagrivaEntryWriter {
     }
 
     private void mergeScalar(ObjectNode node, String key, Field field, BibEntry entry, BibEntry current) {
-        Optional<String> target = entry.getField(field);
-        if (target.equals(current.getField(field))) {
+        Optional<String> target = scalarValue(entry, field);
+        if (target.equals(scalarValue(current, field))) {
             return;
         }
         target.ifPresentOrElse(value -> node.put(key, value), () -> node.remove(key));
+    }
+
+    /// `date` is resolved through the field aliases, so an entry carrying only the BibTeX
+    /// YEAR/MONTH/DAY fields still gets its `date` written (normalized, e.g. `2020-05`).
+    private Optional<String> scalarValue(BibEntry entry, Field field) {
+        return field == StandardField.DATE ? entry.getFieldOrAlias(field) : entry.getField(field);
+    }
+
+    /// JabRef's per-user comment fields are written as equally named `comment-<name>` extension
+    /// keys, symmetric to [HayagrivaMapping#applyUserComments].
+    private void mergeUserComments(ObjectNode node, BibEntry entry, BibEntry current) {
+        SequencedSet<String> keys = new LinkedHashSet<>();
+        for (Map.Entry<String, JsonNode> property : node.properties()) {
+            if (property.getKey().startsWith(HayagrivaMapping.USER_COMMENT_PREFIX)) {
+                keys.add(property.getKey());
+            }
+        }
+        entry.getFields().stream()
+             .map(Field::getName)
+             .filter(name -> name.startsWith(HayagrivaMapping.USER_COMMENT_PREFIX))
+             .forEach(keys::add);
+        keys.forEach(key -> mergeScalar(node, key, FieldFactory.parseField(key), entry, current));
     }
 
     private void mergeFormattable(ObjectNode node, String key, Field field, BibEntry entry, BibEntry current) {
