@@ -43,7 +43,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.1")
 
-    api("com.dlsc.gemsfx:gemsfx:4.2.0")
+    api("com.dlsc.gemsfx:gemsfx:4.3.0")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -131,11 +131,11 @@ dependencies.constraints {
     api("org.hisp.dhis:json-tree:1.9.4")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
-    api("org.jabref:html-to-node:0.1.0-SNAPSHOT")
-    api("org.jabref:latex-conv:0.1.0-SNAPSHOT")
+    api("org.jabref:html-to-node:0.1.0")
+    api("org.jabref:latex-conv:0.1.0")
     api("org.jabref:mslinks:1.2")
     api("org.jetbrains:annotations:26.1.0")
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.0")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.10")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.22.2")
     api("org.jspecify:jspecify:1.0.0")
