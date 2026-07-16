@@ -52,6 +52,11 @@ public class LspClientHandler implements LanguageServer, LanguageClientAware {
         this.messageHandler = messageHandler;
     }
 
+    public LspClientHandler(RemoteMessageHandler messageHandler, CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository, BibEntryTypesManager bibEntryTypesManager, boolean standalone) {
+        this(messageHandler, cliPreferences, abbreviationRepository, bibEntryTypesManager);
+        this.standalone = standalone;
+    }
+
     @Override
     public CompletableFuture<InitializeResult> initialize(InitializeParams params) {
         ServerCapabilities capabilities = new ServerCapabilities();
@@ -106,10 +111,6 @@ public class LspClientHandler implements LanguageServer, LanguageClientAware {
         workspaceService.setClient(client);
         textDocumentService.setClient(client);
         client.logMessage(new MessageParams(MessageType.Warning, "BibtexLSPServer connected."));
-    }
-
-    public void setStandalone(boolean standalone) {
-        this.standalone = standalone;
     }
 
     public boolean isStandalone() {
