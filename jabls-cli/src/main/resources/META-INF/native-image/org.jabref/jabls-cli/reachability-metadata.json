@@ -17,122 +17,6 @@
       ]
     },
     {
-      "type": "com.github.benmanes.caffeine.cache.BLCHeader$DrainStatusRef",
-      "fields": [
-        {
-          "name": "drainStatus"
-        }
-      ]
-    },
-    {
-      "type": "com.github.benmanes.caffeine.cache.BaseMpscLinkedArrayQueueColdProducerFields",
-      "fields": [
-        {
-          "name": "producerLimit"
-        }
-      ]
-    },
-    {
-      "type": "com.github.benmanes.caffeine.cache.BaseMpscLinkedArrayQueueConsumerFields",
-      "fields": [
-        {
-          "name": "consumerIndex"
-        }
-      ]
-    },
-    {
-      "type": "com.github.benmanes.caffeine.cache.BaseMpscLinkedArrayQueueProducerFields",
-      "fields": [
-        {
-          "name": "producerIndex"
-        }
-      ]
-    },
-    {
-      "type": "com.github.benmanes.caffeine.cache.BoundedLocalCache",
-      "fields": [
-        {
-          "name": "refreshes"
-        }
-      ]
-    },
-    {
-      "type": "com.github.benmanes.caffeine.cache.FS",
-      "fields": [
-        {
-          "name": "key"
-        },
-        {
-          "name": "value"
-        }
-      ]
-    },
-    {
-      "type": "com.github.benmanes.caffeine.cache.FSMS",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        }
-      ]
-    },
-    {
-      "type": "com.github.benmanes.caffeine.cache.PS",
-      "fields": [
-        {
-          "name": "key"
-        },
-        {
-          "name": "value"
-        }
-      ]
-    },
-    {
-      "type": "com.github.benmanes.caffeine.cache.PSMS",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        }
-      ]
-    },
-    {
-      "type": "com.github.benmanes.caffeine.cache.SSMS",
-      "fields": [
-        {
-          "name": "FACTORY"
-        },
-        {
-          "name": "maximum"
-        },
-        {
-          "name": "weightedSize"
-        }
-      ]
-    },
-    {
-      "type": "com.github.benmanes.caffeine.cache.StripedBuffer",
-      "fields": [
-        {
-          "name": "tableBusy"
-        }
-      ]
-    },
-    {
-      "type": "com.github.benmanes.caffeine.cache.WSMS",
-      "fields": [
-        {
-          "name": "FACTORY"
-        },
-        {
-          "name": "maximum"
-        },
-        {
-          "name": "weightedSize"
-        }
-      ]
-    },
-    {
       "type": "com.google.common.util.concurrent.AbstractFutureState",
       "fields": [
         {
@@ -154,15 +38,6 @@
         },
         {
           "name": "thread"
-        }
-      ]
-    },
-    {
-      "type": "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
         }
       ]
     },
@@ -279,14 +154,6 @@
     },
     {
       "type": "java.time.ZonedDateTime"
-    },
-    {
-      "type": "java.util.ArrayList",
-      "serializable": true
-    },
-    {
-      "type": "java.util.CollSer",
-      "serializable": true
     },
     {
       "type": "java.util.ImmutableCollections$List12"
@@ -1530,39 +1397,6 @@
       ]
     },
     {
-      "type": "org.h2.mvstore.MVStore$TxCounter"
-    },
-    {
-      "type": "org.h2.mvstore.Page"
-    },
-    {
-      "type": "org.h2.store.fs.async.FilePathAsync"
-    },
-    {
-      "type": "org.h2.store.fs.mem.FilePathMem"
-    },
-    {
-      "type": "org.h2.store.fs.mem.FilePathMemLZF"
-    },
-    {
-      "type": "org.h2.store.fs.niomapped.FilePathNioMapped"
-    },
-    {
-      "type": "org.h2.store.fs.niomem.FilePathNioMem"
-    },
-    {
-      "type": "org.h2.store.fs.niomem.FilePathNioMemLZF"
-    },
-    {
-      "type": "org.h2.store.fs.retry.FilePathRetryOnInterrupt"
-    },
-    {
-      "type": "org.h2.store.fs.split.FilePathSplit"
-    },
-    {
-      "type": "org.h2.store.fs.zip.FilePathZip"
-    },
-    {
       "type": "org.jabref.languageserver.BibtexTextDocumentService"
     },
     {
@@ -1578,14 +1412,6 @@
           "name": "port"
         }
       ]
-    },
-    {
-      "type": "org.jabref.logic.journals.Abbreviation",
-      "serializable": true
-    },
-    {
-      "type": "org.jabref.logic.journals.ltwa.LtwaEntry",
-      "serializable": true
     },
     {
       "type": "org.jabref.model.database.BibDatabase"
@@ -1648,54 +1474,10 @@
       ]
     },
     {
-      "type": "sun.security.provider.NativePRNG",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": [
-            "java.security.SecureRandomParameters"
-          ]
-        }
-      ]
-    },
-    {
-      "type": "sun.security.provider.SHA",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        }
-      ]
-    },
-    {
-      "type": "sun.text.resources.cldr.FormatData"
-    },
-    {
-      "type": "sun.text.resources.cldr.FormatData_en"
-    },
-    {
-      "type": "sun.text.resources.cldr.FormatData_en_US"
-    },
-    {
-      "type": "sun.util.resources.cldr.CalendarData"
-    },
-    {
       "type": "sun.util.resources.cldr.LocaleNames"
     },
     {
       "type": "sun.util.resources.cldr.LocaleNames_en"
-    },
-    {
-      "type": "tools.jackson.databind.deser.Deserializers[]"
-    },
-    {
-      "type": "tools.jackson.databind.deser.KeyDeserializers[]"
-    },
-    {
-      "type": "tools.jackson.databind.deser.ValueInstantiators[]"
-    },
-    {
-      "type": "tools.jackson.databind.ser.Serializers[]"
     },
     {
       "type": {
