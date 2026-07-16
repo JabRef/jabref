@@ -33,10 +33,10 @@ the last-opened list and routed back through the directory-library opener.
 Needs: impl
 
 ## External file changes appear live in an open directory library
-`req~directory-library.inbound-sync~1`
+`req~directory-library.inbound-sync~2`
 
 While a directory library is open, external creation, modification, deletion, and renaming of
-`.yml`/`.yaml`/`.pdf` files under its root must be reflected in the open library. Changed
+`.yml`/`.yaml`/`.md`/`.pdf` files under its root must be reflected in the open library. Changed
 entries are updated in place (the entry identity is preserved), renames are detected via a
 grace window over the monitor's delete + create events and keep the affected entries, and files
 written by JabRef itself are recognized by fingerprint and not re-imported. All resulting
