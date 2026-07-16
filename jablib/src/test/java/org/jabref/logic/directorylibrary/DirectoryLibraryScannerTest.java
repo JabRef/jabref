@@ -21,6 +21,7 @@ import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -109,6 +110,52 @@ class DirectoryLibraryScannerTest {
         assertEquals(List.of(new LinkedFile("", Path.of("smith2020.pdf"), "PDF")), entry.getFiles());
         assertEquals(Optional.of(new DirectoryLibraryCatalog.EntrySource(root.resolve("smith2020.yml"), "smith2020")),
                 result.catalog().sourceOf(entry));
+    }
+
+    @Test
+    void markdownSidecarIsImportedWithNotesAndPairedPdf() throws IOException {
+        Files.writeString(root.resolve("smith2020.md"), """
+                ---
+                smith2020:
+                    type: article
+                    title: A Test Article
+                    author: Smith, Jane
+                ---
+
+                # Notes
+
+                Shared comment text.
+
+                ## comment-koppor
+
+                Per-user comment text.
+                """);
+        Files.createFile(root.resolve("smith2020.pdf"));
+
+        ScanResult result = scan();
+        BibEntry entry = singleEntry(result);
+
+        assertEquals(Optional.of("smith2020"), entry.getCitationKey());
+        assertEquals(Optional.of("A Test Article"), entry.getField(StandardField.TITLE));
+        assertEquals(Optional.of("Shared comment text."), entry.getField(StandardField.COMMENT));
+        assertEquals(Optional.of("Per-user comment text."), entry.getField(FieldFactory.parseField("comment-koppor")));
+        assertEquals(List.of(new LinkedFile("", Path.of("smith2020.pdf"), "PDF")), entry.getFiles());
+        assertEquals(Optional.of(new DirectoryLibraryCatalog.EntrySource(root.resolve("smith2020.md"), "smith2020")),
+                result.catalog().sourceOf(entry));
+    }
+
+    @Test
+    void plainMarkdownFileIsIgnored() throws IOException {
+        Files.writeString(root.resolve("README.md"), """
+                # A readme
+
+                Just prose.
+                """);
+
+        ScanResult result = scan();
+
+        assertEquals(List.of(), result.databaseContext().getDatabase().getEntries());
+        assertEquals(List.of(), result.warnings());
     }
 
     @Test
