@@ -45,6 +45,19 @@ class DirectoryLibrarySynchronizerTest {
                 note: first version
             """;
 
+    private static final String MARKDOWN_SIDECAR = """
+            ---
+            smith2020:
+                type: article
+                title: A Test Article
+                author: Smith, Jane
+            ---
+
+            # Notes
+
+            Shared comment text.
+            """;
+
     /// Deterministic clock for the rename grace window.
     private static final class SteppingClock extends Clock {
         private Instant now = Instant.parse("2026-07-13T12:00:00Z");
@@ -133,6 +146,35 @@ class DirectoryLibrarySynchronizerTest {
         assertSame(entry, entries().getFirst());
         assertEquals(Optional.of("second version"), entry.getField(StandardField.NOTE));
         assertEquals(1, entry.getFiles().size());
+    }
+
+    @Test
+    void externallyCreatedMarkdownSidecarAddsEntryWithComments() throws IOException {
+        openLibrary();
+        Path sidecar = root.resolve("smith2020.md");
+        Files.writeString(sidecar, MARKDOWN_SIDECAR);
+
+        synchronizer.handleFileCreated(sidecar);
+
+        assertEquals(1, entries().size());
+        BibEntry added = entries().getFirst();
+        assertEquals(Optional.of("smith2020"), added.getCitationKey());
+        assertEquals(Optional.of("Shared comment text."), added.getField(StandardField.COMMENT));
+    }
+
+    @Test
+    void externalMarkdownChangeUpdatesCommentOnTheSameEntryInstance() throws IOException {
+        Path sidecar = root.resolve("smith2020.md");
+        Files.writeString(sidecar, MARKDOWN_SIDECAR);
+        openLibrary();
+        BibEntry entry = entries().getFirst();
+
+        Files.writeString(sidecar, MARKDOWN_SIDECAR.replace("Shared comment text.", "Updated comment text."));
+        synchronizer.handleFileChanged(sidecar);
+
+        assertEquals(1, entries().size());
+        assertSame(entry, entries().getFirst());
+        assertEquals(Optional.of("Updated comment text."), entry.getField(StandardField.COMMENT));
     }
 
     @Test

@@ -74,6 +74,9 @@ import org.slf4j.LoggerFactory;
 /// deletion's entries is treated as a move (the [BibEntry] instances survive, preserving
 /// selection and undo history); only unmatched deletions are committed.
 ///
+/// Sidecars come in two forms (see [MarkdownSidecar]): plain Hayagriva `.yml`/`.yaml` files and
+/// Markdown `.md` files whose Hayagriva frontmatter carries the data; both are watched alike.
+///
 /// The outbound direction subscribes to entry events (relayed through the
 /// [org.jabref.logic.util.CoarseChangeFilter] installed by
 /// [BibDatabaseContext#attachDirectorySynchronizer]) and persists user changes back into the
@@ -82,7 +85,7 @@ import org.slf4j.LoggerFactory;
 /// edit renames the YAML map key, and deleting an entry removes it from its file (disposing the
 /// file once its last entry is gone — the paired PDF is never touched). Writes are debounced
 /// per file; [#flush] forces them, and shutdown flushes implicitly.
-// [impl->req~directory-library.inbound-sync~1]
+// [impl->req~directory-library.inbound-sync~2]
 // [impl->req~directory-library.write-back~1]
 @NullMarked
 public class DirectoryLibrarySynchronizer implements FileAlterationListener {
@@ -93,7 +96,7 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
     /// in the poll cycle after its delete event.
     private static final Duration RENAME_GRACE = Duration.ofMillis(2500);
 
-    private static final Set<String> YAML_EXTENSIONS = Set.of("yml", "yaml");
+    private static final Set<String> SIDECAR_EXTENSIONS = Set.of("yml", "yaml", MarkdownSidecar.MARKDOWN_EXTENSION);
     private static final String PDF_EXTENSION = "pdf";
 
     /// Collects the keystroke-level bursts the CoarseChangeFilter still lets through into one
@@ -107,6 +110,7 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
     private final Consumer<Runnable> modelUpdateMarshaller;
     private final Clock clock;
     private final HayagrivaImporter importer = new HayagrivaImporter();
+    private final MarkdownSidecar markdownSidecar = new MarkdownSidecar();
     private final ScheduledExecutorService syncExecutor;
 
     private final Map<Path, StagedDeletion> stagedDeletions = new HashMap<>();
@@ -157,6 +161,7 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
                 FileFilterUtils.directoryFileFilter(),
                 FileFilterUtils.suffixFileFilter(".yml", IOCase.INSENSITIVE),
                 FileFilterUtils.suffixFileFilter(".yaml", IOCase.INSENSITIVE),
+                FileFilterUtils.suffixFileFilter(".md", IOCase.INSENSITIVE),
                 FileFilterUtils.suffixFileFilter(".pdf", IOCase.INSENSITIVE));
         IOFileFilter notHidden = FileFilterUtils.notFileFilter(FileFilterUtils.prefixFileFilter("."));
         observer = FileAlterationObserver.builder()
@@ -368,7 +373,7 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
 
     synchronized void handleFileCreated(Path file) {
         commitExpiredStagedDeletions();
-        if (isYaml(file)) {
+        if (isSidecar(file)) {
             if (consumeSelfEcho(file)) {
                 return;
             }
@@ -380,7 +385,7 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
 
     synchronized void handleFileChanged(Path file) {
         commitExpiredStagedDeletions();
-        if (!isYaml(file) || consumeSelfEcho(file)) {
+        if (!isSidecar(file) || consumeSelfEcho(file)) {
             return;
         }
         List<BibEntry> knownEntries = entriesOf(file);
@@ -388,8 +393,8 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
             importFile(file);
             return;
         }
-        if (!looksLikeHayagriva(file)) {
-            // The file stopped being a Hayagriva file (e.g. replaced by unrelated YAML)
+        if (!looksLikeSidecar(file)) {
+            // The file stopped being a sidecar (e.g. replaced by unrelated YAML or Markdown)
             removeEntries(knownEntries, file);
             return;
         }
@@ -403,7 +408,7 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
 
     synchronized void handleFileDeleted(Path file) {
         commitExpiredStagedDeletions();
-        if (isYaml(file)) {
+        if (isSidecar(file)) {
             List<BibEntry> entries = entriesOf(file);
             if (entries.isEmpty()) {
                 return;
@@ -433,7 +438,7 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
             handleFileChanged(file);
             return;
         }
-        if (!looksLikeHayagriva(file)) {
+        if (!looksLikeSidecar(file)) {
             return;
         }
         Optional<List<BibEntry>> parsed = parse(file);
@@ -594,7 +599,9 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
 
     private Optional<List<BibEntry>> parse(Path file) {
         try {
-            ParserResult parserResult = importer.importDatabase(file);
+            ParserResult parserResult = MarkdownSidecar.hasMarkdownExtension(file)
+                                        ? markdownSidecar.read(file)
+                                        : importer.importDatabase(file);
             if (parserResult.isInvalid()) {
                 return Optional.empty();
             }
@@ -605,9 +612,14 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
         }
     }
 
-    private boolean looksLikeHayagriva(Path file) {
-        try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-            return importer.isRecognizedFormat(reader);
+    private boolean looksLikeSidecar(Path file) {
+        try {
+            if (MarkdownSidecar.hasMarkdownExtension(file)) {
+                return markdownSidecar.looksLikeSidecar(file);
+            }
+            try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
+                return importer.isRecognizedFormat(reader);
+            }
         } catch (IOException e) {
             LOGGER.warn("Could not read {}", file, e);
             return false;
@@ -620,7 +632,7 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
             return Optional.empty();
         }
         String baseName = FileUtil.getBaseName(pdf);
-        for (String extension : YAML_EXTENSIONS) {
+        for (String extension : SIDECAR_EXTENSIONS) {
             List<BibEntry> entries = entriesOf(parent.resolve(baseName + "." + extension));
             if (!entries.isEmpty()) {
                 return Optional.of(entries.getFirst());
@@ -664,8 +676,8 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
         }
     }
 
-    private static boolean isYaml(Path file) {
-        return YAML_EXTENSIONS.contains(FileUtil.getFileExtension(file).orElse("").toLowerCase(Locale.ROOT));
+    private static boolean isSidecar(Path file) {
+        return SIDECAR_EXTENSIONS.contains(FileUtil.getFileExtension(file).orElse("").toLowerCase(Locale.ROOT));
     }
 
     private static boolean isPdf(Path file) {
