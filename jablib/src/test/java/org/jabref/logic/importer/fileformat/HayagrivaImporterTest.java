@@ -18,6 +18,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -287,6 +288,24 @@ class HayagrivaImporterTest {
             ParserResult result = hayagrivaImporter.importDatabase(reader);
             assertEquals(Optional.of("~2003-06-21"),
                     result.getDatabase().getEntryByCitationKey("test").flatMap(entry -> entry.getField(StandardField.DATE)));
+        }
+    }
+
+    @Test
+    void importsCommentExtensionKeys() throws Exception {
+        String yaml = """
+                test:
+                    type: Book
+                    comment: A shared comment
+                    comment-koppor: A per-user comment
+                """;
+        try (BufferedReader reader = new BufferedReader(Reader.of(yaml))) {
+            ParserResult result = hayagrivaImporter.importDatabase(reader);
+            Optional<BibEntry> entry = result.getDatabase().getEntryByCitationKey("test");
+            assertEquals(Optional.of("A shared comment"),
+                    entry.flatMap(bibEntry -> bibEntry.getField(StandardField.COMMENT)));
+            assertEquals(Optional.of("A per-user comment"),
+                    entry.flatMap(bibEntry -> bibEntry.getField(new UserSpecificCommentField("koppor"))));
         }
     }
 

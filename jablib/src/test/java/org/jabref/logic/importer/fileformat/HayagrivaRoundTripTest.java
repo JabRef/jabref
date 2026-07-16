@@ -12,6 +12,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
@@ -102,7 +103,12 @@ class HayagrivaRoundTripTest {
                         .withField(StandardField.TITLE, "Defining the Really Habitable Zone")
                         .withField(StandardField.EPRINT, "2003.13722")
                         .withField(StandardField.EPRINTTYPE, "arxiv")
-                        .withField(StandardField.URL, "https://arxiv.org/abs/2003.13722")));
+                        .withField(StandardField.URL, "https://arxiv.org/abs/2003.13722")),
+                Arguments.of(new BibEntry(StandardEntryType.Article)
+                        .withCitationKey("commented")
+                        .withField(StandardField.TITLE, "An entry carrying comments")
+                        .withField(StandardField.COMMENT, "A shared comment")
+                        .withField(new UserSpecificCommentField("koppor"), "A per-user comment")));
     }
 
     @ParameterizedTest
