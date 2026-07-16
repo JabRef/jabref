@@ -36,7 +36,6 @@ public class AiSummaryShowingView extends VBox {
     @FXML private CheckBox markdownCheckbox;
     @FXML private Text summaryInfoText;
 
-    private StackPane summaryContentPane;
     private MarkdownTextFlow markdownTextFlow;
 
     private AiSummaryShowingViewModel viewModel;
@@ -100,7 +99,7 @@ public class AiSummaryShowingView extends VBox {
     }
 
     private void initializeMarkdownTextFlow() {
-        summaryContentPane = new StackPane();
+        StackPane summaryContentPane = new StackPane();
         markdownTextFlow = new MarkdownTextFlow(summaryContentPane);
         summaryContentPane.getChildren().add(markdownTextFlow);
 
@@ -128,8 +127,10 @@ public class AiSummaryShowingView extends VBox {
             if (requestVersion != updateVersion) {
                 return;
             }
-            String content = StringUtil.makeSafe(viewModel.summaryProperty().map(AiSummary::content).getValue());
-            if (viewModel.isMarkdownProperty().get()) {
+            AiSummary summary = viewModel.summaryProperty().get();
+            String content = StringUtil.makeSafe(summary == null ? null : summary.content());
+            boolean markdown = viewModel.isMarkdownProperty().get();
+            if (markdown) {
                 markdownTextFlow.setMarkdown(content);
             } else {
                 markdownTextFlow.setPlainText(content);
