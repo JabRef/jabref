@@ -229,7 +229,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
     @Test
     void performRawSearchQueryPagedFindsEntry() throws FetcherException {
         Page<BibEntry> page = fetcher.performRawSearchQueryPaged("bibcode:2000JGR...10520297L", 0);
-        assertFalse(page.getContent().isEmpty());
+        assertEquals(List.of(luceyPaulEntry), page.getContent());
     }
 
     @Override
