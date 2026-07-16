@@ -237,10 +237,14 @@ public class SourceTab extends EntryEditorTab {
             BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
                                                .orElse(BibDatabaseMode.BIBLATEX);
 
+            int caretPosition = codeArea.getCaretPosition();
             codeArea.clear();
             try {
                 codeArea.appendText(getSourceString(getCurrentEntry(), mode, fieldPreferences));
                 codeArea.setEditable(true);
+                // Restore caret position, clamped to new text length
+                int newPosition = Math.min(caretPosition, codeArea.getLength());
+                codeArea.displaceCaret(newPosition);
                 Platform.runLater(this::highlightSearchPattern);
             } catch (IOException ex) {
                 codeArea.setEditable(false);
