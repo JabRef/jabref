@@ -6,9 +6,12 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.exporter.HayagrivaEntryWriter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UserSpecificCommentField;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -133,6 +136,27 @@ class MarkdownSidecarTest {
         BibEntry entry = sidecar.read(file).getDatabase().getEntries().getFirst();
 
         assertEquals(Optional.of("First paragraph.\n\nSecond paragraph."), entry.getField(StandardField.COMMENT));
+    }
+
+    @Test
+    void mergeRoundTripsCommentsThroughTheBody() throws IOException {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("smith2020")
+                .withField(StandardField.TITLE, "A Test Article")
+                .withField(StandardField.COMMENT, "Shared comment text.")
+                .withField(new UserSpecificCommentField("koppor"), "Per-user comment text.");
+
+        String document = sidecar.merge(null, List.of(new HayagrivaEntryWriter.KeyedEntry("", "smith2020", entry)));
+        Path file = write("smith2020.md", document);
+
+        assertTrue(document.startsWith("---\n"), () -> "missing frontmatter: " + document);
+        assertTrue(document.contains("\n# Notes\n\nShared comment text.\n\n## comment-koppor\n\nPer-user comment text.\n"),
+                () -> "unexpected body: " + document);
+        BibEntry reimported = sidecar.read(file).getDatabase().getEntries().getFirst();
+        assertEquals(entry.getField(StandardField.COMMENT), reimported.getField(StandardField.COMMENT));
+        assertEquals(entry.getField(new UserSpecificCommentField("koppor")),
+                reimported.getField(new UserSpecificCommentField("koppor")));
+        assertEquals(entry.getField(StandardField.TITLE), reimported.getField(StandardField.TITLE));
     }
 
     @Test

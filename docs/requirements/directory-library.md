@@ -33,14 +33,21 @@ the last-opened list and routed back through the directory-library opener.
 Needs: impl
 
 ## User changes are written back into the sidecar files
-`req~directory-library.write-back~1`
+`req~directory-library.write-back~2`
 
-A directory library persists into its Hayagriva sidecar files: user edits rewrite the entry's
-file read-modify-write (content JabRef does not understand survives), the first user edit of an
-entry without a sidecar creates one (next to its PDF, sharing the base name, or named after the
-citation key), a citation-key edit renames the YAML map key, and deleting an entry removes it
+A directory library persists into its sidecar files: user edits rewrite the entry's
+file read-modify-write (content JabRef does not understand survives, including body sections of
+Markdown sidecars under foreign headings), the first user edit of an
+entry without a sidecar creates a Markdown sidecar `X.md` (next to its PDF, sharing the base
+name, or named after the citation key) whose frontmatter carries the Hayagriva data and whose
+markdownlint-clean body carries the comment fields (`# Notes` intro for the comment, one
+`## comment-<name>` section per per-user comment); in plain `.yml` sidecars the comment fields
+are written as extension keys. A citation-key edit renames the YAML map key, and deleting an
+entry removes it
 from its file — the file itself is trashed/deleted once its last entry is gone, the paired PDF
-is never touched. Writes are debounced per file; Save (Ctrl+S) flushes them and must never
+is never touched. Writes are debounced per file with a trailing-edge debounce that is re-armed
+by every change event — including the keystroke events the CoarseChangeFilter marks as
+filtered, so the tail of a typing burst is never lost; Save (Ctrl+S) flushes them and must never
 write a `.bib` file ("Save as" remains the explicit `.bib` snapshot). Closing needs no save
 prompt. System-initiated changes (background enrichment, generated citation keys, inbound
 synchronization) do not create or rewrite sidecars.

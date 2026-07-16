@@ -26,6 +26,7 @@ import java.util.SequencedMap;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -86,7 +87,7 @@ import org.slf4j.LoggerFactory;
 /// file once its last entry is gone — the paired PDF is never touched). Writes are debounced
 /// per file; [#flush] forces them, and shutdown flushes implicitly.
 // [impl->req~directory-library.inbound-sync~2]
-// [impl->req~directory-library.write-back~1]
+// [impl->req~directory-library.write-back~2]
 @NullMarked
 public class DirectoryLibrarySynchronizer implements FileAlterationListener {
 
@@ -99,8 +100,9 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
     private static final Set<String> SIDECAR_EXTENSIONS = Set.of("yml", "yaml", MarkdownSidecar.MARKDOWN_EXTENSION);
     private static final String PDF_EXTENSION = "pdf";
 
-    /// Collects the keystroke-level bursts the CoarseChangeFilter still lets through into one
-    /// write per file.
+    /// Collects keystroke-level bursts into one write per file. Trailing edge: every change
+    /// event re-arms the timer, so the write fires once typing pauses and always persists the
+    /// latest state.
     private static final Duration WRITE_DEBOUNCE = Duration.ofMillis(500);
 
     private final BibDatabaseContext databaseContext;
@@ -118,7 +120,7 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
     private final HayagrivaEntryWriter entryWriter = new HayagrivaEntryWriter();
     private final Set<Path> dirtyFiles = new LinkedHashSet<>();
     private final Consumer<Path> fileDisposer;
-    private boolean writeScheduled;
+    private @Nullable ScheduledFuture<?> scheduledWrite;
 
     private @Nullable FileAlterationObserver observer;
     private @Nullable DirectoryMonitor directoryMonitor;
@@ -236,9 +238,12 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
 
     @Subscribe
     public void listen(EntryChangedEvent event) {
-        if (event.isFilteredOut() || !isUserChange(event)) {
+        if (!isUserChange(event)) {
             return;
         }
+        // Events the CoarseChangeFilter marks as filtered (the keystrokes of a typing burst)
+        // still re-arm the debounce: the write captures the entry's state at fire time, so the
+        // tail of a burst — which produces only filtered events — is never lost.
         BibEntry entry = event.getBibEntry();
         syncExecutor.execute(() -> handleLocalChange(entry));
     }
@@ -295,9 +300,9 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
         }
     }
 
-    /// The first user change of an entry without a source materializes its sidecar: next to the
-    /// entry's PDF (sharing the base name, per the pairing convention), or named after the
-    /// citation key for entries without a file.
+    /// The first user change of an entry without a source materializes its sidecar — a Markdown
+    /// sidecar (see [MarkdownSidecar]): next to the entry's PDF (sharing the base name, per the
+    /// pairing convention), or named after the citation key for entries without a file.
     private Path assignSidecar(BibEntry entry) {
         Optional<Path> pairedFile = entry.getFiles().stream()
                                          .filter(linkedFile -> !linkedFile.isOnlineLink())
@@ -306,13 +311,13 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
         Path sidecar;
         if (pairedFile.isPresent() && pairedFile.get().startsWith(root)) {
             Path parent = pairedFile.get().getParent();
-            sidecar = parent.resolve(FileUtil.getBaseName(pairedFile.get()) + ".yml");
+            sidecar = parent.resolve(FileUtil.getBaseName(pairedFile.get()) + "." + MarkdownSidecar.MARKDOWN_EXTENSION);
         } else {
             String baseName = entry.getCitationKey().filter(key -> !key.isBlank()).orElse("entry");
-            sidecar = root.resolve(baseName + ".yml");
+            sidecar = root.resolve(baseName + "." + MarkdownSidecar.MARKDOWN_EXTENSION);
             int counter = 1;
             while (Files.exists(sidecar)) {
-                sidecar = root.resolve(baseName + "-" + counter++ + ".yml");
+                sidecar = root.resolve(baseName + "-" + counter++ + "." + MarkdownSidecar.MARKDOWN_EXTENSION);
             }
         }
         catalog.register(entry, sidecar, entry.getCitationKey().orElse(""));
@@ -320,15 +325,14 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
     }
 
     private synchronized void scheduleWrite() {
-        if (writeScheduled) {
-            return;
+        if (scheduledWrite != null) {
+            scheduledWrite.cancel(false);
         }
-        writeScheduled = true;
-        syncExecutor.schedule(this::writeDirtyFiles, WRITE_DEBOUNCE.toMillis(), TimeUnit.MILLISECONDS);
+        scheduledWrite = syncExecutor.schedule(this::writeDirtyFiles, WRITE_DEBOUNCE.toMillis(), TimeUnit.MILLISECONDS);
     }
 
     private synchronized void writeDirtyFiles() {
-        writeScheduled = false;
+        scheduledWrite = null;
         List<Path> files = List.copyOf(dirtyFiles);
         dirtyFiles.clear();
         files.forEach(this::writeFile);
@@ -357,7 +361,9 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
         }
         try {
             String existingDocument = Files.exists(file) ? Files.readString(file, StandardCharsets.UTF_8) : null;
-            String document = entryWriter.mergeIntoDocument(existingDocument, keyedEntries);
+            String document = MarkdownSidecar.hasMarkdownExtension(file)
+                              ? markdownSidecar.merge(existingDocument, keyedEntries)
+                              : entryWriter.mergeIntoDocument(existingDocument, keyedEntries);
             byte[] content = document.getBytes(StandardCharsets.UTF_8);
             recordWrittenFile(file, content);
             // Written atomically: the polling watcher (or another process) must never see a
