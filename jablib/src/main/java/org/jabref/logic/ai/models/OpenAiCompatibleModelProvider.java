@@ -3,7 +3,6 @@ package org.jabref.logic.ai.models;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jabref.logic.net.URLDownload;
 import org.jabref.model.ai.llm.AiProvider;
 
 import kong.unirest.core.HttpResponse;

@@ -7,7 +7,6 @@ import java.net.URLConnection;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
-import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
