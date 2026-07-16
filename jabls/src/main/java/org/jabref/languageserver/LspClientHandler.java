@@ -82,8 +82,8 @@ public class LspClientHandler implements LanguageServer, LanguageClientAware {
         return CompletableFuture.completedFuture(null);
     }
 
-    /// When running in JabGUI: NOOP, because the JabGui has the lifecycle control
-    /// When running standalone: immediately exits
+    /// When running in JabGUI: NOOP, because the JabGui has the lifecycle control.
+    /// When running standalone: immediately exits.
     @Override
     public void exit() {
         if (standalone) {
