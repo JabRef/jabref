@@ -23,29 +23,43 @@ represented in JabRef, and where does the per-entry data live?
 
 ## Considered Options
 
-* Hayagriva YAML sidecars (`X.yml` next to `X.pdf`), directory represented as a third
-  `DatabaseLocation` with an empty database path
+* Hayagriva-based sidecars (Markdown notes files with a Hayagriva YAML frontmatter, plain
+  Hayagriva `.yml` also read), directory represented as a third `DatabaseLocation` with an
+  empty database path
+* Pure Hayagriva YAML sidecars (`X.yml` next to `X.pdf`)
 * A hidden auto-maintained `.bib` file inside the directory
 * XMP metadata embedded in the PDFs as the only store
 
 ## Decision Outcome
 
-Chosen option: "Hayagriva YAML sidecars with a third `DatabaseLocation`", because sidecars keep
-the folder tool-agnostic (Hayagriva is Typst's bibliography format and JabRef has a symmetric
-importer/exporter for it, including the `note` field), embedded XMP cannot represent all fields
-and rewrites the PDFs themselves, and a hidden `.bib` would duplicate state that immediately
-drifts from the files.
+Chosen option: "Hayagriva-based sidecars with a third `DatabaseLocation`", because sidecars
+keep the folder tool-agnostic (Hayagriva is Typst's bibliography format and JabRef has a
+symmetric importer/exporter for it), embedded XMP cannot represent all fields and rewrites the
+PDFs themselves, and a hidden `.bib` would duplicate state that immediately drifts from the
+files. Pure YAML sidecars lost against the Markdown form because per-entry notes (JabRef's
+comment fields) are long-form Markdown that reads terribly as YAML block scalars but naturally
+as a Markdown body — the folder then doubles as a plain notes collection (Obsidian, any text
+editor).
 
 Key points of the chosen design:
+
+* A JabRef-authored sidecar is a Markdown file (`X.md` next to `X.pdf`): the YAML frontmatter
+  (between two `---` lines) is a regular Hayagriva document, the body below is markdownlint-clean
+  Markdown — a `# Notes` heading, the entry's comment text beneath it, and one
+  `## comment-<name>` section per per-user comment field. Body content under other headings is
+  kept but not imported. Plain Hayagriva `.yml`/`.yaml` files are still read and written back
+  (they stay directly loadable by Typst); JabRef-only fields are written there as
+  `comment`/`comment-<name>` extension keys, which the Hayagriva parser ignores.
 
 * `DatabaseLocation.DIRECTORY`: the context keeps an **empty** database path plus a separate
   directory root. Empty path gives correct default behavior at almost every existing decision
   point (no autosave/backup managers, no `.bib` change monitor, "needs saved local database"
   actions disabled). The directory root is registered as the library-specific file directory, so
   relative PDF links resolve without a database path.
-* Pairing is by convention — `X.yml`/`X.yaml` next to `X.pdf` — because Hayagriva has no
+* Pairing is by convention — `X.md`/`X.yml`/`X.yaml` next to `X.pdf` — because Hayagriva has no
   file-path field; nothing JabRef-specific is written into the YAML for the association.
-* Non-Hayagriva `.yml` files (CI configs, ...) are ignored via format recognition, not reported
+* Non-Hayagriva `.yml` files (CI configs, ...) and `.md` files without a Hayagriva frontmatter
+  (READMEs, plain notes) are ignored via format recognition, not reported
   as errors. PDFs without a sidecar appear immediately as stubs; their metadata is extracted
   asynchronously after the library is shown (the standard PDF import pipeline, enriching the
   stub in place); a sidecar is only written once the user edits the entry (scanning never
@@ -59,10 +73,13 @@ Key points of the chosen design:
 
 ### Consequences
 
-* Good, because the directory stays the single source of truth and is usable from Typst as-is.
+* Good, because the directory stays the single source of truth; `.yml` sidecars are usable from
+  Typst as-is, and `.md` sidecars double as plain Markdown notes.
 * Good, because the empty-database-path representation needs only a handful of explicit UI
   branches (tab title, close confirmation, save-as).
+* Bad, because a `.md` sidecar is not directly loadable by Typst — its frontmatter must be
+  extracted (trivially, e.g. with `sed`/`yq`) or exported to obtain a plain Hayagriva file.
 * Bad, because YAML comments in hand-edited sidecars will not survive JabRef rewrites (the YAML
-  parser drops them), and JabRef-only fields need an extension mechanism inside the entry.
+  parser drops them).
 * Bad, because library-level metadata (groups, save actions) has no natural home yet; a
   metadata file in the root may be added later.
