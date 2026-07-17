@@ -3,17 +3,30 @@ package org.jabref.logic.openoffice;
 import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
+import org.jspecify.annotations.Nullable;
 
 class ZoteroCitationData {
+    public static final String CSL_CITATION_SCHEMA = "https://github.com/citation-style-language/schema/raw/master/csl-citation.json";
+
+    String schema = CSL_CITATION_SCHEMA;
+    @SerializedName("citationID")
+    String citationId = "";
     List<CitationItemData> citationItems = List.of();
 
     public static class CitationItemData {
-        int id;
+        String id = "";
+        List<String> uris = List.of();
+        @SerializedName("suppress-author")
+        @Nullable
+        Boolean suppressAuthor;
         @SerializedName("itemData")
         ItemData itemData = new ItemData();
     }
 
     public static class ItemData {
+        String id = "";
+        @SerializedName("citation-key")
+        String citationKey = "";
         String type = "";
 
         @SerializedName("abstract")
@@ -167,7 +180,9 @@ class ZoteroCitationData {
     }
 
     public static class IssuedData {
+        @Nullable
+        String raw;
         @SerializedName("date-parts")
-        List<List<String>> dateParts = List.of();
+        List<List<Object>> dateParts = List.of();
     }
 }

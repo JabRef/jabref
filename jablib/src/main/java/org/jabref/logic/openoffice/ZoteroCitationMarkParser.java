@@ -30,26 +30,21 @@ public class ZoteroCitationMarkParser {
     private ZoteroCitationMarkParser() {
     }
 
-    public static List<BibEntry> parse(String referenceMarkName) {
-        if (!ReferenceMark.isZoteroReferenceMarkName(referenceMarkName)) {
-            return List.of();
-        }
-
-        Optional<String> cslJSON = extractCSLJSON(referenceMarkName);
-        if (cslJSON.isEmpty()) {
+    public static List<BibEntry> parseCslCitationJson(String cslJson) {
+        if (StringUtil.isBlank(cslJson)) {
             return List.of();
         }
 
         try {
-            ZoteroCitationData citationData = GSON.fromJson(cslJSON.get(), ZoteroCitationData.class);
+            ZoteroCitationData citationData = GSON.fromJson(cslJson, ZoteroCitationData.class);
             List<BibEntry> entries = new ArrayList<>();
-            for (ZoteroCitationData.CitationItemData citationItem : citationData.citationItems) {
+            for (ZoteroCitationData.CitationItemData citationItem : Optional.ofNullable(citationData.citationItems).orElse(List.of())) {
                 toBibEntry(citationItem).ifPresent(entries::add);
             }
 
             return entries;
         } catch (JsonParseException | NumberFormatException | NoSuchElementException e) {
-            LOGGER.debug("Could not parse Zotero citation mark {}", referenceMarkName, e);
+            LOGGER.debug("Could not parse Zotero CSL citation JSON", e);
             return List.of();
         }
     }
@@ -88,19 +83,11 @@ public class ZoteroCitationMarkParser {
         }
     }
 
-    private static Optional<String> extractCSLJSON(String referenceMarkName) {
-        int jsonStart = referenceMarkName.indexOf('{');
-        int jsonEnd = referenceMarkName.lastIndexOf('}');
-        if ((jsonStart < 0) || (jsonEnd < jsonStart)) {
-            LOGGER.debug("Could not find CSL citation JSON in Zotero mark {}", referenceMarkName);
-            return Optional.empty();
-        }
-        return Optional.of(referenceMarkName.substring(jsonStart, jsonEnd + 1));
-    }
-
-    private static Optional<BibEntry> toBibEntry(ZoteroCitationData.CitationItemData citationItem) {
+    public static Optional<BibEntry> toBibEntry(ZoteroCitationData.CitationItemData citationItem) {
         return toBibEntry(citationItem.itemData)
-                .map(entry -> entry.withCitationKey("Zotero-" + citationItem.id));
+                .map(entry -> ZoteroReferenceMark.getCitationKey(citationItem)
+                                                 .map(entry::withCitationKey)
+                                                 .orElse(entry));
     }
 
     private static Optional<BibEntry> toBibEntry(ZoteroCitationData.ItemData itemData) {
@@ -137,15 +124,32 @@ public class ZoteroCitationMarkParser {
 
     private static void setDate(BibEntry entry, ZoteroCitationData.IssuedData issuedData) {
         if ((issuedData.dateParts == null) || issuedData.dateParts.isEmpty()) {
+            String rawDate = issuedData.raw;
+            if (rawDate != null && !StringUtil.isBlank(rawDate)) {
+                Date.parse(rawDate).ifPresent(entry::withDate);
+            }
             return;
         }
 
-        List<String> dateParts = issuedData.dateParts.getFirst();
+        List<Object> dateParts = issuedData.dateParts.getFirst();
         if ((dateParts == null) || dateParts.isEmpty()) {
+            String rawDate = issuedData.raw;
+            if (rawDate != null && !StringUtil.isBlank(rawDate)) {
+                Date.parse(rawDate).ifPresent(entry::withDate);
+            }
             return;
         }
 
-        String dateString = String.join("-", dateParts);
+        List<String> datePartStrings = new ArrayList<>();
+        for (Object datePart : dateParts) {
+            if (datePart instanceof Number number) {
+                datePartStrings.add(Integer.toString(number.intValue()));
+            } else {
+                datePartStrings.add(datePart.toString());
+            }
+        }
+
+        String dateString = String.join("-", datePartStrings);
         Date.parse(dateString).ifPresent(entry::withDate);
     }
 

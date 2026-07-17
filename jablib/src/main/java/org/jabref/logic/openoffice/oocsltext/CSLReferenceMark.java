@@ -1,15 +1,19 @@
 package org.jabref.logic.openoffice.oocsltext;
 
 import java.util.List;
+import java.util.Map;
 
 import org.jabref.logic.openoffice.ReferenceMark;
+import org.jabref.logic.openoffice.ZoteroReferenceMark;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.sun.star.container.XNamed;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XTextContent;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
-import io.github.thibaultmeyer.cuid.CUID;
 
 /// Class to model a reference mark. See {@link CSLReferenceMarkManager} for the usage and management of all reference marks.
 public class CSLReferenceMark {
@@ -17,7 +21,7 @@ public class CSLReferenceMark {
     private XTextContent textContent;
     private final List<String> citationKeys;
     private List<Integer> citationNumbers;
-    private CSLCitationType citationType;
+    private final CSLCitationType citationType;
 
     public CSLReferenceMark(XNamed named, ReferenceMark referenceMark) {
         this.referenceMark = referenceMark;
@@ -27,40 +31,36 @@ public class CSLReferenceMark {
         this.citationType = referenceMark.getCitationType();
     }
 
-    public static CSLReferenceMark of(List<String> citationKeys, List<Integer> citationNumbers, CSLCitationType citationType, XMultiServiceFactory factory) throws Exception {
-        String uniqueId = CUID.randomCUID2(8).toString();
-        String name = buildReferenceName(citationKeys, citationNumbers, uniqueId, citationType);
+    public static CSLReferenceMark of(List<BibEntry> entries,
+                                      List<String> citationKeys,
+                                      List<Integer> citationNumbers,
+                                      CSLCitationType citationType,
+                                      int firstZoteroItemId,
+                                      XMultiServiceFactory factory,
+                                      BibDatabaseContext bibDatabaseContext,
+                                      BibEntryTypesManager entryTypesManager,
+                                      Map<String, String> zoteroUriByCitationKey) throws Exception {
+        // TODO: Implement preference for JabRef reference mark and Zotero reference mark
+        ReferenceMark referenceMark = ZoteroReferenceMark.buildReferenceMark(
+                entries,
+                citationKeys,
+                citationNumbers,
+                firstZoteroItemId,
+                citationType,
+                bibDatabaseContext,
+                entryTypesManager,
+                zoteroUriByCitationKey);
         XNamed named = UnoRuntime.queryInterface(XNamed.class, factory.createInstance("com.sun.star.text.ReferenceMark"));
-        named.setName(name);
-        ReferenceMark referenceMark = new ReferenceMark(name, citationKeys, citationNumbers, uniqueId, citationType);
+        named.setName(referenceMark.getName());
         return new CSLReferenceMark(named, referenceMark);
-    }
-
-    private static String buildReferenceName(List<String> citationKeys, List<Integer> citationNumbers, String uniqueId, CSLCitationType citationType) {
-        StringBuilder nameBuilder = new StringBuilder();
-        for (int i = 0; i < citationKeys.size(); i++) {
-            if (i > 0) {
-                nameBuilder.append(", ");
-            }
-            nameBuilder.append(ReferenceMark.PREFIXES[0]).append(citationKeys.get(i))
-                       .append(" ").append(ReferenceMark.PREFIXES[1]).append(citationNumbers.get(i));
-        }
-        nameBuilder.append(" ").append(uniqueId);
-
-        // Embed citation nature into reference mark
-        switch (citationType) {
-            case IN_TEXT ->
-                    nameBuilder.append(" ").append(ReferenceMark.IN_TEXT_MARKER);
-            case EMPTY ->
-                    nameBuilder.append(" ").append(ReferenceMark.EMPTY_MARKER);
-            case NORMAL ->
-                    nameBuilder.append(" ").append(ReferenceMark.NORMAL_MARKER);
-        }
-        return nameBuilder.toString();
     }
 
     public List<String> getCitationKeys() {
         return citationKeys;
+    }
+
+    public List<Integer> getCitationNumbers() {
+        return citationNumbers;
     }
 
     public void setCitationNumbers(List<Integer> numbers) {
@@ -80,6 +80,6 @@ public class CSLReferenceMark {
     }
 
     public void updateName(String newName) {
-        this.referenceMark = new ReferenceMark(newName, this.citationKeys, this.citationNumbers, this.referenceMark.getUniqueId(), this.citationType);
+        this.referenceMark = ReferenceMark.of(newName, this.citationKeys, this.citationNumbers, this.referenceMark.getUniqueId(), this.citationType);
     }
 }
