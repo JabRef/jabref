@@ -166,11 +166,13 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         fetchedEntry.ifPresent(entry -> {
             doPostCleanup(entry);
 
-            // Output warnings in case of inconsistencies
-            entry.getField(StandardField.DOI)
-                 .filter(entryDoi -> entryDoi.equals(doi.asString()))
-                 .ifPresent(entryDoi -> LOGGER.warn("Fetched entry's DOI {} is different from requested DOI {}", entryDoi, identifier));
-            if (entry.getField(StandardField.DOI).isEmpty()) {
+            // Output warnings in case of inconsistencies. Compare as parsed DOIs so a mere
+            // difference in the http(s) prefix (or letter case) is not reported as a mismatch.
+            Optional<String> fetchedDoi = entry.getField(StandardField.DOI);
+            fetchedDoi.flatMap(DOI::parse)
+                      .filter(entryDoi -> !entryDoi.equals(doi))
+                      .ifPresent(entryDoi -> LOGGER.warn("Fetched entry's DOI {} is different from requested DOI {}", entryDoi.asString(), identifier));
+            if (fetchedDoi.isEmpty()) {
                 LOGGER.warn("Fetched entry does not contain doi field {}", identifier);
             }
 

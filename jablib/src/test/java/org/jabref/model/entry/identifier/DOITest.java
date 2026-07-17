@@ -250,6 +250,11 @@ class DOITest {
     }
 
     @Test
+    void equalsIgnoresHttpPrefix() {
+        assertEquals(new DOI("https://doi.org/10.1109/cloud.2017.89"), new DOI("10.1109/cloud.2017.89"));
+    }
+
+    @Test
     void isShortDoiShouldReturnTrueWhenItIsShortDoi() {
         assertTrue(new DOI("10/abcde").isShortDoi());
     }
