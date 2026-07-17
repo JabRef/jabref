@@ -167,68 +167,68 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         groupListView.setEditable(false);
         libraryListView.getItems().addAll(stateManager.getOpenDatabases());
         new ViewModelListCellFactory<BibDatabaseContext>()
-                                                          .withText(database -> {
-                                                              Optional<String> dbOpt = Optional.empty();
-                                                              if (database.getDatabasePath().isPresent()) {
-                                                                  dbOpt = FileUtil.getUniquePathFragment(stateManager.getAllDatabasePaths(), database.getDatabasePath().get());
-                                                              }
-                                                              if (database.getLocation() == DatabaseLocation.SHARED) {
-                                                                  return database.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
-                                                              }
+                .withText(database -> {
+                    Optional<String> dbOpt = Optional.empty();
+                    if (database.getDatabasePath().isPresent()) {
+                        dbOpt = FileUtil.getUniquePathFragment(stateManager.getAllDatabasePaths(), database.getDatabasePath().get());
+                    }
+                    if (database.getLocation() == DatabaseLocation.SHARED) {
+                        return database.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
+                    }
 
-                                                              return dbOpt.orElseGet(() -> Localization.lang("untitled"));
-                                                          })
-                                                          .install(libraryListView);
+                    return dbOpt.orElseGet(() -> Localization.lang("untitled"));
+                })
+                .install(libraryListView);
         viewModel.selectedDbProperty().bind(libraryListView.getSelectionModel().selectedItemProperty());
         stateManager.getActiveDatabase().ifPresent(database1 -> libraryListView.getSelectionModel().select(database1));
         setupGroupListView();
 
         PseudoClass entrySelected = PseudoClass.getPseudoClass("selected");
         new ViewModelListCellFactory<BibEntry>()
-                                                .withGraphic(entry -> {
-                                                    ToggleButton addToggle = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.ADD);
-                                                    EasyBind.subscribe(addToggle.selectedProperty(), selected -> {
-                                                        if (selected) {
-                                                            addToggle.setGraphic(IconTheme.JabRefIcons.ADD_FILLED.withColor(IconTheme.SELECTED_COLOR).getGraphicNode());
-                                                        } else {
-                                                            addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
-                                                        }
-                                                    });
-                                                    addToggle.getStyleClass().add("addEntryButton");
-                                                    addToggle.selectedProperty().bindBidirectional(entriesListView.getItemBooleanProperty(entry));
-                                                    HBox separator = new HBox();
-                                                    HBox.setHgrow(separator, Priority.SOMETIMES);
-                                                    Node entryNode = BibEntryView.getEntryNode(entry);
-                                                    HBox.setHgrow(entryNode, Priority.ALWAYS);
-                                                    HBox container = new HBox(entryNode, separator, addToggle);
-                                                    container.getStyleClass().add("entry-container");
-                                                    container.prefWidthProperty().bind(entriesListView.widthProperty().subtract(25));
+                .withGraphic(entry -> {
+                    ToggleButton addToggle = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.ADD);
+                    EasyBind.subscribe(addToggle.selectedProperty(), selected -> {
+                        if (selected) {
+                            addToggle.setGraphic(IconTheme.JabRefIcons.ADD_FILLED.withColor(IconTheme.SELECTED_COLOR).getGraphicNode());
+                        } else {
+                            addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
+                        }
+                    });
+                    addToggle.getStyleClass().add("addEntryButton");
+                    addToggle.selectedProperty().bindBidirectional(entriesListView.getItemBooleanProperty(entry));
+                    HBox separator = new HBox();
+                    HBox.setHgrow(separator, Priority.SOMETIMES);
+                    Node entryNode = BibEntryView.getEntryNode(entry);
+                    HBox.setHgrow(entryNode, Priority.ALWAYS);
+                    HBox container = new HBox(entryNode, separator, addToggle);
+                    container.getStyleClass().add("entry-container");
+                    container.prefWidthProperty().bind(entriesListView.widthProperty().subtract(25));
 
-                                                    BackgroundTask.wrap(() -> viewModel.hasDuplicate(entry)).onSuccess(duplicateFound -> {
-                                                        if (duplicateFound) {
-                                                            Node icon = IconTheme.JabRefIcons.ERROR.getGraphicNode();
-                                                            Tooltip tooltip = new Tooltip(Localization.lang("Possible duplicate of existing entry. Will be resolved on import."));
-                                                            Tooltip.install(icon, tooltip);
-                                                            container.getChildren().add(icon);
-                                                        }
-                                                    }).executeWith(taskExecutor);
+                    BackgroundTask.wrap(() -> viewModel.hasDuplicate(entry)).onSuccess(duplicateFound -> {
+                        if (duplicateFound) {
+                            Node icon = IconTheme.JabRefIcons.ERROR.getGraphicNode();
+                            Tooltip tooltip = new Tooltip(Localization.lang("Possible duplicate of existing entry. Will be resolved on import."));
+                            Tooltip.install(icon, tooltip);
+                            container.getChildren().add(icon);
+                        }
+                    }).executeWith(taskExecutor);
 
                                                     /*
                                                     inserted the if-statement here, since a Platform.runLater() call did not work.
                                                     also tried to move it to the end of the initialize method, but it did not select the entry.
                                                     */
-                                                    if (entriesListView.getItems().size() == 1) {
-                                                        selectAllNewEntries();
-                                                    }
+                    if (entriesListView.getItems().size() == 1) {
+                        selectAllNewEntries();
+                    }
 
-                                                    return container;
-                                                })
-                                                .withOnMouseClickedEvent((entry, event) -> {
-                                                    entriesListView.getCheckModel().toggleCheckState(entry);
-                                                    displayBibTeX(entry, viewModel.getSourceString(entry));
-                                                })
-                                                .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
-                                                .install(entriesListView);
+                    return container;
+                })
+                .withOnMouseClickedEvent((entry, event) -> {
+                    entriesListView.getCheckModel().toggleCheckState(entry);
+                    displayBibTeX(entry, viewModel.getSourceString(entry));
+                })
+                .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
+                .install(entriesListView);
 
         selectedItems.textProperty().bind(Bindings.size(viewModel.getCheckedEntries()).asString());
         totalItems.textProperty().bind(Bindings.size(viewModel.getAllEntries()).asString());
@@ -249,8 +249,8 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                        });
 
         new ViewModelListCellFactory<GroupTreeNode>()
-                                                     .withText(group -> group != null ? group.getName() : Localization.lang("No group"))
-                                                     .install(groupListView);
+                .withText(group -> group != null ? group.getName() : Localization.lang("No group"))
+                .install(groupListView);
     }
 
     private void updateGroupList() {
@@ -353,45 +353,45 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         // Disable: during loading OR when on the last page for non-paged fetchers
         // OR when the initial load is not complete for paged fetchers
         nextPageButton.disableProperty().bind(
-                                              loading.or(isOnLastPage.and(isPagedFetcher.not()))
-                                                     .or(isPagedFetcher.and(initialLoadComplete.not())));
+                loading.or(isOnLastPage.and(isPagedFetcher.not()))
+                       .or(isPagedFetcher.and(initialLoadComplete.not())));
         prevPageButton.disableProperty().bind(loading.or(viewModel.currentPageProperty().isEqualTo(0)));
 
         prevPageButton.textProperty().bind(
-                                           Bindings.when(loading)
-                                                   .then("< " + Localization.lang("Loading..."))
-                                                   .otherwise("< " + Localization.lang("Previous")));
+                Bindings.when(loading)
+                        .then("< " + Localization.lang("Loading..."))
+                        .otherwise("< " + Localization.lang("Previous")));
 
         nextPageButton.textProperty().bind(
-                                           Bindings.when(loading)
-                                                   .then(Localization.lang("Loading...") + " >")
-                                                   .otherwise(
-                                                              Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
-                                                                      .then(Localization.lang("Loading initial entries..."))
-                                                                      .otherwise(
-                                                                                 Bindings.when(isOnLastPage)
-                                                                                         .then(
-                                                                                               Bindings.when(isPagedFetcher)
-                                                                                                       .then(Localization.lang("Next") + " >")
-                                                                                                       .otherwise(Localization.lang("No more entries")))
-                                                                                         .otherwise(Localization.lang("Next") + " >"))));
+                Bindings.when(loading)
+                        .then(Localization.lang("Loading...") + " >")
+                        .otherwise(
+                                Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
+                                        .then(Localization.lang("Loading initial entries..."))
+                                        .otherwise(
+                                                Bindings.when(isOnLastPage)
+                                                        .then(
+                                                                Bindings.when(isPagedFetcher)
+                                                                        .then(Localization.lang("Next") + " >")
+                                                                        .otherwise(Localization.lang("No more entries")))
+                                                        .otherwise(Localization.lang("Next") + " >"))));
 
         statusLabel.textProperty().bind(
-                                        Bindings.when(loading)
-                                                .then(Localization.lang("Fetching more entries..."))
-                                                .otherwise(
-                                                           Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
-                                                                   .then(Localization.lang("Loading initial results..."))
-                                                                   .otherwise(
-                                                                              Bindings.when(isOnLastPage)
-                                                                                      .then(
-                                                                                            Bindings.when(isPagedFetcher)
-                                                                                                    .then(Localization.lang("Click 'Load More' to fetch additional entries"))
-                                                                                                    .otherwise(Bindings.createStringBinding(() -> {
-                                                                                                        int totalEntries = viewModel.getAllEntries().size();
-                                                                                                        return totalEntries > 0 ? Localization.lang("All %0 entries loaded", String.valueOf(totalEntries)) : Localization.lang("No entries available");
-                                                                                                    }, viewModel.getAllEntries())))
-                                                                                      .otherwise(""))));
+                Bindings.when(loading)
+                        .then(Localization.lang("Fetching more entries..."))
+                        .otherwise(
+                                Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
+                                        .then(Localization.lang("Loading initial results..."))
+                                        .otherwise(
+                                                Bindings.when(isOnLastPage)
+                                                        .then(
+                                                                Bindings.when(isPagedFetcher)
+                                                                        .then(Localization.lang("Click 'Load More' to fetch additional entries"))
+                                                                        .otherwise(Bindings.createStringBinding(() -> {
+                                                                            int totalEntries = viewModel.getAllEntries().size();
+                                                                            return totalEntries > 0 ? Localization.lang("All %0 entries loaded", String.valueOf(totalEntries)) : Localization.lang("No entries available");
+                                                                        }, viewModel.getAllEntries())))
+                                                        .otherwise(""))));
 
         loading.addListener((_, _, newVal) -> {
             getDialogPane().getScene().setCursor(newVal ? Cursor.WAIT : Cursor.DEFAULT);
