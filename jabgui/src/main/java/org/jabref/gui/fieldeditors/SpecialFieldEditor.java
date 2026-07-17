@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -41,7 +40,9 @@ import org.jspecify.annotations.Nullable;
 public class SpecialFieldEditor extends HBox implements FieldEditorFX {
 
     private final SpecialField specialField;
+
     private final SpecialFieldViewModel viewModel;
+
     /// Pushes a stored field value into whichever control this editor built, so the varying
     /// control types don't have to be kept as separate (mostly-null) fields.
     private final Consumer<Optional<SpecialFieldValue>> valueApplier;
@@ -49,8 +50,10 @@ public class SpecialFieldEditor extends HBox implements FieldEditorFX {
     /// Null until [#bindToEntry] runs; the control listeners fire once on construction (before
     /// binding) and again for every value pushed into a control, so they must tolerate no entry.
     private @Nullable BibEntry entry;
+
     /// Retained only to keep the field binding alive: [BibEntry] holds its bindings weakly.
     private @Nullable ObservableValue<Optional<String>> fieldValue;
+
     /// Distinguishes programmatic control updates (driven by the field binding) from user input.
     private boolean updatingControls;
 
@@ -157,12 +160,8 @@ public class SpecialFieldEditor extends HBox implements FieldEditorFX {
         EasyBind.subscribe(fieldValue, value -> {
             Optional<SpecialFieldValue> parsed = value.flatMap(specialField::parseValue);
             // The binding may fire from a background thread (e.g. autosave); the control mutation
-            // and its guard must both run on the FX thread, so keep them inside the dispatch.
-            if (Platform.isFxApplicationThread()) {
-                applyValue(parsed);
-            } else {
-                UiTaskExecutor.runInJavaFXThread(() -> applyValue(parsed));
-            }
+            // and its guard must both run on the FX thread.
+            UiTaskExecutor.runNowOrInJavaFXThread(() -> applyValue(parsed));
         });
     }
 
