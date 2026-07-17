@@ -42,6 +42,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We improved the [MODS](https://www.loc.gov/standards/mods/) importer for mapping entry types [#16055](https://github.com/JabRef/jabref/issues/16055)
 - We replaced the LaTeX-to-Unicode and Unicode-to-LaTeX conversion engine (the unmaintained Scala latex2unicode library plus hand-maintained maps) with the new SnuggleTeX-based [latex-conv](https://github.com/JabRef/latex-conv) library. Formulas keep their brackets and spacing, `\text{...}` and `\operatorname{...}` render as their content, bases carrying both a sub- and a superscript convert, and `--`/`---` render as typographic dashes. [#6155](https://github.com/JabRef/jabref/pull/6155)
 - The "Unicode to LaTeX" cleanup emits accent commands with a single brace group (`{\aa}` instead of `{{\aa}}`). [#6155](https://github.com/JabRef/jabref/pull/6155)
 - The Hayagriva YAML exporter now writes all fields the new Hayagriva importer reads. [#16190](https://github.com/JabRef/jabref/pull/16190)
