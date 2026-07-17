@@ -54,6 +54,10 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     private final Parser parser;
     private final HtmlRenderer htmlRenderer;
 
+    /// Whether the current content was set via `setPlainText` rather than `setMarkdown`.
+    /// Governs whether copying reproduces Markdown markup or the displayed text verbatim.
+    private boolean plainText;
+
     public MarkdownTextFlow(Pane parent) {
         super(parent);
         this.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
@@ -66,6 +70,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     public void setMarkdown(@NonNull String markdownText) {
         super.clearSelection();
         getChildren().clear();
+        plainText = false;
 
         if (markdownText.isBlank()) {
             return;
@@ -73,6 +78,19 @@ public class MarkdownTextFlow extends SelectableTextFlow {
 
         MarkdownRenderer renderer = new MarkdownRenderer();
         renderer.render(parser.parse(markdownText));
+    }
+
+    /// Displays the given text as-is, without interpreting any Markdown syntax.
+    public void setPlainText(@NonNull String text) {
+        super.clearSelection();
+        getChildren().clear();
+        plainText = true;
+
+        if (text.isBlank()) {
+            return;
+        }
+
+        getChildren().add(new Text(text));
     }
 
     private void addTextNode(@Nullable String content, Node astNode, String... styleClasses) {
@@ -117,6 +135,13 @@ public class MarkdownTextFlow extends SelectableTextFlow {
 
     @Override
     public void copySelectedText() {
+        // In plain-text mode there is no Markdown markup to reconstruct, so copy the
+        // selected text verbatim instead of putting a rendered HTML flavor on the clipboard.
+        if (plainText) {
+            super.copySelectedText();
+            return;
+        }
+
         if (!isSelectionActive()) {
             return;
         }

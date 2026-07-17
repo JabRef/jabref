@@ -83,8 +83,7 @@ public class LspLauncher extends Thread {
     }
 
     private void handleClient(Socket socket) {
-        LspClientHandler clientHandler = new LspClientHandler(messageHandler, cliPreferences, abbreviationRepository, bibEntryTypesManager);
-        clientHandler.setStandalone(standalone);
+        LspClientHandler clientHandler = new LspClientHandler(messageHandler, cliPreferences, abbreviationRepository, bibEntryTypesManager, true);
         LOGGER.debug("LSP clientHandler started.");
         try (socket; // socket should be closed on error
              InputStream in = socket.getInputStream();
