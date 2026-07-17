@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -20,6 +21,7 @@ import javafx.scene.layout.HBox;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
@@ -153,13 +155,24 @@ public class SpecialFieldEditor extends HBox implements FieldEditorFX {
         this.entry = entry;
         fieldValue = entry.getFieldBinding(specialField);
         EasyBind.subscribe(fieldValue, value -> {
-            updatingControls = true;
-            try {
-                valueApplier.accept(value.flatMap(specialField::parseValue));
-            } finally {
-                updatingControls = false;
+            Optional<SpecialFieldValue> parsed = value.flatMap(specialField::parseValue);
+            // The binding may fire from a background thread (e.g. autosave); the control mutation
+            // and its guard must both run on the FX thread, so keep them inside the dispatch.
+            if (Platform.isFxApplicationThread()) {
+                applyValue(parsed);
+            } else {
+                UiTaskExecutor.runInJavaFXThread(() -> applyValue(parsed));
             }
         });
+    }
+
+    private void applyValue(Optional<SpecialFieldValue> value) {
+        updatingControls = true;
+        try {
+            valueApplier.accept(value);
+        } finally {
+            updatingControls = false;
+        }
     }
 
     @Override
