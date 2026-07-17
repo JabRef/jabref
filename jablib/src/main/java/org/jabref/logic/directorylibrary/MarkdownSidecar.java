@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import org.jabref.logic.exporter.HayagrivaEntryWriter;
 import org.jabref.logic.importer.ParserResult;
