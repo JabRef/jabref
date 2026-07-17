@@ -165,15 +165,17 @@ public class JabRefGUI extends Application {
         }
     }
 
-    /// Does not go through {@link DialogService}, since a startup failure can happen before
-    /// {@link #initialize()} sets it up. `Dialog.initOwner` throws a NullPointerException if the
-    /// owner window has no {@link Scene} yet, which is only set in {@link #openWindow()}, so the owner
+    /// [impl->req~ux.startup.critical-error-dialog~1]
+    ///
+    /// Does not go through [DialogService], since a startup failure can happen before
+    /// [#initialize()] sets it up. `Dialog.initOwner` throws a NullPointerException if the
+    /// owner window has no [Scene] yet, which is only set in [#openWindow()], so the owner
     /// is skipped in that case.
     private void showStartupErrorDialog(Throwable throwable) {
         try {
             ExceptionDialog exceptionDialog = new ExceptionDialog(throwable);
             exceptionDialog.setHeaderText(Localization.lang("Unhandled exception occurred."));
-            if (mainStage != null && mainStage.getScene() != null) {
+            if (mainStage.getScene() != null) {
                 exceptionDialog.initOwner(mainStage);
             }
             exceptionDialog.showAndWait();
