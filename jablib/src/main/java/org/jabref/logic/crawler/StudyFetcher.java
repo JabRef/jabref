@@ -27,7 +27,7 @@ class StudyFetcher {
     private final List<StudyQuery> searchQueries;
     private final Map<String, Integer> resultLimits;
 
-    StudyFetcher(List<SearchBasedFetcher> activeFetchers, List<StudyQuery> searchQueries, Map<String, Integer> resultLimits) throws IllegalArgumentException {
+    StudyFetcher(List<SearchBasedFetcher> activeFetchers, List<StudyQuery> searchQueries, Map<String, Integer> resultLimits) {
         this.searchQueries = searchQueries;
         this.activeFetchers = activeFetchers;
         this.resultLimits = resultLimits;
@@ -53,11 +53,11 @@ class StudyFetcher {
     private List<FetchResult> performSearchOnQuery(StudyQuery searchQuery) {
         return activeFetchers.parallelStream()
                              .map(fetcher -> performSearchOnQueryForFetcher(searchQuery, fetcher))
-                             .filter(Objects::nonNull)
+                             .flatMap(Optional::stream)
                              .toList();
     }
 
-    private FetchResult performSearchOnQueryForFetcher(StudyQuery searchQuery, SearchBasedFetcher fetcher) {
+    private Optional<FetchResult> performSearchOnQueryForFetcher(StudyQuery searchQuery, SearchBasedFetcher fetcher) {
         try {
             Optional<String> catalogOverride = searchQuery.getCatalogSpecific().entrySet().stream()
                                                           .filter(entry -> entry.getKey().equalsIgnoreCase(fetcher.getName()))
@@ -70,10 +70,10 @@ class StudyFetcher {
             } else {
                 fetchResult = performNonPagedSearch(fetcher, catalogOverride, searchQuery);
             }
-            return new FetchResult(fetcher.getName(), new BibDatabase(fetchResult));
+            return Optional.of(new FetchResult(fetcher.getName(), new BibDatabase(fetchResult)));
         } catch (FetcherException e) {
             LOGGER.warn("{} API request failed", fetcher.getName(), e);
-            return null;
+            return Optional.empty();
         }
     }
 
