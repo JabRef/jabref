@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fileformat.pdf;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
@@ -11,7 +12,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -222,5 +230,44 @@ class PdfContentPartialImporterTest {
                 Arguments.of("Adopting microservices and DevOps in the cyber-physical systems domain: A rapid review and case study", "/pdfs/PdfContentImporter/Fritzsch2022.pdf"),
                 Arguments.of("OPIUM: Optimal Package Install/Uninstall Manager", "/pdfs/PdfContentImporter/Tucker2007.pdf")
         );
+    }
+
+    /// The generated PDF mimics pdfTeX output: no space glyphs at all — words are separated by
+    /// `TJ` advances (negative values move the pen right), and kerned pairs such as "To" are drawn
+    /// as separate strings pulled tighter (positive values move left). The kern must not be read as
+    /// a word boundary, and the same-font-size label on page two must not be glued onto the title.
+    @Test
+    void pdfTitleExtractionIgnoresKerningAndTextOfFollowingPages(@TempDir Path tempDir) throws IOException {
+        Path file = tempDir.resolve("kerned-title.pdf");
+        try (PDDocument document = new PDDocument()) {
+            PDFont titleFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
+            PDPage firstPage = new PDPage();
+            document.addPage(firstPage);
+            try (PDPageContentStream contentStream = new PDPageContentStream(document, firstPage)) {
+                contentStream.beginText();
+                contentStream.setFont(titleFont, 13);
+                contentStream.newLineAtOffset(72, 750);
+                contentStream.showTextWithPositioning(new Object[] {"Method", -273f, "to", -273f, "Split", -273f, "T", 92f, "opology", -273f, "Models"});
+                contentStream.endText();
+                contentStream.beginText();
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 10);
+                contentStream.newLineAtOffset(72, 720);
+                contentStream.showText("Ann Author");
+                contentStream.endText();
+            }
+            PDPage secondPage = new PDPage();
+            document.addPage(secondPage);
+            try (PDPageContentStream contentStream = new PDPageContentStream(document, secondPage)) {
+                contentStream.beginText();
+                contentStream.setFont(titleFont, 13);
+                contentStream.newLineAtOffset(300, 400);
+                contentStream.showText("PaaS B");
+                contentStream.endText();
+            }
+            document.save(file.toFile());
+        }
+
+        List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
+        assertEquals(Optional.of("Method to Split Topology Models"), result.getFirst().getTitle());
     }
 }
