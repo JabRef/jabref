@@ -3,6 +3,7 @@ package org.jabref.gui.fieldeditors;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javax.swing.undo.UndoManager;
 
@@ -26,26 +27,30 @@ import org.jabref.model.entry.field.SpecialFieldValue;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.Rating;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// Editor offering the same icon-based selection for [SpecialField]s as the main table's
 /// special field columns ([org.jabref.gui.maintable.columns.SpecialFieldColumn]):
 /// a star [Rating] for the ranking, a single toggle for the one-value fields
 /// (printed, quality, relevance), and one toggle per value for priority and read status.
 // [impl->req~entry-editor.special-field-editors~1]
+@NullMarked
 public class SpecialFieldEditor extends HBox implements FieldEditorFX {
 
     private final SpecialField specialField;
     private final SpecialFieldViewModel viewModel;
+    /// Pushes a stored field value into whichever control this editor built, so the varying
+    /// control types don't have to be kept as separate (mostly-null) fields.
+    private final Consumer<Optional<SpecialFieldValue>> valueApplier;
 
-    private BibEntry entry;
-    // BibEntry field bindings are held weakly, so keep a reference for the editor's lifetime
-    private ObservableValue<Optional<String>> fieldValue;
-    // Distinguishes programmatic control updates (driven by the field binding) from user input
+    /// Null until [#bindToEntry] runs; the control listeners fire once on construction (before
+    /// binding) and again for every value pushed into a control, so they must tolerate no entry.
+    private @Nullable BibEntry entry;
+    /// Retained only to keep the field binding alive: [BibEntry] holds its bindings weakly.
+    private @Nullable ObservableValue<Optional<String>> fieldValue;
+    /// Distinguishes programmatic control updates (driven by the field binding) from user input.
     private boolean updatingControls;
-
-    private Rating ratingControl;
-    private ToggleButton toggleControl;
-    private ToggleGroup toggleGroup;
 
     public SpecialFieldEditor(SpecialField specialField, CliPreferences preferences, UndoManager undoManager) {
         this.specialField = specialField;
@@ -55,50 +60,60 @@ public class SpecialFieldEditor extends HBox implements FieldEditorFX {
         setSpacing(2);
 
         if (specialField == SpecialField.RANKING) {
-            getChildren().add(createRatingControl());
+            Rating rating = createRatingControl();
+            getChildren().add(rating);
+            valueApplier = value -> rating.setRating(value.map(SpecialFieldValue::toRating).orElse(0));
         } else if (specialField.isSingleValueField()) {
-            getChildren().add(createToggleControl());
+            ToggleButton toggle = createToggleControl();
+            getChildren().add(toggle);
+            valueApplier = value -> toggle.setSelected(value.isPresent());
         } else {
-            getChildren().addAll(createToggleGroupControls());
+            ToggleGroup group = new ToggleGroup();
+            getChildren().addAll(createToggleGroupControls(group));
+            valueApplier = value -> group.getToggles().stream()
+                                         .filter(toggle -> value.map(toggle.getUserData()::equals).orElse(false))
+                                         .findFirst()
+                                         .ifPresentOrElse(group::selectToggle, () -> group.selectToggle(null));
         }
     }
 
     private Rating createRatingControl() {
-        ratingControl = new Rating();
-        ratingControl.setRating(0);
-        ratingControl.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+        Rating rating = new Rating();
+        rating.setRating(0);
+        rating.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             if ((event.getButton() == MouseButton.PRIMARY) && (event.getClickCount() == 2)) {
-                ratingControl.setRating(0);
+                rating.setRating(0);
                 event.consume();
             } else if (event.getButton() == MouseButton.SECONDARY) {
                 event.consume();
             }
         });
-        EasyBind.subscribe(ratingControl.ratingProperty(), rating -> {
-            if (!updatingControls && (entry != null)) {
-                viewModel.setSpecialFieldValue(entry, SpecialFieldValue.getRating(rating.intValue()));
+        EasyBind.subscribe(rating.ratingProperty(), value -> {
+            BibEntry boundEntry = entry;
+            if (!updatingControls && (boundEntry != null)) {
+                viewModel.setSpecialFieldValue(boundEntry, SpecialFieldValue.getRating(value.intValue()));
             }
         });
-        return ratingControl;
+        return rating;
     }
 
     private ToggleButton createToggleControl() {
         SpecialFieldValueViewModel value = new SpecialFieldValueViewModel(specialField.getValues().getFirst());
-        toggleControl = new ToggleButton();
-        toggleControl.setGraphic(viewModel.getIcon().getGraphicNode());
-        toggleControl.getStyleClass().add("icon-button");
-        toggleControl.setTooltip(new Tooltip(value.getToolTipText()));
-        EasyBind.subscribe(toggleControl.selectedProperty(), selected -> {
-            if (!updatingControls && (entry != null)) {
+        ToggleButton toggle = new ToggleButton();
+        toggle.setGraphic(viewModel.getIcon().getGraphicNode());
+        toggle.getStyleClass().add("icon-button");
+        toggle.setTooltip(new Tooltip(value.getToolTipText()));
+        EasyBind.subscribe(toggle.selectedProperty(), selected -> {
+            BibEntry boundEntry = entry;
+            if (!updatingControls && (boundEntry != null)) {
                 // Setting the single value again clears it, so select and deselect are the same call
-                viewModel.toggle(entry);
+                viewModel.toggle(boundEntry);
             }
         });
-        return toggleControl;
+        return toggle;
     }
 
-    private List<ToggleButton> createToggleGroupControls() {
-        toggleGroup = new ToggleGroup();
+    private List<ToggleButton> createToggleGroupControls(ToggleGroup group) {
         List<ToggleButton> buttons = new ArrayList<>();
         for (SpecialFieldValueViewModel value : viewModel.getValues()) {
             if (value.getValue().getFieldValue().isEmpty()) {
@@ -106,19 +121,20 @@ public class SpecialFieldEditor extends HBox implements FieldEditorFX {
                 continue;
             }
             ToggleButton button = new ToggleButton();
-            button.setGraphic(value.getIcon().map(JabRefIcon::getGraphicNode).orElse(null));
+            value.getIcon().map(JabRefIcon::getGraphicNode).ifPresent(button::setGraphic);
             button.getStyleClass().add("icon-button");
             button.setTooltip(new Tooltip(value.getToolTipText()));
             button.setUserData(value.getValue());
-            button.setToggleGroup(toggleGroup);
+            button.setToggleGroup(group);
             buttons.add(button);
         }
-        EasyBind.subscribe(toggleGroup.selectedToggleProperty(), toggle -> {
-            if (!updatingControls && (entry != null)) {
+        EasyBind.subscribe(group.selectedToggleProperty(), toggle -> {
+            BibEntry boundEntry = entry;
+            if (!updatingControls && (boundEntry != null)) {
                 if (toggle == null) {
-                    viewModel.setSpecialFieldValue(entry, clearValue());
+                    viewModel.setSpecialFieldValue(boundEntry, clearValue());
                 } else {
-                    viewModel.setSpecialFieldValue(entry, (SpecialFieldValue) toggle.getUserData());
+                    viewModel.setSpecialFieldValue(boundEntry, (SpecialFieldValue) toggle.getUserData());
                 }
             }
         });
@@ -139,24 +155,11 @@ public class SpecialFieldEditor extends HBox implements FieldEditorFX {
         EasyBind.subscribe(fieldValue, value -> {
             updatingControls = true;
             try {
-                applyValue(value.flatMap(specialField::parseValue));
+                valueApplier.accept(value.flatMap(specialField::parseValue));
             } finally {
                 updatingControls = false;
             }
         });
-    }
-
-    private void applyValue(Optional<SpecialFieldValue> value) {
-        if (specialField == SpecialField.RANKING) {
-            ratingControl.setRating(value.map(SpecialFieldValue::toRating).orElse(0));
-        } else if (specialField.isSingleValueField()) {
-            toggleControl.setSelected(value.isPresent());
-        } else {
-            toggleGroup.selectToggle(toggleGroup.getToggles().stream()
-                                                .filter(toggle -> value.map(toggle.getUserData()::equals).orElse(false))
-                                                .findFirst()
-                                                .orElse(null));
-        }
     }
 
     @Override
