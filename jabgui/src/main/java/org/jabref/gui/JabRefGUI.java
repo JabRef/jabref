@@ -45,6 +45,7 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
@@ -56,7 +57,6 @@ import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
-import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
