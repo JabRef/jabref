@@ -232,15 +232,17 @@ public abstract class NativeDesktop {
         executeCommand(command, absolutePath, dialogService);
     }
 
-    /// Opens a new console starting on the given file location
+    /// Opens a new console: in the given directory itself, or, given a file, in the file's
+    /// parent directory.
     ///
-    /// @param file Location the console should be opened at.
-    public static void openConsole(Path file, GuiPreferences preferences, DialogService dialogService) throws IOException {
-        if (file == null) {
+    /// @param fileOrDirectory Location the console should be opened at.
+    public static void openConsole(Path fileOrDirectory, GuiPreferences preferences, DialogService dialogService) throws IOException {
+        if (fileOrDirectory == null) {
             return;
         }
 
-        String absolutePath = file.toAbsolutePath().getParent().toString();
+        Path absolute = fileOrDirectory.toAbsolutePath();
+        String absolutePath = Files.isDirectory(absolute) ? absolute.toString() : absolute.getParent().toString();
 
         boolean useCustomTerminal = preferences.getExternalApplicationsPreferences().useCustomTerminal();
         if (!useCustomTerminal) {

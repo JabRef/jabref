@@ -35,6 +35,13 @@ public class ActionHelper {
         return BooleanExpression.booleanExpression(binding);
     }
 
+    /// Like [#needsSavedLocalDatabase], but also accepts a directory library: both have a
+    /// location on disk to reveal in the file explorer or open a terminal in.
+    public static BooleanExpression needsDatabaseOnDisk(StateManager stateManager) {
+        EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context -> context.filter(c -> c.getDatabasePath().or(c::getDirectoryLibraryRoot).isPresent()).isPresent());
+        return BooleanExpression.booleanExpression(binding);
+    }
+
     public static BooleanExpression needsSharedDatabase(StateManager stateManager) {
         EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context -> context.filter(c -> c.getLocation() == DatabaseLocation.SHARED).isPresent());
         return BooleanExpression.booleanExpression(binding);

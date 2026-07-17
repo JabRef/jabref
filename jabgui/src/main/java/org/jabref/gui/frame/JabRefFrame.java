@@ -75,7 +75,7 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.gui.actions.ActionHelper.needsSavedLocalDatabase;
+import static org.jabref.gui.actions.ActionHelper.needsDatabaseOnDisk;
 
 /// Represents the inner frame of the JabRef window
 public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMessageHandler {
@@ -799,12 +799,13 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             this.dialogService = dialogService;
             this.preferences = preferences;
             this.databaseContext = databaseContext;
-            this.executable.bind(needsSavedLocalDatabase(stateManager));
+            this.executable.bind(needsDatabaseOnDisk(stateManager));
         }
 
         @Override
         public void execute() {
-            Optional.of(databaseContext.get()).flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
+            // For a directory library, reveal the library's root directory itself
+            Optional.of(databaseContext.get()).flatMap(context -> context.getDatabasePath().or(context::getDirectoryLibraryRoot)).ifPresent(path -> {
                 try {
                     NativeDesktop.openFolderAndSelectFile(path, preferences.getExternalApplicationsPreferences(), dialogService);
                 } catch (IOException e) {
