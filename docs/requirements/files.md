@@ -23,11 +23,13 @@ As a consequence, the file is copied.
 Needs: impl
 
 ## Auto-link broken linked file
-`req~logic.externalfiles.file-transfer.auto-link~1`
+`req~logic.externalfiles.file-transfer.auto-link~2`
 
 After a file is linked to an entry, the user might move the file to another directory without JabRef, leading to broken linked file.
 
 The function `Quality -> Automatically set file links` can help user to auto-link the moved files based on the broken file name, or the entry citation key.
+
+A Markdown file sharing its base name with another associated or linked file (e.g. `X.md` next to `X.pdf`) is treated as a notes companion of that file and is never auto-linked. The same holds for a Markdown sidecar of a directory library (a Hayagriva frontmatter block) even without such a partner: it is an entry's source, not an attachment. Any other Markdown file is still linked.
 
 Needs: impl, utest
 

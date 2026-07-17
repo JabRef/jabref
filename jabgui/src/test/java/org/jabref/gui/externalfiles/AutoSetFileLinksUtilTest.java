@@ -71,6 +71,46 @@ class AutoSetFileLinksUtilTest {
         assertEquals(expected, actual);
     }
 
+    /// [utest->req~logic.externalfiles.file-transfer.auto-link~2]
+    @Test
+    void markdownCompanionOfAssociatedFileIsIgnored() throws IOException {
+        Files.createFile(path.getParent().resolve("CiteKey.md"));
+        when(databaseContext.getFileDirectories(any())).thenReturn(List.of(path.getParent()));
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        Collection<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
+        assertEquals(List.of(new LinkedFile("", Path.of("CiteKey.pdf"), "PDF")), actual);
+    }
+
+    /// [utest->req~logic.externalfiles.file-transfer.auto-link~2]
+    @Test
+    void markdownFileWithoutCompanionIsLinked(@TempDir Path tempDir) throws IOException {
+        Files.createFile(tempDir.resolve("CiteKey.md"));
+        when(databaseContext.getFileDirectories(any())).thenReturn(List.of(tempDir));
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        Collection<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
+        assertEquals(List.of(new LinkedFile("", Path.of("CiteKey.md"), "Markdown")), actual);
+    }
+
+    /// [utest->req~logic.externalfiles.file-transfer.auto-link~2]
+    @Test
+    void markdownSidecarWithoutPartnerIsIgnored(@TempDir Path tempDir) throws IOException {
+        Files.writeString(tempDir.resolve("CiteKey.md"), """
+                ---
+                CiteKey:
+                    type: article
+                    title: A Test Article
+                ---
+
+                # Notes
+
+                Some notes.
+                """);
+        when(databaseContext.getFileDirectories(any())).thenReturn(List.of(tempDir));
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        Collection<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
+        assertEquals(List.of(), actual);
+    }
+
     @Test
     void findAssociatedNotLinkedFilesForEmptySearchDir() throws IOException {
         when(databaseContext.getFileDirectories(any())).thenReturn(List.of());
@@ -181,7 +221,7 @@ class AutoSetFileLinksUtilTest {
         assertEquals(expected, Set.copyOf(matchedFiles));
     }
 
-    /// [utest->req~logic.externalfiles.file-transfer.auto-link~1]
+    /// [utest->req~logic.externalfiles.file-transfer.auto-link~2]
     @Nested
     @DisplayName("linkAssociatedFiles")
     class linkAssociatedFiles {

@@ -46,6 +46,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- Automatic file linking no longer links a Markdown file that shares its base name with another found or linked file (e.g. `X.md` next to `X.pdf`) or whose frontmatter is a Hayagriva document (a directory-library sidecar), treating such files as notes companions instead of attachments. [#741](https://github.com/JabRef/jabref-koppor/pull/741)
 - The Hayagriva YAML exporter is now implemented programmatically instead of via a layout template: re-exporting an imported Hayagriva file preserves structured data JabRef cannot represent (short titles, person aliases, additional identifiers), `misc` entries export with a lowercase type, and journal details are written into the periodical parent. The `HayagrivaType` custom-layout formatter was removed. [#736](https://github.com/JabRef/jabref-koppor/pull/736)
 - Hayagriva YAML import and export now cover JabRef's "Comment" field and per-user comment fields (written as `comment`/`comment-<name>` extension keys, which the Hayagriva parser ignores), and entries carrying only BibTeX `year`/`month` fields get their `date` written. [#736](https://github.com/JabRef/jabref-koppor/pull/736)
 - The Hayagriva YAML exporter now writes all fields the new Hayagriva importer reads. [#16190](https://github.com/JabRef/jabref/pull/16190)
