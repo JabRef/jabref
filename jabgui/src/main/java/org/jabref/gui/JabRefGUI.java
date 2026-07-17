@@ -65,6 +65,7 @@ import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterViewPos;
 import com.tobiasdiez.easybind.EasyBind;
 import kong.unirest.core.Unirest;
+import org.controlsfx.dialog.ExceptionDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,6 +107,13 @@ public class JabRefGUI extends Application {
 
     @Override
     public void start(Stage stage) {
+        // Installed before the try block below (not after) so background threads started during
+        // initialize() are also covered, not just ones started once the main window is up.
+        FallbackExceptionHandler.installExceptionHandler((exception, thread) -> UiTaskExecutor.runInJavaFXThread(() -> {
+            DialogService exceptionDialogService = Injector.instantiateModelOrService(DialogService.class);
+            exceptionDialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
+        }));
+
         try {
             this.mainStage = stage;
             Injector.setModelOrService(Stage.class, mainStage);
@@ -152,13 +160,26 @@ public class JabRefGUI extends Application {
             setupProxy();
         } catch (Throwable throwable) {
             LOGGER.error("Error during initialization", throwable);
+            showStartupErrorDialog(throwable);
             throw throwable;
         }
+    }
 
-        FallbackExceptionHandler.installExceptionHandler((exception, thread) -> UiTaskExecutor.runInJavaFXThread(() -> {
-            DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-            dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
-        }));
+    /// Does not go through {@link DialogService}, since a startup failure can happen before
+    /// {@link #initialize()} sets it up. `Dialog.initOwner` throws a NullPointerException if the
+    /// owner window has no {@link Scene} yet, which is only set in {@link #openWindow()}, so the owner
+    /// is skipped in that case.
+    private void showStartupErrorDialog(Throwable throwable) {
+        try {
+            ExceptionDialog exceptionDialog = new ExceptionDialog(throwable);
+            exceptionDialog.setHeaderText(Localization.lang("Unhandled exception occurred."));
+            if (mainStage != null && mainStage.getScene() != null) {
+                exceptionDialog.initOwner(mainStage);
+            }
+            exceptionDialog.showAndWait();
+        } catch (Throwable dialogFailure) {
+            LOGGER.error("Could not show startup error dialog", dialogFailure);
+        }
     }
 
     public void initialize() {
