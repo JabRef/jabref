@@ -38,7 +38,6 @@ public sealed interface EntryEditorTabModel
         FILE_ANNOTATIONS,
         LATEX_CITATIONS,
         CITATION_INFORMATION,
-        MATH_SCI_NET,
         SOURCE,
         FULLTEXT_SEARCH_RESULTS;
 
@@ -63,8 +62,6 @@ public sealed interface EntryEditorTabModel
                         Localization.lang("LaTeX citations");
                 case CITATION_INFORMATION ->
                         Localization.lang("Citations");
-                case MATH_SCI_NET ->
-                        Localization.lang("MathSciNet Review");
                 case SOURCE ->
                         Localization.lang("Source");
                 case FULLTEXT_SEARCH_RESULTS ->

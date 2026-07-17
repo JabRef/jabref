@@ -22,7 +22,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
@@ -85,7 +84,6 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     @Inject private GuiPreferences preferences;
     @Inject private DialogService dialogService;
-    @Inject private ThemeManager themeManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private BibEntryTypesManager bibEntryTypesManager;
 
@@ -253,7 +251,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     }
 
     private PreviewViewer initializePreviewViewer(BibEntry entry) {
-        PreviewViewer viewer = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
+        PreviewViewer viewer = new PreviewViewer(dialogService, preferences, taskExecutor);
         viewer.setDatabaseContext(new BibDatabaseContext());
         viewer.setEntry(entry);
         return viewer;

@@ -1,6 +1,7 @@
 ---
 name: jabref-contributor
-description: Development conventions for contributing to JabRef, the open-source BibTeX/biblatex reference manager. Use when working on the JabRef codebase - covers the Gradle build, module layout (jablib, jabgui, jabkit, jabls, jabsrv), testing rules (JUnit 5, no Hamcrest), naming conventions, and the mandatory pre-PR checklist.
+category: developers
+description: Gradle build, module layout (jablib, jabgui, jabkit, jabls, jabsrv), JUnit 5 testing rules, naming conventions, and the mandatory pre-PR checklist for contributing to JabRef.
 license: MIT
 ---
 

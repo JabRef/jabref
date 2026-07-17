@@ -35,7 +35,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.gui.util.WebViewStore;
 import org.jabref.http.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiCommand;
@@ -171,8 +170,6 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(TaskExecutor.class, taskExecutor);
 
         journalAbbreviationRepository = JournalAbbreviationLoader.loadRepositoryInBackground(preferences.getAbbreviationPreferences(), taskExecutor);
-
-        WebViewStore.init();
 
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefGUI.fileUpdateMonitor = fileUpdateMonitor;

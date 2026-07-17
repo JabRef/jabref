@@ -1,6 +1,7 @@
 ---
 name: bibtex-library-management
-description: Check, clean, and maintain BibTeX and biblatex libraries with JabRef's jabkit CLI. Use when the user wants to validate a .bib file (integrity and consistency checks), generate citation keys, search a bibliography, convert between bibliography formats, or pseudonymize a library before sharing.
+category: users
+description: Validates, cleans, and repairs BibTeX/biblatex libraries with JabRef's jabkit CLI - integrity checks, citation key generation, searching, format conversion, and pseudonymization before sharing.
 license: MIT
 ---
 
