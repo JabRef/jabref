@@ -592,9 +592,9 @@ public class ModsImporter extends Importer implements Parser {
             return;
         }
 
-        if (StandardEntryType.InBook.equals(entryType)
-                || StandardEntryType.InCollection.equals(entryType)
-                || StandardEntryType.InProceedings.equals(entryType)) {
+        if (StandardEntryType.InBook == entryType
+                || StandardEntryType.InCollection == entryType
+                || StandardEntryType.InProceedings == entryType) {
             putIfValueNotNull(fields, StandardField.BOOKTITLE, typeHints.hostTitle);
         } else {
             putIfValueNotNull(fields, StandardField.JOURNAL, typeHints.hostTitle);
