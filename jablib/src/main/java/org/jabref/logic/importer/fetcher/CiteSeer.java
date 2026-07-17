@@ -24,7 +24,6 @@ import kong.unirest.core.Unirest;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONElement;
 import kong.unirest.core.json.JSONObject;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +38,6 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
     private static final String API_URL = "https://citeseerx.ist.psu.edu/api/search";
 
     private static final String PDF_URL = "https://" + BASE_URL + "/document?repid=rep1&type=pdf&doi=%s";
-
-    private CiteSeerQueryTransformer transformer;
 
     public CiteSeer() {
     }
@@ -72,10 +69,10 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
         }
         try {
             JSONObject payload = new JSONObject();
-            payload.put("page", 1);
-            payload.put("pageSize", 20);
-            payload.put("must_have_pdf", "false");
-            payload.put("sortBy", "relevance");
+            payload.put("page", CiteSeerQueryTransformer.DEFAULT_PAGE);
+            payload.put("pageSize", CiteSeerQueryTransformer.DEFAULT_PAGE_SIZE);
+            payload.put("must_have_pdf", CiteSeerQueryTransformer.DEFAULT_MUST_HAVE_PDF);
+            payload.put("sortBy", CiteSeerQueryTransformer.DEFAULT_SORT_BY);
             payload.put("queryString", rawQuery);
             return sendSearchRequest(payload);
         } catch (ParseException ex) {
@@ -109,17 +106,17 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
         }
 
         CiteSeerParser parser = new CiteSeerParser();
-        return parser.parseCiteSeerResponse(jsonResponse.orElse(new JSONArray()));
+        return parser.parseCiteSeerResponse(jsonResponse.get());
     }
 
     private JSONElement getPayloadJSON(BaseQueryNode searchQueryList) throws ParseException {
-        transformer = new CiteSeerQueryTransformer();
+        CiteSeerQueryTransformer transformer = new CiteSeerQueryTransformer();
         String transformedQuery = transformer.transformSearchQuery(searchQueryList).orElse("");
         return transformer.getJSONPayload();
     }
 
     @Override
-    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException, FetcherException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
         // does not use a valid DOI, but Cite Seer's id / hash available for each entry
         Optional<String> id = entry.getField(StandardField.DOI);
         if (id.isPresent()) {

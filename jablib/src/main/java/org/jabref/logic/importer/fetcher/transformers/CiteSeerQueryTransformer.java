@@ -10,14 +10,19 @@ import kong.unirest.core.json.JSONObject;
 
 public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
 
+    public static final int DEFAULT_PAGE = 1;
+    public static final int DEFAULT_PAGE_SIZE = 20;
+    public static final String DEFAULT_MUST_HAVE_PDF = "false";
+    public static final String DEFAULT_SORT_BY = "relevance";
+
     private JSONObject payload = new JSONObject();
 
     /// Default values for necessary parameters set in constructor
     public CiteSeerQueryTransformer() {
-        handlePage("1");
-        handlePageSize("20");
-        this.getJSONPayload().put("must_have_pdf", "false");
-        handleSortBy("relevance");
+        getJSONPayload().put("page", DEFAULT_PAGE);
+        getJSONPayload().put("pageSize", DEFAULT_PAGE_SIZE);
+        getJSONPayload().put("must_have_pdf", DEFAULT_MUST_HAVE_PDF);
+        getJSONPayload().put("sortBy", DEFAULT_SORT_BY);
     }
 
     @Override

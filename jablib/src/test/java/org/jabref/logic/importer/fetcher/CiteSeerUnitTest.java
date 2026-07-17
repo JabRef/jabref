@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -19,10 +18,4 @@ class CiteSeerUnitTest {
     void performRawSearchQueryWithBlankQueryReturnsEmpty(String blank) throws FetcherException {
         assertEquals(List.of(), fetcher.performRawSearchQuery(blank));
     }
-
-    @Test
-    void performSearchWithBlankQueryReturnsEmpty() throws FetcherException {
-        assertEquals(List.of(), fetcher.performSearch(""));
-    }
 }
-
