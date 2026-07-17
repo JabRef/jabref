@@ -203,7 +203,7 @@ public class SaveDatabaseAction {
         if (bibDatabaseContext.getLocation() == DatabaseLocation.DIRECTORY) {
             // A directory library persists into its sidecar files; saving means flushing the
             // debounced writes, never writing a .bib ("Save as" remains the explicit snapshot)
-            // [impl->req~directory-library.write-back~1]
+            // [impl->req~directory-library.write-back~2]
             DirectoryLibrarySynchronizer synchronizer = bibDatabaseContext.getDirectorySynchronizer();
             if (synchronizer != null) {
                 synchronizer.flush();
