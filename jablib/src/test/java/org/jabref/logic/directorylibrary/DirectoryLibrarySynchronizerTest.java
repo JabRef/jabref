@@ -22,7 +22,10 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.event.EntriesEventSource;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UserSpecificCommentField;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -43,6 +46,19 @@ class DirectoryLibrarySynchronizerTest {
                 title: A Test Article
                 author: Smith, Jane
                 note: first version
+            """;
+
+    private static final String MARKDOWN_SIDECAR = """
+            ---
+            smith2020:
+                type: article
+                title: A Test Article
+                author: Smith, Jane
+            ---
+
+            # Notes
+
+            Shared comment text.
             """;
 
     /// Deterministic clock for the rename grace window.
@@ -133,6 +149,35 @@ class DirectoryLibrarySynchronizerTest {
         assertSame(entry, entries().getFirst());
         assertEquals(Optional.of("second version"), entry.getField(StandardField.NOTE));
         assertEquals(1, entry.getFiles().size());
+    }
+
+    @Test
+    void externallyCreatedMarkdownSidecarAddsEntryWithComments() throws IOException {
+        openLibrary();
+        Path sidecar = root.resolve("smith2020.md");
+        Files.writeString(sidecar, MARKDOWN_SIDECAR);
+
+        synchronizer.handleFileCreated(sidecar);
+
+        assertEquals(1, entries().size());
+        BibEntry added = entries().getFirst();
+        assertEquals(Optional.of("smith2020"), added.getCitationKey());
+        assertEquals(Optional.of("Shared comment text."), added.getField(StandardField.COMMENT));
+    }
+
+    @Test
+    void externalMarkdownChangeUpdatesCommentOnTheSameEntryInstance() throws IOException {
+        Path sidecar = root.resolve("smith2020.md");
+        Files.writeString(sidecar, MARKDOWN_SIDECAR);
+        openLibrary();
+        BibEntry entry = entries().getFirst();
+
+        Files.writeString(sidecar, MARKDOWN_SIDECAR.replace("Shared comment text.", "Updated comment text."));
+        synchronizer.handleFileChanged(sidecar);
+
+        assertEquals(1, entries().size());
+        assertSame(entry, entries().getFirst());
+        assertEquals(Optional.of("Updated comment text."), entry.getField(StandardField.COMMENT));
     }
 
     @Test
@@ -287,7 +332,7 @@ class DirectoryLibrarySynchronizerTest {
     }
 
     @Test
-    void firstEditOfStubEntryCreatesSidecarNextToPdf() throws IOException {
+    void firstEditOfStubEntryCreatesMarkdownSidecarNextToPdf() throws IOException {
         Files.createFile(root.resolve("loose.pdf"));
         openLibrary();
         BibEntry stub = entries().getFirst();
@@ -296,13 +341,15 @@ class DirectoryLibrarySynchronizerTest {
         synchronizer.handleLocalChange(stub);
         synchronizer.flush();
 
-        Path sidecar = root.resolve("loose.yml");
+        Path sidecar = root.resolve("loose.md");
         assertTrue(Files.exists(sidecar));
-        assertTrue(Files.readString(sidecar).contains("Doe, John"));
+        String written = Files.readString(sidecar);
+        assertTrue(written.startsWith("---\n"));
+        assertTrue(written.contains("Doe, John"));
     }
 
     @Test
-    void newEntryWithoutFileGetsCitationKeyNamedSidecar() throws IOException {
+    void newEntryWithoutFileGetsCitationKeyNamedMarkdownSidecar() throws IOException {
         openLibrary();
         BibEntry entry = new BibEntry(org.jabref.model.entry.types.StandardEntryType.Article)
                 .withCitationKey("fresh2026")
@@ -312,7 +359,69 @@ class DirectoryLibrarySynchronizerTest {
         synchronizer.handleLocalChange(entry);
         synchronizer.flush();
 
-        assertTrue(Files.exists(root.resolve("fresh2026.yml")));
+        assertTrue(Files.exists(root.resolve("fresh2026.md")));
+    }
+
+    @Test
+    void commentEditsLandInTheMarkdownBody() throws IOException {
+        Files.createFile(root.resolve("loose.pdf"));
+        openLibrary();
+        BibEntry stub = entries().getFirst();
+
+        stub.setField(StandardField.COMMENT, "First thoughts.");
+        stub.setField(new UserSpecificCommentField("koppor"), "Per-user thoughts.");
+        synchronizer.handleLocalChange(stub);
+        synchronizer.flush();
+
+        String written = Files.readString(root.resolve("loose.md"));
+        assertTrue(written.contains("# Notes\n\nFirst thoughts.\n\n## comment-koppor\n\nPer-user thoughts."),
+                () -> "unexpected body: " + written);
+        assertFalse(written.contains("comment:"), () -> "comment leaked into the frontmatter: " + written);
+    }
+
+    @Test
+    void markdownRewriteKeepsForeignBodySections() throws IOException {
+        Path sidecar = root.resolve("smith2020.md");
+        Files.writeString(sidecar, MARKDOWN_SIDECAR + """
+
+                ## Reading list
+
+                Follow-up papers.
+                """);
+        openLibrary();
+        BibEntry entry = entries().getFirst();
+
+        entry.setField(StandardField.COMMENT, "Updated comment text.");
+        synchronizer.handleLocalChange(entry);
+        synchronizer.flush();
+
+        String written = Files.readString(sidecar);
+        assertTrue(written.contains("Updated comment text."));
+        assertTrue(written.contains("## Reading list\n\nFollow-up papers."), () -> "foreign section lost: " + written);
+        assertFalse(written.contains("Shared comment text."));
+    }
+
+    @Test
+    void filteredKeystrokeEventsStillTriggerTheDebouncedWrite() throws IOException, InterruptedException {
+        Path sidecar = root.resolve("smith2020.yml");
+        Files.writeString(sidecar, ARTICLE_YAML);
+        openLibrary();
+        BibEntry entry = entries().getFirst();
+
+        // The CoarseChangeFilter marks every keystroke of a same-field burst as filtered; only
+        // relying on unfiltered events would strand the burst's tail (it never gets one)
+        entry.setField(StandardField.NOTE, "typed letter by letter", EntriesEventSource.LOCAL);
+        FieldChangedEvent keystroke = new FieldChangedEvent(entry, StandardField.NOTE, "typed letter by letter", "first version");
+        keystroke.setFilteredOut(true);
+        synchronizer.listen(keystroke);
+
+        Instant deadline = Instant.now().plusSeconds(10);
+        while (!Files.readString(sidecar).contains("typed letter by letter")) {
+            if (Instant.now().isAfter(deadline)) {
+                throw new AssertionError("debounced write did not happen; file: " + Files.readString(sidecar));
+            }
+            Thread.sleep(25);
+        }
     }
 
     @Test
