@@ -513,7 +513,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     }
 
     private Button createAddChip(BibDatabaseContext bibDatabaseContext, BibEntry entry, Field field) {
-        Button chip = new Button("+ " + FieldsUtil.getDisplayName(field));
+        Button chip = new Button(Localization.lang("+ %0", FieldsUtil.getDisplayName(field)));
         chip.getStyleClass().add("all-fields-add-chip");
         chip.setOnAction(_ -> showFieldEditor(bibDatabaseContext, entry, field));
         return chip;
