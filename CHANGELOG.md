@@ -63,6 +63,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed spurious "DOI is different from requested DOI" log warnings when fetching an entry by DOI, which appeared whenever the fetched DOI matched the request but differed only in its `http(s)://` prefix or letter case. [#16280](https://github.com/JabRef/jabref/pull/16280)
 - We fixed an issue where canceling the duplicate resolution dialog did not stop the background duplicate scan and kept the left entry. [#16234](https://github.com/JabRef/jabref/pull/16234)
 - We fixed an issue where entries imported or updated by an arXiv number could end up with the paper's automatic DOI web address as their citation key instead of a proper one; the INSPIRE literature database's key is now used when available, and updating an existing entry no longer silently drops its own or the fetched citation key. [#12292](https://github.com/JabRef/jabref/issues/12292)
 - We fixed an issue where a BibTeX entry printed on the first page of a PDF was not imported when other text (such as author email addresses) appeared above it. [#16245](https://github.com/JabRef/jabref/pull/16245)
