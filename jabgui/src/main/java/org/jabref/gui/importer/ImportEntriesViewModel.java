@@ -166,8 +166,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     public boolean hasDuplicate(BibEntry entry) {
         return findInternalDuplicate(entry).isPresent() ||
-                new DuplicateCheck(entryTypesManager)
-                        .containsDuplicate(selectedDb.getValue().getDatabase(), entry, selectedDb.getValue().getMode()).isPresent();
+            new DuplicateCheck(entryTypesManager)
+                                                 .containsDuplicate(selectedDb.getValue().getDatabase(), entry, selectedDb.getValue().getMode()).isPresent();
     }
 
     public String getSourceString(BibEntry entry) {
@@ -197,28 +197,27 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         preferences.getFilePreferences().setDownloadLinkedFiles(shouldDownloadFiles);
 
         new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator()).mergeStrings(
-                databaseContext.getDatabase(),
-                parserResult.getDatabase());
+                                                                                                    databaseContext.getDatabase(),
+                                                                                                    parserResult.getDatabase());
         new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator()).mergeMetaData(
-                databaseContext.getMetaData(),
-                parserResult.getMetaData(),
-                parserResult.getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
-                parserResult.getDatabase().getEntries());
+                                                                                                     databaseContext.getMetaData(),
+                                                                                                     parserResult.getMetaData(),
+                                                                                                     parserResult.getPath().map(path -> path.getFileName().toString()).orElse("unknown"),
+                                                                                                     parserResult.getDatabase().getEntries());
         ImportHandler importHandler = new ImportHandler(
-                selectedDb.getValue(),
-                preferences,
-                fileUpdateMonitor,
-                undoManager,
-                stateManager,
-                dialogService,
-                taskExecutor);
+                                                        selectedDb.getValue(),
+                                                        preferences,
+                                                        fileUpdateMonitor,
+                                                        undoManager,
+                                                        stateManager,
+                                                        dialogService,
+                                                        taskExecutor);
         EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(stateManager, entriesToImport.size());
         if (StringUtil.isNotBlank(targetGroup)) {
             // Assign the group to the actually imported BibEntry instances (the copies inserted into the
             // database), not to the originals. The import runs asynchronously, so this must happen in the
             // tracker's onFinish callback after all entries have been inserted/merged.
-            tracker.setOnFinish(() ->
-                    GroupsHelper.assignEntriesToGroup(selectedDb.getValue(), tracker.getImportedEntries(), targetGroup, preferences.getBibEntryPreferences().getKeywordSeparator()));
+            tracker.setOnFinish(() -> GroupsHelper.assignEntriesToGroup(selectedDb.getValue(), tracker.getImportedEntries(), targetGroup, preferences.getBibEntryPreferences().getKeywordSeparator()));
         }
         importHandler.importEntriesWithDuplicateCheck(null, entriesToImport, tracker);
     }
@@ -292,32 +291,37 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     public void fetchMoreEntries() {
         if (fetcher.isPresent() &&
-                fetcher.get() instanceof PagedSearchBasedFetcher pagedFetcher &&
-                query.isPresent() && !loading.get()) {
+            fetcher.get() instanceof PagedSearchBasedFetcher pagedFetcher &&
+            query.isPresent() && !loading.get()) {
             loading.set(true);
             BackgroundTask<ArrayList<BibEntry>> fetchTask = BackgroundTask
-                    .wrap(() -> {
-                        LOGGER.info("Fetching entries from {} for page {}", fetcher.get().getName(), currentPageProperty.get() + 2);
-                        return new ArrayList<>(pagedFetcher.performSearchPaged(query.get(), currentPageProperty.get() + 1).getContent());
-                    })
-                    .onSuccess(newEntries -> {
-                        if (newEntries != null && !newEntries.isEmpty()) {
-                            allEntries.addAll(newEntries);
-                            updateTotalPages();
-                        } else {
-                            LOGGER.warn("No new entries fetched from {} for page {}", fetcher.get().getName(), currentPageProperty.get() + 2);
-                            dialogService.notify(Localization.lang("No new entries found from %0", fetcher.get().getName()));
-                        }
-                        loading.set(false);
-                    })
-                    .onFailure(exception -> {
-                        loading.set(false);
-                        dialogService.showErrorDialogAndWait(
-                                Localization.lang("Error fetching entries"),
-                                Localization.lang("An error occurred while fetching entries from %0: %1",
-                                        fetcher.get().getName(), exception.getMessage())
-                        );
-                    });
+                                                                          .wrap(() -> {
+                                                                              LOGGER.info("Fetching entries from {} for page {}", fetcher.get().getName(), currentPageProperty.get() + 2);
+                                                                              return new ArrayList<>(pagedFetcher.performSearchPaged(query.get(), currentPageProperty.get() + 1).getContent());
+                                                                          })
+                                                                          .onSuccess(newEntries -> {
+                                                                              if (newEntries != null && !newEntries.isEmpty()) {
+                                                                                  allEntries.addAll(newEntries);
+                                                                                  updateTotalPages();
+                                                                                  // goToNextPage(); // <-- Add this line
+                                                                              } else {
+                                                                                  LOGGER.warn("No new entries fetched from {} for page {}",
+                                                                                              fetcher.get().getName(),
+                                                                                              currentPageProperty.get() + 2);
+
+                                                                                  dialogService.notify(
+                                                                                                       Localization.lang("No new entries found from %0",
+                                                                                                                         fetcher.get().getName()));
+                                                                              }
+                                                                              loading.set(false);
+                                                                          })
+                                                                          .onFailure(exception -> {
+                                                                              loading.set(false);
+                                                                              dialogService.showErrorDialogAndWait(
+                                                                                                                   Localization.lang("Error fetching entries"),
+                                                                                                                   Localization.lang("An error occurred while fetching entries from %0: %1",
+                                                                                                                                     fetcher.get().getName(), exception.getMessage()));
+                                                                          });
 
             fetchTask.executeWith(taskExecutor);
         }

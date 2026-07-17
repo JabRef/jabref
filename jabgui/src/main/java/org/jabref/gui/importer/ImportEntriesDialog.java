@@ -67,6 +67,7 @@ import org.fxmisc.richtext.CodeArea;
 import org.jspecify.annotations.Nullable;
 
 public class ImportEntriesDialog extends BaseDialog<Boolean> {
+
     @FXML private HBox paginationBox;
     @FXML private Label pageNumberLabel;
     @FXML private CheckListView<BibEntry> entriesListView;
@@ -90,11 +91,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     private final Optional<SearchBasedFetcher> searchBasedFetcher;
     private final Optional<String> query;
 
-    /// Optional group the imported entries should be assigned to (e.g. supplied via the REST
-    /// `?group=` parameter). It pre-selects the matching group in the picker and acts as the
-    /// fallback when the user does not pick an explicit group: in that case the import creates the
-    /// group (if missing) and assigns the entries. An explicit selection in the picker overrides it.
-    /// The group is only ever created on confirm, so cancelling imports nothing.
+    /// Optional group the imported entries should be assigned to (e.g. supplied via the REST `?group=` parameter). It pre-selects the matching group in the picker and acts as the fallback when the user does not pick an explicit group: in that case the import creates the group (if missing) and assigns the entries. An explicit selection in the picker overrides it. The group is only ever created on confirm, so cancelling imports nothing.
     private final @Nullable String targetGroup;
 
     @Inject private TaskExecutor taskExecutor;
@@ -105,9 +102,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
 
-    /// Creates an import dialog for entries from file sources.
-    /// This constructor is used for importing entries from local files, BibTeX files,
-    /// or other file-based sources that don't require pagination or search functionality.
+    /// Creates an import dialog for entries from file sources. This constructor is used for importing entries from local files, BibTeX files, or other file-based sources that don't require pagination or search functionality.
     ///
     /// @param database the database to import into
     /// @param task     the task executed for parsing the selected files(s).
@@ -115,9 +110,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         this(database, task, null);
     }
 
-    /// Variant that pre-selects {@code targetGroup} in the group picker. The group is created and
-    /// assigned by the caller only after the dialog is confirmed (see {@link #getImportedEntries()}
-    /// / {@link #getImportTarget()}).
+    /// Variant that pre-selects {@code targetGroup} in the group picker. The group is created and assigned by the caller only after the dialog is confirmed (see {@link #getImportedEntries()} / {@link #getImportTarget()}).
     ///
     /// @param database    the database to import into
     /// @param task        the task executed for parsing the selected files(s).
@@ -132,8 +125,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         initializeDialog();
     }
 
-    /// Creates an import dialog for entries from web-based search sources.
-    /// This constructor is used for importing entries that support pagination and require search queries.
+    /// Creates an import dialog for entries from web-based search sources. This constructor is used for importing entries that support pagination and require search queries.
     ///
     /// @param database database where the imported entries will be added
     /// @param task     task that handles parsing and loading entries from the search results
@@ -175,68 +167,68 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         groupListView.setEditable(false);
         libraryListView.getItems().addAll(stateManager.getOpenDatabases());
         new ViewModelListCellFactory<BibDatabaseContext>()
-                .withText(database -> {
-                    Optional<String> dbOpt = Optional.empty();
-                    if (database.getDatabasePath().isPresent()) {
-                        dbOpt = FileUtil.getUniquePathFragment(stateManager.getAllDatabasePaths(), database.getDatabasePath().get());
-                    }
-                    if (database.getLocation() == DatabaseLocation.SHARED) {
-                        return database.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
-                    }
+                                                          .withText(database -> {
+                                                              Optional<String> dbOpt = Optional.empty();
+                                                              if (database.getDatabasePath().isPresent()) {
+                                                                  dbOpt = FileUtil.getUniquePathFragment(stateManager.getAllDatabasePaths(), database.getDatabasePath().get());
+                                                              }
+                                                              if (database.getLocation() == DatabaseLocation.SHARED) {
+                                                                  return database.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
+                                                              }
 
-                    return dbOpt.orElseGet(() -> Localization.lang("untitled"));
-                })
-                .install(libraryListView);
+                                                              return dbOpt.orElseGet(() -> Localization.lang("untitled"));
+                                                          })
+                                                          .install(libraryListView);
         viewModel.selectedDbProperty().bind(libraryListView.getSelectionModel().selectedItemProperty());
         stateManager.getActiveDatabase().ifPresent(database1 -> libraryListView.getSelectionModel().select(database1));
         setupGroupListView();
 
         PseudoClass entrySelected = PseudoClass.getPseudoClass("selected");
         new ViewModelListCellFactory<BibEntry>()
-                .withGraphic(entry -> {
-                    ToggleButton addToggle = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.ADD);
-                    EasyBind.subscribe(addToggle.selectedProperty(), selected -> {
-                        if (selected) {
-                            addToggle.setGraphic(IconTheme.JabRefIcons.ADD_FILLED.withColor(IconTheme.SELECTED_COLOR).getGraphicNode());
-                        } else {
-                            addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
-                        }
-                    });
-                    addToggle.getStyleClass().add("addEntryButton");
-                    addToggle.selectedProperty().bindBidirectional(entriesListView.getItemBooleanProperty(entry));
-                    HBox separator = new HBox();
-                    HBox.setHgrow(separator, Priority.SOMETIMES);
-                    Node entryNode = BibEntryView.getEntryNode(entry);
-                    HBox.setHgrow(entryNode, Priority.ALWAYS);
-                    HBox container = new HBox(entryNode, separator, addToggle);
-                    container.getStyleClass().add("entry-container");
-                    container.prefWidthProperty().bind(entriesListView.widthProperty().subtract(25));
+                                                .withGraphic(entry -> {
+                                                    ToggleButton addToggle = ControlHelper.iconToggleButton(IconTheme.JabRefIcons.ADD);
+                                                    EasyBind.subscribe(addToggle.selectedProperty(), selected -> {
+                                                        if (selected) {
+                                                            addToggle.setGraphic(IconTheme.JabRefIcons.ADD_FILLED.withColor(IconTheme.SELECTED_COLOR).getGraphicNode());
+                                                        } else {
+                                                            addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
+                                                        }
+                                                    });
+                                                    addToggle.getStyleClass().add("addEntryButton");
+                                                    addToggle.selectedProperty().bindBidirectional(entriesListView.getItemBooleanProperty(entry));
+                                                    HBox separator = new HBox();
+                                                    HBox.setHgrow(separator, Priority.SOMETIMES);
+                                                    Node entryNode = BibEntryView.getEntryNode(entry);
+                                                    HBox.setHgrow(entryNode, Priority.ALWAYS);
+                                                    HBox container = new HBox(entryNode, separator, addToggle);
+                                                    container.getStyleClass().add("entry-container");
+                                                    container.prefWidthProperty().bind(entriesListView.widthProperty().subtract(25));
 
-                    BackgroundTask.wrap(() -> viewModel.hasDuplicate(entry)).onSuccess(duplicateFound -> {
-                        if (duplicateFound) {
-                            Node icon = IconTheme.JabRefIcons.ERROR.getGraphicNode();
-                            Tooltip tooltip = new Tooltip(Localization.lang("Possible duplicate of existing entry. Will be resolved on import."));
-                            Tooltip.install(icon, tooltip);
-                            container.getChildren().add(icon);
-                        }
-                    }).executeWith(taskExecutor);
+                                                    BackgroundTask.wrap(() -> viewModel.hasDuplicate(entry)).onSuccess(duplicateFound -> {
+                                                        if (duplicateFound) {
+                                                            Node icon = IconTheme.JabRefIcons.ERROR.getGraphicNode();
+                                                            Tooltip tooltip = new Tooltip(Localization.lang("Possible duplicate of existing entry. Will be resolved on import."));
+                                                            Tooltip.install(icon, tooltip);
+                                                            container.getChildren().add(icon);
+                                                        }
+                                                    }).executeWith(taskExecutor);
 
-                    /*
-                    inserted the if-statement here, since a Platform.runLater() call did not work.
-                    also tried to move it to the end of the initialize method, but it did not select the entry.
-                    */
-                    if (entriesListView.getItems().size() == 1) {
-                        selectAllNewEntries();
-                    }
+                                                    /*
+                                                    inserted the if-statement here, since a Platform.runLater() call did not work.
+                                                    also tried to move it to the end of the initialize method, but it did not select the entry.
+                                                    */
+                                                    if (entriesListView.getItems().size() == 1) {
+                                                        selectAllNewEntries();
+                                                    }
 
-                    return container;
-                })
-                .withOnMouseClickedEvent((entry, event) -> {
-                    entriesListView.getCheckModel().toggleCheckState(entry);
-                    displayBibTeX(entry, viewModel.getSourceString(entry));
-                })
-                .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
-                .install(entriesListView);
+                                                    return container;
+                                                })
+                                                .withOnMouseClickedEvent((entry, event) -> {
+                                                    entriesListView.getCheckModel().toggleCheckState(entry);
+                                                    displayBibTeX(entry, viewModel.getSourceString(entry));
+                                                })
+                                                .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
+                                                .install(entriesListView);
 
         selectedItems.textProperty().bind(Bindings.size(viewModel.getCheckedEntries()).asString());
         totalItems.textProperty().bind(Bindings.size(viewModel.getAllEntries()).asString());
@@ -257,8 +249,8 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                        });
 
         new ViewModelListCellFactory<GroupTreeNode>()
-                .withText(group -> group != null ? group.getName() : Localization.lang("No group"))
-                .install(groupListView);
+                                                     .withText(group -> group != null ? group.getName() : Localization.lang("No group"))
+                                                     .install(groupListView);
     }
 
     private void updateGroupList() {
@@ -356,64 +348,50 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
             return currentPage >= totalPages - 1;
         }, viewModel.currentPageProperty(), viewModel.totalPagesProperty());
 
-        BooleanBinding isPagedFetcher = Bindings.createBooleanBinding(() ->
-                searchBasedFetcher.isPresent() && searchBasedFetcher.get() instanceof PagedSearchBasedFetcher
-        );
+        BooleanBinding isPagedFetcher = Bindings.createBooleanBinding(() -> searchBasedFetcher.isPresent() && searchBasedFetcher.get() instanceof PagedSearchBasedFetcher);
 
         // Disable: during loading OR when on the last page for non-paged fetchers
         // OR when the initial load is not complete for paged fetchers
         nextPageButton.disableProperty().bind(
-                loading.or(isOnLastPage.and(isPagedFetcher.not()))
-                       .or(isPagedFetcher.and(initialLoadComplete.not()))
-        );
+                                              loading.or(isOnLastPage.and(isPagedFetcher.not()))
+                                                     .or(isPagedFetcher.and(initialLoadComplete.not())));
         prevPageButton.disableProperty().bind(loading.or(viewModel.currentPageProperty().isEqualTo(0)));
 
         prevPageButton.textProperty().bind(
-                Bindings.when(loading)
-                        .then("< " + Localization.lang("Loading..."))
-                        .otherwise("< " + Localization.lang("Previous"))
-        );
+                                           Bindings.when(loading)
+                                                   .then("< " + Localization.lang("Loading..."))
+                                                   .otherwise("< " + Localization.lang("Previous")));
 
         nextPageButton.textProperty().bind(
-                Bindings.when(loading)
-                        .then(Localization.lang("Loading...") + " >")
-                        .otherwise(
-                                Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
-                                        .then(Localization.lang("Loading initial entries..."))
-                                        .otherwise(
-                                                Bindings.when(isOnLastPage)
-                                                        .then(
-                                                                Bindings.when(isPagedFetcher)
-                                                                        .then(Localization.lang("Load More") + " >>")
-                                                                        .otherwise(Localization.lang("No more entries"))
-                                                        )
-                                                        .otherwise(Localization.lang("Next") + " >")
-                                        )
-                        )
-        );
+                                           Bindings.when(loading)
+                                                   .then(Localization.lang("Loading...") + " >")
+                                                   .otherwise(
+                                                              Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
+                                                                      .then(Localization.lang("Loading initial entries..."))
+                                                                      .otherwise(
+                                                                                 Bindings.when(isOnLastPage)
+                                                                                         .then(
+                                                                                               Bindings.when(isPagedFetcher)
+                                                                                                       .then(Localization.lang("Next") + " >")
+                                                                                                       .otherwise(Localization.lang("No more entries")))
+                                                                                         .otherwise(Localization.lang("Next") + " >"))));
 
         statusLabel.textProperty().bind(
-                Bindings.when(loading)
-                        .then(Localization.lang("Fetching more entries..."))
-                        .otherwise(
-                                Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
-                                        .then(Localization.lang("Loading initial results..."))
-                                        .otherwise(
-                                                Bindings.when(isOnLastPage)
-                                                        .then(
-                                                                Bindings.when(isPagedFetcher)
-                                                                        .then(Localization.lang("Click 'Load More' to fetch additional entries"))
-                                                                        .otherwise(Bindings.createStringBinding(() -> {
-                                                                            int totalEntries = viewModel.getAllEntries().size();
-                                                                            return totalEntries > 0 ?
-                                                                                   Localization.lang("All %0 entries loaded", String.valueOf(totalEntries)) :
-                                                                                   Localization.lang("No entries available");
-                                                                        }, viewModel.getAllEntries()))
-                                                        )
-                                                        .otherwise("")
-                                        )
-                        )
-        );
+                                        Bindings.when(loading)
+                                                .then(Localization.lang("Fetching more entries..."))
+                                                .otherwise(
+                                                           Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
+                                                                   .then(Localization.lang("Loading initial results..."))
+                                                                   .otherwise(
+                                                                              Bindings.when(isOnLastPage)
+                                                                                      .then(
+                                                                                            Bindings.when(isPagedFetcher)
+                                                                                                    .then(Localization.lang("Click 'Load More' to fetch additional entries"))
+                                                                                                    .otherwise(Bindings.createStringBinding(() -> {
+                                                                                                        int totalEntries = viewModel.getAllEntries().size();
+                                                                                                        return totalEntries > 0 ? Localization.lang("All %0 entries loaded", String.valueOf(totalEntries)) : Localization.lang("No entries available");
+                                                                                                    }, viewModel.getAllEntries())))
+                                                                                      .otherwise(""))));
 
         loading.addListener((_, _, newVal) -> {
             getDialogPane().getScene().setCursor(newVal ? Cursor.WAIT : Cursor.DEFAULT);
