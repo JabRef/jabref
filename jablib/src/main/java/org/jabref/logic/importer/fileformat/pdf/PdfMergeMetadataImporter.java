@@ -33,6 +33,7 @@ import org.jabref.model.entry.field.StandardField;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -170,8 +171,20 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         return FILENAME_TITLE_PATTERN.matcher(title.trim()).matches();
     }
 
+    /// Merges all candidate entries — the results of the individual [PdfImporter]s plus any online fetches —
+    /// into a single entry. Candidates earlier in the list take precedence on conflicting fields, so
+    /// higher-priority importers must come first.
+    ///
+    /// Beyond the plain field merge this also: replaces a filename-like title with the first candidate title
+    /// that does not look like a filename; cross-checks the merged author against the PDF text (see
+    /// [PdfContentImporter]); and keeps only online (URL) file links.
+    ///
+    /// @param candidates       candidate entries ordered by descending priority
+    /// @param leadingPagesText plain text of the PDF's leading pages (typically the first two, as produced by
+    ///                         [PdfContentImporter]), used only to validate the merged author; `null` or empty
+    ///                         when the text could not be extracted, in which case the author is left untouched
     @VisibleForTesting
-    static BibEntry mergeCandidates(List<BibEntry> candidates, String documentText) {
+    static BibEntry mergeCandidates(List<BibEntry> candidates, @Nullable String leadingPagesText) {
         final BibEntry entry = new BibEntry();
         candidates.forEach(entry::mergeWith);
 
@@ -185,7 +198,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
                       .ifPresent(betterTitle -> entry.setField(StandardField.TITLE, betterTitle));
         }
 
-        PdfContentImporter.crossCheckAuthor(entry, candidates, documentText);
+        PdfContentImporter.crossCheckAuthor(entry, candidates, leadingPagesText);
 
         // Retain online links only
         List<LinkedFile> onlineLinks = entry.getFiles().stream().filter(LinkedFile::isOnlineLink).toList();

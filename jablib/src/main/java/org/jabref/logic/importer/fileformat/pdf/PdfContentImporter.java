@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
@@ -53,6 +54,7 @@ import static org.jabref.logic.util.strings.StringUtil.isNullOrEmpty;
 /// please see {@link RuleBasedBibliographyPdfImporter}.
 ///
 /// If several PDF importers should be tried, use {@link PdfMergeMetadataImporter}.
+@NullMarked
 public class PdfContentImporter extends PdfImporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfContentImporter.class);
@@ -762,12 +764,12 @@ public class PdfContentImporter extends PdfImporter {
     /// wrong author is worse than none. Entries with a citation key or explicit type are left untouched so
     /// that metadata previously written by JabRef survives re-import even when the PDF text does not
     /// contain the author (e.g. slides or reports).
-    static void crossCheckAuthor(BibEntry entry, List<BibEntry> candidates, String documentText) {
-        if (documentText.isBlank()) {
+    static void crossCheckAuthor(BibEntry entry, List<BibEntry> candidates, @Nullable String leadingPagesText) {
+        String normalizedText = normalizeForComparison(Objects.requireNonNullElse(leadingPagesText, ""));
+        if (normalizedText.isBlank()) {
             return;
         }
         entry.getField(StandardField.AUTHOR).ifPresent(mergedAuthor -> {
-            String normalizedText = normalizeForComparison(documentText);
             if (isAuthorConfirmedByText(mergedAuthor, normalizedText)) {
                 return;
             }

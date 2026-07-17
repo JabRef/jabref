@@ -44,8 +44,8 @@ class PdfMergeMetadataImporterOfflineTest {
 
     /// Single creator-style candidate (as produced from PDF document properties): a Misc entry without a
     /// citation key. Its author survives only when confirmed by the document text; an empty expected value
-    /// means it is dropped. Columns: author | documentText | expectedAuthor (an empty documentText models a
-    /// PDF whose text could not be extracted).
+    /// means it is dropped. Columns: author | leadingPagesText | expectedAuthor (an empty leadingPagesText
+    /// column arrives as `null`, modelling a PDF whose text could not be extracted).
     @ParameterizedTest
     @CsvSource(delimiter = '|', textBlock = """
             Krieger, Christoph        | Christoph Krieger, Uwe Breitenbücher, University of Stuttgart | Krieger, Christoph
@@ -54,10 +54,10 @@ class PdfMergeMetadataImporterOfflineTest {
             Doe, John and Smith, Jane | Christoph Krieger, Uwe Breitenbücher, University of Stuttgart | Doe, John and Smith, Jane
             Richter, Markus           |                                                              | Richter, Markus
             """)
-    void singleCreatorCandidateAuthorIsCrossCheckedAgainstText(String author, String documentText, String expectedAuthor) {
+    void singleCreatorCandidateAuthorIsCrossCheckedAgainstText(String author, String leadingPagesText, String expectedAuthor) {
         BibEntry candidate = new BibEntry().withField(StandardField.AUTHOR, author);
 
-        BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(candidate), documentText == null ? "" : documentText);
+        BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(candidate), leadingPagesText);
 
         assertEquals(Optional.ofNullable(expectedAuthor), merged.getField(StandardField.AUTHOR));
     }
