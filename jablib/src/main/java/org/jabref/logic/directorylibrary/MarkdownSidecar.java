@@ -108,8 +108,8 @@ public class MarkdownSidecar {
     public String merge(@Nullable String existingDocument, List<HayagrivaEntryWriter.KeyedEntry> entries) {
         Optional<Document> existing = Optional.ofNullable(existingDocument).flatMap(MarkdownSidecar::split);
         List<HayagrivaEntryWriter.KeyedEntry> frontmatterEntries = entries.stream()
-                .map(keyed -> new HayagrivaEntryWriter.KeyedEntry(keyed.previousKey(), keyed.targetKey(), withoutCommentFields(keyed.entry())))
-                .toList();
+                                                                          .map(keyed -> new HayagrivaEntryWriter.KeyedEntry(keyed.previousKey(), keyed.targetKey(), withoutCommentFields(keyed.entry())))
+                                                                          .toList();
         String frontmatter = entryWriter.mergeIntoDocument(existing.map(Document::frontmatter).orElse(null), frontmatterEntries);
         String body = entries.isEmpty() ? "" : renderBody(existing.map(Document::body).orElse(""), entries.getFirst().entry());
 
