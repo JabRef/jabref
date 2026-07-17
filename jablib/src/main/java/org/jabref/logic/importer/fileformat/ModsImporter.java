@@ -212,12 +212,6 @@ public class ModsImporter extends Importer implements Parser {
                             typeHints.hostGenres.add(reader.getText());
                         }
                     }
-                    case "typeOfResource" -> {
-                        reader.next();
-                        if (hostRelatedItem && isCharacterXMLEvent(reader)) {
-                            typeHints.hostResource = reader.getText();
-                        }
-                    }
                     case "originInfo" ->
                             parseOriginInfo(reader, fields, typeHints, hostRelatedItem);
                     case "detail" ->
@@ -611,7 +605,6 @@ public class ModsImporter extends Importer implements Parser {
         private final List<String> mainGenres = new ArrayList<>();
         private final List<String> hostGenres = new ArrayList<>();
         private @Nullable String mainResource;
-        private @Nullable String hostResource;
         private @Nullable String mainIssuance;
         private @Nullable String hostIssuance;
         private @Nullable String hostTitle;
