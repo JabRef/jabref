@@ -284,6 +284,10 @@ public class UnlinkedFilesDialogViewModel {
         return directory;
     }
 
+    public TaskExecutor getTaskExecutor() {
+        return taskExecutor;
+    }
+
     public ObservableList<ImportFilesResultItemViewModel> resultTableItems() {
         return this.resultList;
     }

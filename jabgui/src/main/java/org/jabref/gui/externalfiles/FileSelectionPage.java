@@ -2,6 +2,8 @@ package org.jabref.gui.externalfiles;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
+import java.util.StringJoiner;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -33,15 +35,22 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.documentviewer.PdfDocumentViewer;
 import org.jabref.gui.util.FileNodeViewModel;
-import org.jabref.gui.util.PdfMetadataExtractor;
 import org.jabref.gui.util.RecursiveTreeItem;
+import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckTreeView;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +62,8 @@ public class FileSelectionPage extends WizardPane {
     private final StateManager stateManager;
     private final BooleanProperty invalidProperty = new SimpleBooleanProperty(false);
 
-    private final PdfMetadataExtractor metadataExtractor = new PdfMetadataExtractor();
+    private final PdfXmpImporter xmpImporter;
+    private @Nullable BackgroundTask<?> currentMetadataTask;
 
     private CheckTreeView<FileNodeViewModel> unlinkedFilesList;
     private ProgressIndicator progressIndicator;
@@ -72,9 +82,10 @@ public class FileSelectionPage extends WizardPane {
     private Button collapseAllButton;
     private boolean nextButtonBound = false;
 
-    public FileSelectionPage(StateManager stateManager, UnlinkedFilesDialogViewModel viewModel) {
+    public FileSelectionPage(StateManager stateManager, UnlinkedFilesDialogViewModel viewModel, XmpPreferences xmpPreferences) {
         this.viewModel = viewModel;
         this.stateManager = stateManager;
+        this.xmpImporter = new PdfXmpImporter(xmpPreferences);
 
         setHeaderText(Localization.lang("Select files to import"));
         setGraphic(null);
@@ -222,14 +233,17 @@ public class FileSelectionPage extends WizardPane {
 
         pdfPreview.show(selectedPath);
 
+        cancelCurrentMetadataTask();
         metadataPreview.setText(Localization.lang("Loading metadata..."));
-        metadataExtractor.extractAsync(
-                selectedPath,
-                metadataPreview::setText,
-                exception -> {
-                    LOGGER.warn("Could not extract PDF metadata for {}", selectedPath, exception);
-                    metadataPreview.setText(Localization.lang("Could not extract Metadata from: %0", selectedPath.getFileName().toString()));
-                });
+
+        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> xmpImporter.importDatabase(selectedPath));
+        currentMetadataTask = task;
+        task.onSuccess(result -> UiTaskExecutor.runNowOrInJavaFXThread(() -> metadataPreview.setText(formatParserResult(result))));
+        task.onFailure(exception -> UiTaskExecutor.runNowOrInJavaFXThread(() -> {
+            LOGGER.warn("Could not extract PDF metadata for {}", selectedPath, exception);
+            metadataPreview.setText(Localization.lang("Could not extract Metadata from: %0", selectedPath.getFileName().toString()));
+        }));
+        task.executeWith(viewModel.getTaskExecutor());
     }
 
     private boolean isPreviewActive() {
@@ -242,7 +256,7 @@ public class FileSelectionPage extends WizardPane {
     }
 
     private void showPreviewDisabledState(String metadataText) {
-        metadataExtractor.cancelCurrent();
+        cancelCurrentMetadataTask();
         pdfPreview.cancelCurrent();
         pdfPreview.show(null);
         metadataPreview.setText(metadataText);
@@ -274,6 +288,31 @@ public class FileSelectionPage extends WizardPane {
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.COLLAPSE_ALL, new TreeContextAction(StandardActions.COLLAPSE_ALL)));
 
         return contextMenu;
+    }
+
+    private void cancelCurrentMetadataTask() {
+        if (currentMetadataTask != null) {
+            currentMetadataTask.cancel();
+            currentMetadataTask = null;
+        }
+    }
+
+    private String formatParserResult(ParserResult result) {
+        if (result.isEmpty() || !result.getDatabase().hasEntries()) {
+            return Localization.lang("No extracted metadata available.");
+        }
+        return formatBibEntry(result.getDatabase().getEntries().getFirst());
+    }
+
+    private String formatBibEntry(BibEntry entry) {
+        StringJoiner joiner = new StringJoiner(System.lineSeparator());
+        for (Map.Entry<Field, String> field : entry.getFieldMap().entrySet()) {
+            String value = field.getValue();
+            if (value != null && !value.isBlank()) {
+                joiner.add(field.getKey().getName() + ": " + value);
+            }
+        }
+        return joiner.toString();
     }
 
     @Override
