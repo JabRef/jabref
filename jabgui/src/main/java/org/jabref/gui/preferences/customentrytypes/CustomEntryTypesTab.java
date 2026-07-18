@@ -285,12 +285,13 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                 .setOnDragExited(this::handleOnDragExited)
                 .install(fields);
 
+        // Cap the popup height so it always fits below the field instead of JavaFX flipping it above and obscuring it
         TextFields.bindAutoCompletion(
                 addNewField,
                 viewModel.fieldsForAdding().stream()
                          .map(Field::getName)
                          .collect(Collectors.toList())
-        );
+        ).setVisibleRowCount(5);
 
         // selected field will show in addNewField box with its properties
         fields.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
