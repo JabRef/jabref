@@ -943,9 +943,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-    public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> entriesToAdd) {
+    public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> entriesToAdd, TransferMode mode) {
         addEntriesWithFeedback(
-                new TransferInformation(sourceBibDatabaseContext, TransferMode.NONE), // "NONE", because we don't know the modifiers here and thus cannot say whether the attached file (and entry(s)) should be copied or moved
+                new TransferInformation(sourceBibDatabaseContext, mode),
                 entriesToAdd,
                 bibDatabaseContext,
                 Localization.lang("Moved %0 entry(s) to %1"),
