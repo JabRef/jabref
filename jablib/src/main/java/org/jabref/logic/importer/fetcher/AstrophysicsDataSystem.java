@@ -83,7 +83,6 @@ public class AstrophysicsDataSystem
     private URL buildSearchURL(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
         builder.addParameter("q", query);
-        
         builder.addParameter("fl", "bibcode");
         builder.addParameter("rows", String.valueOf(getPageSize()));
         builder.addParameter("start", String.valueOf(getPageSize() * pageNumber));
