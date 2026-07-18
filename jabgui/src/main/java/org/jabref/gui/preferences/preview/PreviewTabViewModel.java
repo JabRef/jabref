@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -132,12 +133,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         chosenListProperty.getValue().addAll(previewPreferences.getLayoutCycle());
 
         availableListProperty.clear();
-        if (chosenListProperty.stream().noneMatch(TextBasedPreviewLayout.class::isInstance)) {
-            availableListProperty.getValue().add(TextBasedPreviewLayout.of(
-                    previewPreferences.getCustomPreviewLayout(),
-                    preferences.getLayoutFormatterPreferences(),
-                    abbreviationRepository));
-        }
+        List<String> chosenNames = chosenListProperty.getValue().stream().map(PreviewLayout::getName).toList();
+        previewPreferences.getCustomPreviewLayouts().stream()
+                          .filter(customLayout -> !chosenNames.contains(customLayout.getName()))
+                          .forEach(availableListProperty::add);
 
         BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
 
@@ -207,9 +206,12 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
 
         if (chosenListProperty.isEmpty()) {
-            PreviewLayout textBasedPreviewLayout = findLayoutByName(TextBasedPreviewLayout.NAME);
-            if (textBasedPreviewLayout != null) {
-                chosenListProperty.add(textBasedPreviewLayout);
+            PreviewLayout anyCustomLayout = availableListProperty.getValue().stream()
+                                                                 .filter(TextBasedPreviewLayout.class::isInstance)
+                                                                 .findFirst()
+                                                                 .orElse(null);
+            if (anyCustomLayout != null) {
+                chosenListProperty.add(anyCustomLayout);
             } else {
                 chosenListProperty.add(TextBasedPreviewLayout.of(
                         TextBasedPreviewLayout.DEFAULT,
@@ -218,9 +220,14 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             }
         }
 
-        if (findLayoutByName(TextBasedPreviewLayout.NAME) instanceof TextBasedPreviewLayout customLayout) {
-            previewPreferences.setCustomPreviewLayout(customLayout.getText());
-        }
+        List<TextBasedPreviewLayout> allCustomLayouts = Stream.concat(
+                        availableListProperty.getValue().stream(),
+                        chosenListProperty.getValue().stream())
+                        .filter(TextBasedPreviewLayout.class::isInstance)
+                        .map(TextBasedPreviewLayout.class::cast)
+                        .distinct()
+                        .toList();
+        previewPreferences.setCustomPreviewLayouts(allCustomLayouts);
 
         previewPreferences.getLayoutCycle().clear();
         previewPreferences.getLayoutCycle().addAll(chosenListProperty);
@@ -312,8 +319,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetDefaultLayout() {
-        PreviewLayout defaultLayout = findLayoutByName(TextBasedPreviewLayout.NAME);
-        if (defaultLayout instanceof TextBasedPreviewLayout layout) {
+        if (selectedLayoutProperty.getValue() instanceof TextBasedPreviewLayout layout) {
             layout.setText(TextBasedPreviewLayout.of(
                     TextBasedPreviewLayout.DEFAULT,
                     preferences.getLayoutFormatterPreferences(),

@@ -69,6 +69,7 @@ public class PreviewPreferences {
                 TextBasedPreviewLayout.DEFAULT,
                 layoutFormatterPreferences,
                 abbreviationRepository);
+        defaults.getCustomPreviewLayouts().add(defaultCustomLayout);
 
         PreviewLayout defaultCslLayout = PreviewLayout.of(
                 CSLStyleLoader.DEFAULT_STYLE,
