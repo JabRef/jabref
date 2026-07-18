@@ -205,7 +205,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
         return searchForEntries(transformedQuery.get());
     }
 
-    /// The raw query is sent as the esearch `term` parameter
+    /// The raw query is sent as the `term` parameter of PubMed's esearch API (see SEARCH_URL)
     @Override
     public @NonNull List<BibEntry> performRawSearchQuery(@NonNull String rawQuery) throws FetcherException {
         if (rawQuery.isBlank()) {
