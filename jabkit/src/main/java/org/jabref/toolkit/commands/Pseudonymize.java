@@ -35,7 +35,7 @@ class Pseudonymize implements Callable<Integer> {
     private JabKit argumentProcessor;
 
     @Mixin
-    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+    private JabKit.SharedOptions sharedOptions;
 
     @Mixin
     private InputOption inputOption = new InputOption();

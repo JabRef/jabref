@@ -604,6 +604,73 @@ jobs:
           VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
           OSXCERT: ${{ needs.conditions.outputs.secretspresent }}
 
+      - name: Verify Linux Postgres binary packaging
+        if: startsWith(matrix.os, 'ubuntu')
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          case "${{ matrix.os }}" in
+            ubuntu-22.04)
+              expected="embedded.postgres.binaries.linux.amd64"
+              forbidden=(
+                "embedded.postgres.binaries.linux.arm64v8"
+                "embedded.postgres.binaries.linux.amd64.alpine"
+                "embedded.postgres.binaries.darwin.amd64"
+                "embedded.postgres.binaries.darwin.arm64v8"
+                "embedded.postgres.binaries.windows.amd64"
+              )
+              ;;
+            ubuntu-22.04-arm)
+              expected="embedded.postgres.binaries.linux.arm64v8"
+              forbidden=(
+                "embedded.postgres.binaries.linux.amd64"
+                "embedded.postgres.binaries.linux.amd64.alpine"
+                "embedded.postgres.binaries.darwin.amd64"
+                "embedded.postgres.binaries.darwin.arm64v8"
+                "embedded.postgres.binaries.windows.amd64"
+              )
+              ;;
+            *)
+              echo "No Postgres binary expectation configured for ${{ matrix.os }}"
+              exit 1
+              ;;
+          esac
+
+          runtime_java="jabgui/build/packages/${{ matrix.os }}/JabRef/lib/runtime/bin/java"
+          if [[ ! -x "$runtime_java" ]]; then
+            echo "Could not find packaged Java runtime in JabRef app image."
+            exit 1
+          fi
+
+          modules="$("$runtime_java" --list-modules)"
+          if ! awk -F@ -v expected="$expected" '$1 == expected { found = 1 } END { exit !found }' <<<"$modules"; then
+            echo "Expected Postgres binary module is missing for ${{ matrix.os }}: $expected"
+            exit 1
+          fi
+          for module in "${forbidden[@]}"; do
+            if awk -F@ -v module="$module" '$1 == module { found = 1 } END { exit !found }' <<<"$modules"; then
+              echo "Unexpected Postgres binary module packaged for ${{ matrix.os }}: $module"
+              exit 1
+            fi
+          done
+
+          for image in \
+            "jabkit/build/packages/${{ matrix.os }}/jabkit" \
+            "jabls-cli/build/packages/${{ matrix.os }}/jabls" \
+            "jabsrv-cli/build/packages/${{ matrix.os }}/jabsrv"; do
+            runtime_java="$image/lib/runtime/bin/java"
+            if [[ ! -x "$runtime_java" ]]; then
+              echo "Could not find packaged Java runtime in $image."
+              exit 1
+            fi
+
+            modules="$("$runtime_java" --list-modules)"
+            if awk -F@ '$1 ~ /^embedded[.]postgres[.]binaries[.]/ { found = 1 } END { exit !found }' <<<"$modules"; then
+              echo "Unexpected Postgres binary module packaged in $image."
+              exit 1
+            fi
+          done
 
       - name: Sync pigz
         wait: pigz
