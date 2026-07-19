@@ -336,7 +336,7 @@ public class CSLCitationOOAdapter {
                 "<p oo:ParaStyleName=\"%s\">".formatted(ZOTERO_BIBLIOGRAPHY_PARAGRAPH_STYLE));
         for (String bibliographyEntry : bibliography.getEntries()) {
             String formattedBibliographyEntry = CSL_LEFT_RIGHT_MARGIN_PATTERN.matcher(bibliographyEntry)
-                                                                            .replaceAll("$1\t$2");
+                                                                             .replaceAll("$1\t$2");
             formattedBibliographyEntry = CSLFormatUtils.transformHTML(formattedBibliographyEntry);
             formattedBibliographyEntry = EMPTY_PARAGRAPHS_AT_BIBLIOGRAPHY_ENTRY_EDGES_PATTERN.matcher(formattedBibliographyEntry)
                                                                                              .replaceAll("");
