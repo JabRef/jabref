@@ -235,6 +235,7 @@ class GroupNodeViewModelTest {
         );
 
         GroupNodeViewModel vm = getViewModelForGroup(autoRoot);
+        vm.ensureMatchedEntriesLoaded();
 
         // INCLUDING: automatic root sums direct matches and those of its children -> expect 2.
         assertEquals(2, vm.getHits().getValue().intValue());
@@ -254,6 +255,7 @@ class GroupNodeViewModelTest {
         );
 
         GroupNodeViewModel vm = getViewModelForGroup(autoRoot);
+        vm.ensureMatchedEntriesLoaded();
 
         // INDEPENDENT: automatic root has no direct matches -> expect 0.
         assertEquals(0, vm.getHits().getValue().intValue());
