@@ -944,12 +944,21 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> entriesToAdd, TransferMode mode) {
+        String successMessage;
+        String partialMessage;
+        if (mode == TransferMode.COPY) {
+            successMessage = Localization.lang("Copied %0 entry(s) to %1");
+            partialMessage = Localization.lang("Copied %0 entry(s) to %1. %2 were skipped");
+        } else {
+            successMessage = Localization.lang("Moved %0 entry(s) to %1");
+            partialMessage = Localization.lang("Moved %0 entry(s) to %1. %2 were skipped");
+        }
         addEntriesWithFeedback(
                 new TransferInformation(sourceBibDatabaseContext, mode),
                 entriesToAdd,
                 bibDatabaseContext,
-                Localization.lang("Moved %0 entry(s) to %1"),
-                Localization.lang("Moved %0 entry(s) to %1. %2 were skipped"),
+                successMessage,
+                partialMessage,
                 dialogService,
                 importHandler,
                 stateManager
