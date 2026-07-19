@@ -75,7 +75,6 @@ public class FrameDndHandler {
     }
 
     private void onTabDragDropped(Node destinationTabNode, DragEvent tabDragEvent, Tab dndIndicator) {
-        LOGGER.info("TransferMode = {}", tabDragEvent.getTransferMode());
         Dragboard dragboard = tabDragEvent.getDragboard();
 
         if (hasBibFiles(dragboard)) {
@@ -127,6 +126,9 @@ public class FrameDndHandler {
     }
 
     private org.jabref.model.TransferMode toModelTransferMode(TransferMode javafxTransferMode) {
+        if (javafxTransferMode == null) {
+            return org.jabref.model.TransferMode.NONE;
+        }
         switch (javafxTransferMode) {
             case COPY -> {
                 return org.jabref.model.TransferMode.COPY;
@@ -134,9 +136,7 @@ public class FrameDndHandler {
             case MOVE -> {
                 return org.jabref.model.TransferMode.MOVE;
             }
-            default -> {
-                return org.jabref.model.TransferMode.NONE;
-            }
+            default -> throw new IllegalStateException("Unexpected transfer mode: " + javafxTransferMode);
         }
     }
 
