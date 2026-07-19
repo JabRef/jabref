@@ -3,7 +3,6 @@ package org.jabref.logic.crawler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
@@ -53,31 +52,35 @@ class StudyFetcher {
     private List<FetchResult> performSearchOnQuery(StudyQuery searchQuery) {
         return activeFetchers.parallelStream()
                              .map(fetcher -> performSearchOnQueryForFetcher(searchQuery, fetcher))
-                             .filter(Objects::nonNull)
+                             .flatMap(Optional::stream)
                              .toList();
     }
 
-    private FetchResult performSearchOnQueryForFetcher(StudyQuery searchQuery, SearchBasedFetcher fetcher) {
+    private Optional<FetchResult> performSearchOnQueryForFetcher(StudyQuery searchQuery, SearchBasedFetcher fetcher) {
         try {
-            Optional<String> catalogOverride = searchQuery.getCatalogSpecific().entrySet().stream()
-                                                          .filter(entry -> entry.getKey().equalsIgnoreCase(fetcher.getName()))
-                                                          .map(Map.Entry::getValue)
-                                                          .filter(v -> v != null && !v.isBlank())
-                                                          .findFirst();
             List<BibEntry> fetchResult;
             if (fetcher instanceof PagedSearchBasedFetcher basedFetcher) {
-                fetchResult = performPagedSearch(basedFetcher, catalogOverride, searchQuery);
+                fetchResult = performPagedSearch(basedFetcher, searchQuery);
             } else {
-                fetchResult = performNonPagedSearch(fetcher, catalogOverride, searchQuery);
+                fetchResult = performNonPagedSearch(fetcher, searchQuery);
             }
-            return new FetchResult(fetcher.getName(), new BibDatabase(fetchResult));
+            return Optional.of(new FetchResult(fetcher.getName(), new BibDatabase(fetchResult)));
         } catch (FetcherException e) {
             LOGGER.warn("{} API request failed", fetcher.getName(), e);
-            return null;
+            return Optional.empty();
         }
     }
 
-    private List<BibEntry> performPagedSearch(PagedSearchBasedFetcher basedFetcher, Optional<String> catalogOverride, StudyQuery searchQuery) throws FetcherException {
+    private Optional<String> getCatalogOverride(StudyQuery searchQuery, SearchBasedFetcher fetcher) {
+        return searchQuery.getCatalogSpecific().entrySet().stream()
+                          .filter(entry -> entry.getKey().equalsIgnoreCase(fetcher.getName()))
+                          .map(Map.Entry::getValue)
+                          .filter(v -> v != null && !v.isBlank())
+                          .findFirst();
+    }
+
+    private List<BibEntry> performPagedSearch(PagedSearchBasedFetcher basedFetcher, StudyQuery searchQuery) throws FetcherException {
+        Optional<String> catalogOverride = getCatalogOverride(searchQuery, basedFetcher);
         int limit = resultLimits.getOrDefault(basedFetcher.getName(), StudyRepository.DEFAULT_RESULT_LIMIT);
         int pages = (int) Math.ceil((double) limit / basedFetcher.getPageSize());
         List<BibEntry> fetchResult = new ArrayList<>();
@@ -100,7 +103,8 @@ class StudyFetcher {
         return fetchResult;
     }
 
-    private List<BibEntry> performNonPagedSearch(SearchBasedFetcher fetcher, Optional<String> catalogOverride, StudyQuery searchQuery) throws FetcherException {
+    private List<BibEntry> performNonPagedSearch(SearchBasedFetcher fetcher, StudyQuery searchQuery) throws FetcherException {
+        Optional<String> catalogOverride = getCatalogOverride(searchQuery, fetcher);
         if (catalogOverride.isPresent()) {
             try {
                 return fetcher.performRawSearchQuery(catalogOverride.get());
