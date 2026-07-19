@@ -34,11 +34,14 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/GetCitingWorks.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/InputOption.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/JabKit.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/LatexCompiler.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Pdf.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/PdfUpdate.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Preferences.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Pseudonymize.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/ReferenceShortener.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Search.java
+//SOURCES ../jabkit/src/main/java/org/jabref/toolkit/commands/Shorten.java
 
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/service/CitationFetcherFactory.java
 //SOURCES ../jabkit/src/main/java/org/jabref/toolkit/service/ExportService.java

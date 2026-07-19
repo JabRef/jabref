@@ -22,6 +22,7 @@ module org.jabref.jabkit {
     requires java.xml;
 
     // region: other libraries (alphabetically)
+    requires com.google.common;
     requires static io.github.eadr;
     // endregion
 }

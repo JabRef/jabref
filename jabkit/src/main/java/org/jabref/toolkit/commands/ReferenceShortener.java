@@ -29,8 +29,7 @@ class ReferenceShortener {
         this.measure = measure;
     }
 
-    /// @param targetPages desired maximum page count; when empty, the target is "one page shorter than
-    ///                    the baseline", matching "reduce until the paper is one page shorter"
+    /// @param targetPages desired maximum page count; when empty, the target is one page shorter than the baseline ("reduce until the paper is one page shorter")
     Result shorten(OptionalInt targetPages) {
         int baseline = measure.getAsInt();
         int target = targetPages.orElse(baseline - 1);
