@@ -71,6 +71,14 @@ class Shorten implements Callable<Integer> {
 
     @Override
     public Integer call() throws ImportServiceException, CliException {
+        // A URL is downloaded to a lone temp file, losing the .bib and \input files this command
+        // needs from the paper's directory. Reject it rather than compile an incomplete project.
+        if (inputOption.isUrl()) {
+            throw new CliException(
+                    "shorten needs a local LaTeX project directory, not a URL",
+                    Localization.lang("The shorten command needs a local LaTeX project directory, not a URL."),
+                    CommandLine.ExitCode.USAGE);
+        }
         Path texFile = inputOption.getInputFile();
 
         // Work on a copy so the loop never touches the user's tree until a validated result exists,

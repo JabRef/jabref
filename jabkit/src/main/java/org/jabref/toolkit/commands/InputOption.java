@@ -45,8 +45,7 @@ class InputOption {
                        ? inputSource.positionalInput
                        : inputSource.optionInput;
 
-        String lowerCaseInput = input.toLowerCase(Locale.ROOT);
-        if (lowerCaseInput.startsWith("http://") || lowerCaseInput.startsWith("https://") || lowerCaseInput.startsWith("ftp://")) {
+        if (isUrl()) {
             try {
                 return new URLDownload(input).toTemporaryFile();
             } catch (FetcherException | MalformedURLException e) {
@@ -68,6 +67,16 @@ class InputOption {
                     e,
                     CommandLine.ExitCode.USAGE);
         }
+    }
+
+    /// Whether the supplied input is an `http(s)`/`ftp` URL (which [#getInputFile] downloads to a
+    /// temporary file). Commands that need a real on-disk location — for example a multi-file
+    /// LaTeX project directory — can use this to reject URL input up front.
+    boolean isUrl() {
+        String input = (inputSource.positionalInput != null
+                        ? inputSource.positionalInput
+                        : inputSource.optionInput).toLowerCase(Locale.ROOT);
+        return input.startsWith("http://") || input.startsWith("https://") || input.startsWith("ftp://");
     }
 
     private static class InputSource {
