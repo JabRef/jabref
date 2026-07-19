@@ -47,11 +47,24 @@ class LatexCompiler {
     /// Compiles the document and returns the page count of the produced PDF.
     int compileAndCountPages() throws CliException {
         int exitCode = runLatexmk();
-        OptionalInt pages = parsePageCount(readLog());
-        if (pages.isEmpty()) {
-            // A missing "Output written on" line means pdflatex never produced a PDF -> a real error.
+        return pageCountOrFail(exitCode, readLog(), texFileName);
+    }
+
+    /// Turns a compile run into a page count, or fails. A non-zero latexmk exit is a hard failure
+    /// even when the log still carries a page count: pdflatex writes a PDF in nonstopmode despite
+    /// errors, and shortening must not proceed to rewrite the `.bib` on top of a broken compile.
+    /// A zero exit must still yield a page count (a missing one means no PDF was produced).
+    static int pageCountOrFail(int exitCode, String log, String texFileName) throws CliException {
+        if (exitCode != 0) {
             throw new CliException(
                     "LaTeX compilation of '%s' failed (latexmk exit %d)".formatted(texFileName, exitCode),
+                    Localization.lang("LaTeX compilation of '%0' failed. Run latexmk manually to see the error.", texFileName),
+                    CommandLine.ExitCode.SOFTWARE);
+        }
+        OptionalInt pages = parsePageCount(log);
+        if (pages.isEmpty()) {
+            throw new CliException(
+                    "latexmk reported success but produced no page count for '%s'".formatted(texFileName),
                     Localization.lang("LaTeX compilation of '%0' failed. Run latexmk manually to see the error.", texFileName),
                     CommandLine.ExitCode.SOFTWARE);
         }

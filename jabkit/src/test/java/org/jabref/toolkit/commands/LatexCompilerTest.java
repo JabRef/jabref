@@ -2,11 +2,17 @@ package org.jabref.toolkit.commands;
 
 import java.util.OptionalInt;
 
+import org.jabref.toolkit.exception.CliException;
+
 import org.junit.jupiter.api.Test;
+import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class LatexCompilerTest {
+
+    private static final String PAGE_LINE = "Output written on paper.pdf (2 pages, 100 bytes).";
 
     @Test
     void parsesSinglePage() {
@@ -35,5 +41,24 @@ class LatexCompilerTest {
     void returnsEmptyWhenCompilationProducedNoPdf() {
         assertEquals(OptionalInt.empty(),
                 LatexCompiler.parsePageCount("! LaTeX Error: File `IEEEtran.cls' not found."));
+    }
+
+    @Test
+    void zeroExitWithPageCountReturnsCount() throws CliException {
+        assertEquals(2, LatexCompiler.pageCountOrFail(0, PAGE_LINE, "paper.tex"));
+    }
+
+    @Test
+    void nonZeroExitFailsEvenWhenAPageCountWasWritten() {
+        // pdflatex writes a (broken) PDF in nonstopmode, so a page count alone must not count as success.
+        CliException exception = assertThrows(CliException.class,
+                () -> LatexCompiler.pageCountOrFail(1, PAGE_LINE, "paper.tex"));
+        assertEquals(CommandLine.ExitCode.SOFTWARE, exception.getExitCode());
+    }
+
+    @Test
+    void zeroExitWithoutPageCountFails() {
+        assertThrows(CliException.class,
+                () -> LatexCompiler.pageCountOrFail(0, "! Undefined control sequence.", "paper.tex"));
     }
 }
