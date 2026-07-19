@@ -23,14 +23,14 @@ class ReferenceShortener {
     private final IntSupplier measure;
 
     /// @param steps   escalation levels, applied in order until the target is met
-     /// @param measure persists the current entry state, compiles, and returns the resulting page count
+    /// @param measure persists the current entry state, compiles, and returns the resulting page count
     ReferenceShortener(List<Step> steps, IntSupplier measure) {
         this.steps = List.copyOf(steps);
         this.measure = measure;
     }
 
     /// @param targetPages desired maximum page count; when empty, the target is "one page shorter than
-     ///                    the baseline", matching "reduce until the paper is one page shorter"
+    ///                    the baseline", matching "reduce until the paper is one page shorter"
     Result shorten(OptionalInt targetPages) {
         int baseline = measure.getAsInt();
         int target = targetPages.orElse(baseline - 1);
