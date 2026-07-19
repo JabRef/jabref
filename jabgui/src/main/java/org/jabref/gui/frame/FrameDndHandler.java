@@ -136,7 +136,8 @@ public class FrameDndHandler {
             case MOVE -> {
                 return org.jabref.model.TransferMode.MOVE;
             }
-            default -> throw new IllegalStateException("Unexpected transfer mode: " + javafxTransferMode);
+            default ->
+                    throw new IllegalStateException("Unexpected transfer mode: " + javafxTransferMode);
         }
     }
 
