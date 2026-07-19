@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -89,12 +91,32 @@ class LatexCompiler {
     private List<String> buildCommand() {
         if (useDocker) {
             // ponytail: Docker fallback is untested in this TeX-less path; local latexmk is used when present.
-            return List.of("docker", "run", "--rm",
+            List<String> command = new ArrayList<>(List.of("docker", "run", "--rm"));
+            // Without --user, the bind-mounted artifacts (pdf/log/aux) are created as the image's
+            // default user (often root), which the invoking user then cannot read back or clean up.
+            unixUserFlag().ifPresent(user -> {
+                command.add("--user");
+                command.add(user);
+            });
+            command.addAll(List.of(
                     "-v", workingDir + ":/work", "-w", "/work",
                     DOCKER_IMAGE,
-                    "latexmk", "-pdf", "-interaction=nonstopmode", texFileName);
+                    "latexmk", "-pdf", "-interaction=nonstopmode", texFileName));
+            return command;
         }
         return List.of("latexmk", "-pdf", "-interaction=nonstopmode", texFileName);
+    }
+
+    /// The invoking user's `uid:gid` for Docker's `--user`, read from the (self-created) working
+    /// directory. Empty on non-Unix filesystems, where Docker manages bind-mount ownership itself.
+    private Optional<String> unixUserFlag() {
+        try {
+            Object uid = Files.getAttribute(workingDir, "unix:uid");
+            Object gid = Files.getAttribute(workingDir, "unix:gid");
+            return Optional.of(uid + ":" + gid);
+        } catch (IOException | UnsupportedOperationException e) {
+            return Optional.empty();
+        }
     }
 
     /// Read with Latin-1: TeX logs are not guaranteed UTF-8, and Latin-1 maps every byte without

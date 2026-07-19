@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -29,6 +30,8 @@ import org.jabref.toolkit.exception.ImportServiceException;
 import org.jabref.toolkit.service.ExportService;
 import org.jabref.toolkit.service.ImportService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import static picocli.CommandLine.Command;
@@ -44,6 +47,8 @@ import static picocli.CommandLine.ParentCommand;
 // [impl->req~jabkit.cli.shorten~1]
 @Command(name = "shorten", description = "Shorten a paper's references (via latexmk) until it fits a page count.")
 class Shorten implements Callable<Integer> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Shorten.class);
 
     @ParentCommand
     private JabKit jabKit;
@@ -71,6 +76,14 @@ class Shorten implements Callable<Integer> {
         // Work on a copy so the loop never touches the user's tree until a validated result exists,
         // and so latexmk's aux/pdf/log artifacts land in a throwaway directory.
         Path workDir = copyTexDirectory(texFile);
+        try {
+            return shorten(texFile, workDir);
+        } finally {
+            deleteRecursivelyQuietly(workDir);
+        }
+    }
+
+    private Integer shorten(Path texFile, Path workDir) throws ImportServiceException, CliException {
         Path workTex = workDir.resolve(texFile.getFileName());
 
         LatexParserResult parsed = new DefaultLatexParser().parse(workTex)
@@ -209,6 +222,22 @@ class Shorten implements Callable<Integer> {
                     "Could not stage '%s' for compilation: %s".formatted(texFile, e.getMessage()),
                     Localization.lang("Could not read '%0'.", texFile.toString()),
                     e, CommandLine.ExitCode.SOFTWARE);
+        }
+    }
+
+    /// Best-effort recursive delete of the staging directory. Never throws: a leftover artifact
+    /// (for example a Docker-created file) must not fail an otherwise-successful run.
+    private static void deleteRecursivelyQuietly(Path directory) {
+        try (var paths = Files.walk(directory)) {
+            paths.sorted(Comparator.reverseOrder()).forEach(path -> {
+                try {
+                    Files.deleteIfExists(path);
+                } catch (IOException e) {
+                    LOGGER.debug("Could not delete staging file {}", path, e);
+                }
+            });
+        } catch (IOException e) {
+            LOGGER.debug("Could not clean up staging directory {}", directory, e);
         }
     }
 
