@@ -82,9 +82,11 @@ class Shorten implements Callable<Integer> {
         Path texFile = inputOption.getInputFile();
 
         // Work on a copy so the loop never touches the user's tree until a validated result exists,
-        // and so latexmk's aux/pdf/log artifacts land in a throwaway directory.
-        Path workDir = copyTexDirectory(texFile);
+        // and so latexmk's aux/pdf/log artifacts land in a throwaway directory. The directory is
+        // created before the try so the finally removes it even if the copy itself fails partway.
+        Path workDir = createStagingDirectory(texFile);
         try {
+            copyDirectoryContents(texFile.toAbsolutePath().getParent(), workDir);
             return shorten(texFile, workDir);
         } finally {
             deleteRecursivelyQuietly(workDir);
@@ -209,32 +211,40 @@ class Shorten implements Callable<Integer> {
         loadedBibs.forEach(bib -> bib.citedEntries().forEach(action));
     }
 
-    private static Path copyTexDirectory(Path texFile) throws CliException {
-        Path source = texFile.toAbsolutePath().getParent();
+    private static Path createStagingDirectory(Path texFile) throws CliException {
         try {
-            Path target = Files.createTempDirectory("jabkit-shorten");
-            try (var paths = Files.walk(source)) {
-                for (Path path : (Iterable<Path>) paths::iterator) {
-                    Path destination = target.resolve(source.relativize(path));
-                    if (Files.isDirectory(path)) {
-                        Files.createDirectories(destination);
-                    } else {
-                        Files.createDirectories(destination.getParent());
-                        Files.copy(path, destination);
-                    }
-                }
-            }
-            return target;
+            return Files.createTempDirectory("jabkit-shorten");
         } catch (IOException e) {
             throw new CliException(
-                    "Could not stage '%s' for compilation: %s".formatted(texFile, e.getMessage()),
+                    "Could not create a staging directory: " + e.getMessage(),
                     Localization.lang("Could not read '%0'.", texFile.toString()),
                     e, CommandLine.ExitCode.SOFTWARE);
         }
     }
 
+    private static void copyDirectoryContents(Path source, Path target) throws CliException {
+        try (var paths = Files.walk(source)) {
+            for (Path path : (Iterable<Path>) paths::iterator) {
+                Path destination = target.resolve(source.relativize(path));
+                if (Files.isDirectory(path)) {
+                    Files.createDirectories(destination);
+                } else {
+                    Files.createDirectories(destination.getParent());
+                    Files.copy(path, destination);
+                }
+            }
+        } catch (IOException e) {
+            throw new CliException(
+                    "Could not stage '%s' for compilation: %s".formatted(source, e.getMessage()),
+                    Localization.lang("Could not read '%0'.", source.toString()),
+                    e, CommandLine.ExitCode.SOFTWARE);
+        }
+    }
+
     /// Best-effort recursive delete of the staging directory. Never throws: a leftover artifact
-    /// (for example a Docker-created file) must not fail an otherwise-successful run.
+    /// (for example a Docker-created file with different ownership) must not fail an otherwise
+    /// successful run. Per-file failures are logged at debug to avoid spam; a single warning is
+    /// emitted if anything remains afterwards.
     private static void deleteRecursivelyQuietly(Path directory) {
         try (var paths = Files.walk(directory)) {
             paths.sorted(Comparator.reverseOrder()).forEach(path -> {
@@ -245,7 +255,10 @@ class Shorten implements Callable<Integer> {
                 }
             });
         } catch (IOException e) {
-            LOGGER.debug("Could not clean up staging directory {}", directory, e);
+            LOGGER.debug("Could not walk staging directory {} for cleanup", directory, e);
+        }
+        if (Files.exists(directory)) {
+            LOGGER.warn("Could not fully remove staging directory {}", directory);
         }
     }
 
