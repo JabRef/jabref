@@ -10,7 +10,6 @@ import java.util.OptionalInt;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
-import java.util.function.IntSupplier;
 
 import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.cleanup.DoiCleanup;
@@ -137,24 +136,15 @@ class Shorten implements Callable<Integer> {
             System.out.println(Localization.lang("No local TeX found; compiling with the Island of TeX Docker image."));
         }
 
-        IntSupplier measure = () -> {
-            try {
-                for (LoadedBib bib : loadedBibs) {
-                    tempExport.saveDatabase(bib.database(), bib.tempPath());
-                }
-                return compiler.compileAndCountPages();
-            } catch (CliException e) {
-                throw new MeasureFailure(e);
+        ReferenceShortener.PageCounter measure = () -> {
+            for (LoadedBib bib : loadedBibs) {
+                tempExport.saveDatabase(bib.database(), bib.tempPath());
             }
+            return compiler.compileAndCountPages();
         };
 
-        ReferenceShortener.Result result;
-        try {
-            result = new ReferenceShortener(steps, measure).shorten(
-                    pages == null ? OptionalInt.empty() : OptionalInt.of(pages));
-        } catch (MeasureFailure failure) {
-            throw failure.cause();
-        }
+        ReferenceShortener.Result result = new ReferenceShortener(steps, measure).shorten(
+                pages == null ? OptionalInt.empty() : OptionalInt.of(pages));
 
         return report(texFile, workDir, loadedBibs, result);
     }
@@ -293,19 +283,6 @@ class Shorten implements Callable<Integer> {
         }
         if (Files.exists(directory)) {
             LOGGER.warn("Could not fully remove staging directory {}", directory);
-        }
-    }
-
-    /// Carries a checked [CliException] out of the [IntSupplier] used by [ReferenceShortener].
-    private static final class MeasureFailure extends RuntimeException {
-        private final CliException cause;
-
-        private MeasureFailure(CliException cause) {
-            this.cause = cause;
-        }
-
-        private CliException cause() {
-            return cause;
         }
     }
 }

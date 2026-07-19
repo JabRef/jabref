@@ -3,7 +3,8 @@ package org.jabref.toolkit.commands;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalInt;
-import java.util.function.IntSupplier;
+
+import org.jabref.toolkit.exception.CliException;
 
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +17,7 @@ class ReferenceShortenerTest {
     private final List<String> applied = new ArrayList<>();
 
     /// Returns the given page counts on successive `measure` calls (first call = baseline).
-    private static IntSupplier scriptedPageCounts(int... counts) {
+    private static ReferenceShortener.PageCounter scriptedPageCounts(int... counts) {
         int[] index = {0};
         return () -> counts[index[0]++];
     }
@@ -26,7 +27,7 @@ class ReferenceShortenerTest {
     }
 
     @Test
-    void doesNothingWhenAlreadyWithinTarget() {
+    void doesNothingWhenAlreadyWithinTarget() throws CliException {
         ReferenceShortener shortener = new ReferenceShortener(List.of(step("a")), scriptedPageCounts(5));
 
         ReferenceShortener.Result result = shortener.shorten(OptionalInt.of(5));
@@ -39,7 +40,7 @@ class ReferenceShortenerTest {
     }
 
     @Test
-    void stopsAtFirstStepThatReachesTarget() {
+    void stopsAtFirstStepThatReachesTarget() throws CliException {
         ReferenceShortener shortener = new ReferenceShortener(
                 List.of(step("a"), step("b"), step("c")),
                 scriptedPageCounts(8, 6));
@@ -53,7 +54,7 @@ class ReferenceShortenerTest {
     }
 
     @Test
-    void appliesAllStepsAndReportsFailureWhenTargetUnreachable() {
+    void appliesAllStepsAndReportsFailureWhenTargetUnreachable() throws CliException {
         ReferenceShortener shortener = new ReferenceShortener(
                 List.of(step("a"), step("b"), step("c")),
                 scriptedPageCounts(8, 7, 7, 7));
@@ -66,7 +67,7 @@ class ReferenceShortenerTest {
     }
 
     @Test
-    void defaultTargetIsOnePageShorterThanBaseline() {
+    void defaultTargetIsOnePageShorterThanBaseline() throws CliException {
         ReferenceShortener shortener = new ReferenceShortener(
                 List.of(step("a"), step("b")),
                 scriptedPageCounts(5, 4));
@@ -79,7 +80,7 @@ class ReferenceShortenerTest {
     }
 
     @Test
-    void defaultTargetIsClampedToOneForSinglePageDocument() {
+    void defaultTargetIsClampedToOneForSinglePageDocument() throws CliException {
         // A one-page paper must not be shortened: the default target is clamped to 1, not 0.
         ReferenceShortener shortener = new ReferenceShortener(
                 List.of(step("a"), step("b")),
