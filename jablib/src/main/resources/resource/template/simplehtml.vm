@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>JabRef references</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+body { font-size: 12px; font-family: Arial, sans-serif; }
+dt { margin-top: 1em; font-weight: bold; }
+@media print {
+	dt { page-break-after: avoid; }
+	dd { page-break-before: avoid; }
+}
+</style>
+</head>
+<body>
+<dl>
+#foreach( $entry in $entries )
+<dt>$entry.type #if( $entry.citationKey )<a name="$entry.citationKey">($entry.citationKey)</a>#end</dt>
+#if( $entry.getField("author") )
+<dd>$html.format($entry.getField("author"))</dd>
+#end
+#if( $entry.getField("title") )
+<dd><i>$html.format($entry.getField("title"))</i></dd>
+#end
+#if( $entry.getField("editor") )
+<dd>$html.format($entry.getField("editor")) <i>(ed.)</i></dd>
+#end
+#if( $entry.getField("booktitle") )
+<dd>$html.format($entry.getField("booktitle"))</dd>
+#end
+#if( $entry.getField("chapter") )
+<dd>Chapter $html.format($entry.getField("chapter"))</dd>
+#end
+<dd>#if( $entry.getField("journal") )$html.format($entry.getField("journal")), #end#if( $entry.getField("school") )$html.format($entry.getField("school")), #end#if( $entry.getField("publisher") )$html.format($entry.getField("publisher")), #end#if( $entry.getField("year") )<b>$entry.getField("year")</b>#end#if( $entry.getField("volume") ), Vol. $entry.getField("volume")#end#if( $entry.getField("number") )($entry.getField("number"))#end#if( $entry.getField("pages") ), pp. $entry.getField("pages")#end</dd>
+#end
+</dl>
+</body>
+</html>
