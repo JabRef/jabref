@@ -57,6 +57,7 @@ Place before the subcommand:
 | `preferences reset\|import\|export` | Manage jabkit preferences |
 | `pseudonymize` | Replace identifying data in a library (writes a key file for reversal) |
 | `search` | Search in a library using JabRef's search syntax |
+| `shorten FILE.tex` | Compile a LaTeX paper with `latexmk` and shorten its cited references (authors → first author, journal abbreviations, DOI cleanup) until it fits a target page count |
 
 Input files are passed positionally or via `--input`; both forms are equivalent. `--input-format "*"` auto-detects the input format.
 
@@ -83,6 +84,9 @@ jabkit pdf update --citation-key Smith2020 --input library.bib --input-format bi
 
 # Library subset actually cited in a LaTeX document
 jabkit generate-bib-from-aux --aux paper.aux --input full-library.bib --output paper.bib
+
+# Shorten a paper's references until it fits 6 pages (rewrites the referenced .bib in place)
+jabkit shorten paper.tex --pages 6
 ```
 
 ## Notes for agents
@@ -90,3 +94,4 @@ jabkit generate-bib-from-aux --aux paper.aux --input full-library.bib --output p
 - Always use `-p`/`--porcelain` when parsing output programmatically.
 - `fetch --provider` matches JabRef's web-search fetcher names case-insensitively; on an unknown name, jabkit reports `Could not find fetcher`.
 - URLs are accepted as input: `jabkit convert --input https://example.org/refs.ris --input-format ris`.
+- `shorten` needs a local `latexmk` (any TeX distribution); if none is found it falls back to the `texlive/texlive` Docker image. It applies only the cleanups needed to hit `--pages` (default: one page fewer), rewrites the referenced `.bib` in place, and warns on stderr if the target can't be reached. Use `--output FILE` to redirect the shortened `.bib` instead of overwriting.

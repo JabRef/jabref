@@ -26,7 +26,8 @@ import static picocli.CommandLine.Option;
                 Pdf.class,
                 Preferences.class,
                 Pseudonymize.class,
-                Search.class
+                Search.class,
+                Shorten.class
         })
 public class JabKit implements Runnable {
 
