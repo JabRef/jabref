@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -244,9 +245,13 @@ class DOITest {
         assertEquals(expected, input);
     }
 
-    @Test
-    void equalsWorksFor2017Doi() {
-        assertEquals(new DOI("10.1109/cloud.2017.89"), new DOI("10.1109/CLOUD.2017.89"));
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            10.1109/cloud.2017.89,               10.1109/CLOUD.2017.89
+            https://doi.org/10.1109/cloud.2017.89, 10.1109/cloud.2017.89
+            """)
+    void equalsIgnoresPrefixAndCase(String left, String right) {
+        assertEquals(new DOI(left), new DOI(right));
     }
 
     @Test
