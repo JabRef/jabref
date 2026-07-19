@@ -58,18 +58,19 @@ class StudyFetcher {
 
     private Optional<FetchResult> performSearchOnQueryForFetcher(StudyQuery searchQuery, SearchBasedFetcher fetcher) {
         try {
+            String effectiveQuery = searchQuery.getCatalogSpecific().getOrDefault(fetcher.getName(), searchQuery.getQuery());
             List<BibEntry> fetchResult = new ArrayList<>();
             if (fetcher instanceof PagedSearchBasedFetcher basedFetcher) {
                 int limit = resultLimits.getOrDefault(fetcher.getName(), StudyRepository.DEFAULT_RESULT_LIMIT);
                 int pages = (int) Math.ceil((double) limit / basedFetcher.getPageSize());
                 for (int page = 0; page < pages; page++) {
-                    fetchResult.addAll(basedFetcher.performSearchPaged(searchQuery.getQuery(), page).getContent());
+                    fetchResult.addAll(basedFetcher.performSearchPaged(effectiveQuery, page).getContent());
                 }
                 if (fetchResult.size() > limit) {
                     fetchResult = new ArrayList<>(fetchResult.subList(0, limit));
                 }
             } else {
-                fetchResult = fetcher.performSearch(searchQuery.getQuery());
+                fetchResult = fetcher.performSearch(effectiveQuery);
             }
             return Optional.of(new FetchResult(fetcher.getName(), new BibDatabase(fetchResult)));
         } catch (FetcherException e) {
