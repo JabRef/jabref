@@ -39,6 +39,10 @@ import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
+import org.jabref.model.groups.DirectoryStructureGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.SaveOrder;
 
 import org.junit.jupiter.api.AfterEach;
@@ -636,7 +640,7 @@ class DirectoryLibrarySynchronizerTest {
         assertFalse(Files.exists(root.resolve("wrong.yml")));
     }
 
-    /// [utest->req~directory-library.bib-mirror~1]
+    /// [utest->req~directory-library.bib-mirror~2]
     @Test
     void initializeMirrorCreatesBibMirrorWithBase() throws IOException {
         Files.writeString(root.resolve("smith2020.yml"), ARTICLE_YAML);
@@ -649,7 +653,7 @@ class DirectoryLibrarySynchronizerTest {
         assertEquals(Files.readString(mirror), Files.readString(root.resolve(".jabref").resolve("mirror-base.bib")));
     }
 
-    /// [utest->req~directory-library.bib-mirror~1]
+    /// [utest->req~directory-library.bib-mirror~2]
     @Test
     void externalMirrorEditUpdatesEntryAndSidecar() throws IOException {
         Path sidecar = root.resolve("smith2020.yml");
@@ -669,7 +673,7 @@ class DirectoryLibrarySynchronizerTest {
         assertTrue(Files.readString(mirror).contains("An Edited Title"));
     }
 
-    /// [utest->req~directory-library.bib-mirror~1]
+    /// [utest->req~directory-library.bib-mirror~2]
     @Test
     void externalMirrorAdditionCreatesEntryAndSidecar() throws IOException {
         Files.writeString(root.resolve("smith2020.yml"), ARTICLE_YAML);
@@ -696,7 +700,7 @@ class DirectoryLibrarySynchronizerTest {
         assertTrue(Files.readString(root.resolve("doe2021.md")).contains("A Second Article"));
     }
 
-    /// [utest->req~directory-library.bib-mirror~1]
+    /// [utest->req~directory-library.bib-mirror~2]
     @Test
     void externalMirrorDeletionRemovesEntryAndDisposesSidecar() throws IOException {
         Path sidecar = root.resolve("smith2020.yml");
@@ -716,7 +720,7 @@ class DirectoryLibrarySynchronizerTest {
         assertEquals(List.of(sidecar), disposedFiles);
     }
 
-    /// [utest->req~directory-library.bib-mirror~1]
+    /// [utest->req~directory-library.bib-mirror~2]
     @Test
     void conflictingMirrorEditKeepsLibraryStateWhenResolutionIsCancelled() throws IOException {
         Path sidecar = root.resolve("smith2020.yml");
@@ -737,7 +741,7 @@ class DirectoryLibrarySynchronizerTest {
 
     /// A pre-existing `.bib` named like the directory, without a recorded base, is adopted by
     /// importing against an empty base — its entries appear, nothing is deleted.
-    /// [utest->req~directory-library.bib-mirror~1]
+    /// [utest->req~directory-library.bib-mirror~2]
     @Test
     void preExistingBibIsAdoptedWithoutDeletingLibraryContent() throws IOException {
         Files.writeString(root.resolve("smith2020.yml"), ARTICLE_YAML);
@@ -755,5 +759,26 @@ class DirectoryLibrarySynchronizerTest {
         assertEquals(2, entries().size());
         assertTrue(Files.readString(mirror).contains("smith2020"));
         assertTrue(Files.readString(mirror).contains("doe2021"));
+    }
+
+    /// [utest->req~directory-library.bib-mirror~2]
+    @Test
+    void userGroupsFromMirrorMetadataAreRestoredAtOpen() throws IOException {
+        Files.writeString(root.resolve("smith2020.yml"), ARTICLE_YAML);
+        openLibrary();
+        synchronizer.doInitializeMirror();
+        context.getMetaData().getGroups().orElseThrow()
+               .addSubgroup(new ExplicitGroup("My group", GroupHierarchyType.INDEPENDENT, ','));
+        // The mirror is derived state: reporting it deleted forces a rewrite, now with the group
+        synchronizer.handleFileDeleted(synchronizer.getMirrorFile());
+        synchronizer.flush();
+        synchronizer.shutdown();
+
+        openLibrary();
+        synchronizer.doInitializeMirror();
+
+        List<GroupTreeNode> children = context.getMetaData().getGroups().orElseThrow().getChildren();
+        assertTrue(children.stream().anyMatch(child -> "My group".equals(child.getName())));
+        assertEquals(1, children.stream().filter(child -> child.getGroup() instanceof DirectoryStructureGroup).count());
     }
 }

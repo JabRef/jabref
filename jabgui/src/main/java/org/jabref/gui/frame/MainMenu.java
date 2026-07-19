@@ -48,6 +48,7 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.help.SearchForUpdateAction;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.NewEntryAction;
+import org.jabref.gui.importer.actions.ConvertToDirectoryLibraryAction;
 import org.jabref.gui.importer.actions.ImportCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.importer.actions.OpenDirectoryLibraryAction;
@@ -179,6 +180,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferences, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.CONVERT_TO_FOLDER_LIBRARY, new ConvertToDirectoryLibraryAction(frame, dialogService, preferences, aiService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor)),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame, stateManager)),
 
                 new SeparatorMenuItem(),

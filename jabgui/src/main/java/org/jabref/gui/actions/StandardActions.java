@@ -79,6 +79,7 @@ public enum StandardActions implements Action {
     NEW_LIBRARY(Localization.lang("New empty library"), IconTheme.JabRefIcons.NEW),
     OPEN_LIBRARY(Localization.lang("Open library..."), IconTheme.JabRefIcons.OPEN, KeyBinding.OPEN_LIBRARY),
     OPEN_FOLDER_AS_LIBRARY(Localization.lang("Open folder as library..."), IconTheme.JabRefIcons.OPEN),
+    CONVERT_TO_FOLDER_LIBRARY(Localization.lang("Convert to folder library..."), IconTheme.JabRefIcons.FOLDER),
     MERGE_LIBRARY(Localization.lang("Merge..."), IconTheme.JabRefIcons.MERGE_ENTRIES),
     IMPORT(Localization.lang("Import"), IconTheme.JabRefIcons.IMPORT),
     EXPORT(Localization.lang("Export"), IconTheme.JabRefIcons.EXPORT, KeyBinding.EXPORT),

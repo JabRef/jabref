@@ -52,6 +52,9 @@ import org.jabref.model.entry.event.EntriesEvent;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.DirectoryStructureGroup;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.metadata.event.MetaDataChangedEvent;
 
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.io.IOCase;
@@ -105,7 +108,7 @@ import static java.util.function.Predicate.not;
 /// [GitConflictResolverStrategy], and a cancelled resolution keeps the library's state.
 // [impl->req~directory-library.inbound-sync~2]
 // [impl->req~directory-library.write-back~2]
-// [impl->req~directory-library.bib-mirror~1]
+// [impl->req~directory-library.bib-mirror~2]
 @NullMarked
 public class DirectoryLibrarySynchronizer implements FileAlterationListener {
 
@@ -307,9 +310,37 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
         syncExecutor.execute(() -> handleLocalRemoval(entries));
     }
 
+    @Subscribe
+    public void listen(MetaDataChangedEvent event) {
+        // Groups (and other library settings) live only in the mirror's metadata block
+        markMirrorDirty();
+    }
+
     private static boolean isUserChange(EntriesEvent event) {
         return event.getEntriesEventSource() == EntriesEventSource.LOCAL
                 || event.getEntriesEventSource() == EntriesEventSource.UNDO;
+    }
+
+    /// Restores user-defined groups from the mirror's metadata into the freshly scanned
+    /// context (whose tree only holds the automatic directory-structure group). The
+    /// serialized directory-structure group itself is skipped — the scanner installs it with
+    /// a live lookup, the parsed one would be an empty duplicate.
+    private void adoptUserGroups(BibDatabaseContext remote) {
+        Optional<GroupTreeNode> remoteRoot = remote.getMetaData().getGroups();
+        Optional<GroupTreeNode> localRoot = databaseContext.getMetaData().getGroups();
+        if (remoteRoot.isEmpty() || localRoot.isEmpty()) {
+            return;
+        }
+        List<GroupTreeNode> adoptable = remoteRoot.get().getChildren().stream()
+                                                  .filter(child -> !(child.getGroup() instanceof DirectoryStructureGroup))
+                                                  .toList();
+        if (adoptable.isEmpty()) {
+            return;
+        }
+        modelUpdateMarshaller.accept(() -> {
+            adoptable.forEach(child -> child.moveTo(localRoot.get()));
+            refreshGroupsView();
+        });
     }
 
     synchronized void handleLocalChange(BibEntry entry) {
@@ -420,6 +451,9 @@ public class DirectoryLibrarySynchronizer implements FileAlterationListener {
             writeDirtyFiles();
             return;
         }
+        // The mirror's metadata is the only place user-defined groups of a directory library
+        // survive a restart — the sidecars carry entries, not library metadata
+        readBibContext(mirror).ifPresent(this::adoptUserGroups);
         try {
             if (Files.exists(mirrorBaseFile())
                     && hash(Files.readAllBytes(mirror)).equals(hash(Files.readAllBytes(mirrorBaseFile())))) {

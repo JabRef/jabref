@@ -92,7 +92,7 @@ the renamed files.
 Needs: impl
 
 ## The library is mirrored into a single .bib file
-`req~directory-library.bib-mirror~1`
+`req~directory-library.bib-mirror~2`
 
 A directory library is continuously mirrored into `<root>/<root-name>.bib` (debounced with the
 sidecar write-back), so plain BibTeX consumers and collaborators can read and edit the library
@@ -105,6 +105,23 @@ cancelled resolution keeps the library's state. A pre-existing `.bib` without a 
 adopted against an empty base, which can only add entries or raise conflicts, never delete
 library content. Entries are matched across the mirror by citation key; entries without one are
 not matched. The mirror itself is recreated when deleted and never imported as a sidecar.
+User-defined groups are carried by the mirror's metadata block: they are written with every
+mirror update and restored into the library when it is opened (the automatic directory-structure
+group is not duplicated).
+
+Needs: impl, utest
+
+## A .bib library converts into a directory library
+`req~directory-library.convert~1`
+
+A saved local `.bib` library can be converted into a directory library. The root is the
+library-specific file directory when configured, otherwise the `.bib` file's directory. The
+conversion only proceeds when every linked local file resolves to a location under that root and
+the library carries no BibTeX strings or preamble; otherwise the obstacles are reported and
+nothing is changed. On conversion, every entry gets a single-entry Markdown sidecar next to its
+first linked file (or named after its citation key in the root), the `.bib` file moves to the
+root as `<root-name>.bib` and becomes the library's mirror (preserving groups via the mirror
+metadata), and the root is reopened as a directory library.
 
 Needs: impl, utest
 
