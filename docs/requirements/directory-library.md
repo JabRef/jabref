@@ -91,4 +91,21 @@ the renamed files.
 
 Needs: impl
 
+## The library is mirrored into a single .bib file
+`req~directory-library.bib-mirror~1`
+
+A directory library is continuously mirrored into `<root>/<root-name>.bib` (debounced with the
+sidecar write-back), so plain BibTeX consumers and collaborators can read and edit the library
+as one file; a snapshot of the last written mirror is kept as the merge base under
+`.jabref/mirror-base.bib`. External modifications of the mirror — while the library is open or
+while it was closed — are three-way merged into the library using the git-sync semantic merge:
+auto-mergeable changes (including added and deleted entries) are applied and persisted into the
+sidecars, true conflicts are put to the user via the git conflict resolution dialog, and a
+cancelled resolution keeps the library's state. A pre-existing `.bib` without a recorded base is
+adopted against an empty base, which can only add entries or raise conflicts, never delete
+library content. Entries are matched across the mirror by citation key; entries without one are
+not matched. The mirror itself is recreated when deleted and never imported as a sidecar.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->

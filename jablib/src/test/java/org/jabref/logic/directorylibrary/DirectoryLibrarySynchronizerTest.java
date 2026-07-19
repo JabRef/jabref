@@ -1,6 +1,9 @@
 package org.jabref.logic.directorylibrary;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,17 +20,28 @@ import java.util.function.Function;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
+import org.jabref.model.metadata.SaveOrder;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
@@ -96,15 +110,53 @@ class DirectoryLibrarySynchronizerTest {
     /// Tests opt into pattern renames by replacing this; the default keeps file names as-is.
     private Function<BibEntry, Optional<String>> fileNameGenerator = entry -> Optional.empty();
 
+    /// The default resolver behaves like a cancelled dialog: the library's state wins.
+    private GitConflictResolverStrategy conflictResolver = conflicts -> List.of();
+
     private BibDatabaseContext context;
     private DirectoryLibrarySynchronizer synchronizer;
+
+    /// A pending debounced write would otherwise race the @TempDir cleanup
+    @AfterEach
+    void shutDownSynchronizer() {
+        if (synchronizer != null) {
+            synchronizer.shutdown();
+        }
+    }
 
     private void openLibrary() throws IOException {
         PdfEntryFactory pdfEntryFactory = offlinePdfEntryFactory();
         DirectoryLibraryScanner.ScanResult scanResult = new DirectoryLibraryScanner(pdfEntryFactory).scan(root);
         context = scanResult.databaseContext();
         synchronizer = new DirectoryLibrarySynchronizer(context, scanResult.catalog(), pdfEntryFactory,
-                disposedFiles::add, fileNameGenerator, Runnable::run, clock);
+                disposedFiles::add, fileNameGenerator, this::serializeContext, DirectoryLibrarySynchronizerTest::parseBib,
+                conflicts -> conflictResolver.resolveConflicts(conflicts), Runnable::run, clock);
+    }
+
+    private String serializeContext() {
+        StringWriter stringWriter = new StringWriter();
+        BibWriter bibWriter = new BibWriter(stringWriter, "\n");
+        try {
+            new BibDatabaseWriter(bibWriter,
+                    new SelfContainedSaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false),
+                    new FieldPreferences(true, List.of(), List.of()),
+                    mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                    new BibEntryTypesManager()).writeDatabase(context);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        return stringWriter.toString();
+    }
+
+    private static Optional<BibDatabaseContext> parseBib(String content) {
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        try {
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(content));
+            return result.isInvalid() ? Optional.empty() : Optional.of(result.getDatabaseContext());
+        } catch (IOException e) {
+            return Optional.empty();
+        }
     }
 
     /// GROBID off and no identifiers in the fixtures, so no network is touched
@@ -582,5 +634,126 @@ class DirectoryLibrarySynchronizerTest {
 
         assertTrue(Files.exists(file));
         assertFalse(Files.exists(root.resolve("wrong.yml")));
+    }
+
+    /// [utest->req~directory-library.bib-mirror~1]
+    @Test
+    void initializeMirrorCreatesBibMirrorWithBase() throws IOException {
+        Files.writeString(root.resolve("smith2020.yml"), ARTICLE_YAML);
+        openLibrary();
+
+        synchronizer.doInitializeMirror();
+
+        Path mirror = synchronizer.getMirrorFile();
+        assertTrue(Files.readString(mirror).contains("smith2020"));
+        assertEquals(Files.readString(mirror), Files.readString(root.resolve(".jabref").resolve("mirror-base.bib")));
+    }
+
+    /// [utest->req~directory-library.bib-mirror~1]
+    @Test
+    void externalMirrorEditUpdatesEntryAndSidecar() throws IOException {
+        Path sidecar = root.resolve("smith2020.yml");
+        Files.writeString(sidecar, ARTICLE_YAML);
+        openLibrary();
+        synchronizer.doInitializeMirror();
+        Path mirror = synchronizer.getMirrorFile();
+
+        Files.writeString(mirror, Files.readString(mirror).replace("A Test Article", "An Edited Title"));
+        synchronizer.mergeExternalMirror();
+        BibEntry entry = entries().getFirst();
+        synchronizer.handleLocalChange(entry);
+        synchronizer.flush();
+
+        assertEquals(Optional.of("An Edited Title"), entry.getField(StandardField.TITLE));
+        assertTrue(Files.readString(sidecar).contains("An Edited Title"));
+        assertTrue(Files.readString(mirror).contains("An Edited Title"));
+    }
+
+    /// [utest->req~directory-library.bib-mirror~1]
+    @Test
+    void externalMirrorAdditionCreatesEntryAndSidecar() throws IOException {
+        Files.writeString(root.resolve("smith2020.yml"), ARTICLE_YAML);
+        openLibrary();
+        synchronizer.doInitializeMirror();
+        Path mirror = synchronizer.getMirrorFile();
+
+        Files.writeString(mirror, Files.readString(mirror) + """
+
+                @Article{doe2021,
+                  author = {Doe, John},
+                  title  = {A Second Article},
+                }
+                """);
+        synchronizer.mergeExternalMirror();
+        BibEntry added = entries().stream()
+                                  .filter(entry -> entry.getCitationKey().equals(Optional.of("doe2021")))
+                                  .findFirst()
+                                  .orElseThrow();
+        synchronizer.handleLocalChange(added);
+        synchronizer.flush();
+
+        assertEquals(2, entries().size());
+        assertTrue(Files.readString(root.resolve("doe2021.md")).contains("A Second Article"));
+    }
+
+    /// [utest->req~directory-library.bib-mirror~1]
+    @Test
+    void externalMirrorDeletionRemovesEntryAndDisposesSidecar() throws IOException {
+        Path sidecar = root.resolve("smith2020.yml");
+        Files.writeString(sidecar, ARTICLE_YAML);
+        openLibrary();
+        synchronizer.doInitializeMirror();
+        Path mirror = synchronizer.getMirrorFile();
+        BibEntry entry = entries().getFirst();
+
+        String withoutEntry = Files.readString(mirror).replaceAll("(?s)@Article\\{smith2020.*?\\n\\}\\n", "");
+        Files.writeString(mirror, withoutEntry);
+        synchronizer.mergeExternalMirror();
+        synchronizer.handleLocalRemoval(List.of(entry));
+        synchronizer.flush();
+
+        assertEquals(List.of(), entries());
+        assertEquals(List.of(sidecar), disposedFiles);
+    }
+
+    /// [utest->req~directory-library.bib-mirror~1]
+    @Test
+    void conflictingMirrorEditKeepsLibraryStateWhenResolutionIsCancelled() throws IOException {
+        Path sidecar = root.resolve("smith2020.yml");
+        Files.writeString(sidecar, ARTICLE_YAML);
+        openLibrary();
+        synchronizer.doInitializeMirror();
+        Path mirror = synchronizer.getMirrorFile();
+
+        BibEntry entry = entries().getFirst();
+        entry.setField(StandardField.TITLE, "Local Title");
+        Files.writeString(mirror, Files.readString(mirror).replace("A Test Article", "Remote Title"));
+        synchronizer.mergeExternalMirror();
+        synchronizer.flush();
+
+        assertEquals(Optional.of("Local Title"), entry.getField(StandardField.TITLE));
+        assertTrue(Files.readString(mirror).contains("Local Title"));
+    }
+
+    /// A pre-existing `.bib` named like the directory, without a recorded base, is adopted by
+    /// importing against an empty base — its entries appear, nothing is deleted.
+    /// [utest->req~directory-library.bib-mirror~1]
+    @Test
+    void preExistingBibIsAdoptedWithoutDeletingLibraryContent() throws IOException {
+        Files.writeString(root.resolve("smith2020.yml"), ARTICLE_YAML);
+        Path mirror = root.resolve(root.getFileName() + ".bib");
+        Files.writeString(mirror, """
+                @Article{doe2021,
+                  author = {Doe, John},
+                  title  = {A Second Article},
+                }
+                """);
+        openLibrary();
+        synchronizer.mergeExternalMirror();
+        synchronizer.flush();
+
+        assertEquals(2, entries().size());
+        assertTrue(Files.readString(mirror).contains("smith2020"));
+        assertTrue(Files.readString(mirror).contains("doe2021"));
     }
 }

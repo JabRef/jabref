@@ -1,6 +1,8 @@
 package org.jabref.gui.importer.actions;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -15,6 +17,8 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.git.GitConflictResolverDialog;
+import org.jabref.gui.git.GuiGitConflictResolverStrategy;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -23,6 +27,11 @@ import org.jabref.logic.directorylibrary.DirectoryLibraryScanner;
 import org.jabref.logic.directorylibrary.DirectoryLibrarySynchronizer;
 import org.jabref.logic.directorylibrary.PdfEnrichmentTask;
 import org.jabref.logic.directorylibrary.PdfEntryFactory;
+import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.DirectoryMonitor;
@@ -31,6 +40,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -140,11 +150,15 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
                 preferences.getCitationKeyPatternPreferences());
         Function<BibEntry, Optional<String>> fileNameGenerator = entry -> FileUtil.createFileNameFromPattern(
                 databaseContext.getDatabase(), entry, preferences.getFilePreferences().getFileNamePattern());
+        GuiGitConflictResolverStrategy conflictResolver = new GuiGitConflictResolverStrategy(
+                new GitConflictResolverDialog(dialogService, preferences, stateManager));
         DirectoryLibrarySynchronizer synchronizer = new DirectoryLibrarySynchronizer(
                 databaseContext, scanResult.catalog(), pdfEntryFactory, this::disposeFile, fileNameGenerator,
+                () -> serializeToBib(databaseContext), this::parseBib, conflictResolver,
                 UiTaskExecutor::runInJavaFXThread);
         databaseContext.attachDirectorySynchronizer(synchronizer);
         synchronizer.startWatching(Injector.instantiateModelOrService(DirectoryMonitor.class));
+        synchronizer.initializeMirror();
 
         if (!scanResult.pendingPdfImports().isEmpty()) {
             new PdfEnrichmentTask(scanResult.pendingPdfImports(), pdfEntryFactory, databaseContext,
@@ -156,6 +170,34 @@ public class OpenDirectoryLibraryAction extends SimpleCommand {
             dialogService.showWarningDialogAndWait(
                     Localization.lang("Open folder as library"),
                     String.join("\n", scanResult.warnings()));
+        }
+    }
+
+    private String serializeToBib(BibDatabaseContext databaseContext) {
+        StringWriter stringWriter = new StringWriter();
+        BibWriter bibWriter = new BibWriter(stringWriter, databaseContext.getDatabase().getNewLineSeparator());
+        SelfContainedSaveConfiguration saveConfiguration = new SelfContainedSaveConfiguration(
+                SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA,
+                preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
+        try {
+            synchronized (databaseContext) {
+                new BibDatabaseWriter(bibWriter, saveConfiguration, preferences.getFieldPreferences(),
+                        preferences.getCitationKeyPatternPreferences(), entryTypesManager)
+                        .writeDatabase(databaseContext);
+            }
+        } catch (IOException e) {
+            LOGGER.error("Could not serialize the library for its .bib mirror", e);
+        }
+        return stringWriter.toString();
+    }
+
+    private Optional<BibDatabaseContext> parseBib(String content) {
+        try {
+            ParserResult result = new BibtexParser(preferences.getImportFormatPreferences()).parse(Reader.of(content));
+            return result.isInvalid() ? Optional.empty() : Optional.of(result.getDatabaseContext());
+        } catch (IOException e) {
+            LOGGER.warn("Could not parse the .bib mirror", e);
+            return Optional.empty();
         }
     }
 }

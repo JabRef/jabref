@@ -70,6 +70,12 @@ Key points of the chosen design:
   `EntriesEventSource` to prevent echo loops; directory watching uses the Commons-IO
   `DirectoryMonitor` ([ADR-0030](0030-use-apache-commons-io-for-directory-monitoring.md)).
   "Save as" converts a directory library into a regular `.bib` library.
+* The library is additionally mirrored into a visible `<root>/<root-name>.bib`. Unlike the
+  rejected hidden-`.bib` option, the mirror is not primary state: it is derived from the
+  sidecars on every change, and external edits of it are three-way merged back (base = the
+  mirror as last written, kept under `.jabref/mirror-base.bib`) using the git-sync semantic
+  merge and its conflict-resolution dialog. This gives plain-BibTeX consumers and
+  collaborators one file to read and edit without the drift the hidden `.bib` was rejected for.
 
 ### Consequences
 
