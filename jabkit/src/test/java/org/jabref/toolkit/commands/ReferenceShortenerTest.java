@@ -77,4 +77,19 @@ class ReferenceShortenerTest {
         assertEquals(List.of("a"), result.appliedSteps());
         assertTrue(result.reachedTarget());
     }
+
+    @Test
+    void defaultTargetIsClampedToOneForSinglePageDocument() {
+        // A one-page paper must not be shortened: the default target is clamped to 1, not 0.
+        ReferenceShortener shortener = new ReferenceShortener(
+                List.of(step("a"), step("b")),
+                scriptedPageCounts(1));
+
+        ReferenceShortener.Result result = shortener.shorten(OptionalInt.empty());
+
+        assertEquals(1, result.targetPages());
+        assertEquals(List.of(), applied);
+        assertEquals(List.of(), result.appliedSteps());
+        assertTrue(result.reachedTarget());
+    }
 }

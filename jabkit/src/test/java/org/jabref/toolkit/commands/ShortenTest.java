@@ -33,6 +33,17 @@ class ShortenTest extends AbstractJabKitTest {
     }
 
     @Test
+    void rejectsNonPositivePageTargetWithUsageError(@TempDir Path projectDir) throws IOException {
+        Path texFile = projectDir.resolve("paper.tex");
+        Files.writeString(texFile, "\\documentclass{article}\\begin{document}hi\\end{document}");
+
+        int exitCode = commandLine.executeToLog("shorten", texFile.toString(), "--pages", "0");
+
+        assertEquals(CommandLine.ExitCode.USAGE, exitCode);
+        assertTrue(commandLine.getErrorOutput().contains("at least 1"));
+    }
+
+    @Test
     void removesStagingDirectoryOnFailure(@TempDir Path projectDir) throws IOException {
         // A .tex without a \bibliography fails the "No bibliography file found" check *after* the
         // directory has been staged, exercising the finally-block cleanup without needing a compile.

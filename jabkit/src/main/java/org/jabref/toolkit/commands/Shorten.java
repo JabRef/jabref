@@ -79,6 +79,12 @@ class Shorten implements Callable<Integer> {
                     Localization.lang("The shorten command needs a local LaTeX project directory, not a URL."),
                     CommandLine.ExitCode.USAGE);
         }
+        if (pages != null && pages < 1) {
+            throw new CliException(
+                    "--pages must be at least 1, was " + pages,
+                    Localization.lang("The target page count must be at least 1."),
+                    CommandLine.ExitCode.USAGE);
+        }
         Path texFile = inputOption.getInputFile();
 
         // Work on a copy so the loop never touches the user's tree until a validated result exists,

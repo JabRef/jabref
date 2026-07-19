@@ -29,10 +29,12 @@ class ReferenceShortener {
         this.measure = measure;
     }
 
-    /// @param targetPages desired maximum page count; when empty, the target is one page shorter than the baseline ("reduce until the paper is one page shorter")
+    /// @param targetPages desired maximum page count; when empty, the target is one page shorter than the baseline ("reduce until the paper is one page shorter"), but never below 1 so a single-page paper is left untouched
     Result shorten(OptionalInt targetPages) {
         int baseline = measure.getAsInt();
-        int target = targetPages.orElse(baseline - 1);
+        // Clamp the implicit "one page shorter" target to 1: a 0-page target is unreachable and would
+        // otherwise apply every step (rewriting the .bib) on a paper that cannot shrink further.
+        int target = targetPages.orElse(Math.max(1, baseline - 1));
         List<String> applied = new ArrayList<>();
 
         int pages = baseline;
