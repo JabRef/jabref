@@ -41,6 +41,7 @@ import static picocli.CommandLine.ParentCommand;
 /// first author minification, then journal abbreviation, then DOI normalization — recompiling with
 /// latexmk after each and stopping as soon as the target is met. The referenced `.bib` file(s) are
 /// rewritten with the smallest set of cleanups that reaches the target.
+// [impl->req~jabkit.cli.shorten~1]
 @Command(name = "shorten", description = "Shorten a paper's references (via latexmk) until it fits a page count.")
 class Shorten implements Callable<Integer> {
 

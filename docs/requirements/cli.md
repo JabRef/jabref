@@ -59,3 +59,15 @@ Windows-style paths (containing `:`) and titles (containing `:` between citation
 are parsed correctly by the GitHub Actions runner.
 
 Needs: impl
+
+## Shorten a paper's references to fit a page count
+`req~jabkit.cli.shorten~1`
+
+The `jabkit shorten FILE.tex` command compiles the referenced LaTeX document with `latexmk`
+and applies escalating, information-reducing cleanups to its cited references
+(author minification, journal-name abbreviation, DOI normalization), recompiling after each
+and stopping as soon as the paper reaches the target page count (`--pages`, default one page fewer).
+The referenced `.bib` file(s) are rewritten with the smallest set of cleanups that reaches the target.
+A local `latexmk` is preferred; the `texlive/texlive` Docker image is used when no local TeX is present.
+
+Needs: impl
