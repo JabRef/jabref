@@ -25,7 +25,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.toolkit.exception.CliException;
-import org.jabref.toolkit.exception.ExportServiceException;
 import org.jabref.toolkit.exception.ImportServiceException;
 import org.jabref.toolkit.service.ExportService;
 import org.jabref.toolkit.service.ImportService;
@@ -157,7 +156,7 @@ class Shorten implements Callable<Integer> {
             throw failure.cause();
         }
 
-        return report(texFile, loadedBibs, result);
+        return report(texFile, workDir, loadedBibs, result);
     }
 
     private List<ReferenceShortener.Step> buildSteps(List<LoadedBib> loadedBibs) {
@@ -172,7 +171,7 @@ class Shorten implements Callable<Integer> {
                         () -> forEachCitedEntry(loadedBibs, new DoiCleanup()::cleanup)));
     }
 
-    private Integer report(Path texFile, List<LoadedBib> loadedBibs, ReferenceShortener.Result result) throws ExportServiceException {
+    private Integer report(Path texFile, Path workDir, List<LoadedBib> loadedBibs, ReferenceShortener.Result result) throws CliException {
         if (result.appliedSteps().isEmpty()) {
             if (!sharedOptions.porcelain) {
                 System.out.println(Localization.lang("'%0' already fits within %1 pages; nothing to shorten.",
@@ -181,7 +180,7 @@ class Shorten implements Callable<Integer> {
             return CommandLine.ExitCode.OK;
         }
 
-        writeBack(texFile, loadedBibs);
+        writeBack(texFile, workDir, loadedBibs);
 
         String appliedSteps = String.join(", ", result.appliedSteps());
         if (result.reachedTarget()) {
@@ -197,16 +196,33 @@ class Shorten implements Callable<Integer> {
         return CommandLine.ExitCode.OK;
     }
 
-    private void writeBack(Path texFile, List<LoadedBib> loadedBibs) throws ExportServiceException {
+    private void writeBack(Path texFile, Path workDir, List<LoadedBib> loadedBibs) throws CliException {
         ExportService writeBackExport = ExportService.create(jabKit.cliPreferences, sharedOptions.porcelain);
+        Path sourceRoot = texFile.toAbsolutePath().getParent();
         for (LoadedBib bib : loadedBibs) {
-            // outputFile is only reached with exactly one bib (validated earlier); otherwise each
-            // referenced .bib is rewritten in place.
+            // outputFile is only reached with exactly one bib (validated earlier); otherwise map the
+            // staged copy back onto the user's tree, preserving its subdirectory.
             Path destination = outputFile != null
                                ? outputFile
-                               : texFile.toAbsolutePath().getParent().resolve(bib.tempPath().getFileName());
+                               : resolveWriteBackDestination(sourceRoot, workDir, bib.tempPath());
             writeBackExport.saveDatabase(bib.database(), destination);
         }
+    }
+
+    /// Maps a staged `.bib` back to the user's source tree, preserving the path (e.g. subdirectory)
+    /// it had relative to the staging root — `DefaultLatexParser` resolves and keeps subdirectories,
+    /// so writing only the basename would target the wrong file. Refuses paths that escape the
+    /// source directory via `..`.
+    static Path resolveWriteBackDestination(Path sourceRoot, Path workDir, Path stagedBib) throws CliException {
+        Path relative = workDir.relativize(stagedBib);
+        Path destination = sourceRoot.resolve(relative).normalize();
+        if (!destination.startsWith(sourceRoot.normalize())) {
+            throw new CliException(
+                    "Refusing to write '%s' outside the project directory '%s'".formatted(destination, sourceRoot),
+                    Localization.lang("Refusing to write outside the project directory."),
+                    CommandLine.ExitCode.SOFTWARE);
+        }
+        return destination;
     }
 
     private List<LoadedBib> loadBibs(List<Path> bibFiles, Set<String> citedKeys) throws ImportServiceException {

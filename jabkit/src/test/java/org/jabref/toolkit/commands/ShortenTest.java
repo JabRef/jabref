@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
+import org.jabref.toolkit.exception.CliException;
 import org.jabref.toolkit.exception.CliExceptionHandler;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.io.TempDir;
 import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ShortenTest extends AbstractJabKitTest {
@@ -72,6 +74,27 @@ class ShortenTest extends AbstractJabKitTest {
 
         assertEquals(CommandLine.ExitCode.USAGE, exitCode);
         assertEquals(stagingDirsBefore, stagingDirsAfter);
+    }
+
+    @Test
+    void writeBackDestinationPreservesBibSubdirectory(@TempDir Path root) throws CliException {
+        Path sourceRoot = root.resolve("project");
+        Path workDir = root.resolve("staging");
+        Path stagedBib = workDir.resolve("bib").resolve("references.bib");
+
+        assertEquals(sourceRoot.resolve("bib").resolve("references.bib"),
+                Shorten.resolveWriteBackDestination(sourceRoot, workDir, stagedBib));
+    }
+
+    @Test
+    void writeBackDestinationRefusesEscapingPath(@TempDir Path root) {
+        Path sourceRoot = root.resolve("project");
+        Path workDir = root.resolve("staging");
+        // A bib resolved outside the staging root would map back outside the project directory.
+        Path outsideBib = root.resolve("evil.bib");
+
+        assertThrows(CliException.class,
+                () -> Shorten.resolveWriteBackDestination(sourceRoot, workDir, outsideBib));
     }
 
     private static long countStagingDirectories() throws IOException {
