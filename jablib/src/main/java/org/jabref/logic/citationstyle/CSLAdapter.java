@@ -34,13 +34,16 @@ public class CSLAdapter {
     ///
     /// @param databaseContext {@link BibDatabaseContext} is used to be able to resolve fields and their aliases
     public synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException, IllegalArgumentException {
+        return Arrays.asList(makeBibliographyObject(bibEntries, style, outputFormat, databaseContext, entryTypesManager).getEntries());
+    }
+
+    public synchronized Bibliography makeBibliographyObject(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException, IllegalArgumentException {
         dataProvider.setData(bibEntries, databaseContext, entryTypesManager);
 
         CSL cslInstance = getCslInstance(style, outputFormat);
         cslInstance.registerCitationItems(dataProvider.getIds());
 
-        Bibliography bibliography = cslInstance.makeBibliography();
-        return Arrays.asList(bibliography.getEntries());
+        return cslInstance.makeBibliography();
     }
 
     public synchronized Citation makeCitation(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {

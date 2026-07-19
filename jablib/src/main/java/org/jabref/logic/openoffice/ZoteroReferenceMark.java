@@ -57,7 +57,7 @@ public record ZoteroReferenceMark(
                                                          BibEntryTypesManager entryTypesManager,
                                                          Map<String, String> zoteroUriByCitationKey) {
         String citationId = createRandomString(CITATION_ID_LENGTH);
-        String suffixId = createRandomString(RANDOM_LENGTH);
+        String suffix = createRandomSuffix();
         JabRefItemDataProvider itemDataProvider = new JabRefItemDataProvider();
         ZoteroCitationData citation = new ZoteroCitationData();
         citation.citationId = citationId;
@@ -99,12 +99,12 @@ public record ZoteroReferenceMark(
         }
         citation.citationItems = citationItems;
 
-        String referenceMarkName = PREFIX + GSON.toJson(citation) + RANDOM_PREFIX + suffixId;
+        String referenceMarkName = PREFIX + GSON.toJson(citation) + " " + suffix;
         return new ZoteroReferenceMark(
                 referenceMarkName,
                 List.copyOf(citationKeys),
                 List.copyOf(citationNumbers),
-                RANDOM_PREFIX.trim() + suffixId,
+                suffix,
                 citationType);
     }
 
@@ -194,7 +194,7 @@ public record ZoteroReferenceMark(
 
         String suffix = getSuffix(referenceMarkName);
         if (StringUtil.isBlank(suffix)) {
-            suffix = RANDOM_PREFIX.trim() + createRandomString(RANDOM_LENGTH);
+            suffix = createRandomSuffix();
         }
         return PREFIX + GSON.toJson(citation) + " " + suffix;
     }
@@ -296,6 +296,10 @@ public record ZoteroReferenceMark(
             return "";
         }
         return matcher.group().trim();
+    }
+
+    static String createRandomSuffix() {
+        return RANDOM_PREFIX.trim() + createRandomString(RANDOM_LENGTH);
     }
 
     private static String createRandomString(int length) {

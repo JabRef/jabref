@@ -2,6 +2,7 @@ package org.jabref.logic.citationstyle;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
@@ -10,6 +11,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
+import de.undercouch.citeproc.output.Bibliography;
 import org.jbibtex.TokenMgrException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +67,21 @@ public class CitationStyleGenerator {
                     Localization.lang("Bad character inside entry") +
                     outputFormat.getLineSeparator() +
                     e.getLocalizedMessage());
+        }
+    }
+
+    public static Optional<Bibliography> generateBibliographyObject(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
+        try {
+            return Optional.of(CSL_ADAPTER.makeBibliographyObject(bibEntries, style, outputFormat, databaseContext, entryTypesManager));
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("Could not generate BibEntry bibliography. The CSL engine could not create a bibliography output for your item.", e);
+            return Optional.empty();
+        } catch (IOException | ArrayIndexOutOfBoundsException e) {
+            LOGGER.error("Could not generate BibEntry bibliography", e);
+            return Optional.empty();
+        } catch (TokenMgrException e) {
+            LOGGER.error("Bad character inside BibEntry", e);
+            return Optional.empty();
         }
     }
 }
