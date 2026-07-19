@@ -48,6 +48,7 @@ public record ZoteroReferenceMark(
         return name.startsWith(PREFIX);
     }
 
+    /// Example: "ZOTERO_ITEM CSL_CITATION {json} RNDxxxxxxx"
     public static ZoteroReferenceMark buildReferenceMark(List<BibEntry> entries,
                                                          List<String> citationKeys,
                                                          List<Integer> citationNumbers,

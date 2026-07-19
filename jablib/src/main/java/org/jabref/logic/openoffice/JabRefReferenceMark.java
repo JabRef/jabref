@@ -22,6 +22,7 @@ public record JabRefReferenceMark(
     public static final String EMPTY_MARKER = "EMPTY";
     public static final String NORMAL_MARKER = "NORMAL";
 
+    /// e.g. "JABREF_Smith_2020 CID_1 abcd1234 NORMAL"
     private static final Pattern REFERENCE_MARK_FORMAT = Pattern.compile(
             "^(JABREF_[\\w-:—./–]+ CID_\\d+(?:, JABREF_[\\w-:—./–]+ CID_\\d+)*) (\\w+)(?: (" + IN_TEXT_MARKER + "|" + EMPTY_MARKER + "|" + NORMAL_MARKER + "))?$",
             Pattern.UNICODE_CHARACTER_CLASS);
