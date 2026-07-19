@@ -44,6 +44,22 @@ class ShortenTest extends AbstractJabKitTest {
     }
 
     @Test
+    void rejectsOutputWhenPaperReferencesMultipleBibFiles(@TempDir Path projectDir) throws IOException {
+        // --output names a single destination, so a two-.bib project must be rejected up front
+        // rather than silently overwriting both referenced files in place.
+        Files.writeString(projectDir.resolve("a.bib"), "@Article{a1, author={X}, title={A}, year={2020}}");
+        Files.writeString(projectDir.resolve("b.bib"), "@Article{b1, author={Y}, title={B}, year={2021}}");
+        Path texFile = projectDir.resolve("paper.tex");
+        Files.writeString(texFile, "\\documentclass{article}\\begin{document}\\cite{a1}\\bibliography{a,b}\\end{document}");
+
+        int exitCode = commandLine.executeToLog("shorten", texFile.toString(),
+                "--output", projectDir.resolve("out.bib").toString());
+
+        assertEquals(CommandLine.ExitCode.USAGE, exitCode);
+        assertTrue(commandLine.getErrorOutput().contains("single .bib file"));
+    }
+
+    @Test
     void removesStagingDirectoryOnFailure(@TempDir Path projectDir) throws IOException {
         // A .tex without a \bibliography fails the "No bibliography file found" check *after* the
         // directory has been staged, exercising the finally-block cleanup without needing a compile.

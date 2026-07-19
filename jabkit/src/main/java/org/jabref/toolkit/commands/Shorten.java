@@ -117,6 +117,17 @@ class Shorten implements Callable<Integer> {
 
         Set<String> citedKeys = parsed.getCitations().keySet();
         List<LoadedBib> loadedBibs = loadBibs(parsed.getBibFiles(), citedKeys);
+
+        // --output can only name one destination, so reject multi-.bib papers before compiling or
+        // mutating anything — silently falling back to in-place edits would defeat the point of the
+        // flag (avoiding in-place modification).
+        if (outputFile != null && loadedBibs.size() != 1) {
+            throw new CliException(
+                    "--output supports a single .bib, but '%s' references %d".formatted(texFile, loadedBibs.size()),
+                    Localization.lang("The --output option is only supported when the paper references a single .bib file."),
+                    CommandLine.ExitCode.USAGE);
+        }
+
         // Internal temp writes stay quiet; only the final write-back to the user's file is announced.
         ExportService tempExport = ExportService.create(jabKit.cliPreferences, true);
 
@@ -188,9 +199,10 @@ class Shorten implements Callable<Integer> {
 
     private void writeBack(Path texFile, List<LoadedBib> loadedBibs) throws ExportServiceException {
         ExportService writeBackExport = ExportService.create(jabKit.cliPreferences, sharedOptions.porcelain);
-        boolean redirect = outputFile != null && loadedBibs.size() == 1;
         for (LoadedBib bib : loadedBibs) {
-            Path destination = redirect
+            // outputFile is only reached with exactly one bib (validated earlier); otherwise each
+            // referenced .bib is rewritten in place.
+            Path destination = outputFile != null
                                ? outputFile
                                : texFile.toAbsolutePath().getParent().resolve(bib.tempPath().getFileName());
             writeBackExport.saveDatabase(bib.database(), destination);
