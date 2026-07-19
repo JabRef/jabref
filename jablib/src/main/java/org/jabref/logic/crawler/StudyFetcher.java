@@ -26,7 +26,7 @@ class StudyFetcher {
     private final List<StudyQuery> searchQueries;
     private final Map<String, Integer> resultLimits;
 
-    StudyFetcher(List<SearchBasedFetcher> activeFetchers, List<StudyQuery> searchQueries, Map<String, Integer> resultLimits) throws IllegalArgumentException {
+    StudyFetcher(List<SearchBasedFetcher> activeFetchers, List<StudyQuery> searchQueries, Map<String, Integer> resultLimits) {
         this.searchQueries = searchQueries;
         this.activeFetchers = activeFetchers;
         this.resultLimits = resultLimits;

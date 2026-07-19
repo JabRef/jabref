@@ -57,17 +57,6 @@ public class NewEntryPreferences {
         return new NewEntryPreferences();
     }
 
-    public void setAll(NewEntryPreferences other) {
-        this.latestApproach.set(other.getLatestApproach());
-        this.typesRecommendedExpanded.set(other.getTypesRecommendedExpanded());
-        this.typesOtherExpanded.set(other.getTypesOtherExpanded());
-        this.typesCustomExpanded.set(other.getTypesCustomExpanded());
-        this.latestImmediateType.set(other.getLatestImmediateType());
-        this.idLookupGuessing.set(other.getIdLookupGuessing());
-        this.latestIdFetcherName.set(other.getLatestIdFetcher());
-        this.latestInterpretParserName.set(other.getLatestInterpretParser());
-    }
-
     public NewEntryDialogTab getLatestApproach() {
         return latestApproach.get();
     }

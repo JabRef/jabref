@@ -21,8 +21,10 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Notifications;
@@ -34,7 +36,6 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferencesDialogView;
 import org.jabref.gui.preferences.preview.PreviewTab;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -63,7 +64,6 @@ public class PreviewPanel extends VBox implements PreviewControls {
     public PreviewPanel(DialogService dialogService,
                         KeyBindingRepository keyBindingRepository,
                         GuiPreferences preferences,
-                        ThemeManager themeManager,
                         TaskExecutor taskExecutor,
                         StateManager stateManager) {
         this.keyBindingRepository = keyBindingRepository;
@@ -73,7 +73,7 @@ public class PreviewPanel extends VBox implements PreviewControls {
         this.stateManager = stateManager;
 
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
-        previewView = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor, stateManager.searchQueryProperty());
+        previewView = new PreviewViewer(dialogService, preferences, taskExecutor, stateManager.searchQueryProperty());
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
         previewView.setContextMenu(createPopupMenu());
         previewView.setOnDragDetected(this::onDragDetected);
@@ -83,6 +83,8 @@ public class PreviewPanel extends VBox implements PreviewControls {
         HBox previewSelectionBar = constructPreviewSelectionBar(previewPreferences);
 
         this.getChildren().addAll(previewView, previewSelectionBar);
+        // The preview absorbs all extra vertical space, keeping the selection bar at the bottom
+        VBox.setVgrow(previewView, Priority.ALWAYS);
 
         createKeyBindings();
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
@@ -103,6 +105,17 @@ public class PreviewPanel extends VBox implements PreviewControls {
                 .install(previewLayoutComboBox);
         previewLayoutComboBox.setItems(previewPreferences.getLayoutCycle());
         previewLayoutComboBox.setValue(previewPreferences.getSelectedPreviewLayout());
+        previewLayoutComboBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(@Nullable PreviewLayout layout) {
+                return layout == null ? "" : layout.getDisplayName();
+            }
+
+            @Override
+            public @Nullable PreviewLayout fromString(String s) {
+                return null;
+            }
+        });
 
         BindingsHelper.bindBidirectional(
                 previewPreferences.layoutCyclePositionProperty(),
@@ -118,6 +131,10 @@ public class PreviewPanel extends VBox implements PreviewControls {
     }
 
     private void onDragDetected(MouseEvent event) {
+        if (!previewView.isPressOnSelection(event.getScreenX(), event.getScreenY())) {
+            // dragging over text extends the selection; only an existing selection is dragged out
+            return;
+        }
         previewView.startFullDrag();
 
         Dragboard dragboard = previewView.startDragAndDrop(TransferMode.COPY);

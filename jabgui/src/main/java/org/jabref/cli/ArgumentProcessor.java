@@ -82,7 +82,7 @@ public class ArgumentProcessor {
 
         if (guiCli.libraries != null && !guiCli.libraries.isEmpty()) {
             if (guiCli.append) {
-                uiCommands.add(new UiCommand.AppendFilesToCurrentLibrary(guiCli.libraries));
+                uiCommands.add(new UiCommand.AppendFilesToLibrary(guiCli.libraries));
             } else {
                 uiCommands.add(new UiCommand.OpenLibraries(guiCli.libraries));
             }
@@ -92,7 +92,7 @@ public class ArgumentProcessor {
             uiCommands.add(new UiCommand.AppendFileOrUrlToCurrentLibrary(guiCli.importToOpen));
         }
         if (guiCli.importBibtex != null) {
-            uiCommands.add(new UiCommand.AppendBibTeXToCurrentLibrary(guiCli.importBibtex));
+            uiCommands.add(new UiCommand.AppendBibTeXToLibrary(guiCli.importBibtex));
         }
         return uiCommands;
     }
