@@ -179,10 +179,8 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     /// that does not look like a filename; cross-checks the merged author against the PDF text (see
     /// [PdfContentImporter]); and keeps only online (URL) file links.
     ///
-    /// @param candidates       candidate entries ordered by descending priority
-    /// @param leadingPagesText plain text of the PDF's leading pages (typically the first two, as produced by
-    ///                         [PdfContentImporter]), used only to validate the merged author; `null` or empty
-    ///                         when the text could not be extracted, in which case the author is left untouched
+    /// @param candidates candidate entries ordered by descending priority
+    /// @param leadingPagesText plain text of the PDF's leading pages (as produced by [PdfContentImporter]), used only to validate the merged author; `null` or empty when the text could not be extracted, in which case the author is left untouched
     @VisibleForTesting
     static BibEntry mergeCandidates(List<BibEntry> candidates, @Nullable String leadingPagesText) {
         final BibEntry entry = new BibEntry();
