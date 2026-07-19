@@ -72,9 +72,9 @@ public class TreeCollector<T> implements Collector<T, ObservableList<T>, Observa
     }
 
     private static <T extends TreeNode<T>, K> void merge(T target,
-                                                          T node,
-                                                          Function<T, K> keyExtractor,
-                                                          IdentityHashMap<T, Map<K, T>> childrenByKey) {
+                                                         T node,
+                                                         Function<T, K> keyExtractor,
+                                                         IdentityHashMap<T, Map<K, T>> childrenByKey) {
         Map<K, T> targetChildrenByKey = childrenByKey.computeIfAbsent(target, currentTarget -> {
             Map<K, T> index = new HashMap<>();
             for (T child : currentTarget.getChildren()) {
