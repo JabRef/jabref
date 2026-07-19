@@ -8,17 +8,17 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.logic.util.FileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /// Export format based on an Apache Velocity template — the designated successor of the
 /// `.layout`-based [TemplateExporter] (see ADR-0039 and [#12418](https://github.com/JabRef/jabref/issues/12418)).
@@ -31,6 +31,8 @@ import org.jspecify.annotations.NonNull;
 /// Context contract (see [TemplateBibEntry] for the entry view):
 /// - `$entries` — the sorted entries to export
 /// - `$html` — [HTMLChars], converts LaTeX markup to HTML (`$html.format(...)`)
+// [impl->req~logic.exporter.velocity-template~1]
+@NullMarked
 public class VelocityTemplateExporter extends Exporter {
 
     static final String TEMPLATE_PREFIX = "/resource/template/";
@@ -52,13 +54,13 @@ public class VelocityTemplateExporter extends Exporter {
                                     SelfContainedSaveOrder saveOrder) {
         super(consoleName, displayName, extension);
         this.templateFileName = templateFileName;
-        this.saveOrder = saveOrder == null ? SaveOrder.getDefaultSaveOrder() : saveOrder;
+        this.saveOrder = saveOrder;
     }
 
     @Override
-    public void export(@NonNull BibDatabaseContext databaseContext,
+    public void export(BibDatabaseContext databaseContext,
                        Path file,
-                       @NonNull List<BibEntry> entries) throws IOException {
+                       List<BibEntry> entries) throws IOException {
         if (entries.isEmpty()) { // Do not export if no entries to export -- avoids exports with only template text
             return;
         }
@@ -72,10 +74,8 @@ public class VelocityTemplateExporter extends Exporter {
         context.put("entries", templateEntries);
         context.put("html", new HTMLChars());
 
-        InputStream inputStream = VelocityTemplateExporter.class.getResourceAsStream(TEMPLATE_PREFIX + templateFileName);
-        if (inputStream == null) {
-            throw new IOException("Cannot find template file: '" + TEMPLATE_PREFIX + templateFileName + "'.");
-        }
+        InputStream inputStream = Optional.ofNullable(VelocityTemplateExporter.class.getResourceAsStream(TEMPLATE_PREFIX + templateFileName))
+                                          .orElseThrow(() -> new IOException("Cannot find template file: '" + TEMPLATE_PREFIX + templateFileName + "'."));
         try (AtomicFileWriter writer = new AtomicFileWriter(file, StandardCharsets.UTF_8);
              Reader template = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             VELOCITY_ENGINE.evaluate(context, writer, templateFileName, template);

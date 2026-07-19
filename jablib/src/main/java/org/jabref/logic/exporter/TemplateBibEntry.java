@@ -4,19 +4,20 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldFactory;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /// Read-only view of a [BibEntry] for use in export templates (see [VelocityTemplateExporter]).
 ///
 /// All accessors return plain strings — the empty string for unset fields — so that templates
 /// can rely on Velocity's empty-string check: `#if( $entry.getField("author") ) ... #end`.
+@NullMarked
 public class TemplateBibEntry {
 
     private final BibEntry entry;
-    private final BibDatabase database;
+    private final @Nullable BibDatabase database;
 
-    public TemplateBibEntry(@NonNull BibEntry entry, @Nullable BibDatabase database) {
+    public TemplateBibEntry(BibEntry entry, @Nullable BibDatabase database) {
         this.entry = entry;
         this.database = database;
     }
