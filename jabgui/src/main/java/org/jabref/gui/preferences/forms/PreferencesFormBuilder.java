@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import javafx.application.Platform;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
@@ -42,6 +43,7 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 
+import com.dlsc.gemsfx.TagsField;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.SearchableComboBox;
@@ -235,6 +237,14 @@ public class PreferencesFormBuilder {
             combo.setPromptText(prompt);
         }
         addField(label, combo);
+        return this;
+    }
+
+    /// A pre-built {@link TagsField} (see {@link TagsFieldEditor}) bound to a list property.
+    public <T> PreferencesFormBuilder tagsField(String label, TagsField<T> tagsField, ListProperty<T> value) {
+        tagsField.tagsProperty().bindBidirectional(value);
+        HBox.setHgrow(tagsField, Priority.ALWAYS);
+        addField(label, tagsField);
         return this;
     }
 
