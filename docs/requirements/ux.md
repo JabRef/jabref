@@ -40,7 +40,7 @@ The user needs a visible error dialog, in addition to the log entry, since [digg
 
 Needs: impl
 
-## Activating large libraries keeps entry previews responsive
+### Activating large libraries keeps entry previews responsive
 `req~ux.active-library.preview-responsiveness~1`
 
 When a user activates a large library, automatic group construction and group-count evaluation must not delay rendering the selected entry preview.
