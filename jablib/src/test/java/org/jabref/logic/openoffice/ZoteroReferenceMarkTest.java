@@ -105,7 +105,7 @@ class ZoteroReferenceMarkTest {
                 Map.of()).getName();
 
         JsonObject itemData = getCitationJson(referenceMarkName).getAsJsonArray("citationItems").get(0).getAsJsonObject()
-                                                               .getAsJsonObject("itemData");
+                                                                .getAsJsonObject("itemData");
 
         assertEquals("1", itemData.get("id").getAsString());
         assertEquals("Smith2020", itemData.get("citation-key").getAsString());
