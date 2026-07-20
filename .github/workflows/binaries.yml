@@ -844,7 +844,7 @@ jobs:
       - name: Package JabKit native binary
         shell: bash
         run: |
-          set -e
+          set -eo pipefail
           mv jabkit/build/native/nativeCompile jabkit/build/native/jabkit
           mkdir -p jabkit/build/native-dist
           ${{ matrix.archiveNative }}
