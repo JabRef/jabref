@@ -1,21 +1,14 @@
 package org.jabref.gui.preferences.export;
 
-import javafx.fxml.FXML;
-
 import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
-import org.jabref.gui.preferences.AbstractPreferenceTabView;
-import org.jabref.gui.preferences.PreferencesTab;
+import org.jabref.gui.preferences.forms.AbstractFormTabView;
 import org.jabref.logic.l10n.Localization;
 
-import com.airhacks.afterburner.views.ViewLoader;
-
-public class ExportTab extends AbstractPreferenceTabView<ExportTabViewModel> implements PreferencesTab {
-    @FXML private SaveOrderConfigPanel exportOrderPanel;
+public class ExportTab extends AbstractFormTabView<ExportTabViewModel> {
 
     public ExportTab() {
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+        this.viewModel = new ExportTabViewModel(preferences.getExportPreferences());
+        buildView();
     }
 
     @Override
@@ -23,14 +16,19 @@ public class ExportTab extends AbstractPreferenceTabView<ExportTabViewModel> imp
         return Localization.lang("Export");
     }
 
-    public void initialize() {
-        this.viewModel = new ExportTabViewModel(preferences.getExportPreferences());
-
+    private void buildView() {
+        SaveOrderConfigPanel exportOrderPanel = new SaveOrderConfigPanel();
         exportOrderPanel.saveInOriginalProperty().bindBidirectional(viewModel.saveInOriginalProperty());
         exportOrderPanel.saveInTableOrderProperty().bindBidirectional(viewModel.saveInTableOrderProperty());
         exportOrderPanel.saveInSpecifiedOrderProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
         exportOrderPanel.sortableFieldsProperty().bind(viewModel.sortableFieldsProperty());
         exportOrderPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
         exportOrderPanel.setCriteriaLimit(3);
+
+        getChildren().add(form()
+                .title(Localization.lang("Export"))
+                .section(Localization.lang("Export sort order"))
+                .custom(exportOrderPanel)
+                .build());
     }
 }
