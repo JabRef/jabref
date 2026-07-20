@@ -2,6 +2,8 @@ package org.jabref.logic.openoffice;
 
 import java.util.List;
 
+import org.jabref.logic.util.strings.StringUtil;
+
 import com.google.gson.annotations.SerializedName;
 import org.jspecify.annotations.Nullable;
 
@@ -27,88 +29,120 @@ class ZoteroCitationData {
         String id = "";
         @SerializedName("citation-key")
         String citationKey = "";
-        String type = "";
+        @Nullable
+        String type;
 
         @SerializedName("abstract")
-        String abstractText = "";
+        @Nullable
+        String abstractText;
 
         @SerializedName("call-number")
-        String callNumber = "";
+        @Nullable
+        String callNumber;
 
         @SerializedName("chapter-number")
-        String chapterNumber = "";
+        @Nullable
+        String chapterNumber;
 
         @SerializedName("container-title")
-        String containerTitle = "";
+        @Nullable
+        String containerTitle;
 
         @SerializedName("collection-title")
-        String collectionTitle = "";
+        @Nullable
+        String collectionTitle;
 
         @SerializedName("collection-number")
-        String collectionNumber = "";
+        @Nullable
+        String collectionNumber;
 
         @SerializedName("DOI")
-        String doi = "";
+        @Nullable
+        String doi;
 
-        String edition = "";
+        @Nullable
+        String edition;
 
         @SerializedName("event-place")
-        String eventPlace = "";
+        @Nullable
+        String eventPlace;
 
         @SerializedName("ISBN")
-        String isbn = "";
+        @Nullable
+        String isbn;
 
         @SerializedName("ISSN")
-        String issn = "";
+        @Nullable
+        String issn;
 
-        String issue = "";
+        @Nullable
+        String issue;
 
-        String keyword = "";
+        @Nullable
+        String keyword;
 
-        String language = "";
+        @Nullable
+        String language;
 
-        String number = "";
+        @Nullable
+        String number;
 
         @SerializedName("number-of-pages")
-        String numberOfPages = "";
+        @Nullable
+        String numberOfPages;
 
         @SerializedName("number-of-volumes")
-        String numberOfVolumes = "";
+        @Nullable
+        String numberOfVolumes;
 
-        String page = "";
+        @Nullable
+        String page;
 
-        String publisher = "";
+        @Nullable
+        String publisher;
 
         @SerializedName("publisher-place")
-        String publisherPlace = "";
+        @Nullable
+        String publisherPlace;
 
-        String status = "";
+        @Nullable
+        String status;
 
-        String title = "";
+        @Nullable
+        String title;
 
         @SerializedName(value = "title-short", alternate = "shortTitle")
-        String shortTitle = "";
+        @Nullable
+        String shortTitle;
 
-        String volume = "";
+        @Nullable
+        String volume;
 
         @SerializedName("volume-title")
-        String volumeTitle = "";
+        @Nullable
+        String volumeTitle;
 
         @SerializedName("URL")
-        String url = "";
+        @Nullable
+        String url;
 
-        String version = "";
+        @Nullable
+        String version;
 
-        String note = "";
+        @Nullable
+        String note;
 
-        String section = "";
+        @Nullable
+        String section;
 
-        List<AuthorData> author = List.of();
+        @Nullable
+        List<AuthorData> author;
 
-        IssuedData issued = new IssuedData();
+        @Nullable
+        IssuedData issued;
 
         String getFieldValue(String cslField) {
-            return switch (cslField) {
+            @Nullable String value = switch (cslField) {
                 case "abstract" ->
                         abstractText;
                 case "call-number" ->
@@ -169,20 +203,96 @@ class ZoteroCitationData {
                 case "section" ->
                         section;
                 default ->
-                        "";
+                        null;
             };
+            return value == null ? "" : value;
+        }
+
+        void omitEmptyFields() {
+            type = blankToNull(type);
+            abstractText = blankToNull(abstractText);
+            callNumber = blankToNull(callNumber);
+            chapterNumber = blankToNull(chapterNumber);
+            containerTitle = blankToNull(containerTitle);
+            collectionTitle = blankToNull(collectionTitle);
+            collectionNumber = blankToNull(collectionNumber);
+            doi = blankToNull(doi);
+            edition = blankToNull(edition);
+            eventPlace = blankToNull(eventPlace);
+            isbn = blankToNull(isbn);
+            issn = blankToNull(issn);
+            issue = blankToNull(issue);
+            keyword = blankToNull(keyword);
+            language = blankToNull(language);
+            number = blankToNull(number);
+            numberOfPages = blankToNull(numberOfPages);
+            numberOfVolumes = blankToNull(numberOfVolumes);
+            page = blankToNull(page);
+            publisher = blankToNull(publisher);
+            publisherPlace = blankToNull(publisherPlace);
+            status = blankToNull(status);
+            title = blankToNull(title);
+            shortTitle = blankToNull(shortTitle);
+            volume = blankToNull(volume);
+            volumeTitle = blankToNull(volumeTitle);
+            url = blankToNull(url);
+            version = blankToNull(version);
+            note = blankToNull(note);
+            section = blankToNull(section);
+
+            if (author != null) {
+                List<AuthorData> nonEmptyAuthors = author.stream()
+                                                         .peek(AuthorData::omitEmptyFields)
+                                                         .filter(authorData -> !authorData.isEmpty())
+                                                         .toList();
+                author = nonEmptyAuthors.isEmpty() ? null : nonEmptyAuthors;
+            }
+
+            if (issued != null) {
+                issued.omitEmptyFields();
+                if (issued.isEmpty()) {
+                    issued = null;
+                }
+            }
         }
     }
 
     public static class AuthorData {
-        String family = "";
-        String given = "";
+        @Nullable
+        String family;
+        @Nullable
+        String given;
+
+        void omitEmptyFields() {
+            family = blankToNull(family);
+            given = blankToNull(given);
+        }
+
+        boolean isEmpty() {
+            return StringUtil.isBlank(family) && StringUtil.isBlank(given);
+        }
     }
 
     public static class IssuedData {
         @Nullable
         String raw;
         @SerializedName("date-parts")
-        List<List<Object>> dateParts = List.of();
+        @Nullable
+        List<List<Object>> dateParts;
+
+        void omitEmptyFields() {
+            raw = blankToNull(raw);
+            if (dateParts != null && dateParts.isEmpty()) {
+                dateParts = null;
+            }
+        }
+
+        boolean isEmpty() {
+            return StringUtil.isBlank(raw) && (dateParts == null || dateParts.isEmpty());
+        }
+    }
+
+    private static @Nullable String blankToNull(@Nullable String value) {
+        return StringUtil.isBlank(value) ? null : value;
     }
 }

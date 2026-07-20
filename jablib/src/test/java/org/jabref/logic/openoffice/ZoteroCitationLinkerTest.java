@@ -42,6 +42,7 @@ class ZoteroCitationLinkerTest {
         assertEquals("https://github.com/citation-style-language/schema/raw/master/csl-citation.json", citation.get("schema").getAsString());
         assertEquals("keep-me", citation.getAsJsonObject("properties").get("plainCitation").getAsString());
         assertEquals("Original archive", itemData.get("archive-place").getAsString());
+        assertEquals(true, updatedReferenceMarkName.indexOf("\"schema\"") < updatedReferenceMarkName.indexOf("\"citationID\""));
     }
 
     @Test
@@ -76,7 +77,7 @@ class ZoteroCitationLinkerTest {
     private static String zoteroReferenceMarkName(String doi) {
         return """
                 ZOTERO_ITEM CSL_CITATION {
-                  "schema": "https://github.com/citation-style-language/schema/raw/master/csl-citation.json",
+                  "citationID": "abc123",
                   "properties": {
                     "plainCitation": "keep-me"
                   },
@@ -91,7 +92,8 @@ class ZoteroCitationLinkerTest {
                         "archive-place": "Original archive"
                       }
                     }
-                  ]
+                  ],
+                  "schema": "https://github.com/citation-style-language/schema/raw/master/csl-citation.json"
                 } RNDabc123DEF4
                 """.formatted(ZOTERO_URI, doi).trim();
     }
@@ -99,7 +101,7 @@ class ZoteroCitationLinkerTest {
     private static String zoteroReferenceMarkNameWithJabRefUri(String doi, String citationKey) {
         return """
                 ZOTERO_ITEM CSL_CITATION {
-                  "schema": "https://github.com/citation-style-language/schema/raw/master/csl-citation.json",
+                  "citationID": "abc123",
                   "properties": {
                     "plainCitation": "keep-me"
                   },
@@ -114,7 +116,8 @@ class ZoteroCitationLinkerTest {
                         "archive-place": "Original archive"
                       }
                     }
-                  ]
+                  ],
+                  "schema": "https://github.com/citation-style-language/schema/raw/master/csl-citation.json"
                 } RNDabc123DEF4
                 """.formatted(ZOTERO_URI, citationKey, doi).trim();
     }

@@ -115,7 +115,9 @@ public class ZoteroCitationMarkParser {
 
         List<Author> authors = new ArrayList<>();
         for (ZoteroCitationData.AuthorData authorData : authorsList) {
-            Author author = new Author(authorData.given, "", "", authorData.family, "");
+            String given = Optional.ofNullable(authorData.given).orElse("");
+            String family = Optional.ofNullable(authorData.family).orElse("");
+            Author author = new Author(given, "", "", family, "");
             authors.add(author);
         }
 

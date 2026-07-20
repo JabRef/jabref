@@ -45,6 +45,7 @@ class ZoteroReferenceMarkTest {
         String referenceMarkName = referenceMark.getName();
 
         assertTrue(referenceMarkName.startsWith("ZOTERO_ITEM CSL_CITATION {"));
+        assertTrue(referenceMarkName.indexOf("\"schema\"") < referenceMarkName.indexOf("\"citationID\""));
 
         ZoteroCitationData citation = GSON.fromJson(ZoteroReferenceMark.getCSLJson(referenceMarkName), ZoteroCitationData.class);
         ZoteroCitationData.CitationItemData citationItem = citation.citationItems.getFirst();
@@ -84,6 +85,36 @@ class ZoteroReferenceMarkTest {
         assertEquals(StandardEntryType.Article, parsedEntry.getType());
         assertEquals(Optional.of("Reference mark compatibility"), parsedEntry.getField(StandardField.TITLE));
         assertEquals(Optional.of("2020"), parsedEntry.getField(StandardField.YEAR));
+    }
+
+    @Test
+    void buildReferenceMarkOmitsEmptyItemDataFields() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Smith2020")
+                .withField(StandardField.TITLE, "Reference mark compatibility");
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+
+        String referenceMarkName = ZoteroReferenceMark.buildReferenceMark(
+                List.of(entry),
+                List.of("Smith2020"),
+                List.of(0),
+                1,
+                CSLCitationType.NORMAL,
+                bibDatabaseContext,
+                new BibEntryTypesManager(),
+                Map.of()).getName();
+
+        JsonObject itemData = getCitationJson(referenceMarkName).getAsJsonArray("citationItems").get(0).getAsJsonObject()
+                                                               .getAsJsonObject("itemData");
+
+        assertEquals("1", itemData.get("id").getAsString());
+        assertEquals("Smith2020", itemData.get("citation-key").getAsString());
+        assertEquals("article-journal", itemData.get("type").getAsString());
+        assertEquals("Reference mark compatibility", itemData.get("title").getAsString());
+        assertEquals(false, itemData.has("abstract"));
+        assertEquals(false, itemData.has("author"));
+        assertEquals(false, itemData.has("issued"));
+        assertEquals(false, itemData.has("volume"));
     }
 
     @Test

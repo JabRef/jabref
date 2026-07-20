@@ -70,9 +70,10 @@ public record ZoteroReferenceMark(
             ZoteroCitationData.ItemData itemData = GSON.fromJson(
                     itemDataProvider.toJson(entries.get(i), bibDatabaseContext, entryTypesManager),
                     ZoteroCitationData.ItemData.class);
-            if (itemData.issued != null &&
-                    ((itemData.issued.dateParts == null) || itemData.issued.dateParts.isEmpty())) {
-                String rawDate = itemData.issued.raw;
+            ZoteroCitationData.IssuedData issued = itemData.issued;
+            if (issued != null &&
+                    ((issued.dateParts == null) || issued.dateParts.isEmpty())) {
+                String rawDate = issued.raw;
                 if (rawDate != null && !StringUtil.isBlank(rawDate)) {
                     Date.parse(rawDate).ifPresent(date -> {
                         List<Object> dateParts = new ArrayList<>();
@@ -80,14 +81,15 @@ public record ZoteroReferenceMark(
                         date.getMonth().ifPresent(month -> dateParts.add(month.getNumber()));
                         date.getDay().ifPresent(dateParts::add);
                         if (!dateParts.isEmpty()) {
-                            itemData.issued.dateParts = List.of(dateParts);
-                            itemData.issued.raw = null;
+                            issued.dateParts = List.of(dateParts);
+                            issued.raw = null;
                         }
                     });
                 }
             }
             itemData.id = itemId;
             itemData.citationKey = citationKey;
+            itemData.omitEmptyFields();
 
             ZoteroCitationData.CitationItemData citationItem = new ZoteroCitationData.CitationItemData();
             citationItem.id = itemId;
