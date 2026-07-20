@@ -781,12 +781,16 @@ jobs:
         include:
           - os: ubuntu-22.04
             displayName: linux-amd64
+            javaPackage: jdk+fx
             archiveNative: "tar -c -C jabkit/build/native jabkit | gzip > jabkit/build/native-dist/jabkit-native_linux.tar.gz"
           - os: ubuntu-22.04-arm
             displayName: linux-arm
+            # BellSoft does not publish the Full NIK (jdk+fx) for linux-aarch64; the standard JDK bundle still contains java.desktop/AWT
+            javaPackage: jdk
             archiveNative: "tar -c -C jabkit/build/native jabkit | gzip > jabkit/build/native-dist/jabkit-native_linux_arm64.tar.gz"
           - os: macos-15
             displayName: macOS-silicon
+            javaPackage: jdk+fx
             archiveNative: "7z a jabkit/build/native-dist/jabkit-native_macos-silicon.zip ./jabkit/build/native/jabkit"
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.displayName }} jabkit native binary
@@ -806,7 +810,7 @@ jobs:
         uses: graalvm/setup-graalvm@v1
         with:
           distribution: 'liberica'
-          java-package: 'jdk+fx'
+          java-package: ${{ matrix.javaPackage }}
           java-version: '25'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
