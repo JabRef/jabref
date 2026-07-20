@@ -150,7 +150,7 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
             int count = response.optInt("count", 0);
             boolean isLastPage = count < getPageSize();
 
-            if (isLastPage) {
+            if (!isLastPage) {
                 String nextIndexedAfter = response.getString("next_indexed_after");
                 cursorCacheMap.put(new PageKey(query, startYear, endYear, pageNumber + 1), nextIndexedAfter);
             }
@@ -184,22 +184,6 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
     @Override
     public String getName() {
         return FETCHER_NAME;
-    }
-
-    @Override
-    public boolean isValidKey(@NonNull String apiKey) {
-        try {
-            URLDownload urlDownload = new URLDownload(getTestUrl());
-            urlDownload.addHeader("X-API-Key", apiKey);
-            int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
-            return (statusCode >= 200) && (statusCode < 300);
-        } catch (IOException | UnirestException e) {
-            return false;
-        }
-    }
-
-    private URL getTestUrl() throws MalformedURLException {
-        return URLUtil.create("https://scholarapi.net/api/v1/list?limit=1");
     }
 
     private URL buildSearchUrl(String query, int pageNumber, Optional<Integer> startYear, Optional<Integer> endYear)
