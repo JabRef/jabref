@@ -3,43 +3,30 @@ package org.jabref.gui.preferences.entryeditor;
 import java.util.List;
 
 import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
-import org.jabref.gui.preferences.AbstractPreferenceTabView;
-import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIconView;
+import org.jabref.gui.preferences.forms.AbstractFormTabView;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.l10n.Localization;
 
-import com.airhacks.afterburner.views.ViewLoader;
-
-public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabViewModel> implements PreferencesTab {
-
-    @FXML private CheckBox openOnNewEntry;
-    @FXML private CheckBox defaultSource;
-    @FXML private CheckBox acceptRecommendations;
-    @FXML private CheckBox enableValidation;
-    @FXML private CheckBox allowIntegerEdition;
-    @FXML private CheckBox journalPopupEnabled;
-    @FXML private CheckBox autoLinkFilesEnabled;
-    @FXML private CheckBox enableMscKeywordDescriptions;
-    @FXML private ComboBox<CitationCountFetcherType> citationCountFetcherCombo;
-
-    @FXML private ListView<EntryEditorTabModel> tabConfigsList;
-    @FXML private Button resetTabsButton;
+public class EntryEditorTab extends AbstractFormTabView<EntryEditorTabViewModel> {
 
     public EntryEditorTab() {
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+        this.viewModel = new EntryEditorTabViewModel(dialogService, preferences, taskExecutor);
+        buildView();
     }
 
     @Override
@@ -47,31 +34,47 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         return Localization.lang("Entry editor");
     }
 
-    public void initialize() {
-        this.viewModel = new EntryEditorTabViewModel(dialogService, preferences, taskExecutor);
+    private void buildView() {
+        getChildren().add(form()
+                .title(Localization.lang("Entry editor"))
 
-        openOnNewEntry.selectedProperty().bindBidirectional(viewModel.openOnNewEntryProperty());
-        defaultSource.selectedProperty().bindBidirectional(viewModel.defaultSourceProperty());
-        acceptRecommendations.selectedProperty().bindBidirectional(viewModel.acceptRecommendationsProperty());
-        enableValidation.selectedProperty().bindBidirectional(viewModel.enableValidationProperty());
-        allowIntegerEdition.selectedProperty().bindBidirectional(viewModel.allowIntegerEditionProperty());
-        journalPopupEnabled.selectedProperty().bindBidirectional(viewModel.journalPopupProperty());
-        autoLinkFilesEnabled.selectedProperty().bindBidirectional(viewModel.autoLinkFilesEnabledProperty());
-        enableMscKeywordDescriptions.selectedProperty().bindBidirectional(viewModel.enableMscKeywordDescriptionsProperty());
+                .checkbox(Localization.lang("Open editor when a new entry is created"), viewModel.openOnNewEntryProperty())
+                .checkbox(Localization.lang("Automatically search and show unlinked files in the entry editor"), viewModel.autoLinkFilesEnabledProperty())
+                .checkbox(Localization.lang("Show validation messages"), viewModel.enableValidationProperty())
+                .checkbox(Localization.lang("Allow integers in 'edition' field in BibTeX mode"), viewModel.allowIntegerEditionProperty())
+                .checkbox(Localization.lang("Fetch journal information online to show"), viewModel.journalPopupProperty())
+                .checkbox(Localization.lang("Enable MSC keyword descriptions"), viewModel.enableMscKeywordDescriptionsProperty())
+                .checkbox(Localization.lang("Show BibTeX source by default"), viewModel.defaultSourceProperty())
+                .checkbox(Localization.lang("Accept recommendations from Mr. DLib"), viewModel.acceptRecommendationsProperty())
 
-        citationCountFetcherCombo.setItems(FXCollections.observableList(List.of(CitationCountFetcherType.values())));
-        new ViewModelListCellFactory<CitationCountFetcherType>()
-                .withText(CitationCountFetcherType::getName)
-                .install(citationCountFetcherCombo);
-        citationCountFetcherCombo.valueProperty().bindBidirectional(viewModel.citationCountFetcherTypeProperty());
+                .comboItems(Localization.lang("Citation count fetcher:"),
+                        FXCollections.observableList(List.of(CitationCountFetcherType.values())),
+                        viewModel.citationCountFetcherTypeProperty(), CitationCountFetcherType::getName)
 
-        tabConfigsList.setItems(viewModel.getTabModels());
-        tabConfigsList.setCellFactory(_ -> new TabConfigCell());
+                .section(Localization.lang("Editor tabs"))
+                .custom(buildTabConfigRegion())
+
+                .build());
     }
 
-    @FXML
-    void resetToDefaults() {
-        viewModel.resetToDefaults();
+    private Node buildTabConfigRegion() {
+        ListView<EntryEditorTabModel> tabConfigsList = new ListView<>();
+        VBox.setVgrow(tabConfigsList, Priority.ALWAYS);
+        tabConfigsList.setItems(viewModel.getTabModels());
+        tabConfigsList.setCellFactory(_ -> new TabConfigCell());
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Button resetTabsButton = new Button();
+        resetTabsButton.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.REFRESH));
+        resetTabsButton.getStyleClass().add("icon-button");
+        resetTabsButton.setTooltip(new Tooltip(Localization.lang("Reset to default tabs")));
+        resetTabsButton.setOnAction(_ -> viewModel.resetToDefaults());
+        HBox buttonRow = new HBox(5.0, spacer, resetTabsButton);
+
+        VBox region = new VBox(5.0, tabConfigsList, buttonRow);
+        VBox.setVgrow(region, Priority.ALWAYS);
+        return region;
     }
 
     // region Cell

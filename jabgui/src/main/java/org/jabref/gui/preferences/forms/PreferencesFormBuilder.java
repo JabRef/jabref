@@ -209,6 +209,20 @@ public class PreferencesFormBuilder {
         return this;
     }
 
+    /// Combo box over a fixed item list (set directly, not bound to a property).
+    public <X> PreferencesFormBuilder comboItems(String label,
+                                                 ObservableList<X> items,
+                                                 Property<X> value,
+                                                 Callback<X, String> display) {
+        ComboBox<X> combo = new ComboBox<>();
+        new ViewModelListCellFactory<X>().withText(display).install(combo);
+        combo.setItems(items);
+        combo.setMaxWidth(Double.MAX_VALUE);
+        combo.valueProperty().bindBidirectional(value);
+        addField(label, combo);
+        return this;
+    }
+
     public <X> PreferencesFormBuilder searchableCombo(String label,
                                                       ObservableValue<? extends ObservableList<X>> items,
                                                       Property<X> value,
