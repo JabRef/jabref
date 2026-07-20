@@ -22,7 +22,7 @@ val pdfbox = "3.0.8"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.17.2"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.18.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.4.0"))
     api(platform("org.junit:junit-bom:6.1.2"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
