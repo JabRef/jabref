@@ -321,11 +321,13 @@ public class GroupNodeViewModel {
         });
     }
 
-    private void updateMatchedEntries() {
+    void updateMatchedEntries() {
         // [impl->req~ux.active-library.preview-responsiveness~1]
         if (!preferences.getGroupsPreferences().shouldDisplayGroupCount()) {
-            // A skipped recompute leaves matchedEntries stale, so force a reload when counts are re-enabled
+            // A skipped recompute leaves the cache stale: force a reload when counts are re-enabled,
+            // and clear now so rebinding never briefly shows the outdated number
             matchedEntriesInitialized = false;
+            matchedEntries.clear();
             return;
         }
 
