@@ -196,17 +196,14 @@ public class PreferencesFormBuilder {
         return this;
     }
 
+    /// Combo box whose items are bound to a (potentially changing) list property.
     public <X> PreferencesFormBuilder combo(String label,
                                             ObservableValue<? extends ObservableList<X>> items,
                                             Property<X> value,
                                             Callback<X, String> display) {
         ComboBox<X> combo = new ComboBox<>();
-        new ViewModelListCellFactory<X>().withText(display).install(combo);
         combo.itemsProperty().bind(items);
-        combo.setMaxWidth(Double.MAX_VALUE);
-        combo.valueProperty().bindBidirectional(value);
-        addField(label, combo);
-        return this;
+        return addCombo(label, combo, value, display, false, null);
     }
 
     /// Combo box over a fixed item list (set directly, not bound to a property).
@@ -215,12 +212,8 @@ public class PreferencesFormBuilder {
                                                  Property<X> value,
                                                  Callback<X, String> display) {
         ComboBox<X> combo = new ComboBox<>();
-        new ViewModelListCellFactory<X>().withText(display).install(combo);
         combo.setItems(items);
-        combo.setMaxWidth(Double.MAX_VALUE);
-        combo.valueProperty().bindBidirectional(value);
-        addField(label, combo);
-        return this;
+        return addCombo(label, combo, value, display, false, null);
     }
 
     public <X> PreferencesFormBuilder searchableCombo(String label,
@@ -228,15 +221,11 @@ public class PreferencesFormBuilder {
                                                       Property<X> value,
                                                       Callback<X, String> display) {
         SearchableComboBox<X> combo = new SearchableComboBox<>();
-        new ViewModelListCellFactory<X>().withText(display).install(combo);
         combo.itemsProperty().bind(items);
-        combo.setMaxWidth(Double.MAX_VALUE);
-        combo.valueProperty().bindBidirectional(value);
-        addField(label, combo);
-        return this;
+        return addCombo(label, combo, value, display, false, null);
     }
 
-    /// String combo box (optionally editable, with a prompt). The identity display is used.
+    /// String combo box (optionally editable, with a prompt). No display callback (identity toString).
     public PreferencesFormBuilder stringCombo(String label,
                                               ObservableValue<? extends ObservableList<String>> items,
                                               Property<String> value,
@@ -244,12 +233,26 @@ public class PreferencesFormBuilder {
                                               String prompt) {
         ComboBox<String> combo = new ComboBox<>();
         combo.itemsProperty().bind(items);
-        combo.valueProperty().bindBidirectional(value);
+        return addCombo(label, combo, value, null, editable, prompt);
+    }
+
+    /// Shared wiring for every combo variant. {@link SearchableComboBox} extends {@link ComboBox},
+    /// so all flavours funnel through here; items are set/bound by the caller beforehand.
+    private <X> PreferencesFormBuilder addCombo(String label,
+                                                ComboBox<X> combo,
+                                                Property<X> value,
+                                                Callback<X, String> display,
+                                                boolean editable,
+                                                String prompt) {
+        if (display != null) {
+            new ViewModelListCellFactory<X>().withText(display).install(combo);
+        }
         combo.setEditable(editable);
         combo.setMaxWidth(Double.MAX_VALUE);
         if (prompt != null) {
             combo.setPromptText(prompt);
         }
+        combo.valueProperty().bindBidirectional(value);
         addField(label, combo);
         return this;
     }
@@ -357,15 +360,18 @@ public class PreferencesFormBuilder {
 
     // region grouping & post-configuration
 
-    /// Starts a sub-group whose visibility (and layout participation) follows `visibleWhen`.
-    /// Controls added until {@link #endGroup()} are placed inside it.
-    public PreferencesFormBuilder beginGroup(ObservableValue<? extends Boolean> visibleWhen) {
+    /// Opens a sub-group: controls added until {@link #endGroup()} are placed inside it. The group
+    /// becomes the current subject, so the universal {@link #visibleWhen} / {@link #disableWhen}
+    /// (called before adding children) bind the whole group — e.g.
+    /// `beginGroup().visibleWhen(expertOn)` or `beginGroup().disableWhen(aiOff)` (disable propagates
+    /// to every descendant). Both are combinable.
+    public PreferencesFormBuilder beginGroup() {
         flushGrid();
         VBox group = new VBox(10.0);
-        group.visibleProperty().bind(visibleWhen);
-        group.managedProperty().bind(visibleWhen);
         container().getChildren().add(group);
         containers.push(group);
+        lastControl = group;
+        lastRow = null;
         return this;
     }
 
@@ -379,6 +385,14 @@ public class PreferencesFormBuilder {
 
     public PreferencesFormBuilder disableWhen(ObservableValue<? extends Boolean> condition) {
         lastControl.disableProperty().bind(condition);
+        return this;
+    }
+
+    /// Binds the last subject's visibility (and layout participation) to `condition`. Works on any
+    /// control or on a group opened with {@link #beginGroup()}.
+    public PreferencesFormBuilder visibleWhen(ObservableValue<? extends Boolean> condition) {
+        lastControl.visibleProperty().bind(condition);
+        lastControl.managedProperty().bind(condition);
         return this;
     }
 
