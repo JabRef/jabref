@@ -5,28 +5,35 @@ import java.util.List;
 
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
-import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.preferences.AbstractPreferenceTabView;
-import org.jabref.gui.preferences.PreferencesTab;
+import org.jabref.gui.icon.JabRefIconView;
+import org.jabref.gui.preferences.forms.AbstractFormTabView;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -40,46 +47,154 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
 
-import com.airhacks.afterburner.views.ViewLoader;
+import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
+import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 
-public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> implements PreferencesTab {
+public class PreviewTab extends AbstractFormTabView<PreviewTabViewModel> {
 
-    @FXML private CheckBox showAsTabCheckBox;
-    @FXML private CheckBox showPreviewTooltipCheckBox;
-    @FXML private ListView<PreviewLayout> availableListView;
-    @FXML private ListView<PreviewLayout> chosenListView;
-    @FXML private Button toRightButton;
-    @FXML private Button toLeftButton;
-    @FXML private Button sortUpButton;
-    @FXML private Button sortDownButton;
-    @FXML private Label readOnlyLabel;
-    @FXML private Button resetDefaultButton;
-    @FXML private Tab previewTab;
-    @FXML private CodeArea editArea;
-    @FXML private CustomTextField searchBox;
-    @FXML private CheckBox bookCoverDownload;
+    // Controls of the custom available/chosen region, built in code and wired in wireControls().
+    private ListView<PreviewLayout> availableListView;
+    private ListView<PreviewLayout> chosenListView;
+    private Button toRightButton;
+    private Button toLeftButton;
+    private Button sortUpButton;
+    private Button sortDownButton;
+    private Label readOnlyLabel;
+    private Button resetDefaultButton;
+    private Tab previewTab;
+    private CodeArea editArea;
+    private CustomTextField searchBox;
 
-    @Inject private StateManager stateManager;
-    @Inject private JournalAbbreviationRepository abbreviationRepository;
+    private final StateManager stateManager;
+    private final JournalAbbreviationRepository abbreviationRepository;
 
     private final ContextMenu contextMenu = new ContextMenu();
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     private long lastKeyPressTime;
     private String listSearchTerm;
 
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
-
     public PreviewTab() {
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+        this.stateManager = Injector.instantiateModelOrService(StateManager.class);
+        this.abbreviationRepository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+        this.viewModel = new PreviewTabViewModel(dialogService, preferences, taskExecutor, stateManager, abbreviationRepository);
+        this.lastKeyPressTime = System.currentTimeMillis();
+
+        Node dualListRegion = buildDualListRegion();
+        Node editorRegion = buildEditorRegion();
+
+        getChildren().add(form()
+                .title(Localization.lang("Current Preview"))
+                .checkbox(Localization.lang("Show preview as a tab in entry editor"), viewModel.showAsExtraTabProperty())
+                .checkbox(Localization.lang("Show preview in entry table tooltip"), viewModel.showPreviewInEntryTableTooltip())
+                .checkbox(Localization.lang("Download cover images"), viewModel.shouldDownloadCoversProperty())
+                .button(Localization.lang("Add BST file"), null, this::selectBstFile)
+                .custom(dualListRegion)
+                .custom(editorRegion)
+                .build());
+
+        wireControls();
     }
+
+    @Override
+    public String getTabName() {
+        return Localization.lang("Entry preview");
+    }
+
+    // region custom region construction (the `.custom(Node)` hatch)
+
+    private Node buildDualListRegion() {
+        searchBox = new CustomTextField();
+        searchBox.setPromptText(Localization.lang("Filter"));
+
+        availableListView = layoutListView();
+        VBox availableBox = new VBox(4.0, sectionLabel(Localization.lang("Available")), searchBox, availableListView);
+        HBox.setHgrow(availableBox, Priority.ALWAYS);
+        VBox.setVgrow(availableListView, Priority.ALWAYS);
+
+        toRightButton = moveButton(IconTheme.JabRefIcons.LIST_MOVE_RIGHT, this::toRightButtonAction);
+        toLeftButton = moveButton(IconTheme.JabRefIcons.LIST_MOVE_LEFT, this::toLeftButtonAction);
+        VBox moveButtons = new VBox(4.0, sectionLabel(""), spacer(24.0), toRightButton, toLeftButton);
+        moveButtons.setAlignment(Pos.CENTER);
+
+        chosenListView = layoutListView();
+        VBox chosenBox = new VBox(4.0, sectionLabel(Localization.lang("Selected")), spacer(24.0), chosenListView);
+        HBox.setHgrow(chosenBox, Priority.ALWAYS);
+        VBox.setVgrow(chosenListView, Priority.ALWAYS);
+
+        sortUpButton = moveButton(IconTheme.JabRefIcons.LIST_MOVE_UP, this::sortUpButtonAction);
+        sortDownButton = moveButton(IconTheme.JabRefIcons.LIST_MOVE_DOWN, this::sortDownButtonAction);
+        VBox sortButtons = new VBox(4.0, sectionLabel(""), spacer(24.0), sortUpButton, sortDownButton);
+        sortButtons.setAlignment(Pos.CENTER);
+
+        return new HBox(4.0, availableBox, moveButtons, chosenBox, sortButtons);
+    }
+
+    private Node buildEditorRegion() {
+        previewTab = new Tab(Localization.lang("Preview"));
+        previewTab.setClosable(false);
+
+        editArea = new CodeArea();
+        Tab editTab = new Tab(Localization.lang("Edit"), new VirtualizedScrollPane<>(editArea));
+        editTab.setClosable(false);
+
+        TabPane tabPane = new TabPane(previewTab, editTab);
+        tabPane.setPrefHeight(250.0);
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        AnchorPane.setTopAnchor(tabPane, 0.0);
+        AnchorPane.setLeftAnchor(tabPane, 0.0);
+        AnchorPane.setBottomAnchor(tabPane, 0.0);
+        AnchorPane.setRightAnchor(tabPane, 0.0);
+
+        readOnlyLabel = new Label(Localization.lang("Read only"));
+        resetDefaultButton = new Button();
+        resetDefaultButton.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.REFRESH));
+        resetDefaultButton.getStyleClass().addAll("icon-button", "narrow");
+        resetDefaultButton.setPrefSize(20.0, 20.0);
+        resetDefaultButton.setTooltip(new Tooltip(Localization.lang("Reset default preview style")));
+        resetDefaultButton.setOnAction(_ -> resetDefaultButtonAction());
+        HBox topRight = new HBox(5.0, readOnlyLabel, resetDefaultButton);
+        topRight.setAlignment(Pos.CENTER_RIGHT);
+        AnchorPane.setTopAnchor(topRight, 2.0);
+        AnchorPane.setRightAnchor(topRight, 5.0);
+
+        return new AnchorPane(tabPane, topRight);
+    }
+
+    private ListView<PreviewLayout> layoutListView() {
+        ListView<PreviewLayout> listView = new ListView<>();
+        listView.setMinHeight(150.0);
+        listView.setPrefHeight(250.0);
+        return listView;
+    }
+
+    private Button moveButton(IconTheme.JabRefIcons icon, Runnable action) {
+        Button button = new Button();
+        button.setGraphic(new JabRefIconView(icon, 24));
+        button.getStyleClass().add("icon-button");
+        button.setPrefSize(40.0, 40.0);
+        button.setOnAction(_ -> action.run());
+        return button;
+    }
+
+    private Label sectionLabel(String text) {
+        Label label = new Label(text);
+        label.getStyleClass().add("sectionHeader");
+        return label;
+    }
+
+    private Region spacer(double height) {
+        Region region = new Region();
+        region.setPrefHeight(height);
+        return region;
+    }
+
+    // endregion
 
     private class EditAction extends SimpleCommand {
 
@@ -107,12 +222,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         }
     }
 
-    @Override
-    public String getTabName() {
-        return Localization.lang("Entry preview");
-    }
-
-    @FXML
     private void selectBstFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.BST)
@@ -123,15 +232,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(bstFile -> viewModel.addBstStyle(bstFile));
     }
 
-    public void initialize() {
-        this.viewModel = new PreviewTabViewModel(dialogService, preferences, taskExecutor, stateManager, abbreviationRepository);
-        lastKeyPressTime = System.currentTimeMillis();
-
-        showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());
-        showPreviewTooltipCheckBox.selectedProperty().bindBidirectional(viewModel.showPreviewInEntryTableTooltip());
-
-        bookCoverDownload.selectedProperty().bindBidirectional(viewModel.shouldDownloadCoversProperty());
-
+    private void wireControls() {
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
 
@@ -230,7 +331,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     ///
     /// @param list       The ListView currently focused
     /// @param keypressed The pressed character
-
     private void jumpToSearchKey(ListView<PreviewLayout> list, KeyEvent keypressed) {
         if (keypressed.getCharacter() == null) {
             return;
