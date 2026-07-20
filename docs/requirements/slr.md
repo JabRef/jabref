@@ -46,6 +46,4 @@ Covers: `feat~slr~1`
 
 After each crawl, the system shall record the exact query sent to each catalog so the crawl can be reproduced. The record shall be machine-readable and produce identical content when the same study is crawled again with no changes.
 
-> Planned. Not yet implemented.
-
 <!-- markdownlint-disable-file MD022 -->
