@@ -1,7 +1,5 @@
 package org.jabref.gui.ai.summary;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -13,17 +11,17 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.htmltonode.HtmlRenderOptions;
-import org.jabref.htmltonode.rich.RichHtmlView;
+import org.jabref.gui.util.component.MarkdownTextFlow;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
@@ -33,19 +31,22 @@ import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class AiSummaryShowingView extends VBox {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(AiSummaryShowingView.class);
-
     @FXML private CheckBox markdownCheckbox;
     @FXML private Text summaryInfoText;
 
-    private RichHtmlView htmlView;
+    private MarkdownTextFlow markdownTextFlow;
 
     private AiSummaryShowingViewModel viewModel;
+
+    /// Monotonically increasing stamp identifying the most recently scheduled content update.
+    ///
+    /// Each [#updateContent()] call increments this counter and captures its own value before
+    /// scheduling the UI mutation on the JavaFX thread. When the scheduled callback runs, it compares
+    /// the captured value against the current counter and skips the mutation if a newer update has been
+    /// scheduled in the meantime, preventing a stale summary from overwriting a newer one.
+    private int updateVersion;
 
     @Inject private GuiPreferences preferences;
     @Inject private DialogService dialogService;
@@ -91,29 +92,22 @@ public class AiSummaryShowingView extends VBox {
                 entryTypesManager,
                 dialogService
         );
-        initializeSummaryView();
+        initializeMarkdownTextFlow();
 
         setupBindings();
         setupListeners();
     }
 
-    private void initializeSummaryView() {
-        // RichHtmlView scrolls itself - no surrounding ScrollPane
-        htmlView = new RichHtmlView();
-        htmlView.setOptions(HtmlRenderOptions.defaults().withLinkHandler(this::openLink));
-        VBox.setVgrow(htmlView, Priority.ALWAYS);
+    private void initializeMarkdownTextFlow() {
+        StackPane summaryContentPane = new StackPane();
+        markdownTextFlow = new MarkdownTextFlow(summaryContentPane);
+        summaryContentPane.getChildren().add(markdownTextFlow);
 
-        getChildren().addFirst(htmlView);
-    }
+        ScrollPane scrollPane = new ScrollPane(summaryContentPane);
+        scrollPane.setFitToWidth(true);
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
 
-    private void openLink(String href) {
-        try {
-            NativeDesktop.openBrowser(href, preferences.getExternalApplicationsPreferences());
-        } catch (MalformedURLException exception) {
-            LOGGER.error("Invalid URL", exception);
-        } catch (IOException e) {
-            LOGGER.error("Could not open URL: {}", href, e);
-        }
+        getChildren().addFirst(scrollPane);
     }
 
     private void setupBindings() {
@@ -123,11 +117,25 @@ public class AiSummaryShowingView extends VBox {
     }
 
     private void setupListeners() {
-        BindingsHelper.listen(
-                viewModel.webViewSourceProperty(),
-                value -> UiTaskExecutor.runInJavaFXThread(() ->
-                        htmlView.setHtml(StringUtil.makeSafe(value)))
-        );
+        BindingsHelper.listen(viewModel.summaryProperty(), _ -> updateContent());
+        BindingsHelper.listen(viewModel.isMarkdownProperty(), _ -> updateContent());
+    }
+
+    private void updateContent() {
+        int requestVersion = ++updateVersion;
+        UiTaskExecutor.runInJavaFXThread(() -> {
+            if (requestVersion != updateVersion) {
+                return;
+            }
+            AiSummary summary = viewModel.summaryProperty().get();
+            String content = StringUtil.makeSafe(summary == null ? null : summary.content());
+            boolean markdown = viewModel.isMarkdownProperty().get();
+            if (markdown) {
+                markdownTextFlow.setMarkdown(content);
+            } else {
+                markdownTextFlow.setPlainText(content);
+            }
+        });
     }
 
     public ObjectProperty<EventHandler<ActionEvent>> onRegenerateProperty() {

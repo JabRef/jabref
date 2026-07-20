@@ -3,16 +3,26 @@ package org.jabref.logic.importer.fetcher;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Optional;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fileformat.ModsImporter;
+import org.jabref.logic.util.strings.StringUtil;
 
+import com.google.common.util.concurrent.RateLimiter;
 import org.apache.hc.core5.net.URIBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// Fetcher for the Library of Congress Control Number (LCCN) using https://lccn.loc.gov/
 public class LibraryOfCongress implements IdBasedParserFetcher {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryOfCongress.class);
+    // The Library of Congress asks clients to stay at or below 10 requests per minute.
+    private static final RateLimiter RATE_LIMITER = RateLimiter.create(10.0 / 60.0);
 
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -29,6 +39,19 @@ public class LibraryOfCongress implements IdBasedParserFetcher {
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder("https://lccn.loc.gov/" + identifier + "/mods");
         return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public Optional<org.jabref.model.entry.BibEntry> performSearchById(String identifier) throws FetcherException {
+        if (StringUtil.isBlank(identifier)) {
+            return Optional.empty();
+        }
+
+        double waitingTime = RATE_LIMITER.acquire();
+        LOGGER.trace("Thread {}, searching Library of Congress identifier '{}', waited {} because of API rate limiter",
+                Thread.currentThread().threadId(), identifier, waitingTime);
+
+        return IdBasedParserFetcher.super.performSearchById(identifier);
     }
 
     @Override

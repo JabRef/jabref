@@ -32,4 +32,12 @@ Since some data fetchers take time, we need to open the dialog and wait until al
 
 Needs: impl
 
+## Critical startup failures show an error dialog
+`req~ux.startup.critical-error-dialog~1`
+
+If a critical error occurs before the main window is fully constructed, it must not fail silently.
+The user needs a visible error dialog, in addition to the log entry, since [digging through log files is not accessible to most users](https://github.com/JabRef/jabref/issues/14967).
+
+Needs: impl
+
 <!-- markdownlint-disable-file MD022 -->

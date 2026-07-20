@@ -1,3 +1,4 @@
+import org.gradlex.javamodule.packaging.tasks.Jpackage
 import org.jabref.gradle.useLibericaJdkFull
 
 plugins {
@@ -100,6 +101,26 @@ tasks.named<JavaExec>("run") {
     enableAssertions = true
 }
 
+// These modules need to be present in every jpackage runtime image. Keeping them named separately
+// avoids mixing shared image requirements with target-specific embedded Postgres binaries.
+val sharedJpackageImageModules = listOf("jdk.incubator.vector")
+
+val embeddedPostgresBinaryByJpackageTask = mapOf(
+    "jpackageUbuntu-22.04" to "embedded.postgres.binaries.linux.amd64",
+    "jpackageUbuntu-22.04-arm" to "embedded.postgres.binaries.linux.arm64v8",
+    "jpackageMacos-15-intel" to "embedded.postgres.binaries.darwin.amd64",
+    "jpackageMacos-15" to "embedded.postgres.binaries.darwin.arm64v8",
+    "jpackageWindows-latest" to "embedded.postgres.binaries.windows.amd64"
+)
+
+val embeddedPostgresDependencyByTarget = mapOf(
+    "ubuntu-22.04" to "io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64",
+    "ubuntu-22.04-arm" to "io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8",
+    "macos-15-intel" to "io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64",
+    "macos-15" to "io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8",
+    "windows-latest" to "io.zonky.test.postgres:embedded-postgres-binaries-windows-amd64"
+)
+
 // Below should eventually replace the 'jlink {}' and doLast-copy configurations above
 javaModulePackaging {
     verbose = true
@@ -108,7 +129,7 @@ javaModulePackaging {
     applicationDescription = "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX."
     vendor = "JabRef e.V."
 
-    addModules.add("jdk.incubator.vector")
+    addModules.addAll(sharedJpackageImageModules)
 
     // general jLinkOptions are set in org.jabref.gradle.base.targets.gradle.kts
     jlinkOptions.addAll("--launcher", "JabRef=org.jabref/org.jabref.Launcher")
@@ -197,6 +218,19 @@ javaModulePackaging {
         targetResources.from(layout.projectDirectory.dir("buildres/macos").asFileTree.matching {
             include("Resources/**")
         })
+    }
+}
+
+dependencies {
+    embeddedPostgresDependencyByTarget.forEach { (target, dependency) ->
+        add("${target}RuntimeClasspath", dependency)
+    }
+}
+
+embeddedPostgresBinaryByJpackageTask.forEach { (taskName, moduleName) ->
+    tasks.named<Jpackage>(taskName) {
+        addModules.add(moduleName)
+        addModules.addAll(sharedJpackageImageModules)
     }
 }
 

@@ -166,13 +166,18 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         fetchedEntry.ifPresent(entry -> {
             doPostCleanup(entry);
 
-            // Output warnings in case of inconsistencies
-            entry.getField(StandardField.DOI)
-                 .filter(entryDoi -> entryDoi.equals(doi.asString()))
-                 .ifPresent(entryDoi -> LOGGER.warn("Fetched entry's DOI {} is different from requested DOI {}", entryDoi, identifier));
-            if (entry.getField(StandardField.DOI).isEmpty()) {
-                LOGGER.warn("Fetched entry does not contain doi field {}", identifier);
-            }
+            // Output warnings in case of inconsistencies. Compare as parsed DOIs so a mere
+            // difference in the http(s) prefix (or letter case) is not reported as a mismatch,
+            // while still distinguishing a missing field from a present-but-unparsable value.
+            entry.getField(StandardField.DOI).ifPresentOrElse(
+                    fetchedDoi -> DOI.parse(fetchedDoi).ifPresentOrElse(
+                            entryDoi -> {
+                                if (!entryDoi.equals(doi)) {
+                                    LOGGER.warn("Fetched entry's DOI {} is different from requested DOI {}", entryDoi.asString(), identifier);
+                                }
+                            },
+                            () -> LOGGER.warn("Fetched entry contains invalid DOI field value {} (requested {})", fetchedDoi, identifier)),
+                    () -> LOGGER.warn("Fetched entry does not contain doi field {}", identifier));
 
             if (isAPSJournal(entry, doi) && !entry.hasField(StandardField.PAGES)) {
                 setPageNumbersBasedOnDoi(entry, doi);
