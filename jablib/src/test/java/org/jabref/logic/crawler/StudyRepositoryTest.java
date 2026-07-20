@@ -303,6 +303,18 @@ class StudyRepositoryTest {
     }
 
     @Test
+    void studyLockUsesFirstOverrideWhenKeysDifferOnlyByCase() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        Map<String, String> catalogSpecific = studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific();
+        catalogSpecific.put("arxiv", "ti:First");
+        catalogSpecific.put("ArXiv", "ti:Second");
+
+        studyRepository.persist(getMockResults());
+
+        // StudyFetcher uses the first case-insensitive match, so the lock must record the same one
+        assertEquals("ti:First", parseStudyLock().getQueries().getFirst().getCatalogSpecific().get("ArXiv"));
+    }
+
+    @Test
     void studyLockFallsBackToQueryForBlankOverride() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
         studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific().put("ArXiv", " ");
 

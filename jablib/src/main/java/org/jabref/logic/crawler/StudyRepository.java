@@ -464,7 +464,7 @@ public class StudyRepository {
 
     private StudyQuery toLockQuery(StudyQuery query) {
         Map<String, String> overrides = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        overrides.putAll(query.getCatalogSpecific());
+        query.getCatalogSpecific().forEach(overrides::putIfAbsent);
 
         Map<String, String> effectiveQueries = new LinkedHashMap<>();
         for (StudyCatalog catalog : getActiveLibraryEntries()) {
