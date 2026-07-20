@@ -44,6 +44,7 @@ public final class BuildInfo {
     public final String openAlexApiKey;
     public final String scopusApiKey;
     public final String semanticScholarApiKey;
+    public final String scholarApiKey;
     public final String springerNatureAPIKey;
     public final String unpaywallEmail;
     public final String wileyTdmApiKey;
@@ -76,6 +77,7 @@ public final class BuildInfo {
         openAlexApiKey = BuildInfo.getValue(properties, "openAlexApiKey", "");
         scopusApiKey = BuildInfo.getValue(properties, "scopusApiKey", "fb82f2e692b3c72dafe5f4f1fa0ac00b");
         semanticScholarApiKey = BuildInfo.getValue(properties, "semanticScholarApiKey", "");
+        scholarApiKey = BuildInfo.getValue(properties, "scholarApiKey", "");
         springerNatureAPIKey = BuildInfo.getValue(properties, "springerNatureAPIKey", "118d90a519d0fc2a01ee9715400054d4");
         unpaywallEmail = BuildInfo.getValue(properties, "unpaywallEmail", "");
         wileyTdmApiKey = BuildInfo.getValue(properties, "wileyTdmApiKey", "");
