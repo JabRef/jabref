@@ -69,6 +69,27 @@ class ConvertTest extends AbstractJabKitTest {
     }
 
     @Test
+    void noOutputExportsRequestedOutputFormat(@TempDir Path tempDir) throws IOException {
+        SelfContainedSaveOrder saveOrder = new SelfContainedSaveOrder(SaveOrder.OrderType.ORIGINAL, List.of());
+        when(preferences.getSelfContainedExportConfiguration())
+                .thenReturn(new SelfContainedSaveConfiguration(saveOrder, false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false));
+
+        Path origin = getClassResourceAsPath("origin.bib").toAbsolutePath();
+        Path newPath = tempDir.resolve("origin.bib");
+        Files.copy(origin, newPath);
+
+        int exitCode = commandLine.executeToLog("convert",
+                "--input=" + newPath,
+                "--input-format=bibtex",
+                "--output-format=html");
+
+        assertEquals(0, exitCode);
+        assertTrue(commandLine.getStandardOutput().contains("<html"));
+        assertFalse(commandLine.getStandardOutput().contains("@Book"));
+        assertTrue(commandLine.getErrorOutput().contains("Converting"));
+    }
+
+    @Test
     void fieldFormattersAreAppliedDuringConversion(@TempDir Path tempDir) throws IOException {
         Path newPath = tempDir.resolve("origin.bib");
         String originBibtex = """
