@@ -20,7 +20,10 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -66,6 +69,9 @@ public class PreferencesFormBuilder {
     private GridPane currentGrid;
     private int gridRow;
 
+    /// The toggle group that radios are added to between beginRadioGroup/endRadioGroup.
+    private ToggleGroup currentToggleGroup;
+
     /// The control that trailing configuration methods act on.
     private Node lastControl;
     /// The row (if any) that {@link #help} appends to.
@@ -94,7 +100,7 @@ public class PreferencesFormBuilder {
         header.getStyleClass().add("sectionHeader");
         header.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(header, Priority.ALWAYS);
-        HBox row = new HBox(header, helpButton(helpFile));
+        HBox row = new HBox(header, helpButton(StandardActions.HELP, helpFile));
         row.setAlignment(Pos.BASELINE_CENTER);
         container().getChildren().add(row);
         lastRow = row;
@@ -214,6 +220,93 @@ public class PreferencesFormBuilder {
         return this;
     }
 
+    /// String combo box (optionally editable, with a prompt). The identity display is used.
+    public PreferencesFormBuilder stringCombo(String label,
+                                              ObservableValue<? extends ObservableList<String>> items,
+                                              Property<String> value,
+                                              boolean editable,
+                                              String prompt) {
+        ComboBox<String> combo = new ComboBox<>();
+        combo.itemsProperty().bind(items);
+        combo.valueProperty().bindBidirectional(value);
+        combo.setEditable(editable);
+        combo.setMaxWidth(Double.MAX_VALUE);
+        if (prompt != null) {
+            combo.setPromptText(prompt);
+        }
+        addField(label, combo);
+        return this;
+    }
+
+    // endregion
+
+    // region radio groups
+
+    /// Opens a mutually-exclusive radio group. Radios added until {@link #endRadioGroup()} share one
+    /// {@link ToggleGroup}; each stays bound to its own boolean property (matching the existing VMs).
+    public PreferencesFormBuilder beginRadioGroup() {
+        currentToggleGroup = new ToggleGroup();
+        return this;
+    }
+
+    public PreferencesFormBuilder endRadioGroup() {
+        currentToggleGroup = null;
+        return this;
+    }
+
+    public PreferencesFormBuilder radio(String text, Property<Boolean> selected) {
+        addNode(radioRow(text, selected, null));
+        return this;
+    }
+
+    /// A radio with a bound text field that is enabled only while the radio is selected.
+    public PreferencesFormBuilder radioWithField(String text, Property<Boolean> selected, StringProperty fieldValue) {
+        RadioButton radio = newRadio(text, selected);
+        TextField field = new TextField();
+        field.textProperty().bindBidirectional(fieldValue);
+        field.disableProperty().bind(radio.selectedProperty().not());
+        HBox.setHgrow(field, Priority.ALWAYS);
+        HBox row = new HBox(10.0, radio, field);
+        row.setAlignment(Pos.CENTER_LEFT);
+        addNode(row);
+        lastControl = field;
+        lastRow = row;
+        return this;
+    }
+
+    /// A radio with an inline browse field (e.g. "Main file directory"). Trailing {@link #validate}
+    /// and {@link #disableWhen} target the path field (the browse button follows its disabled state).
+    public PreferencesFormBuilder radioWithBrowse(String text, Property<Boolean> selected, StringProperty pathValue, Runnable onBrowse) {
+        RadioButton radio = newRadio(text, selected);
+        BrowseFileEditor.Result browse = BrowseFileEditor.create(pathValue, onBrowse);
+        HBox.setHgrow(browse.row(), Priority.ALWAYS);
+        HBox row = new HBox(10.0, radio, browse.row());
+        row.setAlignment(Pos.CENTER_LEFT);
+        addNode(row);
+        lastControl = browse.field();
+        lastRow = row;
+        return this;
+    }
+
+    private HBox radioRow(String text, Property<Boolean> selected, TextField trailing) {
+        RadioButton radio = newRadio(text, selected);
+        HBox row = new HBox(10.0, radio);
+        row.setAlignment(Pos.CENTER_LEFT);
+        if (trailing != null) {
+            row.getChildren().add(trailing);
+        }
+        lastControl = radio;
+        lastRow = row;
+        return row;
+    }
+
+    private RadioButton newRadio(String text, Property<Boolean> selected) {
+        RadioButton radio = new RadioButton(text);
+        radio.setToggleGroup(currentToggleGroup);
+        radio.selectedProperty().bindBidirectional(selected);
+        return radio;
+    }
+
     // endregion
 
     // region escape hatches
@@ -265,6 +358,19 @@ public class PreferencesFormBuilder {
         return this;
     }
 
+    /// Statically disables the last control (for platform-capability checks, not reactive state).
+    public PreferencesFormBuilder disabled(boolean value) {
+        lastControl.setDisable(value);
+        return this;
+    }
+
+    public PreferencesFormBuilder tooltip(String text) {
+        if (lastControl instanceof Control control) {
+            control.setTooltip(new Tooltip(text));
+        }
+        return this;
+    }
+
     public PreferencesFormBuilder validate(ValidationStatus status) {
         if (lastControl instanceof Control control) {
             validationInits.add(() -> visualizer.initVisualization(status, control));
@@ -274,8 +380,12 @@ public class PreferencesFormBuilder {
 
     /// Appends a help icon button to the current row (checkbox, checkWithField or section row).
     public PreferencesFormBuilder help(HelpFile helpFile) {
+        return help(StandardActions.HELP, helpFile);
+    }
+
+    public PreferencesFormBuilder help(StandardActions action, HelpFile helpFile) {
         if (lastRow != null) {
-            lastRow.getChildren().add(helpButton(helpFile));
+            lastRow.getChildren().add(helpButton(action, helpFile));
         }
         return this;
     }
@@ -334,11 +444,11 @@ public class PreferencesFormBuilder {
         currentGrid = null;
     }
 
-    private javafx.scene.control.Button helpButton(HelpFile helpFile) {
+    private javafx.scene.control.Button helpButton(StandardActions action, HelpFile helpFile) {
         javafx.scene.control.Button button = new javafx.scene.control.Button();
         button.setPrefWidth(20.0);
         new ActionFactory().configureIconButton(
-                StandardActions.HELP,
+                action,
                 new HelpAction(helpFile, dialogService, preferences.getExternalApplicationsPreferences()),
                 button);
         return button;

@@ -1,58 +1,16 @@
 package org.jabref.gui.preferences.linkedfiles;
 
-import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
-
-import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.preferences.AbstractPreferenceTabView;
-import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.preferences.forms.AbstractFormTabView;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
-import com.airhacks.afterburner.views.ViewLoader;
-import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-
-public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabViewModel> implements PreferencesTab {
-
-    @FXML private TextField mainFileDirectory;
-    @FXML private RadioButton useMainFileDirectory;
-    @FXML private RadioButton useBibLocationAsPrimary;
-    @FXML private Button browseDirectory;
-    @FXML private Button autolinkRegexHelp;
-    @FXML private RadioButton autolinkFileStartsBibtex;
-    @FXML private RadioButton autolinkFileExactBibtex;
-    @FXML private RadioButton autolinkUseRegex;
-    @FXML private RadioButton openFileExplorerInFilesDirectory;
-    @FXML private RadioButton openFileExplorerInLastDirectory;
-    @FXML private TextField autolinkRegexKey;
-
-    @FXML private CheckBox fulltextIndex;
-    @FXML private CheckBox autoRenameFilesOnChange;
-
-    @FXML private ComboBox<String> fileNamePattern;
-    @FXML private TextField fileDirectoryPattern;
-    @FXML private CheckBox confirmLinkedFileDelete;
-    @FXML private CheckBox moveToTrash;
-    @FXML private CheckBox adjustLinkedFilesOnTransfer;
-    @FXML private CheckBox copyLinkedFilesOnTransfer;
-    @FXML private CheckBox moveLinkedFilesOnTransfer;
-
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+public class LinkedFilesTab extends AbstractFormTabView<LinkedFilesTabViewModel> {
 
     public LinkedFilesTab() {
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+        this.viewModel = new LinkedFilesTabViewModel(dialogService, preferences);
+        buildView();
     }
 
     @Override
@@ -60,48 +18,55 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         return Localization.lang("Linked files");
     }
 
-    public void initialize() {
-        this.viewModel = new LinkedFilesTabViewModel(dialogService, preferences);
+    private void buildView() {
+        getChildren().add(form()
+                .title(Localization.lang("Linked files"))
 
-        mainFileDirectory.textProperty().bindBidirectional(viewModel.mainFileDirectoryProperty());
-        mainFileDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());
-        browseDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());
-        useBibLocationAsPrimary.selectedProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());
-        useMainFileDirectory.selectedProperty().bindBidirectional(viewModel.useMainFileDirectoryProperty());
+                .section(Localization.lang("File directory"))
+                .beginRadioGroup()
+                .radioWithBrowse(Localization.lang("Main file directory"),
+                        viewModel.useMainFileDirectoryProperty(), viewModel.mainFileDirectoryProperty(), viewModel::mainFileDirBrowse)
+                .disableWhen(viewModel.useBibLocationAsPrimaryProperty())
+                .validate(viewModel.mainFileDirValidationStatus())
+                .radio(Localization.lang("Search and store files relative to library file location"),
+                        viewModel.useBibLocationAsPrimaryProperty())
+                .tooltip(Localization.lang("When downloading files, or moving linked files to the file directory, use the bib file location."))
+                .endRadioGroup()
 
-        moveToTrash.selectedProperty().bindBidirectional(viewModel.moveToTrashProperty());
-        moveToTrash.setDisable(!NativeDesktop.get().moveToTrashSupported());
+                .section(Localization.lang("Open file explorer"))
+                .beginRadioGroup()
+                .radio(Localization.lang("Open file explorer in files directory"), viewModel.openFileExplorerInFilesDirectoryProperty())
+                .radio(Localization.lang("Open file explorer in last opened directory"), viewModel.openFileExplorerInLastDirectoryProperty())
+                .endRadioGroup()
 
-        autolinkFileStartsBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileStartsBibtexProperty());
-        autolinkFileExactBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileExactBibtexProperty());
-        autolinkUseRegex.selectedProperty().bindBidirectional(viewModel.autolinkUseRegexProperty());
-        autolinkRegexKey.textProperty().bindBidirectional(viewModel.autolinkRegexKeyProperty());
-        autolinkRegexKey.disableProperty().bind(autolinkUseRegex.selectedProperty().not());
-        fulltextIndex.selectedProperty().bindBidirectional(viewModel.fulltextIndexProperty());
-        autoRenameFilesOnChange.selectedProperty().bindBidirectional(viewModel.autoRenameFilesOnChangeProperty());
-        fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());
-        fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
-        fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirectoryPatternProperty());
-        confirmLinkedFileDelete.selectedProperty().bindBidirectional(viewModel.confirmLinkedFileDeleteProperty());
-        openFileExplorerInFilesDirectory.selectedProperty().bindBidirectional(viewModel.openFileExplorerInFilesDirectoryProperty());
-        openFileExplorerInLastDirectory.selectedProperty().bindBidirectional(viewModel.openFileExplorerInLastDirectoryProperty());
-        adjustLinkedFilesOnTransfer.selectedProperty().bindBidirectional(viewModel.adjustLinkedFilesOnTransferProperty());
-        copyLinkedFilesOnTransfer.selectedProperty().bindBidirectional(viewModel.copyLinkedFilesOnTransferProperty());
-        moveLinkedFilesOnTransfer.selectedProperty().bindBidirectional(viewModel.moveFilesOnTransferProperty());
+                .section(Localization.lang("Autolink files"))
+                .beginRadioGroup()
+                .radio(Localization.lang("Autolink files with names starting with the citation key"), viewModel.autolinkFileStartsBibtexProperty())
+                .radio(Localization.lang("Autolink only files that match the citation key"), viewModel.autolinkFileExactBibtexProperty())
+                .radioWithField(Localization.lang("Use regular expression search"),
+                        viewModel.autolinkUseRegexProperty(), viewModel.autolinkRegexKeyProperty())
+                .help(StandardActions.HELP_REGEX_SEARCH, HelpFile.REGEX_SEARCH)
+                .endRadioGroup()
 
-        EasyBind.listen(adjustLinkedFilesOnTransfer.selectedProperty(), (_, _, selected) -> {
-            copyLinkedFilesOnTransfer.setDisable(!selected);
-            moveLinkedFilesOnTransfer.setDisable(!selected);
-        });
+                .section(Localization.lang("Fulltext Index"))
+                .checkbox(Localization.lang("Automatically index all linked files for fulltext search"), viewModel.fulltextIndexProperty())
 
-        ActionFactory actionFactory = new ActionFactory();
-        actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH, dialogService, preferences.getExternalApplicationsPreferences()), autolinkRegexHelp);
+                .section(Localization.lang("Linked file name conventions"))
+                .checkbox(Localization.lang("Auto rename files if entry changes"), viewModel.autoRenameFilesOnChangeProperty())
+                .stringCombo(Localization.lang("Filename format pattern"),
+                        viewModel.defaultFileNamePatternsProperty(), viewModel.fileNamePatternProperty(), true, Localization.lang("Choose pattern"))
+                .stringField(Localization.lang("File directory pattern"), viewModel.fileDirectoryPatternProperty())
 
-        validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.mainFileDirValidationStatus(), mainFileDirectory));
-    }
+                .section(Localization.lang("Attached files"))
+                .checkbox(Localization.lang("Show confirmation dialog when deleting attached files"), viewModel.confirmLinkedFileDeleteProperty())
+                .checkbox(Localization.lang("Move deleted files to trash (instead of deleting them)"), viewModel.moveToTrashProperty())
+                .disabled(!NativeDesktop.get().moveToTrashSupported())
+                .checkbox(Localization.lang("Update linked file paths during entry transfer if the files are accessible"), viewModel.adjustLinkedFilesOnTransferProperty())
+                .checkbox(Localization.lang("Copy linked files on entry transfer when they would otherwise be inaccessible"), viewModel.copyLinkedFilesOnTransferProperty())
+                .disableWhen(viewModel.adjustLinkedFilesOnTransferProperty().not())
+                .checkbox(Localization.lang("Move linked files on entry transfer when they would otherwise be inaccessible"), viewModel.moveFilesOnTransferProperty())
+                .disableWhen(viewModel.adjustLinkedFilesOnTransferProperty().not())
 
-    public void mainFileDirBrowse() {
-        viewModel.mainFileDirBrowse();
+                .build());
     }
 }
