@@ -1,28 +1,25 @@
 package org.jabref.gui.preferences.ocr;
 
-import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 
-import org.jabref.gui.preferences.AbstractPreferenceTabView;
-import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIconView;
+import org.jabref.gui.preferences.forms.AbstractFormTabView;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.PagesWithTextHandling;
 
-import com.airhacks.afterburner.views.ViewLoader;
-
-public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> implements PreferencesTab {
-    @FXML private TextField ocrEnginePath;
-    @FXML private Button browseButton;
-    @FXML private Button autoDetectButton;
-    @FXML private ComboBox<PagesWithTextHandling> pagesHaveTextComboBox;
+public class OcrTab extends AbstractFormTabView<OcrTabViewModel> {
 
     public OcrTab() {
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+        this.viewModel = new OcrTabViewModel(dialogService, preferences.getFilePreferences(), preferences.getOcrPreferences(), taskExecutor);
+        buildView();
     }
 
     @Override
@@ -30,32 +27,39 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> implement
         return Localization.lang("OCR");
     }
 
-    public void initialize() {
-        this.viewModel = new OcrTabViewModel(dialogService, preferences.getFilePreferences(), preferences.getOcrPreferences(), taskExecutor);
+    private void buildView() {
+        getChildren().add(form()
+                .title(Localization.lang("OCR"))
 
-        initializeOcrEnginePath();
-        initializePagesHaveText();
+                .section(Localization.lang("Partially scanned PDFs"))
+                .combo(Localization.lang("OCR for partially scanned PDFs"),
+                        viewModel.pagesHaveTextOptions(), viewModel.selectedPagesHaveTextProperty(), PagesWithTextHandling::getDisplayName)
+
+                .section(Localization.lang("OCR engine path"))
+                .custom(buildEnginePathRow())
+
+                .build());
     }
 
-    private void initializeOcrEnginePath() {
+    private Node buildEnginePathRow() {
+        TextField ocrEnginePath = new TextField();
+        ocrEnginePath.setPromptText(Localization.lang("Type the engine's path"));
         ocrEnginePath.textProperty().bindBidirectional(viewModel.ocrEnginePathProperty());
+        HBox.setHgrow(ocrEnginePath, Priority.ALWAYS);
+
+        Button browseButton = iconButton(IconTheme.JabRefIcons.FOLDER, Localization.lang("Browse engine path"), viewModel::browseEnginePath);
+        Button autoDetectButton = iconButton(IconTheme.JabRefIcons.SEARCH, Localization.lang("Auto detect the engine's path"), viewModel::autoDetectEnginePath);
+
+        HBox row = new HBox(8.0, new Label(Localization.lang("Path to the OCR engine")), ocrEnginePath, browseButton, autoDetectButton);
+        row.setAlignment(Pos.CENTER_LEFT);
+        return row;
     }
 
-    private void initializePagesHaveText() {
-        new ViewModelListCellFactory<PagesWithTextHandling>()
-                .withText(PagesWithTextHandling::getDisplayName)
-                .install(pagesHaveTextComboBox);
-        pagesHaveTextComboBox.itemsProperty().bind(viewModel.pagesHaveTextOptions());
-        pagesHaveTextComboBox.valueProperty().bindBidirectional(viewModel.selectedPagesHaveTextProperty());
-    }
-
-    @FXML
-    private void browseEnginePath() {
-        viewModel.browseEnginePath();
-    }
-
-    @FXML
-    private void autoDetectEnginePath() {
-        viewModel.autoDetectEnginePath();
+    private Button iconButton(IconTheme.JabRefIcons icon, String tooltip, Runnable action) {
+        Button button = new Button();
+        button.setGraphic(new JabRefIconView(icon));
+        button.setTooltip(new Tooltip(tooltip));
+        button.setOnAction(_ -> action.run());
+        return button;
     }
 }
