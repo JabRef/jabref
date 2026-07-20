@@ -3,7 +3,13 @@ package org.jabref.toolkit.commands;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.stream.Collectors;
+
+import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -11,6 +17,7 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 class ConvertTest extends AbstractJabKitTest {
 
@@ -43,6 +50,22 @@ class ConvertTest extends AbstractJabKitTest {
                 "--output-format=bibtex");
 
         assertEquals(1, Files.list(tempDir).collect(Collectors.toSet()).size());
+    }
+
+    @Test
+    void noOutputPrintsBibtexToStdout(@TempDir Path tempDir) throws IOException {
+        SelfContainedSaveOrder saveOrder = new SelfContainedSaveOrder(SaveOrder.OrderType.ORIGINAL, List.of());
+        when(preferences.getSelfContainedExportConfiguration())
+                .thenReturn(new SelfContainedSaveConfiguration(saveOrder, false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false));
+
+        Path origin = getClassResourceAsPath("origin.bib").toAbsolutePath();
+        Path newPath = tempDir.resolve("origin.bib");
+        Files.copy(origin, newPath);
+
+        commandLine.executeToLog("convert",
+                "--input=" + newPath, "--input-format=bibtex");
+
+        assertTrue(commandLine.getStandardOutput().contains("@Book{Darwin1888,"));
     }
 
     @Test

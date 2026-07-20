@@ -54,13 +54,14 @@ class Convert implements Callable<Integer> {
             System.out.println(Localization.lang("Converting '%0' to '%1'.", inputFile, outputFormat));
         }
 
+        ExportService exportService = ExportService.create(jabKit.cliPreferences, sharedOptions.porcelain);
+
         if (outputFile == null) {
-            System.out.println(parserResult.getDatabase());
+            exportService.printDatabaseContextToStdOut(parserResult.getDatabaseContext());
             return 0;
         }
 
-        ExportService.create(jabKit.cliPreferences, sharedOptions.porcelain)
-                     .exportParserResultToFile(parserResult, outputFile, outputFormat);
+        exportService.exportParserResultToFile(parserResult, outputFile, outputFormat);
         return CommandLine.ExitCode.OK;
     }
 }
