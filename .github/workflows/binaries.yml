@@ -869,7 +869,7 @@ jobs:
 
   comment-on-issue-and-pr:
     # separate job, because it should wait until all binaries are available
-    needs: [ conditions, disk-space-check, build ]
+    needs: [ conditions, disk-space-check, build, jabkit-native ]
     if: ${{ (github.event_name == 'pull_request') }}
     permissions:
       issues: write
