@@ -175,6 +175,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void setDatabaseContext(BibDatabaseContext newDatabaseContext) {
+        // we do not use equals here as it would compare all entries, and we just want to get notified of changes when a user switches library
         if (databaseContext == newDatabaseContext) {
             return;
         }
@@ -186,10 +187,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private void update() {
         // updateSequence is unsynchronized and relies on FX-thread confinement; entry observables
         // (see invalidated()) can fire from background threads, e.g. fetchers modifying fields
-        if (!Platform.isFxApplicationThread()) {
-            Platform.runLater(this::update);
-            return;
-        }
+        UiTaskExecutor.runNowOrInJavaFXThread(this::updateOnFxThread);
+    }
+
+    private void updateOnFxThread() {
         long currentUpdateSequence = ++updateSequence;
         if ((databaseContext == null) || (entry == null) || (layout == null)) {
             LOGGER.debug("Missing components - Database: {}, Entry: {}, Layout: {}",
