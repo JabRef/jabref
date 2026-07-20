@@ -212,7 +212,9 @@ public class GroupNodeViewModel {
     }
 
     void ensureMatchedEntriesLoaded() {
-        if (!matchedEntriesInitialized) {
+        // Also guard on "in progress": this method only needs the initial load, and cells re-render
+        // frequently — queueing a pending re-run here would rescan the whole database once per burst.
+        if (!matchedEntriesInitialized && !matchedEntriesUpdateInProgress) {
             updateMatchedEntries();
         }
     }
@@ -322,6 +324,8 @@ public class GroupNodeViewModel {
     private void updateMatchedEntries() {
         // [impl->req~ux.active-library.preview-responsiveness~1]
         if (!preferences.getGroupsPreferences().shouldDisplayGroupCount()) {
+            // A skipped recompute leaves matchedEntries stale, so force a reload when counts are re-enabled
+            matchedEntriesInitialized = false;
             return;
         }
 
@@ -343,9 +347,11 @@ public class GroupNodeViewModel {
                     completeMatchedEntriesUpdate();
                 })
                 .onFailure(e -> {
-                    LOGGER.debug("Could not update matched entries for group {}", groupNode.getName(), e);
+                    LOGGER.warn("Could not update matched entries for group {}", groupNode.getName(), e);
                     completeMatchedEntriesUpdate();
                 });
+        // schedule() routes to the executor's separate scheduled pool, keeping the main worker pool
+        // free for preview rendering — do not "simplify" to executeWith()
         taskExecutor.schedule(updateTask, 0, TimeUnit.MILLISECONDS);
     }
 

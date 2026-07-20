@@ -184,6 +184,12 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void update() {
+        // updateSequence is unsynchronized and relies on FX-thread confinement; entry observables
+        // (see invalidated()) can fire from background threads, e.g. fetchers modifying fields
+        if (!Platform.isFxApplicationThread()) {
+            Platform.runLater(this::update);
+            return;
+        }
         long currentUpdateSequence = ++updateSequence;
         if ((databaseContext == null) || (entry == null) || (layout == null)) {
             LOGGER.debug("Missing components - Database: {}, Entry: {}, Layout: {}",

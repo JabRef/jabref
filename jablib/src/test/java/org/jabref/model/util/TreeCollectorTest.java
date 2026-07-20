@@ -35,6 +35,28 @@ class TreeCollectorTest {
                 mergedRoots.getFirst().getChildren().stream().map(GroupTreeNode::getName).collect(Collectors.toSet()));
     }
 
+    @Test
+    void mergesCollidingGrandchildrenRecursively() {
+        GroupTreeNode firstRoot = node("2024");
+        GroupTreeNode firstChild = firstRoot.addSubgroup(group("2024-01"));
+        firstChild.addSubgroup(group("2024-01-01"));
+        GroupTreeNode secondRoot = node("2024");
+        GroupTreeNode secondChild = secondRoot.addSubgroup(group("2024-01"));
+        secondChild.addSubgroup(group("2024-01-01"));
+        secondChild.addSubgroup(group("2024-01-02"));
+
+        List<GroupTreeNode> mergedRoots = TreeCollector.mergeIntoTree(
+                Stream.of(firstRoot, secondRoot),
+                GroupTreeNode::getGroup);
+
+        assertEquals(1, mergedRoots.size());
+        List<GroupTreeNode> children = mergedRoots.getFirst().getChildren();
+        assertEquals(1, children.size());
+        assertEquals(
+                Set.of("2024-01-01", "2024-01-02"),
+                children.getFirst().getChildren().stream().map(GroupTreeNode::getName).collect(Collectors.toSet()));
+    }
+
     private static GroupTreeNode node(String name) {
         return GroupTreeNode.fromGroup(group(name));
     }
