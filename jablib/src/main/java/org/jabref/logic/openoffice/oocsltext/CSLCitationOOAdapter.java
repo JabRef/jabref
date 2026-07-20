@@ -80,6 +80,7 @@ public class CSLCitationOOAdapter {
 
     private CitationStyle currentStyle;
     private CSLCitationType citationType;
+    private boolean needsCSLReferenceMarkConversion = true;
 
     public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager) throws WrappedTargetException, NoSuchElementException {
         this.document = doc;
@@ -87,6 +88,7 @@ public class CSLCitationOOAdapter {
         this.databasesSupplier = databasesSupplier;
         this.bibEntryTypesManager = bibEntryTypesManager;
         this.openOfficePreferences = openOfficePreferences;
+        this.openOfficePreferences.referenceMarkFormatProperty().addListener((_, _, _) -> needsCSLReferenceMarkConversion = true);
 
         OOStyle initialStyle = openOfficePreferences.getCurrentStyle(); // may be a jstyle, can still be used for detecting subsequent style changes in context of CSL
         if (initialStyle instanceof CitationStyle citationStyle) {
@@ -95,6 +97,31 @@ public class CSLCitationOOAdapter {
 
         markManager.readAndUpdateExistingMarks();
         this.citationType = markManager.getCitationType();
+    }
+
+    public boolean needsReferenceMarkConversion() throws WrappedTargetException, NoSuchElementException {
+        if (!needsCSLReferenceMarkConversion) {
+            return false;
+        }
+
+        markManager.readAndUpdateExistingMarks();
+        boolean conversionNeeded = markManager.isConversionNeededForFirstReferenceMark(openOfficePreferences.getReferenceMarkFormat());
+        if (!conversionNeeded) {
+            needsCSLReferenceMarkConversion = false;
+        }
+        return conversionNeeded;
+    }
+
+    public void convertReferenceMarksToPreference() throws CreationException, com.sun.star.uno.Exception {
+        try {
+            int convertedMarks = markManager.convertReferenceMarks(
+                    openOfficePreferences.getReferenceMarkFormat(),
+                    databasesSupplier.get(),
+                    bibEntryTypesManager);
+            LOGGER.debug("Converted {} reference marks to {}", convertedMarks, openOfficePreferences.getReferenceMarkFormat());
+        } finally {
+            needsCSLReferenceMarkConversion = false;
+        }
     }
 
     /// This method is used to determine whether citation style and citation type should be updated
@@ -387,7 +414,8 @@ public class CSLCitationOOAdapter {
                 openOfficePreferences.getAddSpaceAfter(),
                 citationType,
                 bibDatabaseContext,
-                bibEntryTypesManager);
+                bibEntryTypesManager,
+                openOfficePreferences.getReferenceMarkFormat());
         markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
         markManager.readAndUpdateExistingMarks();
         this.citationType = markManager.getCitationType();

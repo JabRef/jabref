@@ -84,7 +84,7 @@ public class OOBibBase {
             StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
             Supplier<List<BibDatabaseContext>> databasesSupplier = stateManager::getOpenDatabases;
             cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier, openOfficePreferences, Injector.instantiateModelOrService(BibEntryTypesManager.class));
-            cslUpdateBibliography = new CSLUpdateBibliography();
+            cslUpdateBibliography = new CSLUpdateBibliography(openOfficePreferences);
         }
     }
 
@@ -558,10 +558,26 @@ public class OOBibBase {
                                                    OOResult<XTextCursor,
                                                            OOError> cursor,
                                                    Optional<Update.SyncOptions> syncOptions) {
+        boolean convertReferenceMarks;
+        try {
+            convertReferenceMarks = cslCitationOOAdapter.needsReferenceMarkConversion();
+            if (convertReferenceMarks) {
+                dialogService.showWarningDialogAndWait(
+                        Localization.lang("Converting citation markers"),
+                        Localization.lang("Existing LibreOffice citation markers use a different storage format. JabRef will convert them to the selected format before inserting the citation."));
+            }
+        } catch (com.sun.star.uno.Exception e) {
+            return OOVoidResult.error(OOError.fromMisc(e));
+        }
+
         try {
             // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
             // MUST always be paired with an unlockControllers() call
             doc.lockControllers();
+
+            if (convertReferenceMarks) {
+                cslCitationOOAdapter.convertReferenceMarksToPreference();
+            }
 
             if (citationType == CitationType.AUTHORYEAR_PAR) {
                 // "Cite" button

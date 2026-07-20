@@ -10,8 +10,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.openoffice.JabRefReferenceMark;
+import org.jabref.logic.openoffice.OpenOfficeReferenceMarkFormat;
 import org.jabref.logic.openoffice.ReferenceMark;
 import org.jabref.logic.openoffice.ZoteroReferenceMark;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -69,7 +71,8 @@ public class CSLReferenceMarkManager {
     public CSLReferenceMark createReferenceMark(List<BibEntry> entries,
                                                 CSLCitationType citationType,
                                                 BibDatabaseContext bibDatabaseContext,
-                                                BibEntryTypesManager entryTypesManager) throws Exception {
+                                                BibEntryTypesManager entryTypesManager,
+                                                OpenOfficeReferenceMarkFormat referenceMarkFormat) throws Exception {
         List<String> citationKeys = entries.stream()
                                            .map(entry -> entry.getCitationKey().orElse(CUID.randomCUID2(8).toString()))
                                            .collect(Collectors.toList());
@@ -87,6 +90,7 @@ public class CSLReferenceMarkManager {
                 factory,
                 bibDatabaseContext,
                 entryTypesManager,
+                referenceMarkFormat,
                 getZoteroUriByCitationKey());
         marksByName.put(referenceMark.getName(), referenceMark);
         marksInOrder.add(referenceMark);
@@ -98,10 +102,126 @@ public class CSLReferenceMarkManager {
     private Map<String, String> getZoteroUriByCitationKey() {
         Map<String, String> zoteroUriByCitationKey = new HashMap<>();
         for (CSLReferenceMark mark : marksInOrder) {
-            ZoteroReferenceMark.extractZoteroUriByCitationKey(mark.getName())
+            String referenceMarkName = mark.getName();
+            if (!ReferenceMark.isZoteroReferenceMarkName(referenceMarkName)) {
+                continue;
+            }
+
+            ZoteroReferenceMark.extractZoteroUriByCitationKey(referenceMarkName)
                                .forEach(zoteroUriByCitationKey::putIfAbsent);
         }
         return zoteroUriByCitationKey;
+    }
+
+    public boolean isConversionNeededForFirstReferenceMark(OpenOfficeReferenceMarkFormat referenceMarkFormat) {
+        sortMarksInOrder();
+        return marksInOrder.stream()
+                           .findFirst()
+                           .map(mark -> !referenceMarkFormat.matchesReferenceMarkName(mark.getName()))
+                           .orElse(false);
+    }
+
+    public int convertReferenceMarks(OpenOfficeReferenceMarkFormat referenceMarkFormat,
+                                     List<BibDatabaseContext> bibDatabaseContexts,
+                                     BibEntryTypesManager entryTypesManager) throws Exception, CreationException {
+        sortMarksInOrder();
+        Map<String, String> zoteroUriByCitationKey = getZoteroUriByCitationKey();
+        int convertedMarks = 0;
+
+        for (CSLReferenceMark mark : List.copyOf(marksInOrder)) {
+            if (referenceMarkFormat.matchesReferenceMarkName(mark.getName())) {
+                continue;
+            }
+
+            Optional<String> convertedName = buildConvertedReferenceMarkName(
+                    mark,
+                    referenceMarkFormat,
+                    bibDatabaseContexts,
+                    entryTypesManager,
+                    zoteroUriByCitationKey);
+            if (convertedName.isEmpty()) {
+                LOGGER.warn("Could not convert reference mark: {}", mark.getName());
+                continue;
+            }
+
+            if (updateReferenceMarkName(mark, convertedName.get())) {
+                convertedMarks++;
+            }
+        }
+
+        readAndUpdateExistingMarks();
+        return convertedMarks;
+    }
+
+    private boolean updateReferenceMarkName(CSLReferenceMark mark, String markName) throws Exception, CreationException {
+        Optional<XTextRange> range = Optional.ofNullable(mark.getTextContent().getAnchor());
+        if (range.isEmpty()) {
+            return false;
+        }
+        updateMarkAndText(mark, range.orElseThrow().getString(), markName);
+        return true;
+    }
+
+    private Optional<String> buildConvertedReferenceMarkName(CSLReferenceMark mark,
+                                                             OpenOfficeReferenceMarkFormat referenceMarkFormat,
+                                                             List<BibDatabaseContext> bibDatabaseContexts,
+                                                             BibEntryTypesManager entryTypesManager,
+                                                             Map<String, String> zoteroUriByCitationKey) {
+        return switch (referenceMarkFormat) {
+            case JABREF_ONLY ->
+                    Optional.of(JabRefReferenceMark.buildReferenceMarkName(
+                            mark.getCitationKeys(),
+                            mark.getCitationNumbers(),
+                            mark.getUniqueId(),
+                            mark.getCitationType()));
+            case ZOTERO_COMPATIBLE ->
+                    buildZoteroReferenceMarkName(mark, bibDatabaseContexts, entryTypesManager, zoteroUriByCitationKey);
+        };
+    }
+
+    private Optional<String> buildZoteroReferenceMarkName(CSLReferenceMark mark,
+                                                          List<BibDatabaseContext> bibDatabaseContexts,
+                                                          BibEntryTypesManager entryTypesManager,
+                                                          Map<String, String> zoteroUriByCitationKey) {
+        Optional<List<BibEntry>> entries = findEntriesByCitationKeys(mark.getCitationKeys(), bibDatabaseContexts);
+        if (entries.isEmpty()) {
+            return Optional.empty();
+        }
+
+        List<BibEntry> bibEntries = entries.get();
+        ReferenceMark referenceMark = ZoteroReferenceMark.buildReferenceMark(
+                bibEntries,
+                mark.getCitationKeys(),
+                mark.getCitationNumbers(),
+                nextZoteroItemId,
+                mark.getCitationType(),
+                new BibDatabaseContext(new BibDatabase(bibEntries)),
+                entryTypesManager,
+                zoteroUriByCitationKey);
+        nextZoteroItemId += bibEntries.size();
+        return Optional.of(referenceMark.getName());
+    }
+
+    private Optional<List<BibEntry>> findEntriesByCitationKeys(List<String> citationKeys,
+                                                               List<BibDatabaseContext> bibDatabaseContexts) {
+        List<BibEntry> entries = new ArrayList<>();
+        for (String citationKey : citationKeys) {
+            Optional<BibEntry> entry = findEntryByCitationKey(citationKey, bibDatabaseContexts);
+            if (entry.isEmpty()) {
+                return Optional.empty();
+            }
+            entries.add(entry.orElseThrow());
+        }
+        return Optional.of(entries);
+    }
+
+    private Optional<BibEntry> findEntryByCitationKey(String citationKey,
+                                                      List<BibDatabaseContext> bibDatabaseContexts) {
+        return bibDatabaseContexts.stream()
+                                  .map(BibDatabaseContext::getDatabase)
+                                  .map(database -> database.getEntryByCitationKey(citationKey))
+                                  .flatMap(Optional::stream)
+                                  .findFirst();
     }
 
     public void insertReferenceIntoOO(List<BibEntry> entries,
@@ -112,9 +232,10 @@ public class CSLReferenceMarkManager {
                                       boolean insertSpaceAfter,
                                       CSLCitationType citationType,
                                       BibDatabaseContext bibDatabaseContext,
-                                      BibEntryTypesManager entryTypesManager)
+                                      BibEntryTypesManager entryTypesManager,
+                                      OpenOfficeReferenceMarkFormat referenceMarkFormat)
             throws CreationException, Exception {
-        CSLReferenceMark mark = createReferenceMark(entries, citationType, bibDatabaseContext, entryTypesManager);
+        CSLReferenceMark mark = createReferenceMark(entries, citationType, bibDatabaseContext, entryTypesManager, referenceMarkFormat);
         // Ensure the cursor is at the end of its range
         position.collapseToEnd();
 

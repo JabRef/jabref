@@ -217,6 +217,10 @@ public record ZoteroReferenceMark(
     /// Create a map of "citationKey -> ZoteroUri".
     /// Next time JabRef cites the same citation, it will add ZoteroUri into citationItem.
     public static Map<String, String> extractZoteroUriByCitationKey(String referenceMarkName) {
+        if (!isZoteroReferenceMarkName(referenceMarkName)) {
+            return Map.of();
+        }
+
         Map<String, String> zoteroUriByCitationKey = new HashMap<>();
         ZoteroCitationData citationData = getCitationData(referenceMarkName);
 

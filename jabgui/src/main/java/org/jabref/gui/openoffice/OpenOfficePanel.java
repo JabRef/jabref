@@ -16,6 +16,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioMenuItem;
@@ -51,6 +52,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.OpenOfficeReferenceMarkFormat;
 import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
@@ -650,6 +652,22 @@ public class OpenOfficePanel {
         alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());
         alwaysAddCitedOnPagesText.setOnAction(_ -> openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));
 
+        Menu cslCitationStorageFormat = new Menu(Localization.lang("CSL citation storage format"));
+        ToggleGroup referenceMarkFormatGroup = new ToggleGroup();
+        RadioMenuItem jabRefOnlyReferenceMarks = new RadioMenuItem(Localization.lang("JabRef-only"));
+        RadioMenuItem zoteroCompatibleReferenceMarks = new RadioMenuItem(Localization.lang("Zotero-compatible"));
+        jabRefOnlyReferenceMarks.setToggleGroup(referenceMarkFormatGroup);
+        zoteroCompatibleReferenceMarks.setToggleGroup(referenceMarkFormatGroup);
+        cslCitationStorageFormat.getItems().addAll(jabRefOnlyReferenceMarks, zoteroCompatibleReferenceMarks);
+
+        if (openOfficePreferences.getReferenceMarkFormat() == OpenOfficeReferenceMarkFormat.JABREF_ONLY) {
+            jabRefOnlyReferenceMarks.setSelected(true);
+        } else {
+            zoteroCompatibleReferenceMarks.setSelected(true);
+        }
+        jabRefOnlyReferenceMarks.setOnAction(_ -> openOfficePreferences.setReferenceMarkFormat(OpenOfficeReferenceMarkFormat.JABREF_ONLY));
+        zoteroCompatibleReferenceMarks.setOnAction(_ -> openOfficePreferences.setReferenceMarkFormat(OpenOfficeReferenceMarkFormat.ZOTERO_COMPATIBLE));
+
         EasyBind.listen(currentStyleProperty, (_, _, newValue) -> {
             switch (newValue) {
                 case JStyle _ -> {
@@ -689,6 +707,7 @@ public class OpenOfficePanel {
         contextMenu.getItems().addAll(
                 autoSync,
                 addSpaceAfter,
+                cslCitationStorageFormat,
                 new SeparatorMenuItem(),
                 useActiveBase,
                 useAllBases,

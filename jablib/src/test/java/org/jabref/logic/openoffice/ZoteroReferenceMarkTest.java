@@ -276,6 +276,19 @@ class ZoteroReferenceMarkTest {
     }
 
     @Test
+    void extractZoteroUriByCitationKeyReturnsEmptyMapForJabRefReferenceMark() {
+        String referenceMarkName = JabRefReferenceMark.buildReferenceMarkName(
+                List.of("Smith2020"),
+                List.of(1),
+                "uniqueId1",
+                CSLCitationType.NORMAL);
+
+        Map<String, String> zoteroUriByCitationKey = ZoteroReferenceMark.extractZoteroUriByCitationKey(referenceMarkName);
+
+        assertEquals(Map.of(), zoteroUriByCitationKey);
+    }
+
+    @Test
     void getMaxItemIdFindsHighestExistingItemId() {
         String referenceMarkName = """
                 ZOTERO_ITEM CSL_CITATION {

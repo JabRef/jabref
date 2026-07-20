@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.openoffice.JabRefBibliographyMark;
+import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.ZoteroBibliographyMark;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -19,6 +20,16 @@ public class CSLUpdateBibliography {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLUpdateBibliography.class);
 
+    private final OpenOfficePreferences openOfficePreferences;
+
+    public CSLUpdateBibliography() {
+        this(OpenOfficePreferences.getDefault());
+    }
+
+    public CSLUpdateBibliography(OpenOfficePreferences openOfficePreferences) {
+        this.openOfficePreferences = openOfficePreferences;
+    }
+
     /// Rebuilds the bibliography using CSL.
     public void rebuildCSLBibliography(XTextDocument doc,
                                        CSLCitationOOAdapter cslCitationOOAdapter,
@@ -29,12 +40,11 @@ public class CSLUpdateBibliography {
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException {
         LOGGER.debug("Starting to rebuild CSL bibliography");
 
-        // TODO: Implement preference. For now, only allow Zotero Style
-        boolean useZoteroBibliography = true;
-        if (useZoteroBibliography) {
-            new ZoteroBibliographyMark().rebuildCSLBibliography(doc, cslCitationOOAdapter, entries, citationStyle, bibDatabaseContext, bibEntryTypesManager);
-        } else {
-            new JabRefBibliographyMark().rebuildCSLBibliography(doc, cslCitationOOAdapter, entries, citationStyle, bibDatabaseContext, bibEntryTypesManager);
+        switch (openOfficePreferences.getReferenceMarkFormat()) {
+            case JABREF_ONLY ->
+                    new JabRefBibliographyMark().rebuildCSLBibliography(doc, cslCitationOOAdapter, entries, citationStyle, bibDatabaseContext, bibEntryTypesManager);
+            case ZOTERO_COMPATIBLE ->
+                    new ZoteroBibliographyMark().rebuildCSLBibliography(doc, cslCitationOOAdapter, entries, citationStyle, bibDatabaseContext, bibEntryTypesManager);
         }
 
         LOGGER.debug("Finished rebuilding CSL bibliography");

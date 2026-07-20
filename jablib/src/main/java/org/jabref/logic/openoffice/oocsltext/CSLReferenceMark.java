@@ -3,6 +3,8 @@ package org.jabref.logic.openoffice.oocsltext;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.logic.openoffice.JabRefReferenceMark;
+import org.jabref.logic.openoffice.OpenOfficeReferenceMarkFormat;
 import org.jabref.logic.openoffice.ReferenceMark;
 import org.jabref.logic.openoffice.ZoteroReferenceMark;
 import org.jabref.model.database.BibDatabaseContext;
@@ -39,20 +41,49 @@ public class CSLReferenceMark {
                                       XMultiServiceFactory factory,
                                       BibDatabaseContext bibDatabaseContext,
                                       BibEntryTypesManager entryTypesManager,
+                                      OpenOfficeReferenceMarkFormat referenceMarkFormat,
                                       Map<String, String> zoteroUriByCitationKey) throws Exception {
-        // TODO: Implement preference for JabRef reference mark and Zotero reference mark
-        ReferenceMark referenceMark = ZoteroReferenceMark.buildReferenceMark(
+        ReferenceMark referenceMark = buildReferenceMark(
                 entries,
                 citationKeys,
                 citationNumbers,
-                firstZoteroItemId,
                 citationType,
+                firstZoteroItemId,
                 bibDatabaseContext,
                 entryTypesManager,
+                referenceMarkFormat,
                 zoteroUriByCitationKey);
         XNamed named = UnoRuntime.queryInterface(XNamed.class, factory.createInstance("com.sun.star.text.ReferenceMark"));
         named.setName(referenceMark.getName());
         return new CSLReferenceMark(named, referenceMark);
+    }
+
+    static ReferenceMark buildReferenceMark(List<BibEntry> entries,
+                                            List<String> citationKeys,
+                                            List<Integer> citationNumbers,
+                                            CSLCitationType citationType,
+                                            int firstZoteroItemId,
+                                            BibDatabaseContext bibDatabaseContext,
+                                            BibEntryTypesManager entryTypesManager,
+                                            OpenOfficeReferenceMarkFormat referenceMarkFormat,
+                                            Map<String, String> zoteroUriByCitationKey) {
+        return switch (referenceMarkFormat) {
+            case JABREF_ONLY ->
+                    JabRefReferenceMark.buildReferenceMark(
+                            citationKeys,
+                            citationNumbers,
+                            citationType);
+            case ZOTERO_COMPATIBLE ->
+                    ZoteroReferenceMark.buildReferenceMark(
+                            entries,
+                            citationKeys,
+                            citationNumbers,
+                            firstZoteroItemId,
+                            citationType,
+                            bibDatabaseContext,
+                            entryTypesManager,
+                            zoteroUriByCitationKey);
+        };
     }
 
     public List<String> getCitationKeys() {
@@ -61,6 +92,10 @@ public class CSLReferenceMark {
 
     public List<Integer> getCitationNumbers() {
         return citationNumbers;
+    }
+
+    public CSLCitationType getCitationType() {
+        return citationType;
     }
 
     public void setCitationNumbers(List<Integer> numbers) {
@@ -73,6 +108,10 @@ public class CSLReferenceMark {
 
     public String getName() {
         return referenceMark.getName();
+    }
+
+    public String getUniqueId() {
+        return referenceMark.getUniqueId();
     }
 
     public void updateTextContent(XTextContent newTextContent) {
