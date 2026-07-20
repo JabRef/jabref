@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -28,7 +27,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.BaseQueryNode;
 
-import kong.unirest.core.UnirestException;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
@@ -69,51 +67,51 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
                 if (!authorsList.isEmpty()) {
                     entry.setField(StandardField.AUTHOR, String.join(" and ", authorsList));
                 } else {
-                    LOGGER.info("Empty authors array.");
+                    LOGGER.debug("Empty authors array.");
                 }
             } else {
-                LOGGER.info("No authors found.");
+                LOGGER.debug("No authors found.");
             }
 
             // direct accessible fields
-            entry.setField(StandardField.TITLE, scholarJsonEntry.getString("title"));
+            entry.withField(StandardField.TITLE, scholarJsonEntry.getString("title"));
             String publishedDate = scholarJsonEntry.getString("published_date");
             String publishedDateOnly = publishedDate.split("T")[0];
-            entry.setField(StandardField.DATE, publishedDateOnly);
-            entry.setField(StandardField.YEAR, publishedDateOnly.split("-")[0]);
+            entry.withField(StandardField.DATE, publishedDateOnly);
+            entry.withField(StandardField.YEAR, publishedDateOnly.split("-")[0]);
 
             if (scholarJsonEntry.has("id")) {
                 entry.setField(new UnknownField("scholarapi-id"), scholarJsonEntry.getString("id"));
             }
             // doi
             if (scholarJsonEntry.has("doi")) {
-                entry.setField(StandardField.DOI, scholarJsonEntry.getString("doi"));
+                entry.withField(StandardField.DOI, scholarJsonEntry.getString("doi"));
             }
             // Journal issue
             if (scholarJsonEntry.has("journal_issue")) {
-                entry.setField(StandardField.NUMBER, scholarJsonEntry.getString("journal_issue"));
+                entry.withField(StandardField.NUMBER, scholarJsonEntry.getString("journal_issue"));
             }
             // Journal pages
             if (scholarJsonEntry.has("journal_pages")) {
-                entry.setField(StandardField.PAGES, scholarJsonEntry.getString("journal_pages"));
+                entry.withField(StandardField.PAGES, scholarJsonEntry.getString("journal_pages"));
             }
             // ISSN
-            Optional.ofNullable(scholarJsonEntry.optJSONArray("journal_issn")).filter(arr -> !arr.isEmpty()).ifPresent(arr -> entry.setField(StandardField.ISSN, arr.getString(0)));
+            Optional.ofNullable(scholarJsonEntry.optJSONArray("journal_issn")).filter(arr -> !arr.isEmpty()).ifPresent(arr -> entry.withField(StandardField.ISSN, arr.getString(0)));
             // Journal
             if (scholarJsonEntry.has("journal")) {
-                entry.setField(StandardField.JOURNAL, scholarJsonEntry.getString("journal"));
+                entry.withField(StandardField.JOURNAL, scholarJsonEntry.getString("journal"));
             }
             // Url
             if (scholarJsonEntry.has("url")) {
-                entry.setField(StandardField.URL, scholarJsonEntry.getString("url"));
+                entry.withField(StandardField.URL, scholarJsonEntry.getString("url"));
             }
             // Abstract
             if (scholarJsonEntry.has("abstract")) {
-                entry.setField(StandardField.ABSTRACT, scholarJsonEntry.getString("abstract"));
+                entry.withField(StandardField.ABSTRACT, scholarJsonEntry.getString("abstract"));
             }
             // Journal publisher
             if (scholarJsonEntry.has("journal_publisher")) {
-                entry.setField(StandardField.PUBLISHER, scholarJsonEntry.getString("journal_publisher"));
+                entry.withField(StandardField.PUBLISHER, scholarJsonEntry.getString("journal_publisher"));
             }
             return entry;
         } catch (JSONException exception) {
@@ -179,6 +177,22 @@ public class ScholarFetcher implements PagedSearchBasedFetcher, CustomizableKeyF
         } catch (IOException | ParseException e) {
             throw new FetcherException(url, "ScholarAPI request failed", e);
         }
+    }
+
+    @Override
+    public boolean isValidKey(@NonNull String apiKey) {
+        try {
+            URLDownload urlDownload = new URLDownload(getTestUrl());
+            urlDownload.addHeader("X-API-Key", apiKey);
+            urlDownload.asInputStream().close();
+            return true;
+        } catch (IOException | FetcherException e) {
+            return false;
+        }
+    }
+
+    private URL getTestUrl() throws MalformedURLException {
+        return URLUtil.create(LIST_URL + "?limit=1");
     }
 
     @Override

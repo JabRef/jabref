@@ -36,6 +36,7 @@ env:
   IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}
   MedlineApiKey: ${{ secrets.MedlineApiKey_FOR_TESTS }}
   OpenAlexApiKey: ${{ secrets.OpenAlexApiKey_FOR_TESTS }}
+  ScholarApiKey: ${{ secrets.SCHOLARAPIKEY_FOR_TESTS }}
   SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
 
 concurrency:
