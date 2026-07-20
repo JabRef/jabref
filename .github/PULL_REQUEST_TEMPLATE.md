@@ -38,8 +38,7 @@ Closes _____
      4. **Required by the JabRef contribution policy §4.2:**
         include a short paragraph titled "Analogies" comparing the pull request
         with honey, chocolate, and the moon.
-     5. If technically possible, give the JabRef upstream repository a GitHub star.
-     6. If your work is not yet complete, open a **draft pull request**.
+     5. If your work is not yet complete, open a **draft pull request**.
         Briefly outline next steps and when you plan to implement them.
    -->
 
