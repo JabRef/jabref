@@ -89,6 +89,11 @@ on:
         type: boolean
         required: false
         default: false
+      run-jabkit-online-tests:
+        description: "Run online JabKit smoke tests (native binary)"
+        type: boolean
+        required: false
+        default: false
       upload:
         description: "Upload to builds.jabref.org"
         type: boolean
@@ -766,6 +771,101 @@ jobs:
             jabgui/build/packages/${{ matrix.os }}
             jabls-cli/build/packages/${{ matrix.os }}
           compression-level: 0 # no compression
+
+  jabkit-native:
+    needs: [ conditions, disk-space-check, pre-build ]
+    if: ${{ needs.conditions.outputs.should-build == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            displayName: linux-amd64
+            archiveNative: "tar -c -C jabkit/build/native jabkit | gzip > jabkit/build/native-dist/jabkit-native_linux.tar.gz"
+          - os: ubuntu-22.04-arm
+            displayName: linux-arm
+            archiveNative: "tar -c -C jabkit/build/native jabkit | gzip > jabkit/build/native-dist/jabkit-native_linux_arm64.tar.gz"
+          - os: macos-15
+            displayName: macOS-silicon
+            archiveNative: "7z a jabkit/build/native-dist/jabkit-native_macos-silicon.zip ./jabkit/build/native/jabkit"
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.displayName }} jabkit native binary
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+          submodules: 'true'
+          show-progress: 'false'
+
+      - uses: ./.github/actions/setup-gradle
+
+      # In graalvm/setup-graalvm, distribution "liberica" means Liberica NIK.
+      # jdk+fx maps to the Full Liberica package, used here for the AWT/java.desktop path triggered by PDFBox.
+      - name: Set up Liberica NIK (native-image with AWT support)
+        uses: graalvm/setup-graalvm@v1
+        with:
+          distribution: 'liberica'
+          java-package: 'jdk+fx'
+          java-version: '25'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build JabKit native binary
+        run: gradle :jabkit:nativeCompile
+        env:
+          VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
+
+      - name: Install clitest
+        uses: ethanjli/cached-download-action@v0.1.4
+        with:
+          # clitest v0.5.0 (https://github.com/aureliojargas/clitest/releases/tag/0.5.0)
+          url: https://raw.githubusercontent.com/aureliojargas/clitest/8bdaae2f56e524f8824307d5c443e6353fe0dbd9/clitest
+          destination: /tmp/clitest
+
+      - name: Make clitest executable
+        run: chmod +x /tmp/clitest
+
+      - name: Run JabKit offline smoke tests
+        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline.md
+
+      - name: Run JabKit PDF native smoke test (Linux only)
+        if: ${{ runner.os == 'Linux' }}
+        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline-pdf.md
+
+      - name: Run JabKit online smoke tests
+        if: ${{ inputs.run-jabkit-online-tests }}
+        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-online.md
+
+      - name: Package JabKit native binary
+        shell: bash
+        run: |
+          set -e
+          mv jabkit/build/native/nativeCompile jabkit/build/native/jabkit
+          mkdir -p jabkit/build/native-dist
+          ${{ matrix.archiveNative }}
+
+      - name: Upload jabkit native to GitHub artifacts store
+        if: ${{ github.event.inputs.upload-as-artifact == 'true' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: jabkit-native (${{ matrix.displayName }})
+          path: jabkit/build/native-dist/*.*
+          if-no-files-found: error
+
+      - name: Setup SSH key
+        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
+        run: |
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+      - name: Setup rsync (macOS)
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
+        run: brew install rsync
+      - name: Upload jabkit native to builds.jabref.org
+        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
+        shell: bash
+        run: |
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/native-dist/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools/
 
   comment-on-issue-and-pr:
     # separate job, because it should wait until all binaries are available
