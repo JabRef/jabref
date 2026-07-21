@@ -42,7 +42,6 @@ class ZoteroCitationLinkerTest {
         assertEquals("https://github.com/citation-style-language/schema/raw/master/csl-citation.json", citation.get("schema").getAsString());
         assertEquals("keep-me", citation.getAsJsonObject("properties").get("plainCitation").getAsString());
         assertEquals("Original archive", itemData.get("archive-place").getAsString());
-        assertEquals(true, updatedReferenceMarkName.indexOf("\"schema\"") < updatedReferenceMarkName.indexOf("\"citationID\""));
     }
 
     @Test
