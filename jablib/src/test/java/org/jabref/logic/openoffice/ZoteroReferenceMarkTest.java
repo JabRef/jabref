@@ -19,6 +19,7 @@ import com.google.gson.JsonParser;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ZoteroReferenceMarkTest {
@@ -51,22 +52,22 @@ class ZoteroReferenceMarkTest {
         ZoteroCitationData.CitationItemData citationItem = citation.citationItems.getFirst();
         JsonObject citationJson = getCitationJson(referenceMarkName);
         JsonObject citationItemJson = citationJson.getAsJsonArray("citationItems").get(0).getAsJsonObject();
-        assertEquals(false, citationJson.has("properties"));
+        assertFalse(citationJson.has("properties"));
         assertEquals(ZoteroCitationData.CSL_CITATION_SCHEMA, citation.schema);
         assertEquals(8, citation.citationId.length());
         assertEquals(Boolean.TRUE, citationItem.suppressAuthor);
-        assertEquals(false, citationItemJson.has("jabref-citation-number"));
+        assertFalse(citationItemJson.has("jabref-citation-number"));
         assertEquals(List.of("http://www.jabref.org/Smith2020"), citationItem.uris);
         JsonArray dateParts = citationItemJson.getAsJsonObject("itemData")
                                               .getAsJsonObject("issued")
                                               .getAsJsonArray("date-parts")
                                               .get(0)
                                               .getAsJsonArray();
-        assertEquals(true, dateParts.get(0).getAsJsonPrimitive().isString());
+        assertTrue(dateParts.get(0).getAsJsonPrimitive().isString());
         assertEquals("2020", dateParts.get(0).getAsString());
-        assertEquals(true, dateParts.get(1).getAsJsonPrimitive().isNumber());
+        assertTrue(dateParts.get(1).getAsJsonPrimitive().isNumber());
         assertEquals(5, dateParts.get(1).getAsInt());
-        assertEquals(true, dateParts.get(2).getAsJsonPrimitive().isNumber());
+        assertTrue(dateParts.get(2).getAsJsonPrimitive().isNumber());
         assertEquals(3, dateParts.get(2).getAsInt());
 
         String uniqueId = referenceMark.getUniqueId();
@@ -111,10 +112,10 @@ class ZoteroReferenceMarkTest {
         assertEquals("Smith2020", itemData.get("citation-key").getAsString());
         assertEquals("article-journal", itemData.get("type").getAsString());
         assertEquals("Reference mark compatibility", itemData.get("title").getAsString());
-        assertEquals(false, itemData.has("abstract"));
-        assertEquals(false, itemData.has("author"));
-        assertEquals(false, itemData.has("issued"));
-        assertEquals(false, itemData.has("volume"));
+        assertFalse(itemData.has("abstract"));
+        assertFalse(itemData.has("author"));
+        assertFalse(itemData.has("issued"));
+        assertFalse(itemData.has("volume"));
     }
 
     @Test
@@ -366,7 +367,7 @@ class ZoteroReferenceMarkTest {
 
         JsonObject citationItem = getCitationJson(referenceMarkName).getAsJsonArray("citationItems").get(0).getAsJsonObject();
 
-        assertEquals(false, citationItem.has("suppress-author"));
+        assertFalse(citationItem.has("suppress-author"));
     }
 
     @Test
@@ -392,8 +393,8 @@ class ZoteroReferenceMarkTest {
         JsonObject citation = getCitationJson(updatedReferenceMarkName);
         JsonObject citationItem = citation.getAsJsonArray("citationItems").get(0).getAsJsonObject();
 
-        assertEquals(false, citation.has("properties"));
-        assertEquals(false, citationItem.has("suppress-author"));
+        assertFalse(citation.has("properties"));
+        assertFalse(citationItem.has("suppress-author"));
         assertEquals(new ZoteroReferenceMark(
                 updatedReferenceMarkName,
                 List.of("Smith2020"),

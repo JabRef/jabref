@@ -191,7 +191,10 @@ public record ZoteroReferenceMark(
             uris.add(jabRefUri);
 
             String suffix = getSuffix(referenceMarkName);
-            return PREFIX + GSON.toJson(citation) + suffix;
+            if (StringUtil.isBlank(suffix)) {
+                return PREFIX + GSON.toJson(citation);
+            }
+            return PREFIX + GSON.toJson(citation) + " " + suffix;
         } catch (JsonParseException | IllegalStateException e) {
             LOGGER.debug("Could not add JabRef URI to Zotero reference mark at citation item index {}", citationItemIndex, e);
             return referenceMarkName;
