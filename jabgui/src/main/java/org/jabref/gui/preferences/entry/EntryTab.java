@@ -42,9 +42,9 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> {
 
     private void buildView() {
         TagsField<Field> resolvableTags = TagsFieldEditor.create(
-                FieldTextMapper::getDisplayName, viewModel::getSuggestions, viewModel.getFieldStringConverter());
+                FieldTextMapper::getDisplayName, viewModel::getSuggestions, viewModel.getFieldStringConverter(), viewModel.resolvableTagsFieldProperty());
         TagsField<Field> nonWrappableTags = TagsFieldEditor.create(
-                FieldTextMapper::getDisplayName, viewModel::getSuggestions, viewModel.getFieldStringConverter());
+                FieldTextMapper::getDisplayName, viewModel::getSuggestions, viewModel.getFieldStringConverter(), viewModel.nonWrappableTagsFieldProperty());
 
         getChildren().add(form()
                 .title(Localization.lang("Entry"))
@@ -52,9 +52,9 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> {
                 .section(Localization.lang("Field"), field -> field
                         .custom(buildKeywordSeparatorRow())
                         .checkbox(Localization.lang("Resolve BibTeX strings"), viewModel.resolveStringsProperty())
-                        .tagsField(Localization.lang("Affected fields"), resolvableTags, viewModel.resolvableTagsFieldProperty(),
+                        .tagsField(Localization.lang("Affected fields"), resolvableTags,
                                 affected -> affected.disableWhen(viewModel.resolveStringsProperty().not()))
-                        .tagsField(Localization.lang("Do not wrap when saving"), nonWrappableTags, viewModel.nonWrappableTagsFieldProperty()))
+                        .tagsField(Localization.lang("Do not wrap when saving"), nonWrappableTags))
 
                 .section(Localization.lang("Entry owner"), owner -> owner
                         .custom(buildOwnerRow()))
