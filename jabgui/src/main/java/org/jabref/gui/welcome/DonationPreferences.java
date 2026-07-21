@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences;
+package org.jabref.gui.welcome;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
