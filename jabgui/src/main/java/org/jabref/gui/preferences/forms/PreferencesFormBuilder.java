@@ -83,10 +83,18 @@ import org.controlsfx.control.SearchableComboBox;
 /// collected and applied once on the FX thread in {@link #build()}.
 public class PreferencesFormBuilder {
 
+    /// Gap between elements, both inside a region and between regions.
+    private static final double GAP = 10.0;
+    /// Width of the inline value field of {@link #checkWithField} (sized for a port number; use
+    /// {@link ControlElementBase#grow()} for longer values).
+    private static final double SHORT_FIELD_WIDTH = 100.0;
+    /// Minimum width of the caption column of the shared field grid.
+    private static final double LABEL_COLUMN_MIN_WIDTH = 120.0;
+
     private final DialogService dialogService;
     private final GuiPreferences preferences;
 
-    private final VBox root = new VBox(10.0);
+    private final VBox root = new VBox(GAP);
     private final Deque<Pane> containers = new ArrayDeque<>();
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
     private final List<Runnable> validationInits = new ArrayList<>();
@@ -172,7 +180,7 @@ public class PreferencesFormBuilder {
             row.setAlignment(Pos.BASELINE_CENTER);
             addNode(row);
         }
-        return region(new VBox(10.0), content, config);
+        return region(new VBox(GAP), content, config);
     }
 
     /// A plain, unstyled caption line (for text that introduces the following controls).
@@ -211,7 +219,7 @@ public class PreferencesFormBuilder {
         // Consent and explanation labels run long; wrapping is never wrong for a short one.
         checkBox.setWrapText(true);
         checkBox.selectedProperty().bindBidirectional(value);
-        HBox row = new HBox(10.0, checkBox);
+        HBox row = new HBox(GAP, checkBox);
         row.setAlignment(Pos.CENTER_LEFT);
         addNode(row);
         return configured(new RowElement<>(this, checkBox, row), config);
@@ -231,10 +239,10 @@ public class PreferencesFormBuilder {
         CheckBox checkBox = new CheckBox(text);
         checkBox.selectedProperty().bindBidirectional(enabled);
         TextField field = new TextField();
-        field.setMaxWidth(100.0);
+        field.setMaxWidth(SHORT_FIELD_WIDTH);
         field.textProperty().bindBidirectional(fieldValue);
         ownDisable(field, checkBox.selectedProperty().not());
-        HBox row = new HBox(10.0, checkBox, field);
+        HBox row = new HBox(GAP, checkBox, field);
         row.setAlignment(Pos.CENTER_LEFT);
         addNode(row);
         return configured(new RowElement<>(this, field, row), config);
@@ -398,7 +406,7 @@ public class PreferencesFormBuilder {
 
     public PreferencesFormBuilder radio(String text, Property<Boolean> selected, Consumer<RowElement<RadioButton>> config) {
         RadioButton radio = newRadio(text, selected);
-        HBox row = new HBox(10.0, radio);
+        HBox row = new HBox(GAP, radio);
         row.setAlignment(Pos.CENTER_LEFT);
         addNode(row);
         return configured(new RowElement<>(this, radio, row), config);
@@ -419,7 +427,7 @@ public class PreferencesFormBuilder {
         field.textProperty().bindBidirectional(fieldValue);
         ownDisable(field, radio.selectedProperty().not());
         HBox.setHgrow(field, Priority.ALWAYS);
-        HBox row = new HBox(10.0, radio, field);
+        HBox row = new HBox(GAP, radio, field);
         row.setAlignment(Pos.CENTER_LEFT);
         addNode(row);
         return configured(new RowElement<>(this, field, row), config);
@@ -442,7 +450,7 @@ public class PreferencesFormBuilder {
         RadioButton radio = newRadio(text, selected);
         BrowseFileEditor.Result browse = BrowseFileEditor.create(pathValue, onBrowse);
         HBox.setHgrow(browse.row(), Priority.ALWAYS);
-        HBox row = new HBox(10.0, radio, browse.row());
+        HBox row = new HBox(GAP, radio, browse.row());
         row.setAlignment(Pos.CENTER_LEFT);
         addNode(row);
         return configured(new RowElement<>(this, browse.field(), row), config);
@@ -505,7 +513,7 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder group(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<VBox>> config) {
-        return region(new VBox(10.0), content, config);
+        return region(new VBox(GAP), content, config);
     }
 
     /// A side-by-side region: every element inside becomes an equally growing column. Usually filled
@@ -515,7 +523,7 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder columns(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<HBox>> config) {
-        return region(new HBox(10.0), content, config);
+        return region(new HBox(GAP), content, config);
     }
 
     /// A wrapping region: elements flow left to right and wrap onto the next line as the dialog
@@ -649,10 +657,10 @@ public class PreferencesFormBuilder {
     private GridPane ensureGrid() {
         if (currentGrid == null) {
             currentGrid = new GridPane();
-            currentGrid.setHgap(10.0);
-            currentGrid.setVgap(10.0);
+            currentGrid.setHgap(GAP);
+            currentGrid.setVgap(GAP);
             ColumnConstraints labelColumn = new ColumnConstraints();
-            labelColumn.setMinWidth(120.0);
+            labelColumn.setMinWidth(LABEL_COLUMN_MIN_WIDTH);
             labelColumn.setHalignment(HPos.LEFT);
             ColumnConstraints controlColumn = new ColumnConstraints();
             controlColumn.setHgrow(Priority.ALWAYS);
@@ -718,7 +726,7 @@ public class PreferencesFormBuilder {
             return this;
         }
 
-        /// Overrides the gap between the region's elements (default 10).
+        /// Overrides the gap between the region's elements (default {@value #GAP}).
         public FormRegion<T> spacing(double value) {
             switch (region) {
                 case VBox box ->
