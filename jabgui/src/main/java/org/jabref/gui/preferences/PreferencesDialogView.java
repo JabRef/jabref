@@ -91,19 +91,20 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
 
+        this.getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+                if (event.getTarget() instanceof ListView || event.getTarget() instanceof TableView || event.getTarget() instanceof TreeView || event.getTarget() instanceof TreeTableView) {
+                    this.closeDialog();
+                    event.consume();
+                }
+            }
+        });
+
         EasyBind.subscribe(preferenceTabList.getSelectionModel().selectedItemProperty(), tab -> {
             if (tab instanceof AbstractPreferenceTabView<?> preferencesTab) {
                 preferencesContainer.setContent(preferencesTab.getBuilder());
                 preferencesTab.prefWidthProperty().bind(preferencesContainer.widthProperty().subtract(10d));
                 preferencesTab.getStyleClass().add("preferencesTab");
-                this.getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-                    if (preferences.getKeyBindingRepository().checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
-                        if (event.getTarget() instanceof ListView || event.getTarget() instanceof TableView || event.getTarget() instanceof TreeView || event.getTarget() instanceof TreeTableView) {
-                            this.closeDialog();
-                            event.consume();
-                        }
-                    }
-                });
             } else {
                 preferencesContainer.setContent(null);
             }
