@@ -64,9 +64,10 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
                         .stringField(Localization.lang("Remove the following characters:"), viewModel.unwantedCharactersProperty())
                         .checkbox(Localization.lang("Transliterate fields that are used for generating the citation key"), viewModel.transliterateFieldsForCitationKeyProperty()))
 
-                .sectionWithHelp(Localization.lang("Key patterns"), KEY_PATTERNS_HELP_URL, patterns -> patterns
+                .section(Localization.lang("Key patterns"), patterns -> patterns
                         .label(Localization.lang("( Note: Press return to commit changes in the table! )"))
-                        .custom(buildKeyPatternsRegion()))
+                        .custom(buildKeyPatternsRegion()),
+                    patternsSection -> patternsSection.help(KEY_PATTERNS_HELP_URL))
 
                 .build());
     }

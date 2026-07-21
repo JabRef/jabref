@@ -77,13 +77,14 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
 
         getChildren().add(form()
 
-                .sectionWithHelp(Localization.lang("General"), HelpFile.AI_GENERAL_SETTINGS, general -> general
+                .section(Localization.lang("General"), general -> general
                         // [impl->feat~ai.llms.providers~1]
                         .checkbox(Localization.lang("Enable AI functionality in JabRef"), viewModel.enableAi())
                         .info(Localization.lang("AI functionality in Jabref includes:"))
                         .info(Localization.lang("• Chatting with entries."))
                         .info(Localization.lang("• Summarizing entries."))
-                        .info(Localization.lang("• Turn a citation into a BibTeX or BibLaTeX entry.")))
+                        .info(Localization.lang("• Turn a citation into a BibTeX or BibLaTeX entry.")),
+                    generalSection -> generalSection.help(HelpFile.AI_GENERAL_SETTINGS))
 
                 .section(Localization.lang("Connection"), connection -> connection
                         .combo(Localization.lang("AI provider"),
@@ -98,7 +99,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                 key -> key.disableWhen(viewModel.disableBasicSettingsProperty())
                                           .validate(viewModel.getApiTokenValidationStatus())))
 
-                .sectionWithHelp(Localization.lang("Expert settings"), HelpFile.AI_EXPERT_SETTINGS, expertSettings -> expertSettings
+                .section(Localization.lang("Expert settings"), expertSettings -> expertSettings
                         .checkbox(Localization.lang("Customize expert settings"), viewModel.customizeExpertSettingsProperty(),
                                 customize -> customize.disableWhen(viewModel.disableBasicSettingsProperty()))
                         .group(expert -> expert
@@ -116,11 +117,13 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                 // Disabling the group covers every expert control above; individual controls
                                 // only add their own extra conditions on top.
                                 expertGroup -> expertGroup.visibleWhen(viewModel.customizeExpertSettingsProperty())
-                                                          .disableWhen(viewModel.disableExpertSettingsProperty())))
+                                                          .disableWhen(viewModel.disableExpertSettingsProperty())),
+                    expertSection -> expertSection.help(HelpFile.AI_EXPERT_SETTINGS))
 
                 // [impl->req~ai.expert-settings.templates~1]
-                .sectionWithHelp(Localization.lang("Templates"), HelpFile.AI_TEMPLATES, templates -> templates
-                        .custom(buildTemplatesRegion()))
+                .section(Localization.lang("Templates"), templates -> templates
+                        .custom(buildTemplatesRegion()),
+                    templatesSection -> templatesSection.help(HelpFile.AI_TEMPLATES))
 
                 .section(Localization.lang("Miscellaneous"), miscellaneous -> miscellaneous
                         // [impl->req~ai.ingestion.automatic-trigger~1]
