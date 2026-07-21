@@ -151,7 +151,11 @@ public class CSLCitationOOAdapter {
 
     /// Inserts a citation for a group of entries.
     /// Comparable to LaTeX's \cite command.
-    public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
+    public void insertCitation(XTextCursor cursor,
+                               CitationStyle selectedStyle,
+                               List<BibEntry> entries,
+                               BibDatabaseContext bibDatabaseContext,
+                               BibEntryTypesManager bibEntryTypesManager)
             throws CreationException, com.sun.star.uno.Exception {
         linkZoteroCitationsBeforeInsert(bibDatabaseContext);
 
@@ -186,7 +190,11 @@ public class CSLCitationOOAdapter {
     /// Comparable to LaTeX's \citet command.
     ///
     /// @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation} method.
-    public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
+    public void insertInTextCitation(XTextCursor cursor,
+                                     CitationStyle selectedStyle,
+                                     List<BibEntry> entries,
+                                     BibDatabaseContext bibDatabaseContext,
+                                     BibEntryTypesManager bibEntryTypesManager)
             throws CreationException, com.sun.star.uno.Exception {
         linkZoteroCitationsBeforeInsert(bibDatabaseContext);
 
@@ -213,7 +221,11 @@ public class CSLCitationOOAdapter {
 
     /// Creates a "Bibliography" section in the document and inserts a list of references.
     /// The list is generated based on the existing citations, in-text citations and empty citations in the document.
-    public void insertBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
+    public void insertBibliography(XTextCursor cursor,
+                                   CitationStyle selectedStyle,
+                                   List<BibEntry> entries,
+                                   BibDatabaseContext bibDatabaseContext,
+                                   BibEntryTypesManager bibEntryTypesManager)
             throws com.sun.star.uno.Exception, CreationException {
         if (!selectedStyle.hasBibliography()) {
             return;
@@ -531,7 +543,11 @@ public class CSLCitationOOAdapter {
     }
 
     /// Helper method for creating citation group for `insertInTextCitation` and `updateAllCitationsWithNewStyle`
-    private @NonNull String createInTextCitationGroupText(CitationStyle style, boolean isAlphaNumericStyle, boolean isNumericStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext) {
+    private @NonNull String createInTextCitationGroupText(CitationStyle style,
+                                                          boolean isAlphaNumericStyle,
+                                                          boolean isNumericStyle,
+                                                          List<BibEntry> entries,
+                                                          BibDatabaseContext bibDatabaseContext) {
         StringJoiner citations = new StringJoiner(CITATION_DELIMITER);
         for (BibEntry entry : entries) {
             citations.add(createInTextCitationText(style, isAlphaNumericStyle, isNumericStyle, entry, bibDatabaseContext));
@@ -541,7 +557,11 @@ public class CSLCitationOOAdapter {
     }
 
     ///  Helper method for creating in-text citations for `updateAllCitationsWithNewStyle` and `insertInTextCitation`.
-    private @NonNull String createInTextCitationText(CitationStyle style, boolean isAlphaNumericStyle, boolean isNumericStyle, BibEntry currentEntry, BibDatabaseContext bibDatabaseContext) {
+    private @NonNull String createInTextCitationText(CitationStyle style,
+                                                     boolean isAlphaNumericStyle,
+                                                     boolean isNumericStyle,
+                                                     BibEntry currentEntry,
+                                                     BibDatabaseContext bibDatabaseContext) {
         String citation;
 
         if (isAlphaNumericStyle) {
