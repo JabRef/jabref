@@ -131,32 +131,52 @@ public class PreferencesFormBuilder {
     public PreferencesFormBuilder section(String title,
                                           Consumer<PreferencesFormBuilder> content,
                                           Consumer<FormRegion<VBox>> config) {
-        styledLabel(title, "sectionHeader");
-        return region(new VBox(10.0), content, config);
+        return section(title, null, content, config);
     }
 
     public PreferencesFormBuilder sectionWithHelp(String title, HelpFile helpFile, Consumer<PreferencesFormBuilder> content) {
-        sectionHeader(title, helpButton(StandardActions.HELP, helpFile));
-        return region(new VBox(10.0), content, _ -> {
+        return sectionWithHelp(title, helpFile, content, _ -> {
         });
+    }
+
+    public PreferencesFormBuilder sectionWithHelp(String title,
+                                                  HelpFile helpFile,
+                                                  Consumer<PreferencesFormBuilder> content,
+                                                  Consumer<FormRegion<VBox>> config) {
+        return section(title, helpButton(StandardActions.HELP, helpFile), content, config);
     }
 
     /// Section whose help button points at a documentation URL rather than a {@link HelpFile}.
     public PreferencesFormBuilder sectionWithHelp(String title, String helpUrl, Consumer<PreferencesFormBuilder> content) {
-        sectionHeader(title, new HelpButton(helpUrl));
-        return region(new VBox(10.0), content, _ -> {
+        return sectionWithHelp(title, helpUrl, content, _ -> {
         });
     }
 
-    private void sectionHeader(String text, Button help) {
-        flushGrid();
-        Label header = new Label(text);
+    public PreferencesFormBuilder sectionWithHelp(String title,
+                                                  String helpUrl,
+                                                  Consumer<PreferencesFormBuilder> content,
+                                                  Consumer<FormRegion<VBox>> config) {
+        return section(title, new HelpButton(helpUrl), content, config);
+    }
+
+    /// The funnel all section variants go through: a "sectionHeader"-styled label, joined by the
+    /// help button if there is one, followed by the section's own region.
+    private PreferencesFormBuilder section(String title,
+                                           Button help,
+                                           Consumer<PreferencesFormBuilder> content,
+                                           Consumer<FormRegion<VBox>> config) {
+        Label header = new Label(title);
         header.getStyleClass().add("sectionHeader");
-        header.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(header, Priority.ALWAYS);
-        HBox row = new HBox(header, help);
-        row.setAlignment(Pos.BASELINE_CENTER);
-        addToContainer(row);
+        if (help == null) {
+            addNode(header);
+        } else {
+            header.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(header, Priority.ALWAYS);
+            HBox row = new HBox(header, help);
+            row.setAlignment(Pos.BASELINE_CENTER);
+            addNode(row);
+        }
+        return region(new VBox(10.0), content, config);
     }
 
     /// A plain, unstyled caption line (for text that introduces the following controls).
