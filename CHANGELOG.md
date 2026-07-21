@@ -64,6 +64,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where importing a PDF could set the author to the person stored in the PDF's document properties (typically the account name of whoever exported the file, e.g. from Microsoft Word) instead of the authors of the work: author candidates are now cross-checked against the text of the PDF's first pages. [#16247](https://github.com/JabRef/jabref/pull/16247)
+- We fixed an issue where importing a PDF could extract an implausible year (e.g. from a postal code or a link printed on the first page). [#16247](https://github.com/JabRef/jabref/pull/16247)
 - We fixed spurious DOI-mismatch warnings when fetching an entry by DOI. [#16280](https://github.com/JabRef/jabref/pull/16280)
 - We fixed an issue where a critical error occurring during application startup (e.g. while constructing the main window) was only written to the log, leaving the user with no visible feedback and an apparently silent crash. [#14967](https://github.com/JabRef/jabref/issues/14967)
 - We fixed an issue where canceling the duplicate resolution dialog did not stop the background duplicate scan and kept the left entry. [#16234](https://github.com/JabRef/jabref/pull/16234)
