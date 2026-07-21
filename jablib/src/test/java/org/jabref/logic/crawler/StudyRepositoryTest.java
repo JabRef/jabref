@@ -36,6 +36,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.study.Study;
+import org.jabref.model.study.StudyCatalog;
 import org.jabref.model.study.StudyQuery;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -272,7 +273,16 @@ class StudyRepositoryTest {
         assertEquals(3, lock.getQueries().size());
         StudyQuery quantumLock = lock.getQueries().getFirst();
         assertEquals("Quantum", quantumLock.getQuery());
-        assertEquals(Map.of("Springer", "Quantum", "ArXiv", "Quantum", "Medline/PubMed", "Quantum"), quantumLock.getCatalogSpecific());
+        assertEquals(Map.of("Springer", "Quantum", "arXiv", "Quantum", "Medline/PubMed", "Quantum"), quantumLock.getCatalogSpecific());
+    }
+
+    @Test
+    void studyLockExcludesCatalogsWithoutFetcher() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.getStudy().getCatalogs().add(new StudyCatalog("NotAFetcher", true));
+
+        studyRepository.persist(getMockResults());
+
+        assertFalse(parseStudyLock().getQueries().getFirst().getCatalogSpecific().containsKey("NotAFetcher"));
     }
 
     @Test
@@ -284,43 +294,43 @@ class StudyRepositoryTest {
 
     @Test
     void studyLockPreservesCatalogSpecificOverride() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
-        studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific().put("ArXiv", "ti:Quantum");
+        studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific().put("arXiv", "ti:Quantum");
 
         studyRepository.persist(getMockResults());
 
         Map<String, String> effectiveQueries = parseStudyLock().getQueries().getFirst().getCatalogSpecific();
-        assertEquals("ti:Quantum", effectiveQueries.get("ArXiv"));
+        assertEquals("ti:Quantum", effectiveQueries.get("arXiv"));
         assertEquals("Quantum", effectiveQueries.get("Springer"));
     }
 
     @Test
     void studyLockMatchesOverrideCaseInsensitively() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
-        studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific().put("arxiv", "ti:Quantum");
+        studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific().put("ARXIV", "ti:Quantum");
 
         studyRepository.persist(getMockResults());
 
-        assertEquals("ti:Quantum", parseStudyLock().getQueries().getFirst().getCatalogSpecific().get("ArXiv"));
+        assertEquals("ti:Quantum", parseStudyLock().getQueries().getFirst().getCatalogSpecific().get("arXiv"));
     }
 
     @Test
     void studyLockUsesFirstOverrideWhenKeysDifferOnlyByCase() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
         Map<String, String> catalogSpecific = studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific();
         catalogSpecific.put("arxiv", "ti:First");
-        catalogSpecific.put("ArXiv", "ti:Second");
+        catalogSpecific.put("ARXIV", "ti:Second");
 
         studyRepository.persist(getMockResults());
 
         // StudyFetcher uses the first case-insensitive match, so the lock must record the same one
-        assertEquals("ti:First", parseStudyLock().getQueries().getFirst().getCatalogSpecific().get("ArXiv"));
+        assertEquals("ti:First", parseStudyLock().getQueries().getFirst().getCatalogSpecific().get("arXiv"));
     }
 
     @Test
     void studyLockFallsBackToQueryForBlankOverride() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
-        studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific().put("ArXiv", " ");
+        studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific().put("arXiv", " ");
 
         studyRepository.persist(getMockResults());
 
-        assertEquals("Quantum", parseStudyLock().getQueries().getFirst().getCatalogSpecific().get("ArXiv"));
+        assertEquals("Quantum", parseStudyLock().getQueries().getFirst().getCatalogSpecific().get("arXiv"));
     }
 
     @Test
