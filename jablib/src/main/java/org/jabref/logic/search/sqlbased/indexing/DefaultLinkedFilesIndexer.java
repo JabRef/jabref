@@ -299,6 +299,9 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
                 indexWriter.forceMergeDeletes(true);
             } catch (IOException e) {
                 LOGGER.warn("Could not force merge deletes.", e);
+            } catch (ThreadInterruptedException e) {
+                LOGGER.debug("Interrupted optimization of index while forcing merge.");
+                Thread.currentThread().interrupt();
             }
         }
         try {
@@ -307,7 +310,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         } catch (IOException e) {
             LOGGER.warn("Could not force merge segments.", e);
         } catch (ThreadInterruptedException e) {
-            LOGGER.warn("Interrupted optimization of index. ", e);
+            LOGGER.debug("Interrupted optimization of index.");
             Thread.currentThread().interrupt();
         }
     }
