@@ -82,7 +82,7 @@ public class CitationStyleGenerator {
         try {
             return Optional.of(CSL_ADAPTER.makeBibliographyObject(bibEntries, style, outputFormat, databaseContext, entryTypesManager));
         } catch (IllegalArgumentException e) {
-            LOGGER.error("Could not generate BibEntry bibliography. The CSL engine could not create a bibliography output for your item.", e);
+            LOGGER.error("The CSL engine could not create a bibliography output for your item.", e);
             return Optional.empty();
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
             LOGGER.error("Could not generate BibEntry bibliography", e);
