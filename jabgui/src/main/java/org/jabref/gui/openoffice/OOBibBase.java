@@ -563,8 +563,8 @@ public class OOBibBase {
             convertReferenceMarks = cslCitationOOAdapter.needsReferenceMarkConversion();
             if (convertReferenceMarks) {
                 dialogService.showWarningDialogAndWait(
-                        Localization.lang("Converting citation markers"),
-                        Localization.lang("Existing LibreOffice citation markers use a different storage format. JabRef will convert them to the selected format before inserting the citation."));
+                        Localization.lang("Format"),
+                        Localization.lang("Converting references to selected format"));
             }
         } catch (com.sun.star.uno.Exception e) {
             return OOVoidResult.error(OOError.fromMisc(e));
