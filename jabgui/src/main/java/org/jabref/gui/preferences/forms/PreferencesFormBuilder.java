@@ -399,10 +399,20 @@ public class PreferencesFormBuilder {
         return configured(new NodeElement<>(this, node), config);
     }
 
-    /// Registers a control the builder did not create — one inside a {@link #custom} region — with
-    /// the same visualizer, so a tab needs no second {@link ControlsFxVisualizer} of its own.
+    /// Decorates a control the builder did not create — one inside a {@link #custom} node — so a
+    /// tab needs no {@link ControlsFxVisualizer} of its own. This is the one configuring method on
+    /// the builder, because no element handle owns a control the builder never saw; decoration is
+    /// applied on the FX thread in {@link #build()} either way, as for
+    /// {@link InputElement#validate}.
     public PreferencesFormBuilder validate(ValidationStatus status, Control control) {
         validationInits.add(() -> visualizer.initVisualization(status, control));
+        return this;
+    }
+
+    /// Like {@link #validate}, but also marks the control as mandatory, which decorates it while
+    /// it is still empty rather than only once its content is invalid.
+    public PreferencesFormBuilder validateRequired(ValidationStatus status, Control control) {
+        validationInits.add(() -> visualizer.initVisualization(status, control, true));
         return this;
     }
 
@@ -828,6 +838,13 @@ public class PreferencesFormBuilder {
         /// Decorates the control with `status`, applied once on the FX thread in {@link #build()}.
         public InputElement<N> validate(ValidationStatus status) {
             form.validate(status, node);
+            return this;
+        }
+
+        /// Like {@link #validate}, but also marks the control as mandatory; see
+        /// {@link PreferencesFormBuilder#validateRequired}.
+        public InputElement<N> validateRequired(ValidationStatus status) {
+            form.validateRequired(status, node);
             return this;
         }
 

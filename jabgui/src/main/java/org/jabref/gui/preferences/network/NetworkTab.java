@@ -3,7 +3,6 @@ package org.jabref.gui.preferences.network;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.HPos;
@@ -25,19 +24,15 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.PasswordFieldEditor;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 
 import com.dlsc.gemsfx.EnhancedPasswordField;
 import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 import static javafx.beans.binding.Bindings.not;
 
 public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
-
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     // Kept as fields so validation can be attached after the grids are assembled.
     private TextField proxyHostname;
@@ -70,7 +65,11 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
                 .custom(hint)
 
                 .section(Localization.lang("Proxy configuration"), proxy -> proxy
-                        .custom(buildProxyGrid()))
+                        .custom(buildProxyGrid())
+                        .validate(viewModel.proxyHostnameValidationStatus(), proxyHostname)
+                        .validate(viewModel.proxyPortValidationStatus(), proxyPort)
+                        .validate(viewModel.proxyUsernameValidationStatus(), proxyUsername)
+                        .validate(viewModel.proxyPasswordValidationStatus(), proxyPassword))
 
                 .section(Localization.lang("Git configuration"), git -> git
                         .custom(buildGitGrid()))
@@ -79,14 +78,6 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
                         .custom(buildSslGrid()))
 
                 .build());
-
-        validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> {
-            validationVisualizer.initVisualization(viewModel.proxyHostnameValidationStatus(), proxyHostname);
-            validationVisualizer.initVisualization(viewModel.proxyPortValidationStatus(), proxyPort);
-            validationVisualizer.initVisualization(viewModel.proxyUsernameValidationStatus(), proxyUsername);
-            validationVisualizer.initVisualization(viewModel.proxyPasswordValidationStatus(), proxyPassword);
-        });
     }
 
     private GridPane buildProxyGrid() {

@@ -3,7 +3,6 @@ package org.jabref.gui.preferences.preview;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -37,7 +36,6 @@ import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -49,7 +47,6 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
@@ -74,8 +71,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     private final JournalAbbreviationRepository abbreviationRepository;
 
     private final ContextMenu contextMenu = new ContextMenu();
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
-
     private long lastKeyPressTime;
     private String listSearchTerm;
 
@@ -101,6 +96,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
                 .button(Localization.lang("Add BST file"), null, this::selectBstFile)
                 .custom(dualListRegion)
                 .custom(editorRegion)
+                .validate(viewModel.chosenListValidationStatus(), chosenListView)
                 .build());
 
         wireControls();
@@ -331,9 +327,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         contextMenu.getItems().getFirst().disableProperty().bind(viewModel.selectedIsEditableProperty().not());
         contextMenu.getItems().get(2).disableProperty().bind(viewModel.selectedIsEditableProperty().not());
         editArea.editableProperty().bind(viewModel.selectedIsEditableProperty());
-
-        validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.chosenListValidationStatus(), chosenListView));
     }
 
     /// This is called, if a user starts typing some characters into the keyboard with focus on one ListView. The

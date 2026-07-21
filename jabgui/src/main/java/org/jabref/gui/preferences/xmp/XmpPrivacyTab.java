@@ -2,7 +2,6 @@ package org.jabref.gui.preferences.xmp;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -21,19 +20,16 @@ import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FieldsUtil;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.injection.Injector;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewModel> {
 
     private final UndoManager undoManager = Injector.instantiateModelOrService(UndoManager.class);
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     private TableView<Field> filterList;
 
@@ -56,10 +52,8 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
         getChildren().add(form()
                 .checkbox(Localization.lang("Do not write the following fields to XMP Metadata"), viewModel.xmpFilterEnabledProperty())
                 .custom(buildFilterRegion())
+                .validate(viewModel.xmpFilterListValidationStatus(), filterList)
                 .build());
-
-        validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.xmpFilterListValidationStatus(), filterList));
     }
 
     private Node buildFilterRegion() {

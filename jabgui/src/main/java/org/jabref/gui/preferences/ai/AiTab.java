@@ -1,6 +1,5 @@
 package org.jabref.gui.preferences.ai;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.IntegerProperty;
@@ -26,7 +25,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.PasswordFieldEditor;
-import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.preferences.forms.PreferencesFormBuilder;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.preferences.AiPreferences;
@@ -39,14 +38,10 @@ import com.airhacks.afterburner.injection.Injector;
 import com.dlsc.gemsfx.EnhancedPasswordField;
 import com.dlsc.unitfx.IntegerInputField;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
 
     private static final String HUGGING_FACE_CHAT_MODEL_PROMPT = "TinyLlama/TinyLlama_v1.1 (or any other model name)";
-
-    /// Decorates the controls of the expert grid, which is assembled outside the builder.
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     private final BooleanBinding aiDisabled;
 
@@ -60,7 +55,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                 taskExecutor);
         this.aiDisabled = viewModel.enableAi().not();
 
-        visualizer.setDecoration(new IconValidationDecorator());
         buildView();
     }
 
@@ -112,7 +106,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                 PredefinedEmbeddingModel::fullInfo,
                                                 embedding -> embedding.validate(viewModel.getEmbeddingModelValidationStatus()))
                                         .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
-                                        .custom(buildExpertGrid())
+                                        .custom(buildExpertGrid(expert))
                                         .button(Localization.lang("Reset expert settings to default"), IconTheme.JabRefIcons.REFRESH, viewModel::resetExpertSettings),
                                 // Disabling the group covers every expert control above; individual controls
                                 // only add their own extra conditions on top.
@@ -181,9 +175,11 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
     }
 
     /// The six numeric expert settings, laid out as two equal columns of label-above-field cells.
+    /// The grid is assembled outside the builder, so its fields register their validation with
+    /// `form` explicitly rather than through an element handle.
     // [impl->req~ai.expert-settings.chat-inference-global~1]
     // [impl->req~ai.expert-settings.rag-global~1]
-    private Node buildExpertGrid() {
+    private Node buildExpertGrid(PreferencesFormBuilder form) {
         IntegerInputField contextWindowSize = integerField(viewModel.contextWindowSizeProperty());
         TextField temperature = textField(viewModel.temperatureProperty());
         IntegerInputField ragMaxResultsCount = integerField(viewModel.ragMaxResultsCountProperty());
@@ -191,16 +187,14 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
         IntegerInputField documentSplitterChunkSize = integerField(viewModel.documentSplitterChunkSizeProperty());
         IntegerInputField documentSplitterOverlapSize = integerField(viewModel.documentSplitterOverlapSizeProperty());
 
-        Platform.runLater(() -> {
-            visualize(viewModel.getTemperatureTypeValidationStatus(), temperature);
-            visualize(viewModel.getTemperatureRangeValidationStatus(), temperature);
-            visualize(viewModel.getMessageWindowSizeValidationStatus(), contextWindowSize);
-            visualize(viewModel.getDocumentSplitterChunkSizeValidationStatus(), documentSplitterChunkSize);
-            visualize(viewModel.getDocumentSplitterOverlapSizeValidationStatus(), documentSplitterOverlapSize);
-            visualize(viewModel.getRagMaxResultsCountValidationStatus(), ragMaxResultsCount);
-            visualize(viewModel.getRagMinScoreTypeValidationStatus(), ragMinScore);
-            visualize(viewModel.getRagMinScoreRangeValidationStatus(), ragMinScore);
-        });
+        form.validate(viewModel.getTemperatureTypeValidationStatus(), temperature)
+            .validate(viewModel.getTemperatureRangeValidationStatus(), temperature)
+            .validate(viewModel.getMessageWindowSizeValidationStatus(), contextWindowSize)
+            .validate(viewModel.getDocumentSplitterChunkSizeValidationStatus(), documentSplitterChunkSize)
+            .validate(viewModel.getDocumentSplitterOverlapSizeValidationStatus(), documentSplitterOverlapSize)
+            .validate(viewModel.getRagMaxResultsCountValidationStatus(), ragMaxResultsCount)
+            .validate(viewModel.getRagMinScoreTypeValidationStatus(), ragMinScore)
+            .validate(viewModel.getRagMinScoreRangeValidationStatus(), ragMinScore);
 
         GridPane grid = new GridPane();
         grid.setHgap(10.0);
@@ -220,10 +214,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
         grid.add(labelledCell(Localization.lang("Document splitter - chunk size"), documentSplitterChunkSize), 0, 2);
         grid.add(labelledCell(Localization.lang("Document splitter - overlap size"), documentSplitterOverlapSize), 1, 2);
         return grid;
-    }
-
-    private void visualize(ValidationStatus status, javafx.scene.control.Control control) {
-        visualizer.initVisualization(status, control);
     }
 
     private Node labelledCell(String text, Node control) {
