@@ -25,12 +25,12 @@ public class LinkedFilesTab extends AbstractFormTabView<LinkedFilesTabViewModel>
                 .section(Localization.lang("File directory"))
                 .radioGroup(directory -> directory
                         .radioWithBrowse(Localization.lang("Main file directory"),
-                                viewModel.useMainFileDirectoryProperty(), viewModel.mainFileDirectoryProperty(), viewModel::mainFileDirBrowse)
-                            .disableWhen(viewModel.useBibLocationAsPrimaryProperty())
-                            .validate(viewModel.mainFileDirValidationStatus())
+                                viewModel.useMainFileDirectoryProperty(), viewModel.mainFileDirectoryProperty(), viewModel::mainFileDirBrowse,
+                                path -> path.disableWhen(viewModel.useBibLocationAsPrimaryProperty())
+                                            .validate(viewModel.mainFileDirValidationStatus()))
                         .radio(Localization.lang("Search and store files relative to library file location"),
-                                viewModel.useBibLocationAsPrimaryProperty())
-                            .tooltip(Localization.lang("When downloading files, or moving linked files to the file directory, use the bib file location.")))
+                                viewModel.useBibLocationAsPrimaryProperty(),
+                                relative -> relative.tooltip(Localization.lang("When downloading files, or moving linked files to the file directory, use the bib file location."))))
 
                 .section(Localization.lang("Open file explorer"))
                 .radioGroup(explorer -> explorer
@@ -42,8 +42,8 @@ public class LinkedFilesTab extends AbstractFormTabView<LinkedFilesTabViewModel>
                         .radio(Localization.lang("Autolink files with names starting with the citation key"), viewModel.autolinkFileStartsBibtexProperty())
                         .radio(Localization.lang("Autolink only files that match the citation key"), viewModel.autolinkFileExactBibtexProperty())
                         .radioWithField(Localization.lang("Use regular expression search"),
-                                viewModel.autolinkUseRegexProperty(), viewModel.autolinkRegexKeyProperty())
-                            .help(StandardActions.HELP_REGEX_SEARCH, HelpFile.REGEX_SEARCH))
+                                viewModel.autolinkUseRegexProperty(), viewModel.autolinkRegexKeyProperty(),
+                                regex -> regex.help(StandardActions.HELP_REGEX_SEARCH, HelpFile.REGEX_SEARCH)))
 
                 .section(Localization.lang("Fulltext Index"))
                 .checkbox(Localization.lang("Automatically index all linked files for fulltext search"), viewModel.fulltextIndexProperty())
@@ -56,13 +56,13 @@ public class LinkedFilesTab extends AbstractFormTabView<LinkedFilesTabViewModel>
 
                 .section(Localization.lang("Attached files"))
                 .checkbox(Localization.lang("Show confirmation dialog when deleting attached files"), viewModel.confirmLinkedFileDeleteProperty())
-                .checkbox(Localization.lang("Move deleted files to trash (instead of deleting them)"), viewModel.moveToTrashProperty())
-                .disabled(!NativeDesktop.get().moveToTrashSupported())
+                .checkbox(Localization.lang("Move deleted files to trash (instead of deleting them)"), viewModel.moveToTrashProperty(),
+                        trash -> trash.disabled(!NativeDesktop.get().moveToTrashSupported()))
                 .checkbox(Localization.lang("Update linked file paths during entry transfer if the files are accessible"), viewModel.adjustLinkedFilesOnTransferProperty())
-                .checkbox(Localization.lang("Copy linked files on entry transfer when they would otherwise be inaccessible"), viewModel.copyLinkedFilesOnTransferProperty())
-                .disableWhen(viewModel.adjustLinkedFilesOnTransferProperty().not())
-                .checkbox(Localization.lang("Move linked files on entry transfer when they would otherwise be inaccessible"), viewModel.moveFilesOnTransferProperty())
-                .disableWhen(viewModel.adjustLinkedFilesOnTransferProperty().not())
+                .checkbox(Localization.lang("Copy linked files on entry transfer when they would otherwise be inaccessible"), viewModel.copyLinkedFilesOnTransferProperty(),
+                        copy -> copy.disableWhen(viewModel.adjustLinkedFilesOnTransferProperty().not()))
+                .checkbox(Localization.lang("Move linked files on entry transfer when they would otherwise be inaccessible"), viewModel.moveFilesOnTransferProperty(),
+                        move -> move.disableWhen(viewModel.adjustLinkedFilesOnTransferProperty().not()))
 
                 .build());
     }

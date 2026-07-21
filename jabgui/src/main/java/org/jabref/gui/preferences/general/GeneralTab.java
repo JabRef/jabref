@@ -58,17 +58,17 @@ public class GeneralTab extends AbstractFormTabView<GeneralTabViewModel> {
                 .searchableCombo(Localization.lang("Language"),
                         viewModel.languagesListProperty(), viewModel.selectedLanguageProperty(), Language::getDisplayName)
                 .combo(Localization.lang("Visual theme"),
-                        viewModel.themesListProperty(), viewModel.selectedThemeProperty(), ThemeTypes::getDisplayName)
-                    .disableWhen(viewModel.themeSyncOsProperty())
-                    .validate(viewModel.themeValidationStatus())
+                        viewModel.themesListProperty(), viewModel.selectedThemeProperty(), ThemeTypes::getDisplayName,
+                        theme -> theme.disableWhen(viewModel.themeSyncOsProperty())
+                                      .validate(viewModel.themeValidationStatus()))
                 .checkbox(Localization.lang("Use System Preference"), viewModel.themeSyncOsProperty())
                 .browseField(null,
-                        viewModel.customPathToThemeProperty(), viewModel::importCSSFile)
-                    .disableWhen(viewModel.selectedThemeProperty().isNotEqualTo(ThemeTypes.CUSTOM))
-                    .validate(viewModel.customPathToThemeValidationStatus())
+                        viewModel.customPathToThemeProperty(), viewModel::importCSSFile,
+                        path -> path.disableWhen(viewModel.selectedThemeProperty().isNotEqualTo(ThemeTypes.CUSTOM))
+                                    .validate(viewModel.customPathToThemeValidationStatus()))
                 .checkbox(Localization.lang("Override default font settings"), viewModel.fontOverrideProperty())
-                .field(Localization.lang("Size"), buildFontSizeSpinner())
-                    .validate(viewModel.fontSizeValidationStatus())
+                .field(Localization.lang("Size"), buildFontSizeSpinner(),
+                        size -> size.validate(viewModel.fontSizeValidationStatus()))
                 .hyperlink(Localization.lang("Get more themes..."), viewModel::openBrowser)
 
                 .section(Localization.lang("User interface"))
@@ -82,20 +82,20 @@ public class GeneralTab extends AbstractFormTabView<GeneralTabViewModel> {
 
                 .section(Localization.lang("Single instance"))
                 .checkWithField(Localization.lang("Enforce single JabRef instance (and allow remote operations) using port"),
-                        viewModel.remoteServerProperty(), viewModel.remotePortProperty())
-                    .validate(viewModel.remotePortValidationStatus())
-                    .help(HelpFile.REMOTE)
+                        viewModel.remoteServerProperty(), viewModel.remotePortProperty(),
+                        port -> port.validate(viewModel.remotePortValidationStatus())
+                                    .help(HelpFile.REMOTE))
 
                 .section(Localization.lang("HTTP Server"))
                 .checkWithField(Localization.lang("Enable HTTP Server (e.g., for JabMap) on port"),
-                        viewModel.enableHttpServerProperty(), viewModel.httpPortProperty())
-                    .validate(viewModel.httpPortValidationStatus())
+                        viewModel.enableHttpServerProperty(), viewModel.httpPortProperty(),
+                        port -> port.validate(viewModel.httpPortValidationStatus()))
                 .checkbox(Localization.lang("Skip import dialog for entries received from browser extensions"), viewModel.directHttpImportProperty())
 
                 .section(Localization.lang("LSP Server"))
                 .checkWithField(Localization.lang("Enable LSP Server on port"),
-                        viewModel.enableLanguageServerProperty(), viewModel.languageServerPortProperty())
-                    .validate(viewModel.languageServerPortValidationStatus())
+                        viewModel.enableLanguageServerProperty(), viewModel.languageServerPortProperty(),
+                        port -> port.validate(viewModel.languageServerPortValidationStatus()))
 
                 .section(Localization.lang("Libraries"))
                 .combo(Localization.lang("Default library mode"),
@@ -103,11 +103,11 @@ public class GeneralTab extends AbstractFormTabView<GeneralTabViewModel> {
 
                 .section(Localization.lang("Saving"))
                 .checkbox(Localization.lang("Always reformat library on save and export"), viewModel.alwaysReformatBibProperty())
-                .checkbox(Localization.lang("Autosave local libraries"), viewModel.autosaveLocalLibrariesProperty())
-                    .help(HelpFile.AUTOSAVE)
+                .checkbox(Localization.lang("Autosave local libraries"), viewModel.autosaveLocalLibrariesProperty(),
+                        autosave -> autosave.help(HelpFile.AUTOSAVE))
                 .checkbox(Localization.lang("Create backup"), viewModel.createBackupProperty())
-                .browseField(null, viewModel.backupDirectoryProperty(), viewModel::backupFileDirBrowse)
-                    .disableWhen(viewModel.createBackupProperty().not())
+                .browseField(null, viewModel.backupDirectoryProperty(), viewModel::backupFileDirBrowse,
+                        directory -> directory.disableWhen(viewModel.createBackupProperty().not()))
 
                 .build());
     }
