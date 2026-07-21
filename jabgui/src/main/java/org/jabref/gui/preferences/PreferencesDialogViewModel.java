@@ -52,6 +52,9 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesDialogViewModel.class);
 
+    /// Memory-stick mode is deliberately not part of any tab: it belongs to the portable-preferences
+    /// concern (import/export/reset) and is therefore a footer toggle of the dialog itself,
+    /// loaded in [#setValues()] and stored in [#storeAllSettings()] alongside the tabs.
     private final SimpleBooleanProperty memoryStickProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
