@@ -2,6 +2,7 @@ package org.jabref.gui.groups;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
@@ -62,8 +63,12 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
 import io.github.adr.linked.ADR;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GroupNodeViewModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GroupNodeViewModel.class);
 
     private final SimpleObjectProperty<String> displayName;
     private final boolean isRoot;
@@ -84,6 +89,9 @@ public class GroupNodeViewModel {
     private final ObservableList<BibEntry> entriesList;
     @SuppressWarnings("FieldCanBeLocal")
     private final InvalidationListener onInvalidatedGroup = _ -> refreshGroup();
+    private boolean matchedEntriesInitialized;
+    private boolean matchedEntriesUpdateInProgress;
+    private boolean matchedEntriesUpdatePending;
 
     public GroupNodeViewModel(@NonNull BibDatabaseContext databaseContext,
                               @NonNull StateManager stateManager,
@@ -120,7 +128,6 @@ public class GroupNodeViewModel {
 
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
-        EasyBind.subscribe(preferences.getGroupsPreferences().displayGroupCountProperty(), _ -> updateMatchedEntries());
         expandedProperty.set(groupNode.getGroup().isExpanded());
         expandedProperty.addListener((_, _, newValue) -> groupNode.getGroup().setExpanded(newValue));
 
@@ -202,6 +209,14 @@ public class GroupNodeViewModel {
 
     public IntegerBinding getHits() {
         return Bindings.size(matchedEntries);
+    }
+
+    void ensureMatchedEntriesLoaded() {
+        // Also guard on "in progress": this method only needs the initial load, and cells re-render
+        // frequently — queueing a pending re-run here would rescan the whole database once per burst.
+        if (!matchedEntriesInitialized && !matchedEntriesUpdateInProgress) {
+            updateMatchedEntries();
+        }
     }
 
     @Override
@@ -306,21 +321,47 @@ public class GroupNodeViewModel {
         });
     }
 
-    private void updateMatchedEntries() {
-        // We calculate the new hit value
-        // We could be more intelligent and try to figure out the new number of hits based on the entry change
-        // for example, a previously matched entry gets removed -> hits = hits - 1
-        if (preferences.getGroupsPreferences().shouldDisplayGroupCount()) {
-            BackgroundTask
-                    .wrap(() -> databaseContext.getDatabase().getEntries().stream()
-                                               .filter(e -> isMatchEffective(this, e))
-                                               .toList())
-                    .onSuccess(entries -> {
-                        matchedEntries.clear();
-                        // ADR-0038
-                        entries.forEach(entry -> matchedEntries.add(entry.getId()));
-                    })
-                    .executeWith(taskExecutor);
+    void updateMatchedEntries() {
+        // [impl->req~ux.active-library.preview-responsiveness~1]
+        if (!preferences.getGroupsPreferences().shouldDisplayGroupCount()) {
+            // A skipped recompute leaves the cache stale: force a reload when counts are re-enabled,
+            // and clear now so rebinding never briefly shows the outdated number
+            matchedEntriesInitialized = false;
+            matchedEntries.clear();
+            return;
+        }
+
+        if (matchedEntriesUpdateInProgress) {
+            matchedEntriesUpdatePending = true;
+            return;
+        }
+
+        matchedEntriesUpdateInProgress = true;
+        BackgroundTask<List<BibEntry>> updateTask = BackgroundTask
+                .wrap(() -> databaseContext.getDatabase().getEntries().stream()
+                                           .filter(e -> isMatchEffective(this, e))
+                                           .toList())
+                .onSuccess(entries -> {
+                    matchedEntries.clear();
+                    // ADR-0038
+                    entries.forEach(entry -> matchedEntries.add(entry.getId()));
+                    matchedEntriesInitialized = true;
+                    completeMatchedEntriesUpdate();
+                })
+                .onFailure(e -> {
+                    LOGGER.warn("Could not update matched entries for group {}", groupNode.getName(), e);
+                    completeMatchedEntriesUpdate();
+                });
+        // schedule() routes to the executor's separate scheduled pool, keeping the main worker pool
+        // free for preview rendering — do not "simplify" to executeWith()
+        taskExecutor.schedule(updateTask, 0, TimeUnit.MILLISECONDS);
+    }
+
+    private void completeMatchedEntriesUpdate() {
+        matchedEntriesUpdateInProgress = false;
+        if (matchedEntriesUpdatePending) {
+            matchedEntriesUpdatePending = false;
+            updateMatchedEntries();
         }
     }
 
