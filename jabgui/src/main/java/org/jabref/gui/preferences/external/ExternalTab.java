@@ -1,6 +1,5 @@
 package org.jabref.gui.preferences.external;
 
-import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -19,17 +18,13 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.push.GuiPushToApplication;
 import org.jabref.gui.util.ControlHelper;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.SearchableComboBox;
 
 public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel> {
-
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     // Kept as fields so validation can be attached after the grids are assembled.
     private TextField citeCommand;
@@ -59,19 +54,15 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
                         .checkbox(Localization.lang("Automatically open folders of attached files"), viewModel.autoOpenAttachedFoldersProperty()))
 
                 .section(Localization.lang("Push applications"), push -> push
-                        .custom(buildPushGrid()))
+                        .custom(buildPushGrid())
+                        .validate(viewModel.citeCommandValidationStatus(), citeCommand))
 
                 .section(Localization.lang("Custom applications"), applications -> applications
-                        .custom(buildCustomApplicationsGrid()))
+                        .custom(buildCustomApplicationsGrid())
+                        .validate(viewModel.terminalCommandValidationStatus(), customTerminalCommand)
+                        .validate(viewModel.fileBrowserCommandValidationStatus(), customFileBrowserCommand))
 
                 .build());
-
-        validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> {
-            validationVisualizer.initVisualization(viewModel.terminalCommandValidationStatus(), customTerminalCommand);
-            validationVisualizer.initVisualization(viewModel.fileBrowserCommandValidationStatus(), customFileBrowserCommand);
-            validationVisualizer.initVisualization(viewModel.citeCommandValidationStatus(), citeCommand);
-        });
     }
 
     private Node buildPushGrid() {

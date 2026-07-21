@@ -1,6 +1,5 @@
 package org.jabref.gui.preferences.table;
 
-import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
@@ -17,17 +16,13 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.ControlHelper;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> {
-
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     private final TableView<MainTableColumnModel> columnsList = new TableView<>();
 
@@ -51,6 +46,7 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> {
 
                 .section(Localization.lang("Columns"), columns -> columns
                         .custom(buildColumnsRegion())
+                        .validate(viewModel.columnsListValidationStatus(), columnsList)
                         .checkbox(Localization.lang("Enable special fields"), viewModel.specialFieldsEnabledProperty(),
                                 specialFields -> specialFields.help(StandardActions.HELP_SPECIAL_FIELDS, HelpFile.SPECIAL_FIELDS))
                         .checkbox(Localization.lang("Show extra columns"), viewModel.extraFileColumnsEnabledProperty())
@@ -143,9 +139,6 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> {
                 event.consume();
             }
         });
-
-        validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.columnsListValidationStatus(), columnsList));
     }
 
     private ComboBox<MainTableColumnModel> buildAddColumnCombo() {

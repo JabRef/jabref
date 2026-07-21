@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
@@ -51,7 +50,6 @@ import org.jabref.model.entry.types.EntryType;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.control.textfield.TextFields;
 
@@ -64,8 +62,6 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     private final Button addNewEntryTypeButton = new Button();
     private final Button addNewFieldButton = new Button(Localization.lang("Add"));
     private final CheckComboBox<FieldProperty> fieldPropertyCheckComboBox = new CheckComboBox<>();
-
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     private final CustomLocalDragboard localDragboard;
 
@@ -94,11 +90,6 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         addNewFieldButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));
 
         viewModel.newFieldToAddProperty().bindBidirectional(addNewField.textProperty());
-
-        Platform.runLater(() -> {
-            visualizer.initVisualization(viewModel.entryTypeValidationStatus(), addNewEntryType, true);
-            visualizer.initVisualization(viewModel.fieldValidationStatus(), addNewField, true);
-        });
     }
 
     @Override
@@ -114,6 +105,8 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     private void buildView() {
         getChildren().add(form()
                 .custom(new HBox(10.0, buildEntryTypesColumn(), buildFieldsColumn()))
+                .validateRequired(viewModel.entryTypeValidationStatus(), addNewEntryType)
+                .validateRequired(viewModel.fieldValidationStatus(), addNewField)
                 .build());
     }
 
