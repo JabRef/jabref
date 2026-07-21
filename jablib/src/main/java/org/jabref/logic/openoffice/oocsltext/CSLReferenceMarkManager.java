@@ -299,7 +299,13 @@ public class CSLReferenceMarkManager {
             if (ReferenceMark.isReferenceMarkName(name)) {
                 XNamed named = UnoRuntime.queryInterface(XNamed.class, marks.getByName(name));
 
-                Optional<ReferenceMark> parsedReferenceMark = ReferenceMark.parse(name);
+                Optional<ReferenceMark> parsedReferenceMark;
+                try {
+                    parsedReferenceMark = ReferenceMark.parse(name);
+                } catch (RuntimeException e) {
+                    LOGGER.warn("Cannot parse reference mark: {}", name, e);
+                    continue;
+                }
                 if (parsedReferenceMark.isEmpty()) {
                     continue;
                 }

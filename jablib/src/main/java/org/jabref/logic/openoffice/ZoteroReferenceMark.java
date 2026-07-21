@@ -119,32 +119,37 @@ public record ZoteroReferenceMark(
     }
 
     public static Optional<ZoteroReferenceMark> parse(String referenceMarkName) {
-        ZoteroCitationData citation = getCitationData(referenceMarkName);
-        List<String> citationKeys = new ArrayList<>();
-        List<Integer> citationNumbers = new ArrayList<>();
-        boolean suppressesAuthor = false;
-        for (ZoteroCitationData.CitationItemData citationItem : Optional.ofNullable(citation.citationItems).orElse(List.of())) {
-            getCitationKey(citationItem).ifPresent(citationKey -> {
-                citationKeys.add(citationKey);
-                citationNumbers.add(0);
-            });
-            suppressesAuthor = suppressesAuthor || Optional.ofNullable(citationItem.suppressAuthor).orElse(false);
-        }
+        try {
+            ZoteroCitationData citation = getCitationData(referenceMarkName);
+            List<String> citationKeys = new ArrayList<>();
+            List<Integer> citationNumbers = new ArrayList<>();
+            boolean suppressesAuthor = false;
+            for (ZoteroCitationData.CitationItemData citationItem : Optional.ofNullable(citation.citationItems).orElse(List.of())) {
+                getCitationKey(citationItem).ifPresent(citationKey -> {
+                    citationKeys.add(citationKey);
+                    citationNumbers.add(0);
+                });
+                suppressesAuthor = suppressesAuthor || Optional.ofNullable(citationItem.suppressAuthor).orElse(false);
+            }
 
-        if (citationKeys.isEmpty()) {
+            if (citationKeys.isEmpty()) {
+                return Optional.empty();
+            }
+
+            String uniqueId = getSuffix(referenceMarkName);
+
+            CSLCitationType citationType = suppressesAuthor ? CSLCitationType.IN_TEXT : CSLCitationType.NORMAL;
+
+            return Optional.of(new ZoteroReferenceMark(
+                    referenceMarkName,
+                    List.copyOf(citationKeys),
+                    List.copyOf(citationNumbers),
+                    uniqueId,
+                    citationType));
+        } catch (RuntimeException e) {
+            LOGGER.debug("Could not parse Zotero reference mark", e);
             return Optional.empty();
         }
-
-        String uniqueId = getSuffix(referenceMarkName);
-
-        CSLCitationType citationType = suppressesAuthor ? CSLCitationType.IN_TEXT : CSLCitationType.NORMAL;
-
-        return Optional.of(new ZoteroReferenceMark(
-                referenceMarkName,
-                List.copyOf(citationKeys),
-                List.copyOf(citationNumbers),
-                uniqueId,
-                citationType));
     }
 
     public static int getMaxItemId(String referenceMarkName) {
@@ -217,6 +222,9 @@ public record ZoteroReferenceMark(
     public static String getCSLJson(String referenceMarkName) {
         int jsonStart = referenceMarkName.indexOf('{');
         int jsonEnd = referenceMarkName.lastIndexOf('}');
+        if (jsonStart < 0 || jsonEnd <= jsonStart) {
+            return "";
+        }
         return referenceMarkName.substring(jsonStart, jsonEnd + 1);
     }
 
