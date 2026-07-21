@@ -46,7 +46,13 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
     private EnhancedPasswordField proxyPassword;
 
     public NetworkTab() {
-        this.viewModel = new NetworkTabViewModel(dialogService, preferences);
+        this.viewModel = new NetworkTabViewModel(
+                dialogService,
+                preferences.getProxyPreferences(),
+                preferences.getGitPreferences(),
+                preferences.getInternalPreferences(),
+                preferences.getSSLPreferences(),
+                preferences.getFilePreferences());
         buildView();
     }
 

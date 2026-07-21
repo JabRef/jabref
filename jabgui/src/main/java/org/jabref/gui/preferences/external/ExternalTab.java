@@ -37,7 +37,11 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     private TextField customFileBrowserCommand;
 
     public ExternalTab() {
-        this.viewModel = new ExternalTabViewModel(dialogService, preferences);
+        this.viewModel = new ExternalTabViewModel(
+                dialogService,
+                preferences.getExternalApplicationsPreferences(),
+                preferences.getPushToApplicationPreferences(),
+                preferences.getFilePreferences());
         buildView();
     }
 

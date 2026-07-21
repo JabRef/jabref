@@ -14,7 +14,6 @@ import javafx.util.StringConverter;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.bibtex.FieldPreferences;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
@@ -42,11 +41,14 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
     private final OwnerPreferences ownerPreferences;
     private final TimestampPreferences timestampPreferences;
 
-    public EntryTabViewModel(CliPreferences preferences) {
-        this.bibEntryPreferences = preferences.getBibEntryPreferences();
-        this.fieldPreferences = preferences.getFieldPreferences();
-        this.ownerPreferences = preferences.getOwnerPreferences();
-        this.timestampPreferences = preferences.getTimestampPreferences();
+    public EntryTabViewModel(BibEntryPreferences bibEntryPreferences,
+                             FieldPreferences fieldPreferences,
+                             OwnerPreferences ownerPreferences,
+                             TimestampPreferences timestampPreferences) {
+        this.bibEntryPreferences = bibEntryPreferences;
+        this.fieldPreferences = fieldPreferences;
+        this.ownerPreferences = ownerPreferences;
+        this.timestampPreferences = timestampPreferences;
     }
 
     @Override

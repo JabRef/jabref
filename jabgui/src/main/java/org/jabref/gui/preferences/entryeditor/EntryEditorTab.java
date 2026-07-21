@@ -25,7 +25,12 @@ import org.jabref.logic.l10n.Localization;
 public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabViewModel> {
 
     public EntryEditorTab() {
-        this.viewModel = new EntryEditorTabViewModel(dialogService, preferences, taskExecutor);
+        this.viewModel = new EntryEditorTabViewModel(
+                dialogService,
+                preferences.getEntryEditorPreferences(),
+                preferences.getMrDlibPreferences(),
+                preferences.getAbbreviationPreferences(),
+                taskExecutor);
         buildView();
     }
 

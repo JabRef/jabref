@@ -19,7 +19,6 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
@@ -46,12 +45,14 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
 
     public ProtectedTermsTabViewModel(ProtectedTermsLoader termsLoader,
                                       DialogService dialogService,
-                                      GuiPreferences preferences) {
+                                      ExternalApplicationsPreferences externalApplicationsPreferences,
+                                      FilePreferences filePreferences,
+                                      ProtectedTermsPreferences protectedTermsPreferences) {
         this.termsLoader = termsLoader;
         this.dialogService = dialogService;
-        this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
-        this.filePreferences = preferences.getFilePreferences();
-        this.protectedTermsPreferences = preferences.getProtectedTermsPreferences();
+        this.externalApplicationsPreferences = externalApplicationsPreferences;
+        this.filePreferences = filePreferences;
+        this.protectedTermsPreferences = protectedTermsPreferences;
     }
 
     @Override

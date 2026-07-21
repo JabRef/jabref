@@ -32,7 +32,12 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> {
     private final TableView<MainTableColumnModel> columnsList = new TableView<>();
 
     public TableTab() {
-        this.viewModel = new TableTabViewModel(dialogService, preferences);
+        this.viewModel = new TableTabViewModel(
+                dialogService,
+                preferences.getSpecialFieldsPreferences(),
+                preferences.getNameDisplayPreferences(),
+                preferences.getMainTablePreferences(),
+                preferences.getExternalApplicationsPreferences());
         buildView();
     }
 

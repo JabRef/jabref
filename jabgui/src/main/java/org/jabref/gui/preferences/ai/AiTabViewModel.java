@@ -27,7 +27,6 @@ import org.jabref.logic.ai.preferences.AiDefaultExpertSettings;
 import org.jabref.logic.ai.preferences.AiDefaultTemplates;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.LocalizedNumbersUtils;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
@@ -142,13 +141,13 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final List<String> restartWarnings = new ArrayList<>();
 
     public AiTabViewModel(
-            CliPreferences preferences,
+            AiPreferences aiPreferences,
             AiModelService aiModelService,
             TaskExecutor taskExecutor
     ) {
         this.oldLocale = Locale.getDefault();
 
-        this.aiPreferences = preferences.getAiPreferences();
+        this.aiPreferences = aiPreferences;
         this.aiModelService = aiModelService;
         this.taskExecutor = taskExecutor;
 

@@ -9,7 +9,10 @@ import org.jabref.logic.l10n.Localization;
 public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabViewModel> {
 
     public LinkedFilesTab() {
-        this.viewModel = new LinkedFilesTabViewModel(dialogService, preferences);
+        this.viewModel = new LinkedFilesTabViewModel(
+                dialogService,
+                preferences.getFilePreferences(),
+                preferences.getAutoLinkPreferences());
         buildView();
     }
 

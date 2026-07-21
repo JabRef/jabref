@@ -82,7 +82,13 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     public PreviewTab() {
         this.stateManager = Injector.instantiateModelOrService(StateManager.class);
         this.abbreviationRepository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
-        this.viewModel = new PreviewTabViewModel(dialogService, preferences, taskExecutor, stateManager, abbreviationRepository);
+        this.viewModel = new PreviewTabViewModel(
+                dialogService,
+                preferences.getPreviewPreferences(),
+                preferences.getLayoutFormatterPreferences(),
+                taskExecutor,
+                stateManager,
+                abbreviationRepository);
         this.lastKeyPressTime = System.currentTimeMillis();
 
         Node dualListRegion = buildDualListRegion();

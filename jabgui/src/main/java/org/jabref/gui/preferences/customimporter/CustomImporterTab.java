@@ -20,7 +20,10 @@ import com.tobiasdiez.easybind.EasyBind;
 public class CustomImporterTab extends AbstractPreferenceTabView<CustomImporterTabViewModel> {
 
     public CustomImporterTab() {
-        viewModel = new CustomImporterTabViewModel(preferences, dialogService);
+        viewModel = new CustomImporterTabViewModel(
+                preferences.getImporterPreferences(),
+                preferences.getFilePreferences(),
+                dialogService);
         buildView();
     }
 
