@@ -1,7 +1,7 @@
 package org.jabref.gui.preferences.autocompletion;
 
 
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.TagsFieldEditor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
@@ -9,7 +9,7 @@ import org.jabref.model.entry.field.FieldTextMapper;
 
 import com.dlsc.gemsfx.TagsField;
 
-public class AutoCompletionTab extends AbstractFormTabView<AutoCompletionTabViewModel> {
+public class AutoCompletionTab extends AbstractPreferenceTabView<AutoCompletionTabViewModel> {
 
     public AutoCompletionTab() {
         this.viewModel = new AutoCompletionTabViewModel(preferences.getAutoCompletePreferences());

@@ -18,11 +18,11 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
 import org.jabref.logic.l10n.Localization;
 
-public class EntryEditorTab extends AbstractFormTabView<EntryEditorTabViewModel> {
+public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabViewModel> {
 
     public EntryEditorTab() {
         this.viewModel = new EntryEditorTabViewModel(dialogService, preferences, taskExecutor);

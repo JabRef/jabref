@@ -2,11 +2,11 @@ package org.jabref.gui.preferences.linkedfiles;
 
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
-public class LinkedFilesTab extends AbstractFormTabView<LinkedFilesTabViewModel> {
+public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabViewModel> {
 
     public LinkedFilesTab() {
         this.viewModel = new LinkedFilesTabViewModel(dialogService, preferences);

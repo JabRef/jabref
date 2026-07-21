@@ -33,7 +33,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -55,7 +55,7 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.control.textfield.TextFields;
 
-public class CustomEntryTypesTab extends AbstractFormTabView<CustomEntryTypesTabViewModel> {
+public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTypesTabViewModel> {
 
     private final TableView<EntryTypeViewModel> entryTypesTable = new TableView<>();
     private final TextField addNewEntryType = new TextField();

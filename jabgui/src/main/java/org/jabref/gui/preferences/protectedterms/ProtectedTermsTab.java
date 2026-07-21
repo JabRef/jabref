@@ -16,7 +16,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
@@ -27,7 +27,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import com.airhacks.afterburner.injection.Injector;
 
 /// Tab for managing term list files.
-public class ProtectedTermsTab extends AbstractFormTabView<ProtectedTermsTabViewModel> {
+public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsTabViewModel> {
 
     public ProtectedTermsTab() {
         ProtectedTermsLoader termsLoader = Injector.instantiateModelOrService(ProtectedTermsLoader.class);

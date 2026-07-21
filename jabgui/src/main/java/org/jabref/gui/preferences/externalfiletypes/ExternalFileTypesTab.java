@@ -11,13 +11,13 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 
 /// Editor for external file types.
-public class ExternalFileTypesTab extends AbstractFormTabView<ExternalFileTypesTabViewModel> {
+public class ExternalFileTypesTab extends AbstractPreferenceTabView<ExternalFileTypesTabViewModel> {
 
     private TableView<ExternalFileTypeItemViewModel> fileTypesTable;
 

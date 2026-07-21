@@ -10,14 +10,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanel;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.component.HelpButton;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.injection.Injector;
 
-public class CitationKeyPatternTab extends AbstractFormTabView<CitationKeyPatternTabViewModel> {
+public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKeyPatternTabViewModel> {
 
     private static final String KEY_PATTERNS_HELP_URL = "https://docs.jabref.org/setup/citationkeypatterns";
     private static final String REGEX_HELP_URL = KEY_PATTERNS_HELP_URL + "#replace-via-regular-expression";

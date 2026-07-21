@@ -1,9 +1,9 @@
 package org.jabref.gui.preferences.groups;
 
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.logic.l10n.Localization;
 
-public class GroupsTab extends AbstractFormTabView<GroupsTabViewModel> {
+public class GroupsTab extends AbstractPreferenceTabView<GroupsTabViewModel> {
 
     public GroupsTab() {
         this.viewModel = new GroupsTabViewModel(preferences.getGroupsPreferences());

@@ -16,7 +16,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.push.GuiPushToApplication;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -27,7 +27,7 @@ import org.jabref.logic.l10n.Localization;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.SearchableComboBox;
 
-public class ExternalTab extends AbstractFormTabView<ExternalTabViewModel> {
+public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel> {
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 

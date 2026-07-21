@@ -8,7 +8,7 @@ import javafx.scene.control.TextFormatter;
 import javafx.util.converter.IntegerStringConverter;
 
 import org.jabref.gui.StateManager;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.http.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
@@ -21,7 +21,7 @@ import org.jabref.model.database.BibDatabaseMode;
 
 import com.airhacks.afterburner.injection.Injector;
 
-public class GeneralTab extends AbstractFormTabView<GeneralTabViewModel> {
+public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
 
     // Formats the font-size input so that only integers can be entered.
     private final TextFormatter<Integer> fontSizeFormatter = new TextFormatter<>(new IntegerStringConverter(), 9,

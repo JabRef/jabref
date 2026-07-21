@@ -11,11 +11,11 @@ import javafx.scene.layout.Priority;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.PagesWithTextHandling;
 
-public class OcrTab extends AbstractFormTabView<OcrTabViewModel> {
+public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
 
     public OcrTab() {
         this.viewModel = new OcrTabViewModel(dialogService, preferences.getFilePreferences(), preferences.getOcrPreferences(), taskExecutor);
