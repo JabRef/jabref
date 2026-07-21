@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.scene.Node;
@@ -22,6 +23,9 @@ public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel
 
     protected T viewModel;
 
+    /// The builders created via [#form()], kept to serve their texts to the preferences search.
+    private final List<PreferencesFormBuilder> forms = new ArrayList<>();
+
     protected AbstractPreferenceTabView() {
         this.preferences = Injector.instantiateModelOrService(GuiPreferences.class);
         this.dialogService = Injector.instantiateModelOrService(DialogService.class);
@@ -31,7 +35,16 @@ public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel
 
     /// Creates a fresh builder pre-wired with the services needed for section help buttons.
     protected PreferencesFormBuilder form() {
-        return new PreferencesFormBuilder(dialogService, preferences);
+        PreferencesFormBuilder form = new PreferencesFormBuilder(dialogService, preferences);
+        forms.add(form);
+        return form;
+    }
+
+    @Override
+    public List<SearchableElement> getSearchableElements() {
+        return forms.stream()
+                    .flatMap(form -> form.getSearchableElements().stream())
+                    .toList();
     }
 
     @Override
