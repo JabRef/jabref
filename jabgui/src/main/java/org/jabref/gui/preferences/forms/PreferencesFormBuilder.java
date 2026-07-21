@@ -133,31 +133,7 @@ public class PreferencesFormBuilder {
         this.containers.push(root);
     }
 
-    // region headers & static content
-
-    /// A titled section. Its contents go in the lambda, so the grouping is visible in the source and
-    /// the section can be configured or moved as a unit — rather than a header label followed by
-    /// loose siblings that only look related because of their order.
-    public PreferencesFormBuilder section(String title, Consumer<PreferencesFormBuilder> content) {
-        return section(title, content, noConfig());
-    }
-
-    /// The configuration lambda addresses the section as a whole — including its header, which is
-    /// where a {@link SectionRegion#help help button} attaches.
-    public PreferencesFormBuilder section(String title,
-                                          Consumer<PreferencesFormBuilder> content,
-                                          Consumer<SectionRegion> config) {
-        Label header = new Label(title);
-        searchable(title, header);
-        header.getStyleClass().add("sectionHeader");
-        header.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(header, Priority.ALWAYS);
-        HBox headerRow = new HBox(header);
-        headerRow.setAlignment(Pos.BASELINE_CENTER);
-        addNode(headerRow);
-
-        return configured(new SectionRegion(this, region(new VBox(GAP), content), header), config);
-    }
+    // region static content
 
     /// A plain, unstyled caption line (for text that introduces the following controls).
     public PreferencesFormBuilder label(String text) {
@@ -409,7 +385,9 @@ public class PreferencesFormBuilder {
         return configured(new NodeElement<>(this, node), config);
     }
 
-    /// Adds a fully custom node spanning the form width (the `.custom(Node)` hatch).
+    /// Adds a fully custom node spanning the form width (the `.custom(Node)` hatch). The handle is
+    /// a {@link NodeElement} even for a {@link Control}, since erasure forbids a `Control` sibling
+    /// of this method; register a control inside such a node with {@link #validate} instead.
     public <T extends Node> PreferencesFormBuilder custom(T node) {
         return custom(node, noConfig());
     }
@@ -439,6 +417,30 @@ public class PreferencesFormBuilder {
     // endregion
 
     // region regions
+
+    /// A titled section. Its contents go in the lambda, so the grouping is visible in the source and
+    /// the section can be configured or moved as a unit — rather than a header label followed by
+    /// loose siblings that only look related because of their order.
+    public PreferencesFormBuilder section(String title, Consumer<PreferencesFormBuilder> content) {
+        return section(title, content, noConfig());
+    }
+
+    /// The configuration lambda addresses the section as a whole — including its header, which is
+    /// where a {@link SectionRegion#help help button} attaches.
+    public PreferencesFormBuilder section(String title,
+                                          Consumer<PreferencesFormBuilder> content,
+                                          Consumer<SectionRegion> config) {
+        Label header = new Label(title);
+        searchable(title, header);
+        header.getStyleClass().add("sectionHeader");
+        header.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(header, Priority.ALWAYS);
+        HBox headerRow = new HBox(header);
+        headerRow.setAlignment(Pos.BASELINE_CENTER);
+        addNode(headerRow);
+
+        return configured(new SectionRegion(this, region(new VBox(GAP), content), header), config);
+    }
 
     public PreferencesFormBuilder group(Consumer<PreferencesFormBuilder> content) {
         return group(content, noConfig());
@@ -646,7 +648,7 @@ public class PreferencesFormBuilder {
 
     private Button helpButton(StandardActions action, HelpFile helpFile) {
         Button button = new Button();
-        button.setPrefWidth(20.0);
+        button.setPrefWidth(ICON_BUTTON_SIZE);
         new ActionFactory().configureIconButton(
                 action,
                 new HelpAction(helpFile, dialogService, preferences.getExternalApplicationsPreferences()),
@@ -923,7 +925,7 @@ public class PreferencesFormBuilder {
             Button browseButton = new Button();
             browseButton.setGraphic(IconTheme.JabRefIcons.OPEN.getGraphicNode());
             browseButton.getStyleClass().addAll("icon-button", "narrow");
-            browseButton.setPrefSize(20.0, 20.0);
+            browseButton.setPrefSize(ICON_BUTTON_SIZE, ICON_BUTTON_SIZE);
             browseButton.setTooltip(new Tooltip(Localization.lang("Browse")));
             browseButton.disableProperty().bind(node.disableProperty());
             browseButton.setOnAction(_ -> onBrowse.run());
