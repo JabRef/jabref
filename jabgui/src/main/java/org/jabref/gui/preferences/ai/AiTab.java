@@ -54,7 +54,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
 
     public AiTab(PreferencesDialogState dialogState) {
         this.viewModel = new AiTabViewModel(
-                preferences,
+                preferences.getAiPreferences(),
                 Injector.instantiateModelOrService(AiService.class).getModelService(),
                 taskExecutor);
         this.aiDisabled = viewModel.enableAi().not();

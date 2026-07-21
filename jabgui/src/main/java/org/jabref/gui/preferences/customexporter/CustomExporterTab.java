@@ -18,7 +18,7 @@ import com.tobiasdiez.easybind.EasyBind;
 public class CustomExporterTab extends AbstractPreferenceTabView<CustomExporterTabViewModel> {
 
     public CustomExporterTab() {
-        viewModel = new CustomExporterTabViewModel(preferences, dialogService);
+        viewModel = new CustomExporterTabViewModel(preferences.getExportPreferences(), dialogService);
         buildView();
     }
 

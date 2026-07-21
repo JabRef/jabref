@@ -27,7 +27,11 @@ import com.dlsc.gemsfx.TagsField;
 public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> {
 
     public EntryTab() {
-        this.viewModel = new EntryTabViewModel(preferences);
+        this.viewModel = new EntryTabViewModel(
+                preferences.getBibEntryPreferences(),
+                preferences.getFieldPreferences(),
+                preferences.getOwnerPreferences(),
+                preferences.getTimestampPreferences());
         buildView();
     }
 

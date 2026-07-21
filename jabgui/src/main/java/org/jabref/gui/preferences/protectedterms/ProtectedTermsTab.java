@@ -31,7 +31,12 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
 
     public ProtectedTermsTab() {
         ProtectedTermsLoader termsLoader = Injector.instantiateModelOrService(ProtectedTermsLoader.class);
-        viewModel = new ProtectedTermsTabViewModel(termsLoader, dialogService, preferences);
+        viewModel = new ProtectedTermsTabViewModel(
+                termsLoader,
+                dialogService,
+                preferences.getExternalApplicationsPreferences(),
+                preferences.getFilePreferences(),
+                preferences.getProtectedTermsPreferences());
         buildView();
     }
 

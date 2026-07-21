@@ -12,7 +12,6 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabModel;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationCountFetcherType;
@@ -53,11 +52,15 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final TaskExecutor taskExecutor;
     private boolean mscKeywordDescriptionsInitialized;
 
-    public EntryEditorTabViewModel(DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
+    public EntryEditorTabViewModel(DialogService dialogService,
+                                   EntryEditorPreferences entryEditorPreferences,
+                                   MrDlibPreferences mrDlibPreferences,
+                                   AbbreviationPreferences abbreviationPreferences,
+                                   TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
-        this.entryEditorPreferences = preferences.getEntryEditorPreferences();
-        this.mrDlibPreferences = preferences.getMrDlibPreferences();
-        this.abbreviationPreferences = preferences.getAbbreviationPreferences();
+        this.entryEditorPreferences = entryEditorPreferences;
+        this.mrDlibPreferences = mrDlibPreferences;
+        this.abbreviationPreferences = abbreviationPreferences;
         this.taskExecutor = taskExecutor;
 
         EasyBind.subscribe(enableMscKeywordDescriptionsProperty, this::onMscKeywordDescriptionsChanged);

@@ -2,7 +2,6 @@ package org.jabref.gui.preferences.entryeditor;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.journals.AbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -27,12 +26,13 @@ class EntryEditorTabViewModelTest {
     @BeforeEach
     void setUp() {
         dialogService = mock(DialogService.class);
-        GuiPreferences preferences = mock(GuiPreferences.class);
-        when(preferences.getEntryEditorPreferences()).thenReturn(EntryEditorPreferences.getDefault());
-        when(preferences.getMrDlibPreferences()).thenReturn(MrDlibPreferences.getDefault());
-        when(preferences.getAbbreviationPreferences()).thenReturn(AbbreviationPreferences.getDefault());
 
-        viewModel = new EntryEditorTabViewModel(dialogService, preferences, mock(TaskExecutor.class));
+        viewModel = new EntryEditorTabViewModel(
+                dialogService,
+                EntryEditorPreferences.getDefault(),
+                MrDlibPreferences.getDefault(),
+                AbbreviationPreferences.getDefault(),
+                mock(TaskExecutor.class));
     }
 
     @Test

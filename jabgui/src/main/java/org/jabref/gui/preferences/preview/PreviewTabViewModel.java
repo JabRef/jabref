@@ -28,7 +28,6 @@ import javafx.scene.input.TransferMode;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -36,6 +35,7 @@ import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.preview.BstPreviewLayout;
 import org.jabref.logic.preview.CitationStylePreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
@@ -85,7 +85,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final JournalAbbreviationRepository abbreviationRepository;
-    private final GuiPreferences preferences;
+    private final PreviewPreferences previewPreferences;
+    private final LayoutFormatterPreferences layoutFormatterPreferences;
     private final TaskExecutor taskExecutor;
 
     private final Validator chosenListValidator;
@@ -95,12 +96,14 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private ObjectProperty<MultipleSelectionModel<PreviewLayout>> dragSourceSelectionModel = null;
 
     public PreviewTabViewModel(DialogService dialogService,
-                               GuiPreferences preferences,
+                               PreviewPreferences previewPreferences,
+                               LayoutFormatterPreferences layoutFormatterPreferences,
                                TaskExecutor taskExecutor,
                                StateManager stateManager,
                                JournalAbbreviationRepository abbreviationRepository) {
         this.dialogService = dialogService;
-        this.preferences = preferences;
+        this.previewPreferences = previewPreferences;
+        this.layoutFormatterPreferences = layoutFormatterPreferences;
         this.taskExecutor = taskExecutor;
         this.localDragboard = stateManager.getLocalDragboard();
         this.abbreviationRepository = abbreviationRepository;
@@ -125,7 +128,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
         showAsExtraTabProperty.set(previewPreferences.shouldShowPreviewAsExtraTab());
         showPreviewInEntryTableTooltip.set(previewPreferences.shouldShowPreviewEntryTableTooltip());
         chosenListProperty().getValue().clear();
@@ -135,7 +137,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         if (chosenListProperty.stream().noneMatch(TextBasedPreviewLayout.class::isInstance)) {
             availableListProperty.getValue().add(TextBasedPreviewLayout.of(
                     previewPreferences.getCustomPreviewLayout(),
-                    preferences.getLayoutFormatterPreferences(),
+                    layoutFormatterPreferences,
                     abbreviationRepository));
         }
 
@@ -204,8 +206,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     /// Store the changes of preference-preview settings.
     @Override
     public void storeSettings() {
-        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
-
         if (chosenListProperty.isEmpty()) {
             PreviewLayout textBasedPreviewLayout = findLayoutByName(TextBasedPreviewLayout.NAME);
             if (textBasedPreviewLayout != null) {
@@ -213,7 +213,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             } else {
                 chosenListProperty.add(TextBasedPreviewLayout.of(
                         TextBasedPreviewLayout.DEFAULT,
-                        preferences.getLayoutFormatterPreferences(),
+                        layoutFormatterPreferences,
                         abbreviationRepository));
             }
         }
@@ -316,7 +316,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         if (defaultLayout instanceof TextBasedPreviewLayout layout) {
             layout.setText(TextBasedPreviewLayout.of(
                     TextBasedPreviewLayout.DEFAULT,
-                    preferences.getLayoutFormatterPreferences(),
+                    layoutFormatterPreferences,
                     abbreviationRepository).getText());
         }
         refreshPreview();

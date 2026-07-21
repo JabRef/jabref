@@ -46,7 +46,15 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     private final Label tableNote = new Label(Localization.lang("( Note: Press return to commit changes in the table! )"));
 
     public WebSearchTab(PreferencesDialogState dialogState) {
-        this.viewModel = new WebSearchTabViewModel(preferences, dialogState.aiEnabledReadOnlyProperty(), taskExecutor);
+        this.viewModel = new WebSearchTabViewModel(
+                preferences.getImporterPreferences(),
+                preferences.getGrobidPreferences(),
+                preferences.getDOIPreferences(),
+                preferences.getFilePreferences(),
+                preferences.getImportFormatPreferences(),
+                preferences.getLibraryPreferences(),
+                dialogState.aiEnabledReadOnlyProperty(),
+                taskExecutor);
         buildView();
     }
 

@@ -15,10 +15,11 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.importer.ImporterViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.ImportException;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 
@@ -32,17 +33,21 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<ImporterViewModel> importers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<ImporterViewModel> selectedImporters = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-    private final CliPreferences preferences;
+    private final ImporterPreferences importerPreferences;
+    private final FilePreferences filePreferences;
     private final DialogService dialogService;
 
-    public CustomImporterTabViewModel(CliPreferences preferences, DialogService dialogService) {
-        this.preferences = preferences;
+    public CustomImporterTabViewModel(ImporterPreferences importerPreferences,
+                                      FilePreferences filePreferences,
+                                      DialogService dialogService) {
+        this.importerPreferences = importerPreferences;
+        this.filePreferences = filePreferences;
         this.dialogService = dialogService;
     }
 
     @Override
     public void setValues() {
-        Set<CustomImporter> importersLogic = preferences.getImporterPreferences().getCustomImporters();
+        Set<CustomImporter> importersLogic = importerPreferences.getCustomImporters();
         importers.clear();
         for (CustomImporter importer : importersLogic) {
             importers.add(new ImporterViewModel(importer));
@@ -51,7 +56,7 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        preferences.getImporterPreferences().setCustomImporters(importers.stream()
+        importerPreferences.setCustomImporters(importers.stream()
                                                                          .map(ImporterViewModel::getLogic)
                                                                          .collect(Collectors.toSet()));
     }
@@ -77,7 +82,7 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.CLASS, StandardFileType.JAR, StandardFileType.ZIP)
                 .withDefaultExtension(StandardFileType.CLASS)
-                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
+                .withInitialDirectory(filePreferences.getWorkingDirectory())
                 .build();
 
         Optional<Path> selectedFile = dialogService.showFileOpenDialog(fileDialogConfiguration);

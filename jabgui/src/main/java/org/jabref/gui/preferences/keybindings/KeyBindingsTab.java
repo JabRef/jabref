@@ -38,7 +38,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
     private final TreeTableView<KeyBindingViewModel> keyBindingsTable = new TreeTableView<>();
 
     public KeyBindingsTab() {
-        viewModel = new KeyBindingsTabViewModel(preferences.getKeyBindingRepository(), dialogService, preferences);
+        viewModel = new KeyBindingsTabViewModel(preferences.getKeyBindingRepository(), dialogService);
         buildView();
     }
 
