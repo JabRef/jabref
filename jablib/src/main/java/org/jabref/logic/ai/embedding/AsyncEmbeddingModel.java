@@ -10,7 +10,6 @@ import org.jabref.logic.ai.ingestion.tasks.UpdateEmbeddingModelTask;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.NotificationService;
-import org.jabref.logic.util.ProgressCounter;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 
@@ -61,29 +60,18 @@ public class AsyncEmbeddingModel implements EmbeddingModel, AutoCloseable {
     public void startRebuildingTask() {
         predictorProperty.set(Optional.empty());
 
-        if (DeepJavaEmbeddingModel.isDownloaded(embeddingModelKind.getName())) {
-            try {
-                predictorProperty.set(Optional.of(new DeepJavaEmbeddingModel(embeddingModelKind.getName(), new ProgressCounter())));
-            } catch (Exception e) {
-                LOGGER.error("An error occurred while loading the embedding model", e);
-                notificationService.notify(Localization.lang("An error occurred while loading the embedding model"));
-                predictorProperty.set(Optional.empty());
-                errorWhileBuildingModel = e.getMessage() == null ? "" : e.getMessage();
-            }
-        } else {
-            new UpdateEmbeddingModelTask(embeddingModelKind.getName())
-                    .onSuccess(model -> {
-                        predictorProperty.set(Optional.of(model));
-                        errorWhileBuildingModel = "";
-                    })
-                    .onFailure(e -> {
-                        LOGGER.error("An error occurred while downloading the embedding model", e);
-                        notificationService.notify(Localization.lang("An error occurred while downloading the embedding model"));
-                        predictorProperty.set(Optional.empty());
-                        errorWhileBuildingModel = e.getMessage() == null ? "" : e.getMessage();
-                    })
-                    .executeWith(taskExecutor);
-        }
+        new UpdateEmbeddingModelTask(embeddingModelKind.getName())
+                .onSuccess(model -> {
+                    predictorProperty.set(Optional.of(model));
+                    errorWhileBuildingModel = "";
+                })
+                .onFailure(e -> {
+                    LOGGER.error("An error occurred while downloading the embedding model", e);
+                    notificationService.notify(Localization.lang("An error occurred while downloading the embedding model"));
+                    predictorProperty.set(Optional.empty());
+                    errorWhileBuildingModel = e.getMessage() == null ? "" : e.getMessage();
+                })
+                .executeWith(taskExecutor);
     }
 
     public boolean isPresent() {

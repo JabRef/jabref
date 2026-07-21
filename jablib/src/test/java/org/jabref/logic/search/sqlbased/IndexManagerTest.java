@@ -43,7 +43,7 @@ class IndexManagerTest {
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
     private BibDatabaseContext databaseContext;
-    private PostgreServer postgreServer;
+    private PostgresServer postgresServer;
 
     @TempDir
     private Path indexDir;
@@ -58,17 +58,17 @@ class IndexManagerTest {
         databaseContext = spy(new BibDatabaseContext());
         when(databaseContext.getFulltextIndexPath()).thenReturn(indexDir);
 
-        postgreServer = new PostgreServer();
+        postgresServer = new PostgresServer();
     }
 
     @AfterEach
     void tearDown() {
-        postgreServer.close();
+        postgresServer.close();
     }
 
     @Test
     void closeAndWaitCancelsScheduledThrottledUpdateAndShutsDownThrottler() throws Exception {
-        IndexManager indexManager = new IndexManager(databaseContext, TASK_EXECUTOR, preferences, postgreServer);
+        IndexManager indexManager = new IndexManager(databaseContext, TASK_EXECUTOR, preferences, postgresServer);
 
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "old");
         databaseContext.getDatabase().insertEntry(entry);

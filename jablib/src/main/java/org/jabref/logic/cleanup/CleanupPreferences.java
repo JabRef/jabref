@@ -14,6 +14,7 @@ public class CleanupPreferences {
 
     private static final EnumSet<CleanupStep> DEFAULT_ACTIVE_JOBS = EnumSet.of(
             CleanupStep.CLEAN_UP_DOI,
+            CleanupStep.CLEAN_UP_ARXIV_DOI,
             CleanupStep.CLEANUP_EPRINT,
             CleanupStep.CLEAN_UP_URL,
             CleanupStep.MAKE_PATHS_RELATIVE,
@@ -61,11 +62,6 @@ public class CleanupPreferences {
         return new CleanupPreferences();
     }
 
-    public void setAll(CleanupPreferences other) {
-        setActiveJobs(other.getActiveJobs());
-        setFieldFormatterCleanups(other.getFieldFormatterCleanups());
-    }
-
     public Set<CleanupStep> getActiveJobs() {
         return activeJobs;
     }
@@ -98,6 +94,9 @@ public class CleanupPreferences {
     public enum CleanupStep {
         // Removes the http://... for each DOI. Moves DOIs from URL and NOTE filed to DOI field.
         CLEAN_UP_DOI,
+
+        // Consolidates the arXiv identifier onto the (version-stable) DOI field and drops the redundant eprint.
+        CLEAN_UP_ARXIV_DOI,
 
         CLEANUP_EPRINT,
         CLEAN_UP_URL,

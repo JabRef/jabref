@@ -11,7 +11,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 public class AiChatTab extends EntryEditorTab {
-    private final EntryEditorPreferences entryEditorPreferences;
     private final StateManager stateManager;
 
     private final AiEntryChatView aiEntryChatView = new AiEntryChatView();
@@ -20,17 +19,11 @@ public class AiChatTab extends EntryEditorTab {
             GuiPreferences preferences,
             StateManager stateManager
     ) {
-        this.entryEditorPreferences = preferences.getEntryEditorPreferences();
         this.stateManager = stateManager;
 
-        setText(Localization.lang("AI chat"));
+        setText(EntryEditorTabModel.BuiltIn.AI_CHAT.displayName());
         setTooltip(new Tooltip(Localization.lang("Chat with AI about content of attached file(s)")));
         setContent(aiEntryChatView);
-    }
-
-    @Override
-    public boolean shouldShow(BibEntry entry) {
-        return entryEditorPreferences.shouldShowAiChatTab();
     }
 
     /// @implNote Method similar to {@link AiSummaryTab#bindToEntry(BibEntry)}

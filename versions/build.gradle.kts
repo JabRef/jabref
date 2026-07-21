@@ -14,36 +14,36 @@ val arch = DefaultNativePlatform.getCurrentArchitecture()
 
 val javafxDefault = "26.0.1"
 // The JavaFX version can be overridden via the gradle property `javafxVersion`.
-// Only the non-web modules follow the override; javafx-web always stays on the default version.
 val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
-val javafxWeb = javafxDefault
 
-val lucene = "10.4.0"
+val lucene = "10.5.0"
 
-val pdfbox = "3.0.7"
+val pdfbox = "3.0.8"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.16.3"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.18.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.4.0"))
-    api(platform("org.junit:junit-bom:6.1.0"))
+    api(platform("org.junit:junit-bom:6.1.2"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
-    api(platform("tools.jackson:jackson-bom:3.2.0"))
+    api(platform("tools.jackson:jackson-bom:3.2.1"))
 }
 
 dependencies.constraints {
+    // With -PuseLibericaJdkFull=true, no org.openjfx:* dependency is requested (see
+    // org.jabref.gradle.base.dependency-rules.gradle.kts), so these JavaFX version pins stay inert.
     api("org.openjfx:javafx-base:$javafx")
     api("org.openjfx:javafx-controls:$javafx")
     api("org.openjfx:javafx-fxml:$javafx")
     api("org.openjfx:javafx-graphics:$javafx")
     api("org.openjfx:javafx-swing:$javafx")
-    api("org.openjfx:javafx-web:$javafxWeb")
-    api("org.openjfx:jdk-jsobject:$javafx")
+    api("org.openjfx:jfx-incubator-input:$javafx")
+    api("org.openjfx:jfx-incubator-richtext:$javafx")
 
     api("cc.jilt:jilt:1.9.1")
 
-    api("com.dlsc.gemsfx:gemsfx:4.1.0")
+    api("com.dlsc.gemsfx:gemsfx:4.3.0")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -55,7 +55,6 @@ dependencies.constraints {
     api("com.github.javaparser:javaparser-core:3.28.2")
     api("com.github.javaparser:javaparser-symbol-solver-core:3.28.2")
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
-    api("com.github.tomtung:latex2unicode_2.13:0.3.2")
     api("com.google.errorprone:error_prone_core:2.50.0")
     api("com.google.guava:guava:33.6.0-jre")
     api("com.googlecode.plist:dd-plist:1.29")
@@ -63,13 +62,14 @@ dependencies.constraints {
     api("com.knuddels:jtokkit:1.1.0")
     api("com.konghq:unirest-java-core:4.10.0")
     api("com.konghq:unirest-modules-gson:4.10.0")
+    api("com.squareup.okhttp3:mockwebserver3:5.4.0")
     api("com.squareup.okhttp3:okhttp:5.4.0")
     api("com.squareup.okio:okio-jvm:3.17.0")
     api("com.squareup.retrofit2:retrofit:3.0.0")
     api("com.tngtech.archunit:archunit:1.4.2")
     api("com.tngtech.archunit:archunit-junit5-api:1.4.2")
     api("com.tngtech.archunit:archunit-junit5-engine:1.4.2")
-    api("com.uber.nullaway:nullaway:0.13.7")
+    api("com.uber.nullaway:nullaway:0.13.8")
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
     api("com.vladsch.flexmark:flexmark:0.64.8")
     api("commons-io:commons-io:2.22.0")
@@ -94,7 +94,7 @@ dependencies.constraints {
     api("jakarta.inject:jakarta.inject-api:2.0.1")
     api("jakarta.validation:jakarta.validation-api:3.1.1")
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
-    api("net.bytebuddy:byte-buddy:1.18.10")
+    api("net.bytebuddy:byte-buddy:1.18.11")
     api("net.harawata:appdirs:1.5.0")
     api("net.java.dev.jna:jna-jpms:5.19.1")
     api("net.java.dev.jna:jna-platform:5.19.1")
@@ -105,9 +105,9 @@ dependencies.constraints {
     api("org.apache.commons:commons-csv:1.14.1")
     api("org.apache.commons:commons-lang3:3.20.0")
     api("org.apache.commons:commons-text:1.15.0")
-    api("org.apache.httpcomponents.core5:httpcore5:5.4.2")
-    api("org.apache.httpcomponents.client5:httpclient5:5.6.1")
-    api("org.apache.logging.log4j:log4j-to-slf4j:2.26.0")
+    api("org.apache.httpcomponents.core5:httpcore5:5.4.3")
+    api("org.apache.httpcomponents.client5:httpclient5:5.6.2")
+    api("org.apache.logging.log4j:log4j-to-slf4j:2.26.1")
     api("org.apache.lucene:lucene-analysis-common:$lucene")
     api("org.apache.lucene:lucene-core:$lucene")
     api("org.apache.lucene:lucene-highlighter:$lucene")
@@ -117,7 +117,7 @@ dependencies.constraints {
     api("org.apache.pdfbox:pdfbox:$pdfbox")
     api("org.apache.pdfbox:xmpbox:$pdfbox")
     api("org.apache.velocity:velocity-engine-core:2.4.1")
-    api("org.bouncycastle:bcprov-jdk18on:1.84")
+    api("org.bouncycastle:bcprov-jdk18on:1.85")
     api("org.controlsfx:controlsfx:11.2.3")
     api("org.eclipse.jgit:org.eclipse.jgit:7.7.0.202606012155-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
@@ -127,13 +127,15 @@ dependencies.constraints {
     api("org.glassfish.hk2:hk2-utils:4.0.1")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.9")
     api("org.hamcrest:hamcrest:3.0")
-    api("org.hibernate.validator:hibernate-validator:9.1.0.Final")
+    api("org.hibernate.validator:hibernate-validator:9.1.2.Final")
     api("org.hisp.dhis:json-tree:1.9.4")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
+    api("org.jabref:html-to-node:0.1.0")
+    api("org.jabref:latex-conv:0.1.0")
     api("org.jabref:mslinks:1.2")
     api("org.jetbrains:annotations:26.1.0")
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.0")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.10")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.22.2")
     api("org.jspecify:jspecify:1.0.0")
@@ -144,7 +146,7 @@ dependencies.constraints {
     api("org.libreoffice:unoloader:26.2.2")
     api("org.mockito:mockito-core:5.23.0")
     api("org.ow2.asm:asm:9.10.1")
-    api("org.postgresql:postgresql:42.7.11")
+    api("org.postgresql:postgresql:42.7.13")
     api("org.slf4j:jul-to-slf4j:2.0.18")
     api("org.slf4j:slf4j-api:2.0.18")
     api("org.testfx:testfx-core:4.0.18")

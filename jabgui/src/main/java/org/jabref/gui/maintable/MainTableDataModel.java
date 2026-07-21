@@ -2,6 +2,7 @@ package org.jabref.gui.maintable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
@@ -43,7 +44,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
+import static org.jabref.model.search.PostgresConstants.ENTRY_ID;
 
 public class MainTableDataModel {
     private final Logger LOGGER = LoggerFactory.getLogger(MainTableDataModel.class);
@@ -57,6 +58,7 @@ public class MainTableDataModel {
     private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
     private final TaskExecutor taskExecutor;
+    private final AtomicLong searchUpdateSequence = new AtomicLong();
     private final Subscription searchQuerySubscription;
     private final Subscription searchDisplayModeSubscription;
     private final Subscription selectedGroupsSubscription;
@@ -102,13 +104,20 @@ public class MainTableDataModel {
     }
 
     private void updateSearchMatches(Optional<SearchQuery> query) {
-        BackgroundTask.wrap(() -> {
-            if (query.isPresent()) {
-                setSearchMatches(searchContext.search(query.get()));
-            } else {
-                clearSearchMatches();
-            }
-        }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+        long updateSequence = searchUpdateSequence.incrementAndGet();
+
+        BackgroundTask.wrap(() ->
+                              query.map(searchQuery -> searchContext.search(searchQuery)))
+                      .onSuccess(results -> {
+                          if (updateSequence != searchUpdateSequence.get()) {
+                              return;
+                          }
+                          results.ifPresentOrElse(
+                                  this::setSearchMatches,
+                                  this::clearSearchMatches
+                          );
+                          FilteredListProxy.refilterListReflection(entriesFiltered);
+                      }).executeWith(taskExecutor);
     }
 
     /// Refresh the current search

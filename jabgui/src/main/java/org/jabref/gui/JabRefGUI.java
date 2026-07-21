@@ -35,7 +35,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.gui.util.WebViewStore;
 import org.jabref.http.manager.HttpServerManager;
 import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiCommand;
@@ -51,7 +50,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.search.sqlbased.IndexManager;
-import org.jabref.logic.search.sqlbased.PostgreServer;
+import org.jabref.logic.search.sqlbased.PostgresServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -66,6 +65,7 @@ import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterViewPos;
 import com.tobiasdiez.easybind.EasyBind;
 import kong.unirest.core.Unirest;
+import org.controlsfx.dialog.ExceptionDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,6 +107,11 @@ public class JabRefGUI extends Application {
 
     @Override
     public void start(Stage stage) {
+        // Installed before the try block below (not after) so background threads started during
+        // initialize() are also covered, not just ones started once the main window is up.
+        FallbackExceptionHandler.installExceptionHandler((exception, thread) -> UiTaskExecutor.runInJavaFXThread(() ->
+                showCriticalErrorDialog(Localization.lang("Uncaught exception occurred in %0", thread.toString()), exception)));
+
         try {
             this.mainStage = stage;
             Injector.setModelOrService(Stage.class, mainStage);
@@ -153,17 +158,42 @@ public class JabRefGUI extends Application {
             setupProxy();
         } catch (Throwable throwable) {
             LOGGER.error("Error during initialization", throwable);
+            showCriticalErrorDialog(Localization.lang("Unhandled exception occurred."), throwable);
             throw throwable;
         }
+    }
 
-        FallbackExceptionHandler.installExceptionHandler((exception, thread) -> UiTaskExecutor.runInJavaFXThread(() -> {
-            DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-            dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
-        }));
+    /// [impl->req~ux.startup.critical-error-dialog~1]
+    ///
+    /// Used both for startup failures (from [#start(Stage)]'s catch block) and for uncaught
+    /// exceptions on other threads ([FallbackExceptionHandler], installed before [#initialize()]
+    /// so it also covers background threads started during startup). In both cases, [DialogService]
+    /// or [Scene] may not exist yet: [DialogService] is only set up in [#initialize()], and `Scene`
+    /// is only set in [#openWindow()]. Calling [DialogService] or `Dialog.initOwner` before then
+    /// throws a NullPointerException, so this falls back to an ownerless [ExceptionDialog] instead.
+    private void showCriticalErrorDialog(String header, Throwable throwable) {
+        try {
+            if (mainStage != null && mainStage.getScene() != null) {
+                Injector.instantiateModelOrService(DialogService.class).showErrorDialogAndWait(header, throwable);
+                return;
+            }
+            ExceptionDialog exceptionDialog = new ExceptionDialog(throwable);
+            exceptionDialog.setHeaderText(header);
+            exceptionDialog.showAndWait();
+        } catch (Throwable dialogFailure) {
+            LOGGER.error("Could not show critical error dialog", dialogFailure);
+        }
     }
 
     public void initialize() {
-        WebViewStore.init();
+        JabRefGUI.stateManager = new JabRefGuiStateManager();
+        Injector.setModelOrService(StateManager.class, stateManager);
+
+        // our Default task executor is the UITaskExecutor which can use the fx thread
+        JabRefGUI.taskExecutor = new UiTaskExecutor();
+        Injector.setModelOrService(TaskExecutor.class, taskExecutor);
+
+        journalAbbreviationRepository = JournalAbbreviationLoader.loadRepositoryInBackground(preferences.getAbbreviationPreferences(), taskExecutor);
 
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefGUI.fileUpdateMonitor = fileUpdateMonitor;
@@ -177,7 +207,6 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(GitHandlerRegistry.class, gitHandlerRegistry);
 
         BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
-        journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getAbbreviationPreferences());
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
         Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);
         Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
@@ -193,9 +222,6 @@ public class JabRefGUI extends Application {
         JabRefGUI.languageServerController = new LanguageServerController(preferences, journalAbbreviationRepository, entryTypesManager);
         Injector.setModelOrService(LanguageServerController.class, JabRefGUI.languageServerController);
 
-        JabRefGUI.stateManager = new JabRefGuiStateManager();
-        Injector.setModelOrService(StateManager.class, stateManager);
-
         Injector.setModelOrService(KeyBindingRepository.class, preferences.getKeyBindingRepository());
 
         JabRefGUI.themeManager = new ThemeManager(
@@ -207,10 +233,6 @@ public class JabRefGUI extends Application {
         JabRefGUI.countingUndoManager = new CountingUndoManager();
         Injector.setModelOrService(UndoManager.class, countingUndoManager);
         Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);
-
-        // our Default task executor is the UITaskExecutor which can use the fx thread
-        JabRefGUI.taskExecutor = new UiTaskExecutor();
-        Injector.setModelOrService(TaskExecutor.class, taskExecutor);
 
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);
@@ -559,10 +581,12 @@ public class JabRefGUI extends Application {
             });
 
             executor.submit(() -> {
-                LOGGER.trace("Shutting down postgreServer");
-                PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
-                postgreServer.close();
-                LOGGER.trace("PostgreServer shut down");
+                if (preferences.getSearchPreferences().shouldUsePostgresSearch()) {
+                    LOGGER.trace("Shutting down postgreServer");
+                    PostgresServer postgresServer = Injector.instantiateModelOrService(PostgresServer.class);
+                    postgresServer.close();
+                    LOGGER.trace("PostgreServer shut down");
+                }
             });
 
             executor.submit(() -> {

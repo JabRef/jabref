@@ -62,8 +62,10 @@ class BibliographyConsistencyCheckResultGitHubActionsWriterTest {
         assertTrue(lines.stream().allMatch(line -> line.startsWith("::error file=")), lines.toString());
         // Each annotation carries line, column, title (citation key + field), and the message.
         assertTrue(lines.stream().allMatch(line -> line.contains(",line=") && line.contains(",col=") && line.contains(",title=")), lines.toString());
-        assertTrue(lines.stream().anyMatch(line -> line.endsWith("::field is absent but used by other entries of entry type Article")), lines.toString());
-        assertTrue(lines.stream().anyMatch(line -> line.endsWith("::unknown field for entry type Article")), lines.toString());
+        // The message embeds the citation key and field name so the plain log line is self-describing.
+        assertTrue(lines.stream().anyMatch(line -> line.endsWith("::first: field 'publisher' is absent but used by other entries of entry type Article")), lines.toString());
+        assertTrue(lines.stream().anyMatch(line -> line.endsWith("::second: field 'pages' is absent but used by other entries of entry type Article")), lines.toString());
+        assertTrue(lines.stream().anyMatch(line -> line.endsWith("::second: unknown field 'publisher' for entry type Article")), lines.toString());
         // Windows drive-letter colon and the ":" between citation key and field name must be URL-encoded inside properties.
         assertTrue(lines.stream().noneMatch(line -> line.matches(".*title=[^:]+:[^:]+::.*")), "title must not contain raw ':' separator: " + lines);
     }
