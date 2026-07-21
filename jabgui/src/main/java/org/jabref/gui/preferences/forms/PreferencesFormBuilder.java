@@ -317,7 +317,7 @@ public class PreferencesFormBuilder {
                                             Consumer<InputElement<ComboBox<X>>> config) {
         ComboBox<X> combo = new ComboBox<>();
         combo.itemsProperty().bind(items);
-        return addCombo(label, combo, value, display, false, null, config);
+        return addCombo(label, combo, value, display, config);
     }
 
     /// Combo box over a fixed item list (set directly, not bound to a property).
@@ -336,7 +336,7 @@ public class PreferencesFormBuilder {
                                                  Consumer<InputElement<ComboBox<X>>> config) {
         ComboBox<X> combo = new ComboBox<>();
         combo.setItems(items);
-        return addCombo(label, combo, value, display, false, null, config);
+        return addCombo(label, combo, value, display, config);
     }
 
     public <X> PreferencesFormBuilder searchableCombo(String label,
@@ -354,19 +354,7 @@ public class PreferencesFormBuilder {
                                                       Consumer<InputElement<ComboBox<X>>> config) {
         SearchableComboBox<X> combo = new SearchableComboBox<>();
         combo.itemsProperty().bind(items);
-        return addCombo(label, combo, value, display, false, null, config);
-    }
-
-    /// String combo box (optionally editable, with a prompt). No display callback (identity toString).
-    public PreferencesFormBuilder stringCombo(String label,
-                                              ObservableValue<? extends ObservableList<String>> items,
-                                              Property<String> value,
-                                              boolean editable,
-                                              String prompt) {
-        ComboBox<String> combo = new ComboBox<>();
-        combo.itemsProperty().bind(items);
-        return addCombo(label, combo, value, null, editable, prompt, _ -> {
-        });
+        return addCombo(label, combo, value, display, config);
     }
 
     /// Shared wiring for every combo variant. {@link SearchableComboBox} extends {@link ComboBox},
@@ -375,17 +363,9 @@ public class PreferencesFormBuilder {
                                                 ComboBox<X> combo,
                                                 Property<X> value,
                                                 Callback<X, String> display,
-                                                boolean editable,
-                                                String prompt,
                                                 Consumer<InputElement<ComboBox<X>>> config) {
-        if (display != null) {
-            new ViewModelListCellFactory<X>().withText(display).install(combo);
-        }
-        combo.setEditable(editable);
+        new ViewModelListCellFactory<X>().withText(display).install(combo);
         combo.setMaxWidth(Double.MAX_VALUE);
-        if (prompt != null) {
-            combo.setPromptText(prompt);
-        }
         combo.valueProperty().bindBidirectional(value);
         addField(label, combo);
         return configured(new InputElement<>(this, combo), config);
