@@ -7,6 +7,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -36,7 +37,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
-import com.google.common.util.concurrent.RateLimiter;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
@@ -55,7 +55,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiFetcher.class);
 
     // 1000 request per 5 minutes. See https://support.datacite.org/docs/is-there-a-rate-limit-for-making-requests-against-the-datacite-apis
-    private static final RateLimiter DATA_CITE_DCN_RATE_LIMITER = RateLimiter.create(3.33);
+    private static final FetcherRateLimiter DATA_CITE_DCN_RATE_LIMITER = FetcherRateLimiter.ofRequestsPerInterval("DataCite", 1000, Duration.ofMinutes(5));
 
     /*
      * By default, it seems that CrossRef DOI Content Negotiation responses are returned by their API pools, more specifically the public one
@@ -64,7 +64,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
      * to default to 50 request / second. However, because of its dynamic nature, this rate could change between API calls, so we need to update it
      * atomically when that happens (as multiple threads might access it at the same time)
      */
-    private static final RateLimiter CROSSREF_DCN_RATE_LIMITER = RateLimiter.create(50.0);
+    private static final FetcherRateLimiter CROSSREF_DCN_RATE_LIMITER = FetcherRateLimiter.ofRequestsPerSecond("Crossref", 50.0);
 
     private static final FieldFormatterCleanup NORMALIZE_PAGES = new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter());
     private static final FieldFormatterCleanup CLEAR_URL = new FieldFormatterCleanup(StandardField.URL, new ClearFormatter());
@@ -88,22 +88,16 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     }
 
     private void doAPILimiting(String identifier) {
-        // Without a generic API Rate Limiter implemented on the project, use Guava's RateLimiter for avoiding
-        // API throttling when multiple threads are working, specially during DOI Content Negotiations
         Optional<DOI> doi = DOI.parse(identifier);
 
         try {
             Optional<String> agency;
             if (doi.isPresent() && (agency = getAgency(doi.get())).isPresent()) {
-                double waitingTime = 0.0;
                 if ("datacite".equalsIgnoreCase(agency.get())) {
-                    waitingTime = DATA_CITE_DCN_RATE_LIMITER.acquire();
+                    DATA_CITE_DCN_RATE_LIMITER.acquire();
                 } else if ("crossref".equalsIgnoreCase(agency.get())) {
-                    waitingTime = CROSSREF_DCN_RATE_LIMITER.acquire();
+                    CROSSREF_DCN_RATE_LIMITER.acquire();
                 } // mEDRA does not explicit an API rating
-
-                LOGGER.trace("Thread {}, searching for DOI '{}', waited {} because of API rate limiter",
-                        Thread.currentThread().threadId(), identifier, waitingTime);
             }
         } catch (FetcherException | MalformedURLException e) {
             LOGGER.warn("Could not limit DOI API access rate", e);
