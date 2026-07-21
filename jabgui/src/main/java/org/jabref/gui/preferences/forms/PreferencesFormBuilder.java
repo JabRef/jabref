@@ -21,11 +21,13 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -409,6 +411,22 @@ public class PreferencesFormBuilder {
         return endGroup();
     }
 
+    /// Opens a wrapping region: elements added until {@link #endFlow()} flow left to right and wrap
+    /// onto the next line as the dialog narrows. Gaps come from CSS, not from {@link #spacing}.
+    public PreferencesFormBuilder beginFlow() {
+        flushGrid();
+        FlowPane flow = new FlowPane();
+        addToContainer(flow);
+        containers.push(flow);
+        lastControl = flow;
+        lastRow = null;
+        return this;
+    }
+
+    public PreferencesFormBuilder endFlow() {
+        return endGroup();
+    }
+
     public PreferencesFormBuilder endGroup() {
         flushGrid();
         if (containers.size() > 1) {
@@ -476,6 +494,25 @@ public class PreferencesFormBuilder {
     public PreferencesFormBuilder help(String helpUrl) {
         if (lastRow != null) {
             lastRow.getChildren().add(new HelpButton(helpUrl));
+        }
+        return this;
+    }
+
+    /// Lets the last subject take all remaining horizontal space in its row. Use where a builder
+    /// default is too narrow, e.g. the value field of {@link #checkWithField} when it holds a name
+    /// rather than a port number.
+    public PreferencesFormBuilder grow() {
+        if (lastControl instanceof Region region) {
+            region.setMaxWidth(Double.MAX_VALUE);
+        }
+        HBox.setHgrow(lastControl, Priority.ALWAYS);
+        return this;
+    }
+
+    /// Wraps the last subject's text over several lines instead of truncating it.
+    public PreferencesFormBuilder wrapText() {
+        if (lastControl instanceof Labeled labeled) {
+            labeled.setWrapText(true);
         }
         return this;
     }
