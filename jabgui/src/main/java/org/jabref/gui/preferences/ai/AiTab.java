@@ -21,6 +21,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
@@ -267,12 +268,18 @@ public class AiTab extends AbstractFormTabView<AiTabViewModel> {
 
     /// A template tab; its reset action is carried on the tab itself so that "reset current
     /// template" needs no chain of identity comparisons.
+    ///
+    /// The text area sits in a wrapper rather than being the content directly: {@link Tab} writes
+    /// through to its content's `disable` property (on {@link Tab#setContent}, on being added to a
+    /// {@link TabPane}, and whenever the tab itself is disabled), which throws against a bound
+    /// value. The wrapper absorbs those writes; the text area keeps its own binding and the
+    /// effective state is the union of both.
     private Tab templateTab(String title, StringProperty template, Runnable reset) {
         TextArea textArea = new TextArea();
         textArea.textProperty().bindBidirectional(template);
         textArea.disableProperty().bind(aiDisabled);
 
-        Tab tab = new Tab(title, textArea);
+        Tab tab = new Tab(title, new StackPane(textArea));
         tab.setClosable(false);
         tab.setUserData(reset);
         return tab;

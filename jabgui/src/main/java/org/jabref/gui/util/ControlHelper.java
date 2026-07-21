@@ -13,6 +13,7 @@ import javafx.scene.control.Cell;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.DragEvent;
 
 import org.jabref.gui.icon.JabRefIcon;
@@ -30,6 +31,17 @@ public class ControlHelper {
         Button button = new Button();
         button.setGraphic(icon.getGraphicNode());
         button.getStyleClass().add("icon-button");
+        return button;
+    }
+
+    /// The compact 20x20 icon button used next to fields and lists (browse, reset, reorder, ...).
+    public static Button narrowIconButton(JabRefIcon icon, String tooltip, Runnable action) {
+        Button button = new Button();
+        button.setGraphic(icon.getGraphicNode());
+        button.getStyleClass().addAll("icon-button", "narrow");
+        button.setPrefSize(20.0, 20.0);
+        button.setTooltip(new Tooltip(tooltip));
+        button.setOnAction(_ -> action.run());
         return button;
     }
 
