@@ -30,6 +30,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
@@ -114,7 +115,7 @@ public class PreferencesFormBuilder {
         HBox.setHgrow(header, Priority.ALWAYS);
         HBox row = new HBox(header, help);
         row.setAlignment(Pos.BASELINE_CENTER);
-        container().getChildren().add(row);
+        addToContainer(row);
         lastRow = row;
         lastControl = header;
         return this;
@@ -385,17 +386,43 @@ public class PreferencesFormBuilder {
     public PreferencesFormBuilder beginGroup() {
         flushGrid();
         VBox group = new VBox(10.0);
-        container().getChildren().add(group);
+        addToContainer(group);
         containers.push(group);
         lastControl = group;
         lastRow = null;
         return this;
     }
 
+    /// Opens a side-by-side region: every element added until {@link #endColumns()} becomes an
+    /// equally growing column. Usually filled with {@link #beginGroup()} blocks, one per column.
+    public PreferencesFormBuilder beginColumns() {
+        flushGrid();
+        HBox columns = new HBox(10.0);
+        addToContainer(columns);
+        containers.push(columns);
+        lastControl = columns;
+        lastRow = null;
+        return this;
+    }
+
+    public PreferencesFormBuilder endColumns() {
+        return endGroup();
+    }
+
     public PreferencesFormBuilder endGroup() {
         flushGrid();
         if (containers.size() > 1) {
             containers.pop();
+        }
+        return this;
+    }
+
+    /// Overrides the spacing of the last group or column region (default 10).
+    public PreferencesFormBuilder spacing(double value) {
+        if (lastControl instanceof VBox box) {
+            box.setSpacing(value);
+        } else if (lastControl instanceof HBox box) {
+            box.setSpacing(value);
         }
         return this;
     }
@@ -475,9 +502,22 @@ public class PreferencesFormBuilder {
 
     private void addNode(Node node) {
         flushGrid();
-        container().getChildren().add(node);
+        addToContainer(node);
         lastControl = node;
         lastRow = null;
+    }
+
+    /// Appends to the open container. Inside a {@link #beginColumns()} region every child is made an
+    /// equally growing column, so callers never repeat the hgrow boilerplate.
+    private void addToContainer(Node node) {
+        Pane container = container();
+        container.getChildren().add(node);
+        if (container instanceof HBox) {
+            HBox.setHgrow(node, Priority.ALWAYS);
+            if (node instanceof Region region) {
+                region.setMaxWidth(Double.MAX_VALUE);
+            }
+        }
     }
 
     private void addField(String label, Node control) {
@@ -504,7 +544,7 @@ public class PreferencesFormBuilder {
             controlColumn.setHgrow(Priority.ALWAYS);
             currentGrid.getColumnConstraints().addAll(labelColumn, controlColumn);
             gridRow = 0;
-            container().getChildren().add(currentGrid);
+            addToContainer(currentGrid);
         }
         return currentGrid;
     }

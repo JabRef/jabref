@@ -16,9 +16,9 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.preferences.forms.AbstractFormTabView;
 import org.jabref.gui.push.GuiPushToApplication;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
@@ -81,7 +81,7 @@ public class ExternalTab extends AbstractFormTabView<ExternalTabViewModel> {
         pushToApplicationCombo.itemsProperty().bind(viewModel.pushToApplicationsListProperty());
         pushToApplicationCombo.valueProperty().bindBidirectional(viewModel.selectedPushToApplication());
 
-        Button applicationSettings = iconButton(IconTheme.JabRefIcons.PREFERENCES, Localization.lang("Application settings"), viewModel::pushToApplicationSettings);
+        Button applicationSettings = ControlHelper.narrowIconButton(IconTheme.JabRefIcons.PREFERENCES, Localization.lang("Application settings"), viewModel::pushToApplicationSettings);
 
         citeCommand = new TextField();
         citeCommand.setPrefWidth(300.0);
@@ -94,7 +94,7 @@ public class ExternalTab extends AbstractFormTabView<ExternalTabViewModel> {
                 StandardActions.HELP_PUSH_TO_APPLICATION,
                 new HelpAction(HelpFile.PUSH_TO_APPLICATION, dialogService, preferences.getExternalApplicationsPreferences()),
                 citeHelp);
-        Button resetCite = iconButton(IconTheme.JabRefIcons.REFRESH, Localization.lang("Reset to default"), viewModel::resetCiteCommandToDefault);
+        Button resetCite = ControlHelper.narrowIconButton(IconTheme.JabRefIcons.REFRESH, Localization.lang("Reset to default"), viewModel::resetCiteCommandToDefault);
 
         GridPane grid = new GridPane();
         grid.setHgap(4.0);
@@ -152,18 +152,8 @@ public class ExternalTab extends AbstractFormTabView<ExternalTabViewModel> {
     }
 
     private Button browseButton(CheckBox enabler, Runnable action) {
-        Button button = iconButton(IconTheme.JabRefIcons.OPEN, Localization.lang("Browse"), action);
+        Button button = ControlHelper.narrowIconButton(IconTheme.JabRefIcons.OPEN, Localization.lang("Browse"), action);
         button.disableProperty().bind(enabler.selectedProperty().not());
-        return button;
-    }
-
-    private Button iconButton(IconTheme.JabRefIcons icon, String tooltip, Runnable action) {
-        Button button = new Button();
-        button.setGraphic(new JabRefIconView(icon));
-        button.getStyleClass().addAll("icon-button", "narrow");
-        button.setPrefSize(20.0, 20.0);
-        button.setTooltip(new Tooltip(tooltip));
-        button.setOnAction(_ -> action.run());
         return button;
     }
 }
