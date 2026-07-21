@@ -48,7 +48,6 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> {
 
     private void buildView() {
         getChildren().add(form()
-                .title(Localization.lang("Entry table"))
 
                 .section(Localization.lang("Columns"), columns -> columns
                         .custom(buildColumnsRegion())

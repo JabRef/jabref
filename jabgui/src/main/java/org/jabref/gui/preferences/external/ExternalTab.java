@@ -52,7 +52,6 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
 
     private void buildView() {
         getChildren().add(form()
-                .title(Localization.lang("External programs"))
 
                 .section(Localization.lang("Sending of emails"), emails -> emails
                         .stringField(Localization.lang("Subject for sending an email with references"), viewModel.eMailReferenceSubjectProperty())

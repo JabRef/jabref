@@ -29,7 +29,6 @@ public class CustomExporterTab extends AbstractPreferenceTabView<CustomExporterT
 
     private void buildView() {
         getChildren().add(form()
-                .title(Localization.lang("Custom export formats"))
                 .custom(buildExporterTable())
                 .custom(buildButtonRow())
                 .build());

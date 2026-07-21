@@ -26,7 +26,6 @@ public class AutoCompletionTab extends AbstractPreferenceTabView<AutoCompletionT
                 FieldTextMapper::getDisplayName, viewModel::getSuggestions, viewModel.getFieldStringConverter(), viewModel.autoCompleteFieldsProperty());
 
         getChildren().add(form()
-                .title(Localization.lang("Autocompletion"))
                 .checkbox(Localization.lang("Use autocompletion"), viewModel.enableAutoCompleteProperty())
 
                 .group(autoComplete -> autoComplete

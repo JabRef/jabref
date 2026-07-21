@@ -17,7 +17,6 @@ public class GroupsTab extends AbstractPreferenceTabView<GroupsTabViewModel> {
 
     private void buildView() {
         getChildren().add(form()
-                .title(Localization.lang("Groups"))
 
                 .section(Localization.lang("View"), view -> view
                         .radioGroup(viewMode -> viewMode

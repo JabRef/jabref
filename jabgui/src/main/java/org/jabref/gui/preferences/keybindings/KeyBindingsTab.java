@@ -49,7 +49,6 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
 
     private void buildView() {
         getChildren().add(form()
-                .title(Localization.lang("Keyboard shortcuts"))
                 .custom(buildBindingsEditor())
                 .custom(buildButtonRow())
                 .build());

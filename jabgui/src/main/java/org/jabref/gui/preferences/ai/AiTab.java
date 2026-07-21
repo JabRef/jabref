@@ -76,7 +76,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                           .build();
 
         getChildren().add(form()
-                .title(Localization.lang("AI"))
 
                 .sectionWithHelp(Localization.lang("General"), HelpFile.AI_GENERAL_SETTINGS, general -> general
                         // [impl->feat~ai.llms.providers~1]

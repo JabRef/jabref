@@ -52,7 +52,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
 
     private void buildView() {
         getChildren().add(form()
-                .title(Localization.lang("General"))
 
                 .section(Localization.lang("Appearance"), appearance -> appearance
                         .searchableCombo(Localization.lang("Language"),

@@ -6,6 +6,7 @@ import java.util.Optional;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableView;
@@ -37,6 +38,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     public static final String DIALOG_TITLE = Localization.lang("JabRef preferences");
     @FXML private CustomTextField searchBox;
     @FXML private ListView<PreferencesTab> preferenceTabList;
+    @FXML private Label tabTitle;
     @FXML private ScrollPane preferencesContainer;
     @FXML private ButtonType saveButton;
     @FXML private ButtonType cancelButton;
@@ -104,9 +106,11 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
         EasyBind.subscribe(preferenceTabList.getSelectionModel().selectedItemProperty(), tab -> {
             if (tab == null) {
+                tabTitle.setText("");
                 preferencesContainer.setContent(null);
                 return;
             }
+            tabTitle.setText(tab.getTitle());
             Node content = tab.getContent();
             preferencesContainer.setContent(content);
             if (content instanceof Region region) {

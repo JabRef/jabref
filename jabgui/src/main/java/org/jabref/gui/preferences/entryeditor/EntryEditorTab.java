@@ -41,7 +41,6 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
 
     private void buildView() {
         getChildren().add(form()
-                .title(Localization.lang("Entry editor"))
 
                 .checkbox(Localization.lang("Open editor when a new entry is created"), viewModel.openOnNewEntryProperty())
                 .checkbox(Localization.lang("Automatically search and show unlinked files in the entry editor"), viewModel.autoLinkFilesEnabledProperty())

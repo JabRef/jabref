@@ -95,7 +95,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
         Node editorRegion = buildEditorRegion();
 
         getChildren().add(form()
-                .title(Localization.lang("Current Preview"))
                 .checkbox(Localization.lang("Show preview as a tab in entry editor"), viewModel.showAsExtraTabProperty())
                 .checkbox(Localization.lang("Show preview in entry table tooltip"), viewModel.showPreviewInEntryTableTooltip())
                 .checkbox(Localization.lang("Download cover images"), viewModel.shouldDownloadCoversProperty())
@@ -110,6 +109,11 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
     @Override
     public String getTabName() {
         return Localization.lang("Entry preview");
+    }
+
+    @Override
+    public String getTitle() {
+        return Localization.lang("Current Preview");
     }
 
     // region custom region construction (the `.custom(Node)` hatch)

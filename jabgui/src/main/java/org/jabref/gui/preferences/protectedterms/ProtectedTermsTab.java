@@ -47,7 +47,6 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
 
     private void buildView() {
         getChildren().add(form()
-                .title(Localization.lang("Protected terms files"))
                 .custom(buildFilesTable(), table -> table.configure(t -> VBox.setVgrow(t, Priority.ALWAYS)))
                 .custom(buildButtonRow())
                 .build());

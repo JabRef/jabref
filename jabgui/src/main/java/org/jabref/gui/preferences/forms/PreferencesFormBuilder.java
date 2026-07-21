@@ -128,10 +128,6 @@ public class PreferencesFormBuilder {
 
     // region headers & static content
 
-    public PreferencesFormBuilder title(String text) {
-        return styledLabel(text, "titleHeader");
-    }
-
     /// A titled section. Its contents go in the lambda, so the grouping is visible in the source and
     /// the section can be configured or moved as a unit — rather than a header label followed by
     /// loose siblings that only look related because of their order.
@@ -202,14 +198,6 @@ public class PreferencesFormBuilder {
         searchable(text, label);
         label.getStyleClass().add("italic");
         label.setPadding(new Insets(0, 0, 0, 20));
-        addNode(label);
-        return this;
-    }
-
-    private PreferencesFormBuilder styledLabel(String text, String styleClass) {
-        Label label = new Label(text);
-        searchable(text, label);
-        label.getStyleClass().add(styleClass);
         addNode(label);
         return this;
     }
