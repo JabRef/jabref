@@ -60,14 +60,6 @@ public final class PasswordFieldEditor {
         return this;
     }
 
-    /// Reveals on a click anywhere in the field, with a non-interactive icon as the only affordance.
-    /// Kept for the fields that shipped with this behaviour; prefer {@link #withRevealButton()}.
-    public PasswordFieldEditor withRevealOnClick() {
-        buttons.getChildren().add(IconTheme.JabRefIcons.PASSWORD_REVEALED.getGraphicNode());
-        field.setOnMouseClicked(_ -> field.setShowPassword(!field.isShowPassword()));
-        return this;
-    }
-
     public EnhancedPasswordField build() {
         return field;
     }

@@ -121,7 +121,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
         proxyUsername.disableProperty().bind(proxyAuthOff);
 
         Label passwordLabel = disabledWhen(new Label(Localization.lang("Password")), proxyAuthOff);
-        proxyPassword = PasswordFieldEditor.create(viewModel.proxyPasswordProperty()).withRevealOnClick().build();
+        proxyPassword = PasswordFieldEditor.create(viewModel.proxyPasswordProperty()).withRevealButton().withClearButton().build();
         proxyPassword.setPrefWidth(200.0);
         proxyPassword.disableProperty().bind(proxyAuthOff);
 
@@ -158,7 +158,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
 
         Label patLabel = new Label(Localization.lang("PAT"));
         patLabel.setTooltip(new Tooltip(Localization.lang("Personal Access Token")));
-        EnhancedPasswordField gitPat = PasswordFieldEditor.create(viewModel.gitPatProperty()).withRevealOnClick().build();
+        EnhancedPasswordField gitPat = PasswordFieldEditor.create(viewModel.gitPatProperty()).withRevealButton().withClearButton().build();
         gitPat.setPrefWidth(200.0);
 
         CheckBox gitPersistPat = new CheckBox(Localization.lang("Persist PAT between sessions"));
