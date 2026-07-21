@@ -42,8 +42,8 @@ public class AutoCompletionTab extends AbstractFormTabView<AutoCompletionTabView
                         .radioGroup(firstNames -> firstNames
                                 .radio(Localization.lang("Use abbreviated firstname whenever possible"), viewModel.firstNameModeAbbreviatedProperty())
                                 .radio(Localization.lang("Use full firstname whenever possible"), viewModel.firstNameModeFullProperty())
-                                .radio(Localization.lang("Use abbreviated and full firstname"), viewModel.firstNameModeBothProperty())))
-                    .disableWhen(viewModel.enableAutoCompleteProperty().not())
+                                .radio(Localization.lang("Use abbreviated and full firstname"), viewModel.firstNameModeBothProperty())),
+                    settings -> settings.disableWhen(viewModel.enableAutoCompleteProperty().not()))
 
                 .build());
     }

@@ -41,9 +41,9 @@ public class CitationKeyPatternTab extends AbstractFormTabView<CitationKeyPatter
 
                 .section(Localization.lang("General"))
                 .checkbox(Localization.lang("Overwrite existing keys"), viewModel.overwriteAllowProperty())
-                .checkbox(Localization.lang("Warn before overwriting existing keys"), viewModel.overwriteWarningProperty())
-                    .disableWhen(viewModel.overwriteAllowProperty().not())
-                    .styleClass("prefIndent")
+                .checkbox(Localization.lang("Warn before overwriting existing keys"), viewModel.overwriteWarningProperty(),
+                        warn -> warn.disableWhen(viewModel.overwriteAllowProperty().not())
+                                    .styleClass("prefIndent"))
                 .checkbox(Localization.lang("Generate keys before saving (only for entries without a key)"), viewModel.generateOnSaveProperty())
                 .checkbox(Localization.lang("Generate new keys for imported entries (overwriting their default)"), viewModel.generateKeyOnImportProperty())
 
@@ -52,11 +52,11 @@ public class CitationKeyPatternTab extends AbstractFormTabView<CitationKeyPatter
                         .radioGroup(suffix -> suffix
                                 .radio(Localization.lang("Start on second duplicate key with letter A (a, b, ...)"), viewModel.letterStartAProperty())
                                 .radio(Localization.lang("Start on second duplicate key with letter B (b, c, ...)"), viewModel.letterStartBProperty())
-                                .radio(Localization.lang("Always add letter (a, b, ...) to generated keys"), viewModel.letterAlwaysAddProperty())))
-                    .styleClass("prefIndent")
+                                .radio(Localization.lang("Always add letter (a, b, ...) to generated keys"), viewModel.letterAlwaysAddProperty())),
+                    indent -> indent.styleClass("prefIndent"))
 
-                .field(Localization.lang("Replace (regular expression)"), buildRegexReplacementRow())
-                    .help(REGEX_HELP_URL)
+                .field(Localization.lang("Replace (regular expression)"), buildRegexReplacementRow(),
+                        replacement -> replacement.help(REGEX_HELP_URL))
                 .stringField(Localization.lang("Remove the following characters:"), viewModel.unwantedCharactersProperty())
                 .checkbox(Localization.lang("Transliterate fields that are used for generating the citation key"), viewModel.transliterateFieldsForCitationKeyProperty())
 

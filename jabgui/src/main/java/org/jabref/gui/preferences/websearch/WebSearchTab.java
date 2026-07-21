@@ -76,22 +76,22 @@ public class WebSearchTab extends AbstractFormTabView<WebSearchTabViewModel> {
                         .checkbox(Localization.lang("Enable web search"), viewModel.enableWebSearchProperty())
                         .checkbox(Localization.lang("Warn about duplicates on import"), viewModel.warnAboutDuplicatesOnImportProperty())
                         .checkbox(Localization.lang("Download referenced files (PDFs, ...)"), viewModel.shouldDownloadLinkedOnlineFiles())
-                        .checkbox(Localization.lang("Store url for downloaded file"), viewModel.shouldKeepDownloadUrl()))
-                    .styleClass("checkbox-flowpane")
-                .checkWithField(Localization.lang("Add imported entries to group"), viewModel.getAddImportedEntries(), viewModel.getAddImportedEntriesGroupName())
-                .grow()
+                        .checkbox(Localization.lang("Store url for downloaded file"), viewModel.shouldKeepDownloadUrl()),
+                    toggleRow -> toggleRow.styleClass("checkbox-flowpane"))
+                .checkWithField(Localization.lang("Add imported entries to group"), viewModel.getAddImportedEntries(), viewModel.getAddImportedEntriesGroupName(),
+                        groupName -> groupName.grow())
                 .combo(Localization.lang("Default plain citation parser"), viewModel.plainCitationParsers(), viewModel.defaultPlainCitationParserProperty(), PlainCitationParserChoice::getLocalizedName)
                 .field(Localization.lang("Citations relations local storage time-to-live (in days)"), buildStoreTtlField())
 
                 .section(Localization.lang("Custom DOI URI"))
-                .checkWithField(Localization.lang("Use custom DOI base URI for article access"), viewModel.useCustomDOIProperty(), viewModel.useCustomDOINameProperty())
-                .grow()
+                .checkWithField(Localization.lang("Use custom DOI base URI for article access"), viewModel.useCustomDOIProperty(), viewModel.useCustomDOINameProperty(),
+                        baseUri -> baseUri.grow())
 
                 .section(Localization.lang("Remote services"))
-                .checkbox(Localization.lang("Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results."), viewModel.grobidEnabledProperty())
-                .wrapText()
-                .stringField(Localization.lang("Grobid URL"), viewModel.grobidURLProperty())
-                .disableWhen(viewModel.grobidEnabledProperty().not())
+                .checkbox(Localization.lang("Allow sending PDF files and raw citation strings to a JabRef online service (Grobid) to determine Metadata. This produces better results."), viewModel.grobidEnabledProperty(),
+                        consent -> consent.wrapText())
+                .stringField(Localization.lang("Grobid URL"), viewModel.grobidURLProperty(),
+                        url -> url.disableWhen(viewModel.grobidEnabledProperty().not()))
 
                 .section(Localization.lang("Search Engine URL Templates"))
                 .custom(tableNote)

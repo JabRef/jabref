@@ -48,8 +48,8 @@ public class EntryTab extends AbstractFormTabView<EntryTabViewModel> {
                 .section(Localization.lang("Field"))
                 .custom(buildKeywordSeparatorRow())
                 .checkbox(Localization.lang("Resolve BibTeX strings"), viewModel.resolveStringsProperty())
-                .tagsField(Localization.lang("Affected fields"), resolvableTags, viewModel.resolvableTagsFieldProperty())
-                    .disableWhen(viewModel.resolveStringsProperty().not())
+                .tagsField(Localization.lang("Affected fields"), resolvableTags, viewModel.resolvableTagsFieldProperty(),
+                        affected -> affected.disableWhen(viewModel.resolveStringsProperty().not()))
                 .tagsField(Localization.lang("Do not wrap when saving"), nonWrappableTags, viewModel.nonWrappableTagsFieldProperty())
 
                 .section(Localization.lang("Entry owner"))

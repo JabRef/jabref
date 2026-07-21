@@ -19,6 +19,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
@@ -55,16 +56,32 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.SearchableComboBox;
 
-/// Fluent, eager builder that assembles a preference tab's node tree and wires all bindings.
+/// Fluent, eager builder that assembles a preference tab's node tree and wires all bindings. It
+/// replaces the FXML + controller pair: each call creates a control, binds it to a view-model
+/// property and appends it to the current container.
 ///
-/// It replaces the FXML + controller pair: each `add*` call creates a control, binds it to a
-/// view-model property and appends it to the current container. Post-configuration methods
-/// ({@link #disableWhen}, {@link #validate}, {@link #help}) apply to the most recently added
-/// control, so calls read top-to-bottom like the form itself.
+/// One rule governs the shape of a form: **the chain only ever adds elements; anything that
+/// configures an element happens inside that element's lambda.** There is no "current control" to
+/// keep track of, so no call can silently land on the wrong node:
 ///
-/// Consecutive labelled fields share an aligned two-column {@link GridPane}; any full-width
-/// element (checkbox, section header, custom node) flushes that grid. Validation decoration is
-/// collected and initialised once on the FX thread in {@link #build()}.
+/// ```java
+/// form().section(Localization.lang("HTTP Server"))
+///       .checkWithField(Localization.lang("Enable HTTP Server on port"),
+///               viewModel.enableHttpServerProperty(), viewModel.httpPortProperty(),
+///               port -> port.validate(viewModel.httpPortValidationStatus()))
+///       .group(expert -> expert
+///               .stringField(Localization.lang("API base URL"), viewModel.apiBaseUrlProperty()))
+///           .disableWhen(viewModel.disableExpertSettingsProperty())
+///       .build();
+/// ```
+///
+/// Regions ({@link #group}, {@link #columns}, {@link #flow}, {@link #fields}) are the one exception:
+/// their contents go in the lambda but their own configuration follows the call, because a region
+/// method has exactly one possible subject and needs no disambiguation.
+///
+/// Consecutive labelled fields share an aligned two-column {@link GridPane}; any full-width element
+/// flushes that grid — use {@link #fields} to make a shared block explicit. Validation decoration is
+/// collected and applied once on the FX thread in {@link #build()}.
 public class PreferencesFormBuilder {
 
     private final DialogService dialogService;
@@ -76,7 +93,7 @@ public class PreferencesFormBuilder {
     private final List<Runnable> validationInits = new ArrayList<>();
 
     /// Disable bindings the builder installed itself (a value field following its checkbox, ...).
-    /// {@link #disableWhen} combines with these instead of silently replacing them.
+    /// {@link FormElement#disableWhen} combines with these instead of silently replacing them.
     private final Map<Node, ObservableValue<? extends Boolean>> ownedDisableBindings = new IdentityHashMap<>();
 
     private GridPane currentGrid;
@@ -89,13 +106,6 @@ public class PreferencesFormBuilder {
 
     /// The toggle group radios join inside {@link #radioGroup}.
     private ToggleGroup currentToggleGroup;
-
-    /// The control that trailing configuration methods act on. Null where there is no meaningful
-    /// subject (after {@link #radioGroup}, which adds no container of its own), so that misaimed
-    /// configuration fails instead of silently landing on the previous element.
-    private Node lastControl;
-    /// The row (if any) that {@link #help} appends to.
-    private HBox lastRow;
 
     public PreferencesFormBuilder(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
@@ -123,7 +133,7 @@ public class PreferencesFormBuilder {
         return sectionWithHelp(text, new HelpButton(helpUrl));
     }
 
-    private PreferencesFormBuilder sectionWithHelp(String text, javafx.scene.control.Button help) {
+    private PreferencesFormBuilder sectionWithHelp(String text, Button help) {
         flushGrid();
         Label header = new Label(text);
         header.getStyleClass().add("sectionHeader");
@@ -132,16 +142,18 @@ public class PreferencesFormBuilder {
         HBox row = new HBox(header, help);
         row.setAlignment(Pos.BASELINE_CENTER);
         addToContainer(row);
-        lastRow = row;
-        lastControl = header;
         return this;
     }
 
     /// A plain, unstyled caption line (for text that introduces the following controls).
     public PreferencesFormBuilder label(String text) {
+        return label(text, _ -> { });
+    }
+
+    public PreferencesFormBuilder label(String text, Consumer<FormElement<Label>> config) {
         Label label = new Label(text);
         addNode(label);
-        return this;
+        return configured(label, null, config);
     }
 
     public PreferencesFormBuilder info(String text) {
@@ -164,21 +176,30 @@ public class PreferencesFormBuilder {
     // region controls
 
     public PreferencesFormBuilder checkbox(String text, Property<Boolean> value) {
+        return checkbox(text, value, _ -> { });
+    }
+
+    public PreferencesFormBuilder checkbox(String text, Property<Boolean> value, Consumer<FormElement<CheckBox>> config) {
         CheckBox checkBox = new CheckBox(text);
         checkBox.setMaxWidth(Double.MAX_VALUE);
         checkBox.selectedProperty().bindBidirectional(value);
         HBox row = new HBox(10.0, checkBox);
         row.setAlignment(Pos.CENTER_LEFT);
         addNode(row);
-        lastControl = checkBox;
-        lastRow = row;
-        return this;
+        return configured(checkBox, row, config);
     }
 
-    /// A checkbox with an inline value field that is enabled only while the box is ticked
-    /// (the recurring "Enable ... on port [....]" pattern). Trailing {@link #validate} targets
-    /// the value field.
+    /// A checkbox with an inline value field that is enabled only while the box is ticked (the
+    /// recurring "Enable ... on port [....]" pattern). The configured element is the **value field**;
+    /// its disable binding to the checkbox is preserved even if you add one of your own.
     public PreferencesFormBuilder checkWithField(String text, Property<Boolean> enabled, StringProperty fieldValue) {
+        return checkWithField(text, enabled, fieldValue, _ -> { });
+    }
+
+    public PreferencesFormBuilder checkWithField(String text,
+                                                 Property<Boolean> enabled,
+                                                 StringProperty fieldValue,
+                                                 Consumer<FormElement<TextField>> config) {
         CheckBox checkBox = new CheckBox(text);
         checkBox.selectedProperty().bindBidirectional(enabled);
         TextField field = new TextField();
@@ -188,39 +209,52 @@ public class PreferencesFormBuilder {
         HBox row = new HBox(10.0, checkBox, field);
         row.setAlignment(Pos.CENTER_LEFT);
         addNode(row);
-        lastControl = field;
-        lastRow = row;
-        return this;
+        return configured(field, row, config);
     }
 
     public PreferencesFormBuilder stringField(String label, StringProperty value) {
+        return stringField(label, value, _ -> { });
+    }
+
+    public PreferencesFormBuilder stringField(String label, StringProperty value, Consumer<FormElement<TextField>> config) {
         TextField field = new TextField();
         field.setMaxWidth(Double.MAX_VALUE);
         field.textProperty().bindBidirectional(value);
         addField(label, field);
-        return this;
+        return configured(field, null, config);
     }
 
+    /// A path field with a browse button. The configured element is the **text field**; the browse
+    /// button follows its disabled state.
     public PreferencesFormBuilder browseField(String label, StringProperty value, Runnable onBrowse) {
+        return browseField(label, value, onBrowse, _ -> { });
+    }
+
+    public PreferencesFormBuilder browseField(String label,
+                                              StringProperty value,
+                                              Runnable onBrowse,
+                                              Consumer<FormElement<TextField>> config) {
         BrowseFileEditor.Result result = BrowseFileEditor.create(value, onBrowse);
         if (label == null) {
             addNode(result.row());
         } else {
             addField(label, result.row());
         }
-        lastControl = result.field();
-        lastRow = result.row();
-        return this;
+        return configured(result.field(), result.row(), config);
     }
 
     public PreferencesFormBuilder button(String text, JabRefIcon icon, Runnable action) {
-        javafx.scene.control.Button button = new javafx.scene.control.Button(text);
+        return button(text, icon, action, _ -> { });
+    }
+
+    public PreferencesFormBuilder button(String text, JabRefIcon icon, Runnable action, Consumer<FormElement<Button>> config) {
+        Button button = new Button(text);
         if (icon != null) {
             button.setGraphic(icon.getGraphicNode());
         }
         button.setOnAction(_ -> action.run());
         addNode(button);
-        return this;
+        return configured(button, null, config);
     }
 
     public PreferencesFormBuilder hyperlink(String text, Runnable action) {
@@ -235,9 +269,17 @@ public class PreferencesFormBuilder {
                                             ObservableValue<? extends ObservableList<X>> items,
                                             Property<X> value,
                                             Callback<X, String> display) {
+        return combo(label, items, value, display, _ -> { });
+    }
+
+    public <X> PreferencesFormBuilder combo(String label,
+                                            ObservableValue<? extends ObservableList<X>> items,
+                                            Property<X> value,
+                                            Callback<X, String> display,
+                                            Consumer<FormElement<ComboBox<X>>> config) {
         ComboBox<X> combo = new ComboBox<>();
         combo.itemsProperty().bind(items);
-        return addCombo(label, combo, value, display, false, null);
+        return addCombo(label, combo, value, display, false, null, config);
     }
 
     /// Combo box over a fixed item list (set directly, not bound to a property).
@@ -245,18 +287,34 @@ public class PreferencesFormBuilder {
                                                  ObservableList<X> items,
                                                  Property<X> value,
                                                  Callback<X, String> display) {
+        return comboItems(label, items, value, display, _ -> { });
+    }
+
+    public <X> PreferencesFormBuilder comboItems(String label,
+                                                 ObservableList<X> items,
+                                                 Property<X> value,
+                                                 Callback<X, String> display,
+                                                 Consumer<FormElement<ComboBox<X>>> config) {
         ComboBox<X> combo = new ComboBox<>();
         combo.setItems(items);
-        return addCombo(label, combo, value, display, false, null);
+        return addCombo(label, combo, value, display, false, null, config);
     }
 
     public <X> PreferencesFormBuilder searchableCombo(String label,
                                                       ObservableValue<? extends ObservableList<X>> items,
                                                       Property<X> value,
                                                       Callback<X, String> display) {
+        return searchableCombo(label, items, value, display, _ -> { });
+    }
+
+    public <X> PreferencesFormBuilder searchableCombo(String label,
+                                                      ObservableValue<? extends ObservableList<X>> items,
+                                                      Property<X> value,
+                                                      Callback<X, String> display,
+                                                      Consumer<FormElement<ComboBox<X>>> config) {
         SearchableComboBox<X> combo = new SearchableComboBox<>();
         combo.itemsProperty().bind(items);
-        return addCombo(label, combo, value, display, false, null);
+        return addCombo(label, combo, value, display, false, null, config);
     }
 
     /// String combo box (optionally editable, with a prompt). No display callback (identity toString).
@@ -267,7 +325,7 @@ public class PreferencesFormBuilder {
                                               String prompt) {
         ComboBox<String> combo = new ComboBox<>();
         combo.itemsProperty().bind(items);
-        return addCombo(label, combo, value, null, editable, prompt);
+        return addCombo(label, combo, value, null, editable, prompt, _ -> { });
     }
 
     /// Shared wiring for every combo variant. {@link SearchableComboBox} extends {@link ComboBox},
@@ -277,7 +335,8 @@ public class PreferencesFormBuilder {
                                                 Property<X> value,
                                                 Callback<X, String> display,
                                                 boolean editable,
-                                                String prompt) {
+                                                String prompt,
+                                                Consumer<FormElement<ComboBox<X>>> config) {
         if (display != null) {
             new ViewModelListCellFactory<X>().withText(display).install(combo);
         }
@@ -288,15 +347,22 @@ public class PreferencesFormBuilder {
         }
         combo.valueProperty().bindBidirectional(value);
         addField(label, combo);
-        return this;
+        return configured(combo, null, config);
     }
 
     /// A pre-built {@link TagsField} (see {@link TagsFieldEditor}) bound to a list property.
-    public <T> PreferencesFormBuilder tagsField(String label, TagsField<T> tagsField, ListProperty<T> value) {
+    public <X> PreferencesFormBuilder tagsField(String label, TagsField<X> tagsField, ListProperty<X> value) {
+        return tagsField(label, tagsField, value, _ -> { });
+    }
+
+    public <X> PreferencesFormBuilder tagsField(String label,
+                                                TagsField<X> tagsField,
+                                                ListProperty<X> value,
+                                                Consumer<FormElement<TagsField<X>>> config) {
         tagsField.tagsProperty().bindBidirectional(value);
         HBox.setHgrow(tagsField, Priority.ALWAYS);
         addField(label, tagsField);
-        return this;
+        return configured(tagsField, null, config);
     }
 
     // endregion
@@ -305,26 +371,38 @@ public class PreferencesFormBuilder {
 
     /// A mutually-exclusive radio group: radios added inside share one {@link ToggleGroup}, while
     /// each stays bound to its own boolean property (matching the existing view models). Unlike a
-    /// {@link #group}, this adds no container — the radios stay in the surrounding layout.
+    /// {@link #group}, this adds no container — the radios stay in the surrounding layout, so there
+    /// is nothing to configure afterwards. Wrap it in a {@link #group} to style the block.
     public PreferencesFormBuilder radioGroup(Consumer<PreferencesFormBuilder> content) {
         ToggleGroup enclosing = currentToggleGroup;
         currentToggleGroup = new ToggleGroup();
         content.accept(this);
         currentToggleGroup = enclosing;
-        // Deliberately no subject afterwards: a radio group is not a node, so trailing configuration
-        // would silently land on its last radio. Wrap it in group(...) to configure the block.
-        lastControl = null;
-        lastRow = null;
         return this;
     }
 
     public PreferencesFormBuilder radio(String text, Property<Boolean> selected) {
-        addNode(radioRow(text, selected, null));
-        return this;
+        return radio(text, selected, _ -> { });
     }
 
-    /// A radio with a bound text field that is enabled only while the radio is selected.
+    public PreferencesFormBuilder radio(String text, Property<Boolean> selected, Consumer<FormElement<RadioButton>> config) {
+        RadioButton radio = newRadio(text, selected);
+        HBox row = new HBox(10.0, radio);
+        row.setAlignment(Pos.CENTER_LEFT);
+        addNode(row);
+        return configured(radio, row, config);
+    }
+
+    /// A radio with a bound text field that is enabled only while the radio is selected. The
+    /// configured element is the **text field**.
     public PreferencesFormBuilder radioWithField(String text, Property<Boolean> selected, StringProperty fieldValue) {
+        return radioWithField(text, selected, fieldValue, _ -> { });
+    }
+
+    public PreferencesFormBuilder radioWithField(String text,
+                                                 Property<Boolean> selected,
+                                                 StringProperty fieldValue,
+                                                 Consumer<FormElement<TextField>> config) {
         RadioButton radio = newRadio(text, selected);
         TextField field = new TextField();
         field.textProperty().bindBidirectional(fieldValue);
@@ -333,35 +411,30 @@ public class PreferencesFormBuilder {
         HBox row = new HBox(10.0, radio, field);
         row.setAlignment(Pos.CENTER_LEFT);
         addNode(row);
-        lastControl = field;
-        lastRow = row;
-        return this;
+        return configured(field, row, config);
     }
 
-    /// A radio with an inline browse field (e.g. "Main file directory"). Trailing {@link #validate}
-    /// and {@link #disableWhen} target the path field (the browse button follows its disabled state).
-    public PreferencesFormBuilder radioWithBrowse(String text, Property<Boolean> selected, StringProperty pathValue, Runnable onBrowse) {
+    /// A radio with an inline browse field (e.g. "Main file directory"). The configured element is
+    /// the **path field**; the browse button follows its disabled state.
+    public PreferencesFormBuilder radioWithBrowse(String text,
+                                                  Property<Boolean> selected,
+                                                  StringProperty pathValue,
+                                                  Runnable onBrowse) {
+        return radioWithBrowse(text, selected, pathValue, onBrowse, _ -> { });
+    }
+
+    public PreferencesFormBuilder radioWithBrowse(String text,
+                                                  Property<Boolean> selected,
+                                                  StringProperty pathValue,
+                                                  Runnable onBrowse,
+                                                  Consumer<FormElement<TextField>> config) {
         RadioButton radio = newRadio(text, selected);
         BrowseFileEditor.Result browse = BrowseFileEditor.create(pathValue, onBrowse);
         HBox.setHgrow(browse.row(), Priority.ALWAYS);
         HBox row = new HBox(10.0, radio, browse.row());
         row.setAlignment(Pos.CENTER_LEFT);
         addNode(row);
-        lastControl = browse.field();
-        lastRow = row;
-        return this;
-    }
-
-    private HBox radioRow(String text, Property<Boolean> selected, TextField trailing) {
-        RadioButton radio = newRadio(text, selected);
-        HBox row = new HBox(10.0, radio);
-        row.setAlignment(Pos.CENTER_LEFT);
-        if (trailing != null) {
-            row.getChildren().add(trailing);
-        }
-        lastControl = radio;
-        lastRow = row;
-        return row;
+        return configured(browse.field(), row, config);
     }
 
     private RadioButton newRadio(String text, Property<Boolean> selected) {
@@ -375,48 +448,63 @@ public class PreferencesFormBuilder {
 
     // region escape hatches
 
-    /// Adds a bespoke labelled control; trailing configuration methods target it.
-    public PreferencesFormBuilder field(String label, Node control) {
+    /// Adds a bespoke labelled control.
+    public <T extends Node> PreferencesFormBuilder field(String label, T control) {
+        return field(label, control, _ -> { });
+    }
+
+    public <T extends Node> PreferencesFormBuilder field(String label, T control, Consumer<FormElement<T>> config) {
         addField(label, control);
-        return this;
+        return configured(control, control instanceof HBox hbox ? hbox : null, config);
     }
 
     /// Adds a fully custom node spanning the form width (the `.custom(Node)` hatch).
-    public PreferencesFormBuilder custom(Node node) {
-        addNode(node);
-        return this;
+    public <T extends Node> PreferencesFormBuilder custom(T node) {
+        return custom(node, _ -> { });
     }
 
-    /// Runs arbitrary configuration on the last added element, typed — e.g. to keep a reference to a
-    /// control the builder created: `.configure(ComboBox.class, combo -> this.combo = combo)`.
-    public <T extends Node> PreferencesFormBuilder configure(Class<T> type, Consumer<T> consumer) {
-        consumer.accept(subject("configure", type));
+    public <T extends Node> PreferencesFormBuilder custom(T node, Consumer<FormElement<T>> config) {
+        addNode(node);
+        return configured(node, node instanceof HBox hbox ? hbox : null, config);
+    }
+
+    /// Registers a control the builder did not create — one inside a {@link #custom} region — with
+    /// the same visualizer, so a tab needs no second {@link ControlsFxVisualizer} of its own.
+    public PreferencesFormBuilder validate(ValidationStatus status, Control control) {
+        validationInits.add(() -> visualizer.initVisualization(status, control));
         return this;
     }
 
     // endregion
 
-    // region grouping & post-configuration
+    // region regions
 
-    /// Opens a sub-group: controls added until {@link #endGroup()} are placed inside it. The group
-    /// becomes the current subject, so the universal {@link #visibleWhen} / {@link #disableWhen}
-    /// (called before adding children) bind the whole group — e.g.
-    /// `beginGroup().visibleWhen(expertOn)` or `beginGroup().disableWhen(aiOff)` (disable propagates
-    /// to every descendant). Both are combinable.
     public PreferencesFormBuilder group(Consumer<PreferencesFormBuilder> content) {
-        return region(new VBox(10.0), content);
+        return group(content, _ -> { });
+    }
+
+    public PreferencesFormBuilder group(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<VBox>> config) {
+        return region(new VBox(10.0), content, config);
     }
 
     /// A side-by-side region: every element inside becomes an equally growing column. Usually filled
     /// with {@link #group} blocks, one per column.
     public PreferencesFormBuilder columns(Consumer<PreferencesFormBuilder> content) {
-        return region(new HBox(10.0), content);
+        return columns(content, _ -> { });
+    }
+
+    public PreferencesFormBuilder columns(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<HBox>> config) {
+        return region(new HBox(10.0), content, config);
     }
 
     /// A wrapping region: elements flow left to right and wrap onto the next line as the dialog
     /// narrows.
     public PreferencesFormBuilder flow(Consumer<PreferencesFormBuilder> content) {
-        return region(new FlowPane(), content);
+        return flow(content, _ -> { });
+    }
+
+    public PreferencesFormBuilder flow(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<FlowPane>> config) {
+        return region(new FlowPane(), content, config);
     }
 
     /// An explicitly aligned block: every labelled field inside shares one {@link GridPane}, so
@@ -424,140 +512,35 @@ public class PreferencesFormBuilder {
     /// full-width element silently splits them into separate grids with independent column widths —
     /// inside `fields(...)` that cannot happen, because adding one is an error.
     public PreferencesFormBuilder fields(Consumer<PreferencesFormBuilder> content) {
+        return fields(content, _ -> { });
+    }
+
+    public PreferencesFormBuilder fields(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<GridPane>> config) {
         flushGrid();
         GridPane grid = ensureGrid();
         fieldsDepth++;
         content.accept(this);
         fieldsDepth--;
         flushGrid();
-        lastControl = grid;
-        lastRow = null;
+        config.accept(new FormRegion<>(grid));
         return this;
     }
 
     /// Everything added inside becomes a sub-region of the form. Nesting is the lambda's, so a
-    /// region cannot be left unclosed, and trailing configuration after the call applies to the
-    /// region as a whole — `group(g -> ...).disableWhen(off)` disables all of its contents.
-    private PreferencesFormBuilder region(Pane region, Consumer<PreferencesFormBuilder> content) {
+    /// region cannot be left unclosed, and the second lambda configures the region as a whole —
+    /// `group(content, g -> g.disableWhen(off))` disables all of its contents.
+    private <T extends Pane> PreferencesFormBuilder region(T region,
+                                                           Consumer<PreferencesFormBuilder> content,
+                                                           Consumer<FormRegion<T>> config) {
         flushGrid();
         addToContainer(region);
         containers.push(region);
-        lastControl = region;
-        lastRow = null;
 
         content.accept(this);
 
         flushGrid();
         containers.pop();
-        // The region itself, not its last child, is the subject of what follows.
-        lastControl = region;
-        lastRow = null;
-        return this;
-    }
-
-    /// Overrides the spacing of the last region (default 10). On a {@link #flow} region this sets
-    /// both gaps.
-    public PreferencesFormBuilder spacing(double value) {
-        switch (subject("spacing", Pane.class)) {
-            case VBox box ->
-                    box.setSpacing(value);
-            case HBox box ->
-                    box.setSpacing(value);
-            case FlowPane pane -> {
-                pane.setHgap(value);
-                pane.setVgap(value);
-            }
-            default ->
-                    throw new IllegalStateException(
-                            "spacing() applies to a group, columns or flow region, not to a "
-                                    + lastControl.getClass().getSimpleName());
-        }
-        return this;
-    }
-
-    /// Disables the last subject while `condition` holds. Where the builder already installed a
-    /// disable binding of its own — the value field of {@link #checkWithField}, the path field of
-    /// {@link #radioWithBrowse} — the two are combined, so the built-in coupling survives.
-    public PreferencesFormBuilder disableWhen(ObservableValue<? extends Boolean> condition) {
-        Node target = subject("disableWhen");
-        ObservableValue<? extends Boolean> owned = ownedDisableBindings.get(target);
-        ObservableValue<? extends Boolean> effective = owned == null ? condition : either(owned, condition);
-        target.disableProperty().unbind();
-        target.disableProperty().bind(effective);
-        if (owned != null) {
-            ownedDisableBindings.put(target, effective);
-        }
-        return this;
-    }
-
-    /// Binds the last subject's visibility (and layout participation) to `condition`. Works on any
-    /// control or on a region opened with {@link #group}, {@link #columns} or {@link #flow}.
-    public PreferencesFormBuilder visibleWhen(ObservableValue<? extends Boolean> condition) {
-        Node target = subject("visibleWhen");
-        target.visibleProperty().bind(condition);
-        target.managedProperty().bind(condition);
-        return this;
-    }
-
-    /// Statically disables the last subject (for platform-capability checks, not reactive state).
-    public PreferencesFormBuilder disabled(boolean value) {
-        subject("disabled").setDisable(value);
-        return this;
-    }
-
-    public PreferencesFormBuilder tooltip(String text) {
-        subject("tooltip", Control.class).setTooltip(new Tooltip(text));
-        return this;
-    }
-
-    /// Decorates the last subject with `status`. Decoration is applied once, on the FX thread, in
-    /// {@link #build()}.
-    public PreferencesFormBuilder validate(ValidationStatus status) {
-        return validate(status, subject("validate", Control.class));
-    }
-
-    /// Registers a control the builder did not create — a control inside a {@link #custom} region —
-    /// with the same visualizer, so a tab needs no second {@link ControlsFxVisualizer} of its own.
-    public PreferencesFormBuilder validate(ValidationStatus status, Control control) {
-        validationInits.add(() -> visualizer.initVisualization(status, control));
-        return this;
-    }
-
-    /// Appends a help icon button to the current row (checkbox, checkWithField or section row).
-    public PreferencesFormBuilder help(HelpFile helpFile) {
-        return help(StandardActions.HELP, helpFile);
-    }
-
-    public PreferencesFormBuilder help(StandardActions action, HelpFile helpFile) {
-        row("help").getChildren().add(helpButton(action, helpFile));
-        return this;
-    }
-
-    /// Appends a help icon button linking to a documentation URL.
-    public PreferencesFormBuilder help(String helpUrl) {
-        row("help").getChildren().add(new HelpButton(helpUrl));
-        return this;
-    }
-
-    /// Lets the last subject take all remaining horizontal space in its row. Use where a builder
-    /// default is too narrow, e.g. the value field of {@link #checkWithField} when it holds a name
-    /// rather than a port number.
-    public PreferencesFormBuilder grow() {
-        Region target = subject("grow", Region.class);
-        target.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(target, Priority.ALWAYS);
-        return this;
-    }
-
-    /// Wraps the last subject's text over several lines instead of truncating it.
-    public PreferencesFormBuilder wrapText() {
-        subject("wrapText", Labeled.class).setWrapText(true);
-        return this;
-    }
-
-    /// Adds CSS style classes to the last subject (control or region), e.g. `"prefIndent"`.
-    public PreferencesFormBuilder styleClass(String... styleClasses) {
-        subject("styleClass").getStyleClass().addAll(styleClasses);
+        config.accept(new FormRegion<>(region));
         return this;
     }
 
@@ -578,37 +561,13 @@ public class PreferencesFormBuilder {
 
     // region internals
 
-    /// The element trailing configuration applies to. Every accessor fails loudly rather than
-    /// no-opping: a misaimed `.validate(...)` or `.help(...)` is otherwise invisible until someone
-    /// notices the decoration or the button is missing from the running dialog.
-    private Node subject(String method) {
-        if (lastControl == null) {
-            throw new IllegalStateException(method + "() has no element to apply to. radioGroup() adds no "
-                    + "container of its own — wrap it in group(...) to configure the block as a whole");
-        }
-        return lastControl;
+    private <T extends Node> PreferencesFormBuilder configured(T control, HBox row, Consumer<FormElement<T>> config) {
+        config.accept(new FormElement<>(this, control, row));
+        return this;
     }
 
-    private <T> T subject(String method, Class<T> required) {
-        Node target = subject(method);
-        if (!required.isInstance(target)) {
-            throw new IllegalStateException(method + "() applies to a " + required.getSimpleName()
-                    + ", but the current element is a " + target.getClass().getSimpleName());
-        }
-        return required.cast(target);
-    }
-
-    private HBox yrow(String method) {
-        if (lastRow == null) {
-            throw new IllegalStateException(method + "() appends to the current row, but "
-                    + (lastControl == null ? "there is no current element" : lastControl.getClass().getSimpleName()
-                                                                             + " does not sit in one"));
-        }
-        return lastRow;
-    }
-
-    /// Records a disable binding the builder owns, so that a later {@link #disableWhen} extends it
-    /// rather than replacing it.
+    /// Records a disable binding the builder owns, so that a later {@link FormElement#disableWhen}
+    /// extends it rather than replacing it.
     private void ownDisable(Node node, ObservableValue<? extends Boolean> condition) {
         node.disableProperty().bind(condition);
         ownedDisableBindings.put(node, condition);
@@ -632,11 +591,9 @@ public class PreferencesFormBuilder {
         }
         flushGrid();
         addToContainer(node);
-        lastControl = node;
-        lastRow = null;
     }
 
-    /// Appends to the open container. Inside a {@link #beginColumns()} region every child is made an
+    /// Appends to the open container. Inside a {@link #columns} region every child is made an
     /// equally growing column, so callers never repeat the hgrow boilerplate.
     private void addToContainer(Node node) {
         Pane container = container();
@@ -660,8 +617,6 @@ public class PreferencesFormBuilder {
         }
         GridPane.setHgrow(control, Priority.ALWAYS);
         gridRow++;
-        lastControl = control;
-        lastRow = (control instanceof HBox hbox) ? hbox : null;
     }
 
     private GridPane ensureGrid() {
@@ -685,8 +640,8 @@ public class PreferencesFormBuilder {
         currentGrid = null;
     }
 
-    private javafx.scene.control.Button helpButton(StandardActions action, HelpFile helpFile) {
-        javafx.scene.control.Button button = new javafx.scene.control.Button();
+    private Button helpButton(StandardActions action, HelpFile helpFile) {
+        Button button = new Button();
         button.setPrefWidth(20.0);
         new ActionFactory().configureIconButton(
                 action,
@@ -696,4 +651,179 @@ public class PreferencesFormBuilder {
     }
 
     // endregion
+
+    /// A region the builder just closed, handed to that region's configuration lambda. Configuring a
+    /// region is deliberately the same shape as configuring a control, so that no configuration
+    /// method exists on the builder itself — a call aimed at the wrong thing cannot compile.
+    public static final class FormRegion<T extends Pane> {
+
+        private final T region;
+
+        private FormRegion(T region) {
+            this.region = region;
+        }
+
+        public T node() {
+            return region;
+        }
+
+        public FormRegion<T> configure(Consumer<T> consumer) {
+            consumer.accept(region);
+            return this;
+        }
+
+        /// Disables the whole region while `condition` holds; disable propagates to every descendant,
+        /// so its contents need no binding of their own.
+        public FormRegion<T> disableWhen(ObservableValue<? extends Boolean> condition) {
+            region.disableProperty().bind(condition);
+            return this;
+        }
+
+        /// Binds the region's visibility, and its participation in layout, to `condition`.
+        public FormRegion<T> visibleWhen(ObservableValue<? extends Boolean> condition) {
+            region.visibleProperty().bind(condition);
+            region.managedProperty().bind(condition);
+            return this;
+        }
+
+        public FormRegion<T> styleClass(String... styleClasses) {
+            region.getStyleClass().addAll(styleClasses);
+            return this;
+        }
+
+        /// Overrides the gap between the region's elements (default 10).
+        public FormRegion<T> spacing(double value) {
+            switch (region) {
+                case VBox box -> box.setSpacing(value);
+                case HBox box -> box.setSpacing(value);
+                case FlowPane pane -> {
+                    pane.setHgap(value);
+                    pane.setVgap(value);
+                }
+                case GridPane grid -> {
+                    grid.setHgap(value);
+                    grid.setVgap(value);
+                }
+                default -> throw new IllegalStateException(
+                        "spacing() does not apply to a " + region.getClass().getSimpleName() + " region");
+            }
+            return this;
+        }
+    }
+
+    /// A single control the builder just added, handed to that control's configuration lambda. The
+    /// type parameter names exactly which node you are configuring, which is what the old
+    /// "most recently added control" state could not express — for {@link #checkWithField} it is the
+    /// value field, not the checkbox.
+    public static final class FormElement<T extends Node> {
+
+        private final PreferencesFormBuilder form;
+        private final T control;
+        private final HBox row;
+
+        private FormElement(PreferencesFormBuilder form, T control, HBox row) {
+            this.form = form;
+            this.control = control;
+            this.row = row;
+        }
+
+        /// The control itself, e.g. to keep a reference for later wiring.
+        public T node() {
+            return control;
+        }
+
+        public FormElement<T> configure(Consumer<T> consumer) {
+            consumer.accept(control);
+            return this;
+        }
+
+        /// Disables the control while `condition` holds. Where the builder installed a disable
+        /// binding of its own — the value field of {@link #checkWithField}, the path field of
+        /// {@link #radioWithBrowse} — the two are combined, so the built-in coupling survives.
+        public FormElement<T> disableWhen(ObservableValue<? extends Boolean> condition) {
+            ObservableValue<? extends Boolean> owned = form.ownedDisableBindings.get(control);
+            ObservableValue<? extends Boolean> effective = owned == null ? condition : either(owned, condition);
+            control.disableProperty().unbind();
+            control.disableProperty().bind(effective);
+            if (owned != null) {
+                form.ownedDisableBindings.put(control, effective);
+            }
+            return this;
+        }
+
+        public FormElement<T> visibleWhen(ObservableValue<? extends Boolean> condition) {
+            control.visibleProperty().bind(condition);
+            control.managedProperty().bind(condition);
+            return this;
+        }
+
+        /// Statically disables the control (for platform-capability checks, not reactive state).
+        public FormElement<T> disabled(boolean value) {
+            control.setDisable(value);
+            return this;
+        }
+
+        public FormElement<T> tooltip(String text) {
+            required(Control.class, "tooltip").setTooltip(new Tooltip(text));
+            return this;
+        }
+
+        /// Decorates the control with `status`, applied once on the FX thread in {@link #build()}.
+        public FormElement<T> validate(ValidationStatus status) {
+            form.validate(status, required(Control.class, "validate"));
+            return this;
+        }
+
+        public FormElement<T> help(HelpFile helpFile) {
+            return help(StandardActions.HELP, helpFile);
+        }
+
+        public FormElement<T> help(StandardActions action, HelpFile helpFile) {
+            row("help").getChildren().add(form.helpButton(action, helpFile));
+            return this;
+        }
+
+        /// Appends a help icon button linking to a documentation URL.
+        public FormElement<T> help(String helpUrl) {
+            row("help").getChildren().add(new HelpButton(helpUrl));
+            return this;
+        }
+
+        /// Lets the control take all remaining horizontal space in its row. Use where a builder
+        /// default is too narrow, e.g. the value field of {@link #checkWithField} when it holds a
+        /// name rather than a port number.
+        public FormElement<T> grow() {
+            Region region = required(Region.class, "grow");
+            region.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(region, Priority.ALWAYS);
+            return this;
+        }
+
+        /// Wraps the control's text over several lines instead of truncating it.
+        public FormElement<T> wrapText() {
+            required(Labeled.class, "wrapText").setWrapText(true);
+            return this;
+        }
+
+        public FormElement<T> styleClass(String... styleClasses) {
+            control.getStyleClass().addAll(styleClasses);
+            return this;
+        }
+
+        private <R> R required(Class<R> type, String method) {
+            if (!type.isInstance(control)) {
+                throw new IllegalStateException(method + "() applies to a " + type.getSimpleName()
+                        + ", but this element is a " + control.getClass().getSimpleName());
+            }
+            return type.cast(control);
+        }
+
+        private HBox row(String method) {
+            if (row == null) {
+                throw new IllegalStateException(method + "() appends to the element's row, but a "
+                        + control.getClass().getSimpleName() + " here does not sit in one");
+            }
+            return row;
+        }
+    }
 }
