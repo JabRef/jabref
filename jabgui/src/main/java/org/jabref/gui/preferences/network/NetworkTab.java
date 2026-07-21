@@ -64,14 +64,14 @@ public class NetworkTab extends AbstractFormTabView<NetworkTabViewModel> {
                 .checkbox(Localization.lang("Check for updates on startup"), viewModel.versionCheckProperty())
                 .custom(hint)
 
-                .section(Localization.lang("Proxy configuration"))
-                .custom(buildProxyGrid())
+                .section(Localization.lang("Proxy configuration"), proxy -> proxy
+                        .custom(buildProxyGrid()))
 
-                .section(Localization.lang("Git configuration"))
-                .custom(buildGitGrid())
+                .section(Localization.lang("Git configuration"), git -> git
+                        .custom(buildGitGrid()))
 
-                .section(Localization.lang("SSL configuration"))
-                .custom(buildSslGrid())
+                .section(Localization.lang("SSL configuration"), ssl -> ssl
+                        .custom(buildSslGrid()))
 
                 .build());
 

@@ -27,8 +27,8 @@ public class ExportTab extends AbstractFormTabView<ExportTabViewModel> {
 
         getChildren().add(form()
                 .title(Localization.lang("Export"))
-                .section(Localization.lang("Export sort order"))
-                .custom(exportOrderPanel)
+                .section(Localization.lang("Export sort order"), order -> order
+                        .custom(exportOrderPanel))
                 .build());
     }
 }

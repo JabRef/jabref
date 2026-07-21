@@ -82,64 +82,78 @@ public class AiTab extends AbstractFormTabView<AiTabViewModel> {
         getChildren().add(form()
                 .title(Localization.lang("AI"))
 
-                .sectionWithHelp(Localization.lang("General"), HelpFile.AI_GENERAL_SETTINGS)
-                // [impl->feat~ai.llms.providers~1]
-                .checkbox(Localization.lang("Enable AI functionality in JabRef"), viewModel.enableAi())
-                .info(Localization.lang("AI functionality in Jabref includes:"))
-                .info(Localization.lang("• Chatting with entries."))
-                .info(Localization.lang("• Summarizing entries."))
-                .info(Localization.lang("• Turn a citation into a BibTeX or BibLaTeX entry."))
+                .sectionWithHelp(Localization.lang("General"), HelpFile.AI_GENERAL_SETTINGS, general -> general
+                        // [impl->feat~ai.llms.providers~1]
+                        .checkbox(Localization.lang("Enable AI functionality in JabRef"), viewModel.enableAi())
+                        .info(Localization.lang("AI functionality in Jabref includes:"))
+                        .info(Localization.lang("• Chatting with entries."))
+                        .info(Localization.lang("• Summarizing entries."))
+                        .info(Localization.lang("• Turn a citation into a BibTeX or BibLaTeX entry.")))
 
-                .section(Localization.lang("Connection"))
-                .combo(Localization.lang("AI provider"), viewModel.aiProvidersProperty(), viewModel.selectedAiProviderProperty(), AiNamingUtils::getDisplayName,
-                        provider -> provider.disableWhen(viewModel.disableBasicSettingsProperty()))
-                .field(Localization.lang("Chat model"), buildChatModelCombo(),
-                        chatModel -> chatModel.disableWhen(viewModel.disableBasicSettingsProperty())
-                                              .validate(viewModel.getChatModelValidationStatus()))
-                .field(Localization.lang("API key"), apiKey,
-                        key -> key.disableWhen(viewModel.disableBasicSettingsProperty())
-                                  .validate(viewModel.getApiTokenValidationStatus()))
+                .section(Localization.lang("Connection"), connection -> connection
+                        .combo(Localization.lang("AI provider"),
+                                viewModel.aiProvidersProperty(),
+                                viewModel.selectedAiProviderProperty(),
+                                AiNamingUtils::getDisplayName,
+                                provider -> provider.disableWhen(viewModel.disableBasicSettingsProperty()))
+                        .field(Localization.lang("Chat model"), buildChatModelCombo(),
+                                chatModel -> chatModel.disableWhen(viewModel.disableBasicSettingsProperty())
+                                                      .validate(viewModel.getChatModelValidationStatus()))
+                        .field(Localization.lang("API key"), apiKey,
+                                key -> key.disableWhen(viewModel.disableBasicSettingsProperty())
+                                          .validate(viewModel.getApiTokenValidationStatus())))
 
-                .sectionWithHelp(Localization.lang("Expert settings"), HelpFile.AI_EXPERT_SETTINGS)
-                .checkbox(Localization.lang("Customize expert settings"), viewModel.customizeExpertSettingsProperty(),
-                        customize -> customize.disableWhen(viewModel.disableBasicSettingsProperty()))
-                .group(expert -> expert
-                        .stringField(Localization.lang("API base URL (used only for LLM)"), viewModel.apiBaseUrlProperty(),
-                                baseUrl -> baseUrl.disableWhen(viewModel.disableApiBaseUrlProperty())
-                                                  .validate(viewModel.getApiBaseUrlValidationStatus()))
-                        .searchableCombo(Localization.lang("Embedding model"), viewModel.embeddingModelsProperty(), viewModel.selectedEmbeddingModelProperty(), PredefinedEmbeddingModel::fullInfo,
-                                embedding -> embedding.validate(viewModel.getEmbeddingModelValidationStatus()))
-                        .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
-                        .custom(buildExpertGrid())
-                        .button(Localization.lang("Reset expert settings to default"), IconTheme.JabRefIcons.REFRESH, viewModel::resetExpertSettings),
-                    // Disabling the group covers every expert control above; individual controls only
-                    // add their own extra conditions on top.
-                    expertGroup -> expertGroup.visibleWhen(viewModel.customizeExpertSettingsProperty())
-                                              .disableWhen(viewModel.disableExpertSettingsProperty()))
+                .sectionWithHelp(Localization.lang("Expert settings"), HelpFile.AI_EXPERT_SETTINGS, expertSettings -> expertSettings
+                        .checkbox(Localization.lang("Customize expert settings"), viewModel.customizeExpertSettingsProperty(),
+                                customize -> customize.disableWhen(viewModel.disableBasicSettingsProperty()))
+                        .group(expert -> expert
+                                        .stringField(Localization.lang("API base URL (used only for LLM)"), viewModel.apiBaseUrlProperty(),
+                                                baseUrl -> baseUrl.disableWhen(viewModel.disableApiBaseUrlProperty())
+                                                                  .validate(viewModel.getApiBaseUrlValidationStatus()))
+                                        .searchableCombo(Localization.lang("Embedding model"),
+                                                viewModel.embeddingModelsProperty(),
+                                                viewModel.selectedEmbeddingModelProperty(),
+                                                PredefinedEmbeddingModel::fullInfo,
+                                                embedding -> embedding.validate(viewModel.getEmbeddingModelValidationStatus()))
+                                        .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
+                                        .custom(buildExpertGrid())
+                                        .button(Localization.lang("Reset expert settings to default"), IconTheme.JabRefIcons.REFRESH, viewModel::resetExpertSettings),
+                                // Disabling the group covers every expert control above; individual controls
+                                // only add their own extra conditions on top.
+                                expertGroup -> expertGroup.visibleWhen(viewModel.customizeExpertSettingsProperty())
+                                                          .disableWhen(viewModel.disableExpertSettingsProperty())))
 
                 // [impl->req~ai.expert-settings.templates~1]
-                .sectionWithHelp(Localization.lang("Templates"), HelpFile.AI_TEMPLATES)
-                .custom(buildTemplatesRegion())
+                .sectionWithHelp(Localization.lang("Templates"), HelpFile.AI_TEMPLATES, templates -> templates
+                        .custom(buildTemplatesRegion()))
 
-                .section(Localization.lang("Miscellaneous"))
-                // [impl->req~ai.ingestion.automatic-trigger~1]
-                .checkbox(Localization.lang("Automatically generate embeddings for new entries"), viewModel.autoGenerateEmbeddings(),
-                        embeddings -> embeddings.disableWhen(Bindings.or(aiDisabled, viewModel.disableAutoGenerateEmbeddings())))
-                // [impl->req~ai.summarization.entries.auto~1]
-                .checkbox(Localization.lang("Automatically generate summaries for new entries"), viewModel.autoGenerateSummaries(),
-                        summaries -> summaries.disableWhen(Bindings.or(aiDisabled, viewModel.disableAutoGenerateSummaries())))
-                .checkbox(Localization.lang("Generate follow-up questions after AI response"), viewModel.generateFollowUpQuestionsProperty(),
-                        followUp -> followUp.disableWhen(viewModel.disableBasicSettingsProperty()))
-                .field(Localization.lang("Number of follow-up questions"), buildFollowUpQuestionsCountSpinner())
-                // [impl->req~ai.response-engines.default~1]
-                .comboItems(Localization.lang("Default response engine"), viewModel.responseEngineKindsProperty(), viewModel.responseEngineProperty(), AiNamingUtils::getDisplayName,
-                        engine -> engine.disableWhen(viewModel.disableExpertSettingsProperty()))
-                // [impl->req~ai.summarization.algorithm.default~1]
-                .comboItems(Localization.lang("Default summarization algorithm"), viewModel.summarizationAlgorithmsProperty(), viewModel.summarizationAlgorithmProperty(), AiNamingUtils::getDisplayName,
-                        algorithm -> algorithm.disableWhen(viewModel.disableExpertSettingsProperty()))
-                .comboItems(Localization.lang("Default token estimation algorithm"), viewModel.tokenEstimationAlgorithmsProperty(), viewModel.tokenEstimationAlgorithmProperty(), AiNamingUtils::getDisplayName,
-                        estimator -> estimator.disableWhen(viewModel.disableExpertSettingsProperty()))
-
+                .section(Localization.lang("Miscellaneous"), miscellaneous -> miscellaneous
+                        // [impl->req~ai.ingestion.automatic-trigger~1]
+                        .checkbox(Localization.lang("Automatically generate embeddings for new entries"), viewModel.autoGenerateEmbeddings(),
+                                embeddings -> embeddings.disableWhen(Bindings.or(aiDisabled, viewModel.disableAutoGenerateEmbeddings())))
+                        // [impl->req~ai.summarization.entries.auto~1]
+                        .checkbox(Localization.lang("Automatically generate summaries for new entries"), viewModel.autoGenerateSummaries(),
+                                summaries -> summaries.disableWhen(Bindings.or(aiDisabled, viewModel.disableAutoGenerateSummaries())))
+                        .checkbox(Localization.lang("Generate follow-up questions after AI response"), viewModel.generateFollowUpQuestionsProperty(),
+                                followUp -> followUp.disableWhen(viewModel.disableBasicSettingsProperty()))
+                        .field(Localization.lang("Number of follow-up questions"), buildFollowUpQuestionsCountSpinner())
+                        // [impl->req~ai.response-engines.default~1]
+                        .comboItems(Localization.lang("Default response engine"),
+                                viewModel.responseEngineKindsProperty(),
+                                viewModel.responseEngineProperty(),
+                                AiNamingUtils::getDisplayName,
+                                engine -> engine.disableWhen(viewModel.disableExpertSettingsProperty()))
+                        // [impl->req~ai.summarization.algorithm.default~1]
+                        .comboItems(Localization.lang("Default summarization algorithm"),
+                                viewModel.summarizationAlgorithmsProperty(),
+                                viewModel.summarizationAlgorithmProperty(),
+                                AiNamingUtils::getDisplayName,
+                                algorithm -> algorithm.disableWhen(viewModel.disableExpertSettingsProperty()))
+                        .comboItems(Localization.lang("Default token estimation algorithm"),
+                                viewModel.tokenEstimationAlgorithmsProperty(),
+                                viewModel.tokenEstimationAlgorithmProperty(),
+                                AiNamingUtils::getDisplayName,
+                                estimator -> estimator.disableWhen(viewModel.disableExpertSettingsProperty())))
                 .build());
     }
 

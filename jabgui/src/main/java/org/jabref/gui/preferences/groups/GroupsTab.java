@@ -19,14 +19,13 @@ public class GroupsTab extends AbstractFormTabView<GroupsTabViewModel> {
         getChildren().add(form()
                 .title(Localization.lang("Groups"))
 
-                .section(Localization.lang("View"))
-                .radioGroup(viewMode -> viewMode
-                        .radio(Localization.lang("Display only entries belonging to all selected groups"), viewModel.groupViewModeIntersectionProperty())
-                        .radio(Localization.lang("Display all entries belonging to one or more of the selected groups"), viewModel.groupViewModeUnionProperty()))
-
-                .checkbox(Localization.lang("Automatically assign new entry to selected groups"), viewModel.autoAssignGroupProperty())
-                .checkbox(Localization.lang("Display count of items in group"), viewModel.displayGroupCount())
-                .checkbox(Localization.lang("Show 'AI chat' in the context menu"), viewModel.showAiChatButtonProperty())
+                .section(Localization.lang("View"), view -> view
+                        .radioGroup(viewMode -> viewMode
+                                .radio(Localization.lang("Display only entries belonging to all selected groups"), viewModel.groupViewModeIntersectionProperty())
+                                .radio(Localization.lang("Display all entries belonging to one or more of the selected groups"), viewModel.groupViewModeUnionProperty()))
+                        .checkbox(Localization.lang("Automatically assign new entry to selected groups"), viewModel.autoAssignGroupProperty())
+                        .checkbox(Localization.lang("Display count of items in group"), viewModel.displayGroupCount())
+                        .checkbox(Localization.lang("Show 'AI chat' in the context menu"), viewModel.showAiChatButtonProperty()))
 
                 .build());
     }

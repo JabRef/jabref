@@ -45,19 +45,19 @@ public class EntryTab extends AbstractFormTabView<EntryTabViewModel> {
         getChildren().add(form()
                 .title(Localization.lang("Entry"))
 
-                .section(Localization.lang("Field"))
-                .custom(buildKeywordSeparatorRow())
-                .checkbox(Localization.lang("Resolve BibTeX strings"), viewModel.resolveStringsProperty())
-                .tagsField(Localization.lang("Affected fields"), resolvableTags, viewModel.resolvableTagsFieldProperty(),
-                        affected -> affected.disableWhen(viewModel.resolveStringsProperty().not()))
-                .tagsField(Localization.lang("Do not wrap when saving"), nonWrappableTags, viewModel.nonWrappableTagsFieldProperty())
+                .section(Localization.lang("Field"), field -> field
+                        .custom(buildKeywordSeparatorRow())
+                        .checkbox(Localization.lang("Resolve BibTeX strings"), viewModel.resolveStringsProperty())
+                        .tagsField(Localization.lang("Affected fields"), resolvableTags, viewModel.resolvableTagsFieldProperty(),
+                                affected -> affected.disableWhen(viewModel.resolveStringsProperty().not()))
+                        .tagsField(Localization.lang("Do not wrap when saving"), nonWrappableTags, viewModel.nonWrappableTagsFieldProperty()))
 
-                .section(Localization.lang("Entry owner"))
-                .custom(buildOwnerRow())
+                .section(Localization.lang("Entry owner"), owner -> owner
+                        .custom(buildOwnerRow()))
 
-                .section(Localization.lang("Time stamp"))
-                .checkbox(Localization.lang("Add timestamp to new entries (field \"creationdate\")"), viewModel.addCreationDateProperty())
-                .checkbox(Localization.lang("Add timestamp to modified entries (field \"modificationdate\")"), viewModel.addModificationDateProperty())
+                .section(Localization.lang("Time stamp"), timeStamp -> timeStamp
+                        .checkbox(Localization.lang("Add timestamp to new entries (field \"creationdate\")"), viewModel.addCreationDateProperty())
+                        .checkbox(Localization.lang("Add timestamp to modified entries (field \"modificationdate\")"), viewModel.addModificationDateProperty()))
 
                 .build());
     }

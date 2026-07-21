@@ -51,8 +51,8 @@ public class EntryEditorTab extends AbstractFormTabView<EntryEditorTabViewModel>
                         FXCollections.observableList(List.of(CitationCountFetcherType.values())),
                         viewModel.citationCountFetcherTypeProperty(), CitationCountFetcherType::getName)
 
-                .section(Localization.lang("Editor tabs"))
-                .custom(buildTabConfigRegion())
+                .section(Localization.lang("Editor tabs"), tabs -> tabs
+                        .custom(buildTabConfigRegion()))
 
                 .build());
     }

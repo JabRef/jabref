@@ -50,16 +50,16 @@ public class ExternalTab extends AbstractFormTabView<ExternalTabViewModel> {
         getChildren().add(form()
                 .title(Localization.lang("External programs"))
 
-                .section(Localization.lang("Sending of emails"))
-                .stringField(Localization.lang("Subject for sending an email with references"), viewModel.eMailReferenceSubjectProperty())
-                .stringField(Localization.lang("Email address for sending to Kindle"), viewModel.kindleEmailProperty())
-                .checkbox(Localization.lang("Automatically open folders of attached files"), viewModel.autoOpenAttachedFoldersProperty())
+                .section(Localization.lang("Sending of emails"), emails -> emails
+                        .stringField(Localization.lang("Subject for sending an email with references"), viewModel.eMailReferenceSubjectProperty())
+                        .stringField(Localization.lang("Email address for sending to Kindle"), viewModel.kindleEmailProperty())
+                        .checkbox(Localization.lang("Automatically open folders of attached files"), viewModel.autoOpenAttachedFoldersProperty()))
 
-                .section(Localization.lang("Push applications"))
-                .custom(buildPushGrid())
+                .section(Localization.lang("Push applications"), push -> push
+                        .custom(buildPushGrid()))
 
-                .section(Localization.lang("Custom applications"))
-                .custom(buildCustomApplicationsGrid())
+                .section(Localization.lang("Custom applications"), applications -> applications
+                        .custom(buildCustomApplicationsGrid()))
 
                 .build());
 
