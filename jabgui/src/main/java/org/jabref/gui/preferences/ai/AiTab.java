@@ -8,14 +8,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -25,7 +22,6 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.PasswordFieldEditor;
-import org.jabref.gui.preferences.forms.PreferencesFormBuilder;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.preferences.AiPreferences;
@@ -106,7 +102,26 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                                 PredefinedEmbeddingModel::fullInfo,
                                                 embedding -> embedding.validate(viewModel.getEmbeddingModelValidationStatus()))
                                         .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
-                                        .custom(buildExpertGrid(expert))
+                                        // The six numeric expert settings, as two columns of caption-above-field cells.
+                                        // [impl->req~ai.expert-settings.chat-inference-global~1]
+                                        // [impl->req~ai.expert-settings.rag-global~1]
+                                        .columns(expertColumns -> expertColumns
+                                                .group(leftColumn -> leftColumn
+                                                        .stackedField(Localization.lang("Context window size"), integerField(viewModel.contextWindowSizeProperty()),
+                                                                windowSize -> windowSize.validate(viewModel.getMessageWindowSizeValidationStatus()))
+                                                        .stackedField(Localization.lang("RAG - maximum results count"), integerField(viewModel.ragMaxResultsCountProperty()),
+                                                                resultsCount -> resultsCount.validate(viewModel.getRagMaxResultsCountValidationStatus()))
+                                                        .stackedField(Localization.lang("Document splitter - chunk size"), integerField(viewModel.documentSplitterChunkSizeProperty()),
+                                                                chunkSize -> chunkSize.validate(viewModel.getDocumentSplitterChunkSizeValidationStatus())))
+                                                .group(rightColumn -> rightColumn
+                                                        .stackedField(Localization.lang("Temperature"), textField(viewModel.temperatureProperty()),
+                                                                temperature -> temperature.validate(viewModel.getTemperatureTypeValidationStatus())
+                                                                                          .validate(viewModel.getTemperatureRangeValidationStatus()))
+                                                        .stackedField(Localization.lang("RAG - minimum score"), textField(viewModel.ragMinScoreProperty()),
+                                                                minScore -> minScore.validate(viewModel.getRagMinScoreTypeValidationStatus())
+                                                                                    .validate(viewModel.getRagMinScoreRangeValidationStatus()))
+                                                        .stackedField(Localization.lang("Document splitter - overlap size"), integerField(viewModel.documentSplitterOverlapSizeProperty()),
+                                                                overlapSize -> overlapSize.validate(viewModel.getDocumentSplitterOverlapSizeValidationStatus()))))
                                         .button(Localization.lang("Reset expert settings to default"), IconTheme.JabRefIcons.REFRESH, viewModel::resetExpertSettings),
                                 // Disabling the group covers every expert control above; individual controls
                                 // only add their own extra conditions on top.
@@ -172,54 +187,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
         spinner.getValueFactory().valueProperty().bindBidirectional(viewModel.followUpQuestionsCountProperty().asObject());
         spinner.disableProperty().bind(viewModel.generateFollowUpQuestionsProperty().not());
         return spinner;
-    }
-
-    /// The six numeric expert settings, laid out as two equal columns of label-above-field cells.
-    /// The grid is assembled outside the builder, so its fields register their validation with
-    /// `form` explicitly rather than through an element handle.
-    // [impl->req~ai.expert-settings.chat-inference-global~1]
-    // [impl->req~ai.expert-settings.rag-global~1]
-    private Node buildExpertGrid(PreferencesFormBuilder form) {
-        IntegerInputField contextWindowSize = integerField(viewModel.contextWindowSizeProperty());
-        TextField temperature = textField(viewModel.temperatureProperty());
-        IntegerInputField ragMaxResultsCount = integerField(viewModel.ragMaxResultsCountProperty());
-        TextField ragMinScore = textField(viewModel.ragMinScoreProperty());
-        IntegerInputField documentSplitterChunkSize = integerField(viewModel.documentSplitterChunkSizeProperty());
-        IntegerInputField documentSplitterOverlapSize = integerField(viewModel.documentSplitterOverlapSizeProperty());
-
-        form.validate(viewModel.getTemperatureTypeValidationStatus(), temperature)
-            .validate(viewModel.getTemperatureRangeValidationStatus(), temperature)
-            .validate(viewModel.getMessageWindowSizeValidationStatus(), contextWindowSize)
-            .validate(viewModel.getDocumentSplitterChunkSizeValidationStatus(), documentSplitterChunkSize)
-            .validate(viewModel.getDocumentSplitterOverlapSizeValidationStatus(), documentSplitterOverlapSize)
-            .validate(viewModel.getRagMaxResultsCountValidationStatus(), ragMaxResultsCount)
-            .validate(viewModel.getRagMinScoreTypeValidationStatus(), ragMinScore)
-            .validate(viewModel.getRagMinScoreRangeValidationStatus(), ragMinScore);
-
-        GridPane grid = new GridPane();
-        grid.setHgap(10.0);
-        grid.setVgap(10.0);
-        ColumnConstraints half = new ColumnConstraints();
-        half.setHgrow(Priority.ALWAYS);
-        half.setPercentWidth(50.0);
-        ColumnConstraints otherHalf = new ColumnConstraints();
-        otherHalf.setHgrow(Priority.ALWAYS);
-        otherHalf.setPercentWidth(50.0);
-        grid.getColumnConstraints().addAll(half, otherHalf);
-
-        grid.add(labelledCell(Localization.lang("Context window size"), contextWindowSize), 0, 0);
-        grid.add(labelledCell(Localization.lang("Temperature"), temperature), 1, 0);
-        grid.add(labelledCell(Localization.lang("RAG - maximum results count"), ragMaxResultsCount), 0, 1);
-        grid.add(labelledCell(Localization.lang("RAG - minimum score"), ragMinScore), 1, 1);
-        grid.add(labelledCell(Localization.lang("Document splitter - chunk size"), documentSplitterChunkSize), 0, 2);
-        grid.add(labelledCell(Localization.lang("Document splitter - overlap size"), documentSplitterOverlapSize), 1, 2);
-        return grid;
-    }
-
-    private Node labelledCell(String text, Node control) {
-        Label label = new Label(text);
-        label.setMaxWidth(Double.MAX_VALUE);
-        return new VBox(10.0, label, control);
     }
 
     /// {@link IntegerInputField} holds a nullable `Integer`; mirror it onto the view model's

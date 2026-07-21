@@ -375,6 +375,28 @@ public class PreferencesFormBuilder {
         return configured(new InputElement<>(this, control), config);
     }
 
+    /// A bespoke control whose caption sits **above** it rather than beside it, for a control that
+    /// needs the full width — the cell of a {@link #columns} block, a list under its heading. It
+    /// therefore joins no shared field grid; use {@link #field} where captions should line up.
+    public <T extends Control> PreferencesFormBuilder stackedField(String label, T control) {
+        return stackedField(label, control, noConfig());
+    }
+
+    public <T extends Control> PreferencesFormBuilder stackedField(String label, T control, Consumer<InputElement<T>> config) {
+        Label caption = new Label(label);
+        caption.setMaxWidth(Double.MAX_VALUE);
+        searchable(label, caption);
+
+        control.setMaxWidth(Double.MAX_VALUE);
+        // The control gets a row of its own so that attachments have somewhere to go.
+        HBox controlRow = new HBox(GAP, control);
+        controlRow.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(control, Priority.ALWAYS);
+
+        addNode(new VBox(GAP, caption, controlRow));
+        return configured(new InputElement<>(this, control), config);
+    }
+
     /// Adds a bespoke labelled node that is not a {@link Control} — a hand-assembled row, a table.
     public <T extends Node> PreferencesFormBuilder customField(String label, T node) {
         return customField(label, node, noConfig());
