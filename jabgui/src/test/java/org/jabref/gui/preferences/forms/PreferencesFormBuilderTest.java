@@ -89,6 +89,34 @@ class PreferencesFormBuilderTest {
                 "the text field is laid out, but was " + textField.getWidth() + "x" + textField.getHeight());
     }
 
+    /// Columns are of equal width whatever they contain: a column claiming width in proportion to
+    /// its longest caption is what the hand-built grids used percentage constraints to avoid.
+    @Test
+    void columnsAreEquallyWideRegardlessOfContent() throws Exception {
+        CountDownLatch laidOut = new CountDownLatch(1);
+        VBox[] columns = new VBox[2];
+
+        Platform.runLater(() -> {
+            VBox root = form()
+                    .columns(row -> row
+                            .group(left -> left.stackedField("A very much longer caption than the other", new TextField()))
+                            .group(right -> right.stackedField("Short", new TextField())))
+                    .build();
+            new Scene(root, 900, 700);
+            root.applyCss();
+            root.layout();
+
+            HBox columnsRow = (HBox) root.getChildren().getFirst();
+            columns[0] = (VBox) columnsRow.getChildren().get(0);
+            columns[1] = (VBox) columnsRow.getChildren().get(1);
+            laidOut.countDown();
+        });
+
+        assertTrue(laidOut.await(10, TimeUnit.SECONDS), "layout pass ran");
+        assertEquals(columns[0].getWidth(), columns[1].getWidth(),
+                "columns are equally wide, but were " + columns[0].getWidth() + " and " + columns[1].getWidth());
+    }
+
     /// The shape of the AI tab's expert settings: a group holding a labelled field and then the
     /// two-column block of stacked fields.
     @Test
