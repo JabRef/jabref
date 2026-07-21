@@ -136,8 +136,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     private void savePreferencesAndCloseDialog() {
-        if (viewModel.validSettings()) {
-            viewModel.storeAllSettings();
+        if (viewModel.storeAllSettings()) {
             closeDialog();
         }
     }

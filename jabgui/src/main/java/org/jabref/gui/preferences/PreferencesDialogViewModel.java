@@ -166,7 +166,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     /// Checks if all tabs are valid
-    public boolean validSettings() {
+    private boolean validSettings() {
         for (PreferencesTab tab : preferenceTabs) {
             if (!tab.validateSettings()) {
                 return false;
@@ -175,9 +175,10 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         return true;
     }
 
-    public void storeAllSettings() {
+    /// @return true if the settings were valid and have been stored
+    public boolean storeAllSettings() {
         if (!validSettings()) {
-            return;
+            return false;
         }
 
         // Store settings
@@ -198,6 +199,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
         Injector.setModelOrService(BibEntryTypesManager.class, preferences.getCustomEntryTypesRepository());
         dialogService.notify(Localization.lang("Preferences recorded."));
+        return true;
     }
 
     /// Inserts the preference values into the Properties of the ViewModel
