@@ -61,12 +61,10 @@ public class ZoteroCitationLinker {
                 continue;
             }
 
-            if (ZoteroReferenceMark.isZoteroUri(citationItem.uris.getFirst())) {
-                updatedReferenceMarkName = ZoteroReferenceMark.addJabRefUri(
-                        updatedReferenceMarkName,
-                        i,
-                        jabRefUri.get());
-            }
+            updatedReferenceMarkName = ZoteroReferenceMark.addJabRefUri(
+                    updatedReferenceMarkName,
+                    i,
+                    jabRefUri.get());
         }
 
         return updatedReferenceMarkName;
@@ -75,7 +73,7 @@ public class ZoteroCitationLinker {
     private static Optional<String> createJabRefUriForZotero(ZoteroCitationData.CitationItemData citationItem,
                                                              BibDatabaseContext bibDatabaseContext,
                                                              DuplicateCheck duplicateCheck) {
-        List<String> uris = Optional.of(citationItem.uris).orElse(List.of());
+        List<String> uris = Optional.ofNullable(citationItem.uris).orElse(List.of());
         // Filter citations that only contain ZoteroUri
         if (uris.stream().anyMatch(ZoteroReferenceMark::isJabRefUri) ||
                 uris.stream().noneMatch(ZoteroReferenceMark::isZoteroUri)) {
