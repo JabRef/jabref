@@ -138,54 +138,21 @@ public class PreferencesFormBuilder {
         return section(title, content, noConfig());
     }
 
+    /// The configuration lambda addresses the section as a whole — including its header, which is
+    /// where a {@link SectionRegion#help help button} attaches.
     public PreferencesFormBuilder section(String title,
                                           Consumer<PreferencesFormBuilder> content,
-                                          Consumer<FormRegion<VBox>> config) {
-        return section(title, null, content, config);
-    }
-
-    public PreferencesFormBuilder sectionWithHelp(String title, HelpFile helpFile, Consumer<PreferencesFormBuilder> content) {
-        return sectionWithHelp(title, helpFile, content, noConfig());
-    }
-
-    public PreferencesFormBuilder sectionWithHelp(String title,
-                                                  HelpFile helpFile,
-                                                  Consumer<PreferencesFormBuilder> content,
-                                                  Consumer<FormRegion<VBox>> config) {
-        return section(title, helpButton(StandardActions.HELP, helpFile), content, config);
-    }
-
-    /// Section whose help button points at a documentation URL rather than a {@link HelpFile}.
-    public PreferencesFormBuilder sectionWithHelp(String title, String helpUrl, Consumer<PreferencesFormBuilder> content) {
-        return sectionWithHelp(title, helpUrl, content, noConfig());
-    }
-
-    public PreferencesFormBuilder sectionWithHelp(String title,
-                                                  String helpUrl,
-                                                  Consumer<PreferencesFormBuilder> content,
-                                                  Consumer<FormRegion<VBox>> config) {
-        return section(title, new HelpButton(helpUrl), content, config);
-    }
-
-    /// The funnel all section variants go through: a "sectionHeader"-styled label, joined by the
-    /// help button if there is one, followed by the section's own region.
-    private PreferencesFormBuilder section(String title,
-                                           Button help,
-                                           Consumer<PreferencesFormBuilder> content,
-                                           Consumer<FormRegion<VBox>> config) {
+                                          Consumer<SectionRegion> config) {
         Label header = new Label(title);
         searchable(title, header);
         header.getStyleClass().add("sectionHeader");
-        if (help == null) {
-            addNode(header);
-        } else {
-            header.setMaxWidth(Double.MAX_VALUE);
-            HBox.setHgrow(header, Priority.ALWAYS);
-            HBox row = new HBox(header, help);
-            row.setAlignment(Pos.BASELINE_CENTER);
-            addNode(row);
-        }
-        return region(new VBox(GAP), content, config);
+        header.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(header, Priority.ALWAYS);
+        HBox headerRow = new HBox(header);
+        headerRow.setAlignment(Pos.BASELINE_CENTER);
+        addNode(headerRow);
+
+        return configured(new SectionRegion(this, region(new VBox(GAP), content), header), config);
     }
 
     /// A plain, unstyled caption line (for text that introduces the following controls).
@@ -448,7 +415,7 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder group(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<VBox>> config) {
-        return region(new VBox(GAP), content, config);
+        return configured(new FormRegion<>(this, region(new VBox(GAP), content)), config);
     }
 
     /// A side-by-side region: every element inside becomes an equally growing column. Usually filled
@@ -458,7 +425,7 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder columns(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<HBox>> config) {
-        return region(new HBox(GAP), content, config);
+        return configured(new FormRegion<>(this, region(new HBox(GAP), content)), config);
     }
 
     /// A wrapping region: elements flow left to right and wrap onto the next line as the dialog
@@ -468,7 +435,7 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder flow(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<FlowPane>> config) {
-        return region(new FlowPane(), content, config);
+        return configured(new FormRegion<>(this, region(new FlowPane(), content)), config);
     }
 
     /// An explicitly aligned block: every labelled field inside shares one {@link GridPane}, so
@@ -486,16 +453,14 @@ public class PreferencesFormBuilder {
         content.accept(this);
         fieldsDepth--;
         flushGrid();
-        config.accept(new FormRegion<>(grid));
-        return this;
+        return configured(new FormRegion<>(this, grid), config);
     }
 
     /// Everything added inside becomes a sub-region of the form. Nesting is the lambda's, so a
-    /// region cannot be left unclosed, and the second lambda configures the region as a whole —
-    /// `group(content, g -> g.disableWhen(off))` disables all of its contents.
-    private <T extends Pane> PreferencesFormBuilder region(T region,
-                                                           Consumer<PreferencesFormBuilder> content,
-                                                           Consumer<FormRegion<T>> config) {
+    /// region cannot be left unclosed; the caller wraps the returned pane in the handle its
+    /// configuration lambda expects — `group(content, g -> g.disableWhen(off))` disables all of
+    /// its contents.
+    private <T extends Pane> T region(T region, Consumer<PreferencesFormBuilder> content) {
         flushGrid();
         addToContainer(region);
         containers.push(region);
@@ -504,8 +469,7 @@ public class PreferencesFormBuilder {
 
         flushGrid();
         containers.pop();
-        config.accept(new FormRegion<>(region));
-        return this;
+        return region;
     }
 
     // endregion
@@ -662,47 +626,57 @@ public class PreferencesFormBuilder {
 
     // endregion
 
-    /// A region the builder just closed, handed to that region's configuration lambda. Configuring a
-    /// region is deliberately the same shape as configuring a control, so that no configuration
-    /// method exists on the builder itself — a call aimed at the wrong thing cannot compile.
-    public static final class FormRegion<T extends Pane> {
+    /// Base of the region handles, handed to a region's configuration lambda once the builder has
+    /// closed it. Configuring a region is deliberately the same shape as configuring an element,
+    /// so that no configuration method exists on the builder itself — a call aimed at the wrong
+    /// thing cannot compile. As with {@link ElementBase}, `S` is the concrete handle type, so a
+    /// base method still returns the subclass and the order of a chain does not matter.
+    public abstract static sealed class RegionBase<S extends RegionBase<S, T>, T extends Pane>
+            permits FormRegion, SectionRegion {
 
-        private final T region;
+        final PreferencesFormBuilder form;
+        final T region;
 
-        private FormRegion(T region) {
+        RegionBase(PreferencesFormBuilder form, T region) {
+            this.form = form;
             this.region = region;
+        }
+
+        @SuppressWarnings("unchecked")
+        final S self() {
+            return (S) this;
         }
 
         public T node() {
             return region;
         }
 
-        public FormRegion<T> configure(Consumer<T> consumer) {
+        public S configure(Consumer<T> consumer) {
             consumer.accept(region);
-            return this;
+            return self();
         }
 
         /// Disables the whole region while `condition` holds; disable propagates to every descendant,
         /// so its contents need no binding of their own.
-        public FormRegion<T> disableWhen(ObservableValue<? extends Boolean> condition) {
+        public S disableWhen(ObservableValue<? extends Boolean> condition) {
             region.disableProperty().bind(condition);
-            return this;
+            return self();
         }
 
         /// Binds the region's visibility, and its participation in layout, to `condition`.
-        public FormRegion<T> visibleWhen(ObservableValue<? extends Boolean> condition) {
+        public S visibleWhen(ObservableValue<? extends Boolean> condition) {
             region.visibleProperty().bind(condition);
             region.managedProperty().bind(condition);
-            return this;
+            return self();
         }
 
-        public FormRegion<T> styleClass(String... styleClasses) {
+        public S styleClass(String... styleClasses) {
             region.getStyleClass().addAll(styleClasses);
-            return this;
+            return self();
         }
 
-        /// Overrides the gap between the region's elements (default {@value #GAP}).
-        public FormRegion<T> spacing(double value) {
+        /// Overrides the gap between the region's elements (default {@value PreferencesFormBuilder#GAP}).
+        public S spacing(double value) {
             switch (region) {
                 case VBox box ->
                         box.setSpacing(value);
@@ -720,6 +694,43 @@ public class PreferencesFormBuilder {
                         throw new IllegalStateException(
                                 "spacing() does not apply to a " + region.getClass().getSimpleName() + " region");
             }
+            return self();
+        }
+    }
+
+    /// A plain region: a {@link #group}, {@link #columns}, {@link #flow} or {@link #fields} block,
+    /// which has contents but no heading of its own.
+    public static final class FormRegion<T extends Pane> extends RegionBase<FormRegion<T>, T> {
+
+        FormRegion(PreferencesFormBuilder form, T region) {
+            super(form, region);
+        }
+    }
+
+    /// The region of a {@link #section}: unlike a plain region it has a header, which is therefore
+    /// the only kind of region that can take a help button.
+    public static final class SectionRegion extends RegionBase<SectionRegion, VBox> {
+
+        private final Label header;
+
+        SectionRegion(PreferencesFormBuilder form, VBox region, Label header) {
+            super(form, region);
+            this.header = header;
+        }
+
+        /// Attaches a help icon button to the section header, right-aligned in its row.
+        public SectionRegion help(HelpFile helpFile) {
+            return help(StandardActions.HELP, helpFile);
+        }
+
+        public SectionRegion help(StandardActions action, HelpFile helpFile) {
+            form.attachTo(header, form.helpButton(action, helpFile));
+            return this;
+        }
+
+        /// Attaches a help icon button linking to a documentation URL.
+        public SectionRegion help(String helpUrl) {
+            form.attachTo(header, new HelpButton(helpUrl));
             return this;
         }
     }

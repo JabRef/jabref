@@ -18,7 +18,9 @@
 ///   addressable. `checkWithField` remains as sugar over `checkbox` + `attachField` because the
 ///   "Enable X on port [..]" idiom reads better as one call.
 /// - **Regions nest via lambdas** (`section`, `group`, `columns`, `flow`, `fields`), so a region
-///   cannot be left unclosed and can be configured or disabled as a unit.
+///   cannot be left unclosed and can be configured or disabled as a unit. Their handles mirror the
+///   element handles: a `SectionRegion` has a header and therefore takes `help(...)`, a plain
+///   `FormRegion` has none and does not — again a compile error rather than an exception.
 ///
 /// ## The editors
 ///
