@@ -94,6 +94,10 @@ public class PreferencesFormBuilder {
     private static final double SHORT_FIELD_WIDTH = 100.0;
     /// Minimum width of the caption column of the shared field grid.
     private static final double LABEL_COLUMN_MIN_WIDTH = 120.0;
+    /// How far an {@link #info} line is indented past the control it comments on.
+    private static final double INFO_INDENT = 20.0;
+    /// Edge length of the square icon buttons the element handles attach.
+    private static final double ICON_BUTTON_SIZE = 20.0;
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
@@ -157,19 +161,27 @@ public class PreferencesFormBuilder {
 
     /// A plain, unstyled caption line (for text that introduces the following controls).
     public PreferencesFormBuilder label(String text) {
-        Label label = new Label(text);
-        searchable(text, label);
-        addNode(label);
-        return this;
+        return label(text, noConfig());
     }
 
-    public PreferencesFormBuilder info(String text) {
+    public PreferencesFormBuilder label(String text, Consumer<InputElement<Label>> config) {
         Label label = new Label(text);
         searchable(text, label);
-        label.getStyleClass().add("italic");
-        label.setPadding(new Insets(0, 0, 0, 20));
         addNode(label);
-        return this;
+        return configured(new InputElement<>(this, label), config);
+    }
+
+    /// An indented, italic explanatory line below the control it comments on.
+    public PreferencesFormBuilder info(String text) {
+        return info(text, noConfig());
+    }
+
+    public PreferencesFormBuilder info(String text, Consumer<InputElement<Label>> config) {
+        return label(text, info -> {
+            info.styleClass("italic")
+                .configure(label -> label.setPadding(new Insets(0, 0, 0, INFO_INDENT)));
+            config.accept(info);
+        });
     }
 
     // endregion
