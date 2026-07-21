@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -25,6 +24,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.PreferencesDialogState;
 import org.jabref.gui.preferences.forms.AbstractFormTabView;
 import org.jabref.gui.preferences.forms.PasswordFieldEditor;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -52,12 +52,13 @@ public class AiTab extends AbstractFormTabView<AiTabViewModel> {
 
     private TabPane templatesTabPane;
 
-    public AiTab() {
+    public AiTab(PreferencesDialogState dialogState) {
         this.viewModel = new AiTabViewModel(
                 preferences,
                 Injector.instantiateModelOrService(AiService.class).getModelService(),
                 taskExecutor);
         this.aiDisabled = viewModel.enableAi().not();
+        dialogState.aiEnabledProperty().bind(viewModel.enableAi());
 
         visualizer.setDecoration(new IconValidationDecorator());
         buildView();
@@ -66,11 +67,6 @@ public class AiTab extends AbstractFormTabView<AiTabViewModel> {
     @Override
     public String getTabName() {
         return Localization.lang("AI");
-    }
-
-    /// The AI master switch, consumed by the web search tab.
-    public ReadOnlyBooleanProperty aiEnabledProperty() {
-        return viewModel.enableAi();
     }
 
     private void buildView() {
