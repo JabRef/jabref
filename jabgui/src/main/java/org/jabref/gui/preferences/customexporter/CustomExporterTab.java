@@ -1,29 +1,25 @@
 package org.jabref.gui.preferences.customexporter;
 
-import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.HBox;
 
 import org.jabref.gui.exporter.ExporterViewModel;
-import org.jabref.gui.preferences.AbstractPreferenceTabView;
-import org.jabref.gui.preferences.PreferencesTab;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.forms.AbstractFormTabView;
 import org.jabref.logic.l10n.Localization;
 
-import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 
-public class CustomExporterTab extends AbstractPreferenceTabView<CustomExporterTabViewModel> implements PreferencesTab {
-
-    @FXML private TableView<ExporterViewModel> exporterTable;
-    @FXML private TableColumn<ExporterViewModel, String> nameColumn;
-    @FXML private TableColumn<ExporterViewModel, String> layoutColumn;
-    @FXML private TableColumn<ExporterViewModel, String> extensionColumn;
+public class CustomExporterTab extends AbstractFormTabView<CustomExporterTabViewModel> {
 
     public CustomExporterTab() {
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+        viewModel = new CustomExporterTabViewModel(preferences, dialogService);
+        buildView();
     }
 
     @Override
@@ -31,30 +27,50 @@ public class CustomExporterTab extends AbstractPreferenceTabView<CustomExporterT
         return Localization.lang("Custom export formats");
     }
 
-    @FXML
-    private void initialize() {
-        viewModel = new CustomExporterTabViewModel(preferences, dialogService);
+    private void buildView() {
+        getChildren().add(form()
+                .title(Localization.lang("Custom export formats"))
+                .custom(buildExporterTable())
+                .custom(buildButtonRow())
+                .build());
+    }
 
+    private TableView<ExporterViewModel> buildExporterTable() {
+        TableView<ExporterViewModel> exporterTable = new TableView<>();
+        exporterTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         exporterTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         exporterTable.itemsProperty().bind(viewModel.exportersProperty());
         EasyBind.bindContent(viewModel.selectedExportersProperty(), exporterTable.getSelectionModel().getSelectedItems());
+
+        TableColumn<ExporterViewModel, String> nameColumn = new TableColumn<>(Localization.lang("Export name"));
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().name());
+
+        TableColumn<ExporterViewModel, String> layoutColumn = new TableColumn<>(Localization.lang("Main layout file"));
         layoutColumn.setCellValueFactory(cellData -> cellData.getValue().layoutFileName());
+
+        TableColumn<ExporterViewModel, String> extensionColumn = new TableColumn<>(Localization.lang("Extension"));
         extensionColumn.setCellValueFactory(cellData -> cellData.getValue().extension());
+
+        exporterTable.getColumns().add(nameColumn);
+        exporterTable.getColumns().add(layoutColumn);
+        exporterTable.getColumns().add(extensionColumn);
+        return exporterTable;
     }
 
-    @FXML
-    private void add() {
-        viewModel.addExporter();
+    private Node buildButtonRow() {
+        HBox row = new HBox(10.0,
+                iconButton(Localization.lang("Add"), IconTheme.JabRefIcons.ADD_NOBOX, viewModel::addExporter),
+                iconButton(Localization.lang("Modify"), IconTheme.JabRefIcons.EDIT, viewModel::modifyExporter),
+                iconButton(Localization.lang("Remove"), IconTheme.JabRefIcons.REMOVE_NOBOX, viewModel::removeExporters));
+        row.setAlignment(Pos.BASELINE_RIGHT);
+        return row;
     }
 
-    @FXML
-    private void modify() {
-        viewModel.modifyExporter();
-    }
-
-    @FXML
-    private void remove() {
-        viewModel.removeExporters();
+    private Button iconButton(String text, IconTheme.JabRefIcons icon, Runnable action) {
+        Button button = new Button(text);
+        button.setPrefWidth(100.0);
+        button.setGraphic(icon.getGraphicNode());
+        button.setOnAction(_ -> action.run());
+        return button;
     }
 }
