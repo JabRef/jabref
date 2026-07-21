@@ -62,15 +62,14 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.preferences = preferences;
 
-        // This enables passing unsaved preference values from the AI tab to the "web search" tab.
-        AiTab aiTab = new AiTab();
+        PreferencesDialogState dialogState = new PreferencesDialogState();
 
         preferenceTabs = FXCollections.observableArrayList(
                 new GeneralTab(),
                 new KeyBindingsTab(),
                 new GroupsTab(),
-                new WebSearchTab(aiTab.aiEnabledProperty()),
-                aiTab,
+                new WebSearchTab(dialogState),
+                new AiTab(dialogState),
                 new EntryTab(),
                 new TableTab(),
                 new PreviewTab(),

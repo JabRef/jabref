@@ -6,7 +6,6 @@ import java.util.Optional;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -21,6 +20,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.preferences.PreferencesDialogState;
 import org.jabref.gui.preferences.forms.AbstractFormTabView;
 import org.jabref.gui.util.component.HelpButton;
 import org.jabref.logic.help.HelpFile;
@@ -45,8 +45,8 @@ public class WebSearchTab extends AbstractFormTabView<WebSearchTabViewModel> {
     /// tracks the configured font size.
     private final Label tableNote = new Label(Localization.lang("( Note: Press return to commit changes in the table! )"));
 
-    public WebSearchTab(ReadOnlyBooleanProperty refAiEnabled) {
-        this.viewModel = new WebSearchTabViewModel(preferences, refAiEnabled, taskExecutor);
+    public WebSearchTab(PreferencesDialogState dialogState) {
+        this.viewModel = new WebSearchTabViewModel(preferences, dialogState.aiEnabledReadOnlyProperty(), taskExecutor);
         buildView();
     }
 
