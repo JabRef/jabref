@@ -120,7 +120,7 @@ public record ZoteroReferenceMark(
         List<String> citationKeys = new ArrayList<>();
         List<Integer> citationNumbers = new ArrayList<>();
         boolean suppressesAuthor = false;
-        for (ZoteroCitationData.CitationItemData citationItem : Optional.of(citation.citationItems).orElse(List.of())) {
+        for (ZoteroCitationData.CitationItemData citationItem : Optional.ofNullable(citation.citationItems).orElse(List.of())) {
             getCitationKey(citationItem).ifPresent(citationKey -> {
                 citationKeys.add(citationKey);
                 citationNumbers.add(0);
@@ -195,7 +195,7 @@ public record ZoteroReferenceMark(
         }
 
         ZoteroCitationData citation = getCitationData(referenceMarkName);
-        for (ZoteroCitationData.CitationItemData citationItem : Optional.of(citation.citationItems).orElse(List.of())) {
+        for (ZoteroCitationData.CitationItemData citationItem : Optional.ofNullable(citation.citationItems).orElse(List.of())) {
             citationItem.suppressAuthor = citationType == CSLCitationType.IN_TEXT ? true : null;
         }
 
@@ -230,7 +230,7 @@ public record ZoteroReferenceMark(
         Map<String, String> zoteroUriByCitationKey = new HashMap<>();
         ZoteroCitationData citationData = getCitationData(referenceMarkName);
 
-        for (ZoteroCitationData.CitationItemData citationItem : Optional.of(citationData.citationItems).orElse(List.of())) {
+        for (ZoteroCitationData.CitationItemData citationItem : Optional.ofNullable(citationData.citationItems).orElse(List.of())) {
             Optional<String> extractedCitationKey = getCitationKey(citationItem);
             if (extractedCitationKey.isEmpty()) {
                 continue;
