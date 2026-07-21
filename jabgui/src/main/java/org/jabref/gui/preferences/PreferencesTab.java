@@ -13,7 +13,8 @@ public interface PreferencesTab {
         return List.of(getTabName());
     }
 
-    Node getBuilder();
+    /// @return the root node of the tab's content, shown in the preferences dialog
+    Node getContent();
 
     /// Should return the localized identifier to use for the tab.
     ///

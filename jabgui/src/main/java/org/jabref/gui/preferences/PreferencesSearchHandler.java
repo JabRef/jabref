@@ -133,7 +133,7 @@ class PreferencesSearchHandler {
     /// @return A map of preferences tabs to their controls.
     private ArrayListMultimap<PreferencesTab, Control> getPreferenceTabsControlsMap(List<PreferencesTab> tabs) {
         ArrayListMultimap<PreferencesTab, Control> controlMap = ArrayListMultimap.create();
-        tabs.forEach(tab -> scanControls(tab.getBuilder(), controlMap, tab));
+        tabs.forEach(tab -> scanControls(tab.getContent(), controlMap, tab));
         return controlMap;
     }
 
