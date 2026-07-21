@@ -1298,13 +1298,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-size: 1.083em !important;
 }
 
-#entryEditor #bibtexSourceCodeArea .search {
-    -rtfx-background-color: #ffff00;
-    -fx-fill: #7800A9;
-    -fx-font-size: 1.2em;
-    -fx-font-weight: bolder;
-}
-
 #entryEditor #citationsPane {
     -fx-padding: 0;
     -fx-background-color: -fx-control-inner-background;

@@ -25,6 +25,7 @@ import javafx.stage.Modality;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -96,6 +97,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
     @Inject private AiService aiService;
     @Inject private SearchCitationsRelationsService searchCitationsRelationsService;
+    @Inject private BibTeXHighlighter bibTeXHighlighter;
 
     public EntryEditor(Supplier<LibraryTab> tabSupplier, UndoAction undoAction, RedoAction redoAction) {
         this.tabSupplier = tabSupplier;
@@ -132,7 +134,9 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 bibEntryTypesManager,
                 journalAbbreviationRepository,
                 keyBindingRepository,
-                searchCitationsRelationsService);
+                searchCitationsRelationsService,
+                bibTeXHighlighter
+        );
 
         this.viewModel = new EntryEditorViewModel(
                 stateManager,
