@@ -65,6 +65,7 @@ import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterViewPos;
 import com.tobiasdiez.easybind.EasyBind;
 import kong.unirest.core.Unirest;
+import org.controlsfx.dialog.ExceptionDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,6 +107,11 @@ public class JabRefGUI extends Application {
 
     @Override
     public void start(Stage stage) {
+        // Installed before the try block below (not after) so background threads started during
+        // initialize() are also covered, not just ones started once the main window is up.
+        FallbackExceptionHandler.installExceptionHandler((exception, thread) -> UiTaskExecutor.runInJavaFXThread(() ->
+                showCriticalErrorDialog(Localization.lang("Uncaught exception occurred in %0", thread.toString()), exception)));
+
         try {
             this.mainStage = stage;
             Injector.setModelOrService(Stage.class, mainStage);
@@ -152,13 +158,31 @@ public class JabRefGUI extends Application {
             setupProxy();
         } catch (Throwable throwable) {
             LOGGER.error("Error during initialization", throwable);
+            showCriticalErrorDialog(Localization.lang("Unhandled exception occurred."), throwable);
             throw throwable;
         }
+    }
 
-        FallbackExceptionHandler.installExceptionHandler((exception, thread) -> UiTaskExecutor.runInJavaFXThread(() -> {
-            DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-            dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
-        }));
+    /// [impl->req~ux.startup.critical-error-dialog~1]
+    ///
+    /// Used both for startup failures (from [#start(Stage)]'s catch block) and for uncaught
+    /// exceptions on other threads ([FallbackExceptionHandler], installed before [#initialize()]
+    /// so it also covers background threads started during startup). In both cases, [DialogService]
+    /// or [Scene] may not exist yet: [DialogService] is only set up in [#initialize()], and `Scene`
+    /// is only set in [#openWindow()]. Calling [DialogService] or `Dialog.initOwner` before then
+    /// throws a NullPointerException, so this falls back to an ownerless [ExceptionDialog] instead.
+    private void showCriticalErrorDialog(String header, Throwable throwable) {
+        try {
+            if (mainStage != null && mainStage.getScene() != null) {
+                Injector.instantiateModelOrService(DialogService.class).showErrorDialogAndWait(header, throwable);
+                return;
+            }
+            ExceptionDialog exceptionDialog = new ExceptionDialog(throwable);
+            exceptionDialog.setHeaderText(header);
+            exceptionDialog.showAndWait();
+        } catch (Throwable dialogFailure) {
+            LOGGER.error("Could not show critical error dialog", dialogFailure);
+        }
     }
 
     public void initialize() {
