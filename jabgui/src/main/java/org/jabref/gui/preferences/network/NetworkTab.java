@@ -24,7 +24,7 @@ import javafx.scene.layout.Priority;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.preferences.forms.AbstractFormTabView;
-import org.jabref.gui.preferences.forms.RevealPasswordEditor;
+import org.jabref.gui.preferences.forms.PasswordFieldEditor;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -115,7 +115,7 @@ public class NetworkTab extends AbstractFormTabView<NetworkTabViewModel> {
         proxyUsername.disableProperty().bind(proxyAuthOff);
 
         Label passwordLabel = disabledWhen(new Label(Localization.lang("Password")), proxyAuthOff);
-        proxyPassword = RevealPasswordEditor.create(viewModel.proxyPasswordProperty());
+        proxyPassword = PasswordFieldEditor.create(viewModel.proxyPasswordProperty()).withRevealOnClick().build();
         proxyPassword.setPrefWidth(200.0);
         proxyPassword.disableProperty().bind(proxyAuthOff);
 
@@ -152,7 +152,7 @@ public class NetworkTab extends AbstractFormTabView<NetworkTabViewModel> {
 
         Label patLabel = new Label(Localization.lang("PAT"));
         patLabel.setTooltip(new Tooltip(Localization.lang("Personal Access Token")));
-        EnhancedPasswordField gitPat = RevealPasswordEditor.create(viewModel.gitPatProperty());
+        EnhancedPasswordField gitPat = PasswordFieldEditor.create(viewModel.gitPatProperty()).withRevealOnClick().build();
         gitPat.setPrefWidth(200.0);
 
         CheckBox gitPersistPat = new CheckBox(Localization.lang("Persist PAT between sessions"));
