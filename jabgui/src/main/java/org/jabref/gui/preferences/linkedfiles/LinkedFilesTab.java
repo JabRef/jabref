@@ -53,8 +53,12 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
 
                 .section(Localization.lang("Linked file name conventions"), conventions -> conventions
                         .checkbox(Localization.lang("Auto rename files if entry changes"), viewModel.autoRenameFilesOnChangeProperty())
-                        .stringCombo(Localization.lang("Filename format pattern"),
-                                viewModel.defaultFileNamePatternsProperty(), viewModel.fileNamePatternProperty(), true, Localization.lang("Choose pattern"))
+                        .combo(Localization.lang("Filename format pattern"),
+                                viewModel.defaultFileNamePatternsProperty(), viewModel.fileNamePatternProperty(), pattern -> pattern,
+                                patternCombo -> patternCombo.configure(combo -> {
+                                    combo.setEditable(true);
+                                    combo.setPromptText(Localization.lang("Choose pattern"));
+                                }))
                         .stringField(Localization.lang("File directory pattern"), viewModel.fileDirectoryPatternProperty()))
 
                 .section(Localization.lang("Attached files"), attached -> attached
