@@ -50,5 +50,5 @@ Since JabRef uses [citation-js's mapping logic](https://github.com/JabRef/jabref
 
 * Good, because JabRef reads and maps Zotero's reference mark automatically, which does not disturb users.
 * Good, because user does not need to enable anything to use this feature.
-* Bad, because a document may include 2 types of reference mark (old JabRef style reference mark and new Zotero style ones). 
+* Bad, because a document may include 2 types of reference mark (old JabRef style reference mark and new Zotero style ones).
 * Bad, because all the reference marks start with "ZOTERO_ITEM" which weakens JabRef's branding.
