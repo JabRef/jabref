@@ -582,14 +582,17 @@ public class PreferencesFormBuilder {
         addToContainer(node);
     }
 
-    /// Appends to the open container. Inside a {@link #columns} region every child is made an
-    /// equally growing column, so callers never repeat the hgrow boilerplate.
+    /// Appends to the open container. Inside a {@link #columns} region every child becomes a column
+    /// of equal width, so callers never repeat the hgrow boilerplate: with no preferred width of
+    /// its own, a column claims nothing up front and the row's whole width is shared out evenly —
+    /// column widths therefore do not depend on how long the captions inside them happen to be.
     private void addToContainer(Node node) {
         Pane container = container();
         container.getChildren().add(node);
         if (container instanceof HBox) {
             HBox.setHgrow(node, Priority.ALWAYS);
             if (node instanceof Region region) {
+                region.setPrefWidth(0);
                 region.setMaxWidth(Double.MAX_VALUE);
             }
         }
