@@ -34,9 +34,13 @@ public class NameFormatterTab extends AbstractPreferenceTabView<NameFormatterTab
         return Localization.lang("Name formatter");
     }
 
+    @Override
+    public String getTitle() {
+        return Localization.lang("Special name formatters");
+    }
+
     private void buildView() {
         getChildren().add(form()
-                .title(Localization.lang("Special name formatters"))
                 .custom(buildFormatterEditor())
                 .build());
     }

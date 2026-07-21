@@ -36,9 +36,13 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
         return Localization.lang("Citation key generator");
     }
 
+    @Override
+    public String getTitle() {
+        return Localization.lang("Citation key patterns");
+    }
+
     private void buildView() {
         getChildren().add(form()
-                .title(Localization.lang("Citation key patterns"))
 
                 .section(Localization.lang("General"), general -> general
                         .checkbox(Localization.lang("Overwrite existing keys"), viewModel.overwriteAllowProperty())

@@ -29,7 +29,6 @@ public class OcrTab extends AbstractPreferenceTabView<OcrTabViewModel> {
 
     private void buildView() {
         getChildren().add(form()
-                .title(Localization.lang("OCR"))
 
                 .section(Localization.lang("Partially scanned PDFs"), scanned -> scanned
                         .combo(Localization.lang("OCR for partially scanned PDFs"),

@@ -106,9 +106,13 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         return Localization.lang("Entry types");
     }
 
+    @Override
+    public String getTitle() {
+        return Localization.lang("Custom entry types");
+    }
+
     private void buildView() {
         getChildren().add(form()
-                .title(Localization.lang("Custom entry types"))
                 .custom(new HBox(10.0, buildEntryTypesColumn(), buildFieldsColumn()))
                 .build());
     }

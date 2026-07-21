@@ -33,7 +33,6 @@ public class ExternalFileTypesTab extends AbstractPreferenceTabView<ExternalFile
 
     private void buildView() {
         getChildren().add(form()
-                .title(Localization.lang("External file types"))
                 .custom(buildFileTypesTable(), table -> table.configure(t -> VBox.setVgrow(t, Priority.ALWAYS)))
                 .custom(buildButtonRow())
                 .build());

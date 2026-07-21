@@ -47,9 +47,13 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
         return Localization.lang("XMP metadata");
     }
 
+    @Override
+    public String getTitle() {
+        return Localization.lang("XMP export privacy settings");
+    }
+
     private void buildView() {
         getChildren().add(form()
-                .title(Localization.lang("XMP export privacy settings"))
                 .checkbox(Localization.lang("Do not write the following fields to XMP Metadata"), viewModel.xmpFilterEnabledProperty())
                 .custom(buildFilterRegion())
                 .build());

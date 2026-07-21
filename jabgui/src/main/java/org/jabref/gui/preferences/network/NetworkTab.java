@@ -66,7 +66,6 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
         hint.setWrapText(true);
 
         getChildren().add(form()
-                .title(Localization.lang("Network"))
                 .checkbox(Localization.lang("Check for updates on startup"), viewModel.versionCheckProperty())
                 .custom(hint)
 

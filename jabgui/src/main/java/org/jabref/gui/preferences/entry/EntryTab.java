@@ -47,7 +47,6 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> {
                 FieldTextMapper::getDisplayName, viewModel::getSuggestions, viewModel.getFieldStringConverter(), viewModel.nonWrappableTagsFieldProperty());
 
         getChildren().add(form()
-                .title(Localization.lang("Entry"))
 
                 .section(Localization.lang("Field"), field -> field
                         .custom(buildKeywordSeparatorRow())

@@ -23,7 +23,6 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
 
     private void buildView() {
         getChildren().add(form()
-                .title(Localization.lang("Linked files"))
 
                 .section(Localization.lang("File directory"), fileDirectory -> fileDirectory
                         .radioGroup(directory -> directory
