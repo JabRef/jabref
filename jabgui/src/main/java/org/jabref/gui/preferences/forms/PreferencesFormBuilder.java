@@ -406,14 +406,6 @@ public class PreferencesFormBuilder {
         validationInits.add(() -> visualizer.initVisualization(status, control));
         return this;
     }
-
-    /// Like {@link #validate}, but also marks the control as mandatory, which decorates it while
-    /// it is still empty rather than only once its content is invalid.
-    public PreferencesFormBuilder validateRequired(ValidationStatus status, Control control) {
-        validationInits.add(() -> visualizer.initVisualization(status, control, true));
-        return this;
-    }
-
     // endregion
 
     // region regions
@@ -860,13 +852,6 @@ public class PreferencesFormBuilder {
         /// Decorates the control with `status`, applied once on the FX thread in {@link #build()}.
         public InputElement<N> validate(ValidationStatus status) {
             form.validate(status, node);
-            return this;
-        }
-
-        /// Like {@link #validate}, but also marks the control as mandatory; see
-        /// {@link PreferencesFormBuilder#validateRequired}.
-        public InputElement<N> validateRequired(ValidationStatus status) {
-            form.validateRequired(status, node);
             return this;
         }
 
