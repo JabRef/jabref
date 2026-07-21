@@ -23,6 +23,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
@@ -191,18 +192,27 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
             helpButton.setVisible(false);
         }
 
-        Button configureButton = new Button(Localization.lang("Configure API key"));
+        Button configureButton = new Button();
         configureButton.getStyleClass().add("configure-button");
         configureButton.setOnAction(_ -> showApiKeyDialog(item));
         configureButton.setVisible(item.isCustomizable());
 
+        StackPane iconContainer = new StackPane();
+        iconContainer.setMinWidth(20);
+        iconContainer.setPrefWidth(20);
+
         Node keyIcon = IconTheme.JabRefIcons.SUCCESS.getGraphicNode();
-        Tooltip.install(keyIcon, new Tooltip(Localization.lang("API key is saved")));
+        iconContainer.getChildren().add(keyIcon);
+        Tooltip.install(iconContainer, new Tooltip(Localization.lang("API key is saved")));
 
         BooleanBinding isKeyPresent = Bindings.createBooleanBinding(() -> StringUtil.isNotBlank(item.apiKeyProperty().get()), item.apiKeyProperty());
-        keyIcon.visibleProperty().bind(isKeyPresent);
-        keyIcon.managedProperty().bind(isKeyPresent);
-        container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton, keyIcon);
+        iconContainer.visibleProperty().bind(isKeyPresent);
+        configureButton.textProperty().bind(
+                Bindings.when(isKeyPresent)
+                        .then(Localization.lang("Edit API key"))
+                        .otherwise(Localization.lang("Add API key"))
+        );
+        container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton, iconContainer);
         return container;
     }
 
