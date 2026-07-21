@@ -1,7 +1,7 @@
 ---
 name: jabkit
 category: users
-description: JabRef's Swiss Army knife CLI for BibTeX/biblatex - fetches entries online, converts DOIs to BibTeX, extracts references from PDFs, checks libraries, generates citation keys, writes XMP metadata, and searches .bib files.
+description: JabRef's Swiss Army knife CLI for BibTeX/biblatex - fetches entries online, converts DOIs to BibTeX, turns PDF papers into BibTeX entries, checks libraries, generates citation keys, writes XMP metadata, and searches .bib files.
 license: MIT
 ---
 
