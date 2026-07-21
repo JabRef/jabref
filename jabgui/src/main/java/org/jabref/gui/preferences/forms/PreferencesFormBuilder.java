@@ -286,10 +286,14 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder hyperlink(String text, Runnable action) {
+        return hyperlink(text, action, noConfig());
+    }
+
+    public PreferencesFormBuilder hyperlink(String text, Runnable action, Consumer<InputElement<Hyperlink>> config) {
         Hyperlink link = new Hyperlink(text);
         link.setOnAction(_ -> action.run());
         addNode(link);
-        return this;
+        return configured(new InputElement<>(this, link), config);
     }
 
     /// Combo box whose items are bound to a (potentially changing) list property.
