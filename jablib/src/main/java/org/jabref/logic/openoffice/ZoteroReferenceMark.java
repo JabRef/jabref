@@ -63,6 +63,10 @@ public record ZoteroReferenceMark(
         ZoteroCitationData citation = new ZoteroCitationData();
         citation.citationId = citationId;
 
+        if (citationType == CSLCitationType.EMPTY) {
+            citationType = CSLCitationType.NORMAL;
+        }
+
         List<ZoteroCitationData.CitationItemData> citationItems = new ArrayList<>();
         for (int i = 0; i < entries.size(); i++) {
             String citationKey = citationKeys.get(i);
@@ -187,7 +191,7 @@ public record ZoteroReferenceMark(
 
     public static String updateCitationType(String referenceMarkName, CSLCitationType citationType) {
         if (citationType == CSLCitationType.EMPTY) {
-            return referenceMarkName;
+            citationType = CSLCitationType.NORMAL;
         }
 
         ZoteroCitationData citation = getCitationData(referenceMarkName);
