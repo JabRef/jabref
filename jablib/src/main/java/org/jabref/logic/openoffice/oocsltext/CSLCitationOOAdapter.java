@@ -88,7 +88,7 @@ public class CSLCitationOOAdapter {
         this.databasesSupplier = databasesSupplier;
         this.bibEntryTypesManager = bibEntryTypesManager;
         this.openOfficePreferences = openOfficePreferences;
-        this.openOfficePreferences.referenceMarkFormatProperty().addListener((_, _, _) -> needsCSLReferenceMarkConversion = true);
+        this.openOfficePreferences.zoteroCompatibilityModeProperty().addListener((_, _, _) -> needsCSLReferenceMarkConversion = true);
 
         OOStyle initialStyle = openOfficePreferences.getCurrentStyle(); // may be a jstyle, can still be used for detecting subsequent style changes in context of CSL
         if (initialStyle instanceof CitationStyle citationStyle) {
