@@ -23,6 +23,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @NullMarked
 public record ZoteroReferenceMark(
@@ -33,6 +35,7 @@ public record ZoteroReferenceMark(
         CSLCitationType citationType) implements ReferenceMark {
     public static final String PREFIX = "ZOTERO_ITEM CSL_CITATION ";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZoteroReferenceMark.class);
     private static final Gson GSON = new Gson();
     private static final String JABREF_URI_PREFIX = "http://www.jabref.org/";
     private static final String ZOTERO_URI_PREFIX = "http://zotero.org/";
@@ -185,6 +188,7 @@ public record ZoteroReferenceMark(
             String suffix = getSuffix(referenceMarkName);
             return PREFIX + GSON.toJson(citation) + suffix;
         } catch (JsonParseException | IllegalStateException e) {
+            LOGGER.debug("Could not add JabRef URI to Zotero reference mark at citation item index {}", citationItemIndex, e);
             return referenceMarkName;
         }
     }
