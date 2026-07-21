@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
@@ -13,6 +14,7 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Region;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
@@ -101,13 +103,16 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         });
 
         EasyBind.subscribe(preferenceTabList.getSelectionModel().selectedItemProperty(), tab -> {
-            if (tab instanceof AbstractPreferenceTabView<?> preferencesTab) {
-                preferencesContainer.setContent(preferencesTab.getContent());
-                preferencesTab.prefWidthProperty().bind(preferencesContainer.widthProperty().subtract(10d));
-                preferencesTab.getStyleClass().add("preferencesTab");
-            } else {
+            if (tab == null) {
                 preferencesContainer.setContent(null);
+                return;
             }
+            Node content = tab.getContent();
+            preferencesContainer.setContent(content);
+            if (content instanceof Region region) {
+                region.prefWidthProperty().bind(preferencesContainer.widthProperty().subtract(10d));
+            }
+            content.getStyleClass().add("preferencesTab");
         });
 
         if (this.preferencesTabToSelectClass != null) {
