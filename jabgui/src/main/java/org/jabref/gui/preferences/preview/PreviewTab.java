@@ -93,7 +93,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
                 .checkbox(Localization.lang("Show preview as a tab in entry editor"), viewModel.showAsExtraTabProperty())
                 .checkbox(Localization.lang("Show preview in entry table tooltip"), viewModel.showPreviewInEntryTableTooltip())
                 .checkbox(Localization.lang("Download cover images"), viewModel.shouldDownloadCoversProperty())
-                .button(Localization.lang("Add BST file"), null, this::selectBstFile)
+                .button(Localization.lang("Add BST file"), this::selectBstFile)
                 .custom(dualListRegion)
                 .custom(editorRegion)
                 .validate(viewModel.chosenListValidationStatus(), chosenListView)

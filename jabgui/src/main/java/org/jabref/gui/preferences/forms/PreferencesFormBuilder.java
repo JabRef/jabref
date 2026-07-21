@@ -234,19 +234,27 @@ public class PreferencesFormBuilder {
         return configured(new InputElement<>(this, field), config);
     }
 
+    public PreferencesFormBuilder button(String text, Runnable action) {
+        return button(text, action, noConfig());
+    }
+
+    public PreferencesFormBuilder button(String text, Runnable action, Consumer<InputElement<Button>> config) {
+        Button button = new Button(text);
+        searchable(text, button);
+        button.setOnAction(_ -> action.run());
+        addNode(button);
+        return configured(new InputElement<>(this, button), config);
+    }
+
     public PreferencesFormBuilder button(String text, JabRefIcon icon, Runnable action) {
         return button(text, icon, action, noConfig());
     }
 
     public PreferencesFormBuilder button(String text, JabRefIcon icon, Runnable action, Consumer<InputElement<Button>> config) {
-        Button button = new Button(text);
-        searchable(text, button);
-        if (icon != null) {
-            button.setGraphic(icon.getGraphicNode());
-        }
-        button.setOnAction(_ -> action.run());
-        addNode(button);
-        return configured(new InputElement<>(this, button), config);
+        return button(text, action, button -> {
+            button.configure(node -> node.setGraphic(icon.getGraphicNode()));
+            config.accept(button);
+        });
     }
 
     public PreferencesFormBuilder hyperlink(String text, Runnable action) {
