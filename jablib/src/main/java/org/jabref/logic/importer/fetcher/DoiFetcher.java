@@ -94,9 +94,9 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
             Optional<String> agency;
             if (doi.isPresent() && (agency = getAgency(doi.get())).isPresent()) {
                 if ("datacite".equalsIgnoreCase(agency.get())) {
-                    DATA_CITE_DCN_RATE_LIMITER.acquire();
+                    DATA_CITE_DCN_RATE_LIMITER.acquire(identifier);
                 } else if ("crossref".equalsIgnoreCase(agency.get())) {
-                    CROSSREF_DCN_RATE_LIMITER.acquire();
+                    CROSSREF_DCN_RATE_LIMITER.acquire(identifier);
                 } // mEDRA does not explicit an API rating
             }
         } catch (FetcherException | MalformedURLException e) {

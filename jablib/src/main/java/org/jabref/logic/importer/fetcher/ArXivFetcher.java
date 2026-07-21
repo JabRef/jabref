@@ -617,7 +617,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             }
 
             try {
-                ARXIV_API_RATE_LIMITER.acquire();
+                ARXIV_API_RATE_LIMITER.acquire(url.toString());
                 DocumentBuilder builder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();

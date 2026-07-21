@@ -17,6 +17,10 @@ final class FetcherRateLimiter {
     private final RateLimiter rateLimiter;
 
     private FetcherRateLimiter(String serviceName, double requestsPerSecond) {
+        if (!Double.isFinite(requestsPerSecond) || requestsPerSecond <= 0) {
+            throw new IllegalArgumentException("The request rate for %s must be finite and positive: %s"
+                    .formatted(serviceName, requestsPerSecond));
+        }
         this.serviceName = serviceName;
         this.rateLimiter = RateLimiter.create(requestsPerSecond);
     }
@@ -26,14 +30,18 @@ final class FetcherRateLimiter {
     }
 
     static FetcherRateLimiter ofRequestsPerInterval(String serviceName, int requests, Duration interval) {
+        if (requests <= 0 || interval.isZero() || interval.isNegative()) {
+            throw new IllegalArgumentException("The request limit for %s must use a positive request count and interval: requests=%s, interval=%s"
+                    .formatted(serviceName, requests, interval));
+        }
         double requestsPerSecond = requests * 1_000_000_000.0 / interval.toNanos();
         return ofRequestsPerSecond(serviceName, requestsPerSecond);
     }
 
-    void acquire() {
+    void acquire(String requestContext) {
         double waitingTime = rateLimiter.acquire();
-        LOGGER.trace("Thread {} waited {} seconds because of the {} API rate limiter",
-                Thread.currentThread().threadId(), waitingTime, serviceName);
+        LOGGER.trace("Thread {} waited {} seconds before requesting '{}' because of the {} API rate limiter",
+                Thread.currentThread().threadId(), waitingTime, requestContext, serviceName);
     }
 
     double getRate() {

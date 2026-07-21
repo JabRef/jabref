@@ -44,7 +44,7 @@ public class LibraryOfCongress implements IdBasedParserFetcher {
             return Optional.empty();
         }
 
-        RATE_LIMITER.acquire();
+        RATE_LIMITER.acquire(identifier);
 
         return IdBasedParserFetcher.super.performSearchById(identifier);
     }
