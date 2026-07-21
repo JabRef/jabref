@@ -24,17 +24,16 @@ import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @NullMarked
 public final class ZoteroBibliographyMark {
     public static final String PREFIX = "ZOTERO_BIBL ";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZoteroBibliographyMark.class);
     private static final String CODE = "{\"uncited\":[],\"omitted\":[],\"custom\":[]}";
     private static final String BIBLIOGRAPHY_SUFFIX = " CSL_BIBLIOGRAPHY";
-
-    public static String buildName() {
-        return PREFIX + CODE + BIBLIOGRAPHY_SUFFIX + " " + ZoteroReferenceMark.createRandomSuffix();
-    }
 
     public static boolean isBibliographyMarkName(String name) {
         return name.startsWith(PREFIX);
@@ -56,31 +55,32 @@ public final class ZoteroBibliographyMark {
             return;
         }
 
+        LOGGER.debug("Creating new CSL bibliography section");
         Optional<XTextContent> bibliographyReferenceMark = getReferenceMark(doc);
-        XTextCursor cursor;
+        XTextCursor textCursor;
         if (bibliographyReferenceMark.isPresent()) {
             XTextContent referenceMark = bibliographyReferenceMark.orElseThrow();
             Optional<XTextRange> range = Optional.ofNullable(referenceMark.getAnchor());
             if (range.isPresent()) {
                 XTextRange existingBibliographyRange = range.orElseThrow();
                 XText text = existingBibliographyRange.getText();
-                cursor = text.createTextCursorByRange(existingBibliographyRange);
-                cursor.setString("");
+                textCursor = text.createTextCursorByRange(existingBibliographyRange);
+                textCursor.setString("");
                 text.removeTextContent(referenceMark);
             } else {
-                cursor = doc.getText().createTextCursor();
-                cursor.gotoEnd(false);
+                textCursor = doc.getText().createTextCursor();
+                textCursor.gotoEnd(false);
             }
         } else {
-            cursor = doc.getText().createTextCursor();
-            cursor.gotoEnd(false);
+            textCursor = doc.getText().createTextCursor();
+            textCursor.gotoEnd(false);
         }
 
-        XNamed zoteroBibliographyTextSection = UnoTextSection.create(new DocumentAnnotation(
-                doc,
-                buildName(),
-                cursor,
-                false));
+        String bibliographyName = PREFIX + CODE + BIBLIOGRAPHY_SUFFIX + " " + ZoteroReferenceMark.createRandomSuffix();
+        DocumentAnnotation annotation = new DocumentAnnotation(doc, bibliographyName, textCursor, false);
+        XNamed zoteroBibliographyTextSection = UnoTextSection.create(annotation);
+        LOGGER.debug("CSL bibliography section created");
+
         XTextRange sectionRange = UnoTextSection.getAnchor(doc, zoteroBibliographyTextSection.getName())
                                                 .orElseThrow(() -> new CreationException("Could not create Zotero bibliography text section"));
         XTextCursor sectionCursor = sectionRange.getText().createTextCursorByRange(sectionRange);
