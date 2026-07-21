@@ -40,6 +40,7 @@ import org.jabref.gui.preferences.websearch.WebSearchTab;
 import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -65,14 +66,16 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.preferences = preferences;
 
-        PreferencesDialogState dialogState = new PreferencesDialogState();
+        // Dialog-scoped working copy of the AI preferences: the AI tab edits it and flushes it to
+        // the live preferences on save; the web search tab observes its master switch meanwhile.
+        AiPreferences workingAiPreferences = AiPreferences.copyOf(preferences.getAiPreferences());
 
         preferenceTabs = FXCollections.observableArrayList(
                 new GeneralTab(),
                 new KeyBindingsTab(),
                 new GroupsTab(),
-                new WebSearchTab(dialogState),
-                new AiTab(dialogState),
+                new WebSearchTab(workingAiPreferences),
+                new AiTab(workingAiPreferences),
                 new EntryTab(),
                 new TableTab(),
                 new PreviewTab(),

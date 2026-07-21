@@ -121,7 +121,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty disableBasicSettings = new SimpleBooleanProperty(true);
     private final BooleanProperty disableExpertSettings = new SimpleBooleanProperty(true);
 
+    /// The live application preferences; only read in [#setValues()] and written in [#storeSettings()].
     private final AiPreferences aiPreferences;
+    /// The dialog-scoped working copy shared with other tabs (see `PreferencesDialogViewModel`).
+    private final AiPreferences workingAiPreferences;
     private final AiModelService aiModelService;
     private final TaskExecutor taskExecutor;
 
@@ -142,14 +145,23 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public AiTabViewModel(
             AiPreferences aiPreferences,
+            AiPreferences workingAiPreferences,
             AiModelService aiModelService,
             TaskExecutor taskExecutor
     ) {
         this.oldLocale = Locale.getDefault();
 
         this.aiPreferences = aiPreferences;
+        this.workingAiPreferences = workingAiPreferences;
         this.aiModelService = aiModelService;
         this.taskExecutor = taskExecutor;
+
+        // The master switch needs no validation, and other tabs (web search) depend on it, so it
+        // is mirrored into the working copy while the dialog is open. All validated fields are
+        // committed to the working copy only in storeSettings(). Seeding enableAi first keeps the
+        // working copy's value intact when the bidirectional binding syncs the two.
+        enableAi.set(workingAiPreferences.getAiFeaturesEnabledCurrently());
+        workingAiPreferences.aiFeaturesEnabledCurrentlyProperty().bindBidirectional(enableAi);
 
         this.enableAi.addListener((_, _, newValue) -> {
             disableBasicSettings.set(!newValue);
@@ -340,53 +352,55 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
+        workingAiPreferences.copyFrom(aiPreferences);
+
         openAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.OPEN_AI));
         mistralAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.MISTRAL_AI));
         geminiAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.GEMINI));
         huggingFaceApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.HUGGING_FACE));
 
-        openAiApiBaseUrl.setValue(aiPreferences.getOpenAiApiBaseUrl());
-        mistralAiApiBaseUrl.setValue(aiPreferences.getMistralAiApiBaseUrl());
-        geminiApiBaseUrl.setValue(aiPreferences.getGeminiApiBaseUrl());
-        huggingFaceApiBaseUrl.setValue(aiPreferences.getHuggingFaceApiBaseUrl());
+        openAiApiBaseUrl.setValue(workingAiPreferences.getOpenAiApiBaseUrl());
+        mistralAiApiBaseUrl.setValue(workingAiPreferences.getMistralAiApiBaseUrl());
+        geminiApiBaseUrl.setValue(workingAiPreferences.getGeminiApiBaseUrl());
+        huggingFaceApiBaseUrl.setValue(workingAiPreferences.getHuggingFaceApiBaseUrl());
 
-        openAiChatModel.setValue(aiPreferences.getOpenAiChatModel());
-        mistralAiChatModel.setValue(aiPreferences.getMistralAiChatModel());
-        geminiChatModel.setValue(aiPreferences.getGeminiChatModel());
-        huggingFaceChatModel.setValue(aiPreferences.getHuggingFaceChatModel());
+        openAiChatModel.setValue(workingAiPreferences.getOpenAiChatModel());
+        mistralAiChatModel.setValue(workingAiPreferences.getMistralAiChatModel());
+        geminiChatModel.setValue(workingAiPreferences.getGeminiChatModel());
+        huggingFaceChatModel.setValue(workingAiPreferences.getHuggingFaceChatModel());
 
-        enableAi.setValue(aiPreferences.getAiFeaturesEnabledCurrently());
-        autoGenerateSummaries.setValue(aiPreferences.getAutoGenerateSummaries());
-        autoGenerateEmbeddings.setValue(aiPreferences.getAutoGenerateEmbeddings());
+        enableAi.setValue(workingAiPreferences.getAiFeaturesEnabledCurrently());
+        autoGenerateSummaries.setValue(workingAiPreferences.getAutoGenerateSummaries());
+        autoGenerateEmbeddings.setValue(workingAiPreferences.getAutoGenerateEmbeddings());
 
-        selectedAiProvider.setValue(aiPreferences.getAiProvider());
+        selectedAiProvider.setValue(workingAiPreferences.getAiProvider());
 
-        customizeExpertSettings.setValue(aiPreferences.getCustomizeExpertSettings());
+        customizeExpertSettings.setValue(workingAiPreferences.getCustomizeExpertSettings());
 
-        selectedEmbeddingModel.setValue(aiPreferences.getEmbeddingModel());
+        selectedEmbeddingModel.setValue(workingAiPreferences.getEmbeddingModel());
 
-        chattingSystemMessageTemplate.set(aiPreferences.getChattingSystemMessageTemplate());
-        chattingUserMessageTemplate.set(aiPreferences.getChattingUserMessageTemplate());
-        summarizationChunkSystemMessageTemplate.set(aiPreferences.getSummarizationChunkSystemMessageTemplate());
-        summarizationCombineSystemMessageTemplate.set(aiPreferences.getSummarizationCombineSystemMessageTemplate());
-        citationParsingSystemMessageTemplate.set(aiPreferences.getCitationParsingSystemMessageTemplate());
-        summarizationFullDocumentSystemMessageTemplate.set(aiPreferences.getSummarizationFullDocumentSystemMessageTemplate());
-        markdownChatExportTemplate.set(aiPreferences.getMarkdownChatExportTemplate());
+        chattingSystemMessageTemplate.set(workingAiPreferences.getChattingSystemMessageTemplate());
+        chattingUserMessageTemplate.set(workingAiPreferences.getChattingUserMessageTemplate());
+        summarizationChunkSystemMessageTemplate.set(workingAiPreferences.getSummarizationChunkSystemMessageTemplate());
+        summarizationCombineSystemMessageTemplate.set(workingAiPreferences.getSummarizationCombineSystemMessageTemplate());
+        citationParsingSystemMessageTemplate.set(workingAiPreferences.getCitationParsingSystemMessageTemplate());
+        summarizationFullDocumentSystemMessageTemplate.set(workingAiPreferences.getSummarizationFullDocumentSystemMessageTemplate());
+        markdownChatExportTemplate.set(workingAiPreferences.getMarkdownChatExportTemplate());
 
-        generateFollowUpQuestions.set(aiPreferences.getGenerateFollowUpQuestions());
-        followUpQuestionsCount.set(aiPreferences.getFollowUpQuestionsCount());
-        followUpQuestionsTemplate.set(aiPreferences.getFollowUpQuestionsTemplate());
+        generateFollowUpQuestions.set(workingAiPreferences.getGenerateFollowUpQuestions());
+        followUpQuestionsCount.set(workingAiPreferences.getFollowUpQuestionsCount());
+        followUpQuestionsTemplate.set(workingAiPreferences.getFollowUpQuestionsTemplate());
 
-        responseEngineProperty.set(aiPreferences.getResponseEngineKind());
-        summarizationAlgorithmProperty.setValue(aiPreferences.getSummarizatorKind());
-        tokenEstimationAlgorithmProperty.setValue(aiPreferences.getTokenEstimatorKind());
+        responseEngineProperty.set(workingAiPreferences.getResponseEngineKind());
+        summarizationAlgorithmProperty.setValue(workingAiPreferences.getSummarizatorKind());
+        tokenEstimationAlgorithmProperty.setValue(workingAiPreferences.getTokenEstimatorKind());
 
-        temperature.setValue(LocalizedNumbersUtils.doubleToString(aiPreferences.getTemperature()));
-        contextWindowSize.setValue(aiPreferences.getContextWindowSize());
-        documentSplitterChunkSize.setValue(aiPreferences.getDocumentSplitterChunkSize());
-        documentSplitterOverlapSize.setValue(aiPreferences.getDocumentSplitterOverlapSize());
-        ragMaxResultsCount.setValue(aiPreferences.getRagMaxResultsCount());
-        ragMinScore.setValue(LocalizedNumbersUtils.doubleToString(aiPreferences.getRagMinScore()));
+        temperature.setValue(LocalizedNumbersUtils.doubleToString(workingAiPreferences.getTemperature()));
+        contextWindowSize.setValue(workingAiPreferences.getContextWindowSize());
+        documentSplitterChunkSize.setValue(workingAiPreferences.getDocumentSplitterChunkSize());
+        documentSplitterOverlapSize.setValue(workingAiPreferences.getDocumentSplitterOverlapSize());
+        ragMaxResultsCount.setValue(workingAiPreferences.getRagMaxResultsCount());
+        ragMinScore.setValue(LocalizedNumbersUtils.doubleToString(workingAiPreferences.getRagMinScore()));
     }
 
     @Override
@@ -396,54 +410,56 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             restartWarnings.add(Localization.lang("AI features turned on/off."));
         }
 
-        aiPreferences.setAiFeaturesEnabledCurrently(enableAi.get());
-        aiPreferences.setAutoGenerateEmbeddings(autoGenerateEmbeddings.get());
-        aiPreferences.setAutoGenerateSummaries(autoGenerateSummaries.get());
+        workingAiPreferences.setAiFeaturesEnabledCurrently(enableAi.get());
+        workingAiPreferences.setAutoGenerateEmbeddings(autoGenerateEmbeddings.get());
+        workingAiPreferences.setAutoGenerateSummaries(autoGenerateSummaries.get());
 
-        aiPreferences.setAiProvider(selectedAiProvider.get());
+        workingAiPreferences.setAiProvider(selectedAiProvider.get());
 
-        aiPreferences.setOpenAiChatModel(openAiChatModel.get() == null ? "" : openAiChatModel.get());
-        aiPreferences.setMistralAiChatModel(mistralAiChatModel.get() == null ? "" : mistralAiChatModel.get());
-        aiPreferences.setGeminiChatModel(geminiChatModel.get() == null ? "" : geminiChatModel.get());
-        aiPreferences.setHuggingFaceChatModel(huggingFaceChatModel.get() == null ? "" : huggingFaceChatModel.get());
+        workingAiPreferences.setOpenAiChatModel(openAiChatModel.get() == null ? "" : openAiChatModel.get());
+        workingAiPreferences.setMistralAiChatModel(mistralAiChatModel.get() == null ? "" : mistralAiChatModel.get());
+        workingAiPreferences.setGeminiChatModel(geminiChatModel.get() == null ? "" : geminiChatModel.get());
+        workingAiPreferences.setHuggingFaceChatModel(huggingFaceChatModel.get() == null ? "" : huggingFaceChatModel.get());
 
         aiPreferences.storeAiApiKeyInKeyring(AiProvider.OPEN_AI, openAiApiKey.get() == null ? "" : openAiApiKey.get());
         aiPreferences.storeAiApiKeyInKeyring(AiProvider.MISTRAL_AI, mistralAiApiKey.get() == null ? "" : mistralAiApiKey.get());
         aiPreferences.storeAiApiKeyInKeyring(AiProvider.GEMINI, geminiAiApiKey.get() == null ? "" : geminiAiApiKey.get());
         aiPreferences.storeAiApiKeyInKeyring(AiProvider.HUGGING_FACE, huggingFaceApiKey.get() == null ? "" : huggingFaceApiKey.get());
 
-        aiPreferences.setCustomizeExpertSettings(customizeExpertSettings.get());
+        workingAiPreferences.setCustomizeExpertSettings(customizeExpertSettings.get());
 
-        aiPreferences.setEmbeddingModel(selectedEmbeddingModel.get());
+        workingAiPreferences.setEmbeddingModel(selectedEmbeddingModel.get());
 
-        aiPreferences.setOpenAiApiBaseUrl(openAiApiBaseUrl.get() == null ? "" : openAiApiBaseUrl.get());
-        aiPreferences.setMistralAiApiBaseUrl(mistralAiApiBaseUrl.get() == null ? "" : mistralAiApiBaseUrl.get());
-        aiPreferences.setGeminiApiBaseUrl(geminiApiBaseUrl.get() == null ? "" : geminiApiBaseUrl.get());
-        aiPreferences.setHuggingFaceApiBaseUrl(huggingFaceApiBaseUrl.get() == null ? "" : huggingFaceApiBaseUrl.get());
+        workingAiPreferences.setOpenAiApiBaseUrl(openAiApiBaseUrl.get() == null ? "" : openAiApiBaseUrl.get());
+        workingAiPreferences.setMistralAiApiBaseUrl(mistralAiApiBaseUrl.get() == null ? "" : mistralAiApiBaseUrl.get());
+        workingAiPreferences.setGeminiApiBaseUrl(geminiApiBaseUrl.get() == null ? "" : geminiApiBaseUrl.get());
+        workingAiPreferences.setHuggingFaceApiBaseUrl(huggingFaceApiBaseUrl.get() == null ? "" : huggingFaceApiBaseUrl.get());
 
-        aiPreferences.setChattingSystemMessageTemplate(chattingSystemMessageTemplate.get());
-        aiPreferences.setChattingUserMessageTemplate(chattingUserMessageTemplate.get());
-        aiPreferences.setSummarizationChunkSystemMessageTemplate(summarizationChunkSystemMessageTemplate.get());
-        aiPreferences.setSummarizationCombineSystemMessageTemplate(summarizationCombineSystemMessageTemplate.get());
-        aiPreferences.setCitationParsingSystemMessageTemplate(citationParsingSystemMessageTemplate.get());
-        aiPreferences.setSummarizationFullDocumentSystemMessageTemplate(summarizationFullDocumentSystemMessageTemplate.get());
-        aiPreferences.setMarkdownChatExportTemplate(markdownChatExportTemplate.get());
+        workingAiPreferences.setChattingSystemMessageTemplate(chattingSystemMessageTemplate.get());
+        workingAiPreferences.setChattingUserMessageTemplate(chattingUserMessageTemplate.get());
+        workingAiPreferences.setSummarizationChunkSystemMessageTemplate(summarizationChunkSystemMessageTemplate.get());
+        workingAiPreferences.setSummarizationCombineSystemMessageTemplate(summarizationCombineSystemMessageTemplate.get());
+        workingAiPreferences.setCitationParsingSystemMessageTemplate(citationParsingSystemMessageTemplate.get());
+        workingAiPreferences.setSummarizationFullDocumentSystemMessageTemplate(summarizationFullDocumentSystemMessageTemplate.get());
+        workingAiPreferences.setMarkdownChatExportTemplate(markdownChatExportTemplate.get());
 
-        aiPreferences.setGenerateFollowUpQuestions(generateFollowUpQuestions.get());
-        aiPreferences.setFollowUpQuestionsCount(followUpQuestionsCount.get());
-        aiPreferences.setFollowUpQuestionsTemplate(followUpQuestionsTemplate.get());
+        workingAiPreferences.setGenerateFollowUpQuestions(generateFollowUpQuestions.get());
+        workingAiPreferences.setFollowUpQuestionsCount(followUpQuestionsCount.get());
+        workingAiPreferences.setFollowUpQuestionsTemplate(followUpQuestionsTemplate.get());
 
-        aiPreferences.setResponseEngineKind(responseEngineProperty.get());
-        aiPreferences.setSummarizatorKind(summarizationAlgorithmProperty.get());
-        aiPreferences.setTokenEstimatorKind(tokenEstimationAlgorithmProperty.get());
+        workingAiPreferences.setResponseEngineKind(responseEngineProperty.get());
+        workingAiPreferences.setSummarizatorKind(summarizationAlgorithmProperty.get());
+        workingAiPreferences.setTokenEstimatorKind(tokenEstimationAlgorithmProperty.get());
 
         // We already check the correctness of temperature and RAG minimum score in validators, so we don't need to check it here.
-        aiPreferences.setTemperature(LocalizedNumbersUtils.stringToDouble(oldLocale, temperature.get()).get());
-        aiPreferences.setContextWindowSize(contextWindowSize.get());
-        aiPreferences.setDocumentSplitterChunkSize(documentSplitterChunkSize.get());
-        aiPreferences.setDocumentSplitterOverlapSize(documentSplitterOverlapSize.get());
-        aiPreferences.setRagMaxResultsCount(ragMaxResultsCount.get());
-        aiPreferences.setRagMinScore(LocalizedNumbersUtils.stringToDouble(oldLocale, ragMinScore.get()).get());
+        workingAiPreferences.setTemperature(LocalizedNumbersUtils.stringToDouble(oldLocale, temperature.get()).get());
+        workingAiPreferences.setContextWindowSize(contextWindowSize.get());
+        workingAiPreferences.setDocumentSplitterChunkSize(documentSplitterChunkSize.get());
+        workingAiPreferences.setDocumentSplitterOverlapSize(documentSplitterOverlapSize.get());
+        workingAiPreferences.setRagMaxResultsCount(ragMaxResultsCount.get());
+        workingAiPreferences.setRagMinScore(LocalizedNumbersUtils.stringToDouble(oldLocale, ragMinScore.get()).get());
+
+        aiPreferences.copyFrom(workingAiPreferences);
     }
 
     public void resetExpertSettings() {
