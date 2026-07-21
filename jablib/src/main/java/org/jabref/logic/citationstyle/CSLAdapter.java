@@ -33,11 +33,19 @@ public class CSLAdapter {
     /// Creates the bibliography of the provided items.
     ///
     /// @param databaseContext {@link BibDatabaseContext} is used to be able to resolve fields and their aliases
-    public synchronized List<String> makeBibliography(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException, IllegalArgumentException {
+    public synchronized List<String> makeBibliography(List<BibEntry> bibEntries,
+                                                      String style,
+                                                      CitationStyleOutputFormat outputFormat,
+                                                      BibDatabaseContext databaseContext,
+                                                      BibEntryTypesManager entryTypesManager) throws IOException, IllegalArgumentException {
         return Arrays.asList(makeBibliographyObject(bibEntries, style, outputFormat, databaseContext, entryTypesManager).getEntries());
     }
 
-    public synchronized Bibliography makeBibliographyObject(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException, IllegalArgumentException {
+    public synchronized Bibliography makeBibliographyObject(List<BibEntry> bibEntries,
+                                                            String style,
+                                                            CitationStyleOutputFormat outputFormat,
+                                                            BibDatabaseContext databaseContext,
+                                                            BibEntryTypesManager entryTypesManager) throws IOException, IllegalArgumentException {
         dataProvider.setData(bibEntries, databaseContext, entryTypesManager);
 
         CSL cslInstance = getCslInstance(style, outputFormat);
@@ -46,7 +54,11 @@ public class CSLAdapter {
         return cslInstance.makeBibliography();
     }
 
-    public synchronized Citation makeCitation(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {
+    public synchronized Citation makeCitation(List<BibEntry> bibEntries,
+                                              String style,
+                                              CitationStyleOutputFormat outputFormat,
+                                              BibDatabaseContext databaseContext,
+                                              BibEntryTypesManager entryTypesManager) throws IOException {
         dataProvider.setData(bibEntries, databaseContext, entryTypesManager);
 
         CSL cslInstance = getCslInstance(style, outputFormat);
