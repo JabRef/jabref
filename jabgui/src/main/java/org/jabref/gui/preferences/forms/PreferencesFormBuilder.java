@@ -771,8 +771,10 @@ public class PreferencesFormBuilder {
             this.node = node;
         }
 
+        /// The single unchecked cast of the handle hierarchy: `S` is always the concrete class of
+        /// `this`, so base methods can return the subclass and chain order does not matter.
         @SuppressWarnings("unchecked")
-        private S self() {
+        final S self() {
             return (S) this;
         }
 
@@ -833,11 +835,6 @@ public class PreferencesFormBuilder {
 
         ControlElementBase(PreferencesFormBuilder form, N control) {
             super(form, control);
-        }
-
-        @SuppressWarnings("unchecked")
-        private S self() {
-            return (S) this;
         }
 
         public S tooltip(String text) {
