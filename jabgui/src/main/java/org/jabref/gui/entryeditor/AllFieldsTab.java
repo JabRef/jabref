@@ -567,14 +567,8 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     private static void applyNaturalHeight(FieldEditorFX editor) {
         normalizeInputHeights(editor.getNode());
-        if (editor instanceof LinkedFilesEditor) {
+        if (editor instanceof LinkedFilesEditor || editor instanceof TagsEditor) {
             // Sizes itself to the file rows plus the trailing button row; a fixed weight-based height would override that.
-            return;
-        }
-        if (editor instanceof TagsEditor) {
-            // Grows with the number of wrapped tag/chip lines (e.g. many keywords); a fixed
-            // weight-based height would either leave blank space below a short chip list or
-            // clip a long, wrapped one (issue #12112).
             return;
         }
         if ((editor.getWeight() > 1) && (editor.getNode() instanceof Region region)) {
