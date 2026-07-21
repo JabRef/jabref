@@ -102,7 +102,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
         EasyBind.subscribe(preferenceTabList.getSelectionModel().selectedItemProperty(), tab -> {
             if (tab instanceof AbstractPreferenceTabView<?> preferencesTab) {
-                preferencesContainer.setContent(preferencesTab.getBuilder());
+                preferencesContainer.setContent(preferencesTab.getContent());
                 preferencesTab.prefWidthProperty().bind(preferencesContainer.widthProperty().subtract(10d));
                 preferencesTab.getStyleClass().add("preferencesTab");
             } else {

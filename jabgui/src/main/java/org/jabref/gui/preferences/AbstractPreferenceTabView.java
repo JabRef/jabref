@@ -19,7 +19,7 @@ public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel
     protected T viewModel;
 
     @Override
-    public Node getBuilder() {
+    public Node getContent() {
         return this;
     }
 
