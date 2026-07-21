@@ -123,8 +123,7 @@ public class PreferencesFormBuilder {
     /// the section can be configured or moved as a unit — rather than a header label followed by
     /// loose siblings that only look related because of their order.
     public PreferencesFormBuilder section(String title, Consumer<PreferencesFormBuilder> content) {
-        return section(title, content, _ -> {
-        });
+        return section(title, content, noConfig());
     }
 
     public PreferencesFormBuilder section(String title,
@@ -134,8 +133,7 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder sectionWithHelp(String title, HelpFile helpFile, Consumer<PreferencesFormBuilder> content) {
-        return sectionWithHelp(title, helpFile, content, _ -> {
-        });
+        return sectionWithHelp(title, helpFile, content, noConfig());
     }
 
     public PreferencesFormBuilder sectionWithHelp(String title,
@@ -147,8 +145,7 @@ public class PreferencesFormBuilder {
 
     /// Section whose help button points at a documentation URL rather than a {@link HelpFile}.
     public PreferencesFormBuilder sectionWithHelp(String title, String helpUrl, Consumer<PreferencesFormBuilder> content) {
-        return sectionWithHelp(title, helpUrl, content, _ -> {
-        });
+        return sectionWithHelp(title, helpUrl, content, noConfig());
     }
 
     public PreferencesFormBuilder sectionWithHelp(String title,
@@ -205,8 +202,7 @@ public class PreferencesFormBuilder {
     // region controls
 
     public PreferencesFormBuilder checkbox(String text, Property<Boolean> value) {
-        return checkbox(text, value, _ -> {
-        });
+        return checkbox(text, value, noConfig());
     }
 
     public PreferencesFormBuilder checkbox(String text, Property<Boolean> value, Consumer<RowElement<CheckBox>> config) {
@@ -225,8 +221,7 @@ public class PreferencesFormBuilder {
     /// recurring "Enable ... on port [....]" pattern). The configured element is the **value field**;
     /// its disable binding to the checkbox is preserved even if you add one of your own.
     public PreferencesFormBuilder checkWithField(String text, Property<Boolean> enabled, StringProperty fieldValue) {
-        return checkWithField(text, enabled, fieldValue, _ -> {
-        });
+        return checkWithField(text, enabled, fieldValue, noConfig());
     }
 
     public PreferencesFormBuilder checkWithField(String text,
@@ -246,8 +241,7 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder stringField(String label, StringProperty value) {
-        return stringField(label, value, _ -> {
-        });
+        return stringField(label, value, noConfig());
     }
 
     public PreferencesFormBuilder stringField(String label, StringProperty value, Consumer<InputElement<TextField>> config) {
@@ -261,8 +255,7 @@ public class PreferencesFormBuilder {
     /// A path field with a browse button. The configured element is the **text field**; the browse
     /// button follows its disabled state.
     public PreferencesFormBuilder browseField(String label, StringProperty value, Runnable onBrowse) {
-        return browseField(label, value, onBrowse, _ -> {
-        });
+        return browseField(label, value, onBrowse, noConfig());
     }
 
     public PreferencesFormBuilder browseField(String label,
@@ -279,8 +272,7 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder button(String text, JabRefIcon icon, Runnable action) {
-        return button(text, icon, action, _ -> {
-        });
+        return button(text, icon, action, noConfig());
     }
 
     public PreferencesFormBuilder button(String text, JabRefIcon icon, Runnable action, Consumer<InputElement<Button>> config) {
@@ -305,8 +297,7 @@ public class PreferencesFormBuilder {
                                             ObservableValue<? extends ObservableList<X>> items,
                                             Property<X> value,
                                             Callback<X, String> display) {
-        return combo(label, items, value, display, _ -> {
-        });
+        return combo(label, items, value, display, noConfig());
     }
 
     public <X> PreferencesFormBuilder combo(String label,
@@ -324,8 +315,7 @@ public class PreferencesFormBuilder {
                                                  ObservableList<X> items,
                                                  Property<X> value,
                                                  Callback<X, String> display) {
-        return comboItems(label, items, value, display, _ -> {
-        });
+        return comboItems(label, items, value, display, noConfig());
     }
 
     public <X> PreferencesFormBuilder comboItems(String label,
@@ -342,8 +332,7 @@ public class PreferencesFormBuilder {
                                                       ObservableValue<? extends ObservableList<X>> items,
                                                       Property<X> value,
                                                       Callback<X, String> display) {
-        return searchableCombo(label, items, value, display, _ -> {
-        });
+        return searchableCombo(label, items, value, display, noConfig());
     }
 
     public <X> PreferencesFormBuilder searchableCombo(String label,
@@ -372,8 +361,7 @@ public class PreferencesFormBuilder {
 
     /// A pre-built, pre-bound {@link TagsField} (see {@link TagsFieldEditor}).
     public <X> PreferencesFormBuilder tagsField(String label, TagsField<X> tagsField) {
-        return tagsField(label, tagsField, _ -> {
-        });
+        return tagsField(label, tagsField, noConfig());
     }
 
     public <X> PreferencesFormBuilder tagsField(String label,
@@ -401,8 +389,7 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder radio(String text, Property<Boolean> selected) {
-        return radio(text, selected, _ -> {
-        });
+        return radio(text, selected, noConfig());
     }
 
     public PreferencesFormBuilder radio(String text, Property<Boolean> selected, Consumer<RowElement<RadioButton>> config) {
@@ -416,8 +403,7 @@ public class PreferencesFormBuilder {
     /// A radio with a bound text field that is enabled only while the radio is selected. The
     /// configured element is the **text field**.
     public PreferencesFormBuilder radioWithField(String text, Property<Boolean> selected, StringProperty fieldValue) {
-        return radioWithField(text, selected, fieldValue, _ -> {
-        });
+        return radioWithField(text, selected, fieldValue, noConfig());
     }
 
     public PreferencesFormBuilder radioWithField(String text,
@@ -441,8 +427,7 @@ public class PreferencesFormBuilder {
                                                   Property<Boolean> selected,
                                                   StringProperty pathValue,
                                                   Runnable onBrowse) {
-        return radioWithBrowse(text, selected, pathValue, onBrowse, _ -> {
-        });
+        return radioWithBrowse(text, selected, pathValue, onBrowse, noConfig());
     }
 
     public PreferencesFormBuilder radioWithBrowse(String text,
@@ -472,8 +457,7 @@ public class PreferencesFormBuilder {
 
     /// Adds a bespoke labelled control.
     public <T extends Control> PreferencesFormBuilder field(String label, T control) {
-        return field(label, control, _ -> {
-        });
+        return field(label, control, noConfig());
     }
 
     public <T extends Control> PreferencesFormBuilder field(String label, T control, Consumer<InputElement<T>> config) {
@@ -483,8 +467,7 @@ public class PreferencesFormBuilder {
 
     /// Adds a bespoke labelled node that is not a {@link Control} — a hand-assembled row, a table.
     public <T extends Node> PreferencesFormBuilder customField(String label, T node) {
-        return customField(label, node, _ -> {
-        });
+        return customField(label, node, noConfig());
     }
 
     public <T extends Node> PreferencesFormBuilder customField(String label, T node, Consumer<NodeElement<T>> config) {
@@ -494,8 +477,7 @@ public class PreferencesFormBuilder {
 
     /// Adds a fully custom node spanning the form width (the `.custom(Node)` hatch).
     public <T extends Node> PreferencesFormBuilder custom(T node) {
-        return custom(node, _ -> {
-        });
+        return custom(node, noConfig());
     }
 
     public <T extends Node> PreferencesFormBuilder custom(T node, Consumer<NodeElement<T>> config) {
@@ -515,8 +497,7 @@ public class PreferencesFormBuilder {
     // region regions
 
     public PreferencesFormBuilder group(Consumer<PreferencesFormBuilder> content) {
-        return group(content, _ -> {
-        });
+        return group(content, noConfig());
     }
 
     public PreferencesFormBuilder group(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<VBox>> config) {
@@ -526,8 +507,7 @@ public class PreferencesFormBuilder {
     /// A side-by-side region: every element inside becomes an equally growing column. Usually filled
     /// with {@link #group} blocks, one per column.
     public PreferencesFormBuilder columns(Consumer<PreferencesFormBuilder> content) {
-        return columns(content, _ -> {
-        });
+        return columns(content, noConfig());
     }
 
     public PreferencesFormBuilder columns(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<HBox>> config) {
@@ -537,8 +517,7 @@ public class PreferencesFormBuilder {
     /// A wrapping region: elements flow left to right and wrap onto the next line as the dialog
     /// narrows.
     public PreferencesFormBuilder flow(Consumer<PreferencesFormBuilder> content) {
-        return flow(content, _ -> {
-        });
+        return flow(content, noConfig());
     }
 
     public PreferencesFormBuilder flow(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<FlowPane>> config) {
@@ -550,8 +529,7 @@ public class PreferencesFormBuilder {
     /// full-width element silently splits them into separate grids with independent column widths —
     /// inside `fields(...)` that cannot happen, because adding one is an error.
     public PreferencesFormBuilder fields(Consumer<PreferencesFormBuilder> content) {
-        return fields(content, _ -> {
-        });
+        return fields(content, noConfig());
     }
 
     public PreferencesFormBuilder fields(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<GridPane>> config) {
@@ -603,6 +581,12 @@ public class PreferencesFormBuilder {
     private <E> PreferencesFormBuilder configured(E element, Consumer<E> config) {
         config.accept(element);
         return this;
+    }
+
+    /// The empty configuration every no-config overload delegates with.
+    private static <E> Consumer<E> noConfig() {
+        return _ -> {
+        };
     }
 
     /// Records a disable binding the builder owns, so that a later {@link ElementBase#disableWhen}
