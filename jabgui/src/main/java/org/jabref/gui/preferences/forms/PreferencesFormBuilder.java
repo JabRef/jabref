@@ -26,6 +26,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
@@ -42,6 +43,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.SearchableElement;
@@ -49,6 +51,7 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.HelpButton;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.l10n.Localization;
 
 import com.dlsc.gemsfx.TagsField;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
@@ -74,10 +77,10 @@ import org.controlsfx.control.SearchableComboBox;
 ///       .build();
 /// ```
 ///
-/// The handle a lambda receives states what it is: a {@link RowElement} carries a help button
-/// because it sits in a row of its own, an {@link InputElement} does not; a {@link NodeElement}
-/// offers neither tooltip nor validation because it is not a {@link Control}. Asking for the wrong
-/// one does not compile.
+/// The handle a lambda receives states what it is: an {@link InputElement} is a {@link Control},
+/// so it can carry a tooltip, validation and attachments — a help button, a browse button, an
+/// inline value field appended right after it; a {@link NodeElement} offers none of that because
+/// it is not a {@link Control}. Asking for the wrong one does not compile.
 ///
 /// Consecutive labelled fields share an aligned two-column {@link GridPane}; any full-width element
 /// flushes that grid — use {@link #fields} to make a shared block explicit. Validation decoration is
@@ -87,7 +90,7 @@ public class PreferencesFormBuilder {
     /// Gap between elements, both inside a region and between regions.
     private static final double GAP = 10.0;
     /// Width of the inline value field of {@link #checkWithField} (sized for a port number; use
-    /// {@link ControlElementBase#grow()} for longer values).
+    /// {@link InputElement#grow()} for longer values).
     private static final double SHORT_FIELD_WIDTH = 100.0;
     /// Minimum width of the caption column of the shared field grid.
     private static final double LABEL_COLUMN_MIN_WIDTH = 120.0;
@@ -210,7 +213,7 @@ public class PreferencesFormBuilder {
         return checkbox(text, value, noConfig());
     }
 
-    public PreferencesFormBuilder checkbox(String text, Property<Boolean> value, Consumer<RowElement<CheckBox>> config) {
+    public PreferencesFormBuilder checkbox(String text, Property<Boolean> value, Consumer<InputElement<CheckBox>> config) {
         CheckBox checkBox = new CheckBox(text);
         searchable(text, checkBox);
         checkBox.setMaxWidth(Double.MAX_VALUE);
@@ -220,7 +223,7 @@ public class PreferencesFormBuilder {
         HBox row = new HBox(GAP, checkBox);
         row.setAlignment(Pos.CENTER_LEFT);
         addNode(row);
-        return configured(new RowElement<>(this, checkBox, row), config);
+        return configured(new InputElement<>(this, checkBox), config);
     }
 
     /// A checkbox with an inline value field that is enabled only while the box is ticked (the
@@ -233,18 +236,11 @@ public class PreferencesFormBuilder {
     public PreferencesFormBuilder checkWithField(String text,
                                                  Property<Boolean> enabled,
                                                  StringProperty fieldValue,
-                                                 Consumer<RowElement<TextField>> config) {
-        CheckBox checkBox = new CheckBox(text);
-        searchable(text, checkBox);
-        checkBox.selectedProperty().bindBidirectional(enabled);
-        TextField field = new TextField();
-        field.setMaxWidth(SHORT_FIELD_WIDTH);
-        field.textProperty().bindBidirectional(fieldValue);
-        ownDisable(field, checkBox.selectedProperty().not());
-        HBox row = new HBox(GAP, checkBox, field);
-        row.setAlignment(Pos.CENTER_LEFT);
-        addNode(row);
-        return configured(new RowElement<>(this, field, row), config);
+                                                 Consumer<InputElement<TextField>> config) {
+        return checkbox(text, enabled, box -> box.attachField(fieldValue, field -> {
+            field.node().setMaxWidth(SHORT_FIELD_WIDTH);
+            config.accept(field);
+        }));
     }
 
     public PreferencesFormBuilder stringField(String label, StringProperty value) {
@@ -257,25 +253,6 @@ public class PreferencesFormBuilder {
         field.textProperty().bindBidirectional(value);
         addField(label, field);
         return configured(new InputElement<>(this, field), config);
-    }
-
-    /// A path field with a browse button. The configured element is the **text field**; the browse
-    /// button follows its disabled state.
-    public PreferencesFormBuilder browseField(String label, StringProperty value, Runnable onBrowse) {
-        return browseField(label, value, onBrowse, noConfig());
-    }
-
-    public PreferencesFormBuilder browseField(String label,
-                                              StringProperty value,
-                                              Runnable onBrowse,
-                                              Consumer<RowElement<TextField>> config) {
-        BrowseFileEditor.Result result = BrowseFileEditor.create(value, onBrowse);
-        if (label == null) {
-            addNode(result.row());
-        } else {
-            addField(label, result.row());
-        }
-        return configured(new RowElement<>(this, result.field(), result.row()), config);
     }
 
     public PreferencesFormBuilder button(String text, JabRefIcon icon, Runnable action) {
@@ -405,56 +382,12 @@ public class PreferencesFormBuilder {
         return radio(text, selected, noConfig());
     }
 
-    public PreferencesFormBuilder radio(String text, Property<Boolean> selected, Consumer<RowElement<RadioButton>> config) {
+    public PreferencesFormBuilder radio(String text, Property<Boolean> selected, Consumer<InputElement<RadioButton>> config) {
         RadioButton radio = newRadio(text, selected);
         HBox row = new HBox(GAP, radio);
         row.setAlignment(Pos.CENTER_LEFT);
         addNode(row);
-        return configured(new RowElement<>(this, radio, row), config);
-    }
-
-    /// A radio with a bound text field that is enabled only while the radio is selected. The
-    /// configured element is the **text field**.
-    public PreferencesFormBuilder radioWithField(String text, Property<Boolean> selected, StringProperty fieldValue) {
-        return radioWithField(text, selected, fieldValue, noConfig());
-    }
-
-    public PreferencesFormBuilder radioWithField(String text,
-                                                 Property<Boolean> selected,
-                                                 StringProperty fieldValue,
-                                                 Consumer<RowElement<TextField>> config) {
-        RadioButton radio = newRadio(text, selected);
-        TextField field = new TextField();
-        field.textProperty().bindBidirectional(fieldValue);
-        ownDisable(field, radio.selectedProperty().not());
-        HBox.setHgrow(field, Priority.ALWAYS);
-        HBox row = new HBox(GAP, radio, field);
-        row.setAlignment(Pos.CENTER_LEFT);
-        addNode(row);
-        return configured(new RowElement<>(this, field, row), config);
-    }
-
-    /// A radio with an inline browse field (e.g. "Main file directory"). The configured element is
-    /// the **path field**; the browse button follows its disabled state.
-    public PreferencesFormBuilder radioWithBrowse(String text,
-                                                  Property<Boolean> selected,
-                                                  StringProperty pathValue,
-                                                  Runnable onBrowse) {
-        return radioWithBrowse(text, selected, pathValue, onBrowse, noConfig());
-    }
-
-    public PreferencesFormBuilder radioWithBrowse(String text,
-                                                  Property<Boolean> selected,
-                                                  StringProperty pathValue,
-                                                  Runnable onBrowse,
-                                                  Consumer<RowElement<TextField>> config) {
-        RadioButton radio = newRadio(text, selected);
-        BrowseFileEditor.Result browse = BrowseFileEditor.create(pathValue, onBrowse);
-        HBox.setHgrow(browse.row(), Priority.ALWAYS);
-        HBox row = new HBox(GAP, radio, browse.row());
-        row.setAlignment(Pos.CENTER_LEFT);
-        addNode(row);
-        return configured(new RowElement<>(this, browse.field(), row), config);
+        return configured(new InputElement<>(this, radio), config);
     }
 
     private RadioButton newRadio(String text, Property<Boolean> selected) {
@@ -652,6 +585,36 @@ public class PreferencesFormBuilder {
         }
     }
 
+    /// Places `attachment` directly after `primary`: appended to the primary's row if it sits in
+    /// an {@link HBox}, otherwise by wrapping the primary's grid cell into a row. Wrapping keeps
+    /// the cell's position and span, and the primary keeps growing while the attachment does not.
+    private void attachTo(Node primary, Node attachment) {
+        switch (primary.getParent()) {
+            case HBox row ->
+                    row.getChildren().add(attachment);
+            case GridPane grid -> {
+                Integer columnIndex = GridPane.getColumnIndex(primary);
+                Integer rowIndex = GridPane.getRowIndex(primary);
+                Integer columnSpan = GridPane.getColumnSpan(primary);
+                grid.getChildren().remove(primary);
+                HBox wrapper = new HBox(GAP, primary, attachment);
+                wrapper.setAlignment(Pos.CENTER_LEFT);
+                HBox.setHgrow(primary, Priority.ALWAYS);
+                GridPane.setHgrow(wrapper, Priority.ALWAYS);
+                grid.add(wrapper,
+                        columnIndex == null ? 0 : columnIndex,
+                        rowIndex == null ? 0 : rowIndex,
+                        columnSpan == null ? 1 : columnSpan,
+                        1);
+            }
+            case null ->
+                    throw new IllegalStateException("the control has not been placed yet; attach from within its config lambda");
+            default ->
+                    throw new IllegalStateException("cannot attach to a control sitting in a "
+                            + primary.getParent().getClass().getSimpleName());
+        }
+    }
+
     private void addField(String label, Node control) {
         GridPane grid = ensureGrid();
         if (label == null) {
@@ -769,7 +732,7 @@ public class PreferencesFormBuilder {
     /// `S` is the concrete handle type, so that a base method still returns the subclass and the
     /// order of a configuration chain does not matter.
     public abstract static sealed class ElementBase<S extends ElementBase<S, N>, N extends Node>
-            permits NodeElement, ControlElementBase {
+            permits NodeElement, InputElement {
 
         final PreferencesFormBuilder form;
         final N node;
@@ -797,8 +760,8 @@ public class PreferencesFormBuilder {
         }
 
         /// Disables the node while `condition` holds. Where the builder installed a disable binding
-        /// of its own — the value field of {@link #checkWithField}, the path field of
-        /// {@link #radioWithBrowse} — the two are combined, so the built-in coupling survives.
+        /// of its own — an {@link InputElement#attachField attached field} following its toggle —
+        /// the two are combined, so the built-in coupling survives.
         public S disableWhen(ObservableValue<? extends Boolean> condition) {
             ObservableValue<? extends Boolean> owned = form.ownedDisableBindings.get(node);
             ObservableValue<? extends Boolean> effective = owned == null ? condition : either(owned, condition);
@@ -836,68 +799,106 @@ public class PreferencesFormBuilder {
         }
     }
 
-    /// A {@link Control}, so it can carry a tooltip and validation decoration, and — being a
-    /// {@link Region} — can be told to take the remaining width.
-    public abstract static sealed class ControlElementBase<S extends ControlElementBase<S, N>, N extends Control>
-            extends ElementBase<S, N> permits InputElement, RowElement {
+    /// A {@link Control} the builder placed. Being a control, it can carry a tooltip and
+    /// validation decoration, be told to take the remaining width — and take **attachments**:
+    /// nodes appended right after it (a help button, a browse button, an inline value field) that
+    /// stay coupled to it instead of floating free in the layout.
+    public static final class InputElement<N extends Control> extends ElementBase<InputElement<N>, N> {
 
-        ControlElementBase(PreferencesFormBuilder form, N control) {
+        InputElement(PreferencesFormBuilder form, N control) {
             super(form, control);
         }
 
-        public S tooltip(String text) {
+        public InputElement<N> tooltip(String text) {
             node.setTooltip(new Tooltip(text));
-            return self();
+            return this;
         }
 
         /// Decorates the control with `status`, applied once on the FX thread in {@link #build()}.
-        public S validate(ValidationStatus status) {
+        public InputElement<N> validate(ValidationStatus status) {
             form.validate(status, node);
-            return self();
+            return this;
         }
 
         /// Lets the control take all remaining horizontal space in its row. Use where a builder
         /// default is too narrow, e.g. the value field of {@link #checkWithField} when it holds a
         /// name rather than a port number.
-        public S grow() {
+        public InputElement<N> grow() {
             node.setMaxWidth(Double.MAX_VALUE);
             HBox.setHgrow(node, Priority.ALWAYS);
-            return self();
-        }
-    }
-
-    /// A control the builder placed in a labelled grid row or a bare column.
-    public static final class InputElement<N extends Control> extends ControlElementBase<InputElement<N>, N> {
-
-        InputElement(PreferencesFormBuilder form, N control) {
-            super(form, control);
-        }
-    }
-
-    /// A control the builder placed in a row of its own, which is therefore the only kind that can
-    /// take a trailing help button.
-    public static final class RowElement<N extends Control> extends ControlElementBase<RowElement<N>, N> {
-
-        private final HBox row;
-
-        RowElement(PreferencesFormBuilder form, N control, HBox row) {
-            super(form, control);
-            this.row = row;
+            return this;
         }
 
-        public RowElement<N> help(HelpFile helpFile) {
+        // region attachments
+
+        /// Attaches an arbitrary node right after this control; it follows the control's disabled
+        /// state. The config lambda addresses the attachment.
+        public <A extends Node> InputElement<N> attach(A attachment) {
+            return attach(attachment, noConfig());
+        }
+
+        public <A extends Node> InputElement<N> attach(A attachment, Consumer<NodeElement<A>> config) {
+            attachment.disableProperty().bind(node.disableProperty());
+            form.attachTo(node, attachment);
+            config.accept(new NodeElement<>(form, attachment));
+            return this;
+        }
+
+        /// Attaches a text field bound to `value`. On a checkbox or radio the field is enabled
+        /// only while the toggle is selected (the recurring "option with inline value" pattern);
+        /// on any other control it follows the control's disabled state. The config lambda
+        /// addresses the new field.
+        public InputElement<N> attachField(StringProperty value) {
+            return attachField(value, noConfig());
+        }
+
+        public InputElement<N> attachField(StringProperty value, Consumer<InputElement<TextField>> config) {
+            TextField field = new TextField();
+            field.textProperty().bindBidirectional(value);
+            field.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(field, Priority.ALWAYS);
+            switch (node) {
+                case CheckBox box ->
+                        form.ownDisable(field, box.selectedProperty().not());
+                case ToggleButton toggle ->
+                        form.ownDisable(field, toggle.selectedProperty().not());
+                default ->
+                        field.disableProperty().bind(node.disableProperty());
+            }
+            form.attachTo(node, field);
+            config.accept(new InputElement<>(form, field));
+            return this;
+        }
+
+        /// Attaches a "browse" icon button that follows this control's disabled state.
+        public InputElement<N> browse(Runnable onBrowse) {
+            Button browseButton = new Button();
+            browseButton.setGraphic(IconTheme.JabRefIcons.OPEN.getGraphicNode());
+            browseButton.getStyleClass().addAll("icon-button", "narrow");
+            browseButton.setPrefSize(20.0, 20.0);
+            browseButton.setTooltip(new Tooltip(Localization.lang("Browse")));
+            browseButton.disableProperty().bind(node.disableProperty());
+            browseButton.setOnAction(_ -> onBrowse.run());
+            form.attachTo(node, browseButton);
+            return this;
+        }
+
+        /// Attaches a help icon button. Help stays clickable even while the control is disabled.
+        public InputElement<N> help(HelpFile helpFile) {
             return help(StandardActions.HELP, helpFile);
         }
 
-        public RowElement<N> help(StandardActions action, HelpFile helpFile) {
-            row.getChildren().add(form.helpButton(action, helpFile));
+        public InputElement<N> help(StandardActions action, HelpFile helpFile) {
+            form.attachTo(node, form.helpButton(action, helpFile));
             return this;
         }
 
-        /// Appends a help icon button linking to a documentation URL.
-        public RowElement<N> help(String helpUrl) {
-            row.getChildren().add(new HelpButton(helpUrl));
+        /// Attaches a help icon button linking to a documentation URL.
+        public InputElement<N> help(String helpUrl) {
+            form.attachTo(node, new HelpButton(helpUrl));
             return this;
         }
+
+        // endregion
     }
 }

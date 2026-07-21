@@ -66,8 +66,9 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                                         .disableWhen(viewModel.themeSyncOsProperty())
                                         .validate(viewModel.themeValidationStatus()))
                         .checkbox(Localization.lang("Use System Preference"), viewModel.themeSyncOsProperty())
-                        .browseField(null, viewModel.customPathToThemeProperty(), viewModel::importCSSFile,
+                        .stringField(null, viewModel.customPathToThemeProperty(),
                                 path -> path
+                                        .browse(viewModel::importCSSFile)
                                         .disableWhen(viewModel.selectedThemeProperty().isNotEqualTo(ThemeTypes.CUSTOM))
                                         .validate(viewModel.customPathToThemeValidationStatus()))
                         .checkbox(Localization.lang("Override default font settings"), viewModel.fontOverrideProperty())
@@ -110,10 +111,10 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> {
                         .checkbox(Localization.lang("Autosave local libraries"), viewModel.autosaveLocalLibrariesProperty(),
                                 autosave -> autosave.help(HelpFile.AUTOSAVE))
                         .checkbox(Localization.lang("Create backup"), viewModel.createBackupProperty())
-                        .browseField(null,
-                                viewModel.backupDirectoryProperty(),
-                                viewModel::backupFileDirBrowse,
-                                directory -> directory.disableWhen(viewModel.createBackupProperty().not())))
+                        .stringField(null, viewModel.backupDirectoryProperty(),
+                                directory -> directory
+                                        .browse(viewModel::backupFileDirBrowse)
+                                        .disableWhen(viewModel.createBackupProperty().not())))
 
                 .build());
     }

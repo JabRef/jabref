@@ -26,10 +26,11 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
 
                 .section(Localization.lang("File directory"), fileDirectory -> fileDirectory
                         .radioGroup(directory -> directory
-                                .radioWithBrowse(Localization.lang("Main file directory"),
-                                        viewModel.useMainFileDirectoryProperty(), viewModel.mainFileDirectoryProperty(), viewModel::mainFileDirBrowse,
-                                        path -> path.disableWhen(viewModel.useBibLocationAsPrimaryProperty())
-                                                    .validate(viewModel.mainFileDirValidationStatus()))
+                                .radio(Localization.lang("Main file directory"), viewModel.useMainFileDirectoryProperty(),
+                                        mainDir -> mainDir.attachField(viewModel.mainFileDirectoryProperty(),
+                                                path -> path.browse(viewModel::mainFileDirBrowse)
+                                                            .disableWhen(viewModel.useBibLocationAsPrimaryProperty())
+                                                            .validate(viewModel.mainFileDirValidationStatus())))
                                 .radio(Localization.lang("Search and store files relative to library file location"),
                                         viewModel.useBibLocationAsPrimaryProperty(),
                                         relative -> relative.tooltip(Localization.lang("When downloading files, or moving linked files to the file directory, use the bib file location.")))))
@@ -43,9 +44,9 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
                         .radioGroup(autolink -> autolink
                                 .radio(Localization.lang("Autolink files with names starting with the citation key"), viewModel.autolinkFileStartsBibtexProperty())
                                 .radio(Localization.lang("Autolink only files that match the citation key"), viewModel.autolinkFileExactBibtexProperty())
-                                .radioWithField(Localization.lang("Use regular expression search"),
-                                        viewModel.autolinkUseRegexProperty(), viewModel.autolinkRegexKeyProperty(),
-                                        regex -> regex.help(StandardActions.HELP_REGEX_SEARCH, HelpFile.REGEX_SEARCH))))
+                                .radio(Localization.lang("Use regular expression search"), viewModel.autolinkUseRegexProperty(),
+                                        useRegex -> useRegex.attachField(viewModel.autolinkRegexKeyProperty(),
+                                                regex -> regex.help(StandardActions.HELP_REGEX_SEARCH, HelpFile.REGEX_SEARCH)))))
 
                 .section(Localization.lang("Fulltext Index"), fulltext -> fulltext
                         .checkbox(Localization.lang("Automatically index all linked files for fulltext search"), viewModel.fulltextIndexProperty()))
