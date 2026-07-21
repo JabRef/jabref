@@ -25,7 +25,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.PreferencesDialogState;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.PasswordFieldEditor;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.ai.AiNamingUtils;
@@ -41,7 +41,7 @@ import com.dlsc.unitfx.IntegerInputField;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class AiTab extends AbstractFormTabView<AiTabViewModel> {
+public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
 
     private static final String HUGGING_FACE_CHAT_MODEL_PROMPT = "TinyLlama/TinyLlama_v1.1 (or any other model name)";
 

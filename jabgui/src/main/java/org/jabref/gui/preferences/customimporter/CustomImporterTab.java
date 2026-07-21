@@ -11,13 +11,13 @@ import javafx.scene.layout.HBox;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ImporterViewModel;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 
 import com.tobiasdiez.easybind.EasyBind;
 
-public class CustomImporterTab extends AbstractFormTabView<CustomImporterTabViewModel> {
+public class CustomImporterTab extends AbstractPreferenceTabView<CustomImporterTabViewModel> {
 
     public CustomImporterTab() {
         viewModel = new CustomImporterTabViewModel(preferences, dialogService);

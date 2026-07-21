@@ -21,14 +21,14 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.preferences.PreferencesDialogState;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.component.HelpButton;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
 
-public class WebSearchTab extends AbstractFormTabView<WebSearchTabViewModel> {
+public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewModel> {
 
     // Multiplier for row height based on font size
     private static final double FONT_HEIGHT_MULTIPLIER = 2.5;

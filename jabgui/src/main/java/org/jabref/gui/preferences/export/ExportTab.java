@@ -1,10 +1,10 @@
 package org.jabref.gui.preferences.export;
 
 import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.logic.l10n.Localization;
 
-public class ExportTab extends AbstractFormTabView<ExportTabViewModel> {
+public class ExportTab extends AbstractPreferenceTabView<ExportTabViewModel> {
 
     public ExportTab() {
         this.viewModel = new ExportTabViewModel(preferences.getExportPreferences());

@@ -23,7 +23,7 @@ import javafx.scene.paint.Color;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.keybindings.presets.KeyBindingPreset;
 import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.RecursiveTreeItem;
@@ -33,7 +33,7 @@ import org.jabref.logic.l10n.Localization;
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.textfield.CustomTextField;
 
-public class KeyBindingsTab extends AbstractFormTabView<KeyBindingsTabViewModel> {
+public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabViewModel> {
 
     private final TreeTableView<KeyBindingViewModel> keyBindingsTable = new TreeTableView<>();
 

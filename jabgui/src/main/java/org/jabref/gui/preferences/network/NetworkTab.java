@@ -23,7 +23,7 @@ import javafx.scene.layout.Priority;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.PasswordFieldEditor;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -35,7 +35,7 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 import static javafx.beans.binding.Bindings.not;
 
-public class NetworkTab extends AbstractFormTabView<NetworkTabViewModel> {
+public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> {
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 

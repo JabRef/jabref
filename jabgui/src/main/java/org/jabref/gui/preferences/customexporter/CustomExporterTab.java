@@ -10,12 +10,12 @@ import javafx.scene.layout.HBox;
 
 import org.jabref.gui.exporter.ExporterViewModel;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.logic.l10n.Localization;
 
 import com.tobiasdiez.easybind.EasyBind;
 
-public class CustomExporterTab extends AbstractFormTabView<CustomExporterTabViewModel> {
+public class CustomExporterTab extends AbstractPreferenceTabView<CustomExporterTabViewModel> {
 
     public CustomExporterTab() {
         viewModel = new CustomExporterTabViewModel(preferences, dialogService);

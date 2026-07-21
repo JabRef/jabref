@@ -17,12 +17,12 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
-public class NameFormatterTab extends AbstractFormTabView<NameFormatterTabViewModel> {
+public class NameFormatterTab extends AbstractPreferenceTabView<NameFormatterTabViewModel> {
 
     public NameFormatterTab() {
         this.viewModel = new NameFormatterTabViewModel(preferences.getNameFormatterPreferences());

@@ -18,7 +18,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -30,7 +30,7 @@ import org.jabref.model.entry.field.Field;
 import com.airhacks.afterburner.injection.Injector;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class XmpPrivacyTab extends AbstractFormTabView<XmpPrivacyTabViewModel> {
+public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewModel> {
 
     private final UndoManager undoManager = Injector.instantiateModelOrService(UndoManager.class);
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();

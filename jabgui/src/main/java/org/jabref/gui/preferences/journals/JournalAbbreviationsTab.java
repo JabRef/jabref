@@ -29,7 +29,7 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -40,7 +40,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.textfield.CustomTextField;
 
 /// Tab for managing journal abbreviation lists.
-public class JournalAbbreviationsTab extends AbstractFormTabView<JournalAbbreviationsTabViewModel> {
+public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAbbreviationsTabViewModel> {
 
     private final TableView<AbbreviationViewModel> journalAbbreviationsTable = new TableView<>();
     private final TableColumn<AbbreviationViewModel, String> journalTableNameColumn = new TableColumn<>(Localization.lang("Full journal name"));

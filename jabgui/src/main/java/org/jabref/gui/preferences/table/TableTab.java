@@ -15,7 +15,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -25,7 +25,7 @@ import org.jabref.logic.l10n.Localization;
 
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class TableTab extends AbstractFormTabView<TableTabViewModel> {
+public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> {
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 

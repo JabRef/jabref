@@ -15,7 +15,7 @@ import javafx.scene.layout.Priority;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.preferences.forms.AbstractFormTabView;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.TagsFieldEditor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -24,7 +24,7 @@ import org.jabref.model.entry.field.FieldTextMapper;
 
 import com.dlsc.gemsfx.TagsField;
 
-public class EntryTab extends AbstractFormTabView<EntryTabViewModel> {
+public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> {
 
     public EntryTab() {
         this.viewModel = new EntryTabViewModel(preferences);
