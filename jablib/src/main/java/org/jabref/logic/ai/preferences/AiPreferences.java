@@ -252,6 +252,64 @@ public class AiPreferences {
         return new AiPreferences();
     }
 
+    /// Creates an independent copy of `other`, e.g. as a dialog-scoped working copy that is
+    /// edited freely and flushed back via {@link #copyFrom(AiPreferences)} on save.
+    public static AiPreferences copyOf(AiPreferences other) {
+        AiPreferences copy = new AiPreferences();
+        copy.copyFrom(other);
+        return copy;
+    }
+
+    /// Copies all persisted, user-editable values from `other` into this instance.
+    ///
+    /// [#aiFeaturesEnabledInitially] is deliberately not copied: it captures the state at JabRef
+    /// startup and belongs to the instance's own session, not to the copied values.
+    public void copyFrom(AiPreferences other) {
+        setAiFeaturesEnabledCurrently(other.getAiFeaturesEnabledCurrently());
+        setAutoGenerateEmbeddings(other.getAutoGenerateEmbeddings());
+        setAutoGenerateSummaries(other.getAutoGenerateSummaries());
+
+        setAiProvider(other.getAiProvider());
+
+        setOpenAiChatModel(other.getOpenAiChatModel());
+        setMistralAiChatModel(other.getMistralAiChatModel());
+        setGeminiChatModel(other.getGeminiChatModel());
+        setHuggingFaceChatModel(other.getHuggingFaceChatModel());
+
+        setCustomizeExpertSettings(other.getCustomizeExpertSettings());
+
+        setOpenAiApiBaseUrl(other.getOpenAiApiBaseUrl());
+        setMistralAiApiBaseUrl(other.getMistralAiApiBaseUrl());
+        setGeminiApiBaseUrl(other.getGeminiApiBaseUrl());
+        setHuggingFaceApiBaseUrl(other.getHuggingFaceApiBaseUrl());
+
+        setSummarizatorKind(other.getSummarizatorKind());
+        setTokenEstimatorKind(other.getTokenEstimatorKind());
+        setEmbeddingModel(other.getEmbeddingModel());
+        setTemperature(other.getTemperature());
+        setContextWindowSize(other.getContextWindowSize());
+
+        setDocumentSplitterKind(other.getDocumentSplitterKind());
+        setDocumentSplitterChunkSize(other.getDocumentSplitterChunkSize());
+        setDocumentSplitterOverlapSize(other.getDocumentSplitterOverlapSize());
+
+        setResponseEngineKind(other.getResponseEngineKind());
+        setRagMaxResultsCount(other.getRagMaxResultsCount());
+        setRagMinScore(other.getRagMinScore());
+
+        setChattingSystemMessageTemplate(other.getChattingSystemMessageTemplate());
+        setChattingUserMessageTemplate(other.getChattingUserMessageTemplate());
+        setSummarizationChunkSystemMessageTemplate(other.getSummarizationChunkSystemMessageTemplate());
+        setSummarizationCombineSystemMessageTemplate(other.getSummarizationCombineSystemMessageTemplate());
+        setSummarizationFullDocumentSystemMessageTemplate(other.getSummarizationFullDocumentSystemMessageTemplate());
+        setCitationParsingSystemMessageTemplate(other.getCitationParsingSystemMessageTemplate());
+        setMarkdownChatExportTemplate(other.getMarkdownChatExportTemplate());
+
+        setGenerateFollowUpQuestions(other.getGenerateFollowUpQuestions());
+        setFollowUpQuestionsCount(other.getFollowUpQuestionsCount());
+        setFollowUpQuestionsTemplate(other.getFollowUpQuestionsTemplate());
+    }
+
     public String getApiKeyForAiProvider(AiProvider aiProvider) {
         try (final Keyring keyring = Keyring.create()) {
             return keyring.getPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());

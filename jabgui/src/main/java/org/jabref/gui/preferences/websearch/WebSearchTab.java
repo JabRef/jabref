@@ -20,9 +20,9 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.preferences.PreferencesDialogState;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.util.component.HelpButton;
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
@@ -45,7 +45,9 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     /// tracks the configured font size.
     private final Label tableNote = new Label(Localization.lang("( Note: Press return to commit changes in the table! )"));
 
-    public WebSearchTab(PreferencesDialogState dialogState) {
+    /// @param workingAiPreferences the dialog-scoped working copy edited by the AI tab; this tab
+    ///                             observes its master switch to offer or hide the LLM citation parser
+    public WebSearchTab(AiPreferences workingAiPreferences) {
         this.viewModel = new WebSearchTabViewModel(
                 preferences.getImporterPreferences(),
                 preferences.getGrobidPreferences(),
@@ -53,7 +55,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
                 preferences.getFilePreferences(),
                 preferences.getImportFormatPreferences(),
                 preferences.getLibraryPreferences(),
-                dialogState.aiEnabledReadOnlyProperty(),
+                workingAiPreferences.aiFeaturesEnabledCurrentlyProperty(),
                 taskExecutor);
         buildView();
     }

@@ -24,12 +24,12 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.preferences.PreferencesDialogState;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.forms.PasswordFieldEditor;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.ai.AiNamingUtils;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
@@ -52,13 +52,13 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
 
     private TabPane templatesTabPane;
 
-    public AiTab(PreferencesDialogState dialogState) {
+    public AiTab(AiPreferences workingAiPreferences) {
         this.viewModel = new AiTabViewModel(
                 preferences.getAiPreferences(),
+                workingAiPreferences,
                 Injector.instantiateModelOrService(AiService.class).getModelService(),
                 taskExecutor);
         this.aiDisabled = viewModel.enableAi().not();
-        dialogState.aiEnabledProperty().bind(viewModel.enableAi());
 
         visualizer.setDecoration(new IconValidationDecorator());
         buildView();
