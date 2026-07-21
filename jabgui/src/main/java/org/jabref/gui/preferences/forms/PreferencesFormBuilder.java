@@ -289,15 +289,14 @@ public class PreferencesFormBuilder {
 
     // region radio groups
 
-    /// Opens a mutually-exclusive radio group. Radios added until {@link #endRadioGroup()} share one
-    /// {@link ToggleGroup}; each stays bound to its own boolean property (matching the existing VMs).
-    public PreferencesFormBuilder beginRadioGroup() {
+    /// A mutually-exclusive radio group: radios added inside share one {@link ToggleGroup}, while
+    /// each stays bound to its own boolean property (matching the existing view models). Unlike a
+    /// {@link #group}, this adds no container — the radios stay in the surrounding layout.
+    public PreferencesFormBuilder radioGroup(Consumer<PreferencesFormBuilder> content) {
+        ToggleGroup enclosing = currentToggleGroup;
         currentToggleGroup = new ToggleGroup();
-        return this;
-    }
-
-    public PreferencesFormBuilder endRadioGroup() {
-        currentToggleGroup = null;
+        content.accept(this);
+        currentToggleGroup = enclosing;
         return this;
     }
 
@@ -385,53 +384,39 @@ public class PreferencesFormBuilder {
     /// (called before adding children) bind the whole group — e.g.
     /// `beginGroup().visibleWhen(expertOn)` or `beginGroup().disableWhen(aiOff)` (disable propagates
     /// to every descendant). Both are combinable.
-    public PreferencesFormBuilder beginGroup() {
+    public PreferencesFormBuilder group(Consumer<PreferencesFormBuilder> content) {
+        return region(new VBox(10.0), content);
+    }
+
+    /// A side-by-side region: every element inside becomes an equally growing column. Usually filled
+    /// with {@link #group} blocks, one per column.
+    public PreferencesFormBuilder columns(Consumer<PreferencesFormBuilder> content) {
+        return region(new HBox(10.0), content);
+    }
+
+    /// A wrapping region: elements flow left to right and wrap onto the next line as the dialog
+    /// narrows. Gaps come from CSS, not from {@link #spacing}.
+    public PreferencesFormBuilder flow(Consumer<PreferencesFormBuilder> content) {
+        return region(new FlowPane(), content);
+    }
+
+    /// Everything added inside becomes a sub-region of the form. Nesting is the lambda's, so a
+    /// region cannot be left unclosed, and trailing configuration after the call applies to the
+    /// region as a whole — `group(g -> ...).disableWhen(off)` disables all of its contents.
+    private PreferencesFormBuilder region(Pane region, Consumer<PreferencesFormBuilder> content) {
         flushGrid();
-        VBox group = new VBox(10.0);
-        addToContainer(group);
-        containers.push(group);
-        lastControl = group;
+        addToContainer(region);
+        containers.push(region);
+        lastControl = region;
         lastRow = null;
-        return this;
-    }
 
-    /// Opens a side-by-side region: every element added until {@link #endColumns()} becomes an
-    /// equally growing column. Usually filled with {@link #beginGroup()} blocks, one per column.
-    public PreferencesFormBuilder beginColumns() {
+        content.accept(this);
+
         flushGrid();
-        HBox columns = new HBox(10.0);
-        addToContainer(columns);
-        containers.push(columns);
-        lastControl = columns;
+        containers.pop();
+        // The region itself, not its last child, is the subject of what follows.
+        lastControl = region;
         lastRow = null;
-        return this;
-    }
-
-    public PreferencesFormBuilder endColumns() {
-        return endGroup();
-    }
-
-    /// Opens a wrapping region: elements added until {@link #endFlow()} flow left to right and wrap
-    /// onto the next line as the dialog narrows. Gaps come from CSS, not from {@link #spacing}.
-    public PreferencesFormBuilder beginFlow() {
-        flushGrid();
-        FlowPane flow = new FlowPane();
-        addToContainer(flow);
-        containers.push(flow);
-        lastControl = flow;
-        lastRow = null;
-        return this;
-    }
-
-    public PreferencesFormBuilder endFlow() {
-        return endGroup();
-    }
-
-    public PreferencesFormBuilder endGroup() {
-        flushGrid();
-        if (containers.size() > 1) {
-            containers.pop();
-        }
         return this;
     }
 

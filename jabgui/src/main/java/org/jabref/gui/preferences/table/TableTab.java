@@ -53,35 +53,28 @@ public class TableTab extends AbstractFormTabView<TableTabViewModel> {
                 .checkbox(Localization.lang("Fit table horizontally on screen"), viewModel.autoResizeColumnsProperty())
 
                 .section(Localization.lang("Format of author and editor names"))
-                .beginColumns()
-                    .beginGroup()
-                        .label(Localization.lang("Order"))
-                        .beginGroup()
-                            .styleClass("prefIndent")
-                            .spacing(4.0)
-                            .beginRadioGroup()
-                            .radio(Localization.lang("Natbib style"), viewModel.namesNatbibProperty())
-                            .radio(Localization.lang("Show names unchanged"), viewModel.nameAsIsProperty())
-                            .radio(Localization.lang("Show 'Firstname Lastname'"), viewModel.nameFirstLastProperty())
-                            .radio(Localization.lang("Show 'Lastname, Firstname'"), viewModel.nameLastFirstProperty())
-                            .endRadioGroup()
-                        .endGroup()
-                    .endGroup()
-                    .beginGroup()
-                        .label(Localization.lang("Abbreviations"))
-                        .beginGroup()
-                            .styleClass("prefIndent")
-                            .spacing(4.0)
-                            // Natbib and "unchanged" render names verbatim, so abbreviation does not apply.
-                            .disableWhen(viewModel.namesNatbibProperty().or(viewModel.nameAsIsProperty()))
-                            .beginRadioGroup()
-                            .radio(Localization.lang("Do not abbreviate names"), viewModel.abbreviationDisabledProperty())
-                            .radio(Localization.lang("Abbreviate names"), viewModel.abbreviationEnabledProperty())
-                            .radio(Localization.lang("Show last names only"), viewModel.abbreviationLastNameOnlyProperty())
-                            .endRadioGroup()
-                        .endGroup()
-                    .endGroup()
-                .endColumns()
+                .columns(nameFormat -> nameFormat
+                        .group(order -> order
+                                .label(Localization.lang("Order"))
+                                .group(choices -> choices
+                                        .radioGroup(choice -> choice
+                                                .radio(Localization.lang("Natbib style"), viewModel.namesNatbibProperty())
+                                                .radio(Localization.lang("Show names unchanged"), viewModel.nameAsIsProperty())
+                                                .radio(Localization.lang("Show 'Firstname Lastname'"), viewModel.nameFirstLastProperty())
+                                                .radio(Localization.lang("Show 'Lastname, Firstname'"), viewModel.nameLastFirstProperty())))
+                                    .styleClass("prefIndent")
+                                    .spacing(4.0))
+                        .group(abbreviation -> abbreviation
+                                .label(Localization.lang("Abbreviations"))
+                                .group(choices -> choices
+                                        .radioGroup(choice -> choice
+                                                .radio(Localization.lang("Do not abbreviate names"), viewModel.abbreviationDisabledProperty())
+                                                .radio(Localization.lang("Abbreviate names"), viewModel.abbreviationEnabledProperty())
+                                                .radio(Localization.lang("Show last names only"), viewModel.abbreviationLastNameOnlyProperty())))
+                                    .styleClass("prefIndent")
+                                    .spacing(4.0)
+                                    // Natbib and "unchanged" render names verbatim, so abbreviation does not apply.
+                                    .disableWhen(viewModel.namesNatbibProperty().or(viewModel.nameAsIsProperty()))))
 
                 .build());
     }
