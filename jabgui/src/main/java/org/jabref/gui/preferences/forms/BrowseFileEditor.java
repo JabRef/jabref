@@ -19,6 +19,9 @@ import org.jabref.logic.l10n.Localization;
 /// `field().disableProperty()` (via [PreferencesFormBuilder.disableWhen]) disables the whole row.
 public final class BrowseFileEditor {
 
+    /// Tight gap between a field and the icon button that belongs to it.
+    private static final double GAP = 4.0;
+
     /// @param row   the assembled `[TextField][browse]` row to place in the form
     /// @param field the text field, exposed so callers can attach validation/disable bindings
     public record Result(HBox row, TextField field) {
@@ -40,7 +43,7 @@ public final class BrowseFileEditor {
         browse.disableProperty().bind(field.disableProperty());
         browse.setOnAction(_ -> onBrowse.run());
 
-        HBox row = new HBox(4.0, field, browse);
+        HBox row = new HBox(GAP, field, browse);
         row.setAlignment(Pos.CENTER_LEFT);
         return new Result(row, field);
     }
