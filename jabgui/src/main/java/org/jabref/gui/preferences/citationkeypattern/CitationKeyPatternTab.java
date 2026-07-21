@@ -1,38 +1,33 @@
 package org.jabref.gui.preferences.citationkeypattern;
 
-import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.RadioButton;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanel;
-import org.jabref.gui.preferences.AbstractPreferenceTabView;
-import org.jabref.gui.preferences.PreferencesTab;
+import org.jabref.gui.preferences.forms.AbstractFormTabView;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.injection.Injector;
-import com.airhacks.afterburner.views.ViewLoader;
 
-public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKeyPatternTabViewModel> implements PreferencesTab {
+public class CitationKeyPatternTab extends AbstractFormTabView<CitationKeyPatternTabViewModel> {
 
-    @FXML private CheckBox transliterateFieldsForCitationKey;
-    @FXML private CheckBox overwriteAllow;
-    @FXML private CheckBox overwriteWarning;
-    @FXML private CheckBox generateOnSave;
-    @FXML private CheckBox generateNewKeyOnImport;
-    @FXML private RadioButton letterStartA;
-    @FXML private RadioButton letterStartB;
-    @FXML private RadioButton letterAlwaysAdd;
-    @FXML private TextField keyPatternRegex;
-    @FXML private TextField keyPatternReplacement;
-    @FXML private TextField unwantedCharacters;
-    @FXML private CitationKeyPatternsPanel bibtexKeyPatternTable;
+    private static final String KEY_PATTERNS_HELP_URL = "https://docs.jabref.org/setup/citationkeypatterns";
+    private static final String REGEX_HELP_URL = KEY_PATTERNS_HELP_URL + "#replace-via-regular-expression";
+
+    private final CitationKeyPatternsPanel keyPatternsPanel = new CitationKeyPatternsPanel();
 
     public CitationKeyPatternTab() {
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+        this.viewModel = new CitationKeyPatternTabViewModel(
+                preferences.getCitationKeyPatternPreferences(),
+                preferences.getImporterPreferences());
+        buildView();
     }
 
     @Override
@@ -40,41 +35,77 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
         return Localization.lang("Citation key generator");
     }
 
-    public void initialize() {
-        this.viewModel = new CitationKeyPatternTabViewModel(preferences.getCitationKeyPatternPreferences(), preferences.getImporterPreferences());
+    private void buildView() {
+        getChildren().add(form()
+                .title(Localization.lang("Citation key patterns"))
 
-        transliterateFieldsForCitationKey.selectedProperty().bindBidirectional(viewModel.transliterateFieldsForCitationKeyProperty());
-        overwriteAllow.selectedProperty().bindBidirectional(viewModel.overwriteAllowProperty());
-        overwriteWarning.selectedProperty().bindBidirectional(viewModel.overwriteWarningProperty());
-        generateOnSave.selectedProperty().bindBidirectional(viewModel.generateOnSaveProperty());
-        generateNewKeyOnImport.selectedProperty().bindBidirectional(viewModel.generateKeyOnImportProperty());
-        letterStartA.selectedProperty().bindBidirectional(viewModel.letterStartAProperty());
-        letterStartB.selectedProperty().bindBidirectional(viewModel.letterStartBProperty());
-        letterAlwaysAdd.selectedProperty().bindBidirectional(viewModel.letterAlwaysAddProperty());
-        keyPatternRegex.textProperty().bindBidirectional(viewModel.keyPatternRegexProperty());
-        keyPatternReplacement.textProperty().bindBidirectional(viewModel.keyPatternReplacementProperty());
-        unwantedCharacters.textProperty().bindBidirectional(viewModel.unwantedCharactersProperty());
+                .section(Localization.lang("General"))
+                .checkbox(Localization.lang("Overwrite existing keys"), viewModel.overwriteAllowProperty())
+                .checkbox(Localization.lang("Warn before overwriting existing keys"), viewModel.overwriteWarningProperty())
+                    .disableWhen(viewModel.overwriteAllowProperty().not())
+                    .styleClass("prefIndent")
+                .checkbox(Localization.lang("Generate keys before saving (only for entries without a key)"), viewModel.generateOnSaveProperty())
+                .checkbox(Localization.lang("Generate new keys for imported entries (overwriting their default)"), viewModel.generateKeyOnImportProperty())
 
-        bibtexKeyPatternTable.patternListProperty().bindBidirectional(viewModel.patternListProperty());
-        bibtexKeyPatternTable.defaultKeyPatternProperty().bindBidirectional(viewModel.defaultKeyPatternProperty());
+                .label(Localization.lang("Letters after duplicate generated keys"))
+                .beginGroup()
+                    .styleClass("prefIndent")
+                    .beginRadioGroup()
+                    .radio(Localization.lang("Start on second duplicate key with letter A (a, b, ...)"), viewModel.letterStartAProperty())
+                    .radio(Localization.lang("Start on second duplicate key with letter B (b, c, ...)"), viewModel.letterStartBProperty())
+                    .radio(Localization.lang("Always add letter (a, b, ...) to generated keys"), viewModel.letterAlwaysAddProperty())
+                    .endRadioGroup()
+                .endGroup()
+
+                .field(Localization.lang("Replace (regular expression)"), buildRegexReplacementRow())
+                    .help(REGEX_HELP_URL)
+                .stringField(Localization.lang("Remove the following characters:"), viewModel.unwantedCharactersProperty())
+                .checkbox(Localization.lang("Transliterate fields that are used for generating the citation key"), viewModel.transliterateFieldsForCitationKeyProperty())
+
+                .sectionWithHelp(Localization.lang("Key patterns"), KEY_PATTERNS_HELP_URL)
+                .label(Localization.lang("( Note: Press return to commit changes in the table! )"))
+                .custom(buildKeyPatternsRegion())
+
+                .build());
+    }
+
+    /// `[regex] by [replacement]` — a single labelled cell, so the two fields stay adjacent.
+    private Node buildRegexReplacementRow() {
+        TextField regex = new TextField();
+        regex.textProperty().bindBidirectional(viewModel.keyPatternRegexProperty());
+        HBox.setHgrow(regex, Priority.ALWAYS);
+
+        TextField replacement = new TextField();
+        replacement.textProperty().bindBidirectional(viewModel.keyPatternReplacementProperty());
+        HBox.setHgrow(replacement, Priority.ALWAYS);
+
+        HBox row = new HBox(4.0, regex, new Label(Localization.lang("by")), replacement);
+        row.setAlignment(Pos.CENTER_LEFT);
+        return row;
+    }
+
+    /// The pattern table with a "Reset All" button overlaid in its top-right corner.
+    private Node buildKeyPatternsRegion() {
+        keyPatternsPanel.patternListProperty().bindBidirectional(viewModel.patternListProperty());
+        keyPatternsPanel.defaultKeyPatternProperty().bindBidirectional(viewModel.defaultKeyPatternProperty());
+        keyPatternsPanel.setPrefHeight(180.0);
+        AnchorPane.setLeftAnchor(keyPatternsPanel, 0.0);
+        AnchorPane.setRightAnchor(keyPatternsPanel, 0.0);
+
+        Button resetAll = new Button(Localization.lang("Reset All"));
+        resetAll.setOnAction(_ -> keyPatternsPanel.resetAll());
+        AnchorPane.setRightAnchor(resetAll, 0.0);
+        AnchorPane.setTopAnchor(resetAll, 0.0);
+
+        return new AnchorPane(keyPatternsPanel, resetAll);
     }
 
     @Override
     public void setValues() {
         viewModel.setValues();
         BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
-        bibtexKeyPatternTable.setValues(
+        keyPatternsPanel.setValues(
                 entryTypesManager.getAllTypes(preferences.getLibraryPreferences().getDefaultBibDatabaseMode()),
                 preferences.getCitationKeyPatternPreferences().getKeyPatterns());
-    }
-
-    @Override
-    public void storeSettings() {
-        viewModel.storeSettings();
-    }
-
-    @FXML
-    public void resetAllKeyPatterns() {
-        bibtexKeyPatternTable.resetAll();
     }
 }
