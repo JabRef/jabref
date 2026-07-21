@@ -42,6 +42,8 @@ This applies to all catalogs the system supports, regardless of whether the rese
 ## Lock file for reproducibility
 `req~slr.lock-file~1`
 
+Needs: impl
+
 Covers: `feat~slr~1`
 
 After each crawl, the system shall record the exact query sent to each catalog so the crawl can be reproduced. The record shall be machine-readable and produce identical content when the same study is crawled again with no changes.
