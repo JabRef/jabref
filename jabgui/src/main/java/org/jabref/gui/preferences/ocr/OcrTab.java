@@ -31,12 +31,12 @@ public class OcrTab extends AbstractFormTabView<OcrTabViewModel> {
         getChildren().add(form()
                 .title(Localization.lang("OCR"))
 
-                .section(Localization.lang("Partially scanned PDFs"))
-                .combo(Localization.lang("OCR for partially scanned PDFs"),
-                        viewModel.pagesHaveTextOptions(), viewModel.selectedPagesHaveTextProperty(), PagesWithTextHandling::getDisplayName)
+                .section(Localization.lang("Partially scanned PDFs"), scanned -> scanned
+                        .combo(Localization.lang("OCR for partially scanned PDFs"),
+                                viewModel.pagesHaveTextOptions(), viewModel.selectedPagesHaveTextProperty(), PagesWithTextHandling::getDisplayName))
 
-                .section(Localization.lang("OCR engine path"))
-                .custom(buildEnginePathRow())
+                .section(Localization.lang("OCR engine path"), engine -> engine
+                        .custom(buildEnginePathRow()))
 
                 .build());
     }

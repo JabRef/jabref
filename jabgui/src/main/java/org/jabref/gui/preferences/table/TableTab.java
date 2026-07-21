@@ -45,36 +45,36 @@ public class TableTab extends AbstractFormTabView<TableTabViewModel> {
         getChildren().add(form()
                 .title(Localization.lang("Entry table"))
 
-                .section(Localization.lang("Columns"))
-                .custom(buildColumnsRegion())
-                .checkbox(Localization.lang("Enable special fields"), viewModel.specialFieldsEnabledProperty(),
-                        specialFields -> specialFields.help(StandardActions.HELP_SPECIAL_FIELDS, HelpFile.SPECIAL_FIELDS))
-                .checkbox(Localization.lang("Show extra columns"), viewModel.extraFileColumnsEnabledProperty())
-                .checkbox(Localization.lang("Fit table horizontally on screen"), viewModel.autoResizeColumnsProperty())
+                .section(Localization.lang("Columns"), columns -> columns
+                        .custom(buildColumnsRegion())
+                        .checkbox(Localization.lang("Enable special fields"), viewModel.specialFieldsEnabledProperty(),
+                                specialFields -> specialFields.help(StandardActions.HELP_SPECIAL_FIELDS, HelpFile.SPECIAL_FIELDS))
+                        .checkbox(Localization.lang("Show extra columns"), viewModel.extraFileColumnsEnabledProperty())
+                        .checkbox(Localization.lang("Fit table horizontally on screen"), viewModel.autoResizeColumnsProperty()))
 
-                .section(Localization.lang("Format of author and editor names"))
-                .columns(nameFormat -> nameFormat
-                        .group(order -> order
-                                .label(Localization.lang("Order"))
-                                .group(choices -> choices
-                                        .radioGroup(choice -> choice
-                                                .radio(Localization.lang("Natbib style"), viewModel.namesNatbibProperty())
-                                                .radio(Localization.lang("Show names unchanged"), viewModel.nameAsIsProperty())
-                                                .radio(Localization.lang("Show 'Firstname Lastname'"), viewModel.nameFirstLastProperty())
-                                                .radio(Localization.lang("Show 'Lastname, Firstname'"), viewModel.nameLastFirstProperty())),
-                                        indent -> indent.styleClass("prefIndent").spacing(4.0)))
-                        .group(abbreviation -> abbreviation
-                                .label(Localization.lang("Abbreviations"))
-                                .group(choices -> choices
-                                        .radioGroup(choice -> choice
-                                                .radio(Localization.lang("Do not abbreviate names"), viewModel.abbreviationDisabledProperty())
-                                                .radio(Localization.lang("Abbreviate names"), viewModel.abbreviationEnabledProperty())
-                                                .radio(Localization.lang("Show last names only"), viewModel.abbreviationLastNameOnlyProperty())),
-                                        indent -> indent.styleClass("prefIndent")
-                                                        .spacing(4.0)
-                                                        // Natbib and "unchanged" render names verbatim,
-                                                        // so abbreviation does not apply.
-                                                        .disableWhen(viewModel.namesNatbibProperty().or(viewModel.nameAsIsProperty())))))
+                .section(Localization.lang("Format of author and editor names"), nameFormat -> nameFormat
+                        .columns(sideBySide -> sideBySide
+                                .group(order -> order
+                                        .label(Localization.lang("Order"))
+                                        .group(choices -> choices
+                                                .radioGroup(choice -> choice
+                                                        .radio(Localization.lang("Natbib style"), viewModel.namesNatbibProperty())
+                                                        .radio(Localization.lang("Show names unchanged"), viewModel.nameAsIsProperty())
+                                                        .radio(Localization.lang("Show 'Firstname Lastname'"), viewModel.nameFirstLastProperty())
+                                                        .radio(Localization.lang("Show 'Lastname, Firstname'"), viewModel.nameLastFirstProperty())),
+                                                indent -> indent.styleClass("prefIndent").spacing(4.0)))
+                                .group(abbreviation -> abbreviation
+                                        .label(Localization.lang("Abbreviations"))
+                                        .group(choices -> choices
+                                                .radioGroup(choice -> choice
+                                                        .radio(Localization.lang("Do not abbreviate names"), viewModel.abbreviationDisabledProperty())
+                                                        .radio(Localization.lang("Abbreviate names"), viewModel.abbreviationEnabledProperty())
+                                                        .radio(Localization.lang("Show last names only"), viewModel.abbreviationLastNameOnlyProperty())),
+                                                indent -> indent.styleClass("prefIndent")
+                                                                .spacing(4.0)
+                                                                // Natbib and "unchanged" render names verbatim,
+                                                                // so abbreviation does not apply.
+                                                                .disableWhen(viewModel.namesNatbibProperty().or(viewModel.nameAsIsProperty()))))))
 
                 .build());
     }
