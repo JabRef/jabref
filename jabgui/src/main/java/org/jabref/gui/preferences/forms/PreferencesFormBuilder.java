@@ -44,6 +44,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preferences.SearchableElement;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.HelpButton;
@@ -98,6 +99,10 @@ public class PreferencesFormBuilder {
     private final Deque<Pane> containers = new ArrayDeque<>();
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
     private final List<Runnable> validationInits = new ArrayList<>();
+
+    /// Every visible text handed to the builder, paired with the node it captions. The
+    /// preferences search matches against these and highlights the node.
+    private final List<SearchableElement> searchableElements = new ArrayList<>();
 
     /// Disable bindings the builder installed itself (a value field following its checkbox, ...).
     /// {@link ElementBase#disableWhen} combines with these instead of silently replacing them.
@@ -170,6 +175,7 @@ public class PreferencesFormBuilder {
                                            Consumer<PreferencesFormBuilder> content,
                                            Consumer<FormRegion<VBox>> config) {
         Label header = new Label(title);
+        searchable(title, header);
         header.getStyleClass().add("sectionHeader");
         if (help == null) {
             addNode(header);
@@ -186,12 +192,14 @@ public class PreferencesFormBuilder {
     /// A plain, unstyled caption line (for text that introduces the following controls).
     public PreferencesFormBuilder label(String text) {
         Label label = new Label(text);
+        searchable(text, label);
         addNode(label);
         return this;
     }
 
     public PreferencesFormBuilder info(String text) {
         Label label = new Label(text);
+        searchable(text, label);
         label.getStyleClass().add("italic");
         label.setPadding(new Insets(0, 0, 0, 20));
         addNode(label);
@@ -200,6 +208,7 @@ public class PreferencesFormBuilder {
 
     private PreferencesFormBuilder styledLabel(String text, String styleClass) {
         Label label = new Label(text);
+        searchable(text, label);
         label.getStyleClass().add(styleClass);
         addNode(label);
         return this;
@@ -215,6 +224,7 @@ public class PreferencesFormBuilder {
 
     public PreferencesFormBuilder checkbox(String text, Property<Boolean> value, Consumer<RowElement<CheckBox>> config) {
         CheckBox checkBox = new CheckBox(text);
+        searchable(text, checkBox);
         checkBox.setMaxWidth(Double.MAX_VALUE);
         // Consent and explanation labels run long; wrapping is never wrong for a short one.
         checkBox.setWrapText(true);
@@ -237,6 +247,7 @@ public class PreferencesFormBuilder {
                                                  StringProperty fieldValue,
                                                  Consumer<RowElement<TextField>> config) {
         CheckBox checkBox = new CheckBox(text);
+        searchable(text, checkBox);
         checkBox.selectedProperty().bindBidirectional(enabled);
         TextField field = new TextField();
         field.setMaxWidth(SHORT_FIELD_WIDTH);
@@ -285,6 +296,7 @@ public class PreferencesFormBuilder {
 
     public PreferencesFormBuilder button(String text, JabRefIcon icon, Runnable action, Consumer<InputElement<Button>> config) {
         Button button = new Button(text);
+        searchable(text, button);
         if (icon != null) {
             button.setGraphic(icon.getGraphicNode());
         }
@@ -299,6 +311,7 @@ public class PreferencesFormBuilder {
 
     public PreferencesFormBuilder hyperlink(String text, Runnable action, Consumer<InputElement<Hyperlink>> config) {
         Hyperlink link = new Hyperlink(text);
+        searchable(text, link);
         link.setOnAction(_ -> action.run());
         addNode(link);
         return configured(new InputElement<>(this, link), config);
@@ -458,6 +471,7 @@ public class PreferencesFormBuilder {
 
     private RadioButton newRadio(String text, Property<Boolean> selected) {
         RadioButton radio = new RadioButton(text);
+        searchable(text, radio);
         radio.setToggleGroup(currentToggleGroup);
         radio.selectedProperty().bindBidirectional(selected);
         return radio;
@@ -588,7 +602,16 @@ public class PreferencesFormBuilder {
         return root;
     }
 
+    /// The visible texts of this form with the nodes they caption; see {@link SearchableElement}.
+    public List<SearchableElement> getSearchableElements() {
+        return List.copyOf(searchableElements);
+    }
+
     // region internals
+
+    private void searchable(String text, Node node) {
+        searchableElements.add(new SearchableElement(text, node));
+    }
 
     private <E> PreferencesFormBuilder configured(E element, Consumer<E> config) {
         config.accept(element);
@@ -647,6 +670,7 @@ public class PreferencesFormBuilder {
             // No caption: span both columns rather than leaving an empty label column.
             grid.add(control, 0, gridRow, 2, 1);
         } else {
+            searchable(label, control);
             grid.add(new Label(label), 0, gridRow);
             grid.add(control, 1, gridRow);
         }

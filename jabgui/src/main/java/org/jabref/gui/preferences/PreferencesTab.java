@@ -9,8 +9,16 @@ import javafx.scene.Node;
 /// It needs to extend from Component.
 public interface PreferencesTab {
 
+    /// Extra, invisible search terms for the tab (synonyms, abbreviations). The visible texts are
+    /// covered by {@link #getSearchableElements()} already.
     default List<String> getSearchKeywords() {
         return List.of(getTabName());
+    }
+
+    /// The visible texts of the tab with the nodes they caption; the preferences search matches
+    /// these and highlights the node.
+    default List<SearchableElement> getSearchableElements() {
+        return List.of();
     }
 
     /// @return the root node of the tab's content, shown in the preferences dialog
