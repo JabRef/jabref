@@ -103,20 +103,19 @@ public class AiTab extends AbstractFormTabView<AiTabViewModel> {
                 .sectionWithHelp(Localization.lang("Expert settings"), HelpFile.AI_EXPERT_SETTINGS)
                 .checkbox(Localization.lang("Customize expert settings"), viewModel.customizeExpertSettingsProperty())
                     .disableWhen(viewModel.disableBasicSettingsProperty())
-                .beginGroup()
+                .group(expert -> expert
+                        .stringField(Localization.lang("API base URL (used only for LLM)"), viewModel.apiBaseUrlProperty())
+                            .disableWhen(viewModel.disableApiBaseUrlProperty())
+                            .validate(viewModel.getApiBaseUrlValidationStatus())
+                        .searchableCombo(Localization.lang("Embedding model"), viewModel.embeddingModelsProperty(), viewModel.selectedEmbeddingModelProperty(), PredefinedEmbeddingModel::fullInfo)
+                            .validate(viewModel.getEmbeddingModelValidationStatus())
+                        .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
+                        .custom(buildExpertGrid())
+                        .button(Localization.lang("Reset expert settings to default"), IconTheme.JabRefIcons.REFRESH, viewModel::resetExpertSettings))
                     .visibleWhen(viewModel.customizeExpertSettingsProperty())
-                    // Disabling the group covers every expert control below; individual controls only
+                    // Disabling the group covers every expert control above; individual controls only
                     // add their own extra conditions on top.
                     .disableWhen(viewModel.disableExpertSettingsProperty())
-                    .stringField(Localization.lang("API base URL (used only for LLM)"), viewModel.apiBaseUrlProperty())
-                        .disableWhen(viewModel.disableApiBaseUrlProperty())
-                        .validate(viewModel.getApiBaseUrlValidationStatus())
-                    .searchableCombo(Localization.lang("Embedding model"), viewModel.embeddingModelsProperty(), viewModel.selectedEmbeddingModelProperty(), PredefinedEmbeddingModel::fullInfo)
-                        .validate(viewModel.getEmbeddingModelValidationStatus())
-                    .info(Localization.lang("The size of the embedding model could be smaller than written in the list."))
-                    .custom(buildExpertGrid())
-                    .button(Localization.lang("Reset expert settings to default"), IconTheme.JabRefIcons.REFRESH, viewModel::resetExpertSettings)
-                .endGroup()
 
                 // [impl->req~ai.expert-settings.templates~1]
                 .sectionWithHelp(Localization.lang("Templates"), HelpFile.AI_TEMPLATES)

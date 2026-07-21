@@ -23,30 +23,27 @@ public class LinkedFilesTab extends AbstractFormTabView<LinkedFilesTabViewModel>
                 .title(Localization.lang("Linked files"))
 
                 .section(Localization.lang("File directory"))
-                .beginRadioGroup()
-                .radioWithBrowse(Localization.lang("Main file directory"),
-                        viewModel.useMainFileDirectoryProperty(), viewModel.mainFileDirectoryProperty(), viewModel::mainFileDirBrowse)
-                .disableWhen(viewModel.useBibLocationAsPrimaryProperty())
-                .validate(viewModel.mainFileDirValidationStatus())
-                .radio(Localization.lang("Search and store files relative to library file location"),
-                        viewModel.useBibLocationAsPrimaryProperty())
-                .tooltip(Localization.lang("When downloading files, or moving linked files to the file directory, use the bib file location."))
-                .endRadioGroup()
+                .radioGroup(directory -> directory
+                        .radioWithBrowse(Localization.lang("Main file directory"),
+                                viewModel.useMainFileDirectoryProperty(), viewModel.mainFileDirectoryProperty(), viewModel::mainFileDirBrowse)
+                            .disableWhen(viewModel.useBibLocationAsPrimaryProperty())
+                            .validate(viewModel.mainFileDirValidationStatus())
+                        .radio(Localization.lang("Search and store files relative to library file location"),
+                                viewModel.useBibLocationAsPrimaryProperty())
+                            .tooltip(Localization.lang("When downloading files, or moving linked files to the file directory, use the bib file location.")))
 
                 .section(Localization.lang("Open file explorer"))
-                .beginRadioGroup()
-                .radio(Localization.lang("Open file explorer in files directory"), viewModel.openFileExplorerInFilesDirectoryProperty())
-                .radio(Localization.lang("Open file explorer in last opened directory"), viewModel.openFileExplorerInLastDirectoryProperty())
-                .endRadioGroup()
+                .radioGroup(explorer -> explorer
+                        .radio(Localization.lang("Open file explorer in files directory"), viewModel.openFileExplorerInFilesDirectoryProperty())
+                        .radio(Localization.lang("Open file explorer in last opened directory"), viewModel.openFileExplorerInLastDirectoryProperty()))
 
                 .section(Localization.lang("Autolink files"))
-                .beginRadioGroup()
-                .radio(Localization.lang("Autolink files with names starting with the citation key"), viewModel.autolinkFileStartsBibtexProperty())
-                .radio(Localization.lang("Autolink only files that match the citation key"), viewModel.autolinkFileExactBibtexProperty())
-                .radioWithField(Localization.lang("Use regular expression search"),
-                        viewModel.autolinkUseRegexProperty(), viewModel.autolinkRegexKeyProperty())
-                .help(StandardActions.HELP_REGEX_SEARCH, HelpFile.REGEX_SEARCH)
-                .endRadioGroup()
+                .radioGroup(autolink -> autolink
+                        .radio(Localization.lang("Autolink files with names starting with the citation key"), viewModel.autolinkFileStartsBibtexProperty())
+                        .radio(Localization.lang("Autolink only files that match the citation key"), viewModel.autolinkFileExactBibtexProperty())
+                        .radioWithField(Localization.lang("Use regular expression search"),
+                                viewModel.autolinkUseRegexProperty(), viewModel.autolinkRegexKeyProperty())
+                            .help(StandardActions.HELP_REGEX_SEARCH, HelpFile.REGEX_SEARCH))
 
                 .section(Localization.lang("Fulltext Index"))
                 .checkbox(Localization.lang("Automatically index all linked files for fulltext search"), viewModel.fulltextIndexProperty())

@@ -48,14 +48,12 @@ public class CitationKeyPatternTab extends AbstractFormTabView<CitationKeyPatter
                 .checkbox(Localization.lang("Generate new keys for imported entries (overwriting their default)"), viewModel.generateKeyOnImportProperty())
 
                 .label(Localization.lang("Letters after duplicate generated keys"))
-                .beginGroup()
+                .group(letters -> letters
+                        .radioGroup(suffix -> suffix
+                                .radio(Localization.lang("Start on second duplicate key with letter A (a, b, ...)"), viewModel.letterStartAProperty())
+                                .radio(Localization.lang("Start on second duplicate key with letter B (b, c, ...)"), viewModel.letterStartBProperty())
+                                .radio(Localization.lang("Always add letter (a, b, ...) to generated keys"), viewModel.letterAlwaysAddProperty())))
                     .styleClass("prefIndent")
-                    .beginRadioGroup()
-                    .radio(Localization.lang("Start on second duplicate key with letter A (a, b, ...)"), viewModel.letterStartAProperty())
-                    .radio(Localization.lang("Start on second duplicate key with letter B (b, c, ...)"), viewModel.letterStartBProperty())
-                    .radio(Localization.lang("Always add letter (a, b, ...) to generated keys"), viewModel.letterAlwaysAddProperty())
-                    .endRadioGroup()
-                .endGroup()
 
                 .field(Localization.lang("Replace (regular expression)"), buildRegexReplacementRow())
                     .help(REGEX_HELP_URL)
