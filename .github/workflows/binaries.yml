@@ -791,7 +791,7 @@ jobs:
           - os: macos-15
             displayName: macOS-silicon
             javaPackage: jdk+fx
-            archiveNative: "7z a jabkit/build/native-dist/jabkit-native_macos-silicon.zip ./jabkit/build/native/jabkit"
+            archiveNative: "ditto -c -k --keepParent jabkit/build/native/jabkit jabkit/build/native-dist/jabkit-native_macos-silicon.zip"
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.displayName }} jabkit native binary
     steps:
