@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ListProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
@@ -371,17 +370,15 @@ public class PreferencesFormBuilder {
         return configured(new InputElement<>(this, combo), config);
     }
 
-    /// A pre-built {@link TagsField} (see {@link TagsFieldEditor}) bound to a list property.
-    public <X> PreferencesFormBuilder tagsField(String label, TagsField<X> tagsField, ListProperty<X> value) {
-        return tagsField(label, tagsField, value, _ -> {
+    /// A pre-built, pre-bound {@link TagsField} (see {@link TagsFieldEditor}).
+    public <X> PreferencesFormBuilder tagsField(String label, TagsField<X> tagsField) {
+        return tagsField(label, tagsField, _ -> {
         });
     }
 
     public <X> PreferencesFormBuilder tagsField(String label,
                                                 TagsField<X> tagsField,
-                                                ListProperty<X> value,
                                                 Consumer<InputElement<TagsField<X>>> config) {
-        tagsField.tagsProperty().bindBidirectional(value);
         HBox.setHgrow(tagsField, Priority.ALWAYS);
         addField(label, tagsField);
         return configured(new InputElement<>(this, tagsField), config);
