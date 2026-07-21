@@ -21,18 +21,21 @@
 
         -jr-base: #ebebeb;
 
+        /* Shared surface color */
+        -jr-surface: #DDDDDD;
+
         -jr-background-alt: -fx-background;
         -jr-search-background: derive(-jr-base, 80%);
 
-        -jr-menu-background: derive(-jr-base, 46%);
+        -jr-menu-background: -jr-surface;
         -jr-menu-forground-active: -fx-dark-text-color;
 
         -jr-text-foreground: -fx-dark-text-color;
-        -jr-toolbar: derive(-jr-base, 46%);
+        -jr-toolbar: -jr-surface;
 
         -jr-icon-background: transparent;
-        -jr-icon-background-active: #0001;
-        -jr-icon-background-armed: #0002;
+        -jr-icon-background-active: -jr-hover;
+        -jr-icon-background-armed: -jr-hover;
 
         -jr-group-hits-bg: derive(-jr-sidepane-background, -50%);
         -jr-group-hits-fg: ladder(
@@ -46,8 +49,8 @@
         -jr-tooltip-bg: -jr-accent;
         -jr-tooltip-fg: #000;
 
-        -jr-sidepane-background: #DDDDDD;
-        -jr-sidepane-header-background: #DDDDDD;
+        -jr-sidepane-background: -jr-surface;
+        -jr-sidepane-header-background: -jr-surface;
 
         -jr-scrollbar-thumb: derive(-fx-outer-border, -30%);
         -jr-scrollbar-track: derive(-fx-control-inner-background, -10%);
@@ -70,7 +73,6 @@
         -jr-orange: #ff9f43;
     }
 }
-
 @media (prefers-color-scheme: dark) {
     * {
         -jr-theme: #2C9490;
