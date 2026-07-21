@@ -105,8 +105,8 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     private void buildView() {
         getChildren().add(form()
                 .custom(new HBox(10.0, buildEntryTypesColumn(), buildFieldsColumn()))
-                .validateRequired(viewModel.entryTypeValidationStatus(), addNewEntryType)
-                .validateRequired(viewModel.fieldValidationStatus(), addNewField)
+                .validate(viewModel.entryTypeValidationStatus(), addNewEntryType)
+                .validate(viewModel.fieldValidationStatus(), addNewField)
                 .build());
     }
 
