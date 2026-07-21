@@ -10,9 +10,11 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
+import org.jabref.toolkit.exception.CliExceptionHandler;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -87,6 +89,25 @@ class ConvertTest extends AbstractJabKitTest {
         assertTrue(commandLine.getStandardOutput().contains("<html"));
         assertFalse(commandLine.getStandardOutput().contains("@Book"));
         assertTrue(commandLine.getErrorOutput().contains("Converting"));
+    }
+
+    @Test
+    void noOutputWithUnknownOutputFormatFailsWithUsageError(@TempDir Path tempDir) throws IOException {
+        commandLine.setExecutionExceptionHandler(
+                new CliExceptionHandler(commandLine.getExecutionExceptionHandler()));
+
+        Path origin = getClassResourceAsPath("origin.bib").toAbsolutePath();
+        Path newPath = tempDir.resolve("origin.bib");
+        Files.copy(origin, newPath);
+
+        int exitCode = commandLine.executeToLog("convert",
+                "--input=" + newPath,
+                "--input-format=bibtex",
+                "--output-format=unknownformat");
+
+        assertEquals(CommandLine.ExitCode.USAGE, exitCode);
+        assertTrue(commandLine.getErrorOutput().contains("Unknown export format 'unknownformat'."));
+        assertFalse(commandLine.getStandardOutput().contains("@Book"));
     }
 
     @Test
