@@ -41,6 +41,7 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.gui.util.component.HelpButton;
 import org.jabref.logic.help.HelpFile;
 
 import com.dlsc.gemsfx.TagsField;
@@ -97,16 +98,32 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder sectionWithHelp(String text, HelpFile helpFile) {
+        return sectionWithHelp(text, helpButton(StandardActions.HELP, helpFile));
+    }
+
+    /// Section header with a help button pointing at a documentation URL rather than a {@link HelpFile}.
+    public PreferencesFormBuilder sectionWithHelp(String text, String helpUrl) {
+        return sectionWithHelp(text, new HelpButton(helpUrl));
+    }
+
+    private PreferencesFormBuilder sectionWithHelp(String text, javafx.scene.control.Button help) {
         flushGrid();
         Label header = new Label(text);
         header.getStyleClass().add("sectionHeader");
         header.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(header, Priority.ALWAYS);
-        HBox row = new HBox(header, helpButton(StandardActions.HELP, helpFile));
+        HBox row = new HBox(header, help);
         row.setAlignment(Pos.BASELINE_CENTER);
         container().getChildren().add(row);
         lastRow = row;
         lastControl = header;
+        return this;
+    }
+
+    /// A plain, unstyled caption line (for text that introduces the following controls).
+    public PreferencesFormBuilder label(String text) {
+        Label label = new Label(text);
+        addNode(label);
         return this;
     }
 
@@ -425,6 +442,20 @@ public class PreferencesFormBuilder {
         if (lastRow != null) {
             lastRow.getChildren().add(helpButton(action, helpFile));
         }
+        return this;
+    }
+
+    /// Appends a help icon button linking to a documentation URL.
+    public PreferencesFormBuilder help(String helpUrl) {
+        if (lastRow != null) {
+            lastRow.getChildren().add(new HelpButton(helpUrl));
+        }
+        return this;
+    }
+
+    /// Adds CSS style classes to the last subject (control or group), e.g. `"prefIndent"`.
+    public PreferencesFormBuilder styleClass(String... styleClasses) {
+        lastControl.getStyleClass().addAll(styleClasses);
         return this;
     }
 
