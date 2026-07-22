@@ -654,9 +654,11 @@ public class OpenOfficePanel {
 
         CheckMenuItem zoteroCompatibilityMode = new CheckMenuItem(Localization.lang("Zotero compatibility mode"));
         zoteroCompatibilityMode.selectedProperty().set(openOfficePreferences.getZoteroCompatibilityMode());
+        zoteroCompatibilityMode.setDisable(currentStyle instanceof JStyle);
         zoteroCompatibilityMode.setOnAction(_ -> openOfficePreferences.setZoteroCompatibilityMode(zoteroCompatibilityMode.isSelected()));
 
         EasyBind.listen(currentStyleProperty, (_, _, newValue) -> {
+            zoteroCompatibilityMode.setDisable(newValue instanceof JStyle);
             switch (newValue) {
                 case JStyle _ -> {
                     if (!contextMenu.getItems().contains(alwaysAddCitedOnPagesText)) {
