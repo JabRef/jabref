@@ -104,9 +104,9 @@ public class PreferencesFormBuilder {
     /// preferences search matches against these and highlights the node without reflection.
     private final List<SearchableElement> searchableElements = new ArrayList<>();
 
-    /// Element grid spanning multiple input elements to ensure correct alignment
+    /// Element grid spanning multiple input elements to ensure correct alignment. Its next free row
+    /// is the grid's own row count, so the builder keeps no row counter of its own.
     private GridPane currentGrid;
-    private int gridRow;
 
     private boolean built;
 
@@ -338,16 +338,16 @@ public class PreferencesFormBuilder {
 
     private void addField(String label, Node control) {
         GridPane grid = ensureGrid();
+        int row = grid.getRowCount();
         if (label == null) {
             // No caption: span both columns rather than leaving an empty label column.
-            grid.add(control, 0, gridRow, 2, 1);
+            grid.add(control, 0, row, 2, 1);
         } else {
             searchable(label, control);
-            grid.add(new Label(label), 0, gridRow);
-            grid.add(control, 1, gridRow);
+            grid.add(new Label(label), 0, row);
+            grid.add(control, 1, row);
         }
         GridPane.setHgrow(control, Priority.ALWAYS);
-        gridRow++;
     }
 
     private GridPane ensureGrid() {
@@ -361,7 +361,6 @@ public class PreferencesFormBuilder {
             ColumnConstraints controlColumn = new ColumnConstraints();
             controlColumn.setHgrow(Priority.ALWAYS);
             currentGrid.getColumnConstraints().addAll(labelColumn, controlColumn);
-            gridRow = 0;
             addToContainer(currentGrid);
         }
         return currentGrid;
@@ -434,7 +433,7 @@ public class PreferencesFormBuilder {
         header.getStyleClass().add("sectionHeader");
         header.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(header, Priority.ALWAYS);
-        HBox headerRow = new HBox(header);
+        HBox headerRow = new HBox(DEFAULT_GAP, header);
         headerRow.setAlignment(Pos.BASELINE_CENTER);
         addNode(headerRow);
 
@@ -446,7 +445,7 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder group(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<VBox>> config) {
-        return configured(new FormRegion<>(this, region(new VBox(DEFAULT_GAP), content)), config);
+        return configured(new FormRegion<>(region(new VBox(DEFAULT_GAP), content)), config);
     }
 
     /// A side-by-side region: every element inside becomes an equally growing column. Usually filled
@@ -456,7 +455,7 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder columns(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<HBox>> config) {
-        return configured(new FormRegion<>(this, region(new HBox(DEFAULT_GAP), content)), config);
+        return configured(new FormRegion<>(region(new HBox(DEFAULT_GAP), content)), config);
     }
 
     /// A wrapping region: elements flow left to right and wrap onto the next line as the dialog
@@ -466,7 +465,7 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder flow(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<FlowPane>> config) {
-        return configured(new FormRegion<>(this, region(new FlowPane(), content)), config);
+        return configured(new FormRegion<>(region(new FlowPane(), content)), config);
     }
 
     /// Everything added inside becomes a sub-region of the form. Nesting is the lambda's, so a
@@ -477,11 +476,12 @@ public class PreferencesFormBuilder {
         flushGrid();
         addToContainer(region);
         containers.push(region);
-
-        content.accept(this);
-
-        flushGrid();
-        containers.pop();
+        try {
+            content.accept(this);
+        } finally {
+            flushGrid();
+            containers.pop();
+        }
         return region;
     }
 
@@ -490,9 +490,6 @@ public class PreferencesFormBuilder {
     public VBox build() {
         if (built) {
             throw new IllegalStateException("build() was already called; a form builder assembles one tree");
-        }
-        if (containers.size() != 1) {
-            throw new IllegalStateException("a region is still open — " + (containers.size() - 1) + " unclosed");
         }
         built = true;
         flushGrid();
@@ -604,11 +601,9 @@ public class PreferencesFormBuilder {
     public abstract static sealed class RegionBase<S extends RegionBase<S, T>, T extends Pane>
             permits FormRegion, SectionRegion {
 
-        final PreferencesFormBuilder form;
         final T region;
 
-        RegionBase(PreferencesFormBuilder form, T region) {
-            this.form = form;
+        RegionBase(T region) {
             this.region = region;
         }
 
@@ -672,8 +667,8 @@ public class PreferencesFormBuilder {
     /// but no heading of its own.
     public static final class FormRegion<T extends Pane> extends RegionBase<FormRegion<T>, T> {
 
-        FormRegion(PreferencesFormBuilder form, T region) {
-            super(form, region);
+        FormRegion(T region) {
+            super(region);
         }
     }
 
@@ -681,10 +676,14 @@ public class PreferencesFormBuilder {
     /// the only kind of region that can take a help button.
     public static final class SectionRegion extends RegionBase<SectionRegion, VBox> {
 
+        /// The only region handle that needs the builder back: its help buttons are attached to
+        /// the header, which the builder alone knows how to place.
+        private final PreferencesFormBuilder form;
         private final Label header;
 
         SectionRegion(PreferencesFormBuilder form, VBox region, Label header) {
-            super(form, region);
+            super(region);
+            this.form = form;
             this.header = header;
         }
 
