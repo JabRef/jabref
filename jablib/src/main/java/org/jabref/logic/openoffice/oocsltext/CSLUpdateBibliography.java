@@ -3,9 +3,8 @@ package org.jabref.logic.openoffice.oocsltext;
 import java.util.List;
 
 import org.jabref.logic.citationstyle.CitationStyle;
-import org.jabref.logic.openoffice.JabRefBibliographyMark;
+import org.jabref.logic.openoffice.CSLBibliographyMark;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.ZoteroBibliographyMark;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -40,12 +39,14 @@ public class CSLUpdateBibliography {
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException {
         LOGGER.debug("Starting to rebuild CSL bibliography");
 
-        switch (openOfficePreferences.getReferenceMarkFormat()) {
-            case JABREF_ONLY ->
-                    JabRefBibliographyMark.rebuildCSLBibliography(doc, cslCitationOOAdapter, entries, citationStyle, bibDatabaseContext, bibEntryTypesManager);
-            case ZOTERO_COMPATIBLE ->
-                    ZoteroBibliographyMark.rebuildCSLBibliography(doc, cslCitationOOAdapter, entries, citationStyle, bibDatabaseContext, bibEntryTypesManager);
-        }
+        CSLBibliographyMark.rebuildCSLBibliography(
+                doc,
+                cslCitationOOAdapter,
+                entries,
+                citationStyle,
+                bibDatabaseContext,
+                bibEntryTypesManager,
+                openOfficePreferences.getReferenceMarkFormat());
 
         LOGGER.debug("Finished rebuilding CSL bibliography");
     }

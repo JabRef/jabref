@@ -221,11 +221,11 @@ public class CSLCitationOOAdapter {
 
     /// Creates a "Bibliography" section in the document and inserts a list of references.
     /// The list is generated based on the existing citations, in-text citations and empty citations in the document.
-    public void insertBibliography(XTextCursor cursor,
-                                   CitationStyle selectedStyle,
-                                   List<BibEntry> entries,
-                                   BibDatabaseContext bibDatabaseContext,
-                                   BibEntryTypesManager bibEntryTypesManager)
+    public void insertJabRefBibliography(XTextCursor cursor,
+                                         CitationStyle selectedStyle,
+                                         List<BibEntry> entries,
+                                         BibDatabaseContext bibDatabaseContext,
+                                         BibEntryTypesManager bibEntryTypesManager)
             throws com.sun.star.uno.Exception, CreationException {
         if (!selectedStyle.hasBibliography()) {
             return;
