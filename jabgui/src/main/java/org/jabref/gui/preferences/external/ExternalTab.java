@@ -54,13 +54,13 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
                         .checkbox(Localization.lang("Automatically open folders of attached files"), viewModel.autoOpenAttachedFoldersProperty()))
 
                 .section(Localization.lang("Push applications"), push -> push
-                        .custom(buildPushGrid())
-                        .validate(viewModel.citeCommandValidationStatus(), citeCommand))
+                        .custom(buildPushGrid(), grid -> grid
+                                .validate(viewModel.citeCommandValidationStatus(), citeCommand)))
 
                 .section(Localization.lang("Custom applications"), applications -> applications
-                        .custom(buildCustomApplicationsGrid())
-                        .validate(viewModel.terminalCommandValidationStatus(), customTerminalCommand)
-                        .validate(viewModel.fileBrowserCommandValidationStatus(), customFileBrowserCommand))
+                        .custom(buildCustomApplicationsGrid(), grid -> grid
+                                .validate(viewModel.terminalCommandValidationStatus(), customTerminalCommand)
+                                .validate(viewModel.fileBrowserCommandValidationStatus(), customFileBrowserCommand)))
 
                 .build());
     }

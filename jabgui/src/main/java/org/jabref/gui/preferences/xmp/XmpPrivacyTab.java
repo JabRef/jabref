@@ -51,8 +51,8 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
     private void buildView() {
         getChildren().add(form()
                 .checkbox(Localization.lang("Do not write the following fields to XMP Metadata"), viewModel.xmpFilterEnabledProperty())
-                .custom(buildFilterRegion())
-                .validate(viewModel.xmpFilterListValidationStatus(), filterList)
+                .custom(buildFilterRegion(), region -> region
+                        .validate(viewModel.xmpFilterListValidationStatus(), filterList))
                 .build());
     }
 
