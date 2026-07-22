@@ -49,6 +49,19 @@
         <TextField fx:id="grobidURL" HBox.hgrow="ALWAYS"/>
     </HBox>
 
+    <Label styleClass="sectionHeader" text="%External Fetchers"/>
+    <Label text="%Browser-extension fulltext providers discovered in JabRef's fulltext-providers directory. Each provider runs locally and exposes the Browser-Extension Fulltext Protocol."
+           wrapText="true"/>
+    <TableView fx:id="externalFetcherTable">
+        <columns>
+            <TableColumn fx:id="externalFetcherName" text="%Provider" minWidth="220" editable="false"/>
+            <TableColumn fx:id="externalFetcherPort" text="%Port" minWidth="80" editable="false"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
+
     <Label styleClass="sectionHeader" text="%Search Engine URL Templates"/>
     <Label text="%( Note: Press return to commit changes in the table! )"/>
     <TableView

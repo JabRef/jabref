@@ -7,6 +7,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -28,6 +29,7 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.HelpButton;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.fetcher.BrowserExtensionProvider;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringUtil;
@@ -62,6 +64,10 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private TableView<SearchEngineItem> searchEngineTable;
     @FXML private TableColumn<SearchEngineItem, String> searchEngineName;
     @FXML private TableColumn<SearchEngineItem, String> searchEngineUrlTemplate;
+
+    @FXML private TableView<BrowserExtensionProvider> externalFetcherTable;
+    @FXML private TableColumn<BrowserExtensionProvider, String> externalFetcherName;
+    @FXML private TableColumn<BrowserExtensionProvider, String> externalFetcherPort;
 
     @FXML private VBox fetchersContainer;
 
@@ -105,6 +111,10 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
         searchEngineTable.setItems(viewModel.getSearchEngines());
 
+        externalFetcherName.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().displayName()));
+        externalFetcherPort.setCellValueFactory(param -> new ReadOnlyStringWrapper(Integer.toString(param.getValue().port())));
+        externalFetcherTable.setItems(viewModel.getExternalFetchers());
+
         // Dynamic height based on font size and number of items
         DoubleBinding rowHeight = Bindings.createDoubleBinding(
                 () -> enableWebSearch.getFont() != null ? enableWebSearch.getFont().getSize() * FONT_HEIGHT_MULTIPLIER : DEFAULT_ROW_HEIGHT,
@@ -114,6 +124,24 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
                 Bindings.size(searchEngineTable.getItems())
                         .add(HEADER_HEIGHT_ESTIMATE)
                         .multiply(rowHeight));
+
+        externalFetcherTable.fixedCellSizeProperty().bind(rowHeight);
+        externalFetcherTable.prefHeightProperty().bind(
+                Bindings.size(externalFetcherTable.getItems())
+                        .add(HEADER_HEIGHT_ESTIMATE)
+                        .multiply(rowHeight));
+        // Content fits prefHeight exactly, but JavaFX still reserves a vertical scrollbar gutter.
+        // Hide it once the skin is attached so the table reads as a tight read-only list.
+        externalFetcherTable.skinProperty().addListener((_, _, newSkin) -> {
+            if (newSkin == null) {
+                return;
+            }
+            Node vBar = externalFetcherTable.lookup(".scroll-bar:vertical");
+            if (vBar != null) {
+                vBar.setVisible(false);
+                vBar.setManaged(false);
+            }
+        });
 
         enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
