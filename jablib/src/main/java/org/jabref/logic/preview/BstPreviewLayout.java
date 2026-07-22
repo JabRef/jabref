@@ -6,6 +6,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.bst.BstVM;
@@ -19,6 +21,8 @@ import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -44,6 +48,11 @@ public final class BstPreviewLayout implements PreviewLayout {
     private static final Pattern GROUP_EM_PATTERN = Pattern.compile("\\{\\\\em\\s+([^}]*?)}");
     private static final Pattern GROUP_IT_PATTERN = Pattern.compile("\\{\\\\it\\s+([^}]*?)}");
     private static final Pattern GROUP_BF_PATTERN = Pattern.compile("\\{\\\\bf\\s+([^}]*?)}");
+
+    /// Matches a single LaTeX math command wrapped in the `{{$...$}}` form written by some
+    /// exporters, e.g. `{{$\Sigma$}}`. Group 1 is the command without its leading backslash
+    /// (`Sigma`). Reads as: `{{` `$` `\` (command) `$` `}}`.
+    private static final Pattern BRACED_MATH_COMMAND_PATTERN = Pattern.compile("\\{\\{\\$\\\\([^$]+)\\$\\}\\}");
 
     private final Path path;
     private String source;
@@ -120,6 +129,7 @@ public final class BstPreviewLayout implements PreviewLayout {
         // Ensure that the entry is of BibTeX format (and do not modify the original entry)
         BibEntry entry = new BibEntry(originalEntry);
         new ConvertToBibtexCleanup().cleanup(entry);
+        convertBracedMathToUnicode(entry);
         String result = bstVM.render(List.of(entry));
         // Remove all comments
         result = COMMENT_PATTERN.matcher(result).replaceAll("");
@@ -129,18 +139,18 @@ public final class BstPreviewLayout implements PreviewLayout {
         result = result.replace("\\end{thebibliography}", "");
         // The RemoveLatexCommandsFormatter keeps the word inside the latex command, but we want to remove that completely
         result = BIBITEM_PATTERN.matcher(result).replaceAll("");
-        // We want to replace \newblock by a space instead of completely removing it
+        // We want to replace \\newblock by a space instead of completely removing it
         result = result.replace("\\newblock", " ");
         // Remove all latex commands statements - assumption: command in a separate line
         result = LATEX_COMMAND_PATTERN.matcher(result).replaceAll("");
-        // Remove some IEEEtran.bst output (resulting from a multiline \providecommand)
+        // Remove some IEEEtran.bst output (resulting from a multiline \\providecommand)
         result = result.replace("#2}}", "");
         // Have quotes right - and more
         result = new LatexToUnicodeFormatter().format(result);
         result = result.replace("``", "\"");
         result = result.replace("''", "\"");
         // Convert LaTeX inline formatting to HTML before RemoveLatexCommandsFormatter strips them.
-        // \emph{X} and {\em X} forms (IEEEtran uses \emph, abbrv uses {\em})
+        // \\emph{X} and {\\em X} forms (IEEEtran uses \\emph, abbrv uses {\\em})
         result = EMPH_PATTERN.matcher(result).replaceAll("<i>$1</i>");
         result = TEXTIT_PATTERN.matcher(result).replaceAll("<i>$1</i>");
         result = GROUP_EM_PATTERN.matcher(result).replaceAll("<i>$1</i>");
@@ -153,6 +163,39 @@ public final class BstPreviewLayout implements PreviewLayout {
         result = new RemoveTilde().format(result);
         result = MULTIPLE_SPACES_PATTERN.matcher(result.trim()).replaceAll(" ");
         return result;
+    }
+
+    /// Replaces `{{$\Cmd$}}` math expressions in all fields of the given entry by the corresponding
+    /// Unicode character, wrapped in braces. The entry is modified in place, so it has to be a copy.
+    ///
+    /// The BST engine passes `$...$` through unchanged, so without this step the raw math reaches the
+    /// preview and is then stripped by [RemoveLatexCommandsFormatter].
+    ///
+    /// The braces around the result are required: they keep `BstCaseChanger` from lowercasing the
+    /// symbol (Σ would become σ). This is also the reason [BibEntry#getFieldLatexFree] cannot be used
+    /// here -- it resolves the LaTeX, but does not add the protecting braces.
+    ///
+    /// Commands that cannot be resolved are kept as they are: [LatexToUnicodeAdapter#format] returns
+    /// its (NFC-normalized) input if parsing fails, so replacing unconditionally would corrupt them.
+    private static void convertBracedMathToUnicode(BibEntry entry) {
+        for (Map.Entry<Field, String> field : Map.copyOf(entry.getFieldMap()).entrySet()) {
+            Matcher matcher = BRACED_MATH_COMMAND_PATTERN.matcher(field.getValue());
+            StringBuilder converted = new StringBuilder();
+            boolean anyConversion = false;
+            while (matcher.find()) {
+                String unicode = LatexToUnicodeAdapter.format("\\" + matcher.group(1));
+                if (unicode.contains("\\")) {
+                    matcher.appendReplacement(converted, Matcher.quoteReplacement(matcher.group()));
+                    continue;
+                }
+                matcher.appendReplacement(converted, Matcher.quoteReplacement("{" + unicode + "}"));
+                anyConversion = true;
+            }
+            if (anyConversion) {
+                matcher.appendTail(converted);
+                entry.setField(field.getKey(), converted.toString());
+            }
+        }
     }
 
     @Override
