@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.openoffice.oocsltext.CSLCitationType;
 
-import io.github.thibaultmeyer.cuid.CUID;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
@@ -62,7 +61,7 @@ public record JabRefReferenceMark(
     public static JabRefReferenceMark buildReferenceMark(List<String> citationKeys,
                                                          List<Integer> citationNumbers,
                                                          CSLCitationType citationType) {
-        String uniqueId = CUID.randomCUID2(8).toString();
+        String uniqueId = ReferenceMark.generateRandomCUID(8);
         return new JabRefReferenceMark(
                 buildReferenceMarkName(citationKeys, citationNumbers, uniqueId, citationType),
                 citationKeys,

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.jabref.logic.openoffice.oocsltext.CSLCitationType;
 
+import io.github.thibaultmeyer.cuid.CUID;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,10 @@ public sealed interface ReferenceMark permits JabRefReferenceMark, ZoteroReferen
 
     default CSLCitationType getCitationType() {
         return citationType();
+    }
+
+    static String generateRandomCUID(int length) {
+        return CUID.randomCUID2(length).toString();
     }
 
     static boolean isReferenceMarkName(String name) {

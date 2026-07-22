@@ -60,7 +60,7 @@ public record ZoteroReferenceMark(
                                                          BibDatabaseContext bibDatabaseContext,
                                                          BibEntryTypesManager entryTypesManager,
                                                          Map<String, String> zoteroUriByCitationKey) {
-        String citationId = createRandomString(CITATION_ID_LENGTH);
+        String citationId = ReferenceMark.generateRandomCUID(CITATION_ID_LENGTH);
         String suffix = createRandomSuffix();
         JabRefItemDataProvider itemDataProvider = new JabRefItemDataProvider();
         ZoteroCitationData citation = new ZoteroCitationData();
@@ -325,14 +325,6 @@ public record ZoteroReferenceMark(
     }
 
     static String createRandomSuffix() {
-        return RANDOM_PREFIX.trim() + createRandomString(RANDOM_LENGTH);
-    }
-
-    private static String createRandomString(int length) {
-        char[] randomString = new char[length];
-        for (int i = 0; i < length; i++) {
-            randomString[i] = RANDOM_CHARACTERS.charAt(RANDOM.nextInt(RANDOM_CHARACTERS.length()));
-        }
-        return String.valueOf(randomString);
+        return RANDOM_PREFIX.trim() + ReferenceMark.generateRandomCUID(RANDOM_LENGTH);
     }
 }
