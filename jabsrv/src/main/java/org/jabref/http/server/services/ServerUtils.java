@@ -30,27 +30,43 @@ import org.jspecify.annotations.NonNull;
 
 public class ServerUtils {
 
+    /// The on-disk path that identifies a library: the `.bib` file of a regular library, or the
+    /// root directory of a directory library (which has no `.bib` path of its own). This is the
+    /// same identity the GUI session store uses to remember open libraries, so a directory
+    /// library keeps a stable id across everything.
+    /// [impl->req~directory-library.rest-api~1]
+    public static Optional<Path> libraryIdentifyingPath(BibDatabaseContext context) {
+        return context.getDatabasePath().or(context::getDirectoryLibraryRoot);
+    }
+
+    /// The stable id string used in URLs for a library at the given identifying path.
+    private static String libraryId(Path path) {
+        return path.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(path);
+    }
+
     /// Returns ids of all libraries the state manager currently considers
     /// open. Used by every resource that operates across the open
     /// collection (libraries listing, batch query, ...).
     public static List<String> openLibraryIds(SrvStateManager srvStateManager) {
         return srvStateManager.getOpenDatabases().stream()
-                              .map(BibDatabaseContext::getDatabasePath)
+                              .map(ServerUtils::libraryIdentifyingPath)
                               .flatMap(Optional::stream)
-                              .map(path -> path.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(path))
+                              .map(ServerUtils::libraryId)
                               .toList();
     }
 
     /// Returns the on-disk path of the library with the given id, looking it up in the
-    /// state manager's open databases (the same source as [#getBibDatabaseContext]).
+    /// state manager's open databases (the same source as [#getBibDatabaseContext]). For a
+    /// directory library this is its root directory, which the GUI append command routes back
+    /// to the open directory-library tab.
     ///
     /// @throws NotFoundException if no library with the given id is found
     public static @NonNull Path getLibraryPath(String id, SrvStateManager srvStateManager) {
         return srvStateManager.getOpenDatabases()
                               .stream()
-                              .map(BibDatabaseContext::getDatabasePath)
-                              .flatMap(java.util.Optional::stream)
-                              .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
+                              .map(ServerUtils::libraryIdentifyingPath)
+                              .flatMap(Optional::stream)
+                              .filter(p -> libraryId(p).equals(id))
                               .findAny()
                               .orElseThrow(NotFoundException::new);
     }
@@ -77,11 +93,9 @@ public class ServerUtils {
             return srvStateManager.getActiveDatabase().orElseThrow(NotFoundException::new);
         }
         return srvStateManager.getOpenDatabases().stream()
-                              .filter(context -> context.getDatabasePath().isPresent())
-                              .filter(context -> {
-                                  Path p = context.getDatabasePath().get();
-                                  return (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id);
-                              })
+                              .filter(context -> libraryIdentifyingPath(context)
+                                      .map(p -> libraryId(p).equals(id))
+                                      .orElse(false))
                               .findFirst()
                               .orElseThrow(() -> new NotFoundException("No library with id " + HtmlEscapers.htmlEscaper().escape(id) + " found"));
     }

@@ -125,4 +125,17 @@ metadata), and the root is reopened as a directory library.
 
 Needs: impl, utest
 
+## Directory libraries are reachable through the REST API
+`req~directory-library.rest-api~1`
+
+An open directory library must be addressable through JabRef's HTTP API (jabsrv) exactly like a
+`.bib` library. Because a directory library has no `.bib` path, it is identified by its root
+directory (the same identity the session store uses): the library listing includes it, and the
+per-library endpoints — reading entries, the batch existence-check query, and appending entries
+— resolve it by that root-derived id. In GUI mode an append targets the open directory-library
+tab (matched by its root) so the added entries flow through the normal write-back into sidecars
+and the mirror; standalone-server mode still serves only `.bib` files.
+
+Needs: impl, utest
+
 <!-- markdownlint-disable-file MD022 -->
