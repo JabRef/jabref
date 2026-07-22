@@ -145,18 +145,18 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> {
                                 followUp -> followUp.disableWhen(viewModel.disableBasicSettingsProperty()))
                         .field(Localization.lang("Number of follow-up questions"), buildFollowUpQuestionsCountSpinner())
                         // [impl->req~ai.response-engines.default~1]
-                        .comboItems(Localization.lang("Default response engine"),
+                        .combo(Localization.lang("Default response engine"),
                                 viewModel.responseEngineKindsProperty(),
                                 viewModel.responseEngineProperty(),
                                 AiNamingUtils::getDisplayName,
                                 engine -> engine.disableWhen(viewModel.disableExpertSettingsProperty()))
                         // [impl->req~ai.summarization.algorithm.default~1]
-                        .comboItems(Localization.lang("Default summarization algorithm"),
+                        .combo(Localization.lang("Default summarization algorithm"),
                                 viewModel.summarizationAlgorithmsProperty(),
                                 viewModel.summarizationAlgorithmProperty(),
                                 AiNamingUtils::getDisplayName,
                                 algorithm -> algorithm.disableWhen(viewModel.disableExpertSettingsProperty()))
-                        .comboItems(Localization.lang("Default token estimation algorithm"),
+                        .combo(Localization.lang("Default token estimation algorithm"),
                                 viewModel.tokenEstimationAlgorithmsProperty(),
                                 viewModel.tokenEstimationAlgorithmProperty(),
                                 AiNamingUtils::getDisplayName,

@@ -1,8 +1,5 @@
 package org.jabref.gui.preferences.entryeditor;
 
-import java.util.List;
-
-import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -51,8 +48,8 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
                 .checkbox(Localization.lang("Show BibTeX source by default"), viewModel.defaultSourceProperty())
                 .checkbox(Localization.lang("Accept recommendations from Mr. DLib"), viewModel.acceptRecommendationsProperty())
 
-                .comboItems(Localization.lang("Citation count fetcher:"),
-                        FXCollections.observableList(List.of(CitationCountFetcherType.values())),
+                .combo(Localization.lang("Citation count fetcher:"),
+                        viewModel.citationCountFetcherTypes(),
                         viewModel.citationCountFetcherTypeProperty(), CitationCountFetcherType::getName)
 
                 .section(Localization.lang("Editor tabs"), tabs -> tabs

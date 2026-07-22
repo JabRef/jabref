@@ -3,8 +3,11 @@ package org.jabref.gui.preferences.entryeditor;
 import java.nio.file.Path;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -40,6 +43,8 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty autoLinkEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableMscKeywordDescriptionsProperty = new SimpleBooleanProperty();
     private final ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty = new SimpleObjectProperty<>();
+    private final ListProperty<CitationCountFetcherType> citationCountFetcherTypes =
+            new SimpleListProperty<>(FXCollections.observableArrayList(CitationCountFetcherType.values()));
 
     /// Working copy of tab configurations — not the live preferences list.
     /// Written to preferences only in {@link #storeSettings()}.
@@ -168,6 +173,10 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public ObjectProperty<CitationCountFetcherType> citationCountFetcherTypeProperty() {
         return citationCountFetcherTypeProperty;
+    }
+
+    public ReadOnlyListProperty<CitationCountFetcherType> citationCountFetcherTypes() {
+        return citationCountFetcherTypes;
     }
 
     // endregion
