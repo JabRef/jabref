@@ -3,7 +3,7 @@ nav_order: 67
 parent: Decision Records
 ---
 
-# Use Transparent Handling of Zotero Reference Marks
+# Use A Preference to Handle Zotero Reference Marks
 
 ## Context and Problem Statement
 
