@@ -16,7 +16,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioMenuItem;
@@ -653,21 +652,9 @@ public class OpenOfficePanel {
         alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());
         alwaysAddCitedOnPagesText.setOnAction(_ -> openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));
 
-        Menu cslCitationStorageFormat = new Menu(Localization.lang("CSL citation storage format"));
-        ToggleGroup zoteroCompatibilityModeGroup = new ToggleGroup();
-        RadioMenuItem jabRefOnlyReferenceMarks = new RadioMenuItem(Localization.lang("JabRef-only"));
-        RadioMenuItem zoteroCompatibleReferenceMarks = new RadioMenuItem(Localization.lang("Zotero-compatible"));
-        jabRefOnlyReferenceMarks.setToggleGroup(zoteroCompatibilityModeGroup);
-        zoteroCompatibleReferenceMarks.setToggleGroup(zoteroCompatibilityModeGroup);
-        cslCitationStorageFormat.getItems().addAll(jabRefOnlyReferenceMarks, zoteroCompatibleReferenceMarks);
-
-        if (openOfficePreferences.getZoteroCompatibilityMode()) {
-            zoteroCompatibleReferenceMarks.setSelected(true);
-        } else {
-            jabRefOnlyReferenceMarks.setSelected(true);
-        }
-        jabRefOnlyReferenceMarks.setOnAction(_ -> openOfficePreferences.setZoteroCompatibilityMode(false));
-        zoteroCompatibleReferenceMarks.setOnAction(_ -> openOfficePreferences.setZoteroCompatibilityMode(true));
+        CheckMenuItem zoteroCompatibilityMode = new CheckMenuItem(Localization.lang("Zotero compatibility mode"));
+        zoteroCompatibilityMode.selectedProperty().set(openOfficePreferences.getZoteroCompatibilityMode());
+        zoteroCompatibilityMode.setOnAction(_ -> openOfficePreferences.setZoteroCompatibilityMode(zoteroCompatibilityMode.isSelected()));
 
         EasyBind.listen(currentStyleProperty, (_, _, newValue) -> {
             switch (newValue) {
@@ -708,7 +695,7 @@ public class OpenOfficePanel {
         contextMenu.getItems().addAll(
                 autoSync,
                 addSpaceAfter,
-                cslCitationStorageFormat,
+                zoteroCompatibilityMode,
                 new SeparatorMenuItem(),
                 useActiveBase,
                 useAllBases,
