@@ -39,6 +39,11 @@ public interface SearchBasedFetcher extends WebFetcher {
         return this.performSearch(getQueryNode(searchQuery));
     }
 
+    default List<BibEntry> performRawSearchQuery(String rawQuery) throws FetcherException {
+        throw new UnsupportedOperationException(
+                getName() + " has not yet been migrated to performRawSearchQuery");
+    }
+
     /// This method provides a BaseQueryNode for performSearch/performSearchPaged method
     static BaseQueryNode getQueryNode(String searchQuery) {
         // Interface does not allow private constants

@@ -3,20 +3,28 @@ package org.jabref.logic.util.io;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+
+import org.jabref.logic.util.JabRefBaseDirectoryLocator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FileHistoryTest {
     private FileHistory history;
+    private Path baseDir;
 
     @BeforeEach
     void setUp() {
         history = FileHistory.of(List.of());
+        baseDir = JabRefBaseDirectoryLocator.getBaseDirectoryPath();
     }
 
     @Test
@@ -79,9 +87,60 @@ class FileHistoryTest {
         history.newFile(Path.of("file9"));
 
         assertEquals(8, history.size());
-        assertEquals(Path.of("file9"), history.get(0));
+        assertEquals(Path.of("file9"), history.getFirst());
         assertFalse(history.contains(Path.of("file1")));
     }
+
+    @Test
+    void removeItemRemovesAbsoluteWhenRelativeGiven() {
+        Path relative = Path.of("docs/file.pdf");
+        Path absolute = baseDir.resolve(relative).normalize();
+
+        history.newFile(relative);
+        history.newFile(absolute);
+
+        history.removeItem(relative);
+
+        assertFalse(history.contains(relative));
+        assertFalse(history.contains(absolute));
+    }
+
+    @Test
+    void removeItemRemovesRelativeWhenAbsoluteGiven() {
+        Path relative = Path.of("docs/file.pdf");
+        Path absolute = baseDir.resolve(relative).normalize();
+
+        history.newFile(relative);
+        history.newFile(absolute);
+
+        history.removeItem(absolute);
+
+        assertFalse(history.contains(relative));
+        assertFalse(history.contains(absolute));
+    }
+
+    @Test
+    void removeItemHandlesAbsoluteOutsideBaseDir() {
+        Path outside = Path.of("/tmp/somefile.txt");
+
+        history.newFile(outside);
+
+        history.removeItem(outside);
+
+        assertFalse(history.contains(outside));
+    }
+
+    @Test
+    @EnabledOnOs(OS.WINDOWS)
+    void removeItemHandlesFileOnDifferentDriveRoot() {
+        String baseDrive = baseDir.getRoot().toString().substring(0, 1).toUpperCase(Locale.ROOT);
+        String otherDrive = "H".equals(baseDrive) ? "C" : "H";
+        Path differentRoot = Path.of(otherDrive + ":\\somefile.pdf");
+
+        history.newFile(differentRoot);
+
+        assertDoesNotThrow(() -> history.removeItem(differentRoot));
+
+        assertFalse(history.contains(differentRoot));
+    }
 }
-
-

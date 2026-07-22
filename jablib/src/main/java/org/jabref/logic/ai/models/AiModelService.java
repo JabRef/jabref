@@ -2,8 +2,8 @@ package org.jabref.logic.ai.models;
 
 import java.util.List;
 
-import org.jabref.logic.ai.AiDefaultPreferences;
-import org.jabref.model.ai.AiProvider;
+import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
+import org.jabref.model.ai.llm.AiProvider;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -30,12 +30,12 @@ public class AiModelService {
         List<String> dynamicModels = fetchModelsSynchronously(aiProvider, apiBaseUrl, apiKey);
 
         if (!dynamicModels.isEmpty()) {
-            LOGGER.info("Using {} dynamic models for {}", dynamicModels.size(), aiProvider.getLabel());
+            LOGGER.debug("Using {} dynamic models for {}", dynamicModels.size(), aiProvider.name());
             return dynamicModels;
         }
 
-        List<String> staticModels = AiDefaultPreferences.getAvailableModels(aiProvider);
-        LOGGER.debug("Using {} hardcoded models for {}", staticModels.size(), aiProvider.getLabel());
+        List<String> staticModels = getStaticModels(aiProvider);
+        LOGGER.debug("Using {} hardcoded models for {}", staticModels.size(), aiProvider.name());
         return staticModels;
     }
 
@@ -44,7 +44,7 @@ public class AiModelService {
     /// @param aiProvider The AI provider
     /// @return A list of available model names
     public List<String> getStaticModels(AiProvider aiProvider) {
-        return AiDefaultPreferences.getAvailableModels(aiProvider);
+        return PredefinedChatModelUtil.getAvailableModels(aiProvider);
     }
 
     /// Synchronously fetches the list of available models from the API.
@@ -58,7 +58,7 @@ public class AiModelService {
         for (AiModelProvider provider : modelProviders) {
             if (provider.supports(aiProvider)) {
                 List<String> models = provider.fetchModels(aiProvider, apiBaseUrl, apiKey);
-                if (models.isEmpty()) {
+                if (!models.isEmpty()) {
                     return models;
                 }
             }

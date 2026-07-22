@@ -54,7 +54,6 @@
             <mods:dateCreated keyDate="yes">2000-11-10</mods:dateCreated>
             <mods:dateCaptured keyDate="yes">2000-11-11</mods:dateCaptured>
             <mods:edition>2</mods:edition>
-            <mods:issuance>monographic</mods:issuance>
             <mods:dateModified keyDate="yes">2000-12-10</mods:dateModified>
             <mods:publisher xsi:type="mods:stringPlusLanguagePlusSupplied">Verlag verlag</mods:publisher>
             <mods:dateIssued keyDate="yes">2000</mods:dateIssued>

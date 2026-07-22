@@ -4,7 +4,11 @@ open module org.jabref.jablib {
 
     exports org.jabref.search;
     exports org.jabref.logic.search;
+    exports org.jabref.logic.search.inmemory;
     exports org.jabref.logic.search.query;
+    exports org.jabref.logic.search.sqlbased;
+    exports org.jabref.logic.search.sqlbased.indexing;
+    exports org.jabref.logic.search.sqlbased.retrieval;
     exports org.jabref.model.entry.field;
     exports org.jabref.model.search;
     exports org.jabref.model.search.query;
@@ -12,6 +16,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.preferences;
     exports org.jabref.logic.importer;
     exports org.jabref.logic.bibtex;
+    exports org.jabref.logic.browserext;
     exports org.jabref.logic.citationkeypattern;
     exports org.jabref.logic.exporter;
     exports org.jabref.logic.importer.fileformat;
@@ -39,8 +44,6 @@ open module org.jabref.jablib {
     exports org.jabref.model.groups;
     exports org.jabref.model.groups.event;
     exports org.jabref.logic.preview;
-    exports org.jabref.logic.ai;
-    exports org.jabref.logic.ai.models;
     exports org.jabref.logic.pdf;
     exports org.jabref.model.database.event;
     exports org.jabref.model.entry.event;
@@ -59,13 +62,6 @@ open module org.jabref.jablib {
     exports org.jabref.logic.openoffice.style;
     exports org.jabref.model.metadata;
     exports org.jabref.model.metadata.event;
-    exports org.jabref.logic.ai.chatting;
-    exports org.jabref.logic.ai.util;
-    exports org.jabref.logic.ai.ingestion;
-    exports org.jabref.logic.ai.ingestion.model;
-    exports org.jabref.model.ai;
-    exports org.jabref.logic.ai.processingstatus;
-    exports org.jabref.logic.ai.summarization;
     exports org.jabref.logic.layout.format;
     exports org.jabref.logic.auxparser;
     exports org.jabref.logic.cleanup;
@@ -99,7 +95,6 @@ open module org.jabref.jablib {
     exports org.jabref.model.openoffice.uno;
     exports org.jabref.model.openoffice.util;
     exports org.jabref.logic.importer.plaincitation;
-    exports org.jabref.logic.ai.templates;
     exports org.jabref.logic.bst;
     exports org.jabref.model.study;
     exports org.jabref.logic.shared.security;
@@ -123,6 +118,45 @@ open module org.jabref.jablib {
     exports org.jabref.logic.git.merge.execution;
     exports org.jabref.model.sciteTallies;
     exports org.jabref.logic.bibtex.comparator.plausibility;
+    exports org.jabref.logic.ocr;
+
+    // region: AI
+    exports org.jabref.logic.ai;
+    exports org.jabref.logic.ai.chatting;
+    exports org.jabref.logic.ai.util;
+    exports org.jabref.logic.ai.summarization;
+    exports org.jabref.logic.ai.summarization.repositories;
+    exports org.jabref.logic.ai.ingestion;
+    exports org.jabref.logic.ai.ingestion.logic.documentsplitting;
+    exports org.jabref.logic.ai.ingestion.logic.parsing;
+    exports org.jabref.logic.ai.summarization.tasks;
+    exports org.jabref.logic.ai.summarization.logic.summarizationalgorithms;
+    exports org.jabref.logic.ai.ingestion.repositories;
+    exports org.jabref.logic.ai.ingestion.logic;
+    exports org.jabref.logic.ai.chatting.tasks;
+    exports org.jabref.logic.ai.preferences;
+    exports org.jabref.model.ai.chatting;
+    exports org.jabref.model.ai.pipeline;
+    exports org.jabref.model.ai.embeddings;
+    exports org.jabref.model.ai.summarization;
+    exports org.jabref.model.ai.identifiers;
+    exports org.jabref.model.ai.tokenization;
+    exports org.jabref.model.ai.llm;
+    exports org.jabref.logic.ai.chatting.util;
+    exports org.jabref.logic.ai.embedding;
+    exports org.jabref.logic.ai.rag.logic;
+    exports org.jabref.logic.ai.ingestion.tasks.generateembeddingsforseveral;
+    exports org.jabref.logic.ai.ingestion.tasks.generateembeddings;
+    exports org.jabref.logic.ai.rag.util;
+    exports org.jabref.logic.ai.ingestion.util;
+    exports org.jabref.logic.ai.followup.tasks;
+    exports org.jabref.model.ai;
+    exports org.jabref.logic.ai.chatting.exporters;
+    exports org.jabref.logic.ai.summarization.exporters;
+    exports org.jabref.logic.ai.summarization.util;
+    exports org.jabref.logic.msc;
+    exports org.jabref.logic.ai.models;
+    // endregion
 
     requires java.base;
 
@@ -160,6 +194,9 @@ open module org.jabref.jablib {
     requires transitive jakarta.inject;
     // endregion
 
+    // Test-only: BrowserExtensionBridgeClientTest fakes the bridge with a real loopback HttpServer.
+    requires static jdk.httpserver;
+
     // region: data mapping
     requires jdk.xml.dom;
     requires com.google.gson;
@@ -180,9 +217,6 @@ open module org.jabref.jablib {
 
     // region: SQL databases
     requires embedded.postgres;
-    // For arm, we explicitly need to add these as well
-    requires /*runtime*/ embedded.postgres.binaries.darwin.arm64v8;
-    requires /*runtime*/ embedded.postgres.binaries.linux.arm64v8;
 
     requires /*runtime*/ org.tukaani.xz;
     requires org.postgresql.jdbc;
@@ -201,10 +235,7 @@ open module org.jabref.jablib {
     requires com.github.benmanes.caffeine;
     // endregion
 
-    // region: latex2unicode
-    requires com.github.tomtung.latex2unicode;
-    requires fastparse;
-    // endregion
+    requires org.jabref.latexconv;
 
     requires jbibtex;
     requires transitive citeproc.java;

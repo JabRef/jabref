@@ -63,6 +63,27 @@
     -rtfx-background-color: -jr-error;
 }
 
+.bold {
+    -fx-font-weight: bold;
+}
+
+.italic {
+    -fx-font-style: italic;
+}
+
+.bordered {
+    -fx-border-width: 1;
+    -fx-border-color: -fx-outer-border;
+}
+
+.bg-transparent {
+    -fx-background-color: transparent;
+}
+
+.padding-right-15 {
+    -fx-padding: 0 15 0 0;
+}
+
 .merge-header-cell {
     -fx-border-color: -fx-outer-border;
     -fx-background-color: -jr-row-odd-background;
@@ -613,21 +634,33 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-min-width: 10em;
 }
 
-.chat-message-text-area {
+.chat-bubble {
     -fx-border-radius: 10;
     -fx-background-radius: 10;
+    -fx-border-width: 1;
+    -fx-padding: 10;
+    -fx-max-width: 600;
 }
 
-.chat-message-text-area .scroll-pane {
-    -fx-background-color: transparent;
+.chat-bubble:user {
+    -fx-background-color: -jr-ai-message-user;
+    -fx-border-color: -jr-ai-message-user-border;
 }
 
-.chat-message-text-area .scroll-pane .viewport {
-    -fx-background-color: transparent;
+.chat-bubble:ai {
+    -fx-background-color: -jr-ai-message-ai;
+    -fx-border-color: -jr-ai-message-ai-border;
 }
 
-.chat-message-text-area .scroll-pane .content {
-    -fx-background-color: transparent;
+.chat-bubble:error {
+    -fx-background-color: -jr-ai-message-error;
+    -fx-border-color: -jr-ai-message-error-border;
+}
+
+/* CitationKeyPatternsPanel */
+
+.citation-key-pattern-default-row {
+    -fx-background-color: -fx-default-button;
 }
 
 /* MainTable */
@@ -635,6 +668,14 @@ We want to have a look that matches our icons in the tool-bar */
 .main-table .column-icon {
     -fx-alignment: baseline-center;
     -fx-padding: 0;
+}
+
+.padding-0 {
+    -fx-padding: 0;
+}
+
+.align-center-right {
+    -fx-alignment: CENTER-RIGHT;
 }
 
 .main-table .column-header.column-icon > .label {
@@ -1077,6 +1118,56 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 5 5 5 15;
 }
 
+/* Single scroll-list field tab "Main" (issue #12711) */
+#entryEditor .all-fields-container {
+    -fx-padding: 10 15 10 15;
+    -fx-spacing: 8;
+    -fx-background-color: -fx-control-inner-background;
+}
+
+#entryEditor .editorPane.all-fields-list {
+    -fx-vgap: 8;
+    -fx-padding: 0;
+}
+
+/* Collapsible sections: flat look instead of the default TitledPane box */
+#entryEditor .all-fields-section-pane {
+    -fx-box-border: transparent;
+}
+
+#entryEditor .all-fields-section-pane > .title {
+    -fx-background-color: transparent;
+    -fx-font-weight: bold;
+    -fx-padding: 6 0 4 0;
+    -fx-border-color: transparent transparent -fx-outer-border transparent;
+}
+
+#entryEditor .all-fields-section-pane > *.content {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 6 0 4 16;
+}
+
+#entryEditor .all-fields-section-content {
+    -fx-spacing: 8;
+}
+
+#entryEditor .all-fields-add-chips {
+    -fx-hgap: 6;
+    -fx-vgap: 6;
+}
+
+#entryEditor .all-fields-add-chip {
+    -fx-background-radius: 3;
+    -fx-border-radius: 3;
+    -fx-padding: 3 12 3 12;
+}
+
+#entryEditor .all-fields-add-free-form {
+    -fx-spacing: 6;
+    -fx-padding: 4 0 0 0;
+}
+
 #entryEditor Text {
     -fx-text-fill: -fx-text-base-color;
     -fx-fill: -fx-text-base-color;
@@ -1135,11 +1226,25 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-insets: 0;
 }
 
-#entryEditor .tool-bar .glyph-icon {
+#entryEditor .icon-button .glyph-icon,
+#entryEditor .icon-button .ikonli-font-icon,
+#entryEditor .icon-buttonNoSpaceBottom .glyph-icon,
+#entryEditor .icon-buttonNoSpaceBottom .ikonli-font-icon,
+#entryEditor .icon-buttonNoSpaceTop .glyph-icon,
+#entryEditor .icon-buttonNoSpaceTop .ikonli-font-icon {
     -glyph-size: 1.0em;
-    -fx-font-size: 2em;
     -fx-fill: -jr-theme;
     -fx-text-fill: -jr-theme;
+}
+
+#entryEditor .field-remove-button {
+    -fx-background-color: transparent;
+}
+
+#entryEditor .field-remove-button .glyph-icon,
+#entryEditor .field-remove-button .ikonli-font-icon {
+    -fx-fill: -jr-gray-2;
+    -fx-text-fill: -jr-gray-2;
 }
 
 #entryEditor .warning-icon {
@@ -1235,6 +1340,21 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-size: 1.5em;
     -fx-font-weight: bold;
     -fx-text-fill: -jr-error;
+}
+
+#entryEditor .latex-citations-directory-path {
+    -fx-font-family: monospace;
+    -fx-font-weight: bold;
+}
+
+#entryEditor .latex-citations-message-box {
+    -fx-padding: 30 0 0 30;
+}
+
+#entryEditor .latex-citations-error-label {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-accent;
 }
 
 /* ErrorConsole */
@@ -1516,6 +1636,10 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-border-color: -jr-sidepane-background;
 }
 
+#parseLatexResultDialog .parse-latex-reference-text {
+    -fx-fill: -fx-accent;
+}
+
 /* PreferenceDialog */
 #preferencesDialog #sidepane {
     -fx-background-color: -jr-sidepane-background;
@@ -1600,6 +1724,13 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 2;
 }
 
+/* EntryEditorTab — tab list rows, matching the row density of the Entry table */
+.entry-editor-tab-cell {
+    -fx-padding: 0.3em 0.6em;
+    -fx-alignment: center-left;
+    -fx-spacing: 0.5em;
+}
+
 /* WebSearchTab */
 .fetcher-list-cell {
     -fx-padding: 0.3em 0.6em;
@@ -1646,6 +1777,14 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 /* CitationRelationsTab */
+
+.padding-5px {
+    -fx-padding: 5px;
+}
+
+.align-center {
+    -fx-alignment: center;
+}
 
 #citationRelationsTab .addEntryButton {
     -fx-font-size: 2em;
@@ -2196,6 +2335,19 @@ journalInfo .grid-cell-b {
     -fx-fill-width: true;
 }
 
+/* FileSelectionPage */
+
+.file-selection-progress-pane {
+    -fx-alignment: center;
+    -fx-padding: 20;
+}
+
+/* TextFlowLimited */
+
+.text-flow-more-link {
+    -fx-background-color: -jr-white;
+}
+
 /* Markdown styles */
 .markdown-textflow {
     -fx-text-alignment: left;
@@ -2359,9 +2511,50 @@ journalInfo .grid-cell-b {
     -fx-background-color: -fx-default-button;
 }
 
+.linked-files-info {
+    -fx-padding: 0.5em 0 0.5em 0;
+}
+
+/* Row height for the linked-files ListView. Expressed in em so theming and font scaling adjust it;
+   LinkedFilesEditor binds the ListView pref/max height to this fixed cell size. */
+.linked-files-list {
+    -fx-fixed-cell-size: 2.3em;
+}
+
+.delete-files-dialog {
+    -fx-padding: 10px;
+    -fx-background-color: -fx-background;
+}
+
 /* Note: stack-pane comes from GemsFX */
 .stack-pane {
     -fx-background-color: transparent;
     -fx-background-insets: 0, 0;
     -fx-padding: 0;
+}
+
+/* Preview (PreviewViewer): match the entry editor's white content background instead of the
+   transparent one .scroll-pane/.stack-pane get by default (jabref-javafx.css). */
+.preview-viewer,
+.preview-viewer > .viewport {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.preview-viewer-content {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+/* JavaFX incubator RichTextArea (entry preview, AI summary).
+   Modena styles it from -fx-accent, which JabRef deliberately sets to red
+   as an "unthemed control" canary - so map it to the JabRef palette here. */
+.rich-text-area .selection-highlight {
+    -fx-fill: derive(-jr-accent, 20%);
+}
+
+.rich-text-area .caret {
+    -fx-stroke: -fx-text-background-color;
+}
+
+.rich-text-area .caret-line {
+    -fx-fill: transparent;
 }

@@ -69,19 +69,6 @@ public class WorkspacePreferences {
         return new WorkspacePreferences();
     }
 
-    public void setAll(WorkspacePreferences preferences) {
-        this.language.set(preferences.getLanguage());
-        this.shouldOverrideDefaultFontSize.set(preferences.shouldOverrideDefaultFontSize());
-        this.mainFontSize.set(preferences.getMainFontSize());
-        this.theme.set(preferences.getTheme());
-        this.themeSyncOs.set(preferences.shouldThemeSyncOs());
-        this.shouldOpenLastEdited.set(preferences.shouldOpenLastEdited());
-        this.showAdvancedHints.set(preferences.shouldShowAdvancedHints());
-        this.confirmDelete.set(preferences.shouldConfirmDelete());
-        this.confirmHideTabBar.set(preferences.shouldHideTabBar());
-        this.selectedSlrCatalogs.setAll(preferences.getSelectedSlrCatalogs());
-    }
-
     public Language getLanguage() {
         return language.get();
     }

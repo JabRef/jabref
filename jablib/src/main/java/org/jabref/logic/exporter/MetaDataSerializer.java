@@ -59,6 +59,8 @@ public class MetaDataSerializer {
         metaData.getVersionDBStructure().ifPresent(
                 versionDBStructure -> stringyMetaData.put(MetaData.VERSION_DB_STRUCT, List.of(versionDBStructure.trim())));
         metaData.getBlgFilePaths().forEach((user, path) -> stringyMetaData.put(MetaData.BLG_FILE_PATH + "-" + user, List.of(path.toString().trim())));
+        metaData.getAiLibraryId().ifPresent(
+                id -> stringyMetaData.put(MetaData.AI_LIBRARY_ID, List.of(id)));
 
         for (ContentSelector selector : metaData.getContentSelectorsSorted()) {
             stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getField().getName(), selector.getValues());
@@ -166,6 +168,18 @@ public class MetaDataSerializer {
                                  .stream()
                                  .map(BibField::field)
                                  .toList()) +
+                "]";
+    }
+
+    public static String serializeCustomEntryTypesV2(BibEntryType entryType) {
+        return MetaData.ENTRYTYPE_FLAG_V2 +
+                entryType.getType().getName() +
+                ": req[" +
+                FieldFactory.serializeOrFieldsListV2(entryType.getRequiredFields()) +
+                "] opt[" +
+                FieldFactory.serializeFieldsListV2(entryType.getOptionalFields().stream()
+                                                            .map(BibField::field)
+                                                            .toList()) +
                 "]";
     }
 

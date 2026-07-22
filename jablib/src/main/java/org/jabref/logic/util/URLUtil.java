@@ -77,7 +77,7 @@ public class URLUtil {
     /// @param url the String to check for a URL
     /// @return true if `url` contains a valid URL
     public static boolean isURL(String url) {
-        if (url == null || url.trim().isEmpty()) {
+        if (url == null || url.isBlank()) {
             return false;
         }
 
@@ -102,7 +102,7 @@ public class URLUtil {
     public static @NonNull URL create(@NonNull String url) throws MalformedURLException {
         String trimmedUrl = url.trim();
         if (trimmedUrl.isEmpty()) {
-            throw new IllegalArgumentException("URL must not be empty.");
+            throw new MalformedURLException("URL must not be empty.");
         }
 
         // Add https:// prefix to URLs starting with www. to make them absolute

@@ -2,7 +2,8 @@ package org.jabref.logic.crawler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
@@ -11,6 +12,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
+import org.jabref.model.study.StudyQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,14 +21,15 @@ import org.slf4j.LoggerFactory;
 /// and aggregates the results returned by the fetchers by query and E-Library.
 class StudyFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(StudyFetcher.class);
-    private static final int MAX_AMOUNT_OF_RESULTS_PER_FETCHER = 100;
 
     private final List<SearchBasedFetcher> activeFetchers;
-    private final List<String> searchQueries;
+    private final List<StudyQuery> searchQueries;
+    private final Map<String, Integer> resultLimits;
 
-    StudyFetcher(List<SearchBasedFetcher> activeFetchers, List<String> searchQueries) throws IllegalArgumentException {
+    StudyFetcher(List<SearchBasedFetcher> activeFetchers, List<StudyQuery> searchQueries, Map<String, Integer> resultLimits) {
         this.searchQueries = searchQueries;
         this.activeFetchers = activeFetchers;
+        this.resultLimits = resultLimits;
     }
 
     /// Each Map Entry contains the results for one search term for all libraries.
@@ -38,36 +41,78 @@ class StudyFetcher {
                             .toList();
     }
 
-    private QueryResult getQueryResult(String searchQuery) {
-        return new QueryResult(searchQuery, performSearchOnQuery(searchQuery));
+    private QueryResult getQueryResult(StudyQuery searchQuery) {
+        return new QueryResult(searchQuery.getQuery(), performSearchOnQuery(searchQuery));
     }
 
     /// Queries all catalogs on the given searchQuery.
     ///
     /// @param searchQuery The query the search is performed for.
     /// @return Mapping of each fetcher by name and all their retrieved publications as a BibDatabase
-    private List<FetchResult> performSearchOnQuery(String searchQuery) {
+    private List<FetchResult> performSearchOnQuery(StudyQuery searchQuery) {
         return activeFetchers.parallelStream()
                              .map(fetcher -> performSearchOnQueryForFetcher(searchQuery, fetcher))
-                             .filter(Objects::nonNull)
+                             .flatMap(Optional::stream)
                              .toList();
     }
 
-    private FetchResult performSearchOnQueryForFetcher(String searchQuery, SearchBasedFetcher fetcher) {
+    private Optional<FetchResult> performSearchOnQueryForFetcher(StudyQuery searchQuery, SearchBasedFetcher fetcher) {
         try {
-            List<BibEntry> fetchResult = new ArrayList<>();
+            List<BibEntry> fetchResult;
             if (fetcher instanceof PagedSearchBasedFetcher basedFetcher) {
-                int pages = (int) Math.ceil(((double) MAX_AMOUNT_OF_RESULTS_PER_FETCHER) / basedFetcher.getPageSize());
-                for (int page = 0; page < pages; page++) {
-                    fetchResult.addAll(basedFetcher.performSearchPaged(searchQuery, page).getContent());
-                }
+                fetchResult = performPagedSearch(basedFetcher, searchQuery);
             } else {
-                fetchResult = fetcher.performSearch(searchQuery);
+                fetchResult = performNonPagedSearch(fetcher, searchQuery);
             }
-            return new FetchResult(fetcher.getName(), new BibDatabase(fetchResult));
+            return Optional.of(new FetchResult(fetcher.getName(), new BibDatabase(fetchResult)));
         } catch (FetcherException e) {
             LOGGER.warn("{} API request failed", fetcher.getName(), e);
-            return null;
+            return Optional.empty();
+        }
+    }
+
+    private Optional<String> getCatalogOverride(StudyQuery searchQuery, SearchBasedFetcher fetcher) {
+        return searchQuery.getCatalogSpecific().entrySet().stream()
+                          .filter(entry -> entry.getKey().equalsIgnoreCase(fetcher.getName()))
+                          .map(Map.Entry::getValue)
+                          .filter(v -> v != null && !v.isBlank())
+                          .findFirst();
+    }
+
+    private List<BibEntry> performPagedSearch(PagedSearchBasedFetcher basedFetcher, StudyQuery searchQuery) throws FetcherException {
+        Optional<String> catalogOverride = getCatalogOverride(searchQuery, basedFetcher);
+        int limit = resultLimits.getOrDefault(basedFetcher.getName(), StudyRepository.DEFAULT_RESULT_LIMIT);
+        int pages = (int) Math.ceil((double) limit / basedFetcher.getPageSize());
+        List<BibEntry> fetchResult = new ArrayList<>();
+        if (catalogOverride.isPresent()) {
+            try {
+                for (int page = 0; page < pages; page++) {
+                    fetchResult.addAll(basedFetcher.performRawSearchQueryPaged(catalogOverride.get(), page).getContent());
+                }
+            } catch (UnsupportedOperationException e) {
+                throw new FetcherException(basedFetcher.getName() + " does not support raw search queries for catalogSpecific override", e);
+            }
+        } else {
+            for (int page = 0; page < pages; page++) {
+                fetchResult.addAll(basedFetcher.performSearchPaged(searchQuery.getQuery(), page).getContent());
+            }
+        }
+        if (fetchResult.size() > limit) {
+            fetchResult = new ArrayList<>(fetchResult.subList(0, limit));
+        }
+        return fetchResult;
+    }
+
+    private List<BibEntry> performNonPagedSearch(SearchBasedFetcher fetcher, StudyQuery searchQuery) throws FetcherException {
+        Optional<String> catalogOverride = getCatalogOverride(searchQuery, fetcher);
+        if (catalogOverride.isPresent()) {
+            try {
+                return fetcher.performRawSearchQuery(catalogOverride.get());
+            } catch (UnsupportedOperationException e) {
+                throw new FetcherException(fetcher.getName() + " does not support raw search queries for catalogSpecific override", e);
+            }
+        } else {
+            return fetcher.performSearch(searchQuery.getQuery());
         }
     }
 }

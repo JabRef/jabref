@@ -42,6 +42,14 @@
                     <Tooltip text="%Change entry type"/>
                 </tooltip>
             </Button>
+            <Button styleClass="icon-button,narrow" onAction="#jumpToFieldButton">
+                <graphic>
+                    <JabRefIconView glyph="SEARCH"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%Jump to field"/>
+                </tooltip>
+            </Button>
             <Button styleClass="icon-button,narrow" onAction="#generateCiteKeyButton">
                 <graphic>
                     <JabRefIconView glyph="MAKE_KEY"/>
@@ -55,7 +63,7 @@
                     <JabRefIconView glyph="CLEANUP_ENTRIES"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="%Cleanup entry"/>
+                    <Tooltip text="%Clean up entry"/>
                 </tooltip>
             </Button>
             <Button fx:id="fetcherButton" styleClass="icon-button,narrow">

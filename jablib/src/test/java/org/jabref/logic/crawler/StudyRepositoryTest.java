@@ -8,6 +8,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
 
@@ -29,8 +32,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
+import org.jabref.model.study.Study;
+import org.jabref.model.study.StudyCatalog;
+import org.jabref.model.study.StudyQuery;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -41,6 +48,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -75,6 +84,7 @@ class StudyRepositoryTest {
         when(preferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
         when(preferences.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');  // <-- ADD THIS
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(preferences.getTimestampPreferences().getTimestampField()).then(_ -> StandardField.TIMESTAMP);
         entryTypesManager = new BibEntryTypesManager();
@@ -153,28 +163,58 @@ class StudyRepositoryTest {
 
     @Test
     void fetcherResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
-        List<QueryResult> mockResults = getMockResults();
+        studyRepository.persist(getMockResults());
 
-        studyRepository.persist(mockResults);
+        assertEquals(getArXivQuantumMockResultsWithGroups(), getTestStudyRepository().getFetcherResultEntries("Quantum", "ArXiv").getEntries());
+        assertEquals(getSpringerQuantumMockResultsWithGroups(), getTestStudyRepository().getFetcherResultEntries("Quantum", "Springer").getEntries());
+        assertEquals(getSpringerCloudComputingMockResultsWithGroups(), getTestStudyRepository().getFetcherResultEntries("Cloud Computing", "Springer").getEntries());
+    }
 
-        assertEquals(getArXivQuantumMockResults(), getTestStudyRepository().getFetcherResultEntries("Quantum", "ArXiv").getEntries());
-        assertEquals(getSpringerQuantumMockResults(), getTestStudyRepository().getFetcherResultEntries("Quantum", "Springer").getEntries());
-        assertEquals(getSpringerCloudComputingMockResults(), getTestStudyRepository().getFetcherResultEntries("Cloud Computing", "Springer").getEntries());
+    @Test
+    void fetcherGroupIsCreatedInFetcherResultFile() throws Exception {
+        studyRepository.persist(getMockResults());
+
+        BibDatabaseContext arXivResult = getTestStudyRepository()
+                .getFetcherResultEntries("Quantum", "ArXiv");
+
+        Optional<GroupTreeNode> root = arXivResult.getMetaData().getGroups();
+        assertTrue(root.isPresent());
+        assertTrue(root.get().getChildren().stream()
+                       .anyMatch(child -> "ArXiv".equals(child.getGroup().getName())));
+    }
+
+    @Test
+    void fetcherGroupsCreatedInStudyResultFile() throws Exception {
+        studyRepository.persist(getMockResults());
+
+        BibDatabaseContext studyResult = getTestStudyRepository().getStudyResultEntries();
+
+        Optional<GroupTreeNode> root = studyResult.getMetaData().getGroups();
+        assertTrue(root.isPresent());
+
+        List<String> groupNames = root.get().getChildren().stream()
+                                      .map(child -> child.getGroup().getName())
+                                      .toList();
+
+        assertThat(groupNames, hasItems("ArXiv", "Springer"));
     }
 
     @Test
     void mergedResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
         List<QueryResult> mockResults = getMockResults();
+
+        List<BibEntry> arxivEntries = getArXivQuantumMockResultsWithGroups();
+        arxivEntries.getFirst().setField(StandardField.GROUPS, "ArXiv, Springer");
+
         List<BibEntry> expected = new ArrayList<>();
-        expected.addAll(getArXivQuantumMockResults());
-        expected.add(getSpringerQuantumMockResults().get(1));
-        expected.add(getSpringerQuantumMockResults().get(2));
+        expected.addAll(arxivEntries);
+        expected.add(getSpringerQuantumMockResultsWithGroups().get(1));
+        expected.add(getSpringerQuantumMockResultsWithGroups().get(2));
 
         studyRepository.persist(mockResults);
 
-        // All Springer results are duplicates for "Quantum"
         assertEquals(expected, getTestStudyRepository().getQueryResultEntries("Quantum").getEntries());
-        assertEquals(getSpringerCloudComputingMockResults(), getTestStudyRepository().getQueryResultEntries("Cloud Computing").getEntries());
+        assertEquals(getSpringerCloudComputingMockResultsWithGroups(), getTestStudyRepository().getQueryResultEntries("Cloud Computing").getEntries());
     }
 
     @Test
@@ -182,6 +222,142 @@ class StudyRepositoryTest {
         List<QueryResult> mockResults = getMockResults();
         studyRepository.persist(mockResults);
         assertEquals(new HashSet<>(getNonDuplicateBibEntryResult().getEntries()), new HashSet<>(getTestStudyRepository().getStudyResultEntries().getEntries()));
+    }
+
+    @Test
+    void resolvesResultLimitsWithCatalogOverrideAndStudyDefault() {
+        Study study = studyRepository.getStudy();
+        study.setMaxResultsPerCatalog(100);
+        study.getCatalogs().getFirst().setMaxResults(500);
+
+        Map<String, Integer> limits = studyRepository.getResultLimitsPerCatalog();
+
+        String overriddenCatalog = study.getCatalogs().getFirst().getName();
+        assertEquals(500, limits.get(overriddenCatalog));
+        assertEquals(100, limits.get(study.getCatalogs().get(1).getName()));
+    }
+
+    @Test
+    void resolvesResultLimitCaseInsensitively() {
+        Study study = studyRepository.getStudy();
+        String catalogName = study.getCatalogs().getFirst().getName();
+        study.getCatalogs().getFirst().setMaxResults(500);
+
+        Map<String, Integer> limits = studyRepository.getResultLimitsPerCatalog();
+
+        assertEquals(500, limits.get(catalogName.toUpperCase(Locale.ROOT)));
+    }
+
+    @Test
+    void resolvesToDefaultWhenNoLimitSet() {
+        Map<String, Integer> limits = studyRepository.getResultLimitsPerCatalog();
+        // no study default, no catalog override -> every catalog resolves to the default
+        limits.forEach((catalog, limit) ->
+                assertEquals(StudyRepository.DEFAULT_RESULT_LIMIT, limit,
+                        () -> "Catalog '" + catalog + "' did not resolve to the default"));
+    }
+
+    @Test
+    void studyLockFileCreatedAfterPersist() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.persist(getMockResults());
+
+        assertTrue(Files.exists(tempRepositoryDirectory.resolve(StudyRepository.STUDY_LOCK_FILE_NAME)));
+    }
+
+    @Test
+    void studyLockRecordsEffectiveQueryForEachEnabledCatalog() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.persist(getMockResults());
+
+        Study lock = parseStudyLock();
+
+        assertEquals(3, lock.getQueries().size());
+        StudyQuery quantumLock = lock.getQueries().getFirst();
+        assertEquals("Quantum", quantumLock.getQuery());
+        assertEquals(Map.of("Springer", "Quantum", "arXiv", "Quantum", "Medline/PubMed", "Quantum"), quantumLock.getCatalogSpecific());
+    }
+
+    @Test
+    void studyLockExcludesCatalogsWithoutFetcher() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.getStudy().getCatalogs().add(new StudyCatalog("NotAFetcher", true));
+
+        studyRepository.persist(getMockResults());
+
+        assertFalse(parseStudyLock().getQueries().getFirst().getCatalogSpecific().containsKey("NotAFetcher"));
+    }
+
+    @Test
+    void studyLockExcludesDisabledCatalogs() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.persist(getMockResults());
+
+        assertFalse(parseStudyLock().getQueries().getFirst().getCatalogSpecific().containsKey("IEEEXplore"));
+    }
+
+    @Test
+    void studyLockPreservesCatalogSpecificOverride() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific().put("arXiv", "ti:Quantum");
+
+        studyRepository.persist(getMockResults());
+
+        Map<String, String> effectiveQueries = parseStudyLock().getQueries().getFirst().getCatalogSpecific();
+        assertEquals("ti:Quantum", effectiveQueries.get("arXiv"));
+        assertEquals("Quantum", effectiveQueries.get("Springer"));
+    }
+
+    @Test
+    void studyLockMatchesOverrideCaseInsensitively() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific().put("ARXIV", "ti:Quantum");
+
+        studyRepository.persist(getMockResults());
+
+        assertEquals("ti:Quantum", parseStudyLock().getQueries().getFirst().getCatalogSpecific().get("arXiv"));
+    }
+
+    @Test
+    void studyLockUsesFirstOverrideWhenKeysDifferOnlyByCase() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        Map<String, String> catalogSpecific = studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific();
+        catalogSpecific.put("arxiv", "ti:First");
+        catalogSpecific.put("ARXIV", "ti:Second");
+
+        studyRepository.persist(getMockResults());
+
+        // StudyFetcher uses the first case-insensitive match, so the lock must record the same one
+        assertEquals("ti:First", parseStudyLock().getQueries().getFirst().getCatalogSpecific().get("arXiv"));
+    }
+
+    @Test
+    void studyLockFallsBackToQueryForBlankOverride() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific().put("arXiv", " ");
+
+        studyRepository.persist(getMockResults());
+
+        assertEquals("Quantum", parseStudyLock().getQueries().getFirst().getCatalogSpecific().get("arXiv"));
+    }
+
+    @Test
+    void studyLockContentIsIdenticalWhenPersistedAgain() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        Path lockFile = tempRepositoryDirectory.resolve(StudyRepository.STUDY_LOCK_FILE_NAME);
+
+        studyRepository.persist(getMockResults());
+        String firstContent = Files.readString(lockFile);
+        studyRepository.persist(getMockResults());
+
+        assertEquals(firstContent, Files.readString(lockFile));
+    }
+
+    @Test
+    void studyLockPreservesResultLimits() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.getStudy().setMaxResultsPerCatalog(100);
+        studyRepository.getStudy().getCatalogs().getFirst().setMaxResults(500);
+
+        studyRepository.persist(getMockResults());
+
+        Study lock = parseStudyLock();
+        assertEquals(100, lock.getMaxResultsPerCatalog());
+        assertEquals(500, lock.getCatalogs().getFirst().getMaxResults());
+    }
+
+    private Study parseStudyLock() throws IOException {
+        return new StudyYamlParser().parseStudyYamlFile(tempRepositoryDirectory.resolve(StudyRepository.STUDY_LOCK_FILE_NAME));
     }
 
     private StudyRepository getTestStudyRepository() throws IOException, URISyntaxException, JabRefException {
@@ -215,10 +391,10 @@ class StudyRepositoryTest {
     }
 
     private BibDatabase getNonDuplicateBibEntryResult() {
-        BibDatabase mockResults = new BibDatabase(getSpringerCloudComputingMockResults());
+        BibDatabase mockResults = new BibDatabase(getSpringerCloudComputingMockResultsWithGroups());
         DatabaseMerger merger = new DatabaseMerger(importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
-        merger.merge(mockResults, new BibDatabase(getSpringerQuantumMockResults()));
-        merger.merge(mockResults, new BibDatabase(getArXivQuantumMockResults()));
+        merger.merge(mockResults, new BibDatabase(getArXivQuantumMockResultsWithGroups()));
+        merger.merge(mockResults, new BibDatabase(getSpringerQuantumMockResultsWithGroups()));
         return mockResults;
     }
 
@@ -292,5 +468,23 @@ class StudyRepositoryTest {
                 .withField(StandardField.TITLE, "Design of Framework for Disaster Recovery in Cloud Computing");
         entry2.setType(StandardEntryType.Article);
         return List.of(entry1, entry2);
+    }
+
+    private List<BibEntry> getArXivQuantumMockResultsWithGroups() {
+        return getArXivQuantumMockResults().stream()
+                                           .map(e -> e.withField(StandardField.GROUPS, "ArXiv"))
+                                           .toList();
+    }
+
+    private List<BibEntry> getSpringerQuantumMockResultsWithGroups() {
+        return getSpringerQuantumMockResults().stream()
+                                              .map(e -> e.withField(StandardField.GROUPS, "Springer"))
+                                              .toList();
+    }
+
+    private List<BibEntry> getSpringerCloudComputingMockResultsWithGroups() {
+        return getSpringerCloudComputingMockResults().stream()
+                                                     .map(e -> e.withField(StandardField.GROUPS, "Springer"))
+                                                     .toList();
     }
 }
