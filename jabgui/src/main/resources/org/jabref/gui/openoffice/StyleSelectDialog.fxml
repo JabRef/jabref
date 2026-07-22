@@ -100,6 +100,10 @@
                             <RadioButton fx:id="numericFormatButton" text="%Numeric [1]"/>
                             <RadioButton fx:id="authorYearFormatButton" text="%Author-year"/>
                         </HBox>
+                        <VBox spacing="4.0">
+                            <Label text="%Preview" styleClass="sectionHeader"/>
+                            <VBox fx:id="bstPreviewBox" prefHeight="150.0" spacing="4.0"/>
+                        </VBox>
                     </VBox>
                 </Tab>
             </TabPane>

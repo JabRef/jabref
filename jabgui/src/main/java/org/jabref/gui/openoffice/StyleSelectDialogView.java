@@ -34,6 +34,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.style.BstCitationFormat;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
+import org.jabref.logic.preview.BstStylePreviewLayout;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
@@ -89,6 +90,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @FXML private Button addBstStyleButton;
     @FXML private RadioButton numericFormatButton;
     @FXML private RadioButton authorYearFormatButton;
+    @FXML private VBox bstPreviewBox;
 
     @FXML private VBox cslPreviewBox;
     @FXML private VBox jStylePreviewBox;
@@ -356,6 +358,21 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         bstStylesTable.setItems(viewModel.bstStylesProperty());
         addBstStyleButton.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
+
+        // Preview — updates whenever the selected BST style changes
+        PreviewViewer bstPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
+        bstPreviewBox.getChildren().add(bstPreviewViewer);
+
+        EasyBind.subscribe(viewModel.selectedBstStyleProperty(), vm -> {
+            if (vm != null) {
+                bstPreviewViewer.setLayout(new BstStylePreviewLayout(vm.getBstStyle()));
+            }
+        });
+
+        // Select the first style if nothing is selected yet (so preview is not blank on open)
+        if (viewModel.selectedBstStyleProperty().get() == null && !bstStylesTable.getItems().isEmpty()) {
+            bstStylesTable.getSelectionModel().selectFirst();
+        }
 
         // Citation format radio buttons
         ToggleGroup formatGroup = new ToggleGroup();
