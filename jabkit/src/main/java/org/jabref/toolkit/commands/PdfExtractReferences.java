@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.jabref.logic.importer.FetcherException;
@@ -12,6 +14,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.pdf.CitationsFromPdf;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.toolkit.converter.ExtractionModeConverter;
 import org.jabref.toolkit.exception.ExportServiceException;
 import org.jabref.toolkit.exception.ImportServiceException;
@@ -98,6 +101,7 @@ class PdfExtractReferences implements Callable<Integer> {
         }
 
         List<String> failed = new ArrayList<>();
+        Set<Path> takenTargets = new HashSet<>();
         for (String input : inputFiles) {
             Path inputFile;
             try {
@@ -140,7 +144,7 @@ class PdfExtractReferences implements Callable<Integer> {
             if (outputFile != null) {
                 exportService.exportParserResultToFile(result, outputFile, outputFormat);
             } else if (outputDir != null) {
-                exportService.exportParserResultToFile(result, outputDir.resolve(bibFileName(inputFile)), outputFormat);
+                exportService.exportParserResultToFile(result, outputDirTarget(outputDir, inputFile, takenTargets), outputFormat);
             } else if (inputFiles.size() == 1) {
                 exportService.printDatabaseContextToStdOut(result.getDatabaseContext());
             } else {
@@ -180,9 +184,24 @@ class PdfExtractReferences implements Callable<Integer> {
     }
 
     private static String bibFileName(Path inputFile) {
-        String fileName = inputFile.getFileName().toString();
-        int dotIndex = fileName.lastIndexOf('.');
-        String baseName = dotIndex > 0 ? fileName.substring(0, dotIndex) : fileName;
-        return baseName + ".bib";
+        return FileUtil.getBaseName(inputFile) + ".bib";
+    }
+
+    /// Target inside `--output-dir` for one input. Inputs from different directories can share a file
+    /// name, so a name already taken in this run gets a counter appended - `paper.bib`, `paper-2.bib`,
+    /// ... - instead of the later input silently overwriting the earlier one's references.
+    ///
+    /// Only names taken within the same run are avoided: a batch that is run again replaces its own
+    /// previous output rather than piling up numbered copies of it.
+    private static Path outputDirTarget(Path outputDir, Path inputFile, Set<Path> takenTargets) {
+        String baseName = FileUtil.getBaseName(inputFile);
+        Path target = outputDir.resolve(baseName + ".bib");
+
+        int copy = 1;
+        while (!takenTargets.add(target)) {
+            copy++;
+            target = outputDir.resolve(baseName + "-" + copy + ".bib");
+        }
+        return target;
     }
 }

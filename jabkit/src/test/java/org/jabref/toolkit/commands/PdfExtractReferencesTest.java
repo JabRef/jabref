@@ -97,6 +97,25 @@ class PdfExtractReferencesTest extends AbstractJabKitTest {
     }
 
     @Test
+    void sameFileNameInDifferentDirectoriesGetsItsOwnOutputFile(@TempDir Path inputRoot) throws Exception {
+        Path first = Files.createDirectory(inputRoot.resolve("a")).resolve("paper.pdf");
+        Path second = Files.createDirectory(inputRoot.resolve("b")).resolve("paper.pdf");
+        Files.copy(Path.of(pdfPath("ieee-paper.pdf")), first);
+        Files.copy(Path.of(pdfPath("ieee-paper.pdf")), second);
+        ArgumentCaptor<Path> files = ArgumentCaptor.captor();
+
+        int exitCode = commandLine.executeToLog(
+                "pdf", "extract-references",
+                "--output-dir", outputDir.toString(),
+                first.toString(), second.toString());
+
+        assertEquals(CommandLine.ExitCode.OK, exitCode);
+        verify(mockExportService, times(2))
+                .exportParserResultToFile(any(), files.capture(), eq("bibtex"));
+        assertEquals(List.of(outputDir.resolve("paper.bib"), outputDir.resolve("paper-2.bib")), files.getAllValues());
+    }
+
+    @Test
     void missingOutputDirIsCreated() throws Exception {
         Path nestedOutputDir = outputDir.resolve("nested/sub");
 

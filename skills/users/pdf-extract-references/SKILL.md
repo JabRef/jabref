@@ -41,6 +41,8 @@ jabkit -p pdf extract-references https://example.org/paper.pdf  # each input may
 
 `-p`/`--porcelain` suppresses progress messages — use it whenever parsing the output. `--output` is only valid with a single input file; use `--output-dir` for several.
 
+Inside `--output-dir` each `.bib` is named after its PDF. Inputs from different directories that share a file name do not overwrite each other: the second `paper.pdf` of a run is written as `paper-2.bib`, the third as `paper-3.bib`. Re-running the same batch replaces its own previous output instead of adding more numbered copies.
+
 Every positional input may be a local path or an `http(s)`/`ftp` URL; URLs are downloaded to a temporary file first. For a URL input without `--output`/`--output-dir`, the default "next to the source PDF" target becomes the current working directory.
 
 ## Extraction modes
