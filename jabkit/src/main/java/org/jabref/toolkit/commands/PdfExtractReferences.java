@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.pdf.CitationsFromPdf;
 import org.jabref.logic.l10n.Localization;
@@ -42,8 +43,9 @@ class PdfExtractReferences implements Callable<Integer> {
     @Mixin
     private JabKit.SharedOptions sharedOptions;
 
-    @Parameters(paramLabel = "FILE", description = "PDF(s) to extract references from.", arity = "1..*")
-    private List<Path> inputFiles;
+    // [impl->req~jabkit.cli.input-url~2]
+    @Parameters(paramLabel = "FILE", description = "PDF(s) to extract references from, each a file or an http(s)/ftp URL.", arity = "1..*")
+    private List<String> inputFiles;
 
     @Option(names = "--mode", converter = ExtractionModeConverter.class,
             description = "Extraction mode: ${COMPLETION-CANDIDATES} (LLM is experimental). Defaults to GROBID if Grobid is enabled in preferences, otherwise RULE_BASED.")
@@ -100,16 +102,26 @@ class PdfExtractReferences implements Callable<Integer> {
             }
         }
 
-        List<Path> failed = new ArrayList<>();
-        for (Path inputFile : inputFiles) {
+        List<String> failed = new ArrayList<>();
+        for (String input : inputFiles) {
+            Path inputFile;
+            try {
+                inputFile = InputOption.resolveInput(input);
+            } catch (ImportServiceException e) {
+                // One unreachable URL or malformed path must not abort the remaining inputs.
+                LOGGER.error("Skipped - could not resolve input {}", displayName(input), e);
+                failed.add(input);
+                continue;
+            }
+
             if (!Files.exists(inputFile)) {
                 LOGGER.error("Skipped - PDF {} does not exist", inputFile);
-                failed.add(inputFile);
+                failed.add(input);
                 continue;
             }
 
             if (!sharedOptions.porcelain) {
-                System.out.println(Localization.lang("Extracting references from %0 (mode: %1).", inputFile, effectiveMode));
+                System.out.println(Localization.lang("Extracting references from %0 (mode: %1).", displayName(input), effectiveMode));
             }
 
             ParserResult result = switch (effectiveMode) {
@@ -125,8 +137,8 @@ class PdfExtractReferences implements Callable<Integer> {
             };
 
             if (result.isInvalid()) {
-                LOGGER.error("Could not extract references from '{}': {}", inputFile, result.getErrorMessage());
-                failed.add(inputFile);
+                LOGGER.error("Could not extract references from '{}': {}", displayName(input), result.getErrorMessage());
+                failed.add(input);
                 continue;
             }
 
@@ -137,7 +149,7 @@ class PdfExtractReferences implements Callable<Integer> {
             } else if (inputFiles.size() == 1) {
                 exportService.printDatabaseContextToStdOut(result.getDatabaseContext());
             } else {
-                exportService.exportParserResultToFile(result, siblingBibFile(inputFile), outputFormat);
+                exportService.exportParserResultToFile(result, defaultBibFile(input, inputFile), outputFormat);
             }
         }
 
@@ -157,8 +169,19 @@ class PdfExtractReferences implements Callable<Integer> {
         return null;
     }
 
-    private static Path siblingBibFile(Path inputFile) {
-        return inputFile.toAbsolutePath().getParent().resolve(bibFileName(inputFile));
+    /// The input as shown to the user: URLs are redacted so that embedded credentials do not end up
+    /// on the console or in the log.
+    private static String displayName(String input) {
+        return InputOption.isUrl(input) ? FetcherException.getRedactedUrl(input) : input;
+    }
+
+    /// Target for the "one `.bib` next to each source PDF" default. A downloaded URL has no local
+    /// source directory to sit next to, so its output goes into the working directory instead of
+    /// silently into the temporary directory holding the download.
+    private static Path defaultBibFile(String input, Path resolvedFile) {
+        return InputOption.isUrl(input)
+               ? Path.of(bibFileName(resolvedFile))
+               : resolvedFile.toAbsolutePath().getParent().resolve(bibFileName(resolvedFile));
     }
 
     private static String bibFileName(Path inputFile) {

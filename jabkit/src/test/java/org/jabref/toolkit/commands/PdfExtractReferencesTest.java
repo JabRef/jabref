@@ -1,5 +1,6 @@
 package org.jabref.toolkit.commands;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -10,6 +11,10 @@ import org.jabref.toolkit.service.ExportService;
 import org.jabref.toolkit.util.CapturingCommandLine;
 import org.jabref.toolkit.util.CommandFactory;
 
+import mockwebserver3.MockResponse;
+import mockwebserver3.MockWebServer;
+import okio.Buffer;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -30,6 +35,18 @@ class PdfExtractReferencesTest extends AbstractJabKitTest {
     Path outputDir;
 
     private ExportService mockExportService;
+    private MockWebServer server;
+
+    @BeforeEach
+    void startServer() throws IOException {
+        server = new MockWebServer();
+        server.start(0);
+    }
+
+    @AfterEach
+    void stopServer() throws IOException {
+        server.close();
+    }
 
     @BeforeEach
     void setupMocks() {
@@ -98,6 +115,37 @@ class PdfExtractReferencesTest extends AbstractJabKitTest {
         int exitCode = commandLine.executeToLog("pdf", "extract-references", "does-not-exist.pdf");
 
         assertEquals(CommandLine.ExitCode.SOFTWARE, exitCode);
+    }
+
+    @Test
+    void urlInputIsDownloadedAndProcessed() throws Exception {
+        ArgumentCaptor<BibDatabaseContext> captor = ArgumentCaptor.captor();
+        server.enqueue(new MockResponse.Builder()
+                .code(200)
+                .body(new Buffer().write(Files.readAllBytes(Path.of(pdfPath("ieee-paper.pdf")))))
+                .build());
+
+        int exitCode = commandLine.executeToLog("pdf", "extract-references", server.url("/ieee-paper.pdf").toString());
+
+        assertEquals(CommandLine.ExitCode.OK, exitCode);
+        verify(mockExportService).printDatabaseContextToStdOut(captor.capture());
+        assertEquals(5, captor.getValue().getEntries().size());
+    }
+
+    @Test
+    void unreachableUrlIsSkippedWhileRemainingFilesAreStillProcessed() throws Exception {
+        server.enqueue(new MockResponse.Builder().code(404).build());
+
+        int exitCode = commandLine.executeToLog(
+                "pdf", "extract-references",
+                "--output-dir", outputDir.toString(),
+                server.url("/missing.pdf").toString(), pdfPath("ieee-paper.pdf"));
+
+        assertEquals(CommandLine.ExitCode.SOFTWARE, exitCode);
+        // The download must have been attempted - a URL treated as a plain path never reaches the server.
+        assertEquals(1, server.getRequestCount());
+        verify(mockExportService).exportParserResultToFile(
+                any(), eq(outputDir.resolve("ieee-paper.bib")), eq("bibtex"));
     }
 
     @Test

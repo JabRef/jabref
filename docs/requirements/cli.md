@@ -16,12 +16,15 @@ Needs: impl
 <!-- markdownlint-disable-file MD022 -->
 
 ## Input file argument accepts an http(s)/ftp URL
-`req~jabkit.cli.input-url~1`
+`req~jabkit.cli.input-url~2`
 
 The positional `FILE` argument and its `--input` alias additionally accept an `http://`,
-`https://`, or `ftp://` URL wherever a `jabkit` command reads a single file.
+`https://`, or `ftp://` URL. This holds for every input a `jabkit` command reads, including
+each argument of a command taking several of them.
 The URL is downloaded to a local temporary file before use; a download failure is reported
 as a regular CLI error (exit code `SOFTWARE`) rather than a "file not found" usage error.
+For a command reading several inputs, an unusable input is skipped and the remaining ones are
+still processed, with the command exiting non-zero afterwards.
 See [ADR 65](../decisions/0065-download-url-input-files.md) for more details.
 
 Needs: impl

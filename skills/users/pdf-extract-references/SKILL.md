@@ -36,9 +36,12 @@ jabkit -p pdf extract-references paper.pdf                      # single PDF →
 jabkit pdf extract-references paper.pdf --output refs.bib       # single PDF → file
 jabkit pdf extract-references a.pdf b.pdf --output-dir refs/    # one .bib per PDF into refs/
 jabkit pdf extract-references a.pdf b.pdf                       # writes a.bib, b.bib next to each PDF
+jabkit -p pdf extract-references https://example.org/paper.pdf  # each input may also be a URL
 ```
 
 `-p`/`--porcelain` suppresses progress messages — use it whenever parsing the output. `--output` is only valid with a single input file; use `--output-dir` for several.
+
+Every positional input may be a local path or an `http(s)`/`ftp` URL; URLs are downloaded to a temporary file first. For a URL input without `--output`/`--output-dir`, the default "next to the source PDF" target becomes the current working directory.
 
 ## Extraction modes
 
@@ -54,7 +57,7 @@ In `RULE_BASED` mode each entry keeps the original reference string in its `comm
 
 ## Notes
 
-- The exit code is non-zero if any input PDF was missing or failed to parse; remaining files are still processed.
+- The exit code is non-zero if any input PDF was missing, could not be downloaded, or failed to parse; remaining files are still processed.
 - Reference parsing is heuristic. Entries with a `doi` field can be cross-checked by fetching clean metadata: `jabkit doi-to-bibtex <doi>`.
 
 ## Related
