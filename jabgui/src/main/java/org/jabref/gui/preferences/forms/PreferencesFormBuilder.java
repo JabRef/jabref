@@ -405,16 +405,6 @@ public class PreferencesFormBuilder {
         return configured(new NodeElement<>(this, node), config);
     }
 
-    /// Decorates a control the builder did not create — one inside a {@link #custom} node — so a
-    /// tab needs no {@link ControlsFxVisualizer} of its own. This is the one configuring method on
-    /// the builder, because no element handle owns a control the builder never saw; decoration is
-    /// applied on the FX thread in {@link #build()} either way, as for
-    /// {@link InputElement#validate}.
-    public PreferencesFormBuilder validate(ValidationStatus status, Control control) {
-        validationInits.add(() -> visualizer.initVisualization(status, control));
-        return this;
-    }
-
     // endregion
 
     // region regions
@@ -506,6 +496,12 @@ public class PreferencesFormBuilder {
 
     private void searchable(String text, Node node) {
         searchableElements.add(new SearchableElement(text, node));
+    }
+
+    /// Collects a validation decoration; it is applied on the FX thread in {@link #build()}, once
+    /// the controls sit in a scene.
+    private void decorate(ValidationStatus status, Control control) {
+        validationInits.add(() -> visualizer.initVisualization(status, control));
     }
 
     private <E> PreferencesFormBuilder configured(E element, Consumer<E> config) {
@@ -641,6 +637,7 @@ public class PreferencesFormBuilder {
         }
 
         /// Overrides the gap between the region's elements (default {@value PreferencesFormBuilder#DEFAULT_GAP}).
+        /// The three cases are the three panes a region is ever made of; see {@link #region}.
         public S spacing(double value) {
             switch (region) {
                 case VBox box ->
@@ -650,10 +647,6 @@ public class PreferencesFormBuilder {
                 case FlowPane pane -> {
                     pane.setHgap(value);
                     pane.setVgap(value);
-                }
-                case GridPane grid -> {
-                    grid.setHgap(value);
-                    grid.setVgap(value);
                 }
                 default ->
                         throw new IllegalStateException(
@@ -787,6 +780,14 @@ public class PreferencesFormBuilder {
         NodeElement(PreferencesFormBuilder form, N node) {
             super(form, node);
         }
+
+        /// Decorates a control the builder did not create — one the {@link #custom} node brought
+        /// with it — so that a tab needs no {@link ControlsFxVisualizer} of its own. The control is
+        /// named explicitly because this handle addresses the custom node, not its insides.
+        public NodeElement<N> validate(ValidationStatus status, Control control) {
+            form.decorate(status, control);
+            return this;
+        }
     }
 
     /// A {@link Control} the builder placed. Being a control, it can carry a tooltip and
@@ -806,7 +807,7 @@ public class PreferencesFormBuilder {
 
         /// Decorates the control with `status`, applied once on the FX thread in {@link #build()}.
         public InputElement<N> validate(ValidationStatus status) {
-            form.validate(status, node);
+            form.decorate(status, node);
             return this;
         }
 

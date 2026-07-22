@@ -94,9 +94,9 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> {
                 .checkbox(Localization.lang("Show preview in entry table tooltip"), viewModel.showPreviewInEntryTableTooltip())
                 .checkbox(Localization.lang("Download cover images"), viewModel.shouldDownloadCoversProperty())
                 .button(Localization.lang("Add BST file"), this::selectBstFile)
-                .custom(dualListRegion)
+                .custom(dualListRegion, lists -> lists
+                        .validate(viewModel.chosenListValidationStatus(), chosenListView))
                 .custom(editorRegion)
-                .validate(viewModel.chosenListValidationStatus(), chosenListView)
                 .build());
 
         wireControls();
