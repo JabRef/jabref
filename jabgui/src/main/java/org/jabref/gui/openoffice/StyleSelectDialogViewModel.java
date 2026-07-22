@@ -96,12 +96,30 @@ public class StyleSelectDialogViewModel {
         OOStyle currentStyle = openOfficePreferences.getCurrentStyle();
 
         if (currentStyle instanceof JStyle jStyle) {
-            selectedJStyle.setValue(getJStyleOrDefault(jStyle.getPath()));
+            // Prefer exact path match for external styles; fall back to name for internal
+            Optional<JStyleSelectViewModel> byPath = jStyles.stream()
+                                                            .filter(vm -> vm.getStylePath().equals(jStyle.getPath()))
+                                                            .findFirst();
+            if (byPath.isPresent()) {
+                selectedJStyle.setValue(byPath.get());
+            } else {
+                jStyles.stream()
+                       .filter(vm -> vm.nameProperty().get().equals(jStyle.getName()))
+                       .findFirst()
+                       .ifPresentOrElse(selectedJStyle::setValue, () -> selectedJStyle.setValue(jStyles.getFirst()));
+            }
         } else if (currentStyle instanceof BstStyle bstStyle) {
-            bstStyles.stream()
-                     .filter(vm -> vm.getStylePath().equals(bstStyle.getPath()))
-                     .findFirst()
-                     .ifPresent(selectedBstStyle::setValue);
+            Optional<BstStyleSelectViewModel> byPath = bstStyles.stream()
+                                                                .filter(vm -> vm.getStylePath().equals(bstStyle.getPath()))
+                                                                .findFirst();
+            if (byPath.isPresent()) {
+                selectedBstStyle.setValue(byPath.get());
+            } else {
+                bstStyles.stream()
+                         .filter(vm -> vm.nameProperty().get().equals(bstStyle.getName()))
+                         .findFirst()
+                         .ifPresent(selectedBstStyle::setValue);
+            }
         }
 
         BackgroundTask.wrap(CSLStyleLoader::getStyles)
@@ -347,7 +365,7 @@ public class StyleSelectDialogViewModel {
 
     public List<BstStyleSelectViewModel> loadBstStyles() {
         return bstStyleLoader.getStyles().stream()
-                             .map(style -> new BstStyleSelectViewModel(style.getName(), style.getPath(), style))
+                             .map(BstStyleSelectViewModel::new)
                              .toList();
     }
 
@@ -362,7 +380,7 @@ public class StyleSelectDialogViewModel {
         path.map(Path::toAbsolutePath).ifPresent(stylePath -> {
             if (bstStyleLoader.addStyleIfValid(stylePath)) {
                 BstStyle added = new BstStyle(stylePath);
-                BstStyleSelectViewModel vm = new BstStyleSelectViewModel(added.getName(), added.getPath(), added);
+                BstStyleSelectViewModel vm = new BstStyleSelectViewModel(added);
                 bstStyles.add(vm);
                 selectedBstStyle.setValue(vm);
                 openOfficePreferences.setCurrentStyle(added);
@@ -387,7 +405,7 @@ public class StyleSelectDialogViewModel {
     // region - jstyle-specific methods
 
     public JStyleSelectViewModel fromJStyle(JStyle style) {
-        return new JStyleSelectViewModel(style.getName(), String.join(", ", style.getJournals()), style.isInternalStyle() ? Localization.lang("Internal style") : style.getPath(), style);
+        return new JStyleSelectViewModel(style);
     }
 
     public JStyle toJStyle(JStyleSelectViewModel item) {
@@ -407,7 +425,10 @@ public class StyleSelectDialogViewModel {
     }
 
     private JStyleSelectViewModel getJStyleOrDefault(String stylePath) {
-        return jStyles.stream().filter(style -> style.getStylePath().equals(stylePath)).findFirst().orElse(jStyles.getFirst());
+        return jStyles.stream()
+                      .filter(style -> style.getStylePath().equals(stylePath))
+                      .findFirst()
+                      .orElse(jStyles.getFirst());
     }
 
     public void addJStyleFile() {

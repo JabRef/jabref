@@ -9,6 +9,7 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
 
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.style.BstStyle;
 
 /// Row model for a [BstStyle] entry in the BST styles table, mirroring [JStyleSelectViewModel].
@@ -21,10 +22,10 @@ public class BstStyleSelectViewModel {
     private final BstStyle bstStyle;
     private final BooleanProperty internalStyle = new SimpleBooleanProperty(false);
 
-    public BstStyleSelectViewModel(String name, String file, BstStyle bstStyle) {
-        this.name.setValue(name);
-        this.file.setValue(file);
+    public BstStyleSelectViewModel(BstStyle bstStyle) {
         this.bstStyle = bstStyle;
+        this.name.setValue(bstStyle.getName());
+        this.file.setValue(bstStyle.isInternalStyle() ? Localization.lang("Internal style") : bstStyle.getPath());
         this.internalStyle.set(bstStyle.isInternalStyle());
     }
 
