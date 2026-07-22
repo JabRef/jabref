@@ -277,7 +277,7 @@ public class SaveDatabaseAction {
                 List<FieldChange> abbreviationChanges = bibDatabaseContext.getMetaData()
                                                                           .getLibraryAbbreviationType()
                                                                           .map(abbreviationType -> {
-                                                                              boolean useFJournal = preferences.getJournalAbbreviationPreferences().shouldUseFJournalField();
+                                                                              boolean useFJournal = preferences.getAbbreviationPreferences().shouldUseFJournalField();
                                                                               AbbreviateJournalCleanup cleanup = new AbbreviateJournalCleanup(
                                                                                       bibDatabaseContext.getDatabase(), journalAbbreviationRepository, abbreviationType, useFJournal);
                                                                               return entriesToAbbreviate.stream()
