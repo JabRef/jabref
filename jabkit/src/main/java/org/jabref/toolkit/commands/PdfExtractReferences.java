@@ -124,15 +124,18 @@ class PdfExtractReferences implements Callable<Integer> {
             }
 
             ParserResult result = switch (effectiveMode) {
-                case RULE_BASED -> CitationsFromPdf.extractCitationsUsingRuleBasedAlgorithm(preferences, inputFile);
+                case RULE_BASED ->
+                        CitationsFromPdf.extractCitationsUsingRuleBasedAlgorithm(preferences, inputFile);
                 // Force Grobid enabled for this single call: the user explicitly asked for --mode=GROBID,
                 // but the stored preference may have Grobid disabled, which would otherwise make
                 // GrobidService throw instead of running the extraction.
-                case GROBID -> CitationsFromPdf.extractCitationsUsingGrobid(
-                        preferences,
-                        inputFile,
-                        grobidUrl != null ? grobidUrl : preferences.getGrobidPreferences().getGrobidURL());
-                case LLM -> CitationsFromPdf.extractCitationsUsingLLM(preferences, LOGGER::info, inputFile);
+                case GROBID ->
+                        CitationsFromPdf.extractCitationsUsingGrobid(
+                                preferences,
+                                inputFile,
+                                grobidUrl != null ? grobidUrl : preferences.getGrobidPreferences().getGrobidURL());
+                case LLM ->
+                        CitationsFromPdf.extractCitationsUsingLLM(preferences, LOGGER::info, inputFile);
             };
 
             if (result.isInvalid()) {
