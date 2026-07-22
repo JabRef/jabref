@@ -36,10 +36,10 @@ import static org.mockito.Mockito.when;
 class PdfMergeMetadataImporterOfflineTest {
 
     private static final String DOCUMENT_TEXT = """
-            An Approach to Automatically Check the Compliance of Declarative Deployment Models
-            Christoph Krieger, Uwe Breitenbücher, Kálmán Képes, and Frank Leymann
-            Institute of Architecture of Application Systems, University of Stuttgart
-            Abstract. The automation of application deployment has evolved into an important issue.
+            A Study of Placeholder Metadata in Automated Testing
+            Alice Doe, Bob Smith, Carol Roe, and Dave Poe
+            Institute of Placeholder Studies, Example University
+            Abstract. This text exists only to exercise the author cross-check.
             """;
 
     /// Single creator-style candidate (as produced from PDF document properties): a Misc entry without a
@@ -48,11 +48,11 @@ class PdfMergeMetadataImporterOfflineTest {
     /// column arrives as `null`, modelling a PDF whose text could not be extracted).
     @ParameterizedTest
     @CsvSource(delimiter = '|', textBlock = """
-            Krieger, Christoph        | Christoph Krieger, Uwe Breitenbücher, University of Stuttgart | Krieger, Christoph
-            Richter, Markus           | Christoph Krieger, Uwe Breitenbücher, University of Stuttgart |
-            Li, Xin                   | Christoph Krieger, Uwe Breitenbücher, University of Stuttgart |
-            Doe, John and Smith, Jane | Christoph Krieger, Uwe Breitenbücher, University of Stuttgart | Doe, John and Smith, Jane
-            Richter, Markus           |                                                              | Richter, Markus
+            Doe, Alice                  | Alice Doe, Bob Smith, Example University Testing Lab | Doe, Alice
+            Void, Eve                   | Alice Doe, Bob Smith, Example University Testing Lab |
+            Test, Carol                 | Alice Doe, Bob Smith, Example University Testing Lab |
+            Void, Eve and Null, Mallory | Alice Doe, Bob Smith, Example University Testing Lab | Void, Eve and Null, Mallory
+            Void, Eve                   |                                                     | Void, Eve
             """)
     void singleCreatorCandidateAuthorIsCrossCheckedAgainstText(String author, String leadingPagesText, String expectedAuthor) {
         BibEntry candidate = new BibEntry().withField(StandardField.AUTHOR, author);
@@ -65,25 +65,25 @@ class PdfMergeMetadataImporterOfflineTest {
     @Test
     void authorAbsentFromDocumentTextIsReplacedByConfirmedCandidate() {
         BibEntry documentInformation = new BibEntry()
-                .withField(StandardField.AUTHOR, "Richter, Markus");
+                .withField(StandardField.AUTHOR, "Void, Eve");
         BibEntry content = new BibEntry(StandardEntryType.InProceedings)
-                .withField(StandardField.AUTHOR, "Krieger, Christoph and Breitenbücher, Uwe and Képes, Kálmán and Leymann, Frank");
+                .withField(StandardField.AUTHOR, "Doe, Alice and Smith, Bob and Roe, Carol and Poe, Dave");
 
         BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(documentInformation, content), DOCUMENT_TEXT);
 
-        assertEquals(Optional.of("Krieger, Christoph and Breitenbücher, Uwe and Képes, Kálmán and Leymann, Frank"),
+        assertEquals(Optional.of("Doe, Alice and Smith, Bob and Roe, Carol and Poe, Dave"),
                 merged.getField(StandardField.AUTHOR));
     }
 
     @Test
     void authorConfirmedDespiteDiacriticsAndHyphenationDifferences() {
         BibEntry documentInformation = new BibEntry()
-                .withField(StandardField.AUTHOR, "Breitenbücher, Uwe");
-        String hyphenatedText = "A model checking approach developed by Uwe Breitenbü-\ncher in Stuttgart.";
+                .withField(StandardField.AUTHOR, "Fünkel, Bob");
+        String hyphenatedText = "A placeholder method developed by Bob Fün-\nkel in the lab.";
 
         BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(documentInformation), hyphenatedText);
 
-        assertEquals(Optional.of("Breitenbücher, Uwe"), merged.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("Fünkel, Bob"), merged.getField(StandardField.AUTHOR));
     }
 
     @Test
@@ -91,34 +91,34 @@ class PdfMergeMetadataImporterOfflineTest {
         // Separator characters from broken XMP decoding keep AuthorList from finding proper family names;
         // the raw words of the value still occur in the text and must count as confirmation
         BibEntry xmpMetadata = new BibEntry()
-                .withField(StandardField.AUTHOR, "Filippo RiccaⰠ﻿Alessandro MarchettoⰠ﻿Andrea StoccoⰠ");
+                .withField(StandardField.AUTHOR, "Alice DoeⰠ﻿Bob SmithⰠ﻿Carol RoeⰠ");
 
         BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(xmpMetadata),
-                "A grey literature review by Filippo Ricca, Alessandro Marchetto, and Andrea Stocco.");
+                "A grey literature review by Alice Doe, Bob Smith, and Carol Roe.");
 
-        assertEquals(Optional.of("Filippo RiccaⰠ﻿Alessandro MarchettoⰠ﻿Andrea StoccoⰠ"),
+        assertEquals(Optional.of("Alice DoeⰠ﻿Bob SmithⰠ﻿Carol RoeⰠ"),
                 merged.getField(StandardField.AUTHOR));
     }
 
     @Test
     void unconfirmedAuthorFromEntryWithCitationKeyIsKept() {
         BibEntry jabRefWrittenMetadata = new BibEntry()
-                .withCitationKey("Doe2020")
-                .withField(StandardField.AUTHOR, "Doe, John");
+                .withCitationKey("Void2020")
+                .withField(StandardField.AUTHOR, "Void, Eve");
 
         BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(jabRefWrittenMetadata), DOCUMENT_TEXT);
 
-        assertEquals(Optional.of("Doe, John"), merged.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("Void, Eve"), merged.getField(StandardField.AUTHOR));
     }
 
     @Test
     void unconfirmedAuthorFromEntryWithExplicitTypeIsKept() {
         BibEntry jabRefWrittenMetadata = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.AUTHOR, "Doe, John");
+                .withField(StandardField.AUTHOR, "Void, Eve");
 
         BibEntry merged = PdfMergeMetadataImporter.mergeCandidates(List.of(jabRefWrittenMetadata), DOCUMENT_TEXT);
 
-        assertEquals(Optional.of("Doe, John"), merged.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("Void, Eve"), merged.getField(StandardField.AUTHOR));
     }
 
     @Test
@@ -131,16 +131,16 @@ class PdfMergeMetadataImporterOfflineTest {
                 contentStream.beginText();
                 contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 18);
                 contentStream.newLineAtOffset(72, 750);
-                contentStream.showText("Compliance Checking of Deployment Models");
+                contentStream.showText("A Placeholder Study of Example Systems");
                 contentStream.endText();
                 contentStream.beginText();
                 contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
                 contentStream.newLineAtOffset(72, 700);
-                contentStream.showText("Abstract. This work checks deployment models automatically.");
+                contentStream.showText("Abstract. This placeholder text contains no author names.");
                 contentStream.endText();
             }
             // Office suites store the OS account of the person converting the document here
-            document.getDocumentInformation().setAuthor("Markus Richter");
+            document.getDocumentInformation().setAuthor("Eve Void");
             document.save(file.toFile());
         }
 
