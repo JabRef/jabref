@@ -29,7 +29,7 @@ curl -fL https://builds.jabref.org/main/linux-arm/tools/jabkit-native_linux_arm6
 # macOS (Apple Silicon)
 curl -fLO https://builds.jabref.org/main/macOS-silicon/tools/jabkit-native_macos-silicon.zip
 unzip jabkit-native_macos-silicon.zip
-./jabkit/jabkit --help
+./jabkit.app/Contents/MacOS/jabkit --help
 ```
 
 On other platforms (e.g. Windows, Intel macOS), run `jabkit` via [JBang](https://www.jbang.dev/) instead — no JDK setup needed. Install JBang if missing:
