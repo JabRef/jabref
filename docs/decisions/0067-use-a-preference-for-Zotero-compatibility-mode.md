@@ -7,7 +7,7 @@ parent: Decision Records
 
 ## Context and Problem Statement
 
-JabRef is implementing compatibility with [Zotero reference marks](https://github.com/zotero/zotero) in the [LibreOffice integration](https://docs.jabref.org/cite/openofficeintegration). Apart from JabRef's own reference mark, JabRef should also support Zotero's reference mark. Zotero reference marks are supported as an additional input format so that JabRef can read citations created by Zotero. For documents connected to JabRef, JabRef continues to write its own reference mark format.
+JabRef is implementing compatibility with [Zotero reference marks](https://github.com/zotero/zotero-libreoffice-integration/blob/227551c1644c6cb1156226d4db5d1b293fdb271d/build/source/org/zotero/integration/ooo/comp/ReferenceMark.java#L313-L316) in the [LibreOffice integration](https://docs.jabref.org/cite/openofficeintegration). Apart from JabRef's own reference mark, JabRef should also support Zotero's reference mark. Zotero reference marks are supported as an additional input format so that JabRef can read citations created by Zotero. For documents connected to JabRef, JabRef continues to write its own reference mark format.
 
 Do we need a preference for the compatibility mode?
 
