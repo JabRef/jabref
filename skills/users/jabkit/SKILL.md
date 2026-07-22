@@ -21,6 +21,10 @@ curl -Ls https://sh.jbang.dev | bash -s - app setup   # Linux/macOS
 iex "& { $(iwr -useb https://ps.jbang.dev) } app setup"   # Windows
 ```
 
+On linux-x64, mac-aarch64 or windows-x64, exporting `JBANG_USE_NATIVE=true` installs JBang's native binary instead of its JAR: one JDK download less and a faster start.
+Set it in the shell profile rather than just for the install — the launcher re-reads it on every run and falls back to the JAR when it is unset.
+Other platforms have no native build and the install would fail, so leave it unset there.
+
 Then install `jabkit` on the PATH (the same command also updates it):
 
 ```bash
