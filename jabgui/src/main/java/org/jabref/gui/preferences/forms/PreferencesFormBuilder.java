@@ -82,44 +82,37 @@ import org.controlsfx.control.SearchableComboBox;
 /// inline value field appended right after it; a {@link NodeElement} offers none of that because
 /// it is not a {@link Control}. Asking for the wrong one does not compile.
 ///
-/// Consecutive labelled fields share an aligned two-column {@link GridPane}; any full-width element
-/// flushes that grid — use {@link #fields} to make a shared block explicit. Validation decoration is
+/// Consecutive labelled fields share an aligned two-column {@link GridPane}. Validation decoration is
 /// collected and applied once on the FX thread in {@link #build()}.
 public class PreferencesFormBuilder {
 
-    /// Gap between elements, both inside a region and between regions.
-    private static final double GAP = 10.0;
-    /// Width of the inline value field of {@link #checkWithField} (sized for a port number; use
-    /// {@link InputElement#grow()} for longer values).
     private static final double SHORT_FIELD_WIDTH = 100.0;
-    /// Minimum width of the caption column of the shared field grid.
     private static final double LABEL_COLUMN_MIN_WIDTH = 120.0;
-    /// How far an {@link #info} line is indented past the control it comments on.
-    private static final double INFO_INDENT = 20.0;
-    /// Edge length of the square icon buttons the element handles attach.
+    private static final double DEFAULT_GAP = 10.0;
+    private static final double INFO_LABEL_INDENT = 20.0;
+
     private static final double ICON_BUTTON_SIZE = 20.0;
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
 
-    private final VBox root = new VBox(GAP);
+    private final VBox root = new VBox(DEFAULT_GAP);
     private final Deque<Pane> containers = new ArrayDeque<>();
+
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
     private final List<Runnable> validationInits = new ArrayList<>();
 
     /// Every visible text handed to the builder, paired with the node it captions. The
-    /// preferences search matches against these and highlights the node.
+    /// preferences search matches against these and highlights the node without reflection.
     private final List<SearchableElement> searchableElements = new ArrayList<>();
 
     /// Disable bindings the builder installed itself (a value field following its checkbox, ...).
     /// {@link ElementBase#disableWhen} combines with these instead of silently replacing them.
     private final Map<Node, ObservableValue<? extends Boolean>> ownedDisableBindings = new IdentityHashMap<>();
 
+    /// Element grid spanning multiple input elements to ensure correct alignment
     private GridPane currentGrid;
     private int gridRow;
-
-    /// Depth of nested {@link #fields} blocks; inside one, only labelled fields may be added.
-    private int fieldsDepth;
 
     private boolean built;
 
@@ -155,7 +148,7 @@ public class PreferencesFormBuilder {
     public PreferencesFormBuilder info(String text, Consumer<InputElement<Label>> config) {
         return label(text, info -> {
             info.styleClass("italic")
-                .configure(label -> label.setPadding(new Insets(0, 0, 0, INFO_INDENT)));
+                .configure(label -> label.setPadding(new Insets(0, 0, 0, INFO_LABEL_INDENT)));
             config.accept(info);
         });
     }
@@ -175,7 +168,7 @@ public class PreferencesFormBuilder {
         // Consent and explanation labels run long; wrapping is never wrong for a short one.
         checkBox.setWrapText(true);
         checkBox.selectedProperty().bindBidirectional(value);
-        HBox row = new HBox(GAP, checkBox);
+        HBox row = new HBox(DEFAULT_GAP, checkBox);
         row.setAlignment(Pos.CENTER_LEFT);
         addNode(row);
         return configured(new InputElement<>(this, checkBox), config);
@@ -245,9 +238,6 @@ public class PreferencesFormBuilder {
         return configured(new InputElement<>(this, link), config);
     }
 
-    /// Combo box over a list property; the items follow it, so a view model that recomputes its
-    /// options needs no further wiring. A fixed set of options is a list property too — one the
-    /// view model never reassigns — so there is no second, unbound flavour.
     public <X> PreferencesFormBuilder combo(String label,
                                             ObservableValue<? extends ObservableList<X>> items,
                                             Property<X> value,
@@ -265,8 +255,6 @@ public class PreferencesFormBuilder {
         return addCombo(label, combo, value, display, config);
     }
 
-    /// A {@link #combo} whose list can be typed into to filter it — for options too numerous to
-    /// scroll. It differs in the control it creates, so it cannot be a flag on `combo`.
     public <X> PreferencesFormBuilder searchableCombo(String label,
                                                       ObservableValue<? extends ObservableList<X>> items,
                                                       Property<X> value,
@@ -279,13 +267,12 @@ public class PreferencesFormBuilder {
                                                       Property<X> value,
                                                       Callback<X, String> display,
                                                       Consumer<InputElement<ComboBox<X>>> config) {
-        SearchableComboBox<X> combo = new SearchableComboBox<>();
+        SearchableComboBox<X> combo = new SearchableComboBox<>(); // ControlsFX SearchableComboBox
         combo.itemsProperty().bind(items);
         return addCombo(label, combo, value, display, config);
     }
 
-    /// Shared wiring for every combo variant. {@link SearchableComboBox} extends {@link ComboBox},
-    /// so all flavours funnel through here; items are set/bound by the caller beforehand.
+    /// Shared wiring for combo variants.
     private <X> PreferencesFormBuilder addCombo(String label,
                                                 ComboBox<X> combo,
                                                 Property<X> value,
@@ -317,8 +304,8 @@ public class PreferencesFormBuilder {
 
     /// A mutually-exclusive radio group: radios added inside share one {@link ToggleGroup}, while
     /// each stays bound to its own boolean property (matching the existing view models). Unlike a
-    /// {@link #group}, this adds no container — the radios stay in the surrounding layout, so there
-    /// is nothing to configure afterwards. Wrap it in a {@link #group} to style the block.
+    /// {@link #group}, this adds no container. The radios stay in the surrounding layout, so there
+    /// is nothing to configure. Wrap it in a {@link #group} to style the block.
     public PreferencesFormBuilder radioGroup(Consumer<PreferencesFormBuilder> content) {
         ToggleGroup enclosing = currentToggleGroup;
         currentToggleGroup = new ToggleGroup();
@@ -332,26 +319,20 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder radio(String text, Property<Boolean> selected, Consumer<InputElement<RadioButton>> config) {
-        RadioButton radio = newRadio(text, selected);
-        HBox row = new HBox(GAP, radio);
+        RadioButton radio = new RadioButton(text);
+        searchable(text, radio);
+        radio.setToggleGroup(currentToggleGroup);
+        radio.selectedProperty().bindBidirectional(selected);
+        HBox row = new HBox(DEFAULT_GAP, radio);
         row.setAlignment(Pos.CENTER_LEFT);
         addNode(row);
         return configured(new InputElement<>(this, radio), config);
     }
 
-    private RadioButton newRadio(String text, Property<Boolean> selected) {
-        RadioButton radio = new RadioButton(text);
-        searchable(text, radio);
-        radio.setToggleGroup(currentToggleGroup);
-        radio.selectedProperty().bindBidirectional(selected);
-        return radio;
-    }
-
     // endregion
 
-    // region escape hatches
+    // region text fields
 
-    /// Adds a bespoke labelled control.
     public <T extends Control> PreferencesFormBuilder field(String label, T control) {
         return field(label, control, noConfig());
     }
@@ -361,9 +342,42 @@ public class PreferencesFormBuilder {
         return configured(new InputElement<>(this, control), config);
     }
 
-    /// A bespoke control whose caption sits **above** it rather than beside it, for a control that
-    /// needs the full width — the cell of a {@link #columns} block, a list under its heading. It
-    /// therefore joins no shared field grid; use {@link #field} where captions should line up.
+    private void addField(String label, Node control) {
+        GridPane grid = ensureGrid();
+        if (label == null) {
+            // No caption: span both columns rather than leaving an empty label column.
+            grid.add(control, 0, gridRow, 2, 1);
+        } else {
+            searchable(label, control);
+            grid.add(new Label(label), 0, gridRow);
+            grid.add(control, 1, gridRow);
+        }
+        GridPane.setHgrow(control, Priority.ALWAYS);
+        gridRow++;
+    }
+
+    private GridPane ensureGrid() {
+        if (currentGrid == null) {
+            currentGrid = new GridPane();
+            currentGrid.setHgap(DEFAULT_GAP);
+            currentGrid.setVgap(DEFAULT_GAP);
+            ColumnConstraints labelColumn = new ColumnConstraints();
+            labelColumn.setMinWidth(LABEL_COLUMN_MIN_WIDTH);
+            labelColumn.setHalignment(HPos.LEFT);
+            ColumnConstraints controlColumn = new ColumnConstraints();
+            controlColumn.setHgrow(Priority.ALWAYS);
+            currentGrid.getColumnConstraints().addAll(labelColumn, controlColumn);
+            gridRow = 0;
+            addToContainer(currentGrid);
+        }
+        return currentGrid;
+    }
+
+    private void flushGrid() {
+        currentGrid = null;
+    }
+
+    /// A field with the label **above**. No grid alignment allowed.
     public <T extends Control> PreferencesFormBuilder stackedField(String label, T control) {
         return stackedField(label, control, noConfig());
     }
@@ -375,19 +389,20 @@ public class PreferencesFormBuilder {
 
         control.setMaxWidth(Double.MAX_VALUE);
         // The control gets a row of its own so that attachments have somewhere to go.
-        HBox controlRow = new HBox(GAP, control);
+        HBox controlRow = new HBox(DEFAULT_GAP, control);
         controlRow.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(control, Priority.ALWAYS);
 
-        addNode(new VBox(GAP, caption, controlRow));
+        addNode(new VBox(DEFAULT_GAP, caption, controlRow));
         return configured(new InputElement<>(this, control), config);
     }
 
-    /// Adds a fully custom node spanning the form width (the `.custom(Node)` hatch). The handle is
-    /// a {@link NodeElement} even for a {@link Control}, since erasure forbids a `Control` sibling
-    /// of this method; register a control inside such a node with {@link #validate} instead. A
-    /// labelled node that is not a {@link Control} has no hatch of its own: build the row from a
-    /// real field plus {@link InputElement#attach attachments} so the caption keeps its column.
+    // endregion
+
+    // region escape hatches
+
+    /// Adds a fully custom node spanning the form. Ensure that {@link #field(String, Control)} with
+    /// {@link InputElement#attach attachments} is not the better fit for new elements (keeps grid alignment).
     public <T extends Node> PreferencesFormBuilder custom(T node) {
         return custom(node, noConfig());
     }
@@ -406,19 +421,17 @@ public class PreferencesFormBuilder {
         validationInits.add(() -> visualizer.initVisualization(status, control));
         return this;
     }
+
     // endregion
 
     // region regions
 
-    /// A titled section. Its contents go in the lambda, so the grouping is visible in the source and
-    /// the section can be configured or moved as a unit — rather than a header label followed by
-    /// loose siblings that only look related because of their order.
+    /// A titled section. Its contents go in the lambda, so the grouping is visible in the source.
     public PreferencesFormBuilder section(String title, Consumer<PreferencesFormBuilder> content) {
         return section(title, content, noConfig());
     }
 
-    /// The configuration lambda addresses the section as a whole — including its header, which is
-    /// where a {@link SectionRegion#help help button} attaches.
+    /// The configuration lambda addresses the section as a whole, including its header (e.g. for help buttons).
     public PreferencesFormBuilder section(String title,
                                           Consumer<PreferencesFormBuilder> content,
                                           Consumer<SectionRegion> config) {
@@ -431,7 +444,7 @@ public class PreferencesFormBuilder {
         headerRow.setAlignment(Pos.BASELINE_CENTER);
         addNode(headerRow);
 
-        return configured(new SectionRegion(this, region(new VBox(GAP), content), header), config);
+        return configured(new SectionRegion(this, region(new VBox(DEFAULT_GAP), content), header), config);
     }
 
     public PreferencesFormBuilder group(Consumer<PreferencesFormBuilder> content) {
@@ -439,7 +452,7 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder group(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<VBox>> config) {
-        return configured(new FormRegion<>(this, region(new VBox(GAP), content)), config);
+        return configured(new FormRegion<>(this, region(new VBox(DEFAULT_GAP), content)), config);
     }
 
     /// A side-by-side region: every element inside becomes an equally growing column. Usually filled
@@ -449,7 +462,7 @@ public class PreferencesFormBuilder {
     }
 
     public PreferencesFormBuilder columns(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<HBox>> config) {
-        return configured(new FormRegion<>(this, region(new HBox(GAP), content)), config);
+        return configured(new FormRegion<>(this, region(new HBox(DEFAULT_GAP), content)), config);
     }
 
     /// A wrapping region: elements flow left to right and wrap onto the next line as the dialog
@@ -460,24 +473,6 @@ public class PreferencesFormBuilder {
 
     public PreferencesFormBuilder flow(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<FlowPane>> config) {
         return configured(new FormRegion<>(this, region(new FlowPane(), content)), config);
-    }
-
-    /// An explicitly aligned block: every labelled field inside shares one {@link GridPane}, so
-    /// their captions line up. Outside such a block consecutive fields still coalesce, but any
-    /// full-width element silently splits them into separate grids with independent column widths —
-    /// inside `fields(...)` that cannot happen, because adding one is an error.
-    public PreferencesFormBuilder fields(Consumer<PreferencesFormBuilder> content) {
-        return fields(content, noConfig());
-    }
-
-    public PreferencesFormBuilder fields(Consumer<PreferencesFormBuilder> content, Consumer<FormRegion<GridPane>> config) {
-        flushGrid();
-        GridPane grid = ensureGrid();
-        fieldsDepth++;
-        content.accept(this);
-        fieldsDepth--;
-        flushGrid();
-        return configured(new FormRegion<>(this, grid), config);
     }
 
     /// Everything added inside becomes a sub-region of the form. Nesting is the lambda's, so a
@@ -552,10 +547,6 @@ public class PreferencesFormBuilder {
     }
 
     private void addNode(Node node) {
-        if (fieldsDepth > 0) {
-            throw new IllegalStateException("only labelled fields may be added inside fields(...); "
-                    + node.getClass().getSimpleName() + " would break the shared column alignment");
-        }
         flushGrid();
         addToContainer(node);
     }
@@ -588,7 +579,7 @@ public class PreferencesFormBuilder {
                 Integer rowIndex = GridPane.getRowIndex(primary);
                 Integer columnSpan = GridPane.getColumnSpan(primary);
                 grid.getChildren().remove(primary);
-                HBox wrapper = new HBox(GAP, primary, attachment);
+                HBox wrapper = new HBox(DEFAULT_GAP, primary, attachment);
                 wrapper.setAlignment(Pos.CENTER_LEFT);
                 HBox.setHgrow(primary, Priority.ALWAYS);
                 GridPane.setHgrow(wrapper, Priority.ALWAYS);
@@ -604,41 +595,6 @@ public class PreferencesFormBuilder {
                     throw new IllegalStateException("cannot attach to a control sitting in a "
                             + primary.getParent().getClass().getSimpleName());
         }
-    }
-
-    private void addField(String label, Node control) {
-        GridPane grid = ensureGrid();
-        if (label == null) {
-            // No caption: span both columns rather than leaving an empty label column.
-            grid.add(control, 0, gridRow, 2, 1);
-        } else {
-            searchable(label, control);
-            grid.add(new Label(label), 0, gridRow);
-            grid.add(control, 1, gridRow);
-        }
-        GridPane.setHgrow(control, Priority.ALWAYS);
-        gridRow++;
-    }
-
-    private GridPane ensureGrid() {
-        if (currentGrid == null) {
-            currentGrid = new GridPane();
-            currentGrid.setHgap(GAP);
-            currentGrid.setVgap(GAP);
-            ColumnConstraints labelColumn = new ColumnConstraints();
-            labelColumn.setMinWidth(LABEL_COLUMN_MIN_WIDTH);
-            labelColumn.setHalignment(HPos.LEFT);
-            ColumnConstraints controlColumn = new ColumnConstraints();
-            controlColumn.setHgrow(Priority.ALWAYS);
-            currentGrid.getColumnConstraints().addAll(labelColumn, controlColumn);
-            gridRow = 0;
-            addToContainer(currentGrid);
-        }
-        return currentGrid;
-    }
-
-    private void flushGrid() {
-        currentGrid = null;
     }
 
     private Button helpButton(StandardActions action, HelpFile helpFile) {
@@ -702,7 +658,7 @@ public class PreferencesFormBuilder {
             return self();
         }
 
-        /// Overrides the gap between the region's elements (default {@value PreferencesFormBuilder#GAP}).
+        /// Overrides the gap between the region's elements (default {@value PreferencesFormBuilder#DEFAULT_GAP}).
         public S spacing(double value) {
             switch (region) {
                 case VBox box ->
@@ -725,8 +681,8 @@ public class PreferencesFormBuilder {
         }
     }
 
-    /// A plain region: a {@link #group}, {@link #columns}, {@link #flow} or {@link #fields} block,
-    /// which has contents but no heading of its own.
+    /// A plain region: a {@link #group}, {@link #columns} or {@link #flow} block, which has contents
+    /// but no heading of its own.
     public static final class FormRegion<T extends Pane> extends RegionBase<FormRegion<T>, T> {
 
         FormRegion(PreferencesFormBuilder form, T region) {
