@@ -245,7 +245,9 @@ public class PreferencesFormBuilder {
         return configured(new InputElement<>(this, link), config);
     }
 
-    /// Combo box whose items are bound to a (potentially changing) list property.
+    /// Combo box over a list property; the items follow it, so a view model that recomputes its
+    /// options needs no further wiring. A fixed set of options is a list property too — one the
+    /// view model never reassigns — so there is no second, unbound flavour.
     public <X> PreferencesFormBuilder combo(String label,
                                             ObservableValue<? extends ObservableList<X>> items,
                                             Property<X> value,
@@ -263,24 +265,8 @@ public class PreferencesFormBuilder {
         return addCombo(label, combo, value, display, config);
     }
 
-    /// Combo box over a fixed item list (set directly, not bound to a property).
-    public <X> PreferencesFormBuilder comboItems(String label,
-                                                 ObservableList<X> items,
-                                                 Property<X> value,
-                                                 Callback<X, String> display) {
-        return comboItems(label, items, value, display, noConfig());
-    }
-
-    public <X> PreferencesFormBuilder comboItems(String label,
-                                                 ObservableList<X> items,
-                                                 Property<X> value,
-                                                 Callback<X, String> display,
-                                                 Consumer<InputElement<ComboBox<X>>> config) {
-        ComboBox<X> combo = new ComboBox<>();
-        combo.setItems(items);
-        return addCombo(label, combo, value, display, config);
-    }
-
+    /// A {@link #combo} whose list can be typed into to filter it — for options too numerous to
+    /// scroll. It differs in the control it creates, so it cannot be a flag on `combo`.
     public <X> PreferencesFormBuilder searchableCombo(String label,
                                                       ObservableValue<? extends ObservableList<X>> items,
                                                       Property<X> value,
