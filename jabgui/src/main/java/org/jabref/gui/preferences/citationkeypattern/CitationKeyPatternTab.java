@@ -1,17 +1,12 @@
 package org.jabref.gui.preferences.citationkeypattern;
 
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanel;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
-import org.jabref.gui.util.component.HelpButton;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryTypesManager;
 
@@ -60,7 +55,11 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
                                         .radio(Localization.lang("Always add letter (a, b, ...) to generated keys"), viewModel.letterAlwaysAddProperty())),
                             indent -> indent.styleClass("prefIndent"))
 
-                        .customField(Localization.lang("Replace (regular expression)"), buildRegexReplacementRow())
+                        // `[regex] by [replacement]` — one labelled field, so the two stay adjacent.
+                        .stringField(Localization.lang("Replace (regular expression)"), viewModel.keyPatternRegexProperty(),
+                                regex -> regex.attach(new Label(Localization.lang("by")))
+                                              .attachField(viewModel.keyPatternReplacementProperty())
+                                              .help(REGEX_HELP_URL))
                         .stringField(Localization.lang("Remove the following characters:"), viewModel.unwantedCharactersProperty())
                         .checkbox(Localization.lang("Transliterate fields that are used for generating the citation key"), viewModel.transliterateFieldsForCitationKeyProperty()))
 
@@ -70,21 +69,6 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
                     patternsSection -> patternsSection.help(KEY_PATTERNS_HELP_URL))
 
                 .build());
-    }
-
-    /// `[regex] by [replacement]` — a single labelled cell, so the two fields stay adjacent.
-    private Node buildRegexReplacementRow() {
-        TextField regex = new TextField();
-        regex.textProperty().bindBidirectional(viewModel.keyPatternRegexProperty());
-        HBox.setHgrow(regex, Priority.ALWAYS);
-
-        TextField replacement = new TextField();
-        replacement.textProperty().bindBidirectional(viewModel.keyPatternReplacementProperty());
-        HBox.setHgrow(replacement, Priority.ALWAYS);
-
-        HBox row = new HBox(4.0, regex, new Label(Localization.lang("by")), replacement, new HelpButton(REGEX_HELP_URL));
-        row.setAlignment(Pos.CENTER_LEFT);
-        return row;
     }
 
     /// The pattern table with a "Reset All" button overlaid in its top-right corner.

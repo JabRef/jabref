@@ -397,19 +397,11 @@ public class PreferencesFormBuilder {
         return configured(new InputElement<>(this, control), config);
     }
 
-    /// Adds a bespoke labelled node that is not a {@link Control} — a hand-assembled row, a table.
-    public <T extends Node> PreferencesFormBuilder customField(String label, T node) {
-        return customField(label, node, noConfig());
-    }
-
-    public <T extends Node> PreferencesFormBuilder customField(String label, T node, Consumer<NodeElement<T>> config) {
-        addField(label, node);
-        return configured(new NodeElement<>(this, node), config);
-    }
-
     /// Adds a fully custom node spanning the form width (the `.custom(Node)` hatch). The handle is
     /// a {@link NodeElement} even for a {@link Control}, since erasure forbids a `Control` sibling
-    /// of this method; register a control inside such a node with {@link #validate} instead.
+    /// of this method; register a control inside such a node with {@link #validate} instead. A
+    /// labelled node that is not a {@link Control} has no hatch of its own: build the row from a
+    /// real field plus {@link InputElement#attach attachments} so the caption keeps its column.
     public <T extends Node> PreferencesFormBuilder custom(T node) {
         return custom(node, noConfig());
     }
