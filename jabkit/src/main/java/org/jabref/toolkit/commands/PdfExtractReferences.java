@@ -86,19 +86,14 @@ class PdfExtractReferences implements Callable<Integer> {
             return CommandLine.ExitCode.USAGE;
         }
 
-        if (outputDir != null) {
-            Integer errorCode = ensureDirectoryExists(outputDir);
-            if (errorCode != null) {
-                return errorCode;
-            }
+        if (outputDir != null && !ensureDirectoryExists(outputDir)) {
+            return CommandLine.ExitCode.SOFTWARE;
         }
         if (outputFile != null) {
+            // An absolute file path has a parent unless it is a filesystem root, which no output file is.
             Path outputFileParent = outputFile.toAbsolutePath().getParent();
-            if (outputFileParent != null) {
-                Integer errorCode = ensureDirectoryExists(outputFileParent);
-                if (errorCode != null) {
-                    return errorCode;
-                }
+            if (outputFileParent != null && !ensureDirectoryExists(outputFileParent)) {
+                return CommandLine.ExitCode.SOFTWARE;
             }
         }
 
@@ -158,15 +153,15 @@ class PdfExtractReferences implements Callable<Integer> {
 
     /// Creates `directory` (and any missing parents) if it doesn't exist yet.
     ///
-    /// @return a non-null exit code on failure, or `null` on success
-    private static @Nullable Integer ensureDirectoryExists(Path directory) {
+    /// @return `true` if the directory exists afterwards, `false` if it could not be created
+    private static boolean ensureDirectoryExists(Path directory) {
         try {
             Files.createDirectories(directory);
+            return true;
         } catch (IOException e) {
             System.err.println(Localization.lang("Could not create output directory '%0': %1", directory, e.getLocalizedMessage()));
-            return CommandLine.ExitCode.SOFTWARE;
+            return false;
         }
-        return null;
     }
 
     /// The input as shown to the user: URLs are redacted so that embedded credentials do not end up

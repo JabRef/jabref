@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 class PdfExtractReferencesTest extends AbstractJabKitTest {
 
@@ -108,6 +109,22 @@ class PdfExtractReferencesTest extends AbstractJabKitTest {
         assertTrue(Files.isDirectory(nestedOutputDir));
         verify(mockExportService).exportParserResultToFile(
                 any(), eq(nestedOutputDir.resolve("ieee-paper.bib")), eq("bibtex"));
+    }
+
+    @Test
+    void uncreatableOutputDirExitsSoftwareError() throws Exception {
+        // A regular file cannot double as the output directory.
+        Path blockedByFile = outputDir.resolve("occupied");
+        Files.createFile(blockedByFile);
+
+        int exitCode = commandLine.executeToLog(
+                "pdf", "extract-references",
+                "--output-dir", blockedByFile.toString(),
+                pdfPath("ieee-paper.pdf"));
+
+        assertEquals(CommandLine.ExitCode.SOFTWARE, exitCode);
+        assertTrue(commandLine.getErrorOutput().contains("Could not create output directory"));
+        verifyNoInteractions(mockExportService);
     }
 
     @Test
