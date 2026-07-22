@@ -1,6 +1,8 @@
 package org.jabref.logic.preview;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -13,6 +15,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.layout.format.RemoveTilde;
+import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -37,6 +40,39 @@ public final class BstPreviewLayout implements PreviewLayout {
     private final String name;
     @Nullable private BstVM bstVM;
     @Nullable private String error;
+
+    /// Creates a [BstPreviewLayout] for the given [BstStyle], supporting both internal
+    /// (classpath) and external (filesystem) styles.
+    public static BstPreviewLayout of(BstStyle style) {
+        if (style.getFilePath() != null) {
+            return new BstPreviewLayout(style.getFilePath());
+        }
+        // Internal style: read content from the classpath resource
+        String resourcePath = style.getPath();
+        String styleName = style.getName();
+        try (InputStream is = BstPreviewLayout.class.getResourceAsStream(resourcePath)) {
+            if (is == null) {
+                String err = Localization.lang("Error opening file '%0'", styleName);
+                return new BstPreviewLayout(Path.of(styleName), "", null, err);
+            }
+            String source = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            BstVM vm = new BstVM(source);
+            return new BstPreviewLayout(Path.of(styleName), source, vm, null);
+        } catch (IOException e) {
+            LOGGER.error("Could not load internal BST style for preview: {}", resourcePath, e);
+            return new BstPreviewLayout(Path.of(styleName), "", null,
+                    Localization.lang("Error opening file '%0'", styleName));
+        }
+    }
+
+    /// Private constructor used by [of(BstStyle)] for pre-built internal styles.
+    private BstPreviewLayout(Path path, String source, @Nullable BstVM bstVM, @Nullable String error) {
+        this.path = path;
+        this.source = source;
+        this.name = path.getFileName().toString();
+        this.bstVM = bstVM;
+        this.error = error;
+    }
 
     public BstPreviewLayout(Path path) {
         this.path = path;

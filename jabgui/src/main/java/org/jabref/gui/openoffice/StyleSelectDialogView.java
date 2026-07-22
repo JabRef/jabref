@@ -34,7 +34,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.style.BstCitationFormat;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
-import org.jabref.logic.preview.BstStylePreviewLayout;
+import org.jabref.logic.preview.BstPreviewLayout;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
@@ -365,7 +365,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         EasyBind.subscribe(viewModel.selectedBstStyleProperty(), vm -> {
             if (vm != null) {
-                bstPreviewViewer.setLayout(new BstStylePreviewLayout(vm.getBstStyle()));
+                bstPreviewViewer.setLayout(BstPreviewLayout.of(vm.getBstStyle()));
             }
         });
 

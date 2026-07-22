@@ -14,7 +14,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jspecify.annotations.Nullable;
 
 /// Used for displaying a rendered entry in the UI. Due to historical reasons, "rendering" is called "layout".
-public sealed interface PreviewLayout permits BstPreviewLayout, BstStylePreviewLayout, CitationStylePreviewLayout, TextBasedPreviewLayout {
+public sealed interface PreviewLayout permits BstPreviewLayout, CitationStylePreviewLayout, TextBasedPreviewLayout {
     String generatePreview(BibEntry entry, BibDatabaseContext databaseContext);
 
     String getDisplayName();
