@@ -23,13 +23,13 @@ import org.slf4j.LoggerFactory;
 
 @NullMarked
 public final class JabRefBibliographyMark {
-    private static final String BIBLIOGRAPHY_SECTION_NAME = "JR_bib";
+    private static final String JABREF_BIBLIOGRAPHY_SECTION_NAME = "JR_bib";
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefBibliographyMark.class);
 
     private Optional<XTextRange> getBibliographyRange(XTextDocument doc)
             throws NoDocumentException, WrappedTargetException {
         LOGGER.debug("Attempting to get bibliography range");
-        Optional<XTextRange> range = UnoTextSection.getAnchor(doc, BIBLIOGRAPHY_SECTION_NAME);
+        Optional<XTextRange> range = UnoTextSection.getAnchor(doc, JABREF_BIBLIOGRAPHY_SECTION_NAME);
         LOGGER.debug("Bibliography range found: {}", range.isPresent());
         return range;
     }
@@ -62,7 +62,7 @@ public final class JabRefBibliographyMark {
         LOGGER.debug("Creating new CSL bibliography section");
         XTextCursor textCursor = doc.getText().createTextCursor();
         textCursor.gotoEnd(false);
-        DocumentAnnotation annotation = new DocumentAnnotation(doc, BIBLIOGRAPHY_SECTION_NAME, textCursor, false);
+        DocumentAnnotation annotation = new DocumentAnnotation(doc, JABREF_BIBLIOGRAPHY_SECTION_NAME, textCursor, false);
         UnoTextSection.create(annotation);
         LOGGER.debug("CSL bibliography section created");
     }

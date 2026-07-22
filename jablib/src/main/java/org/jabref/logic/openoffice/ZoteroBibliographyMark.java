@@ -12,13 +12,10 @@ import org.jabref.model.openoffice.DocumentAnnotation;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoNameAccess;
-import org.jabref.model.openoffice.uno.UnoReferenceMark;
 import org.jabref.model.openoffice.uno.UnoTextSection;
 
 import com.sun.star.container.XNameAccess;
-import com.sun.star.container.XNamed;
 import com.sun.star.lang.WrappedTargetException;
-import com.sun.star.text.XText;
 import com.sun.star.text.XTextContent;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
@@ -29,14 +26,17 @@ import org.slf4j.LoggerFactory;
 
 @NullMarked
 public final class ZoteroBibliographyMark {
-    public static final String PREFIX = "ZOTERO_BIBL ";
-
+    private static final String ZOTERO_BIBLIOGRAPHY_SECTION_NAME = "ZOTERO_BIBL ";
     private static final Logger LOGGER = LoggerFactory.getLogger(ZoteroBibliographyMark.class);
     private static final String CODE = "{\"uncited\":[],\"omitted\":[],\"custom\":[]}";
     private static final String BIBLIOGRAPHY_SUFFIX = " CSL_BIBLIOGRAPHY";
 
-    public static boolean isBibliographyMarkName(String name) {
-        return name.startsWith(PREFIX);
+    private Optional<XTextRange> getBibliographyRange(XTextDocument doc)
+            throws NoDocumentException, WrappedTargetException {
+        LOGGER.debug("Attempting to get bibliography range");
+        Optional<XTextRange> range = getBibliographyTextSection(doc).map(XTextContent::getAnchor);
+        LOGGER.debug("Bibliography range found: {}", range.isPresent());
+        return range;
     }
 
     public void rebuildCSLBibliography(XTextDocument doc,
@@ -46,65 +46,77 @@ public final class ZoteroBibliographyMark {
                                        BibDatabaseContext bibDatabaseContext,
                                        BibEntryTypesManager bibEntryTypesManager)
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException {
-        Optional<XTextContent> bibliographyTextSection = getTextSection(doc);
-        if (bibliographyTextSection.isPresent()) {
-            XTextRange range = bibliographyTextSection.get().getAnchor();
-            XTextCursor cursor = range.getText().createTextCursorByRange(range);
-            cursor.setString("");
-            cslCitationOOAdapter.insertZoteroBibliography(cursor, citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
-            return;
-        }
+        LOGGER.debug("Starting to rebuild CSL bibliography");
 
-        LOGGER.debug("Creating new CSL bibliography section");
-        Optional<XTextContent> bibliographyReferenceMark = getReferenceMark(doc);
-        XTextCursor textCursor;
-        if (bibliographyReferenceMark.isPresent()) {
-            XTextContent referenceMark = bibliographyReferenceMark.orElseThrow();
-            Optional<XTextRange> range = Optional.ofNullable(referenceMark.getAnchor());
-            if (range.isPresent()) {
-                XTextRange existingBibliographyRange = range.orElseThrow();
-                XText text = existingBibliographyRange.getText();
-                textCursor = text.createTextCursorByRange(existingBibliographyRange);
-                textCursor.setString("");
-                text.removeTextContent(referenceMark);
-            } else {
-                textCursor = doc.getText().createTextCursor();
-                textCursor.gotoEnd(false);
-            }
+        Optional<XTextRange> sectionRange = getBibliographyRange(doc);
+        if (sectionRange.isEmpty()) {
+            LOGGER.debug("Bibliography section not found. Creating new section.");
+            createCSLBibTextSection(doc);
         } else {
-            textCursor = doc.getText().createTextCursor();
-            textCursor.gotoEnd(false);
+            LOGGER.debug("Bibliography section found. Clearing content.");
+            clearCSLBibTextSectionContent(doc);
         }
 
-        String bibliographyName = PREFIX + CODE + BIBLIOGRAPHY_SUFFIX + " " + ZoteroReferenceMark.createRandomSuffix();
-        DocumentAnnotation annotation = new DocumentAnnotation(doc, bibliographyName, textCursor, false);
-        XNamed zoteroBibliographyTextSection = UnoTextSection.create(annotation);
-        LOGGER.debug("CSL bibliography section created");
-
-        XTextRange sectionRange = UnoTextSection.getAnchor(doc, zoteroBibliographyTextSection.getName())
-                                                .orElseThrow(() -> new CreationException("Could not create Zotero bibliography text section"));
-        XTextCursor sectionCursor = sectionRange.getText().createTextCursorByRange(sectionRange);
-        cslCitationOOAdapter.insertZoteroBibliography(sectionCursor, citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+        populateCSLBibTextSection(doc, cslCitationOOAdapter, entries, citationStyle, bibDatabaseContext, bibEntryTypesManager);
+        LOGGER.debug("Finished rebuilding CSL bibliography");
     }
 
-    private Optional<XTextContent> getTextSection(XTextDocument doc)
+    private void createCSLBibTextSection(XTextDocument doc)
+            throws CreationException {
+        LOGGER.debug("Creating new CSL bibliography section");
+        XTextCursor textCursor = doc.getText().createTextCursor();
+        textCursor.gotoEnd(false);
+        String name = ZOTERO_BIBLIOGRAPHY_SECTION_NAME + CODE + BIBLIOGRAPHY_SUFFIX + " " + ZoteroReferenceMark.createRandomSuffix();
+        DocumentAnnotation annotation = new DocumentAnnotation(doc, name, textCursor, false);
+        UnoTextSection.create(annotation);
+        LOGGER.debug("CSL bibliography section created");
+    }
+
+    private void clearCSLBibTextSectionContent(XTextDocument doc)
+            throws NoDocumentException, WrappedTargetException {
+        LOGGER.debug("Clearing CSL bibliography section content");
+        Optional<XTextRange> sectionRange = getBibliographyRange(doc);
+        sectionRange.ifPresentOrElse(
+                range -> {
+                    XTextCursor cursor = range.getText().createTextCursorByRange(range);
+                    cursor.setString("");
+                    LOGGER.debug("CSL bibliography section content cleared");
+                },
+                () -> LOGGER.warn("Failed to clear CSL bibliography section: section not found"));
+    }
+
+    private void populateCSLBibTextSection(XTextDocument doc,
+                                           CSLCitationOOAdapter cslCitationOOAdapter,
+                                           List<BibEntry> entries,
+                                           CitationStyle citationStyle,
+                                           BibDatabaseContext bibDatabaseContext,
+                                           BibEntryTypesManager bibEntryTypesManager)
+            throws com.sun.star.uno.Exception, NoDocumentException, CreationException {
+        LOGGER.debug("Populating CSL bibliography section");
+
+        XTextRange sectionRange = getBibliographyRange(doc).orElseThrow(() -> {
+            LOGGER.error("Bibliography section not found when trying to populate");
+            return new CreationException("Bibliography section not found");
+        });
+        XTextCursor cursor = sectionRange.getText().createTextCursorByRange(sectionRange);
+
+        cslCitationOOAdapter.insertZoteroBibliography(cursor, citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+
+        LOGGER.debug("CSL bibliography section population completed");
+    }
+
+    private Optional<XTextContent> getBibliographyTextSection(XTextDocument doc)
             throws NoDocumentException, WrappedTargetException {
         XNameAccess nameAccess = UnoTextSection.getNameAccess(doc);
         for (String name : nameAccess.getElementNames()) {
-            if (isBibliographyMarkName(name)) {
+            if (isZoteroBibliographyMarkName(name)) {
                 return UnoNameAccess.getTextContentByName(nameAccess, name);
             }
         }
         return Optional.empty();
     }
 
-    private Optional<XTextContent> getReferenceMark(XTextDocument doc)
-            throws NoDocumentException, WrappedTargetException {
-        for (String name : UnoReferenceMark.getListOfNames(doc)) {
-            if (isBibliographyMarkName(name)) {
-                return UnoReferenceMark.getAsTextContent(doc, name);
-            }
-        }
-        return Optional.empty();
+    private static boolean isZoteroBibliographyMarkName(String name) {
+        return name.startsWith(ZOTERO_BIBLIOGRAPHY_SECTION_NAME);
     }
 }
