@@ -5,16 +5,18 @@ import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// This class represents a scientific study.
 ///
 /// This class defines all aspects of a scientific study relevant to the application. It is a proxy for the file based study definition.
 ///
 /// The file is parsed using by {@link org.jabref.logic.crawler.StudyYamlParser}
-@JsonPropertyOrder({"version", "authors", "title", "research-questions", "queries", "catalogs"})
+@JsonPropertyOrder({"version", "authors", "title", "research-questions", "queries", "catalogs", "max-results-per-catalog"})
 // The user might add arbitrary content to the YAML
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Study {
@@ -34,6 +36,10 @@ public class Study {
 
     @JsonProperty("catalogs")
     private List<StudyCatalog> catalogs;
+
+    @JsonProperty("max-results-per-catalog")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer maxResultsPerCatalog;
 
     public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyCatalog> catalogs) {
         this.version = CURRENT_SCHEMA_VERSION;
@@ -101,6 +107,14 @@ public class Study {
         this.researchQuestions = researchQuestions;
     }
 
+    public @Nullable Integer getMaxResultsPerCatalog() {
+        return maxResultsPerCatalog;
+    }
+
+    public void setMaxResultsPerCatalog(@Nullable Integer maxResultsPerCatalog) {
+        this.maxResultsPerCatalog = maxResultsPerCatalog;
+    }
+
     @Override
     public String toString() {
         return "Study{" +
@@ -110,6 +124,7 @@ public class Study {
                 ", researchQuestions=" + researchQuestions +
                 ", queries=" + queries +
                 ", catalogs=" + catalogs +
+                ", maxResultsPerCatalog=" + maxResultsPerCatalog +
                 '}';
     }
 
@@ -129,11 +144,12 @@ public class Study {
                 Objects.equals(title, otherStudy.title) &&
                 Objects.equals(researchQuestions, otherStudy.researchQuestions) &&
                 Objects.equals(queries, otherStudy.queries) &&
-                Objects.equals(catalogs, otherStudy.catalogs);
+                Objects.equals(catalogs, otherStudy.catalogs) &&
+                Objects.equals(maxResultsPerCatalog, otherStudy.maxResultsPerCatalog);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(version, authors, title, researchQuestions, queries, catalogs);
+        return Objects.hash(version, authors, title, researchQuestions, queries, catalogs, maxResultsPerCatalog);
     }
 }

@@ -1,8 +1,6 @@
 package org.jabref.toolkit.commands;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +11,7 @@ import java.util.stream.Collectors;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.exporter.ExportPreferences;
@@ -23,10 +22,10 @@ import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.toolkit.util.CapturingCommandLine;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Answers;
-import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,11 +38,9 @@ public abstract class AbstractJabKitTest {
     protected final ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     protected final ExportPreferences exportPreferences = mock(ExportPreferences.class, Answers.RETURNS_DEEP_STUBS);
     protected final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+    protected final AiPreferences aiPreferences = mock(AiPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
-    protected CommandLine commandLine;
-
-    private ByteArrayOutputStream outWriter;
-    private ByteArrayOutputStream errWriter;
+    protected CapturingCommandLine commandLine;
 
     @BeforeEach()
     void setup() {
@@ -75,50 +72,10 @@ public abstract class AbstractJabKitTest {
                 0,
                 0,
                 0));
+        when(preferences.getAiPreferences()).thenReturn(aiPreferences);
 
         JabKit jabKit = new JabKit(preferences, entryTypesManager);
-        commandLine = new CommandLine(jabKit);
-
-        outWriter = new ByteArrayOutputStream();
-        errWriter = new ByteArrayOutputStream();
-    }
-
-    /// Executes the configured {@link picocli.CommandLine} command while capturing its
-    /// standard output and error streams.
-    ///
-    /// This method temporarily redirects `System.out` and `System.err` to
-    /// internal buffers during the command execution, allowing the captured output to be
-    /// retrieved later using {@link #getStandardOutput()} and {@link #getErrorOutput()}.
-    ///
-    /// @param args the command line arguments to parse
-    /// @return the error code
-    int executeToLog(String... args) {
-        PrintStream or = System.out;
-        PrintStream orErr = System.err;
-
-        System.setOut(new PrintStream(outWriter, true));
-        System.setErr(new PrintStream(errWriter, true));
-
-        int result = commandLine.execute(args);
-
-        System.setOut(or);
-        System.setErr(orErr);
-
-        return result;
-    }
-
-    /// Returns the captured standard output from the command line execution.
-    ///
-    /// @return The captured stdout string.
-    protected String getStandardOutput() {
-        return outWriter.toString().replace("\r\n", "\n");
-    }
-
-    /// Returns the captured error output from the command line execution.
-    ///
-    /// @return The captured stderr string.
-    protected String getErrorOutput() {
-        return errWriter.toString().replace("\r\n", "\n");
+        commandLine = new CapturingCommandLine(jabKit, JabKit.createFactory());
     }
 
     /// Gets class resource as fully qualified string.
@@ -138,7 +95,7 @@ public abstract class AbstractJabKitTest {
     ///
     /// @param resourceName the resource name
     /// @return the class resource as path
-    Path getClassResourceAsPath(String resourceName) {
+    protected Path getClassResourceAsPath(String resourceName) {
         try {
             return Path.of(Objects.requireNonNull(this.getClass().getResource(resourceName), "Could not find resource: " + resourceName).toURI())
                        .toAbsolutePath();
@@ -147,7 +104,7 @@ public abstract class AbstractJabKitTest {
         }
     }
 
-    static void assertFileExists(Path file) throws IOException {
+    protected static void assertFileExists(Path file) throws IOException {
         String listedFiles = Files.list(file.getParent())
                                   .map(path -> "'" + path.getFileName().toString() + "'")
                                   .collect(Collectors.joining(", "));
@@ -155,7 +112,7 @@ public abstract class AbstractJabKitTest {
         assertTrue(Files.exists(file), "file  '" + file.getFileName().toString() + "' doesn't exist, but found " + listedFiles);
     }
 
-    static void assertFileDoesntExist(Path file) throws IOException {
+    protected static void assertFileDoesntExist(Path file) {
         assertFalse(Files.exists(file), "file '" + file.getFileName().toString() + "' shouldn't exist, but does");
     }
 }

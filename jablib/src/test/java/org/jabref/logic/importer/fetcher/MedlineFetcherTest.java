@@ -9,6 +9,7 @@ import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -26,7 +27,8 @@ import static org.mockito.Mockito.when;
 
 @FetcherTest
 class MedlineFetcherTest {
-    private static final Optional<String> API_KEY = Optional.of(new BuildInfo().medlineApiKey);
+    // default value is empty string in BulidInfo
+    private static final Optional<String> API_KEY = Optional.of(new BuildInfo().medlineApiKey).filter(StringUtil::isNotBlank);
 
     private MedlineFetcher fetcher;
 
@@ -104,7 +106,7 @@ class MedlineFetcherTest {
                 .withField(new UnknownField("issn-linking"), "1383-5769")
                 .withField(StandardField.ISSUE, "6")
                 .withField(StandardField.JOURNAL, "Parasitology international")
-                .withField(StandardField.KEYWORDS, "Animals; Antibodies, Protozoan, blood; Antigens, Protozoan, immunology; Cattle, parasitology; Cattle Diseases, epidemiology, parasitology; Enzyme-Linked Immunosorbent Assay, veterinary; Geography; Humans; Indonesia, epidemiology; Livestock, immunology, parasitology; Meat, parasitology; Protozoan Proteins, immunology; Seroepidemiologic Studies; Swine, parasitology; Swine Diseases, epidemiology, parasitology; Toxoplasma, immunology; Toxoplasmosis, Animal, epidemiology, immunology, parasitology; Cattle; ELISA; Indonesia; Pig; TgGRA7; Toxoplasma gondii")
+                .withField(StandardField.KEYWORDS, "Animals; Antibodies, Protozoan/blood*; Antigens, Protozoan/immunology*; Cattle/parasitology*; Cattle Diseases/epidemiology*; Cattle Diseases/parasitology; Enzyme-Linked Immunosorbent Assay/veterinary; Geography; Humans; Indonesia/epidemiology; Livestock/immunology; Livestock/parasitology; Meat/parasitology; Protozoan Proteins/immunology*; Seroepidemiologic Studies; Swine/parasitology*; Swine Diseases/epidemiology*; Swine Diseases/parasitology; Toxoplasma/immunology; Toxoplasmosis, Animal/epidemiology*; Toxoplasmosis, Animal/immunology; Toxoplasmosis, Animal/parasitology; Cattle; ELISA; Indonesia; Pig; TgGRA7; Toxoplasma gondii")
                 .withField(StandardField.MONTH, "#dec#")
                 .withField(new UnknownField("nlm-id"), "9708549")
                 .withField(StandardField.OWNER, "NLM")
@@ -127,10 +129,10 @@ class MedlineFetcherTest {
                 .withField(new UnknownField("issn-linking"), "0125-1562")
                 .withField(StandardField.ISSUE, "6")
                 .withField(StandardField.JOURNAL, "The Southeast Asian journal of tropical medicine and public health")
-                .withField(StandardField.KEYWORDS, "Antibodies, Protozoan; Antibodies, Viral, immunology; Coinfection, epidemiology, immunology; Female; HIV Infections, epidemiology; HTLV-I Antibodies, immunology; HTLV-I Infections, epidemiology, immunology; HTLV-II Antibodies, immunology; HTLV-II Infections, epidemiology, immunology; Hepatitis Antibodies, immunology; Hepatitis B Antibodies, immunology; Hepatitis C Antibodies, immunology; Hepatitis Delta Virus, immunology; Hepatitis, Viral, Human, epidemiology, immunology; Humans; Immunoglobulin G, immunology; Immunoglobulin M, immunology; Indonesia, epidemiology; Male; Prisoners; Seroepidemiologic Studies; Toxoplasma, immunology; Toxoplasmosis, epidemiology, immunology")
+                .withField(StandardField.KEYWORDS, "Antibodies, Protozoan; Antibodies, Viral/immunology*; Coinfection/epidemiology; Coinfection/immunology; Female; HIV Infections/epidemiology*; HTLV-I Antibodies/immunology; HTLV-I Infections/epidemiology*; HTLV-I Infections/immunology; HTLV-II Antibodies/immunology; HTLV-II Infections/epidemiology*; HTLV-II Infections/immunology; Hepatitis Antibodies/immunology; Hepatitis B Antibodies/immunology; Hepatitis C Antibodies/immunology; Hepatitis Delta Virus/immunology; Hepatitis, Viral, Human/epidemiology*; Hepatitis, Viral, Human/immunology; Humans; Immunoglobulin G/immunology; Immunoglobulin M/immunology; Indonesia/epidemiology; Male; Prisoners; Seroepidemiologic Studies; Toxoplasma/immunology; Toxoplasmosis/epidemiology*; Toxoplasmosis/immunology")
                 .withField(StandardField.MONTH, "#nov#")
                 .withField(StandardField.PUBSTATE, "ppublish")
-                .withField(new UnknownField("revised"), "2018-12-02")
+                .withField(new UnknownField("revised"), "2026-01-27")
                 .withField(new UnknownField("nlm-id"), "0266303")
                 .withField(StandardField.OWNER, "NLM")
                 .withField(StandardField.PAGES, "977--985")
@@ -202,6 +204,17 @@ class MedlineFetcherTest {
         List<BibEntry> entryList = fetcher.performSearch("author=vigmond AND year-range=2020-2021");
         entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
         assertEquals(28, entryList.size());
+    }
+
+    @Test
+    void performRawSearchQueryWithBlankQueryReturnsEmptyList() throws FetcherException {
+        assertEquals(List.of(), fetcher.performRawSearchQuery(""));
+    }
+
+    @Test
+    void performRawSearchQueryFindsEntries() throws FetcherException {
+        List<BibEntry> entryList = fetcher.performRawSearchQuery("vigmond[au] AND 2021[dp]");
+        assertEquals(18, entryList.size());
     }
 
     @Test

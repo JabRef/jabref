@@ -8,9 +8,12 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -30,6 +33,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileNameCleaner;
+import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -60,6 +64,8 @@ import org.slf4j.LoggerFactory;
 public class StudyRepository {
     // Tests work with study.yml
     public static final String STUDY_DEFINITION_FILE_NAME = "study.yml";
+    public static final int DEFAULT_RESULT_LIMIT = 100;
+    public static final String STUDY_LOCK_FILE_NAME = "study-lock.yml";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StudyRepository.class);
 
@@ -184,6 +190,11 @@ public class StudyRepository {
                     .collect(Collectors.toList());
     }
 
+    /// Returns all query definitions of the study, preserving catalog-specific overrides.
+    public List<StudyQuery> getStudyQueries() {
+        return study.getQueries();
+    }
+
     /// Extracts all active fetchers from the library entries.
     ///
     /// @return List of BibEntries of type Library
@@ -193,6 +204,27 @@ public class StudyRepository {
                     .parallelStream()
                     .filter(StudyCatalog::isEnabled)
                     .toList();
+    }
+
+    /// Returns the fetchers of all enabled catalogs, catalogs without a matching fetcher are not returned
+    private List<SearchBasedFetcher> getActiveFetchers() {
+        return new StudyCatalogToFetcherConverter(
+                getActiveLibraryEntries(),
+                preferences.getImportFormatPreferences(),
+                preferences.getImporterPreferences()).getActiveFetchers();
+    }
+
+    /// returns the effective result limit per catalog: its own override, else the study wide
+    /// default, else [#DEFAULT_RESULT_LIMIT], keys match catalog names case-insensitively
+    public Map<String, Integer> getResultLimitsPerCatalog() {
+        Map<String, Integer> limits = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        for (StudyCatalog catalog : study.getCatalogs()) {
+            Integer limit = catalog.getMaxResults() != null
+                            ? catalog.getMaxResults()
+                            : study.getMaxResultsPerCatalog();
+            limits.put(catalog.getName(), limit != null ? limit : DEFAULT_RESULT_LIMIT);
+        }
+        return limits;
     }
 
     public Study getStudy() {
@@ -268,14 +300,10 @@ public class StudyRepository {
     /// Create for each query a folder, and for each fetcher a bib file in the query folder to store its results.
     private void setUpRepositoryStructureForQueriesAndFetchers() throws IOException {
         // Cannot use stream here since IOException has to be thrown
-        StudyCatalogToFetcherConverter converter = new StudyCatalogToFetcherConverter(
-                this.getActiveLibraryEntries(),
-                preferences.getImportFormatPreferences(),
-                preferences.getImporterPreferences());
+        List<SearchBasedFetcher> activeFetchers = getActiveFetchers();
         for (String query : this.getSearchQueryStrings()) {
             createQueryResultFolder(query);
-            converter.getActiveFetchers()
-                     .forEach(searchBasedFetcher -> createFetcherResultFile(query, searchBasedFetcher));
+            activeFetchers.forEach(searchBasedFetcher -> createFetcherResultFile(query, searchBasedFetcher));
             createQueryResultFile(query);
         }
         createStudyResultFile();
@@ -413,6 +441,48 @@ public class StudyRepository {
             addFetcherGroupToMetaData(existingStudyResultEntries, fetcherName);
         }
         writeResultToFile(getPathToStudyResultFile(), existingStudyResultEntries);
+
+        writeStudyLockFile();
+    }
+
+    /// Writes the study lock file, it records the exact query sent to each catalog, so a crawl can be reproduced.
+    ///
+    /// The content depends only on the study definition, crawling the same unchanged study again produces identical content.
+    // [impl->req~slr.lock-file~1]
+    private void writeStudyLockFile() throws IOException {
+        new StudyYamlParser().writeStudyYamlFile(buildStudyLock(), repositoryPath.resolve(STUDY_LOCK_FILE_NAME));
+    }
+
+    /// Builds the lock representation of the study.
+    ///
+    /// For each query, the catalog-specific map lists every catalog that is queried with its effective query:
+    /// the catalog-specific override if one is defined for it, otherwise the query string itself.
+    /// Disabled catalogs and catalogs without a matching fetcher are not listed, as no query is sent to them.
+    private Study buildStudyLock() {
+        List<String> catalogNames = getActiveFetchers().stream()
+                                                       .map(SearchBasedFetcher::getName)
+                                                       .toList();
+        List<StudyQuery> lockQueries = study.getQueries().stream()
+                                            .map(query -> toLockQuery(query, catalogNames))
+                                            .toList();
+        Study lock = new Study(study.getAuthors(), study.getTitle(), study.getResearchQuestions(), lockQueries, study.getCatalogs());
+        lock.setMaxResultsPerCatalog(study.getMaxResultsPerCatalog());
+        return lock;
+    }
+
+    private StudyQuery toLockQuery(StudyQuery query, List<String> catalogNames) {
+        Map<String, String> overrides = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        query.getCatalogSpecific().forEach(overrides::putIfAbsent);
+
+        Map<String, String> effectiveQueries = new LinkedHashMap<>();
+        for (String catalogName : catalogNames) {
+            String override = overrides.get(catalogName);
+            effectiveQueries.put(catalogName, StringUtil.isBlank(override) ? query.getQuery() : override);
+        }
+
+        StudyQuery lockQuery = new StudyQuery(query.getQuery());
+        lockQuery.setCatalogSpecific(effectiveQueries);
+        return lockQuery;
     }
 
     private void generateCiteKeys(BibDatabaseContext existingEntries, BibDatabase targetEntries) {

@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -21,8 +23,8 @@ import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
 import org.jabref.model.ai.llm.PredefinedChatModel;
-import org.jabref.model.ai.pipeline.AnswerEngineKind;
 import org.jabref.model.ai.pipeline.DocumentSplitterKind;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
@@ -31,6 +33,12 @@ import com.github.javakeyring.PasswordAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/// AI preferences.
+///
+/// Quick note about [#aiFeaturesEnabledInitially] and [#aiFeaturesEnabledCurrently]:
+/// As per `req~ai.general.enabling.restart~1`, when enabled property is changed, a restart required. This implies that
+/// AI processes should start and work only if they were initially enabled. So whenever you want to guard some code from
+/// executing only if AI is enabled, please use [#aiFeaturesEnabledInitially] via [#getAiFeaturesEnabled()]`.
 public class AiPreferences {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiPreferences.class);
 
@@ -46,7 +54,12 @@ public class AiPreferences {
             AiProvider.HUGGING_FACE, PredefinedChatModel.BLANK_HUGGING_FACE
     );
 
-    private final BooleanProperty enableAi;
+    /// Controls whether the AI features should start/work in a JabRef session.
+    /// This property is set when JabRef has started, and is not persisted.
+    private final BooleanProperty aiFeaturesEnabledInitially;
+    /// Controls whether to show the privacy policy banner and whether to request a restart.
+    /// This property is persisted and controlled by preferences.
+    private final BooleanProperty aiFeaturesEnabledCurrently;
     private final BooleanProperty autoGenerateEmbeddings;
     private final BooleanProperty autoGenerateSummaries;
 
@@ -74,7 +87,7 @@ public class AiPreferences {
     private final IntegerProperty documentSplitterChunkSize;
     private final IntegerProperty documentSplitterOverlapSize;
 
-    private final ObjectProperty<AnswerEngineKind> answerEngineKind;
+    private final ObjectProperty<ResponseEngineKind> responseEngineKind;
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
@@ -119,7 +132,7 @@ public class AiPreferences {
                 AiDefaultExpertSettings.DOCUMENT_SPLITTER_KIND,                              // Document splitter kind
                 AiDefaultExpertSettings.DOCUMENT_SPLITTER_CHUNK_SIZE,                        // Document splitter chunk size
                 AiDefaultExpertSettings.DOCUMENT_SPLITTER_OVERLAP_SIZE,                      // Document splitter overlap size
-                AiDefaultExpertSettings.ANSWER_ENGINE_KIND,                                  // Answer engine kind
+                AiDefaultExpertSettings.RESPONSE_ENGINE_KIND,                                // Response engine kind
                 AiDefaultExpertSettings.RAG_MAX_RESULTS_COUNT,                               // RAG max results count
                 AiDefaultExpertSettings.RAG_MIN_SCORE,                                       // RAG min score
 
@@ -138,7 +151,7 @@ public class AiPreferences {
     }
 
     public AiPreferences(
-            boolean enableAi,
+            boolean aiFeaturesEnabledCurrently,
             boolean autoGenerateEmbeddings,
             boolean autoGenerateSummaries,
             AiProvider aiProvider,
@@ -159,7 +172,7 @@ public class AiPreferences {
             DocumentSplitterKind documentSplitterKind,
             int documentSplitterChunkSize,
             int documentSplitterOverlapSize,
-            AnswerEngineKind answerEngineKind,
+            ResponseEngineKind responseEngineKind,
             int ragMaxResultsCount,
             double ragMinScore,
             String chattingSystemMessageTemplate,
@@ -173,7 +186,8 @@ public class AiPreferences {
             int followUpQuestionsCount,
             String followUpQuestionsTemplate
     ) {
-        this.enableAi = new SimpleBooleanProperty(enableAi);
+        this.aiFeaturesEnabledInitially = new SimpleBooleanProperty(aiFeaturesEnabledCurrently);
+        this.aiFeaturesEnabledCurrently = new SimpleBooleanProperty(aiFeaturesEnabledCurrently);
         this.autoGenerateEmbeddings = new SimpleBooleanProperty(autoGenerateEmbeddings);
         this.autoGenerateSummaries = new SimpleBooleanProperty(autoGenerateSummaries);
 
@@ -201,7 +215,7 @@ public class AiPreferences {
         this.documentSplitterChunkSize = new SimpleIntegerProperty(documentSplitterChunkSize);
         this.documentSplitterOverlapSize = new SimpleIntegerProperty(documentSplitterOverlapSize);
 
-        this.answerEngineKind = new SimpleObjectProperty<>(answerEngineKind);
+        this.responseEngineKind = new SimpleObjectProperty<>(responseEngineKind);
         this.ragMaxResultsCount = new SimpleIntegerProperty(ragMaxResultsCount);
         this.ragMinScore = new SimpleDoubleProperty(ragMinScore);
 
@@ -216,52 +230,26 @@ public class AiPreferences {
         this.generateFollowUpQuestions = new SimpleBooleanProperty(generateFollowUpQuestions);
         this.followUpQuestionsCount = new SimpleIntegerProperty(followUpQuestionsCount);
         this.followUpQuestionsTemplate = new SimpleStringProperty(followUpQuestionsTemplate);
+
+        // This listener is needed for the following scenario:
+        //
+        // 1. AI features initially are enabled.
+        // 2. User turns off AI features.
+        // 3. User sees the privacy notice pane, and again enables AI features.
+        //
+        // If there was no such listener as written below, AI features would continue to work,
+        // however, between steps 2 and 3, the user could change a lot in the running JabRef
+        // instance, such as opening many libraries, which then wouldn't get tracked by the AI.
+        // As a result, it is better to set [#aiFeaturesEnabledInitially] to just `false`.
+        this.aiFeaturesEnabledCurrently.addListener((_, _, newValue) -> {
+            if (!newValue) {
+                this.aiFeaturesEnabledInitially.set(false);
+            }
+        });
     }
 
     public static AiPreferences getDefault() {
         return new AiPreferences();
-    }
-
-    public void setAll(AiPreferences preferences) {
-        this.enableAi.set(preferences.getEnableAi());
-        this.autoGenerateEmbeddings.set(preferences.getAutoGenerateEmbeddings());
-        this.autoGenerateSummaries.set(preferences.getAutoGenerateSummaries());
-        this.aiProvider.set(preferences.getAiProvider());
-
-        this.openAiChatModel.set(preferences.getOpenAiChatModel());
-        this.mistralAiChatModel.set(preferences.getMistralAiChatModel());
-        this.geminiChatModel.set(preferences.getGeminiChatModel());
-        this.huggingFaceChatModel.set(preferences.getHuggingFaceChatModel());
-
-        this.customizeExpertSettings.set(preferences.getCustomizeExpertSettings());
-
-        this.openAiApiBaseUrl.set(preferences.getOpenAiApiBaseUrl());
-        this.mistralAiApiBaseUrl.set(preferences.getMistralAiApiBaseUrl());
-        this.geminiApiBaseUrl.set(preferences.getGeminiApiBaseUrl());
-        this.huggingFaceApiBaseUrl.set(preferences.getHuggingFaceApiBaseUrl());
-
-        this.summarizatorKind.set(preferences.getSummarizatorKind());
-        this.tokenEstimatorKind.set(preferences.getTokenEstimatorKind());
-        this.embeddingModel.set(preferences.getEmbeddingModel());
-        this.temperature.set(preferences.getTemperature());
-        this.contextWindowSize.set(preferences.getContextWindowSize());
-        this.documentSplitterKind.set(preferences.getDocumentSplitterKind());
-        this.documentSplitterChunkSize.set(preferences.getDocumentSplitterChunkSize());
-        this.documentSplitterOverlapSize.set(preferences.getDocumentSplitterOverlapSize());
-        this.answerEngineKind.set(preferences.getAnswerEngineKind());
-        this.ragMaxResultsCount.set(preferences.getRagMaxResultsCount());
-        this.ragMinScore.set(preferences.getRagMinScore());
-        this.chattingSystemMessageTemplate.set(preferences.getChattingSystemMessageTemplate());
-        this.chattingUserMessageTemplate.set(preferences.getChattingUserMessageTemplate());
-        this.summarizationChunkSystemMessageTemplate.set(preferences.getSummarizationChunkSystemMessageTemplate());
-        this.summarizationCombineSystemMessageTemplate.set(preferences.getSummarizationCombineSystemMessageTemplate());
-        this.summarizationFullDocumentSystemMessageTemplate.set(preferences.getSummarizationFullDocumentSystemMessageTemplate());
-        this.citationParsingSystemMessageTemplate.set(preferences.getCitationParsingSystemMessageTemplate());
-        this.markdownChatExportTemplate.set(preferences.getMarkdownChatExportTemplate());
-        this.generateFollowUpQuestions.set(preferences.getGenerateFollowUpQuestions());
-
-        this.followUpQuestionsCount.set(preferences.getFollowUpQuestionsCount());
-        this.followUpQuestionsTemplate.set(preferences.getFollowUpQuestionsTemplate());
     }
 
     public String getApiKeyForAiProvider(AiProvider aiProvider) {
@@ -292,16 +280,29 @@ public class AiPreferences {
         }
     }
 
-    public BooleanProperty enableAiProperty() {
-        return enableAi;
+    public BooleanBinding restartNeededBinding() {
+        return (aiFeaturesEnabledProperty().not().and(aiFeaturesEnabledCurrentlyProperty()))
+                .or(aiFeaturesEnabledProperty().and(aiFeaturesEnabledCurrentlyProperty().not()));
     }
 
-    public boolean getEnableAi() {
-        return enableAi.get();
+    public ReadOnlyBooleanProperty aiFeaturesEnabledProperty() {
+        return aiFeaturesEnabledInitially;
     }
 
-    public void setEnableAi(boolean enableAi) {
-        this.enableAi.set(enableAi);
+    public boolean getAiFeaturesEnabled() {
+        return aiFeaturesEnabledInitially.get();
+    }
+
+    public BooleanProperty aiFeaturesEnabledCurrentlyProperty() {
+        return aiFeaturesEnabledCurrently;
+    }
+
+    public boolean getAiFeaturesEnabledCurrently() {
+        return aiFeaturesEnabledCurrently.get();
+    }
+
+    public void setAiFeaturesEnabledCurrently(boolean aiFeaturesEnabledCurrently) {
+        this.aiFeaturesEnabledCurrently.set(aiFeaturesEnabledCurrently);
     }
 
     public BooleanProperty autoGenerateEmbeddingsProperty() {
@@ -573,16 +574,16 @@ public class AiPreferences {
         this.documentSplitterOverlapSize.set(documentSplitterOverlapSize);
     }
 
-    public ObjectProperty<AnswerEngineKind> answerEngineKindProperty() {
-        return answerEngineKind;
+    public ObjectProperty<ResponseEngineKind> responseEngineKindProperty() {
+        return responseEngineKind;
     }
 
-    public AnswerEngineKind getAnswerEngineKind() {
-        return answerEngineKind.get();
+    public ResponseEngineKind getResponseEngineKind() {
+        return responseEngineKind.get();
     }
 
-    public void setAnswerEngineKind(AnswerEngineKind answerEngineKind) {
-        this.answerEngineKind.set(answerEngineKind);
+    public void setResponseEngineKind(ResponseEngineKind responseEngineKind) {
+        this.responseEngineKind.set(responseEngineKind);
     }
 
     public IntegerProperty ragMaxResultsCountProperty() {
@@ -636,7 +637,7 @@ public class AiPreferences {
 
     public List<Property<?>> getChatProperties() {
         return (List<Property<?>>) Stream.of(
-                List.of(enableAi, aiProvider, customizeExpertSettings, temperature, contextWindowSize, tokenEstimatorKind),
+                List.of(aiFeaturesEnabledCurrently, aiProvider, customizeExpertSettings, temperature, contextWindowSize, tokenEstimatorKind),
                 getChatModelNamesProperties(),
                 getApiBaseUrlsProperties()
         ).flatMap(List::stream).toList();
@@ -644,17 +645,17 @@ public class AiPreferences {
 
     public List<? extends Property<?>> getSummarizatorProperties() {
         return Stream.of(
-                List.of(enableAi, customizeExpertSettings, summarizatorKind),
+                List.of(aiFeaturesEnabledCurrently, customizeExpertSettings, summarizatorKind),
                 List.of(summarizationChunkSystemMessageTemplate, summarizationCombineSystemMessageTemplate, summarizationFullDocumentSystemMessageTemplate)
         ).flatMap(List::stream).toList();
     }
 
-    public List<? extends Property<?>> getAnswerEngineProperties() {
+    public List<? extends Property<?>> getResponseEngineProperties() {
         return List.of(
-                enableAi,
+                aiFeaturesEnabledCurrently,
                 embeddingModel,
                 customizeExpertSettings,
-                answerEngineKind,
+                responseEngineKind,
                 ragMaxResultsCount,
                 ragMinScore
         );
@@ -662,7 +663,7 @@ public class AiPreferences {
 
     public List<? extends Property<?>> getDocumentSplitterProperties() {
         return List.of(
-                enableAi,
+                aiFeaturesEnabledCurrently,
                 customizeExpertSettings,
                 documentSplitterKind,
                 documentSplitterChunkSize,

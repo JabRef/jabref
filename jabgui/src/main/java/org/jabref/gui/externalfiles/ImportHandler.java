@@ -87,6 +87,7 @@ public class ImportHandler {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final ExternalFilesEntryLinker fileLinker;
     private final ExternalFilesContentImporter contentImporter;
+    private final ImportFormatReader importFormatReader;
     private final UndoManager undoManager;
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -125,6 +126,11 @@ public class ImportHandler {
 
         this.fileLinker = new ExternalFilesEntryLinker(preferences.getExternalApplicationsPreferences(), filePreferences, dialogService, stateManager);
         this.contentImporter = new ExternalFilesContentImporter(preferences.getImportFormatPreferences());
+        this.importFormatReader = new ImportFormatReader(
+                preferences.getImporterPreferences(),
+                preferences.getImportFormatPreferences(),
+                preferences.getCitationKeyPatternPreferences(),
+                fileupdateMonitor);
         this.undoManager = undoManager;
     }
 
@@ -155,7 +161,7 @@ public class ImportHandler {
                                 files.size(),
                                 targetBibDatabaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse(Localization.lang("untitled")),
                                 counter));
-                        updateMessage(Localization.lang("Processing %0", FileUtil.shortenFileName(file.getFileName().toString(), 68)));
+                        updateMessage(Localization.lang("Processing \"%0\"...", FileUtil.shortenFileName(file.getFileName().toString(), 68)));
                         updateProgress(counter, files.size());
                         showToUser(true);
                     });
@@ -181,7 +187,7 @@ public class ImportHandler {
 
                             if (pdfEntriesInFile.isEmpty()) {
                                 entriesToAdd.add(createEmptyEntryWithLink(file));
-                                addResultToList(file, false, Localization.lang("No BibTeX was found. An empty entry was created with file link."));
+                                addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with a file link."));
                             } else {
                                 generateKeys(pdfEntriesInFile);
                                 pdfEntriesInFile.forEach(entry -> {
@@ -210,10 +216,20 @@ public class ImportHandler {
                                 message = bibtexParserResult.getErrorMessage();
                             }
                             addResultToList(file, success, message);
+                        } else if (!importFormatReader.hasImporterForFile(file)) {
+                            entriesToAdd.add(createEmptyEntryWithLink(file));
+                            addResultToList(file, false, Localization.lang("Could not auto-detect file format. An empty entry was created with file link."));
                         } else {
-                            BibEntry emptyEntryWithLink = createEmptyEntryWithLink(file);
-                            entriesToAdd.add(emptyEntryWithLink);
-                            addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with file link."));
+                            try {
+                                ImportResult importResult = ImportHandler.this.importFormatReader.importWithAutoDetection(file);
+                                AutoDetectionImportOutcome importOutcome = createAutoDetectionImportOutcome(file, importResult);
+                                entriesToAdd.addAll(importOutcome.entriesToAdd());
+                                addResultToList(file, importOutcome.success(), importOutcome.message());
+                            } catch (ImportException e) {
+                                LOGGER.warn("Could not import file {} using auto-detection", file, e);
+                                entriesToAdd.add(createEmptyEntryWithLink(file));
+                                addResultToList(file, false, Localization.lang("Could not auto-detect file format. An empty entry was created with file link."));
+                            }
                         }
                     } catch (IOException ex) {
                         LOGGER.error("Error importing", ex);
@@ -248,6 +264,39 @@ public class ImportHandler {
         entry.setField(StandardField.TITLE, file.getFileName().toString());
         fileLinker.linkFilesToEntry(entry, List.of(file));
         return entry;
+    }
+
+    AutoDetectionImportOutcome createAutoDetectionImportOutcome(Path file, ImportResult importResult) {
+        List<BibEntry> importedEntries = importResult.parserResult().getDatabase().getEntries();
+        if (importResult.parserResult().hasWarnings()) {
+            String warningMessage = Localization.lang("File was imported as %0, but warnings were reported: %1",
+                    importResult.format(),
+                    importResult.parserResult().getErrorMessage());
+            if (importedEntries.isEmpty()) {
+                return new AutoDetectionImportOutcome(
+                        List.of(createEmptyEntryWithLink(file)),
+                        false,
+                        Localization.lang("No importable data was found in %0. An empty entry was created with file link.", importResult.format())
+                                + " "
+                                + importResult.parserResult().getErrorMessage());
+            }
+            return new AutoDetectionImportOutcome(importedEntries, false, warningMessage);
+        }
+
+        if (importedEntries.isEmpty()) {
+            return new AutoDetectionImportOutcome(
+                    List.of(createEmptyEntryWithLink(file)),
+                    false,
+                    Localization.lang("No importable data was found in %0. An empty entry was created with file link.", importResult.format()));
+        }
+
+        return new AutoDetectionImportOutcome(
+                importedEntries,
+                true,
+                Localization.lang("File was successfully imported as %0", importResult.format()));
+    }
+
+    record AutoDetectionImportOutcome(List<BibEntry> entriesToAdd, boolean success, String message) {
     }
 
     /// Cleans up the given entries and adds them to the library.

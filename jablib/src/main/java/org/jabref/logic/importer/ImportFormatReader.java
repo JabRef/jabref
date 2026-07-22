@@ -20,6 +20,7 @@ import org.jabref.logic.importer.fileformat.CitaviXmlImporter;
 import org.jabref.logic.importer.fileformat.CopacImporter;
 import org.jabref.logic.importer.fileformat.EndnoteImporter;
 import org.jabref.logic.importer.fileformat.EndnoteXmlImporter;
+import org.jabref.logic.importer.fileformat.HayagrivaImporter;
 import org.jabref.logic.importer.fileformat.InspecImporter;
 import org.jabref.logic.importer.fileformat.IsiImporter;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
@@ -37,6 +38,7 @@ import org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibtexImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -98,6 +100,7 @@ public class ImportFormatReader {
         importers.add(new CffImporter(citationKeyPatternPreferences));
         importers.add(new BiblioscapeImporter());
         importers.add(new CitaviXmlImporter());
+        importers.add(new HayagrivaImporter());
 
         // Get user-selected imports
         importers.addAll(importerPreferences.getCustomImporters());
@@ -140,6 +143,13 @@ public class ImportFormatReader {
     /// @return All importers, elements are sorted by name
     public SortedSet<Importer> getImporters() {
         return new TreeSet<>(this.importers);
+    }
+
+    /// Checks whether at least one registered importer supports the file extension.
+    public boolean hasImporterForFile(Path filePath) {
+        return FileUtil.getFileExtension(filePath)
+                       .map(extension -> importers.stream().anyMatch(importer -> importer.supportsFileExtension(extension)))
+                       .orElse(false);
     }
 
     /// @param format       The name of the format used

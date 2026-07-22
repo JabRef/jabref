@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.ai;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -20,16 +21,19 @@ import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.ai.chatting.PredefinedChatModelUtil;
+import org.jabref.logic.ai.models.AiModelService;
+import org.jabref.logic.ai.models.FetchAiModelsBackgroundTask;
 import org.jabref.logic.ai.preferences.AiDefaultExpertSettings;
 import org.jabref.logic.ai.preferences.AiDefaultTemplates;
 import org.jabref.logic.ai.preferences.AiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.LocalizedNumbersUtils;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.ai.embeddings.PredefinedEmbeddingModel;
 import org.jabref.model.ai.llm.AiProvider;
-import org.jabref.model.ai.pipeline.AnswerEngineKind;
+import org.jabref.model.ai.pipeline.ResponseEngineKind;
 import org.jabref.model.ai.summarization.SummarizatorKind;
 import org.jabref.model.ai.tokenization.TokenEstimatorKind;
 
@@ -96,9 +100,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty generateFollowUpQuestions = new SimpleBooleanProperty();
     private final IntegerProperty followUpQuestionsCount = new SimpleIntegerProperty();
 
-    private final ListProperty<AnswerEngineKind> answerEnginesList =
-            new SimpleListProperty<>(FXCollections.observableArrayList(AnswerEngineKind.values()));
-    private final ObjectProperty<AnswerEngineKind> answerEngineProperty = new SimpleObjectProperty<>();
+    private final ListProperty<ResponseEngineKind> responseEnginesList =
+            new SimpleListProperty<>(FXCollections.observableArrayList(ResponseEngineKind.values()));
+    private final ObjectProperty<ResponseEngineKind> responseEngineProperty = new SimpleObjectProperty<>();
 
     private final ListProperty<SummarizatorKind> summarizationAlgorithmsList =
             new SimpleListProperty<>(FXCollections.observableArrayList(SummarizatorKind.values()));
@@ -119,6 +123,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty disableExpertSettings = new SimpleBooleanProperty(true);
 
     private final AiPreferences aiPreferences;
+    private final AiModelService aiModelService;
+    private final TaskExecutor taskExecutor;
 
     private final Validator apiKeyValidator;
     private final Validator chatModelValidator;
@@ -133,10 +139,18 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final Validator ragMinScoreTypeValidator;
     private final Validator ragMinScoreRangeValidator;
 
-    public AiTabViewModel(CliPreferences preferences) {
+    private final List<String> restartWarnings = new ArrayList<>();
+
+    public AiTabViewModel(
+            CliPreferences preferences,
+            AiModelService aiModelService,
+            TaskExecutor taskExecutor
+    ) {
         this.oldLocale = Locale.getDefault();
 
         this.aiPreferences = preferences.getAiPreferences();
+        this.aiModelService = aiModelService;
+        this.taskExecutor = taskExecutor;
 
         this.enableAi.addListener((_, _, newValue) -> {
             disableBasicSettings.set(!newValue);
@@ -153,8 +167,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             disableApiBaseUrl.set(newValue == AiProvider.HUGGING_FACE || newValue == AiProvider.GEMINI);
 
             // When we setAll on Hugging Face, models are empty, and currentChatModel become null.
-            // It becomes null because currentChatModel is bound to combobox, and this combobox becomes empty.
-            // For some reason, custom edited value in the combobox will be erased, so we need to store the old value.
+            // It becomes null because `currentChatModel` is bound to combobox, and this combobox becomes empty.
+            // For some reason, the custom-edited value in the combobox will be erased, so we need to store the old value.
             String oldChatModel = currentChatModel.get();
             chatModelsList.setAll(models);
 
@@ -205,6 +219,17 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                     currentApiBaseUrl.set(huggingFaceApiBaseUrl.get());
                 }
             }
+
+            new FetchAiModelsBackgroundTask(aiModelService, newValue, currentApiBaseUrl.get(), currentApiKey.get())
+                    .onSuccess(foundModels -> {
+                        String current = currentChatModel.get();
+                        if (newValue == selectedAiProvider.get()) {
+                            // Task returns both predefined models + latest, so it should always be non-empty.
+                            chatModelsList.setAll(foundModels.stream().sorted().toList());
+                            currentChatModel.set(current);
+                        }
+                    })
+                    .executeWith(taskExecutor);
         });
 
         this.currentChatModel.addListener((_, _, newValue) -> {
@@ -331,7 +356,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         geminiChatModel.setValue(aiPreferences.getGeminiChatModel());
         huggingFaceChatModel.setValue(aiPreferences.getHuggingFaceChatModel());
 
-        enableAi.setValue(aiPreferences.getEnableAi());
+        enableAi.setValue(aiPreferences.getAiFeaturesEnabledCurrently());
         autoGenerateSummaries.setValue(aiPreferences.getAutoGenerateSummaries());
         autoGenerateEmbeddings.setValue(aiPreferences.getAutoGenerateEmbeddings());
 
@@ -353,7 +378,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         followUpQuestionsCount.set(aiPreferences.getFollowUpQuestionsCount());
         followUpQuestionsTemplate.set(aiPreferences.getFollowUpQuestionsTemplate());
 
-        answerEngineProperty.set(aiPreferences.getAnswerEngineKind());
+        responseEngineProperty.set(aiPreferences.getResponseEngineKind());
         summarizationAlgorithmProperty.setValue(aiPreferences.getSummarizatorKind());
         tokenEstimationAlgorithmProperty.setValue(aiPreferences.getTokenEstimatorKind());
 
@@ -367,7 +392,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        aiPreferences.setEnableAi(enableAi.get());
+        // [impl->req~ai.general.enabling.restart~1]
+        if (enableAi.get() != aiPreferences.getAiFeaturesEnabledCurrently()) {
+            restartWarnings.add(Localization.lang("AI features turned on/off."));
+        }
+
+        aiPreferences.setAiFeaturesEnabledCurrently(enableAi.get());
         aiPreferences.setAutoGenerateEmbeddings(autoGenerateEmbeddings.get());
         aiPreferences.setAutoGenerateSummaries(autoGenerateSummaries.get());
 
@@ -404,7 +434,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setFollowUpQuestionsCount(followUpQuestionsCount.get());
         aiPreferences.setFollowUpQuestionsTemplate(followUpQuestionsTemplate.get());
 
-        aiPreferences.setAnswerEngineKind(answerEngineProperty.get());
+        aiPreferences.setResponseEngineKind(responseEngineProperty.get());
         aiPreferences.setSummarizatorKind(summarizationAlgorithmProperty.get());
         aiPreferences.setTokenEstimatorKind(tokenEstimationAlgorithmProperty.get());
 
@@ -423,7 +453,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         contextWindowSize.set(PredefinedChatModelUtil.getContextWindowSize(selectedAiProvider.get(), currentChatModel.get()));
 
-        answerEngineProperty.set(AiDefaultExpertSettings.ANSWER_ENGINE_KIND);
+        responseEngineProperty.set(AiDefaultExpertSettings.RESPONSE_ENGINE_KIND);
         summarizationAlgorithmProperty.set(AiDefaultExpertSettings.SUMMARIZATOR_KIND);
         tokenEstimationAlgorithmProperty.set(AiDefaultExpertSettings.TOKEN_ESTIMATOR_KIND);
 
@@ -522,6 +552,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return validators.stream().map(Validator::getValidationStatus).allMatch(ValidationStatus::isValid);
     }
 
+    @Override
+    public List<String> getRestartWarnings() {
+        return restartWarnings;
+    }
+
     public BooleanProperty enableAi() {
         return enableAi;
     }
@@ -606,12 +641,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return citationParsingSystemMessageTemplate;
     }
 
-    public ListProperty<AnswerEngineKind> answerEngineKindsProperty() {
-        return answerEnginesList;
+    public ListProperty<ResponseEngineKind> responseEngineKindsProperty() {
+        return responseEnginesList;
     }
 
-    public ObjectProperty<AnswerEngineKind> answerEngineProperty() {
-        return answerEngineProperty;
+    public ObjectProperty<ResponseEngineKind> responseEngineProperty() {
+        return responseEngineProperty;
     }
 
     public ListProperty<SummarizatorKind> summarizationAlgorithmsProperty() {

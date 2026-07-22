@@ -59,7 +59,6 @@ import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.model.metadata.UserHostInfo;
 
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -1779,7 +1778,7 @@ class BibtexParserTest {
     /// Checks that a TexGroup finally gets the required data, after parsing the library.
     @Test
     void integrationTestTexGroup() throws IOException {
-        String userHostInfo = new UserHostInfo(System.getProperty("user.name"), OS.getHostName()).getUserHostString();
+        String userHostInfo = OS.getUserHostInfo().getUserHostString();
         ParserResult result = parser.parse(Reader.of(
                 "@comment{jabref-meta: grouping:" + OS.NEWLINE
                         + "0 AllEntriesGroup:;" + OS.NEWLINE

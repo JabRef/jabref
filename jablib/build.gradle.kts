@@ -1,5 +1,6 @@
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SourcesJar
 import dev.jbang.gradle.tasks.JBangTask
 import net.ltgt.gradle.errorprone.errorprone
 import net.ltgt.gradle.nullaway.nullaway
@@ -14,17 +15,38 @@ plugins {
 
     id("me.champeau.jmh") version "0.7.3"
 
-    id("com.vanniktech.maven.publish") version "0.36.0"
+    id("com.vanniktech.maven.publish") version "0.37.0"
 
     id("dev.jbang") version "0.4.0"
 
     id("net.ltgt.errorprone") version "5.1.0"
-    id("net.ltgt.nullaway") version "3.0.0"
+    id("net.ltgt.nullaway") version "3.1.0"
+}
+
+val embeddedPostgresHostBinary: Pair<String, String>? = run {
+    val osName = System.getProperty("os.name").lowercase(Locale.ROOT)
+    val architectureName = System.getProperty("os.arch").lowercase(Locale.ROOT)
+    val isArm64 = architectureName in setOf("aarch64", "arm64")
+
+    when {
+        osName.contains("linux") && isArm64 ->
+            "embedded.postgres.binaries.linux.arm64v8" to "io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8"
+        osName.contains("linux") ->
+            "embedded.postgres.binaries.linux.amd64" to "io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64"
+        osName.contains("mac") && isArm64 ->
+            "embedded.postgres.binaries.darwin.arm64v8" to "io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8"
+        osName.contains("mac") ->
+            "embedded.postgres.binaries.darwin.amd64" to "io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64"
+        osName.contains("windows") ->
+            "embedded.postgres.binaries.windows.amd64" to "io.zonky.test.postgres:embedded-postgres-binaries-windows-amd64"
+        else -> null
+    }
 }
 
 testModuleInfo {
     // loading of .fxml files in localization tests requires JabRef's GUI classes
     runtimeOnly("org.jabref")
+    embeddedPostgresHostBinary?.let { runtimeOnly(it.first) }
 
     requires("org.jabref.testsupport")
 
@@ -62,6 +84,8 @@ dependencies {
 
     errorprone("com.google.errorprone:error_prone_core")
     errorprone("com.uber.nullaway:nullaway")
+
+    embeddedPostgresHostBinary?.let { testRuntimeOnly(it.second) }
 }
 
 var version = providers.gradleProperty("projVersion")
@@ -160,7 +184,7 @@ abstract class JoinNonCommentedLines : DefaultTask() {
     }
 }
 
-val extractMaintainers by tasks.registering(JoinNonCommentedLines::class) {
+val extractMaintainers = tasks.register<JoinNonCommentedLines>("extractMaintainers") {
     inputFile = layout.projectDirectory.file("../MAINTAINERS")
     outputFile = layout.buildDirectory.file("maintainers.txt")
 }
@@ -280,7 +304,7 @@ tasks.test {
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
     testLogging {
-        showStandardStreams = true
+        showStandardStreams = false
     }
 }
 
@@ -358,7 +382,7 @@ mavenPublishing {
     // - `JavadocJar.Javadoc()` to publish standard javadocs
     javadocJar = JavadocJar.Javadoc(),
     // whether to publish a sources jar
-    sourcesJar = true,
+    sourcesJar = SourcesJar.Sources(),
   ))
 
   publishToMavenCentral()

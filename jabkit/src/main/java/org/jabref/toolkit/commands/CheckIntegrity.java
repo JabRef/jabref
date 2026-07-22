@@ -19,6 +19,8 @@ import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.toolkit.exception.ImportServiceException;
+import org.jabref.toolkit.service.ImportService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +39,7 @@ class CheckIntegrity implements Callable<Integer> {
     private Check check;
 
     @Mixin
-    private JabKit.SharedOptions sharedOptions = new JabKit.SharedOptions();
+    private JabKit.SharedOptions sharedOptions;
 
     @Mixin
     private InputOption inputOption = new InputOption();
@@ -50,7 +52,7 @@ class CheckIntegrity implements Callable<Integer> {
     private boolean allowIntegerEdition;
 
     @Override
-    public Integer call() {
+    public Integer call() throws ImportServiceException {
         return execute(inputOption.getInputFile(), outputFormat, allowIntegerEdition, sharedOptions.porcelain, check.jabKit);
     }
 
@@ -59,12 +61,10 @@ class CheckIntegrity implements Callable<Integer> {
     /// Shared with the parent `check` command, which runs both checks at once.
     ///
     /// @return the exit code (0 = no findings, 1 = integrity findings present, 2/3 = error)
-    static int execute(Path inputFile, String outputFormat, boolean allowIntegerEdition, boolean porcelain, JabKit jabKit) {
-        JabKit.ImportOutcome importOutcome = JabKit.importBibtexLibrary(inputFile, jabKit.cliPreferences, porcelain);
-        ParserResult parserResult = importOutcome.parserResult();
-        if (parserResult == null) {
-            return importOutcome.exitCode();
-        }
+    static int execute(Path inputFile, String outputFormat, boolean allowIntegerEdition, boolean porcelain, JabKit jabKit)
+            throws ImportServiceException {
+
+        ParserResult parserResult = ImportService.importBibTexFile(inputFile, jabKit.cliPreferences, porcelain);
 
         if (!porcelain) {
             System.out.println(Localization.lang("Checking integrity of '%0'.", inputFile));
@@ -77,7 +77,7 @@ class CheckIntegrity implements Callable<Integer> {
                 databaseContext,
                 jabKit.cliPreferences.getFilePreferences(),
                 jabKit.cliPreferences.getCitationKeyPatternPreferences(),
-                JournalAbbreviationLoader.loadRepository(jabKit.cliPreferences.getJournalAbbreviationPreferences()),
+                JournalAbbreviationLoader.loadRepository(jabKit.cliPreferences.getAbbreviationPreferences()),
                 allowIntegerEdition
         );
 

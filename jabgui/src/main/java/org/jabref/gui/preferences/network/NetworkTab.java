@@ -132,6 +132,7 @@ public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> i
 
         gitUsername.textProperty().bindBidirectional(viewModel.gitUsernameProperty());
         gitPat.textProperty().bindBidirectional(viewModel.gitPatProperty());
+        gitPersistPat.selectedProperty().bindBidirectional(viewModel.gitPersistPatProperty());
         gitPersistPat.disableProperty().bind(not(viewModel.passwordPersistAvailable()));
         EasyBind.subscribe(viewModel.passwordPersistAvailable(), available -> {
             if (available) {
