@@ -1,7 +1,7 @@
 ---
 name: jabkit
 category: users
-description: JabRef's Swiss Army knife CLI for BibTeX/biblatex - fetches entries online, converts DOIs to BibTeX, extracts references from PDFs, checks libraries, generates citation keys, writes XMP metadata, and searches .bib files.
+description: JabRef's Swiss Army knife CLI for BibTeX/biblatex - fetches entries online, converts DOIs to BibTeX, turns PDF papers into BibTeX entries, checks libraries, generates citation keys, writes XMP metadata, and searches .bib files.
 license: MIT
 ---
 
@@ -20,6 +20,19 @@ curl -Ls https://sh.jbang.dev | bash -s - app setup   # Linux/macOS
 ```powershell
 iex "& { $(iwr -useb https://ps.jbang.dev) } app setup"   # Windows
 ```
+
+On linux-x64, mac-aarch64 or windows-x64, setting the environment variable `JBANG_USE_NATIVE` to `true` before the command above installs JBang's native binary instead of its JAR: one JDK download less and a faster start.
+
+```bash
+export JBANG_USE_NATIVE=true          # Bash/zsh, persist in ~/.bashrc or ~/.zshrc
+```
+
+```powershell
+$env:JBANG_USE_NATIVE = 'true'        # PowerShell, persist in $PROFILE
+```
+
+Persist it rather than setting it only for the install — the launcher re-reads it on every run and falls back to the JAR when it is unset.
+Other platforms have no native build and the install would fail, so leave it unset there.
 
 Then install `jabkit` on the PATH (the same command also updates it):
 

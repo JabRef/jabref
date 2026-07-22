@@ -30,7 +30,7 @@ class UnicodeConverterTest {
 
             # plain unicode letters
             {\\"{a}}, ä
-            {{$\\Epsilon$}}, \u0395
+            $\\Epsilon$, \u0395
             """)
     void unicode(String expected, String text) {
         assertEquals(expected, formatter.format(text));

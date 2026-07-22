@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
@@ -50,6 +51,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private static final String COVER_IMAGE_FORMAT_HTML = "<img style=\"border-width:1px; border-style:solid; border-color:auto; display:block; height:12rem;\" src=\"%s\"> <br>";
 
+    private boolean viewportResetScheduled = false;
+    private double latestContentHeight = 0.0;
+
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
@@ -64,6 +68,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private @Nullable BibEntry entry;
     private PreviewLayout layout;
     private String layoutText;
+    private long updateSequence;
 
     public PreviewViewer(DialogService dialogService,
                          GuiPreferences preferences,
@@ -170,7 +175,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void setDatabaseContext(BibDatabaseContext newDatabaseContext) {
-        if (Objects.equals(databaseContext, newDatabaseContext)) {
+        // we do not use equals here as it would compare all entries, and we just want to get notified of changes when a user switches library
+        if (databaseContext == newDatabaseContext) {
             return;
         }
         clearEntry();
@@ -179,6 +185,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void update() {
+        // updateSequence is unsynchronized and relies on FX-thread confinement; entry observables
+        // (see invalidated()) can fire from background threads, e.g. fetchers modifying fields
+        UiTaskExecutor.runNowOrInJavaFXThread(this::updateOnFxThread);
+    }
+
+    private void updateOnFxThread() {
+        long currentUpdateSequence = ++updateSequence;
         if ((databaseContext == null) || (entry == null) || (layout == null)) {
             LOGGER.debug("Missing components - Database: {}, Entry: {}, Layout: {}",
                     databaseContext == null ? "null" : databaseContext,
@@ -190,22 +203,31 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
         Number.serialExportNumber = 1;
         BibEntry currentEntry = entry;
+        BibDatabaseContext currentDatabaseContext = databaseContext;
+        PreviewLayout currentLayout = layout;
 
-        BackgroundTask.wrap(() -> layout.generatePreview(currentEntry, databaseContext))
+        BackgroundTask.wrap(() -> currentLayout.generatePreview(currentEntry, currentDatabaseContext))
                       .onSuccess(previewText -> {
+                          if (currentUpdateSequence != updateSequence) {
+                              return;
+                          }
                           setPreviewText(previewText);
                           if (preferences.getPreviewPreferences().shouldDownloadCovers()) {
-                              downloadCoverAndRefresh(currentEntry, previewText);
+                              downloadCoverAndRefresh(currentEntry, previewText, currentUpdateSequence);
                           }
                       })
-                      .onFailure(e -> setPreviewText(formatError(currentEntry, e)))
+                      .onFailure(e -> {
+                          if (currentUpdateSequence == updateSequence) {
+                              setPreviewText(formatError(currentEntry, e));
+                          }
+                      })
                       .executeWith(taskExecutor);
     }
 
-    private void downloadCoverAndRefresh(BibEntry entry, String previewText) {
+    private void downloadCoverAndRefresh(BibEntry entry, String previewText, long currentUpdateSequence) {
         BackgroundTask.wrap(() -> bookCoverFetcher.downloadCoversForEntry(entry))
                       .onSuccess((ignored) -> {
-                          if (entry.equals(this.entry)) {
+                          if (currentUpdateSequence == updateSequence) {
                               setPreviewText(previewText);
                           }
                       })
@@ -229,14 +251,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private void setPreviewText(String text) {
         String coverIfAny = getCoverImageURL().map(COVER_IMAGE_FORMAT_HTML::formatted).orElse("");
         layoutText = coverIfAny + text;
-        UiTaskExecutor.runInJavaFXThread(() -> {
-            HtmlRenderOptions options = previewView.getOptions();
-            previewView.setOptions(getBaseURL()
-                    .map(options::withBaseUri)
-                    .orElseGet(options::withoutBaseUri));
-        });
-        highlightLayoutText();
-        setHvalue(0);
+        renderLayoutTextWithCurrentOptions();
     }
 
     private Optional<String> getBaseURL() {
@@ -264,14 +279,28 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
 
+        UiTaskExecutor.runInJavaFXThread(() -> previewView.setHtml(getHighlightedLayoutText()));
+    }
+
+    private void renderLayoutTextWithCurrentOptions() {
+        String highlightedLayoutText = getHighlightedLayoutText();
+        UiTaskExecutor.runInJavaFXThread(() -> {
+            HtmlRenderOptions options = previewView.getOptions();
+            HtmlRenderOptions optionsWithBaseUri = getBaseURL()
+                    .map(options::withBaseUri)
+                    .orElseGet(options::withoutBaseUri);
+            previewView.setHtml(highlightedLayoutText, optionsWithBaseUri);
+            setHvalue(0);
+        });
+    }
+
+    private String getHighlightedLayoutText() {
         String queryText = searchQueryProperty.get();
         if (StringUtil.isNotBlank(queryText)) {
             SearchQuery searchQuery = new SearchQuery(queryText);
-            String highlighted = Highlighter.highlightHtml(layoutText, searchQuery);
-            UiTaskExecutor.runInJavaFXThread(() -> previewView.setHtml(highlighted));
-        } else {
-            UiTaskExecutor.runInJavaFXThread(() -> previewView.setHtml(layoutText));
+            return Highlighter.highlightHtml(layoutText, searchQuery);
         }
+        return layoutText;
     }
 
     public void print() {
@@ -358,13 +387,36 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         setVbarPolicy(ScrollBarPolicy.NEVER);
         setHbarPolicy(ScrollBarPolicy.NEVER);
 
+        // Disable fitToHeight to prevent the ScrollPane from forcing
+        // the content to 0px height during initial layout calculation
+        setFitToHeight(false);
+
         // Tooltips size to the rendered content: fixed width, natural height. Only write the
         // viewport height when it actually changed, so rendering does not queue redundant relayouts.
         setPrefSize(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE);
         setPrefViewportWidth(750);
         previewView.layoutBoundsProperty().addListener((_, _, bounds) -> {
-            if (Math.abs(getPrefViewportHeight() - bounds.getHeight()) >= 1) {
-                setPrefViewportHeight(bounds.getHeight());
+            double contentHeight = bounds.getHeight();
+            if (contentHeight == 0 && getPrefViewportHeight() == USE_COMPUTED_SIZE) {
+                return;
+            }
+
+            if (Math.abs(getPrefViewportHeight() - contentHeight) >= 1) {
+                setPrefViewportHeight(contentHeight);
+
+                this.latestContentHeight = contentHeight;
+
+                // Asynchronously reset to USE_COMPUTED_SIZE on the next JavaFX layout pulse
+                // updating the viewport height.
+                if (!viewportResetScheduled) {
+                    viewportResetScheduled = true;
+                    Platform.runLater(() -> {
+                        viewportResetScheduled = false;
+                        if (Math.abs(getPrefViewportHeight() - latestContentHeight) < 1 && getPrefViewportHeight() != USE_COMPUTED_SIZE) {
+                            setPrefViewportHeight(USE_COMPUTED_SIZE);
+                        }
+                    });
+                }
             }
         });
     }

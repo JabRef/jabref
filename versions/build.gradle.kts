@@ -18,16 +18,16 @@ val javafx = providers.gradleProperty("javafxVersion").getOrElse(javafxDefault)
 
 val lucene = "10.5.0"
 
-val pdfbox = "3.0.7"
+val pdfbox = "3.0.8"
 
 dependencies {
     api(platform("ai.djl:bom:0.36.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.17.2"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.18.0"))
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.4.0"))
-    api(platform("org.junit:junit-bom:6.1.1"))
+    api(platform("org.junit:junit-bom:6.1.2"))
     api(platform("org.glassfish.grizzly:grizzly-bom:5.0.2"))
     api(platform("org.glassfish.jersey:jersey-bom:4.0.2"))
-    api(platform("tools.jackson:jackson-bom:3.2.0"))
+    api(platform("tools.jackson:jackson-bom:3.2.1"))
 }
 
 dependencies.constraints {
@@ -43,7 +43,7 @@ dependencies.constraints {
 
     api("cc.jilt:jilt:1.9.1")
 
-    api("com.dlsc.gemsfx:gemsfx:4.2.0")
+    api("com.dlsc.gemsfx:gemsfx:4.3.0")
     api("com.dlsc.unitfx:unitfx:1.0.10")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.4.2")
     api("com.ibm.icu:icu4j:72.0.1!!")
@@ -55,7 +55,6 @@ dependencies.constraints {
     api("com.github.javaparser:javaparser-core:3.28.2")
     api("com.github.javaparser:javaparser-symbol-solver-core:3.28.2")
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
-    api("com.github.tomtung:latex2unicode_2.13:0.3.2")
     api("com.google.errorprone:error_prone_core:2.50.0")
     api("com.google.guava:guava:33.6.0-jre")
     api("com.googlecode.plist:dd-plist:1.29")
@@ -70,7 +69,7 @@ dependencies.constraints {
     api("com.tngtech.archunit:archunit:1.4.2")
     api("com.tngtech.archunit:archunit-junit5-api:1.4.2")
     api("com.tngtech.archunit:archunit-junit5-engine:1.4.2")
-    api("com.uber.nullaway:nullaway:0.13.7")
+    api("com.uber.nullaway:nullaway:0.13.8")
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
     api("com.vladsch.flexmark:flexmark:0.64.8")
     api("commons-io:commons-io:2.22.0")
@@ -118,7 +117,7 @@ dependencies.constraints {
     api("org.apache.pdfbox:pdfbox:$pdfbox")
     api("org.apache.pdfbox:xmpbox:$pdfbox")
     api("org.apache.velocity:velocity-engine-core:2.4.1")
-    api("org.bouncycastle:bcprov-jdk18on:1.84")
+    api("org.bouncycastle:bcprov-jdk18on:1.85")
     api("org.controlsfx:controlsfx:11.2.3")
     api("org.eclipse.jgit:org.eclipse.jgit:7.7.0.202606012155-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
@@ -132,10 +131,11 @@ dependencies.constraints {
     api("org.hisp.dhis:json-tree:1.9.4")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
-    api("org.jabref:html-to-node:0.1.0-SNAPSHOT")
+    api("org.jabref:html-to-node:0.2.0")
+    api("org.jabref:latex-conv:0.1.0")
     api("org.jabref:mslinks:1.2")
     api("org.jetbrains:annotations:26.1.0")
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.0")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.4.10")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.22.2")
     api("org.jspecify:jspecify:1.0.0")

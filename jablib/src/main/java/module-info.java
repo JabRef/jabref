@@ -218,9 +218,6 @@ open module org.jabref.jablib {
 
     // region: SQL databases
     requires embedded.postgres;
-    // For arm, we explicitly need to add these as well
-    requires /*runtime*/ embedded.postgres.binaries.darwin.arm64v8;
-    requires /*runtime*/ embedded.postgres.binaries.linux.arm64v8;
 
     requires /*runtime*/ org.tukaani.xz;
     requires org.postgresql.jdbc;
@@ -239,10 +236,7 @@ open module org.jabref.jablib {
     requires com.github.benmanes.caffeine;
     // endregion
 
-    // region: latex2unicode
-    requires com.github.tomtung.latex2unicode;
-    requires fastparse;
-    // endregion
+    requires org.jabref.latexconv;
 
     requires jbibtex;
     requires transitive citeproc.java;

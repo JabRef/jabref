@@ -18,6 +18,9 @@ class CitationEntryTypeMetadata {
     static class CitationEntryType {
         @Nullable String jabrefEntryType;
 
+        CitationEntryType() {
+        }
+
         CitationEntryType(String jabrefEntryType) {
             this.jabrefEntryType = jabrefEntryType;
         }
