@@ -1,6 +1,5 @@
 package org.jabref.logic.openoffice;
 
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,8 +38,6 @@ public record ZoteroReferenceMark(
     private static final Gson GSON = new Gson();
     private static final String JABREF_URI_PREFIX = "http://www.jabref.org/";
     private static final String ZOTERO_URI_PREFIX = "http://zotero.org/";
-    private static final SecureRandom RANDOM = new SecureRandom();
-    private static final String RANDOM_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private static final String RANDOM_PREFIX = " RND";
     private static final int CITATION_ID_LENGTH = 8;
     private static final int RANDOM_LENGTH = 10;
