@@ -85,6 +85,9 @@ tasks.register<JavaExec>("runJabKitPortableSmokeTest") {
 graalvmNative {
     binaries {
         named("main") {
+            resources {
+                includedPatterns.add("build\\.properties")
+            }
             imageName.set("jabkit")
             mainClass.set("org.jabref.toolkit.JabKitLauncher")
         }
