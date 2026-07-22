@@ -32,14 +32,14 @@ public class BstStyle implements OOStyle {
         this.internal = false;
         this.filePath = path;
         this.resourcePath = null;
-        this.name = path.getFileName().toString();
+        this.name = stripBstExtension(path.getFileName().toString());
     }
 
     private BstStyle(String resourcePath) {
         this.internal = true;
         this.resourcePath = resourcePath;
         this.filePath = null;
-        this.name = Path.of(resourcePath).getFileName().toString();
+        this.name = stripBstExtension(Path.of(resourcePath).getFileName().toString());
     }
 
     /// Creates an internal style loaded from a classpath resource (e.g. `/resource/openoffice/IEEEtran.bst`).
@@ -102,5 +102,13 @@ public class BstStyle implements OOStyle {
     @Override
     public String toString() {
         return "BstStyle{path=" + getPath() + ", internal=" + internal + "}";
+    }
+
+    private static String stripBstExtension(String filename) {
+        String lower = filename.toLowerCase();
+        if (lower.endsWith(".bst")) {
+            return filename.substring(0, filename.length() - 4);
+        }
+        return filename;
     }
 }
