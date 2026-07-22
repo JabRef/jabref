@@ -42,9 +42,9 @@ public class CSLUpdateBibliography {
 
         switch (openOfficePreferences.getReferenceMarkFormat()) {
             case JABREF_ONLY ->
-                    new JabRefBibliographyMark().rebuildCSLBibliography(doc, cslCitationOOAdapter, entries, citationStyle, bibDatabaseContext, bibEntryTypesManager);
+                    JabRefBibliographyMark.rebuildCSLBibliography(doc, cslCitationOOAdapter, entries, citationStyle, bibDatabaseContext, bibEntryTypesManager);
             case ZOTERO_COMPATIBLE ->
-                    new ZoteroBibliographyMark().rebuildCSLBibliography(doc, cslCitationOOAdapter, entries, citationStyle, bibDatabaseContext, bibEntryTypesManager);
+                    ZoteroBibliographyMark.rebuildCSLBibliography(doc, cslCitationOOAdapter, entries, citationStyle, bibDatabaseContext, bibEntryTypesManager);
         }
 
         LOGGER.debug("Finished rebuilding CSL bibliography");

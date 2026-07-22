@@ -26,7 +26,10 @@ public final class JabRefBibliographyMark {
     private static final String JABREF_BIBLIOGRAPHY_SECTION_NAME = "JR_bib";
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefBibliographyMark.class);
 
-    private Optional<XTextRange> getBibliographyRange(XTextDocument doc)
+    private JabRefBibliographyMark() {
+    }
+
+    private static Optional<XTextRange> getBibliographyRange(XTextDocument doc)
             throws NoDocumentException, WrappedTargetException {
         LOGGER.debug("Attempting to get bibliography range");
         Optional<XTextRange> range = UnoTextSection.getAnchor(doc, JABREF_BIBLIOGRAPHY_SECTION_NAME);
@@ -34,12 +37,12 @@ public final class JabRefBibliographyMark {
         return range;
     }
 
-    public void rebuildCSLBibliography(XTextDocument doc,
-                                       CSLCitationOOAdapter cslCitationOOAdapter,
-                                       List<BibEntry> entries,
-                                       CitationStyle citationStyle,
-                                       BibDatabaseContext bibDatabaseContext,
-                                       BibEntryTypesManager bibEntryTypesManager)
+    public static void rebuildCSLBibliography(XTextDocument doc,
+                                              CSLCitationOOAdapter cslCitationOOAdapter,
+                                              List<BibEntry> entries,
+                                              CitationStyle citationStyle,
+                                              BibDatabaseContext bibDatabaseContext,
+                                              BibEntryTypesManager bibEntryTypesManager)
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException {
         LOGGER.debug("Starting to rebuild CSL bibliography");
 
@@ -57,7 +60,7 @@ public final class JabRefBibliographyMark {
         LOGGER.debug("Finished rebuilding CSL bibliography");
     }
 
-    private void createCSLBibTextSection(XTextDocument doc)
+    private static void createCSLBibTextSection(XTextDocument doc)
             throws CreationException {
         LOGGER.debug("Creating new CSL bibliography section");
         XTextCursor textCursor = doc.getText().createTextCursor();
@@ -67,7 +70,7 @@ public final class JabRefBibliographyMark {
         LOGGER.debug("CSL bibliography section created");
     }
 
-    private void clearCSLBibTextSectionContent(XTextDocument doc)
+    private static void clearCSLBibTextSectionContent(XTextDocument doc)
             throws NoDocumentException, WrappedTargetException {
         LOGGER.debug("Clearing CSL bibliography section content");
         Optional<XTextRange> sectionRange = getBibliographyRange(doc);
@@ -80,12 +83,12 @@ public final class JabRefBibliographyMark {
                 () -> LOGGER.warn("Failed to clear CSL bibliography section: section not found"));
     }
 
-    private void populateCSLBibTextSection(XTextDocument doc,
-                                           CSLCitationOOAdapter cslCitationOOAdapter,
-                                           List<BibEntry> entries,
-                                           CitationStyle citationStyle,
-                                           BibDatabaseContext bibDatabaseContext,
-                                           BibEntryTypesManager bibEntryTypesManager)
+    private static void populateCSLBibTextSection(XTextDocument doc,
+                                                  CSLCitationOOAdapter cslCitationOOAdapter,
+                                                  List<BibEntry> entries,
+                                                  CitationStyle citationStyle,
+                                                  BibDatabaseContext bibDatabaseContext,
+                                                  BibEntryTypesManager bibEntryTypesManager)
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException {
         LOGGER.debug("Populating CSL bibliography section");
 

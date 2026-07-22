@@ -31,7 +31,10 @@ public final class ZoteroBibliographyMark {
     private static final String CODE = "{\"uncited\":[],\"omitted\":[],\"custom\":[]}";
     private static final String BIBLIOGRAPHY_SUFFIX = " CSL_BIBLIOGRAPHY";
 
-    private Optional<XTextRange> getBibliographyRange(XTextDocument doc)
+    private ZoteroBibliographyMark() {
+    }
+
+    private static Optional<XTextRange> getBibliographyRange(XTextDocument doc)
             throws NoDocumentException, WrappedTargetException {
         LOGGER.debug("Attempting to get bibliography range");
         Optional<XTextRange> range = getBibliographyTextSection(doc).map(XTextContent::getAnchor);
@@ -39,12 +42,12 @@ public final class ZoteroBibliographyMark {
         return range;
     }
 
-    public void rebuildCSLBibliography(XTextDocument doc,
-                                       CSLCitationOOAdapter cslCitationOOAdapter,
-                                       List<BibEntry> entries,
-                                       CitationStyle citationStyle,
-                                       BibDatabaseContext bibDatabaseContext,
-                                       BibEntryTypesManager bibEntryTypesManager)
+    public static void rebuildCSLBibliography(XTextDocument doc,
+                                              CSLCitationOOAdapter cslCitationOOAdapter,
+                                              List<BibEntry> entries,
+                                              CitationStyle citationStyle,
+                                              BibDatabaseContext bibDatabaseContext,
+                                              BibEntryTypesManager bibEntryTypesManager)
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException {
         LOGGER.debug("Starting to rebuild CSL bibliography");
 
@@ -61,7 +64,7 @@ public final class ZoteroBibliographyMark {
         LOGGER.debug("Finished rebuilding CSL bibliography");
     }
 
-    private void createCSLBibTextSection(XTextDocument doc)
+    private static void createCSLBibTextSection(XTextDocument doc)
             throws CreationException {
         LOGGER.debug("Creating new CSL bibliography section");
         XTextCursor textCursor = doc.getText().createTextCursor();
@@ -72,7 +75,7 @@ public final class ZoteroBibliographyMark {
         LOGGER.debug("CSL bibliography section created");
     }
 
-    private void clearCSLBibTextSectionContent(XTextDocument doc)
+    private static void clearCSLBibTextSectionContent(XTextDocument doc)
             throws NoDocumentException, WrappedTargetException {
         LOGGER.debug("Clearing CSL bibliography section content");
         Optional<XTextRange> sectionRange = getBibliographyRange(doc);
@@ -85,12 +88,12 @@ public final class ZoteroBibliographyMark {
                 () -> LOGGER.warn("Failed to clear CSL bibliography section: section not found"));
     }
 
-    private void populateCSLBibTextSection(XTextDocument doc,
-                                           CSLCitationOOAdapter cslCitationOOAdapter,
-                                           List<BibEntry> entries,
-                                           CitationStyle citationStyle,
-                                           BibDatabaseContext bibDatabaseContext,
-                                           BibEntryTypesManager bibEntryTypesManager)
+    private static void populateCSLBibTextSection(XTextDocument doc,
+                                                  CSLCitationOOAdapter cslCitationOOAdapter,
+                                                  List<BibEntry> entries,
+                                                  CitationStyle citationStyle,
+                                                  BibDatabaseContext bibDatabaseContext,
+                                                  BibEntryTypesManager bibEntryTypesManager)
             throws com.sun.star.uno.Exception, NoDocumentException, CreationException {
         LOGGER.debug("Populating CSL bibliography section");
 
@@ -105,7 +108,7 @@ public final class ZoteroBibliographyMark {
         LOGGER.debug("CSL bibliography section population completed");
     }
 
-    private Optional<XTextContent> getBibliographyTextSection(XTextDocument doc)
+    private static Optional<XTextContent> getBibliographyTextSection(XTextDocument doc)
             throws NoDocumentException, WrappedTargetException {
         XNameAccess nameAccess = UnoTextSection.getNameAccess(doc);
         for (String name : nameAccess.getElementNames()) {
