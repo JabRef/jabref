@@ -35,6 +35,16 @@ public final class BstPreviewLayout implements PreviewLayout {
     private static final Pattern LATEX_COMMAND_PATTERN = Pattern.compile("(?m)^\\\\.*$");
     private static final Pattern MULTIPLE_SPACES_PATTERN = Pattern.compile("  +");
 
+    // LaTeX inline formatting → HTML, resolved before RemoveLatexCommandsFormatter strips them.
+    // Both the \cmd{text} form (used by IEEEtran: \emph{Journal}) and the {\cmd text} group
+    // form (used by abbrv.bst: {\em Booktitle}) are handled.
+    private static final Pattern EMPH_PATTERN    = Pattern.compile("\\\\emph\\{([^}]*?)}");
+    private static final Pattern TEXTIT_PATTERN  = Pattern.compile("\\\\textit\\{([^}]*?)}");
+    private static final Pattern TEXTBF_PATTERN  = Pattern.compile("\\\\textbf\\{([^}]*?)}");
+    private static final Pattern GROUP_EM_PATTERN = Pattern.compile("\\{\\\\em\\s+([^}]*?)}");
+    private static final Pattern GROUP_IT_PATTERN = Pattern.compile("\\{\\\\it\\s+([^}]*?)}");
+    private static final Pattern GROUP_BF_PATTERN = Pattern.compile("\\{\\\\bf\\s+([^}]*?)}");
+
     private final Path path;
     private String source;
     private final String name;
@@ -129,6 +139,14 @@ public final class BstPreviewLayout implements PreviewLayout {
         result = new LatexToUnicodeFormatter().format(result);
         result = result.replace("``", "\"");
         result = result.replace("''", "\"");
+        // Convert LaTeX inline formatting to HTML before RemoveLatexCommandsFormatter strips them.
+        // \emph{X} and {\em X} forms (IEEEtran uses \emph, abbrv uses {\em})
+        result = EMPH_PATTERN.matcher(result).replaceAll("<i>$1</i>");
+        result = TEXTIT_PATTERN.matcher(result).replaceAll("<i>$1</i>");
+        result = GROUP_EM_PATTERN.matcher(result).replaceAll("<i>$1</i>");
+        result = GROUP_IT_PATTERN.matcher(result).replaceAll("<i>$1</i>");
+        result = TEXTBF_PATTERN.matcher(result).replaceAll("<b>$1</b>");
+        result = GROUP_BF_PATTERN.matcher(result).replaceAll("<b>$1</b>");
         // Final cleanup
         result = new RemoveNewlinesFormatter().format(result);
         result = new RemoveLatexCommandsFormatter().format(result);
