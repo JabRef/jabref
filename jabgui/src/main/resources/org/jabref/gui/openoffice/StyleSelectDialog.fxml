@@ -5,10 +5,12 @@
 <?import javafx.scene.control.ButtonType?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
@@ -83,7 +85,7 @@
                             <HBox HBox.hgrow="ALWAYS" />
                             <Button fx:id="addBstStyleButton" text="%Add .bst file" onAction="#addBstStyleFile"/>
                         </HBox>
-                        <TableView fx:id="bstStylesTable" VBox.vgrow="ALWAYS" prefHeight="350.0">
+                        <TableView fx:id="bstStylesTable" VBox.vgrow="ALWAYS" prefHeight="300.0">
                             <columns>
                                 <TableColumn fx:id="bstNameColumn" text="%Name" minWidth="200.0" prefWidth="-1.0"/>
                                 <TableColumn fx:id="bstFileColumn" text="%File" minWidth="100.0" prefWidth="-1.0"/>
@@ -93,6 +95,11 @@
                                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                             </columnResizePolicy>
                         </TableView>
+                        <HBox alignment="CENTER_LEFT" spacing="16.0">
+                            <Label text="%Citation format"/>
+                            <RadioButton fx:id="numericFormatButton" text="%Numeric [1]"/>
+                            <RadioButton fx:id="authorYearFormatButton" text="%Author-year"/>
+                        </HBox>
                     </VBox>
                 </Tab>
             </TabPane>

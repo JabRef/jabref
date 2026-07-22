@@ -26,7 +26,7 @@ class BstPipelineTest {
 
     @BeforeEach
     void setUp() {
-        pandoc = new PandocLatexConverter();
+        pandoc = new PandocLatexConverter("pandoc");
         articleEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Cooper2007")
                 .withField(StandardField.AUTHOR, "Cooper, Karen A. and Donovan, Jennifer L. and Waterhouse, Andrew L.")

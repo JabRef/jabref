@@ -40,6 +40,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -52,6 +53,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
+import org.jabref.logic.openoffice.bst.PandocLatexConverter;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
 import org.jabref.logic.openoffice.style.JStyle;
@@ -694,12 +696,21 @@ public class OpenOfficePanel {
             dialogService.notify(Localization.lang("Cleared connection settings"));
         });
 
+        MenuItem setPandocPath = new MenuItem(Localization.lang("Set pandoc path"));
+        setPandocPath.setOnAction(_ -> browsePandocPath());
+
+        MenuItem autoDetectPandoc = new MenuItem(Localization.lang("Auto-detect pandoc path"));
+        autoDetectPandoc.setOnAction(_ -> autoDetectPandocPath());
+
         contextMenu.getItems().addAll(
                 autoSync,
                 addSpaceAfter,
                 new SeparatorMenuItem(),
                 useActiveBase,
                 useAllBases,
+                new SeparatorMenuItem(),
+                setPandocPath,
+                autoDetectPandoc,
                 new SeparatorMenuItem(),
                 clearConnectionSettings);
 
@@ -708,5 +719,31 @@ public class OpenOfficePanel {
         }
 
         return contextMenu;
+    }
+
+    private void browsePandocPath() {
+        FileDialogConfiguration config = new FileDialogConfiguration.Builder()
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
+                .build();
+        dialogService.showFileOpenDialog(config).ifPresent(path -> {
+            openOfficePreferences.setPandocPath(path.toString());
+            dialogService.notify(Localization.lang("Pandoc path set to: %0", path.toString()));
+        });
+    }
+
+    private void autoDetectPandocPath() {
+        BackgroundTask<java.util.Optional<String>> task = BackgroundTask.wrap(PandocLatexConverter::autoDetect);
+        task.titleProperty().set(Localization.lang("Auto-detecting pandoc"));
+        task.showToUser(true);
+        task.onSuccess(result -> {
+            if (result.isPresent()) {
+                openOfficePreferences.setPandocPath(result.get());
+                dialogService.notify(Localization.lang("Pandoc detected at: %0", result.get()));
+            } else {
+                dialogService.notify(Localization.lang("Pandoc could not be detected automatically"));
+            }
+        });
+        task.onFailure(_ -> dialogService.notify(Localization.lang("Auto-detection of pandoc path failed")));
+        taskExecutor.execute(task);
     }
 }

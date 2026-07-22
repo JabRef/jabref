@@ -28,6 +28,7 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.style.BstCitationFormat;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
 import org.jabref.logic.openoffice.style.JStyle;
@@ -61,6 +62,7 @@ public class StyleSelectDialogViewModel {
 
     private final ListProperty<BstStyleSelectViewModel> bstStyles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<BstStyleSelectViewModel> selectedBstStyle = new SimpleObjectProperty<>();
+    private final ObjectProperty<BstCitationFormat> bstCitationFormat = new SimpleObjectProperty<>(BstCitationFormat.NUMERIC);
 
     private final ObservableList<CitationStylePreviewLayout> availableCslLayouts = FXCollections.observableArrayList();
     private final ObjectProperty<CitationStylePreviewLayout> selectedCslLayoutProperty = new SimpleObjectProperty<>();
@@ -88,6 +90,8 @@ public class StyleSelectDialogViewModel {
 
         jStyles.addAll(loadJStyles());
         bstStyles.addAll(loadBstStyles());
+
+        bstCitationFormat.set(openOfficePreferences.getBstCitationFormat());
 
         OOStyle currentStyle = openOfficePreferences.getCurrentStyle();
 
@@ -176,9 +180,14 @@ public class StyleSelectDialogViewModel {
 
         // save external bst styles
         List<String> externalBstStyles = bstStyles.stream()
-                                                  .map(vm -> vm.getBstStyle().getPath())
+                                                  .map(vm -> vm.getBstStyle())
+                                                  .filter(style -> !style.isInternalStyle())
+                                                  .map(BstStyle::getPath)
                                                   .toList();
         openOfficePreferences.setExternalBstStyles(externalBstStyles);
+
+        // save bst citation format
+        openOfficePreferences.setBstCitationFormat(bstCitationFormat.get());
 
         // save the current style selection
         OOStyle selectedStyle = getSelectedStyle();
@@ -330,6 +339,10 @@ public class StyleSelectDialogViewModel {
 
     public ObjectProperty<BstStyleSelectViewModel> selectedBstStyleProperty() {
         return selectedBstStyle;
+    }
+
+    public ObjectProperty<BstCitationFormat> bstCitationFormatProperty() {
+        return bstCitationFormat;
     }
 
     public List<BstStyleSelectViewModel> loadBstStyles() {

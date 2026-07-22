@@ -25,6 +25,7 @@ public class BstStyleSelectViewModel {
         this.name.setValue(name);
         this.file.setValue(file);
         this.bstStyle = bstStyle;
+        this.internalStyle.set(bstStyle.isInternalStyle());
     }
 
     public StringProperty nameProperty() {
@@ -43,7 +44,7 @@ public class BstStyleSelectViewModel {
         return bstStyle;
     }
 
-    /// BST styles are always external — the delete icon is always shown.
+    /// `true` for bundled internal styles (not deletable); `false` for user-added external styles.
     public BooleanProperty internalStyleProperty() {
         return internalStyle;
     }

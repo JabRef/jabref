@@ -1,51 +1,106 @@
 package org.jabref.logic.openoffice.style;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
-import org.jspecify.annotations.NullMarked;
+import org.jabref.logic.bst.BstVM;
 
-/// An [OOStyle] backed by an external `.bst` file.
-/// BST styles are always external (user-supplied); there are no internal BST styles.
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+/// An [OOStyle] backed by a `.bst` file — either an internal (classpath) style bundled with
+/// JabRef or an external (filesystem) style supplied by the user.
 @NullMarked
 public class BstStyle implements OOStyle {
 
-    private final Path path;
+    /// Classpath resource paths for the built-in BST styles.
+    public static final String INTERNAL_IEEETRAN_PATH = "/resource/openoffice/IEEEtran.bst";
+    public static final String INTERNAL_ABBRV_PATH    = "/resource/openoffice/abbrv.bst";
+    public static final String INTERNAL_APA_PATH      = "/resource/openoffice/apa.bst";
 
+    private final boolean internal;
+    /// Classpath resource path for internal styles; `null` for external styles.
+    private final @Nullable String resourcePath;
+    /// Filesystem path for external styles; `null` for internal styles.
+    private final @Nullable Path filePath;
+    private final String name;
+
+    /// Creates an external (user-supplied) style backed by a filesystem path.
     public BstStyle(Path path) {
-        this.path = path;
+        this.internal = false;
+        this.filePath = path;
+        this.resourcePath = null;
+        this.name = path.getFileName().toString();
+    }
+
+    private BstStyle(String resourcePath) {
+        this.internal = true;
+        this.resourcePath = resourcePath;
+        this.filePath = null;
+        this.name = Path.of(resourcePath).getFileName().toString();
+    }
+
+    /// Creates an internal style loaded from a classpath resource (e.g. `/resource/openoffice/IEEEtran.bst`).
+    public static BstStyle createInternal(String resourcePath) {
+        return new BstStyle(resourcePath);
+    }
+
+    /// Creates a [BstVM] for this style, reading from the filesystem or classpath as appropriate.
+    public BstVM createBstVM() throws IOException {
+        if (filePath != null) {
+            return new BstVM(filePath);
+        }
+        assert resourcePath != null;
+        try (InputStream is = BstStyle.class.getResourceAsStream(resourcePath)) {
+            if (is == null) {
+                throw new IOException("Internal BST resource not found: " + resourcePath);
+            }
+            String content = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            return new BstVM(content);
+        }
     }
 
     @Override
     public String getName() {
-        return path.getFileName().toString();
+        return name;
     }
 
     @Override
     public boolean isInternalStyle() {
-        return false;
+        return internal;
     }
 
+    /// For external styles returns the absolute filesystem path.
+    /// For internal styles returns the classpath resource path (starts with `/resource/openoffice/`).
+    /// This value is persisted by [JabRefCliPreferences] and used to reconstruct the style on startup.
     @Override
     public String getPath() {
-        return path.toString();
+        if (filePath != null) {
+            return filePath.toString();
+        }
+        assert resourcePath != null;
+        return resourcePath;
     }
 
-    public Path getFilePath() {
-        return path;
+    /// Returns the filesystem [Path] for external styles, or `null` for internal styles.
+    public @Nullable Path getFilePath() {
+        return filePath;
     }
 
     @Override
     public boolean equals(Object o) {
-        return (o instanceof BstStyle other) && path.equals(other.path);
+        return (o instanceof BstStyle other) && getPath().equals(other.getPath());
     }
 
     @Override
     public int hashCode() {
-        return path.hashCode();
+        return getPath().hashCode();
     }
 
     @Override
     public String toString() {
-        return "BstStyle{path=" + path + "}";
+        return "BstStyle{path=" + getPath() + ", internal=" + internal + "}";
     }
 }

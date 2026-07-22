@@ -11,10 +11,12 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DialogEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 
@@ -29,6 +31,7 @@ import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.openoffice.style.BstCitationFormat;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.BstStyleLoader;
 import org.jabref.logic.openoffice.style.JStyle;
@@ -84,6 +87,8 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @FXML private Button addCslButton;
     @FXML private Button addJStyleButton;
     @FXML private Button addBstStyleButton;
+    @FXML private RadioButton numericFormatButton;
+    @FXML private RadioButton authorYearFormatButton;
 
     @FXML private VBox cslPreviewBox;
     @FXML private VBox jStylePreviewBox;
@@ -317,8 +322,11 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         bstDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
 
         new ValueTableCellFactory<BstStyleSelectViewModel, Boolean>()
-                .withGraphic((_, _) -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withOnMouseClickedEvent((style, _) -> event -> {
+                .withGraphic((_, internalStyle) -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withOnMouseClickedEvent((style, internalStyle) -> event -> {
+                    if (internalStyle) {
+                        return;
+                    }
                     event.consume();
                     if (event.getButton() != MouseButton.PRIMARY) {
                         return;
@@ -326,7 +334,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                     viewModel.deleteBstStyle(style.getBstStyle());
                     bstStylesTable.getItems().remove(style);
                 })
-                .withTooltip((_, _) -> Localization.lang("Remove style"))
+                .withTooltip((_, internalStyle) -> internalStyle ? null : Localization.lang("Remove style"))
                 .install(bstDeleteColumn);
 
         new ViewModelTableRowFactory<BstStyleSelectViewModel>()
@@ -348,6 +356,26 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         bstStylesTable.setItems(viewModel.bstStylesProperty());
         addBstStyleButton.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
+
+        // Citation format radio buttons
+        ToggleGroup formatGroup = new ToggleGroup();
+        numericFormatButton.setToggleGroup(formatGroup);
+        authorYearFormatButton.setToggleGroup(formatGroup);
+
+        BstCitationFormat currentFormat = viewModel.bstCitationFormatProperty().get();
+        numericFormatButton.setSelected(currentFormat == BstCitationFormat.NUMERIC);
+        authorYearFormatButton.setSelected(currentFormat == BstCitationFormat.AUTHOR_YEAR);
+
+        numericFormatButton.selectedProperty().addListener((_, _, selected) -> {
+            if (selected) {
+                viewModel.bstCitationFormatProperty().set(BstCitationFormat.NUMERIC);
+            }
+        });
+        authorYearFormatButton.selectedProperty().addListener((_, _, selected) -> {
+            if (selected) {
+                viewModel.bstCitationFormatProperty().set(BstCitationFormat.AUTHOR_YEAR);
+            }
+        });
     }
 
     @FXML
@@ -358,14 +386,14 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     /// When Select Style dialog is first opened, there is a slight delay in population of CSL styles table.
     /// This function scrolls to the last selected style, while taking care of the delay.
     private void onDialogShown(DialogEvent event) {
-        if (!cslStylesTable.getItems().isEmpty()) {
+        if (!cslStylesTable.getItems().isEmpty() || !bstStylesTable.getItems().isEmpty()) {
             Platform.runLater(this::scrollToCurrentStyle);
         }
     }
 
     private void scrollToCurrentStyle() {
         if (initialScrollPerformed.getAndSet(true)) {
-            return; // Scroll has already been performed, exit early
+            return;
         }
 
         OOStyle currentStyle = preferences.getOpenOfficePreferences(journalAbbreviationRepository).getCurrentStyle();
@@ -375,6 +403,15 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                 if (item.getLayout().getFilePath().equals(currentCitationStyle.getFilePath())) {
                     cslStylesTable.scrollTo(i);
                     cslStylesTable.getSelectionModel().select(i);
+                    break;
+                }
+            }
+        } else if (currentStyle instanceof BstStyle currentBstStyle) {
+            for (int i = 0; i < bstStylesTable.getItems().size(); i++) {
+                BstStyleSelectViewModel item = bstStylesTable.getItems().get(i);
+                if (item.getStylePath().equals(currentBstStyle.getPath())) {
+                    bstStylesTable.scrollTo(i);
+                    bstStylesTable.getSelectionModel().select(i);
                     break;
                 }
             }
