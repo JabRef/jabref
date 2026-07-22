@@ -43,6 +43,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We improved switching between large libraries so entry previews remain responsive while automatic groups and their counts are refreshed. [#16289](https://github.com/JabRef/jabref/pull/16289)
 - We improved the [MODS](https://www.loc.gov/standards/mods/) importer for mapping entry types. [#16055](https://github.com/JabRef/jabref/issues/16055)
 - AI summaries now render with regular JavaFX components instead of an embedded browser, matching how AI chat messages are rendered. [#16189](https://github.com/JabRef/jabref/pull/16189)
 - We replaced the LaTeX-to-Unicode and Unicode-to-LaTeX conversion engine (the unmaintained Scala latex2unicode library plus hand-maintained maps) with the new SnuggleTeX-based [latex-conv](https://github.com/JabRef/latex-conv) library. Formulas keep their brackets and spacing, `\text{...}` and `\operatorname{...}` render as their content, bases carrying both a sub- and a superscript convert, and `--`/`---` render as typographic dashes. [#6155](https://github.com/JabRef/jabref/pull/6155)
@@ -65,6 +66,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where `jabkit convert` without `--output` printed an internal object reference (e.g. `org.jabref.model.database.BibDatabase@17932d9b`) instead of the converted library. It now writes the library to standard output in the format selected by `--output-format`, with progress messages going to standard error. [#16292](https://github.com/JabRef/jabref/pull/16292)
 - We fixed spurious DOI-mismatch warnings when fetching an entry by DOI. [#16280](https://github.com/JabRef/jabref/pull/16280)
 - We fixed an issue where a critical error occurring during application startup (e.g. while constructing the main window) was only written to the log, leaving the user with no visible feedback and an apparently silent crash. [#14967](https://github.com/JabRef/jabref/issues/14967)
 - We fixed an issue where canceling the duplicate resolution dialog did not stop the background duplicate scan and kept the left entry. [#16234](https://github.com/JabRef/jabref/pull/16234)
@@ -77,6 +79,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We reduced the size of Linux packages by removing embedded Postgres binaries for unused architectures. [#16143](https://github.com/JabRef/jabref/issues/16143)
 - We fixed an issue where searching ISIDORE failed with a security connection error. [#16054](https://github.com/JabRef/jabref/issues/16054)
 - We fixed an issue in the new entry editor's file field editor where files added via the add button did not appear until switching to another entry and back, and cleaned up the layout so the add/fetch-fulltext/download-URL buttons sit to the left of the file list and the list no longer leaves blank space below the last file. [#16172](https://github.com/JabRef/jabref/pull/16172)
+- We fixed an issue where Keywords and Groups field editors were too large. [#12112](https://github.com/JabRef/jabref/issues/12112)
 - We fixed an issue where `jabkit`'s `-p`/`--porcelain` and `-d`/`--debug` flags only took effect when placed at the exact command level where they were parsed, so e.g. `jabkit -p check consistency file.bib` silently ran without porcelain output. [#16164](https://github.com/JabRef/jabref/pull/16164)
 - We fixed an issue where no raw preferences values were visible anymore in the preferences filter. [#16161](https://github.com/JabRef/jabref/pull/16161)
 - We fixed an issue where cleanup did not detect an arXiv entry when its `url` field ended with a fragment anchor (e.g. `https://arxiv.org/html/2510.26275v2#bib`). [#16150](https://github.com/JabRef/jabref/pull/16150)

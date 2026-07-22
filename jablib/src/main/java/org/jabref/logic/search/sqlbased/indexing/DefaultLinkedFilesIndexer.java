@@ -43,6 +43,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.ThreadInterruptedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -298,6 +299,9 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
                 indexWriter.forceMergeDeletes(true);
             } catch (IOException e) {
                 LOGGER.warn("Could not force merge deletes.", e);
+            } catch (ThreadInterruptedException e) {
+                LOGGER.debug("Interrupted optimization of index while forcing merge.");
+                Thread.currentThread().interrupt();
             }
         }
         try {
@@ -305,6 +309,9 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
             indexWriter.forceMerge(1, true);
         } catch (IOException e) {
             LOGGER.warn("Could not force merge segments.", e);
+        } catch (ThreadInterruptedException e) {
+            LOGGER.debug("Interrupted optimization of index.");
+            Thread.currentThread().interrupt();
         }
     }
 
