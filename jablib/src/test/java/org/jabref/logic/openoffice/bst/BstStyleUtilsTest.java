@@ -30,15 +30,16 @@ class BstStyleUtilsTest {
                         "Smith &amp; Jones"
                 ),
 
+                // &#x201C; / &#x201D; decode to Unicode left/right double quotation marks
                 Arguments.of(
-                        "\"quoted\"",
+                        "\u201Cquoted\u201D",
                         "&#x201C;quoted&#x201D;"
                 ),
 
-                // Non-breaking space decoded and retained as a regular space character
+                // &nbsp; decodes to a non-breaking space (U+00A0), which is kept as-is
                 Arguments.of(
-                        "word word",
-                        "word\u00a0word"
+                        "word\u00a0word",
+                        "word&nbsp;word"
                 ),
 
                 // --- <div> stripping ---
@@ -147,15 +148,15 @@ class BstStyleUtilsTest {
 
                 // --- combinations typical of pandoc BST output (after BstHtmlToOOText pre-processing) ---
 
-                // Pre-converted italic + entity + link stripped
+                // &#x2013; (en-dash) is decoded to the Unicode en-dash character U+2013
                 Arguments.of(
-                        "K. A. Cooper et al., <i>British Journal of Nutrition</i>, vol. 99, pp. 1-11, 2007.",
+                        "K. A. Cooper et al., <i>British Journal of Nutrition</i>, vol. 99, pp. 1\u201311, 2007.",
                         "K. A. Cooper et al., <i>British Journal of Nutrition</i>, vol. 99, pp. 1&#x2013;11, 2007."
                 ),
 
-                // Pre-converted bold + trimmed
+                // Pre-converted bold + trimmed; en-dash entity decoded
                 Arguments.of(
-                        "B. Smith, <b>34</b>, 45-67 (2016).",
+                        "B. Smith, <b>34</b>, 45\u201367 (2016).",
                         "  B. Smith, <b>34</b>, 45&#x2013;67 (2016).  "
                 )
         );
