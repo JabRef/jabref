@@ -563,7 +563,7 @@ public class OOBibBase {
             convertReferenceMarks = cslCitationOOAdapter.needsReferenceMarkConversion();
             if (convertReferenceMarks) {
                 dialogService.showWarningDialogAndWait(
-                        Localization.lang("Format"),
+                        Localization.lang("Reference mark format"),
                         Localization.lang("Converting references to selected format"));
             }
         } catch (com.sun.star.uno.Exception e) {
