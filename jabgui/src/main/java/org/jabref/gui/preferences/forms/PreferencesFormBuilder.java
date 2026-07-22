@@ -3,9 +3,7 @@ package org.jabref.gui.preferences.forms;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import javafx.application.Platform;
@@ -105,10 +103,6 @@ public class PreferencesFormBuilder {
     /// Every visible text handed to the builder, paired with the node it captions. The
     /// preferences search matches against these and highlights the node without reflection.
     private final List<SearchableElement> searchableElements = new ArrayList<>();
-
-    /// Disable bindings the builder installed itself (a value field following its checkbox, ...).
-    /// {@link ElementBase#disableWhen} combines with these instead of silently replacing them.
-    private final Map<Node, ObservableValue<? extends Boolean>> ownedDisableBindings = new IdentityHashMap<>();
 
     /// Element grid spanning multiple input elements to ensure correct alignment
     private GridPane currentGrid;
@@ -528,13 +522,6 @@ public class PreferencesFormBuilder {
         };
     }
 
-    /// Records a disable binding the builder owns, so that a later {@link ElementBase#disableWhen}
-    /// extends it rather than replacing it.
-    private void ownDisable(Node node, ObservableValue<? extends Boolean> condition) {
-        node.disableProperty().bind(condition);
-        ownedDisableBindings.put(node, condition);
-    }
-
     private static ObservableValue<Boolean> either(ObservableValue<? extends Boolean> first,
                                                    ObservableValue<? extends Boolean> second) {
         return Bindings.createBooleanBinding(
@@ -731,9 +718,20 @@ public class PreferencesFormBuilder {
         final PreferencesFormBuilder form;
         final N node;
 
+        /// A disable binding the builder installed on this element itself (the value field of an
+        /// {@link InputElement#attachField attachField}, which follows its toggle). {@link #disableWhen}
+        /// combines with it instead of silently replacing it.
+        private ObservableValue<? extends Boolean> ownedDisable;
+
         ElementBase(PreferencesFormBuilder form, N node) {
             this.form = form;
             this.node = node;
+        }
+
+        /// Installs `condition` as the builder's own disable binding; see {@link #ownedDisable}.
+        final void ownDisable(ObservableValue<? extends Boolean> condition) {
+            node.disableProperty().bind(condition);
+            ownedDisable = condition;
         }
 
         /// The single unchecked cast of the handle hierarchy: `S` is always the concrete class of
@@ -757,12 +755,11 @@ public class PreferencesFormBuilder {
         /// of its own — an {@link InputElement#attachField attached field} following its toggle —
         /// the two are combined, so the built-in coupling survives.
         public S disableWhen(ObservableValue<? extends Boolean> condition) {
-            ObservableValue<? extends Boolean> owned = form.ownedDisableBindings.get(node);
-            ObservableValue<? extends Boolean> effective = owned == null ? condition : either(owned, condition);
             node.disableProperty().unbind();
-            node.disableProperty().bind(effective);
-            if (owned != null) {
-                form.ownedDisableBindings.put(node, effective);
+            if (ownedDisable == null) {
+                node.disableProperty().bind(condition);
+            } else {
+                ownDisable(either(ownedDisable, condition));
             }
             return self();
         }
@@ -851,16 +848,17 @@ public class PreferencesFormBuilder {
             field.textProperty().bindBidirectional(value);
             field.setMaxWidth(Double.MAX_VALUE);
             HBox.setHgrow(field, Priority.ALWAYS);
+            InputElement<TextField> element = new InputElement<>(form, field);
             switch (node) {
                 case CheckBox box ->
-                        form.ownDisable(field, box.selectedProperty().not());
+                        element.ownDisable(box.selectedProperty().not());
                 case ToggleButton toggle ->
-                        form.ownDisable(field, toggle.selectedProperty().not());
+                        element.ownDisable(toggle.selectedProperty().not());
                 default ->
                         field.disableProperty().bind(node.disableProperty());
             }
             form.attachTo(node, field);
-            config.accept(new InputElement<>(form, field));
+            config.accept(element);
             return this;
         }
 
