@@ -26,6 +26,7 @@ import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.RangeForOverlapCheck;
 import org.jabref.logic.openoffice.oocsltext.BstCitationOOAdapter;
+import org.jabref.logic.openoffice.oocsltext.BstUpdateBibliography;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.oocsltext.CSLUpdateBibliography;
 import org.jabref.logic.openoffice.style.BstStyle;
@@ -74,6 +75,7 @@ public class OOBibBase {
     private CSLCitationOOAdapter cslCitationOOAdapter;
     private CSLUpdateBibliography cslUpdateBibliography;
     private BstCitationOOAdapter bstCitationOOAdapter;
+    private BstUpdateBibliography bstUpdateBibliography;
 
     public OOBibBase(Path loPath, DialogService dialogService, OpenOfficePreferences openOfficePreferences)
             throws
@@ -94,6 +96,7 @@ public class OOBibBase {
         }
         if (bstCitationOOAdapter == null) {
             bstCitationOOAdapter = new BstCitationOOAdapter(doc, openOfficePreferences);
+            bstUpdateBibliography = new BstUpdateBibliography();
         }
     }
 
@@ -924,7 +927,8 @@ public class OOBibBase {
         return OOVoidResult.ok();
     }
 
-    /// Helper method for guiActionUpdateDocument — inserts/refreshes a BST bibliography.
+    /// Helper method for guiActionUpdateDocument — creates or refreshes the BST bibliography
+    /// section in-place, so repeated syncs never duplicate the References section.
     private OOVoidResult<OOError> updateBstBibliography(List<BibDatabase> databases, BstStyle bstStyle,
                                                         XTextDocument doc,
                                                         OOResult<FunctionalTextViewCursor, OOError> fcursor,
@@ -949,12 +953,17 @@ public class OOBibBase {
 
             doc.lockControllers();
             try {
-                XTextCursor cursor = doc.getText().createTextCursor();
-                cursor.gotoEnd(false);
-                bstCitationOOAdapter.insertBibliography(cursor, bstStyle, citedEntries, bibDatabaseContext);
+                bstUpdateBibliography.rebuildBstBibliography(
+                        doc, bstCitationOOAdapter, bstStyle, citedEntries, bibDatabaseContext);
             } catch (java.io.IOException | InterruptedException e) {
                 LOGGER.error("Could not update BST bibliography", e);
                 return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));
+            } catch (com.sun.star.lang.WrappedTargetException e) {
+                LOGGER.error("Could not update BST bibliography", e);
+                return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));
+            } catch (NoDocumentException e) {
+                LOGGER.error("Could not update BST bibliography", e);
+                return OOVoidResult.error(OOError.from(e).setTitle(errorTitle));
             } catch (com.sun.star.uno.Exception | CreationException e) {
                 LOGGER.error("Could not update BST bibliography", e);
                 return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));

@@ -87,11 +87,15 @@ public class BstCitationOOAdapter {
                     + "Please ensure pandoc is installed and on the PATH.");
         }
 
-        // Write bibliography title
+        // Write bibliography title followed by a paragraph break — mirrors CSLCitationOOAdapter
         OOText title = OOFormat.paragraph(
                 OOText.fromString(openOfficePreferences.getCslBibliographyTitle()),
                 openOfficePreferences.getCslBibliographyHeaderFormat());
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
+        OOText titleBreak = OOFormat.paragraph(
+                OOText.fromString(""),
+                openOfficePreferences.getCslBibliographyBodyFormat());
+        OOTextIntoOO.write(document, cursor, titleBreak);
 
         org.jabref.logic.bst.BstVM vm;
         try {
