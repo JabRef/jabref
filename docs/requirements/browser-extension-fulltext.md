@@ -1,7 +1,6 @@
 ---
 parent: Requirements
 ---
-<!-- markdownlint-disable-file MD022 -->
 # Browser-Extension Fulltext Provider Protocol
 
 A loopback HTTP protocol by which JabRef requests fulltext PDFs from a locally-running browser-extension companion. The companion uses the user's already-authenticated browser session to obtain a PDF that JabRef cannot reach directly (paywall, anti-bot, 418, institutional SSO).
@@ -16,6 +15,7 @@ This file is the **canonical copy**. Verbatim copies live alongside provider imp
 
 The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **MAY**, and **OPTIONAL** in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174): they carry normative force only when written in all capitals. The same words in lower case are used in their ordinary English sense and impose no requirement.
 
+<!-- markdownlint-disable-next-line MD022 -->
 ## Message format
 `req~bxf.message-format~1`
 
@@ -78,6 +78,7 @@ Notes:
 - Adapter selection (publisher-specific vs generic fallback) and the per-publisher concurrency cap both live on the provider side; JabRef does not know which publisher adapters a provider supports.
 - The provider returns a local file path; JabRef wraps it as a `file://` URL so its existing attach pipeline copies the PDF into the library's file directory and renames it per the configured pattern.
 
+<!-- markdownlint-disable-next-line MD022 -->
 ## Discovery directory
 `req~bxf.discovery-dir~1`
 
@@ -91,6 +92,7 @@ JabRef enumerates provider discovery files from a well-known directory at fetche
 
 Each provider drops exactly one JSON file at install time. The filename is provider-chosen (for example `<provider-name>.json`) and MUST be unique across providers. Files with parse errors are skipped and logged at warn level; they do not abort the enumeration.
 
+<!-- markdownlint-disable-next-line MD022 -->
 ## Discovery file schema
 `req~bxf.discovery-schema~1`
 
@@ -116,11 +118,13 @@ Each discovery file contains a single JSON object with these fields:
 
 The discovery file is provider-managed. The provider rewrites it whenever the port changes and removes it on uninstall. JabRef treats the values as authoritative; it does not cache them across sessions.
 
+<!-- markdownlint-disable-next-line MD022 -->
 ## Loopback binding
 `req~bxf.loopback-bind~1`
 
 Every endpoint binds `127.0.0.1` only. Providers MUST NOT expose the HTTP server on a routable interface. The protocol assumes single-machine deployment; cross-host scenarios (for example a Linux JabRef talking to a provider in a Windows VM) are explicitly out of scope for version 1.
 
+<!-- markdownlint-disable-next-line MD022 -->
 ## Authentication: bearer token
 `req~bxf.auth-bearer~1`
 
@@ -128,16 +132,19 @@ Every request carries an `Authorization: Bearer <token>` header. The token value
 
 Providers MUST reject requests with a missing or wrong token with HTTP `401`. The token file MUST be created with user-only filesystem permissions (`0600` on POSIX; current-user-only ACL on Windows).
 
+<!-- markdownlint-disable-next-line MD022 -->
 ## Origin check
 `req~bxf.origin-check~1`
 
 Providers MUST reject any request whose `Origin` header is set to anything other than absent or the literal string `null` with HTTP `403`. Loopback callers (JabRef, `curl`) do not set `Origin`; a set origin implies a browser is calling, which is not the intended client. This is the primary defense against malicious web pages reaching the provider via the user's browser.
 
+<!-- markdownlint-disable-next-line MD022 -->
 ## Versioning
 `req~bxf.versioning~1`
 
 All endpoints are prefixed `/v1`. Breaking changes go to `/v2`; providers MAY serve both during a transition. Backwards-compatible additions (new optional fields, new error codes) ship within `/v1`. Clients MUST ignore unknown fields. The `GET /v1/health` response includes a `protocolVersion` integer (currently `1`) so clients can detect a provider that only serves a future version.
 
+<!-- markdownlint-disable-next-line MD022 -->
 ## Endpoint: GET /v1/health
 `req~bxf.health~1`
 
@@ -149,6 +156,7 @@ All endpoints are prefixed `/v1`. Breaking changes go to `/v2`; providers MAY se
 
 JabRef calls this once per session per provider before sending the first fetch and on a configurable interval to update the "provider reachable" indicator in the UI.
 
+<!-- markdownlint-disable-next-line MD022 -->
 ## Endpoint: POST /v1/fulltext
 `req~bxf.fetch~1`
 
@@ -183,6 +191,7 @@ Success response (HTTP `200`):
 
 The file at `path` MUST be a readable PDF (not an HTML error page) when the response is sent. JabRef copies or moves it into the library's file directory via its existing attach pipeline.
 
+<!-- markdownlint-disable-next-line MD022 -->
 ## Endpoint: error responses
 `req~bxf.fetch-errors~1`
 
@@ -207,6 +216,7 @@ Defined short codes:
 
 The HTTP status is advisory. Because JabRef treats every non-`200` response as a soft miss, the machine-readable `error` code — not the status line — is the authoritative failure discriminator; the status codes above are chosen for correct HTTP semantics rather than to drive client control flow. JabRef logs the `error` and `message` and proceeds to the next fetcher in `FulltextFetchers`. Specifically, JabRef does **not** retry `503 busy` (see [`req~bxf.sync-hold~1`](#sync-hold-no-retry)).
 
+<!-- markdownlint-disable-next-line MD022 -->
 ## Endpoint: DELETE /v1/fulltext/{id} (optional cleanup)
 `req~bxf.cleanup~1`
 
@@ -216,6 +226,7 @@ Response: HTTP `204 No Content`. The endpoint is idempotent — a second DELETE 
 
 JabRef MAY omit the DELETE call; providers MUST NOT rely on it.
 
+<!-- markdownlint-disable-next-line MD022 -->
 ## Concurrency caps in the provider
 `req~bxf.concurrency-cap~1`
 
@@ -223,6 +234,7 @@ The provider holds the HTTP connection open for the full duration of the fetch. 
 
 Providers SHOULD cap concurrent fetches (each request opens a browser tab). Suggested defaults: a global cap of 3 concurrent fetches, plus a per-publisher cap of 1 (most publishers throttle aggressively against parallel requests from the same client). When a cap is hit, providers SHOULD queue incoming requests internally (FIFO) and continue to hold the client's connection until the request reaches the front of the queue and completes.
 
+<!-- markdownlint-disable-next-line MD022 -->
 ## Synchronous hold, no client retry
 `req~bxf.sync-hold~1` <a id="sync-hold-no-retry"></a>
 
@@ -230,11 +242,13 @@ Clients (JabRef) issue a single synchronous `POST /v1/fulltext` per fetch attemp
 
 JabRef races multiple registered providers in parallel via separate concurrent HTTP requests and uses the first successful response, cancelling the rest by closing their connections.
 
+<!-- markdownlint-disable-next-line MD022 -->
 ## Safety valve: 503 busy
 `req~bxf.safety-valve~1` <a id="safety-valve"></a>
 
 `503 busy` is a safety valve, not a normal flow-control mechanism. Providers MAY return `503 busy` if the internal queue exceeds a sane depth (suggested 50) or if the browser-side queue has stalled and the provider judges the request will not complete within the client timeout. A well-behaved provider SHOULD rarely emit it; a misbehaving one that emits it constantly makes itself invisible to clients without breaking them.
 
+<!-- markdownlint-disable-next-line MD022 -->
 ## Cancellation via connection close
 `req~bxf.cancellation~1`
 
@@ -242,6 +256,7 @@ Cancellation flows out-of-band. When JabRef closes the TCP connection (the losin
 
 Implementations that cannot detect mid-request client disconnect (for example `HttpListener` on .NET) MAY rely on the provider-side safety-valve timer to fire abort instead; this satisfies the requirement at the cost of higher abort latency.
 
+<!-- markdownlint-disable-next-line MD022 -->
 ## Security model
 `req~bxf.security~1`
 
