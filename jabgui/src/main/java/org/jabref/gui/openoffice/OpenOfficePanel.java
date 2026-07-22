@@ -52,6 +52,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
+import org.jabref.logic.openoffice.style.BstStyle;
+import org.jabref.logic.openoffice.style.BstStyleLoader;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
@@ -107,6 +109,7 @@ public class OpenOfficePanel {
     private final AiService aiService;
     private final JStyleLoader jStyleLoader;
     private final CSLStyleLoader cslStyleLoader;
+    private final BstStyleLoader bstStyleLoader;
     private final LibraryTabContainer tabContainer;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
@@ -150,6 +153,7 @@ public class OpenOfficePanel {
                 abbreviationRepository);
 
         cslStyleLoader = new CSLStyleLoader(openOfficePreferences);
+        bstStyleLoader = new BstStyleLoader(openOfficePreferences);
 
         ActionFactory factory = new ActionFactory();
 
@@ -208,7 +212,7 @@ public class OpenOfficePanel {
                     return FAIL;
                 }
             } else {
-                // CSL Styles don't need to be updated
+                // CSL and BST styles don't need to be reloaded from disk
                 return PASS;
             }
         }
@@ -232,7 +236,7 @@ public class OpenOfficePanel {
 
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
         setStyleFile.setOnAction(_ -> {
-            StyleSelectDialogView styleDialog = new StyleSelectDialogView(cslStyleLoader, jStyleLoader, journalAbbreviationRepository);
+            StyleSelectDialogView styleDialog = new StyleSelectDialogView(cslStyleLoader, jStyleLoader, bstStyleLoader, journalAbbreviationRepository);
             dialogService.showCustomDialogAndWait(styleDialog)
                          .ifPresent(selectedStyle -> {
                              currentStyle = selectedStyle;
@@ -247,6 +251,8 @@ public class OpenOfficePanel {
                                  dialogService.notify(Localization.lang("Currently selected JStyle: '%0'", jStyle.getName()));
                              } else if (currentStyle instanceof CitationStyle cslStyle) {
                                  dialogService.notify(Localization.lang("Currently selected CSL Style: '%0'", cslStyle.getName()));
+                             } else if (currentStyle instanceof BstStyle bstStyle) {
+                                 dialogService.notify(Localization.lang("Currently selected BST style: '%0'", bstStyle.getName()));
                              }
                              updateButtonAvailability();
                          });
@@ -426,7 +432,9 @@ public class OpenOfficePanel {
         boolean canCite = isConnectedToDocument && hasStyle && hasDatabase;
         boolean canRefreshDocument = isConnectedToDocument && hasStyle;
         boolean cslStyleSelected = currentStyle instanceof CitationStyle;
-        boolean canGenerateBibliography = (currentStyle instanceof JStyle) || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography());
+        boolean canGenerateBibliography = (currentStyle instanceof JStyle)
+                || (currentStyle instanceof BstStyle)
+                || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography());
 
         selectDocument.setDisable(!isConnectedToDocument);
 

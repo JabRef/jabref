@@ -42,6 +42,7 @@ public class OpenOfficePreferences {
     private final StringProperty cslBibliographyBodyFormat;
     private final ObservableList<String> externalCslStyles;
     private final BooleanProperty addSpaceAfter;
+    private final ObservableList<String> externalBstStyles;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
@@ -54,7 +55,8 @@ public class OpenOfficePreferences {
                                  String cslBibliographyHeaderFormat,
                                  String cslBibliographyBodyFormat,
                                  List<String> externalCslStyles,
-                                 boolean addSpaceAfter) {
+                                 boolean addSpaceAfter,
+                                 List<String> externalBstStyles) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
@@ -67,6 +69,7 @@ public class OpenOfficePreferences {
         this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat);
         this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
         this.addSpaceAfter = new SimpleBooleanProperty(addSpaceAfter);
+        this.externalBstStyles = FXCollections.observableArrayList(externalBstStyles);
     }
 
     private OpenOfficePreferences() {
@@ -84,7 +87,8 @@ public class OpenOfficePreferences {
                 "Heading 2",                                    // cslBibliographyHeaderFormat
                 "Text body",                                    // cslBibliographyBodyFormat
                 List.of(),                                      // externalCslStyles
-                true                                            // addSpaceAfter
+                true,                                           // addSpaceAfter
+                List.of()                                       // externalBstStyles
         );
     }
 
@@ -242,5 +246,14 @@ public class OpenOfficePreferences {
 
     public void setAddSpaceAfter(boolean addSpaceAfter) {
         this.addSpaceAfter.setValue(addSpaceAfter);
+    }
+
+    /// List of paths to external BST style files.
+    public ObservableList<String> getExternalBstStyles() {
+        return externalBstStyles;
+    }
+
+    public void setExternalBstStyles(List<String> paths) {
+        externalBstStyles.setAll(paths);
     }
 }

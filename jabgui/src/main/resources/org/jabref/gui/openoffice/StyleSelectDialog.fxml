@@ -73,6 +73,28 @@
                         </VBox>
                     </VBox>
                 </Tab>
+                <Tab fx:id="bstStyleTab" text="BST Styles">
+                    <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+                        <padding>
+                            <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                        </padding>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <Label text="%Available" styleClass="sectionHeader"/>
+                            <HBox HBox.hgrow="ALWAYS" />
+                            <Button fx:id="addBstStyleButton" text="%Add .bst file" onAction="#addBstStyleFile"/>
+                        </HBox>
+                        <TableView fx:id="bstStylesTable" VBox.vgrow="ALWAYS" prefHeight="350.0">
+                            <columns>
+                                <TableColumn fx:id="bstNameColumn" text="%Name" minWidth="200.0" prefWidth="-1.0"/>
+                                <TableColumn fx:id="bstFileColumn" text="%File" minWidth="100.0" prefWidth="-1.0"/>
+                                <TableColumn fx:id="bstDeleteColumn" minWidth="30.0" maxWidth="30.0" resizable="false"/>
+                            </columns>
+                            <columnResizePolicy>
+                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                            </columnResizePolicy>
+                        </TableView>
+                    </VBox>
+                </Tab>
             </TabPane>
             <HBox alignment="CENTER_LEFT" spacing="10.0">
                 <padding>

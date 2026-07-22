@@ -25,8 +25,10 @@ import org.jabref.logic.openoffice.action.ManageCitations;
 import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.RangeForOverlapCheck;
+import org.jabref.logic.openoffice.oocsltext.BstCitationOOAdapter;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.oocsltext.CSLUpdateBibliography;
+import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.model.database.BibDatabase;
@@ -71,6 +73,7 @@ public class OOBibBase {
 
     private CSLCitationOOAdapter cslCitationOOAdapter;
     private CSLUpdateBibliography cslUpdateBibliography;
+    private BstCitationOOAdapter bstCitationOOAdapter;
 
     public OOBibBase(Path loPath, DialogService dialogService, OpenOfficePreferences openOfficePreferences)
             throws
@@ -88,6 +91,9 @@ public class OOBibBase {
             Supplier<List<BibDatabaseContext>> databasesSupplier = stateManager::getOpenDatabases;
             cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier, openOfficePreferences, Injector.instantiateModelOrService(BibEntryTypesManager.class));
             cslUpdateBibliography = new CSLUpdateBibliography();
+        }
+        if (bstCitationOOAdapter == null) {
+            bstCitationOOAdapter = new BstCitationOOAdapter(doc, openOfficePreferences);
         }
     }
 
@@ -533,6 +539,9 @@ public class OOBibBase {
                         bibEntryTypesManager,
                         cursor,
                         syncOptions);
+            } else if (style instanceof BstStyle bstStyle) {
+                // Handle insertion of BST citations
+                result = insertBstCitation(entries, doc, bstStyle, bibDatabaseContext, cursor);
             } else if (style instanceof JStyle jStyle) {
                 // Handle insertion of JStyle citations
                 result = insertJStyleCitation(entries,
@@ -639,6 +648,23 @@ public class OOBibBase {
             return Update.resyncDocument(doc, jStyle, fcursor.get(), syncOptions.get()).asVoidResult().mapError(OOError::from);
         }
         return OOVoidResult.ok();
+    }
+
+    /// Helper method for guiActionInsertEntry — handles BST citation insertion.
+    private OOVoidResult<OOError> insertBstCitation(List<BibEntry> entries,
+                                                    XTextDocument doc,
+                                                    BstStyle bstStyle,
+                                                    BibDatabaseContext bibDatabaseContext,
+                                                    OOResult<XTextCursor, OOError> cursor) {
+        try {
+            doc.lockControllers();
+            bstCitationOOAdapter.insertCitation(cursor.get(), entries, bibDatabaseContext);
+            return OOVoidResult.ok();
+        } catch (CreationException | com.sun.star.uno.Exception e) {
+            return OOVoidResult.error(OOError.fromMisc(e));
+        } finally {
+            doc.unlockControllers();
+        }
     }
 
     /// GUI action "Merge citations"
@@ -851,6 +877,13 @@ public class OOBibBase {
                 return;
             }
             testDialog(errorTitle, updateCSLBibliography(databases, citationStyle, doc, fcursor, errorTitle));
+        } else if (style instanceof BstStyle bstStyle) {
+            if (testDialog(errorTitle,
+                    fcursor.asVoidResult(),
+                    checkIfOpenOfficeIsRecordingChanges(doc))) {
+                return;
+            }
+            testDialog(errorTitle, updateBstBibliography(databases, bstStyle, doc, fcursor, errorTitle));
         }
     }
 
@@ -887,6 +920,50 @@ public class OOBibBase {
                             + " which could not be found in your current library.",
                     unresolvedKeys.getFirst());
             dialogService.showErrorDialogAndWait(errorTitle, msg);
+        }
+        return OOVoidResult.ok();
+    }
+
+    /// Helper method for guiActionUpdateDocument — inserts/refreshes a BST bibliography.
+    private OOVoidResult<OOError> updateBstBibliography(List<BibDatabase> databases, BstStyle bstStyle,
+                                                        XTextDocument doc,
+                                                        OOResult<FunctionalTextViewCursor, OOError> fcursor,
+                                                        String errorTitle) {
+        try {
+            UnoUndo.enterUndoContext(doc, "Create BST bibliography");
+
+            List<BibEntry> citedEntries = databases.stream()
+                                                   .flatMap(db -> db.getEntries().stream())
+                                                   .filter(bstCitationOOAdapter::isCitedEntry)
+                                                   .collect(Collectors.toCollection(ArrayList::new));
+
+            if (citedEntries.isEmpty()) {
+                dialogService.showInformationDialogAndWait(
+                        Localization.lang("Bibliography"),
+                        Localization.lang("No cited entries found in the document."));
+                return OOVoidResult.ok();
+            }
+
+            BibDatabase bibDatabase = new BibDatabase(citedEntries);
+            BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
+
+            doc.lockControllers();
+            try {
+                XTextCursor cursor = doc.getText().createTextCursor();
+                cursor.gotoEnd(false);
+                bstCitationOOAdapter.insertBibliography(cursor, bstStyle, citedEntries, bibDatabaseContext);
+            } catch (java.io.IOException | InterruptedException e) {
+                LOGGER.error("Could not update BST bibliography", e);
+                return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));
+            } catch (com.sun.star.uno.Exception | CreationException e) {
+                LOGGER.error("Could not update BST bibliography", e);
+                return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));
+            } finally {
+                doc.unlockControllers();
+            }
+        } finally {
+            UnoUndo.leaveUndoContext(doc);
+            fcursor.get().restore(doc);
         }
         return OOVoidResult.ok();
     }
