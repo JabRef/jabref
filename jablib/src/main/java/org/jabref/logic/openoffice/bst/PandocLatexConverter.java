@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.jabref.logic.os.OS;
+import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.StreamGobbler;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -81,18 +83,30 @@ public class PandocLatexConverter {
     public String latexToHtml(String latex) throws IOException, InterruptedException {
         Process p = new ProcessBuilder(pandocPath, "-f", "latex", "-t", "html", "--wrap=none").start();
 
+        // Start gobblers to prevent blocking on full buffers
+        StringBuilder stdoutBuf = new StringBuilder();
+        StringBuilder stderrBuf = new StringBuilder();
+        StreamGobbler outGobbler = new StreamGobbler(p.getInputStream(), line -> {
+            stdoutBuf.append(line).append('\n');
+        });
+        StreamGobbler errGobbler = new StreamGobbler(p.getErrorStream(), line -> {
+            stderrBuf.append(line).append('\n');
+        });
+        HeadlessExecutorService.INSTANCE.execute(outGobbler);
+        HeadlessExecutorService.INSTANCE.execute(errGobbler);
+
+        // Write LaTeX to stdin and close to signal EOF
         try (var out = p.getOutputStream()) {
             out.write(latex.getBytes(StandardCharsets.UTF_8));
         }
-
-        // Drain BOTH streams before waitFor() to avoid pipe-buffer deadlock
-        String html = new String(p.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-        String err = new String(p.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
 
         if (!p.waitFor(30, TimeUnit.SECONDS)) {
             p.destroyForcibly();
             throw new IOException("pandoc timed out");
         }
+
+        String html = stdoutBuf.toString();
+        String err = stderrBuf.toString();
 
         int exit = p.exitValue();
         if (exit != 0) {
