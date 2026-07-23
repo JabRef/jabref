@@ -16,7 +16,6 @@ import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
 import org.jabref.logic.importer.fetcher.BvbFetcher;
-import org.jabref.logic.importer.fetcher.CiteSeer;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
@@ -168,7 +167,6 @@ public class WebFetchers {
         searchBasedFetchers.add(new SpringerNatureWebFetcher(importerPreferences));
         searchBasedFetchers.add(new CrossRef());
         searchBasedFetchers.add(new OpenAlex(importerPreferences));
-        searchBasedFetchers.add(new CiteSeer());
         searchBasedFetchers.add(new DOAJFetcher(importFormatPreferences));
         searchBasedFetchers.add(new IEEE(importFormatPreferences, importerPreferences));
         // set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
@@ -275,7 +273,6 @@ public class WebFetchers {
         fetchers.add(new WileyFetcher(importerPreferences));
 
         // Meta search
-        fetchers.add(new CiteSeer());
         // fetchers.add(new JstorFetcher(importFormatPreferences));
         // fetchers.add(new GoogleScholar(importFormatPreferences));
         fetchers.add(new OpenAccessDoi());

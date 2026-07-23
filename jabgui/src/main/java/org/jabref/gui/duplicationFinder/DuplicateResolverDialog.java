@@ -150,7 +150,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
             } else if (button.equals(removeExact)) {
                 return DuplicateResolverResult.AUTOREMOVE_EXACT;
             } else if (button.equals(cancel)) {
-                return DuplicateResolverResult.KEEP_LEFT;
+                return DuplicateResolverResult.BREAK;
             }
             return null;
         });
