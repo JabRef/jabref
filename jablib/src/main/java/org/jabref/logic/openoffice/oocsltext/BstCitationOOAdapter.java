@@ -43,7 +43,7 @@ public class BstCitationOOAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(BstCitationOOAdapter.class);
 
     private final XTextDocument document;
-    private final CSLReferenceMarkManager markManager;
+    private final BSTReferenceMarkManager markManager;
     private final PandocLatexConverter pandoc;
     private final OpenOfficePreferences openOfficePreferences;
 
@@ -51,7 +51,7 @@ public class BstCitationOOAdapter {
             throws WrappedTargetException, NoSuchElementException {
         this.document = document;
         this.openOfficePreferences = openOfficePreferences;
-        this.markManager = new CSLReferenceMarkManager(document);
+        this.markManager = new BSTReferenceMarkManager(document);
         this.pandoc = new PandocLatexConverter(openOfficePreferences.getPandocPath());
         markManager.readAndUpdateExistingMarks();
     }
@@ -62,10 +62,8 @@ public class BstCitationOOAdapter {
     public void insertCitation(XTextCursor cursor, List<BibEntry> entries, BibDatabaseContext ctx)
             throws CreationException, com.sun.star.uno.Exception {
         String citationText = switch (openOfficePreferences.getBstCitationFormat()) {
-            case NUMERIC ->
-                    buildNumericCitation(entries);
-            case AUTHOR_YEAR ->
-                    buildAuthorYearCitation(entries, ctx);
+            case NUMERIC -> buildNumericCitation(entries);
+            case AUTHOR_YEAR -> buildAuthorYearCitation(entries, ctx);
         };
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(citationText));
@@ -109,12 +107,22 @@ public class BstCitationOOAdapter {
         }
         BstEntryRenderer renderer = new BstEntryRenderer(vm);
 
-        List<BibEntry> sorted = new ArrayList<>(entries);
-        sorted.sort(Comparator.comparingInt(
-                entry -> markManager.getCitationNumber(keyOrId(entry))));
-
+        // Bibliography ordering strategy:
+        // - NUMERIC mode: first-appearance (manager's citation numbers)
+        // - AUTHOR_YEAR mode: style-defined order from the BST VM (e.g., APA alphabetical)
         boolean useNumberedBibliography = openOfficePreferences.getBstCitationFormat() == BstCitationFormat.NUMERIC;
+
+        List<BibEntry> sorted = new ArrayList<>(entries);
         BibDatabase database = ctx.getDatabase();
+
+        if (useNumberedBibliography) {
+            // Keep numeric styles (e.g., IEEEtran) on first-appearance
+            sorted.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(keyOrId(entry))));
+        } else {
+            // Compute the style-driven order once and sort accordingly
+            java.util.Map<String, Integer> styleOrder = computeStyleOrderNumbers(renderer, vm, sorted, database);
+            sorted.sort(Comparator.comparingInt(entry -> styleOrder.getOrDefault(keyOrId(entry), Integer.MAX_VALUE)));
+        }
 
         for (BibEntry entry : sorted) {
             String identifier = keyOrId(entry);
@@ -146,15 +154,19 @@ public class BstCitationOOAdapter {
 
     /// Returns `true` if the given entry has already been cited in the document.
     public boolean isCitedEntry(BibEntry entry) {
-        return markManager.hasCitationForKey(keyOrId(entry));
+        return markManager.hasCitationForIdentifier(keyOrId(entry));
     }
 
     private String buildNumericCitation(List<BibEntry> entries) {
-        StringJoiner sj = new StringJoiner(", ", "[", "]");
+        // Use the manager's current numbering (may be style-order or first-appearance),
+        // but present numbers in ascending order inside a multi-entry bracket.
+        java.util.List<Integer> nums = new java.util.ArrayList<>(entries.size());
         for (BibEntry entry : entries) {
-            int number = markManager.getCitationNumber(keyOrId(entry));
-            sj.add(String.valueOf(number));
+            nums.add(markManager.getCitationNumber(keyOrId(entry)));
         }
+        nums.sort(Integer::compareTo);
+        StringJoiner sj = new StringJoiner(", ", "[", "]");
+        nums.forEach(n -> sj.add(String.valueOf(n)));
         return sj.toString();
     }
 
@@ -182,8 +194,47 @@ public class BstCitationOOAdapter {
     }
 
     @VisibleForTesting
-    static String keyOrId(BibEntry entry) {
+    private static String keyOrId(BibEntry entry) {
         return entry.getCitationKey().orElse(entry.getId());
+    }
+
+    // Compute identifier -> number map using the BST VM’s bibliography sort order.
+    // For entries missing a citation key, we temporarily assign keyOrId as the key,
+    // so the emitted \bibitem{...} contains a stable identifier we can parse back.
+    @VisibleForTesting
+    static java.util.Map<String, Integer> computeStyleOrderNumbers(BstEntryRenderer renderer, BstVM vm, List<BibEntry> entries, BibDatabase database) {
+        // Clone entries and ensure each has a non-empty key matching keyOrId
+        List<BibEntry> normalized = new ArrayList<>(entries.size());
+        for (BibEntry e : entries) {
+            BibEntry c = new BibEntry(e);
+            if (c.getCitationKey().isEmpty()) {
+                c = c.withCitationKey(keyOrId(e));
+            }
+            normalized.add(c);
+        }
+        // Render all entries at once to get style-driven order in thebibliography
+        String raw = vm.render(normalized, database);
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile("\\\\bibitem(?:\\[[^]]*])?\\{([^}]*)}");
+        java.util.regex.Matcher m = p.matcher(raw);
+        int n = 1;
+        java.util.Map<String, Integer> map = new java.util.LinkedHashMap<>();
+        while (m.find()) {
+            String key = m.group(1);
+            if (!map.containsKey(key)) {
+                map.put(key, n++);
+            }
+        }
+        // Map from emitted key back to identifier (for entries where we substituted)
+        java.util.Map<String, String> keyToIdentifier = new java.util.HashMap<>();
+        for (BibEntry e : normalized) {
+            String k = e.getCitationKey().orElse("");
+            if (!k.isEmpty()) {
+                keyToIdentifier.put(k, keyOrId(e));
+            }
+        }
+        java.util.Map<String, Integer> identifierToNumber = new java.util.LinkedHashMap<>();
+        map.forEach((k, v) -> identifierToNumber.put(keyToIdentifier.getOrDefault(k, k), v));
+        return identifierToNumber;
     }
 
     private boolean checkPreceedingSpace(XTextCursor cursor) {
