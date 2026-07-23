@@ -24,11 +24,11 @@ Do we need a preference for the compatibility mode?
 
 ## Decision Outcome
 
-Chosen option: "Use a preference for the compatibility mode", because it preserves JabRef's branding by keeping the old reference mark format ("JABREF_Smith2020 CID_1 NORMAL"). Users who do not require Zotero compatibility can continue using the original JabRef reference marks, while users who need compatibility can explicitly enable the alternative mode.
+Chosen option: "Use a preference for the compatibility mode", because it keeps the possibilities to customize JabRef's own reference mark by preserving the old reference mark format ("JABREF_Smith2020 CID_1 NORMAL"). Users who do not require Zotero compatibility can continue using the original JabRef reference marks, while users who need compatibility can explicitly enable the alternative mode.
 
 ### Consequences
 
-* Good, because preserving old reference mark (i.e. JABREF_Smith2020 CID_1 NORMAL) helps keep the brand.
+* Good, because preserving JabRef's reference marks brings independence and open the possibilities to customize as we want. On the contrary, only relying on Zotero marks makes JabRef dependent on the Zotero's development.
 * Good, because it gives user the freedom to enable/disable compatibility mode.
 * Good, because it ensures the document contains only one reference mark format, either "JABREF_Smith2020 CID_1 NORMAL" or "ZOTERO_ITEM CSL_CITATION {json} RND1234abc".
 * Bad, because a popup may disturb users workflow.
@@ -39,7 +39,7 @@ Chosen option: "Use a preference for the compatibility mode", because it preserv
 
 Add a preference that allows users to choose between JabRef-only mode and Zotero compatibility mode. Each mode uses its own reference mark format: JabRef-only mode uses JABREF_Smith2020 CID_1 NORMAL, while Zotero compatibility mode uses ZOTERO_ITEM CSL_CITATION {json} RND1234abc. If the selected mode does not match the reference marks already present in a document, JabRef warns the user and automatically converts the reference marks to the chosen format.
 
-* Good, because it preserves JabRef's original reference mark format, helping maintain the JabRef brand.
+* Good, because having custom reference marks brings independence and opens the possibilities to customize as we want.
 * Good, because it gives user the freedom to enable/disable compatibility mode.
 * Good, because it ensures the document contains only one reference mark format.
 * Bad, because a popup may disturb users workflow.
@@ -51,4 +51,4 @@ Since JabRef uses [citation-js's mapping logic](https://github.com/JabRef/jabref
 * Good, because JabRef reads and maps Zotero's reference mark automatically, which does not disturb users.
 * Good, because user does not need to enable anything to use this feature.
 * Bad, because a document may include 2 types of reference mark (old JabRef style reference mark and new Zotero style ones).
-* Bad, because all the reference marks start with "ZOTERO_ITEM" which weakens JabRef's branding.
+* Bad, because all the reference marks start with "ZOTERO_ITEM". As a result, relying on Zotero marks makes JabRef dependent on the Zotero's development.
