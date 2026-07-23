@@ -26,9 +26,11 @@ Every option below produces BST-styled citations in a LibreOffice document. They
 
 ## Considered Options
 
-1. Hand-written LaTeX-subset to `OOText` converter
+1. SnuggleTeX-based converter (existing dependency)
 2. Pandoc as an optional external process
 3. Reuse the existing plain-text cleanup (`RemoveLatexCommandsFormatter` / `LatexToUnicodeAdapter`)
+4. Hybrid: Pandoc as primary with a SnuggleTeX-based pure-Java fallback when Pandoc is unavailable
+5. Hand-written LaTeX-subset to `OOText` converter
 
 ## Decision Outcome
 
@@ -56,17 +58,16 @@ The dependency is optional and follows the precedent already set by `OcrMyPdfEng
 
 ## Pros and Cons of the Options
 
-### Hand-written LaTeX-subset to `OOText` converter
+### SnuggleTeX-based converter (existing dependency)
 
-A JabRef-owned mapper from `\emph{}`, `\textbf{}`, `\textsc{}`, ``` `` '' ```, `~` to the `OOText` tag vocabulary.
+Use SnuggleTeX (already a JabRef dependency) to parse LaTeX and produce XHTML/MathML, then map to the `OOText` vocabulary.
 
-* Good, because it introduces no external dependency, so BST works for every user out of the box
-* Good, because conversion happens in-process, with no latency or failure modes from a subprocess
-* Good, because formatting is preserved for the constructs the mapper covers
-* Neutral, because for a single curated style family the required LaTeX subset is small and well defined
-* Bad, because the LaTeX subset emitted across arbitrary `.bst` files is open-ended, and correctness requires brace-level parsing rather than regular expressions
-* Bad, because this is precisely the work identified as the blocker in [#602](https://github.com/JabRef/jabref/pull/602) and the reason the feature was removed; nothing has changed to make it easier
-* Bad, because JabRef would own and maintain a LaTeX parser indefinitely, growing it per reported `.bst` file
+* Good, because it is already a JabRef dependency; no new install step; in-process
+* Good, because it produces structured XHTML/MathML rather than requiring hand-rolled parsing
+* Neutral, because in JabRef today SnuggleTeX is used primarily as a validator with DOM/XHTML output disabled; using its conversion output here would be a new, unexercised path that needs validation against real `.bst` output
+* Bad, because its LaTeX coverage is oriented toward math and does not span several macro constructs `.bst` files emit (e.g., `\providecommand`, `\csname...\endcsname`, `\expandafter\ifx`, `\typeout`, per-style macros like `\BIBentryALTinterwordspacing`)
+* Bad, because coverage gaps will surface per `.bst` style, leading to open-ended support work extending command coverage and mapping
+* Anticipated: a mapping layer to `OOText` will be required to translate the XHTML/MathML output into the `OOText` inline vocabulary (italics, bold, small caps, quotes). The exact normalization needed for text‑mode constructs needs validation
 
 ### Pandoc as an optional external process
 
@@ -88,6 +89,26 @@ A JabRef-owned mapper from `\emph{}`, `\textbf{}`, `\textsc{}`, ``` `` '' ```, `
 * Bad, because it produces flat plain text: `\emph{Journal}` is discarded rather than converted, so italicized journal and book titles are lost - a visible defect in a bibliography
 * Bad, because it deletes markup instead of translating it, which is acceptable for a tooltip but not for a document deliverable
 * Bad, because it already contains style-specific hacks (for example a literal `#2}}` replacement for `IEEEtran.bst`), demonstrating that the delete-what-we-do-not-understand approach does not generalise
+
+### Hand-written LaTeX-subset to `OOText` converter
+
+A JabRef-owned mapper from `\emph{}`, `\textbf{}`, `\textsc{}`, ``` `` '' ```, `~` to the `OOText` tag vocabulary.
+
+- Good, because it introduces no external dependency, so BST works for every user out of the box
+- Good, because conversion happens in-process, with no latency or failure modes from a subprocess
+- Good, because formatting is preserved for the constructs the mapper covers
+- Neutral, because for a single curated style family the required LaTeX subset is small and well defined
+- Bad, because the LaTeX subset emitted across arbitrary `.bst` files is open-ended, and correctness requires brace-level parsing rather than regular expressions (regex-level handling cannot correctly deal with nested braces)
+- Bad, because practical support devolves into extending coverage per encountered `.bst` construct (e.g., style-specific macros), which is open-ended maintenance work compared to inheriting a mature parser's coverage
+
+### Hybrid: Pandoc primary with SnuggleTeX-based pure-Java fallback
+
+Description: keep Pandoc as the primary converter; when it is not available, fall back to a limited, in-process path leveraging SnuggleTeX-backed LaTeX→Unicode and preview-style transforms for inline emphasis/quotes. The fallback would map only the subset supported by `OOTextIntoOO` and document reduced fidelity.
+
+- Good, because BST bibliography would work without installing Pandoc (lower barrier)
+- Good, because it is fully in-process and reuses existing JabRef code (preview transforms, `LatexToUnicodeAdapter`)
+- Bad, because fidelity for arbitrary `.bst` outputs will be lower than Pandoc; complex LaTeX constructs may not render ideally
+- Neutral, because it can be implemented as an availability-based fallback without impacting the main (Pandoc) path
 
 ## More Information
 
@@ -119,4 +140,4 @@ This is orthogonal to the decision recorded here: the conversion problem concern
 Related issues: [#624](https://github.com/JabRef/jabref/issues/624), [#11102](https://github.com/JabRef/jabref/issues/11102), [#602](https://github.com/JabRef/jabref/pull/602).
 Pandoc was first suggested for this purpose in [#624](https://github.com/JabRef/jabref/issues/624).
 
-This decision was implemented in [#16315](https://github.com/JabRef/jabref/pull/16315).
+
