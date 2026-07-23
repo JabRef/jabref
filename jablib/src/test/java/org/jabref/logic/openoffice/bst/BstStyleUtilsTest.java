@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/// Tests for [BstStyleUtils.transformHTML] — the general HTML-to-OOText cleanup used by the BST path.
+/// Tests for [BstStyleUtils.transformHTML] - the general HTML-to-OOText cleanup used by the BST path.
 ///
 /// These tests cover only operations that apply to pandoc HTML. CSL-exclusive operations
 /// (csl-left-margin div merge, citeproc-java span styles) are tested in CSLFormatUtilsTest.

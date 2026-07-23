@@ -36,7 +36,7 @@ public class BstStyleLoader {
         loadExternalStyles();
     }
 
-    /// Returns all styles — internal first, then external.
+    /// Returns all styles - internal first, then external.
     public List<BstStyle> getStyles() {
         List<BstStyle> all = new ArrayList<>(internalStyles);
         all.addAll(externalStyles);

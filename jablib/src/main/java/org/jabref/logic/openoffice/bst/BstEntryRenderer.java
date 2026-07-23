@@ -15,7 +15,7 @@ import org.jspecify.annotations.NullMarked;
 ///
 /// IEEEtran and similar styles emit a large `\providecommand` preamble before every entry.
 /// Rather than matching individual macros with fragile regexes, we take everything **after the
-/// last `\bibitem{key}`** — since `BstVM.render(List.of(entry), …)` renders exactly one entry,
+/// last `\bibitem{key}`** - since `BstVM.render(List.of(entry), …)` renders exactly one entry,
 /// every line before its `\bibitem` is preamble by construction.
 @NullMarked
 public class BstEntryRenderer {
@@ -31,7 +31,7 @@ public class BstEntryRenderer {
 
     /// Renders one entry to a LaTeX body string with preamble and structure stripped.
     ///
-    /// Returns the inline LaTeX text ready for pandoc — no `\bibitem`, no `\providecommand`,
+    /// Returns the inline LaTeX text ready for pandoc - no `\bibitem`, no `\providecommand`,
     /// no `\begin`/`\end{thebibliography}`.
     public String renderEntryToLatex(BibEntry originalEntry, BibDatabase database) {
         BibEntry entry = new BibEntry(originalEntry);
@@ -39,7 +39,7 @@ public class BstEntryRenderer {
 
         String raw = bstVM.render(List.of(entry), database);
 
-        // Find the last \bibitem — everything before it is BST/IEEEtran preamble.
+        // Find the last \bibitem - everything before it is BST/IEEEtran preamble.
         // This reliably drops \providecommand, \csname, etc. without fragile nested-brace regexes.
         int bibitemIdx = raw.lastIndexOf("\\bibitem");
         if (bibitemIdx >= 0) {

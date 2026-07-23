@@ -10,7 +10,7 @@ import org.jabref.logic.bst.BstVM;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-/// An [OOStyle] backed by a `.bst` file — either an internal (classpath) style bundled with
+/// An [OOStyle] backed by a `.bst` file - either an internal (classpath) style bundled with
 /// JabRef or an external (filesystem) style supplied by the user.
 @NullMarked
 public class BstStyle implements OOStyle {

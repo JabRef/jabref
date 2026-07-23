@@ -649,7 +649,7 @@ public class OOBibBase {
         return OOVoidResult.ok();
     }
 
-    /// Helper method for guiActionInsertEntry — handles BST citation insertion.
+    /// Helper method for guiActionInsertEntry - handles BST citation insertion.
     private OOVoidResult<OOError> insertBstCitation(List<BibEntry> entries,
                                                     XTextDocument doc,
                                                     BstStyle bstStyle,

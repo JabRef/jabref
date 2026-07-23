@@ -1,5 +1,7 @@
 package org.jabref.logic.openoffice.bst;
 
+import org.jabref.model.openoffice.ootext.OOTextIntoOO;
+
 import org.jspecify.annotations.NullMarked;
 
 /// Converts pandoc HTML output into a string that [OOTextIntoOO] can write into a LibreOffice document.
@@ -16,7 +18,7 @@ public final class BstHtmlToOOText {
     /// Converts a pandoc HTML fragment to an OOText-compatible string.
     ///
     /// Processing order:
-    /// 1. Strip pandoc's outer `<p>…</p>` wrapper so the content is an inline run —
+    /// 1. Strip pandoc's outer `<p>…</p>` wrapper so the content is an inline run -
     ///    internal paragraph boundaries become `<p></p>` separators.
     /// 2. Map pandoc's semantic tags to the inline tags [OOTextIntoOO] understands:
     ///    `<em>` → `<i>`, `<strong>` → `<b>`, small-caps span → `<smallcaps>`.

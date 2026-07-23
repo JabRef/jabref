@@ -360,7 +360,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         bstStylesTable.setItems(viewModel.bstStylesProperty());
         addBstStyleButton.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
 
-        // Preview — updates whenever the selected BST style changes
+        // Preview - updates whenever the selected BST style changes
         PreviewViewer bstPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
         bstPreviewBox.getChildren().add(bstPreviewViewer);
 
@@ -411,7 +411,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     private void scrollToCurrentStyle() {
         if (initialScrollPerformed.getAndSet(true)) {
-            return;
+            return; // Scroll has already been performed, exit early
         }
 
         OOStyle currentStyle = preferences.getOpenOfficePreferences(journalAbbreviationRepository).getCurrentStyle();

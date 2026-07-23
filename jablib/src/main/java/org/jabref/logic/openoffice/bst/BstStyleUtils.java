@@ -9,7 +9,7 @@ import org.jspecify.annotations.NullMarked;
 /// This is the BST counterpart of [CSLFormatUtils]: it contains only the transforms that apply
 /// to pandoc HTML. CSL-exclusive operations (the `csl-left-margin`/`csl-right-inline` div merge,
 /// and the citeproc-java `<span style="font-weight/style/decoration/variant:…">` conversions)
-/// are intentionally absent — pandoc never produces those structures.
+/// are intentionally absent - pandoc never produces those structures.
 ///
 /// Pandoc-specific tag conversions (`<em>`, `<strong>`, `<span class="smallcaps">`) are handled
 /// upstream in [BstHtmlToOOText] before this class is called.
@@ -24,7 +24,7 @@ public final class BstStyleUtils {
     /// Steps:
     /// 1. Decode HTML entities (`&amp;` → `&`, `&#x201C;` → `"`, etc.)
     /// 2. Strip `<div>` tags (pandoc may emit them for block-level content)
-    /// 3. Strip hyperlinks (`<a>` tags — LibreOffice OOText does not support arbitrary links)
+    /// 3. Strip hyperlinks (`<a>` tags - LibreOffice OOText does not support arbitrary links)
     /// 4. Strip any remaining `<span>` tags (pandoc-specific ones are already converted by [BstHtmlToOOText])
     /// 5. Normalise line breaks to `<p></p>` paragraph separators
     /// 6. Remove a leading empty paragraph (produced by step 5 when the text starts with a newline)
@@ -38,7 +38,7 @@ public final class BstStyleUtils {
         html = html.replaceAll("<div[^>]*>", "");
         html = html.replace("</div>", "");
 
-        // Strip hyperlinks — LibreOffice OOText does not support arbitrary <a> links
+        // Strip hyperlinks - LibreOffice OOText does not support arbitrary <a> links
         html = html.replaceAll("<a[^>]*>", "");
         html = html.replace("</a>", "");
 
