@@ -67,6 +67,7 @@ Use SnuggleTeX (already a JabRef dependency) to parse LaTeX and produce XHTML/Ma
 * Neutral, because in JabRef today SnuggleTeX is used primarily as a validator with DOM/XHTML output disabled; using its conversion output here would be a new, unexercised path that needs validation against real `.bst` output
 * Bad, because its LaTeX coverage is oriented toward math and does not span several macro constructs `.bst` files emit (e.g., `\providecommand`, `\csname...\endcsname`, `\expandafter\ifx`, `\typeout`, per-style macros like `\BIBentryALTinterwordspacing`)
 * Bad, because coverage gaps will surface per `.bst` style, leading to open-ended support work extending command coverage and mapping
+* [Major] Bad, because in a modular runtime the `snuggletex.core` module does not declare a read edge to `java.xml`, and invoking DOM/XHTML output (`buildXMLString`) touches `javax.xml.parsers`, which throws `IllegalAccessError` unless the JVM is launched with `--add-reads snuggletex.core=java.xml` (or run on the classpath). This flag is a JVM launch option (e.g., via `JAVA_TOOL_OPTIONS` or run configuration), not a JabRef preference.
 * Anticipated: a mapping layer to `OOText` will be required to translate the XHTML/MathML output into the `OOText` inline vocabulary (italics, bold, small caps, quotes). The exact normalization needed for text‑mode constructs needs validation
 
 ### Pandoc as an optional external process
@@ -140,4 +141,4 @@ This is orthogonal to the decision recorded here: the conversion problem concern
 Related issues: [#624](https://github.com/JabRef/jabref/issues/624), [#11102](https://github.com/JabRef/jabref/issues/11102), [#602](https://github.com/JabRef/jabref/pull/602).
 Pandoc was first suggested for this purpose in [#624](https://github.com/JabRef/jabref/issues/624).
 
-
+This decision was implemented in [#16315](https://github.com/JabRef/jabref/pull/16315).
