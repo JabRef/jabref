@@ -229,7 +229,9 @@ dependencies {
 
 embeddedPostgresBinaryByJpackageTask.forEach { (taskName, moduleName) ->
     tasks.named<Jpackage>(taskName) {
+        // Include the platform-specific Postgres binary module in the jlink runtime image.
         addModules.add(moduleName)
+        // Resolve the module when the packaged launcher starts so the binary resource is discoverable.
         javaOptions.add("--add-modules=$moduleName")
         addModules.addAll(sharedJpackageImageModules)
     }
