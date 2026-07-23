@@ -102,21 +102,7 @@ public final class BSTFormatUtils {
         return s;
     }
 
-    // ---- Inline LaTeX -> HTML mapping (Preview path) ----
 
-    public static String mapInlineLatexToHtml(String latex) {
-        String s = latex;
-        s = s.replaceAll("\\\\emph\\{([^}]*?)}", "<i>$1</i>");
-        s = s.replaceAll("\\\\textit\\{([^}]*?)}", "<i>$1</i>");
-        s = s.replaceAll("\\\\textbf\\{([^}]*?)}", "<b>$1</b>");
-        s = s.replaceAll("\\{\\\\em\\s+([^}]*?)}", "<i>$1</i>");
-        s = s.replaceAll("\\{\\\\it\\s+([^}]*?)}", "<i>$1</i>");
-        s = s.replaceAll("\\{\\\\bf\\s+([^}]*?)}", "<b>$1</b>");
-        // small caps: \textsc{X} and {\sc X}
-        s = s.replaceAll("\\\\textsc\\{([^}]*?)}", "<span style=\"font-variant: small-caps\">$1</span>");
-        s = s.replaceAll("\\{\\\\sc\\s+([^}]*?)}", "<span style=\"font-variant: small-caps\">$1</span>");
-        return s;
-    }
 
     // ---- Generic HTML cleanup and entity decoding ----
 

@@ -152,7 +152,13 @@ public final class BstPreviewLayout implements PreviewLayout {
         result = result.replace("``", "\"");
         result = result.replace("''", "\"");
         // Convert LaTeX inline formatting to HTML before RemoveLatexCommandsFormatter strips them.
-        result = org.jabref.logic.openoffice.bst.BSTFormatUtils.mapInlineLatexToHtml(result);
+        // \\emph{X} and {\\em X} forms (IEEEtran uses \\emph, abbrv uses {\\em})
+        result = EMPH_PATTERN.matcher(result).replaceAll("<i>$1</i>");
+        result = TEXTIT_PATTERN.matcher(result).replaceAll("<i>$1</i>");
+        result = GROUP_EM_PATTERN.matcher(result).replaceAll("<i>$1</i>");
+        result = GROUP_IT_PATTERN.matcher(result).replaceAll("<i>$1</i>");
+        result = TEXTBF_PATTERN.matcher(result).replaceAll("<b>$1</b>");
+        result = GROUP_BF_PATTERN.matcher(result).replaceAll("<b>$1</b>");
         // Final cleanup
         result = new RemoveNewlinesFormatter().format(result);
         result = new RemoveLatexCommandsFormatter().format(result);

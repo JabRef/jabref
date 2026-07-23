@@ -48,16 +48,7 @@ class BSTFormatUtilsTest {
         assertTrue(mapped.contains("<u>u</u>"));
     }
 
-    @Test
-    void inlineLatexIsMappedToHtml() {
-        String latex = "{\\sc Katz} and \\textbf{B} and {\\it I} and \\textsc{Small} and {\\bf B2}";
-        String html = BSTFormatUtils.mapInlineLatexToHtml(latex);
-        assertTrue(html.contains("<span style=\"font-variant: small-caps\">Katz</span>"));
-        assertTrue(html.contains("<b>B</b>"));
-        assertTrue(html.contains("<i>I</i>"));
-        assertTrue(html.contains("<span style=\"font-variant: small-caps\">Small</span>"));
-        assertTrue(html.contains("<b>B2</b>"));
-    }
+
 
     @Test
     void convertPandocHtmlToOOTextUnwrapsAndMaps() {
