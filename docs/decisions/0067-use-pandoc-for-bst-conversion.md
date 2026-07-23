@@ -10,7 +10,7 @@ parent: Decision Records
 JabRef's LibreOffice integration supports CSL styles and JStyles, but not BST (BibTeX style) files, although many publishers still distribute only `.bst`.
 Initial BST support existed in the OpenOffice panel but was removed as unfinished ([#602](https://github.com/JabRef/jabref/pull/602), tracked in [#624](https://github.com/JabRef/jabref/issues/624)); the stated blocker was that `.bst` files such as `IEEEtran.bst` emit "quite a bit of non-trivial latex code to parse".
 
-Supporting BST in LibreOffice documents is the goal, not a question. The open question is narrower: `BstVM` renders an entry to a LaTeX fragment (`\emph{...}`, ``` ``...'' ```, `~`, `{\&}`, plus a `\providecommand` preamble), whereas `OOTextIntoOO` consumes an HTML-like tag vocabulary (`<b>`, `<i>`, `<smallcaps>`, `<sup>`, `<p>`).
+Supporting BST in LibreOffice documents is the goal. The open question is: `BstVM` renders an entry to a LaTeX fragment (`\emph{...}`, ``` ``...'' ```, `~`, `{\&}`, plus a `\providecommand` preamble), whereas `OOTextIntoOO` consumes an HTML-like tag vocabulary (`<b>`, `<i>`, `<smallcaps>`, `<sup>`, `<p>`).
 **How do we convert BST's LaTeX output into `OOText`?**
 
 Every option below produces BST-styled citations in a LibreOffice document. They differ only in who parses the LaTeX and what formatting survives.
