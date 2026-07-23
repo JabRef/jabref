@@ -130,7 +130,6 @@ class CompositeSearchBasedFetcherTest {
                 new DBLPFetcher(importFormatPreferences),
                 new SpringerNatureWebFetcher(importerPreferences),
                 new CrossRef(),
-                new CiteSeer(),
                 new DOAJFetcher(importFormatPreferences),
                 new IEEE(importFormatPreferences, importerPreferences),
                 new Scopus(importerPreferences));
