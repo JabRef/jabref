@@ -60,7 +60,7 @@ The dependency is optional, so it adds no weight for users who do not use BST.
 
 ### SnuggleTeX-based converter (existing dependency)
 
-Use SnuggleTeX (already a JabRef dependency) to parse LaTeX and produce XHTML/MathML, then map to the `OOText` vocabulary.
+Use [SnuggleTeX](https://github.com/davemckain/snuggletex) (already a JabRef dependency) to parse LaTeX and produce XHTML/MathML, then map to the `OOText` vocabulary.
 
 * Good, because it is already a JabRef dependency; no new install step; in-process
 * Good, because it produces structured XHTML/MathML rather than requiring hand-rolled parsing
