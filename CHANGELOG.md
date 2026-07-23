@@ -108,6 +108,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed the entry editor tabs "Required fields", "Optional fields", "Optional fields 2", "Deprecated fields", "Other fields", and "Comments"; their content is part of the new "Main" tab. [#12711](https://github.com/JabRef/jabref/issues/12711)
 - We removed the ability to define custom entry editor tabs (including the default "General" and "Abstract" tabs); the entry editor tab preferences now only toggle the visibility of the built-in tabs. [#12711](https://github.com/JabRef/jabref/issues/12711)
 - The citation key integrity check now includes the generated citation key in its warning message. [#15776](https://github.com/JabRef/jabref/pull/15776)
+- We removed the [CiteSeerX](https://en.wikipedia.org/wiki/CiteSeerX) fetcher, because the service is defunct and its links now redirect to the Wayback Machine. [#16299](https://github.com/JabRef/jabref/issues/16299)
 
 ## [6.0-alpha.6] – 2026-05-14
 
