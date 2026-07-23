@@ -70,6 +70,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We fixed formatting issues in entry preview when `.bst` styles were used. [#16314](https://github.com/JabRef/jabref/issues/16314)
 - We fixed rendering of LaTeX math symbols in the entry preview when `.bst` styles were used. [#11338](https://github.com/JabRef/jabref/issues/11338)
+- We fixed importing UTF-16 BibTeX files without a byte-order mark. [#9496](https://github.com/JabRef/jabref/issues/9496)
 - We fixed an issue where `jabkit convert` without `--output` printed an internal object reference (e.g. `org.jabref.model.database.BibDatabase@17932d9b`) instead of the converted library. It now writes the library to standard output in the format selected by `--output-format`, with progress messages going to standard error. [#16292](https://github.com/JabRef/jabref/pull/16292)
 - We fixed spurious DOI-mismatch warnings when fetching an entry by DOI. [#16280](https://github.com/JabRef/jabref/pull/16280)
 - We fixed an issue where a critical error occurring during application startup (e.g. while constructing the main window) was only written to the log, leaving the user with no visible feedback and an apparently silent crash. [#14967](https://github.com/JabRef/jabref/issues/14967)
