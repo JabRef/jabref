@@ -55,7 +55,7 @@ class BSTFormatUtilsTest {
         assertTrue(out.startsWith("A "));
         assertTrue(out.contains("<i>journal</i>"));
         assertTrue(out.contains("<smallcaps>X</smallcaps>"));
-        assertTrue(!out.startsWith("<p>"));
+        assertFalse(out.startsWith("<p>"));
     }
 
     @Test
