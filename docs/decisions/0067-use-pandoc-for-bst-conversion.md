@@ -134,7 +134,7 @@ Everything in the LaTeX -> HTML step - brace nesting, ligatures, quote forms, ti
 
 Changing `BstVM` to emit HTML instead of LaTeX was examined and is not viable: the markup originates in string literals inside the `.bst` programs themselves, which the virtual machine only concatenates, so there is nothing at the VM level to reinterpret. It is therefore not listed as an option.
 
-`.bst` files define only the bibliography, not the in-text citation format - in LaTeX that responsibility belongs to packages such as `natbib`, not to the style file.
+`.bst` files define only the rendering of the bibliography, not the in-text citation format - in LaTeX that responsibility belongs to packages such as `natbib`, not to the style file.
 JabRef therefore supplies the citation format itself, offering two fixed choices, numeric and author-year, analogous to the default JStyles.
 This is orthogonal to the decision recorded here: the conversion problem concerns the bibliography entries, and the same Pandoc pipeline serves both citation formats.
 
