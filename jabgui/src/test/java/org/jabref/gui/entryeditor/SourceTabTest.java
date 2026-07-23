@@ -24,6 +24,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import org.fxmisc.richtext.CodeArea;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,7 +68,7 @@ class SourceTabTest {
                 mock(BibEntryTypesManager.class),
                 keyBindingRepository,
                 stateManager,
-                new BibTeXHighlighter(stateManager)
+                new BibTeXHighlighter(stateManager, new BibTeXSyntaxHighlighter())
         );
         pane = new TabPane(
                 new Tab("main area", area),

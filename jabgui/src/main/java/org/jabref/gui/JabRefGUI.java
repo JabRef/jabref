@@ -65,6 +65,7 @@ import com.dlsc.gemsfx.PowerPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterViewPos;
 import com.tobiasdiez.easybind.EasyBind;
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import kong.unirest.core.Unirest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -250,7 +251,8 @@ public class JabRefGUI extends Application {
         );
         Injector.setModelOrService(SearchCitationsRelationsService.class, citationsAndRelationsSearchService);
 
-        JabRefGUI.bibTeXHighlighter = new BibTeXHighlighter(stateManager);
+        BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter = new BibTeXSyntaxHighlighter();
+        JabRefGUI.bibTeXHighlighter = new BibTeXHighlighter(stateManager, bibTeXSyntaxHighlighter);
         Injector.setModelOrService(BibTeXHighlighter.class, bibTeXHighlighter);
     }
 

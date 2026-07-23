@@ -45,7 +45,7 @@ import org.jspecify.annotations.NullMarked;
 public class BibTeXHighlighter implements SyntaxDecorator {
 
     private final StateManager stateManager;
-    private final BibTeXSyntaxHighlighter syntaxHighlighter = new BibTeXSyntaxHighlighter();
+    private final BibTeXSyntaxHighlighter syntaxHighlighter;
 
     private String cachedFullText = "";
     private List<BibTeXHighlightRegion> cachedRegions = List.of();
@@ -54,11 +54,13 @@ public class BibTeXHighlighter implements SyntaxDecorator {
     /**
      * Creates a new highlighter.
      *
-     * @param stateManager used to read the currently active global search query so matches can
-     *                      be highlighted alongside syntax highlighting
+     * @param stateManager      used to read the currently active global search query so matches can
+     *                          be highlighted alongside syntax highlighting
+     * @param syntaxHighlighter the syntax highlighter used to compute highlight regions for BibTeX source code
      */
-    public BibTeXHighlighter(StateManager stateManager) {
+    public BibTeXHighlighter(StateManager stateManager, BibTeXSyntaxHighlighter syntaxHighlighter) {
         this.stateManager = stateManager;
+        this.syntaxHighlighter = syntaxHighlighter;
     }
 
     /**
