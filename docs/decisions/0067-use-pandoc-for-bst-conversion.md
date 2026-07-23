@@ -28,8 +28,7 @@ Every option below produces BST-styled citations in a LibreOffice document. They
 
 1. Hand-written LaTeX-subset to `OOText` converter
 2. Pandoc as an optional external process
-3. Pandoc bundled with JabRef
-4. Reuse the existing plain-text cleanup (`RemoveLatexCommandsFormatter` / `LatexToUnicodeAdapter`)
+3Reuse the existing plain-text cleanup (`RemoveLatexCommandsFormatter` / `LatexToUnicodeAdapter`)
 
 ## Decision Outcome
 
@@ -79,17 +78,6 @@ A JabRef-owned mapper from `\emph{}`, `\textbf{}`, `\textsc{}`, `` `` '' ``, `~`
 * Neutral, because the binary is discovered through the OS `PATH` with a preference for manual override, so no platform-specific path logic is needed
 * Bad, because BST support is unavailable until the user installs Pandoc
 * Bad, because process-level error handling (exit code, stderr draining) must be implemented carefully to avoid silent empty output and pipe-buffer deadlocks
-
-### Pandoc bundled with JabRef
-
-Ship platform-specific Pandoc binaries inside the JabRef distribution.
-
-* Good, because it keeps Pandoc's parser quality while removing the installation step, so BST works out of the box
-* Good, because the conversion code is identical to the optional-process option; only discovery changes
-* Neutral, because JabRef already ships platform-specific installers, so per-platform assets are not a new concept
-* Bad, because Pandoc binaries add roughly 100 MB per platform to the distribution, which is disproportionate for an optional feature
-* Bad, because JabRef becomes responsible for tracking Pandoc releases and security updates
-* Bad, because Pandoc is GPL-licensed, which requires review before bundling rather than invoking
 
 ### Reuse the existing plain-text cleanup
 
