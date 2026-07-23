@@ -111,9 +111,10 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     /// ViewModel for the CitationStyle entries in the TableView
 
-    public StyleSelectDialogView(CSLStyleLoader cslStyleLoader, JStyleLoader jStyleLoader,
-                                  BstStyleLoader bstStyleLoader,
-                                  JournalAbbreviationRepository journalAbbreviationRepository) {
+    public StyleSelectDialogView(CSLStyleLoader cslStyleLoader,
+                                 JStyleLoader jStyleLoader,
+                                 BstStyleLoader bstStyleLoader,
+                                 JournalAbbreviationRepository journalAbbreviationRepository) {
         this.cslStyleLoader = cslStyleLoader;
         this.jStyleLoader = jStyleLoader;
         this.bstStyleLoader = bstStyleLoader;
