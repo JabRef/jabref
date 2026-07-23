@@ -28,7 +28,7 @@ Every option below produces BST-styled citations in a LibreOffice document. They
 
 1. Hand-written LaTeX-subset to `OOText` converter
 2. Pandoc as an optional external process
-3Reuse the existing plain-text cleanup (`RemoveLatexCommandsFormatter` / `LatexToUnicodeAdapter`)
+3. Reuse the existing plain-text cleanup (`RemoveLatexCommandsFormatter` / `LatexToUnicodeAdapter`)
 
 ## Decision Outcome
 
