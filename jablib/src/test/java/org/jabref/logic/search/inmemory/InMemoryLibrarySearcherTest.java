@@ -1,7 +1,10 @@
 package org.jabref.logic.search.inmemory;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javafx.util.Pair;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -35,5 +38,15 @@ class InMemoryLibrarySearcherTest {
         }
         List<BibEntry> matches = new InMemoryLibrarySearcher(databaseContext, bibEntryPreferences).getMatches(query);
         assertEquals(Set.copyOf(expectedMatches), Set.copyOf(matches));
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.jabref.logic.search.LibrarySearcherTestCases#detailedSearchCases")
+    void commonDetailedSearchCases(List<Pair<BibEntry, MatchInformation>> expectedMatches, SearchQuery query, List<BibEntry> entries) {
+        for (BibEntry entry : entries) {
+            databaseContext.getDatabase().insertEntry(entry);
+        }
+        List<Pair<BibEntry, MatchInformation>> matches = new InMemoryLibrarySearcher(databaseContext, bibEntryPreferences).getDetailedMatches(query);
+        assertEquals(new HashSet<>(expectedMatches), new HashSet<>(matches));
     }
 }

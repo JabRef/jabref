@@ -2,6 +2,8 @@ package org.jabref.logic.search.inmemory;
 
 import java.util.List;
 
+import javafx.util.Pair;
+
 import org.jabref.logic.search.SearchBackend;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -26,10 +28,12 @@ public class InMemorySearchBackend implements SearchBackend {
 
     @Override
     public SearchResults search(SearchQuery query) {
+        query.getMatchInformation().clear();
         SearchResults results = new SearchResults();
         SearchResult marker = new SearchResult();
-        for (BibEntry entry : searcher.getMatches(query)) {
-            results.addSearchResult(entry.getId(), marker);
+        for (Pair<BibEntry, MatchInformation> entry : searcher.getDetailedMatches(query)) {
+            results.addSearchResult(entry.getKey().getId(), marker);
+            query.getMatchInformation().put(entry.getKey().getId(), entry.getValue());
         }
         query.setSearchResults(results);
         return results;
