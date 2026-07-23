@@ -108,15 +108,15 @@ Numeric `[n]` markers reuse the first-appearance numbering already implemented i
 
 The conversion Pandoc performs, and the normalisation JabRef adds on top, are:
 
-| BST output (LaTeX)  | Pandoc (HTML)                       | Normalised (`OOText`)             | Result in LibreOffice  |
-|---------------------|-------------------------------------|-----------------------------------|------------------------|
-| `\emph{Journal}`    | `<em>Journal</em>`                  | `<i>Journal</i>`                  | italic                 |
-| `\textbf{x}`        | `<strong>x</strong>`                | `<b>x</b>`                        | bold                   |
-| `\textsc{x}`        | `<span class="smallcaps">x</span>`  | `<smallcaps>x</smallcaps>`        | small caps             |
-| `` ``x'' ``         | `“x”`                               | `“x”`                             | curly quotes           |
-| `~`                 | non-breaking space                  | non-breaking space                | non-breaking space     |
-| `{\&}`              | `&amp;`                             | `&` (decoded by `transformHTML`)  | `&`                    |
-| paragraph text      | `<p>…</p>`                          | unwrapped                         | no spurious break      |
+| BST output (LaTeX) | Pandoc (HTML)                      | Normalised (`OOText`)            | Result in LibreOffice |
+|--------------------|------------------------------------|----------------------------------|-----------------------|
+| `\emph{Journal}`   | `<em>Journal</em>`                 | `<i>Journal</i>`                 | italic                |
+| `\textbf{x}`       | `<strong>x</strong>`               | `<b>x</b>`                       | bold                  |
+| `\textsc{x}`       | `<span class="smallcaps">x</span>` | `<smallcaps>x</smallcaps>`       | small caps            |
+| ``` ``x'' ```      | `“x”`                              | `“x”`                            | curly quotes          |
+| `~`                | non-breaking space                 | non-breaking space               | non-breaking space    |
+| `{\&}`             | `&amp;`                            | `&` (decoded by `transformHTML`) | `&`                   |
+| paragraph text     | `<p>…</p>`                         | unwrapped                        | no spurious break     |
 
 Only the middle column is JabRef's own code: three tag renames plus unwrapping Pandoc's paragraph wrapper.
 Everything in the first arrow - brace nesting, ligatures, quote forms, tilde handling, entity escaping - is Pandoc's, and is the work that would otherwise have to be written and maintained in Java.
