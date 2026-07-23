@@ -45,9 +45,11 @@ public final class BstPreviewLayout implements PreviewLayout {
     private static final Pattern EMPH_PATTERN = Pattern.compile("\\\\emph\\{([^}]*?)}");
     private static final Pattern TEXTIT_PATTERN = Pattern.compile("\\\\textit\\{([^}]*?)}");
     private static final Pattern TEXTBF_PATTERN = Pattern.compile("\\\\textbf\\{([^}]*?)}");
+    private static final Pattern TEXTSC_PATTERN = Pattern.compile("\\\\textsc\\{([^}]*?)}");
     private static final Pattern GROUP_EM_PATTERN = Pattern.compile("\\{\\\\em\\s+([^}]*?)}");
     private static final Pattern GROUP_IT_PATTERN = Pattern.compile("\\{\\\\it\\s+([^}]*?)}");
     private static final Pattern GROUP_BF_PATTERN = Pattern.compile("\\{\\\\bf\\s+([^}]*?)}");
+    private static final Pattern GROUP_SC_PATTERN = Pattern.compile("\\{\\\\sc\\s+([^}]*?)}");
 
     /// Matches a single LaTeX math command wrapped in the `{{$...$}}` form written by some
     /// exporters, e.g. `{{$\Sigma$}}`. Group 1 is the command without its leading backslash
@@ -150,13 +152,7 @@ public final class BstPreviewLayout implements PreviewLayout {
         result = result.replace("``", "\"");
         result = result.replace("''", "\"");
         // Convert LaTeX inline formatting to HTML before RemoveLatexCommandsFormatter strips them.
-        // \\emph{X} and {\\em X} forms (IEEEtran uses \\emph, abbrv uses {\\em})
-        result = EMPH_PATTERN.matcher(result).replaceAll("<i>$1</i>");
-        result = TEXTIT_PATTERN.matcher(result).replaceAll("<i>$1</i>");
-        result = GROUP_EM_PATTERN.matcher(result).replaceAll("<i>$1</i>");
-        result = GROUP_IT_PATTERN.matcher(result).replaceAll("<i>$1</i>");
-        result = TEXTBF_PATTERN.matcher(result).replaceAll("<b>$1</b>");
-        result = GROUP_BF_PATTERN.matcher(result).replaceAll("<b>$1</b>");
+        result = org.jabref.logic.openoffice.bst.BSTFormatUtils.mapInlineLatexToHtml(result);
         // Final cleanup
         result = new RemoveNewlinesFormatter().format(result);
         result = new RemoveLatexCommandsFormatter().format(result);

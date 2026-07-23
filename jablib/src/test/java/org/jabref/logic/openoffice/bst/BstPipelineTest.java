@@ -76,7 +76,7 @@ class BstPipelineTest {
         assertFalse(html.isBlank(), "pandoc should produce HTML output");
         assertTrue(html.contains("<p>"), "pandoc wraps output in <p>");
 
-        String ooText = BstHtmlToOOText.convert(html);
+        String ooText = BSTFormatUtils.convertPandocHtmlToOOText(html);
 
         assertFalse(ooText.startsWith("<p>"), "OOText should not start with <p>");
         assertTrue(ooText.contains("Cooper"), "Author name should survive the full pipeline");
@@ -92,9 +92,9 @@ class BstPipelineTest {
 
         String latex = new BstEntryRenderer(vm).renderEntryToLatex(articleEntry, db);
         String html = pandoc.latexToHtml(latex);
-        String ooText = BstHtmlToOOText.convert(html);
+        String ooText = BSTFormatUtils.convertPandocHtmlToOOText(html);
 
-        // IEEEtran renders journal name in \emph{} → pandoc → <em> → BstHtmlToOOText → <i>
+        // IEEEtran renders journal name in \emph{}  pandoc  <em>  OOText mapping  <i>
         assertTrue(ooText.contains("<i>") && ooText.contains("</i>"),
                 "Journal title should be in italics in OOText output");
     }
@@ -108,7 +108,7 @@ class BstPipelineTest {
 
         String latex = new BstEntryRenderer(vm).renderEntryToLatex(articleEntry, db);
         String html = pandoc.latexToHtml(latex);
-        String ooText = BstHtmlToOOText.convert(html);
+        String ooText = BSTFormatUtils.convertPandocHtmlToOOText(html);
 
         // The OOText must be a plain inline run - no leading paragraph break that would
         // orphan the "[n] " prefix written by BstCitationOOAdapter.insertBibliography.
@@ -137,7 +137,7 @@ class BstPipelineTest {
         assertFalse(latex.contains("\\bibitem"), "\\bibitem should be stripped");
 
         String html = pandoc.latexToHtml(latex);
-        String ooText = BstHtmlToOOText.convert(html);
+        String ooText = BSTFormatUtils.convertPandocHtmlToOOText(html);
 
         assertFalse(ooText.startsWith("<p>"), "No leading <p> in OOText");
         assertTrue(ooText.contains("Crowston"), "Author should be in final output");
@@ -155,5 +155,19 @@ class BstPipelineTest {
 
         assertFalse(html.isBlank(), "pandoc should produce HTML for simple text input");
         assertTrue(html.contains("Smith"), "Content should appear in pandoc output");
+    }
+
+    @Test
+    void legacyScSwitchBecomesSmallcapsThroughPipeline() throws Exception {
+        assumeTrue(pandoc.isAvailable(), "pandoc not available - skipping pipeline test");
+        String latex = "{\\sc Katz, D.~L.} 2011.";
+        String normalized = BSTFormatUtils.normalizeLegacyForPandoc(latex);
+        String html = pandoc.latexToHtml(normalized);
+        String oo = BSTFormatUtils.convertPandocHtmlToOOText(html);
+        // Expect <smallcaps> in OOText for the name
+        org.junit.jupiter.api.Assertions.assertTrue(oo.contains("<smallcaps>Katz, D. L.</smallcaps>")
+                || oo.contains("<smallcaps>Katz, D.~L.</smallcaps>")
+                || oo.contains("<smallcaps>Katz, D.\u00A0L.</smallcaps>"),
+                "Small caps should survive through pandoc and mapping");
     }
 }

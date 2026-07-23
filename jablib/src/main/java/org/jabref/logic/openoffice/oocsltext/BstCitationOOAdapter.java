@@ -8,8 +8,8 @@ import java.util.StringJoiner;
 
 import org.jabref.logic.bst.BstVM;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.bst.BSTFormatUtils;
 import org.jabref.logic.openoffice.bst.BstEntryRenderer;
-import org.jabref.logic.openoffice.bst.BstHtmlToOOText;
 import org.jabref.logic.openoffice.bst.PandocLatexConverter;
 import org.jabref.logic.openoffice.style.BstCitationFormat;
 import org.jabref.logic.openoffice.style.BstStyle;
@@ -117,17 +117,29 @@ public class BstCitationOOAdapter {
         BibDatabase database = ctx.getDatabase();
 
         for (BibEntry entry : sorted) {
+            String key = entry.getCitationKey().orElse("");
             String latex = renderer.renderEntryToLatex(entry, database);
-            String html = pandoc.latexToHtml(latex);
-            String body = BstHtmlToOOText.convert(html);
+            LOGGER.warn("BST bibliography LaTeX [{}]: {}", key, latex);
+
+            String norm = org.jabref.logic.openoffice.bst.BSTFormatUtils.normalizeLegacyForPandoc(latex);
+            if (!norm.equals(latex)) {
+                LOGGER.warn("Normalized LaTeX for pandoc [{}]: {}", key, norm);
+            }
+
+            String html = pandoc.latexToHtml(norm);
+            LOGGER.warn("Pandoc HTML [{}]: {}", key, html);
+
+            String body = BSTFormatUtils.convertPandocHtmlToOOText(html);
+            LOGGER.warn("OOText body [{}]: {}", key, body);
 
             String finalLine;
             if (useNumberedBibliography) {
-                int number = markManager.getCitationNumber(entry.getCitationKey().orElse(""));
+                int number = markManager.getCitationNumber(key);
                 finalLine = "[" + number + "] " + body;
             } else {
                 finalLine = body;
             }
+            LOGGER.warn("Final OOText [{}]: {}", key, finalLine);
 
             OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalLine));
             OOTextIntoOO.write(document, cursor, ooText);
