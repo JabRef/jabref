@@ -50,14 +50,14 @@ public final class BSTFormatUtils {
             }
             out.append(input, i, j);
             int k = j + needle.length();
-            // skip whitespace after the legacy command
-            int ws = k;
-            while (ws < input.length() && Character.isWhitespace(input.charAt(ws))) {
-                ws++;
+            // Skip whitespace after the legacy command
+            int whitespacePos = k;
+            while (whitespacePos < input.length() && Character.isWhitespace(input.charAt(whitespacePos))) {
+                whitespacePos++;
             }
-            int contentStart = ws;
+            int contentStart = whitespacePos;
             int depth = 0;
-            int pos = ws;
+            int pos = whitespacePos;
             boolean closed = false;
             while (pos < input.length()) {
                 char c = input.charAt(pos);
