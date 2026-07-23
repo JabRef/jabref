@@ -33,7 +33,7 @@ Every option below produces BST-styled citations in a LibreOffice document. They
 
 ## Decision Outcome
 
-Chosen option: "Pandoc as an optional external process", because it removes exactly the blocker that stopped this feature twice - parsing arbitrary BST LaTeX - while everything downstream of the produced HTML reuses code JabRef already ships and trusts.
+Chosen option: "Pandoc as an optional external process", because it removes exactly the blocker that stopped this feature twice — parsing arbitrary BST LaTeX — while everything downstream of the produced HTML reuses code JabRef already ships and trusts.
 The dependency is optional and follows the precedent already set by `OcrMyPdfEngine`, so it adds no weight for users who do not use BST.
 
 ### Consequences
@@ -97,18 +97,34 @@ Ship platform-specific Pandoc binaries inside the JabRef distribution.
 
 * Good, because the code exists, is already used for BST previews, and needs no new dependency
 * Good, because it is by far the smallest change and would ship soonest
-* Bad, because it produces flat plain text: `\emph{Journal}` is discarded rather than converted, so italicised journal and book titles are lost - a visible defect in a bibliography
+* Bad, because it produces flat plain text: `\emph{Journal}` is discarded rather than converted, so italicised journal and book titles are lost — a visible defect in a bibliography
 * Bad, because it deletes markup instead of translating it, which is acceptable for a tooltip but not for a document deliverable
 * Bad, because it already contains style-specific hacks (for example a literal `#2}}` replacement for `IEEEtran.bst`), demonstrating that the delete-what-we-do-not-understand approach does not generalise
 
 ## More Information
 
-The full pipeline is: `BstVM.render(entry)` → strip LaTeX structure and preamble → Pandoc → normalise Pandoc's tags → `CSLFormatUtils.transformHTML` → `OOText` → `OOTextIntoOO.write`.
+The full pipeline is: `BstVM.render(entry)` -> strip LaTeX structure and preamble -> Pandoc -> normalise Pandoc's tags -> `CSLFormatUtils.transformHTML` -> `OOText` -> `OOTextIntoOO.write`.
 Numeric `[n]` markers reuse the first-appearance numbering already implemented in `CSLReferenceMarkManager`, which is independent of CSL.
+
+The conversion Pandoc performs, and the normalisation JabRef adds on top, are:
+
+| BST output (LaTeX) | Pandoc (HTML) | Normalised (`OOText`) | Result in LibreOffice |
+|---|---|---|---|
+| `\emph{Journal}` | `<em>Journal</em>` | `<i>Journal</i>` | italic |
+| `\textbf{x}` | `<strong>x</strong>` | `<b>x</b>` | bold |
+| `\textsc{x}` | `<span class="smallcaps">x</span>` | `<smallcaps>x</smallcaps>` | small caps |
+| `` ``x'' `` | `“x”` | `“x”` | curly quotes |
+| `~` | non-breaking space | non-breaking space | non-breaking space |
+| `{\&}` | `&amp;` | `&` (decoded by `transformHTML`) | `&` |
+| paragraph text | `<p>…</p>` | unwrapped | no spurious break |
+
+Only the middle column is JabRef's own code: three tag renames plus unwrapping Pandoc's paragraph wrapper.
+Everything in the first arrow — brace nesting, ligatures, quote forms, tilde handling, entity escaping — is Pandoc's, and is the work that would otherwise have to be written and maintained in Java.
+`\emph` is semantic rather than literal in LaTeX (it flips to upright inside already-italic text), which is why `.bst` files use it for journal and book titles; in a bibliography entry it always resolves to italic.
 
 Changing `BstVM` to emit HTML instead of LaTeX was examined and is not viable: the markup originates in string literals inside the `.bst` programs themselves, which the virtual machine only concatenates, so there is nothing at the VM level to reinterpret. It is therefore not listed as an option.
 
-`.bst` files define only the bibliography, not the in-text citation format - in LaTeX that responsibility belongs to packages such as `natbib`, not to the style file.
+`.bst` files define only the bibliography, not the in-text citation format — in LaTeX that responsibility belongs to packages such as `natbib`, not to the style file.
 JabRef therefore supplies the citation format itself, offering two fixed choices, numeric and author-year, analogous to the default JStyles.
 This is orthogonal to the decision recorded here: the conversion problem concerns the bibliography entries, and the same Pandoc pipeline serves both citation formats.
 
