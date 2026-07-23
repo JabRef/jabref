@@ -648,6 +648,13 @@ jobs:
             echo "Expected Postgres binary module is missing for ${{ matrix.os }}: $expected"
             exit 1
           fi
+
+          launcher_config="jabgui/build/packages/${{ matrix.os }}/JabRef/lib/app/JabRef.cfg"
+          if ! grep -Fqx "java-options=--add-modules=$expected" "$launcher_config"; then
+            echo "Expected Postgres binary module is not enabled by the JabRef launcher for ${{ matrix.os }}: $expected"
+            exit 1
+          fi
+
           for module in "${forbidden[@]}"; do
             if awk -F@ -v module="$module" '$1 == module { found = 1 } END { exit !found }' <<<"$modules"; then
               echo "Unexpected Postgres binary module packaged for ${{ matrix.os }}: $module"

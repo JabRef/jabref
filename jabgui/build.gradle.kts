@@ -230,6 +230,7 @@ dependencies {
 embeddedPostgresBinaryByJpackageTask.forEach { (taskName, moduleName) ->
     tasks.named<Jpackage>(taskName) {
         addModules.add(moduleName)
+        javaOptions.add("--add-modules=$moduleName")
         addModules.addAll(sharedJpackageImageModules)
     }
 }
