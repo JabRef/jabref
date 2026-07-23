@@ -164,10 +164,7 @@ class BstPipelineTest {
         String normalized = BSTFormatUtils.normalizeLegacyForPandoc(latex);
         String html = pandoc.latexToHtml(normalized);
         String oo = BSTFormatUtils.convertPandocHtmlToOOText(html);
-        // Expect <smallcaps> in OOText for the name
-        org.junit.jupiter.api.Assertions.assertTrue(oo.contains("<smallcaps>Katz, D. L.</smallcaps>")
-                || oo.contains("<smallcaps>Katz, D.~L.</smallcaps>")
-                || oo.contains("<smallcaps>Katz, D.\u00A0L.</smallcaps>"),
-                "Small caps should survive through pandoc and mapping");
+        // Expect <smallcaps> in OOText for the name; NBSP is the canonical output after entity decoding
+        assertTrue(oo.contains("<smallcaps>Katz, D.\u00A0L.</smallcaps>"), "Expected NBSP variant in smallcaps");
     }
 }
