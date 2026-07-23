@@ -927,8 +927,13 @@ public class OOBibBase {
         return OOVoidResult.ok();
     }
 
-    /// Helper method for guiActionUpdateDocument — creates or refreshes the BST bibliography
-    /// section in-place, so repeated syncs never duplicate the References section.
+    /// Helper method for guiActionUpdateDocument - refreshes a BST bibliography.
+    ///
+    /// @param databases   Must have at least one.
+    /// @param bstStyle    BST style to update the bibliography with.
+    /// @param doc         Text document.
+    /// @param fcursor     Used to synchronize document.
+    /// @param errorTitle  Error message for user.
     private OOVoidResult<OOError> updateBstBibliography(List<BibDatabase> databases, BstStyle bstStyle,
                                                         XTextDocument doc,
                                                         OOResult<FunctionalTextViewCursor, OOError> fcursor,
@@ -979,10 +984,11 @@ public class OOBibBase {
 
     /// Helper method for guiActionUpdateDocument, refreshes a CSL bibliography.
     ///
-    /// @param databases     Must have at least one.
-    /// @param citationStyle Citation style to update bibliography with.
-    /// @param doc           Text document.
-    /// @param fcursor       Used to synchronize document.
+    /// @param databases        Must have at least one.
+    /// @param citationStyle    Citation style to update bibliography with.
+    /// @param doc              Text document.
+    /// @param fcursor          Used to synchronize document.
+    /// @param errorTitle       Error message for user.
     private OOVoidResult<OOError> updateCSLBibliography(List<BibDatabase> databases, CitationStyle citationStyle, XTextDocument doc,
                                                         OOResult<FunctionalTextViewCursor, OOError> fcursor, String errorTitle) {
         return updateCSLBibliography(dialogService, databases, citationStyle, doc, fcursor, errorTitle, cslCitationOOAdapter, cslUpdateBibliography);
