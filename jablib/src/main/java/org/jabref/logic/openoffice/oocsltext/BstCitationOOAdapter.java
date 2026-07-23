@@ -117,7 +117,7 @@ public class BstCitationOOAdapter {
         BibDatabase database = ctx.getDatabase();
 
         for (BibEntry entry : sorted) {
-            String key = keyOrId(entry);
+            String identifier = keyOrId(entry);
             String latex = renderer.renderEntryToLatex(entry, database);
 
             String norm = BSTFormatUtils.normalizeLegacyForPandoc(latex);
@@ -128,7 +128,7 @@ public class BstCitationOOAdapter {
 
             String finalLine;
             if (useNumberedBibliography) {
-                int number = markManager.getCitationNumber(key);
+                int number = markManager.getCitationNumber(identifier);
                 finalLine = "[" + number + "] " + body;
             } else {
                 finalLine = body;
