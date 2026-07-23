@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -328,6 +329,59 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         refreshPreview();
     }
 
+    public void addCustomStyle() {
+        Optional<String> chosenName = dialogService.showInputDialogAndWait(
+            Localization.lang("Add custom preview style"),
+            Localization.lang("Enter name"));
+        chosenName.ifPresent(name -> {
+            if (name.isBlank()) {
+                return;
+            }
+
+            if (isNameAlreadyUsed(name, null)) {
+                dialogService.showWarningDialogAndWait(
+                    Localization.lang("Add custom preview style"),
+                    Localization.lang("A custom preview style with this name already exists."));
+                return;
+            }
+
+            TextBasedPreviewLayout newLayout = TextBasedPreviewLayout.of(
+                name,
+                TextBasedPreviewLayout.DEFAULT,
+                preferences.getLayoutFormatterPreferences(),
+                abbreviationRepository);
+            availableListProperty.add(newLayout);        
+        });
+    }
+
+    public void renameCustomStyle(TextBasedPreviewLayout layout) {
+        Optional<String> chosenName = dialogService.showInputDialogWithDefaultAndWait(
+                Localization.lang("Rename custom preview style"),
+                Localization.lang("Enter name"),
+                layout.getName());
+        
+        chosenName.ifPresent(name -> {
+            if (name.isBlank() || name.equals(layout.getName())) {
+                return;
+            }
+
+            if (isNameAlreadyUsed(name, layout)) {
+                dialogService.showWarningDialogAndWait(
+                    Localization.lang("Rename custom preview style"),
+                    Localization.lang("A custom preview style with this name already exists."));
+                return;
+            }
+            layout.setName(name);
+        });
+    }
+
+    private boolean isNameAlreadyUsed(String name, TextBasedPreviewLayout excluding) {
+        return Stream.concat(availableListProperty.getValue().stream(), chosenListProperty.getValue().stream())
+                    .filter(TextBasedPreviewLayout.class::isInstance)
+                    .map(TextBasedPreviewLayout.class::cast)
+                    .filter(layout -> layout != excluding)
+                    .anyMatch(layout -> layout.getName().equals(name));
+    }
     /// XML-Syntax-Highlighting for RichTextFX-Codearea created by (c) Carlos Martins (github:
     /// <a href="https://github.com/cmartins">@cemartins</a>)
     ///

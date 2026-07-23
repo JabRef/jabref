@@ -192,8 +192,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         editArea.clear();
         editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));
         editArea.setContextMenu(contextMenu);
-        editArea.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
-                                                 .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));
+        editArea.visibleProperty().bind(viewModel.selectedIsEditableProperty());
 
         BindingsHelper.bindBidirectional(
                 editArea.textProperty(),
@@ -215,7 +214,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
         searchBox.textProperty().addListener((_, _, searchTerm) -> viewModel.setAvailableFilter(searchTerm));
 
-        readOnlyLabel.visibleProperty().bind(viewModel.selectedIsEditableProperty().not());
+        readOnlyLabel.setVisible(false);
         resetDefaultButton.disableProperty().bind(viewModel.selectedIsEditableProperty().not());
         contextMenu.getItems().getFirst().disableProperty().bind(viewModel.selectedIsEditableProperty().not());
         contextMenu.getItems().get(2).disableProperty().bind(viewModel.selectedIsEditableProperty().not());
