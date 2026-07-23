@@ -12,7 +12,8 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class BSTFormatUtils {
 
-    private BSTFormatUtils() {}
+    private BSTFormatUtils() {
+    }
 
     // ---- Pandoc HTML -> OOText full conversion (wrapper used by LO path) ----
     public static String convertPandocHtmlToOOText(String pandocHtml) {
@@ -101,8 +102,6 @@ public final class BSTFormatUtils {
         s = s.replaceAll("(?s)<span\\s+style=\"[^\"]*text-decoration\\s*:\\s*underline[^\"]*\"[^>]*>(.*?)</span>", "<u>$1</u>");
         return s;
     }
-
-
 
     // ---- Generic HTML cleanup and entity decoding ----
 
