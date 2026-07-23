@@ -112,6 +112,7 @@ public class BstCitationOOAdapter {
         sorted.sort(Comparator.comparingInt(
                 entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
 
+        boolean useNumberedBibliography = openOfficePreferences.getBstCitationFormat() == BstCitationFormat.NUMERIC;
         BibDatabase database = ctx.getDatabase();
 
         for (BibEntry entry : sorted) {
@@ -119,10 +120,15 @@ public class BstCitationOOAdapter {
             String html = pandoc.latexToHtml(latex);
             String body = BstHtmlToOOText.convert(html);
 
-            int number = markManager.getCitationNumber(entry.getCitationKey().orElse(""));
-            String withNumber = "[" + number + "] " + body;
+            String finalLine;
+            if (useNumberedBibliography) {
+                int number = markManager.getCitationNumber(entry.getCitationKey().orElse(""));
+                finalLine = "[" + number + "] " + body;
+            } else {
+                finalLine = body;
+            }
 
-            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(withNumber));
+            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalLine));
             OOTextIntoOO.write(document, cursor, ooText);
 
             OOText ooBreak = OOFormat.paragraph(
