@@ -89,6 +89,11 @@ on:
         type: boolean
         required: false
         default: false
+      run-jabkit-online-tests:
+        description: "Run online JabKit smoke tests (native binary)"
+        type: boolean
+        required: false
+        default: false
       upload:
         description: "Upload to builds.jabref.org"
         type: boolean
@@ -767,9 +772,132 @@ jobs:
             jabls-cli/build/packages/${{ matrix.os }}
           compression-level: 0 # no compression
 
+  jabkit-native:
+    needs: [ conditions, disk-space-check, pre-build ]
+    if: ${{ needs.conditions.outputs.should-build == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            displayName: linux-amd64
+            javaPackage: jdk+fx
+            archiveNative: "tar -c -C jabkit/build/native jabkit | gzip > jabkit/build/native-dist/jabkit-native_linux.tar.gz"
+          - os: ubuntu-22.04-arm
+            displayName: linux-arm
+            # BellSoft does not publish the Full NIK (jdk+fx) for linux-aarch64; the standard JDK bundle still contains java.desktop/AWT
+            javaPackage: jdk
+            archiveNative: "tar -c -C jabkit/build/native jabkit | gzip > jabkit/build/native-dist/jabkit-native_linux_arm64.tar.gz"
+          - os: macos-15
+            displayName: macOS-silicon
+            javaPackage: jdk+fx
+            archiveNative: "ditto -c -k --keepParent jabkit/build/native/jabkit jabkit/build/native-dist/jabkit-native_macos-silicon.zip"
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.displayName }} jabkit native binary
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+          submodules: 'true'
+          show-progress: 'false'
+
+      - uses: ./.github/actions/setup-gradle
+
+      - name: Setup macOS key chain for app id cert
+        if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true') }}
+        uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
+        with:
+          p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
+          p12-password: ${{ secrets.OSX_CERT_PWD }}
+          keychain-password: tEmPoRaRY-PaeSWD
+
+      # In graalvm/setup-graalvm, distribution "liberica" means Liberica NIK.
+      # jdk+fx maps to the Full Liberica package, used here for the AWT/java.desktop path triggered by PDFBox.
+      - name: Set up Liberica NIK (native-image with AWT support)
+        uses: graalvm/setup-graalvm@v1
+        with:
+          distribution: 'liberica'
+          java-package: ${{ matrix.javaPackage }}
+          java-version: '25'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build JabKit native binary
+        run: gradle :jabkit:nativeCompile
+        env:
+          VERSION: ${{ needs.pre-build.outputs.AssemblySemVer }}
+          VERSION_INFO: ${{ needs.pre-build.outputs.InformationalVersion }}
+
+      - name: Install clitest
+        uses: ethanjli/cached-download-action@v0.1.4
+        with:
+          # clitest v0.5.0 (https://github.com/aureliojargas/clitest/releases/tag/0.5.0)
+          url: https://raw.githubusercontent.com/aureliojargas/clitest/8bdaae2f56e524f8824307d5c443e6353fe0dbd9/clitest
+          destination: /tmp/clitest
+
+      - name: Make clitest executable
+        run: chmod +x /tmp/clitest
+
+      - name: Run JabKit offline smoke tests
+        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline.md
+
+      - name: Run JabKit PDF native smoke test (Linux only)
+        if: ${{ runner.os == 'Linux' }}
+        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-offline-pdf.md
+
+      - name: Run JabKit online smoke tests
+        if: ${{ inputs.run-jabkit-online-tests }}
+        run: cd jabkit && /tmp/clitest src/test/nativeimage/jabkit-online.md
+
+      - name: Package JabKit native binary
+        shell: bash
+        run: |
+          set -eo pipefail
+          mv jabkit/build/native/nativeCompile jabkit/build/native/jabkit
+
+          if [[ "${{ matrix.os }}" == macos-* && "${{ needs.conditions.outputs.secretspresent }}" == "true" ]]; then
+            codesign --force --options runtime --timestamp --sign "Developer ID Application: JabRef e.V. (6792V39SK3)" jabkit/build/native/jabkit
+            codesign --verify --strict --verbose=2 jabkit/build/native/jabkit
+            codesign --display --verbose=2 jabkit/build/native/jabkit 2>&1 | grep "Authority=Developer ID Application"
+          fi
+
+          mkdir -p jabkit/build/native-dist
+          ${{ matrix.archiveNative }}
+
+      - name: Upload jabkit native to GitHub artifacts store
+        if: ${{ (github.event.inputs.upload-as-artifact == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: jabkit-native (${{ matrix.displayName }})
+          path: jabkit/build/native-dist/*.*
+          if-no-files-found: error
+
+      - name: Upload jabkit native to GitHub workflow artifacts store for notarization (macOS)
+        if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
+        uses: actions/upload-artifact@v7
+        with:
+          # tbn = to-be-notarized
+          name: jabkit-native-${{ matrix.os }}-tbn
+          path: jabkit/build/native-dist/jabkit-native_macos-silicon.zip
+          compression-level: 0 # no compression
+
+      - name: Setup SSH key
+        if: ${{ needs.disk-space-check.outputs.available == 'true' }}
+        run: |
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+      - name: Setup rsync (macOS)
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (startsWith(matrix.os, 'macos')) }}
+        run: brew install rsync
+      - name: Upload jabkit native to builds.jabref.org
+        if: ${{ (needs.disk-space-check.outputs.available == 'true') && (!startsWith(matrix.os, 'macos') || needs.conditions.outputs.should-notarize != 'true') }}
+        shell: bash
+        run: |
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/native-dist/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/${{ matrix.displayName }}/tools/
+
   comment-on-issue-and-pr:
     # separate job, because it should wait until all binaries are available
-    needs: [ conditions, disk-space-check, build ]
+    needs: [ conditions, disk-space-check, build, jabkit-native ]
     if: ${{ (github.event_name == 'pull_request') }}
     permissions:
       issues: write
@@ -887,6 +1015,37 @@ jobs:
           name: ${{ matrix.displayName }}
           path: |
             ${{ matrix.path }}/build/packages/${{ matrix.os }}
+
+  notarize-jabkit-native:
+    name: macOS notarization - JabKit native binary
+    needs: [ conditions, disk-space-check, jabkit-native, pre-build ]
+    if: ${{ needs.conditions.outputs.should-notarize == 'true' }}
+    runs-on: macos-15
+    steps:
+      - name: Download from GitHub workflow artifacts store (macOS)
+        uses: actions/download-artifact@v8
+        with:
+          name: jabkit-native-macos-15-tbn
+          path: jabkit/build/native-dist
+      - name: Notarize JabKit native binary
+        shell: bash
+        run: |
+          xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
+          xcrun notarytool submit jabkit/build/native-dist/jabkit-native_macos-silicon.zip --keychain-profile "notarytool-profile" --wait
+      - name: Upload to builds.jabref.org
+        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
+        shell: bash
+        run: |
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/macOS-silicon/tools && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/native-dist/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.pre-build.outputs.branch }}/macOS-silicon/tools/
+      - name: Upload artifacts
+        if: ${{ github.event.inputs.upload-as-artifact == 'true' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: jabkit-native (macOS-silicon)
+          path: jabkit/build/native-dist/jabkit-native_macos-silicon.zip
+          if-no-files-found: error
 
   upload-pr-nnumber:
     runs-on: ubuntu-slim
