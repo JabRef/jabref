@@ -8,7 +8,7 @@ parent: Decision Records
 ## Context and Problem Statement
 
 JabRef's [LibreOffice integration](https://docs.jabref.org/cite/openofficeintegration) supports [CSL styles](https://citationstyles.org/) and [JStyles](https://jstyles.jabref.org/), but not BST (BibTeX style) files, although many publishers still distribute only `.bst`.
-Initial BST support existed in the OpenOffice panel but was removed as unfinished ([#602](https://github.com/JabRef/jabref/pull/602), tracked in [#624](https://github.com/JabRef/jabref/issues/624)); the stated blocker was that `.bst` files such as `IEEEtran.bst` emit "quite a bit of non-trivial latex code to parse".
+Initial BST support existed in the OpenOffice panel but was removed as unfinished ([#602](https://github.com/JabRef/jabref/pull/602), tracked in [#624](https://github.com/JabRef/jabref/issues/624)); the [stated blocker](https://github.com/JabRef/jabref/pull/602#issuecomment-167756642) was that `.bst` files such as `IEEEtran.bst` emit "quite a bit of non-trivial latex code to parse".
 
 Supporting BST in LibreOffice documents is the goal. The open question is: `BstVM` renders an entry to a LaTeX fragment (`\emph{...}`, ``` ``...'' ```, `~`, `{\&}`, plus a `\providecommand` preamble), whereas `OOTextIntoOO` consumes an HTML-like tag vocabulary (`<b>`, `<i>`, `<smallcaps>`, `<sup>`, `<p>`).
 **How do we convert BST's LaTeX output into `OOText`?**
@@ -100,7 +100,7 @@ A JabRef-owned mapper from `\emph{}`, `\textbf{}`, `\textsc{}`, ``` `` '' ```, `
 - Good, because formatting is preserved for the constructs the mapper covers
 - Neutral, because for a single curated style family the required LaTeX subset is small and well defined
 - Bad, because the LaTeX subset emitted across arbitrary `.bst` files is open-ended, and correctness requires brace-level parsing rather than regular expressions (regex-level handling cannot correctly deal with nested braces)
-- Bad, because practical support devolves into extending coverage per encountered `.bst` construct (e.g., style-specific macros), which is open-ended maintenance work compared to inheriting a mature parser's coverage
+- Bad, because practical support devolves into extending coverage per encountered `.bst` construct (e.g., style-specific macros), which is open-ended maintenance work compared to inheriting a mature parser's coverage; this is [what stalled the original attempt](https://github.com/JabRef/jabref/pull/602#issuecomment-167756642)
 
 ### Hybrid: Pandoc primary with SnuggleTeX-based pure-Java fallback
 
