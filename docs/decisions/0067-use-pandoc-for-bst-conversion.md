@@ -71,10 +71,7 @@ A JabRef-owned mapper from `\emph{}`, `\textbf{}`, `\textsc{}`, `` `` '' ``, `~`
 
 ### Pandoc as an optional external process
 
-```bash
-pandoc -f latex -t html --wrap=none
-``` 
-over stdin/stdout, wrapped in a class.
+`pandoc -f latex -t html --wrap=none` over stdin/stdout, wrapped in a class.
 
 * Good, because it eliminates the historical blocker outright
 * Good, because its HTML output maps onto the `OOText` vocabulary with a handful of tag renames
