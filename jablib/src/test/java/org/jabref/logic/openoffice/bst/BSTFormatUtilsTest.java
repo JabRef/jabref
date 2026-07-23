@@ -299,7 +299,7 @@ class BSTFormatUtilsTest {
     @Test
     void emptyInputDoesNotThrow() {
         String result = BSTFormatUtils.convertPandocHtmlToOOText("");
-        assertTrue(result.isEmpty() || result.isBlank(), "Empty input should produce empty output");
+        assertTrue(result.isBlank(), "Empty input should produce empty output");
     }
 
     @Test
