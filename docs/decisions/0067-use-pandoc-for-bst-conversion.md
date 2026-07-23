@@ -7,7 +7,7 @@ parent: Decision Records
 
 ## Context and Problem Statement
 
-JabRef's [LibreOffice integration](https://docs.jabref.org/cite/openofficeintegration) supports [CSL styles](https://citationstyles.org/) and [JStyles](https://jstyles.jabref.org/), but not BST (BibTeX style) files, although many publishers still distribute only `.bst`.
+JabRef's [LibreOffice integration](https://docs.jabref.org/cite/openofficeintegration) supports [CSL styles](https://citationstyles.org/) and [JStyles](https://jstyles.jabref.org/), but not [BST](https://text2bib.org/bsts) (BibTeX style) files, although many publishers still distribute only `.bst`.
 Initial BST support existed in the OpenOffice panel but was removed as unfinished ([#602](https://github.com/JabRef/jabref/pull/602), tracked in [#624](https://github.com/JabRef/jabref/issues/624)); the [stated blocker](https://github.com/JabRef/jabref/pull/602#issuecomment-167756642) was that `.bst` files such as `IEEEtran.bst` emit "quite a bit of non-trivial latex code to parse".
 
 Supporting BST in LibreOffice documents is the goal. The open question is: `BstVM` renders an entry to a LaTeX fragment (`\emph{...}`, ``` ``...'' ```, `~`, `{\&}`, plus a `\providecommand` preamble), whereas `OOTextIntoOO` consumes an HTML-like tag vocabulary (`<b>`, `<i>`, `<smallcaps>`, `<sup>`, `<p>`).
