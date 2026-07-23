@@ -940,7 +940,7 @@ public class OOBibBase {
             List<BibEntry> citedEntries = databases.stream()
                                                    .flatMap(db -> db.getEntries().stream())
                                                    .filter(bstCitationOOAdapter::isCitedEntry)
-                                                   .toList();
+                                                   .collect(Collectors.toCollection(ArrayList::new)); // has to be a mutable list as it undergoes sorting
 
             if (citedEntries.isEmpty()) {
                 dialogService.showInformationDialogAndWait(
