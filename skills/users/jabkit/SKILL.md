@@ -11,7 +11,28 @@ license: MIT
 
 ## Installation
 
-`jabkit` runs via [JBang](https://www.jbang.dev/) — no JDK setup needed. Install JBang if missing:
+Preferred: the native binary — a single self-contained executable, no JDK or JBang needed, instant startup. Download and unpack for your platform:
+
+```bash
+# Linux (amd64)
+curl -fL https://builds.jabref.org/main/linux-amd64/tools/jabkit-native_linux.tar.gz | tar xz
+./jabkit/jabkit --help
+```
+
+```bash
+# Linux (arm64)
+curl -fL https://builds.jabref.org/main/linux-arm/tools/jabkit-native_linux_arm64.tar.gz | tar xz
+./jabkit/jabkit --help
+```
+
+```bash
+# macOS (Apple Silicon)
+curl -fLO https://builds.jabref.org/main/macOS-silicon/tools/jabkit-native_macos-silicon.zip
+unzip jabkit-native_macos-silicon.zip
+.jabkit/jabkit --help
+```
+
+On other platforms (e.g. Windows, Intel macOS), run `jabkit` via [JBang](https://www.jbang.dev/) instead — no JDK setup needed. Install JBang if missing:
 
 ```bash
 curl -Ls https://sh.jbang.dev | bash -s - app setup   # Linux/macOS
