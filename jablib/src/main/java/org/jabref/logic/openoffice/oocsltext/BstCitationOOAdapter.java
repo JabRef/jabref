@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.StringJoiner;
 
+import org.jabref.logic.bst.BstVM;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.bst.BstEntryRenderer;
 import org.jabref.logic.openoffice.bst.BstHtmlToOOText;
@@ -99,7 +100,7 @@ public class BstCitationOOAdapter {
                 openOfficePreferences.getCslBibliographyBodyFormat());
         OOTextIntoOO.write(document, cursor, titleBreak);
 
-        org.jabref.logic.bst.BstVM vm;
+        BstVM vm;
         try {
             vm = style.createBstVM();
         } catch (IOException e) {
