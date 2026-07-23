@@ -29,7 +29,17 @@
         <VBox spacing="4.0" HBox.hgrow="ALWAYS">
             <Label text="%Available" styleClass="sectionHeader"/>
             <CustomTextField fx:id="searchBox" promptText="%Filter" VBox.vgrow="NEVER" prefHeight="20.0"/>
-            <ListView fx:id="availableListView" minHeight="150.0" prefHeight="250.0"/>
+            <TabPane tabClosingPolicy="UNAVAILABLE" minHeight="150.0" prefHeight="250.0">
+                <Tab text="%CSL">
+                    <ListView fx:id="availableListViewCsl"/>
+                </Tab>
+                <Tab text="%Customized">
+                    <VBox spacing="4.0">
+                        <Button fx:id="addCustomStyleButton" text="%New custom style" onAction="#addCustomStyleButtonAction"/>
+                        <ListView fx:id="availableListViewCustom" VBox.vgrow="ALWAYS"/>
+                    </VBox>
+                </Tab>
+            </TabPane>
         </VBox>
         <VBox alignment="CENTER" spacing="4.0">
             <Label styleClass="sectionHeader"/>

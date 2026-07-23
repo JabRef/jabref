@@ -74,8 +74,12 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty shouldDownloadCovers = new SimpleBooleanProperty();
 
     private final ListProperty<PreviewLayout> availableListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
-    private final FilteredList<PreviewLayout> filteredAvailableLayouts = new FilteredList<>(this.availableListProperty());
+    private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelPropertyCsl = new SimpleObjectProperty<>(new NoSelectionModel<>());
+    private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelPropertyCustom = new SimpleObjectProperty<>(new NoSelectionModel<>());
+    private final FilteredList<PreviewLayout> filteredAvailableLayoutsCsl =
+            new FilteredList<>(this.availableListProperty(), preview -> !(preview instanceof TextBasedPreviewLayout));
+    private final FilteredList<PreviewLayout> filteredAvailableLayoutsCustom =
+            new FilteredList<>(this.availableListProperty(), preview -> preview instanceof TextBasedPreviewLayout);
     private final ListProperty<PreviewLayout> chosenListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
 
@@ -262,8 +266,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void addToChosen() {
-        List<PreviewLayout> selected = new ArrayList<>(availableSelectionModelProperty.getValue().getSelectedItems());
-        availableSelectionModelProperty.getValue().clearSelection();
+        List<PreviewLayout> selected = new ArrayList<>(availableSelectionModelPropertyCsl.getValue().getSelectedItems());
+        selected.addAll(availableSelectionModelPropertyCustom.getValue().getSelectedItems());
+        availableSelectionModelPropertyCsl.getValue().clearSelection();
+        availableSelectionModelPropertyCustom.getValue().clearSelection();
         availableListProperty.removeAll(selected);
         chosenListProperty.addAll(selected);
     }
@@ -538,18 +544,29 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return availableListProperty;
     }
 
-    public FilteredList<PreviewLayout> getFilteredAvailableLayouts() {
-        return this.filteredAvailableLayouts;
+    public FilteredList<PreviewLayout> getFilteredAvailableLayoutsCsl() {
+        return this.filteredAvailableLayoutsCsl;
     }
+
+    public FilteredList<PreviewLayout> getFilteredAvailableLayoutsCustom() {
+        return this.filteredAvailableLayoutsCustom;
+    }    
 
     public void setAvailableFilter(String searchTerm) {
-        this.filteredAvailableLayouts.setPredicate(
-                preview -> searchTerm.isEmpty()
-                        || preview.containsCaseIndependent(searchTerm));
+        filteredAvailableLayoutsCsl.setPredicate(
+                preview -> !(preview instanceof TextBasedPreviewLayout)
+                        && (searchTerm.isEmpty() || preview.containsCaseIndependent(searchTerm)));
+        filteredAvailableLayoutsCustom.setPredicate(
+                preview -> (preview instanceof TextBasedPreviewLayout)
+                        && (searchTerm.isEmpty() || preview.containsCaseIndependent(searchTerm)));
     }
 
-    public ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty() {
-        return availableSelectionModelProperty;
+    public ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelPropertyCsl() {
+        return availableSelectionModelPropertyCsl;
+    }
+
+    public ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelPropertyCustom() {
+        return availableSelectionModelPropertyCustom;
     }
 
     public ListProperty<PreviewLayout> chosenListProperty() {
@@ -589,6 +606,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             chosenListProperty.remove(bstLayout);
             // Remove the path so it doesn't come back on restart
             bstStylesPaths.remove((bstLayout.getFilePath()));
+        } else if (layout instanceof TextBasedPreviewLayout textLayout) {
+            availableListProperty.remove(textLayout);
+            chosenListProperty.remove(textLayout);
         }
     }
 }
