@@ -331,24 +331,6 @@ public class CSLReferenceMarkManager {
         return citationKeyToNumber.computeIfAbsent(citationKey, _ -> ++highestCitationNumber);
     }
 
-    /// Style-agnostic first-appearance numbering. Each citation key is assigned the number
-    /// corresponding to its first appearance across all marks, in document order.
-    ///
-    /// @param marksInDocumentOrder each element is the list of citation keys for one mark, ordered by position
-    /// @return map from citation key to its first-appearance number (1-based)
-    public static Map<String, Integer> assignFirstAppearanceNumbers(List<List<String>> marksInDocumentOrder) {
-        Map<String, Integer> keyToNumber = new HashMap<>();
-        int next = 1;
-        for (List<String> keys : marksInDocumentOrder) {
-            for (String key : keys) {
-                if (!keyToNumber.containsKey(key)) {
-                    keyToNumber.put(key, next++);
-                }
-            }
-        }
-        return keyToNumber;
-    }
-
     public List<CSLReferenceMark> getMarksInOrder() {
         sortMarksInOrder();
         return marksInOrder;
