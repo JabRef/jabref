@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 /// so repeated "Sync bibliography" calls never duplicate the References section.
 public class BstUpdateBibliography {
 
-    private static final String BST_BIBLIOGRAPHY_SECTION_NAME = "JR_bst_bib";
+    private static final String BST_BIBLIOGRAPHY_SECTION_NAME = "JR_bib";
     private static final Logger LOGGER = LoggerFactory.getLogger(BstUpdateBibliography.class);
 
     /// Creates or clears the BST bibliography section, then populates it.
