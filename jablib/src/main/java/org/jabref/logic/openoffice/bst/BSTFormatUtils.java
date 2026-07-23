@@ -34,6 +34,9 @@ public final class BSTFormatUtils {
     }
 
     // Removes <em>/<strong> only inside <span class="math inline">…</span> and inlines the content
+    // Needed because pandoc wraps inline math identifiers in <em>
+    // (e.g., <span class="math inline"><em>Σ</em></span>), which would otherwise render Greek
+    // letters italic in LibreOffice contrary to the desired bibliography styling.
     private static String stripEmphasisInsideInlineMath(String html) {
         Pattern math = Pattern.compile("(?s)<span\\s+class=\\\"math inline\\\"[^>]*>(.*?)</span>");
         Matcher m = math.matcher(html);

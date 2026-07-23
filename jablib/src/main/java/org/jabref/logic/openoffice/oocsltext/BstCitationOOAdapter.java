@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.bst.BstVM;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -119,12 +121,33 @@ public class BstCitationOOAdapter {
         for (BibEntry entry : sorted) {
             String key = entry.getCitationKey().orElse("");
             String latex = renderer.renderEntryToLatex(entry, database);
+            LOGGER.warn("BST bibliography LaTeX [{}]: {}", key, latex);
 
             String norm = BSTFormatUtils.normalizeLegacyForPandoc(latex);
+            if (!norm.equals(latex)) {
+                LOGGER.warn("Normalized LaTeX for pandoc [{}]: {}", key, norm);
+            }
 
             String html = pandoc.latexToHtml(norm);
+            LOGGER.warn("Pandoc HTML [{}]: {}", key, html);
+            if (html.contains("class=\"math inline\"")) {
+                LOGGER.warn("Pandoc HTML [{}] contains inline math spans", key);
+                try {
+                    Pattern mathSpan = Pattern.compile("(?s)<span\\s+class=\\\"math inline\\\"[^>]*>(.*?)</span>");
+                    Matcher m = mathSpan.matcher(html);
+                    int count = 0;
+                    while (m.find() && count < 3) { // log first few to avoid noise
+                        String inner = m.group(1).replaceAll("\\s+", " ").trim();
+                        LOGGER.warn("Inline math span [{} #{}]: {}", key, count + 1, inner);
+                        count++;
+                    }
+                } catch (Exception e) {
+                    LOGGER.warn("Failed to inspect inline math spans for [{}]", key, e);
+                }
+            }
 
             String body = BSTFormatUtils.convertPandocHtmlToOOText(html);
+            LOGGER.warn("OOText body [{}]: {}", key, body);
 
             String finalLine;
             if (useNumberedBibliography) {
@@ -133,6 +156,7 @@ public class BstCitationOOAdapter {
             } else {
                 finalLine = body;
             }
+            LOGGER.warn("Final OOText [{}]: {}", key, finalLine);
 
             OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalLine));
             OOTextIntoOO.write(document, cursor, ooText);
