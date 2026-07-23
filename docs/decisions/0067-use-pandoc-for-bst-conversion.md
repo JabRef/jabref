@@ -113,8 +113,8 @@ Description: keep Pandoc as the primary converter; when it is not available, fal
 
 ## More Information
 
-Pandoc is involved only in the rendering of the bibliography entries. For a single entry the pipeline is: `BstVM.render(entry)` -> strip LaTeX structure and preamble -> Pandoc -> normalize Pandoc's tags -> `CSLFormatUtils.transformHTML` -> `OOText` -> `OOTextIntoOO.write`.
-In-text citation markers never pass through Pandoc: Numeric `[n]` markers reuse the first-appearance numbering already implemented in `CSLReferenceMarkManager`, which is independent of CSL.
+The full pipeline is: `BstVM.render(entry)` -> strip LaTeX structure and preamble -> Pandoc -> normalize Pandoc's tags -> `CSLFormatUtils.transformHTML` -> `OOText` -> `OOTextIntoOO.write`.
+Numeric `[n]` markers reuse the first-appearance numbering already implemented in `CSLReferenceMarkManager`, which is independent of CSL.
 
 The conversion Pandoc performs, and the normalisation JabRef adds on top, are:
 
