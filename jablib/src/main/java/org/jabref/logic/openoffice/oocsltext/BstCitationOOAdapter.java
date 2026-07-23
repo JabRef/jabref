@@ -110,7 +110,7 @@ public class BstCitationOOAdapter {
 
         List<BibEntry> sorted = new ArrayList<>(entries);
         sorted.sort(Comparator.comparingInt(
-                e -> markManager.getCitationNumber(e.getCitationKey().orElse(""))));
+                entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
 
         BibDatabase database = ctx.getDatabase();
 
