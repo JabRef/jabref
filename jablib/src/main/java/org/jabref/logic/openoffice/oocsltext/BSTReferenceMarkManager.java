@@ -36,11 +36,10 @@ import org.slf4j.LoggerFactory;
 
 import static org.jabref.logic.openoffice.backend.NamedRangeReferenceMark.safeInsertSpacesBetweenReferenceMarks;
 
-/**
- * Reference mark manager for BST-based citations.
- * Mirrors the behavior of CSLReferenceMarkManager but uses identifier terminology
- * and supports applying a precomputed numbering map (e.g., from BST style order).
- */
+/// Reference mark manager for BST-based citations.
+///
+/// Mirrors the behavior of [CSLReferenceMarkManager] but uses identifier terminology
+/// and supports applying a precomputed numbering map (e.g., from BST style order).
 public class BSTReferenceMarkManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(BSTReferenceMarkManager.class);
     private static final Pattern CITATION_NUMBER_PATTERN = Pattern.compile("(\\D*)(\\d+)(\\D*)");
