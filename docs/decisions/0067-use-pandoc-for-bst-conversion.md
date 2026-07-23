@@ -109,7 +109,7 @@ Description: keep Pandoc as the primary converter; when it is not available, fal
 * Good, because BST bibliography would work without installing Pandoc (lower barrier)
 * Good, because it is fully in-process and reuses existing JabRef code (preview transforms, `LatexToUnicodeAdapter`)
 * Bad, because fidelity for arbitrary `.bst` outputs will be lower than Pandoc; complex LaTeX constructs may not render ideally
-* Bad, because the SnuggleTeX fallback inherits the same JPMS constraint: in a modular runtime, `snuggletex.core` does not read `java.xml`, so DOM/XHTML output (`buildXMLString`) will throw `IllegalAccessError` unless the JVM is launched with `--add-reads snuggletex.core=java.xml` (or run on the classpath). This is a JVM launch flag, not a JabRef preference, and the robust fix requires an upstream `module-info` change in SnuggleTeX
+* Bad, because the SnuggleTeX fallback inherits the same JPMS constraint as the pure SnuggleTeX option: in a modular runtime, `snuggletex.core` does not read `java.xml`, so DOM/XHTML output (`buildXMLString`) will throw `IllegalAccessError` unless the JVM is launched with `--add-reads snuggletex.core=java.xml` (or run on the classpath). This is a JVM launch flag, not a JabRef preference, and the robust fix requires an upstream `module-info` change in SnuggleTeX
 * Neutral, because it can be implemented as an availability-based fallback without impacting the main (Pandoc) path
 
 ## More Information
