@@ -111,13 +111,13 @@ public class BstCitationOOAdapter {
 
         List<BibEntry> sorted = new ArrayList<>(entries);
         sorted.sort(Comparator.comparingInt(
-                entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
+                entry -> markManager.getCitationNumber(keyOrId(entry))));
 
         boolean useNumberedBibliography = openOfficePreferences.getBstCitationFormat() == BstCitationFormat.NUMERIC;
         BibDatabase database = ctx.getDatabase();
 
         for (BibEntry entry : sorted) {
-            String key = entry.getCitationKey().orElse("");
+            String key = keyOrId(entry);
             String latex = renderer.renderEntryToLatex(entry, database);
 
             String norm = BSTFormatUtils.normalizeLegacyForPandoc(latex);
@@ -146,13 +146,13 @@ public class BstCitationOOAdapter {
 
     /// Returns `true` if the given entry has already been cited in the document.
     public boolean isCitedEntry(BibEntry entry) {
-        return markManager.hasCitationForKey(entry.getCitationKey().orElse(""));
+        return markManager.hasCitationForKey(keyOrId(entry));
     }
 
     private String buildNumericCitation(List<BibEntry> entries) {
         StringJoiner sj = new StringJoiner(", ", "[", "]");
         for (BibEntry entry : entries) {
-            int number = markManager.getCitationNumber(entry.getCitationKey().orElse(""));
+            int number = markManager.getCitationNumber(keyOrId(entry));
             sj.add(String.valueOf(number));
         }
         return sj.toString();
@@ -179,6 +179,11 @@ public class BstCitationOOAdapter {
                     .map(AuthorList::parse)
                     .map(AuthorList::getAsNatbib)
                     .orElse("?");
+    }
+
+    @VisibleForTesting
+    static String keyOrId(BibEntry entry) {
+        return entry.getCitationKey().orElse(entry.getId());
     }
 
     private boolean checkPreceedingSpace(XTextCursor cursor) {

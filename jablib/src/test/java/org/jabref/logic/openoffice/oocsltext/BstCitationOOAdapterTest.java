@@ -57,6 +57,27 @@ class BstCitationOOAdapterTest {
     }
 
     @Test
+    void keyOrId_returnsCitationKeyWhenPresent() {
+        BibEntry entry = new BibEntry()
+                .withCitationKey("MyKey");
+        assertEquals("MyKey", BstCitationOOAdapter.keyOrId(entry));
+    }
+
+    @Test
+    void keyOrId_fallsBackToUniqueIdWhenKeyMissing() {
+        BibEntry entry1 = new BibEntry();
+        BibEntry entry2 = new BibEntry();
+        String k1 = BstCitationOOAdapter.keyOrId(entry1);
+        String k2 = BstCitationOOAdapter.keyOrId(entry2);
+        // Falls back to the internal id and those should be non-empty and distinct
+        assertEquals(entry1.getId(), k1);
+        assertEquals(entry2.getId(), k2);
+        org.junit.jupiter.api.Assertions.assertNotEquals(k1, k2);
+    }
+
+
+
+    @Test
     void buildAuthorYearCitation_twoEntriesJoinedWithSemicolon() {
         BibEntry entry1 = new BibEntry()
                 .withField(StandardField.AUTHOR, AUTHOR_DOE_JOHN)
