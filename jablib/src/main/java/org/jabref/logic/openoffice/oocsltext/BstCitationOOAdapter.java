@@ -64,7 +64,7 @@ public class BstCitationOOAdapter {
             case NUMERIC ->
                     buildNumericCitation(entries);
             case AUTHOR_YEAR ->
-                    buildAuthorYearCitation(entries);
+                    buildAuthorYearCitation(entries, ctx);
         };
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(citationText));
@@ -146,11 +146,11 @@ public class BstCitationOOAdapter {
         return sj.toString();
     }
 
-    private String buildAuthorYearCitation(List<BibEntry> entries) {
+    private String buildAuthorYearCitation(List<BibEntry> entries, BibDatabaseContext ctx) {
         StringJoiner sj = new StringJoiner("; ", "(", ")");
         for (BibEntry entry : entries) {
             String authorPart = extractFirstAuthorLastName(entry);
-            String year = entry.getField(StandardField.YEAR).orElse("?");
+            String year = entry.getResolvedFieldOrAlias(StandardField.YEAR, ctx.getDatabase()).orElse("?");
             sj.add(authorPart + ", " + year);
         }
         return sj.toString();
