@@ -150,7 +150,7 @@ class BstEntryRendererTest {
 
         String result = new BstEntryRenderer(vm).renderEntryToLatex(entry, db);
 
-        // abbrv wraps booktitle in {\em ...} — inline markup must survive stripping
+        // abbrv wraps booktitle in {\em ...} - inline markup must survive stripping
         assertTrue(result.contains("{\\em"), "Inline LaTeX emphasis markup should be preserved");
     }
 

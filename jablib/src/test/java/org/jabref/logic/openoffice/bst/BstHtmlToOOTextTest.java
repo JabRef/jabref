@@ -22,7 +22,7 @@ class BstHtmlToOOTextTest {
 
     @Test
     void singleParagraphContentIsKeptInline() {
-        // The entry body must be an inline run — no leading paragraph break before the text,
+        // The entry body must be an inline run - no leading paragraph break before the text,
         // so that "[n] " prepended by insertBibliography stays on the same line.
         String input = "<p>Smith et al., 2016.</p>";
         String result = BstHtmlToOOText.convert(input);

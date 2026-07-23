@@ -50,7 +50,7 @@ class BstPipelineTest {
 
     @Test
     void pandocAvailabilityCheck() {
-        // This test always passes — it just documents whether pandoc is present.
+        // This test always passes - it just documents whether pandoc is present.
         // If false, all pandoc-dependent tests below will be skipped.
         boolean available = pandoc.isAvailable();
         assertTrue(available || !available, "pandoc.isAvailable() must return a boolean");
@@ -60,7 +60,7 @@ class BstPipelineTest {
 
     @Test
     void ieeeFullPipelineProducesCleanText() throws Exception {
-        assumeTrue(pandoc.isAvailable(), "pandoc not available — skipping pipeline test");
+        assumeTrue(pandoc.isAvailable(), "pandoc not available - skipping pipeline test");
 
         BstVM vm = new BstVM(ieeePath());
         BibDatabase db = new BibDatabase(List.of(articleEntry));
@@ -85,7 +85,7 @@ class BstPipelineTest {
 
     @Test
     void ieeeFullPipelineProducesItalicsForJournalTitle() throws Exception {
-        assumeTrue(pandoc.isAvailable(), "pandoc not available — skipping pipeline test");
+        assumeTrue(pandoc.isAvailable(), "pandoc not available - skipping pipeline test");
 
         BstVM vm = new BstVM(ieeePath());
         BibDatabase db = new BibDatabase(List.of(articleEntry));
@@ -101,7 +101,7 @@ class BstPipelineTest {
 
     @Test
     void ieeeOutputDoesNotContainPandocParagraphWrapper() throws Exception {
-        assumeTrue(pandoc.isAvailable(), "pandoc not available — skipping pipeline test");
+        assumeTrue(pandoc.isAvailable(), "pandoc not available - skipping pipeline test");
 
         BstVM vm = new BstVM(ieeePath());
         BibDatabase db = new BibDatabase(List.of(articleEntry));
@@ -110,16 +110,16 @@ class BstPipelineTest {
         String html = pandoc.latexToHtml(latex);
         String ooText = BstHtmlToOOText.convert(html);
 
-        // The OOText must be a plain inline run — no leading paragraph break that would
+        // The OOText must be a plain inline run - no leading paragraph break that would
         // orphan the "[n] " prefix written by BstCitationOOAdapter.insertBibliography.
-        assertFalse(ooText.startsWith("<p>"), "No leading <p> — would orphan the citation number");
+        assertFalse(ooText.startsWith("<p>"), "No leading <p> - would orphan the citation number");
     }
 
     // --- abbrv full pipeline ---
 
     @Test
     void abbrvFullPipelineProducesCleanText() throws Exception {
-        assumeTrue(pandoc.isAvailable(), "pandoc not available — skipping pipeline test");
+        assumeTrue(pandoc.isAvailable(), "pandoc not available - skipping pipeline test");
 
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
                 .withCitationKey("canh05")
@@ -148,9 +148,9 @@ class BstPipelineTest {
 
     @Test
     void pandocLatexToHtmlDoesNotReturnBlankOnValidInput() throws Exception {
-        assumeTrue(pandoc.isAvailable(), "pandoc not available — skipping pipeline test");
+        assumeTrue(pandoc.isAvailable(), "pandoc not available - skipping pipeline test");
 
-        // Minimal valid LaTeX inline text — pandoc must produce non-empty HTML
+        // Minimal valid LaTeX inline text - pandoc must produce non-empty HTML
         String html = pandoc.latexToHtml("Smith et al., 2016.");
 
         assertFalse(html.isBlank(), "pandoc should produce HTML for simple text input");
