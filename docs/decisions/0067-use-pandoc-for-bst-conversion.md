@@ -35,7 +35,7 @@ Every option below produces BST-styled citations in a LibreOffice document. They
 ## Decision Outcome
 
 Chosen option: "Pandoc as an optional external process", because it removes exactly the blocker that stopped this feature twice - parsing arbitrary BST LaTeX - while everything downstream of the produced HTML reuses code JabRef already ships and trusts.
-The dependency is optional and follows the precedent already set by `OcrMyPdfEngine`, so it adds no weight for users who do not use BST.
+The dependency is optional, so it adds no weight for users who do not use BST.
 
 ### Consequences
 
@@ -112,8 +112,8 @@ Description: keep Pandoc as the primary converter; when it is not available, fal
 
 ## More Information
 
-The full pipeline is: `BstVM.render(entry)` -> strip LaTeX structure and preamble -> Pandoc -> normalise Pandoc's tags -> `CSLFormatUtils.transformHTML` -> `OOText` -> `OOTextIntoOO.write`.
-Numeric `[n]` markers reuse the first-appearance numbering already implemented in `CSLReferenceMarkManager`, which is independent of CSL.
+Pandoc is involved only in the rendering of the bibliography entries. For a single entry the pipeline is: `BstVM.render(entry)` -> strip LaTeX structure and preamble -> Pandoc -> normalize Pandoc's tags -> `CSLFormatUtils.transformHTML` -> `OOText` -> `OOTextIntoOO.write`.
+In-text citation markers never pass through Pandoc: Numeric `[n]` markers reuse the first-appearance numbering already implemented in `CSLReferenceMarkManager`, which is independent of CSL.
 
 The conversion Pandoc performs, and the normalisation JabRef adds on top, are:
 
