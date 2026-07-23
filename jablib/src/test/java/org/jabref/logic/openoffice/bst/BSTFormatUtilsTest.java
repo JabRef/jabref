@@ -8,8 +8,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class BSTFormatUtilsTest {
 
@@ -56,6 +56,17 @@ class BSTFormatUtilsTest {
         assertTrue(out.contains("<i>journal</i>"));
         assertTrue(out.contains("<smallcaps>X</smallcaps>"));
         assertTrue(!out.startsWith("<p>"));
+    }
+
+    @Test
+    void stripsEmphasisInsideInlineMathButKeepsOutside() {
+        String html = "<p><em>foo</em> <span><span class=\"math inline\"><em>Σ</em></span></span> bar</p>";
+        String oo = BSTFormatUtils.convertPandocHtmlToOOText(html);
+        // Outside <em> becomes <i>
+        assertTrue(oo.contains("<i>foo</i>"));
+        // Math content should not be italicized; Σ should exist without <i> wrapper
+        assertTrue(oo.contains("Σ"));
+        assertFalse(oo.contains("<i>Σ</i>"));
     }
 
     // --- transformHTML (migrated from BstStyleUtilsTest) ---
@@ -297,7 +308,7 @@ class BSTFormatUtilsTest {
     @Test
     void emptyInputDoesNotThrow() {
         String result = BSTFormatUtils.convertPandocHtmlToOOText("");
-        assertTrue(result.isBlank(), "Empty input should produce empty output");
+        assertTrue(result.isEmpty() || result.isBlank(), "Empty input should produce empty output");
     }
 
     @Test
