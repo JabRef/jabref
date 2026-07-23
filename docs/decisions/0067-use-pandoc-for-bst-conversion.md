@@ -67,7 +67,7 @@ Use SnuggleTeX (already a JabRef dependency) to parse LaTeX and produce XHTML/Ma
 * Neutral, because in JabRef today SnuggleTeX is used primarily as a validator with DOM/XHTML output disabled; using its conversion output here would be a new, unexercised path that needs validation against real `.bst` output
 * Bad, because its LaTeX coverage is oriented toward math and does not span several macro constructs `.bst` files emit (e.g., `\providecommand`, `\csname...\endcsname`, `\expandafter\ifx`, `\typeout`, per-style macros like `\BIBentryALTinterwordspacing`)
 * Bad, because coverage gaps will surface per `.bst` style, leading to open-ended support work extending command coverage and mapping
-* [Major] Bad, because in a modular runtime the `snuggletex.core` module does not declare a read edge to `java.xml`, and invoking DOM/XHTML output (`buildXMLString`) touches `javax.xml.parsers`, which throws `IllegalAccessError` unless the JVM is launched with `--add-reads snuggletex.core=java.xml` (or run on the classpath)
+* Bad, because needs changes in build configuration - in a modular runtime the `snuggletex.core` module does not declare a read edge to `java.xml`, and invoking DOM/XHTML output (`buildXMLString`) touches `javax.xml.parsers`, which throws `IllegalAccessError` unless the JVM is launched with `--add-reads snuggletex.core=java.xml` (or run on the classpath)
 * Anticipated: a mapping layer to `OOText` will be required to translate the XHTML/MathML output into the `OOText` inline vocabulary (italics, bold, small caps, quotes). The exact normalization needed for text‑mode constructs needs validation
 
 ### Pandoc as an optional external process
@@ -109,7 +109,7 @@ Description: keep Pandoc as the primary converter; when it is not available, fal
 * Good, because BST bibliography would work without installing Pandoc (lower barrier)
 * Good, because it is fully in-process and reuses existing JabRef code (preview transforms, `LatexToUnicodeAdapter`)
 * Bad, because fidelity for arbitrary `.bst` outputs will be lower than Pandoc; complex LaTeX constructs may not render ideally
-* Bad, because the SnuggleTeX fallback inherits the same JPMS constraint as the pure SnuggleTeX option: in a modular runtime, `snuggletex.core` does not read `java.xml`, so DOM/XHTML output (`buildXMLString`) will throw `IllegalAccessError` unless the JVM is launched with `--add-reads snuggletex.core=java.xml` (or run on the classpath)
+* Bad, because the SnuggleTeX fallback inherits the same JPMS constraint as the pure SnuggleTeX option, needing changes in build configuration
 * Neutral, because it can be implemented as an availability-based fallback without impacting the main (Pandoc) path
 
 ## More Information
