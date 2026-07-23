@@ -15,6 +15,8 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class BSTFormatUtils {
 
+    private static final Pattern INLINE_MATH_SPAN = Pattern.compile("(?s)<span\\s+class=\\\"math inline\\\"[^>]*>(.*?)</span>");
+
     private BSTFormatUtils() {
     }
 
@@ -38,17 +40,16 @@ public final class BSTFormatUtils {
     // (e.g., <span class="math inline"><em>Σ</em></span>), which would otherwise render Greek
     // letters italic in LibreOffice contrary to the desired bibliography styling.
     private static String stripEmphasisInsideInlineMath(String html) {
-        Pattern math = Pattern.compile("(?s)<span\\s+class=\\\"math inline\\\"[^>]*>(.*?)</span>");
-        Matcher m = math.matcher(html);
-        StringBuffer sb = new StringBuffer();
-        while (m.find()) {
-            String inner = m.group(1);
+        Matcher matcher = INLINE_MATH_SPAN.matcher(html);
+        StringBuilder out = new StringBuilder(html.length());
+        while (matcher.find()) {
+            String inner = matcher.group(1);
             String cleaned = inner.replaceAll("(?s)</?em[^>]*>", "");
             cleaned = cleaned.replaceAll("(?s)</?strong[^>]*>", "");
-            m.appendReplacement(sb, Matcher.quoteReplacement(cleaned));
+            matcher.appendReplacement(out, Matcher.quoteReplacement(cleaned));
         }
-        m.appendTail(sb);
-        return sb.toString();
+        matcher.appendTail(out);
+        return out.toString();
     }
 
     // ---- Pre-normalization for pandoc ----

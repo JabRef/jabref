@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 public class BSTCitationOOAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BSTCitationOOAdapter.class);
+    private static final Pattern BIBITEM_PATTERN = Pattern.compile("\\\\bibitem(?:\\[[^]]*])?\\{([^}]*)}");
 
     private final XTextDocument document;
     private final BSTReferenceMarkManager markManager;
@@ -221,8 +222,7 @@ public class BSTCitationOOAdapter {
         }
         // Render all entries at once to get style-driven order in thebibliography
         String renderedBibliography = bstVM.render(normalized, database);
-        Pattern bibitemPattern = Pattern.compile("\\\\bibitem(?:\\[[^]]*])?\\{([^}]*)}");
-        Matcher bibitemMatcher = bibitemPattern.matcher(renderedBibliography);
+        Matcher bibitemMatcher = BIBITEM_PATTERN.matcher(renderedBibliography);
         int order = 1;
         Map<String, Integer> emittedKeyOrder = new LinkedHashMap<>();
         while (bibitemMatcher.find()) {
