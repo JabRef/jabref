@@ -46,21 +46,26 @@ class Convert implements Callable<Integer> {
     @Override
     public Integer call() throws ImportServiceException, ExportServiceException {
         Path inputFile = inputOption.getInputFile();
-        ParserResult parserResult = ImportService.importFile(inputFile, inputFormat, jabKit.cliPreferences, sharedOptions.porcelain);
+        boolean writeToStdOut = outputFile == null;
+        ParserResult parserResult = ImportService.importFile(inputFile, inputFormat, jabKit.cliPreferences, sharedOptions.porcelain || writeToStdOut);
 
         FieldFormatterCleanupMapper.applyFormatters(fieldFormatters, parserResult.getDatabase().getEntries());
+
+        ExportService exportService = ExportService.create(jabKit.cliPreferences, sharedOptions.porcelain || writeToStdOut);
+
+        if (writeToStdOut) {
+            // [impl->req~jabkit.cli.convert-stdout-format~1]
+            if (!sharedOptions.porcelain) {
+                System.err.println(Localization.lang("Converting '%0' to '%1'.", inputFile, outputFormat));
+            }
+            exportService.exportParserResultToStdOut(parserResult, outputFormat);
+            return 0;
+        }
 
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Converting '%0' to '%1'.", inputFile, outputFormat));
         }
-
-        if (outputFile == null) {
-            System.out.println(parserResult.getDatabase());
-            return 0;
-        }
-
-        ExportService.create(jabKit.cliPreferences, sharedOptions.porcelain)
-                     .exportParserResultToFile(parserResult, outputFile, outputFormat);
+        exportService.exportParserResultToFile(parserResult, outputFile, outputFormat);
         return CommandLine.ExitCode.OK;
     }
 }

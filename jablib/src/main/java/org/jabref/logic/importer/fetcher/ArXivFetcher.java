@@ -5,6 +5,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -462,7 +463,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     protected static class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
 
         private static final Logger LOGGER = LoggerFactory.getLogger(ArXiv.class);
-        private static final com.google.common.util.concurrent.RateLimiter ARXIV_API_RATE_LIMITER = com.google.common.util.concurrent.RateLimiter.create(3.0);
+        private static final FetcherRateLimiter ARXIV_API_RATE_LIMITER = FetcherRateLimiter.ofRequestsPerInterval("arXiv", 1, Duration.ofSeconds(3));
 
         private static final String API_URL = "https://export.arxiv.org/api/query";
 
@@ -616,9 +617,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             }
 
             try {
-                double waitingTime = ARXIV_API_RATE_LIMITER.acquire();
-                LOGGER.trace("Thread {}, searching arXiv API '{}', waited {} because of API rate limiter",
-                        Thread.currentThread().threadId(), url, waitingTime);
+                ARXIV_API_RATE_LIMITER.acquire(url.toString());
                 DocumentBuilder builder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();

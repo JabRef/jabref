@@ -36,6 +36,8 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.study.Study;
+import org.jabref.model.study.StudyCatalog;
+import org.jabref.model.study.StudyQuery;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -253,6 +255,109 @@ class StudyRepositoryTest {
         limits.forEach((catalog, limit) ->
                 assertEquals(StudyRepository.DEFAULT_RESULT_LIMIT, limit,
                         () -> "Catalog '" + catalog + "' did not resolve to the default"));
+    }
+
+    @Test
+    void studyLockFileCreatedAfterPersist() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.persist(getMockResults());
+
+        assertTrue(Files.exists(tempRepositoryDirectory.resolve(StudyRepository.STUDY_LOCK_FILE_NAME)));
+    }
+
+    @Test
+    void studyLockRecordsEffectiveQueryForEachEnabledCatalog() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.persist(getMockResults());
+
+        Study lock = parseStudyLock();
+
+        assertEquals(3, lock.getQueries().size());
+        StudyQuery quantumLock = lock.getQueries().getFirst();
+        assertEquals("Quantum", quantumLock.getQuery());
+        assertEquals(Map.of("Springer", "Quantum", "arXiv", "Quantum", "Medline/PubMed", "Quantum"), quantumLock.getCatalogSpecific());
+    }
+
+    @Test
+    void studyLockExcludesCatalogsWithoutFetcher() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.getStudy().getCatalogs().add(new StudyCatalog("NotAFetcher", true));
+
+        studyRepository.persist(getMockResults());
+
+        assertFalse(parseStudyLock().getQueries().getFirst().getCatalogSpecific().containsKey("NotAFetcher"));
+    }
+
+    @Test
+    void studyLockExcludesDisabledCatalogs() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.persist(getMockResults());
+
+        assertFalse(parseStudyLock().getQueries().getFirst().getCatalogSpecific().containsKey("IEEEXplore"));
+    }
+
+    @Test
+    void studyLockPreservesCatalogSpecificOverride() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific().put("arXiv", "ti:Quantum");
+
+        studyRepository.persist(getMockResults());
+
+        Map<String, String> effectiveQueries = parseStudyLock().getQueries().getFirst().getCatalogSpecific();
+        assertEquals("ti:Quantum", effectiveQueries.get("arXiv"));
+        assertEquals("Quantum", effectiveQueries.get("Springer"));
+    }
+
+    @Test
+    void studyLockMatchesOverrideCaseInsensitively() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific().put("ARXIV", "ti:Quantum");
+
+        studyRepository.persist(getMockResults());
+
+        assertEquals("ti:Quantum", parseStudyLock().getQueries().getFirst().getCatalogSpecific().get("arXiv"));
+    }
+
+    @Test
+    void studyLockUsesFirstOverrideWhenKeysDifferOnlyByCase() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        Map<String, String> catalogSpecific = studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific();
+        catalogSpecific.put("arxiv", "ti:First");
+        catalogSpecific.put("ARXIV", "ti:Second");
+
+        studyRepository.persist(getMockResults());
+
+        // StudyFetcher uses the first case-insensitive match, so the lock must record the same one
+        assertEquals("ti:First", parseStudyLock().getQueries().getFirst().getCatalogSpecific().get("arXiv"));
+    }
+
+    @Test
+    void studyLockFallsBackToQueryForBlankOverride() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.getStudy().getQueries().getFirst().getCatalogSpecific().put("arXiv", " ");
+
+        studyRepository.persist(getMockResults());
+
+        assertEquals("Quantum", parseStudyLock().getQueries().getFirst().getCatalogSpecific().get("arXiv"));
+    }
+
+    @Test
+    void studyLockContentIsIdenticalWhenPersistedAgain() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        Path lockFile = tempRepositoryDirectory.resolve(StudyRepository.STUDY_LOCK_FILE_NAME);
+
+        studyRepository.persist(getMockResults());
+        String firstContent = Files.readString(lockFile);
+        studyRepository.persist(getMockResults());
+
+        assertEquals(firstContent, Files.readString(lockFile));
+    }
+
+    @Test
+    void studyLockPreservesResultLimits() throws GitAPIException, SaveException, IOException, URISyntaxException, JabRefException {
+        studyRepository.getStudy().setMaxResultsPerCatalog(100);
+        studyRepository.getStudy().getCatalogs().getFirst().setMaxResults(500);
+
+        studyRepository.persist(getMockResults());
+
+        Study lock = parseStudyLock();
+        assertEquals(100, lock.getMaxResultsPerCatalog());
+        assertEquals(500, lock.getCatalogs().getFirst().getMaxResults());
+    }
+
+    private Study parseStudyLock() throws IOException {
+        return new StudyYamlParser().parseStudyYamlFile(tempRepositoryDirectory.resolve(StudyRepository.STUDY_LOCK_FILE_NAME));
     }
 
     private StudyRepository getTestStudyRepository() throws IOException, URISyntaxException, JabRefException {

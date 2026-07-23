@@ -380,6 +380,7 @@ public class GroupTreeView extends BorderPane {
                     }
 
                     if (shouldDisplayGroupCount) {
+                        group.ensureMatchedEntriesLoaded();
                         text.textProperty().bind(group.getHits().map(Number::intValue).map(this::getFormattedNumber));
                         Tooltip tooltip = new Tooltip();
                         tooltip.textProperty().bind(group.getHits().asString());
