@@ -98,14 +98,14 @@ public class BstCitationOOAdapter {
                 openOfficePreferences.getCslBibliographyBodyFormat());
         OOTextIntoOO.write(document, cursor, titleBreak);
 
-        BstVM vm;
+        BstVM bstVM;
         try {
-            vm = style.createBstVM();
+            bstVM = style.createBstVM();
         } catch (IOException e) {
             LOGGER.warn("Could not load BST style: {}", style.getPath(), e);
             throw e;
         }
-        BstEntryRenderer renderer = new BstEntryRenderer(vm);
+        BstEntryRenderer renderer = new BstEntryRenderer(bstVM);
 
         // Bibliography ordering strategy:
         // - NUMERIC mode: first-appearance (manager's citation numbers)
@@ -120,7 +120,7 @@ public class BstCitationOOAdapter {
             sorted.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(keyOrId(entry))));
         } else {
             // Compute the style-driven order once and sort accordingly
-            java.util.Map<String, Integer> styleOrder = computeStyleOrderNumbers(renderer, vm, sorted, database);
+            java.util.Map<String, Integer> styleOrder = computeStyleOrderNumbers(renderer, bstVM, sorted, database);
             sorted.sort(Comparator.comparingInt(entry -> styleOrder.getOrDefault(keyOrId(entry), Integer.MAX_VALUE)));
         }
 
@@ -160,28 +160,28 @@ public class BstCitationOOAdapter {
     private String buildNumericCitation(List<BibEntry> entries) {
         // Use the manager's current numbering (may be style-order or first-appearance),
         // but present numbers in ascending order inside a multi-entry bracket.
-        java.util.List<Integer> nums = new java.util.ArrayList<>(entries.size());
+        java.util.List<Integer> numbers = new java.util.ArrayList<>(entries.size());
         for (BibEntry entry : entries) {
-            nums.add(markManager.getCitationNumber(keyOrId(entry)));
+            numbers.add(markManager.getCitationNumber(keyOrId(entry)));
         }
-        nums.sort(Integer::compareTo);
-        StringJoiner sj = new StringJoiner(", ", "[", "]");
-        nums.forEach(n -> sj.add(String.valueOf(n)));
-        return sj.toString();
+        numbers.sort(Integer::compareTo);
+        StringJoiner joiner = new StringJoiner(", ", "[", "]");
+        numbers.forEach(number -> joiner.add(String.valueOf(number)));
+        return joiner.toString();
     }
 
     @VisibleForTesting
     static String buildAuthorYearCitation(List<BibEntry> entries, BibDatabaseContext ctx) {
-        StringJoiner sj = new StringJoiner("; ", "(", ")");
+        StringJoiner joiner = new StringJoiner("; ", "(", ")");
         for (BibEntry entry : entries) {
             String authorPart = extractFirstAuthorLastName(entry);
             String year = entry.getResolvedFieldOrAlias(StandardField.YEAR, ctx.getDatabase())
                                .map(String::trim)
                                .filter(y -> !y.isEmpty())
                                .orElse("n.d."); // apa-like fallback when year is missing
-            sj.add(authorPart + ", " + year);
+            joiner.add(authorPart + ", " + year);
         }
-        return sj.toString();
+        return joiner.toString();
     }
 
     @VisibleForTesting
@@ -202,38 +202,38 @@ public class BstCitationOOAdapter {
     // For entries missing a citation key, we temporarily assign keyOrId as the key,
     // so the emitted \bibitem{...} contains a stable identifier we can parse back.
     @VisibleForTesting
-    static java.util.Map<String, Integer> computeStyleOrderNumbers(BstEntryRenderer renderer, BstVM vm, List<BibEntry> entries, BibDatabase database) {
+    static java.util.Map<String, Integer> computeStyleOrderNumbers(BstEntryRenderer renderer, BstVM bstVM, List<BibEntry> entries, BibDatabase database) {
         // Clone entries and ensure each has a non-empty key matching keyOrId
         List<BibEntry> normalized = new ArrayList<>(entries.size());
-        for (BibEntry e : entries) {
-            BibEntry c = new BibEntry(e);
-            if (c.getCitationKey().isEmpty()) {
-                c = c.withCitationKey(keyOrId(e));
+        for (BibEntry entry : entries) {
+            BibEntry entryCopy = new BibEntry(entry);
+            if (entryCopy.getCitationKey().isEmpty()) {
+                entryCopy = entryCopy.withCitationKey(keyOrId(entry));
             }
-            normalized.add(c);
+            normalized.add(entryCopy);
         }
         // Render all entries at once to get style-driven order in thebibliography
-        String raw = vm.render(normalized, database);
-        java.util.regex.Pattern p = java.util.regex.Pattern.compile("\\\\bibitem(?:\\[[^]]*])?\\{([^}]*)}");
-        java.util.regex.Matcher m = p.matcher(raw);
-        int n = 1;
-        java.util.Map<String, Integer> map = new java.util.LinkedHashMap<>();
-        while (m.find()) {
-            String key = m.group(1);
-            if (!map.containsKey(key)) {
-                map.put(key, n++);
+        String renderedBibliography = bstVM.render(normalized, database);
+        java.util.regex.Pattern bibitemPattern = java.util.regex.Pattern.compile("\\\\bibitem(?:\\[[^]]*])?\\{([^}]*)}");
+        java.util.regex.Matcher bibitemMatcher = bibitemPattern.matcher(renderedBibliography);
+        int order = 1;
+        java.util.Map<String, Integer> emittedKeyOrder = new java.util.LinkedHashMap<>();
+        while (bibitemMatcher.find()) {
+            String key = bibitemMatcher.group(1);
+            if (!emittedKeyOrder.containsKey(key)) {
+                emittedKeyOrder.put(key, order++);
             }
         }
         // Map from emitted key back to identifier (for entries where we substituted)
         java.util.Map<String, String> keyToIdentifier = new java.util.HashMap<>();
-        for (BibEntry e : normalized) {
-            String k = e.getCitationKey().orElse("");
-            if (!k.isEmpty()) {
-                keyToIdentifier.put(k, keyOrId(e));
+        for (BibEntry entry : normalized) {
+            String key = entry.getCitationKey().orElse("");
+            if (!key.isEmpty()) {
+                keyToIdentifier.put(key, keyOrId(entry));
             }
         }
         java.util.Map<String, Integer> identifierToNumber = new java.util.LinkedHashMap<>();
-        map.forEach((k, v) -> identifierToNumber.put(keyToIdentifier.getOrDefault(k, k), v));
+        emittedKeyOrder.forEach((key, index) -> identifierToNumber.put(keyToIdentifier.getOrDefault(key, key), index));
         return identifierToNumber;
     }
 

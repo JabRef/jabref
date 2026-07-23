@@ -238,13 +238,13 @@ public class BSTReferenceMarkManager {
         for (BSTReferenceMark mark : marksInOrder) {
             List<String> identifiers = mark.getCitationKeys();
             List<Integer> assignedNumbers = new ArrayList<>(identifiers.size());
-            for (String id : identifiers) {
-                Integer n = numbering.get(id);
-                if (n == null) {
+            for (String identifier : identifiers) {
+                Integer numberOverride = numbering.get(identifier);
+                if (numberOverride == null) {
                     // fallback to existing mapping to avoid breaking text
-                    n = identifierToNumber.getOrDefault(id, 0);
+                    numberOverride = identifierToNumber.getOrDefault(identifier, 0);
                 }
-                assignedNumbers.add(n);
+                assignedNumbers.add(numberOverride);
             }
             mark.setCitationNumbers(assignedNumbers);
             updateMarkAndTextWithNewNumbers(mark, assignedNumbers);
@@ -381,11 +381,11 @@ public class BSTReferenceMarkManager {
         marksInOrder.sort((m1, m2) -> compareTextRanges(m2.getTextContent().getAnchor(), m1.getTextContent().getAnchor()));
     }
 
-    private int compareTextRanges(XTextRange r1, XTextRange r2) {
+    private int compareTextRanges(XTextRange range1, XTextRange range2) {
         try {
-            return r1 != null && r2 != null ? textRangeCompare.compareRegionStarts(r1, r2) : 0;
-        } catch (IllegalArgumentException e) {
-            LOGGER.warn("Error comparing text ranges: {}", e.getMessage(), e);
+            return range1 != null && range2 != null ? textRangeCompare.compareRegionStarts(range1, range2) : 0;
+        } catch (IllegalArgumentException exception) {
+            LOGGER.warn("Error comparing text ranges: {}", exception.getMessage(), exception);
             return 0;
         }
     }
