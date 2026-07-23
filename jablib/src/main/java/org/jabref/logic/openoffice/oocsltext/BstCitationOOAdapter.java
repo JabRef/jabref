@@ -153,7 +153,7 @@ public class BstCitationOOAdapter {
             String year = entry.getResolvedFieldOrAlias(StandardField.YEAR, ctx.getDatabase())
                                .map(String::trim)
                                .filter(y -> !y.isEmpty())
-                               .orElse("n.d.");
+                               .orElse("n.d."); // apa-like fallback when year is missing
             sj.add(authorPart + ", " + year);
         }
         return sj.toString();
