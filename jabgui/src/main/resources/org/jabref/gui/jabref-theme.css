@@ -1291,13 +1291,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0 0 0 20;
 }
 
-#entryEditor #bibtexSourceCodeArea {
-    -fx-padding: 4 4 4 4;
-    -fx-background-color: -fx-control-inner-background;
-    -fx-font-family: "Monospaced", "Courier New", monospace !important;
-    -fx-font-size: 1.083em !important;
-}
-
 #entryEditor #citationsPane {
     -fx-padding: 0;
     -fx-background-color: -fx-control-inner-background;
@@ -2552,4 +2545,41 @@ journalInfo .grid-cell-b {
 
 .rich-text-area .caret-line {
     -fx-fill: transparent;
+}
+
+.bibtex-code-area {
+    -fx-font-family: 'Courier New', monospace;
+    -fx-font-size: 1.0em;
+}
+
+.bibtex-code-area .bibtex-keyword {
+    -fx-fill: -jr-purple !important;
+    -fx-font-weight: bold;
+}
+
+.bibtex-code-area .bibtex-type {
+    -fx-fill: -jr-purple !important;
+    -fx-font-weight: bold;
+}
+
+.bibtex-code-area .bibtex-field {
+    -fx-fill: -jr-green !important;
+    -fx-font-weight: bold;
+}
+
+.bibtex-code-area .bibtex-key {
+    -fx-fill: -jr-orange !important;
+}
+
+.bibtex-code-area .bibtex-string {
+    -fx-fill: -jr-red !important;
+}
+
+.bibtex-code-area .bibtex-number {
+    -fx-fill: -jr-red !important;
+}
+
+.bibtex-code-area .bibtex-comment {
+    -fx-fill: -jr-light-green !important;
+    -fx-font-style: italic;
 }

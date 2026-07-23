@@ -252,6 +252,9 @@ extraJavaModuleInfo {
     module("eu.lestard:doc-annotations", "doc.annotations")
     module("info.debatty:java-string-similarity", "java.string.similarity")
     module("io.github.java-diff-utils:java-diff-utils", "io.github.javadiffutils")
+    module("io.github.kusoroadeolu:veneer", "veneer") {
+        preserveExisting()
+    }
     module("io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64", "embedded.postgres.binaries.darwin.amd64")
     module("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8", "embedded.postgres.binaries.darwin.arm64v8")
     module("io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64", "embedded.postgres.binaries.linux.amd64")

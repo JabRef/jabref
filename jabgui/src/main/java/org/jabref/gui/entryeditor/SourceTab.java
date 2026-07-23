@@ -61,8 +61,6 @@ import org.slf4j.LoggerFactory;
 public class SourceTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceTab.class);
-    private static final String TEXT_STYLE = "text";
-    private static final String SEARCH_STYLE = "search";
     private final FieldPreferences fieldPreferences;
     private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> validationMessage = new SimpleObjectProperty<>();
@@ -143,7 +141,7 @@ public class SourceTab extends EntryEditorTab {
                 codeArea.getModel().replace(null, caretPos, caretPos, committed);
             }
         });
-        codeArea.setId("bibtexSourceCodeArea");
+        codeArea.getStyleClass().add("bibtex-code-area");
 
         //codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
@@ -181,8 +179,8 @@ public class SourceTab extends EntryEditorTab {
 
             BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
                                                .orElse(BibDatabaseMode.BIBLATEX);
-
             try {
+                codeArea.clear();
                 codeArea.appendText(getSourceString(getCurrentEntry(), mode, fieldPreferences));
                 codeArea.setEditable(true);
                 Platform.runLater(this::refreshCodeAreaDecorator);
