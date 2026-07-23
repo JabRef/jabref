@@ -150,7 +150,10 @@ public class BstCitationOOAdapter {
         StringJoiner sj = new StringJoiner("; ", "(", ")");
         for (BibEntry entry : entries) {
             String authorPart = extractFirstAuthorLastName(entry);
-            String year = entry.getResolvedFieldOrAlias(StandardField.YEAR, ctx.getDatabase()).orElse("?");
+            String year = entry.getResolvedFieldOrAlias(StandardField.YEAR, ctx.getDatabase())
+                               .map(String::trim)
+                               .filter(y -> !y.isEmpty())
+                               .orElse("n.d.");
             sj.add(authorPart + ", " + year);
         }
         return sj.toString();
