@@ -133,7 +133,7 @@ class BstStyleUtilsTest {
                         "text<p></p><p></p><p></p>"
                 ),
 
-                // A single trailing <p></p> is kept as-is (matches CSLFormatUtils behaviour)
+                // A single trailing <p></p> is kept as-is
                 Arguments.of(
                         "text<p></p>",
                         "text<p></p>"
