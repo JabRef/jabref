@@ -121,7 +121,7 @@ public class BstCitationOOAdapter {
             String latex = renderer.renderEntryToLatex(entry, database);
             LOGGER.warn("BST bibliography LaTeX [{}]: {}", key, latex);
 
-            String norm = org.jabref.logic.openoffice.bst.BSTFormatUtils.normalizeLegacyForPandoc(latex);
+            String norm = BSTFormatUtils.normalizeLegacyForPandoc(latex);
             if (!norm.equals(latex)) {
                 LOGGER.warn("Normalized LaTeX for pandoc [{}]: {}", key, norm);
             }
