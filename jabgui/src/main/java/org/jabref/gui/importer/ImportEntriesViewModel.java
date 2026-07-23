@@ -304,6 +304,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                         if (newEntries != null && !newEntries.isEmpty()) {
                             allEntries.addAll(newEntries);
                             updateTotalPages();
+                            goToNextPage();
                         } else {
                             LOGGER.warn("No new entries fetched from {} for page {}", fetcher.get().getName(), currentPageProperty.get() + 2);
                             dialogService.notify(Localization.lang("No new entries found from %0", fetcher.get().getName()));
