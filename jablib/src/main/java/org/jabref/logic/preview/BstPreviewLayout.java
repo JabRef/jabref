@@ -60,30 +60,6 @@ public final class BstPreviewLayout implements PreviewLayout {
     @Nullable private BstVM bstVM;
     @Nullable private String error;
 
-    /// Creates a [BstPreviewLayout] for the given [BstStyle], supporting both internal
-    /// (classpath) and external (filesystem) styles.
-    public static BstPreviewLayout of(BstStyle style) {
-        if (style.getFilePath() != null) {
-            return new BstPreviewLayout(style.getFilePath());
-        }
-        // Internal style: read content from the classpath resource
-        String resourcePath = style.getPath();
-        String styleName = style.getName();
-        try (InputStream is = BstPreviewLayout.class.getResourceAsStream(resourcePath)) {
-            if (is == null) {
-                String err = Localization.lang("Error opening file '%0'", styleName);
-                return new BstPreviewLayout(Path.of(styleName), "", null, err);
-            }
-            String source = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            BstVM vm = new BstVM(source);
-            return new BstPreviewLayout(Path.of(styleName), source, vm, null);
-        } catch (IOException e) {
-            LOGGER.error("Could not load internal BST style for preview: {}", resourcePath, e);
-            return new BstPreviewLayout(Path.of(styleName), "", null,
-                    Localization.lang("Error opening file '%0'", styleName));
-        }
-    }
-
     /// Private constructor used by [of(BstStyle)] for pre-built internal styles.
     private BstPreviewLayout(Path path, String source, @Nullable BstVM bstVM, @Nullable String error) {
         this.path = path;
@@ -113,6 +89,30 @@ public final class BstPreviewLayout implements PreviewLayout {
         } catch (IOException e) {
             LOGGER.error("Could not read {}.", path.toAbsolutePath(), e);
             error = Localization.lang("Error opening file '%0'", path.toString());
+        }
+    }
+
+    /// Creates a [BstPreviewLayout] for the given [BstStyle], supporting both internal
+    /// (classpath) and external (filesystem) styles.
+    public static BstPreviewLayout of(BstStyle style) {
+        if (style.getFilePath() != null) {
+            return new BstPreviewLayout(style.getFilePath());
+        }
+        // Internal style: read content from the classpath resource
+        String resourcePath = style.getPath();
+        String styleName = style.getName();
+        try (InputStream is = BstPreviewLayout.class.getResourceAsStream(resourcePath)) {
+            if (is == null) {
+                String err = Localization.lang("Error opening file '%0'", styleName);
+                return new BstPreviewLayout(Path.of(styleName), "", null, err);
+            }
+            String source = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            BstVM vm = new BstVM(source);
+            return new BstPreviewLayout(Path.of(styleName), source, vm, null);
+        } catch (IOException e) {
+            LOGGER.error("Could not load internal BST style for preview: {}", resourcePath, e);
+            return new BstPreviewLayout(Path.of(styleName), "", null,
+                    Localization.lang("Error opening file '%0'", styleName));
         }
     }
 

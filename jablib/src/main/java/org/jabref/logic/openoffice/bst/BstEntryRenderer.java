@@ -20,10 +20,8 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class BstEntryRenderer {
 
-    private static final Pattern BIBITEM =
-            Pattern.compile("\\\\bibitem(?:\\[[^]]*])?\\{[^}]*}");
-    private static final Pattern BIB_ENV_END =
-            Pattern.compile("\\\\end\\{thebibliography}");
+    private static final Pattern BIBITEM_PATTERN = Pattern.compile("\\\\bibitem(?:\\[[^]]*])?\\{[^}]*}");
+    private static final Pattern BIB_ENV_END_PATTERN = Pattern.compile("\\\\end\\{thebibliography}");
 
     private final BstVM bstVM;
 
@@ -46,12 +44,12 @@ public class BstEntryRenderer {
         int bibitemIdx = raw.lastIndexOf("\\bibitem");
         if (bibitemIdx >= 0) {
             raw = raw.substring(bibitemIdx);
-            // Drop the \bibitem{key} tag itself (may have optional [label])
-            raw = BIBITEM.matcher(raw).replaceFirst("");
+            // Drop the \\bibitem{key} tag itself (may have optional [label])
+            raw = BIBITEM_PATTERN.matcher(raw).replaceFirst("");
         }
 
-        // Strip closing \end{thebibliography} if present
-        raw = BIB_ENV_END.matcher(raw).replaceAll("");
+        // Strip closing \\end{thebibliography} if present
+        raw = BIB_ENV_END_PATTERN.matcher(raw).replaceAll("");
 
         raw = raw.replace("\\newblock", " ");
         return raw.trim();

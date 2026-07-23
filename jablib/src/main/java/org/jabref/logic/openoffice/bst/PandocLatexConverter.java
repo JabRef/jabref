@@ -66,7 +66,7 @@ public class PandocLatexConverter {
             }
             return p.exitValue() == 0;
         } catch (IOException | InterruptedException e) {
-            LOGGER.debug("pandoc candidate '{}' not usable: {}", candidate, e.getMessage());
+            LOGGER.debug("pandoc candidate '{}' not usable: {}", candidate, e.getMessage(), e);
             return false;
         }
     }
