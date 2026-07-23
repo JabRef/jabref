@@ -330,7 +330,7 @@ public class OpenOfficePanel {
     }
 
     private void modifyBibliographyProperties() {
-        ModifyCSLBibliographyPropertiesDialogView modifyBibliographyPropertiesDialogView = new ModifyCSLBibliographyPropertiesDialogView(openOfficePreferences);
+        ModifyBibliographyPropertiesDialogView modifyBibliographyPropertiesDialogView = new ModifyBibliographyPropertiesDialogView(openOfficePreferences);
         dialogService.showCustomDialog(modifyBibliographyPropertiesDialogView);
     }
 
