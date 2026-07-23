@@ -23,6 +23,7 @@ import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
 import org.jabref.model.openoffice.uno.CreationException;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
@@ -152,7 +153,8 @@ public class BstCitationOOAdapter {
         return sj.toString();
     }
 
-    private String buildAuthorYearCitation(List<BibEntry> entries, BibDatabaseContext ctx) {
+    @VisibleForTesting
+    static String buildAuthorYearCitation(List<BibEntry> entries, BibDatabaseContext ctx) {
         StringJoiner sj = new StringJoiner("; ", "(", ")");
         for (BibEntry entry : entries) {
             String authorPart = extractFirstAuthorLastName(entry);
@@ -165,7 +167,8 @@ public class BstCitationOOAdapter {
         return sj.toString();
     }
 
-    private String extractFirstAuthorLastName(BibEntry entry) {
+    @VisibleForTesting
+    static String extractFirstAuthorLastName(BibEntry entry) {
         // use natbib-like author formatting: 1 -> "Last", 2 -> "Last and Last", 3+ -> "Last et al."
         return entry.getField(StandardField.AUTHOR)
                     .map(AuthorList::parse)
