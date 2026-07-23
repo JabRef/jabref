@@ -61,8 +61,10 @@ public class BstCitationOOAdapter {
     public void insertCitation(XTextCursor cursor, List<BibEntry> entries, BibDatabaseContext ctx)
             throws CreationException, com.sun.star.uno.Exception {
         String citationText = switch (openOfficePreferences.getBstCitationFormat()) {
-            case NUMERIC -> buildNumericCitation(entries);
-            case AUTHOR_YEAR -> buildAuthorYearCitation(entries);
+            case NUMERIC ->
+                    buildNumericCitation(entries);
+            case AUTHOR_YEAR ->
+                    buildAuthorYearCitation(entries);
         };
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(citationText));
@@ -85,7 +87,7 @@ public class BstCitationOOAdapter {
         if (!pandoc.isAvailable()) {
             throw new IllegalStateException(
                     "pandoc is not available at the configured path. "
-                    + "Please ensure pandoc is installed and configure its path via the OO settings menu.");
+                            + "Please ensure pandoc is installed and configure its path via the OO settings menu.");
         }
 
         OOText title = OOFormat.paragraph(

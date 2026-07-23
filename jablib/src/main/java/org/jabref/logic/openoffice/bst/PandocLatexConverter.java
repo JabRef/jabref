@@ -47,8 +47,8 @@ public class PandocLatexConverter {
     /// or [Optional.empty] if none responds to `--version` within 5 seconds.
     public static Optional<String> autoDetect() {
         List<String> candidates = OS.WINDOWS ? WINDOWS_CANDIDATES
-                                 : OS.OS_X   ? MACOS_CANDIDATES
-                                             : LINUX_CANDIDATES;
+                                             : OS.OS_X ? MACOS_CANDIDATES
+                                                       : LINUX_CANDIDATES;
         return candidates.stream()
                          .filter(PandocLatexConverter::probeCandidate)
                          .findFirst();

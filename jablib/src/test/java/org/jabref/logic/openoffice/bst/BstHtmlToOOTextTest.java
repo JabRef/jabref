@@ -82,8 +82,8 @@ class BstHtmlToOOTextTest {
         // Realistic pandoc output for an IEEEtran entry
         String pandocHtml =
                 "<p>K. A. Cooper, J. L. Donovan, A. L. Waterhouse, and G. Williamson, "
-                + "&#x201C;Cocoa and health: a decade of research,&#x201D; "
-                + "<em>British Journal of Nutrition</em>, vol. 99, no. 1, pp. 1–11, 2007.</p>\n";
+                        + "&#x201C;Cocoa and health: a decade of research,&#x201D; "
+                        + "<em>British Journal of Nutrition</em>, vol. 99, no. 1, pp. 1–11, 2007.</p>\n";
 
         String result = BstHtmlToOOText.convert(pandocHtml);
 
@@ -98,8 +98,8 @@ class BstHtmlToOOTextTest {
         // abbrv wraps booktitle in {\em ...}; pandoc turns {\em X} into <em>X</em>
         String pandocHtml =
                 "<p>K. Crowston, H. Annabi, J. Howison, and C. Masango. "
-                + "Effective work practices for floss development. "
-                + "In <em>Hawaii Intl. Conference On System Sciences</em>, 2005.</p>\n";
+                        + "Effective work practices for floss development. "
+                        + "In <em>Hawaii Intl. Conference On System Sciences</em>, 2005.</p>\n";
 
         String result = BstHtmlToOOText.convert(pandocHtml);
 

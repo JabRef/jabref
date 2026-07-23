@@ -42,9 +42,9 @@ public final class BstPreviewLayout implements PreviewLayout {
     // LaTeX inline formatting → HTML, resolved before RemoveLatexCommandsFormatter strips them.
     // Both the \cmd{text} form (used by IEEEtran: \emph{Journal}) and the {\cmd text} group
     // form (used by abbrv.bst: {\em Booktitle}) are handled.
-    private static final Pattern EMPH_PATTERN    = Pattern.compile("\\\\emph\\{([^}]*?)}");
-    private static final Pattern TEXTIT_PATTERN  = Pattern.compile("\\\\textit\\{([^}]*?)}");
-    private static final Pattern TEXTBF_PATTERN  = Pattern.compile("\\\\textbf\\{([^}]*?)}");
+    private static final Pattern EMPH_PATTERN = Pattern.compile("\\\\emph\\{([^}]*?)}");
+    private static final Pattern TEXTIT_PATTERN = Pattern.compile("\\\\textit\\{([^}]*?)}");
+    private static final Pattern TEXTBF_PATTERN = Pattern.compile("\\\\textbf\\{([^}]*?)}");
     private static final Pattern GROUP_EM_PATTERN = Pattern.compile("\\{\\\\em\\s+([^}]*?)}");
     private static final Pattern GROUP_IT_PATTERN = Pattern.compile("\\{\\\\it\\s+([^}]*?)}");
     private static final Pattern GROUP_BF_PATTERN = Pattern.compile("\\{\\\\bf\\s+([^}]*?)}");

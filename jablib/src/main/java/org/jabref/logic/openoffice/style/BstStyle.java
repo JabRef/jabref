@@ -17,8 +17,8 @@ public class BstStyle implements OOStyle {
 
     /// Classpath resource paths for the built-in BST styles.
     public static final String INTERNAL_IEEETRAN_PATH = "/resource/openoffice/IEEEtran.bst";
-    public static final String INTERNAL_ABBRV_PATH    = "/resource/openoffice/abbrv.bst";
-    public static final String INTERNAL_APA_PATH      = "/resource/openoffice/apa.bst";
+    public static final String INTERNAL_ABBRV_PATH = "/resource/openoffice/abbrv.bst";
+    public static final String INTERNAL_APA_PATH = "/resource/openoffice/apa.bst";
 
     private final boolean internal;
     /// Classpath resource path for internal styles; `null` for external styles.
