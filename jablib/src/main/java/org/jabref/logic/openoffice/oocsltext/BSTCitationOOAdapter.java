@@ -43,16 +43,16 @@ import org.slf4j.LoggerFactory;
 /// [OpenOfficePreferences.getBstCitationFormat]. The bibliography is always rendered by the
 /// BST engine regardless of the citation format setting.
 @NullMarked
-public class BstCitationOOAdapter {
+public class BSTCitationOOAdapter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BstCitationOOAdapter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BSTCitationOOAdapter.class);
 
     private final XTextDocument document;
     private final BSTReferenceMarkManager markManager;
     private final PandocLatexConverter pandoc;
     private final OpenOfficePreferences openOfficePreferences;
 
-    public BstCitationOOAdapter(XTextDocument document, OpenOfficePreferences openOfficePreferences)
+    public BSTCitationOOAdapter(XTextDocument document, OpenOfficePreferences openOfficePreferences)
             throws WrappedTargetException, NoSuchElementException {
         this.document = document;
         this.openOfficePreferences = openOfficePreferences;
@@ -67,8 +67,10 @@ public class BstCitationOOAdapter {
     public void insertCitation(XTextCursor cursor, List<BibEntry> entries, BibDatabaseContext ctx)
             throws CreationException, com.sun.star.uno.Exception {
         String citationText = switch (openOfficePreferences.getBstCitationFormat()) {
-            case NUMERIC -> buildNumericCitation(entries);
-            case AUTHOR_YEAR -> buildAuthorYearCitation(entries, ctx);
+            case NUMERIC ->
+                    buildNumericCitation(entries);
+            case AUTHOR_YEAR ->
+                    buildAuthorYearCitation(entries, ctx);
         };
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(citationText));
@@ -199,7 +201,7 @@ public class BstCitationOOAdapter {
     }
 
     @VisibleForTesting
-    private static String keyOrId(BibEntry entry) {
+    static String keyOrId(BibEntry entry) {
         return entry.getCitationKey().orElse(entry.getId());
     }
 

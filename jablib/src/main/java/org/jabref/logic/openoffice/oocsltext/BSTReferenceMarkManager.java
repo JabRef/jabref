@@ -304,9 +304,12 @@ public class BSTReferenceMarkManager {
 
         // Then add the new marker
         String marker = switch (citationType) {
-            case IN_TEXT -> ReferenceMark.IN_TEXT_MARKER;
-            case EMPTY -> ReferenceMark.EMPTY_MARKER;
-            case NORMAL -> ReferenceMark.NORMAL_MARKER;
+            case IN_TEXT ->
+                    ReferenceMark.IN_TEXT_MARKER;
+            case EMPTY ->
+                    ReferenceMark.EMPTY_MARKER;
+            case NORMAL ->
+                    ReferenceMark.NORMAL_MARKER;
         };
 
         updateMarkAndText(mark, newText, updatedName + " " + marker);

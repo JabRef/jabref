@@ -25,7 +25,7 @@ import org.jabref.logic.openoffice.action.ManageCitations;
 import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.RangeForOverlapCheck;
-import org.jabref.logic.openoffice.oocsltext.BstCitationOOAdapter;
+import org.jabref.logic.openoffice.oocsltext.BSTCitationOOAdapter;
 import org.jabref.logic.openoffice.oocsltext.BstUpdateBibliography;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.oocsltext.CSLUpdateBibliography;
@@ -74,7 +74,7 @@ public class OOBibBase {
 
     private CSLCitationOOAdapter cslCitationOOAdapter;
     private CSLUpdateBibliography cslUpdateBibliography;
-    private BstCitationOOAdapter bstCitationOOAdapter;
+    private BSTCitationOOAdapter bstCitationOOAdapter;
     private BstUpdateBibliography bstUpdateBibliography;
 
     public OOBibBase(Path loPath, DialogService dialogService, OpenOfficePreferences openOfficePreferences)
@@ -95,7 +95,7 @@ public class OOBibBase {
             cslUpdateBibliography = new CSLUpdateBibliography();
         }
         if (bstCitationOOAdapter == null) {
-            bstCitationOOAdapter = new BstCitationOOAdapter(doc, openOfficePreferences);
+            bstCitationOOAdapter = new BSTCitationOOAdapter(doc, openOfficePreferences);
             bstUpdateBibliography = new BstUpdateBibliography();
         }
     }

@@ -49,9 +49,12 @@ public class BSTReferenceMark {
 
         // Embed citation nature into reference mark
         switch (citationType) {
-            case IN_TEXT -> nameBuilder.append(" ").append(ReferenceMark.IN_TEXT_MARKER);
-            case EMPTY -> nameBuilder.append(" ").append(ReferenceMark.EMPTY_MARKER);
-            case NORMAL -> nameBuilder.append(" ").append(ReferenceMark.NORMAL_MARKER);
+            case IN_TEXT ->
+                    nameBuilder.append(" ").append(ReferenceMark.IN_TEXT_MARKER);
+            case EMPTY ->
+                    nameBuilder.append(" ").append(ReferenceMark.EMPTY_MARKER);
+            case NORMAL ->
+                    nameBuilder.append(" ").append(ReferenceMark.NORMAL_MARKER);
         }
         return nameBuilder.toString();
     }

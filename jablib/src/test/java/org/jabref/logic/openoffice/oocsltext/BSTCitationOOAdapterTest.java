@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class BstCitationOOAdapterTest {
+class BSTCitationOOAdapterTest {
 
     private static final String AUTHOR_DOE_JOHN = "Doe, John";
 
@@ -20,7 +20,7 @@ class BstCitationOOAdapterTest {
         BibEntry entry = new BibEntry()
                 .withField(StandardField.AUTHOR, AUTHOR_DOE_JOHN)
                 .withField(StandardField.YEAR, "2007");
-        assertEquals("Doe", BstCitationOOAdapter.extractFirstAuthorLastName(entry));
+        assertEquals("Doe", BSTCitationOOAdapter.extractFirstAuthorLastName(entry));
     }
 
     @Test
@@ -28,7 +28,7 @@ class BstCitationOOAdapterTest {
         BibEntry entry = new BibEntry()
                 .withField(StandardField.AUTHOR, AUTHOR_DOE_JOHN + " and Roe, Richard")
                 .withField(StandardField.YEAR, "2007");
-        assertEquals("Doe and Roe", BstCitationOOAdapter.extractFirstAuthorLastName(entry));
+        assertEquals("Doe and Roe", BSTCitationOOAdapter.extractFirstAuthorLastName(entry));
     }
 
     @Test
@@ -36,14 +36,14 @@ class BstCitationOOAdapterTest {
         BibEntry entry = new BibEntry()
                 .withField(StandardField.AUTHOR, AUTHOR_DOE_JOHN + " and Roe, Richard and Poe, Peter")
                 .withField(StandardField.YEAR, "2007");
-        assertEquals("Doe et al.", BstCitationOOAdapter.extractFirstAuthorLastName(entry));
+        assertEquals("Doe et al.", BSTCitationOOAdapter.extractFirstAuthorLastName(entry));
     }
 
     @Test
     void extractFirstAuthorLastName_missingAuthorYieldsQuestionMark() {
         BibEntry entry = new BibEntry()
                 .withField(StandardField.YEAR, "2007");
-        assertEquals("?", BstCitationOOAdapter.extractFirstAuthorLastName(entry));
+        assertEquals("?", BSTCitationOOAdapter.extractFirstAuthorLastName(entry));
     }
 
     @Test
@@ -52,7 +52,7 @@ class BstCitationOOAdapterTest {
                 .withField(StandardField.AUTHOR, AUTHOR_DOE_JOHN)
                 .withField(StandardField.YEAR, "2007");
         BibDatabaseContext ctx = new BibDatabaseContext(new BibDatabase(List.of(entry)));
-        String result = BstCitationOOAdapter.buildAuthorYearCitation(List.of(entry), ctx);
+        String result = BSTCitationOOAdapter.buildAuthorYearCitation(List.of(entry), ctx);
         assertEquals("(Doe, 2007)", result);
     }
 
@@ -60,22 +60,20 @@ class BstCitationOOAdapterTest {
     void keyOrId_returnsCitationKeyWhenPresent() {
         BibEntry entry = new BibEntry()
                 .withCitationKey("MyKey");
-        assertEquals("MyKey", BstCitationOOAdapter.keyOrId(entry));
+        assertEquals("MyKey", BSTCitationOOAdapter.keyOrId(entry));
     }
 
     @Test
     void keyOrId_fallsBackToUniqueIdWhenKeyMissing() {
         BibEntry entry1 = new BibEntry();
         BibEntry entry2 = new BibEntry();
-        String k1 = BstCitationOOAdapter.keyOrId(entry1);
-        String k2 = BstCitationOOAdapter.keyOrId(entry2);
+        String k1 = BSTCitationOOAdapter.keyOrId(entry1);
+        String k2 = BSTCitationOOAdapter.keyOrId(entry2);
         // Falls back to the internal id and those should be non-empty and distinct
         assertEquals(entry1.getId(), k1);
         assertEquals(entry2.getId(), k2);
         org.junit.jupiter.api.Assertions.assertNotEquals(k1, k2);
     }
-
-
 
     @Test
     void buildAuthorYearCitation_twoEntriesJoinedWithSemicolon() {
@@ -86,7 +84,7 @@ class BstCitationOOAdapterTest {
                 .withField(StandardField.AUTHOR, "Roe, Richard")
                 .withField(StandardField.YEAR, "2008");
         BibDatabaseContext ctx = new BibDatabaseContext(new BibDatabase(List.of(entry1, entry2)));
-        String result = BstCitationOOAdapter.buildAuthorYearCitation(List.of(entry1, entry2), ctx);
+        String result = BSTCitationOOAdapter.buildAuthorYearCitation(List.of(entry1, entry2), ctx);
         assertEquals("(Doe, 2007; Roe, 2008)", result);
     }
 
@@ -95,7 +93,7 @@ class BstCitationOOAdapterTest {
         BibEntry entry = new BibEntry()
                 .withField(StandardField.AUTHOR, AUTHOR_DOE_JOHN);
         BibDatabaseContext ctx = new BibDatabaseContext(new BibDatabase(List.of(entry)));
-        String result = BstCitationOOAdapter.buildAuthorYearCitation(List.of(entry), ctx);
+        String result = BSTCitationOOAdapter.buildAuthorYearCitation(List.of(entry), ctx);
         assertEquals("(Doe, n.d.)", result);
     }
 
@@ -105,7 +103,7 @@ class BstCitationOOAdapterTest {
                 .withField(StandardField.AUTHOR, AUTHOR_DOE_JOHN)
                 .withField(StandardField.YEAR, "   ");
         BibDatabaseContext ctx = new BibDatabaseContext(new BibDatabase(List.of(entry)));
-        String result = BstCitationOOAdapter.buildAuthorYearCitation(List.of(entry), ctx);
+        String result = BSTCitationOOAdapter.buildAuthorYearCitation(List.of(entry), ctx);
         assertEquals("(Doe, n.d.)", result);
     }
 
@@ -115,7 +113,7 @@ class BstCitationOOAdapterTest {
                 .withField(StandardField.AUTHOR, AUTHOR_DOE_JOHN)
                 .withField(StandardField.DATE, "2007-05-01");
         BibDatabaseContext ctx = new BibDatabaseContext(new BibDatabase(List.of(entry)));
-        String result = BstCitationOOAdapter.buildAuthorYearCitation(List.of(entry), ctx);
+        String result = BSTCitationOOAdapter.buildAuthorYearCitation(List.of(entry), ctx);
         assertEquals("(Doe, 2007)", result);
     }
 }

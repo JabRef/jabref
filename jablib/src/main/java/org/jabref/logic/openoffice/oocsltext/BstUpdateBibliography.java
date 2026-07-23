@@ -31,7 +31,7 @@ public class BstUpdateBibliography {
 
     /// Creates or clears the BST bibliography section, then populates it.
     public void rebuildBstBibliography(XTextDocument doc,
-                                       BstCitationOOAdapter bstCitationOOAdapter,
+                                       BSTCitationOOAdapter bstCitationOOAdapter,
                                        BstStyle style,
                                        List<BibEntry> entries,
                                        BibDatabaseContext ctx)
@@ -78,7 +78,7 @@ public class BstUpdateBibliography {
     }
 
     private void populateBstBibTextSection(XTextDocument doc,
-                                           BstCitationOOAdapter bstCitationOOAdapter,
+                                           BSTCitationOOAdapter bstCitationOOAdapter,
                                            BstStyle style,
                                            List<BibEntry> entries,
                                            BibDatabaseContext ctx)
