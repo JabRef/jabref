@@ -579,8 +579,7 @@ public class OOBibBase {
                                                    CitationStyle citationStyle,
                                                    BibDatabaseContext bibDatabaseContext,
                                                    BibEntryTypesManager bibEntryTypesManager,
-                                                   OOResult<XTextCursor,
-                                                           OOError> cursor,
+                                                   OOResult<XTextCursor, OOError> cursor,
                                                    Optional<Update.SyncOptions> syncOptions) {
         try {
             // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
@@ -625,15 +624,12 @@ public class OOBibBase {
                                                       XTextDocument doc,
                                                       CitationType citationType,
                                                       JStyle jStyle,
-                                                      OOResult<OOFrontend,
-                                                              OOError> frontend,
-                                                      OOResult<XTextCursor,
-                                                              OOError> cursor,
+                                                      OOResult<OOFrontend, OOError> frontend,
+                                                      OOResult<XTextCursor, OOError> cursor,
                                                       BibDatabaseContext bibDatabaseContext,
                                                       Optional<Update.SyncOptions> syncOptions,
                                                       String pageInfo,
-                                                      OOResult<FunctionalTextViewCursor,
-                                                              OOError> fcursor) {
+                                                      OOResult<FunctionalTextViewCursor, OOError> fcursor) {
         OOVoidResult<OOError> insertResult = EditInsert.insertCitationGroup(doc,
                 frontend.get(),
                 cursor.get(),
@@ -944,7 +940,7 @@ public class OOBibBase {
             List<BibEntry> citedEntries = databases.stream()
                                                    .flatMap(db -> db.getEntries().stream())
                                                    .filter(bstCitationOOAdapter::isCitedEntry)
-                                                   .collect(Collectors.toCollection(ArrayList::new));
+                                                   .toList();
 
             if (citedEntries.isEmpty()) {
                 dialogService.showInformationDialogAndWait(
@@ -960,18 +956,12 @@ public class OOBibBase {
             try {
                 bstUpdateBibliography.rebuildBstBibliography(
                         doc, bstCitationOOAdapter, bstStyle, citedEntries, bibDatabaseContext);
-            } catch (java.io.IOException | InterruptedException e) {
-                LOGGER.error("Could not update BST bibliography", e);
-                return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));
-            } catch (com.sun.star.lang.WrappedTargetException e) {
+            } catch (IOException | InterruptedException | com.sun.star.uno.Exception | CreationException e) {
                 LOGGER.error("Could not update BST bibliography", e);
                 return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));
             } catch (NoDocumentException e) {
                 LOGGER.error("Could not update BST bibliography", e);
                 return OOVoidResult.error(OOError.from(e).setTitle(errorTitle));
-            } catch (com.sun.star.uno.Exception | CreationException e) {
-                LOGGER.error("Could not update BST bibliography", e);
-                return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));
             } finally {
                 doc.unlockControllers();
             }
@@ -1009,7 +999,7 @@ public class OOBibBase {
             List<BibEntry> citedEntries = databases.stream()
                                                    .flatMap(database -> database.getEntries().stream())
                                                    .filter(cslCitationOOAdapter::isCitedEntry)
-                                                   .collect(Collectors.toCollection(ArrayList::new));
+                                                   .toList();
 
             // If no entries are cited, show a message and return
             if (citedEntries.isEmpty()) {
@@ -1029,15 +1019,12 @@ public class OOBibBase {
             doc.lockControllers();
             try {
                 cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
-            } catch (CreationException e) {
+            } catch (CreationException | com.sun.star.uno.Exception e) {
                 LOGGER.error("Could not update CSL bibliography", e);
                 return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));
             } catch (NoDocumentException e) {
                 LOGGER.error("Could not update CSL bibliography", e);
                 return OOVoidResult.error(OOError.from(e).setTitle(errorTitle));
-            } catch (com.sun.star.uno.Exception e) {
-                LOGGER.error("Could not update CSL bibliography", e);
-                return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));
             } finally {
                 doc.unlockControllers();
             }
