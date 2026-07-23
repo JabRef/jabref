@@ -10,7 +10,7 @@ parent: Decision Records
 JabRef's LibreOffice integration supports CSL styles and JStyles, but not BST (BibTeX style) files, although many publishers still distribute only `.bst`.
 Initial BST support existed in the OpenOffice panel but was removed as unfinished ([#602](https://github.com/JabRef/jabref/pull/602), tracked in [#624](https://github.com/JabRef/jabref/issues/624)); the stated blocker was that `.bst` files such as `IEEEtran.bst` emit "quite a bit of non-trivial latex code to parse".
 
-Supporting BST in LibreOffice documents is the goal, not a question. The open question is narrower: `BstVM` renders an entry to a LaTeX fragment (`\emph{...}`, `` ``...'' ``, `~`, `{\&}`, plus a `\providecommand` preamble), whereas `OOTextIntoOO` consumes an HTML-like tag vocabulary (`<b>`, `<i>`, `<smallcaps>`, `<sup>`, `<p>`).
+Supporting BST in LibreOffice documents is the goal, not a question. The open question is narrower: `BstVM` renders an entry to a LaTeX fragment (`\emph{...}`, ``` ``...'' ```, `~`, `{\&}`, plus a `\providecommand` preamble), whereas `OOTextIntoOO` consumes an HTML-like tag vocabulary (`<b>`, `<i>`, `<smallcaps>`, `<sup>`, `<p>`).
 **How do we convert BST's LaTeX output into `OOText`?**
 
 Every option below produces BST-styled citations in a LibreOffice document. They differ only in who parses the LaTeX and what formatting survives.
@@ -37,7 +37,7 @@ The dependency is optional and follows the precedent already set by `OcrMyPdfEng
 
 ### Consequences
 
-* Good, because Pandoc's LaTeX parser is mature and battle-tested, and handles `~`, `` ``...'' ``, `\emph`, `{\&}`, and brace nesting without any parser code owned by JabRef
+* Good, because Pandoc's LaTeX parser is mature and battle-tested, and handles `~`, ``` ``...'' ```, `\emph`, `{\&}`, and brace nesting without any parser code owned by JabRef
 * Good, because semantic formatting survives: `\emph{Journal}` becomes `<em>Journal</em>` and ultimately an italic run in LibreOffice
 * Good, because the remaining JabRef code is a small tag rename (`<em>`/`<strong>`/`<span class="smallcaps">`) that then delegates to the existing `CSLFormatUtils.transformHTML`, inheriting entity decoding and `<div>`/`<a>`/`<span>` stripping
 * Good, because it follows an established JabRef pattern: `OcrMyPdfEngine` already shells out to an optional external binary with an `isAvailable()` guard and a user-configurable path preference
@@ -58,7 +58,7 @@ The dependency is optional and follows the precedent already set by `OcrMyPdfEng
 
 ### Hand-written LaTeX-subset to `OOText` converter
 
-A JabRef-owned mapper from `\emph{}`, `\textbf{}`, `\textsc{}`, `` `` '' ``, `~` to the `OOText` tag vocabulary.
+A JabRef-owned mapper from `\emph{}`, `\textbf{}`, `\textsc{}`, ``` `` '' ```, `~` to the `OOText` tag vocabulary.
 
 * Good, because it introduces no external dependency, so BST works for every user out of the box
 * Good, because conversion happens in-process, with no latency or failure modes from a subprocess
@@ -106,8 +106,8 @@ The conversion Pandoc performs, and the normalisation JabRef adds on top, are:
 | `{\&}`             | `&amp;`                            | `&` (decoded by `transformHTML`) | `&`                   |
 | paragraph text     | `<p>…</p>`                         | unwrapped                        | no spurious break     |
 
-Only the middle column is JabRef's own code: three tag renames plus unwrapping Pandoc's paragraph wrapper.
-Everything in the first arrow - brace nesting, ligatures, quote forms, tilde handling, entity escaping - is Pandoc's, and is the work that would otherwise have to be written and maintained in Java.
+Only the third column is JabRef's own code: three tag renames plus unwrapping Pandoc's paragraph wrapper.
+Everything in the LaTeX -> HTML step - brace nesting, ligatures, quote forms, tilde handling, entity escaping - is Pandoc's, and is the work that would otherwise have to be written and maintained in Java.
 `\emph` is semantic rather than literal in LaTeX (it flips to upright inside already-italic text), which is why `.bst` files use it for journal and book titles; in a bibliography entry it always resolves to italic.
 
 Changing `BstVM` to emit HTML instead of LaTeX was examined and is not viable: the markup originates in string literals inside the `.bst` programs themselves, which the virtual machine only concatenates, so there is nothing at the VM level to reinterpret. It is therefore not listed as an option.
