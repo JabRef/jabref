@@ -13,7 +13,7 @@ It supports you in every step of your research work.
 
 ### Collect
 
-- Search across many online scientific catalogues like CiteSeer, CrossRef, Google Scholar, IEEEXplore, INSPIRE-HEP, Medline PubMed, MathSciNet, Springer, arXiv, and zbMATH
+- Search across many online scientific catalogues like CrossRef, Google Scholar, IEEEXplore, INSPIRE-HEP, Medline PubMed, MathSciNet, Springer, arXiv, and zbMATH
 - Import options for over 15 reference formats
 - Easily retrieve and link full-text articles
 - Fetch complete bibliographic information based on ISBN, DOI, PubMed-ID and arXiv-ID

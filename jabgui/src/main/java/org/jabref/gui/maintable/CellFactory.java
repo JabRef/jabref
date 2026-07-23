@@ -15,7 +15,6 @@ import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.field.UnknownField;
 
 public class CellFactory {
 
@@ -30,10 +29,6 @@ public class CellFactory {
         icon = IconTheme.JabRefIcons.WWW;
         // icon.setToolTipText(Localization.lang("Open") + " URL");
         TABLE_ICONS.put(StandardField.URL, icon);
-
-        icon = IconTheme.JabRefIcons.WWW;
-        // icon.setToolTipText(Localization.lang("Open") + " CiteSeer URL");
-        TABLE_ICONS.put(new UnknownField("citeseerurl"), icon);
 
         icon = IconTheme.JabRefIcons.WWW;
         // icon.setToolTipText(Localization.lang("Open") + " ArXivFetcher URL");
