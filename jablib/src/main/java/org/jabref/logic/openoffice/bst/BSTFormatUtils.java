@@ -1,5 +1,8 @@
 package org.jabref.logic.openoffice.bst;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.text.StringEscapeUtils;
 import org.jspecify.annotations.NullMarked;
 
@@ -22,10 +25,27 @@ public final class BSTFormatUtils {
         s = s.replaceAll("(?s)</p>\\s*<p>", "<p></p>");
         s = s.replaceAll("(?s)^<p>", "");
         s = s.replaceAll("(?s)</p>$", "");
+        // Strip emphasis inside inline math spans only, then drop the math wrapper
+        s = stripEmphasisInsideInlineMath(s);
         // Map pandoc spans/elements to OOText inline tags
         s = mapPandocInlineToOO(s);
         // Delegate generic cleanup and entity decoding
         return transformHTML(s);
+    }
+
+    // Removes <em>/<strong> only inside <span class="math inline">…</span> and inlines the content
+    private static String stripEmphasisInsideInlineMath(String html) {
+        Pattern math = Pattern.compile("(?s)<span\\s+class=\\\"math inline\\\"[^>]*>(.*?)</span>");
+        Matcher m = math.matcher(html);
+        StringBuffer sb = new StringBuffer();
+        while (m.find()) {
+            String inner = m.group(1);
+            String cleaned = inner.replaceAll("(?s)</?em[^>]*>", "");
+            cleaned = cleaned.replaceAll("(?s)</?strong[^>]*>", "");
+            m.appendReplacement(sb, Matcher.quoteReplacement(cleaned));
+        }
+        m.appendTail(sb);
+        return sb.toString();
     }
 
     // ---- Pre-normalization for pandoc ----
