@@ -44,6 +44,22 @@ class SpringerNatureWebFetcherTest implements SearchBasedFetcherCapabilityTest, 
     @Test
     void searchByQueryFindsEntry() throws FetcherException {
 
+        BibEntry articleGenerativeAISolutions = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Gheventer, Andre and do Amaral Gurgel, Patricia and Henrique Brito, Carlos and Maiani de Mello, Rafael and Rocha, Sabrina and Feitosa, Rodrigo and Horta Travassos, Guilherme")
+                .withField(StandardField.DATE, "2026-05-13")
+                .withField(StandardField.DOI, "10.1007/s11219-026-09754-7")
+                .withField(StandardField.FILE, ":http\\://link.springer.com/openurl/pdf?id=doi\\:10.1007/s11219-026-09754-7:PDF")
+                .withField(StandardField.ISSN, "0963-9314")
+                .withField(StandardField.JOURNAL, "Software Quality Journal")
+                .withField(StandardField.MONTH, "#may#")
+                .withField(StandardField.NUMBER, "2")
+                .withField(StandardField.PAGES, "1--37")
+                .withField(StandardField.PUBLISHER, "Springer")
+                .withField(StandardField.TITLE, "Generative AI solutions for software quality: Assessing industrial readiness")
+                .withField(StandardField.VOLUME, "34")
+                .withField(StandardField.YEAR, "2026")
+                .withField(StandardField.ABSTRACT, "Software quality is undergoing a profound transformation, driven by state-of-the-art research on the application of emerging technologies in software development processes. Specifically, the use of generative Artificial Intelligence (AI) may represent an opportunity to advance the state of practice in this domain. This study aims to assess the industrial readiness and availability of Generative AI-based solutions for software quality, classifying them according to ISO/IEC 25010 attributes and SDLC phases. An empirical assessment of the state of practice was conducted, employing a Rapid Multivocal Literature Review (RMLR) protocol as a data collection instrument to screen evidence from academic databases (Scopus) and grey literature (Google, GitHub, PapersWithCode). We identified 24 potentially usable solutions. However, the analysis reveals a low technological maturity, with most solutions being academic prototypes hampered by fundamental technical limitations and adoption challenges. These include the “last mile problem” in translating research prototypes into reliable, production-ready tools; the “strategic adoption dilemma” forcing practitioners to trade off between proprietary lock-in and high open-source infrastructure costs; and the “scarcity of realistic public data,” which drives a generalization gap due to reliance on synthetic or leaked benchmarks. Generative AI in software quality remains an emerging but immature field, hampered by a critical reliability gap between academic prototypes and industrial needs. Advancing this domain requires moving beyond a narrow code-centric focus to address the quality of the AI systems themselves, expanding research across all SDLC phases and ISO 25010 attributes. We conclude with a roadmap advocating for contamination-free benchmarks, explainable architectures, and robust guidelines for real-world integration.");
+
         BibEntry articleSupportingIdentification = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Iftikhar, Umar and Börstler, Jürgen and Bin Ali, Nauman and Kopp, Oliver")
                 .withField(StandardField.DATE, "2025-04-23")
@@ -138,7 +154,7 @@ class SpringerNatureWebFetcherTest implements SearchBasedFetcherCapabilityTest, 
                 .withField(StandardField.ABSTRACT, "Several Open-Source Software (OSS) projects depend on the continuity of their development communities to remain sustainable. Understanding how developers become inactive or why they take breaks can help communities prevent abandonment and incentivize developers to come back. In this paper, we propose a novel method to identify developers’ inactive periods by analyzing the individual rhythm of contributions to the projects. Using this method, we quantitatively analyze the inactivity of core developers in 18 OSS organizations hosted on GitHub. We also survey core developers to receive their feedback about the identified breaks and transitions. Our results show that our method was effective for identifying developers’ breaks. About 94% of the surveyed core developers agreed with our state model of inactivity; 71% and 79% of them acknowledged their breaks and state transition, respectively. We also show that all core developers take breaks (at least once) and about a half of them (~45%) have completely disengaged from a project for at least one year. We also analyzed the probability of transitions to/from inactivity and found that developers who pause their activity have a ~35 to ~55% chance to return to an active state; yet, if the break lasts for a year or longer, then the probability of resuming activities drops to ~21–26%, with a ~54% chance of complete disengagement. These results may support the creation of policies and mechanisms to make OSS community managers aware of breaks and potential project abandonment.");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("JabRef Social Barriers Steinmacher");
-        assertEquals(List.of(articleSupportingIdentification, articleTagThatIssue, fourthArticle, thirdArticle, firstArticle, secondArticle), fetchedEntries);
+        assertEquals(List.of(articleGenerativeAISolutions, articleSupportingIdentification, articleTagThatIssue, fourthArticle, thirdArticle, firstArticle, secondArticle), fetchedEntries);
     }
 
     @Test

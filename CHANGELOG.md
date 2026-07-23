@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- The command `jabkit pdf update --format=xmp` now writes XMP metadata to the linked PDF. [#16087](https://github.com/JabRef/jabref/issues/16087)
+- We now offer `jabkit` as a native binary (no Java runtime required, instant startup) for Linux (amd64/arm64) and macOS (Apple Silicon) as part of the binary distribution. [#16291](https://github.com/JabRef/jabref/pull/16291)
 - The HTTP import endpoint (`POST /libraries/{id}/entries`) now accepts CSL-JSON (`application/vnd.citationstyles.csl+json`), mapping each item to the correct entry type (e.g. conference paper, book chapter, thesis) via the citation-js-based mapping. [#16151](https://github.com/JabRef/jabref/pull/16151)
 - We added a new "Main" tab to the entry editor showing all fields of an entry in a single scrollable list, with one-click chips for adding optional fields and a free-form box for adding arbitrary fields. Identifiers, files and links, bibliometrics, comments, and meta fields (groups, owner, timestamps, special fields) live in collapsible sections — collapsed when empty — each offering chips for its unset fields. [#12711](https://github.com/JabRef/jabref/issues/12711)
 - We added auto-detection import for drag-and-dropped library files. [#15391](https://github.com/JabRef/jabref/issues/15391)
@@ -43,6 +45,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - The Hayagriva YAML exporter is now implemented programmatically instead of via a layout template: re-exporting an imported Hayagriva file preserves structured data JabRef cannot represent (short titles, person aliases, additional identifiers), `misc` entries export with a lowercase type, and journal details are written into the periodical parent. The `HayagrivaType` custom-layout formatter was removed. [#736](https://github.com/JabRef/jabref-koppor/pull/736)
 - Hayagriva YAML import and export now cover JabRef's "Comment" field and per-user comment fields (written as `comment`/`comment-<name>` extension keys, which the Hayagriva parser ignores), and entries carrying only BibTeX `year`/`month` fields get their `date` written. [#736](https://github.com/JabRef/jabref-koppor/pull/736)
+- We improved the reliability of online searches by respecting the request limits of arXiv and other services. [#16300](https://github.com/JabRef/jabref/issues/16300)
+- We improved switching between large libraries so entry previews remain responsive while automatic groups and their counts are refreshed. [#16289](https://github.com/JabRef/jabref/pull/16289)
+- We improved the [MODS](https://www.loc.gov/standards/mods/) importer for mapping entry types. [#16055](https://github.com/JabRef/jabref/issues/16055)
+- AI summaries now render with regular JavaFX components instead of an embedded browser, matching how AI chat messages are rendered. [#16189](https://github.com/JabRef/jabref/pull/16189)
+- We replaced the LaTeX-to-Unicode and Unicode-to-LaTeX conversion engine (the unmaintained Scala latex2unicode library plus hand-maintained maps) with the new SnuggleTeX-based [latex-conv](https://github.com/JabRef/latex-conv) library. Formulas keep their brackets and spacing, `\text{...}` and `\operatorname{...}` render as their content, bases carrying both a sub- and a superscript convert, and `--`/`---` render as typographic dashes. [#6155](https://github.com/JabRef/jabref/pull/6155)
+- The "Unicode to LaTeX" cleanup emits accent commands with a single brace group (`{\aa}` instead of `{{\aa}}`). [#6155](https://github.com/JabRef/jabref/pull/6155)
 - The Hayagriva YAML exporter now writes all fields the new Hayagriva importer reads. [#16190](https://github.com/JabRef/jabref/pull/16190)
 - We increased the size of arrow buttons in the Entry Preview preferences tab to improve visibility. [#16028](https://github.com/JabRef/jabref/issues/16028)
 - We now render the entry preview with regular JavaFX components instead of an embedded browser. Text in the preview can be selected with mouse and keyboard and copied; without a selection, "Copy selection" copies the whole preview. [#16145](https://github.com/JabRef/jabref/pull/16145)
@@ -61,8 +69,20 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where `jabkit convert` without `--output` printed an internal object reference (e.g. `org.jabref.model.database.BibDatabase@17932d9b`) instead of the converted library. It now writes the library to standard output in the format selected by `--output-format`, with progress messages going to standard error. [#16292](https://github.com/JabRef/jabref/pull/16292)
+- We fixed spurious DOI-mismatch warnings when fetching an entry by DOI. [#16280](https://github.com/JabRef/jabref/pull/16280)
+- We fixed an issue where a critical error occurring during application startup (e.g. while constructing the main window) was only written to the log, leaving the user with no visible feedback and an apparently silent crash. [#14967](https://github.com/JabRef/jabref/issues/14967)
+- We fixed an issue where canceling the duplicate resolution dialog did not stop the background duplicate scan and kept the left entry. [#16234](https://github.com/JabRef/jabref/pull/16234)
+- We fixed an issue where entries imported or updated by an arXiv number could end up with the paper's automatic DOI web address as their citation key instead of a proper one; the INSPIRE literature database's key is now used when available, and updating an existing entry no longer silently drops its own or the fetched citation key. [#12292](https://github.com/JabRef/jabref/issues/12292)
+- We fixed an issue where a BibTeX entry printed on the first page of a PDF was not imported when other text (such as author email addresses) appeared above it. [#16245](https://github.com/JabRef/jabref/pull/16245)
+- We fixed an issue where the title detected when importing a PDF could contain a spurious space inside a word (e.g. "T opology") and could pick up unrelated text from the second page. [#16246](https://github.com/JabRef/jabref/pull/16246)
+- We fixed an issue where exported dates displayed month names in the system language—regardless of locale settings—instead of in English. [#16224](https://github.com/JabRef/jabref/issues/16224)
+- We improved the zbMATH fetcher so it imports books and collection articles more accurately and handles current zbMATH API responses more reliably. [#16048](https://github.com/JabRef/jabref/issues/16048)
+- We fixed an issue where converting a field to Unicode and back to LaTeX destroyed `\textsuperscript{...}`/`\textsubscript{...}`: runs of Unicode super-/subscript characters now merge back into a single command. [#3644](https://github.com/JabRef/jabref/issues/3644)
+- We reduced the size of Linux packages by removing embedded Postgres binaries for unused architectures. [#16143](https://github.com/JabRef/jabref/issues/16143)
 - We fixed an issue where searching ISIDORE failed with a security connection error. [#16054](https://github.com/JabRef/jabref/issues/16054)
 - We fixed an issue in the new entry editor's file field editor where files added via the add button did not appear until switching to another entry and back, and cleaned up the layout so the add/fetch-fulltext/download-URL buttons sit to the left of the file list and the list no longer leaves blank space below the last file. [#16172](https://github.com/JabRef/jabref/pull/16172)
+- We fixed an issue where Keywords and Groups field editors were too large. [#12112](https://github.com/JabRef/jabref/issues/12112)
 - We fixed an issue where `jabkit`'s `-p`/`--porcelain` and `-d`/`--debug` flags only took effect when placed at the exact command level where they were parsed, so e.g. `jabkit -p check consistency file.bib` silently ran without porcelain output. [#16164](https://github.com/JabRef/jabref/pull/16164)
 - We fixed an issue where no raw preferences values were visible anymore in the preferences filter. [#16161](https://github.com/JabRef/jabref/pull/16161)
 - We fixed an issue where cleanup did not detect an arXiv entry when its `url` field ended with a fragment anchor (e.g. `https://arxiv.org/html/2510.26275v2#bib`). [#16150](https://github.com/JabRef/jabref/pull/16150)
@@ -81,12 +101,16 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where renaming a linked file with a very long title showed a misleading "file is being used by another process" error instead of renaming successfully. [#14771](https://github.com/JabRef/jabref/issues/14771)
 - We fixed an issue where JabRef would trigger `The libray has been changed` while still saving. [#4877](https://github.com/JabRef/jabref/issues/4877)
 - We fixed preview tooltip height calculation in the main table. [#16219](https://github.com/JabRef/jabref/issues/16219)
+- We fixed an issue where stale main table search results could remain visible after consecutive searches. [#15710](https://github.com/JabRef/jabref/issues/15710)
+- We fixed an issue where the button shape changed when hovering over it. [#16188](https://github.com/JabRef/jabref/issues/16188)
+- We fixed handling of `exit` in the LSP server. [#16268](https://github.com/JabRef/jabref/pull/16268)
 
 ### Removed
 
 - We removed the entry editor tabs "Required fields", "Optional fields", "Optional fields 2", "Deprecated fields", "Other fields", and "Comments"; their content is part of the new "Main" tab. [#12711](https://github.com/JabRef/jabref/issues/12711)
 - We removed the ability to define custom entry editor tabs (including the default "General" and "Abstract" tabs); the entry editor tab preferences now only toggle the visibility of the built-in tabs. [#12711](https://github.com/JabRef/jabref/issues/12711)
 - The citation key integrity check now includes the generated citation key in its warning message. [#15776](https://github.com/JabRef/jabref/pull/15776)
+- We removed the [CiteSeerX](https://en.wikipedia.org/wiki/CiteSeerX) fetcher, because the service is defunct and its links now redirect to the Wayback Machine. [#16299](https://github.com/JabRef/jabref/issues/16299)
 
 ## [6.0-alpha.6] – 2026-05-14
 

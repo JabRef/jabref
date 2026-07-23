@@ -77,9 +77,12 @@ public class AstrophysicsDataSystem
     /// @return URL which points to a search request for given query
     @Override
     public URL getURLForQuery(BaseQueryNode queryList, int pageNumber) throws URISyntaxException, MalformedURLException {
+        return buildSearchURL(new DefaultQueryTransformer().transformSearchQuery(queryList).orElse(""), pageNumber);
+    }
+
+    private URL buildSearchURL(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
-        builder.addParameter("q", new DefaultQueryTransformer().transformSearchQuery(queryList).orElse(""));
-        builder.addParameter("q", "");
+        builder.addParameter("q", query);
         builder.addParameter("fl", "bibcode");
         builder.addParameter("rows", String.valueOf(getPageSize()));
         builder.addParameter("start", String.valueOf(getPageSize() * pageNumber));
@@ -278,8 +281,24 @@ public class AstrophysicsDataSystem
         }
         // This is currently just interpreting the complex query as a default string query
         List<String> bibCodes = fetchBibcodes(urlForQuery);
-        Collection<BibEntry> results = performSearchByIds(bibCodes);
+        List<BibEntry> results = performSearchByIds(bibCodes);
         return new Page<>(queryList.toString(), pageNumber, results);
+    }
+
+    @Override
+    public Page<BibEntry> performRawSearchQueryPaged(String rawQuery, int pageNumber) throws FetcherException {
+        if (rawQuery.isBlank()) {
+            return new Page<>(rawQuery, pageNumber, List.of());
+        }
+        URL urlForQuery;
+        try {
+            urlForQuery = buildSearchURL(rawQuery, pageNumber);
+        } catch (URISyntaxException | MalformedURLException e) {
+            throw new FetcherException("Search URI crafted from raw search query is malformed: " + rawQuery, e);
+        }
+        List<String> bibCodes = fetchBibcodes(urlForQuery);
+        List<BibEntry> results = performSearchByIds(bibCodes);
+        return new Page<>(rawQuery, pageNumber, results);
     }
 
     @Override
