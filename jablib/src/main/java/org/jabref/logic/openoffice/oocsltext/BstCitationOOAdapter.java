@@ -15,7 +15,6 @@ import org.jabref.logic.openoffice.style.BstCitationFormat;
 import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -158,14 +157,10 @@ public class BstCitationOOAdapter {
     }
 
     private String extractFirstAuthorLastName(BibEntry entry) {
+        // use natbib-like author formatting: 1 -> "Last", 2 -> "Last and Last", 3+ -> "Last et al."
         return entry.getField(StandardField.AUTHOR)
                     .map(AuthorList::parse)
-                    .filter(list -> !list.isEmpty())
-                    .map(list -> {
-                        Author first = list.getAuthor(0);
-                        String lastName = first.getFamilyName().orElse("?");
-                        return list.getNumberOfAuthors() > 1 ? lastName + " et al." : lastName;
-                    })
+                    .map(AuthorList::getAsNatbib)
                     .orElse("?");
     }
 
