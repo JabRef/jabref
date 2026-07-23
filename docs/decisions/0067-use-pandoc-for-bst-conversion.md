@@ -85,7 +85,7 @@ A JabRef-owned mapper from `\emph{}`, `\textbf{}`, `\textsc{}`, ``` `` '' ```, `
 
 * Good, because the code exists, is already used for BST previews, and needs no new dependency
 * Good, because it is by far the smallest change and would ship soonest
-* Bad, because it produces flat plain text: `\emph{Journal}` is discarded rather than converted, so italicised journal and book titles are lost - a visible defect in a bibliography
+* Bad, because it produces flat plain text: `\emph{Journal}` is discarded rather than converted, so italicized journal and book titles are lost - a visible defect in a bibliography
 * Bad, because it deletes markup instead of translating it, which is acceptable for a tooltip but not for a document deliverable
 * Bad, because it already contains style-specific hacks (for example a literal `#2}}` replacement for `IEEEtran.bst`), demonstrating that the delete-what-we-do-not-understand approach does not generalise
 
