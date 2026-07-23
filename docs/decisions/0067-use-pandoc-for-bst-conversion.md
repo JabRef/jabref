@@ -113,8 +113,9 @@ Description: keep Pandoc as the primary converter; when it is not available, fal
 
 ## More Information
 
-The full pipeline is: `BstVM.render(entry)` -> strip LaTeX structure and preamble -> Pandoc -> normalize Pandoc's tags -> `CSLFormatUtils.transformHTML` -> `OOText` -> `OOTextIntoOO.write`.
-Numeric `[n]` markers reuse the first-appearance numbering already implemented in `CSLReferenceMarkManager`, which is independent of CSL.
+The full pipeline is: `BstVM.render(entry)` -> strip LaTeX structure and preamble -> Pandoc -> normalize Pandoc's tags -> `BSTFormatUtils.transformHTML` -> `OOText` -> `OOTextIntoOO.write`.
+`BSTFormatUtils` will be an analogue of the existing `CSLStyleUtils`, with it dealing with conversion of pandoc-flavored HTML to OO-flavored HTML.
+Numeric `[n]` markers reuse the first-appearance numbering already implemented in `CSLReferenceMarkManager`, which is independent of CSL. An analogous `BSTReferenceMarkManager` is to be implemented to support appearance-first as well as `.bst`-style defined bibliography ordering.
 
 The conversion Pandoc performs, and the normalisation JabRef adds on top, are:
 
