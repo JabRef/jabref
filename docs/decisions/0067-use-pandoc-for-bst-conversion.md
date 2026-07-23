@@ -95,12 +95,12 @@ Use SnuggleTeX (already a JabRef dependency) to parse LaTeX and produce XHTML/Ma
 
 A JabRef-owned mapper from `\emph{}`, `\textbf{}`, `\textsc{}`, ``` `` '' ```, `~` to the `OOText` tag vocabulary.
 
-- Good, because it introduces no external dependency, so BST works for every user out of the box
-- Good, because conversion happens in-process, with no latency or failure modes from a subprocess
-- Good, because formatting is preserved for the constructs the mapper covers
-- Neutral, because for a single curated style family the required LaTeX subset is small and well defined
-- Bad, because the LaTeX subset emitted across arbitrary `.bst` files is open-ended, and correctness requires brace-level parsing rather than regular expressions (regex-level handling cannot correctly deal with nested braces)
-- Bad, because practical support devolves into extending coverage per encountered `.bst` construct (e.g., style-specific macros), which is open-ended maintenance work compared to inheriting a mature parser's coverage; this is [what stalled the original attempt](https://github.com/JabRef/jabref/pull/602#issuecomment-167756642)
+* Good, because it introduces no external dependency, so BST works for every user out of the box
+* Good, because conversion happens in-process, with no latency or failure modes from a subprocess
+* Good, because formatting is preserved for the constructs the mapper covers
+* Neutral, because for a single curated style family the required LaTeX subset is small and well defined
+* Bad, because the LaTeX subset emitted across arbitrary `.bst` files is open-ended, and correctness requires brace-level parsing rather than regular expressions (regex-level handling cannot correctly deal with nested braces)
+* Bad, because practical support devolves into extending coverage per encountered `.bst` construct (e.g., style-specific macros), which is open-ended maintenance work compared to inheriting a mature parser's coverage; this is [what stalled the original attempt](https://github.com/JabRef/jabref/pull/602#issuecomment-167756642)
 
 ### Hybrid: Pandoc primary with SnuggleTeX-based pure-Java fallback
 
