@@ -38,7 +38,8 @@ public class ZoteroCitationMarkParser {
         try {
             ZoteroCitationData citationData = GSON.fromJson(cslJson, ZoteroCitationData.class);
             List<BibEntry> entries = new ArrayList<>();
-            for (ZoteroCitationData.CitationItemData citationItem : Optional.ofNullable(citationData.citationItems).orElse(List.of())) {
+            List<ZoteroCitationData.CitationItemData> citationItemDataList = Optional.ofNullable(citationData.citationItems).orElse(List.of());
+            for (ZoteroCitationData.CitationItemData citationItem : citationItemDataList) {
                 toBibEntry(citationItem).ifPresent(entries::add);
             }
 
