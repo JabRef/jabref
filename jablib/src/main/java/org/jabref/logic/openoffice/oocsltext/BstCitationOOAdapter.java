@@ -3,8 +3,13 @@ package org.jabref.logic.openoffice.oocsltext;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringJoiner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.bst.BstVM;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -120,7 +125,7 @@ public class BstCitationOOAdapter {
             sorted.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(keyOrId(entry))));
         } else {
             // Compute the style-driven order once and sort accordingly
-            java.util.Map<String, Integer> styleOrder = computeStyleOrderNumbers(renderer, bstVM, sorted, database);
+            Map<String, Integer> styleOrder = computeStyleOrderNumbers(renderer, bstVM, sorted, database);
             sorted.sort(Comparator.comparingInt(entry -> styleOrder.getOrDefault(keyOrId(entry), Integer.MAX_VALUE)));
         }
 
@@ -160,7 +165,7 @@ public class BstCitationOOAdapter {
     private String buildNumericCitation(List<BibEntry> entries) {
         // Use the manager's current numbering (may be style-order or first-appearance),
         // but present numbers in ascending order inside a multi-entry bracket.
-        java.util.List<Integer> numbers = new java.util.ArrayList<>(entries.size());
+        List<Integer> numbers = new ArrayList<>(entries.size());
         for (BibEntry entry : entries) {
             numbers.add(markManager.getCitationNumber(keyOrId(entry)));
         }
@@ -202,7 +207,7 @@ public class BstCitationOOAdapter {
     // For entries missing a citation key, we temporarily assign keyOrId as the key,
     // so the emitted \bibitem{...} contains a stable identifier we can parse back.
     @VisibleForTesting
-    static java.util.Map<String, Integer> computeStyleOrderNumbers(BstEntryRenderer renderer, BstVM bstVM, List<BibEntry> entries, BibDatabase database) {
+    static Map<String, Integer> computeStyleOrderNumbers(BstEntryRenderer renderer, BstVM bstVM, List<BibEntry> entries, BibDatabase database) {
         // Clone entries and ensure each has a non-empty key matching keyOrId
         List<BibEntry> normalized = new ArrayList<>(entries.size());
         for (BibEntry entry : entries) {
@@ -214,10 +219,10 @@ public class BstCitationOOAdapter {
         }
         // Render all entries at once to get style-driven order in thebibliography
         String renderedBibliography = bstVM.render(normalized, database);
-        java.util.regex.Pattern bibitemPattern = java.util.regex.Pattern.compile("\\\\bibitem(?:\\[[^]]*])?\\{([^}]*)}");
-        java.util.regex.Matcher bibitemMatcher = bibitemPattern.matcher(renderedBibliography);
+        Pattern bibitemPattern = Pattern.compile("\\\\bibitem(?:\\[[^]]*])?\\{([^}]*)}");
+        Matcher bibitemMatcher = bibitemPattern.matcher(renderedBibliography);
         int order = 1;
-        java.util.Map<String, Integer> emittedKeyOrder = new java.util.LinkedHashMap<>();
+        Map<String, Integer> emittedKeyOrder = new LinkedHashMap<>();
         while (bibitemMatcher.find()) {
             String key = bibitemMatcher.group(1);
             if (!emittedKeyOrder.containsKey(key)) {
@@ -225,14 +230,14 @@ public class BstCitationOOAdapter {
             }
         }
         // Map from emitted key back to identifier (for entries where we substituted)
-        java.util.Map<String, String> keyToIdentifier = new java.util.HashMap<>();
+        Map<String, String> keyToIdentifier = new HashMap<>();
         for (BibEntry entry : normalized) {
             String key = entry.getCitationKey().orElse("");
             if (!key.isEmpty()) {
                 keyToIdentifier.put(key, keyOrId(entry));
             }
         }
-        java.util.Map<String, Integer> identifierToNumber = new java.util.LinkedHashMap<>();
+        Map<String, Integer> identifierToNumber = new LinkedHashMap<>();
         emittedKeyOrder.forEach((key, index) -> identifierToNumber.put(keyToIdentifier.getOrDefault(key, key), index));
         return identifierToNumber;
     }
