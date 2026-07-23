@@ -483,7 +483,7 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 5. Keep **all** checklist items. Mark each `[x]` (done), `[ ]` (TODO), or `[/]` (not applicable). Never `[ x]` or `[.]`.
 6. Remove **all** HTML comments before opening the PR.
 7. Write the body to a temp file and run `gh pr create --body-file <file>` — never `--body`, which bypasses the template.
-8. If the CHANGELOG.md entry used a `TODO` placeholder (no issue existed), immediately after the PR is created replace `TODO` with the real PR-number link (`[#NUM](https://github.com/JabRef/jabref/pull/NUM)`), then commit and push that change.
+8. Only if the CHANGELOG.md entry used a `TODO` placeholder (meaning no issue has been confidently identified yet — an existing issue link always stays): immediately after the PR is created replace `TODO` with the real PR-number link (`[#NUM](https://github.com/JabRef/jabref/pull/NUM)`), then commit and push that change. If an issue is identified or created later, switch the link to the issue per the precedence rule above.
 
 ---
 
@@ -492,6 +492,7 @@ PR body — **must** be built from `.github/PULL_REQUEST_TEMPLATE.md`:
 - Add a CHANGELOG.md entry only if the change is visible to the user.
 - The CHANGELOG.md entry should be for end users (and not programmers).
 - Do not add extra blank lines in CHANGELOG.md
+- CHANGELOG.md entries link the issue number when an issue exists; the PR number is used only as a fallback when there is no issue.
 - When no issue is known and the PR is not yet created, use `TODO` as the issue/PR reference placeholder — never invent a fake number.
 - Before using `TODO`, search <https://github.com/JabRef/jabref/issues> and <https://github.com/JabRef/jabref-koppor/issues> for a matching issue. Link it only on a confident match; otherwise list candidates for human review and keep `TODO`. Never use `closes`/`fixes` keywords for a merely-similar issue.
 - User documentation is available in a separate repository <https://github.com/JabRef/user-documentation>.

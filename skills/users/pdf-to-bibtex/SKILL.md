@@ -1,13 +1,15 @@
 ---
 name: pdf-to-bibtex
 category: users
-description: Turns PDF papers into BibTeX entries with JabRef's jabkit CLI, pulling metadata from XMP, embedded BibTeX, GROBID, or text heuristics - builds a bibliography from a whole folder of papers.
+description: Turns a PDF paper into a BibTeX entry describing that paper, using JabRef's jabkit CLI - merges XMP, embedded BibTeX, GROBID, and text heuristics, then enriches the result via DOI/arXiv/ISBN lookup; builds a bibliography from a whole folder of papers. Not for extracting the reference list cited by a paper.
 license: MIT
 ---
 
 # PDF to BibTeX
 
-Extract bibliographic data from PDF files and produce BibTeX entries using `jabkit`, JabRef's command-line toolkit.
+Produce a BibTeX entry describing a PDF paper (its own title, authors, year, ...) using `jabkit`, JabRef's command-line toolkit.
+
+This skill is about metadata *of* the PDF. Extracting the entries a paper *cites* (its "References" section) is a different task, not covered by this skill.
 
 ## Setup
 
@@ -57,20 +59,13 @@ Pass one of these as `--input-format`:
 | `pdfVerbatimBibtex` | Parses BibTeX printed verbatim on the first page |
 | `pdfContent` | Heuristic extraction from the text of the first page |
 | `pdfGrobid` | Sends the PDF to a [GROBID](https://github.com/kermitt2/grobid) service (requires GROBID to be enabled/reachable) |
-| `pdfBibiliography` | Rule-based parsing of the bibliography section |
 
 `--input-format "*"` auto-detects the format (also works for non-PDF inputs).
 
 ## Recommended workflow
 
-1. Run with `pdfMerged` first.
-2. Check the result for a `doi` field. If a DOI is present but fields look incomplete, fetch clean metadata instead:
-
-   ```bash
-   jabkit doi-to-bibtex 10.1145/3149935.3149942
-   ```
-
-3. Validate the resulting library:
+1. Run with `pdfMerged` first. Besides merging the other importers' results, it looks up any DOI, arXiv eprint, or ISBN found in the PDF online and merges the fetched metadata into the entry — no separate DOI lookup is needed.
+2. Validate the resulting library:
 
    ```bash
    jabkit check paper.bib

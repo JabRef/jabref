@@ -2,7 +2,6 @@ package org.jabref.model.paging;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,13 +16,13 @@ class PageTest {
     private Page<String> page2;
     private final int testPageNumber = 3;
     private final String testQuery = "anyQuery";
-    private Collection<String> testContent = new ArrayList<>();
+    private List<String> testContent = new ArrayList<>();
     private final String[] testStrings = {"str1", "str2", "str3"};
 
     @BeforeEach
     void setup() {
         testContent.addAll(Arrays.asList(testStrings));
-        testContent = Collections.unmodifiableCollection(testContent);
+        testContent = Collections.unmodifiableList(testContent);
         page1 = new Page<>(testQuery, testPageNumber, testContent);
         page2 = new Page<>(testQuery, testPageNumber);
     }

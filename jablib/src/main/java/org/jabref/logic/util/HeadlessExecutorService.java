@@ -96,8 +96,8 @@ public class HeadlessExecutorService implements Executor {
         }
     }
 
-    public void executeInterruptableTask(final Runnable runnable, String taskName) {
-        this.lowPriorityExecutorService.execute(new NamedRunnable(taskName, runnable));
+    public Future<?> executeInterruptableTask(final Runnable runnable, String taskName) {
+        return this.lowPriorityExecutorService.submit(new NamedRunnable(taskName, runnable));
     }
 
     public void executeInterruptableTaskAndWait(@NonNull Runnable runnable) {

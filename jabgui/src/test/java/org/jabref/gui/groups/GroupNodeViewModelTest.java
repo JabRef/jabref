@@ -235,6 +235,7 @@ class GroupNodeViewModelTest {
         );
 
         GroupNodeViewModel vm = getViewModelForGroup(autoRoot);
+        vm.ensureMatchedEntriesLoaded();
 
         // INCLUDING: automatic root sums direct matches and those of its children -> expect 2.
         assertEquals(2, vm.getHits().getValue().intValue());
@@ -254,8 +255,28 @@ class GroupNodeViewModelTest {
         );
 
         GroupNodeViewModel vm = getViewModelForGroup(autoRoot);
+        vm.ensureMatchedEntriesLoaded();
 
         // INDEPENDENT: automatic root has no direct matches -> expect 0.
         assertEquals(0, vm.getHits().getValue().intValue());
+    }
+
+    @Test
+    void hitsAreRecomputedWhenGroupCountIsReenabledAfterSkippedRefresh() {
+        databaseContext.getDatabase().insertEntry(new BibEntry().withField(StandardField.TITLE, "search"));
+        GroupNodeViewModel vm = getViewModelForGroup(
+                new WordKeywordGroup("Test group", GroupHierarchyType.INDEPENDENT, StandardField.TITLE, "search", true, ',', false));
+        vm.ensureMatchedEntriesLoaded();
+        assertEquals(1, vm.getHits().getValue().intValue());
+
+        // A refresh arriving while counts are disabled is skipped, but must invalidate the cache
+        preferences.getGroupsPreferences().setDisplayGroupCount(false);
+        vm.updateMatchedEntries();
+        assertEquals(0, vm.getHits().getValue().intValue());
+
+        // Re-enabling counts (what GroupTreeView's number cell does) recomputes instead of showing the stale cache
+        preferences.getGroupsPreferences().setDisplayGroupCount(true);
+        vm.ensureMatchedEntriesLoaded();
+        assertEquals(1, vm.getHits().getValue().intValue());
     }
 }

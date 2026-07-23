@@ -89,4 +89,31 @@ class MergeEntriesHelperTest {
 
         assertFalse(entryFromLibrary.hasField(StandardField.NOTE));
     }
+
+    @Test
+    void citationKeyFromFetcherIsAdoptedWhenLibraryEntryHasNone() {
+        BibEntry entryFromFetcher = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Some Title")
+                .withCitationKey("Maldacena:1997re");
+        BibEntry entryFromLibrary = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Some Title");
+
+        MergeEntriesHelper.mergeEntries(entryFromFetcher, entryFromLibrary, compoundEdit, KEYWORD_SEPARATOR);
+
+        assertEquals("Maldacena:1997re", entryFromLibrary.getCitationKey().orElse(""));
+    }
+
+    @Test
+    void existingCitationKeyInLibraryEntryIsNotOverwritten() {
+        BibEntry entryFromFetcher = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Some Title")
+                .withCitationKey("Maldacena:1997re");
+        BibEntry entryFromLibrary = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.TITLE, "Some Title")
+                .withCitationKey("myOwnKey2024");
+
+        MergeEntriesHelper.mergeEntries(entryFromFetcher, entryFromLibrary, compoundEdit, KEYWORD_SEPARATOR);
+
+        assertEquals("myOwnKey2024", entryFromLibrary.getCitationKey().orElse(""));
+    }
 }
