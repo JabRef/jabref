@@ -115,4 +115,4 @@ This is orthogonal to the decision recorded here: the conversion problem concern
 Related issues: [#624](https://github.com/JabRef/jabref/issues/624), [#11102](https://github.com/JabRef/jabref/issues/11102), [#602](https://github.com/JabRef/jabref/pull/602).
 Pandoc was first suggested for this purpose in [#624](https://github.com/JabRef/jabref/issues/624).
 
-This ADR was implemented in [#16315](https://github.com/JabRef/jabref/pull/16315).
+This decision was implemented in [#16315](https://github.com/JabRef/jabref/pull/16315).
