@@ -9,6 +9,7 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
 
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.style.JStyle;
 
 public class JStyleSelectViewModel {
@@ -20,11 +21,11 @@ public class JStyleSelectViewModel {
     private final JStyle jStyle;
     private final BooleanProperty internalStyle = new SimpleBooleanProperty();
 
-    public JStyleSelectViewModel(String name, String journals, String file, JStyle jStyle) {
-        this.name.setValue(name);
-        this.journals.setValue(journals);
-        this.file.setValue(file);
+    public JStyleSelectViewModel(JStyle jStyle) {
         this.jStyle = jStyle;
+        this.name.setValue(jStyle.getName());
+        this.journals.setValue(String.join(", ", jStyle.getJournals()));
+        this.file.setValue(jStyle.isInternalStyle() ? Localization.lang("Internal style") : jStyle.getPath());
         this.internalStyle.set(jStyle.isInternalStyle());
     }
 

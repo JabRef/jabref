@@ -13,16 +13,16 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class ModifyCSLBibliographyPropertiesDialogView extends BaseDialog<Void> {
+public class ModifyBibliographyPropertiesDialogView extends BaseDialog<Void> {
 
     @FXML private TextField titleField;
     @FXML private ComboBox<String> headerFormats;
     @FXML private ComboBox<String> bodyFormats;
 
-    private final ModifyCSLBibliographyPropertiesDialogViewModel viewModel;
+    private final ModifyBibliographyPropertiesDialogViewModel viewModel;
 
-    public ModifyCSLBibliographyPropertiesDialogView(OpenOfficePreferences openOfficePreferences) {
-        this.viewModel = new ModifyCSLBibliographyPropertiesDialogViewModel(openOfficePreferences);
+    public ModifyBibliographyPropertiesDialogView(OpenOfficePreferences openOfficePreferences) {
+        this.viewModel = new ModifyBibliographyPropertiesDialogViewModel(openOfficePreferences);
 
         this.setTitle(Localization.lang("Modify bibliography properties"));
         this.initModality(Modality.NONE);
