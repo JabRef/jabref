@@ -570,8 +570,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 // Different actions depending on where the user releases the drop in the target row
                 // - Bottom + top -> import entries
                 case TOP,
-                     BOTTOM ->
+                     BOTTOM -> {
+                        if (!ImportHandler.confirmBibFileImportIfNecessary(files, preferences, dialogService)) {
+                            event.setDropCompleted(false);
+                            event.consume();
+                            return;
+                        }
                         importHandler.importFilesInBackground(files, transferMode).executeWith(taskExecutor);
+                     }
                 // - Center -> modify entry: link files to entry
                 case CENTER -> {
                     BibEntry entry = target.getEntry();
