@@ -48,12 +48,12 @@ public class UnlinkedFilesWizard {
         Platform.runLater(() -> {
             if (page1.getScene() != null) {
                 themeManager.installCssOnScene(page1.getScene());
-                if (page1.getScene().getWindow() instanceof javafx.stage.Stage stage) {
-                    stage.setResizable(true);
-                    stage.setWidth(650);
-                    stage.setHeight(550);
-                    stage.getIcons().addAll(IconTheme.getLogoSet());
-                }
+            }
+            if (page1.getScene() != null && page1.getScene().getWindow() instanceof javafx.stage.Stage stage) {
+                stage.setResizable(true);
+                stage.setWidth(650);
+                stage.setHeight(550);
+                stage.getIcons().addAll(IconTheme.getLogoSet());
             }
         });
 
