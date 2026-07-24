@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StreamGobbler;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -16,12 +15,7 @@ import org.slf4j.LoggerFactory;
 /// Implementation of the {@link OcrEngine} interface using OCRmyPDF.
 public class OcrMyPdfEngine implements OcrEngine {
 
-    private static final String OCR_PDF_PREFIX = "_ocr.pdf";
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(OcrMyPdfEngine.class);
-    private static final int TIMEOUT_MINS = 10;
-    private static final int CHECKING_TIMEOUT = 5;
-
+    public static final Logger LOGGER = LoggerFactory.getLogger(OcrMyPdfEngine.class);
     private final OcrPreferences ocrPreferences;
 
     public OcrMyPdfEngine(OcrPreferences ocrPreferences) {
@@ -41,7 +35,7 @@ public class OcrMyPdfEngine implements OcrEngine {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectErrorStream(true);
             Process process = processBuilder.start();
-            boolean finished = process.waitFor(CHECKING_TIMEOUT, TimeUnit.SECONDS);
+            boolean finished = process.waitFor(OcrUtils.CHECKING_TIMEOUT, TimeUnit.SECONDS);
             if (!finished) {
                 process.destroyForcibly();
                 LOGGER.debug("Checking OCRmyPDF availability timed out");
@@ -70,7 +64,7 @@ public class OcrMyPdfEngine implements OcrEngine {
         if (!isAvailable()) {
             return OcrResult.failure(OcrFailureReason.NOT_AVAILABLE);
         }
-        Path outputPath = makeOutputFilePath(pdfPath);
+        Path outputPath = OcrUtils.makeOutputFilePath(pdfPath);
         String outputFile = outputPath.toString();
         String ocrCommand = switch (ocrPreferences.getPagesHaveText()) {
             case SKIP ->
@@ -95,7 +89,7 @@ public class OcrMyPdfEngine implements OcrEngine {
             StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
             HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
 
-            boolean finished = process.waitFor(TIMEOUT_MINS, TimeUnit.MINUTES);
+            boolean finished = process.waitFor(OcrUtils.TIMEOUT_MINS, TimeUnit.MINUTES);
             if (!finished) {
                 process.destroyForcibly();
                 return OcrResult.failure(OcrFailureReason.TIMEOUT);
@@ -115,16 +109,5 @@ public class OcrMyPdfEngine implements OcrEngine {
             LOGGER.error("OCRmyPDF process was interrupted.", e);
             return OcrResult.failure(OcrFailureReason.INTERRUPTED);
         }
-    }
-
-    /// Generates the output path for the searchable PDF.
-    ///
-    /// Example: Documents/my files/document.pdf -> Documents/my files/document_ocr.pdf.
-    ///
-    /// @param inputPath the path of the PDF that needs to be OCRed.
-    /// @return the output path of the searchable OCRed PDF.
-    private Path makeOutputFilePath(Path inputPath) {
-        String baseName = FileUtil.getBaseName(inputPath.toString());
-        return inputPath.resolveSibling(baseName + OCR_PDF_PREFIX);
     }
 }
