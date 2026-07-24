@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
-import org.jabref.logic.openoffice.CitationEntryTypeMetadataManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.ZoteroCitationLinker;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -24,13 +24,29 @@ import org.jabref.model.openoffice.ootext.OOFormat;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
 import org.jabref.model.openoffice.uno.CreationException;
+import org.jabref.model.openoffice.uno.NoDocumentException;
 
+import com.sun.star.beans.XPropertySet;
 import com.sun.star.container.NoSuchElementException;
+import com.sun.star.container.XNameAccess;
+import com.sun.star.container.XNameContainer;
 import com.sun.star.lang.WrappedTargetException;
+import com.sun.star.lang.XMultiServiceFactory;
+import com.sun.star.style.LineSpacing;
+import com.sun.star.style.LineSpacingMode;
+import com.sun.star.style.TabAlign;
+import com.sun.star.style.TabStop;
+import com.sun.star.style.XStyle;
+import com.sun.star.style.XStyleFamiliesSupplier;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Exception;
+import com.sun.star.uno.UnoRuntime;
+import de.undercouch.citeproc.output.Bibliography;
+import de.undercouch.citeproc.output.SecondFieldAlign;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /// This class processes CSL citations in JabRef and interacts directly with LibreOffice using an XTextDocument instance.
 /// It is tightly coupled with {@link CSLReferenceMarkManager} for management of reference marks tied to the CSL citations.
@@ -43,9 +59,18 @@ import org.jspecify.annotations.NonNull;
 /// For example, see the comment inside {@link CSLCitationOOAdapter#insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation}.
 public class CSLCitationOOAdapter {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CSLCitationOOAdapter.class);
+
     private static final String CITATION_DELIMITER = ", ";
+    private static final String ZOTERO_BIBLIOGRAPHY_PARAGRAPH_STYLE = "Bibliography 1";
+    private static final String PARAGRAPH_STYLES = "ParagraphStyles";
     private static final CitationStyleOutputFormat HTML_OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
     private static final Pattern CITATION_NUMBER_PATTERN = Pattern.compile("(\\D*)(\\d+)(\\D*)");
+    private static final Pattern CSL_LEFT_RIGHT_MARGIN_PATTERN = Pattern.compile(
+            "<div class=\"csl-left-margin\">(.*?)</div><div class=\"csl-right-inline\">(.*?)</div>");
+    private static final Pattern EMPTY_PARAGRAPHS_AT_BIBLIOGRAPHY_ENTRY_EDGES_PATTERN = Pattern.compile(
+            "^(?:\\s*<p(?: oo:ParaStyleName=\"[^\"]*\")?>\\s*</p>)+\\s*|(?:\\s*<p(?: oo:ParaStyleName=\"[^\"]*\")?>\\s*</p>)+\\s*$");
+    private static final double MM_PER_100_TWIP = 25.4 / 1440 * 100;
 
     private final XTextDocument document;
     private final CSLReferenceMarkManager markManager;
@@ -55,6 +80,7 @@ public class CSLCitationOOAdapter {
 
     private CitationStyle currentStyle;
     private CSLCitationType citationType;
+    private boolean needsCSLReferenceMarkConversion = true;
 
     public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager) throws WrappedTargetException, NoSuchElementException {
         this.document = doc;
@@ -62,6 +88,7 @@ public class CSLCitationOOAdapter {
         this.databasesSupplier = databasesSupplier;
         this.bibEntryTypesManager = bibEntryTypesManager;
         this.openOfficePreferences = openOfficePreferences;
+        this.openOfficePreferences.zoteroCompatibilityModeProperty().addListener((_, _, _) -> needsCSLReferenceMarkConversion = true);
 
         OOStyle initialStyle = openOfficePreferences.getCurrentStyle(); // may be a jstyle, can still be used for detecting subsequent style changes in context of CSL
         if (initialStyle instanceof CitationStyle citationStyle) {
@@ -70,6 +97,31 @@ public class CSLCitationOOAdapter {
 
         markManager.readAndUpdateExistingMarks();
         this.citationType = markManager.getCitationType();
+    }
+
+    public boolean needsReferenceMarkConversion() throws WrappedTargetException, NoSuchElementException {
+        if (!needsCSLReferenceMarkConversion) {
+            return false;
+        }
+
+        markManager.readAndUpdateExistingMarks();
+        boolean conversionNeeded = markManager.isConversionNeededForFirstReferenceMark(openOfficePreferences.getReferenceMarkFormat());
+        if (!conversionNeeded) {
+            needsCSLReferenceMarkConversion = false;
+        }
+        return conversionNeeded;
+    }
+
+    public void convertReferenceMarksToPreference() throws CreationException, com.sun.star.uno.Exception {
+        try {
+            int convertedMarks = markManager.convertReferenceMarks(
+                    openOfficePreferences.getReferenceMarkFormat(),
+                    databasesSupplier.get(),
+                    bibEntryTypesManager);
+            LOGGER.debug("Converted {} reference marks to {}", convertedMarks, openOfficePreferences.getReferenceMarkFormat());
+        } finally {
+            needsCSLReferenceMarkConversion = false;
+        }
     }
 
     /// This method is used to determine whether citation style and citation type should be updated
@@ -99,8 +151,14 @@ public class CSLCitationOOAdapter {
 
     /// Inserts a citation for a group of entries.
     /// Comparable to LaTeX's \cite command.
-    public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
+    public void insertCitation(XTextCursor cursor,
+                               CitationStyle selectedStyle,
+                               List<BibEntry> entries,
+                               BibDatabaseContext bibDatabaseContext,
+                               BibEntryTypesManager bibEntryTypesManager)
             throws CreationException, com.sun.star.uno.Exception {
+        linkZoteroCitationsBeforeInsert(bibDatabaseContext);
+
         // If current citation style is not the same as passed-in citation type, then change it to the new citation style
         // If current citation type is not "NORMAL", then change it to "NORMAL".
         // Placing this at the beginning reduces the number of updates needed by 1 (in the positive case)
@@ -125,37 +183,49 @@ public class CSLCitationOOAdapter {
         }
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
-        insertReferences(cursor, entries, ooText, isNumericStyle, CSLCitationType.NORMAL);
+        insertReferences(cursor, entries, ooText, isNumericStyle, CSLCitationType.NORMAL, bibDatabaseContext);
     }
 
     /// Inserts in-text citations for a group of entries.
     /// Comparable to LaTeX's \citet command.
     ///
     /// @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation} method.
-    public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
+    public void insertInTextCitation(XTextCursor cursor,
+                                     CitationStyle selectedStyle,
+                                     List<BibEntry> entries,
+                                     BibDatabaseContext bibDatabaseContext,
+                                     BibEntryTypesManager bibEntryTypesManager)
             throws CreationException, com.sun.star.uno.Exception {
+        linkZoteroCitationsBeforeInsert(bibDatabaseContext);
+
         setCitationStyleParameters(selectedStyle, CSLCitationType.IN_TEXT);
 
         boolean isNumericStyle = selectedStyle.isNumericStyle();
         boolean isAlphanumericStyle = selectedStyle.isAlphanumericStyle();
         String citation = createInTextCitationGroupText(selectedStyle, isAlphanumericStyle, isNumericStyle, entries, bibDatabaseContext);
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(citation));
-        insertReferences(cursor, entries, ooText, isNumericStyle, CSLCitationType.IN_TEXT);
+        insertReferences(cursor, entries, ooText, isNumericStyle, CSLCitationType.IN_TEXT, bibDatabaseContext);
     }
 
     /// Inserts "empty" citations for a list of entries at the cursor to the document.
     /// Adds the entries to the list for which bibliography is to be generated.
-    public void insertEmptyCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries)
+    public void insertEmptyCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext)
             throws CreationException, com.sun.star.uno.Exception {
+        linkZoteroCitationsBeforeInsert(bibDatabaseContext);
+
         setCitationStyleParameters(selectedStyle, CSLCitationType.EMPTY);
 
         OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
-        insertReferences(cursor, entries, emptyOOText, selectedStyle.isNumericStyle(), CSLCitationType.EMPTY);
+        insertReferences(cursor, entries, emptyOOText, selectedStyle.isNumericStyle(), CSLCitationType.EMPTY, bibDatabaseContext);
     }
 
     /// Creates a "Bibliography" section in the document and inserts a list of references.
     /// The list is generated based on the existing citations, in-text citations and empty citations in the document.
-    public void insertBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
+    public void insertJabRefBibliography(XTextCursor cursor,
+                                         CitationStyle selectedStyle,
+                                         List<BibEntry> entries,
+                                         BibDatabaseContext bibDatabaseContext,
+                                         BibEntryTypesManager bibEntryTypesManager)
             throws com.sun.star.uno.Exception, CreationException {
         if (!selectedStyle.hasBibliography()) {
             return;
@@ -202,8 +272,135 @@ public class CSLCitationOOAdapter {
         }
     }
 
+    public void insertZoteroBibliography(XTextCursor cursor,
+                                         CitationStyle selectedStyle,
+                                         List<BibEntry> entries,
+                                         BibDatabaseContext bibDatabaseContext,
+                                         BibEntryTypesManager bibEntryTypesManager)
+            throws com.sun.star.uno.Exception, CreationException {
+        if (!selectedStyle.hasBibliography()) {
+            return;
+        }
+
+        boolean isNumericStyle = selectedStyle.isNumericStyle();
+
+        markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
+        markManager.readAndUpdateExistingMarks();
+        updateAllCitationsWithNewStyle(selectedStyle, citationType);
+        markManager.readAndUpdateExistingMarks();
+
+        List<BibEntry> bibliographyEntries = new ArrayList<>(entries);
+        if (isNumericStyle) {
+            bibliographyEntries.sort(
+                    Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
+        }
+
+        Optional<Bibliography> bibliography = CitationStyleGenerator.generateBibliographyObject(
+                bibliographyEntries,
+                selectedStyle.getSource(),
+                HTML_OUTPUT_FORMAT,
+                bibDatabaseContext,
+                bibEntryTypesManager);
+        if (bibliography.isEmpty()) {
+            return;
+        }
+        Bibliography generatedBibliography = bibliography.orElseThrow();
+
+        XStyleFamiliesSupplier styleFamilies = UnoRuntime.queryInterface(XStyleFamiliesSupplier.class, document);
+        XNameAccess styleFamilyNames = styleFamilies.getStyleFamilies();
+        XNameAccess paragraphStyles = UnoRuntime.queryInterface(
+                XNameAccess.class,
+                styleFamilyNames.getByName(PARAGRAPH_STYLES));
+        XPropertySet styleProperties;
+
+        try {
+            styleProperties = UnoRuntime.queryInterface(
+                    XPropertySet.class,
+                    paragraphStyles.getByName(ZOTERO_BIBLIOGRAPHY_PARAGRAPH_STYLE));
+        } catch (NoSuchElementException e) {
+            LOGGER.debug("Bibliography paragraph style not found. Creating it.", e);
+            XMultiServiceFactory documentFactory = UnoRuntime.queryInterface(XMultiServiceFactory.class, document);
+            XStyle style = UnoRuntime.queryInterface(
+                    XStyle.class,
+                    documentFactory.createInstance("com.sun.star.style.ParagraphStyle"));
+            XNameContainer paragraphStyleNames = UnoRuntime.queryInterface(
+                    XNameContainer.class,
+                    paragraphStyles);
+            paragraphStyleNames.insertByName(ZOTERO_BIBLIOGRAPHY_PARAGRAPH_STYLE, style);
+            style.setParentStyle("Default");
+            styleProperties = UnoRuntime.queryInterface(XPropertySet.class, style);
+        }
+
+        int firstLineIndent = 0;
+        int indent = 0;
+        int maxOffset = Optional.ofNullable(generatedBibliography.getMaxOffset()).orElse(0);
+        TabStop[] tabStops = new TabStop[0];
+        SecondFieldAlign secondFieldAlign = Optional.ofNullable(generatedBibliography.getSecondFieldAlign())
+                                                    .orElse(SecondFieldAlign.FALSE);
+
+        if (Boolean.TRUE.equals(generatedBibliography.getHangingIndent())) {
+            indent = 720;
+            firstLineIndent = -720;
+        } else if (secondFieldAlign != SecondFieldAlign.FALSE) {
+            int alignAt = 24 + maxOffset * 120;
+            firstLineIndent = -alignAt;
+            if (secondFieldAlign == SecondFieldAlign.MARGIN) {
+                tabStops = createTabStops(0);
+            } else {
+                indent = alignAt;
+                tabStops = createTabStops(alignAt);
+            }
+        }
+
+        LineSpacing lineSpacing = new LineSpacing();
+        lineSpacing.Mode = LineSpacingMode.MINIMUM;
+        lineSpacing.Height = (short) (240
+                * Optional.ofNullable(generatedBibliography.getLineSpacing()).orElse(1)
+                * MM_PER_100_TWIP);
+
+        styleProperties.setPropertyValue("ParaFirstLineIndent", (int) (firstLineIndent * MM_PER_100_TWIP));
+        styleProperties.setPropertyValue("ParaLeftMargin", (int) (indent * MM_PER_100_TWIP));
+        styleProperties.setPropertyValue("ParaLineSpacing", lineSpacing);
+        styleProperties.setPropertyValue("ParaTopMargin", 0);
+        styleProperties.setPropertyValue("ParaBottomMargin", 0);
+        styleProperties.setPropertyValue("ParaTabStops", tabStops);
+
+        XPropertySet cursorProperties = UnoRuntime.queryInterface(XPropertySet.class, cursor);
+        cursorProperties.setPropertyValue("ParaStyleName", ZOTERO_BIBLIOGRAPHY_PARAGRAPH_STYLE);
+        OOTextIntoOO.write(document, cursor, createZoteroBibliographyText(generatedBibliography));
+    }
+
+    static OOText createZoteroBibliographyText(Bibliography bibliography) {
+        StringJoiner bibliographyText = new StringJoiner(
+                "<p oo:ParaStyleName=\"%s\">".formatted(ZOTERO_BIBLIOGRAPHY_PARAGRAPH_STYLE));
+        for (String bibliographyEntry : bibliography.getEntries()) {
+            String formattedBibliographyEntry = CSL_LEFT_RIGHT_MARGIN_PATTERN.matcher(bibliographyEntry)
+                                                                             .replaceAll("$1\t$2");
+            formattedBibliographyEntry = CSLFormatUtils.transformHTML(formattedBibliographyEntry);
+            formattedBibliographyEntry = EMPTY_PARAGRAPHS_AT_BIBLIOGRAPHY_ENTRY_EDGES_PATTERN.matcher(formattedBibliographyEntry)
+                                                                                             .replaceAll("");
+            bibliographyText.add(formattedBibliographyEntry);
+        }
+        return OOFormat.setLocaleNone(OOText.fromString(bibliographyText.toString()));
+    }
+
+    private static TabStop[] createTabStops(int... positions) {
+        TabStop[] tabStops = new TabStop[positions.length];
+        for (int i = 0; i < positions.length; i++) {
+            tabStops[i] = new TabStop();
+            tabStops[i].Position = (int) (positions[i] * MM_PER_100_TWIP);
+            tabStops[i].Alignment = TabAlign.LEFT;
+        }
+        return tabStops;
+    }
+
     /// Inserts references and also adds a space before the citation if not already present ("smart space").
-    private void insertReferences(XTextCursor cursor, List<BibEntry> entries, OOText ooText, boolean isNumericStyle, CSLCitationType citationType)
+    private void insertReferences(XTextCursor cursor,
+                                  List<BibEntry> entries,
+                                  OOText ooText,
+                                  boolean isNumericStyle,
+                                  CSLCitationType citationType,
+                                  BibDatabaseContext bibDatabaseContext)
             throws CreationException, com.sun.star.uno.Exception {
         boolean preceedingSpaceExists;
         XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
@@ -220,11 +417,33 @@ public class CSLCitationOOAdapter {
                 preceedingSpaceExists = checkCursor.getString().matches("\\R");
             }
         }
-        markManager.insertReferenceIntoOO(entries, document, cursor, ooText, !preceedingSpaceExists, openOfficePreferences.getAddSpaceAfter(), citationType);
-        CitationEntryTypeMetadataManager.storeEntryTypes(document, entries);
+        markManager.insertReferenceIntoOO(
+                entries,
+                document,
+                cursor,
+                ooText,
+                !preceedingSpaceExists,
+                openOfficePreferences.getAddSpaceAfter(),
+                citationType,
+                bibDatabaseContext,
+                bibEntryTypesManager,
+                openOfficePreferences.getReferenceMarkFormat());
         markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
         markManager.readAndUpdateExistingMarks();
         this.citationType = markManager.getCitationType();
+    }
+
+    private void linkZoteroCitationsBeforeInsert(BibDatabaseContext bibDatabaseContext) {
+        try {
+            int linkedCitations = ZoteroCitationLinker.linkZoteroCitations(
+                    document,
+                    bibDatabaseContext,
+                    bibEntryTypesManager);
+            LOGGER.debug("Linked {} Zotero citations to JabRef entries before inserting citation", linkedCitations);
+            markManager.readAndUpdateExistingMarks();
+        } catch (NoDocumentException | CreationException | Exception e) {
+            LOGGER.warn("Could not link Zotero citations to JabRef entries before inserting citation", e);
+        }
     }
 
     /// Transforms the numbers in the citation to globally-unique (and thus, reusable) numbers.
@@ -271,7 +490,6 @@ public class CSLCitationOOAdapter {
                                                .flatMap(db -> db.getEntries().stream())
                                                .filter(this::isCitedEntry)
                                                .toList();
-        CitationEntryTypeMetadataManager.storeEntryTypes(document, citedEntries);
 
         BibDatabase unifiedDatabase = new BibDatabase(citedEntries);
         BibDatabaseContext unifiedBibDatabaseContext = new BibDatabaseContext(unifiedDatabase);
@@ -325,7 +543,11 @@ public class CSLCitationOOAdapter {
     }
 
     /// Helper method for creating citation group for `insertInTextCitation` and `updateAllCitationsWithNewStyle`
-    private @NonNull String createInTextCitationGroupText(CitationStyle style, boolean isAlphaNumericStyle, boolean isNumericStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext) {
+    private @NonNull String createInTextCitationGroupText(CitationStyle style,
+                                                          boolean isAlphaNumericStyle,
+                                                          boolean isNumericStyle,
+                                                          List<BibEntry> entries,
+                                                          BibDatabaseContext bibDatabaseContext) {
         StringJoiner citations = new StringJoiner(CITATION_DELIMITER);
         for (BibEntry entry : entries) {
             citations.add(createInTextCitationText(style, isAlphaNumericStyle, isNumericStyle, entry, bibDatabaseContext));
@@ -335,7 +557,11 @@ public class CSLCitationOOAdapter {
     }
 
     ///  Helper method for creating in-text citations for `updateAllCitationsWithNewStyle` and `insertInTextCitation`.
-    private @NonNull String createInTextCitationText(CitationStyle style, boolean isAlphaNumericStyle, boolean isNumericStyle, BibEntry currentEntry, BibDatabaseContext bibDatabaseContext) {
+    private @NonNull String createInTextCitationText(CitationStyle style,
+                                                     boolean isAlphaNumericStyle,
+                                                     boolean isNumericStyle,
+                                                     BibEntry currentEntry,
+                                                     BibDatabaseContext bibDatabaseContext) {
         String citation;
 
         if (isAlphaNumericStyle) {

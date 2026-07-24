@@ -42,6 +42,7 @@ public class OpenOfficePreferences {
     private final StringProperty cslBibliographyBodyFormat;
     private final ObservableList<String> externalCslStyles;
     private final BooleanProperty addSpaceAfter;
+    private final BooleanProperty zoteroCompatibilityMode;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
@@ -54,7 +55,8 @@ public class OpenOfficePreferences {
                                  String cslBibliographyHeaderFormat,
                                  String cslBibliographyBodyFormat,
                                  List<String> externalCslStyles,
-                                 boolean addSpaceAfter) {
+                                 boolean addSpaceAfter,
+                                 boolean zoteroCompatibilityMode) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
@@ -67,6 +69,7 @@ public class OpenOfficePreferences {
         this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat);
         this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
         this.addSpaceAfter = new SimpleBooleanProperty(addSpaceAfter);
+        this.zoteroCompatibilityMode = new SimpleBooleanProperty(zoteroCompatibilityMode);
     }
 
     private OpenOfficePreferences() {
@@ -84,7 +87,8 @@ public class OpenOfficePreferences {
                 "Heading 2",                                    // cslBibliographyHeaderFormat
                 "Text body",                                    // cslBibliographyBodyFormat
                 List.of(),                                      // externalCslStyles
-                true                                            // addSpaceAfter
+                true,                                           // addSpaceAfter
+                true                                            // zoteroCompatibilityMode
         );
     }
 
@@ -242,5 +246,23 @@ public class OpenOfficePreferences {
 
     public void setAddSpaceAfter(boolean addSpaceAfter) {
         this.addSpaceAfter.setValue(addSpaceAfter);
+    }
+
+    public boolean getZoteroCompatibilityMode() {
+        return zoteroCompatibilityMode.get();
+    }
+
+    public BooleanProperty zoteroCompatibilityModeProperty() {
+        return zoteroCompatibilityMode;
+    }
+
+    public void setZoteroCompatibilityMode(boolean zoteroCompatibilityMode) {
+        this.zoteroCompatibilityMode.set(zoteroCompatibilityMode);
+    }
+
+    public OpenOfficeReferenceMarkFormat getReferenceMarkFormat() {
+        return zoteroCompatibilityMode.get()
+               ? OpenOfficeReferenceMarkFormat.ZOTERO_COMPATIBLE
+               : OpenOfficeReferenceMarkFormat.JABREF_ONLY;
     }
 }

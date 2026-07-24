@@ -261,6 +261,7 @@ public class OpenOfficePanel {
         pushEntriesEmpty.setTooltip(new Tooltip(Localization.lang("Insert a citation without text (the entry will appear in the reference list)")));
         pushEntriesEmpty.setOnAction(_ -> pushEntries(CitationType.INVISIBLE_CIT, false));
         pushEntriesEmpty.setMaxWidth(Double.MAX_VALUE);
+        openOfficePreferences.zoteroCompatibilityModeProperty().addListener((_, _, _) -> updateButtonAvailability());
         pushEntriesAdvanced.setTooltip(new Tooltip(Localization.lang("Cite selected entries with extra information")));
         pushEntriesAdvanced.setOnAction(_ -> pushEntries(CitationType.AUTHORYEAR_INTEXT, true));
         pushEntriesAdvanced.setMaxWidth(Double.MAX_VALUE);
@@ -426,13 +427,14 @@ public class OpenOfficePanel {
         boolean canCite = isConnectedToDocument && hasStyle && hasDatabase;
         boolean canRefreshDocument = isConnectedToDocument && hasStyle;
         boolean cslStyleSelected = currentStyle instanceof CitationStyle;
+        boolean emptyCitationSupported = currentStyle instanceof JStyle || (cslStyleSelected && !openOfficePreferences.getZoteroCompatibilityMode());
         boolean canGenerateBibliography = (currentStyle instanceof JStyle) || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography());
 
         selectDocument.setDisable(!isConnectedToDocument);
 
         pushEntries.setDisable(!canCite);
         pushEntriesInt.setDisable(!canCite);
-        pushEntriesEmpty.setDisable(!canCite);
+        pushEntriesEmpty.setDisable(!canCite || !emptyCitationSupported);
         pushEntriesAdvanced.setDisable(!canCite || cslStyleSelected);
 
         update.setDisable(!canRefreshDocument || !canGenerateBibliography);
@@ -650,7 +652,13 @@ public class OpenOfficePanel {
         alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());
         alwaysAddCitedOnPagesText.setOnAction(_ -> openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));
 
+        CheckMenuItem zoteroCompatibilityMode = new CheckMenuItem(Localization.lang("Zotero compatibility mode"));
+        zoteroCompatibilityMode.selectedProperty().set(openOfficePreferences.getZoteroCompatibilityMode());
+        zoteroCompatibilityMode.setDisable(currentStyle instanceof JStyle);
+        zoteroCompatibilityMode.setOnAction(_ -> openOfficePreferences.setZoteroCompatibilityMode(zoteroCompatibilityMode.isSelected()));
+
         EasyBind.listen(currentStyleProperty, (_, _, newValue) -> {
+            zoteroCompatibilityMode.setDisable(newValue instanceof JStyle);
             switch (newValue) {
                 case JStyle _ -> {
                     if (!contextMenu.getItems().contains(alwaysAddCitedOnPagesText)) {
@@ -689,6 +697,7 @@ public class OpenOfficePanel {
         contextMenu.getItems().addAll(
                 autoSync,
                 addSpaceAfter,
+                zoteroCompatibilityMode,
                 new SeparatorMenuItem(),
                 useActiveBase,
                 useAllBases,
