@@ -138,6 +138,20 @@ public class ImportHandler {
         return fileLinker;
     }
 
+    public static boolean confirmBibFileImportIfNecessary(List<Path> files, GuiPreferences preferences, DialogService dialogService) {
+        boolean containsBibFile = files.stream().map(FileUtil::resolveIfShortcut).anyMatch(FileUtil::isBibFile);
+        if (containsBibFile && preferences.getImporterPreferences().shouldWarnAboutBibFileImport()) {
+            return dialogService.showConfirmationDialogWithOptOutAndWait(
+                    Localization.lang("Import BibTeX file"),
+                    Localization.lang("Are you sure you want to import entries from the dropped BibTeX file(s) into the current library?"),
+                    Localization.lang("Import"),
+                    Localization.lang("Cancel"),
+                    Localization.lang("Do not ask again"),
+                    optOut -> preferences.getImporterPreferences().setWarnAboutBibFileImport(!optOut));
+        }
+        return true;
+    }
+
     public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files, TransferMode transferMode) {
         // TODO: Make a utility class out of this. Package: org.jabref.logic.externalfiles.
         return new BackgroundTask<>() {
