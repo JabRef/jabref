@@ -1,6 +1,7 @@
 package org.jabref.logic.openoffice.bst;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
@@ -81,34 +82,34 @@ public class PandocLatexConverter {
     /// Both stdout and stderr are drained to prevent pipe-buffer deadlock.
     /// Throws [IOException] if pandoc exits non-zero, surfacing the real error message.
     public String latexToHtml(String latex) throws IOException, InterruptedException {
-        Process p = new ProcessBuilder(pandocPath, "-f", "latex", "-t", "html", "--wrap=none").start();
+        Process pandocProcess = new ProcessBuilder(pandocPath, "-f", "latex", "-t", "html", "--wrap=none").start();
 
         // Start gobblers to prevent blocking on full buffers
         StringBuilder stdoutBuf = new StringBuilder();
         StringBuilder stderrBuf = new StringBuilder();
-        StreamGobbler outGobbler = new StreamGobbler(p.getInputStream(), line -> {
+        StreamGobbler outGobbler = new StreamGobbler(pandocProcess.getInputStream(), line -> {
             stdoutBuf.append(line).append('\n');
         });
-        StreamGobbler errGobbler = new StreamGobbler(p.getErrorStream(), line -> {
+        StreamGobbler errGobbler = new StreamGobbler(pandocProcess.getErrorStream(), line -> {
             stderrBuf.append(line).append('\n');
         });
         HeadlessExecutorService.INSTANCE.execute(outGobbler);
         HeadlessExecutorService.INSTANCE.execute(errGobbler);
 
         // Write LaTeX to stdin and close to signal EOF
-        try (var out = p.getOutputStream()) {
+        try (OutputStream out = pandocProcess.getOutputStream()) {
             out.write(latex.getBytes(StandardCharsets.UTF_8));
         }
 
-        if (!p.waitFor(30, TimeUnit.SECONDS)) {
-            p.destroyForcibly();
+        if (!pandocProcess.waitFor(30, TimeUnit.SECONDS)) {
+            pandocProcess.destroyForcibly();
             throw new IOException("pandoc timed out");
         }
 
         String html = stdoutBuf.toString();
         String err = stderrBuf.toString();
 
-        int exit = p.exitValue();
+        int exit = pandocProcess.exitValue();
         if (exit != 0) {
             throw new IOException("pandoc failed (exit " + exit + "): " + err);
         }

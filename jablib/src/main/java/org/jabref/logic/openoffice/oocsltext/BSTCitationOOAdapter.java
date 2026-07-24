@@ -249,7 +249,7 @@ public class BSTCitationOOAdapter {
         if (!checkCursor.goLeft((short) 1, true)) {
             return true;
         }
-        String s = checkCursor.getString();
-        return " ".equals(s) || s.matches("\\R");
+        String cursorString = checkCursor.getString();
+        return " ".equals(cursorString) || cursorString.matches("\\R");
     }
 }

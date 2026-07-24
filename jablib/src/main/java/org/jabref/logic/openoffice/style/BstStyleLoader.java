@@ -86,9 +86,9 @@ public class BstStyleLoader {
     private void loadExternalStyles() {
         externalStyles.clear();
         for (String pathStr : openOfficePreferences.getExternalBstStyles()) {
-            Path p = Path.of(pathStr);
-            if (Files.exists(p)) {
-                externalStyles.add(new BstStyle(p));
+            Path bstFilePath = Path.of(pathStr);
+            if (Files.exists(bstFilePath)) {
+                externalStyles.add(new BstStyle(bstFilePath));
             } else {
                 LOGGER.warn("BST style file not found, skipping: {}", pathStr);
             }
