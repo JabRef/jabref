@@ -73,6 +73,9 @@ public class URLDownload {
     private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(30);
     private static final int MAX_RETRIES = 3;
 
+    private static volatile boolean unirestConfigured = false;
+    private static final Object UNIREST_CONFIG_LOCK = new Object();
+
     private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
 
@@ -83,13 +86,6 @@ public class URLDownload {
     private Duration connectTimeout = DEFAULT_CONNECT_TIMEOUT;
     // Can be null if SSL is not supported. If null, then ignore.
     private @Nullable SSLContext sslContext;
-
-    static {
-        Unirest.config()
-               .followRedirects(true)
-               .enableCookieManagement(true)
-               .setDefaultHeader("User-Agent", USER_AGENT);
-    }
 
     /// @param source the URL to download from
     /// @throws MalformedURLException if no protocol is specified in the source, or an unknown protocol is found
@@ -119,6 +115,25 @@ public class URLDownload {
         this.importerPreferences = importerPreferences;
     }
 
+    public static void ensureUnirestConfigured() {
+        if (unirestConfigured) {
+            return;
+        }
+
+        synchronized (UNIREST_CONFIG_LOCK) {
+            if (unirestConfigured) {
+                return;
+            }
+
+            Unirest.config()
+                   .followRedirects(true)
+                   .enableCookieManagement(true)
+                   .setDefaultHeader("User-Agent", USER_AGENT);
+
+            unirestConfigured = true;
+        }
+    }
+
     public URL getSource() {
         return source;
     }
@@ -135,6 +150,7 @@ public class URLDownload {
             do {
                 // @formatter:on
                 retries++;
+                ensureUnirestConfigured();
                 HttpResponse<String> response = Unirest.head(urlToCheck).headers(parameters).asString();
                 // Check if we have redirects, e.g. arxiv will give otherwise content type HTML for the original url
                 // We need to do it "manually", because ".followRedirects(true)" only works for GET not for HEAD
@@ -144,6 +160,7 @@ public class URLDownload {
                 }
                 // while loop, because there could be multiple redirects
             } while (!StringUtil.isNullOrEmpty(locationHeader) && retries <= MAX_RETRIES);
+            ensureUnirestConfigured();
             contentType = Unirest.head(urlToCheck).headers(parameters).asString().getHeaders().getFirst("Content-Type");
             if ((contentType != null) && !contentType.isEmpty()) {
                 return Optional.of(contentType);
@@ -154,6 +171,7 @@ public class URLDownload {
 
         // Use GET request as alternative if no HEAD request is available
         try {
+            ensureUnirestConfigured();
             contentType = Unirest.get(source.toString()).headers(parameters).asString().getHeaders().get("Content-Type").getFirst();
             if (!StringUtil.isNullOrEmpty(contentType)) {
                 return Optional.of(contentType);
@@ -181,6 +199,7 @@ public class URLDownload {
     ///
     /// @return the status code of the response
     public boolean canBeReached() throws UnirestException {
+        ensureUnirestConfigured();
 
         int statusCode = Unirest.head(source.toString()).asString().getStatus();
         return (statusCode >= 200) && (statusCode < 300);

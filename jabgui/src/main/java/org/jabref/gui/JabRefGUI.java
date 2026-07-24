@@ -45,6 +45,7 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
@@ -186,6 +187,9 @@ public class JabRefGUI extends Application {
     }
 
     public void initialize() {
+        // Configure Unirest once during application startup.
+        // See #16059.
+        URLDownload.ensureUnirestConfigured();
         JabRefGUI.stateManager = new JabRefGuiStateManager();
         Injector.setModelOrService(StateManager.class, stateManager);
 
