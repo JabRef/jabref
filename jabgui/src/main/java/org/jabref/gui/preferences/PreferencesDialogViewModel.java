@@ -67,8 +67,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         // This enables passing unsaved preference values from the AI tab to the "web search" tab.
         Optional<AiTab> aiTab = createAiTab(AiTab::new);
         ReadOnlyBooleanProperty aiEnabled = aiTab.map(AiTab::aiEnabledProperty)
-                .orElseGet(() -> new SimpleBooleanProperty(
-                        preferences.getAiPreferences().getAiFeaturesEnabledCurrently()));
+                                                 .orElseGet(() -> new SimpleBooleanProperty(
+                                                         preferences.getAiPreferences().getAiFeaturesEnabledCurrently()));
 
         preferenceTabs = FXCollections.observableArrayList(
                 new GeneralTab(),
