@@ -13,6 +13,8 @@ license: MIT
 
 Preferred: the native binary — a single self-contained executable, no JDK or JBang needed, instant startup. Download and unpack for your platform:
 
+<!-- Features that do not use AWT have been verified to work without the bundled .so files. -->
+
 ```bash
 # Linux (amd64)
 curl -fL https://builds.jabref.org/main/linux-amd64/tools/jabkit-native_linux.tar.gz | tar xz
