@@ -469,9 +469,9 @@ public class GroupTreeView extends BorderPane {
 
         if (dragboard.hasFiles()) {
             List<Path> files = dragboard.getFiles().stream()
-                                    .map(File::toPath)
-                                    .map(FileUtil::resolveIfShortcut)
-                                    .toList();
+                                        .map(File::toPath)
+                                        .map(FileUtil::resolveIfShortcut)
+                                        .toList();
             if (!ImportHandler.confirmBibFileImportIfNecessary(files, preferences, dialogService)) {
                 event.setDropCompleted(false);
                 event.consume();
