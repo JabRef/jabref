@@ -1,0 +1,372 @@
+{
+  "reflection": [
+    {
+      "type": "com.github.benmanes.caffeine.cache.BBHeader$ReadAndWriteCounterRef",
+      "fields": [
+        {
+          "name": "writeCounter"
+        }
+      ]
+    },
+    {
+      "type": "com.github.benmanes.caffeine.cache.BBHeader$ReadCounterRef",
+      "fields": [
+        {
+          "name": "readCounter"
+        }
+      ]
+    },
+    {
+      "type": "com.google.common.util.concurrent.AbstractFutureState",
+      "fields": [
+        {
+          "name": "listenersField"
+        },
+        {
+          "name": "valueField"
+        },
+        {
+          "name": "waitersField"
+        }
+      ]
+    },
+    {
+      "type": "com.google.common.util.concurrent.AbstractFutureState$Waiter",
+      "fields": [
+        {
+          "name": "next"
+        },
+        {
+          "name": "thread"
+        }
+      ]
+    },
+    {
+      "type": "groovy.lang.Closure"
+    },
+    {
+      "type": "java.lang.Boolean",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "getBoolean",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Class",
+      "methods": [
+        {
+          "name": "isRecord",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Object"
+    },
+    {
+      "type": "java.lang.ProcessHandle",
+      "methods": [
+        {
+          "name": "current",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.invoke.VarHandle",
+      "methods": [
+        {
+          "name": "releaseFence",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.reflect.RecordComponent"
+    },
+    {
+      "type": "java.nio.file.Path"
+    },
+    {
+      "type": "java.nio.file.Paths"
+    },
+    {
+      "type": "java.sql.Connection"
+    },
+    {
+      "type": "java.sql.Date"
+    },
+    {
+      "type": "java.sql.Driver"
+    },
+    {
+      "type": "java.sql.DriverManager"
+    },
+    {
+      "type": "java.sql.Time"
+    },
+    {
+      "type": "java.sql.Timestamp"
+    },
+    {
+      "type": "java.time.Duration"
+    },
+    {
+      "type": "java.time.Instant"
+    },
+    {
+      "type": "java.time.LocalDate"
+    },
+    {
+      "type": "java.time.LocalDateTime"
+    },
+    {
+      "type": "java.time.LocalTime"
+    },
+    {
+      "type": "java.time.MonthDay"
+    },
+    {
+      "type": "java.time.OffsetDateTime"
+    },
+    {
+      "type": "java.time.OffsetTime"
+    },
+    {
+      "type": "java.time.Period"
+    },
+    {
+      "type": "java.time.Year"
+    },
+    {
+      "type": "java.time.YearMonth"
+    },
+    {
+      "type": "java.time.ZoneId"
+    },
+    {
+      "type": "java.time.ZoneOffset"
+    },
+    {
+      "type": "java.time.ZonedDateTime"
+    },
+    {
+      "type": "java.util.ImmutableCollections$List12"
+    },
+    {
+      "type": "java.util.ImmutableCollections$ListN"
+    },
+    {
+      "type": "java.util.List"
+    },
+    {
+      "type": "org.jabref.languageserver.cli.ServerCli",
+      "fields": [
+        {
+          "name": "port"
+        }
+      ]
+    },
+    {
+      "type": "org.jabref.model.database.BibDatabase"
+    },
+    {
+      "type": "org.jabref.model.database.KeyChangeListener"
+    },
+    {
+      "type": "org.tinylog.configuration.PropertiesConfigurationLoader",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.tinylog.core.TinylogLoggingProvider",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.tinylog.slf4j.TinylogSlf4jServiceProvider"
+    },
+    {
+      "type": "org.tinylog.throwable.StripThrowableFilter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "org.tinylog.writers.ConsoleWriter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.util.Map"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "picocli.CommandLine$AutoHelpMixin",
+      "fields": [
+        {
+          "name": "helpRequested"
+        },
+        {
+          "name": "versionRequested"
+        }
+      ]
+    },
+    {
+      "type": "sun.util.resources.cldr.LocaleNames"
+    },
+    {
+      "type": "sun.util.resources.cldr.LocaleNames_en"
+    }
+  ],
+  "resources": [
+    {
+      "glob": "META-INF/services/java.net.spi.InetAddressResolverProvider"
+    },
+    {
+      "glob": "META-INF/services/java.nio.charset.spi.CharsetProvider"
+    },
+    {
+      "glob": "META-INF/services/java.time.zone.ZoneRulesProvider"
+    },
+    {
+      "glob": "META-INF/services/java.util.prefs.PreferencesFactory"
+    },
+    {
+      "glob": "META-INF/services/javax.xml.parsers.DocumentBuilderFactory"
+    },
+    {
+      "glob": "META-INF/services/org.slf4j.spi.SLF4JServiceProvider"
+    },
+    {
+      "glob": "META-INF/services/org.tinylog.configuration.ConfigurationLoader"
+    },
+    {
+      "glob": "META-INF/services/org.tinylog.provider.LoggingProvider"
+    },
+    {
+      "glob": "META-INF/services/org.tinylog.throwable.ThrowableFilter"
+    },
+    {
+      "glob": "META-INF/services/org.tinylog.writers.Writer"
+    },
+    {
+      "glob": "l10n/JabRef.properties"
+    },
+    {
+      "glob": "tinylog-dev.properties"
+    },
+    {
+      "glob": "tinylog-test.properties"
+    },
+    {
+      "glob": "tinylog.properties"
+    },
+    {
+      "glob": "uk/ac/ed/ph/snuggletex/all-math-characters.txt"
+    },
+    {
+      "glob": "uk/ac/ed/ph/snuggletex/core-error-messages_en.properties"
+    },
+    {
+      "glob": "uk/ac/ed/ph/snuggletex/core-math-characters.txt"
+    },
+    {
+      "glob": "uk/ac/ed/ph/snuggletex/math-character-aliases.txt"
+    },
+    {
+      "glob": "uk/ac/ed/ph/snuggletex/math-character-big-limits.txt"
+    },
+    {
+      "glob": "uk/ac/ed/ph/snuggletex/math-character-brackets.txt"
+    },
+    {
+      "glob": "uk/ac/ed/ph/snuggletex/math-character-negations.txt"
+    },
+    {
+      "glob": "uk/ac/ed/ph/snuggletex/math-function-definitions.txt"
+    },
+    {
+      "module": "java.base",
+      "glob": "jdk/internal/icu/impl/data/icudt76b/nfc.nrm"
+    },
+    {
+      "module": "org.jabref.jablib",
+      "glob": "journals/journal-list.mv"
+    },
+    {
+      "module": "org.jabref.jablib",
+      "glob": "journals/ltwa-list.mv"
+    },
+    {
+      "module": "org.jabref.jablib",
+      "glob": "l10n/JabRef.properties"
+    },
+    {
+      "module": "org.jabref.jablib",
+      "glob": "l10n/JabRef_en.properties"
+    },
+    {
+      "module": "snuggletex.core",
+      "glob": "uk/ac/ed/ph/snuggletex/all-math-characters.txt"
+    },
+    {
+      "module": "snuggletex.core",
+      "glob": "uk/ac/ed/ph/snuggletex/core-error-messages.properties"
+    },
+    {
+      "module": "snuggletex.core",
+      "glob": "uk/ac/ed/ph/snuggletex/core-error-messages_en.properties"
+    },
+    {
+      "module": "snuggletex.core",
+      "glob": "uk/ac/ed/ph/snuggletex/core-math-characters.txt"
+    },
+    {
+      "module": "snuggletex.core",
+      "glob": "uk/ac/ed/ph/snuggletex/math-character-aliases.txt"
+    },
+    {
+      "module": "snuggletex.core",
+      "glob": "uk/ac/ed/ph/snuggletex/math-character-big-limits.txt"
+    },
+    {
+      "module": "snuggletex.core",
+      "glob": "uk/ac/ed/ph/snuggletex/math-character-brackets.txt"
+    },
+    {
+      "module": "snuggletex.core",
+      "glob": "uk/ac/ed/ph/snuggletex/math-character-negations.txt"
+    },
+    {
+      "module": "snuggletex.core",
+      "glob": "uk/ac/ed/ph/snuggletex/math-function-definitions.txt"
+    },
+    {
+      "bundle": "l10n/JabRef"
+    },
+    {
+      "bundle": "uk/ac/ed/ph/snuggletex/core-error-messages"
+    }
+  ]
+}
