@@ -1,18 +1,28 @@
 package org.jabref.gui.externalfiles;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
+import java.util.StringJoiner;
+
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -23,20 +33,37 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.documentviewer.PdfDocumentViewer;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.RecursiveTreeItem;
+import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckTreeView;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileSelectionPage extends WizardPane {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileSelectionPage.class);
 
     private final UnlinkedFilesDialogViewModel viewModel;
     private final StateManager stateManager;
     private final BooleanProperty invalidProperty = new SimpleBooleanProperty(false);
+
+    private final PdfXmpImporter xmpImporter;
+    private @Nullable BackgroundTask<?> currentMetadataTask;
 
     private CheckTreeView<FileNodeViewModel> unlinkedFilesList;
     private ProgressIndicator progressIndicator;
@@ -44,6 +71,10 @@ public class FileSelectionPage extends WizardPane {
     private Label fileCountLabel;
     private VBox progressPane;
     private VBox contentPane;
+    private TitledPane previewPane;
+    private CheckBox enablePreviewCheckBox;
+    private TextArea metadataPreview;
+    private PdfDocumentViewer pdfPreview;
 
     private Button selectAllButton;
     private Button unselectAllButton;
@@ -51,9 +82,10 @@ public class FileSelectionPage extends WizardPane {
     private Button collapseAllButton;
     private boolean nextButtonBound = false;
 
-    public FileSelectionPage(StateManager stateManager, UnlinkedFilesDialogViewModel viewModel) {
+    public FileSelectionPage(StateManager stateManager, UnlinkedFilesDialogViewModel viewModel, XmpPreferences xmpPreferences) {
         this.viewModel = viewModel;
         this.stateManager = stateManager;
+        this.xmpImporter = new PdfXmpImporter(xmpPreferences);
 
         setHeaderText(Localization.lang("Select files to import"));
         setGraphic(null);
@@ -91,6 +123,32 @@ public class FileSelectionPage extends WizardPane {
         unlinkedFilesList.setContextMenu(createContextMenu());
         VBox.setVgrow(unlinkedFilesList, Priority.ALWAYS);
 
+        VBox treePane = new VBox(unlinkedFilesList);
+        VBox.setVgrow(treePane, Priority.ALWAYS);
+
+        enablePreviewCheckBox = new CheckBox(Localization.lang("Enable preview"));
+        enablePreviewCheckBox.setSelected(false);
+
+        pdfPreview = new PdfDocumentViewer();
+        VBox.setVgrow(pdfPreview, Priority.ALWAYS);
+
+        Label metadataLabel = new Label(Localization.lang("Extracted metadata"));
+        metadataPreview = new TextArea();
+        metadataPreview.setEditable(false);
+        metadataPreview.setWrapText(true);
+        metadataPreview.setPrefRowCount(8);
+        metadataPreview.setText(Localization.lang("Preview disabled"));
+
+        VBox previewContent = new VBox(8, enablePreviewCheckBox, pdfPreview, metadataLabel, metadataPreview);
+        previewContent.setPadding(new Insets(8));
+        previewPane = new TitledPane(Localization.lang("Entry preview"), previewContent);
+        previewPane.setExpanded(false);
+        previewPane.setCollapsible(true);
+
+        SplitPane splitPane = new SplitPane(treePane, previewPane);
+        splitPane.setDividerPositions(0.58);
+        VBox.setVgrow(splitPane, Priority.ALWAYS);
+
         HBox buttonBar = new HBox(5);
         selectAllButton = new Button(Localization.lang("Select all"));
         selectAllButton.setOnAction(e -> unlinkedFilesList.getCheckModel().checkAll());
@@ -106,7 +164,7 @@ public class FileSelectionPage extends WizardPane {
 
         buttonBar.getChildren().addAll(selectAllButton, unselectAllButton, expandAllButton, collapseAllButton);
 
-        contentPane.getChildren().addAll(fileCountLabel, unlinkedFilesList, buttonBar);
+        contentPane.getChildren().addAll(fileCountLabel, splitPane, buttonBar);
 
         mainLayout.setCenter(progressPane);
         setContent(mainLayout);
@@ -126,13 +184,19 @@ public class FileSelectionPage extends WizardPane {
                 EasyBind.bindContent(viewModel.checkedFileListProperty(), unlinkedFilesList.getCheckModel().getCheckedItems());
 
                 updateFileCount(root);
+                refreshPreviewForCurrentSelection();
 
                 ((BorderPane) getContent()).setCenter(contentPane);
             } else {
                 EasyBind.bindContent(viewModel.checkedFileListProperty(), FXCollections.observableArrayList());
+                showPreviewDisabledState(Localization.lang("Select a PDF file to preview"));
                 ((BorderPane) getContent()).setCenter(progressPane);
             }
         });
+
+        unlinkedFilesList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> refreshPreviewForCurrentSelection());
+        enablePreviewCheckBox.selectedProperty().addListener((observable, oldValue, enabled) -> updatePreviewVisibility());
+        previewPane.expandedProperty().addListener((observable, oldValue, expanded) -> updatePreviewVisibility());
 
         invalidProperty().bind(Bindings.isEmpty(viewModel.checkedFileListProperty()).or(viewModel.taskActiveProperty()));
 
@@ -140,6 +204,62 @@ public class FileSelectionPage extends WizardPane {
         unselectAllButton.disableProperty().bind(viewModel.taskActiveProperty());
         expandAllButton.disableProperty().bind(viewModel.taskActiveProperty());
         collapseAllButton.disableProperty().bind(viewModel.taskActiveProperty());
+    }
+
+    private void updatePreviewVisibility() {
+        if (enablePreviewCheckBox.isSelected() && previewPane.isExpanded()) {
+            refreshPreviewForCurrentSelection();
+        } else {
+            showPreviewDisabledState(Localization.lang("Preview disabled"));
+        }
+    }
+
+    private void refreshPreviewForCurrentSelection() {
+        if (!isPreviewActive()) {
+            return;
+        }
+
+        TreeItem<FileNodeViewModel> selectedItem = unlinkedFilesList.getSelectionModel().getSelectedItem();
+        if ((selectedItem == null) || (selectedItem.getValue() == null)) {
+            showPreviewDisabledState(Localization.lang("Select a PDF file to preview"));
+            return;
+        }
+
+        Path selectedPath = selectedItem.getValue().getPath();
+        if (!Files.isRegularFile(selectedPath) || !FileUtil.isPDFFile(selectedPath)) {
+            showPreviewDisabledState(Localization.lang("Select a PDF file to preview"));
+            return;
+        }
+
+        pdfPreview.show(selectedPath);
+
+        cancelCurrentMetadataTask();
+        metadataPreview.setText(Localization.lang("Loading metadata..."));
+
+        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> xmpImporter.importDatabase(selectedPath));
+        currentMetadataTask = task;
+        task.onSuccess(result -> UiTaskExecutor.runNowOrInJavaFXThread(() -> metadataPreview.setText(formatParserResult(result))));
+        task.onFailure(exception -> UiTaskExecutor.runNowOrInJavaFXThread(() -> {
+            LOGGER.warn("Could not extract PDF metadata for {}", selectedPath, exception);
+            metadataPreview.setText(Localization.lang("Could not extract Metadata from: %0", selectedPath.getFileName().toString()));
+        }));
+        task.executeWith(viewModel.getTaskExecutor());
+    }
+
+    private boolean isPreviewActive() {
+        if (!enablePreviewCheckBox.isSelected() || !previewPane.isExpanded()) {
+            showPreviewDisabledState(Localization.lang("Preview disabled"));
+            return false;
+        }
+
+        return true;
+    }
+
+    private void showPreviewDisabledState(String metadataText) {
+        cancelCurrentMetadataTask();
+        pdfPreview.cancelCurrent();
+        pdfPreview.show(null);
+        metadataPreview.setText(metadataText);
     }
 
     private void updateFileCount(TreeItem<FileNodeViewModel> root) {
@@ -168,6 +288,31 @@ public class FileSelectionPage extends WizardPane {
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.COLLAPSE_ALL, new TreeContextAction(StandardActions.COLLAPSE_ALL)));
 
         return contextMenu;
+    }
+
+    private void cancelCurrentMetadataTask() {
+        if (currentMetadataTask != null) {
+            currentMetadataTask.cancel();
+            currentMetadataTask = null;
+        }
+    }
+
+    private String formatParserResult(ParserResult result) {
+        if (result.isEmpty() || !result.getDatabase().hasEntries()) {
+            return Localization.lang("No extracted metadata available.");
+        }
+        return formatBibEntry(result.getDatabase().getEntries().getFirst());
+    }
+
+    private String formatBibEntry(BibEntry entry) {
+        StringJoiner joiner = new StringJoiner(System.lineSeparator());
+        for (Map.Entry<Field, String> field : entry.getFieldMap().entrySet()) {
+            String value = field.getValue();
+            if (value != null && !value.isBlank()) {
+                joiner.add(field.getKey().getName() + ": " + value);
+            }
+        }
+        return joiner.toString();
     }
 
     @Override
