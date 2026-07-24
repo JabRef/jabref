@@ -57,6 +57,7 @@ public class PdfMergeDialog {
         }
         dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
         dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentImporter(), filePath));
+        dialog.enableAutomaticIdentifierFetching();
     }
 
     private static Supplier<BibEntry> wrapImporterToSupplier(Importer importer, Path filePath) {
