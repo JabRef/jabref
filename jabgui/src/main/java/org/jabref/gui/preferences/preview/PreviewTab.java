@@ -36,6 +36,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.BstPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.preview.TextBasedPreviewLayout;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
@@ -52,7 +53,9 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
     @FXML private CheckBox showAsTabCheckBox;
     @FXML private CheckBox showPreviewTooltipCheckBox;
-    @FXML private ListView<PreviewLayout> availableListView;
+    @FXML private ListView<PreviewLayout> availableListViewCsl;
+    @FXML private ListView<PreviewLayout> availableListViewCustom;
+    @FXML private Button addCustomStyleButton;
     @FXML private ListView<PreviewLayout> chosenListView;
     @FXML private Button toRightButton;
     @FXML private Button toLeftButton;
@@ -145,19 +148,34 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         contextMenu.getItems().forEach(item -> item.setGraphic(null));
         contextMenu.getStyleClass().add("context-menu");
 
-        availableListView.setItems(viewModel.getFilteredAvailableLayouts());
-        viewModel.availableSelectionModelProperty().setValue(availableListView.getSelectionModel());
+        availableListViewCsl.setItems(viewModel.getFilteredAvailableLayoutsCsl());
+        viewModel.availableSelectionModelPropertyCsl().setValue(availableListViewCsl.getSelectionModel());
         new ViewModelListCellFactory<PreviewLayout>()
                 .withText(PreviewLayout::getDisplayName)
                 .withContextMenu(this::createContextMenu)
-                .install(availableListView);
-        availableListView.setOnDragOver(this::dragOver);
-        availableListView.setOnDragDetected(this::dragDetectedInAvailable);
-        availableListView.setOnDragDropped(event -> dragDropped(viewModel.availableListProperty(), event));
-        availableListView.setOnKeyTyped(event -> jumpToSearchKey(availableListView, event));
-        availableListView.setOnMouseClicked(this::mouseClickedAvailable);
-        availableListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        availableListView.selectionModelProperty().getValue().selectedItemProperty().addListener((_, _, newValue) ->
+                .install(availableListViewCsl);
+        availableListViewCsl.setOnDragOver(this::dragOver);
+        availableListViewCsl.setOnDragDetected(this::dragDetectedInAvailableCsl);
+        availableListViewCsl.setOnDragDropped(event -> dragDropped(viewModel.availableListProperty(), event));
+        availableListViewCsl.setOnKeyTyped(event -> jumpToSearchKey(availableListViewCsl, event));
+        availableListViewCsl.setOnMouseClicked(this::mouseClickedAvailable);
+        availableListViewCsl.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        availableListViewCsl.selectionModelProperty().getValue().selectedItemProperty().addListener((_, _, newValue) ->
+                viewModel.setPreviewLayout(newValue));
+
+        availableListViewCustom.setItems(viewModel.getFilteredAvailableLayoutsCustom());
+        viewModel.availableSelectionModelPropertyCustom().setValue(availableListViewCustom.getSelectionModel());
+        new ViewModelListCellFactory<PreviewLayout>()
+                .withText(PreviewLayout::getDisplayName)
+                .withContextMenu(this::createContextMenu)
+                .install(availableListViewCustom);
+        availableListViewCustom.setOnDragOver(this::dragOver);
+        availableListViewCustom.setOnDragDetected(this::dragDetectedInAvailableCustom);
+        availableListViewCustom.setOnDragDropped(event -> dragDropped(viewModel.availableListProperty(), event));
+        availableListViewCustom.setOnKeyTyped(event -> jumpToSearchKey(availableListViewCustom, event));
+        availableListViewCustom.setOnMouseClicked(this::mouseClickedAvailable);
+        availableListViewCustom.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        availableListViewCustom.selectionModelProperty().getValue().selectedItemProperty().addListener((_, _, newValue) ->
                 viewModel.setPreviewLayout(newValue));
 
         chosenListView.itemsProperty().bindBidirectional(viewModel.chosenListProperty());
@@ -176,7 +194,9 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         chosenListView.selectionModelProperty().getValue().selectedItemProperty().addListener((_, _, newValue) ->
                 viewModel.setPreviewLayout(newValue));
 
-        toRightButton.disableProperty().bind(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNull());
+        toRightButton.disableProperty().bind(
+        viewModel.availableSelectionModelPropertyCsl().getValue().selectedItemProperty().isNull()
+                .and(viewModel.availableSelectionModelPropertyCustom().getValue().selectedItemProperty().isNull()));
         toLeftButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
         sortUpButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
         sortDownButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
@@ -186,14 +206,14 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         previewViewer.setEntry(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.selectedLayoutProperty(), previewViewer::setLayout);
         previewViewer.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
-                                                      .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));
+                                              .or(viewModel.availableSelectionModelPropertyCsl().getValue().selectedItemProperty().isNotNull())
+                                              .or(viewModel.availableSelectionModelPropertyCustom().getValue().selectedItemProperty().isNotNull()));
         previewTab.setContent(previewViewer);
 
         editArea.clear();
         editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));
         editArea.setContextMenu(contextMenu);
-        editArea.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
-                                                 .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));
+        editArea.visibleProperty().bind(viewModel.selectedIsEditableProperty());
 
         BindingsHelper.bindBidirectional(
                 editArea.textProperty(),
@@ -215,7 +235,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
         searchBox.textProperty().addListener((_, _, searchTerm) -> viewModel.setAvailableFilter(searchTerm));
 
-        readOnlyLabel.visibleProperty().bind(viewModel.selectedIsEditableProperty().not());
+        readOnlyLabel.setVisible(false);
         resetDefaultButton.disableProperty().bind(viewModel.selectedIsEditableProperty().not());
         contextMenu.getItems().getFirst().disableProperty().bind(viewModel.selectedIsEditableProperty().not());
         contextMenu.getItems().get(2).disableProperty().bind(viewModel.selectedIsEditableProperty().not());
@@ -252,11 +272,20 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         viewModel.dragOver(event);
     }
 
-    private void dragDetectedInAvailable(MouseEvent event) {
-        List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.availableSelectionModelProperty().getValue().getSelectedItems());
+    private void dragDetectedInAvailableCsl(MouseEvent event) {
+        List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.availableSelectionModelPropertyCsl().getValue().getSelectedItems());
         if (!selectedLayouts.isEmpty()) {
             Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
-            viewModel.dragDetected(viewModel.availableListProperty(), viewModel.availableSelectionModelProperty(), selectedLayouts, dragboard);
+            viewModel.dragDetected(viewModel.availableListProperty(), viewModel.availableSelectionModelPropertyCsl(), selectedLayouts, dragboard);
+        }
+        event.consume();
+    }
+
+    private void dragDetectedInAvailableCustom(MouseEvent event) {
+        List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.availableSelectionModelPropertyCustom().getValue().getSelectedItems());
+        if (!selectedLayouts.isEmpty()) {
+            Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
+            viewModel.dragDetected(viewModel.availableListProperty(), viewModel.availableSelectionModelPropertyCustom(), selectedLayouts, dragboard);
         }
         event.consume();
     }
@@ -302,6 +331,10 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         viewModel.resetDefaultLayout();
     }
 
+    public void addCustomStyleButtonAction() {
+        viewModel.addCustomStyle();
+    }
+
     private void mouseClickedAvailable(MouseEvent event) {
         if (event.getClickCount() == 2) {
             viewModel.addToChosen();
@@ -322,6 +355,15 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
             MenuItem deleteItem = new MenuItem(Localization.lang("Remove"));
             deleteItem.setOnAction(_ -> viewModel.removeCustomStyle(layout));
             menu.getItems().add(deleteItem);
+            return menu;
+        }
+        if (layout instanceof TextBasedPreviewLayout customLayout) {
+            ContextMenu menu = new ContextMenu();
+            MenuItem renameItem = new MenuItem(Localization.lang("Rename"));
+            renameItem.setOnAction(_ -> viewModel.renameCustomStyle(customLayout));
+            MenuItem deleteItem = new MenuItem(Localization.lang("Remove"));
+            deleteItem.setOnAction(_ -> viewModel.removeCustomStyle(layout));
+            menu.getItems().addAll(renameItem, deleteItem);
             return menu;
         }
         return null;
