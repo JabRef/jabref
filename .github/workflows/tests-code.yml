@@ -16,6 +16,7 @@ env:
   MedlineAPiKey: ${{ secrets.MedlineApiKey_FOR_TESTS }}
   OpenAlexApiKey: ${{ secrets.OpenAlexApiKey_FOR_TESTS }}
   SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
+  ScholarApiKey: ${{ secrets.SCHOLARAPIKEY_FOR_TESTS }}
   GRADLE_OPTS: -Xmx4g
   JAVA_OPTS: -Xmx4g
 

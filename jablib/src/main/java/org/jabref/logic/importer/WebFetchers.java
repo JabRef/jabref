@@ -42,6 +42,7 @@ import org.jabref.logic.importer.fetcher.OpenAlex;
 import org.jabref.logic.importer.fetcher.ResearchGate;
 import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.ScholarArchiveFetcher;
+import org.jabref.logic.importer.fetcher.ScholarFetcher;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
 import org.jabref.logic.importer.fetcher.Scopus;
 import org.jabref.logic.importer.fetcher.SemanticScholar;
@@ -78,7 +79,7 @@ public class WebFetchers {
     private WebFetchers() {
     }
 
-    /// @implNote Needs to be consistent with [#getIdBasedFetcherFoIdentifier(Identifier, ImportFormatPreferences) ]
+    /// @implNote Needs to be consistent with [#getIdBasedFetcherFoIdentifier(Identifier, ImportFormatPreferences)]
     public static Optional<IdBasedFetcher> getIdBasedFetcherForField(Field field, ImportFormatPreferences importFormatPreferences) {
         IdBasedFetcher fetcher;
 
@@ -99,7 +100,7 @@ public class WebFetchers {
         return Optional.of(fetcher);
     }
 
-    /// @implNote Needs to be consistent with [#getIdBasedFetcherForField(Field, ImportFormatPreferences) ]
+    /// @implNote Needs to be consistent with [#getIdBasedFetcherForField(Field, ImportFormatPreferences)]
     public static Optional<IdBasedFetcher> getIdBasedFetcherForIdentifier(Identifier identifier, ImportFormatPreferences importFormatPreferences) {
         IdBasedFetcher fetcher;
 
@@ -172,6 +173,7 @@ public class WebFetchers {
         // set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
         searchBasedFetchers.add(new DOABFetcher());
         // set.add(new JstorFetcher(importFormatPreferences));
+        searchBasedFetchers.add(new ScholarFetcher(importerPreferences));
         searchBasedFetchers.add(new SemanticScholar(importerPreferences));
         searchBasedFetchers.add(new ResearchGate(importFormatPreferences));
         searchBasedFetchers.add(new BiodiversityLibrary(importerPreferences));
@@ -293,6 +295,7 @@ public class WebFetchers {
                 new IEEE(importFormatPreferences, importerPreferences),
                 new MedlineFetcher(importerPreferences),
                 new OpenAlex(importerPreferences),
+                new ScholarFetcher(importerPreferences),
                 new SemanticScholar(importerPreferences),
                 new Scopus(importerPreferences),
                 new SpringerNatureWebFetcher(importerPreferences),

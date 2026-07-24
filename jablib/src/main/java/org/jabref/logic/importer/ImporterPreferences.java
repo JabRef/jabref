@@ -23,6 +23,7 @@ import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
+import org.jabref.logic.importer.fetcher.ScholarFetcher;
 import org.jabref.logic.importer.fetcher.Scopus;
 import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
 import org.jabref.logic.importer.fetcher.WileyFetcher;
@@ -111,6 +112,7 @@ public class ImporterPreferences {
                 Scopus.FETCHER_NAME, buildInfo.scopusApiKey,
                 SemanticScholarCitationFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey,
                 // SpringerLink uses the same key and fetcher name as SpringerFetcher
+                ScholarFetcher.FETCHER_NAME, buildInfo.scholarApiKey,
                 SpringerNatureWebFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey,
                 WileyFetcher.FETCHER_NAME, buildInfo.wileyTdmApiKey
         );
