@@ -35,6 +35,7 @@ import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.entryeditor.citationrelationtab.BibEntryView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -63,7 +64,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
 import org.controlsfx.control.CheckListView;
-import org.fxmisc.richtext.CodeArea;
+import jfx.incubator.scene.control.richtext.CodeArea;
 import org.jspecify.annotations.Nullable;
 
 public class ImportEntriesDialog extends BaseDialog<Boolean> {
@@ -104,6 +105,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @Inject private StateManager stateManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private BibTeXHighlighter bibTeXHighlighter;
 
     /// Creates an import dialog for entries from file sources.
     /// This constructor is used for importing entries from local files, BibTeX files,
@@ -451,8 +453,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         if (viewModel.getCheckedEntries().contains(entry)) {
             bibTeXData.clear();
             bibTeXData.appendText(bibTeX);
-            bibTeXData.moveTo(0);
-            bibTeXData.requestFollowCaret();
+            bibTeXData.moveDocumentStart();
         } else {
             bibTeXData.clear();
         }
@@ -466,6 +467,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
             bibTeXDataBox.setVisible(new_val);
             bibTeXDataBox.setManaged(new_val);
         });
+        bibTeXData.setSyntaxDecorator(bibTeXHighlighter);
     }
 
     public void unselectAll() {

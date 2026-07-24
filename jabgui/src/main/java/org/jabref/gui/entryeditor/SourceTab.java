@@ -6,7 +6,6 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
@@ -15,10 +14,8 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
-import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.InputMethodRequests;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
@@ -26,10 +23,9 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.search.Highlighter;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableChangeType;
@@ -43,30 +39,28 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.strings.StringUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.Range;
 
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.CodeArea;
+import jfx.incubator.scene.control.richtext.CodeArea;
+
+import jfx.incubator.scene.control.richtext.SyntaxDecorator;
+import jfx.incubator.scene.control.richtext.TextPos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SourceTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceTab.class);
-    private static final String TEXT_STYLE = "text";
-    private static final String SEARCH_STYLE = "search";
     private final FieldPreferences fieldPreferences;
     private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> validationMessage = new SimpleObjectProperty<>();
@@ -80,6 +74,7 @@ public class SourceTab extends EntryEditorTab {
     private Map<Field, Range> fieldPositions;
     private CodeArea codeArea;
     private BibEntry previousEntry;
+    private final BibTeXHighlighter bibTeXHighlighter;
 
     public SourceTab(CountingUndoManager undoManager,
                      FieldPreferences fieldPreferences,
@@ -88,8 +83,10 @@ public class SourceTab extends EntryEditorTab {
                      DialogService dialogService,
                      BibEntryTypesManager entryTypesManager,
                      KeyBindingRepository keyBindingRepository,
-                     StateManager stateManager) {
+                     StateManager stateManager,
+                     BibTeXHighlighter bibTeXHighlighter) {
         this.stateManager = stateManager;
+        this.bibTeXHighlighter = bibTeXHighlighter;
         this.setGraphic(IconTheme.JabRefIcons.SOURCE.getGraphicNode());
         this.undoManager = undoManager;
         this.fieldPreferences = fieldPreferences;
@@ -110,50 +107,16 @@ public class SourceTab extends EntryEditorTab {
                 this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
             }
         });
-        stateManager.searchQueryProperty().addListener((_, _, _) -> Platform.runLater(this::highlightSearchPattern));
+        EasyBind.subscribe(stateManager.searchQueryProperty(), _ -> Platform.runLater(this::refreshCodeAreaDecorator));
     }
 
-    private void highlightSearchPattern() {
+    private void refreshCodeAreaDecorator() {
         if (codeArea == null) {
             return;
         }
-
-        codeArea.setStyleClass(0, codeArea.getLength(), TEXT_STYLE);
-        if (StringUtil.isBlank(stateManager.searchQueryProperty().get())) {
-            return;
-        }
-
-        SearchQuery searchQuery = new SearchQuery(stateManager.searchQueryProperty().get());
-        Map<Optional<Field>, List<String>> searchTermsMap = Highlighter.groupTermsByField(searchQuery);
-        searchTermsMap.forEach(this::buildPatternAndHighlightField);
-    }
-
-    private void buildPatternAndHighlightField(Optional<Field> optionalField, List<String> terms) {
-        Highlighter.buildSearchPattern(terms).ifPresent(
-                searchPattern -> {
-                    if (optionalField.isPresent()) {
-                        highlightField(optionalField.get(), searchPattern);
-                    } else {
-                        // User did not specify any field, thus we need to go through all fields
-                        fieldPositions.keySet().forEach(field -> highlightField(field, searchPattern));
-                    }
-                }
-        );
-    }
-
-    private void highlightField(Field field, String searchPattern) {
-        Range fieldPosition = fieldPositions.get(field);
-        if (fieldPosition == null) {
-            return;
-        }
-
-        int start = fieldPosition.start();
-        int end = fieldPosition.end();
-        List<Range> matchedPositions = Highlighter.findMatchPositions(codeArea.getText(start, end), searchPattern);
-
-        for (Range range : matchedPositions) {
-            codeArea.setStyleClass(start + range.start() - 1, start + range.end(), SEARCH_STYLE);
-        }
+        SyntaxDecorator currentDecorator = codeArea.getSyntaxDecorator();
+        codeArea.setSyntaxDecorator(null);
+        codeArea.setSyntaxDecorator(currentDecorator);
     }
 
     /// Method similar to [BibEntry#getStringRepresentation(BibEntry, BibDatabaseMode, BibEntryTypesManager, FieldPreferences)]. This method additionally updates [#fieldPositions].
@@ -168,42 +131,22 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    /// Work around for different input methods. <https://github.com/FXMisc/RichTextFX/issues/146>
-    private static class InputMethodRequestsObject implements InputMethodRequests {
-
-        @Override
-        public String getSelectedText() {
-            return "";
-        }
-
-        @Override
-        public int getLocationOffset(int x, int y) {
-            return 0;
-        }
-
-        @Override
-        public void cancelLatestCommittedText() {
-        }
-
-        @Override
-        public Point2D getTextLocation(int offset) {
-            return new Point2D(0, 0);
-        }
-    }
-
     private void setupSourceEditor() {
         codeArea = new CodeArea();
         codeArea.setWrapText(true);
-        codeArea.setInputMethodRequests(new InputMethodRequestsObject());
         codeArea.setOnInputMethodTextChanged(event -> {
             String committed = event.getCommitted();
             if (!committed.isEmpty()) {
-                codeArea.insertText(codeArea.getCaretPosition(), committed);
+                TextPos caretPos = codeArea.getCaretPosition();
+                codeArea.getModel().replace(null, caretPos, caretPos, committed);
             }
         });
-        codeArea.setId("bibtexSourceCodeArea");
-        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
+        codeArea.getStyleClass().add("bibtex-code-area");
+
+        //codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
+
+        codeArea.setSyntaxDecorator(bibTeXHighlighter);
 
         ActionFactory factory = new ActionFactory();
         ContextMenu contextMenu = new ContextMenu();
@@ -221,11 +164,11 @@ public class SourceTab extends EntryEditorTab {
 
         codeArea.focusedProperty().addListener((_, _, onFocus) -> {
             if (!onFocus && (getCurrentEntry() != null)) {
-                storeSource(getCurrentEntry(), codeArea.textProperty().getValue());
+                storeSource(getCurrentEntry(), codeArea.getText());
             }
         });
-        VirtualizedScrollPane<CodeArea> scrollableCodeArea = new VirtualizedScrollPane<>(codeArea);
-        this.setContent(scrollableCodeArea);
+
+        this.setContent(codeArea);
     }
 
     private void updateCodeArea() {
@@ -236,12 +179,11 @@ public class SourceTab extends EntryEditorTab {
 
             BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
                                                .orElse(BibDatabaseMode.BIBLATEX);
-
-            codeArea.clear();
             try {
+                codeArea.clear();
                 codeArea.appendText(getSourceString(getCurrentEntry(), mode, fieldPreferences));
                 codeArea.setEditable(true);
-                Platform.runLater(this::highlightSearchPattern);
+                Platform.runLater(this::refreshCodeAreaDecorator);
             } catch (IOException ex) {
                 codeArea.setEditable(false);
                 codeArea.appendText(ex.getMessage() + "\n\n" +
@@ -254,7 +196,7 @@ public class SourceTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         if ((previousEntry != null) && (codeArea != null)) {
-            storeSource(previousEntry, codeArea.textProperty().getValue());
+            storeSource(previousEntry, codeArea.getText());
         }
         this.previousEntry = entry;
 
@@ -374,7 +316,7 @@ public class SourceTab extends EntryEditorTab {
                 case SAVE_LIBRARY,
                      SAVE_ALL,
                      SAVE_LIBRARY_AS ->
-                        storeSource(getCurrentEntry(), codeArea.textProperty().getValue());
+                        storeSource(getCurrentEntry(), codeArea.getText());
             }
         });
     }
@@ -403,3 +345,4 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 }
+

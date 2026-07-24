@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -23,6 +24,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import org.fxmisc.richtext.CodeArea;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -65,7 +67,9 @@ class SourceTabTest {
                 mock(DialogService.class),
                 mock(BibEntryTypesManager.class),
                 keyBindingRepository,
-                stateManager);
+                stateManager,
+                new BibTeXHighlighter(stateManager, new BibTeXSyntaxHighlighter())
+        );
         pane = new TabPane(
                 new Tab("main area", area),
                 new Tab("other tab", new Label("some text")),

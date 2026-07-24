@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.entryeditor.citationrelationtab.CitationRelationsTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
@@ -44,6 +45,7 @@ public class EntryEditorTabFactory {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final KeyBindingRepository keyBindingRepository;
     private final SearchCitationsRelationsService searchCitationsRelationsService;
+    private final BibTeXHighlighter bibTeXHighlighter;
 
     public EntryEditorTabFactory(PreviewPanel previewPanel,
                                  UndoAction undoAction,
@@ -59,7 +61,7 @@ public class EntryEditorTabFactory {
                                  BibEntryTypesManager bibEntryTypesManager,
                                  JournalAbbreviationRepository journalAbbreviationRepository,
                                  KeyBindingRepository keyBindingRepository,
-                                 SearchCitationsRelationsService searchCitationsRelationsService) {
+                                 SearchCitationsRelationsService searchCitationsRelationsService, BibTeXHighlighter bibTeXHighlighter) {
         this.previewPanel = previewPanel;
         this.undoAction = undoAction;
         this.redoAction = redoAction;
@@ -75,6 +77,7 @@ public class EntryEditorTabFactory {
         this.journalAbbreviationRepository = journalAbbreviationRepository;
         this.keyBindingRepository = keyBindingRepository;
         this.searchCitationsRelationsService = searchCitationsRelationsService;
+        this.bibTeXHighlighter = bibTeXHighlighter;
     }
 
     /// Creates all tabs that can possibly be shown from {@link EntryEditorTabModel}, in display order.
@@ -142,7 +145,9 @@ public class EntryEditorTabFactory {
                             dialogService,
                             bibEntryTypesManager,
                             keyBindingRepository,
-                            stateManager);
+                            stateManager,
+                            bibTeXHighlighter
+                    );
             case FULLTEXT_SEARCH_RESULTS ->
                     new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor);
         };

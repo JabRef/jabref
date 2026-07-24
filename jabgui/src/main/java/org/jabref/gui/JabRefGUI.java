@@ -19,6 +19,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import org.jabref.gui.bibtexhighlighter.BibTeXHighlighter;
 import org.jabref.gui.clipboard.ClipBoardManager;
 import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
@@ -64,6 +65,7 @@ import com.dlsc.gemsfx.PowerPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterPane;
 import com.dlsc.gemsfx.infocenter.InfoCenterViewPos;
 import com.tobiasdiez.easybind.EasyBind;
+import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import kong.unirest.core.Unirest;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.slf4j.Logger;
@@ -92,6 +94,7 @@ public class JabRefGUI extends Application {
     private static JabRefFrame mainFrame;
     private static GitHandlerRegistry gitHandlerRegistry;
     private static JournalAbbreviationRepository journalAbbreviationRepository;
+    private static BibTeXHighlighter bibTeXHighlighter;
 
     private static RemoteListenerServerManager remoteListenerServerManager;
     private static HttpServerManager httpServerManager;
@@ -271,6 +274,10 @@ public class JabRefGUI extends Application {
                 dialogService
         );
         Injector.setModelOrService(SearchCitationsRelationsService.class, citationsAndRelationsSearchService);
+
+        BibTeXSyntaxHighlighter bibTeXSyntaxHighlighter = new BibTeXSyntaxHighlighter();
+        JabRefGUI.bibTeXHighlighter = new BibTeXHighlighter(stateManager, bibTeXSyntaxHighlighter);
+        Injector.setModelOrService(BibTeXHighlighter.class, bibTeXHighlighter);
     }
 
     private void setupProxy() {
