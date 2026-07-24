@@ -38,6 +38,7 @@ public class ImporterPreferences {
     private final BooleanProperty importerEnabled;
     private final BooleanProperty generateNewKeyOnImport;
     private final BooleanProperty warnAboutDuplicatesOnImport;
+    private final BooleanProperty warnAboutBibFileImport;
     private final ObjectProperty<Path> importWorkingDirectory;
     private final ObservableSet<FetcherApiKey> apiKeys;
     private final ObservableSet<CustomImporter> customImporters;
@@ -53,6 +54,7 @@ public class ImporterPreferences {
                 true,                                          // Generate new key on import
                 Directories.getUserDirectory(),                // Import working directory
                 true,                                          // Warn about duplicates on import
+                true,                                          // Warn about bib file import
                 Set.of(),                                      // Custom importers
                 Set.of(),                                      // API keys
                 false,                                         // Persist custom keys
@@ -70,6 +72,7 @@ public class ImporterPreferences {
                                boolean generateNewKeyOnImport,
                                Path importWorkingDirectory,
                                boolean warnAboutDuplicatesOnImport,
+                               boolean warnAboutBibFileImport,
                                Set<CustomImporter> customImporters,
                                Set<FetcherApiKey> apiKeys,
                                boolean persistCustomKeys,
@@ -82,6 +85,7 @@ public class ImporterPreferences {
         this.generateNewKeyOnImport = new SimpleBooleanProperty(generateNewKeyOnImport);
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
         this.warnAboutDuplicatesOnImport = new SimpleBooleanProperty(warnAboutDuplicatesOnImport);
+        this.warnAboutBibFileImport = new SimpleBooleanProperty(warnAboutBibFileImport);
         this.customImporters = FXCollections.observableSet(new HashSet<>(customImporters));
         this.apiKeys = FXCollections.observableSet(new HashSet<>(apiKeys));
         this.persistCustomKeys = new SimpleBooleanProperty(persistCustomKeys);
@@ -89,6 +93,21 @@ public class ImporterPreferences {
         this.defaultPlainCitationParser = new SimpleObjectProperty<>(defaultPlainCitationParser);
         this.citationsRelationsStoreTTL = new SimpleIntegerProperty(citationsRelationsStoreTTL);
         this.searchEngineUrlTemplates = new HashMap<>(searchEngineUrlTemplates);
+    }
+
+    public ImporterPreferences(boolean importerEnabled,
+                               boolean generateNewKeyOnImport,
+                               Path importWorkingDirectory,
+                               boolean warnAboutDuplicatesOnImport,
+                               Set<CustomImporter> customImporters,
+                               Set<FetcherApiKey> apiKeys,
+                               boolean persistCustomKeys,
+                               List<String> catalogs,
+                               PlainCitationParserChoice defaultPlainCitationParser,
+                               int citationsRelationsStoreTTL,
+                               Map<String, String> searchEngineUrlTemplates
+    ) {
+        this(importerEnabled, generateNewKeyOnImport, importWorkingDirectory, warnAboutDuplicatesOnImport, true, customImporters, apiKeys, persistCustomKeys, catalogs, defaultPlainCitationParser, citationsRelationsStoreTTL, searchEngineUrlTemplates);
     }
 
     public static ImporterPreferences getDefault() {
@@ -162,6 +181,18 @@ public class ImporterPreferences {
 
     public void setWarnAboutDuplicatesOnImport(boolean warnAboutDuplicatesOnImport) {
         this.warnAboutDuplicatesOnImport.set(warnAboutDuplicatesOnImport);
+    }
+
+    public boolean shouldWarnAboutBibFileImport() {
+        return warnAboutBibFileImport.get();
+    }
+
+    public BooleanProperty warnAboutBibFileImportProperty() {
+        return warnAboutBibFileImport;
+    }
+
+    public void setWarnAboutBibFileImport(boolean warnAboutBibFileImport) {
+        this.warnAboutBibFileImport.set(warnAboutBibFileImport);
     }
 
     public void setApiKeys(Set<FetcherApiKey> apiKeys) {

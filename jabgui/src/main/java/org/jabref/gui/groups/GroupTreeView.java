@@ -69,6 +69,7 @@ import org.jabref.gui.util.ViewModelTreeTableRowFactory;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -467,6 +468,22 @@ public class GroupTreeView extends BorderPane {
         }
 
         if (dragboard.hasFiles()) {
+            List<Path> files = dragboard.getFiles().stream().map(File::toPath).collect(Collectors.toList());
+            boolean containsBibFile = files.stream().anyMatch(FileUtil::isBibFile);
+            if (containsBibFile && preferences.getImporterPreferences().shouldWarnAboutBibFileImport()) {
+                boolean confirm = dialogService.showConfirmationDialogWithOptOutAndWait(
+                        Localization.lang("Import BibTeX file"),
+                        Localization.lang("Are you sure you want to import entries from the dropped BibTeX file(s) into the current library?"),
+                        Localization.lang("Import"),
+                        Localization.lang("Cancel"),
+                        Localization.lang("Do not ask again"),
+                        optOut -> preferences.getImporterPreferences().setWarnAboutBibFileImport(!optOut));
+                if (!confirm) {
+                    event.setDropCompleted(false);
+                    event.consume();
+                    return;
+                }
+            }
             this.database = stateManager.getActiveDatabase().orElse(null);
             this.importHandler = new ImportHandler(
                     database,
@@ -476,10 +493,8 @@ public class GroupTreeView extends BorderPane {
                     stateManager,
                     dialogService,
                     taskExecutor);
-            List<Path> files = dragboard.getFiles().stream().map(File::toPath).collect(Collectors.toList());
             stateManager.setSelectedGroups(database, List.of(row.getItem().getGroupNode()));
-            importHandler.importFilesInBackground(files, event.getTransferMode())
-                         .executeWith(taskExecutor);
+            importHandler.importFilesInBackground(files, event.getTransferMode()).executeWith(taskExecutor);
             success = true;
         }
         event.setDropCompleted(success);
