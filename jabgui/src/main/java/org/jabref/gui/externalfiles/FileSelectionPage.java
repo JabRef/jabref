@@ -128,8 +128,8 @@ public class FileSelectionPage extends WizardPane {
 
     private void setupBindings() {
         headerTextProperty().bind(Bindings.when(viewModel.taskActiveProperty())
-                .then(Localization.lang("Searching for unlinked files..."))
-                .otherwise(Localization.lang("Select files to import")));
+                                          .then(Localization.lang("Searching for unlinked files..."))
+                                          .otherwise(Localization.lang("Select files to import")));
 
         progressPane.managedProperty().bind(viewModel.taskActiveProperty());
         progressPane.visibleProperty().bind(viewModel.taskActiveProperty());
