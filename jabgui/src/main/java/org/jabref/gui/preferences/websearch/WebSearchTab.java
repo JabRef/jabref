@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
@@ -17,12 +18,15 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -188,12 +192,27 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
             helpButton.setVisible(false);
         }
 
-        Button configureButton = new Button(Localization.lang("Configure API key"));
+        Button configureButton = new Button();
         configureButton.getStyleClass().add("configure-button");
         configureButton.setOnAction(_ -> showApiKeyDialog(item));
         configureButton.setVisible(item.isCustomizable());
 
-        container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton);
+        StackPane iconContainer = new StackPane();
+        iconContainer.setMinWidth(20);
+        iconContainer.setPrefWidth(20);
+
+        Node keyIcon = IconTheme.JabRefIcons.SUCCESS.getGraphicNode();
+        iconContainer.getChildren().add(keyIcon);
+        Tooltip.install(iconContainer, new Tooltip(Localization.lang("API key is saved")));
+
+        BooleanBinding isKeyPresent = Bindings.createBooleanBinding(() -> StringUtil.isNotBlank(item.apiKeyProperty().get()), item.apiKeyProperty());
+        iconContainer.visibleProperty().bind(isKeyPresent);
+        configureButton.textProperty().bind(
+                Bindings.when(isKeyPresent)
+                        .then(Localization.lang("Edit API key"))
+                        .otherwise(Localization.lang("Add API key"))
+        );
+        container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton, iconContainer);
         return container;
     }
 
