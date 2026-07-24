@@ -11,6 +11,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -26,6 +27,7 @@ public class UnlinkedFilesWizard {
     @Inject private UndoManager undoManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
+    @Inject private ThemeManager themeManager;
 
     private UnlinkedFilesDialogViewModel viewModel;
     private BibDatabaseContext bibDatabaseContext;
@@ -44,6 +46,9 @@ public class UnlinkedFilesWizard {
         }
 
         Platform.runLater(() -> {
+            if (page1.getScene() != null) {
+                themeManager.installCssOnScene(page1.getScene());
+            }
             if (page1.getScene() != null && page1.getScene().getWindow() instanceof javafx.stage.Stage stage) {
                 stage.setResizable(true);
                 stage.setWidth(650);
