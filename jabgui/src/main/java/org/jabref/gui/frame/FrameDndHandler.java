@@ -111,7 +111,9 @@ public class FrameDndHandler {
                 List<BibEntry> entryCopies = stateManager.getLocalDragboard().getBibEntries().stream()
                                                          .map(BibEntry::new).toList();
                 BibDatabaseContext sourceBibDatabaseContext = stateManager.getActiveDatabase().orElse(null);
-                destinationLibraryTab.dropEntry(sourceBibDatabaseContext, entryCopies);
+                TransferMode mode = tabDragEvent.getTransferMode();
+                org.jabref.model.TransferMode modelTransferMode = toModelTransferMode(mode);
+                destinationLibraryTab.dropEntry(sourceBibDatabaseContext, entryCopies, modelTransferMode);
                 success = true;
             } else if (hasGroups(dragboard)) {
                 dropGroups(dragboard, destinationLibraryTab);
@@ -120,6 +122,22 @@ public class FrameDndHandler {
 
             tabDragEvent.setDropCompleted(success);
             tabDragEvent.consume();
+        }
+    }
+
+    private org.jabref.model.TransferMode toModelTransferMode(TransferMode javafxTransferMode) {
+        if (javafxTransferMode == null) {
+            return org.jabref.model.TransferMode.NONE;
+        }
+        switch (javafxTransferMode) {
+            case COPY -> {
+                return org.jabref.model.TransferMode.COPY;
+            }
+            case MOVE -> {
+                return org.jabref.model.TransferMode.MOVE;
+            }
+            default ->
+                    throw new IllegalStateException("Unexpected transfer mode: " + javafxTransferMode);
         }
     }
 
@@ -162,7 +180,7 @@ public class FrameDndHandler {
         }
 
         if (tabDragEvent.getDragboard().hasContent(DragAndDropDataFormats.ENTRIES)) {
-            tabDragEvent.acceptTransferModes(TransferMode.COPY);
+            tabDragEvent.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             tabDragEvent.consume();
         }
     }
@@ -221,7 +239,7 @@ public class FrameDndHandler {
         // add groupTreeNodeToCopy to the parent-- in the first run that will the source/main GroupTreeNode
         GroupTreeNode copiedNode = parent.addSubgroup(groupTreeNodeToCopy.copyNode().getGroup());
         // add all entries of a groupTreeNode to the new library.
-        destinationLibraryTab.dropEntry(stateManager.getActiveDatabase().get(), groupTreeNodeToCopy.getEntriesInGroup(allEntries));
+        destinationLibraryTab.dropEntry(stateManager.getActiveDatabase().get(), groupTreeNodeToCopy.getEntriesInGroup(allEntries), org.jabref.model.TransferMode.COPY);
         // List of all children of groupTreeNodeToCopy
         List<GroupTreeNode> children = groupTreeNodeToCopy.getChildren();
 
