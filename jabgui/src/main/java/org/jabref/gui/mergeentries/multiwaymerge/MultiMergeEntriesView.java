@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
@@ -361,14 +363,20 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         });
     }
 
+    /// Starts automatic identifier fetching for the columns already added via [#addSource]. Must be called after
+    /// all initial sources have been added, since it only considers the columns present at call time.
     public void enableAutomaticIdentifierFetching() {
         for (MultiMergeEntriesViewModel.EntrySource entrySourceColumn : List.copyOf(viewModel.entriesProperty())) {
             if (!entrySourceColumn.isLoadingProperty().getValue()) {
                 triggerAutomaticIdentifierFetch(entrySourceColumn);
             } else {
-                entrySourceColumn.isLoadingProperty().addListener((_, _, isLoading) -> {
-                    if (!isLoading) {
-                        triggerAutomaticIdentifierFetch(entrySourceColumn);
+                entrySourceColumn.isLoadingProperty().addListener(new ChangeListener<>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean isLoading) {
+                        if (!isLoading) {
+                            entrySourceColumn.isLoadingProperty().removeListener(this);
+                            triggerAutomaticIdentifierFetch(entrySourceColumn);
+                        }
                     }
                 });
             }
