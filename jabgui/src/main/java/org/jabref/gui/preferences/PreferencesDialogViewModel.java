@@ -4,9 +4,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.prefs.BackingStoreException;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -63,14 +65,19 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         this.preferences = preferences;
 
         // This enables passing unsaved preference values from the AI tab to the "web search" tab.
-        AiTab aiTab = new AiTab();
+        Optional<AiTab> aiTab = createAiTab(AiTab::new);
+        ReadOnlyBooleanProperty aiEnabled = aiTab.map(AiTab::aiEnabledProperty)
+                                                   .orElseGet(() -> new SimpleBooleanProperty(
+                                                           preferences.getAiPreferences().getAiFeaturesEnabledCurrently()));
 
         preferenceTabs = FXCollections.observableArrayList(
                 new GeneralTab(),
                 new KeyBindingsTab(),
                 new GroupsTab(),
-                new WebSearchTab(aiTab.aiEnabledProperty()),
-                aiTab,
+                new WebSearchTab(aiEnabled)
+        );
+        aiTab.ifPresent(preferenceTabs::add);
+        preferenceTabs.addAll(
                 new EntryTab(),
                 new TableTab(),
                 new PreviewTab(),
@@ -91,6 +98,30 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new CustomExporterTab(),
                 new NetworkTab()
         );
+    }
+
+    static Optional<AiTab> createAiTab(Supplier<AiTab> aiTabSupplier) {
+        try {
+            return Optional.of(aiTabSupplier.get());
+        } catch (NoClassDefFoundError error) {
+            LOGGER.error("Could not initialize AI preferences because a required class could not be loaded", error);
+            return Optional.empty();
+        } catch (RuntimeException error) {
+            if (causedByNoClassDefFoundError(error)) {
+                LOGGER.error("Could not initialize AI preferences because a required class could not be loaded", error);
+                return Optional.empty();
+            }
+            throw error;
+        }
+    }
+
+    private static boolean causedByNoClassDefFoundError(Throwable error) {
+        if (error instanceof NoClassDefFoundError) {
+            return true;
+        }
+        return Optional.ofNullable(error.getCause())
+                       .map(PreferencesDialogViewModel::causedByNoClassDefFoundError)
+                       .orElse(false);
     }
 
     public ObservableList<PreferencesTab> getPreferenceTabs() {
