@@ -11,6 +11,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
@@ -141,13 +142,21 @@ public class ImportHandler {
     public static boolean confirmBibFileImportIfNecessary(List<Path> files, GuiPreferences preferences, DialogService dialogService) {
         boolean containsBibFile = files.stream().map(FileUtil::resolveIfShortcut).anyMatch(FileUtil::isBibFile);
         if (containsBibFile && preferences.getImporterPreferences().shouldWarnAboutBibFileImport()) {
-            return dialogService.showConfirmationDialogWithOptOutAndWait(
+            AtomicBoolean optOutSelected = new AtomicBoolean(false);
+            boolean confirmed = dialogService.showConfirmationDialogWithOptOutAndWait(
                     Localization.lang("Import BibTeX file"),
                     Localization.lang("Are you sure you want to import entries from the dropped BibTeX file(s) into the current library?"),
                     Localization.lang("Import"),
                     Localization.lang("Cancel"),
                     Localization.lang("Do not ask again"),
-                    optOut -> preferences.getImporterPreferences().setWarnAboutBibFileImport(!optOut));
+                    optOutSelected::set);
+            if (confirmed) {
+                if (optOutSelected.get()) {
+                    preferences.getImporterPreferences().setWarnAboutBibFileImport(false);
+                }
+                return true;
+            }
+            return false;
         }
         return true;
     }
