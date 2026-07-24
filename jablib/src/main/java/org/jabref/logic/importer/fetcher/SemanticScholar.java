@@ -53,6 +53,14 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
         this.importerPreferences = importerPreferences;
     }
 
+    @Override
+    public URLDownload getUrlDownload(URL url) {
+        URLDownload download = new URLDownload(url);
+        importerPreferences.getApiKey(getName()).ifPresent(
+                key -> download.addHeader("x-api-key", key));
+        return download;
+    }
+
     /// Tries to find a fulltext URL for a given BibTex entry.
     ///
     /// Uses the DOI if present, otherwise the arXiv identifier.

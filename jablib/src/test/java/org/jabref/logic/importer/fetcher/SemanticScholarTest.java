@@ -12,6 +12,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
@@ -203,6 +204,13 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
         // Abstract should not be included in JabRef tests
         actual.clearField(StandardField.ABSTRACT);
         assertEquals(barrosEntry, actual);
+    }
+
+    @Test
+    void getUrlDownloadReturnsDownload() throws MalformedURLException {
+        URL testUrl = URI.create("https://api.semanticscholar.org/graph/v1/paper/search?query=test&limit=20").toURL();
+        URLDownload download = fetcher.getUrlDownload(testUrl);
+        assertEquals(testUrl, download.getSource());
     }
 
     @Test
