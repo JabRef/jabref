@@ -18,24 +18,6 @@ class MultiMergeEntriesViewModelTest {
 
     private MultiMergeEntriesViewModel viewModel;
 
-    @BeforeEach
-    void setUp() {
-        viewModel = new MultiMergeEntriesViewModel();
-    }
-
-    @Test
-    void updateFieldsIgnoresNullEntry() {
-        viewModel.updateFields(null);
-        assertEquals(new BibEntry(), viewModel.mergedEntryProperty().get());
-    }
-
-    @Test
-    void updateFieldsSetsFieldWhenNotYetPresent() {
-        BibEntry source = new BibEntry().withField(StandardField.YEAR, "2015");
-        viewModel.updateFields(source);
-        assertEquals("2015", viewModel.mergedEntryProperty().get().getField(StandardField.YEAR).orElse(""));
-    }
-
     static Stream<Arguments> updateFieldsMergesWithPlausibility() {
         return Stream.of(
                 // No comparator → first-seen value wins
@@ -55,6 +37,24 @@ class MultiMergeEntriesViewModelTest {
         );
     }
 
+    @BeforeEach
+    void setUp() {
+        viewModel = new MultiMergeEntriesViewModel();
+    }
+
+    @Test
+    void updateFieldsIgnoresNullEntry() {
+        viewModel.updateFields(null);
+        assertEquals(new BibEntry(), viewModel.mergedEntryProperty().get());
+    }
+
+    @Test
+    void updateFieldsSetsFieldWhenNotYetPresent() {
+        BibEntry source = new BibEntry().withField(StandardField.YEAR, "2015");
+        viewModel.updateFields(source);
+        assertEquals("2015", viewModel.mergedEntryProperty().get().getField(StandardField.YEAR).orElse(""));
+    }
+
     @ParameterizedTest
     @MethodSource
     void updateFieldsMergesWithPlausibility(Field field, String leftValue, String rightValue, String expected) {
@@ -65,5 +65,18 @@ class MultiMergeEntriesViewModelTest {
         viewModel.updateFields(rightEntry);
 
         assertEquals(expected, viewModel.mergedEntryProperty().get().getField(field).orElse(""));
+    }
+
+    @Test
+    void addSourceWithImmediateEntryInitializesMergedEntryWithOriginalFields() {
+        BibEntry originalEntry = new BibEntry()
+                .withField(StandardField.TITLE, "Original title")
+                .withField(StandardField.YEAR, "2024");
+
+        viewModel.addSource(new MultiMergeEntriesViewModel.EntrySource("Original entry", originalEntry));
+
+        BibEntry mergedEntry = viewModel.mergedEntryProperty().get();
+        assertEquals("Original title", mergedEntry.getField(StandardField.TITLE).orElseThrow());
+        assertEquals("2024", mergedEntry.getField(StandardField.YEAR).orElseThrow());
     }
 }
