@@ -90,7 +90,7 @@ public class FileSelectionPage extends WizardPane {
 
         unlinkedFilesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         unlinkedFilesList.setContextMenu(createContextMenu());
-        unlinkedFilesList.setOnKeyPressed(event -> {
+        unlinkedFilesList.setOnKeyReleased(event -> {
             if (event.getCode() == KeyCode.SPACE) {
                 TreeItem<FileNodeViewModel> focusedItem = unlinkedFilesList.getFocusModel().getFocusedItem();
                 if (focusedItem != null) {
