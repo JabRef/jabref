@@ -431,6 +431,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String IMPORTER_GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
     private static final String IMPORTER_WORKING_DIRECTORY = "importWorkingDirectory";
     private static final String IMPORTER_WARN_ABOUT_DUPLICATES = "warnAboutDuplicatesInInspection";
+    private static final String IMPORTER_WARN_ABOUT_BIB_FILE = "warnAboutBibFileImport";
     private static final String IMPORTER_CUSTOM_FORMAT = "customImportFormat";
     private static final String FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
     private static final String FETCHER_CUSTOM_KEY_USES = "fetcherCustomKeyUses";
@@ -2315,6 +2316,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(IMPORTER_GENERATE_KEY_ON_IMPORT, defaultValues.shouldGenerateNewKeyOnImport()),
                 Path.of(get(IMPORTER_WORKING_DIRECTORY, defaultValues.getImportWorkingDirectory().toString())),
                 getBoolean(IMPORTER_WARN_ABOUT_DUPLICATES, defaultValues.shouldWarnAboutDuplicatesOnImport()),
+                getBoolean(IMPORTER_WARN_ABOUT_BIB_FILE, defaultValues.shouldWarnAboutBibFileImport()),
                 getCustomImportFormats(defaultValues.getCustomImporters()),
                 getFetcherKeys(defaultValues.getApiKeys()),
                 getBoolean(FETCHER_CUSTOM_KEY_PERSIST, defaultValues.shouldPersistCustomKeys()),
@@ -2328,6 +2330,7 @@ public class JabRefCliPreferences implements CliPreferences {
         bindObject(importerPreferences.importWorkingDirectoryProperty(), IMPORTER_WORKING_DIRECTORY, defaultValues.getImportWorkingDirectory(),
                 Path::toString, Path::of);
         bindBoolean(importerPreferences.warnAboutDuplicatesOnImportProperty(), IMPORTER_WARN_ABOUT_DUPLICATES, defaultValues.shouldWarnAboutDuplicatesOnImport());
+        bindBoolean(importerPreferences.warnAboutBibFileImportProperty(), IMPORTER_WARN_ABOUT_BIB_FILE, defaultValues.shouldWarnAboutBibFileImport());
         // persistCustomKeys must be bound before apiKeys: loading the keys re-persists them and reads this flag to
         // decide whether to write the keyring, so the flag has to be in place first.
         bindBoolean(importerPreferences.persistCustomKeysProperty(), FETCHER_CUSTOM_KEY_PERSIST, defaultValues.shouldPersistCustomKeys());

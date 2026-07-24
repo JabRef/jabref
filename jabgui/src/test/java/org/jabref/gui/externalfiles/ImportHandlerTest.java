@@ -305,4 +305,25 @@ class ImportHandlerTest {
         assertFalse(bibDatabase.getEntries().contains(duplicateEntry)); // Assert that the duplicate entry was removed from the database
         assertEquals(mergedEntry, result); // Assert that the merged entry is returned
     }
+
+    @Test
+    void confirmBibFileImportReturnsTrueWhenNoBibFiles() {
+        DialogService dialogService = mock(DialogService.class);
+        List<Path> files = List.of(Path.of("paper.pdf"));
+        assertTrue(ImportHandler.confirmBibFileImportIfNecessary(files, preferences, dialogService));
+    }
+
+    @Test
+    void confirmBibFileImportShowsDialogWhenBibFileDropped() {
+        DialogService dialogService = mock(DialogService.class);
+        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
+        when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
+        when(importerPreferences.shouldWarnAboutBibFileImport()).thenReturn(true);
+        when(dialogService.showConfirmationDialogWithOptOutAndWait(any(), any(), any(), any(), any(), any())).thenReturn(true);
+
+        List<Path> files = List.of(Path.of("library.bib"));
+        boolean result = ImportHandler.confirmBibFileImportIfNecessary(files, preferences, dialogService);
+
+        assertTrue(result);
+    }
 }
