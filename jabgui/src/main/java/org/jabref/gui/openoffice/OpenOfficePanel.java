@@ -62,6 +62,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.uno.CreationException;
+import org.jabref.model.openoffice.util.OOVoidResult;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.sun.star.comp.helper.BootstrapException;
@@ -191,26 +192,29 @@ public class OpenOfficePanel {
         final boolean FAIL = true;
         final boolean PASS = false;
 
-        if (currentStyle == null) {
+        if (ooBase != null && ooBase.testDialog(title, ooBase.readStyleInPreference())) {
+            return FAIL;
+        }
+
+        currentStyle = openOfficePreferences.getCurrentStyle();
+        currentStyleProperty.set(currentStyle);
+
+        if (!(currentStyle instanceof JStyle jStyle)) {
+            return PASS;
+        }
+
+        try {
+            jStyle = jStyleLoader.getUsedJstyle();
+            jStyle.ensureUpToDate();
             currentStyle = openOfficePreferences.getCurrentStyle();
             currentStyleProperty.set(currentStyle);
-        } else {
-            if (currentStyle instanceof JStyle jStyle) {
-                try {
-                    jStyle = jStyleLoader.getUsedJstyle();
-                    jStyle.ensureUpToDate();
-                } catch (IOException ex) {
-                    LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
-                    String msg = Localization.lang("Unable to reload style file")
-                            + "'" + jStyle.getPath() + "'"
-                            + "\n" + ex.getMessage();
-                    new OOError(title, msg, ex).showErrorDialog(dialogService);
-                    return FAIL;
-                }
-            } else {
-                // CSL Styles don't need to be updated
-                return PASS;
-            }
+        } catch (IOException ex) {
+            LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
+            String msg = Localization.lang("Unable to reload style file")
+                    + "'" + jStyle.getPath() + "'"
+                    + "\n" + ex.getMessage();
+            new OOError(title, msg, ex).showErrorDialog(dialogService);
+            return FAIL;
         }
         return PASS;
     }
@@ -246,6 +250,11 @@ public class OpenOfficePanel {
                                  }
                                  dialogService.notify(Localization.lang("Currently selected JStyle: '%0'", jStyle.getName()));
                              } else if (currentStyle instanceof CitationStyle cslStyle) {
+                                 final String errorTitle = Localization.lang("Problem modifying citation");
+                                 OOVoidResult<OOError> result = ooBase.writeZoteroDocumentStyle(cslStyle);
+                                 if (ooBase.testDialog(errorTitle, result)) {
+                                     return;
+                                 }
                                  dialogService.notify(Localization.lang("Currently selected CSL Style: '%0'", cslStyle.getName()));
                              }
                              updateButtonAvailability();
@@ -431,6 +440,7 @@ public class OpenOfficePanel {
         boolean canGenerateBibliography = (currentStyle instanceof JStyle) || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography());
 
         selectDocument.setDisable(!isConnectedToDocument);
+        setStyleFile.setDisable(!isConnectedToDocument);
 
         pushEntries.setDisable(!canCite);
         pushEntriesInt.setDisable(!canCite);

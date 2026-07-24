@@ -35,7 +35,7 @@ public record CSLStyleLoader(
 
     /// Returns a list of all available citation styles (both internal and external).
     public static List<CitationStyle> getStyles() {
-        List<CitationStyle> result = new ArrayList<>(INTERNAL_STYLES);
+        List<CitationStyle> result = new ArrayList<>(getInternalStyles());
         result.addAll(EXTERNAL_STYLES);
         return result;
     }
@@ -71,6 +71,10 @@ public record CSLStyleLoader(
                     String path = (String) info.get("path");
                     @NonNull
                     String title = (String) info.get("title");
+                    @NonNull
+                    String styleId = Optional.ofNullable((String) info.get("styleId")).orElse("");
+                    @NonNull
+                    String styleClass = Optional.ofNullable((String) info.get("styleClass")).orElse("");
                     @Nullable
                     String shortTitle = (String) info.get("shortTitle");
                     if (shortTitle == null) {
@@ -86,7 +90,13 @@ public record CSLStyleLoader(
                     try (InputStream styleStream = CSLStyleLoader.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
                         if (styleStream != null) {
                             String source = new String(styleStream.readAllBytes());
-                            CitationStyle style = new CitationStyle(path, title, shortTitle, isNumeric, hasBibliography, usesHangingIndent, source, true);
+                            // If cannot find styleId, then parse .csl to retrieve styleId
+                            if (styleId.isBlank() || styleClass.isBlank()) {
+                                Optional<CSLStyleUtils.StyleInfo> parsedStyleInfo = CSLStyleUtils.parseStyleInfo(path, source);
+                                styleId = styleId.isBlank() ? parsedStyleInfo.map(CSLStyleUtils.StyleInfo::styleId).orElse("") : styleId;
+                                styleClass = styleClass.isBlank() ? parsedStyleInfo.map(CSLStyleUtils.StyleInfo::styleClass).orElse("") : styleClass;
+                            }
+                            CitationStyle style = new CitationStyle(path, styleId, styleClass, title, shortTitle, isNumeric, hasBibliography, usesHangingIndent, source, true);
                             INTERNAL_STYLES.add(style);
                         }
                     } catch (IOException e) {
