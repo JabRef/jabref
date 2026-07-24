@@ -56,6 +56,7 @@ public class SearchConfigurationPage extends WizardPane {
         this.validationVisualizer = new ControlsFxVisualizer();
 
         setHeaderText(Localization.lang("Configure search"));
+        setGraphic(null);
         setupUI(bibDatabaseContext, preferences);
         setupValidation();
     }

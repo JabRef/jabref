@@ -42,6 +42,7 @@ public class ImportResultsPage extends WizardPane {
         this.viewModel = viewModel;
 
         setHeaderText(Localization.lang("Import results"));
+        setGraphic(null);
         setupUI();
         setupBindings();
     }

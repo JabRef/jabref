@@ -67,6 +67,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We refined the UX of the "Search for unlinked files" wizard dialog: applied JabRef theme CSS, removed extraneous question mark icon, renamed default sort option to "Grouped by directory", dynamically updated progress header text, and enabled Space key checkbox toggling in tree view. [#16158](https://github.com/JabRef/jabref/issues/16158)
 - We fixed importing UTF-16 BibTeX files without a byte-order mark. [#9496](https://github.com/JabRef/jabref/issues/9496)
 - We fixed an issue where `jabkit convert` without `--output` printed an internal object reference (e.g. `org.jabref.model.database.BibDatabase@17932d9b`) instead of the converted library. It now writes the library to standard output in the format selected by `--output-format`, with progress messages going to standard error. [#16292](https://github.com/JabRef/jabref/pull/16292)
 - We fixed spurious DOI-mismatch warnings when fetching an entry by DOI. [#16280](https://github.com/JabRef/jabref/pull/16280)
