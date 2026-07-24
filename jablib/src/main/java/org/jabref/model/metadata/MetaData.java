@@ -19,6 +19,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanupActions;
+import org.jabref.logic.journals.AbbreviationType;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.ChangePropagation;
@@ -42,6 +43,7 @@ public class MetaData {
     public static final String ENTRYTYPE_FLAG_V2 = "jabref-entrytype-v2: ";
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig"; // ToDo: Rename in next major version to saveOrder, adapt testbibs
     public static final String SAVE_ACTIONS = "saveActions";
+    public static final String LIBRARY_ABBREVIATION_TYPE = "libraryAbbreviationType";
     public static final String PREFIX_KEYPATTERN = "keypattern_";
     public static final String KEYPATTERNDEFAULT = "keypatterndefault";
     public static final String DATABASE_TYPE = "databaseType";
@@ -76,6 +78,7 @@ public class MetaData {
     @Nullable private String defaultCiteKeyPattern;
     @Nullable private FieldFormatterCleanupActions saveActions;
     @Nullable private BibDatabaseMode mode;
+    @Nullable private AbbreviationType libraryAbbreviationType;
     private boolean isProtected;
     @Nullable private String librarySpecificFileDirectory;
 
@@ -195,6 +198,24 @@ public class MetaData {
         }
 
         this.mode = mode;
+        postChange();
+    }
+
+    public Optional<AbbreviationType> getLibraryAbbreviationType() {
+        return Optional.ofNullable(libraryAbbreviationType);
+    }
+
+    public void setLibraryAbbreviationType(@NonNull AbbreviationType type) {
+        if (type == this.libraryAbbreviationType) {
+            return;
+        }
+
+        this.libraryAbbreviationType = type;
+        postChange();
+    }
+
+    public void clearLibraryAbbreviationType() {
+        libraryAbbreviationType = null;
         postChange();
     }
 
@@ -397,6 +418,7 @@ public class MetaData {
                 && Objects.equals(defaultCiteKeyPattern, that.defaultCiteKeyPattern)
                 && Objects.equals(saveActions, that.saveActions)
                 && (mode == that.mode)
+                && (libraryAbbreviationType == that.libraryAbbreviationType)
                 && Objects.equals(librarySpecificFileDirectory, that.librarySpecificFileDirectory)
                 && Objects.equals(contentSelectors, that.contentSelectors)
                 && Objects.equals(versionDBStructure, that.versionDBStructure)
