@@ -10,7 +10,8 @@ import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "pdf", description = "Manage PDF metadata.",
         subcommands = {
-                PdfUpdate.class
+                PdfUpdate.class,
+                PdfExtractReferences.class
                 // RemoveComments.class
                 // RemoveEmbedded.class
                 // RemovePrivateFields.class
@@ -24,7 +25,7 @@ class Pdf implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        System.err.println(Localization.lang("Specify a subcommand (update)."));
+        System.err.println(Localization.lang("Specify a subcommand (update, extract-references)."));
         return 2;
     }
 }
