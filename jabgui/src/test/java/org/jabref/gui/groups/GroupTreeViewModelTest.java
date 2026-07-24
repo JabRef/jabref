@@ -15,6 +15,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.groups.GroupsFactory;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.NoOpSearchBackend;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
@@ -186,7 +187,13 @@ class GroupTreeViewModelTest {
 
         model.addSuggestedGroups(rootGroup);
 
-        assertEquals(2, rootGroup.getChildren().size());
+        assertEquals(3, rootGroup.getChildren().size());
+        assertEquals(Localization.lang("Entries without linked files"), rootGroup.getChildren().getFirst().getDisplayName());
+        assertEquals(Localization.lang("Entries without groups"), rootGroup.getChildren().get(1).getDisplayName());
+
+        GroupNodeViewModel markingGroup = rootGroup.getChildren().get(2);
+        assertEquals(Localization.lang("Marking and Grading"), markingGroup.getDisplayName());
+        assertEquals(6, markingGroup.getChildren().size());
         assertTrue(rootGroup.hasAllSuggestedGroups());
     }
 
@@ -199,7 +206,13 @@ class GroupTreeViewModelTest {
 
         model.addSuggestedGroups(rootGroup);
 
-        assertEquals(2, rootGroup.getChildren().size());
+        assertEquals(3, rootGroup.getChildren().size());
+        assertEquals(Localization.lang("Entries without linked files"), rootGroup.getChildren().getFirst().getDisplayName());
+        assertEquals(Localization.lang("Entries without groups"), rootGroup.getChildren().get(1).getDisplayName());
+
+        GroupNodeViewModel markingGroup = rootGroup.getChildren().get(2);
+        assertEquals(Localization.lang("Marking and Grading"), markingGroup.getDisplayName());
+        assertEquals(6, markingGroup.getChildren().size());
         assertTrue(rootGroup.hasAllSuggestedGroups());
     }
 
@@ -209,11 +222,24 @@ class GroupTreeViewModelTest {
         GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
         rootGroup.getGroupNode().addSubgroup(GroupsFactory.createWithoutFilesGroup());
         rootGroup.getGroupNode().addSubgroup(GroupsFactory.createWithoutGroupsGroup());
-        assertEquals(2, rootGroup.getChildren().size());
+
+        org.jabref.model.groups.GroupTreeNode markingNode = rootGroup.getGroupNode().addSubgroup(
+                new ExplicitGroup(Localization.lang("Marking and Grading"), GroupHierarchyType.INCLUDING, ','));
+        markingNode.addSubgroup(GroupsFactory.createRankParentGroup());
+        markingNode.addSubgroup(GroupsFactory.createRelevanceParentGroup());
+        markingNode.addSubgroup(GroupsFactory.createQualityParentGroup());
+        markingNode.addSubgroup(GroupsFactory.createPrintedParentGroup());
+        markingNode.addSubgroup(GroupsFactory.createPriorityParentGroup());
+        markingNode.addSubgroup(GroupsFactory.createReadStatusParentGroup());
+
+        assertEquals(3, rootGroup.getChildren().size());
+        GroupNodeViewModel markingGroup = rootGroup.getChildren().get(2);
+        assertEquals(6, markingGroup.getChildren().size());
 
         model.addSuggestedGroups(rootGroup);
 
-        assertEquals(2, rootGroup.getChildren().size());
+        assertEquals(3, rootGroup.getChildren().size());
+        assertEquals(6, markingGroup.getChildren().size());
         assertTrue(rootGroup.hasAllSuggestedGroups());
     }
 

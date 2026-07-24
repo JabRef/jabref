@@ -28,6 +28,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.groups.GroupsFactory;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.search.SearchContext;
 import org.jabref.logic.util.BackgroundTask;
@@ -477,7 +478,8 @@ public class GroupNodeViewModel {
 
     public boolean hasAllSuggestedGroups() {
         return hasSimilarSearchGroup(GroupsFactory.createWithoutFilesGroup())
-                && hasSimilarSearchGroup(GroupsFactory.createWithoutGroupsGroup());
+                && hasSimilarSearchGroup(GroupsFactory.createWithoutGroupsGroup())
+                && getGroupNode().findGroupByName(Localization.lang("Marking and Grading")).isPresent();
     }
 
     public boolean canAddEntriesIn() {
