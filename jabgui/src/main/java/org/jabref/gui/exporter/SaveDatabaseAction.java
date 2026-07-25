@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -28,7 +27,6 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.cleanup.AbbreviateJournalCleanup;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
@@ -40,10 +38,8 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
@@ -269,22 +265,10 @@ public class SaveDatabaseAction {
                         saveConfiguration,
                         preferences.getFieldPreferences(),
                         preferences.getCitationKeyPatternPreferences(),
-                        entryTypesManager);
-
-                List<BibEntry> entriesToAbbreviate = selectedOnly
-                                                     ? libraryTab.getSelectedEntries()
-                                                     : bibDatabaseContext.getDatabase().getEntries();
-                List<FieldChange> abbreviationChanges = bibDatabaseContext.getMetaData()
-                                                                          .getLibraryAbbreviationType()
-                                                                          .map(abbreviationType -> {
-                                                                              boolean useFJournal = preferences.getAbbreviationPreferences().shouldUseFJournalField();
-                                                                              AbbreviateJournalCleanup cleanup = new AbbreviateJournalCleanup(
-                                                                                      bibDatabaseContext.getDatabase(), journalAbbreviationRepository, abbreviationType, useFJournal);
-                                                                              return entriesToAbbreviate.stream()
-                                                                                                        .flatMap(entry -> cleanup.cleanup(entry).stream())
-                                                                                                        .toList();
-                                                                          })
-                                                                          .orElse(List.of());
+                        entryTypesManager)
+                        .withJournalAbbreviationRepository(
+                                journalAbbreviationRepository,
+                                preferences.getAbbreviationPreferences().shouldUseFJournalField());
 
                 if (selectedOnly) {
                     databaseWriter.writePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());
@@ -292,8 +276,7 @@ public class SaveDatabaseAction {
                     databaseWriter.writeDatabase(bibDatabaseContext);
                 }
 
-                libraryTab.registerUndoableChanges(
-                        Stream.concat(databaseWriter.getSaveActionsFieldChanges().stream(), abbreviationChanges.stream()).toList());
+                libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
 
                 if (fileWriter.hasEncodingProblems()) {
                     saveWithDifferentEncoding(file, selectedOnly, encoding, fileWriter.getEncodingProblems(), saveType, saveOrder);

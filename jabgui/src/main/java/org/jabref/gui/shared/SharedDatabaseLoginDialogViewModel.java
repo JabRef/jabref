@@ -51,7 +51,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -94,6 +93,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final UndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     private final Validator databaseValidator;
     private final Validator hostValidator;
@@ -112,7 +112,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                               FileUpdateMonitor fileUpdateMonitor,
                                               UndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
-                                              TaskExecutor taskExecutor) {
+                                              TaskExecutor taskExecutor,
+                                              JournalAbbreviationRepository journalAbbreviationRepository) {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -123,6 +124,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
+        this.journalAbbreviationRepository = journalAbbreviationRepository;
 
         EasyBind.subscribe(selectedDBMSType, selected -> port.setValue(Integer.toString(selected.getDefaultPort())));
         EasyBind.subscribe(useSSL, selected -> {
@@ -239,9 +241,9 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                             libraryTab,
                             dialogService,
                             preferences,
-                            Injector.instantiateModelOrService(BibEntryTypesManager.class),
+                            entryTypesManager,
                             stateManager,
-                            Injector.instantiateModelOrService(JournalAbbreviationRepository.class)
+                            journalAbbreviationRepository
                     ).saveAs(Path.of(folder.getValue()));
                 } catch (Throwable e) {
                     LOGGER.error("Error while saving the database", e);
