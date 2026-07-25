@@ -10,11 +10,7 @@ import org.jspecify.annotations.NullMarked;
 /// Interpreted version of JabRefClipBoardData
 /// Also used in a non-clipboard case at internal transfers at JabRef
 @NullMarked
-public record TransferInformation(
-        BibDatabaseContext bibDatabaseContext,
-        TransferMode transferMode,
-        List<BibEntry> sourceEntries
-) {
+public record TransferInformation(BibDatabaseContext bibDatabaseContext, TransferMode transferMode, List<BibEntry> sourceEntries) {
     public TransferInformation(BibDatabaseContext bibDatabaseContext, TransferMode transferMode) {
         this(bibDatabaseContext, transferMode, List.of());
     }
