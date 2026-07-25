@@ -136,7 +136,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         showPreviewInEntryTableTooltip.set(previewPreferences.shouldShowPreviewEntryTableTooltip());
         chosenListProperty().getValue().clear();
         chosenListProperty.getValue().addAll(previewPreferences.getLayoutCycle());
-
+        LOGGER.info("Loaded chosen layout names: {}", chosenListProperty.getValue().stream().map(PreviewLayout::getName).toList());
+        LOGGER.info("Loaded customPreviewLayouts names: {}", previewPreferences.getCustomPreviewLayouts().stream().map(TextBasedPreviewLayout::getName).toList());
+        
         availableListProperty.clear();
         List<String> chosenNames = chosenListProperty.getValue().stream().map(PreviewLayout::getName).toList();
         previewPreferences.getCustomPreviewLayouts().stream()
@@ -195,14 +197,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     public void refreshPreview() {
         setPreviewLayout(null);
         setPreviewLayout(chosenSelectionModelProperty.getValue().getSelectedItem());
-    }
-
-    private PreviewLayout findLayoutByName(String name) {
-        return availableListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
-                                    .findAny()
-                                    .orElse(chosenListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
-                                                              .findAny()
-                                                              .orElse(null));
     }
 
     /// Store the changes of preference-preview settings.
@@ -378,8 +372,20 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                 return;
             }
             layout.setName(name);
+            touchLayout(layout);
         });
     }
+
+    private void touchLayout(PreviewLayout layout) {
+        int availableIndex = availableListProperty.indexOf(layout);
+        if (availableIndex >= 0) {
+            availableListProperty.set(availableIndex, layout);
+        }
+        int chosenIndex = chosenListProperty.indexOf(layout);
+        if (chosenIndex >= 0) {
+            chosenListProperty.set(chosenIndex, layout);
+        }
+    }    
 
     private boolean isNameAlreadyUsed(String name, TextBasedPreviewLayout excluding) {
         return Stream.concat(availableListProperty.getValue().stream(), chosenListProperty.getValue().stream())

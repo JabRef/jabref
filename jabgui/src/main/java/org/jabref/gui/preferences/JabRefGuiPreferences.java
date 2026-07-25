@@ -1,7 +1,9 @@
 package org.jabref.gui.preferences;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -840,6 +842,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         // Mutable lists required
         List<TextBasedPreviewLayout> customPreviewLayouts = getCustomPreviewLayoutsFromStore(defaultValues.getCustomPreviewLayouts());
         List<PreviewLayout> layouts = getPreviewLayouts(getStringList(PREVIEW_CYCLE), customPreviewLayouts);
+        LOGGER.info("PREVIEW_CYCLE raw: {}", getStringList(PREVIEW_CYCLE));
+        LOGGER.info("Resolved layout names: {}", layouts.stream().map(PreviewLayout::getName).toList());
         if (layouts.isEmpty()) {
             layouts = new ArrayList<>(defaultValues.getLayoutCycle());
         }
@@ -896,12 +900,18 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private List<TextBasedPreviewLayout> getCustomPreviewLayoutsFromStore(List<TextBasedPreviewLayout> defaultValues) {
         if (hasKey(PREVIEW_CUSTOM_STYLE_NAMES) || hasKey(PREVIEW_CUSTOM_STYLE_CONTENTS)) {
             List<String> names = getStringList(PREVIEW_CUSTOM_STYLE_NAMES);
-            List<String> contents = getStringList(PREVIEW_CUSTOM_STYLE_CONTENTS);
             List<TextBasedPreviewLayout> layouts = new ArrayList<>();
-            for (int i = 0; i < Math.min(names.size(), contents.size()); i++) {
+            for (int i = 0; i < names.size(); i++) {
+                String rawContent = get(previewCustomStyleContentKey(i), "");
+                String decodedContent;
+                try {
+                    decodedContent = new String(Base64.getDecoder().decode(rawContent), StandardCharsets.UTF_8);
+                } catch (IllegalArgumentException e) {
+                    decodedContent = rawContent;
+                }
                 layouts.add(TextBasedPreviewLayout.of(
                         names.get(i),
-                        contents.get(i),
+                        decodedContent,
                         getLayoutFormatterPreferences(),
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class)));
             }
@@ -920,7 +930,15 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     private void storeCustomPreviewLayouts(List<TextBasedPreviewLayout> customPreviewLayouts) {
         putStringList(PREVIEW_CUSTOM_STYLE_NAMES, customPreviewLayouts.stream().map(TextBasedPreviewLayout::getName).toList());
-        putStringList(PREVIEW_CUSTOM_STYLE_CONTENTS, customPreviewLayouts.stream().map(TextBasedPreviewLayout::getText).toList());
+
+        for (int i = 0; i < customPreviewLayouts.size(); i++) {
+            String encoded = Base64.getEncoder().encodeToString(customPreviewLayouts.get(i).getText().getBytes(StandardCharsets.UTF_8));
+            put(previewCustomStyleContentKey(i), encoded);
+        }
+    }
+
+    private String previewCustomStyleContentKey(int index) {
+        return PREVIEW_CUSTOM_STYLE_CONTENTS + "_" + index;
     }
 
     private List<PreviewLayout> getPreviewLayouts(List<String> cycle, List<TextBasedPreviewLayout> customPreviewLayouts) {

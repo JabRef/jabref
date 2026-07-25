@@ -312,6 +312,9 @@ public class PreferencesMigrations {
 
     /// Since v6-alpha6 built in preview style will be stored by internal identifier instead by display name.
     protected static void upgradeBuiltinPreviewName(JabRefGuiPreferences prefs) {
+        if (prefs.hasKey(JabRefGuiPreferences.PREVIEW_CUSTOM_STYLE_NAMES)) { // Means user already using multi-custom-style format, nothing left for this legacy migration to do
+            return;
+        }
         String previewCycle = prefs.get(JabRefGuiPreferences.PREVIEW_CYCLE, "");
         prefs.put(JabRefGuiPreferences.PREVIEW_CYCLE, previewCycle.replace("Customized preview style", TextBasedPreviewLayout.NAME));
     }
