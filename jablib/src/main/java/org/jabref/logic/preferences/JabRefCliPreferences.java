@@ -81,6 +81,8 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.ocr.OcrPreferences;
 import org.jabref.logic.ocr.PagesWithTextHandling;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.style.BstCitationFormat;
+import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.os.OS;
@@ -273,6 +275,9 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT = "cslBibliographyHeaderFormat";
     public static final String OO_CSL_BIBLIOGRAPHY_BODY_FORMAT = "cslBibliographyBodyFormat";
     public static final String OO_ADD_SPACE_AFTER = "ooAddSpaceAfter";
+    public static final String OO_EXTERNAL_BST_STYLES = "externalBstStyles";
+    public static final String OO_PANDOC_PATH = "ooPandocPath";
+    public static final String OO_BST_CITATION_FORMAT = "ooBstCitationFormat";
 
     // Prefs node for CitationKeyPatterns
     public static final String CITATION_KEY_PATTERNS_NODE = "bibtexkeypatterns";
@@ -2501,7 +2506,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, defaultValues.getCslBibliographyHeaderFormat()),
                 get(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, defaultValues.getCslBibliographyBodyFormat()),
                 getStringList(OO_EXTERNAL_CSL_STYLES),
-                getBoolean(OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter()));
+                getBoolean(OO_ADD_SPACE_AFTER, defaultValues.getAddSpaceAfter()),
+                getStringList(OO_EXTERNAL_BST_STYLES),
+                get(OO_PANDOC_PATH, defaultValues.getPandocPath()),
+                getBstCitationFormatFromPrefs(defaultValues.getBstCitationFormat()));
 
         bindString(openOfficePreferences.executablePathProperty(), OO_EXECUTABLE_PATH, defaultValues.getExecutablePath());
         bindBoolean(openOfficePreferences.useAllDatabasesProperty(), OO_USE_ALL_OPEN_BASES, defaultValues.getUseAllDatabases());
@@ -2513,6 +2521,14 @@ public class JabRefCliPreferences implements CliPreferences {
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
         bindCustomList(openOfficePreferences.getExternalCslStyles(), OO_EXTERNAL_CSL_STYLES, defaultValues.getExternalCslStyles(),
                 JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
+        bindCustomList(openOfficePreferences.getExternalBstStyles(), OO_EXTERNAL_BST_STYLES, defaultValues.getExternalBstStyles(),
+                JabRefCliPreferences::convertListToString, JabRefCliPreferences::convertStringToList);
+        bindString(openOfficePreferences.pandocPathProperty(), OO_PANDOC_PATH, defaultValues.getPandocPath());
+        bindCustom(openOfficePreferences.bstCitationFormatProperty(), OO_BST_CITATION_FORMAT,
+                defaultValues.getBstCitationFormat(),
+                (_, _, newValue) -> put(OO_BST_CITATION_FORMAT, newValue.name()),
+                () -> openOfficePreferences.bstCitationFormatProperty().set(getBstCitationFormatFromPrefs(defaultValues.getBstCitationFormat())),
+                () -> openOfficePreferences.bstCitationFormatProperty().set(defaultValues.getBstCitationFormat()));
         bindString(openOfficePreferences.currentJStyleProperty(), OO_BIBLIOGRAPHY_STYLE_FILE, defaultValues.getCurrentJStyle());
         // currentStyle is persisted as a style path and reconstructed into a CSL style or JStyle on load, so it needs a custom binding.
         bindCustom(openOfficePreferences.currentStyleProperty(), OO_CURRENT_STYLE, defaultValues.getCurrentStyle(),
@@ -2528,16 +2544,26 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /// Reconstructs the persisted [OOStyle] from its stored path: a CSL style file becomes a [org.jabref.logic.citationstyle.CitationStyle], otherwise
-    /// it is treated as a [JStyle] (requiring `journalAbbreviationRepository`). Falls back to `defaultStyle` when the
-    /// path is absent, the repository is missing, or the JStyle cannot be created.
+    /// Handles CSL (`.csl`), BST (`.bst`), and JStyle (`.jstyle`) files.
+    /// Falls back to `defaultStyle` when the path is absent or the style cannot be created.
     private OOStyle getCurrentOOStyle(OOStyle defaultStyle, JournalAbbreviationRepository journalAbbreviationRepository) {
         String currentStylePath = get(OO_CURRENT_STYLE, defaultStyle.getPath());
 
         if (CSLStyleUtils.isCitationStyleFile(currentStylePath)) {
             return CSLStyleUtils.createCitationStyleFromFile(currentStylePath)
                                 .orElse(CSLStyleLoader.getDefaultStyle());
+        } else if (currentStylePath.endsWith(".bst")) {
+            // Internal BST style (classpath resource path starting with /resource/openoffice/)
+            if (currentStylePath.startsWith("/")) {
+                return BstStyle.createInternal(currentStylePath);
+            }
+            // External BST style (absolute filesystem path)
+            java.nio.file.Path bstPath = java.nio.file.Path.of(currentStylePath);
+            if (java.nio.file.Files.exists(bstPath)) {
+                return new BstStyle(bstPath);
+            }
+            LOGGER.warn("BST style file not found: {}", currentStylePath);
         } else if (journalAbbreviationRepository != null) {
-            // For now, must be a JStyle. In the future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
             try {
                 return new JStyle(currentStylePath, getLayoutFormatterPreferences(), journalAbbreviationRepository);
             } catch (IOException ex) {
@@ -2545,6 +2571,15 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         }
         return defaultStyle;
+    }
+
+    private BstCitationFormat getBstCitationFormatFromPrefs(BstCitationFormat defaultFormat) {
+        String stored = get(OO_BST_CITATION_FORMAT, defaultFormat.name());
+        try {
+            return BstCitationFormat.valueOf(stored);
+        } catch (IllegalArgumentException e) {
+            return defaultFormat;
+        }
     }
     // endregion
 
