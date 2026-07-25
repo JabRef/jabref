@@ -64,8 +64,8 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import io.github.kusoroadeolu.veneer.BibTeXSyntaxHighlighter;
 import jakarta.inject.Inject;
-import org.controlsfx.control.CheckListView;
 import jfx.incubator.scene.control.richtext.CodeArea;
+import org.controlsfx.control.CheckListView;
 import org.jspecify.annotations.Nullable;
 
 public class ImportEntriesDialog extends BaseDialog<Boolean> {

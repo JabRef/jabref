@@ -3,11 +3,10 @@ package org.jabref.gui.keyboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
+import jfx.incubator.scene.control.richtext.CodeArea;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.framework.junit5.ApplicationExtension;
-
-import jfx.incubator.scene.control.richtext.CodeArea;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
