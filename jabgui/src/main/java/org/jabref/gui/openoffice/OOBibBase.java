@@ -921,7 +921,7 @@ public class OOBibBase {
                                               .flatMap(database -> database.getEntries().stream())
                                               .toList();
 
-            cslCitationOOAdapter.linkZoteroCitationsIfNeeded(new BibDatabaseContext(new BibDatabase(entries)));
+            cslCitationOOAdapter.linkZoteroCitations(new BibDatabaseContext(new BibDatabase(entries)));
 
             // Collect only cited entries from all databases
             List<BibEntry> citedEntries = entries.stream()
