@@ -63,52 +63,53 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     public PreferencesDialogViewModel(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.preferenceTabs = FXCollections.observableArrayList();
 
         // This enables passing unsaved preference values from the AI tab to the "web search" tab.
-        Optional<AiTab> aiTab = createAiTab(AiTab::new);
+        Optional<AiTab> aiTab = createTab(AiTab::new);
         ReadOnlyBooleanProperty aiEnabled = aiTab.map(AiTab::aiEnabledProperty)
                                                  .orElseGet(() -> new SimpleBooleanProperty(
                                                          preferences.getAiPreferences().getAiFeaturesEnabledCurrently()));
 
-        preferenceTabs = FXCollections.observableArrayList(
-                new GeneralTab(),
-                new KeyBindingsTab(),
-                new GroupsTab(),
-                new WebSearchTab(aiEnabled)
-        );
+        addTab(GeneralTab::new);
+        addTab(KeyBindingsTab::new);
+        addTab(GroupsTab::new);
+        addTab(() -> new WebSearchTab(aiEnabled));
         aiTab.ifPresent(preferenceTabs::add);
-        preferenceTabs.addAll(
-                new EntryTab(),
-                new TableTab(),
-                new PreviewTab(),
-                new EntryEditorTab(),
-                new CustomEntryTypesTab(),
-                new CitationKeyPatternTab(),
-                new LinkedFilesTab(),
-                new OcrTab(),
-                new ExportTab(),
-                new AutoCompletionTab(),
-                new ProtectedTermsTab(),
-                new ExternalTab(),
-                new ExternalFileTypesTab(),
-                new JournalAbbreviationsTab(),
-                new NameFormatterTab(),
-                new XmpPrivacyTab(),
-                new CustomImporterTab(),
-                new CustomExporterTab(),
-                new NetworkTab()
-        );
+        addTab(EntryTab::new);
+        addTab(TableTab::new);
+        addTab(PreviewTab::new);
+        addTab(EntryEditorTab::new);
+        addTab(CustomEntryTypesTab::new);
+        addTab(CitationKeyPatternTab::new);
+        addTab(LinkedFilesTab::new);
+        addTab(OcrTab::new);
+        addTab(ExportTab::new);
+        addTab(AutoCompletionTab::new);
+        addTab(ProtectedTermsTab::new);
+        addTab(ExternalTab::new);
+        addTab(ExternalFileTypesTab::new);
+        addTab(JournalAbbreviationsTab::new);
+        addTab(NameFormatterTab::new);
+        addTab(XmpPrivacyTab::new);
+        addTab(CustomImporterTab::new);
+        addTab(CustomExporterTab::new);
+        addTab(NetworkTab::new);
     }
 
-    static Optional<AiTab> createAiTab(Supplier<AiTab> aiTabSupplier) {
+    private void addTab(Supplier<? extends PreferencesTab> tabSupplier) {
+        createTab(tabSupplier).ifPresent(preferenceTabs::add);
+    }
+
+    static <T extends PreferencesTab> Optional<T> createTab(Supplier<T> tabSupplier) {
         try {
-            return Optional.of(aiTabSupplier.get());
+            return Optional.of(tabSupplier.get());
         } catch (NoClassDefFoundError error) {
-            LOGGER.error("Could not initialize AI preferences because a required class could not be loaded", error);
+            LOGGER.error("Could not initialize preferences tab because a required class could not be loaded", error);
             return Optional.empty();
         } catch (RuntimeException error) {
             if (causedByNoClassDefFoundError(error)) {
-                LOGGER.error("Could not initialize AI preferences because a required class could not be loaded", error);
+                LOGGER.error("Could not initialize preferences tab because a required class could not be loaded", error);
                 return Optional.empty();
             }
             throw error;
