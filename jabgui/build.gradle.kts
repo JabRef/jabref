@@ -74,10 +74,13 @@ tasks.named<JavaCompile>("compileJava") {
     options.compilerArgs.addAll(useLibericaJdkFullCompilerArgs)
 }
 
-val embeddedPostgresHostBinary = EmbeddedPostgresBinaries.forHost()
+val embeddedPostgresHostBinary = EmbeddedPostgresBinaries.forHost(
+    providers.systemProperty("os.name").get(),
+    providers.systemProperty("os.arch").get()
+)
 
 dependencies {
-    embeddedPostgresHostBinary?.let { runtimeOnly(it.dependency) }
+    embeddedPostgresHostBinary?.let { runtimeOnly(javaModuleDependencies.ga(it.moduleName)) }
 }
 
 application {
@@ -231,7 +234,7 @@ javaModulePackaging {
 
 dependencies {
     embeddedPostgresDependencyByTarget.forEach { (target, binary) ->
-        add("${target}RuntimeClasspath", binary.dependency)
+        add("${target}RuntimeClasspath", javaModuleDependencies.ga(binary.moduleName))
     }
 }
 
@@ -241,8 +244,8 @@ embeddedPostgresHostBinary?.let { hostBinary ->
         .forEach { (target, _) ->
             configurations.named("${target}RuntimeClasspath") {
                 exclude(mapOf(
-                    "group" to hostBinary.dependency.substringBefore(':'),
-                    "module" to hostBinary.dependency.substringAfter(':')
+                    "group" to "io.zonky.test.postgres",
+                    "module" to hostBinary.artifactName
                 ))
             }
         }

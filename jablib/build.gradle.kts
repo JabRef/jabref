@@ -24,7 +24,10 @@ plugins {
     id("net.ltgt.nullaway") version "3.1.0"
 }
 
-val embeddedPostgresHostBinary = EmbeddedPostgresBinaries.forHost()
+val embeddedPostgresHostBinary = EmbeddedPostgresBinaries.forHost(
+    providers.systemProperty("os.name").get(),
+    providers.systemProperty("os.arch").get()
+)
 
 testModuleInfo {
     // loading of .fxml files in localization tests requires JabRef's GUI classes
@@ -68,7 +71,7 @@ dependencies {
     errorprone("com.google.errorprone:error_prone_core")
     errorprone("com.uber.nullaway:nullaway")
 
-    embeddedPostgresHostBinary?.let { testRuntimeOnly(it.dependency) }
+    embeddedPostgresHostBinary?.let { testRuntimeOnly(javaModuleDependencies.ga(it.moduleName)) }
 }
 
 var version = providers.gradleProperty("projVersion")
