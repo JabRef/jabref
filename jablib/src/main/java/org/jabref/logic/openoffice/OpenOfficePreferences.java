@@ -43,6 +43,7 @@ public class OpenOfficePreferences {
     private final StringProperty cslBibliographyBodyFormat;
     private final ObservableList<String> externalCslStyles;
     private final BooleanProperty addSpaceAfter;
+    private final BooleanProperty zoteroCompatibilityMode;
     private final ObservableList<String> externalBstStyles;
     private final StringProperty pandocPath;
     private final ObjectProperty<BstCitationFormat> bstCitationFormat;
@@ -59,6 +60,7 @@ public class OpenOfficePreferences {
                                  String cslBibliographyBodyFormat,
                                  List<String> externalCslStyles,
                                  boolean addSpaceAfter,
+                                 boolean zoteroCompatibilityMode,
                                  List<String> externalBstStyles,
                                  String pandocPath,
                                  BstCitationFormat bstCitationFormat) {
@@ -74,6 +76,7 @@ public class OpenOfficePreferences {
         this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat);
         this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
         this.addSpaceAfter = new SimpleBooleanProperty(addSpaceAfter);
+        this.zoteroCompatibilityMode = new SimpleBooleanProperty(zoteroCompatibilityMode);
         this.externalBstStyles = FXCollections.observableArrayList(externalBstStyles);
         this.pandocPath = new SimpleStringProperty(pandocPath);
         this.bstCitationFormat = new SimpleObjectProperty<>(bstCitationFormat);
@@ -95,6 +98,7 @@ public class OpenOfficePreferences {
                 "Text body",                                    // cslBibliographyBodyFormat
                 List.of(),                                      // externalCslStyles
                 true,                                           // addSpaceAfter
+                true,                                            // zoteroCompatibilityMode
                 List.of(),                                      // externalBstStyles
                 "pandoc",                                       // pandocPath
                 BstCitationFormat.NUMERIC                       // bstCitationFormat
@@ -255,6 +259,24 @@ public class OpenOfficePreferences {
 
     public void setAddSpaceAfter(boolean addSpaceAfter) {
         this.addSpaceAfter.setValue(addSpaceAfter);
+    }
+
+    public boolean getZoteroCompatibilityMode() {
+        return zoteroCompatibilityMode.get();
+    }
+
+    public BooleanProperty zoteroCompatibilityModeProperty() {
+        return zoteroCompatibilityMode;
+    }
+
+    public void setZoteroCompatibilityMode(boolean zoteroCompatibilityMode) {
+        this.zoteroCompatibilityMode.set(zoteroCompatibilityMode);
+    }
+
+    public OpenOfficeReferenceMarkFormat getReferenceMarkFormat() {
+        return zoteroCompatibilityMode.get()
+               ? OpenOfficeReferenceMarkFormat.ZOTERO_COMPATIBLE
+               : OpenOfficeReferenceMarkFormat.JABREF_ONLY;
     }
 
     /// List of paths to external BST style files.
