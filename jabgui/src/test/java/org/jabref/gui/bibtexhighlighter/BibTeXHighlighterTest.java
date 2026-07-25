@@ -100,7 +100,6 @@ class BibTeXHighlighterTest {
         verify(syntaxHighlighter, times(1)).computeHighlightRegions("line1\nline2");
     }
 
-
     @Test
     void addSearchHighlightsExecutesWithoutErrorsWhenQueryIsActive() {
         when(model.size()).thenReturn(1);
