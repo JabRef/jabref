@@ -43,6 +43,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- Comment fields are edited in a separate "Comments" entry editor tab again (instead of a section inside the "Main" tab). The general comment field is always shown, and the current user's comment field is offered as a one-click chip. [TODO](TODO)
+- In the entry editor, the "File annotations" tab now appears before "Related articles". [TODO](TODO)
 - We improved the reliability of online searches by respecting the request limits of arXiv and other services. [#16300](https://github.com/JabRef/jabref/issues/16300)
 - We improved switching between large libraries so entry previews remain responsive while automatic groups and their counts are refreshed. [#16289](https://github.com/JabRef/jabref/pull/16289)
 - We improved the [MODS](https://www.loc.gov/standards/mods/) importer for mapping entry types. [#16055](https://github.com/JabRef/jabref/issues/16055)
