@@ -29,10 +29,7 @@ public class ZoteroCitationLinker {
     public static int linkZoteroCitations(XTextDocument document,
                                           BibDatabaseContext bibDatabaseContext,
                                           BibEntryTypesManager entryTypesManager)
-            throws
-            NoDocumentException,
-            CreationException,
-            com.sun.star.uno.Exception {
+            throws NoDocumentException, CreationException, com.sun.star.uno.Exception {
         int updatedMarks = 0;
         for (String referenceMarkName : UnoReferenceMark.getListOfNames(document)) {
             String updatedName = linkReferenceMark(referenceMarkName, bibDatabaseContext, entryTypesManager);
@@ -103,10 +100,7 @@ public class ZoteroCitationLinker {
     }
 
     private static void updateReferenceMarkName(XTextDocument document, String oldName, String newName)
-            throws
-            NoDocumentException,
-            CreationException,
-            com.sun.star.uno.Exception {
+            throws NoDocumentException, CreationException, com.sun.star.uno.Exception {
         Optional<XTextContent> oldContent = UnoReferenceMark.getAsTextContent(document, oldName);
         if (oldContent.isEmpty()) {
             return;
