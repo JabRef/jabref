@@ -14,6 +14,7 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.OpenOfficeReferenceMarkFormat;
 import org.jabref.logic.openoffice.ZoteroCitationLinker;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.model.database.BibDatabase;
@@ -157,7 +158,7 @@ public class CSLCitationOOAdapter {
                                BibDatabaseContext bibDatabaseContext,
                                BibEntryTypesManager bibEntryTypesManager)
             throws CreationException, com.sun.star.uno.Exception {
-        linkZoteroCitationsBeforeInsert(bibDatabaseContext);
+        linkZoteroCitations(bibDatabaseContext);
 
         // If current citation style is not the same as passed-in citation type, then change it to the new citation style
         // If current citation type is not "NORMAL", then change it to "NORMAL".
@@ -196,7 +197,7 @@ public class CSLCitationOOAdapter {
                                      BibDatabaseContext bibDatabaseContext,
                                      BibEntryTypesManager bibEntryTypesManager)
             throws CreationException, com.sun.star.uno.Exception {
-        linkZoteroCitationsBeforeInsert(bibDatabaseContext);
+        linkZoteroCitations(bibDatabaseContext);
 
         setCitationStyleParameters(selectedStyle, CSLCitationType.IN_TEXT);
 
@@ -211,7 +212,7 @@ public class CSLCitationOOAdapter {
     /// Adds the entries to the list for which bibliography is to be generated.
     public void insertEmptyCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext)
             throws CreationException, com.sun.star.uno.Exception {
-        linkZoteroCitationsBeforeInsert(bibDatabaseContext);
+        linkZoteroCitations(bibDatabaseContext);
 
         setCitationStyleParameters(selectedStyle, CSLCitationType.EMPTY);
 
@@ -433,16 +434,20 @@ public class CSLCitationOOAdapter {
         this.citationType = markManager.getCitationType();
     }
 
-    private void linkZoteroCitationsBeforeInsert(BibDatabaseContext bibDatabaseContext) {
+    public void linkZoteroCitations(BibDatabaseContext bibDatabaseContext) {
+        if (openOfficePreferences.getReferenceMarkFormat() != OpenOfficeReferenceMarkFormat.ZOTERO_COMPATIBLE) {
+            return;
+        }
+
         try {
             int linkedCitations = ZoteroCitationLinker.linkZoteroCitations(
                     document,
                     bibDatabaseContext,
                     bibEntryTypesManager);
-            LOGGER.debug("Linked {} Zotero citations to JabRef entries before inserting citation", linkedCitations);
+            LOGGER.debug("Linked {} Zotero citations to JabRef entries", linkedCitations);
             markManager.readAndUpdateExistingMarks();
         } catch (NoDocumentException | CreationException | Exception e) {
-            LOGGER.warn("Could not link Zotero citations to JabRef entries before inserting citation", e);
+            LOGGER.warn("Could not link Zotero citations to JabRef entries", e);
         }
     }
 
