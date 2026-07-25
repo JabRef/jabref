@@ -15,10 +15,7 @@ import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.OpenOfficeReferenceMarkFormat;
-import org.jabref.logic.openoffice.ReferenceMark;
 import org.jabref.logic.openoffice.ZoteroCitationLinker;
-import org.jabref.logic.openoffice.ZoteroCitationMarkParser;
-import org.jabref.logic.openoffice.ZoteroReferenceMark;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -512,14 +509,22 @@ public class CSLCitationOOAdapter {
         } else if (citationType == CSLCitationType.IN_TEXT) {
             // Now, for each such reference mark, we get the entries to be updated
             for (CSLReferenceMark mark : marksInOrder) {
-                List<BibEntry> entries = getBibEntriesFromReferenceMark(mark, unifiedDatabase);
+                List<String> citationKeys = mark.getCitationKeys();
+                List<BibEntry> entries = citationKeys.stream()
+                                                     .map(unifiedDatabase::getEntryByCitationKey)
+                                                     .flatMap(Optional::stream)
+                                                     .toList();
                 String citation = createInTextCitationGroupText(style, isAlphaNumericStyle, isNumericStyle, entries, unifiedBibDatabaseContext);
                 markManager.updateMarkAndTextWithNewStyle(mark, citation, CSLCitationType.IN_TEXT);
             }
         } else {
             // Same flow as above - for each such reference mark, we get the entries to be updated
             for (CSLReferenceMark mark : marksInOrder) {
-                List<BibEntry> entries = getBibEntriesFromReferenceMark(mark, unifiedDatabase);
+                List<String> citationKeys = mark.getCitationKeys();
+                List<BibEntry> entries = citationKeys.stream()
+                                                     .map(unifiedDatabase::getEntryByCitationKey)
+                                                     .flatMap(Optional::stream)
+                                                     .toList();
 
                 // We re-generate the citation in the new style and update it in the document
                 String citation = createCitationText(style, isAlphaNumericStyle, entries, unifiedBibDatabaseContext);
@@ -527,35 +532,6 @@ public class CSLCitationOOAdapter {
                 markManager.updateMarkAndTextWithNewStyle(mark, citation, CSLCitationType.NORMAL);
             }
         }
-    }
-
-    private List<BibEntry> getBibEntriesFromReferenceMark(CSLReferenceMark mark, BibDatabase unifiedDatabase) {
-        List<BibEntry> embeddedZoteroEntries;
-        if (!ReferenceMark.isZoteroReferenceMarkName(mark.getName())) {
-            embeddedZoteroEntries = List.of();
-        } else {
-            embeddedZoteroEntries = ZoteroCitationMarkParser.parseCslCitationJson(ZoteroReferenceMark.getCSLJson(mark.getName()));
-        }
-        List<BibEntry> entries = new ArrayList<>();
-
-        for (String citationKey : mark.getCitationKeys()) {
-            unifiedDatabase.getEntryByCitationKey(citationKey)
-                           // Specifically for entries cited by Zotero, which does not contain jabref's citationKey
-                           .or(() -> findEmbeddedZoteroEntry(citationKey, embeddedZoteroEntries))
-                           .ifPresent(entries::add);
-        }
-
-        return entries;
-    }
-
-    private Optional<BibEntry> findEmbeddedZoteroEntry(String citationKey, List<BibEntry> embeddedZoteroEntries) {
-        for (BibEntry entry : embeddedZoteroEntries) {
-            Optional<String> entryCitationKey = entry.getCitationKey();
-            if (entryCitationKey.filter(citationKey::equals).isPresent()) {
-                return Optional.of(entry);
-            }
-        }
-        return Optional.empty();
     }
 
     /// Helper method for creating citations for `updateAllCitationsWithNewStyle` and `insertCitation`.

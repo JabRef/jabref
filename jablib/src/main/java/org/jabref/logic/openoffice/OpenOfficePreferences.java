@@ -14,6 +14,7 @@ import javafx.collections.ObservableList;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
+import org.jabref.logic.openoffice.style.BstCitationFormat;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.os.OS;
@@ -43,6 +44,9 @@ public class OpenOfficePreferences {
     private final ObservableList<String> externalCslStyles;
     private final BooleanProperty addSpaceAfter;
     private final BooleanProperty zoteroCompatibilityMode;
+    private final ObservableList<String> externalBstStyles;
+    private final StringProperty pandocPath;
+    private final ObjectProperty<BstCitationFormat> bstCitationFormat;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
@@ -56,7 +60,10 @@ public class OpenOfficePreferences {
                                  String cslBibliographyBodyFormat,
                                  List<String> externalCslStyles,
                                  boolean addSpaceAfter,
-                                 boolean zoteroCompatibilityMode) {
+                                 boolean zoteroCompatibilityMode,
+                                 List<String> externalBstStyles,
+                                 String pandocPath,
+                                 BstCitationFormat bstCitationFormat) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
@@ -70,6 +77,9 @@ public class OpenOfficePreferences {
         this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
         this.addSpaceAfter = new SimpleBooleanProperty(addSpaceAfter);
         this.zoteroCompatibilityMode = new SimpleBooleanProperty(zoteroCompatibilityMode);
+        this.externalBstStyles = FXCollections.observableArrayList(externalBstStyles);
+        this.pandocPath = new SimpleStringProperty(pandocPath);
+        this.bstCitationFormat = new SimpleObjectProperty<>(bstCitationFormat);
     }
 
     private OpenOfficePreferences() {
@@ -88,7 +98,10 @@ public class OpenOfficePreferences {
                 "Text body",                                    // cslBibliographyBodyFormat
                 List.of(),                                      // externalCslStyles
                 true,                                           // addSpaceAfter
-                true                                            // zoteroCompatibilityMode
+                true,                                            // zoteroCompatibilityMode
+                List.of(),                                      // externalBstStyles
+                "pandoc",                                       // pandocPath
+                BstCitationFormat.NUMERIC                       // bstCitationFormat
         );
     }
 
@@ -264,5 +277,40 @@ public class OpenOfficePreferences {
         return zoteroCompatibilityMode.get()
                ? OpenOfficeReferenceMarkFormat.ZOTERO_COMPATIBLE
                : OpenOfficeReferenceMarkFormat.JABREF_ONLY;
+    }
+
+    /// List of paths to external BST style files.
+    public ObservableList<String> getExternalBstStyles() {
+        return externalBstStyles;
+    }
+
+    public void setExternalBstStyles(List<String> paths) {
+        externalBstStyles.setAll(paths);
+    }
+
+    /// Path to the pandoc executable used for BST bibliography rendering.
+    /// Defaults to `"pandoc"` (system PATH). Users can override via the OO settings menu.
+    public String getPandocPath() {
+        return pandocPath.get();
+    }
+
+    public StringProperty pandocPathProperty() {
+        return pandocPath;
+    }
+
+    public void setPandocPath(String path) {
+        this.pandocPath.set(path);
+    }
+
+    public BstCitationFormat getBstCitationFormat() {
+        return bstCitationFormat.get();
+    }
+
+    public ObjectProperty<BstCitationFormat> bstCitationFormatProperty() {
+        return bstCitationFormat;
+    }
+
+    public void setBstCitationFormat(BstCitationFormat format) {
+        this.bstCitationFormat.set(format);
     }
 }

@@ -40,6 +40,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -52,6 +53,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
+import org.jabref.logic.openoffice.bst.PandocLatexConverter;
+import org.jabref.logic.openoffice.style.BstStyle;
+import org.jabref.logic.openoffice.style.BstStyleLoader;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
@@ -62,7 +66,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.uno.CreationException;
-import org.jabref.model.openoffice.util.OOVoidResult;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.sun.star.comp.helper.BootstrapException;
@@ -108,6 +111,7 @@ public class OpenOfficePanel {
     private final AiService aiService;
     private final JStyleLoader jStyleLoader;
     private final CSLStyleLoader cslStyleLoader;
+    private final BstStyleLoader bstStyleLoader;
     private final LibraryTabContainer tabContainer;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
@@ -151,6 +155,7 @@ public class OpenOfficePanel {
                 abbreviationRepository);
 
         cslStyleLoader = new CSLStyleLoader(openOfficePreferences);
+        bstStyleLoader = new BstStyleLoader(openOfficePreferences);
 
         ActionFactory factory = new ActionFactory();
 
@@ -192,29 +197,26 @@ public class OpenOfficePanel {
         final boolean FAIL = true;
         final boolean PASS = false;
 
-        if (ooBase != null && ooBase.testDialog(title, ooBase.readStyleInPreference())) {
-            return FAIL;
-        }
-
-        currentStyle = openOfficePreferences.getCurrentStyle();
-        currentStyleProperty.set(currentStyle);
-
-        if (!(currentStyle instanceof JStyle jStyle)) {
-            return PASS;
-        }
-
-        try {
-            jStyle = jStyleLoader.getUsedJstyle();
-            jStyle.ensureUpToDate();
+        if (currentStyle == null) {
             currentStyle = openOfficePreferences.getCurrentStyle();
             currentStyleProperty.set(currentStyle);
-        } catch (IOException ex) {
-            LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
-            String msg = Localization.lang("Unable to reload style file")
-                    + "'" + jStyle.getPath() + "'"
-                    + "\n" + ex.getMessage();
-            new OOError(title, msg, ex).showErrorDialog(dialogService);
-            return FAIL;
+        } else {
+            if (currentStyle instanceof JStyle jStyle) {
+                try {
+                    jStyle = jStyleLoader.getUsedJstyle();
+                    jStyle.ensureUpToDate();
+                } catch (IOException ex) {
+                    LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
+                    String msg = Localization.lang("Unable to reload style file")
+                            + "'" + jStyle.getPath() + "'"
+                            + "\n" + ex.getMessage();
+                    new OOError(title, msg, ex).showErrorDialog(dialogService);
+                    return FAIL;
+                }
+            } else {
+                // CSL and BST styles don't need to be reloaded from disk
+                return PASS;
+            }
         }
         return PASS;
     }
@@ -236,7 +238,7 @@ public class OpenOfficePanel {
 
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
         setStyleFile.setOnAction(_ -> {
-            StyleSelectDialogView styleDialog = new StyleSelectDialogView(cslStyleLoader, jStyleLoader, journalAbbreviationRepository);
+            StyleSelectDialogView styleDialog = new StyleSelectDialogView(cslStyleLoader, jStyleLoader, bstStyleLoader, journalAbbreviationRepository);
             dialogService.showCustomDialogAndWait(styleDialog)
                          .ifPresent(selectedStyle -> {
                              currentStyle = selectedStyle;
@@ -250,12 +252,9 @@ public class OpenOfficePanel {
                                  }
                                  dialogService.notify(Localization.lang("Currently selected JStyle: '%0'", jStyle.getName()));
                              } else if (currentStyle instanceof CitationStyle cslStyle) {
-                                 final String errorTitle = Localization.lang("Problem modifying citation");
-                                 OOVoidResult<OOError> result = ooBase.writeZoteroDocumentStyle(cslStyle);
-                                 if (ooBase.testDialog(errorTitle, result)) {
-                                     return;
-                                 }
                                  dialogService.notify(Localization.lang("Currently selected CSL Style: '%0'", cslStyle.getName()));
+                             } else if (currentStyle instanceof BstStyle bstStyle) {
+                                 dialogService.notify(Localization.lang("Currently selected BST style: '%0'", bstStyle.getName()));
                              }
                              updateButtonAvailability();
                          });
@@ -332,7 +331,7 @@ public class OpenOfficePanel {
     }
 
     private void modifyBibliographyProperties() {
-        ModifyCSLBibliographyPropertiesDialogView modifyBibliographyPropertiesDialogView = new ModifyCSLBibliographyPropertiesDialogView(openOfficePreferences);
+        ModifyBibliographyPropertiesDialogView modifyBibliographyPropertiesDialogView = new ModifyBibliographyPropertiesDialogView(openOfficePreferences);
         dialogService.showCustomDialog(modifyBibliographyPropertiesDialogView);
     }
 
@@ -437,10 +436,12 @@ public class OpenOfficePanel {
         boolean canRefreshDocument = isConnectedToDocument && hasStyle;
         boolean cslStyleSelected = currentStyle instanceof CitationStyle;
         boolean emptyCitationSupported = currentStyle instanceof JStyle || (cslStyleSelected && !openOfficePreferences.getZoteroCompatibilityMode());
-        boolean canGenerateBibliography = (currentStyle instanceof JStyle) || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography());
+        boolean bstStyleSelected = currentStyle instanceof BstStyle;
+        boolean canGenerateBibliography = (currentStyle instanceof JStyle)
+                || (currentStyle instanceof BstStyle)
+                || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography());
 
         selectDocument.setDisable(!isConnectedToDocument);
-        setStyleFile.setDisable(!isConnectedToDocument);
 
         pushEntries.setDisable(!canCite);
         pushEntriesInt.setDisable(!canCite);
@@ -452,7 +453,7 @@ public class OpenOfficePanel {
         unmerge.setDisable(!canRefreshDocument || cslStyleSelected);
         manageCitations.setDisable(!canRefreshDocument || cslStyleSelected);
         exportCitations.setDisable(!(isConnectedToDocument && hasDatabase) || cslStyleSelected);
-        modifyBibliographyProperties.setDisable(!cslStyleSelected);
+        modifyBibliographyProperties.setDisable(!(cslStyleSelected || bstStyleSelected));
     }
 
     private void connect() {
@@ -704,6 +705,12 @@ public class OpenOfficePanel {
             dialogService.notify(Localization.lang("Cleared connection settings"));
         });
 
+        MenuItem setPandocPath = new MenuItem(Localization.lang("Set pandoc path"));
+        setPandocPath.setOnAction(_ -> browsePandocPath());
+
+        MenuItem autoDetectPandoc = new MenuItem(Localization.lang("Auto-detect pandoc path"));
+        autoDetectPandoc.setOnAction(_ -> autoDetectPandocPath());
+
         contextMenu.getItems().addAll(
                 autoSync,
                 addSpaceAfter,
@@ -712,6 +719,9 @@ public class OpenOfficePanel {
                 useActiveBase,
                 useAllBases,
                 new SeparatorMenuItem(),
+                setPandocPath,
+                autoDetectPandoc,
+                new SeparatorMenuItem(),
                 clearConnectionSettings);
 
         if (currentStyle instanceof JStyle) {
@@ -719,5 +729,31 @@ public class OpenOfficePanel {
         }
 
         return contextMenu;
+    }
+
+    private void browsePandocPath() {
+        FileDialogConfiguration config = new FileDialogConfiguration.Builder()
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
+                .build();
+        dialogService.showFileOpenDialog(config).ifPresent(path -> {
+            openOfficePreferences.setPandocPath(path.toString());
+            dialogService.notify(Localization.lang("Pandoc path set to: %0", path.toString()));
+        });
+    }
+
+    private void autoDetectPandocPath() {
+        BackgroundTask<java.util.Optional<String>> task = BackgroundTask.wrap(PandocLatexConverter::autoDetect);
+        task.titleProperty().set(Localization.lang("Auto-detecting pandoc"));
+        task.showToUser(true);
+        task.onSuccess(result -> {
+            if (result.isPresent()) {
+                openOfficePreferences.setPandocPath(result.get());
+                dialogService.notify(Localization.lang("Pandoc detected at: %0", result.get()));
+            } else {
+                dialogService.notify(Localization.lang("Pandoc could not be detected automatically"));
+            }
+        });
+        task.onFailure(_ -> dialogService.notify(Localization.lang("Auto-detection of pandoc path failed")));
+        taskExecutor.execute(task);
     }
 }
