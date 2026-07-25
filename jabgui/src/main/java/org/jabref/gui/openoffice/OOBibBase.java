@@ -998,7 +998,7 @@ public class OOBibBase {
                                                        CSLUpdateBibliography cslUpdateBibliography) {
         try {
             UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
-            
+
             // Collect only cited entries from all databases
             List<BibEntry> entries = databases.stream()
                                               .flatMap(database -> database.getEntries().stream())
