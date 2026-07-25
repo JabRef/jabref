@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -258,22 +259,49 @@ public abstract class NativeDesktop {
     }
 
     private static void executeCommand(String command, String absolutePath, DialogService dialogService) {
-        // normalize white spaces
-        command = command.replaceAll("\\s+", " ");
-
         // replace the placeholder if used
         command = command.replace("%DIR", absolutePath);
 
         LoggerFactory.getLogger(NativeDesktop.class).info("Executing command \"{}\"...", command);
         dialogService.notify(Localization.lang("Executing command \"%0\"...", command));
 
-        String[] subcommands = command.split(" ");
         try {
-            new ProcessBuilder(subcommands).start();
+            new ProcessBuilder(parseCommand(command)).start();
         } catch (IOException exception) {
             LoggerFactory.getLogger(NativeDesktop.class).error("Error during command execution", exception);
             dialogService.notify(Localization.lang("Error occurred while executing the command \"%0\".", command));
         }
+    }
+
+    static List<String> parseCommand(String command) {
+        List<String> arguments = new ArrayList<>();
+        StringBuilder argument = new StringBuilder();
+        char quote = 0;
+        boolean argumentStarted = false;
+
+        for (int index = 0; index < command.length(); index++) {
+            char character = command.charAt(index);
+            if (quote == 0 && (character == '\'' || character == '"')) {
+                quote = character;
+                argumentStarted = true;
+            } else if (character == quote) {
+                quote = 0;
+            } else if (quote == 0 && Character.isWhitespace(character)) {
+                if (argumentStarted) {
+                    arguments.add(argument.toString());
+                    argument.setLength(0);
+                    argumentStarted = false;
+                }
+            } else {
+                argument.append(character);
+                argumentStarted = true;
+            }
+        }
+
+        if (argumentStarted) {
+            arguments.add(argument.toString());
+        }
+        return arguments;
     }
 
     /// Opens the given URL using the system browser
