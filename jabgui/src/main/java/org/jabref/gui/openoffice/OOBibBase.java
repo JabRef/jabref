@@ -25,8 +25,11 @@ import org.jabref.logic.openoffice.action.ManageCitations;
 import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.RangeForOverlapCheck;
+import org.jabref.logic.openoffice.oocsltext.BSTCitationOOAdapter;
+import org.jabref.logic.openoffice.oocsltext.BstUpdateBibliography;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.oocsltext.CSLUpdateBibliography;
+import org.jabref.logic.openoffice.style.BstStyle;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.model.database.BibDatabase;
@@ -71,6 +74,8 @@ public class OOBibBase {
 
     private CSLCitationOOAdapter cslCitationOOAdapter;
     private CSLUpdateBibliography cslUpdateBibliography;
+    private BSTCitationOOAdapter bstCitationOOAdapter;
+    private BstUpdateBibliography bstUpdateBibliography;
 
     public OOBibBase(Path loPath, DialogService dialogService, OpenOfficePreferences openOfficePreferences)
             throws
@@ -88,6 +93,10 @@ public class OOBibBase {
             Supplier<List<BibDatabaseContext>> databasesSupplier = stateManager::getOpenDatabases;
             cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier, openOfficePreferences, Injector.instantiateModelOrService(BibEntryTypesManager.class));
             cslUpdateBibliography = new CSLUpdateBibliography();
+        }
+        if (bstCitationOOAdapter == null) {
+            bstCitationOOAdapter = new BSTCitationOOAdapter(doc, openOfficePreferences);
+            bstUpdateBibliography = new BstUpdateBibliography();
         }
     }
 
@@ -533,6 +542,9 @@ public class OOBibBase {
                         bibEntryTypesManager,
                         cursor,
                         syncOptions);
+            } else if (style instanceof BstStyle bstStyle) {
+                // Handle insertion of BST citations
+                result = insertBstCitation(entries, doc, bstStyle, bibDatabaseContext, cursor);
             } else if (style instanceof JStyle jStyle) {
                 // Handle insertion of JStyle citations
                 result = insertJStyleCitation(entries,
@@ -567,8 +579,7 @@ public class OOBibBase {
                                                    CitationStyle citationStyle,
                                                    BibDatabaseContext bibDatabaseContext,
                                                    BibEntryTypesManager bibEntryTypesManager,
-                                                   OOResult<XTextCursor,
-                                                           OOError> cursor,
+                                                   OOResult<XTextCursor, OOError> cursor,
                                                    Optional<Update.SyncOptions> syncOptions) {
         try {
             // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
@@ -613,15 +624,12 @@ public class OOBibBase {
                                                       XTextDocument doc,
                                                       CitationType citationType,
                                                       JStyle jStyle,
-                                                      OOResult<OOFrontend,
-                                                              OOError> frontend,
-                                                      OOResult<XTextCursor,
-                                                              OOError> cursor,
+                                                      OOResult<OOFrontend, OOError> frontend,
+                                                      OOResult<XTextCursor, OOError> cursor,
                                                       BibDatabaseContext bibDatabaseContext,
                                                       Optional<Update.SyncOptions> syncOptions,
                                                       String pageInfo,
-                                                      OOResult<FunctionalTextViewCursor,
-                                                              OOError> fcursor) {
+                                                      OOResult<FunctionalTextViewCursor, OOError> fcursor) {
         OOVoidResult<OOError> insertResult = EditInsert.insertCitationGroup(doc,
                 frontend.get(),
                 cursor.get(),
@@ -639,6 +647,23 @@ public class OOBibBase {
             return Update.resyncDocument(doc, jStyle, fcursor.get(), syncOptions.get()).asVoidResult().mapError(OOError::from);
         }
         return OOVoidResult.ok();
+    }
+
+    /// Helper method for guiActionInsertEntry - handles BST citation insertion.
+    private OOVoidResult<OOError> insertBstCitation(List<BibEntry> entries,
+                                                    XTextDocument doc,
+                                                    BstStyle bstStyle,
+                                                    BibDatabaseContext bibDatabaseContext,
+                                                    OOResult<XTextCursor, OOError> cursor) {
+        try {
+            doc.lockControllers();
+            bstCitationOOAdapter.insertCitation(cursor.get(), entries, bibDatabaseContext);
+            return OOVoidResult.ok();
+        } catch (CreationException | com.sun.star.uno.Exception e) {
+            return OOVoidResult.error(OOError.fromMisc(e));
+        } finally {
+            doc.unlockControllers();
+        }
     }
 
     /// GUI action "Merge citations"
@@ -851,6 +876,13 @@ public class OOBibBase {
                 return;
             }
             testDialog(errorTitle, updateCSLBibliography(databases, citationStyle, doc, fcursor, errorTitle));
+        } else if (style instanceof BstStyle bstStyle) {
+            if (testDialog(errorTitle,
+                    fcursor.asVoidResult(),
+                    checkIfOpenOfficeIsRecordingChanges(doc))) {
+                return;
+            }
+            testDialog(errorTitle, updateBstBibliography(databases, bstStyle, doc, fcursor, errorTitle));
         }
     }
 
@@ -891,12 +923,62 @@ public class OOBibBase {
         return OOVoidResult.ok();
     }
 
+    /// Helper method for guiActionUpdateDocument - refreshes a BST bibliography.
+    ///
+    /// @param databases  Must have at least one.
+    /// @param bstStyle   BST style to update the bibliography with.
+    /// @param doc        Text document.
+    /// @param fcursor    Used to synchronize document.
+    /// @param errorTitle Error message for user.
+    private OOVoidResult<OOError> updateBstBibliography(List<BibDatabase> databases, BstStyle bstStyle,
+                                                        XTextDocument doc,
+                                                        OOResult<FunctionalTextViewCursor, OOError> fcursor,
+                                                        String errorTitle) {
+        try {
+            UnoUndo.enterUndoContext(doc, "Create BST bibliography");
+
+            List<BibEntry> citedEntries = databases.stream()
+                                                   .flatMap(db -> db.getEntries().stream())
+                                                   .filter(bstCitationOOAdapter::isCitedEntry)
+                                                   .collect(Collectors.toCollection(ArrayList::new)); // has to be a mutable list as it undergoes sorting
+
+            if (citedEntries.isEmpty()) {
+                dialogService.showInformationDialogAndWait(
+                        Localization.lang("Bibliography"),
+                        Localization.lang("No cited entries found in the document."));
+                return OOVoidResult.ok();
+            }
+
+            BibDatabase bibDatabase = new BibDatabase(citedEntries);
+            BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
+
+            doc.lockControllers();
+            try {
+                bstUpdateBibliography.rebuildBstBibliography(
+                        doc, bstCitationOOAdapter, bstStyle, citedEntries, bibDatabaseContext);
+            } catch (IOException | InterruptedException | com.sun.star.uno.Exception | CreationException e) {
+                LOGGER.error("Could not update BST bibliography", e);
+                return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));
+            } catch (NoDocumentException e) {
+                LOGGER.error("Could not update BST bibliography", e);
+                return OOVoidResult.error(OOError.from(e).setTitle(errorTitle));
+            } finally {
+                doc.unlockControllers();
+            }
+        } finally {
+            UnoUndo.leaveUndoContext(doc);
+            fcursor.get().restore(doc);
+        }
+        return OOVoidResult.ok();
+    }
+
     /// Helper method for guiActionUpdateDocument, refreshes a CSL bibliography.
     ///
     /// @param databases     Must have at least one.
     /// @param citationStyle Citation style to update bibliography with.
     /// @param doc           Text document.
     /// @param fcursor       Used to synchronize document.
+    /// @param errorTitle    Error message for user.
     private OOVoidResult<OOError> updateCSLBibliography(List<BibDatabase> databases, CitationStyle citationStyle, XTextDocument doc,
                                                         OOResult<FunctionalTextViewCursor, OOError> fcursor, String errorTitle) {
         return updateCSLBibliography(dialogService, databases, citationStyle, doc, fcursor, errorTitle, cslCitationOOAdapter, cslUpdateBibliography);
@@ -917,7 +999,7 @@ public class OOBibBase {
             List<BibEntry> citedEntries = databases.stream()
                                                    .flatMap(database -> database.getEntries().stream())
                                                    .filter(cslCitationOOAdapter::isCitedEntry)
-                                                   .collect(Collectors.toCollection(ArrayList::new));
+                                                   .collect(Collectors.toCollection(ArrayList::new)); // has to be a mutable list as it undergoes sorting
 
             // If no entries are cited, show a message and return
             if (citedEntries.isEmpty()) {
@@ -937,15 +1019,12 @@ public class OOBibBase {
             doc.lockControllers();
             try {
                 cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
-            } catch (CreationException e) {
+            } catch (CreationException | com.sun.star.uno.Exception e) {
                 LOGGER.error("Could not update CSL bibliography", e);
                 return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));
             } catch (NoDocumentException e) {
                 LOGGER.error("Could not update CSL bibliography", e);
                 return OOVoidResult.error(OOError.from(e).setTitle(errorTitle));
-            } catch (com.sun.star.uno.Exception e) {
-                LOGGER.error("Could not update CSL bibliography", e);
-                return OOVoidResult.error(OOError.fromMisc(e).setTitle(errorTitle));
             } finally {
                 doc.unlockControllers();
             }
