@@ -15,7 +15,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.openoffice.CitationEntryTypeMetadataManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.EditInsert;
 import org.jabref.logic.openoffice.action.EditMerge;
@@ -51,8 +50,6 @@ import org.jabref.model.openoffice.util.OOResult;
 import org.jabref.model.openoffice.util.OOVoidResult;
 
 import com.airhacks.afterburner.injection.Injector;
-import com.sun.star.beans.IllegalTypeException;
-import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
@@ -92,7 +89,7 @@ public class OOBibBase {
             StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
             Supplier<List<BibDatabaseContext>> databasesSupplier = stateManager::getOpenDatabases;
             cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier, openOfficePreferences, Injector.instantiateModelOrService(BibEntryTypesManager.class));
-            cslUpdateBibliography = new CSLUpdateBibliography();
+            cslUpdateBibliography = new CSLUpdateBibliography(openOfficePreferences);
         }
         if (bstCitationOOAdapter == null) {
             bstCitationOOAdapter = new BSTCitationOOAdapter(doc, openOfficePreferences);
@@ -106,17 +103,8 @@ public class OOBibBase {
         if (isConnectedToDocument()) {
             XTextDocument doc = this.getXTextDocument().get();
             initializeCitationAdapter(doc);
-            storeZoteroEntryTypes(doc);
             dialogService.notify(Localization.lang("Connected to document") + ": "
                     + this.getCurrentDocumentTitle().orElse(""));
-        }
-    }
-
-    private void storeZoteroEntryTypes(XTextDocument doc) {
-        try {
-            CitationEntryTypeMetadataManager.storeZoteroEntryTypes(doc);
-        } catch (IllegalTypeException | NoDocumentException | PropertyVetoException | WrappedTargetException e) {
-            LOGGER.warn("Could not store Zotero citation entry type metadata", e);
         }
     }
 
@@ -581,10 +569,26 @@ public class OOBibBase {
                                                    BibEntryTypesManager bibEntryTypesManager,
                                                    OOResult<XTextCursor, OOError> cursor,
                                                    Optional<Update.SyncOptions> syncOptions) {
+        boolean convertReferenceMarks;
+        try {
+            convertReferenceMarks = cslCitationOOAdapter.needsReferenceMarkConversion();
+            if (convertReferenceMarks) {
+                dialogService.showWarningDialogAndWait(
+                        Localization.lang("Reference mark format"),
+                        Localization.lang("Converting references to selected format"));
+            }
+        } catch (com.sun.star.uno.Exception e) {
+            return OOVoidResult.error(OOError.fromMisc(e));
+        }
+
         try {
             // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
             // MUST always be paired with an unlockControllers() call
             doc.lockControllers();
+
+            if (convertReferenceMarks) {
+                cslCitationOOAdapter.convertReferenceMarksToPreference();
+            }
 
             if (citationType == CitationType.AUTHORYEAR_PAR) {
                 // "Cite" button
@@ -594,7 +598,7 @@ public class OOBibBase {
                 cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
             } else if (citationType == CitationType.INVISIBLE_CIT) {
                 // "Insert empty citation"
-                cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries);
+                cslCitationOOAdapter.insertEmptyCitation(cursor.get(), citationStyle, entries, bibDatabaseContext);
             }
 
             // If "Automatically sync bibliography when inserting citations" is enabled
@@ -996,10 +1000,15 @@ public class OOBibBase {
             UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
 
             // Collect only cited entries from all databases
-            List<BibEntry> citedEntries = databases.stream()
-                                                   .flatMap(database -> database.getEntries().stream())
-                                                   .filter(cslCitationOOAdapter::isCitedEntry)
-                                                   .collect(Collectors.toCollection(ArrayList::new)); // has to be a mutable list as it undergoes sorting
+            List<BibEntry> entries = databases.stream()
+                                              .flatMap(database -> database.getEntries().stream())
+                                              .toList();
+
+            cslCitationOOAdapter.linkZoteroCitations(new BibDatabaseContext(new BibDatabase(entries)));
+
+            List<BibEntry> citedEntries = entries.stream()
+                                                 .filter(cslCitationOOAdapter::isCitedEntry)
+                                                 .collect(Collectors.toCollection(ArrayList::new)); // has to be a mutable list as it undergoes sorting
 
             // If no entries are cited, show a message and return
             if (citedEntries.isEmpty()) {
