@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 
+import javax.xml.stream.XMLInputFactory;
+
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.util.StandardFileType;
 
@@ -22,6 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /// - Press **'Create File'** to download your search results in a medline xml file.
 /// </ol>
 class MedlineImporterTest {
+
+    private static final String AALTO_INPUT_FACTORY = "com.fasterxml.aalto.stax.InputFactoryImpl";
 
     private MedlineImporter importer;
 
@@ -58,5 +62,17 @@ class MedlineImporterTest {
                 """;
 
         assertTrue(importer.importDatabase(new BufferedReader(Reader.of(xmlWithExternalEntity))).isInvalid());
+    }
+
+    @Test
+    void xmlInputFactoryUsesAaltoAndSupportsSecureProperties() {
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+
+        assertEquals(AALTO_INPUT_FACTORY, xmlInputFactory.getClass().getName());
+        assertEquals(false, xmlInputFactory.getProperty(XMLInputFactory.SUPPORT_DTD));
+        assertEquals(false, xmlInputFactory.getProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES));
     }
 }
