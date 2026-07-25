@@ -29,7 +29,6 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
@@ -370,23 +369,6 @@ public class AllFieldsTab extends FieldsEditorTab {
             overlay.getChildren().addAll(input, button);
             return Optional.of(overlay);
         });
-    }
-
-    /// First [TextInputControl] in the editor node's subtree (the row-filling text field/area),
-    /// or empty for composite editors that have none.
-    private static Optional<TextInputControl> findPrimaryTextInput(Node node) {
-        if (node instanceof TextInputControl textInput) {
-            return Optional.of(textInput);
-        }
-        if (node instanceof Parent parent) {
-            for (Node child : parent.getChildrenUnmodifiable()) {
-                Optional<TextInputControl> found = findPrimaryTextInput(child);
-                if (found.isPresent()) {
-                    return found;
-                }
-            }
-        }
-        return Optional.empty();
     }
 
     /// Hides a still-empty, user-added field row again (reachable only for non-required,

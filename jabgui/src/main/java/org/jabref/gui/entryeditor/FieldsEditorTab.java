@@ -2,9 +2,11 @@ package org.jabref.gui.entryeditor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.SequencedSet;
 import java.util.stream.Stream;
 
@@ -17,6 +19,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -49,6 +52,12 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldsEditorTab.class);
 
+    /// Caret positions per entry (keyed by [BibEntry#getId()]) and field, shared by all
+    /// fields tabs so a caret survives switching entries and back. Session-only by design;
+    /// the default position (0, beginning of the field) is never stored to keep the map small.
+    // ponytail: grows with the number of entries edited in a session (a few ints each); no eviction
+    private static final Map<String, Map<Field, Integer>> CARET_POSITIONS = new HashMap<>();
+
     protected final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     protected GridPane gridPane;
     private final boolean isCompressed;
@@ -59,6 +68,14 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     private final UndoManager undoManager;
 
     private Collection<Field> fields = new ArrayList<>();
+
+    /// Id of the entry the current [#editors] belong to. It can differ from the id of the
+    /// entry passed to [#setupPanel]: setupPanel is called with the *new* entry while the
+    /// editors on screen still belong to the *previous* one (this field is only updated after
+    /// the rebuild). Caret positions captured at that moment must therefore be saved under
+    /// this id — using the new entry's id would file the previous entry's carets under the
+    /// wrong entry.
+    private Optional<String> entryIdOfEditors = Optional.empty();
 
     @SuppressWarnings("FieldCanBeLocal")
     private Subscription dividerPositionSubscription;
@@ -99,6 +116,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
             return;
         }
 
+        storeCaretPositions();
         editors.clear();
         gridPane.getChildren().clear();
         gridPane.getColumnConstraints().clear();
@@ -112,7 +130,62 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
                 .toList();
 
         layoutEditors(bibDatabaseContext, entry, compressed, labels);
+
+        entryIdOfEditors = Optional.of(entry.getId());
+        restoreCaretPositions(entry.getId());
     }
+
+    // region — caret capture / restore across entry switches and rebuilds
+    // [impl->req~entry-editor.caret-restore~1]
+
+    /// Remembers the caret position of every current editor (under the entry the editors
+    /// belong to) before they are torn down. Position 0 is the default and not stored.
+    private void storeCaretPositions() {
+        entryIdOfEditors.ifPresent(entryId -> {
+            Map<Field, Integer> positions = CARET_POSITIONS.computeIfAbsent(entryId, _ -> new HashMap<>());
+            editors.forEach((field, editor) -> findPrimaryTextInput(editor.getNode()).ifPresent(textInput -> {
+                int caretPosition = textInput.getCaretPosition();
+                if (caretPosition > 0) {
+                    positions.put(field, caretPosition);
+                } else {
+                    positions.remove(field);
+                }
+            }));
+            if (positions.isEmpty()) {
+                CARET_POSITIONS.remove(entryId);
+            }
+        });
+    }
+
+    /// Places the caret of every recreated editor where it was when the entry was last
+    /// shown. [TextInputControl#positionCaret(int)] clamps to the current text length.
+    private void restoreCaretPositions(String entryId) {
+        CARET_POSITIONS.getOrDefault(entryId, Map.of()).forEach((field, caretPosition) -> {
+            if (editors.containsKey(field)) {
+                findPrimaryTextInput(editors.get(field).getNode())
+                        .ifPresent(textInput -> textInput.positionCaret(caretPosition));
+            }
+        });
+    }
+
+    /// First [TextInputControl] in the editor node's subtree (the row-filling text field/area),
+    /// or empty for composite editors that have none.
+    protected static Optional<TextInputControl> findPrimaryTextInput(Node node) {
+        if (node instanceof TextInputControl textInput) {
+            return Optional.of(textInput);
+        }
+        if (node instanceof Parent parent) {
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                Optional<TextInputControl> found = findPrimaryTextInput(child);
+                if (found.isPresent()) {
+                    return found;
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    // endregion
 
     /// Arranges the created labels and editors inside [#gridPane]. The default layout stretches the
     /// editors to fill the tab height (one or two columns). Subclasses may override for other layouts.

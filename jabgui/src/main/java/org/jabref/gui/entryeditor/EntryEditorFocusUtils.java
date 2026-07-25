@@ -44,7 +44,8 @@ class EntryEditorFocusUtils {
         }
     }
 
-    /// Restores focus to the last captured field (if any) and moves the caret to the end.
+    /// Restores focus to the last captured field (if any); the caret position is restored by
+    /// [FieldsEditorTab]'s caret memory when the tab rebinds, so it is not touched here.
     /// Clears the captured field afterwards so a subsequent entry change starts clean.
     void restoreLastFocusedField() {
         if (lastFocusedField == null) {
@@ -52,15 +53,7 @@ class EntryEditorFocusUtils {
         }
         Field fieldToRestore = lastFocusedField;
         lastFocusedField = null;
-        Platform.runLater(() -> {
-            setFocusToField(fieldToRestore);
-            Platform.runLater(() -> {
-                Node focused = sceneSource.getScene().getFocusOwner();
-                if (focused instanceof TextInputControl textInput) {
-                    textInput.end();
-                }
-            });
-        });
+        Platform.runLater(() -> setFocusToField(fieldToRestore));
     }
 
     // endregion
