@@ -277,6 +277,8 @@ public class OpenOfficePreferences {
         return zoteroCompatibilityMode.get()
                ? OpenOfficeReferenceMarkFormat.ZOTERO_COMPATIBLE
                : OpenOfficeReferenceMarkFormat.JABREF_ONLY;
+    }
+
     /// List of paths to external BST style files.
     public ObservableList<String> getExternalBstStyles() {
         return externalBstStyles;
