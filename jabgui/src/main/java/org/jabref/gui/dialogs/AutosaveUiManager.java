@@ -9,7 +9,6 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.event.AutosaveEvent;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +20,8 @@ public class AutosaveUiManager {
 
     private final SaveDatabaseAction saveDatabaseAction;
 
-    public AutosaveUiManager(LibraryTab libraryTab, DialogService dialogService, GuiPreferences preferences, BibEntryTypesManager entryTypesManager, StateManager stateManager) {
-        this.saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferences, entryTypesManager, stateManager, Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+    public AutosaveUiManager(LibraryTab libraryTab, DialogService dialogService, GuiPreferences preferences, BibEntryTypesManager entryTypesManager, StateManager stateManager, JournalAbbreviationRepository journalAbbreviationRepository) {
+        this.saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferences, entryTypesManager, stateManager, journalAbbreviationRepository);
     }
 
     @Subscribe
