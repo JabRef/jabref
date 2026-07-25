@@ -31,11 +31,14 @@ public sealed interface EntryEditorTabModel
         // The single scroll-list tab showing all fields (issue #12711)
         ALL_FIELDS,
 
+        // Comment fields (general comment + user-specific comments) in their own tab
+        COMMENTS,
+
         // Feature tabs: fixed implementations
+        FILE_ANNOTATIONS,
         RELATED_ARTICLES,
         AI_SUMMARY,
         AI_CHAT,
-        FILE_ANNOTATIONS,
         LATEX_CITATIONS,
         CITATION_INFORMATION,
         SOURCE,
@@ -50,6 +53,8 @@ public sealed interface EntryEditorTabModel
                         Localization.lang("Preview");
                 case ALL_FIELDS ->
                         Localization.lang("Main");
+                case COMMENTS ->
+                        Localization.lang("Comments");
                 case RELATED_ARTICLES ->
                         Localization.lang("Related articles");
                 case AI_SUMMARY ->

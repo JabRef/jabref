@@ -32,6 +32,9 @@ public final class FieldListSections {
         FILES_AND_LINKS,
         /// External metrics about the paper (citation count, ICORE ranking).
         BIBLIOMETRY,
+        /// Comment fields (general comment + user-specific comments). Not rendered as a
+        /// section in the [AllFieldsTab] — these fields are edited in the [CommentsTab];
+        /// the constant classifies which fields belong there.
         COMMENTS,
         /// Fields about the library entry itself rather than the paper: crossref, groups,
         /// owner, timestamps, and the special fields (ranking, priority, read status, …).
@@ -111,8 +114,8 @@ public final class FieldListSections {
 
     /// All fields belonging to the given section (in display order) — the basis for the
     /// section's add-chips. Empty for [SectionType#MAIN] (its add-chips come from the
-    /// entry type's optional fields) and [SectionType#COMMENTS] (user-specific comment
-    /// fields are dynamic).
+    /// entry type's optional fields) and [SectionType#COMMENTS] (edited in the
+    /// [CommentsTab], which offers its own chip).
     public static SequencedSet<Field> fieldsOf(SectionType type) {
         return switch (type) {
             case IDENTIFIERS ->

@@ -5,13 +5,11 @@ import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SequencedCollection;
 import java.util.SequencedSet;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import javax.swing.undo.UndoManager;
 
@@ -65,7 +63,6 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.field.UserSpecificCommentField;
 
 import com.google.common.eventbus.Subscribe;
 import org.jspecify.annotations.NullMarked;
@@ -77,9 +74,9 @@ import org.jspecify.annotations.Nullable;
 ///
 /// Below the main fields sits a chip bar for adding unset optional fields ("Show more"
 /// reveals the secondary-optional ones). The identifiers, files & links, bibliometrics,
-/// comments, and meta groups are always-present collapsible sections — collapsed when
-/// empty — each with its own add-chips for its unset member fields. A free-form
-/// field-name box at the bottom adds arbitrary fields.
+/// and meta groups are always-present collapsible sections — collapsed when empty —
+/// each with its own add-chips for its unset member fields. A free-form field-name box
+/// at the bottom adds arbitrary fields. Comment fields are edited in the [CommentsTab].
 @NullMarked
 public class AllFieldsTab extends FieldsEditorTab {
 
@@ -91,14 +88,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// (e.g. the linked-files list), since percent-height rows do not exist in the scroll list.
     private static final double HEIGHT_PER_WEIGHT = 60;
 
-    /// Characters not allowed in the user-specific comment field name.
-    private static final Pattern NON_ALPHANUMERIC = Pattern.compile("[^a-z0-9]");
-
     private final BibEntryTypesManager entryTypesManager;
-    private final GuiPreferences guiPreferences;
-
-    /// The current user's personal comment field (derived from the default-owner preference).
-    private final UserSpecificCommentField userSpecificCommentField;
 
     /// Fields the user added via chip / free-form box that are still empty: they are not part
     /// of [BibEntry#getFields()] yet, but must stay visible while this entry is edited.
@@ -145,10 +135,6 @@ public class AllFieldsTab extends FieldsEditorTab {
         );
 
         this.entryTypesManager = entryTypesManager;
-        this.guiPreferences = preferences;
-        String defaultOwner = NON_ALPHANUMERIC.matcher(
-                preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT)).replaceAll("-");
-        this.userSpecificCommentField = new UserSpecificCommentField(defaultOwner);
         this.listContainer.getStyleClass().add("all-fields-container");
 
         setText(EntryEditorTabModel.BuiltIn.ALL_FIELDS.displayName());
@@ -158,7 +144,8 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// Order: citation key, required fields (entry-type order), set optional fields
     /// (important first, then detail; each in entry-type order), then all remaining set
-    /// fields sorted by name, then still-empty user-added fields.
+    /// fields sorted by name, then still-empty user-added fields. Comment fields are
+    /// excluded — they live in the separate [CommentsTab].
     // [impl->req~entry-editor.main-tab.single-list~1]
     @Override
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
@@ -189,6 +176,7 @@ public class AllFieldsTab extends FieldsEditorTab {
                  .sorted(Comparator.comparing(Field::getName))
                  .forEach(fields::add);
         fields.addAll(userAddedFields);
+        fields.removeIf(field -> FieldListSections.sectionOf(field) == FieldListSections.SectionType.COMMENTS);
         return fields;
     }
 
@@ -246,9 +234,9 @@ public class AllFieldsTab extends FieldsEditorTab {
 
     /// Main fields as a grid with natural row heights, then the optional-field chip bar,
     /// then the always-present collapsible sections (identifiers / files & links /
-    /// bibliometrics / comments / meta, collapsed when empty) each with its own add-chips,
+    /// bibliometrics / meta, collapsed when empty) each with its own add-chips,
     /// then the free-form add row. The whole column scrolls instead of stretching to the
-    /// tab height.
+    /// tab height. Comment fields have their own tab, so no comments section here.
     @Override
     protected void layoutEditors(BibDatabaseContext bibDatabaseContext, BibEntry entry, boolean compressed, List<Label> labels) {
         // labels were created in editors-map iteration order (see FieldsEditorTab#setupPanel)
@@ -274,7 +262,7 @@ public class AllFieldsTab extends FieldsEditorTab {
 
         listContainer.getChildren().setAll(gridPane, createMainChipBar(bibDatabaseContext, entry));
         for (FieldListSections.SectionType type : FieldListSections.SectionType.values()) {
-            if (type == FieldListSections.SectionType.MAIN) {
+            if (type == FieldListSections.SectionType.MAIN || type == FieldListSections.SectionType.COMMENTS) {
                 continue;
             }
             listContainer.getChildren().add(
@@ -404,7 +392,7 @@ public class AllFieldsTab extends FieldsEditorTab {
     /// An always-present collapsible section: its shown fields as rows plus add-chips for
     /// its unset member fields. Collapsed by default when it contains no field; a manual
     /// expand/collapse survives rebuilds until another entry is opened.
-    // [impl->req~entry-editor.main-tab.sections~1]
+    // [impl->req~entry-editor.main-tab.sections~2]
     private TitledPane createSectionPane(FieldListSections.SectionType type,
                                          SequencedSet<Field> shownFields,
                                          Map<Field, Label> labelForField,
@@ -421,7 +409,8 @@ public class AllFieldsTab extends FieldsEditorTab {
             content.getChildren().add(sectionGrid);
         }
 
-        SequencedSet<Field> chipFields = FieldListSections.subtract(sectionMemberFields(type), editors.keySet());
+        // [impl->req~entry-editor.main-tab.section-chips~2]
+        SequencedSet<Field> chipFields = FieldListSections.subtract(FieldListSections.fieldsOf(type), editors.keySet());
         if (!chipFields.isEmpty()) {
             FlowPane chips = new FlowPane();
             chips.getStyleClass().add("all-fields-add-chips");
@@ -436,21 +425,6 @@ public class AllFieldsTab extends FieldsEditorTab {
         pane.setExpanded(sectionExpandOverrides.getOrDefault(type, !shownFields.isEmpty()));
         pane.expandedProperty().addListener((_, _, expanded) -> sectionExpandOverrides.put(type, expanded));
         return pane;
-    }
-
-    /// All member fields of a section offered as add-chips; the comments section offers the
-    /// general comment plus the current user's personal comment field (if enabled).
-    // [impl->req~entry-editor.main-tab.section-chips~1]
-    private SequencedSet<Field> sectionMemberFields(FieldListSections.SectionType type) {
-        if (type == FieldListSections.SectionType.COMMENTS) {
-            SequencedSet<Field> commentFields = new LinkedHashSet<>();
-            commentFields.add(StandardField.COMMENT);
-            if (guiPreferences.getEntryEditorPreferences().shouldShowUserCommentsFields()) {
-                commentFields.add(userSpecificCommentField);
-            }
-            return commentFields;
-        }
-        return FieldListSections.fieldsOf(type);
     }
 
     // endregion

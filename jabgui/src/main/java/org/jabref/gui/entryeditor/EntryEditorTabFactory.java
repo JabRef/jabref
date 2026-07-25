@@ -113,6 +113,8 @@ public class EntryEditorTabFactory {
                     new PreviewTab(preferences, stateManager, previewPanel);
             case ALL_FIELDS ->
                     new AllFieldsTab(undoManager, undoAction, redoAction, preferences, bibEntryTypesManager, journalAbbreviationRepository, stateManager, previewPanel);
+            case COMMENTS ->
+                    new CommentsTab(undoManager, undoAction, redoAction, preferences, journalAbbreviationRepository, stateManager, previewPanel);
             case RELATED_ARTICLES ->
                     new RelatedArticlesTab(buildInfo, preferences, dialogService, stateManager, taskExecutor);
             case AI_SUMMARY ->

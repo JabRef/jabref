@@ -228,6 +228,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String ENTRY_EDITOR_TABS = "entryEditorTabs";
     private static final String AUTO_OPEN_FORM = "autoOpenForm";
     private static final String SHOW_ALL_FIELDS_TAB = "showAllFieldsTab";
+    private static final String SHOW_COMMENTS_TAB = "showCommentsTab";
     private static final String SHOW_RECOMMENDATIONS = "showRecommendations";
     private static final String SHOW_AI_SUMMARY = "showAiSummary";
     private static final String SHOW_AI_CHAT = "showAiChat";
@@ -408,6 +409,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         tabModels.addAll(List.<EntryEditorTabModel>of(
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.ALL_FIELDS,
                         getBoolean(SHOW_ALL_FIELDS_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.ALL_FIELDS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.COMMENTS,
+                        getBoolean(SHOW_COMMENTS_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.COMMENTS))),
+                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.FILE_ANNOTATIONS,
+                        getBoolean(SHOW_FILE_ANNOTATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FILE_ANNOTATIONS))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.RELATED_ARTICLES,
                         getBoolean(SHOW_RECOMMENDATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.RELATED_ARTICLES))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.AI_SUMMARY,
@@ -416,8 +421,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                         getBoolean(SHOW_AI_CHAT, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.AI_CHAT))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.LATEX_CITATIONS,
                         getBoolean(SHOW_LATEX_CITATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.LATEX_CITATIONS))),
-                new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.FILE_ANNOTATIONS,
-                        getBoolean(SHOW_FILE_ANNOTATIONS, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.FILE_ANNOTATIONS))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION,
                         getBoolean(SHOW_SCITE_TAB, defaults.isTabVisible(EntryEditorTabModel.BuiltIn.CITATION_INFORMATION))),
                 new EntryEditorTabModel.BuiltInTab(EntryEditorTabModel.BuiltIn.SOURCE,
@@ -441,6 +444,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                     }
                     case ALL_FIELDS ->
                             putBoolean(SHOW_ALL_FIELDS_TAB, visible);
+                    case COMMENTS ->
+                            putBoolean(SHOW_COMMENTS_TAB, visible);
                     case RELATED_ARTICLES ->
                             putBoolean(SHOW_RECOMMENDATIONS, visible);
                     case AI_SUMMARY ->

@@ -27,9 +27,9 @@ The "Main" tab shows the citation key, all required fields of the entry type (ev
 Needs: impl
 
 ## Fields are grouped into collapsible sections
-`req~entry-editor.main-tab.sections~1`
+`req~entry-editor.main-tab.sections~2`
 
-Identifier fields (DOI, ISBN, ISSN, eprint variants, PMID, MR number), file and link fields (file, URL, URI, urldate), bibliometrics fields (citation count, ICORE ranking), comment fields (comment plus user-specific comment fields), and meta fields (crossref, groups, owner, timestamps, special fields — data about the library entry rather than the paper) are shown in their own always-present, collapsible sections in this order after the main fields. A section is collapsed by default when it contains no shown field and expanded when it contains at least one; a manual expand/collapse by the user survives rebuilds until another entry is opened.
+Identifier fields (DOI, ISBN, ISSN, eprint variants, PMID, MR number), file and link fields (file, URL, URI, urldate), bibliometrics fields (citation count, ICORE ranking), and meta fields (crossref, groups, owner, timestamps, special fields — data about the library entry rather than the paper) are shown in their own always-present, collapsible sections in this order after the main fields. A section is collapsed by default when it contains no shown field and expanded when it contains at least one; a manual expand/collapse by the user survives rebuilds until another entry is opened. Comment fields do not appear in the Main tab; they are edited in the separate Comments tab.
 
 Needs: impl
 
@@ -41,9 +41,16 @@ The entry type's unset important-optional fields that belong to the main group a
 Needs: impl
 
 ## Each section offers chips for its unset member fields
-`req~entry-editor.main-tab.section-chips~1`
+`req~entry-editor.main-tab.section-chips~2`
 
-Every section offers "+" chips for its unset member fields: the identifiers section collects all identifier fields, the files and links and bibliometrics sections their respective fields, the comments section the general comment plus the current user's personal comment field (only when user-specific comment fields are enabled), and the meta section crossref, groups, owner, and the special fields (ranking, priority, read status, quality, relevance, printed). The automatically managed timestamp fields have no chip.
+Every section offers "+" chips for its unset member fields: the identifiers section collects all identifier fields, the files and links and bibliometrics sections their respective fields, and the meta section crossref, groups, owner, and the special fields (ranking, priority, read status, quality, relevance, printed). The automatically managed timestamp fields have no chip.
+
+Needs: impl
+
+## Comments are edited in their own tab
+`req~entry-editor.comments-tab~1`
+
+Comment fields have a separate "Comments" tab. The general comment field is always shown with an editable input — even when the entry has no comment yet. All set comment fields are shown below it, sorted by name; user-specific comment fields of other users are read-only. When user-specific comment fields are enabled and the current user's own comment field is unset, it is offered as a one-click "+" chip that shows an empty, focused editor which stays visible — even while still empty — until another entry is opened.
 
 Needs: impl
 
